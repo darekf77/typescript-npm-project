@@ -1,0 +1,33 @@
+{
+  "name": "typescript-npm-project",
+  "version": "0.0.1",
+  "description": "Build and publish typescript projects to npm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darekf77/typescript-npm-project.git"
+  },
+  "keywords": [
+    "build",
+    "and",
+    "pubslih",
+    "npm",
+    "projects"
+  ],
+  "author": "Dariusz Filipiak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/darekf77/typescript-npm-project/issues"
+  },
+  "homepage": "https://github.com/darekf77/typescript-npm-project#readme",
+  "dependencies": {
+    "release-it": "^5.0.0",
+    "ts-node": "3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.53"
+  }
+}
