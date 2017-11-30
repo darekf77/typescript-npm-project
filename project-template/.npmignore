@@ -1,5 +1,4 @@
 
 .vscode
-/src/**/*.ts
-!/src/**/*.d.ts
+!dist/
 tsconfig.json
