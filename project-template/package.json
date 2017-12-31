@@ -1,0 +1,13 @@
+{
+    "name": "project-template",
+    "version": "1.0.0",
+    "readmeFilename": "README.md",
+    "scripts": {
+        "build:plunker": " npm-run webpack --config webpack.config.plunker-bundle.js"
+    },
+    "devDependencies": {
+        "typescript": "^2.2.2",
+        "tslib": "^1.8.1",
+        "webpack": "^2.4.1"
+    }
+}
