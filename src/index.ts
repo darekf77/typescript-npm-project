@@ -1,10 +1,5 @@
-import { execute } from './execute';
 import { Strategy, getStrategy } from './startegy';
-
-const scripts = {
-    release: execute('release.sh'),
-    build: execute('build.sh')
-}
+import { scripts } from './scripts';
 
 export function run(argsv) {
     console.log('heelllloooo')

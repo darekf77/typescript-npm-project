@@ -25,10 +25,11 @@
   "homepage": "https://github.com/darekf77/tsc-npm-project#readme",
   "dependencies": {
     "@types/lodash": "^4.14.91",
+    "@types/node": "^8.5.2",
     "chalk": "^2.3.0",
     "lodash": "^4.17.4",
+    "npm-run": "^4.1.2",
     "ts-node": "3.3.0",
-    "typescript": "^2.2.2",
-    "@types/node": "^8.5.2"
+    "typescript": "^2.6.2"
   }
 }
