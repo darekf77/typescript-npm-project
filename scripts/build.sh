@@ -1,1 +1,1 @@
-./node_modules/.bin/tsc -p tsconfig.json
+npm-run tsc tsconfig.json

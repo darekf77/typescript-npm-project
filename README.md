@@ -1,30 +1,10 @@
-## Build helper for typescript like, npm projects
+# tsc-npm-project
 
-### Example project
+Helper project for my typescript npm packages.
 
-Require structure for new typescript/npm project:
 
-```
-├── index.ts # main file
-├── .gitignore
-├── .npmignore
-├── package.json
-├── README.md
-├── src
-|  └── project-file.ts
-└── tsconfig.json
-```
-Commnads to build project:
-`
-npm run build
-`
+## Commands
+- build and publish path
 
-Commnads to build and publish: project:
-`
-npm run build:publish
-`
 
-```
-
-Reference
-- https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html
+`npm-run tsc-npm-project --release-normal`

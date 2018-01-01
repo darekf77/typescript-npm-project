@@ -5,9 +5,9 @@
     "command": "tsc",
     "isShellCommand": true,
     "args": [
-        "-w",
         "-p",
-        "."
+        ".",
+        "-w"
     ],
     "showOutput": "always",
     "isBackground": false
