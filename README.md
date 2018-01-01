@@ -1,10 +1,10 @@
-# tsc-npm-project
+# tsc-npm-project (alpha)
 
-Helper project for my typescript npm packages.
+<!-- Helper project for my typescript npm packages.
 
 
 ## Commands
 - build and publish path
 
 
-`npm-run tsc-npm-project --release-normal`
+`npm-run tsc-npm-project --release-normal` -->
