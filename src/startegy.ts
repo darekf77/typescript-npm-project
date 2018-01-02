@@ -4,6 +4,7 @@ import { kebabCase } from 'lodash';
 export enum Strategy {
     RELEASE,
     BUILD,
+    VERSION,
     __NONE
 }
 
