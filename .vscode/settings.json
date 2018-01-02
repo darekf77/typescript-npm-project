@@ -12,7 +12,7 @@
         // "bin": true,
         ".gitignore": true,
         ".npmignore": true,
-        ".npmrc": true,
+        // ".npmrc": true,
         ".tsconfig": true
     },
     "workbench.colorCustomizations": {
