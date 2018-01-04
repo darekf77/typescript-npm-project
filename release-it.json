@@ -1,0 +1,6 @@
+{
+    "buildCommand": "echo HUHUASDASDASD",
+    "npm": {
+        "publishPath": "dist/"
+    }
+}

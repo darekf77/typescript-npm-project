@@ -1,9 +1,11 @@
 import * as path from 'path';
 import * as _ from 'lodash';
-import { getNpmVersion, execute } from './helpers';
 import chalk from 'chalk';
+import * as child from "child_process";
+import * as fse from "fs-extra";
 
-type LibType = "angular-lib" | "isomorphic-lib";
+import { getNpmVersion, execute } from './helpers';
+import { LibType, config } from "./config";
 
 export const scripts = {
     release: execute('release.sh'),
@@ -13,6 +15,7 @@ export const scripts = {
     version: () => {
         console.log(getNpmVersion())
     },
+    //#region new
     new: (argv: string[]) => {
         if (!_.isArray(argv) || argv.length < 2) {
             console.log(chalk.red(`Top few argument for ${chalk.black('init')} parameter.`));
@@ -25,10 +28,23 @@ export const scripts = {
             type: argv[0] as LibType,
             name: argv[1]
         }
-        if (project.type === 'angular-lib') {
-
-        } else if (project.type === 'isomorphic-lib') {
-
+        const options: fse.CopyOptions = {
+            overwrite: true,
+            recursive: true,
+            errorOnExist: true
+        };
+        const sourcePath = config.lib.sourcePath(project.type);
+        const destinationPath = path.join(process.cwd(), project.name);
+        if (project.type === 'angular-lib' || project.type === 'isomorphic-lib') {
+            try {
+                fse.copySync(sourcePath, destinationPath, options);
+                console.log(chalk.green(`${project.name.toUpperCase()} library structure created sucessfully, installing npm...`));
+                child.execSync(`cd ${destinationPath} && npm i`);
+                console.log(chalk.green('Done.'));
+            } catch (error) {
+                console.log(chalk.red(error));
+                process.exit(1)
+            }
         } else {
             console.log(chalk.red(`Bad library library type. Examples:`));
             console.log(chalk.red(`\t${chalk.gray('tnp new')} ${chalk.black('angular-lib')} ${chalk.gray('mySuperLib')}`));
@@ -36,4 +52,5 @@ export const scripts = {
         }
 
     }
+    //#endregion
 }
