@@ -9,14 +9,16 @@ import * as child from 'child_process'
 import { kebabCase } from 'lodash';
 import { PathParameter } from './path-parameter';
 import { LibType, PackageJSON } from './models';
+import { config } from 'config';
 
 export function error(details: string) {
     console.log(chalk.red(details));
     process.exit(1);
 }
 
-export function run(command: string) {
-    return child.execSync('cd ' + process.cwd() + ` && ${command}`, { stdio: [0, 1, 2] })
+export function run(command: string, output = true) {
+    if (output) return child.execSync('cd ' + process.cwd() + ` && ${command}`, { stdio: [0, 1, 2] })
+    return child.execSync('cd ' + process.cwd() + ` && ${command}`)
 }
 
 function getPackageJSON(filePath: string): PackageJSON {
@@ -25,7 +27,8 @@ function getPackageJSON(filePath: string): PackageJSON {
         const json = JSON.parse(file);
         return json;
     } catch (err) {
-        error(err)
+        console.log(chalk.red(filePath));
+        error( err)
     }
 }
 
@@ -34,11 +37,21 @@ const packageJSON = {
     tnp: () => getPackageJSON(path.join(__dirname, '../package.json'))
 }
 
+
 export function preventNonInstalledNodeModules() {
+
     const clientNodeModules = path.join(process.cwd(), 'node_modules');
     if (!fs.existsSync(clientNodeModules)) {
         error("Please run `npm i` in your project");
     }
+    const devDependencies = project.tnp.devDependencies()
+    _.forIn(project.tnp.devDependencies(), (v, k) => {
+        const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
+        if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
+            console.log(`Installing ${k}@${version}`);
+            child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} --save-dev`, { cwd: process.cwd() })
+        }
+    })
 }
 
 export const project = {
@@ -51,15 +64,31 @@ export const project = {
                 process.exit(1);
             }
             return p.type;
+        },
+        resources: (): string[] => {
+            const p = packageJSON.current().tnp;
+            if (!p) {
+                error('Unrecognized project type');
+                process.exit(1);
+            }
+            return Array.isArray(p.resources) ? p.resources : [];
         }
     },
     tnp: {
         version: () => packageJSON.tnp().version,
+        devDependencies: () => packageJSON.tnp().devDependencies ?
+            packageJSON.tnp().devDependencies : {}
     }
 
 }
 
-
+export function copyResourcesToBundle() {
+    ['package.json'].concat(project.current.resources()).forEach(res => {
+        const file = path.join(process.cwd(), res);
+        const dest = path.join(process.cwd(), 'bundle', res);
+        fs.writeFileSync(dest, fs.readFileSync(file));
+    })
+}
 
 export function getStrategy(procesArgs: string[] = process.argv): { strategy: PathParameter, args: any[]; } {
     // console.log(JSON.stringify(procesArgs))

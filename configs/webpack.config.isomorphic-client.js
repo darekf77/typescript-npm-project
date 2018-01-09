@@ -17,7 +17,8 @@ fs.readdirSync('node_modules')
 module.exports = {
     entry: './src/index.ts',
     output: {
-        filename: clientFile
+        filename: clientFile,
+        libraryTarget: "commonjs"
     },
     resolve: {
         extensions: ['.ts', '.js']
@@ -55,8 +56,14 @@ module.exports = {
         new WebpackOnBuildPlugin(function (stats) {
             const tscOut = path.join(process.cwd(), 'bundle');
             const tscCommand = `npm-run tsc  --pretty  --outDir ${tscOut}`;
-            child.execSync('cd ' + process.cwd() + ' && ' + tscCommand, { stdio: [0, 1, 2] });
-            fs.writeFileSync(path.join(tscOut, clientFile), fs.readFileSync(path.join(process.cwd(), clientFile)));
+            child.exec('cd ' + process.cwd() + ' && ' + tscCommand, (err, stdout, stderr) => {
+                if(err) {
+                    console.error(err);
+                    process.exit(1)
+                }
+                fs.writeFileSync(path.join(tscOut, clientFile), fs.readFileSync(path.join(process.cwd(), clientFile)));
+            });
+
         }),
     ]
 }

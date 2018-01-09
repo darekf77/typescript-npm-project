@@ -4,20 +4,35 @@ import chalk from 'chalk';
 import * as child from "child_process";
 import * as fse from "fs-extra";
 
-import { execute, project, run, error, preventNonInstalledNodeModules } from './helpers';
+import {
+    execute, project, run, error,
+    preventNonInstalledNodeModules,
+    copyResourcesToBundle
+} from './helpers';
 import { config } from "./config";
 import { LibType } from './models';
 
 
 
 export const scripts = {
-    release: execute('release.sh'),
+    release: () => {
+        run(`release-it -c ${path.join(__dirname, "../release-it.json")}`)
+    },
+    build_watch: () => {
+        // preventNonInstalledNodeModules();
+        if (project.current.getType() === 'isomorphic-lib') {
+            run('npm-run tsc -w')
+        } else if (project.current.getType() === 'angular-lib') {
+            run('npm-run ng server')
+        }
+    },
     build: () => {
         preventNonInstalledNodeModules();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
             const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
             run(`npm-run webpack --config=${configPath}`)
+            copyResourcesToBundle();
         }
     },
     clear: () => {

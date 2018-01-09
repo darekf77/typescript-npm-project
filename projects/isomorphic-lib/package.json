@@ -6,7 +6,8 @@
         "build:plunker": " npm-run webpack --config webpack.config.plunker-bundle.js"
     },
     "tnp": {
-        "type": "isomorphic-lib"
+        "type": "isomorphic-lib",
+        "resources": [ "README.md" ]
     },
     "devDependencies": {
         "@ngtools/webpack": "^1.9.3",

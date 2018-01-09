@@ -13,6 +13,12 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "tnp": {
+    "type": "angular-lib",
+    "resources": [
+      "README.md"
+    ]
+  },
   "dependencies": {
     "@angular/common": "~5.1.0",
     "@angular/compiler": "~5.1.0",

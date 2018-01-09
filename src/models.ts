@@ -9,5 +9,9 @@ export interface PackageJSON {
     scripts: Object;
     tnp: {
         type: LibType;
-    }
+        resources: string[];
+    },
+    peerDependencies: Object;
+    dependencies: Object;
+    devDependencies: Object;
 }

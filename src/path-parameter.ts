@@ -1,8 +1,10 @@
 
 export enum PathParameter {
-    RELEASE,
+    $RELEASE,
     $NEW,
     $BUILD,
+    BUILD_WATCH,
+    $BUILD_PROD,
     VERSION,
     __NONE
 }

@@ -4,6 +4,10 @@ import chalk from 'chalk';
 import { LibType } from './models';
 
 export const config = {
+    // folders: {
+    //     bundle: 'bundle',
+    //     dist: 'dist'
+    // },
     lib: {
         sourcePath(libraryType: LibType) {
             if (libraryType === 'angular-lib') return path.join(__dirname, '../projects/angular-lib');

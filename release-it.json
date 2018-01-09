@@ -1,6 +1,6 @@
 {
-    "buildCommand": "echo HUHUASDASDASD",
+    "buildCommand": "tnp build",
     "npm": {
-        "publishPath": "dist/"
+        "publishPath": "bundle/"
     }
 }
