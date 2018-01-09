@@ -4,16 +4,26 @@ import chalk from 'chalk';
 import * as child from "child_process";
 import * as fse from "fs-extra";
 
-import { getNpmVersion, execute } from './helpers';
-import { LibType, config } from "./config";
+import { execute, project, run, error } from './helpers';
+import { config } from "./config";
+import { LibType } from './models';
+
+
 
 export const scripts = {
     release: execute('release.sh'),
-    build: execute('build.sh', {
-        'DIST_INDEX': path.join(__dirname, '../configs', 'index-dist.d.ts')
-    }),
+    build: () => {
+        if (project.current.getType() === 'isomorphic-lib') {
+            scripts.clear();
+            const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
+            run(`npm-run webpack --config=${configPath}`)
+        }
+    },
+    clear: () => {
+        run('rimraf dist/ && rimraf client.js')
+    },
     version: () => {
-        console.log(getNpmVersion())
+        console.log(project.current.version);
     },
     //#region new
     new: (argv: string[]) => {

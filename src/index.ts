@@ -16,6 +16,7 @@ export function run(argsv) {
             break;
         case PathParameter.VERSION:
             scripts.version();
+            break;
         case PathParameter.$NEW:
             scripts.new(args);
     }

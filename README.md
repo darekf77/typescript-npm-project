@@ -26,9 +26,9 @@ Helper project for my typescript npm libraries.
     - angular-lib
         - preview angular app
 - Build
-    - **quick dev build** with *ctrl*(*cmd*)+*shift*+*b*
-    - *npm run build* for production build in *bundle*
-- Publish 
+    - quick development build with *ctrl*(*cmd*)+*shift*+*b*
+    - **tnp build** for production build in *bundle*
+- Publish
     - from *bundle* folder
     - resources.json for needed things in bundle
     - *tnp publish* for publishing production build (path)
@@ -37,7 +37,7 @@ Helper project for my typescript npm libraries.
     - resouces for production build
 ```json
 ...
-    "tnp-project":{
+    "tnp":{
         "type":"isomorphic-lib | angular-lib",
         "resources: [
             "images",

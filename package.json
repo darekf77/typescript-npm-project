@@ -30,10 +30,17 @@
     "chalk": "^2.3.0",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
+    "ng2-logger": "^1.0.12",
+    "rimraf": "^2.6.2",
+    "tslib": "^1.8.1"
+  },
+  "peerDependencies": {
     "npm-run": "^4.1.2",
     "ts-node": "3.3.0",
-    "tslib": "^1.8.1",
     "typescript": "^2.4.2",
     "webpack": "^3.10.0"
+  },
+  "devDependencies": {
+    "on-build-webpack": "^0.1.0"
   }
 }

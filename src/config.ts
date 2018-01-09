@@ -1,7 +1,7 @@
 import * as path from 'path';
 import chalk from 'chalk';
 
-export type LibType = "angular-lib" | "isomorphic-lib";
+import { LibType } from './models';
 
 export const config = {
     lib: {

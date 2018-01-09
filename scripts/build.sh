@@ -1,1 +1,2 @@
-npm-run tsc tsconfig.json
+
+npm-run webpack --config $WEBPACK_CONFIG
