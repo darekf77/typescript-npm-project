@@ -1,6 +1,6 @@
 
 
-export type LibType = "angular-lib" | "isomorphic-lib";
+export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server';
 
 export interface PackageJSON {
     name: string;

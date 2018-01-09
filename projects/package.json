@@ -1,0 +1,12 @@
+{
+  "name": "example-isomorphic-rest",
+  "scripts": {
+    "start": "./node_modules/.bin/ts-node run-client-server.ts"
+  },
+  "dependencies": {
+    "@types/node": "^8.0.53",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.2"
+  }
+}
