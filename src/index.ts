@@ -1,5 +1,5 @@
 import { PathParameter } from './path-parameter';
-import { getStrategy } from './helpers';
+import { getStrategy, project } from './helpers';
 import { scripts } from './scripts';
 
 

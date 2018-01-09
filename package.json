@@ -28,7 +28,9 @@
     "@types/lodash": "^4.14.91",
     "@types/node": "^8.5.2",
     "chalk": "^2.3.0",
+    "filehound": "^1.16.2",
     "fs-extra": "^5.0.0",
+    "glob": "^7.1.2",
     "lodash": "^4.17.4",
     "ng2-logger": "^1.0.12",
     "on-build-webpack": "^0.1.0"

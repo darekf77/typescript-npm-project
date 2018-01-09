@@ -7,36 +7,43 @@ import * as fse from "fs-extra";
 import {
     execute, project, run, error,
     preventNonInstalledNodeModules,
-    copyResourcesToBundle
+    copyResourcesToBundle,
+    getProjectsInFolder
 } from './helpers';
 import { config } from "./config";
 import { LibType } from './models';
 
 
-
 export const scripts = {
     release: () => {
-        run(`release-it -c ${path.join(__dirname, "../release-it.json")}`)
+        run(`release-it -c ${path.join(__dirname, "../release-it.json")}`).sync.inProject()
     },
-    build_watch: () => {
-        // preventNonInstalledNodeModules();
-        if (project.current.getType() === 'isomorphic-lib') {
-            run('npm-run tsc -w')
-        } else if (project.current.getType() === 'angular-lib') {
-            run('npm-run ng server')
+    build_watch: (projectType: LibType = project.current.getType(), projectDir: string = process.cwd(), runAsync = false) => {
+        let command;
+        if (projectType === 'isomorphic-lib') {
+            command = 'npm-run tsc -w';
+        } else if (projectType === 'angular-lib') {
+            command = 'npm-run ng server';
+        } else if (projectType === 'workspace') {
+            getProjectsInFolder(process.cwd()).forEach(d => {
+                scripts.build_watch(d.type, d.path, true);
+            })
+            return;
         }
+        if (runAsync) run(command).async.inProject(projectDir)
+        else run(command).sync.inProject(projectDir)
     },
     build: () => {
         preventNonInstalledNodeModules();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
             const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
-            run(`npm-run webpack --config=${configPath}`)
+            run(`npm-run webpack --config=${configPath}`).sync.inProject()
             copyResourcesToBundle();
         }
     },
     clear: () => {
-        run('rimraf bundle/ && rimraf client.js')
+        run('rimraf bundle/ && rimraf client.js').sync.inProject();
     },
     version: () => {
         console.log(project.tnp.version());

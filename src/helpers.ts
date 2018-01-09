@@ -4,7 +4,8 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import chalk from 'chalk';
 import * as child from 'child_process'
-
+import * as glob from 'glob';
+import * as Filehound from 'filehound';
 
 import { kebabCase } from 'lodash';
 import { PathParameter } from './path-parameter';
@@ -16,25 +17,60 @@ export function error(details: string) {
     process.exit(1);
 }
 
-export function run(command: string, output = true) {
-    if (output) return child.execSync('cd ' + process.cwd() + ` && ${command}`, { stdio: [0, 1, 2] })
-    return child.execSync('cd ' + process.cwd() + ` && ${command}`)
+export function log(process: child.ChildProcess, output = true) {
+    process.stdout.on('data', (data) => {
+        console.log(data.toString());
+    })
+    process.stderr.on('data', (data) => {
+        console.log(data.toString());
+    })
 }
 
-function getPackageJSON(filePath: string): PackageJSON {
+function runSyncIn(dirPath: string, command: string, output = true) {
+    if (output) return child.execSync('cd ' + dirPath + ` && ${command}`, { stdio: [0, 1, 2] })
+    return child.execSync('cd ' + dirPath + ` && ${command}`)
+}
+
+function runAsyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
+    if (biggerBuffer) {
+        log(child.exec('cd ' + dirPath + ` && ${command}`, { maxBuffer: 2024 * 500, cwd: dirPath }), output);
+    } else {
+        log(child.exec('cd ' + dirPath + ` && ${command}`, { cwd: dirPath }), output);
+    }
+}
+
+export function run(command: string, output = true) {
+    return {
+        sync: {
+            inProject(projectDirPath: string = process.cwd()) {
+                return runSyncIn(projectDirPath, command, output);
+            }
+
+        },
+        async: {
+            inProject(projectDirPath: string = process.cwd(), biggerBuffer = false) {
+                return runAsyncIn(projectDirPath, command, output, biggerBuffer);
+            }
+        }
+    }
+}
+
+
+function getPackageJSON(dirPath: string): PackageJSON {
+    const filePath = path.join(dirPath, 'package.json');
     try {
         const file = fs.readFileSync(filePath, 'utf8').toString();
         const json = JSON.parse(file);
         return json;
     } catch (err) {
         console.log(chalk.red(filePath));
-        error( err)
+        error(err)
     }
 }
 
 const packageJSON = {
-    current: () => getPackageJSON(path.join(process.cwd(), 'package.json')),
-    tnp: () => getPackageJSON(path.join(__dirname, '../package.json'))
+    current: () => getPackageJSON(process.cwd()),
+    tnp: () => getPackageJSON(__dirname)
 }
 
 
@@ -52,6 +88,15 @@ export function preventNonInstalledNodeModules() {
             child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} --save-dev`, { cwd: process.cwd() })
         }
     })
+}
+
+function getProjectType(dirPath: string): LibType {
+    const p = getPackageJSON(dirPath).tnp;
+    if (!p) {
+        error('Unrecognized project type');
+        process.exit(1);
+    }
+    return p.type;
 }
 
 export const project = {
@@ -134,4 +179,16 @@ export function execute(scriptName: string, env?: Object) {
 }
 
 
+export function getProjectsInFolder(folderPath: string): { path: string; type: LibType; }[] {
 
+    const subdirectories: string[] = Filehound.create()
+        .path(folderPath)
+        .directory()
+        .findSync()
+
+    const result = subdirectories.map(dir => {
+        let type = getProjectType(dir);
+        return { path: dir, type };
+    })
+    return result;
+}
