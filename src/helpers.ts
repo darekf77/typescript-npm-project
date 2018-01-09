@@ -12,6 +12,7 @@ import { LibType, PackageJSON } from './models';
 
 export function error(details: string) {
     console.log(chalk.red(details));
+    process.exit(1);
 }
 
 export function run(command: string) {
@@ -23,9 +24,8 @@ function getPackageJSON(filePath: string): PackageJSON {
         const file = fs.readFileSync(filePath, 'utf8').toString();
         const json = JSON.parse(file);
         return json;
-    } catch (error) {
-        console.log(chalk.red(error));
-        process.exit(1);
+    } catch (err) {
+        error(err)
     }
 }
 
@@ -34,9 +34,16 @@ const packageJSON = {
     tnp: () => getPackageJSON(path.join(__dirname, '../package.json'))
 }
 
+export function preventNonInstalledNodeModules() {
+    const clientNodeModules = path.join(process.cwd(), 'node_modules');
+    if (!fs.existsSync(clientNodeModules)) {
+        error("Please run `npm i` in your project");
+    }
+}
+
 export const project = {
     current: {
-        version: packageJSON.current().version,
+        version: () => packageJSON.current().version,
         getType(): LibType {
             const p = packageJSON.current().tnp;
             if (!p) {
@@ -45,6 +52,9 @@ export const project = {
             }
             return p.type;
         }
+    },
+    tnp: {
+        version: () => packageJSON.tnp().version,
     }
 
 }

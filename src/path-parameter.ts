@@ -2,7 +2,7 @@
 export enum PathParameter {
     RELEASE,
     $NEW,
-    BUILD,
+    $BUILD,
     VERSION,
     __NONE
 }

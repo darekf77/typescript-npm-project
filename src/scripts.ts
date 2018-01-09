@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import * as child from "child_process";
 import * as fse from "fs-extra";
 
-import { execute, project, run, error } from './helpers';
+import { execute, project, run, error, preventNonInstalledNodeModules } from './helpers';
 import { config } from "./config";
 import { LibType } from './models';
 
@@ -13,6 +13,7 @@ import { LibType } from './models';
 export const scripts = {
     release: execute('release.sh'),
     build: () => {
+        preventNonInstalledNodeModules();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
             const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
@@ -20,10 +21,10 @@ export const scripts = {
         }
     },
     clear: () => {
-        run('rimraf dist/ && rimraf client.js')
+        run('rimraf bundle/ && rimraf client.js')
     },
     version: () => {
-        console.log(project.current.version);
+        console.log(project.tnp.version());
     },
     //#region new
     new: (argv: string[]) => {

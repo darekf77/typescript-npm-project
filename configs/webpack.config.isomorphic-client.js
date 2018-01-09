@@ -1,8 +1,11 @@
-var fs = require('fs');
-var WebpackOnBuildPlugin = require('on-build-webpack');
-var child = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const WebpackOnBuildPlugin = require('on-build-webpack');
+const child = require('child_process');
 
-var nodeModules = {};
+const clientFile = 'client.js';
+
+const nodeModules = {};
 fs.readdirSync('node_modules')
     .filter(function (x) {
         return ['.bin'].indexOf(x) === -1;
@@ -14,8 +17,7 @@ fs.readdirSync('node_modules')
 module.exports = {
     entry: './src/index.ts',
     output: {
-        // path: __dirname + '/dist-client',
-        filename: 'client.js'
+        filename: clientFile
     },
     resolve: {
         extensions: ['.ts', '.js']
@@ -51,7 +53,10 @@ module.exports = {
 
     plugins: [
         new WebpackOnBuildPlugin(function (stats) {
-            child.execSync('cd ' + process.cwd() + ' && npm-run tsc');
+            const tscOut = path.join(process.cwd(), 'bundle');
+            const tscCommand = `npm-run tsc  --pretty  --outDir ${tscOut}`;
+            child.execSync('cd ' + process.cwd() + ' && ' + tscCommand, { stdio: [0, 1, 2] });
+            fs.writeFileSync(path.join(tscOut, clientFile), fs.readFileSync(path.join(process.cwd(), clientFile)));
         }),
     ]
 }

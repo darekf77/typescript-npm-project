@@ -5,9 +5,14 @@
     "scripts": {
         "build:plunker": " npm-run webpack --config webpack.config.plunker-bundle.js"
     },
+    "tnp": {
+        "type": "isomorphic-lib"
+    },
     "devDependencies": {
-        "typescript": "^2.2.2",
-        "tslib": "^1.8.1",
-        "webpack": "^2.4.1"
+        "@ngtools/webpack": "^1.9.3",
+        "@types/node": "^9.3.0",
+        "isomorphic-region-loader": "0.0.1",
+        "typescript": "^2.6.2",
+        "webpack": "^3.10.0"
     }
 }

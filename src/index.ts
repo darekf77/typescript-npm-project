@@ -11,7 +11,7 @@ export function run(argsv) {
             scripts.build()
             scripts.release()
             break;
-        case PathParameter.BUILD:
+        case PathParameter.$BUILD:
             scripts.build()
             break;
         case PathParameter.VERSION:
