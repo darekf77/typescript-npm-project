@@ -5,6 +5,8 @@ const child = require('child_process');
 
 const clientFile = 'client.js';
 const clientFileDts = 'client.d.ts';
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+
 const src = {
     client: path.join(process.cwd(), 'src', 'client.ts')
 }
@@ -66,6 +68,7 @@ module.exports = {
     },
 
     plugins: [
+        new UglifyJSPlugin(),
         new WebpackOnBuildPlugin(function (stats) {
             const tscOut = path.join(process.cwd(), 'bundle');
             const tscCommand = `npm-run tsc  --pretty  --outDir ${tscOut}`;

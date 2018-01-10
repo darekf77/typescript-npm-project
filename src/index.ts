@@ -11,8 +11,14 @@ export function run(argsv) {
         case PathParameter.$RELEASE:
             scripts.release()
             break;
+        case PathParameter.$RELEASE_PROD:
+            scripts.release(true)
+            break;
         case PathParameter.$BUILD:
             scripts.build()
+            break;
+        case PathParameter.$BUILD_PROD:
+            scripts.build(true)
             break;
         case PathParameter.BUILD_WATCH:
             scripts.build_watch();

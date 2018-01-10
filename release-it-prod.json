@@ -1,0 +1,6 @@
+{
+    "buildCommand": "tnp build-prod && tnp --copy-resources",
+    "npm": {
+        "publishPath": "bundle/"
+    }
+}

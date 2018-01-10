@@ -128,10 +128,12 @@ export const project = {
 }
 
 export function copyResourcesToBundle() {
+    const bundleFolder = path.join(process.cwd(), 'bundle');
+    if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);
     ['package.json'].concat(project.current.resources()).forEach(res => {
         const file = path.join(process.cwd(), res);
-        const dest = path.join(process.cwd(), 'bundle', res);
-        if(!fs.existsSync(file)) {
+        const dest = path.join(bundleFolder, res);
+        if (!fs.existsSync(file)) {
             error(`Resource file ${file} does not exist in ${process.cwd()}`)
         }
         fs.writeFileSync(dest, fs.readFileSync(file));
@@ -145,22 +147,26 @@ export function getStrategy(procesArgs: string[] = process.argv): { strategy: Pa
     let args = [];
     for (let enumMember in PathParameter) {
         let isValueProperty = parseInt(enumMember, 10) >= 0;
-        const arg = kebabCase(PathParameter[enumMember].toString());
-        const isWithoutDash = PathParameter[enumMember].toString().startsWith('$');
-        // console.log('isWithoutDash', arg)
-        const isOkArg = procesArgs.filter((a, i) => {
-            // console.log(a)
-            const condition = (isWithoutDash && a === `${arg}`)
-                || a === `--${arg}`
-                || a === `-${arg.substr(0, 1)}`;
-            if (condition) {
-                args = _.slice(procesArgs, i + 1, procesArgs.length);
-            }
-            return condition;
-        }).length > 0;
+        if (isValueProperty) {
+            const arg = kebabCase(PathParameter[enumMember].toString());
+            // console.log('arg ' + arg)
+            const isWithoutDash = PathParameter[enumMember].toString().startsWith('$');
+            // console.log('isWithoutDash', arg)
+            const isOkArg = procesArgs.filter((vv, i) => {
+                // console.log(a)
+                const a = kebabCase(vv)
+                const condition = (isWithoutDash && a === `${arg}`)
+                    || a === `${arg}`
+                    || a === `${arg.substr(0, 1)}`;
+                if (condition) {
+                    args = _.slice(procesArgs, i + 1, procesArgs.length);
+                }
+                return condition;
+            }).length > 0;
 
-        if (isValueProperty && isOkArg) {
-            return { strategy: parseInt(enumMember, 10), args };
+            if (isOkArg) {
+                return { strategy: parseInt(enumMember, 10), args };
+            }
         }
     }
     return { strategy: PathParameter.__NONE, args: procesArgs };

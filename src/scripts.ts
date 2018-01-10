@@ -15,8 +15,11 @@ import { LibType } from './models';
 
 
 export const scripts = {
-    release: () => {
-        run(`release-it -c ${path.join(__dirname, "../release-it.json")}`).sync.inProject()
+    release: (prod = false) => {
+        // scripts.clear();
+        // copyResourcesToBundle();
+        const releseFile = prod ? 'release-it-prod.json' : 'release-it.json';
+        run(`release-it -c ${path.join(__dirname, '..', releseFile)}`).sync.inProject()
     },
     build_watch: (projectType: LibType = project.current.getType(), projectDir: string = process.cwd(), runAsync = false) => {
         let command;
@@ -33,11 +36,14 @@ export const scripts = {
         if (runAsync) run(command).async.inProject(projectDir)
         else run(command).sync.inProject(projectDir)
     },
-    build: () => {
+    build: (prod = false) => {
         preventNonInstalledNodeModules();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
-            const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
+            const configPath = path.join(
+                __dirname,
+                '../configs/webpack.config.isomorphic-client.' +
+                    (prod ? 'prod.' : '') + 'js');
             run(`npm-run webpack --config=${configPath}`).sync.inProject()
         }
     },
