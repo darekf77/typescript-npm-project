@@ -22,33 +22,33 @@ export class AppComponent {
   ) {
 
 
-    // test.__model.getAll().received.subscribe(books => {
-    //   console.log('books', books);
-    // });
+    test.__model.getAll().received.subscribe(books => {
+      console.log('books', books);
+    });
 
-    // user.__model.getAll().received.subscribe(user => {
-    //   console.log('users', user);
-    // });
-    // hello.deleteUser(1111).received.subscribe(d => console.log(d));
-    // hello.saveUSer(2222, { aa: 'aaa' }).received.subscribe(d => console.log(d));
-    // hello.updateUSer(333, 'super cookies').received.subscribe(d => console.log(d));
+    user.__model.getAll().received.subscribe(user => {
+      console.log('users', user);
+    });
+    hello.deleteUser(1111).received.subscribe(d => console.log(d));
+    hello.saveUSer(2222, { aa: 'aaa' }).received.subscribe(d => console.log(d));
+    hello.updateUSer(333, 'super cookies').received.subscribe(d => console.log(d));
 
-    // hello.getUsersList(1).received.subscribe(d => {
-    //   console.log('USER LIST', d);
-    //   console.log('users', d.body.json);
-    // });
+    hello.getUsersList(1).received.subscribe(d => {
+      console.log('USER LIST', d);
+      console.log('users', d.body.json);
+    });
 
-    // const sub = hello.getUser(888).received.subscribe(d => {
-    //   console.log(d);
-    //   this.data.username = d.body.json.username;
-    //   sub.unsubscribe();
-    // });
+    const sub = hello.getUser(888).received.subscribe(d => {
+      console.log(d);
+      this.data.username = d.body.json.username;
+      sub.unsubscribe();
+    });
 
 
-    // parent.get().received.subscribe(data => console.log('parent:', data.body.text));
-    // child.get().received.subscribe(data => console.log('child:', data.body.text));
-    // child2.get().received.subscribe(data => console.log('child2:', data.body.text));
-    // child2.loveme().received.subscribe(data => console.log('child2 love :', data.body.text));
+    parent.get().received.subscribe(data => console.log('parent:', data.body.text));
+    child.get().received.subscribe(data => console.log('child:', data.body.text));
+    child2.get().received.subscribe(data => console.log('child2:', data.body.text));
+    child2.loveme().received.subscribe(data => console.log('child2 love :', data.body.text));
   }
 
   title = 'app';

@@ -33,7 +33,7 @@ export class HelloController {
             // console.log('Pizda in constr', this['pizda'])
             this.repository = this.connection.getRepository(User) as any;
             const user = new User();
-            user.username = 'Dariusz Filipiak';
+            user.username = 'Dariusz Filipiak Pierwszy';
             user.books = [
                 new Book()
             ]
@@ -54,12 +54,12 @@ export class HelloController {
     @GET('/db/:id', true)
     getUser( @PathParam('id') id: number): Response<User> {
         //#region backend
-        return { send: test }
-        
-        // async (req, res) => {
-        //     const user = await this.repository.findOne({});
-        //     return user;
-        // }
+        // return { send: test }
+
+        return async (req, res) => {
+            const user = await this.repository.findOne({});
+            return user;
+        }
         //#endregion
     };
 
