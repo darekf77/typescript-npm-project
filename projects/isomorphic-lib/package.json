@@ -1,10 +1,6 @@
 {
-    "name": "project-template",
-    "version": "1.0.0",
-    "readmeFilename": "README.md",
-    "scripts": {
-        "build:plunker": " npm-run webpack --config webpack.config.plunker-bundle.js"
-    },
+    "name": "isomorphic-lib",
+    "version": "0.0.0",
     "tnp": {
         "type": "isomorphic-lib",
         "resources": [ "README.md" ]
