@@ -73,22 +73,34 @@ const packageJSON = {
     tnp: () => getPackageJSON(path.join(__dirname, '..'))
 }
 
-
-export function preventNonInstalledNodeModules() {
-
-    const clientNodeModules = path.join(process.cwd(), 'node_modules');
-    if (!fs.existsSync(clientNodeModules)) {
-        error("Please run `npm i` in your project");
-    }
-    const devDependencies = project.tnp.devDependencies()
-    _.forIn(project.tnp.devDependencies(), (v, k) => {
-        const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
-        if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
-            console.log(`Installing ${k}@${version}`);
-            child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} --save-dev`, { cwd: process.cwd() })
+export const prevent = {
+    notInstalled: {
+        nodeModules(projectDir = process.cwd()) {
+            const clientNodeModules = path.join(projectDir, 'node_modules');
+            const yarnLock = path.join(projectDir, 'yarn.lock');
+            if (!fs.existsSync(clientNodeModules)) {
+                if (fs.existsSync(yarnLock)) {
+                    console.log(chalk.green('Installing npm packages... from yarn.lock '))
+                    run('yarn install').sync.inProject()
+                } else {
+                    console.log(chalk.green('Installing npm packages... '))
+                    run('npm i').sync.inProject()
+                }
+            }
+        },
+        tnpDevDependencies() {
+            const devDependencies = project.tnp.devDependencies()
+            _.forIn(project.tnp.devDependencies(), (v, k) => {
+                const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
+                if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
+                    console.log(`Installing ${k}@${version}`);
+                    child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} --save-dev`, { cwd: process.cwd() })
+                }
+            })
         }
-    })
+    }
 }
+
 
 function getProjectType(dirPath: string): LibType {
     const p = getPackageJSON(dirPath).tnp;

@@ -5,8 +5,7 @@ import * as child from "child_process";
 import * as fse from "fs-extra";
 
 import {
-    execute, project, run, error,
-    preventNonInstalledNodeModules,
+    execute, project, run, error, prevent,
     copyResourcesToBundle,
     getProjectsInFolder
 } from './helpers';
@@ -22,6 +21,7 @@ export const scripts = {
         run(`release-it -c ${path.join(__dirname, '..', releseFile)}`).sync.inProject()
     },
     build_watch: (projectType: LibType = project.current.getType(), projectDir: string = process.cwd(), runAsync = false) => {
+        prevent.notInstalled.nodeModules();
         let command;
         if (projectType === 'isomorphic-lib') {
             command = 'npm-run tsc -w';
@@ -37,18 +37,22 @@ export const scripts = {
         else run(command).sync.inProject(projectDir)
     },
     build: (prod = false) => {
-        preventNonInstalledNodeModules();
+        prevent.notInstalled.nodeModules();
+        prevent.notInstalled.tnpDevDependencies();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
             const configPath = path.join(
                 __dirname,
                 '../configs/webpack.config.isomorphic-client.' +
-                    (prod ? 'prod.' : '') + 'js');
+                (prod ? 'prod.' : '') + 'js');
             run(`npm-run webpack --config=${configPath}`).sync.inProject()
         }
     },
     clear: () => {
         run('rimraf bundle/ && rimraf client.js').sync.inProject();
+    },
+    clear_all: () => {
+        run('rimraf node_modules/ && rimraf bundle/ && rimraf client.js').sync.inProject();
     },
     copy_resources: () => {
         copyResourcesToBundle();

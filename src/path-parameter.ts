@@ -8,5 +8,9 @@ export enum PathParameter {
     BUILD_WATCH,
     $BUILD_PROD,
     VERSION,
+    $CLEAN,
+    $CLEAN_ALL,
+    $CLEAR,
+    $CLEAR_ALL,
     __NONE
 }
