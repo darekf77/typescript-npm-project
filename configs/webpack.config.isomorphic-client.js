@@ -4,6 +4,8 @@ const WebpackOnBuildPlugin = require('on-build-webpack');
 const child = require('child_process');
 
 const clientFile = 'client.js';
+const clientFileDts = 'client.d.ts';
+
 
 const nodeModules = {};
 fs.readdirSync('node_modules')
@@ -57,11 +59,12 @@ module.exports = {
             const tscOut = path.join(process.cwd(), 'bundle');
             const tscCommand = `npm-run tsc  --pretty  --outDir ${tscOut}`;
             child.exec('cd ' + process.cwd() + ' && ' + tscCommand, (err, stdout, stderr) => {
-                if(err) {
+                if (err) {
                     console.error(err);
                     process.exit(1)
                 }
-                fs.writeFileSync(path.join(tscOut, clientFile), fs.readFileSync(path.join(process.cwd(), clientFile)));
+                fs.writeFileSync(path.join(tscOut, clientFile), fs.readFileSync(path.join(process.cwd(), clientFile)))
+                fs.writeFileSync(path.join(process.cwd(), clientFileDts), fs.readFileSync(path.join(tscOut, clientFileDts)));
             });
 
         }),

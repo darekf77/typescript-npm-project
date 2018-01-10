@@ -70,7 +70,7 @@ function getPackageJSON(dirPath: string): PackageJSON {
 
 const packageJSON = {
     current: () => getPackageJSON(process.cwd()),
-    tnp: () => getPackageJSON(__dirname)
+    tnp: () => getPackageJSON(path.join(__dirname, '..'))
 }
 
 
@@ -131,8 +131,12 @@ export function copyResourcesToBundle() {
     ['package.json'].concat(project.current.resources()).forEach(res => {
         const file = path.join(process.cwd(), res);
         const dest = path.join(process.cwd(), 'bundle', res);
+        if(!fs.existsSync(file)) {
+            error(`Resource file ${file} does not exist in ${process.cwd()}`)
+        }
         fs.writeFileSync(dest, fs.readFileSync(file));
     })
+    console.log(chalk.green('Resouces copied to npm bundle'))
 }
 
 export function getStrategy(procesArgs: string[] = process.argv): { strategy: PathParameter, args: any[]; } {
@@ -145,6 +149,7 @@ export function getStrategy(procesArgs: string[] = process.argv): { strategy: Pa
         const isWithoutDash = PathParameter[enumMember].toString().startsWith('$');
         // console.log('isWithoutDash', arg)
         const isOkArg = procesArgs.filter((a, i) => {
+            // console.log(a)
             const condition = (isWithoutDash && a === `${arg}`)
                 || a === `--${arg}`
                 || a === `-${arg.substr(0, 1)}`;

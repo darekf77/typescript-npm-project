@@ -1,9 +1,19 @@
 {
     "name": "isomorphic-lib",
     "version": "0.0.0",
+    "license": "UNLICENSED",
+    "main": "index.js",
     "tnp": {
         "type": "isomorphic-lib",
-        "resources": [ "README.md" ]
+        "resources": [
+            "README.md"
+        ]
+    },
+    "dependencies": {
+        "isomorphic-rest": "^0.0.11",
+        "reflect-metadata": "^0.1.10",
+        "rxjs": "^5.5.2",
+        "typeorm": "^0.1.9"
     },
     "devDependencies": {
         "@ngtools/webpack": "^1.9.3",

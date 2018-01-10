@@ -9,7 +9,9 @@ Helper project for my typescript npm libraries.
 
 ---
 
+
 - General
+    - compare global packages versions, install local addtional packages
     - global tool
     - in *package.json* filed configuration 
     - generated project out of box ready to **npm link**

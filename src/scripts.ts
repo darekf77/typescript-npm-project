@@ -39,11 +39,13 @@ export const scripts = {
             scripts.clear();
             const configPath = path.join(__dirname, '../configs/webpack.config.isomorphic-client.js');
             run(`npm-run webpack --config=${configPath}`).sync.inProject()
-            copyResourcesToBundle();
         }
     },
     clear: () => {
         run('rimraf bundle/ && rimraf client.js').sync.inProject();
+    },
+    copy_resources: () => {
+        copyResourcesToBundle();
     },
     version: () => {
         console.log(project.tnp.version());
