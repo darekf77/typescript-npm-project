@@ -3,11 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { init, replay } from 'isomorphic-rest';
-import { Controllers, Entities, HelloController } from 'example-isomorphic-rest-shared';
+import { Controllers, Entities, HelloController } from 'isomorphic-lib';
 
 import { AppComponent } from './app.component';
-
-
 
 
 @NgModule({

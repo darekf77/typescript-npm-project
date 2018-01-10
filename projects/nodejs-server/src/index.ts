@@ -5,7 +5,7 @@ import "reflect-metadata";
 import { init } from 'isomorphic-rest';
 import { createConnection, useContainer } from 'typeorm';
 
-import { Controllers, Entities } from 'example-isomorphic-rest-shared';
+import { Controllers, Entities } from 'isomorphic-lib';
 import { MockData } from './db-scripts';
 export async function start() {
     const connection = await createConnection({
@@ -14,7 +14,7 @@ export async function start() {
         type: 'sqlite',
         synchronize: true,
         dropSchema: true,
-        logging: true
+        logging: false
     });
 
 

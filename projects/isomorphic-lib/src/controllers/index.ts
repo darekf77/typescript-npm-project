@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 export * from './HelloController';
 export * from './ParentChildControllers';
 export * from './UsersController';

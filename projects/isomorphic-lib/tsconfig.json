@@ -28,6 +28,7 @@
         "preview",
         "docs",
         "dist",
+        "bundle",
         "tests"
     ]
 }

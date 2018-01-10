@@ -23,10 +23,12 @@ export const scripts = {
     build_watch: (projectType: LibType = project.current.getType(), projectDir: string = process.cwd(), runAsync = false) => {
         prevent.notInstalled.nodeModules();
         let command;
-        if (projectType === 'isomorphic-lib') {
+        if (projectType === 'isomorphic-lib' || projectType === 'nodejs-server') {
             command = 'npm-run tsc -w';
-        } else if (projectType === 'angular-lib') {
-            command = 'npm-run ng server';
+        } else if (projectType === 'angular-lib' ) {
+            command = 'npm-run ng serve';
+        } else if (projectType === 'angular-client') {
+            command = 'npm-run webpack-dev-server --port=4200';
         } else if (projectType === 'workspace') {
             getProjectsInFolder(process.cwd()).forEach(d => {
                 scripts.build_watch(d.type, d.path, true);

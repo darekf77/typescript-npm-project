@@ -1,17 +1,10 @@
 {
-  "name": "cli-client",
+  "name": "angular-client",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {
-    "ng": "ng",
-    "start": "webpack-dev-server --port=4200",
-    "build": "webpack",
-    "test": "karma start ./karma.conf.js",
-    "lint": "ng lint",
-    "e2e": "protractor ./protractor.conf.js",
-    "pree2e": "webdriver-manager update --standalone false --gecko false --quiet"
+  "tnp": {
+    "type": "angular-client"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^5.0.0",
     "@angular/common": "^5.0.0",
@@ -22,12 +15,14 @@
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
     "@angular/router": "^5.0.0",
-    "@mobileart/angular-layout-components": "file:../shared/angular-layout-components/components",
-    "@mobileart/shared-controllers-entities": "file:../shared/controllers-entities",
+    "@types/express": "^4.11.0",
     "@types/lodash": "^4.14.91",
     "core-js": "^2.4.1",
+    "isomorphic-lib": "file:../isomorphic-lib",
+    "isomorphic-rest": "^0.0.13",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.2",
+    "tslib": "^1.8.1",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
@@ -47,6 +42,7 @@
     "file-loader": "^1.1.5",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.29.0",
+    "isomorphic-region-loader": "0.0.1",
     "istanbul-instrumenter-loader": "^2.0.0",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",

@@ -1,4 +1,6 @@
+//#region node
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+//#endregion
 
 import { User } from "./User";
 

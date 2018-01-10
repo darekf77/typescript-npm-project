@@ -3,7 +3,7 @@ import { Repository, Connection } from 'typeorm';
 
 import {
     Controllers, Entities, User
-} from 'example-isomorphic-rest-shared';
+} from 'isomorphic-lib';
 
 export class MockData {
 
