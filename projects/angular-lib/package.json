@@ -1,14 +1,13 @@
 {
-  "name": "ng-packaged",
+  "name": "angular-lib",
   "version": "0.0.0",
-  "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "build:app": "cpr dist/my-lib src/@my/lib && ng build --app packages && rimraf src/@my",
-    "build:lib": "ng-packagr",
+    "build:lib": "npm-run ng-packagr",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
