@@ -14,7 +14,7 @@ export class TestController extends BaseCRUD<Book> {
     @BaseCRUDEntity(Book) public entity: Book;
     constructor() {
         super();
-        if (isNode) {;
+        if (isNode) {
             this.createBooks()
         }
     }

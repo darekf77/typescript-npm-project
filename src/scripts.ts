@@ -23,9 +23,11 @@ export const scripts = {
     build_watch: (projectType: LibType = project.current.getType(), projectDir: string = process.cwd(), runAsync = false) => {
         prevent.notInstalled.nodeModules();
         let command;
-        if (projectType === 'isomorphic-lib' || projectType === 'nodejs-server') {
+        if (projectType === 'isomorphic-lib') {
+            scripts.build(false, true);
+        } else if (projectType === 'nodejs-server') {
             command = 'npm-run tsc -w';
-        } else if (projectType === 'angular-lib' ) {
+        } else if (projectType === 'angular-lib') {
             command = 'npm-run ng serve';
         } else if (projectType === 'angular-client') {
             command = 'npm-run webpack-dev-server --port=4200';
@@ -38,16 +40,19 @@ export const scripts = {
         if (runAsync) run(command).async.inProject(projectDir)
         else run(command).sync.inProject(projectDir)
     },
-    build: (prod = false) => {
+    build: (prod = false, watch = false) => {
         prevent.notInstalled.nodeModules();
         prevent.notInstalled.tnpDevDependencies();
         if (project.current.getType() === 'isomorphic-lib') {
             scripts.clear();
-            const configPath = path.join(
-                __dirname,
-                '../configs/webpack.config.isomorphic-client.' +
-                (prod ? 'prod.' : '') + 'js');
-            run(`npm-run webpack --config=${configPath}`).sync.inProject()
+            const o = {
+                config: '--config=' + path.join(
+                    __dirname,
+                    '../configs/webpack.config.isomorphic-client.' +
+                    (prod ? 'prod.' : '') + 'js'),
+                watch: watch ? '--watch' : ''
+            }
+            run(`npm-run webpack ${o.config} ${o.watch}`).sync.inProject()
         }
     },
     clear: () => {
