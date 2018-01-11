@@ -1,12 +1,12 @@
 {
   "name": "tnp",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "main": "index.js",
   "private": true,
   "bin": {
     "tnp": "bin/tnp"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "@types/fs-extra": "^5.0.0",
     "@types/lodash": "^4.14.91",
