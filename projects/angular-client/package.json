@@ -19,7 +19,7 @@
     "@types/lodash": "^4.14.91",
     "core-js": "^2.4.1",
     "isomorphic-lib": "file:../isomorphic-lib",
-    "^isomorphic-rest": "0.0.14",
+    "isomorphic-rest": "^0.0.14",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.2",
     "tslib": "^1.8.1",
