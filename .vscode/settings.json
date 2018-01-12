@@ -8,7 +8,7 @@
         "**/.DS_Store": true,
         "node_modules": true,
         "index.*": true,
-        "dist": true,
+        // "dist": true,
         // "bin": true,
         // ".gitignore": true,
         // ".npmignore": true,

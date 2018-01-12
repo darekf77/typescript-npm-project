@@ -10,6 +10,7 @@
     "dist": true,
     "e2e": true,
     ".editorconfig": true,
+    "protractor.conf.js": true,
     // "bin": true,
     // ".gitignore": true,
     // ".npmignore": true,

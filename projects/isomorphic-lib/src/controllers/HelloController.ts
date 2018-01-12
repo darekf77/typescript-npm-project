@@ -7,7 +7,6 @@ import { User, Book, Author } from "../entities";
 
 import { Repository } from "typeorm";
 
-
 const test = new User();
 test.username = 'Dariusz Filipiak';
 test.books = [
@@ -27,6 +26,7 @@ export class HelloController {
     private repository: Repository<User>;
     user = new User();
     constructor() {
+        console.log('siema')
         //#region backend
         if (isNode) {
             console.log('I am in the contructor of HelloController !!', this.connection)
@@ -65,6 +65,7 @@ export class HelloController {
 
     @GET('/aaooaoaoa/test/:id', true)
     getUsersList( @PathParam('id') id: number): Response<User[]> {
+        console.log('test super')
         //#region node
         return {
             send: (req, res) => {

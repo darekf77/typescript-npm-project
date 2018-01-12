@@ -13,6 +13,7 @@ export const Controllers = {
     UsersController,
     TestController
 };
+console.log('test')
 //#endregion
 
 //#region entities

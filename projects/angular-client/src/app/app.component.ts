@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {
   HelloController, UsersController, TestController,
   ParentClass, ChildClass, ChildClass2
-} from 'isomorphic-lib';
+} from 'isomorphic-lib/client';
 
 
 

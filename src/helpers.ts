@@ -7,15 +7,10 @@ import * as child from 'child_process'
 import * as glob from 'glob';
 import * as Filehound from 'filehound';
 
-import { kebabCase } from 'lodash';
-import { PathParameter } from './path-parameter';
-import { LibType, PackageJSON } from './models';
-import { config } from 'config';
+import { LibType, PackageJSON, Project } from './models';
+import config from './config';
+import { error } from "./errors";
 
-export function error(details: string) {
-    console.log(chalk.red(details));
-    process.exit(1);
-}
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
@@ -26,6 +21,7 @@ export function log(process: child.ChildProcess, output = true) {
     })
 }
 
+//#region  run process
 function runSyncIn(dirPath: string, command: string, output = true) {
     if (output) return child.execSync('cd ' + dirPath + ` && ${command}`, { stdio: [0, 1, 2] })
     return child.execSync('cd ' + dirPath + ` && ${command}`)
@@ -54,26 +50,24 @@ export function run(command: string, output = true) {
         }
     }
 }
+//#endregion
 
-
-function getPackageJSON(dirPath: string): PackageJSON {
-    const filePath = path.join(dirPath, 'package.json');
-    try {
-        const file = fs.readFileSync(filePath, 'utf8').toString();
-        const json = JSON.parse(file);
-        return json;
-    } catch (err) {
-        console.log(chalk.red(filePath));
-        error(err)
-    }
-}
-
-const packageJSON = {
-    current: () => getPackageJSON(process.cwd()),
-    tnp: () => getPackageJSON(path.join(__dirname, '..'))
-}
-
+//#region prevent
 export const prevent = {
+    unexist: {
+        clientTsInSrc() {
+            const src = {
+                client: path.join(process.cwd(), 'src', 'client.ts')
+            }
+            if (!fs.existsSync(src.client)) {
+                console.log('Creating client.ts file in src...');
+                fs.writeFileSync(src.client,
+                    `// File empty for purpose
+            export * from './index';
+            `, 'utf8')
+            }
+        }
+    },
     notInstalled: {
         nodeModules(projectDir = process.cwd()) {
             const clientNodeModules = path.join(projectDir, 'node_modules');
@@ -89,8 +83,8 @@ export const prevent = {
             }
         },
         tnpDevDependencies() {
-            const devDependencies = project.tnp.devDependencies()
-            _.forIn(project.tnp.devDependencies(), (v, k) => {
+            const devDependencies = projects.tnp().packageJSON.devDependencies;
+            _.forIn(devDependencies, (v, k) => {
                 const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
                 if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
                     console.log(`Installing ${k}@${version}`);
@@ -100,49 +94,35 @@ export const prevent = {
         }
     }
 }
+//#endregion
 
+export const projects = {
+    inFolder(folderPath: string): Project[] {
 
-function getProjectType(dirPath: string): LibType {
-    const p = getPackageJSON(dirPath).tnp;
-    if (!p) {
-        error('Unrecognized project type');
-        process.exit(1);
-    }
-    return p.type;
-}
+        const subdirectories: string[] = Filehound.create()
+            .path(folderPath)
+            .directory()
+            .findSync()
 
-export const project = {
-    current: {
-        version: () => packageJSON.current().version,
-        getType(): LibType {
-            const p = packageJSON.current().tnp;
-            if (!p) {
-                error('Unrecognized project type');
-                process.exit(1);
-            }
-            return p.type;
-        },
-        resources: (): string[] => {
-            const p = packageJSON.current().tnp;
-            if (!p) {
-                error('Unrecognized project type');
-                process.exit(1);
-            }
-            return Array.isArray(p.resources) ? p.resources : [];
-        }
+        const result = subdirectories.map(dir => {
+            return new Project(dir);
+        })
+        return result;
     },
-    tnp: {
-        version: () => packageJSON.tnp().version,
-        devDependencies: () => packageJSON.tnp().devDependencies ?
-            packageJSON.tnp().devDependencies : {}
+    current() {
+        return new Project(process.cwd())
+    },
+    tnp() {
+        return new Project(path.join(__dirname, '..'))
     }
-
 }
 
+
+//#region copy resource
 export function copyResourcesToBundle() {
-    const bundleFolder = path.join(process.cwd(), 'bundle');
+    const bundleFolder = path.join(process.cwd(), config.folder.bundle);
     if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);
-    ['package.json'].concat(project.current.resources()).forEach(res => {
+    ['package.json'].concat(projects.current().resources).forEach(res => {
         const file = path.join(process.cwd(), res);
         const dest = path.join(bundleFolder, res);
         if (!fs.existsSync(file)) {
@@ -152,39 +132,9 @@ export function copyResourcesToBundle() {
     })
     console.log(chalk.green('Resouces copied to npm bundle'))
 }
+//#endregion
 
-export function getStrategy(procesArgs: string[] = process.argv): { strategy: PathParameter, args: any[]; } {
-    // console.log(JSON.stringify(procesArgs))
-    let strategy: PathParameter = PathParameter.__NONE;
-    let args = [];
-    for (let enumMember in PathParameter) {
-        let isValueProperty = parseInt(enumMember, 10) >= 0;
-        if (isValueProperty) {
-            const arg = kebabCase(PathParameter[enumMember].toString());
-            // console.log('arg ' + arg)
-            const isWithoutDash = PathParameter[enumMember].toString().startsWith('$');
-            // console.log('isWithoutDash', arg)
-            const isOkArg = procesArgs.filter((vv, i) => {
-                // console.log(a)
-                const a = kebabCase(vv)
-                const condition = (isWithoutDash && a === `${arg}`)
-                    || a === `${arg}`
-                    || a === `${arg.substr(0, 1)}`;
-                if (condition) {
-                    args = _.slice(procesArgs, i + 1, procesArgs.length);
-                }
-                return condition;
-            }).length > 0;
-
-            if (isOkArg) {
-                return { strategy: parseInt(enumMember, 10), args };
-            }
-        }
-    }
-    return { strategy: PathParameter.__NONE, args: procesArgs };
-}
-
-
+//#region execute script
 export function execute(scriptName: string, env?: Object) {
     return function () {
         const p = path.join(__dirname, '../scripts', scriptName);
@@ -198,20 +148,5 @@ export function execute(scriptName: string, env?: Object) {
             env
         })
     }
-
 }
-
-
-export function getProjectsInFolder(folderPath: string): { path: string; type: LibType; }[] {
-
-    const subdirectories: string[] = Filehound.create()
-        .path(folderPath)
-        .directory()
-        .findSync()
-
-    const result = subdirectories.map(dir => {
-        let type = getProjectType(dir);
-        return { path: dir, type };
-    })
-    return result;
-}
+//#endregion
