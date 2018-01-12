@@ -6,26 +6,28 @@ import { projects } from "../helpers";
 import { LibType } from '../models';
 
 
-function clearFiles(files: string[]) {
-    if (!Array.isArray(files)) return;
-    run(`rimraf ${files.join(' ')}`).sync.inProject()
-    files.forEach(file => {
+function clearFiles(files: string[] | string) {
+    if (!files) return;
+    const toDelete = !Array.isArray(files) ? [files] : files;
+    run(`rimraf ${toDelete}`).sync.inProject()
+    toDelete.forEach(file => {
         console.log(`Deleted ${file}`)
     })
 }
 
+
 export const clear = {
     all: () => {
-        clearFiles(['node_modules/'])
+        clearFiles('node_modules/')
         clear.forBuild();
         clear.forWatching();
     },
     forBuild: () => {
-        clearFiles(['bundle/'])
+        clearFiles('bundle/')
     },
     forWatching: () => {
-        clearFiles(['dist/'])
-        _.forIn(config.templateFiles, (file => clearFiles([file.path])))
+        clearFiles('dist/')
+        _.forIn(config.templateFiles, (file => clearFiles(file.path)))
     }
 };
 

@@ -4,7 +4,7 @@ import {
   ParentClass, ChildClass, ChildClass2
 } from 'isomorphic-lib/client';
 
-
+alert('siema');
 
 @Component({
   selector: 'app-root',

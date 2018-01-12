@@ -53,6 +53,18 @@ export function run(command: string, output = true) {
 //#endregion
 
 //#region prevent
+type InstalationType = '-g' | '--save' | '--save-dev';
+
+function installDependencies(packages: Object, type: InstalationType = '--save-dev') {
+    _.forIn(packages, (v, k) => {
+        const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
+        if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
+            console.log(`Installing ${k}@${version}`);
+            child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} ${type}`, { cwd: process.cwd() })
+        }
+    });
+}
+
 export const prevent = {
     notInstalled: {
         nodeModules(projectDir = process.cwd()) {
@@ -68,16 +80,22 @@ export const prevent = {
                 }
             }
         },
-        tnpDevDependencies() {
-            const devDependencies = projects.tnp().packageJSON.devDependencies;
-            _.forIn(devDependencies, (v, k) => {
-                const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
-                if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
-                    console.log(`Installing ${k}@${version}`);
-                    child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} --save-dev`, { cwd: process.cwd() })
-                }
-            })
+        dependencies: {
+            global() {
+                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
+                installDependencies(dependencies.global);
+            },
+            forAllLibs() {
+                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
+                installDependencies(dependencies.forAllLibs);
+            },
+            forBuild(porjectType: LibType) {
+                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
+                installDependencies(dependencies.lib[_.kebabCase(porjectType)]);
+            }
         }
+
+
     }
 }
 //#endregion

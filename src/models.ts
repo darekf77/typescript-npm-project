@@ -64,6 +64,19 @@ export class Project {
     }
 };
 
+export type Dependency = { [packageName: string]: string; };
+
+export interface Dependencies {
+    forAllLibs: Dependency;
+    global: Dependency;
+    lib: {
+        angularLib: Dependency;
+        angularClient: Dependency;
+        isomorphicLib:Dependency;
+        nodejsServer: Dependency;
+    }
+}
+
 export interface PackageJSON {
     name: string;
     version: string;
@@ -72,6 +85,7 @@ export interface PackageJSON {
     tnp: {
         type: LibType;
         resources: string[];
+        dependencies?: Dependencies;
     },
     peerDependencies: Object;
     dependencies: Object;

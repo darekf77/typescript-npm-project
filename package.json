@@ -2,10 +2,35 @@
   "name": "tnp",
   "version": "0.0.3",
   "main": "index.js",
+  "license": "UNLICENSED",
   "bin": {
     "tnp": "bin/tnp"
   },
-  "license": "MIT",
+  "tnp": {
+    "dependencies": {
+      "forAllLibs": {
+        "@types/node": "^9.3.0",
+        "tslib": "^1.8.1",
+        "typescript": "^2.6.2",
+        "webpack": "^3.10.0"
+      },
+      "global": {
+        "release-it": "^5.1.2",
+        "npm-run": "^4.1.2",
+        "rimraf": "^2.6.2",
+        "ts-node": "3.3.0"
+      },
+      "lib": {
+        "angularLib": {},
+        "angularClient": {},
+        "isomorphicLib": {
+          "@ngtools/webpack": "^1.9.3"
+        },
+        "nodejsServer": {}
+      }
+    }
+  },
+  
   "dependencies": {
     "@ngtools/webpack": "^1.9.3",
     "@types/fs-extra": "^5.0.0",
@@ -22,19 +47,5 @@
     "tslib": "^1.8.1",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "webpack-merge": "^4.1.1"
-  },
-  "devDependencies": {
-    "@ngtools/webpack": "^1.9.3",
-    "@types/node": "^9.3.0",
-    "isomorphic-region-loader": "0.0.1",
-    "tslib": "^1.8.1",
-    "typescript": "^2.6.2",
-    "webpack": "^3.10.0"
-  },
-  "peerDependencies": {
-    "release-it": "^5.1.2",
-    "npm-run": "^4.1.2",
-    "rimraf": "^2.6.2",
-    "ts-node": "3.3.0"
   }
 }

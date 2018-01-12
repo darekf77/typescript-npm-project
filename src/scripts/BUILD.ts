@@ -9,8 +9,6 @@ import { clear } from "./CLEAR";
 
 function build(prod = false, watch = false, project: Project = projects.current(), runAsync = false) {
     return function (args) {
-        prevent.notInstalled.nodeModules();
-        prevent.notInstalled.tnpDevDependencies();
 
         if (watch) clear.forWatching();
         else clear.forBuild();
@@ -20,9 +18,9 @@ function build(prod = false, watch = false, project: Project = projects.current(
             const webpackParams = config.webpack.params(prod, watch);
             command = `npm-run webpack ${webpackParams}`
         } else if (project.type === 'nodejs-server') {
-            command = 'npm-run tsc -w';
+            command = `npm-run tsc ${watch ? '-w' : ''}`;
         } else if (project.type === 'angular-lib') {
-            command = 'npm-run ng serve';
+            command = `npm-run ng ${watch ? 'serve' : 'build'}`;
         } else if (project.type === 'angular-client') {
             command = 'npm-run webpack-dev-server --port=4200';
         } else if (project.type === 'workspace') {
