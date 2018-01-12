@@ -10,8 +10,6 @@ import { run } from "../helpers";
 import config from "../config";
 
 
-
-
 //#region handle node modules
 const nodeModules = {};
 fs.readdirSync('node_modules')
@@ -25,14 +23,13 @@ fs.readdirSync('node_modules')
 
 module.exports = env => {
     _.forIn(env, (v, k) => {
-        if(v === 'true') env[k] = true;
-        if(v === 'false') env[k] = false;
+        if (v === 'true') env[k] = true;
+        if (v === 'false') env[k] = false;
     })
     let buildOk = true;
     const filename = (env.isWatch ? config.folder.watchDist : config.folder.bundle) + config.templateFiles.clientJS.name;
     const outDir = path.join(process.cwd(), (env.isWatch ? config.folder.watchDist : config.folder.bundle));
-    console.log('env: ' + JSON.stringify(env))
-    console.log('outDir: ' + outDir)
+
     return {
         //#region config
         entry: './src/index.ts',
@@ -76,6 +73,7 @@ module.exports = env => {
         //#endregion
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
+                config.templateFiles.clientTs.create();
                 const tscCommand = `npm-run tsc --pretty --outDir ${outDir}`;
                 try {
                     run(tscCommand).sync.inProject()

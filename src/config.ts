@@ -24,8 +24,10 @@ const config = {
             `{"version":3,"file":"index.js","sourceRoot":"","sources":["index.ts"],"names":[],"mappings":";;;;;AAAA,2BAAsB"}`),
         indexDts: new TemplateFile(path.join(process.cwd(), 'index.d.ts'), `export * from './src'; `),
         clientDts: new TemplateFile(path.join(process.cwd(), 'client.d.ts'), `export * from './index'; `),
-        clientJS: new TemplateFile(path.join(process.cwd(), 'client.js'))
-    } as { [files: string]: TemplateFile },
+        clientJS: new TemplateFile(path.join(process.cwd(), 'client.js')),
+        clientTs: new TemplateFile(path.join(process.cwd(), 'src', 'client.ts'), `/* File empty for purpose */ export * from './index';`)
+    },
+    // as { [files: string]: TemplateFile },
 
 
     pathes: {

@@ -30,8 +30,8 @@ export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nod
 export class Project {
 
     __originProject: boolean;
-    constructor(public projectPath: string) {
-        this.__originProject = (projectPath === path.join(__dirname, '..'));
+    constructor(public location: string) {
+        this.__originProject = (this.location === path.join(__dirname, '..'));
     }
 
     get type(): LibType {
@@ -39,7 +39,7 @@ export class Project {
         return p.type;
     }
     get packageJSON(): PackageJSON {
-        const filePath = path.join(this.projectPath, 'package.json');
+        const filePath = path.join(this.location, 'package.json');
         try {
             const file = fs.readFileSync(filePath, 'utf8').toString();
             const json: PackageJSON = JSON.parse(file);

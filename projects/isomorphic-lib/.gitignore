@@ -4,5 +4,5 @@ npm-debug.log*
 /bundle
 /dist
 bundle.umd.js
-client.js
-client.d.ts
+client.*
+index.*

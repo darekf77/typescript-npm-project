@@ -4,41 +4,37 @@ import {
 } from '../helpers';
 
 import config from '../config'
-import { LibType } from '../models';
+import { Project } from '../models';
 import { clear } from "./CLEAR";
 
-function build(prod = false, watch = false, projectType: LibType = projects.current().type,
-    projectDir: string = process.cwd(), runAsync = false) {
+function build(prod = false, watch = false, project: Project = projects.current(), runAsync = false) {
     return function (args) {
         prevent.notInstalled.nodeModules();
         prevent.notInstalled.tnpDevDependencies();
 
         if (watch) clear.forWatching();
-        else clear.forWatching();
+        else clear.forBuild();
 
         let command;
-        if (projectType === 'isomorphic-lib') {
-            prevent.unexist.clientTsInSrc()
+        if (project.type === 'isomorphic-lib') {
             const webpackParams = config.webpack.params(prod, watch);
-            // console.log(webpackParams)
-            // process.exit(1)
             command = `npm-run webpack ${webpackParams}`
-        } else if (projectType === 'nodejs-server') {
+        } else if (project.type === 'nodejs-server') {
             command = 'npm-run tsc -w';
-        } else if (projectType === 'angular-lib') {
+        } else if (project.type === 'angular-lib') {
             command = 'npm-run ng serve';
-        } else if (projectType === 'angular-client') {
+        } else if (project.type === 'angular-client') {
             command = 'npm-run webpack-dev-server --port=4200';
-        } else if (projectType === 'workspace') {
+        } else if (project.type === 'workspace') {
             projects.inFolder(process.cwd()).forEach(d => {
-                build(prod, watch, d.type, d.projectPath, true)(args)
+                build(prod, watch, d, true)(args)
             })
             return;
         }
 
         //#region sync/async
-        if (runAsync) run(command).async.inProject(projectDir)
-        else run(command).sync.inProject(projectDir)
+        if (runAsync) run(command).async.inProject(project.location)
+        else run(command).sync.inProject(project.location)
         //#endregion
     }
 }

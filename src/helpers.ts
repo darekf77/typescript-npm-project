@@ -54,20 +54,6 @@ export function run(command: string, output = true) {
 
 //#region prevent
 export const prevent = {
-    unexist: {
-        clientTsInSrc() {
-            const src = {
-                client: path.join(process.cwd(), 'src', 'client.ts')
-            }
-            if (!fs.existsSync(src.client)) {
-                console.log('Creating client.ts file in src...');
-                fs.writeFileSync(src.client,
-                    `// File empty for purpose
-            export * from './index';
-            `, 'utf8')
-            }
-        }
-    },
     notInstalled: {
         nodeModules(projectDir = process.cwd()) {
             const clientNodeModules = path.join(projectDir, 'node_modules');
