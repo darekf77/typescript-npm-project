@@ -55,7 +55,8 @@ function build(prod = false, watch = false, project: Project = projects.current(
 
 function BUILD_WATCH_ANGULAR_LIB() {
     console.log('Rebuilding start...')
-    run(`npm-run ngc -p tsconfig.watch.json`).sync()
+    run(`npm run build:esm`).sync();
+    // run(`npm-run ngc -p tsconfig.watch.json`).sync()
     console.log('Rebuilding done.')
 }
 

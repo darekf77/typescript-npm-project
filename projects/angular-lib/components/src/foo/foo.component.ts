@@ -2,15 +2,11 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'my-foo',
-  template: `
-  <h1>amazog it is very useful </h1>`,
-  styles: [`
-
-h1 {
-  color: $colourful;
-}
-
-  `]
+  templateUrl: 'foo.components.html',
+  styleUrls: ['foo.component.scss']
 })
 export class FooComponent {
 }
+
+
+ 

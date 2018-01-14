@@ -10,7 +10,11 @@
     "build:lib": "npm-run ng-packagr",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "build:esm": "npm-run gulp inline-templates && npm run ngcompile",
+    "build:esm:watch": "npm-run gulp build:esm:watch",
+    "ngcompile": "npm-run ngc -p tsconfig-aot.json",
+    "clean:tmp": "rimraf coverage dist tmp"
   },
   "tnp": {
     "type": "angular-lib",
@@ -40,6 +44,8 @@
     "@types/node": "~8.5.0",
     "codelyzer": "~4.0.0",
     "cpr": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-inline-ng2-template": "^4.1.0",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.0",
     "karma": "~2.0.0",
@@ -52,8 +58,8 @@
     "protractor": "~5.2.0",
     "rimraf": "^2.6.1",
     "ts-node": "~4.1.0",
-    "tslint": "~5.8.0",
     "tsickle": "^0.26.0",
+    "tslint": "~5.8.0",
     "typescript": "~2.5.3"
   }
 }
