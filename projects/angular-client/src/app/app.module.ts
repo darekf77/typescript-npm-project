@@ -6,8 +6,8 @@ import { init, replay } from 'isomorphic-rest';
 import { Controllers, Entities, HelloController } from 'isomorphic-lib';
 import { MyLibModule } from 'angular-lib';
 
+import { HttpModule } from "@angular/http";
 import { AppComponent } from './app.component';
-
 
 @NgModule({
   declarations: [
@@ -16,7 +16,8 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     FormsModule,
-    MyLibModule
+    HttpModule,
+    MyLibModule.forRoot()
   ],
   providers: [
     init('http://localhost:4000')
