@@ -1,8 +1,8 @@
 {
   "$schema": "./node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "dist/my-lib",
+  "dest": "bundle",
   "workingDirectory": ".ng_build",
   "lib": {
-    "entryFile": "my-lib/src/public_api.ts"
+    "entryFile": "components/src/public_api.ts"
   }
 }

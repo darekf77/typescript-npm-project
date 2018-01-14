@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { BarService } from '@my/lib';
+import { BarService } from 'components';
+
 
 @Component({
   selector: 'app-root',
@@ -15,10 +16,10 @@ export class AppComponent {
 
   value$: Observable<string>;
 
-  constructor (
+  constructor(
     bar: BarService
   ) {
-     this.value$ = bar.value;
+    this.value$ = bar.value;
   }
 
 }

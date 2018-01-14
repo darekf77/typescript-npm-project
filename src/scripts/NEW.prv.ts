@@ -24,7 +24,7 @@ function newProject(type: LibType, name: string) {
         try {
             fse.copySync(sourcePath, destinationPath, options);
             console.log(chalk.green(`${name.toUpperCase()} library structure created sucessfully, installing npm...`));
-            run('npm i').sync.inProject(destinationPath)
+            run('npm i', { projectDirPath: destinationPath }).sync();
             console.log(chalk.green('Done.'));
         } catch (error) {
             console.log(chalk.red(error));

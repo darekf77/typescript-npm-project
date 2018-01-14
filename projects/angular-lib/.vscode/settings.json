@@ -1,28 +1,30 @@
 {
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "node_modules": true,
-    "index.*": true,
-    "dist": true,
-    "e2e": true,
-    ".editorconfig": true,
-    "protractor.conf.js": true,
-    // "bin": true,
-    // ".gitignore": true,
-    // ".npmignore": true,
-    // ".npmrc": true,
-    ".tsconfig": true
-},
-  "workbench.colorCustomizations": {
-      "activityBar.background": "#da5ac5",
-      "activityBar.foreground": "#313129"
-  },
-  "editor.rulers": [
-      100,
-      120
-  ]
+    "files.exclude": {
+        // "**/.git": true,
+        // "**/.svn": true,
+        // "**/.hg": true,
+        // "**/CVS": true,
+        // "**/.DS_Store": true,
+        // "node_modules": true,
+        // "index.*": true,
+        // "dist": true,
+        "e2e": true,
+        "tslint.json": true,
+        ".editorconfig": true,
+        "protractor.conf.js": true,
+        "karma.conf.js": true
+        // // "bin": true,
+        // // ".gitignore": true,
+        // // ".npmignore": true,
+        // // ".npmrc": true,
+        // ".tsconfig": true
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#da5ac5",
+        "activityBar.foreground": "#313129"
+    },
+    "editor.rulers": [
+        100,
+        120
+    ]
 }

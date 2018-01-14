@@ -10,7 +10,7 @@
       "node"
     ],
     "paths": {
-      "@my/lib": [ "../dist/my-lib" ]
+      "components": [ "../bundle" ]
     }
   },
   "files": [

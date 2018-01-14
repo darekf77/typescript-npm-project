@@ -48,6 +48,18 @@ const config = {
     },
 
     webpack: {
+        paramsFor(libType: LibType, prod = false, watch = false) {
+            const o = {
+                env: [
+                    '--env.production=' + prod,
+                    '--env.isWatch=' + watch
+                ],
+                config: '--config=' + path.join(__dirname, '/webpack-config/angular-lib.' + (prod ? 'prod.' : '') + 'js'),
+                watch: watch ? '--watch' : '',
+
+            }
+            return `${o.config} ${o.watch}  --bail ${o.env.join(' ')}`;
+        },
         params(prod = false, watch = false) {
             const o = {
                 env: [

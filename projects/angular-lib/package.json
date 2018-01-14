@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:app": "cpr dist/my-lib src/@my/lib && ng build --app packages && rimraf src/@my",
+    "build:app": "cpr bundle src/components && ng build --app packages && rimraf src/@my",
     "build:lib": "npm-run ng-packagr",
     "test": "ng test",
     "lint": "ng lint",

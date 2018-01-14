@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
 
-export function run(argsv) {
+export function run(argsv: string[]) {
     glob.sync(
         path
             .join(__dirname, '/scripts/*.js'))
@@ -14,7 +14,7 @@ export function run(argsv) {
                         const check = match(k, argsv);
                         if (check.isMatch) {
                             v.apply(null, check.restOfArgs);
-                            process.exit(0)
+                            process.stdin.resume();
                         }
                     }
                 })

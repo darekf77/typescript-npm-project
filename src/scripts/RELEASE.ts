@@ -10,7 +10,7 @@ import { clear } from "./CLEAR";
 
 function release(prod = false) {
     return function (args) {
-        run(`release-it -c ${config.pathes.releaseItJSON(prod)}`).sync.inProject()
+        run(`release-it -c ${config.pathes.releaseItJSON(prod)}`).sync()
     }
 }
 

@@ -2,9 +2,7 @@ import { Component } from '@angular/core';
 import {
   HelloController, UsersController, TestController,
   ParentClass, ChildClass, ChildClass2
-} from 'isomorphic-lib/client';
-
-alert('siema');
+} from 'isomorphic-lib';
 
 @Component({
   selector: 'app-root',

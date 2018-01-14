@@ -6,47 +6,81 @@ import chalk from 'chalk';
 import * as child from 'child_process'
 import * as glob from 'glob';
 import * as Filehound from 'filehound';
+import * as watch from 'node-watch';
+import * as chokidar from 'chokidar';
+
 
 import { LibType, PackageJSON, Project } from './models';
 import config from './config';
 import { error } from "./errors";
 
+export function paramFromFn(fn: Function) {
+    return _.kebabCase(fn.name);
+}
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
         console.log(data.toString());
     })
+
     process.stderr.on('data', (data) => {
         console.log(data.toString());
     })
+
+    return process;
+}
+
+function checkProcess(dirPath: string, command: string) {
+    if (!fs.existsSync(dirPath)) error(`Path doesn't exist: ${dirPath}`);
+    if (!command) error(`Bad command: ${command}`);
 }
 
 //#region  run process
-function runSyncIn(dirPath: string, command: string, output = true) {
-    if (output) return child.execSync('cd ' + dirPath + ` && ${command}`, { stdio: [0, 1, 2] })
-    return child.execSync('cd ' + dirPath + ` && ${command}`)
-}
-
-function runAsyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
-    if (biggerBuffer) {
-        log(child.exec('cd ' + dirPath + ` && ${command}`, { maxBuffer: 2024 * 500, cwd: dirPath }), output);
-    } else {
-        log(child.exec('cd ' + dirPath + ` && ${command}`, { cwd: dirPath }), output);
+function runSyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
+    checkProcess(dirPath, command);
+    try {
+        if (output) return child.execSync('cd ' + dirPath + ` && ${command}`, { stdio: [0, 1, 2] })
+        return child.execSync('cd ' + dirPath + ` && ${command}`)
+    } catch (err) {
+        error(err);
     }
 }
 
-export function run(command: string, output = true) {
+function runAsyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
+    checkProcess(dirPath, command);
+    if (biggerBuffer) {
+        return log(child.exec(command, { cwd: dirPath, maxBuffer: 2024 * 500 }), output);
+    } else {
+        return log(child.exec(command, { cwd: dirPath }), output);
+    }
+}
+
+export const watcher = {
+    run(command: Function, folderPath: string = 'src') {
+        return run(`watch 'tnp ${paramFromFn(command)}' ${path.join(process.cwd(), folderPath)}`).async()
+    }
+}
+
+export interface RunOptions {
+    output?: boolean;
+    projectDirPath?: string;
+    biggerBuffer?: boolean;
+}
+
+export function run(command: string,
+    options?: RunOptions) {
+    const { output, projectDirPath, biggerBuffer } = _.merge({
+        output: true,
+        projectDirPath: process.cwd(),
+        biggerBuffer: false
+    }, options)
     return {
-        sync: {
-            inProject(projectDirPath: string = process.cwd()) {
-                return runSyncIn(projectDirPath, command, output);
-            }
+        sync() {
+            return runSyncIn(projectDirPath, command, output);
 
         },
-        async: {
-            inProject(projectDirPath: string = process.cwd(), biggerBuffer = false) {
-                return runAsyncIn(projectDirPath, command, output, biggerBuffer);
-            }
+        async() {
+            return runAsyncIn(projectDirPath, command, output, biggerBuffer);
         }
     }
 }
@@ -65,6 +99,13 @@ function installDependencies(packages: Object, type: InstalationType = '--save-d
     });
 }
 
+
+function sleep() {
+    console.log('SLEEEPS')
+    run(`sleep 5`);
+    sleep()
+}
+
 export const prevent = {
     notInstalled: {
         nodeModules(projectDir = process.cwd()) {
@@ -73,10 +114,10 @@ export const prevent = {
             if (!fs.existsSync(clientNodeModules)) {
                 if (fs.existsSync(yarnLock)) {
                     console.log(chalk.green('Installing npm packages... from yarn.lock '))
-                    run('yarn install').sync.inProject()
+                    run('yarn install').sync()
                 } else {
                     console.log(chalk.green('Installing npm packages... '))
-                    run('npm i').sync.inProject()
+                    run('npm i').sync()
                 }
             }
         },

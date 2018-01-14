@@ -7,6 +7,7 @@
     "tnp": "bin/tnp"
   },
   "tnp": {
+    "type": "angular-lib",
     "dependencies": {
       "forAllLibs": {
         "@types/node": "^9.3.0",
@@ -30,18 +31,25 @@
       }
     }
   },
-  
   "dependencies": {
-    "@ngtools/webpack": "^1.9.3",
+    "@angular/compiler": "^5.2.0",
+    "@angular/compiler-cli": "^5.2.0",
+    "@types/chokidar": "^1.7.4",
+    "@types/express": "^4.11.0",
     "@types/fs-extra": "^5.0.0",
     "@types/lodash": "^4.14.91",
     "@types/node": "^9.3.0",
     "chalk": "^2.3.0",
+    "chokidar": "^2.0.0",
+    "express": "^4.16.2",
     "filehound": "^1.16.2",
     "fs-extra": "^5.0.0",
+    "get-port": "^3.2.0",
     "glob": "^7.1.2",
     "isomorphic-region-loader": "0.0.1",
     "lodash": "^4.17.4",
+    "ngc-webpack": "^4.1.2",
+    "node-watch": "^0.5.5",
     "on-build-webpack": "^0.1.0",
     "pre-build-webpack": "^0.1.0",
     "tslib": "^1.8.1",

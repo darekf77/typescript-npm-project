@@ -4,7 +4,6 @@ import * as path from 'path'
 import * as WebpackOnBuildPlugin from 'on-build-webpack';
 import * as WebpackPreBuildPlugin from 'pre-build-webpack';
 import * as child from 'child_process';
-import * as webpack from 'webpack';
 import { run } from "../helpers";
 
 import config from "../config";
@@ -76,7 +75,7 @@ module.exports = env => {
                 config.templateFiles.clientTs.create();
                 const tscCommand = `npm-run tsc --pretty --outDir ${outDir}`;
                 try {
-                    run(tscCommand).sync.inProject()
+                    run(tscCommand).sync();
                     console.log('Typescript compilation OK')
                 } catch (error) {
                     console.error('Typescript compilation ERROR')

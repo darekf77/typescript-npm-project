@@ -9,7 +9,7 @@ import { LibType } from '../models';
 function clearFiles(files: string[] | string) {
     if (!files) return;
     const toDelete = !Array.isArray(files) ? [files] : files;
-    run(`rimraf ${toDelete}`).sync.inProject()
+    run(`rimraf ${toDelete}`).sync()
     toDelete.forEach(file => {
         console.log(`Deleted ${file}`)
     })
@@ -22,12 +22,16 @@ export const clear = {
         clear.forBuild();
         clear.forWatching();
     },
-    forBuild: () => {
+    forBuild: (libType?: LibType) => {
         clearFiles('bundle/')
     },
-    forWatching: () => {
-        clearFiles('dist/')
-        _.forIn(config.templateFiles, (file => clearFiles(file.path)))
+    forWatching: (libType?: LibType) => {
+        if (libType === 'isomorphic-lib' || libType === 'nodejs-server') {
+            clearFiles('dist/')
+            _.forIn(config.templateFiles, (file => clearFiles(file.path)))
+        } else if(libType === 'angular-lib') {
+            clearFiles('dist/')
+        }
     }
 };
 
