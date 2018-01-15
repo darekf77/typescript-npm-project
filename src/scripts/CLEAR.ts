@@ -26,12 +26,7 @@ export const clear = {
         clearFiles('bundle/')
     },
     forWatching: (libType?: LibType) => {
-        if (libType === 'isomorphic-lib' || libType === 'nodejs-server') {
-            clearFiles('dist/')
-            _.forIn(config.templateFiles, (file => clearFiles(file.path)))
-        } else if(libType === 'angular-lib') {
-            clearFiles('dist/')
-        }
+        clearFiles('dist/')
     }
 };
 

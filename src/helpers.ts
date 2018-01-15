@@ -6,13 +6,13 @@ import chalk from 'chalk';
 import * as child from 'child_process'
 import * as glob from 'glob';
 import * as Filehound from 'filehound';
-import * as watch from 'node-watch';
 import * as chokidar from 'chokidar';
 
 
-import { LibType, PackageJSON, Project } from './models';
+import { LibType, PackageJSON,  InstalationType } from './models';
 import config from './config';
-import { error } from "./errors";
+import { error, info } from "./messages";
+import { Project } from "./project";
 
 export function paramFromFn(fn: Function) {
     return _.kebabCase(fn.name);
@@ -89,18 +89,80 @@ export function run(command: string,
 //#endregion
 
 //#region prevent
-type InstalationType = '-g' | '--save' | '--save-dev';
 
-function installDependencies(packages: Object, type: InstalationType = '--save-dev') {
-    _.forIn(packages, (v, k) => {
-        const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
-        if (!fs.existsSync(path.join(process.cwd(), 'node_modules', k))) {
-            console.log(`Installing ${k}@${version}`);
-            child.execSync(`cd ${process.cwd()} && npm i ${k}@${version} ${type}`, { cwd: process.cwd() })
+
+
+export function getPackageJSON(location: string): PackageJSON {
+    const isTnpProject = (location === path.join(__dirname, '..'));
+    const filePath = path.join(location, 'package.json');
+    try {
+        const file = fs.readFileSync(filePath, 'utf8').toString();
+        const json: PackageJSON = JSON.parse(file);
+        if (!json.tnp && !isTnpProject) {
+            error(`Unrecognized project type ${filePath}`);
+            process.exit(1);
         }
-    });
+        return json;
+    } catch (err) {
+        error(filePath, true);
+        error(err)
+    }
 }
 
+
+
+function checkAndInstal(packages: Object, type: InstalationType = '--save-dev', packageJSONlocation = process.cwd()) {
+
+}
+
+
+export const install = {
+    packages(wherePath: string, packageName?: string, type: InstalationType = '--save-dev', exact = false) {
+        const yarnLock = path.join(wherePath, 'yarn.lock');
+        const clientNodeModules = path.join(wherePath, 'node_modules');
+        if (!fs.existsSync(clientNodeModules)) {
+            if (fs.existsSync(yarnLock)) {
+                info('Installing npm packages... from yarn.lock ')
+                run('yarn install').sync()
+                if (packageName) run(`yarn add ${packageName} ${type}`, { projectDirPath: wherePath })
+            } else {
+                info('Installing npm packages... ');
+                run('npm i').sync()
+                if (packageName) run(`npm i ${packageName} ${type}`, { projectDirPath: wherePath })
+            }
+        }
+    },
+
+    from(location: string) {
+        const packageJSON: PackageJSON = getPackageJSON(location);
+        return {
+            dep() {
+
+            },
+            devDep() {
+
+            },
+            peer() {
+
+            },
+            _global() {
+
+            },
+            _commonDevTo(projectPath: string) {
+                _.forIn(packageJSON.tnp.dependencies.forAllLibs, (v, k) => {
+                    const version = (v as any).replace(/\~/g, '').replace(/\^/g, '')
+                    if (!fs.existsSync(path.join(projectPath, 'node_modules', k))) {
+                        info(`Installing ${k}@${version}`);
+                        install.packages(projectPath, `${k}@${version}`);
+                    }
+                });
+            },
+            _forLib(libType: LibType) {
+
+            }
+        }
+    }
+}
 
 function sleep() {
     console.log('SLEEEPS')
@@ -108,40 +170,6 @@ function sleep() {
     sleep()
 }
 
-export const prevent = {
-    notInstalled: {
-        nodeModules(projectDir = process.cwd()) {
-            const clientNodeModules = path.join(projectDir, 'node_modules');
-            const yarnLock = path.join(projectDir, 'yarn.lock');
-            if (!fs.existsSync(clientNodeModules)) {
-                if (fs.existsSync(yarnLock)) {
-                    console.log(chalk.green('Installing npm packages... from yarn.lock '))
-                    run('yarn install').sync()
-                } else {
-                    console.log(chalk.green('Installing npm packages... '))
-                    run('npm i').sync()
-                }
-            }
-        },
-        dependencies: {
-            global() {
-                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
-                installDependencies(dependencies.global);
-            },
-            forAllLibs() {
-                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
-                installDependencies(dependencies.forAllLibs);
-            },
-            forBuild(porjectType: LibType) {
-                const dependencies = projects.tnp().packageJSON.tnp.dependencies;
-                installDependencies(dependencies.lib[_.kebabCase(porjectType)]);
-            }
-        }
-
-
-    }
-}
-//#endregion
 
 export const projects = {
     inFolder(folderPath: string): Project[] {
@@ -197,3 +225,10 @@ export function execute(scriptName: string, env?: Object) {
     }
 }
 //#endregion
+
+export function copy(sousrce: string, destination: string) {
+    if (!fs.existsSync(sousrce)) {
+        error(`[${copy.name}] No able to find source of ${sousrce}`);
+    }
+    fs.writeFileSync(this.path, fs.readFileSync(sousrce), 'utf8')
+}

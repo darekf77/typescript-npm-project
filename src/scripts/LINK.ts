@@ -1,15 +1,15 @@
 
 // import * as getPort from 'get-port';
-const getPort = require('get-port');
+// const getPort = require('get-port');
 
 import {
-    run, watcher, prevent, projects, paramFromFn
+    run, watcher,  projects, paramFromFn
 } from '../helpers';
 
 import config from '../config'
-import { Project } from '../models';
+import { Project } from '../project';
 import { clear } from "./CLEAR";
-import { error } from "../errors";
+import { error } from "../messages";
 
 
 function LINK() {

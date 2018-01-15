@@ -1,7 +1,8 @@
 
 import {
-    run, prevent, copyResourcesToBundle
+    run, copyResourcesToBundle
 } from '../helpers';
+import { prevent } from "../prevent";
 
 import config from "../config";
 import { LibType } from '../models';

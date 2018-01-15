@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as WebpackOnBuildPlugin from 'on-build-webpack';
 import * as WebpackPreBuildPlugin from 'pre-build-webpack';
 import * as child from 'child_process';
-import { run } from "../helpers";
+import { run, copy } from "../helpers";
 
 import config from "../config";
 
@@ -26,7 +26,7 @@ module.exports = env => {
         if (v === 'false') env[k] = false;
     })
     let buildOk = true;
-    const filename = (env.isWatch ? config.folder.watchDist : config.folder.bundle) + config.templateFiles.clientJS.name;
+    const filename = (env.isWatch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
     const outDir = path.join(process.cwd(), (env.isWatch ? config.folder.watchDist : config.folder.bundle));
 
     return {
@@ -72,7 +72,8 @@ module.exports = env => {
         //#endregion
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
-                config.templateFiles.clientTs.create();
+                config.beforeBuikd('build-dist').fileToRecreateFor('isomorphic-lib')
+                    .forEach(file => copy(file.from, file.where));
                 const tscCommand = `npm-run tsc --pretty --outDir ${outDir}`;
                 try {
                     run(tscCommand).sync();
@@ -84,11 +85,8 @@ module.exports = env => {
             }),
             new WebpackOnBuildPlugin(function (stats) {
                 if (env.isWatch && buildOk) {
-                    config.templateFiles.clientJS.createFrom(path.join(outDir, config.templateFiles.clientJS.name))
-                    config.templateFiles.clientDts.createFrom(path.join(outDir, config.templateFiles.clientDts.name))
-                    config.templateFiles.indexDts.create()
-                    config.templateFiles.indexJS.create()
-                    config.templateFiles.indexJSmap.create()
+                    config.afterBuild('build-dist').filesToRecreateFor('isomorphic-lib')
+                        .forEach(file => copy(file.from, file.where));
                 }
             }),
         ],

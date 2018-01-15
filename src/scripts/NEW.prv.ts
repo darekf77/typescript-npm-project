@@ -4,8 +4,9 @@ import chalk from 'chalk';
 import * as fse from "fs-extra";
 
 import {
-    run, prevent
+    run,
 } from '../helpers';
+import { prevent } from "../prevent";
 
 import config from "../config";
 import { LibType } from '../models';

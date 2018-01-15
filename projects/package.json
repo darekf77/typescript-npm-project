@@ -1,34 +1,42 @@
 {
-  "name": "example-isomorphic-rest",
-  "scripts": {
-    "start": "./node_modules/.bin/ts-node run-client-server.ts"
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "tnp": {
+    "type": "workspace",
+    "resources": [
+      "README.md"
+    ]
   },
   "dependencies": {
-    "@angular/animations": "^5.2.0",
-    "@angular/cdk": "^5.0.4",
-    "@angular/common": "^5.2.0",
-    "@angular/compiler": "^5.2.0",
-    "@angular/core": "^5.2.0",
-    "@angular/forms": "^5.2.0",
-    "@angular/http": "^5.2.0",
-    "@angular/material": "^5.0.4",
-    "@angular/platform-browser": "^5.2.0",
-    "@angular/platform-browser-dynamic": "^5.2.0",
-    "@angular/router": "^5.2.0",
-    "core-js": "^2.5.3",
+    "@angular/animations": "5.2.0",
+    "@angular/cdk": "5.0.4",
+    "@angular/common": "5.2.0",
+    "@angular/compiler": "5.2.0",
+    "@angular/core": "5.2.0",
+    "@angular/forms": "5.2.0",
+    "@angular/http": "5.2.0",
+    "@angular/material": "5.0.4",
+    "@angular/platform-browser": "5.2.0",
+    "@angular/platform-browser-dynamic": "5.2.0",
+    "@angular/router": "5.2.0",
+    "@types/lodash": "4.14.92",
+    "codelyzer": "^4.0.2",
+    "core-js": "2.5.3",
     "isomorphic-rest": "^0.0.14",
-    "lodash": "^4.17.4",
-    "@types/lodash": "^4.14.91",
-    "reflect-metadata": "^0.1.10",
-    "tslib": "^1.8.1",
-    "rxjs": "^5.5.6",
-    "zone.js": "^0.8.20"
+    "ng2-rest": "^9.0.5",
+    "ng2-logger": "^2.0.25",
+    "lodash": "4.17.4",
+    "reflect-metadata": "0.1.10",
+    "rxjs": "5.5.6",
+    "tslib": "1.8.1",
+    "zone.js": "0.8.20"
   },
   "devDependencies": {
-    "tslint": "~5.7.0",
-    "@types/node": "^8.0.53",
-    "nodemon": "^1.12.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.6.2"
+    "tslint": "5.7.0",
+    "@types/node": "9.3.0",
+    "nodemon": "1.14.1",
+    "ts-node": "3.3.0",
+    "typescript": "2.6.2"
   }
 }

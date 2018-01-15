@@ -1,6 +1,6 @@
 
-import { run } from "./index";
-import * as express from "express";
+// import { run } from "./index";
+// import * as express from "express";
 
 // const app = express()
 // const server = app.listen(4200)
@@ -11,5 +11,5 @@ import * as express from "express";
 //     console.log('Port busy')
 // })
 
-run(["--build-watch"])
+// run(["--build-watch"])
 

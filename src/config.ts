@@ -1,34 +1,72 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import chalk from 'chalk';
+import fs from 'fs';
 import { clear } from "./scripts/CLEAR";
 
-import { LibType, TemplateFile } from './models';
-
+import { LibType, TemplateFile, RecreateFile, BuildType } from './models';
+import { error } from "./messages";
 
 const config = {
     folder: {
         watchDist: 'dist/',
-        bundle: 'bundle/'
-    },
-
-    templateFiles: {
-        indexJS: new TemplateFile(path.join(process.cwd(), 'index.js'), `"use strict";
-        function __export(m) {
-            for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+        bundle: 'bundle/',
+        preview(libType:LibType) {
+            return path.join(this.location, 'preview');
         }
-        Object.defineProperty(exports, "__esModule", { value: true });
-        __export(require("./dist"));
-        //# sourceMappingURL=index.js.map` ),
-        indexJSmap: new TemplateFile(path.join(process.cwd(), 'index.js.map'),
-            `{"version":3,"file":"index.js","sourceRoot":"","sources":["index.ts"],"names":[],"mappings":";;;;;AAAA,2BAAsB"}`),
-        indexDts: new TemplateFile(path.join(process.cwd(), 'index.d.ts'), `export * from './src'; `),
-        clientDts: new TemplateFile(path.join(process.cwd(), 'client.d.ts'), `export * from './index'; `),
-        clientJS: new TemplateFile(path.join(process.cwd(), 'client.js')),
-        clientTs: new TemplateFile(path.join(process.cwd(), 'src', 'client.ts'), `/* File empty for purpose */ export * from './index';`)
     },
-    // as { [files: string]: TemplateFile },
 
+    beforeBuikd(buildType: BuildType) {
+
+        return {
+            fileToRecreateFor(libType: LibType): RecreateFile[] {
+                const wokrspace = config.pathes.newProjectPrototypePath(libType);
+                const files = [];
+                if (libType === 'isomorphic-lib') {
+                    files.push('src/client.ts')
+                }
+                return files.map(file => path.join(wokrspace, file))
+                    .map(file => {
+                        return { from: path.join(wokrspace, file), where: path.join(process.cwd(), file) }
+                    })
+                    .concat(config.beforeBuikd(buildType)._commonFiles())
+            },
+
+            _commonFiles(): RecreateFile[] {
+                const wokrspace = config.pathes.newProjectPrototypePath('workspace');
+                const files = [
+                    'index.js',
+                    'index.d.ts',
+                    'index.js.map',
+                    '.npmrc',
+                    '.gitignore',
+                    '.npmignore',
+                    'tslint.json'
+                ];
+                return files.map(file => {
+                    return { from: path.join(wokrspace, file), where: path.join(process.cwd(), file) }
+                })
+            }
+        }
+    },
+
+    afterBuild(buildType: BuildType) {
+        return {
+            filesToRecreateFor(libType: LibType): RecreateFile[] {
+                const files: RecreateFile[] = [];
+                if (libType === 'isomorphic-lib') {
+                    const f = ['client.d.ts', 'client.js', 'client.js.map']
+                    f.forEach(file => {
+                        files.push({
+                            where: path.join(process.cwd(), file),
+                            from: path.join(process.cwd(), config.folder.watchDist, file),
+                        })
+                    })
+                }
+                return files;
+            }
+        }
+    },
 
     pathes: {
         releaseItJSON(prod = false) {
@@ -40,10 +78,13 @@ const config = {
             return path.join(process.cwd(), projectName);
         },
         newProjectPrototypePath(libraryType: LibType) {
-            if (libraryType === 'angular-lib') return path.join(__dirname, '../projects/angular-lib');
-            if (libraryType === 'isomorphic-lib') return path.join(__dirname, '../projects/isomorphic-lib');
-            console.error(chalk.red(`Bad library type: ${libraryType}`))
-            process.exit(1);
+            if (libraryType === 'workspace') {
+                return path.join(__dirname, `../projects`);
+            }
+            const p = path.join(__dirname, `../projects/${libraryType}`);
+            if (!fs.existsSync(p)) {
+                error(`Bad library type: ${libraryType}`)
+            }
         }
     },
 
