@@ -27,6 +27,9 @@ export class TemplateFile {
 
 export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server' | 'workspace';
 
+
+
+
 export class Project {
 
     __originProject: boolean;
@@ -62,6 +65,8 @@ export class Project {
         const p = this.packageJSON.tnp;
         return Array.isArray(p.resources) ? p.resources : [];
     }
+
+
 };
 
 export type Dependency = { [packageName: string]: string; };
@@ -72,7 +77,7 @@ export interface Dependencies {
     lib: {
         angularLib: Dependency;
         angularClient: Dependency;
-        isomorphicLib:Dependency;
+        isomorphicLib: Dependency;
         nodejsServer: Dependency;
     }
 }
