@@ -1,1 +1,1 @@
-export * from './components/src/index';
+export * from './dist/index';

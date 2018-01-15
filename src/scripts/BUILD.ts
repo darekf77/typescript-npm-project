@@ -10,9 +10,9 @@ import config from '../config'
 import { Project } from '../models';
 import { clear } from "./CLEAR";
 import { error } from "../errors";
+import * as path from "path";
 
-
-
+const projectDirPath = path.join(process.cwd(), 'preview')
 
 function build(prod = false, watch = false, project: Project = projects.current(), runAsync = false) {
     return async function (args) {
@@ -32,8 +32,8 @@ function build(prod = false, watch = false, project: Project = projects.current(
         } else if (project.type === 'nodejs-server') {
             command = `npm-run tsc ${watch ? '-w' : ''}`;
         } else if (project.type === 'angular-lib') {
-            run('npm run start', { biggerBuffer: true }).async()
-            watcher.run(BUILD_WATCH_ANGULAR_LIB, 'components/src');
+            run('npm-run ng server', { biggerBuffer: true, projectDirPath }).async()
+            watcher.run(BUILD_WATCH_ANGULAR_LIB, 'preview/components/src');
             return;
         } else if (project.type === 'angular-client') {
             // const port = await Promise.resolve(4201)
@@ -55,8 +55,7 @@ function build(prod = false, watch = false, project: Project = projects.current(
 
 function BUILD_WATCH_ANGULAR_LIB() {
     console.log('Rebuilding start...')
-    run(`npm run build:esm`).sync();
-    // run(`npm-run ngc -p tsconfig.watch.json`).sync()
+    run(`npm run build:esm`, { projectDirPath }).sync();
     console.log('Rebuilding done.')
 }
 

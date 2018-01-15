@@ -3,14 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FooComponent } from './foo/foo.component';
 import { BarService } from './bar/bar.service';
 
-
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule } from '@angular/material';
+import { MatCardModule, MatCommonModule } from '@angular/material';
 
 @NgModule({
   imports: [
     CommonModule,
-    NoopAnimationsModule,
     MatCardModule
   ],
   declarations: [
