@@ -3,19 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FooComponent } from './foo/foo.component';
 import { BarService } from './bar/bar.service';
 
-import { MatCardModule, MatCommonModule } from '@angular/material';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  MatCardModule,
+  MatSlideToggleModule
+} from '@angular/material';
 
 @NgModule({
   imports: [
     CommonModule,
-    MatCardModule
+    MatSlideToggleModule,
+    MatCardModule,
+    NoopAnimationsModule
   ],
   declarations: [
     FooComponent
   ],
   exports: [
     FooComponent,
-    MatCardModule
+    MatCardModule,
+    MatSlideToggleModule,
+    NoopAnimationsModule
   ]
 })
 export class MyLibModule {

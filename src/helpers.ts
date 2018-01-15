@@ -65,15 +65,17 @@ export interface RunOptions {
     output?: boolean;
     projectDirPath?: string;
     biggerBuffer?: boolean;
+    folder?: string;
 }
 
 export function run(command: string,
     options?: RunOptions) {
-    const { output, projectDirPath, biggerBuffer } = _.merge({
+    let { output, projectDirPath, biggerBuffer, folder } = _.merge({
         output: true,
         projectDirPath: process.cwd(),
         biggerBuffer: false
     }, options)
+    if (folder) projectDirPath = path.join(projectDirPath, folder);
     return {
         sync() {
             return runSyncIn(projectDirPath, command, output);
