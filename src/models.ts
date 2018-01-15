@@ -3,6 +3,7 @@ import { Project } from "./project";
 export type InstalationType = '-g' | '--save' | '--save-dev';
 
 export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencies';
+
 export type Package = { name: string; version: string; };
 
 export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server' | 'workspace' | 'angular-cli';
@@ -14,4 +15,11 @@ export interface BuildOptions {
     watch: boolean;
     project: Project;
     runAsync: boolean;
+}
+
+export interface RunOptions {
+    output?: boolean;
+    projectDirPath?: string;
+    biggerBuffer?: boolean;
+    folder?: string;
 }

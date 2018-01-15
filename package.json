@@ -7,7 +7,7 @@
     "tnp": "bin/tnp"
   },
   "tnp": {
-    "type": "angular-lib"
+    "type": "isomorphic-lib"
   },
   "preferGlobal": true,
   "peerDependencies": {

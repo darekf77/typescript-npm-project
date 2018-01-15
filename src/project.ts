@@ -9,7 +9,7 @@ import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, Dependencies } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
-import { run } from "./process";
+import { run, watcher } from "./process";
 
 export class Project {
     children: Project[];
@@ -67,8 +67,82 @@ export class Project {
     //#endregion
 
     //#region build
-    build(buildType: BuildOptions) {
-        this._packageJSON.preprareFor(buildType);
+    static BUILD_WATCH_ANGULAR_LIB() {
+        console.log('Rebuilding start...')
+        run(`npm run build:esm`, { folder: 'preview' }).sync();
+        console.log('Rebuilding done.')
+    }
+
+    build(buildOptions: BuildOptions) {
+        const { prod, watch, project, runAsync } = buildOptions;
+
+        this._packageJSON.preprareFor(buildOptions);
+
+        switch (this.type) {
+
+            //#region isomorphic-lib
+            case 'isomorphic-lib':
+                const webpackParams = config.webpack.params(prod, watch);
+                if (runAsync) {
+                    run(`npm-run webpack ${webpackParams}`).async();
+                } else {
+                    run(`npm-run webpack ${webpackParams}`).sync()
+                }
+                return;
+            //#endregion 
+
+            //#region nodejs-server
+            case 'nodejs-server':
+                if (runAsync) {
+                    run(`npm-run tsc ${watch ? '-w' : ''}`).async();
+                } else {
+                    run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
+                }
+                return
+            //#endregion
+
+            //#region angular-lib
+            case 'angular-lib':
+                if (watch) {
+                    run('npm-run ng server', { biggerBuffer: true, folder: 'preview' }).async()
+                    watcher.run(Project.BUILD_WATCH_ANGULAR_LIB, 'preview/components/src');
+                } else {
+                    run(`npm run build:lib`, { folder: 'preview' }).sync();
+                }
+                return;
+            //#endregion
+
+            //#region angular-cli
+            case 'angular-cli':
+                if (runAsync) {
+                    run('npm-run ng server').async()
+                } else {
+                    run('npm-run ng server').sync()
+                }
+                return;
+            //#endregion
+
+            //#region angular-client
+            case 'angular-client':
+                if (runAsync) {
+                    run(`npm-run webpack-dev-server --port=${4201}`).async();
+                } else {
+                    run(`npm-run webpack-dev-server --port=${4201}`).sync()
+                }
+                return;
+            //#endregion
+
+            //#region workspace
+            case 'workspace':
+                this.children.forEach(child => {
+                    buildOptions.runAsync = true;
+                    buildOptions.watch = true;
+                    this.build(buildOptions)
+                })
+                return;
+            //#endregion 
+
+        }
     }
     //#endregion
 
@@ -121,31 +195,32 @@ export class Project {
     public static by(libraryType: LibType): Project {
         let projectPath;
         if (libraryType === 'workspace') {
-            return new Project(path.join(__dirname, `../projects`));
+            return Project.create(path.join(__dirname, `../projects`));
         }
         projectPath = path.join(__dirname, `../projects/${libraryType}`);
         if (!fs.existsSync(projectPath)) {
             error(`Bad library type: ${libraryType}`)
         }
-        return new Project(projectPath);
+        return Project.create(projectPath);
     }
 
-    public static Current = new Project(process.cwd());
-    public static Tnp = new Project(path.join(__dirname, '..'));
+    public static Current = Project.create(process.cwd());
+    public static Tnp = Project.create(path.join(__dirname, '..'));
 
     public static from(folderPath: string): Project[] {
         const subdirectories: string[] = Filehound.create()
             .path(folderPath)
+            .depth(0)
             .directory()
             .findSync()
-
+        // error(subdirectories)
         const result = subdirectories.map(dir => {
-            return new Project(dir);
+            return Project.create(dir);
         })
         return result;
     }
 
-    clone(destinationPath: string): Project {
+    cloneTo(destinationPath: string): Project {
         const options: fse.CopyOptions = {
             overwrite: true,
             recursive: true,
@@ -153,16 +228,20 @@ export class Project {
         };
         fse.copySync(this.location, destinationPath, options);
         console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));
-        const project = new Project(destinationPath);
+        const project = Project.create(destinationPath);
         console.log(chalk.green('Done.'));
         return project;
     }
 
-    //#endregion
+    static create(location: string): Project {
+        if (!fs.existsSync(location)) return;
+        if (!PackageJSON.from(location)) return;
+        return new Project(location)
+    }
 
-    //#region constructor
-    constructor(public location: string) {
+    private constructor(public location: string) {
         if (fs.existsSync(location)) {
+
             this._packageJSON = PackageJSON.from(location);
             this.type = this._packageJSON.type;
             if (!this.type) {
@@ -173,16 +252,8 @@ export class Project {
             }
 
             this.children = Project.from(location);
-
-            const parentPath = path.join(location, '..');
-            if (fs.existsSync(parentPath)) {
-                this.parent = new Project(parentPath)
-            }
-
-            const previewPath = path.join(location, 'preview');
-            if (fs.existsSync(previewPath)) {
-                this.preview = new Project(previewPath);
-            }
+            this.parent = Project.create(path.join(location, '..'));
+            this.preview = Project.create(path.join(location, 'preview'));
 
         } else {
             warn(`Invalid project location: ${location}`);

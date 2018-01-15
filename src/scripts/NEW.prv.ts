@@ -22,15 +22,15 @@ function newProject(type: LibType, name: string) {
     const destinationPath = getDestinationPath(name);
     if (type === 'angular-lib' || type === 'isomorphic-lib') {
         try {
-            project.clone(destinationPath);
+            project.cloneTo(destinationPath);
             info(`Project ${project.name} create sucessfullu`);
         } catch (err) {
             error(err);
         }
     } else {
-        console.log(chalk.red(`Bad library library type. Examples:`));
-        console.log(chalk.red(`\t${chalk.gray('tnp new')} ${chalk.black('angular-lib')} ${chalk.gray('mySuperLib')}`));
-        console.log(chalk.red(`\t${chalk.gray('tnp new')} ${chalk.black('isomorphic-lib')} ${chalk.gray('mySuperLib')}`));
+        error(`Bad library library type. Examples:`, true);
+        error(`\t${chalk.gray('tnp new')} ${chalk.black('angular-lib')} ${chalk.gray('mySuperLib')}`, true);
+        error(chalk.red(`\t${chalk.gray('tnp new')} ${chalk.black('isomorphic-lib')} ${chalk.gray('mySuperLib')}`));
     }
 
 }

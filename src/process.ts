@@ -1,5 +1,5 @@
 
-import child from 'child_process'
+import * as child from 'child_process'
 import chalk from 'chalk';
 import * as _ from 'lodash';
 import * as fs from 'fs';
@@ -7,6 +7,7 @@ import * as path from 'path';
 
 import { error, info } from "./messages";
 import { paramFromFn } from "./index";
+import { RunOptions } from "./models";
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
@@ -50,12 +51,7 @@ export const watcher = {
     }
 }
 
-export interface RunOptions {
-    output?: boolean;
-    projectDirPath?: string;
-    biggerBuffer?: boolean;
-    folder?: string;
-}
+
 
 export function run(command: string,
     options?: RunOptions) {

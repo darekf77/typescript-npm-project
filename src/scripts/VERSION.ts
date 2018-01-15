@@ -9,7 +9,6 @@ function version() {
     console.log(Project.Tnp.version);
 }
 
-
 export default {
     VERSION: version
 }

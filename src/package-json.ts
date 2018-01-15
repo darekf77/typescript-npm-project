@@ -5,7 +5,6 @@ import * as path from 'path';
 import { LibType, InstalationType, BuildOptions, Dependencies, Package } from "./models";
 import { error, info } from "./messages";
 import { run } from "./process";
-import { read } from "fs-extra";
 
 export interface IPackageJSON {
     name: string;
@@ -80,12 +79,11 @@ export class PackageJSON {
             const json = JSON.parse(file);
             if (!json.tnp && !isTnpProject) {
                 error(`Unrecognized project type ${filePath}`);
-                process.exit(1);
             }
             return new PackageJSON(json, location);
         } catch (err) {
             error(filePath, true);
-            error(err)
+            error(err, true)
         }
     }
 
