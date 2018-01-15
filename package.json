@@ -7,29 +7,14 @@
     "tnp": "bin/tnp"
   },
   "tnp": {
-    "type": "angular-lib",
-    "dependencies": {
-      "forAllLibs": {
-        "@types/node": "^9.3.0",
-        "tslib": "^1.8.1",
-        "typescript": "^2.6.2",
-        "webpack": "^3.10.0"
-      },
-      "global": {
-        "release-it": "^5.1.2",
-        "npm-run": "^4.1.2",
-        "rimraf": "^2.6.2",
-        "ts-node": "3.3.0"
-      },
-      "lib": {
-        "angularLib": {},
-        "angularClient": {},
-        "isomorphicLib": {
-          "@ngtools/webpack": "^1.9.3"
-        },
-        "nodejsServer": {}
-      }
-    }
+    "type": "angular-lib"
+  },
+  "preferGlobal": true,
+  "peerDependencies": {
+    "release-it": "^5.1.2",
+    "npm-run": "^4.1.2",
+    "rimraf": "^2.6.2",
+    "ts-node": "3.3.0"
   },
   "dependencies": {
     "@angular/compiler": "^5.2.0",

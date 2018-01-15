@@ -1,8 +1,7 @@
 
 import * as _ from 'lodash';
-import { run } from '../helpers';
+import { run } from "../process";
 import config from "../config";
-import { projects } from "../helpers";
 import { LibType } from '../models';
 
 

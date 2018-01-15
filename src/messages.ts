@@ -7,3 +7,7 @@ export function error(details: string, noExit = false) {
 export function info(details: string) {
     console.log(chalk.green(details))
 }
+
+export function warn(details:string) {
+    console.log(chalk.yellow(details))
+}

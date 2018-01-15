@@ -22,6 +22,10 @@ export function run(argsv: string[]) {
         });
 }
 
+export function paramFromFn(fn: Function) {
+    return _.kebabCase(fn.name);
+}
+
 
 function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: string[] } {
     let isMatch = false;

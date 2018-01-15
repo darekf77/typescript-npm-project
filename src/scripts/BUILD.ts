@@ -3,18 +3,24 @@
 // const getPort = require('get-port');
 
 import {
-    run, watcher, projects, paramFromFn
-} from '../helpers';
+    run, watcher
+} from '../process';
+
 
 import config from '../config'
 import { Project } from '../project';
 import { clear } from "./CLEAR";
 import { error } from "../messages";
+import { BuildOptions } from "../models";
 
 
-function build(prod = false, watch = false, project: Project = projects.current(), runAsync = false) {
+function build(prod = false, watch = false, project: Project = Project.Current, runAsync = false) {
     return async function (args) {
+        const options: BuildOptions = {
+            prod, watch, project, runAsync
+        };
 
+        let command;
         if (watch) {
             clear.forWatching(project.type);
         }
@@ -22,8 +28,10 @@ function build(prod = false, watch = false, project: Project = projects.current(
             clear.forBuild(project.type);
         }
 
-        if (!project.type) error("Bad project type " + project.type)
-        let command;
+        
+
+
+
         if (project.type === 'isomorphic-lib') {
             const webpackParams = config.webpack.params(prod, watch);
             command = `npm-run webpack ${webpackParams}`
@@ -38,19 +46,16 @@ function build(prod = false, watch = false, project: Project = projects.current(
                 run(`npm run build:lib`, { folder: 'preview' }).sync();
             }
         } else if (project.type === 'angular-client') {
-            // const port = await Promise.resolve(4201)
-            // console.log('port', port);
             command = `npm-run webpack-dev-server --port=${4201}`;
         } else if (project.type === 'workspace') {
-            projects.inFolder(process.cwd()).forEach(d => {
-                build(prod, watch, d, true)(args)
+            project.children.forEach(child => {
+                build(prod, watch, child, true)(args)
             })
             return;
         }
 
         if (runAsync) run(command, { projectDirPath: project.location }).async()
         else run(command, { projectDirPath: project.location }).sync()
-        // })
     }
 }
 

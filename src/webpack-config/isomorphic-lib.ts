@@ -4,7 +4,10 @@ import * as path from 'path'
 import * as WebpackOnBuildPlugin from 'on-build-webpack';
 import * as WebpackPreBuildPlugin from 'pre-build-webpack';
 import * as child from 'child_process';
-import { run, copy } from "../helpers";
+import { copy } from "../helpers";
+import { run } from "../process";
+import { Project } from "../project";
+import { BuildOptions } from "../models";
 
 import config from "../config";
 
@@ -20,14 +23,17 @@ fs.readdirSync('node_modules')
     });
 //#endregion
 
-module.exports = env => {
+
+module.exports = (env: BuildOptions) => {
     _.forIn(env, (v, k) => {
-        if (v === 'true') env[k] = true;
-        if (v === 'false') env[k] = false;
+        const value: string = v as any;
+        if (value === 'true') env[k] = true;
+        if (value === 'false') env[k] = false;
     })
     let buildOk = true;
-    const filename = (env.isWatch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
-    const outDir = path.join(process.cwd(), (env.isWatch ? config.folder.watchDist : config.folder.bundle));
+
+    const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
+    const outDir = path.join(process.cwd(), (env.watch ? config.folder.watchDist : config.folder.bundle));
 
     return {
         //#region config
@@ -72,8 +78,10 @@ module.exports = env => {
         //#endregion
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
-                config.beforeBuikd('build-dist').fileToRecreateFor('isomorphic-lib')
+                Project.Current
+                    .filesToRecreateBeforeBuild()
                     .forEach(file => copy(file.from, file.where));
+
                 const tscCommand = `npm-run tsc --pretty --outDir ${outDir}`;
                 try {
                     run(tscCommand).sync();
@@ -84,13 +92,14 @@ module.exports = env => {
                 }
             }),
             new WebpackOnBuildPlugin(function (stats) {
-                if (env.isWatch && buildOk) {
-                    config.afterBuild('build-dist').filesToRecreateFor('isomorphic-lib')
+                if (env.watch && buildOk) {
+                    Project.Current
+                        .filesToRecreateAfterBuild()
                         .forEach(file => copy(file.from, file.where));
                 }
             }),
         ],
-        stats: env.isWatch ? "none" : "normal"
+        stats: env.watch ? "none" : "normal"
 
     }
 

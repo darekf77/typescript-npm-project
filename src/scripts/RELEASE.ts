@@ -1,23 +1,8 @@
 
-import {
-    run, copyResourcesToBundle
-} from '../helpers';
-import { prevent } from "../prevent";
-
-import config from "../config";
-import { LibType } from '../models';
-import { clear } from "./CLEAR";
-
-
-function release(prod = false) {
-    return function (args) {
-        run(`release-it -c ${config.pathes.releaseItJSON(prod)}`).sync()
-    }
-}
-
+import { Project } from "../project";
 
 export default {
-    $RELEASE: release(),
-    $RELEASE_PROD: release(true),
-    COPY_RESOURCES: copyResourcesToBundle
+    $RELEASE: Project.Current.release,
+    $RELEASE_PROD: () => Project.Current.release(true),
+    COPY_RESOURCES: Project.Current.bundleResources
 }
