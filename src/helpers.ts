@@ -7,7 +7,7 @@ export function copy(sousrce: string, destination: string) {
     if (!fs.existsSync(sousrce)) {
         error(`[${copy.name}] No able to find source of ${sousrce}`);
     }
-    fs.writeFileSync(this.path, fs.readFileSync(sousrce), 'utf8')
+    fs.writeFileSync(destination, fs.readFileSync(sousrce), 'utf8')
 }
 
 

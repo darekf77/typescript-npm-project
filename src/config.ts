@@ -30,8 +30,8 @@ const config = {
         params(prod = false, watch = false) {
             const o = {
                 env: [
-                    '--env.production=' + prod,
-                    '--env.isWatch=' + watch
+                    '--env.prod=' + prod,
+                    '--env.watch=' + watch
                 ],
                 config: '--config=' + path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js'),
                 watch: watch ? '--watch' : '',

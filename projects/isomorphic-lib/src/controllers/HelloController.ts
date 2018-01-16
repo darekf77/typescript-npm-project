@@ -8,7 +8,7 @@ import { User, Book, Author } from "../entities";
 import { Repository } from "typeorm";
 
 const test = new User();
-test.username = 'Dariusz Filipiak';
+test.username = 'Dariusz Filipiak brak ego';
 test.books = [
     new Book()
 ]

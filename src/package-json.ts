@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { LibType, InstalationType, BuildOptions, Dependencies, Package } from "./models";
-import { error, info } from "./messages";
+import { error, info, warn } from "./messages";
 import { run } from "./process";
 
 export interface IPackageJSON {
@@ -82,8 +82,8 @@ export class PackageJSON {
             }
             return new PackageJSON(json, location);
         } catch (err) {
-            error(filePath, true);
-            error(err, true)
+            warn(filePath);
+            warn(err)
         }
     }
 
