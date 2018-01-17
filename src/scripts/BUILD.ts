@@ -11,10 +11,10 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
         };
 
         if (watch) {
-            clear.forWatching(project.type);
+            clear.forWatching(project.type, false);
         }
         else {
-            clear.forBuild(project.type);
+            clear.forBuild(project.type, false);
         }
 
         project.build(options);

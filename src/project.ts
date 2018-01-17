@@ -10,7 +10,6 @@ import { LibType, BuildOptions, RecreateFile, Dependencies } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
-import { inflate } from 'zlib';
 
 export class Project {
     children: Project[];
@@ -18,6 +17,7 @@ export class Project {
     preview: Project;
     type: LibType;
     packageJson: PackageJSON;
+    private static projects: Project[] = [];
 
     //#region link
     linkDependencies(type: Dependencies) {
@@ -93,10 +93,8 @@ export class Project {
     build(buildOptions: BuildOptions) {
         const { prod, watch, project, runAsync } = buildOptions;
 
-        this.linkParentDependencies()
-        process.exit(0)
-
         this.packageJson.preprareForBuild(buildOptions);
+        this.linkParentDependencies()
 
         switch (this.type) {
 
@@ -128,6 +126,7 @@ export class Project {
                     watcher.run(Project.BUILD_WATCH_ANGULAR_LIB, 'preview/components/src');
                 } else {
                     run(`npm run build:lib`, { folder: 'preview' }).sync();
+                    process.exit(0)
                 }
                 return;
             //#endregion
@@ -213,6 +212,7 @@ export class Project {
 
     //#region get project 
     public static by(libraryType: LibType): Project {
+        console.log('by libraryType ' + libraryType)
         let projectPath;
         if (libraryType === 'workspace') {
             return Project.create(path.join(__dirname, `../projects`));
@@ -228,16 +228,24 @@ export class Project {
     public static Tnp = Project.create(path.join(__dirname, '..'));
 
     public static from(folderPath: string): Project[] {
-        const subdirectories: string[] = Filehound.create()
+        // console.log('from ' + folderPath)
+        const notAllowed: string[] = [
+            '.vscode', 'node_modules', 'dist', 'bundle',
+            'src', 'e2e', 'tmp', 'tests',
+            'components', '.git', 'bin'
+        ]
+        let subdirectories: string[] = Filehound.create()
             .path(folderPath)
-            .depth(0)
+            .depth(1)
             .directory()
             .findSync()
-        // error(subdirectories)
-        const result = subdirectories.map(dir => {
-            return Project.create(dir);
-        })
-        return result;
+        subdirectories = subdirectories
+            .filter(f => !notAllowed.find(a => path.basename(f) == a));
+
+        return subdirectories
+            .map(dir => {
+                return Project.create(dir);
+            })
     }
 
     cloneTo(destinationPath: string): Project {
@@ -253,11 +261,15 @@ export class Project {
         return project;
     }
 
-    static create(location: string): Project {
+    static create(location: string, parent?: Project): Project {
+        const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
+        if (alreadyExist) return alreadyExist;
         if (!fs.existsSync(location)) return;
         if (!PackageJSON.from(location)) return;
         return new Project(location)
     }
+
+
 
     private constructor(public location: string) {
         if (fs.existsSync(location)) {
@@ -270,6 +282,7 @@ export class Project {
                 }
                 error("Bad project type " + this.type)
             }
+            Project.projects.push(this);
 
             this.children = Project.from(location);
             this.parent = Project.create(path.join(location, '..'));

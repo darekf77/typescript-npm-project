@@ -8,7 +8,7 @@ import { LibType } from '../models';
 function clearFiles(files: string[] | string) {
     if (!files) return;
     const toDelete = !Array.isArray(files) ? [files] : files;
-    run(`rimraf ${toDelete}`).sync()
+    run(`rimraf ${toDelete.join(' ')}`).sync()
     toDelete.forEach(file => {
         console.log(`Deleted ${file}`)
     })
@@ -18,14 +18,17 @@ function clearFiles(files: string[] | string) {
 export const clear = {
     all: () => {
         clearFiles('node_modules/')
-        clear.forBuild();
-        clear.forWatching();
-    },
-    forBuild: (libType?: LibType) => {
         clearFiles('bundle/')
-    },
-    forWatching: (libType?: LibType) => {
         clearFiles('dist/')
+        process.exit(0)
+    },
+    forBuild: (libType?: LibType, exit = true) => {
+        clearFiles('bundle/')
+        if (exit) process.exit(0)
+    },
+    forWatching: (libType?: LibType, exit = true) => {
+        clearFiles('dist/')
+        if (exit) process.exit(0)
     }
 };
 
