@@ -14,7 +14,9 @@
     "release-it": "^5.1.2",
     "npm-run": "^4.1.2",
     "rimraf": "^2.6.2",
-    "ts-node": "3.3.0"
+    "ts-node": "3.3.0",
+    "mkdirp": "^0.5.1",
+    "cpr": "^3.0.1"
   },
   "dependencies": {
     "@angular/compiler": "^5.2.0",

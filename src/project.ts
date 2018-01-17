@@ -10,13 +10,14 @@ import { LibType, BuildOptions, RecreateFile, Dependencies } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
+import { inflate } from 'zlib';
 
 export class Project {
     children: Project[];
     parent: Project;
     preview: Project;
     type: LibType;
-    private _packageJSON: PackageJSON;
+    packageJson: PackageJSON;
 
     //#region link
     linkDependencies(type: Dependencies) {
@@ -24,12 +25,28 @@ export class Project {
         const thisNodeModelsPath = path.join(this.location, 'node_modules');
         return {
             toProject(project: Project) {
-                const dependencies = self._packageJSON.dependencies(type);
+                const dependencies = self.packageJson.dependencies(type);
+
+                dependencies.some((d) => {
+                    if (!fs.existsSync(path.join(thisNodeModelsPath, d.name))) {
+                        self.packageJson.preprareForBuild();
+                        return false;
+                    }
+                });
+
+                info('Linking parent workspace common packages...')
                 dependencies.forEach(d => {
                     const destinationFolder = path.join(project.location, 'node_modules', d.name);
-                    run(`rimraf ${destinationFolder}`)
-                    run(`ln -s ${path.join(thisNodeModelsPath, d.name)} ${destinationFolder}`)
+                    const isOrganizationPackage = /.*\/.*/g.test(d.name);
+                    const linkName2 = isOrganizationPackage ? d.name.split('/')[0] : '';
+                    const destinationFolder2 = path.join(project.location, 'node_modules', linkName2);
+                    const parentSourcePackagePath = path.join(thisNodeModelsPath, d.name);
+                    const linkCommand = `ln -sf ${parentSourcePackagePath} .`;
+                    run(`rimraf ${destinationFolder}`).sync()
+                    run(`mkdirp  ${destinationFolder2}`).sync()
+                    run(linkCommand, { projectDirPath: destinationFolder2 }).sync()
                 })
+                info('Linking Done.')
             }
         }
     }
@@ -68,15 +85,18 @@ export class Project {
 
     //#region build
     static BUILD_WATCH_ANGULAR_LIB() {
-        console.log('Rebuilding start...')
+        info('Rebuilding start...')
         run(`npm run build:esm`, { folder: 'preview' }).sync();
-        console.log('Rebuilding done.')
+        info('Rebuilding done.')
     }
 
     build(buildOptions: BuildOptions) {
         const { prod, watch, project, runAsync } = buildOptions;
 
-        this._packageJSON.preprareFor(buildOptions);
+        this.linkParentDependencies()
+        process.exit(0)
+
+        this.packageJson.preprareForBuild(buildOptions);
 
         switch (this.type) {
 
@@ -242,8 +262,8 @@ export class Project {
     private constructor(public location: string) {
         if (fs.existsSync(location)) {
 
-            this._packageJSON = PackageJSON.from(location);
-            this.type = this._packageJSON.type;
+            this.packageJson = PackageJSON.from(location);
+            this.type = this.packageJson.type;
             if (!this.type) {
                 if (fs.existsSync(path.join(location, 'angular-cli.json'))) {
                     this.type = 'angular-cli';
@@ -263,15 +283,15 @@ export class Project {
 
     //#region getters
     get name(): string {
-        return this._packageJSON.name;
+        return this.packageJson.name;
     }
 
     get version() {
-        return this._packageJSON.version;
+        return this.packageJson.version;
     }
 
     get resources(): string[] {
-        return this._packageJSON.resources;
+        return this.packageJson.resources;
     }
     //#endregion
 

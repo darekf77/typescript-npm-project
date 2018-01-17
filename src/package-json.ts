@@ -37,15 +37,15 @@ export class PackageJSON {
     }
     //#endregion
 
-    preprareFor(buildOptions: BuildOptions) {
+    preprareForBuild(buildOptions?: BuildOptions) {
         const yarnLock = path.join(this.location, 'yarn.lock');
         if (!this.checkNodeModules()) {
             if (fs.existsSync(yarnLock)) {
                 info('Installing npm packages... from yarn.lock ')
-                run('yarn install').sync()
+                run('yarn install', { projectDirPath: this.location }).sync()
             } else {
                 info('Installing npm packages... ');
-                run('npm i').sync()
+                run('npm i', { projectDirPath: this.location }).sync()
             }
         }
     }
@@ -74,6 +74,10 @@ export class PackageJSON {
     public static from(location: string): PackageJSON {
         const isTnpProject = (location === path.join(__dirname, '..'));
         const filePath = path.join(location, 'package.json');
+        if (!fs.existsSync(filePath)) {
+            warn(`No package.json in folder: ${path.basename(location)}`)
+            return;
+        }
         try {
             const file = fs.readFileSync(filePath, 'utf8').toString();
             const json = JSON.parse(file);
@@ -82,8 +86,8 @@ export class PackageJSON {
             }
             return new PackageJSON(json, location);
         } catch (err) {
-            warn(filePath);
-            warn(err)
+            error(`Error while parsing package.json in: ${filePath}`);
+            error(err)
         }
     }
 
