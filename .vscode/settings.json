@@ -13,7 +13,7 @@
         ".gitignore": true,
         ".npmignore": true,
         ".npmrc": true,
-        "tsconfig.json": true
+        // "tsconfig.json": true
     },
     "workbench.colorCustomizations": {
         "activityBar.background": "#5c3735"
@@ -23,4 +23,5 @@
         120
     ],
     "html.format.wrapAttributes": "force-aligned",
+    "workbench.colorTheme": "Default Light+"
 }

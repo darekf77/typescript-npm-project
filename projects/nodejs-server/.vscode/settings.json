@@ -13,7 +13,8 @@
         "node_modules": true
     },
     "workbench.colorCustomizations": {
-        "activityBar.background": "#3186d4"
+        "activityBar.background": "#62635c",
+        "activityBar.foreground": "#bbbbb5"
     },
     "editor.rulers": [
         100,
