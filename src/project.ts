@@ -85,9 +85,10 @@ export class Project {
 
     //#region build
     static BUILD_WATCH_ANGULAR_LIB() {
-        info('Rebuilding start...')
-        run(`npm run build:esm`, { folder: 'preview' }).sync();
-        info('Rebuilding done.')
+        console.log('Rebuilding start...')
+        run(`npm run build:esm`).sync();
+        console.log('Rebuilding done.')
+        process.exit(0)
     }
 
     build(buildOptions: BuildOptions) {
@@ -121,12 +122,16 @@ export class Project {
 
             //#region angular-lib
             case 'angular-lib':
-                if (watch) {
-                    run('npm-run ng server', { biggerBuffer: true, folder: 'preview' }).async()
-                    watcher.run(Project.BUILD_WATCH_ANGULAR_LIB, 'preview/components/src');
+                if (runAsync) {
+
                 } else {
-                    run(`npm run build:lib`, { folder: 'preview' }).sync();
-                    process.exit(0)
+                    if (watch) {
+                        run('npm-run ng server').async()
+                        watcher.run(Project.BUILD_WATCH_ANGULAR_LIB, 'components/src');
+                    } else {
+                        run(`npm run build:lib`).sync();
+                        process.exit(0)
+                    }
                 }
                 return;
             //#endregion
