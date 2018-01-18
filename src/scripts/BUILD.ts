@@ -26,7 +26,6 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
 export default {
     $BUILD: build(),
     $BUILD_PROD: build(true),
-    BUILD_WATCH_ANGULAR_LIB: Project.BUILD_WATCH_ANGULAR_LIB,
     BUILD_WATCH: build(false, true),
     BUILD_WATCH_PROD: build(true, true),
 }

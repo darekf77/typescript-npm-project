@@ -46,11 +46,8 @@ function runAsyncIn(dirPath: string, command: string, output = true, biggerBuffe
 }
 
 export const watcher = {
-    run(command: Function, folderPath: string = 'src') {
-        console.log(typeof command)
-        console.log('COMMAND: ' + paramFromFn(command))
-        run(`tnp ${paramFromFn(command)}`).sync()
-        return run(`watch 'tnp ${paramFromFn(command)}' ${path.join(process.cwd(), folderPath)}`).sync()
+    run(command: string, folderPath: string = 'src') {
+        return run(`watch 'tnp command ${encodeURIComponent(command)}' ${folderPath}`).async()
     }
 }
 

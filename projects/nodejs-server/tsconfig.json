@@ -5,6 +5,7 @@
         "watch": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "importHelpers": true,
         "skipLibCheck": true,
         "sourceMap": true,
         "moduleResolution": "node",

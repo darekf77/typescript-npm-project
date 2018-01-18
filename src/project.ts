@@ -11,6 +11,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
 
+
 export class Project {
     children: Project[];
     parent: Project;
@@ -84,12 +85,7 @@ export class Project {
     //#endregion
 
     //#region build
-    static BUILD_WATCH_ANGULAR_LIB() {
-        console.log('Rebuilding start...')
-        run(`npm run build:esm`).sync();
-        console.log('Rebuilding done.')
-        process.exit(0)
-    }
+    
 
     build(buildOptions: BuildOptions) {
         const { prod, watch, project, runAsync } = buildOptions;
@@ -127,7 +123,7 @@ export class Project {
                 } else {
                     if (watch) {
                         run('npm-run ng server').async()
-                        watcher.run(Project.BUILD_WATCH_ANGULAR_LIB, 'components/src');
+                        watcher.run('npm run build:esm', 'components/src');
                     } else {
                         run(`npm run build:lib`).sync();
                         process.exit(0)
