@@ -20,5 +20,12 @@
         ],
         "outDir": "dist",
         "rootDir": "./src"
-    }
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "bundle"
+    ]
 }

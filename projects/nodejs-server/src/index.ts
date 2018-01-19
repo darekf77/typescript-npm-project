@@ -9,7 +9,7 @@ import { Controllers, Entities } from 'isomorphic-lib';
 import { MockData } from './db-scripts';
 export async function start() {
     const connection = await createConnection({
-        database: 'db.sqlite3',
+        database: 'tmp/db.sqlite3',
         entities: _.values(Entities),
         type: 'sqlite',
         synchronize: true,
