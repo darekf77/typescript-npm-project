@@ -18,7 +18,7 @@ export async function start() {
     });
 
 
-    console.log('connection sucessfull');
+    console.log('connection sucessfull!!!!!!!!');
     new MockData(connection);
 
     init('http://localhost:4000').expressApp({

@@ -22,7 +22,7 @@
     "angular-lib": "file:../angular-lib",
     "core-js": "^2.5.3",
     "isomorphic-lib": "file:../isomorphic-lib",
-    "isomorphic-rest": "^0.0.14",
+    "isomorphic-rest": "^0.0.15",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.6",
     "tslib": "^1.8.1",
