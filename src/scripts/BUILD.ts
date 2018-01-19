@@ -24,8 +24,8 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
 
 
 export default {
-    $BUILD: build(),
-    $BUILD_PROD: build(true),
-    BUILD_WATCH: build(false, true),
-    BUILD_WATCH_PROD: build(true, true),
+    $BUILD: () => build(),
+    $BUILD_PROD: () => build(true),
+    BUILD_WATCH: ()=> build(false, true),
+    BUILD_WATCH_PROD: ()=> build(true, true),
 }

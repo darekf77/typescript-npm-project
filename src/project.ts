@@ -20,6 +20,12 @@ export class Project {
     type: LibType;
     packageJson: PackageJSON;
     private static projects: Project[] = [];
+    public static get Current() {
+        return Project.create(process.cwd())
+    } 
+    public static get Tnp() {
+        return Project.create(path.join(__dirname, '..'));
+    }
 
     //#region link
     linkDependencies(type: Dependencies) {
@@ -62,7 +68,6 @@ export class Project {
 
     //#region release
     release(prod = false) {
-        this.build
         this.bundleResources();
         const releseFilePath = path.join(
             __dirname, '..', 'templates',
@@ -88,8 +93,8 @@ export class Project {
     //#region build
 
 
-    build(buildOptions: BuildOptions) {
-        const { prod, watch, project } = buildOptions;
+    build(buildOptions?: BuildOptions) {
+        const { prod, watch } = buildOptions;
 
         this.packageJson.preprareForBuild(buildOptions);
         this.linkParentDependencies()
@@ -215,9 +220,6 @@ export class Project {
         }
         return Project.create(projectPath);
     }
-
-    public static Current = Project.create(process.cwd());
-    public static Tnp = Project.create(path.join(__dirname, '..'));
 
     public static from(folderPath: string): Project[] {
         // console.log('from ' + folderPath)

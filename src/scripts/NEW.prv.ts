@@ -48,5 +48,5 @@ function handleArgs(argv: string[]) {
 
 
 export default {
-    $NEW: handleArgs
+    $NEW:  handleArgs
 }

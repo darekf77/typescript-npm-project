@@ -12,7 +12,7 @@ export type RecreateFile = { where: string; from: string };
 
 export interface BuildOptions {
     prod: boolean;
-    watch: boolean;
+    watch?: boolean;
     project: Project;
 }
 

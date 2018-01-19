@@ -10,5 +10,5 @@ function version() {
 }
 
 export default {
-    VERSION: version
+    VERSION: ()=> version()
 }

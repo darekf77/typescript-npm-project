@@ -34,8 +34,8 @@ export const clear = {
 
 
 export default {
-    $CLEAN: clear.forBuild,
-    $CLEAR: clear.forBuild,
-    $CLEAN_ALL: clear.all,
-    $CLEAR_ALL: clear.all
+    $CLEAN: () => clear.forBuild(),
+    $CLEAR: () => clear.forBuild(),
+    $CLEAN_ALL: () => clear.all(),
+    $CLEAR_ALL: () => clear.all()
 }
