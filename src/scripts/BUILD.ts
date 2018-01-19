@@ -5,20 +5,23 @@ import { BuildOptions } from "../models";
 
 
 function build(prod = false, watch = false, project: Project = Project.Current, runAsync = false) {
-    return async function (args) {
-        const options: BuildOptions = {
-            prod, watch, project
-        };
 
-        if (watch) {
-            clear.forWatching(project.type, false);
-        }
-        else {
-            clear.forBuild(project.type, false);
-        }
+    const options: BuildOptions = {
+        prod, watch, project
+    };
 
-        project.build(options);
+    if (watch) {
+        clear.forWatching(project.type, false);
     }
+    else {
+        clear.forBuild(project.type, false);
+    }
+
+    project.build(options);
+    if (!watch) {
+        process.exit(0)
+    }
+
 }
 
 
@@ -26,6 +29,6 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
 export default {
     $BUILD: () => build(),
     $BUILD_PROD: () => build(true),
-    BUILD_WATCH: ()=> build(false, true),
-    BUILD_WATCH_PROD: ()=> build(true, true),
+    BUILD_WATCH: () => build(false, true),
+    BUILD_WATCH_PROD: () => build(true, true),
 }

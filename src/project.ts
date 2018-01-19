@@ -110,7 +110,6 @@ export class Project {
                     run(`npm-run webpack ${webpackParams}`).async();
                 } else {
                     run(`npm-run webpack ${webpackParams}`).sync()
-                    process.exit(0)
                 }
                 return;
             //#endregion 
@@ -128,7 +127,6 @@ export class Project {
                     watcher.run('npm run build:esm', 'components/src');
                 } else {
                     run(`npm run build:lib`).sync();
-                    process.exit(0)
                 }
                 return;
             //#endregion
