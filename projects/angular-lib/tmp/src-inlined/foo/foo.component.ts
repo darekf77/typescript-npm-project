@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   template: `
     <h1>amazing super</h1>
     <h1>This is perfect</h1>
-    <mat-card>Simple cardaa</mat-card>
+    <mat-card>Simple card</mat-card>
     <mat-slide-toggle>Slide me!</mat-slide-toggle>
   `,
   styles: [`

@@ -7,7 +7,7 @@ import { BuildOptions } from "../models";
 function build(prod = false, watch = false, project: Project = Project.Current, runAsync = false) {
     return async function (args) {
         const options: BuildOptions = {
-            prod, watch, project, runAsync
+            prod, watch, project
         };
 
         if (watch) {

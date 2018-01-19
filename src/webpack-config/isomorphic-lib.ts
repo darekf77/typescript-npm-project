@@ -33,8 +33,8 @@ module.exports = (env: BuildOptions) => {
     let buildOk = true;
 
     const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
-    const outDir = path.join(process.cwd(), (env.watch ? config.folder.watchDist : config.folder.bundle));
-
+    const outDir = env.watch ? config.folder.watchDist : config.folder.bundle;
+    
     return {
         //#region config
         entry: './src/index.ts',
@@ -81,8 +81,7 @@ module.exports = (env: BuildOptions) => {
                 Project.Current
                     .filesToRecreateBeforeBuild()
                     .forEach(file => copy(file.from, file.where));
-
-                const tscCommand = `npm-run tsc --pretty --outDir ${outDir}`;
+                const tscCommand = `npm-run tsc --outDir ${outDir}`;
                 try {
                     run(tscCommand).sync();
                     console.log('Typescript compilation OK')
@@ -95,7 +94,9 @@ module.exports = (env: BuildOptions) => {
                 if (env.watch && buildOk) {
                     Project.Current
                         .filesToRecreateAfterBuild()
-                        .forEach(file => copy(file.from, file.where));
+                        .forEach(file => {
+                            copy(file.from, file.where)
+                        });
                 }
             }),
         ],

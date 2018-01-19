@@ -33,7 +33,7 @@ export class HelloController {
             // console.log('Pizda in constr', this['pizda'])
             this.repository = this.connection.getRepository(User) as any;
             const user = new User();
-            user.username = 'Dariusz Filipiak Master';
+            user.username = 'Dariusz Filipiak is programmer';
             user.books = [
                 new Book()
             ]

@@ -8,6 +8,7 @@ import * as path from 'path';
 import { error, info } from "./messages";
 import { paramFromFn } from "./index";
 import { RunOptions } from "./models";
+import config from './config';
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
@@ -26,23 +27,22 @@ function checkProcess(dirPath: string, command: string) {
     if (!command) error(`Bad command: ${command}`);
 }
 
-function runSyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
-    checkProcess(dirPath, command);
-    try {
-        if (output) return child.execSync('cd ' + dirPath + ` && ${command}`, { stdio: [0, 1, 2] })
-        return child.execSync('cd ' + dirPath + ` && ${command}`)
-    } catch (err) {
-        error(err);
+function runSyncIn(command: string, options?: RunOptions) {
+    const { output, cwd } = options;
+    checkProcess(cwd, command);
+    if (output) {
+        return child.execSync(command, { stdio: [0, 1, 2], cwd })
     }
+    return child.execSync(command, { cwd })
 }
 
-function runAsyncIn(dirPath: string, command: string, output = true, biggerBuffer = false) {
-    checkProcess(dirPath, command);
+function runAsyncIn(command: string, options?: RunOptions) {
+    const { output, cwd, biggerBuffer } = options;
+    checkProcess(cwd, command);
     if (biggerBuffer) {
-        return log(child.exec(command, { cwd: dirPath, maxBuffer: 2024 * 500 }), output);
-    } else {
-        return log(child.exec(command, { cwd: dirPath }), output);
+        return log(child.exec(command, { cwd, maxBuffer: 2024 * 500 }), output);
     }
+    return log(child.exec(command, { cwd }), output);
 }
 
 export const watcher = {
@@ -55,19 +55,16 @@ export const watcher = {
 
 export function run(command: string,
     options?: RunOptions) {
-    let { output, projectDirPath, biggerBuffer, folder } = _.merge({
-        output: true,
-        projectDirPath: process.cwd(),
-        biggerBuffer: false
-    }, options)
-    if (folder) projectDirPath = path.join(projectDirPath, folder);
+    if (!options) options = {};
+    if (options.output === undefined) options.output = true;
+    if (options.biggerBuffer === undefined) options.biggerBuffer = false;
+    if (options.cwd === undefined) options.cwd = process.cwd()
     return {
         sync() {
-            return runSyncIn(projectDirPath, command, output);
-
+            return runSyncIn(command, options);
         },
         async() {
-            return runAsyncIn(projectDirPath, command, output, biggerBuffer);
+            return runAsyncIn(command, options);
         }
     }
 }

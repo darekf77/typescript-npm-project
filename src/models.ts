@@ -14,12 +14,18 @@ export interface BuildOptions {
     prod: boolean;
     watch: boolean;
     project: Project;
-    runAsync: boolean;
 }
 
 export interface RunOptions {
+
+    /**
+     * Show process output
+     */
     output?: boolean;
-    projectDirPath?: string;
+    cwd?: string;
+
+    /**
+     * Use big buffer for big webpack logs
+     */
     biggerBuffer?: boolean;
-    folder?: string;
 }

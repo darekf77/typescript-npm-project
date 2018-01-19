@@ -42,10 +42,10 @@ export class PackageJSON {
         if (!this.checkNodeModules()) {
             if (fs.existsSync(yarnLock)) {
                 info('Installing npm packages... from yarn.lock ')
-                run('yarn install', { projectDirPath: this.location }).sync()
+                run('yarn install', { cwd: this.location }).sync()
             } else {
                 info('Installing npm packages... ');
-                run('npm i', { projectDirPath: this.location }).sync()
+                run('npm i', { cwd: this.location }).sync()
             }
         }
     }
@@ -57,10 +57,10 @@ export class PackageJSON {
         if (!this.checkNodeModules()) {
             if (fs.existsSync(yarnLock)) {
                 info(`Installing npm packge ${packageName} with yarn.`)
-                run(`yarn add ${packageName} ${type}`, { projectDirPath: this.location })
+                run(`yarn add ${packageName} ${type}`, { cwd: this.location })
             } else {
                 info(`Installing npm packge ${packageName} with npm.`)
-                run(`npm i ${packageName} ${type}`, { projectDirPath: this.location })
+                run(`npm i ${packageName} ${type}`, { cwd: this.location })
             }
         }
     }

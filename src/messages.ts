@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 export function error(details: any, noExit = false) {
     if (typeof details === 'object') {
-        console.log(chalk.red(JSON.stringify(details)));
+        try {
+            const json = JSON.stringify(details)
+            console.log(chalk.red(json));
+        } catch (error) {
+            console.log(details);
+        }       
     } else {
         console.log(chalk.red(details));
     }

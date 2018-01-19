@@ -10,6 +10,7 @@ import { LibType, BuildOptions, RecreateFile, Dependencies } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
+import { create } from 'domain';
 
 
 export class Project {
@@ -45,7 +46,7 @@ export class Project {
                     const linkCommand = `ln -sf ${parentSourcePackagePath} .`;
                     run(`rimraf ${destinationFolder}`).sync()
                     run(`mkdirp  ${destinationFolder2}`).sync()
-                    run(linkCommand, { projectDirPath: destinationFolder2 }).sync()
+                    run(linkCommand, { cwd: destinationFolder2 }).sync()
                 })
                 info('Linking Done.')
             }
@@ -85,10 +86,10 @@ export class Project {
     //#endregion
 
     //#region build
-    
+
 
     build(buildOptions: BuildOptions) {
-        const { prod, watch, project, runAsync } = buildOptions;
+        const { prod, watch, project } = buildOptions;
 
         this.packageJson.preprareForBuild(buildOptions);
         this.linkParentDependencies()
@@ -98,67 +99,52 @@ export class Project {
             //#region isomorphic-lib
             case 'isomorphic-lib':
                 const webpackParams = config.webpack.params(prod, watch);
-                if (runAsync) {
+                if (watch) {
                     run(`npm-run webpack ${webpackParams}`).async();
                 } else {
                     run(`npm-run webpack ${webpackParams}`).sync()
+                    process.exit(0)
                 }
                 return;
             //#endregion 
 
             //#region nodejs-server
             case 'nodejs-server':
-                if (runAsync) {
-                    run(`npm-run tsc ${watch ? '-w' : ''}`).async();
-                } else {
-                    run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
-                }
+                run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
                 return
             //#endregion
 
             //#region angular-lib
             case 'angular-lib':
-                if (runAsync) {
-
+                if (watch) {
+                    run('npm-run ng server').async()
+                    watcher.run('npm run build:esm', 'components/src');
                 } else {
-                    if (watch) {
-                        run('npm-run ng server').async()
-                        watcher.run('npm run build:esm', 'components/src');
-                    } else {
-                        run(`npm run build:lib`).sync();
-                        process.exit(0)
-                    }
+                    run(`npm run build:lib`).sync();
+                    process.exit(0)
                 }
                 return;
             //#endregion
 
             //#region angular-cli
             case 'angular-cli':
-                if (runAsync) {
-                    run('npm-run ng server').async()
-                } else {
-                    run('npm-run ng server').sync()
-                }
+                run('npm-run ng server').sync()
                 return;
             //#endregion
 
             //#region angular-client
             case 'angular-client':
-                if (runAsync) {
-                    run(`npm-run webpack-dev-server --port=${4201}`).async();
-                } else {
-                    run(`npm-run webpack-dev-server --port=${4201}`).sync()
-                }
+                run(`npm-run webpack-dev-server --port=${4201}`).sync()
                 return;
             //#endregion
 
             //#region workspace
             case 'workspace':
-                this.children.forEach(child => {
-                    buildOptions.runAsync = true;
-                    buildOptions.watch = true;
-                    this.build(buildOptions)
-                })
+                // this.children.forEach(child => {
+                //     buildOptions.runAsync = true;
+                //     buildOptions.watch = true;
+                //     this.build(buildOptions)
+                // })
                 return;
             //#endregion 
 
@@ -168,12 +154,12 @@ export class Project {
 
     //#region files recreatetion
     filesToRecreateBeforeBuild(): RecreateFile[] {
-        const workspace = Project.by('workspace');
+        const isomorphicLib = Project.by('isomorphic-lib');
         const files: RecreateFile[] = [];
-        if (this.type === 'isomorphic-lib') {
+        if (this.type === 'isomorphic-lib' && this.location !== isomorphicLib.location) {
             files.push({
-                from: path.join(this.location, 'src', 'client.ts'),
-                where: path.join(process.cwd(), 'src', 'client.ts')
+                from: path.join(isomorphicLib.location, 'src', 'client.ts'),
+                where: path.join(this.location, 'src', 'client.ts')
             })
         }
         return files.concat(this.commonFiles())
@@ -185,8 +171,8 @@ export class Project {
             const f = ['client.d.ts', 'client.js', 'client.js.map']
             f.forEach(file => {
                 files.push({
-                    where: path.join(process.cwd(), file),
-                    from: path.join(process.cwd(), config.folder.watchDist, file),
+                    where: path.join(this.location, file),
+                    from: path.join(this.location, config.folder.watchDist, file),
                 })
             })
         }
@@ -206,14 +192,17 @@ export class Project {
             'tslint.json'
         ];
         return files.map(file => {
-            return { from: path.join(wokrspace.location, file), where: path.join(process.cwd(), file) }
+            return {
+                from: path.join(wokrspace.location, file),
+                where: path.join(this.location, file)
+            }
         })
     }
     //#endregion
 
     //#region get project 
     public static by(libraryType: LibType): Project {
-        console.log('by libraryType ' + libraryType)
+        // console.log('by libraryType ' + libraryType)
         let projectPath;
         if (libraryType === 'workspace') {
             return Project.create(path.join(__dirname, `../projects`));
@@ -284,6 +273,7 @@ export class Project {
                 error("Bad project type " + this.type)
             }
             Project.projects.push(this);
+            console.log(`Created project ${path.basename(this.location)}`)
 
             this.children = Project.from(location);
             this.parent = Project.create(path.join(location, '..'));
