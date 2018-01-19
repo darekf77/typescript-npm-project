@@ -1,9 +1,31 @@
+# compiled output
+/bundle
+/dist
+/tmp
+/out-tsc
+bundle.umd.js
+/index.*
+/client.*
+
+
+
+# dependencies
+/node_modules
+
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+# System Files
 .DS_Store
-dist
-doc
-node_modules
-.nyc_output
-coverage
-*.log
-npm-debug.log*
-db.*
+Thumbs.db
