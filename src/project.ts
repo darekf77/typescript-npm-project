@@ -11,7 +11,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
-
+import { copy } from "./helpers";
 
 export class Project {
     children: Project[];
@@ -93,6 +93,8 @@ export class Project {
 
         this.packageJson.preprareForBuild(buildOptions);
         this.linkParentDependencies()
+        this.filesToRecreateBeforeBuild()
+            .forEach(file => copy(file.from, file.where));
 
         switch (this.type) {
 
@@ -273,7 +275,7 @@ export class Project {
                 error("Bad project type " + this.type)
             }
             Project.projects.push(this);
-            console.log(`Created project ${path.basename(this.location)}`)
+            // console.log(`Created project ${path.basename(this.location)}`)
 
             this.children = Project.from(location);
             this.parent = Project.create(path.join(location, '..'));

@@ -75,7 +75,7 @@ export class PackageJSON {
         const isTnpProject = (location === path.join(__dirname, '..'));
         const filePath = path.join(location, 'package.json');
         if (!fs.existsSync(filePath)) {
-            warn(`No package.json in folder: ${path.basename(location)}`)
+            // warn(`No package.json in folder: ${path.basename(location)}`)
             return;
         }
         try {

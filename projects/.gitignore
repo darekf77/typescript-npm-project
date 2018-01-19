@@ -4,8 +4,10 @@
 /tmp
 /out-tsc
 bundle.umd.js
-/client.*
 /index.*
+/client.*
+
+
 
 # dependencies
 /node_modules

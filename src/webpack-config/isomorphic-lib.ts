@@ -34,7 +34,7 @@ module.exports = (env: BuildOptions) => {
 
     const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
     const outDir = env.watch ? config.folder.watchDist : config.folder.bundle;
-    
+
     return {
         //#region config
         entry: './src/index.ts',
@@ -78,9 +78,6 @@ module.exports = (env: BuildOptions) => {
         //#endregion
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
-                Project.Current
-                    .filesToRecreateBeforeBuild()
-                    .forEach(file => copy(file.from, file.where));
                 const tscCommand = `npm-run tsc --outDir ${outDir}`;
                 try {
                     run(tscCommand).sync();
