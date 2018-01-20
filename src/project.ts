@@ -21,10 +21,10 @@ export class Project {
     packageJson: PackageJSON;
     private static projects: Project[] = [];
     public static get Current() {
-        return Project.create(process.cwd())
-    } 
+        return Project.from(process.cwd())
+    }
     public static get Tnp() {
-        return Project.create(path.join(__dirname, '..'));
+        return Project.from(path.join(__dirname, '..'));
     }
 
     //#region link
@@ -37,12 +37,12 @@ export class Project {
 
                 dependencies.some((d) => {
                     if (!fs.existsSync(path.join(thisNodeModelsPath, d.name))) {
-                        self.packageJson.preprareForBuild();
+                        self.packageJson.installNodeModules();
                         return false;
                     }
                 });
 
-                info('Linking parent workspace common packages...')
+                info(`Linking parent workspace common packages to ${project.name}...`)
                 dependencies.forEach(d => {
                     const destinationFolder = path.join(project.location, 'node_modules', d.name);
                     const isOrganizationPackage = /.*\/.*/g.test(d.name);
@@ -96,7 +96,10 @@ export class Project {
     build(buildOptions?: BuildOptions) {
         const { prod, watch } = buildOptions;
 
-        this.packageJson.preprareForBuild(buildOptions);
+        this.packageJson.installNodeModules(buildOptions);
+        this.packageJson.getLinkedProjects().forEach(p => {
+            p.linkParentDependencies()
+        })
         this.linkParentDependencies()
         this.filesToRecreateBeforeBuild()
             .forEach(file => copy(file.from, file.where));
@@ -210,24 +213,24 @@ export class Project {
         // console.log('by libraryType ' + libraryType)
         let projectPath;
         if (libraryType === 'workspace') {
-            return Project.create(path.join(__dirname, `../projects`));
+            return Project.from(path.join(__dirname, `../projects/workspace`));
         }
-        projectPath = path.join(__dirname, `../projects/${libraryType}`);
+        projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
         if (!fs.existsSync(projectPath)) {
             error(`Bad library type: ${libraryType}`)
         }
-        return Project.create(projectPath);
+        return Project.from(projectPath);
     }
 
-    public static from(folderPath: string): Project[] {
-        // console.log('from ' + folderPath)
+    public findChildren(): Project[] {
+        // console.log('from ' + this.location)
         const notAllowed: string[] = [
             '.vscode', 'node_modules', 'dist', 'bundle',
             'src', 'e2e', 'tmp', 'tests',
             'components', '.git', 'bin'
         ]
         let subdirectories: string[] = Filehound.create()
-            .path(folderPath)
+            .path(this.location)
             .depth(1)
             .directory()
             .findSync()
@@ -236,7 +239,7 @@ export class Project {
 
         return subdirectories
             .map(dir => {
-                return Project.create(dir);
+                return Project.from(dir);
             })
     }
 
@@ -248,14 +251,14 @@ export class Project {
         };
         fse.copySync(this.location, destinationPath, options);
         console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));
-        const project = Project.create(destinationPath);
+        const project = Project.from(destinationPath);
         console.log(chalk.green('Done.'));
         return project;
     }
 
-    static create(location: string, parent?: Project): Project {
+    static from(location: string, parent?: Project): Project {
         const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
-        if (alreadyExist) return alreadyExist;
+        if (alreadyExist) return alreadyExist; 
         if (!fs.existsSync(location)) return;
         if (!PackageJSON.from(location)) return;
         return new Project(location)
@@ -277,9 +280,9 @@ export class Project {
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 
-            this.children = Project.from(location);
-            this.parent = Project.create(path.join(location, '..'));
-            this.preview = Project.create(path.join(location, 'preview'));
+            this.children = this.findChildren();
+            this.parent = Project.from(path.join(location, '..'));
+            this.preview = Project.from(path.join(location, 'preview'));
 
         } else {
             warn(`Invalid project location: ${location}`);

@@ -20,14 +20,17 @@ export const clear = {
         clearFiles('node_modules/')
         clearFiles('bundle/')
         clearFiles('dist/')
+        clearFiles('tmp/')
         process.exit(0)
     },
     forBuild: (libType?: LibType, exit = true) => {
         clearFiles('bundle/')
+        clearFiles('tmp/')
         if (exit) process.exit(0)
     },
     forWatching: (libType?: LibType, exit = true) => {
         clearFiles('dist/')
+        clearFiles('tmp/')
         if (exit) process.exit(0)
     }
 };

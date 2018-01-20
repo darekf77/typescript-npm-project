@@ -5,7 +5,9 @@ import * as path from 'path';
 import { LibType, InstalationType, BuildOptions, Dependencies, Package } from "./models";
 import { error, info, warn } from "./messages";
 import { run } from "./process";
+import { Project } from "./project";
 
+//#region package json
 export interface IPackageJSON {
     name: string;
     version: string;
@@ -19,6 +21,7 @@ export interface IPackageJSON {
     dependencies: Object;
     devDependencies: Object;
 }
+//#endregion
 
 export class PackageJSON {
 
@@ -37,37 +40,57 @@ export class PackageJSON {
     }
     //#endregion
 
-    preprareForBuild(buildOptions?: BuildOptions) {
+    installNodeModules(buildOptions?: BuildOptions) {
         const yarnLock = path.join(this.location, 'yarn.lock');
-        if (!this.checkNodeModules()) {
+        if (!this.checkNodeModulesInstalled()) {
             if (fs.existsSync(yarnLock)) {
-                info('Installing npm packages... from yarn.lock ')
-                run('yarn install', { cwd: this.location }).sync()
+                info(`Installing npm packages in ${this.name}... from yarn.lock `)
+                run('yarn install', { cwd: this.location, output: false }).sync()
             } else {
-                info('Installing npm packages... ');
-                run('npm i', { cwd: this.location }).sync()
+                info(`Installing npm packages in ${this.name}... `);
+                run('npm i', { cwd: this.location, output: false }).sync()
             }
         }
     }
 
-
-    install(packageName?: string, type: InstalationType = '--save-dev', exact = false) {
-        const yarnLock = path.join(this.location, 'yarn.lock');
-
-        if (!this.checkNodeModules()) {
-            if (fs.existsSync(yarnLock)) {
-                info(`Installing npm packge ${packageName} with yarn.`)
-                run(`yarn add ${packageName} ${type}`, { cwd: this.location })
-            } else {
-                info(`Installing npm packge ${packageName} with npm.`)
-                run(`npm i ${packageName} ${type}`, { cwd: this.location })
-            }
+    private projectFromLocalVersion(version: string): Project {
+        if (/file\:.+/g.test(version)) {
+            const name = version.replace('file:', '');
+            const location = path.join(this.location, name)
+            return Project.from(location);
         }
     }
 
-    private checkNodeModules() {
+    getLinkedProjects(dependencyType: Dependencies = 'dependencies'): Project[] {
+        if (!this.data) return [];
+        const dependencies = this.data.dependencies;
+        let localLinkedProjects: Project[] = [];
+        _.forEach(dependencies, (version, name) => {
+            const project = this.projectFromLocalVersion(version as any);
+            if (project) localLinkedProjects.push(project)
+        })
+        return localLinkedProjects;
+    }
+
+    // install(packageName?: string, type: InstalationType = '--save-dev', exact = false) {
+    //     const yarnLock = path.join(this.location, 'yarn.lock');
+
+    //     if (!this.checkNodeModules()) {
+    //         // if (fs.existsSync(yarnLock)) {
+    //         //     info(`Installing npm packge ${packageName} with yarn.`)
+    //         //     run(`yarn add ${packageName} ${type}`, { cwd: this.location })
+    //         // } else {
+    //         //     info(`Installing npm packge ${packageName} with npm.`)
+    //         //     run(`npm i ${packageName} ${type}`, { cwd: this.location })
+    //         // }
+    //         )
+    //     }
+    // }
+
+    private checkNodeModulesInstalled() {
         const clientNodeModules = path.join(this.location, 'node_modules');
         // return (run("check-dependencies").sync().toString().trim() === '')
+        console.log('this.location', this.location)
         return fs.existsSync(clientNodeModules)
     }
 
@@ -99,6 +122,8 @@ export class PackageJSON {
         return packages;
     }
 
+    //#region getters
+
     get type(): LibType {
         return this.data.tnp.type;
     }
@@ -115,5 +140,6 @@ export class PackageJSON {
         const p = this.data.tnp;
         return Array.isArray(p.resources) ? p.resources : [];
     }
+    //#endregion
 
 }
