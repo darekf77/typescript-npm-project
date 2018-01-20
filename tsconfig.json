@@ -12,12 +12,11 @@
         ],
         "typeRoots": [
             "node_modules/@types"
-        ]
+        ],
+        "baseUrl": "./src"
     },
-    "filesGlob": [
-        "./src/**/*.ts",
-        "!./src/**/*.spec.ts",
-        "!./node_modules/**/*.ts"
+    "include": [
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",
