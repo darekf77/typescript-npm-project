@@ -5,13 +5,13 @@ import {
     ManyToOne, ManyToMany, PrimaryGeneratedColumn
 } from "typeorm";
 import { Router, Request, Response } from "express";
-import EMAIL from "./EMAIL";
+import { EMAIL } from "./EMAIL";
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
 
 @Entity()
-export  class EMAIL_TYPE {
+export class EMAIL_TYPE {
     private constructor() {
 
     }

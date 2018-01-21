@@ -5,9 +5,9 @@ import {
 } from 'isomorphic-rest';
 import { Repository } from "typeorm";
 // local
-import User from '../../entities/examples/User';
-import Book from '../../entities/examples/Book';
-import Author from '../../entities/examples/Author';
+import { User } from '../../entities/examples/User';
+import { Book } from '../../entities/examples/Book';
+import { Author } from '../../entities/examples/Author';
 import { UsersController } from './UsersController';
 
 

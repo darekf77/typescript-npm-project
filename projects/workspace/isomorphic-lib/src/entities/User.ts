@@ -7,7 +7,7 @@ import {
 import { Router, Request, Response } from 'express';
 import { authenticate } from "passport";
 
-import EMAIL from "./EMAIL";
+import { EMAIL } from "./EMAIL";
 
 @Entity()
 export class USER {

@@ -9,9 +9,8 @@ import { authenticate, use } from "passport";
 import { Strategy, IStrategyOptions } from "passport-http-bearer";
 //#endregion
 
-import USER from '../entities/USER'
-import SESSION from '../entities/SESSION';
-import { endianness } from 'os';
+import { USER } from '../entities/USER'
+import { SESSION } from '../entities/SESSION';
 
 @ENDPOINT()
 export class AuthController {

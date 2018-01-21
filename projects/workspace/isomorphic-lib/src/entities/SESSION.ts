@@ -4,7 +4,7 @@ import {
 } from "typeorm";
 import { verify, generate } from "password-hash";
 // local
-import USER from './USER';
+import { USER } from './USER';
 
 /**
  * Session time in miliseconds

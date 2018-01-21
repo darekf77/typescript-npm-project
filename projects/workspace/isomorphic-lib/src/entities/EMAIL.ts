@@ -6,8 +6,8 @@ import {
 } from "typeorm";
 import { Router, Request, Response } from "express";
 
-import USER from "./USER";
-import EMAIL_TYPE from './EMAIL_TYPE';
+import { USER } from "./USER";
+import { EMAIL_TYPE } from './EMAIL_TYPE';
 
 
 

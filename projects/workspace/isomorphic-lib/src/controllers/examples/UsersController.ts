@@ -7,7 +7,7 @@ import {
 } from 'isomorphic-rest';
 import { Repository } from "typeorm";
 // local
-import User from '../../entities/examples/User';
+import { User } from '../../entities/examples/User';
 
 
 @ENDPOINT()

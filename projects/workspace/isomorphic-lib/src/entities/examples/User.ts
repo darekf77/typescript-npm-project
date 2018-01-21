@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-import Author from "./Author";
-import Book from "./Book";
+import { Author } from "./Author";
+import { Book } from "./Book";
 
 @Entity()
 export class User {
