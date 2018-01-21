@@ -4,11 +4,14 @@ import {
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, OrmConnection, Connection
 } from 'isomorphic-rest';
+//#region backend
 import { authenticate, use } from "passport";
 import { Strategy, IStrategyOptions } from "passport-http-bearer";
+//#endregion
 
 import USER from '../entities/USER'
 import SESSION from '../entities/SESSION';
+import { endianness } from 'os';
 
 @ENDPOINT()
 export class AuthController {
@@ -16,11 +19,13 @@ export class AuthController {
     @OrmConnection connection: Connection;
 
     private async repos() {
+        //#region backedn
         const auth = await this.connection.getRepository(SESSION);
         const user = await this.connection.getRepository(USER);
         return {
             auth, user
         }
+        //#endregion
     }
 
     constructor() {

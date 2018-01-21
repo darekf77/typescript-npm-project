@@ -118,4 +118,4 @@ export class HelloController {
 
 }
 
-export default UsersController;
+export default HelloController;

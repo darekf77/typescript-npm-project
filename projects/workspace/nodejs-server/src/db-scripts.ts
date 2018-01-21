@@ -2,7 +2,7 @@
 import { Repository, Connection } from 'typeorm';
 
 import {
-    Controllers, Entities, User
+    Controllers, Entities, User,
 } from 'isomorphic-lib/backend';
 
 
