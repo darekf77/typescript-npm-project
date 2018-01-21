@@ -1,22 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+    Entity, PrimaryColumn, Column,
+    Connection, OneToMany, ManyToMany, JoinTable,
+    AfterInsert, AfterUpdate, BeforeUpdate,
+    PrimaryGeneratedColumn
+} from "typeorm";
+import { Router, Request, Response } from 'express';
+import { authenticate } from "passport";
 
-import { Author } from "./Author";
-import { Book } from "./Book";
+import EMAIL from "./EMAIL";
 
 @Entity()
-export class User {
+export class USER {
+
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true })
-    name: string;
+    @Column() username: string;
+    @Column() password: string;
+    @Column() firstname: string;
+    @Column() lastname: string;
 
-    @Column()
-    username: string;
 
-    friend: Author;
-    books: Book[];
-    public isAmazing() {
-        return 'is amazing person'
-    }
+    @OneToMany(type => EMAIL, email => email.user, {
+        cascadeUpdate: false,
+        cascadeInsert: false
+    })
+    emails: EMAIL[] = [];
+
+    session_expire_in: number;
+
 }
+
+
+export default USER;

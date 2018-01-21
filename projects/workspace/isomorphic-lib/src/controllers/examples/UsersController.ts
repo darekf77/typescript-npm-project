@@ -6,17 +6,18 @@ import {
     Response, BaseCRUD, BaseCRUDEntity, Connection, OrmConnection
 } from 'isomorphic-rest';
 import { Repository } from "typeorm";
+// local
+import User from '../../entities/examples/User';
 
-import { User, Book, Author } from "../entities";
 
 @ENDPOINT()
 export class UsersController extends BaseCRUD<User>
 {
-    //#region backend
+
     @OrmConnection connection: Connection;
     @BaseCRUDEntity(User) public entity: User;
     private reposiotry: Repository<User>;
-    //#endregion
+
     constructor() {
         super();
 
@@ -24,3 +25,6 @@ export class UsersController extends BaseCRUD<User>
 
 
 }
+
+
+export default UsersController;

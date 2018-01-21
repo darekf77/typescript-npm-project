@@ -36,7 +36,8 @@ function newProject(type: LibType, name: string) {
 }
 
 
-function handleArgs(argv: string[]) {
+function handleArgs(args: string) {
+    const argv = args.split(' ');
     if (!_.isArray(argv) || argv.length < 2) {
         error(`Top few argument for ${chalk.black('init')} parameter.`, true);
         error(`Examples:`, true);
@@ -48,5 +49,5 @@ function handleArgs(argv: string[]) {
 
 
 export default {
-    $NEW:  handleArgs
+    $NEW: handleArgs
 }

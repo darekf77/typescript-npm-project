@@ -3,9 +3,13 @@ import {
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, OrmConnection, Connection
 } from 'isomorphic-rest';
-import { User, Book, Author } from "../entities";
-
 import { Repository } from "typeorm";
+// local
+import User from '../../entities/examples/User';
+import Book from '../../entities/examples/Book';
+import Author from '../../entities/examples/Author';
+import { UsersController } from './UsersController';
+
 
 const test = new User();
 test.username = 'Dariusz Filipiak brak ego';
@@ -19,6 +23,12 @@ enum USER_GROUPS {
     ADMIN, USER, USER_PREMIU
 }
 //#endregion
+
+console.log('life is amazing')
+
+export function aaa() {
+
+}
 
 @ENDPOINT('/test')
 export class HelloController {
@@ -108,3 +118,4 @@ export class HelloController {
 
 }
 
+export default UsersController;

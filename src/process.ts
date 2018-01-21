@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { error, info } from "./messages";
-import { paramFromFn } from "./index";
 import { RunOptions } from "./models";
 import config from './config';
 

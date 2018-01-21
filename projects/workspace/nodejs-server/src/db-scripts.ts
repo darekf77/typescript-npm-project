@@ -3,12 +3,13 @@ import { Repository, Connection } from 'typeorm';
 
 import {
     Controllers, Entities, User
-} from 'isomorphic-lib';
+} from 'isomorphic-lib/backend';
+
 
 export class MockData {
 
     reposiory = {
-        users: this.connection.getRepository(User),
+        users: this.connection.getRepository(Entities.User as any),
     }
     constructor(private connection: Connection) {
         this.createUser();

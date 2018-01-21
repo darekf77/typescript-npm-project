@@ -6,10 +6,14 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "index.*": true,
+        // "index.*": true,
         // "client.*": true,
         // "dist": true,
         // "bundle": true,
+        ".gitignore": true,
+        ".npmignore": true,
+        ".npmrc": true,
+        "tsconfig.json": true,
         "node_modules": true
     },
     "workbench.colorCustomizations": {

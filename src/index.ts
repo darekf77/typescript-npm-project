@@ -13,7 +13,7 @@ export function run(argsv: string[]) {
                     if (typeof v === 'function') {
                         const check = match(k, argsv);
                         if (check.isMatch) {
-                            v.apply(null, check.restOfArgs);
+                            v.apply(null, [check.restOfArgs.join(' ')]);
                             process.stdin.resume();
                         }
                     }
@@ -22,8 +22,12 @@ export function run(argsv: string[]) {
         });
 }
 
-export function paramFromFn(fn: Function) {
-    return _.kebabCase(fn.name);
+function paramsFrom(command: string) {
+    return _.kebabCase(command);
+}
+
+export function tnpCall(fn: Function, params: string) {
+    return `tnp ${paramsFrom(fn.name)} ${params}`;
 }
 
 
@@ -32,14 +36,14 @@ function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: st
     let restOfArgs = argv;
 
     isMatch = argv.filter((vv, i) => {
-        const nameKebabCase = _.kebabCase(name);
+        const nameInKC = paramsFrom(name);
         const isWithoutDash = name.startsWith('$');
-        const argKebabCase = _.kebabCase(vv);
+        const argInKC = paramsFrom(vv);
 
         const condition =
-            (isWithoutDash && argKebabCase === `${nameKebabCase}`)
-            || argKebabCase === `${nameKebabCase}`
-            || argKebabCase === `${nameKebabCase.substr(0, 1)}`;
+            (isWithoutDash && argInKC === `${nameInKC}`)
+            || argInKC === `${nameInKC}`
+            || argInKC === `${nameInKC.substr(0, 1)}`;
         if (condition) {
             restOfArgs = _.slice(argv, i + 1, argv.length);
         }

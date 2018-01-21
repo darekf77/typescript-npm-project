@@ -5,7 +5,7 @@ import "reflect-metadata";
 import { init } from 'isomorphic-rest';
 import { createConnection, useContainer } from 'typeorm';
 
-import { Controllers, Entities } from 'isomorphic-lib';
+import { Controllers, Entities } from 'isomorphic-lib/backend';
 import { MockData } from './db-scripts';
 export async function start() {
     const connection = await createConnection({

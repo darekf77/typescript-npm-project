@@ -8,6 +8,7 @@ import { copy } from "../helpers";
 import { run } from "../process";
 import { Project } from "../project";
 import { BuildOptions } from "../models";
+import * as dateformat from "dateformat";
 
 import config from "../config";
 
@@ -79,11 +80,12 @@ module.exports = (env: BuildOptions) => {
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
                 const tscCommand = `npm-run tsc --outDir ${outDir}`;
+                const date = `[${dateformat(new Date(), 'HH:MM:ss')}]`;
                 try {
                     run(tscCommand).sync();
-                    console.log('Typescript compilation OK')
+                    console.log(`${date} Typescript compilation OK`)
                 } catch (error) {
-                    console.error('Typescript compilation ERROR')
+                    console.error(`${date} Typescript compilation ERROR`)
                     buildOk = false;
                 }
             }),

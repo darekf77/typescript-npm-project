@@ -12,6 +12,7 @@ import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
 import { copy } from "./helpers";
+import { tnpCall } from './index';
 
 export class Project {
     children: Project[];
@@ -110,9 +111,9 @@ export class Project {
             case 'isomorphic-lib':
                 const webpackParams = config.webpack.params(prod, watch);
                 if (watch) {
-                    run(`npm-run webpack ${webpackParams}`).async();
+                    watcher.run(tnpCall(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams));
                 } else {
-                    run(`npm-run webpack ${webpackParams}`).sync()
+                    BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams)
                 }
                 return;
             //#endregion 
@@ -258,7 +259,7 @@ export class Project {
 
     static from(location: string, parent?: Project): Project {
         const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
-        if (alreadyExist) return alreadyExist; 
+        if (alreadyExist) return alreadyExist;
         if (!fs.existsSync(location)) return;
         if (!PackageJSON.from(location)) return;
         return new Project(location)
@@ -305,3 +306,8 @@ export class Project {
     //#endregion
 
 };
+
+
+export function BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams: string) {
+    run(`npm-run webpack ${webpackParams}`).sync()
+}

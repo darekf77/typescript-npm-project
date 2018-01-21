@@ -5,8 +5,9 @@ import {
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, BaseCRUD, BaseCRUDEntity, OrmConnection, Connection
 } from 'isomorphic-rest';
-import { User, Book, Author } from "../entities";
 import { Repository } from "typeorm";
+// local
+import Book from '../../entities/examples/Book';
 
 
 @ENDPOINT()
@@ -27,3 +28,6 @@ export class TestController extends BaseCRUD<Book> {
         this.repository.save([book1, book2] as any)
     }
 }
+
+
+export default TestController;

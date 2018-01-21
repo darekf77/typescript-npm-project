@@ -1,8 +1,6 @@
-//#region node
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-//#endregion
-
-import { User } from "./User";
+// local
+import User from "./User";
 
 @Entity()
 export class Author {
@@ -11,7 +9,10 @@ export class Author {
 
     @Column("int", { nullable: true })
     age: number;
+
     user: User;
+
     friends: User[];
 }
 
+export default Author;

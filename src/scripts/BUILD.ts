@@ -1,5 +1,6 @@
 
-import { Project } from '../project';
+import { run } from "../process";
+import { Project, BUILD_ISOMORPHIC_LIB_WEBPACK } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions } from "../models";
 
@@ -25,8 +26,10 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
 }
 
 
-
 export default {
+    BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
+        BUILD_ISOMORPHIC_LIB_WEBPACK(args)
+    },
     $BUILD: () => build(),
     $BUILD_PROD: () => build(true),
     BUILD_WATCH: () => build(false, true),

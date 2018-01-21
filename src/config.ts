@@ -33,11 +33,9 @@ const config = {
                     '--env.prod=' + prod,
                     '--env.watch=' + watch
                 ],
-                config: '--config=' + path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js'),
-                watch: watch ? '--watch' : '',
-
+                config: '--config=' + path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js')
             }
-            return `${o.config} ${o.watch}  --bail ${o.env.join(' ')}`;
+            return `${o.config} --bail ${o.env.join(' ')}`;
         }
     }
 
