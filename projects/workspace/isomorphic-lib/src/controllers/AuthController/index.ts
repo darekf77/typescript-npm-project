@@ -9,10 +9,10 @@ import { authenticate, use } from "passport";
 import { Strategy, IStrategyOptions } from "passport-http-bearer";
 //#endregion
 
-import { USER } from '../entities/USER'
-import { SESSION } from '../entities/SESSION';
-import { EMAIL } from "../entities/EMAIL";
-import { EMAIL_TYPE } from "../entities/EMAIL_TYPE";
+import { USER } from '../../entities/USER'
+import { SESSION } from '../../entities/SESSION';
+import { EMAIL } from "../../entities/EMAIL";
+import { EMAIL_TYPE } from "../../entities/EMAIL_TYPE";
 
 export function routeAuthentication() {
     return authenticate('bearer', { session: false });
@@ -49,15 +49,16 @@ export class AuthController {
         // return { send: 'asdasdasdas' }
     }
 
-    @GET('/auth')
+    @GET('/')
     test(): Response<USER> {
+        //#region backend
         return async (req, res) => {
             const repo = await this.repos();
             const requestUser: USER = req['user'];
             const user = await repo.user
-                .createQueryBuilder('USERS')
-                .innerJoinAndSelect('USERS.emails', 'emails')
-                .where('USERS.id = :id')
+                .createQueryBuilder(USER.name)
+                .innerJoinAndSelect(`${USER.name}.emails`, 'emails')
+                .where(`${USER.name}.id = :id`)
                 .setParameter('id', requestUser.id)
                 .getOne()
             if (user) {
@@ -66,6 +67,33 @@ export class AuthController {
             }
             throw Errors.entityNotFound(USER)
         }
+        //#endregion
+    }
+
+    @GET('/logout')
+    logout() {
+        //#region backend
+        return async (req) => {
+            const repo = await this.repos();
+            var user = await repo.user
+                .createQueryBuilder(USER.name)
+                .innerJoinAndSelect(`${USER.name}.emails`, 'emails')
+                .where(`${USER.name}.id = :id`)
+                .setParameter('id', req.user.id)
+                .getOne()
+            let token = await repo.auth
+                .createQueryBuilder(SESSION.name)
+                .innerJoinAndSelect(`${SESSION.name}.user`, 'user')
+                .where(`${SESSION.name}.ip = :ip`)
+                .andWhere('user.id = :userid')
+                .setParameters({
+                    ip: req.ip,
+                    userid: req.user.id
+                })
+                .getOne()
+            await repo.auth.removeById(token.id);
+        }
+        //#endregion
     }
 
     async __init() {
