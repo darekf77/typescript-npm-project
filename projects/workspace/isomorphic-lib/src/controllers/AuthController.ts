@@ -2,7 +2,7 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, OrmConnection, Connection
+    Response, OrmConnection, Connection, Errors
 } from 'isomorphic-rest';
 //#region backend
 import { authenticate, use } from "passport";
@@ -11,6 +11,12 @@ import { Strategy, IStrategyOptions } from "passport-http-bearer";
 
 import { USER } from '../entities/USER'
 import { SESSION } from '../entities/SESSION';
+import { EMAIL } from "../entities/EMAIL";
+import { EMAIL_TYPE } from "../entities/EMAIL_TYPE";
+
+export function routeAuthentication() {
+    return authenticate('bearer', { session: false });
+}
 
 @ENDPOINT()
 export class AuthController {
@@ -18,33 +24,51 @@ export class AuthController {
     @OrmConnection connection: Connection;
 
     private async repos() {
-        //#region backedn
+        //#region backend
         const auth = await this.connection.getRepository(SESSION);
         const user = await this.connection.getRepository(USER);
+        const email = await this.connection.getRepository(EMAIL);
+        const emailType = await this.connection.getRepository(EMAIL_TYPE);
         return {
-            auth, user
+            auth, user, email, emailType
         }
         //#endregion
     }
 
     constructor() {
 
-
         //#region backend
-        this.init()
+        this.__init()
         //#endregion
     }
 
 
-
-
-    @GET('/auth')
-    test(): Response {
-        return { send: "super! this is amazing" }
+    @GET('/auth2')
+    test2(): Response {
+        throw Errors.entityNotFound(USER)
+        // return { send: 'asdasdasdas' }
     }
 
+    @GET('/auth')
+    test(): Response<USER> {
+        return async (req, res) => {
+            const repo = await this.repos();
+            const requestUser: USER = req['user'];
+            const user = await repo.user
+                .createQueryBuilder('USERS')
+                .innerJoinAndSelect('USERS.emails', 'emails')
+                .where('USERS.id = :id')
+                .setParameter('id', requestUser.id)
+                .getOne()
+            if (user) {
+                user.session_expire_in = requestUser.session_expire_in
+                return user;
+            }
+            throw Errors.entityNotFound(USER)
+        }
+    }
 
-    async init() {
+    async __init() {
         //#region backend
 
         const repo = await this.repos();

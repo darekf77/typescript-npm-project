@@ -5,12 +5,13 @@ import "reflect-metadata";
 import { init } from 'isomorphic-rest';
 import { createConnection, useContainer } from 'typeorm';
 
-import { Controllers, Entities } from 'isomorphic-lib/backend';
+import { Controllers, Entities } from 'isomorphic-lib';
 import { MockData } from './db-scripts';
 export async function start() {
+    const entities = _.values(Entities) as any;
     const connection = await createConnection({
         database: 'tmp/db.sqlite3',
-        entities: _.values(Entities),
+        entities,
         type: 'sqlite',
         synchronize: true,
         dropSchema: true,
