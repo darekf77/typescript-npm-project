@@ -19,11 +19,22 @@
         "tslib": "^1.8.1"
     },
     "dependencies": {
+        "@types/bcrypt": "^1.0.0",
+        "@types/oauth2orize": "^1.8.0",
+        "@types/passport": "^0.3.3",
+        "@types/passport-http-bearer": "^1.0.30",
+        "@types/password-hash": "^1.2.19",
+        "@types/q": "^1.0.3",
+        "@types/validator": "^6.2.2",
         "@types/glob": "^5.0.34",
+        "bcrypt": "^1.0.3",
+        "fbgraph": "^1.4.1",
+        "g": "^2.0.1",
         "glob": "^7.1.2",
         "passport": "^0.4.0",
         "passport-http-bearer": "^1.0.1",
-        "password-hash": "^1.2.2"
+        "password-hash": "^1.2.2",
+        "validator": "^9.2.0"
     },
     "devDependencies": {
         "@ngtools/webpack": "^1.9.3",

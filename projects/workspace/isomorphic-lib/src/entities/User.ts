@@ -8,9 +8,21 @@ import { Router, Request, Response } from 'express';
 import { authenticate } from "passport";
 
 import { EMAIL } from "./EMAIL";
+import { EMAIL_TYPE } from "./EMAIL_TYPE";
+
+export interface IUSER {
+    email: string;
+    username: string;
+    password: string;
+    firstname?: string;
+    lastname?: string;
+    city?: string;
+    email_type?: EMAIL_TYPE;
+}
+
 
 @Entity()
-export class USER {
+export class USER implements IUSER {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -19,7 +31,7 @@ export class USER {
     @Column() password: string;
     @Column() firstname: string;
     @Column() lastname: string;
-
+    @Column() email: string;
 
     @OneToMany(type => EMAIL, email => email.user, {
         cascadeUpdate: false,
