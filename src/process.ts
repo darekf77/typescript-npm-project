@@ -51,7 +51,6 @@ export const watcher = {
         let cmd = `tnp command ${command}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
         const toRun = `watch ${cmd} ${folderPath}`;
-        console.log('toRun', toRun)
         return run(toRun).async()
     },
 
@@ -59,7 +58,6 @@ export const watcher = {
         let cmd = `tnp ${paramsFrom(fn.name)} ${params}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
         const toRun = `watch ${cmd} ${folderPath}`;
-        console.log('toRun', toRun)
         return run(toRun).async()
     }
 }
