@@ -4,10 +4,12 @@ import chalk from 'chalk';
 import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from "os";
 
 import { error, info } from "./messages";
 import { RunOptions } from "./models";
 import config from './config';
+import { paramsFrom } from './index';
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
@@ -46,7 +48,17 @@ function runAsyncIn(command: string, options?: RunOptions) {
 
 export const watcher = {
     run(command: string, folderPath: string = 'src') {
-        return run(`watch 'tnp command ${encodeURIComponent(command)}' ${folderPath}`).async()
+        const toRun = `watch 'tnp command ${command}' ${folderPath}`;
+        console.log('toRun', toRun)
+        return run(toRun).async()
+    },
+
+    call(fn: Function, params: string, folderPath: string = 'src') {
+        let cmd = `tnp ${paramsFrom(fn.name)} ${params}`;
+        cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
+        const toRun = `watch ${cmd} ${folderPath}`;
+        console.log('toRun', toRun)
+        return run(toRun).async()
     }
 }
 

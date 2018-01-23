@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
+import * as os from "os";
+
 import { clear } from "./scripts/CLEAR";
 
 import { LibType, RecreateFile, BuildOptions } from './models';
@@ -33,7 +35,10 @@ const config = {
                     '--env.prod=' + prod,
                     '--env.watch=' + watch
                 ],
-                config: '--config=' + path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js')
+                config: '--config=' + path.normalize(path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js'))
+            }
+            if (os.platform() === 'win32') {
+                o.config = o.config.replace(/\\/g, '\\\\')
             }
             return `${o.config} --bail ${o.env.join(' ')}`;
         }

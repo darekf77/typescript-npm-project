@@ -12,8 +12,6 @@ import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
 import { copy } from "./helpers";
-import { tnpCall } from './index';
-
 export class Project {
     children: Project[];
     parent: Project;
@@ -111,7 +109,7 @@ export class Project {
             case 'isomorphic-lib':
                 const webpackParams = config.webpack.params(prod, watch);
                 if (watch) {
-                    watcher.run(tnpCall(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams));
+                    watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
                 } else {
                     BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams)
                 }

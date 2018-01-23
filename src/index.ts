@@ -22,12 +22,8 @@ export function run(argsv: string[]) {
         });
 }
 
-function paramsFrom(command: string) {
+export function paramsFrom(command: string) {
     return _.kebabCase(command);
-}
-
-export function tnpCall(fn: Function, params: string) {
-    return `tnp ${paramsFrom(fn.name)} ${params}`;
 }
 
 
