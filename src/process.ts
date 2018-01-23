@@ -48,7 +48,9 @@ function runAsyncIn(command: string, options?: RunOptions) {
 
 export const watcher = {
     run(command: string, folderPath: string = 'src') {
-        const toRun = `watch 'tnp command ${command}' ${folderPath}`;
+        let cmd = `tnp command ${command}`;
+        cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
+        const toRun = `watch ${cmd} ${folderPath}`;
         console.log('toRun', toRun)
         return run(toRun).async()
     },
