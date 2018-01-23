@@ -99,7 +99,7 @@ module.exports = (env: BuildOptions) => {
                 }
             }),
         ],
-        stats: env.watch ? "none" : "normal"
+        stats: "normal"
 
     }
 

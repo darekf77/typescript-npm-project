@@ -2,7 +2,7 @@
 import { Repository, Connection } from 'typeorm';
 
 import {
-    Controllers, Entities, User
+    Controllers, Entities, TestUser
 } from 'isomorphic-lib';
 
 
@@ -10,7 +10,7 @@ export class MockData {
 
     repo() {
         return {
-            users: this.connection.getRepository(User)
+            users: this.connection.getRepository(TestUser)
         }
     }
 
@@ -20,7 +20,7 @@ export class MockData {
     }
 
     async createUser() {
-        const user = new User();
+        const user = new TestUser();
         user.name = 'Dariusz';
         user.username = 'darekf77';
         await this.repo().users.save(user);

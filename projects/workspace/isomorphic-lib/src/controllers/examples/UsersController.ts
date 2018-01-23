@@ -7,16 +7,16 @@ import {
 } from 'isomorphic-rest';
 import { Repository } from "typeorm";
 // local
-import { User } from '../../entities/examples/User';
+import { TestUser } from '../../entities/examples/User';
 
 
 @ENDPOINT()
-export class UsersController extends BaseCRUD<User>
+export class UsersController extends BaseCRUD<TestUser>
 {
 
     @OrmConnection connection: Connection;
-    @BaseCRUDEntity(User) public entity: User;
-    private reposiotry: Repository<User>;
+    @BaseCRUDEntity(TestUser) public entity: TestUser;
+    private reposiotry: Repository<TestUser>;
 
     constructor() {
         super();

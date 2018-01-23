@@ -14,7 +14,7 @@
         ".gitignore": true,
         ".npmignore": true,
         ".npmrc": true,
-        "tsconfig.json": true,
+        // "tsconfig.json": true,
         "node_modules": true
     },
     "workbench.colorCustomizations": {

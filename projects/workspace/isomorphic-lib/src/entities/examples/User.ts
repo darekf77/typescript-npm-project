@@ -3,8 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { Author } from "./Author";
 import { Book } from "./Book";
 
-@Entity()
-export class User {
+@Entity(TestUser.name)
+export class TestUser {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -23,4 +23,4 @@ export class User {
     }
 }
 
-export default User;
+export default TestUser;

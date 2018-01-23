@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 // local
-import { User } from "./User";
+import { TestUser } from "./User";
 
-@Entity()
+@Entity(Author.name)
 export class Author {
     @PrimaryGeneratedColumn()
     id: number;
@@ -10,9 +10,9 @@ export class Author {
     @Column("int", { nullable: true })
     age: number;
 
-    user: User;
+    user: TestUser;
 
-    friends: User[];
+    friends: TestUser[];
 }
 
 export default Author;

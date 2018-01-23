@@ -7,7 +7,7 @@ import {
 
 import { ChildClass } from "./Child1Controller";
 
-@ENDPOINT((parhes => parhes.join('') + '/superChild'))
+@ENDPOINT({ path: (pathes => pathes.join('') + '/superChild') })
 export class ChildClass2 extends ChildClass {
 
     @GET('/saySomething')

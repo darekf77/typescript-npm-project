@@ -11,7 +11,7 @@ import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE } from "./EMAIL_TYPE";
 
 export interface IUSER {
-    email: string;
+    email?: string;
     username: string;
     password: string;
     firstname?: string;
@@ -21,7 +21,7 @@ export interface IUSER {
 }
 
 
-@Entity()
+@Entity(USER.name)
 export class USER implements IUSER {
 
     @PrimaryGeneratedColumn()
@@ -29,9 +29,9 @@ export class USER implements IUSER {
 
     @Column() username: string;
     @Column() password: string;
-    @Column() firstname: string;
-    @Column() lastname: string;
-    @Column() email: string;
+    @Column({ nullable: true }) firstname: string;
+    @Column({ nullable: true }) lastname: string;
+    @Column({ nullable: true }) email?: string;
 
     @OneToMany(type => EMAIL, email => email.user, {
         cascadeUpdate: false,

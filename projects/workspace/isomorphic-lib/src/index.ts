@@ -38,9 +38,9 @@ export { AuthController } from './controllers/AuthController';
 addController(AuthController)
 
 
-import { User } from "./entities/examples/User";
-export { User } from "./entities/examples/User";
-addEntity(User)
+import { TestUser } from "./entities/examples/User";
+export { TestUser } from "./entities/examples/User";
+addEntity(TestUser)
 
 import { Book } from "./entities/examples/Book";
 export { Book } from "./entities/examples/Book";

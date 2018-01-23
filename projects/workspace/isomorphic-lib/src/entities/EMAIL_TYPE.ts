@@ -1,7 +1,7 @@
 
 
 import {
-    Entity, PrimaryColumn, Column, Connection,
+    Entity, PrimaryColumn, Column, Connection, JoinTable,
     ManyToOne, ManyToMany, PrimaryGeneratedColumn
 } from "typeorm";
 import { Router, Request, Response } from "express";
@@ -19,12 +19,16 @@ export class EMAIL_TYPE {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('varchar', { length: 50, unique: true })
+    
+    @Column({ length: 50, unique: true })
     name: EMAIL_TYPE_NAME;
 
     @ManyToMany(type => EMAIL, email => email.types, {
         cascadeInsert: true,
         cascadeUpdate: true
+    })
+    @JoinTable({
+        name: EMAIL.name
     })
     emails: EMAIL[] = [];
 
@@ -35,7 +39,7 @@ export class EMAIL_TYPE {
         twitter: EMAIL_TYPE.create('twitter'),
     }
 
-    private static create(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
+    public static create(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
         let t = new EMAIL_TYPE();
         t.name = name;
         return t;

@@ -9,6 +9,9 @@ import { authenticate, use } from "passport";
 import { Strategy, IStrategyOptions } from "passport-http-bearer";
 import { isEmail, isLowercase, isLength } from "validator";
 import * as q from 'q';
+import { Handler } from "express";
+export { Handler } from "express";
+
 import * as bcrypt from "bcrypt";
 import * as graph from "fbgraph";
 //#endregion
@@ -48,11 +51,13 @@ export interface IFacebook {
 }
 
 
-export function routeAuthentication() {
-    return authenticate('bearer', { session: false });
-}
-
-@ENDPOINT()
+@ENDPOINT({
+    auth: (method) => {
+        if (method === AuthController.prototype.login) return;
+        if (method === AuthController.prototype.checkExist) return;
+        return authenticate('bearer', { session: false });
+    }
+})
 export class AuthController {
 
     @OrmConnection connection: Connection;
@@ -132,13 +137,14 @@ export class AuthController {
     @POST('/logout')
     logout(): Response<boolean> {
         //#region backend
-        return async (req) => {
+        return async (req, res) => {
+            const requestUser: USER = req.user;
             const repo = await this.repos();
             var user = await repo.user
                 .createQueryBuilder(USER.name)
                 .innerJoinAndSelect(`${USER.name}.emails`, 'emails')
                 .where(`${USER.name}.id = :id`)
-                .setParameter('id', req.user.id)
+                .setParameter('id', requestUser.id)
                 .getOne()
             if (!user) {
                 return false;
@@ -181,11 +187,11 @@ export class AuthController {
     }
 
     get __authorization() {
-        //#region backend
+
         const self = this;
         return {
             async facebook(body: IHelloJS): Promise<USER> {
-                //#region facebook authentication
+
                 let fb = await self.__handle.facebook().getData(body)
                 let dbEmail = await self.__check.exist.email(fb.email);
                 if (dbEmail && dbEmail.user) {
@@ -205,7 +211,7 @@ export class AuthController {
                     throw 'Not able to create facebook user'
                 }
                 return user;
-                //#endregion
+
             },
             email: {
                 async login(form: IUSER): Promise<USER> {
@@ -238,11 +244,11 @@ export class AuthController {
                 }
             }
         }
-        //#endregion
+
     }
 
     get __handle() {
-        //#region backend
+
         const self = this;
         return {
             facebook() {
@@ -289,22 +295,24 @@ export class AuthController {
                 //#endregion
             }
         }
-        //#endregion
+
     }
 
+    //#region backend
     get __validate() {
-        //#region backend
+
         return {
             username(username) {
                 if (username && isLength(username, 3, 50)) return true;
                 return false;
             }
         }
-        //#endregion
+
     }
+    //#endregion
 
     get __check() {
-        //#region backend
+
         const self = this;
         return {
             exist: {
@@ -328,13 +336,13 @@ export class AuthController {
             },
             ifRegistration(body: IUSER) {
                 const {
-                    email,
+                        email,
                     username,
                     password,
                     firstname,
                     lastname,
                     city
-                } = body;
+                    } = body;
                 const is = {
                     registration: (
                         !!password &&
@@ -350,11 +358,12 @@ export class AuthController {
                 return is.registration;
             }
         }
-        //#endregion
+
     }
 
+    //#region backend
     async  __token(user: USER, ip: string) {
-        //#region backend
+
         if (!user) {
             throw 'No user to send token'
         }
@@ -372,11 +381,12 @@ export class AuthController {
             expires_in,
             token_type: 'bearer'
         }
-        //#endregion
+
     }
+    //#endregion
 
     async __createUser(formData: IUSER) {
-        //#region backend
+
         const repo = await this.repos();
         if (formData && !formData.email_type) {
             formData.email_type = EMAIL_TYPE.types.normal_auth;
@@ -408,11 +418,21 @@ export class AuthController {
         email.user = user;
         await repo.email.updateById(email.id, email)
         return user;
-        //#endregion
+
     }
 
+    async __mocks() {
+        const repo = await this.repos();
+        await this.__createUser({
+            username: 'admin',
+            email: 'admin@admin.pl',
+            password: 'admin'
+        });
+    }
+
+
     async __init() {
-        //#region backend
+
 
         const repo = await this.repos();
 
@@ -446,7 +466,7 @@ export class AuthController {
         }
         use(new Strategy(strategy));
 
-        //#endregion
+        await this.__mocks()
     }
 
 

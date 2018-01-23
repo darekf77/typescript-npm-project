@@ -11,7 +11,7 @@ import { EMAIL_TYPE } from './EMAIL_TYPE';
 
 
 
-@Entity()
+@Entity(EMAIL.name)
 export class EMAIL {
 
     constructor(address: string) {
@@ -30,7 +30,7 @@ export class EMAIL {
         cascadeUpdate: true
     })
     @JoinTable({
-        name: 'EMAILS_AND_TYPES'
+        name: EMAIL_TYPE.name
     })
     types: EMAIL_TYPE[] = [];
 

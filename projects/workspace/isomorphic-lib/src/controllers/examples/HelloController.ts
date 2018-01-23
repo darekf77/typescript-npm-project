@@ -5,13 +5,13 @@ import {
 } from 'isomorphic-rest';
 import { Repository } from "typeorm";
 // local
-import { User } from '../../entities/examples/User';
+import { TestUser } from '../../entities/examples/User';
 import { Book } from '../../entities/examples/Book';
 import { Author } from '../../entities/examples/Author';
 import { UsersController } from './UsersController';
 
 
-const test = new User();
+const test = new TestUser();
 test.username = 'Dariusz Filipiak brak ego';
 test.books = [
     new Book()
@@ -30,19 +30,19 @@ export function aaa() {
 
 }
 
-@ENDPOINT('/test')
+@ENDPOINT({ path: '/test' })
 export class HelloController {
     @OrmConnection connection: Connection;
-    private repository: Repository<User>;
-    user = new User();
+    private repository: Repository<TestUser>;
+    user = new TestUser();
     constructor() {
         console.log('siema')
         //#region backend
         if (isNode) {
             console.log('I am in the contructor of HelloController !!', this.connection)
             // console.log('Pizda in constr', this['pizda'])
-            this.repository = this.connection.getRepository(User) as any;
-            const user = new User();
+            this.repository = this.connection.getRepository(TestUser) as any;
+            const user = new TestUser();
             user.username = 'Dariusz Filipiak is programmer';
             user.books = [
                 new Book()
@@ -62,7 +62,7 @@ export class HelloController {
     }
 
     @GET('/db/:id', true)
-    getUser( @PathParam('id') id: number): Response<User> {
+    getUser( @PathParam('id') id: number): Response<TestUser> {
         //#region backend
         // return { send: test }
 
@@ -74,7 +74,7 @@ export class HelloController {
     };
 
     @GET('/aaooaoaoa/test/:id', true)
-    getUsersList( @PathParam('id') id: number): Response<User[]> {
+    getUsersList( @PathParam('id') id: number): Response<TestUser[]> {
         console.log('test super')
         //#region node
         return {

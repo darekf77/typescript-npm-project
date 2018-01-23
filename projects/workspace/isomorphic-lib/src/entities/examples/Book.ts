@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 import { Author } from "./Author";
 
-@Entity()
+@Entity(Book.name)
 export class Book {
 
     @PrimaryGeneratedColumn()

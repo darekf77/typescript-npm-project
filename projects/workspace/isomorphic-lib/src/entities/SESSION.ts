@@ -11,7 +11,7 @@ import { USER } from './USER';
  */
 const SESSION_TIME = 3600 * 1000; // 1h
 
-@Entity()
+@Entity(SESSION.name)
 export class SESSION {
 
     @PrimaryGeneratedColumn()
