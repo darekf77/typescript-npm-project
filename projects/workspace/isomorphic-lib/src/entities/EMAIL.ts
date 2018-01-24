@@ -8,10 +8,11 @@ import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
+import { Repository } from "../../../../../../isomorphic-rest/node_modules/typeorm/repository/Repository";
 
+import { __ } from '../helpers';
 
-
-@Entity(EMAIL.name)
+@Entity(__(EMAIL))
 export class EMAIL {
 
     constructor(address: string) {
@@ -25,13 +26,11 @@ export class EMAIL {
     address: string;
 
 
-    @ManyToMany(type => EMAIL_TYPE, email_type => email_type.emails, {
-        cascadeInsert: true,
-        cascadeUpdate: true
+    @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
+        cascadeInsert: false,
+        cascadeUpdate: false
     })
-    @JoinTable({
-        name: EMAIL_TYPE.name
-    })
+    @JoinTable()
     types: EMAIL_TYPE[] = [];
 
 
@@ -41,8 +40,14 @@ export class EMAIL {
     @JoinColumn()
     user: USER;
 
-    public static get types() {
-        return EMAIL_TYPE.types
+
+    public static async getUser(address: string, repo: Repository<EMAIL>) {
+        const Email = await repo.findOne({
+            where: {
+                address
+            }
+        });
+        if (Email) return Email.user;
     }
 
 }

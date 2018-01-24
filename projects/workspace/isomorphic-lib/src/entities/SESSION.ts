@@ -3,15 +3,17 @@ import {
     CreateDateColumn, OneToOne, Repository, JoinColumn, BeforeInsert,
 } from "typeorm";
 import { verify, generate } from "password-hash";
+
 // local
 import { USER } from './USER';
+import { __ } from '../helpers';
 
 /**
  * Session time in miliseconds
  */
 const SESSION_TIME = 3600 * 1000; // 1h
 
-@Entity(SESSION.name)
+@Entity(__(SESSION))
 export class SESSION {
 
     @PrimaryGeneratedColumn()

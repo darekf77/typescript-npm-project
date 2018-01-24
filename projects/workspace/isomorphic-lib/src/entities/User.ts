@@ -2,13 +2,14 @@ import {
     Entity, PrimaryColumn, Column,
     Connection, OneToMany, ManyToMany, JoinTable,
     AfterInsert, AfterUpdate, BeforeUpdate,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn, Repository
 } from "typeorm";
 import { Router, Request, Response } from 'express';
 import { authenticate } from "passport";
 
 import { EMAIL } from "./EMAIL";
-import { EMAIL_TYPE } from "./EMAIL_TYPE";
+import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
+import { __ } from '../helpers';
 
 export interface IUSER {
     email?: string;
@@ -17,11 +18,10 @@ export interface IUSER {
     firstname?: string;
     lastname?: string;
     city?: string;
-    email_type?: EMAIL_TYPE;
 }
 
 
-@Entity(USER.name)
+@Entity(__(USER))
 export class USER implements IUSER {
 
     @PrimaryGeneratedColumn()
@@ -40,6 +40,15 @@ export class USER implements IUSER {
     emails: EMAIL[] = [];
 
     session_expire_in: number;
+
+    public static async findBy(username: string, repo: Repository<USER>) {
+        const User = repo.findOne({
+            where: {
+                username
+            }
+        })
+        return User;
+    }
 
 }
 

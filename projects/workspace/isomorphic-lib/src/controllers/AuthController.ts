@@ -14,12 +14,23 @@ export { Handler } from "express";
 
 import * as bcrypt from "bcrypt";
 import * as graph from "fbgraph";
+import { Log, Level } from "ng2-logger";
+const log = Log.create(__filename)
+
 //#endregion
 
 import { USER, IUSER } from '../entities/USER'
 import { SESSION } from '../entities/SESSION';
 import { EMAIL } from "../entities/EMAIL";
-import { EMAIL_TYPE } from "../entities/EMAIL_TYPE";
+import { EMAIL_TYPE, EMAIL_TYPE_NAME } from "../entities/EMAIL_TYPE";
+import { __ } from "../helpers";
+
+const entity = {
+    USER: __(USER),
+    EMAIL: __(EMAIL),
+    SESSION: __(SESSION),
+    EMAIL_TYPE: __(EMAIL_TYPE),
+}
 
 
 export interface IHelloJS {
@@ -191,7 +202,7 @@ export class AuthController {
         const self = this;
         return {
             async facebook(body: IHelloJS): Promise<USER> {
-
+                const repo = await self.repos();
                 let fb = await self.__handle.facebook().getData(body)
                 let dbEmail = await self.__check.exist.email(fb.email);
                 if (dbEmail && dbEmail.user) {
@@ -200,13 +211,13 @@ export class AuthController {
                 // create facebook user if not exist
                 const facebookUserData = {
                     email: fb.email,
-                    email_type: EMAIL.types.facebook,
+                    email_type: await EMAIL_TYPE.getBy('facebook', repo.emailType),
                     username: `_facebook_${fb.id}`,
                     password: undefined,
                     firstname: `_facebook_${fb.firstname}`,
                     lastname: `_facebook_${fb.lastname}`
                 }
-                const user = await self.__createUser(facebookUserData)
+                const user = await self.__createUser(facebookUserData, 'facebook')
                 if (!user) {
                     throw 'Not able to create facebook user'
                 }
@@ -234,12 +245,12 @@ export class AuthController {
                     throw 'Wron email or username'
                 },
                 async register(form: IUSER): Promise<USER> {
+                    const repo = await self.repos();
                     const emailExist = await self.__check.exist.email(form.email);
                     if (emailExist) {
                         throw `Email ${form.email} already exist in db`
                     }
-                    form.email_type = EMAIL.types.normal_auth;
-                    const user = await self.__createUser(form)
+                    const user = await self.__createUser(form, 'normal_auth')
                     return user;
                 }
             }
@@ -385,40 +396,53 @@ export class AuthController {
     }
     //#endregion
 
-    async __createUser(formData: IUSER) {
+    async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
 
         const repo = await this.repos();
-        if (formData && !formData.email_type) {
-            formData.email_type = EMAIL_TYPE.types.normal_auth;
+        let EmailType = await EMAIL_TYPE.getBy(EmailTypeName, repo.emailType)
+        if (!EmailType) {
+            throw `Bad email type: ${EmailTypeName}`
         }
 
-        const email = new EMAIL(formData.email);
-        email.types.push(formData.email_type)
-        await repo.email.save(email)
-        formData.email_type.emails.push(email);
-        await repo.emailType.save(formData.email_type);
+        let Email = new EMAIL(formData.email);
+        Email.types.push(EmailType)
+        Email = await repo.email.save(Email)
 
+        EmailType = await repo.emailType.save(EmailType);
+
+        let User = await EMAIL.getUser(Email.address, repo.email);
+        if (User) {
+            log.i(`User ${User.username} exist with mail ${Email.address}`)
+            return User;
+        }
+
+        if (!formData.username) {
+            throw 'Username is not defined'
+        }
+        if (!isLowercase(formData.username)) {
+            throw 'Username is not a lowercas string'
+        }
+        if (!isLength(formData.username, 3, 50)) {
+            throw `Bad username length, shoudl be  3-5`
+        }
+
+        User = await repo.user.findOne({
+            where: { username: formData.username }
+        })
+        if (User) {
+            throw `User with username: ${formData.username} already exist`
+        }
+
+        User = new USER();
+        User.username = formData.username
         const salt = bcrypt.genSaltSync(5);
-        const user = new USER();
-        user.password = bcrypt.hashSync(formData.password ? formData.password : 'ddd', salt)
+        User.password = bcrypt.hashSync(formData.password ? formData.password : 'ddd', salt)
+        User.emails.push(Email);
+        User = await repo.user.save(User)
 
-        if (formData.username && isLowercase(formData.username) && isLength(formData.username, 3, 50)) {
-            let existingUser = await repo.user.findOne({
-                where: { username: formData.username }
-            })
-            if (existingUser) return undefined;
-            user.username = formData.username
-        } else {
-            throw 'User exist'
-        }
-        user.emails.push(email);
-
-        // persist data
-        await repo.user.save(user)
-        email.user = user;
-        await repo.email.updateById(email.id, email)
-        return user;
-
+        Email.user = User;
+        await repo.email.save(Email)
+        return User;
     }
 
     async __mocks() {
@@ -427,7 +451,7 @@ export class AuthController {
             username: 'admin',
             email: 'admin@admin.pl',
             password: 'admin'
-        });
+        }, 'normal_auth');
     }
 
 
@@ -435,13 +459,14 @@ export class AuthController {
 
 
         const repo = await this.repos();
+        const types = await EMAIL_TYPE.init(repo.emailType)
 
         const strategy = async (token, cb) => {
             let user: USER = null;
             let t = await repo.auth
-                .createQueryBuilder(SESSION.name)
-                .innerJoinAndSelect(`${SESSION.name}.user`, 'user')
-                .where(`${SESSION.name}.token = :token`)
+                .createQueryBuilder(entity.SESSION)
+                .innerJoinAndSelect(`${entity.SESSION}.user`, 'user')
+                .where(`${entity.SESSION}.token = :token`)
                 .setParameter('token', token)
                 .getOne()
 
