@@ -36,13 +36,13 @@
     "sqlite3": "^3.1.13",
     "tslib": "1.8.1",
     "typeorm": "^0.1.11",
-    "zone.js": "0.8.20"
+    "zone.js": "0.8.20",
+    "typescript": "2.6.2"
   },
   "devDependencies": {
     "tslint": "5.7.0",
     "@types/node": "9.3.0",
     "nodemon": "1.14.1",
-    "ts-node": "3.3.0",
-    "typescript": "2.6.2"
+    "ts-node": "3.3.0"
   }
 }

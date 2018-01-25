@@ -68,8 +68,12 @@ export interface IFacebook {
 
 @ENDPOINT({
     auth: (method) => {
-        if (method === AuthController.prototype.login) return;
-        if (method === AuthController.prototype.checkExist) return;
+        if (method === AuthController.prototype.login) {
+            return;
+        }
+        if (method === AuthController.prototype.checkExist) {
+            return;
+        }
         return authenticate('bearer', { session: false });
     }
 })
@@ -130,12 +134,10 @@ export class AuthController {
                 const email = await self.__check.exist.email(param);
                 if (email) {
                     return true;
-                }
-                else {
+                } else {
                     throw new Error('Email does not exist');
                 }
-            }
-            else if (this.__validate.username(param)) {
+            } else if (this.__validate.username(param)) {
                 const username = await self.__check.exist.username(param);
                 if (username) {
                     return true;
@@ -302,8 +304,11 @@ export class AuthController {
                                 defer.reject(err);
                                 return;
                             }
-                            if (res.id !== credentials.data.id) defer.reject('Bad user id');
-                            else defer.resolve(res);
+                            if (res.id !== credentials.data.id) {
+                                defer.reject('Bad user id');
+                            } else {
+                                defer.resolve(res);
+                            }
                         });
                         return defer.promise;
                     }
@@ -319,7 +324,9 @@ export class AuthController {
 
         return {
             username(username) {
-                if (username && isLength(username, 3, 50)) return true;
+                if (username && isLength(username, 3, 50)) {
+                    return true;
+                }
                 return false;
             }
         };
