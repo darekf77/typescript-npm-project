@@ -11,7 +11,7 @@ import { __ } from '../helpers';
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
 
-@Entity(__(EMAIL_TYPE)
+@Entity(__(EMAIL_TYPE))
 export class EMAIL_TYPE {
 
     private constructor() {

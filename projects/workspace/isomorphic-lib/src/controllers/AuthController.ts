@@ -17,6 +17,8 @@ import * as graph from "fbgraph";
 import { Log, Level } from "ng2-logger";
 const log = Log.create(__filename)
 
+
+
 //#endregion
 
 import { USER, IUSER } from '../entities/USER'
@@ -75,12 +77,12 @@ export class AuthController {
 
     private async repos() {
         //#region backend
-        const auth = await this.connection.getRepository(SESSION);
+        const session = await this.connection.getRepository(SESSION);
         const user = await this.connection.getRepository(USER);
         const email = await this.connection.getRepository(EMAIL);
         const emailType = await this.connection.getRepository(EMAIL_TYPE);
         return {
-            auth, user, email, emailType
+            session, user, email, emailType
         }
         //#endregion
     }
@@ -95,19 +97,17 @@ export class AuthController {
 
     @GET('/')
     info(): Response<USER> {
+        const self = this;
         //#region backend
         return async (req) => {
-            const repo = await this.repos();
-            const requestUser: USER = req['user'];
-            const user = await repo.user
-                .createQueryBuilder(USER.name)
-                .innerJoinAndSelect(`${USER.name}.emails`, 'emails')
-                .where(`${USER.name}.id = :id`)
-                .setParameter('id', requestUser.id)
-                .getOne()
-            if (user) {
-                user.session_expire_in = requestUser.session_expire_in
-                return user;
+            const repo = await self.repos();
+            if (!req.user) {
+                throw 'Not loggin in user!'
+            }
+            let User = await USER.byId(req.user.id, repo.user);
+            if (User) {
+                User.session = await SESSION.getByUser(User, req.ip, repo.session);
+                return User;
             }
             throw Errors.entityNotFound(USER)
         }
@@ -148,29 +148,24 @@ export class AuthController {
     @POST('/logout')
     logout(): Response<boolean> {
         //#region backend
+        const self = this;
         return async (req, res) => {
-            const requestUser: USER = req.user;
-            const repo = await this.repos();
-            var user = await repo.user
-                .createQueryBuilder(USER.name)
-                .innerJoinAndSelect(`${USER.name}.emails`, 'emails')
-                .where(`${USER.name}.id = :id`)
-                .setParameter('id', requestUser.id)
-                .getOne()
-            if (!user) {
+            const repo = await self.repos();
+            let User: USER = req.user;
+            if (!User) {
+                throw 'No user for logout';
+            }
+            User = await USER.byId(User.id, repo.user);
+            if (!User) {
+                log.w(`Cannot find user with id:${req.user} `)
                 return false;
             }
-            let token = await repo.auth
-                .createQueryBuilder(SESSION.name)
-                .innerJoinAndSelect(`${SESSION.name}.user`, 'user')
-                .where(`${SESSION.name}.ip = :ip`)
-                .andWhere('user.id = :userid')
-                .setParameters({
-                    ip: req.ip,
-                    userid: req.user.id
-                })
-                .getOne()
-            await repo.auth.removeById(token.id);
+            const Session = await SESSION.getByUser(User, req.ip, repo.session);
+            if (!Session) {
+                log.w(`Cannot find session for user:${User.username} `)
+                return false;
+            }
+            await repo.session.removeById(Session.id);
             return true;
         }
         //#endregion
@@ -226,6 +221,15 @@ export class AuthController {
             },
             email: {
                 async login(form: IUSER): Promise<USER> {
+                    function checkPassword(user: USER) {
+                        if (user && bcrypt.compareSync(form.password, user.password)) {
+                            return user;
+                        }
+                        throw 'Bad password or user!'
+                    }
+                    function checkUserName(username: string) {
+
+                    }
                     if (form.email && isEmail(form.email)) {
                         // throw 'Wrong form email field format'
                         let email = await self.__check.exist.email(form.email);
@@ -233,14 +237,13 @@ export class AuthController {
                             throw `Wrong login email ${form.email}`
                         }
                         if (email && email.user) {
+                            checkPassword(email.user)
                             return email.user;
                         }
                     } else if (self.__validate.username(form.username)) {
                         const user = await self.__check.exist.username(form.username)
-                        if (user && bcrypt.compareSync(form.password, user.password)) {
-                            return user;
-                        }
-                        throw 'Bad user or password'
+                        checkPassword(user)
+                        return user;
                     }
                     throw 'Wron email or username'
                 },
@@ -337,9 +340,9 @@ export class AuthController {
                 async email(address: string) {
                     const repo = await self.repos();
                     let email = await repo.email
-                        .createQueryBuilder(EMAIL.name)
-                        .innerJoinAndSelect(`${EMAIL.name}.user`, 'user')
-                        .where(`${EMAIL.name}.address = :email`)
+                        .createQueryBuilder(entity.EMAIL)
+                        .innerJoinAndSelect(`${entity.EMAIL}.user`, 'user')
+                        .where(`${entity.EMAIL}.address = :email`)
                         .setParameter('email', address)
                         .getOne()
                     return email;
@@ -375,24 +378,18 @@ export class AuthController {
     //#region backend
     async  __token(user: USER, ip: string) {
 
-        if (!user) {
+        if (!user || !user.id) {
             throw 'No user to send token'
         }
         const repo = await this.repos();
-        const t = new SESSION();
-        t.user = user;
-        t.ip = ip;
-        if (user.username == 'postman') t.createToken('postman');
-        else t.createToken();
-        await repo.auth.save(t)
-
-        const expires_in = Math.round((t.expired_date.getTime() - t.created.getTime()) / 1000);
-        return {
-            access_token: t.token,
-            expires_in,
-            token_type: 'bearer'
+        let Session = await SESSION.getByUser(user, ip, repo.session);
+        if (Session) {
+            log.i(`Session already exist for: ${user.username}`)
+            return Session;
         }
 
+        Session = await SESSION.create(user, ip, repo.session);
+        return Session;
     }
     //#endregion
 
@@ -452,6 +449,11 @@ export class AuthController {
             email: 'admin@admin.pl',
             password: 'admin'
         }, 'normal_auth');
+        await this.__createUser({
+            username: 'postman',
+            email: 'postman@postman.pl',
+            password: 'postman'
+        }, 'normal_auth');
     }
 
 
@@ -463,28 +465,14 @@ export class AuthController {
 
         const strategy = async (token, cb) => {
             let user: USER = null;
-            let t = await repo.auth
-                .createQueryBuilder(entity.SESSION)
-                .innerJoinAndSelect(`${entity.SESSION}.user`, 'user')
-                .where(`${entity.SESSION}.token = :token`)
-                .setParameter('token', token)
-                .getOne()
+            let Session = await SESSION.getByToken(token, repo.session);
 
-            if (t) {
-                let time = {
-                    expire: t.expired_date.getTime(),
-                    now: new Date().getTime()
+            if (Session) {
+                if (Session.expired()) {
+                    await repo.session.remove(Session);
+                    return cb(null, user);
                 }
-                if (time.expire < time.now) {
-                    await repo.auth.remove(t);
-                } else {
-                    user = await repo.user.findOne({
-                        where: { id: t.user.id }
-                    })
-                    if (user) user.session_expire_in = Math.round((time.expire - time.now) / 1000);
-                }
-            }
-            if (user) {
+                user = Session.user;
                 user.password = undefined;
             }
             return cb(null, user);

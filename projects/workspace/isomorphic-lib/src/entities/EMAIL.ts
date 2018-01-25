@@ -2,13 +2,12 @@ import {
     Entity, PrimaryColumn, Column,
     Connection, OneToMany, ManyToOne,
     JoinColumn, ManyToMany, JoinTable,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn, Repository
 } from "typeorm";
 import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-import { Repository } from "../../../../../../isomorphic-rest/node_modules/typeorm/repository/Repository";
 
 import { __ } from '../helpers';
 
