@@ -48,7 +48,7 @@ export class Project {
                     const linkName2 = isOrganizationPackage ? d.name.split('/')[0] : '';
                     const destinationFolder2 = path.join(project.location, 'node_modules', linkName2);
                     const parentSourcePackagePath = path.join(thisNodeModelsPath, d.name);
-                    const linkCommand = `ln -sf ${parentSourcePackagePath} .`;
+                    const linkCommand = `tnp ln ${parentSourcePackagePath} .`;
                     run(`rimraf ${destinationFolder}`).sync()
                     run(`mkdirp  ${destinationFolder2}`).sync()
                     run(linkCommand, { cwd: destinationFolder2 }).sync()
