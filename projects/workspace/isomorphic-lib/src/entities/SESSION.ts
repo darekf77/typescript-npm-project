@@ -1,8 +1,23 @@
-import {
-    Entity, PrimaryColumn, Column, Connection, AfterInsert, PrimaryGeneratedColumn,
-    CreateDateColumn, OneToOne, Repository, JoinColumn, BeforeInsert,
-} from "typeorm";
+import { Connection } from "typeorm/connection/Connection";
+import { Repository } from "typeorm/repository/Repository";
+import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
+import { AfterUpdate } from "typeorm/decorator/listeners/AfterUpdate";
+import { BeforeUpdate } from "typeorm/decorator/listeners/BeforeUpdate";
+import { BeforeInsert } from "typeorm/decorator/listeners/BeforeInsert";
+import { OneToMany } from "typeorm/decorator/relations/OneToMany";
+import { OneToOne } from "typeorm/decorator/relations/OneToOne";
+import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
+import { JoinTable } from "typeorm/decorator/relations/JoinTable";
+import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
+import { Column } from "typeorm/decorator/columns/Column";
+import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
+import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
+import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
+import { Entity } from "typeorm/decorator/entity/Entity";
+
+//#region backend
 import { verify, generate } from "password-hash";
+//#endregion
 
 // local
 import { Log, Level } from "ng2-logger";
@@ -81,6 +96,7 @@ export class SESSION {
 
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
+        //#region backend
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.user = :id`)
@@ -94,8 +110,10 @@ export class SESSION {
             Session.exp = Session.calculateExpirationTime();
         }
         return Session;
+        //#endregion
     }
     public static async getByToken(token: string, repo: Repository<SESSION>) {
+        //#region backend
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.token = :token`)
@@ -105,9 +123,11 @@ export class SESSION {
             Session.exp = Session.calculateExpirationTime();
         }
         return Session;
+        //#endregion
     }
 
     public static async create(user: USER, ip: string, repo: Repository<SESSION>) {
+        //#region backend
         let Session = new SESSION();
         Session.user = user;
         Session.ip = ip;
@@ -119,6 +139,7 @@ export class SESSION {
             Session.exp = Session.calculateExpirationTime();
         }
         return Session;
+        //#endregion
     }
 
 }

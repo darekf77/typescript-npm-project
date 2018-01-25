@@ -3,9 +3,12 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, BaseCRUD, BaseCRUDEntity, OrmConnection, Connection
+    Response, BaseCRUD, BaseCRUDEntity, OrmConnection
 } from 'isomorphic-rest';
-import { Repository } from "typeorm";
+
+import { Connection } from "typeorm/connection/Connection";
+import { Repository } from "typeorm/repository/Repository";
+
 // local
 import { Book } from '../../entities/examples/Book';
 

@@ -6,7 +6,7 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "node_modules": true,
-    "index.*": true,
+    // "index.*": true,
     "dist": true,
     "bundle": true,
     "tmp": true,

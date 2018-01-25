@@ -4,6 +4,7 @@ import {
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, OrmConnection, Connection, Errors
 } from 'isomorphic-rest';
+
 //#region backend
 import { authenticate, use } from 'passport';
 import { Strategy, IStrategyOptions } from 'passport-http-bearer';
@@ -11,17 +12,12 @@ import { isEmail, isLowercase, isLength } from 'validator';
 import * as q from 'q';
 import { Handler } from 'express';
 export { Handler } from 'express';
-
-console.log('asd');
-
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
-import { Log, Level } from 'ng2-logger';
-const log = Log.create(__filename);
-
-
-
 //#endregion
+
+import { Log, Level } from 'ng2-logger';
+const log = Log.create('AuthController');
 
 import { USER, IUSER } from '../entities/USER';
 import { SESSION } from '../entities/SESSION';
@@ -81,20 +77,7 @@ export class AuthController {
 
     @OrmConnection connection: Connection;
 
-    private async repos() {
-        //#region backend
-        const session = await this.connection.getRepository(SESSION);
-        const user = await this.connection.getRepository(USER);
-        const email = await this.connection.getRepository(EMAIL);
-        const emailType = await this.connection.getRepository(EMAIL_TYPE);
-        return {
-            session, user, email, emailType
-        };
-        //#endregion
-    }
-
     constructor() {
-
         //#region backend
         this.__init();
         //#endregion
@@ -106,7 +89,7 @@ export class AuthController {
         const self = this;
         //#region backend
         return async (req, res) => {
-            const repo = await self.repos();
+            const repo = await self.__repos();
             if (!req.user) {
                 throw new Error('Not loggin in user!');
             }
@@ -154,7 +137,7 @@ export class AuthController {
         //#region backend
         const self = this;
         return async (req, res) => {
-            const repo = await self.repos();
+            const repo = await self.__repos();
             let User: USER = req.user;
             if (!User) {
                 throw new Error('No user for logout');
@@ -201,7 +184,7 @@ export class AuthController {
         const self = this;
         return {
             async facebook(body: IHelloJS): Promise<USER> {
-                const repo = await self.repos();
+                const repo = await self.__repos();
                 const fb = await self.__handle.facebook().getData(body);
                 const dbEmail = await self.__check.exist.email(fb.email);
                 if (dbEmail && dbEmail.user) {
@@ -252,7 +235,7 @@ export class AuthController {
                     throw new Error('Wron email or username');
                 },
                 async register(form: IUSER): Promise<USER> {
-                    const repo = await self.repos();
+                    const repo = await self.__repos();
                     const emailExist = await self.__check.exist.email(form.email);
                     if (emailExist) {
                         throw new Error(`Email ${form.email} already exist in db`);
@@ -319,9 +302,9 @@ export class AuthController {
 
     }
 
-    //#region backend
-    get __validate() {
 
+    private get __validate() {
+        //#region backend
         return {
             username(username) {
                 if (username && isLength(username, 3, 50)) {
@@ -330,24 +313,24 @@ export class AuthController {
                 return false;
             }
         };
-
+        //#endregion
     }
-    //#endregion
+
 
     get __check() {
-
+        
         const self = this;
         return {
             exist: {
                 async username(username: string) {
-                    const repo = await self.repos();
+                    const repo = await self.__repos();
                     const user = await repo.user.findOne({
                         where: { username }
                     });
                     return user;
                 },
                 async email(address: string) {
-                    const repo = await self.repos();
+                    const repo = await self.__repos();
                     const email = await repo.email
                         .createQueryBuilder(entity.EMAIL)
                         .innerJoinAndSelect(`${entity.EMAIL}.user`, 'user')
@@ -384,13 +367,24 @@ export class AuthController {
 
     }
 
-    //#region backend
-    async  __token(user: USER, ip: string) {
+    private async __repos() {
+        //#region backend
+        const session = await this.connection.getRepository(SESSION);
+        const user = await this.connection.getRepository(USER);
+        const email = await this.connection.getRepository(EMAIL);
+        const emailType = await this.connection.getRepository(EMAIL_TYPE);
+        return {
+            session, user, email, emailType
+        };
+        //#endregion
+    }
 
+    private async  __token(user: USER, ip: string) {
+        //#region backend
         if (!user || !user.id) {
             throw new Error('No user to send token');
         }
-        const repo = await this.repos();
+        const repo = await this.__repos();
         let Session = await SESSION.getByUser(user, ip, repo.session);
         if (Session) {
             log.i(`Session already exist for: ${user.username}`);
@@ -399,12 +393,12 @@ export class AuthController {
 
         Session = await SESSION.create(user, ip, repo.session);
         return Session;
+        //#endregion
     }
 
-
-    async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
-
-        const repo = await this.repos();
+    private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
+        //#region backend
+        const repo = await this.__repos();
         let EmailType = await EMAIL_TYPE.getBy(EmailTypeName, repo.emailType);
         if (!EmailType) {
             throw new Error(`Bad email type: ${EmailTypeName}`);
@@ -449,10 +443,12 @@ export class AuthController {
         Email.user = User;
         await repo.email.save(Email);
         return User;
+        //#endregion
     }
 
-    async __mocks() {
-        const repo = await this.repos();
+    private async __mocks() {
+        //#region backend
+        const repo = await this.__repos();
         await this.__createUser({
             username: 'admin',
             email: 'admin@admin.pl',
@@ -463,13 +459,12 @@ export class AuthController {
             email: 'postman@postman.pl',
             password: 'postman'
         }, 'normal_auth');
+        //#endregion
     }
 
-
-    async __init() {
-
-
-        const repo = await this.repos();
+    private async __init() {
+        //#region backend
+        const repo = await this.__repos();
         const types = await EMAIL_TYPE.init(repo.emailType);
 
         const strategy = async (token, cb) => {
@@ -489,9 +484,9 @@ export class AuthController {
         use(new Strategy(strategy));
 
         await this.__mocks();
+        //#endregion
     }
 
-    //#endregion
 
 }
 

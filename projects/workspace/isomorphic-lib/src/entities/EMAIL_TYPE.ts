@@ -1,10 +1,21 @@
+import { Connection } from "typeorm/connection/Connection";
+import { Repository } from "typeorm/repository/Repository";
+import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
+import { AfterUpdate } from "typeorm/decorator/listeners/AfterUpdate";
+import { BeforeUpdate } from "typeorm/decorator/listeners/BeforeUpdate";
+import { BeforeInsert } from "typeorm/decorator/listeners/BeforeInsert";
+import { OneToMany } from "typeorm/decorator/relations/OneToMany";
+import { OneToOne } from "typeorm/decorator/relations/OneToOne";
+import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
+import { JoinTable } from "typeorm/decorator/relations/JoinTable";
+import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
+import { Column } from "typeorm/decorator/columns/Column";
+import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
+import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
+import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
+import { Entity } from "typeorm/decorator/entity/Entity";
 
 
-import {
-    Entity, PrimaryColumn, Column, Connection, JoinTable,
-    ManyToOne, ManyToMany, PrimaryGeneratedColumn, Repository
-} from "typeorm";
-import { Router, Request, Response } from "express";
 import { EMAIL } from "./EMAIL";
 import { __ } from '../helpers';
 
@@ -33,15 +44,18 @@ export class EMAIL_TYPE {
     emails: EMAIL[] = [];
 
     public static async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
+        //#region backend
         const etype = await repo.findOne({
             where: {
                 name
             }
         })
         return etype;
+        //#endregion
     }
 
     public static async init(repo: Repository<EMAIL_TYPE>) {
+        //#region backend
         const types = [
             await repo.save(EMAIL_TYPE.create('facebook')),
             await repo.save(EMAIL_TYPE.create('normal_auth')),
@@ -49,6 +63,7 @@ export class EMAIL_TYPE {
             await repo.save(EMAIL_TYPE.create('google_plus'))
         ];
         return types;
+        //#endregion
     }
 
 

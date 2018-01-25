@@ -1,10 +1,23 @@
-import {
-    Entity, PrimaryColumn, Column,
-    Connection, OneToMany, ManyToOne,
-    JoinColumn, ManyToMany, JoinTable,
-    PrimaryGeneratedColumn, Repository
-} from "typeorm";
+import { Connection } from "typeorm/connection/Connection";
+import { Repository } from "typeorm/repository/Repository";
+import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
+import { AfterUpdate } from "typeorm/decorator/listeners/AfterUpdate";
+import { BeforeUpdate } from "typeorm/decorator/listeners/BeforeUpdate";
+import { BeforeInsert } from "typeorm/decorator/listeners/BeforeInsert";
+import { OneToMany } from "typeorm/decorator/relations/OneToMany";
+import { OneToOne } from "typeorm/decorator/relations/OneToOne";
+import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
+import { JoinTable } from "typeorm/decorator/relations/JoinTable";
+import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
+import { Column } from "typeorm/decorator/columns/Column";
+import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
+import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
+import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
+import { Entity } from "typeorm/decorator/entity/Entity";
+
+//#region backend
 import { Router, Request, Response } from "express";
+//#endregion
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
@@ -41,12 +54,14 @@ export class EMAIL {
 
 
     public static async getUser(address: string, repo: Repository<EMAIL>) {
+        //#region backend
         const Email = await repo.findOne({
             where: {
                 address
             }
         });
         if (Email) return Email.user;
+        //#endregion
     }
 
 }

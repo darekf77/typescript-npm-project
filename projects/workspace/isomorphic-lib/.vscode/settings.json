@@ -9,7 +9,7 @@
         "index.*": true,
         "client.*": true,
         "backend.*": true,
-        "dist": true,
+        // "dist": true,
         "bundle": true,
         ".gitignore": true,
         ".npmignore": true,
