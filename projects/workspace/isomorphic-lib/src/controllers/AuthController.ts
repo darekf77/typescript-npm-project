@@ -400,7 +400,7 @@ export class AuthController {
         Session = await SESSION.create(user, ip, repo.session);
         return Session;
     }
-    //#endregion
+
 
     async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
 
@@ -491,7 +491,7 @@ export class AuthController {
         await this.__mocks();
     }
 
-
+    //#endregion
 
 }
 

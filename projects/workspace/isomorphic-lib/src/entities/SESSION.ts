@@ -6,7 +6,7 @@ import { verify, generate } from "password-hash";
 
 // local
 import { Log, Level } from "ng2-logger";
-const log = Log.create(__filename)
+const log = Log.create(__filename);
 
 import { USER } from './USER';
 import { __ } from '../helpers';
@@ -32,7 +32,7 @@ export class SESSION {
 
     exp: number;
     calculateExpirationTime(): number {
-        const now = new Date()
+        const now = new Date();
         return Math.round((this.expired_date.getTime() - now.getTime()) / 1000);
     }
 
@@ -65,7 +65,7 @@ export class SESSION {
 
     createToken(token?: string) {
         this.created = new Date();
-        let timestamp = this.created.getTime();
+        const timestamp = this.created.getTime();
         this.token = token ? token : generate(this.user.id + timestamp + this.ip)
         this.expired_date = new Date(timestamp + SESSION_TIME_SECONDS * 1000)
     }
@@ -81,7 +81,7 @@ export class SESSION {
 
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
-        let Session = await repo.createQueryBuilder(__(SESSION))
+        const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.user = :id`)
             .andWhere(`${__(SESSION)}.ip = :ip`)
@@ -96,11 +96,11 @@ export class SESSION {
         return Session;
     }
     public static async getByToken(token: string, repo: Repository<SESSION>) {
-        let Session = await repo.createQueryBuilder(__(SESSION))
+        const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.token = :token`)
             .setParameter('token', token)
-            .getOne()
+            .getOne();
         if (Session) {
             Session.exp = Session.calculateExpirationTime();
         }
@@ -114,7 +114,7 @@ export class SESSION {
 
         Session.createToken(user.username == 'postman' ? 'postman' : undefined);
 
-        Session = await repo.save(Session)
+        Session = await repo.save(Session);
         if (Session) {
             Session.exp = Session.calculateExpirationTime();
         }

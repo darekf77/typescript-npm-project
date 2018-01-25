@@ -6,4 +6,4 @@
  */
 export function __(entityClass: Function) {
     return `tb_${entityClass.name.toLowerCase()}`
-}
+};
