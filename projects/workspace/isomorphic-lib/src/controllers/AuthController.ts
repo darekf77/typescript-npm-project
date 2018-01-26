@@ -140,7 +140,7 @@ export class AuthController {
             const repo = await self.__repos();
             let User: USER = req.user;
             if (!User) {
-                throw new Error('No user for logout');
+                throw 'No user for logout';
             }
             User = await USER.byId(User.id, repo.user);
             if (!User) {
