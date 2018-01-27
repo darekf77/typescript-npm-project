@@ -11,7 +11,7 @@
         "backend.*": true,
         // "dist": true,
         "bundle": true,
-        ".gitignore": true,
+        // ".gitignore": true,
         ".npmignore": true,
         ".npmrc": true,
         // "tsconfig.json": true,
@@ -27,6 +27,6 @@
     "html.format.wrapAttributes": "force-aligned",
     "workbench.colorTheme": "Default Light+",
     "tslint.autoFixOnSave": true,
-    "eslint.autoFixOnSave": true,
+    "eslint.enable": false,
     "tslint.enable": false
 }

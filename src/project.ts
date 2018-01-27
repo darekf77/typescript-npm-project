@@ -100,8 +100,8 @@ export class Project {
             p.linkParentDependencies()
         })
         this.linkParentDependencies()
-        this.filesToRecreateBeforeBuild()
-            .forEach(file => copy(file.from, file.where));
+        // this.filesToRecreateBeforeBuild()
+        //     .forEach(file => copy(file.from, file.where));
 
         switch (this.type) {
 
