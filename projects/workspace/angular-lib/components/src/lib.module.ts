@@ -13,8 +13,7 @@ import {
   imports: [
     CommonModule,
     MatSlideToggleModule,
-    MatCardModule,
-    NoopAnimationsModule
+    MatCardModule
   ],
   declarations: [
     FooComponent
@@ -22,8 +21,7 @@ import {
   exports: [
     FooComponent,
     MatCardModule,
-    MatSlideToggleModule,
-    NoopAnimationsModule
+    MatSlideToggleModule
   ]
 })
 export class MyLibModule {
