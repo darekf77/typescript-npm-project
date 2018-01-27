@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { init, replay } from 'isomorphic-rest';
 import { Controllers, Entities, HelloController } from 'isomorphic-lib';
-import { MyLibModule } from 'angular-lib';
+
 import { RouterModule, Route, PreloadAllModules } from "@angular/router";
 
 import { HttpModule } from '@angular/http';
@@ -12,15 +12,20 @@ import { AppComponent } from './app.component';
 
 const routes: Route[] = [
   {
-    path: 'test',
+    path: '',
     loadChildren: './app-test/app-test.module#AppTestModule',
     pathMatch: 'prefix',
   },
-  {
-    path: '',
-    pathMatch: 'full' ,
-    redirectTo: 'test'
-  }
+  // {
+  //   path: 'test',
+  //   loadChildren: './app-test/app-test.module#AppTestModule',
+  //   pathMatch: 'prefix',
+  // },
+  // {
+  //   path: '',
+  //   pathMatch: 'full' ,
+  //   redirectTo: 'test'
+  // }
 ];
 
 @NgModule({
@@ -31,7 +36,6 @@ const routes: Route[] = [
     BrowserModule,
     FormsModule,
     HttpModule,
-    MyLibModule.forRoot(),
     RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules })
   ],
   providers: [

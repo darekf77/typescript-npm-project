@@ -7,7 +7,7 @@
     "**/.DS_Store": true,
     "node_modules": true,
     // "index.*": true,
-    "dist": true,
+    // "dist": true,
     "bundle": true,
     "tmp": true,
     "e2e": true,

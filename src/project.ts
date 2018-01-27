@@ -307,5 +307,6 @@ export class Project {
 
 
 export function BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams: string) {
+    //  --display-error-details to see more errors
     run(`npm-run webpack ${webpackParams}`).sync()
 }

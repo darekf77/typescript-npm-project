@@ -2,8 +2,9 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, OrmConnection, Connection, Errors
+    Response, OrmConnection, Errors
 } from 'isomorphic-rest';
+import { Connection } from "typeorm/connection/Connection";
 
 //#region backend
 import { authenticate, use } from 'passport';

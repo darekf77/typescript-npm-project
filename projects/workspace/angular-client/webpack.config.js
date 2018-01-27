@@ -5,6 +5,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const rxPaths = require('rxjs/_esm5/path-mapping');
+const _ = require('lodash');
 const autoprefixer = require('autoprefixer');
 const postcssUrl = require('postcss-url');
 const cssnano = require('cssnano');
@@ -67,7 +68,9 @@ const postcssPlugins = function () {
   ].concat(minimizeCss ? [cssnano(minimizeOptions)] : []);
 };
 
-
+const forceIgnore = {
+  sqlite3: ''
+}
 
 
 module.exports = {
@@ -81,7 +84,7 @@ module.exports = {
       "./node_modules"
     ],
     "symlinks": true,
-    "alias": rxPaths(),
+    "alias": _.merge(rxPaths(), forceIgnore),
     "mainFields": [
       "browser",
       "module",
@@ -93,7 +96,7 @@ module.exports = {
       "./node_modules",
       "./node_modules"
     ],
-    "alias": rxPaths()
+    "alias": _.merge(rxPaths(), forceIgnore),
   },
   "entry": {
     "main": [
@@ -503,7 +506,8 @@ module.exports = {
     "process": true,
     "module": false,
     "clearImmediate": false,
-    "setImmediate": false
+    "setImmediate": false,
+    'child_process': "empty"
   },
   "devServer": {
     "historyApiFallback": true,

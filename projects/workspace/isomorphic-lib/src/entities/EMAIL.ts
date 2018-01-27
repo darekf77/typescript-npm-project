@@ -7,6 +7,7 @@ import { BeforeInsert } from "typeorm/decorator/listeners/BeforeInsert";
 import { OneToMany } from "typeorm/decorator/relations/OneToMany";
 import { OneToOne } from "typeorm/decorator/relations/OneToOne";
 import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
+import { ManyToOne } from "typeorm/decorator/relations/ManyToOne";
 import { JoinTable } from "typeorm/decorator/relations/JoinTable";
 import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
 import { Column } from "typeorm/decorator/columns/Column";

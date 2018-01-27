@@ -12,6 +12,10 @@
             "README.md"
         ]
     },
+    "bowser": {
+        "typeorm": false,
+        "sqlite3": false
+    },
     "peerDependencies": {
         "isomorphic-rest": "^0.0.15",
         "reflect-metadata": "^0.1.10",
@@ -34,7 +38,9 @@
         "passport-http-bearer": "^1.0.1",
         "password-hash": "^1.2.2",
         "q": "^1.5.1",
-        "validator": "^9.2.0"
+        "sqlite3": "^3.1.13",
+        "validator": "^9.2.0",
+        "typeorm": "^0.1.11"
     },
     "devDependencies": {
         "@ngtools/webpack": "^1.9.3",

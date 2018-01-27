@@ -48,7 +48,7 @@ module.exports = (env: BuildOptions) => {
         },
         externals: nodeModules,
         node: {
-            fs: "empty",
+            fs: 'empty',
             __dirname: false,
             __filename: false
         },
