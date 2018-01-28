@@ -2,7 +2,7 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, OrmConnection, Errors
+    Response, OrmConnection, Errors, isBrowser
 } from 'isomorphic-rest';
 import { Connection } from "typeorm/connection/Connection";
 
@@ -17,7 +17,11 @@ import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 //#endregion
 
+import { Resource, HttpResponse } from "ng2-rest";
+export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
 import { USER, IUSER } from '../entities/USER';
@@ -79,9 +83,83 @@ export class AuthController {
     @OrmConnection connection: Connection;
 
     constructor() {
+        this.browser.init()
         //#region backend
         this.__init();
         //#endregion
+    }
+
+    private _subIsLggedIn = new Subject();
+    isLoggedIn = this._subIsLggedIn.asObservable();
+
+    get browser() {
+        const self = this;
+        return {
+            _keys: {
+                session: 'session',
+                Authorization: 'Authorization'
+            },
+            _subjects: {
+                login: new Subject()
+            },
+            async init() {
+                if (!isBrowser) return;
+                let session: SESSION;
+                try {
+                    const data = window.localStorage.getItem(self.browser._keys.session);
+                    session = JSON.parse(data);
+                } catch { }
+                log.i('Current session', session)
+                if (!session) {
+                    self._subIsLggedIn.next(false)
+                    return;
+                }
+                Resource.Headers.request.set(self.browser._keys.Authorization,
+                    `${session.token_type} ${session.token}`)
+                try {
+                    const user = await self.browser.info()
+                    log.i('Authenticated user ', user)
+                    self._subIsLggedIn.next(true)
+                } catch (err) {
+                    log.er(err)
+                    self._subIsLggedIn.next(false)
+                }
+            },
+            async login({ username, password }) {
+                log.i('username', username)
+                log.i('password', password)
+                try {
+                    const session = await self.login({
+                        username, password
+                    } as any).received
+                    log.i('session', session)
+                    window.localStorage.setItem(self.browser._keys.session, JSON.stringify(session.body.json));
+                    await self.browser.init()
+                } catch (error) {
+                    log.er(error)
+                }
+            },
+            async info() {
+                try {
+                    const info = await self.info().received
+                    log.i('info', info)
+                    return info;
+                } catch (error) {
+                    log.er(error)
+                }
+            },
+            async logout() {
+                try {
+                    const data = await self.logout()
+                    log.i('Is proper logout ?', data)
+                } catch (error) {
+                    log.er(error)
+                }
+                window.localStorage.removeItem(self.browser._keys.session);
+                self._subIsLggedIn.next(false)
+            }
+        }
+
     }
 
 
@@ -160,7 +238,7 @@ export class AuthController {
     }
 
     @POST('/login')
-    login( @BodyParam() body: IHelloJS & IUSER) {
+    login( @BodyParam() body: IHelloJS & IUSER): Response<SESSION> {
         //#region backend
         const self = this;
         return async (req) => {
@@ -319,7 +397,7 @@ export class AuthController {
 
 
     get __check() {
-        
+
         const self = this;
         return {
             exist: {

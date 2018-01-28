@@ -1,37 +1,24 @@
-import * as _ from 'lodash';
+// angular
+import { RouterModule, Route, PreloadAllModules } from "@angular/router";
+import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MyLibModule } from 'angular-lib';
+// thrid part
+import * as _ from 'lodash';
 import { init, replay } from 'isomorphic-rest';
-import { Controllers, Entities, HelloController } from 'isomorphic-lib';
-
-import { RouterModule, Route, PreloadAllModules } from "@angular/router";
-
-import { HttpModule } from '@angular/http';
+// my modules
+import { MyLibModule } from 'angular-lib';
+import { Controllers, Entities } from 'isomorphic-lib';
+// local
 import { AppComponent } from './app.component';
-
-const routes: Route[] = [
-  {
-    path: '',
-    loadChildren: './main-page/main-page.module#AppMainPageModule',
-    pathMatch: 'prefix',
-  },
-  {
-    path: 'test',
-    loadChildren: './app-test/app-test.module#AppTestModule',
-    pathMatch: 'prefix',
-  },
-  // {
-  //   path: '',
-  //   pathMatch: 'full' ,
-  //   redirectTo: 'test'
-  // }
-];
+import { LoginComponent } from './login/login.component';
+import { routes } from "./app.routes";
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

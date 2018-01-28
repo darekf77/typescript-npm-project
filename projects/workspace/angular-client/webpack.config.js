@@ -69,7 +69,16 @@ const postcssPlugins = function () {
 };
 
 const forceIgnore = {
-  sqlite3: ''
+  "redis": '',
+  "pg-query-stream": '',
+  "pg-native": '',
+  "pg": '',
+  "oracledb": '',
+  "mysql2": '',
+  "mysql": '',
+  "mssql": '',
+  "mongodb": '',
+  "sqlite3": ''
 }
 
 
@@ -495,7 +504,7 @@ module.exports = {
       "skipCodeGeneration": true,
       "compilerOptions": {}
     }),
-    // new FriendlyErrorsWebpackPlugin()
+    new FriendlyErrorsWebpackPlugin()
   ],
   "node": {
     "fs": "empty",
@@ -511,33 +520,33 @@ module.exports = {
   },
   "devServer": {
     "historyApiFallback": true,
-    // quiet: true, // needed for friend output
-    // noInfo: true,
-    // "stats": {
-    // assets: false,
-    // cached: false,
-    // cachedAssets: false,
-    // children: false,
-    // chunks: false,
-    // chunkModules: false,
-    // chunkOrigins: false,
-    // colors: false,
-    // depth: false,
-    // entrypoints: false,
-    // errors: true,
-    // errorDetails: true,
-    // hash: false,
-    // maxModules: 0,
-    // modules: false,
-    // performance: false,
-    // providedExports: false,
-    // publicPath: false,
-    // reasons: false,
-    // source: false,
-    // timings: false,
-    // usedExports: false,
-    // version: false,
-    // warnings: false
-    // }
+    quiet: true, // needed for friend output
+    noInfo: true,
+    "stats": {
+      assets: false,
+      cached: false,
+      cachedAssets: false,
+      children: false,
+      chunks: false,
+      chunkModules: false,
+      chunkOrigins: false,
+      colors: false,
+      depth: false,
+      entrypoints: false,
+      errors: true,
+      errorDetails: true,
+      hash: false,
+      maxModules: 0,
+      modules: false,
+      performance: false,
+      providedExports: false,
+      publicPath: false,
+      reasons: false,
+      source: false,
+      timings: false,
+      usedExports: false,
+      version: false,
+      warnings: false
+    }
   }
 };

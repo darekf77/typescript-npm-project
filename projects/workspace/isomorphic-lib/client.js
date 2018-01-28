@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 119);
+/******/ 	return __webpack_require__(__webpack_require__.s = 127);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -110,11 +110,11 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  */
-var ConnectionManager_1 = __webpack_require__(75);
-var MetadataArgsStorage_1 = __webpack_require__(95);
+var ConnectionManager_1 = __webpack_require__(78);
+var MetadataArgsStorage_1 = __webpack_require__(98);
 var container_1 = __webpack_require__(61);
 var PlatformTools_1 = __webpack_require__(1);
-var ConnectionOptionsReader_1 = __webpack_require__(105);
+var ConnectionOptionsReader_1 = __webpack_require__(108);
 var PromiseUtils_1 = __webpack_require__(20);
 // -------------------------------------------------------------------------
 // Commonly Used exports
@@ -122,36 +122,10 @@ var PromiseUtils_1 = __webpack_require__(20);
 __export(__webpack_require__(61));
 __export(__webpack_require__(12));
 __export(__webpack_require__(9));
-__export(__webpack_require__(106));
-__export(__webpack_require__(217));
-__export(__webpack_require__(14));
-__export(__webpack_require__(218));
-__export(__webpack_require__(221));
-__export(__webpack_require__(222));
-__export(__webpack_require__(223));
-__export(__webpack_require__(224));
-__export(__webpack_require__(225));
-__export(__webpack_require__(226));
-__export(__webpack_require__(227));
-__export(__webpack_require__(228));
-__export(__webpack_require__(229));
-__export(__webpack_require__(230));
-__export(__webpack_require__(231));
-__export(__webpack_require__(107));
-__export(__webpack_require__(68));
-__export(__webpack_require__(108));
-__export(__webpack_require__(69));
 __export(__webpack_require__(109));
-__export(__webpack_require__(110));
-__export(__webpack_require__(111));
-__export(__webpack_require__(107));
-__export(__webpack_require__(232));
-__export(__webpack_require__(15));
-__export(__webpack_require__(233));
 __export(__webpack_require__(234));
+__export(__webpack_require__(14));
 __export(__webpack_require__(235));
-__export(__webpack_require__(236));
-__export(__webpack_require__(237));
 __export(__webpack_require__(238));
 __export(__webpack_require__(239));
 __export(__webpack_require__(240));
@@ -161,14 +135,40 @@ __export(__webpack_require__(243));
 __export(__webpack_require__(244));
 __export(__webpack_require__(245));
 __export(__webpack_require__(246));
-__export(__webpack_require__(103));
-__export(__webpack_require__(102));
-__export(__webpack_require__(104));
+__export(__webpack_require__(247));
+__export(__webpack_require__(248));
+__export(__webpack_require__(110));
+__export(__webpack_require__(68));
+__export(__webpack_require__(111));
+__export(__webpack_require__(69));
+__export(__webpack_require__(112));
+__export(__webpack_require__(113));
+__export(__webpack_require__(114));
+__export(__webpack_require__(110));
+__export(__webpack_require__(249));
+__export(__webpack_require__(15));
+__export(__webpack_require__(250));
+__export(__webpack_require__(251));
+__export(__webpack_require__(252));
+__export(__webpack_require__(253));
+__export(__webpack_require__(254));
+__export(__webpack_require__(255));
+__export(__webpack_require__(256));
+__export(__webpack_require__(257));
+__export(__webpack_require__(258));
+__export(__webpack_require__(259));
+__export(__webpack_require__(260));
+__export(__webpack_require__(261));
+__export(__webpack_require__(262));
+__export(__webpack_require__(263));
+__export(__webpack_require__(106));
+__export(__webpack_require__(105));
+__export(__webpack_require__(107));
 __export(__webpack_require__(67));
 __export(__webpack_require__(38));
-__export(__webpack_require__(89));
-__export(__webpack_require__(26));
-__export(__webpack_require__(112));
+__export(__webpack_require__(92));
+__export(__webpack_require__(27));
+__export(__webpack_require__(115));
 __export(__webpack_require__(49));
 __export(__webpack_require__(59));
 __export(__webpack_require__(5));
@@ -176,41 +176,41 @@ __export(__webpack_require__(18));
 __export(__webpack_require__(17));
 __export(__webpack_require__(19));
 __export(__webpack_require__(4));
-__export(__webpack_require__(247));
+__export(__webpack_require__(264));
 __export(__webpack_require__(37));
-var ConnectionOptionsReader_2 = __webpack_require__(105);
+var ConnectionOptionsReader_2 = __webpack_require__(108);
 exports.ConnectionOptionsReader = ConnectionOptionsReader_2.ConnectionOptionsReader;
 var Connection_1 = __webpack_require__(54);
 exports.Connection = Connection_1.Connection;
-var ConnectionManager_2 = __webpack_require__(75);
+var ConnectionManager_2 = __webpack_require__(78);
 exports.ConnectionManager = ConnectionManager_2.ConnectionManager;
-var QueryBuilder_1 = __webpack_require__(28);
+var QueryBuilder_1 = __webpack_require__(29);
 exports.QueryBuilder = QueryBuilder_1.QueryBuilder;
 var SelectQueryBuilder_1 = __webpack_require__(63);
 exports.SelectQueryBuilder = SelectQueryBuilder_1.SelectQueryBuilder;
-var DeleteQueryBuilder_1 = __webpack_require__(100);
+var DeleteQueryBuilder_1 = __webpack_require__(103);
 exports.DeleteQueryBuilder = DeleteQueryBuilder_1.DeleteQueryBuilder;
-var InsertQueryBuilder_1 = __webpack_require__(98);
+var InsertQueryBuilder_1 = __webpack_require__(101);
 exports.InsertQueryBuilder = InsertQueryBuilder_1.InsertQueryBuilder;
-var UpdateQueryBuilder_1 = __webpack_require__(99);
+var UpdateQueryBuilder_1 = __webpack_require__(102);
 exports.UpdateQueryBuilder = UpdateQueryBuilder_1.UpdateQueryBuilder;
-var RelationQueryBuilder_1 = __webpack_require__(101);
+var RelationQueryBuilder_1 = __webpack_require__(104);
 exports.RelationQueryBuilder = RelationQueryBuilder_1.RelationQueryBuilder;
-var Brackets_1 = __webpack_require__(97);
+var Brackets_1 = __webpack_require__(100);
 exports.Brackets = Brackets_1.Brackets;
 var EntityManager_1 = __webpack_require__(38);
 exports.EntityManager = EntityManager_1.EntityManager;
 var MongoEntityManager_1 = __webpack_require__(58);
 exports.MongoEntityManager = MongoEntityManager_1.MongoEntityManager;
-var DefaultNamingStrategy_1 = __webpack_require__(76);
+var DefaultNamingStrategy_1 = __webpack_require__(79);
 exports.DefaultNamingStrategy = DefaultNamingStrategy_1.DefaultNamingStrategy;
-var Repository_1 = __webpack_require__(26);
+var Repository_1 = __webpack_require__(27);
 exports.Repository = Repository_1.Repository;
 var TreeRepository_1 = __webpack_require__(49);
 exports.TreeRepository = TreeRepository_1.TreeRepository;
 var MongoRepository_1 = __webpack_require__(59);
 exports.MongoRepository = MongoRepository_1.MongoRepository;
-var BaseEntity_1 = __webpack_require__(112);
+var BaseEntity_1 = __webpack_require__(115);
 exports.BaseEntity = BaseEntity_1.BaseEntity;
 var PromiseUtils_2 = __webpack_require__(20);
 exports.PromiseUtils = PromiseUtils_2.PromiseUtils;
@@ -416,15 +416,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var path = __webpack_require__(78);
-var fs = __webpack_require__(128);
-var cli_highlight_1 = __webpack_require__(129);
+var path = __webpack_require__(81);
+var fs = __webpack_require__(136);
+var cli_highlight_1 = __webpack_require__(137);
 var events_1 = __webpack_require__(46);
 exports.EventEmitter = events_1.EventEmitter;
-var stream_1 = __webpack_require__(130);
+var stream_1 = __webpack_require__(138);
 exports.Readable = stream_1.Readable;
 exports.Writable = stream_1.Writable;
-var chalk = __webpack_require__(141);
+var chalk = __webpack_require__(149);
 /**
  * Platform-specific tools.
  */
@@ -452,52 +452,52 @@ var PlatformTools = /** @class */ (function () {
                 * mongodb
                 */
                 case "mongodb":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"mongodb\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(150);
                 /**
                 * mysql
                 */
                 case "mysql":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"mysql\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(151);
                 case "mysql2":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"mysql2\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(152);
                 /**
                 * oracle
                 */
                 case "oracledb":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"oracledb\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(153);
                 /**
                 * postgres
                 */
                 case "pg":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pg\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(154);
                 case "pg-native":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pg-native\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(155);
                 case "pg-query-stream":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pg-query-stream\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(156);
                 /**
                 * redis
                 */
                 case "redis":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"redis\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(157);
                 /**
                 * sqlite
                 */
                 case "sqlite3":
-                    return __webpack_require__(142);
+                    return __webpack_require__(158);
                 /**
                 * sqlserver
                 */
                 case "mssql":
-                    return __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"mssql\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+                    return __webpack_require__(159);
                 /**
                 * other modules
                 */
                 case "mkdirp":
-                    return __webpack_require__(143);
+                    return __webpack_require__(160);
                 case "path":
-                    return __webpack_require__(78);
+                    return __webpack_require__(81);
                 case "debug":
-                    return __webpack_require__(144);
+                    return __webpack_require__(161);
                 /**
                 * default
                 */
@@ -609,7 +609,7 @@ exports.PlatformTools = PlatformTools;
 
 //# sourceMappingURL=PlatformTools.js.map
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33), __webpack_require__(45)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25), __webpack_require__(45)))
 
 /***/ }),
 /* 2 */
@@ -826,7 +826,7 @@ exports.OrmUtils = OrmUtils;
 Object.defineProperty(exports, "__esModule", { value: true });
 var TableColumn_1 = __webpack_require__(5);
 var AbstractSqliteDriver_1 = __webpack_require__(16);
-var MysqlDriver_1 = __webpack_require__(32);
+var MysqlDriver_1 = __webpack_require__(33);
 var OracleDriver_1 = __webpack_require__(57);
 /**
  * Table in the database represented in this class.
@@ -1272,10 +1272,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionIsNotSetError_1 = __webpack_require__(34);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
 var DriverUtils_1 = __webpack_require__(35);
-var SqlServerQueryRunner_1 = __webpack_require__(147);
+var SqlServerQueryRunner_1 = __webpack_require__(164);
 var DateUtils_1 = __webpack_require__(24);
 var PlatformTools_1 = __webpack_require__(1);
-var RdbmsSchemaBuilder_1 = __webpack_require__(31);
+var RdbmsSchemaBuilder_1 = __webpack_require__(32);
 var MssqlParameter_1 = __webpack_require__(37);
 /**
  * Organizes communication with SQL Server DBMS.
@@ -1825,9 +1825,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionIsNotSetError_1 = __webpack_require__(34);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
-var MongoQueryRunner_1 = __webpack_require__(148);
+var MongoQueryRunner_1 = __webpack_require__(165);
 var PlatformTools_1 = __webpack_require__(1);
-var MongoSchemaBuilder_1 = __webpack_require__(149);
+var MongoSchemaBuilder_1 = __webpack_require__(166);
 /**
  * Organizes communication with MongoDB.
  */
@@ -2435,9 +2435,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var AbstractSqliteQueryRunner_1 = __webpack_require__(29);
+var AbstractSqliteQueryRunner_1 = __webpack_require__(30);
 var DateUtils_1 = __webpack_require__(24);
-var RdbmsSchemaBuilder_1 = __webpack_require__(31);
+var RdbmsSchemaBuilder_1 = __webpack_require__(32);
 var RandomGenerator_1 = __webpack_require__(43);
 /**
  * Organizes communication with sqlite DBMS.
@@ -3029,10 +3029,10 @@ module.exports = Duplex;
 
 /*<replacement>*/
 var util = __webpack_require__(36);
-util.inherits = __webpack_require__(25);
+util.inherits = __webpack_require__(26);
 /*</replacement>*/
 
-var Readable = __webpack_require__(79);
+var Readable = __webpack_require__(82);
 var Writable = __webpack_require__(56);
 
 util.inherits(Duplex, Readable);
@@ -3364,10 +3364,37 @@ exports.DateUtils = DateUtils;
 /* 25 */
 /***/ (function(module, exports) {
 
-module.exports = require("inherits");
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 /* 26 */
+/***/ (function(module, exports) {
+
+module.exports = require("inherits");
+
+/***/ }),
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3660,7 +3687,7 @@ exports.Repository = Repository;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3704,10 +3731,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionIsNotSetError_1 = __webpack_require__(34);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
 var DriverUtils_1 = __webpack_require__(35);
-var PostgresQueryRunner_1 = __webpack_require__(179);
+var PostgresQueryRunner_1 = __webpack_require__(196);
 var DateUtils_1 = __webpack_require__(24);
 var PlatformTools_1 = __webpack_require__(1);
-var RdbmsSchemaBuilder_1 = __webpack_require__(31);
+var RdbmsSchemaBuilder_1 = __webpack_require__(32);
 /**
  * Organizes communication with PostgreSQL DBMS.
  */
@@ -4345,7 +4372,7 @@ exports.PostgresDriver = PostgresDriver;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4386,8 +4413,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryExpressionMap_1 = __webpack_require__(201);
-var Brackets_1 = __webpack_require__(97);
+var QueryExpressionMap_1 = __webpack_require__(218);
+var Brackets_1 = __webpack_require__(100);
 var EntityMetadataUtils_1 = __webpack_require__(67);
 var SqljsDriver_1 = __webpack_require__(60);
 // todo: completely cover query builder with tests
@@ -4461,7 +4488,7 @@ var QueryBuilder = /** @class */ (function () {
     QueryBuilder.prototype.insert = function () {
         this.expressionMap.queryType = "insert";
         // loading it dynamically because of circular issue
-        var InsertQueryBuilderCls = __webpack_require__(98).InsertQueryBuilder;
+        var InsertQueryBuilderCls = __webpack_require__(101).InsertQueryBuilder;
         if (this instanceof InsertQueryBuilderCls)
             return this;
         return new InsertQueryBuilderCls(this);
@@ -4478,7 +4505,7 @@ var QueryBuilder = /** @class */ (function () {
         this.expressionMap.queryType = "update";
         this.expressionMap.valuesSet = updateSet;
         // loading it dynamically because of circular issue
-        var UpdateQueryBuilderCls = __webpack_require__(99).UpdateQueryBuilder;
+        var UpdateQueryBuilderCls = __webpack_require__(102).UpdateQueryBuilder;
         if (this instanceof UpdateQueryBuilderCls)
             return this;
         return new UpdateQueryBuilderCls(this);
@@ -4489,7 +4516,7 @@ var QueryBuilder = /** @class */ (function () {
     QueryBuilder.prototype.delete = function () {
         this.expressionMap.queryType = "delete";
         // loading it dynamically because of circular issue
-        var DeleteQueryBuilderCls = __webpack_require__(100).DeleteQueryBuilder;
+        var DeleteQueryBuilderCls = __webpack_require__(103).DeleteQueryBuilder;
         if (this instanceof DeleteQueryBuilderCls)
             return this;
         return new DeleteQueryBuilderCls(this);
@@ -4507,7 +4534,7 @@ var QueryBuilder = /** @class */ (function () {
             this.expressionMap.setMainAlias(mainAlias);
         }
         // loading it dynamically because of circular issue
-        var RelationQueryBuilderCls = __webpack_require__(101).RelationQueryBuilder;
+        var RelationQueryBuilderCls = __webpack_require__(104).RelationQueryBuilder;
         if (this instanceof RelationQueryBuilderCls)
             return this;
         return new RelationQueryBuilderCls(this);
@@ -4890,7 +4917,7 @@ exports.QueryBuilder = QueryBuilder;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4934,7 +4961,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionAlreadyStartedError_1 = __webpack_require__(22);
 var TransactionNotStartedError_1 = __webpack_require__(23);
 var TableColumn_1 = __webpack_require__(5);
-var ColumnMetadata_1 = __webpack_require__(30);
+var ColumnMetadata_1 = __webpack_require__(31);
 var Table_1 = __webpack_require__(4);
 var TableIndex_1 = __webpack_require__(17);
 var TableForeignKey_1 = __webpack_require__(18);
@@ -5902,7 +5929,7 @@ exports.AbstractSqliteQueryRunner = AbstractSqliteQueryRunner;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6254,7 +6281,7 @@ exports.ColumnMetadata = ColumnMetadata;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6963,7 +6990,7 @@ exports.RdbmsSchemaBuilder = RdbmsSchemaBuilder;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7007,10 +7034,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionIsNotSetError_1 = __webpack_require__(34);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
 var DriverUtils_1 = __webpack_require__(35);
-var MysqlQueryRunner_1 = __webpack_require__(127);
+var MysqlQueryRunner_1 = __webpack_require__(135);
 var DateUtils_1 = __webpack_require__(24);
 var PlatformTools_1 = __webpack_require__(1);
-var RdbmsSchemaBuilder_1 = __webpack_require__(31);
+var RdbmsSchemaBuilder_1 = __webpack_require__(32);
 var RandomGenerator_1 = __webpack_require__(43);
 /**
  * Organizes communication with MySQL DBMS.
@@ -7492,33 +7519,6 @@ exports.MysqlDriver = MysqlDriver;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(44).Buffer))
 
 /***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
 /* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7712,24 +7712,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryRunnerProviderAlreadyReleasedError_1 = __webpack_require__(85);
-var NoNeedToReleaseEntityManagerError_1 = __webpack_require__(150);
+var QueryRunnerProviderAlreadyReleasedError_1 = __webpack_require__(88);
+var NoNeedToReleaseEntityManagerError_1 = __webpack_require__(167);
 var TreeRepository_1 = __webpack_require__(49);
-var Repository_1 = __webpack_require__(26);
-var FindOptionsUtils_1 = __webpack_require__(86);
-var SubjectBuilder_1 = __webpack_require__(152);
-var SubjectOperationExecutor_1 = __webpack_require__(154);
-var PlainObjectToNewEntityTransformer_1 = __webpack_require__(155);
-var PlainObjectToDatabaseEntityTransformer_1 = __webpack_require__(156);
-var CustomRepositoryNotFoundError_1 = __webpack_require__(88);
+var Repository_1 = __webpack_require__(27);
+var FindOptionsUtils_1 = __webpack_require__(89);
+var SubjectBuilder_1 = __webpack_require__(169);
+var SubjectOperationExecutor_1 = __webpack_require__(171);
+var PlainObjectToNewEntityTransformer_1 = __webpack_require__(172);
+var PlainObjectToDatabaseEntityTransformer_1 = __webpack_require__(173);
+var CustomRepositoryNotFoundError_1 = __webpack_require__(91);
 var index_1 = __webpack_require__(0);
-var AbstractRepository_1 = __webpack_require__(89);
-var CustomRepositoryCannotInheritRepositoryError_1 = __webpack_require__(158);
+var AbstractRepository_1 = __webpack_require__(92);
+var CustomRepositoryCannotInheritRepositoryError_1 = __webpack_require__(175);
 var MongoDriver_1 = __webpack_require__(7);
-var RepositoryNotFoundError_1 = __webpack_require__(159);
-var RepositoryNotTreeError_1 = __webpack_require__(160);
-var RepositoryFactory_1 = __webpack_require__(161);
-var TreeRepositoryNotSupportedError_1 = __webpack_require__(162);
+var RepositoryNotFoundError_1 = __webpack_require__(176);
+var RepositoryNotTreeError_1 = __webpack_require__(177);
+var RepositoryFactory_1 = __webpack_require__(178);
+var TreeRepositoryNotSupportedError_1 = __webpack_require__(179);
 /**
  * Entity manager supposed to work with any entity, automatically find its repository and call its methods,
  * whatever entity type are you passing.
@@ -8528,7 +8528,7 @@ exports.EntityManager = EntityManager;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
-var OneToMany_1 = __webpack_require__(110);
+var OneToMany_1 = __webpack_require__(113);
 var Column_1 = __webpack_require__(9);
 var PrimaryGeneratedColumn_1 = __webpack_require__(14);
 var Entity_1 = __webpack_require__(15);
@@ -8625,8 +8625,8 @@ exports.default = USER;
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
 var ManyToMany_1 = __webpack_require__(69);
-var ManyToOne_1 = __webpack_require__(109);
-var JoinTable_1 = __webpack_require__(108);
+var ManyToOne_1 = __webpack_require__(112);
+var JoinTable_1 = __webpack_require__(111);
 var JoinColumn_1 = __webpack_require__(68);
 var Column_1 = __webpack_require__(9);
 var PrimaryGeneratedColumn_1 = __webpack_require__(14);
@@ -8702,8 +8702,8 @@ exports.default = EMAIL;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
-tslib_1.__exportStar(__webpack_require__(248), exports);
-tslib_1.__exportStar(__webpack_require__(251), exports);
+tslib_1.__exportStar(__webpack_require__(277), exports);
+tslib_1.__exportStar(__webpack_require__(280), exports);
 
 
 /***/ }),
@@ -8911,9 +8911,9 @@ exports.RandomGenerator = RandomGenerator;
 
 
 
-var base64 = __webpack_require__(125)
-var ieee754 = __webpack_require__(126)
-var isArray = __webpack_require__(77)
+var base64 = __webpack_require__(133)
+var ieee754 = __webpack_require__(134)
+var isArray = __webpack_require__(80)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -10691,7 +10691,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
 
 /***/ }),
 /* 45 */
@@ -10953,7 +10953,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Repository_1 = __webpack_require__(26);
+var Repository_1 = __webpack_require__(27);
 /**
  * Repository with additional functions to work with trees.
  *
@@ -11415,25 +11415,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var DefaultNamingStrategy_1 = __webpack_require__(76);
-var CannotExecuteNotConnectedError_1 = __webpack_require__(121);
-var CannotConnectAlreadyConnectedError_1 = __webpack_require__(122);
-var EntityMetadataNotFound_1 = __webpack_require__(123);
-var MigrationExecutor_1 = __webpack_require__(124);
+var DefaultNamingStrategy_1 = __webpack_require__(79);
+var CannotExecuteNotConnectedError_1 = __webpack_require__(129);
+var CannotConnectAlreadyConnectedError_1 = __webpack_require__(130);
+var EntityMetadataNotFound_1 = __webpack_require__(131);
+var MigrationExecutor_1 = __webpack_require__(132);
 var MongoDriver_1 = __webpack_require__(7);
 var MongoEntityManager_1 = __webpack_require__(58);
-var EntityMetadataValidator_1 = __webpack_require__(164);
-var QueryRunnerProviderAlreadyReleasedError_1 = __webpack_require__(85);
-var EntityManagerFactory_1 = __webpack_require__(169);
-var DriverFactory_1 = __webpack_require__(171);
-var ConnectionMetadataBuilder_1 = __webpack_require__(180);
+var EntityMetadataValidator_1 = __webpack_require__(181);
+var QueryRunnerProviderAlreadyReleasedError_1 = __webpack_require__(88);
+var EntityManagerFactory_1 = __webpack_require__(186);
+var DriverFactory_1 = __webpack_require__(188);
+var ConnectionMetadataBuilder_1 = __webpack_require__(197);
 var SelectQueryBuilder_1 = __webpack_require__(63);
-var LoggerFactory_1 = __webpack_require__(207);
-var QueryResultCacheFactory_1 = __webpack_require__(209);
+var LoggerFactory_1 = __webpack_require__(224);
+var QueryResultCacheFactory_1 = __webpack_require__(226);
 var SqlServerDriver_1 = __webpack_require__(6);
-var MysqlDriver_1 = __webpack_require__(32);
+var MysqlDriver_1 = __webpack_require__(33);
 var PromiseUtils_1 = __webpack_require__(20);
-var SqljsEntityManager_1 = __webpack_require__(90);
+var SqljsEntityManager_1 = __webpack_require__(93);
 /**
  * Connection is a single database ORM connection to a specific database.
  * Its not required to be a database connection, depend on database type it can create connection pool.
@@ -11893,13 +11893,13 @@ exports.Connection = Connection;
 /* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(79);
+exports = module.exports = __webpack_require__(82);
 exports.Stream = exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(56);
 exports.Duplex = __webpack_require__(21);
-exports.Transform = __webpack_require__(83);
-exports.PassThrough = __webpack_require__(136);
+exports.Transform = __webpack_require__(86);
+exports.PassThrough = __webpack_require__(144);
 
 
 /***/ }),
@@ -11974,17 +11974,17 @@ Writable.WritableState = WritableState;
 
 /*<replacement>*/
 var util = __webpack_require__(36);
-util.inherits = __webpack_require__(25);
+util.inherits = __webpack_require__(26);
 /*</replacement>*/
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(135)
+  deprecate: __webpack_require__(143)
 };
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(80);
+var Stream = __webpack_require__(83);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -11998,7 +11998,7 @@ function _isUint8Array(obj) {
 }
 /*</replacement>*/
 
-var destroyImpl = __webpack_require__(81);
+var destroyImpl = __webpack_require__(84);
 
 util.inherits(Writable, Stream);
 
@@ -12571,7 +12571,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45), __webpack_require__(133).setImmediate, __webpack_require__(33)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45), __webpack_require__(141).setImmediate, __webpack_require__(25)))
 
 /***/ }),
 /* 57 */
@@ -12617,10 +12617,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionIsNotSetError_1 = __webpack_require__(34);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
-var OracleQueryRunner_1 = __webpack_require__(145);
+var OracleQueryRunner_1 = __webpack_require__(162);
 var DateUtils_1 = __webpack_require__(24);
 var PlatformTools_1 = __webpack_require__(1);
-var RdbmsSchemaBuilder_1 = __webpack_require__(31);
+var RdbmsSchemaBuilder_1 = __webpack_require__(32);
 var DriverUtils_1 = __webpack_require__(35);
 /**
  * Organizes communication with Oracle RDBMS.
@@ -13121,8 +13121,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var EntityManager_1 = __webpack_require__(38);
-var DocumentToEntityTransformer_1 = __webpack_require__(163);
-var FindOptionsUtils_1 = __webpack_require__(86);
+var DocumentToEntityTransformer_1 = __webpack_require__(180);
+var FindOptionsUtils_1 = __webpack_require__(89);
 var PlatformTools_1 = __webpack_require__(1);
 /**
  * Entity manager supposed to work with any entity, automatically find its repository and call its methods,
@@ -13669,7 +13669,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Repository_1 = __webpack_require__(26);
+var Repository_1 = __webpack_require__(27);
 /**
  * Repository used to manage mongodb documents of a single entity type.
  */
@@ -14003,7 +14003,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractSqliteDriver_1 = __webpack_require__(16);
-var SqljsQueryRunner_1 = __webpack_require__(170);
+var SqljsQueryRunner_1 = __webpack_require__(187);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
 var DriverOptionNotSetError_1 = __webpack_require__(50);
 var PlatformTools_1 = __webpack_require__(1);
@@ -14302,9 +14302,9 @@ exports.getFromContainer = getFromContainer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var LazyRelationsWrapper_1 = __webpack_require__(91);
+var LazyRelationsWrapper_1 = __webpack_require__(94);
 var OrmUtils_1 = __webpack_require__(3);
-var PostgresDriver_1 = __webpack_require__(27);
+var PostgresDriver_1 = __webpack_require__(28);
 var SqlServerDriver_1 = __webpack_require__(6);
 /**
  * Contains all entity metadata.
@@ -14787,27 +14787,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RawSqlResultsToEntityTransformer_1 = __webpack_require__(192);
+var RawSqlResultsToEntityTransformer_1 = __webpack_require__(209);
 var SqlServerDriver_1 = __webpack_require__(6);
-var PessimisticLockTransactionRequiredError_1 = __webpack_require__(193);
-var NoVersionOrUpdateDateColumnError_1 = __webpack_require__(194);
-var OptimisticLockVersionMismatchError_1 = __webpack_require__(195);
-var OptimisticLockCanNotBeUsedError_1 = __webpack_require__(196);
-var JoinAttribute_1 = __webpack_require__(96);
+var PessimisticLockTransactionRequiredError_1 = __webpack_require__(210);
+var NoVersionOrUpdateDateColumnError_1 = __webpack_require__(211);
+var OptimisticLockVersionMismatchError_1 = __webpack_require__(212);
+var OptimisticLockCanNotBeUsedError_1 = __webpack_require__(213);
+var JoinAttribute_1 = __webpack_require__(99);
 var RelationIdAttribute_1 = __webpack_require__(65);
 var RelationCountAttribute_1 = __webpack_require__(66);
-var RelationIdLoader_1 = __webpack_require__(197);
-var RelationIdMetadataToAttributeTransformer_1 = __webpack_require__(198);
-var RelationCountLoader_1 = __webpack_require__(199);
-var RelationCountMetadataToAttributeTransformer_1 = __webpack_require__(200);
-var Broadcaster_1 = __webpack_require__(87);
-var QueryBuilder_1 = __webpack_require__(28);
-var LockNotSupportedOnGivenDriverError_1 = __webpack_require__(205);
-var MysqlDriver_1 = __webpack_require__(32);
-var PostgresDriver_1 = __webpack_require__(27);
+var RelationIdLoader_1 = __webpack_require__(214);
+var RelationIdMetadataToAttributeTransformer_1 = __webpack_require__(215);
+var RelationCountLoader_1 = __webpack_require__(216);
+var RelationCountMetadataToAttributeTransformer_1 = __webpack_require__(217);
+var Broadcaster_1 = __webpack_require__(90);
+var QueryBuilder_1 = __webpack_require__(29);
+var LockNotSupportedOnGivenDriverError_1 = __webpack_require__(222);
+var MysqlDriver_1 = __webpack_require__(33);
+var PostgresDriver_1 = __webpack_require__(28);
 var OracleDriver_1 = __webpack_require__(57);
 var AbstractSqliteDriver_1 = __webpack_require__(16);
-var OffsetWithoutLimitNotSupportedError_1 = __webpack_require__(206);
+var OffsetWithoutLimitNotSupportedError_1 = __webpack_require__(223);
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
  */
@@ -16691,17 +16691,258 @@ exports.default = ChildClass;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+// CommonJS / Node have global context exposed as "global" variable.
+// We don't want to include the whole node.d.ts this this compilation unit so we'll just fake
+// the global "global" var for now.
+var __window = typeof window !== 'undefined' && window;
+var __self = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
+    self instanceof WorkerGlobalScope && self;
+var __global = typeof global !== 'undefined' && global;
+var _root = __window || __global || __self;
+exports.root = _root;
+// Workaround Closure Compiler restriction: The body of a goog.module cannot use throw.
+// This is needed when used with angular/tsickle which inserts a goog.module statement.
+// Wrap in IIFE
+(function () {
+    if (!_root) {
+        throw new Error('RxJS could not find any global context (window, self, global)');
+    }
+})();
+//# sourceMappingURL=root.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var isArray_1 = __webpack_require__(268);
+var isObject_1 = __webpack_require__(269);
+var isFunction_1 = __webpack_require__(123);
+var tryCatch_1 = __webpack_require__(270);
+var errorObject_1 = __webpack_require__(124);
+var UnsubscriptionError_1 = __webpack_require__(271);
+/**
+ * Represents a disposable resource, such as the execution of an Observable. A
+ * Subscription has one important method, `unsubscribe`, that takes no argument
+ * and just disposes the resource held by the subscription.
+ *
+ * Additionally, subscriptions may be grouped together through the `add()`
+ * method, which will attach a child Subscription to the current Subscription.
+ * When a Subscription is unsubscribed, all its children (and its grandchildren)
+ * will be unsubscribed as well.
+ *
+ * @class Subscription
+ */
+var Subscription = (function () {
+    /**
+     * @param {function(): void} [unsubscribe] A function describing how to
+     * perform the disposal of resources when the `unsubscribe` method is called.
+     */
+    function Subscription(unsubscribe) {
+        /**
+         * A flag to indicate whether this Subscription has already been unsubscribed.
+         * @type {boolean}
+         */
+        this.closed = false;
+        this._parent = null;
+        this._parents = null;
+        this._subscriptions = null;
+        if (unsubscribe) {
+            this._unsubscribe = unsubscribe;
+        }
+    }
+    /**
+     * Disposes the resources held by the subscription. May, for instance, cancel
+     * an ongoing Observable execution or cancel any other type of work that
+     * started when the Subscription was created.
+     * @return {void}
+     */
+    Subscription.prototype.unsubscribe = function () {
+        var hasErrors = false;
+        var errors;
+        if (this.closed) {
+            return;
+        }
+        var _a = this, _parent = _a._parent, _parents = _a._parents, _unsubscribe = _a._unsubscribe, _subscriptions = _a._subscriptions;
+        this.closed = true;
+        this._parent = null;
+        this._parents = null;
+        // null out _subscriptions first so any child subscriptions that attempt
+        // to remove themselves from this subscription will noop
+        this._subscriptions = null;
+        var index = -1;
+        var len = _parents ? _parents.length : 0;
+        // if this._parent is null, then so is this._parents, and we
+        // don't have to remove ourselves from any parent subscriptions.
+        while (_parent) {
+            _parent.remove(this);
+            // if this._parents is null or index >= len,
+            // then _parent is set to null, and the loop exits
+            _parent = ++index < len && _parents[index] || null;
+        }
+        if (isFunction_1.isFunction(_unsubscribe)) {
+            var trial = tryCatch_1.tryCatch(_unsubscribe).call(this);
+            if (trial === errorObject_1.errorObject) {
+                hasErrors = true;
+                errors = errors || (errorObject_1.errorObject.e instanceof UnsubscriptionError_1.UnsubscriptionError ?
+                    flattenUnsubscriptionErrors(errorObject_1.errorObject.e.errors) : [errorObject_1.errorObject.e]);
+            }
+        }
+        if (isArray_1.isArray(_subscriptions)) {
+            index = -1;
+            len = _subscriptions.length;
+            while (++index < len) {
+                var sub = _subscriptions[index];
+                if (isObject_1.isObject(sub)) {
+                    var trial = tryCatch_1.tryCatch(sub.unsubscribe).call(sub);
+                    if (trial === errorObject_1.errorObject) {
+                        hasErrors = true;
+                        errors = errors || [];
+                        var err = errorObject_1.errorObject.e;
+                        if (err instanceof UnsubscriptionError_1.UnsubscriptionError) {
+                            errors = errors.concat(flattenUnsubscriptionErrors(err.errors));
+                        }
+                        else {
+                            errors.push(err);
+                        }
+                    }
+                }
+            }
+        }
+        if (hasErrors) {
+            throw new UnsubscriptionError_1.UnsubscriptionError(errors);
+        }
+    };
+    /**
+     * Adds a tear down to be called during the unsubscribe() of this
+     * Subscription.
+     *
+     * If the tear down being added is a subscription that is already
+     * unsubscribed, is the same reference `add` is being called on, or is
+     * `Subscription.EMPTY`, it will not be added.
+     *
+     * If this subscription is already in an `closed` state, the passed
+     * tear down logic will be executed immediately.
+     *
+     * @param {TeardownLogic} teardown The additional logic to execute on
+     * teardown.
+     * @return {Subscription} Returns the Subscription used or created to be
+     * added to the inner subscriptions list. This Subscription can be used with
+     * `remove()` to remove the passed teardown logic from the inner subscriptions
+     * list.
+     */
+    Subscription.prototype.add = function (teardown) {
+        if (!teardown || (teardown === Subscription.EMPTY)) {
+            return Subscription.EMPTY;
+        }
+        if (teardown === this) {
+            return this;
+        }
+        var subscription = teardown;
+        switch (typeof teardown) {
+            case 'function':
+                subscription = new Subscription(teardown);
+            case 'object':
+                if (subscription.closed || typeof subscription.unsubscribe !== 'function') {
+                    return subscription;
+                }
+                else if (this.closed) {
+                    subscription.unsubscribe();
+                    return subscription;
+                }
+                else if (typeof subscription._addParent !== 'function' /* quack quack */) {
+                    var tmp = subscription;
+                    subscription = new Subscription();
+                    subscription._subscriptions = [tmp];
+                }
+                break;
+            default:
+                throw new Error('unrecognized teardown ' + teardown + ' added to Subscription.');
+        }
+        var subscriptions = this._subscriptions || (this._subscriptions = []);
+        subscriptions.push(subscription);
+        subscription._addParent(this);
+        return subscription;
+    };
+    /**
+     * Removes a Subscription from the internal list of subscriptions that will
+     * unsubscribe during the unsubscribe process of this Subscription.
+     * @param {Subscription} subscription The subscription to remove.
+     * @return {void}
+     */
+    Subscription.prototype.remove = function (subscription) {
+        var subscriptions = this._subscriptions;
+        if (subscriptions) {
+            var subscriptionIndex = subscriptions.indexOf(subscription);
+            if (subscriptionIndex !== -1) {
+                subscriptions.splice(subscriptionIndex, 1);
+            }
+        }
+    };
+    Subscription.prototype._addParent = function (parent) {
+        var _a = this, _parent = _a._parent, _parents = _a._parents;
+        if (!_parent || _parent === parent) {
+            // If we don't have a parent, or the new parent is the same as the
+            // current parent, then set this._parent to the new parent.
+            this._parent = parent;
+        }
+        else if (!_parents) {
+            // If there's already one parent, but not multiple, allocate an Array to
+            // store the rest of the parent Subscriptions.
+            this._parents = [parent];
+        }
+        else if (_parents.indexOf(parent) === -1) {
+            // Only add the new parent to the _parents list if it's not already there.
+            _parents.push(parent);
+        }
+    };
+    Subscription.EMPTY = (function (empty) {
+        empty.closed = true;
+        return empty;
+    }(new Subscription()));
+    return Subscription;
+}());
+exports.Subscription = Subscription;
+function flattenUnsubscriptionErrors(errors) {
+    return errors.reduce(function (errs, err) { return errs.concat((err instanceof UnsubscriptionError_1.UnsubscriptionError) ? err.errors : err); }, []);
+}
+//# sourceMappingURL=Subscription.js.map
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(73);
+var Symbol = root_1.root.Symbol;
+exports.rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
+    Symbol.for('rxSubscriber') : '@@rxSubscriber';
+/**
+ * @deprecated use rxSubscriber instead
+ */
+exports.$$rxSubscriber = exports.rxSubscriber;
+//# sourceMappingURL=rxSubscriber.js.map
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
-var OneToOne_1 = __webpack_require__(111);
+var OneToOne_1 = __webpack_require__(114);
 var JoinColumn_1 = __webpack_require__(68);
 var Column_1 = __webpack_require__(9);
-var CreateDateColumn_1 = __webpack_require__(106);
+var CreateDateColumn_1 = __webpack_require__(109);
 var PrimaryGeneratedColumn_1 = __webpack_require__(14);
 var Entity_1 = __webpack_require__(15);
 // local
-var ng2_logger_1 = __webpack_require__(117);
+var ng2_logger_1 = __webpack_require__(121);
 var log = ng2_logger_1.Log.create(__filename);
 var USER_1 = __webpack_require__(39);
 var helpers_1 = __webpack_require__(41);
@@ -16845,7 +17086,7 @@ exports.default = SESSION;
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16880,15 +17121,15 @@ exports.default = UsersController;
 
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Connection_1 = __webpack_require__(54);
-var ConnectionNotFoundError_1 = __webpack_require__(212);
-var AlreadyHasActiveConnectionError_1 = __webpack_require__(213);
+var ConnectionNotFoundError_1 = __webpack_require__(229);
+var AlreadyHasActiveConnectionError_1 = __webpack_require__(230);
 /**
  * ConnectionManager is used to store and manage multiple orm connections.
  * It also provides useful factory methods to simplify connection creation.
@@ -16951,14 +17192,14 @@ exports.ConnectionManager = ConnectionManager;
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var RandomGenerator_1 = __webpack_require__(43);
-var StringUtils_1 = __webpack_require__(120);
+var StringUtils_1 = __webpack_require__(128);
 /**
  * Naming strategy that is used by default.
  */
@@ -17035,13 +17276,13 @@ exports.DefaultNamingStrategy = DefaultNamingStrategy;
 
 
 /***/ }),
-/* 77 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = require("isarray");
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -17272,7 +17513,7 @@ var substr = 'ab'.substr(-1) === 'b'
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45)))
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17307,7 +17548,7 @@ var processNextTick = __webpack_require__(47);
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(77);
+var isArray = __webpack_require__(80);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -17325,7 +17566,7 @@ var EElistenerCount = function (emitter, type) {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(80);
+var Stream = __webpack_require__(83);
 /*</replacement>*/
 
 // TODO(bmeurer): Change this back to const once hole checks are
@@ -17343,11 +17584,11 @@ function _isUint8Array(obj) {
 
 /*<replacement>*/
 var util = __webpack_require__(36);
-util.inherits = __webpack_require__(25);
+util.inherits = __webpack_require__(26);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(131);
+var debugUtil = __webpack_require__(139);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -17356,8 +17597,8 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(132);
-var destroyImpl = __webpack_require__(81);
+var BufferList = __webpack_require__(140);
+var destroyImpl = __webpack_require__(84);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -17440,7 +17681,7 @@ function ReadableState(options, stream) {
   this.decoder = null;
   this.encoding = null;
   if (options.encoding) {
-    if (!StringDecoder) StringDecoder = __webpack_require__(82).StringDecoder;
+    if (!StringDecoder) StringDecoder = __webpack_require__(85).StringDecoder;
     this.decoder = new StringDecoder(options.encoding);
     this.encoding = options.encoding;
   }
@@ -17596,7 +17837,7 @@ Readable.prototype.isPaused = function () {
 
 // backwards compatibility.
 Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = __webpack_require__(82).StringDecoder;
+  if (!StringDecoder) StringDecoder = __webpack_require__(85).StringDecoder;
   this._readableState.decoder = new StringDecoder(enc);
   this._readableState.encoding = enc;
   return this;
@@ -18283,17 +18524,17 @@ function indexOf(xs, x) {
   }
   return -1;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33), __webpack_require__(45)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25), __webpack_require__(45)))
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(46).EventEmitter;
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18371,7 +18612,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18649,7 +18890,7 @@ function simpleEnd(buf) {
 }
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18724,7 +18965,7 @@ var Duplex = __webpack_require__(21);
 
 /*<replacement>*/
 var util = __webpack_require__(36);
-util.inherits = __webpack_require__(25);
+util.inherits = __webpack_require__(26);
 /*</replacement>*/
 
 util.inherits(Transform, Duplex);
@@ -18869,7 +19110,7 @@ function done(stream, er, data) {
 }
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports) {
 
 function webpackEmptyContext(req) {
@@ -18878,10 +19119,10 @@ function webpackEmptyContext(req) {
 webpackEmptyContext.keys = function() { return []; };
 webpackEmptyContext.resolve = webpackEmptyContext;
 module.exports = webpackEmptyContext;
-webpackEmptyContext.id = 84;
+webpackEmptyContext.id = 87;
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18917,13 +19158,13 @@ exports.QueryRunnerProviderAlreadyReleasedError = QueryRunnerProviderAlreadyRele
 
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FindRelationsNotFoundError_1 = __webpack_require__(151);
+var FindRelationsNotFoundError_1 = __webpack_require__(168);
 /**
  * Utilities to work with FindOptions.
  */
@@ -19107,7 +19348,7 @@ exports.FindOptionsUtils = FindOptionsUtils;
 
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19477,7 +19718,7 @@ exports.Broadcaster = Broadcaster;
 
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19513,15 +19754,15 @@ exports.CustomRepositoryNotFoundError = CustomRepositoryNotFoundError;
 
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CustomRepositoryDoesNotHaveEntityError_1 = __webpack_require__(157);
+var CustomRepositoryDoesNotHaveEntityError_1 = __webpack_require__(174);
 var index_1 = __webpack_require__(0);
-var CustomRepositoryNotFoundError_1 = __webpack_require__(88);
+var CustomRepositoryNotFoundError_1 = __webpack_require__(91);
 /**
  * Provides abstract class for custom repositories that do not inherit from original orm Repository.
  * Contains all most-necessary methods to simplify code in the custom repository.
@@ -19617,7 +19858,7 @@ exports.AbstractRepository = AbstractRepository;
 
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19723,13 +19964,13 @@ exports.SqljsEntityManager = SqljsEntityManager;
 
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var RelationLoader_1 = __webpack_require__(92);
+var RelationLoader_1 = __webpack_require__(95);
 /**
  * Wraps entities and creates getters/setters for their relations
  * to be able to lazily load relations when accessing these relations.
@@ -19793,7 +20034,7 @@ exports.LazyRelationsWrapper = LazyRelationsWrapper;
 
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19941,7 +20182,7 @@ exports.RelationLoader = RelationLoader;
 
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20044,7 +20285,7 @@ exports.IndexMetadata = IndexMetadata;
 
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20097,13 +20338,13 @@ exports.MetadataUtils = MetadataUtils;
 
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var MetadataUtils_1 = __webpack_require__(94);
+var MetadataUtils_1 = __webpack_require__(97);
 /**
  * Storage all metadatas args of all available types: tables, columns, subscribers, relations, etc.
  * Each metadata args represents some specifications of what it represents.
@@ -20235,7 +20476,7 @@ exports.MetadataArgsStorage = MetadataArgsStorage;
 
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20401,7 +20642,7 @@ exports.JoinAttribute = JoinAttribute;
 
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20426,7 +20667,7 @@ exports.Brackets = Brackets;
 
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20442,9 +20683,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryBuilder_1 = __webpack_require__(28);
+var QueryBuilder_1 = __webpack_require__(29);
 var SqlServerDriver_1 = __webpack_require__(6);
-var PostgresDriver_1 = __webpack_require__(27);
+var PostgresDriver_1 = __webpack_require__(28);
 var AbstractSqliteDriver_1 = __webpack_require__(16);
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
@@ -20610,7 +20851,7 @@ exports.InsertQueryBuilder = InsertQueryBuilder;
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20626,9 +20867,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryBuilder_1 = __webpack_require__(28);
+var QueryBuilder_1 = __webpack_require__(29);
 var SqlServerDriver_1 = __webpack_require__(6);
-var PostgresDriver_1 = __webpack_require__(27);
+var PostgresDriver_1 = __webpack_require__(28);
 var EntityMetadataUtils_1 = __webpack_require__(67);
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
@@ -20820,7 +21061,7 @@ exports.UpdateQueryBuilder = UpdateQueryBuilder;
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20836,9 +21077,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryBuilder_1 = __webpack_require__(28);
+var QueryBuilder_1 = __webpack_require__(29);
 var SqlServerDriver_1 = __webpack_require__(6);
-var PostgresDriver_1 = __webpack_require__(27);
+var PostgresDriver_1 = __webpack_require__(28);
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
  */
@@ -20977,7 +21218,7 @@ exports.DeleteQueryBuilder = DeleteQueryBuilder;
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21028,10 +21269,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var QueryBuilder_1 = __webpack_require__(28);
-var RelationUpdater_1 = __webpack_require__(203);
-var RelationRemover_1 = __webpack_require__(204);
-var RelationLoader_1 = __webpack_require__(92);
+var QueryBuilder_1 = __webpack_require__(29);
+var RelationUpdater_1 = __webpack_require__(220);
+var RelationRemover_1 = __webpack_require__(221);
+var RelationLoader_1 = __webpack_require__(95);
 /**
  * Allows to work with entity relations and perform specific operations with those relations.
  *
@@ -21214,7 +21455,7 @@ exports.RelationQueryBuilder = RelationQueryBuilder;
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21318,7 +21559,7 @@ exports.SimpleConsoleLogger = SimpleConsoleLogger;
 
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21423,7 +21664,7 @@ exports.AdvancedConsoleLogger = AdvancedConsoleLogger;
 
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21538,7 +21779,7 @@ exports.FileLogger = FileLogger;
 
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21580,9 +21821,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var PlatformTools_1 = __webpack_require__(1);
-var ConnectionOptionsEnvReader_1 = __webpack_require__(214);
-var ConnectionOptionsYmlReader_1 = __webpack_require__(215);
-var ConnectionOptionsXmlReader_1 = __webpack_require__(216);
+var ConnectionOptionsEnvReader_1 = __webpack_require__(231);
+var ConnectionOptionsYmlReader_1 = __webpack_require__(232);
+var ConnectionOptionsXmlReader_1 = __webpack_require__(233);
 /**
  * Reads connection options from the ormconfig.
  * Can read from multiple file extensions including env, json, js, xml and yml.
@@ -21772,7 +22013,7 @@ exports.ConnectionOptionsReader = ConnectionOptionsReader;
 
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21809,7 +22050,7 @@ exports.CreateDateColumn = CreateDateColumn;
 
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21837,7 +22078,7 @@ exports.RelationCount = RelationCount;
 
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21869,7 +22110,7 @@ exports.JoinTable = JoinTable;
 
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21918,7 +22159,7 @@ exports.ManyToOne = ManyToOne;
 
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21960,7 +22201,7 @@ exports.OneToMany = OneToMany;
 
 
 /***/ }),
-/* 111 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22008,7 +22249,7 @@ exports.OneToOne = OneToOne;
 
 
 /***/ }),
-/* 112 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22212,7 +22453,7 @@ exports.BaseEntity = BaseEntity;
 
 
 /***/ }),
-/* 113 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22322,7 +22563,7 @@ exports.default = HelloController;
 
 
 /***/ }),
-/* 114 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22370,7 +22611,7 @@ exports.default = TestController;
 
 
 /***/ }),
-/* 115 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22404,7 +22645,7 @@ exports.default = ChildClass2;
 
 
 /***/ }),
-/* 116 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22413,10 +22654,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
 var isomorphic_rest_1 = __webpack_require__(8);
 var Connection_1 = __webpack_require__(54);
-var ng2_logger_1 = __webpack_require__(117);
+var ng2_rest_1 = __webpack_require__(120);
+var ng2_rest_2 = __webpack_require__(120);
+exports.HttpResponse = ng2_rest_2.HttpResponse;
+var ng2_logger_1 = __webpack_require__(121);
+var Subject_1 = __webpack_require__(265);
 var log = ng2_logger_1.Log.create('AuthController');
 var USER_1 = __webpack_require__(39);
-var SESSION_1 = __webpack_require__(73);
+var SESSION_1 = __webpack_require__(76);
 var EMAIL_1 = __webpack_require__(40);
 var EMAIL_TYPE_1 = __webpack_require__(53);
 var helpers_1 = __webpack_require__(41);
@@ -22428,8 +22673,142 @@ var entity = {
 };
 var AuthController = /** @class */ (function () {
     function AuthController() {
+        this._subIsLggedIn = new Subject_1.Subject();
+        this.isLoggedIn = this._subIsLggedIn.asObservable();
+        this.browser.init();
     }
     AuthController_1 = AuthController;
+    Object.defineProperty(AuthController.prototype, "browser", {
+        get: function () {
+            var self = this;
+            return {
+                _keys: {
+                    session: 'session',
+                    Authorization: 'Authorization'
+                },
+                _subjects: {
+                    login: new Subject_1.Subject()
+                },
+                init: function () {
+                    return tslib_1.__awaiter(this, void 0, void 0, function () {
+                        var session, data, user, err_1;
+                        return tslib_1.__generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!isomorphic_rest_1.isBrowser)
+                                        return [2 /*return*/];
+                                    try {
+                                        data = window.localStorage.getItem(self.browser._keys.session);
+                                        session = JSON.parse(data);
+                                    }
+                                    catch (_b) { }
+                                    log.i('Current session', session);
+                                    if (!session) {
+                                        self._subIsLggedIn.next(false);
+                                        return [2 /*return*/];
+                                    }
+                                    ng2_rest_1.Resource.Headers.request.set(self.browser._keys.Authorization, session.token_type + " " + session.token);
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, self.browser.info()];
+                                case 2:
+                                    user = _a.sent();
+                                    log.i('Authenticated user ', user);
+                                    self._subIsLggedIn.next(true);
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_1 = _a.sent();
+                                    log.er(err_1);
+                                    self._subIsLggedIn.next(false);
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    });
+                },
+                login: function (_a) {
+                    var username = _a.username, password = _a.password;
+                    return tslib_1.__awaiter(this, void 0, void 0, function () {
+                        var session, error_1;
+                        return tslib_1.__generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    log.i('username', username);
+                                    log.i('password', password);
+                                    _b.label = 1;
+                                case 1:
+                                    _b.trys.push([1, 4, , 5]);
+                                    return [4 /*yield*/, self.login({
+                                            username: username, password: password
+                                        }).received];
+                                case 2:
+                                    session = _b.sent();
+                                    log.i('session', session);
+                                    window.localStorage.setItem(self.browser._keys.session, JSON.stringify(session.body.json));
+                                    return [4 /*yield*/, self.browser.init()];
+                                case 3:
+                                    _b.sent();
+                                    return [3 /*break*/, 5];
+                                case 4:
+                                    error_1 = _b.sent();
+                                    log.er(error_1);
+                                    return [3 /*break*/, 5];
+                                case 5: return [2 /*return*/];
+                            }
+                        });
+                    });
+                },
+                info: function () {
+                    return tslib_1.__awaiter(this, void 0, void 0, function () {
+                        var info, error_2;
+                        return tslib_1.__generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, self.info().received];
+                                case 1:
+                                    info = _a.sent();
+                                    log.i('info', info);
+                                    return [2 /*return*/, info];
+                                case 2:
+                                    error_2 = _a.sent();
+                                    log.er(error_2);
+                                    return [3 /*break*/, 3];
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    });
+                },
+                logout: function () {
+                    return tslib_1.__awaiter(this, void 0, void 0, function () {
+                        var data, error_3;
+                        return tslib_1.__generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, self.logout()];
+                                case 1:
+                                    data = _a.sent();
+                                    log.i('Is proper logout ?', data);
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    error_3 = _a.sent();
+                                    log.er(error_3);
+                                    return [3 /*break*/, 3];
+                                case 3:
+                                    window.localStorage.removeItem(self.browser._keys.session);
+                                    self._subIsLggedIn.next(false);
+                                    return [2 /*return*/];
+                            }
+                        });
+                    });
+                }
+            };
+        },
+        enumerable: true,
+        configurable: true
+    });
     AuthController.prototype.info = function () {
         var _this = this;
         var self = this;
@@ -22904,7 +23283,7 @@ var AuthController = /** @class */ (function () {
         tslib_1.__param(0, isomorphic_rest_1.BodyParam()),
         tslib_1.__metadata("design:type", Function),
         tslib_1.__metadata("design:paramtypes", [Object]),
-        tslib_1.__metadata("design:returntype", void 0)
+        tslib_1.__metadata("design:returntype", typeof (_e = typeof isomorphic_rest_1.Response !== "undefined" && isomorphic_rest_1.Response) === "function" && _e || Object)
     ], AuthController.prototype, "login", null);
     AuthController = AuthController_1 = tslib_1.__decorate([
         isomorphic_rest_1.ENDPOINT({
@@ -22921,26 +23300,339 @@ var AuthController = /** @class */ (function () {
         tslib_1.__metadata("design:paramtypes", [])
     ], AuthController);
     return AuthController;
-    var AuthController_1, _a, _b, _c, _d;
+    var AuthController_1, _a, _b, _c, _d, _e;
 }());
 exports.AuthController = AuthController;
 exports.default = AuthController;
 
 
 /***/ }),
-/* 117 */
+/* 120 */
+/***/ (function(module, exports) {
+
+module.exports = require("ng2-rest");
+
+/***/ }),
+/* 121 */
 /***/ (function(module, exports) {
 
 module.exports = require("ng2-logger");
 
 /***/ }),
-/* 118 */
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var isFunction_1 = __webpack_require__(123);
+var Subscription_1 = __webpack_require__(74);
+var Observer_1 = __webpack_require__(125);
+var rxSubscriber_1 = __webpack_require__(75);
+/**
+ * Implements the {@link Observer} interface and extends the
+ * {@link Subscription} class. While the {@link Observer} is the public API for
+ * consuming the values of an {@link Observable}, all Observers get converted to
+ * a Subscriber, in order to provide Subscription-like capabilities such as
+ * `unsubscribe`. Subscriber is a common type in RxJS, and crucial for
+ * implementing operators, but it is rarely used as a public API.
+ *
+ * @class Subscriber<T>
+ */
+var Subscriber = (function (_super) {
+    __extends(Subscriber, _super);
+    /**
+     * @param {Observer|function(value: T): void} [destinationOrNext] A partially
+     * defined Observer or a `next` callback function.
+     * @param {function(e: ?any): void} [error] The `error` callback of an
+     * Observer.
+     * @param {function(): void} [complete] The `complete` callback of an
+     * Observer.
+     */
+    function Subscriber(destinationOrNext, error, complete) {
+        _super.call(this);
+        this.syncErrorValue = null;
+        this.syncErrorThrown = false;
+        this.syncErrorThrowable = false;
+        this.isStopped = false;
+        switch (arguments.length) {
+            case 0:
+                this.destination = Observer_1.empty;
+                break;
+            case 1:
+                if (!destinationOrNext) {
+                    this.destination = Observer_1.empty;
+                    break;
+                }
+                if (typeof destinationOrNext === 'object') {
+                    if (destinationOrNext instanceof Subscriber) {
+                        this.syncErrorThrowable = destinationOrNext.syncErrorThrowable;
+                        this.destination = destinationOrNext;
+                        this.destination.add(this);
+                    }
+                    else {
+                        this.syncErrorThrowable = true;
+                        this.destination = new SafeSubscriber(this, destinationOrNext);
+                    }
+                    break;
+                }
+            default:
+                this.syncErrorThrowable = true;
+                this.destination = new SafeSubscriber(this, destinationOrNext, error, complete);
+                break;
+        }
+    }
+    Subscriber.prototype[rxSubscriber_1.rxSubscriber] = function () { return this; };
+    /**
+     * A static factory for a Subscriber, given a (potentially partial) definition
+     * of an Observer.
+     * @param {function(x: ?T): void} [next] The `next` callback of an Observer.
+     * @param {function(e: ?any): void} [error] The `error` callback of an
+     * Observer.
+     * @param {function(): void} [complete] The `complete` callback of an
+     * Observer.
+     * @return {Subscriber<T>} A Subscriber wrapping the (partially defined)
+     * Observer represented by the given arguments.
+     */
+    Subscriber.create = function (next, error, complete) {
+        var subscriber = new Subscriber(next, error, complete);
+        subscriber.syncErrorThrowable = false;
+        return subscriber;
+    };
+    /**
+     * The {@link Observer} callback to receive notifications of type `next` from
+     * the Observable, with a value. The Observable may call this method 0 or more
+     * times.
+     * @param {T} [value] The `next` value.
+     * @return {void}
+     */
+    Subscriber.prototype.next = function (value) {
+        if (!this.isStopped) {
+            this._next(value);
+        }
+    };
+    /**
+     * The {@link Observer} callback to receive notifications of type `error` from
+     * the Observable, with an attached {@link Error}. Notifies the Observer that
+     * the Observable has experienced an error condition.
+     * @param {any} [err] The `error` exception.
+     * @return {void}
+     */
+    Subscriber.prototype.error = function (err) {
+        if (!this.isStopped) {
+            this.isStopped = true;
+            this._error(err);
+        }
+    };
+    /**
+     * The {@link Observer} callback to receive a valueless notification of type
+     * `complete` from the Observable. Notifies the Observer that the Observable
+     * has finished sending push-based notifications.
+     * @return {void}
+     */
+    Subscriber.prototype.complete = function () {
+        if (!this.isStopped) {
+            this.isStopped = true;
+            this._complete();
+        }
+    };
+    Subscriber.prototype.unsubscribe = function () {
+        if (this.closed) {
+            return;
+        }
+        this.isStopped = true;
+        _super.prototype.unsubscribe.call(this);
+    };
+    Subscriber.prototype._next = function (value) {
+        this.destination.next(value);
+    };
+    Subscriber.prototype._error = function (err) {
+        this.destination.error(err);
+        this.unsubscribe();
+    };
+    Subscriber.prototype._complete = function () {
+        this.destination.complete();
+        this.unsubscribe();
+    };
+    Subscriber.prototype._unsubscribeAndRecycle = function () {
+        var _a = this, _parent = _a._parent, _parents = _a._parents;
+        this._parent = null;
+        this._parents = null;
+        this.unsubscribe();
+        this.closed = false;
+        this.isStopped = false;
+        this._parent = _parent;
+        this._parents = _parents;
+        return this;
+    };
+    return Subscriber;
+}(Subscription_1.Subscription));
+exports.Subscriber = Subscriber;
+/**
+ * We need this JSDoc comment for affecting ESDoc.
+ * @ignore
+ * @extends {Ignored}
+ */
+var SafeSubscriber = (function (_super) {
+    __extends(SafeSubscriber, _super);
+    function SafeSubscriber(_parentSubscriber, observerOrNext, error, complete) {
+        _super.call(this);
+        this._parentSubscriber = _parentSubscriber;
+        var next;
+        var context = this;
+        if (isFunction_1.isFunction(observerOrNext)) {
+            next = observerOrNext;
+        }
+        else if (observerOrNext) {
+            next = observerOrNext.next;
+            error = observerOrNext.error;
+            complete = observerOrNext.complete;
+            if (observerOrNext !== Observer_1.empty) {
+                context = Object.create(observerOrNext);
+                if (isFunction_1.isFunction(context.unsubscribe)) {
+                    this.add(context.unsubscribe.bind(context));
+                }
+                context.unsubscribe = this.unsubscribe.bind(this);
+            }
+        }
+        this._context = context;
+        this._next = next;
+        this._error = error;
+        this._complete = complete;
+    }
+    SafeSubscriber.prototype.next = function (value) {
+        if (!this.isStopped && this._next) {
+            var _parentSubscriber = this._parentSubscriber;
+            if (!_parentSubscriber.syncErrorThrowable) {
+                this.__tryOrUnsub(this._next, value);
+            }
+            else if (this.__tryOrSetError(_parentSubscriber, this._next, value)) {
+                this.unsubscribe();
+            }
+        }
+    };
+    SafeSubscriber.prototype.error = function (err) {
+        if (!this.isStopped) {
+            var _parentSubscriber = this._parentSubscriber;
+            if (this._error) {
+                if (!_parentSubscriber.syncErrorThrowable) {
+                    this.__tryOrUnsub(this._error, err);
+                    this.unsubscribe();
+                }
+                else {
+                    this.__tryOrSetError(_parentSubscriber, this._error, err);
+                    this.unsubscribe();
+                }
+            }
+            else if (!_parentSubscriber.syncErrorThrowable) {
+                this.unsubscribe();
+                throw err;
+            }
+            else {
+                _parentSubscriber.syncErrorValue = err;
+                _parentSubscriber.syncErrorThrown = true;
+                this.unsubscribe();
+            }
+        }
+    };
+    SafeSubscriber.prototype.complete = function () {
+        var _this = this;
+        if (!this.isStopped) {
+            var _parentSubscriber = this._parentSubscriber;
+            if (this._complete) {
+                var wrappedComplete = function () { return _this._complete.call(_this._context); };
+                if (!_parentSubscriber.syncErrorThrowable) {
+                    this.__tryOrUnsub(wrappedComplete);
+                    this.unsubscribe();
+                }
+                else {
+                    this.__tryOrSetError(_parentSubscriber, wrappedComplete);
+                    this.unsubscribe();
+                }
+            }
+            else {
+                this.unsubscribe();
+            }
+        }
+    };
+    SafeSubscriber.prototype.__tryOrUnsub = function (fn, value) {
+        try {
+            fn.call(this._context, value);
+        }
+        catch (err) {
+            this.unsubscribe();
+            throw err;
+        }
+    };
+    SafeSubscriber.prototype.__tryOrSetError = function (parent, fn, value) {
+        try {
+            fn.call(this._context, value);
+        }
+        catch (err) {
+            parent.syncErrorValue = err;
+            parent.syncErrorThrown = true;
+            return true;
+        }
+        return false;
+    };
+    SafeSubscriber.prototype._unsubscribe = function () {
+        var _parentSubscriber = this._parentSubscriber;
+        this._context = null;
+        this._parentSubscriber = null;
+        _parentSubscriber.unsubscribe();
+    };
+    return SafeSubscriber;
+}(Subscriber));
+//# sourceMappingURL=Subscriber.js.map
+
+/***/ }),
+/* 123 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function isFunction(x) {
+    return typeof x === 'function';
+}
+exports.isFunction = isFunction;
+//# sourceMappingURL=isFunction.js.map
+
+/***/ }),
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// typeof any so that it we don't have to cast when comparing a result to the error object
+exports.errorObject = { e: {} };
+//# sourceMappingURL=errorObject.js.map
+
+/***/ }),
+/* 125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.empty = {
+    closed: true,
+    next: function (value) { },
+    error: function (err) { throw err; },
+    complete: function () { }
+};
+//# sourceMappingURL=Observer.js.map
+
+/***/ }),
+/* 126 */
 /***/ (function(module, exports) {
 
 module.exports = require("typeorm");
 
 /***/ }),
-/* 119 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22955,16 +23647,16 @@ function addController(controller) {
 function addEntity(entity) {
     entities[entity.name] = entity;
 }
-var UsersController_1 = __webpack_require__(74);
-var UsersController_2 = __webpack_require__(74);
+var UsersController_1 = __webpack_require__(77);
+var UsersController_2 = __webpack_require__(77);
 exports.UsersController = UsersController_2.UsersController;
 addController(UsersController_1.UsersController);
-var HelloController_1 = __webpack_require__(113);
-var HelloController_2 = __webpack_require__(113);
+var HelloController_1 = __webpack_require__(116);
+var HelloController_2 = __webpack_require__(116);
 exports.HelloController = HelloController_2.HelloController;
 addController(HelloController_1.HelloController);
-var TestController_1 = __webpack_require__(114);
-var TestController_2 = __webpack_require__(114);
+var TestController_1 = __webpack_require__(117);
+var TestController_2 = __webpack_require__(117);
 exports.TestController = TestController_2.TestController;
 addController(TestController_1.TestController);
 var ParentControllers_1 = __webpack_require__(71);
@@ -22975,12 +23667,12 @@ var Child1Controller_1 = __webpack_require__(72);
 var Child1Controller_2 = __webpack_require__(72);
 exports.ChildClass = Child1Controller_2.ChildClass;
 addController(Child1Controller_1.ChildClass);
-var Child2Controller_1 = __webpack_require__(115);
-var Child2Controller_2 = __webpack_require__(115);
+var Child2Controller_1 = __webpack_require__(118);
+var Child2Controller_2 = __webpack_require__(118);
 exports.ChildClass2 = Child2Controller_2.ChildClass2;
 addController(Child2Controller_1.ChildClass2);
-var AuthController_1 = __webpack_require__(116);
-var AuthController_2 = __webpack_require__(116);
+var AuthController_1 = __webpack_require__(119);
+var AuthController_2 = __webpack_require__(119);
 exports.AuthController = AuthController_2.AuthController;
 addController(AuthController_1.AuthController);
 var User_1 = __webpack_require__(42);
@@ -23007,8 +23699,8 @@ var USER_1 = __webpack_require__(39);
 var USER_2 = __webpack_require__(39);
 exports.USER = USER_2.USER;
 addEntity(USER_1.USER);
-var SESSION_1 = __webpack_require__(73);
-var SESSION_2 = __webpack_require__(73);
+var SESSION_1 = __webpack_require__(76);
+var SESSION_2 = __webpack_require__(76);
 exports.SESSION = SESSION_2.SESSION;
 addEntity(SESSION_1.SESSION);
 exports.Controllers = controllers;
@@ -23016,7 +23708,7 @@ exports.Entities = entities;
 
 
 /***/ }),
-/* 120 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23058,7 +23750,7 @@ exports.titleCase = titleCase;
 
 
 /***/ }),
-/* 121 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23094,7 +23786,7 @@ exports.CannotExecuteNotConnectedError = CannotExecuteNotConnectedError;
 
 
 /***/ }),
-/* 122 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23130,7 +23822,7 @@ exports.CannotConnectAlreadyConnectedError = CannotConnectAlreadyConnectedError;
 
 
 /***/ }),
-/* 123 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23165,7 +23857,7 @@ exports.EntityMetadataNotFound = EntityMetadataNotFound;
 
 
 /***/ }),
-/* 124 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23208,7 +23900,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Table_1 = __webpack_require__(4);
 var TableColumn_1 = __webpack_require__(5);
-var Migration_1 = __webpack_require__(146);
+var Migration_1 = __webpack_require__(163);
 var PromiseUtils_1 = __webpack_require__(20);
 var SqlServerDriver_1 = __webpack_require__(6);
 var MssqlParameter_1 = __webpack_require__(37);
@@ -23546,19 +24238,19 @@ exports.MigrationExecutor = MigrationExecutor;
 
 
 /***/ }),
-/* 125 */
+/* 133 */
 /***/ (function(module, exports) {
 
 module.exports = require("base64-js");
 
 /***/ }),
-/* 126 */
+/* 134 */
 /***/ (function(module, exports) {
 
 module.exports = require("ieee754");
 
 /***/ }),
-/* 127 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24672,19 +25364,19 @@ exports.MysqlQueryRunner = MysqlQueryRunner;
 
 
 /***/ }),
-/* 128 */
+/* 136 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 129 */
+/* 137 */
 /***/ (function(module, exports) {
 
 module.exports = require("cli-highlight");
 
 /***/ }),
-/* 130 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -24711,14 +25403,14 @@ module.exports = require("cli-highlight");
 module.exports = Stream;
 
 var EE = __webpack_require__(46).EventEmitter;
-var inherits = __webpack_require__(25);
+var inherits = __webpack_require__(26);
 
 inherits(Stream, EE);
 Stream.Readable = __webpack_require__(55);
-Stream.Writable = __webpack_require__(137);
-Stream.Duplex = __webpack_require__(138);
-Stream.Transform = __webpack_require__(139);
-Stream.PassThrough = __webpack_require__(140);
+Stream.Writable = __webpack_require__(145);
+Stream.Duplex = __webpack_require__(146);
+Stream.Transform = __webpack_require__(147);
+Stream.PassThrough = __webpack_require__(148);
 
 // Backwards-compat with node 0.4.x
 Stream.Stream = Stream;
@@ -24817,13 +25509,13 @@ Stream.prototype.pipe = function(dest, options) {
 
 
 /***/ }),
-/* 131 */
+/* 139 */
 /***/ (function(module, exports) {
 
 module.exports = require("util");
 
 /***/ }),
-/* 132 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24903,7 +25595,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 133 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
@@ -24956,7 +25648,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(134);
+__webpack_require__(142);
 // On some exotic environments, it's not clear which object `setimmeidate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -24967,22 +25659,22 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
 
 /***/ }),
-/* 134 */
+/* 142 */
 /***/ (function(module, exports) {
 
 module.exports = require("setimmediate");
 
 /***/ }),
-/* 135 */
+/* 143 */
 /***/ (function(module, exports) {
 
 module.exports = require("util-deprecate");
 
 /***/ }),
-/* 136 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25015,11 +25707,11 @@ module.exports = require("util-deprecate");
 
 module.exports = PassThrough;
 
-var Transform = __webpack_require__(83);
+var Transform = __webpack_require__(86);
 
 /*<replacement>*/
 var util = __webpack_require__(36);
-util.inherits = __webpack_require__(25);
+util.inherits = __webpack_require__(26);
 /*</replacement>*/
 
 util.inherits(PassThrough, Transform);
@@ -25035,59 +25727,113 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 137 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(56);
 
 
 /***/ }),
-/* 138 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(21);
 
 
 /***/ }),
-/* 139 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(55).Transform
 
 
 /***/ }),
-/* 140 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(55).PassThrough
 
 
 /***/ }),
-/* 141 */
+/* 149 */
 /***/ (function(module, exports) {
 
 module.exports = require("chalk");
 
 /***/ }),
-/* 142 */
+/* 150 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 151 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 152 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 153 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 154 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 155 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 156 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 157 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 158 */
 /***/ (function(module, exports) {
 
 module.exports = require("sqlite3");
 
 /***/ }),
-/* 143 */
+/* 159 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 160 */
 /***/ (function(module, exports) {
 
 module.exports = require("mkdirp");
 
 /***/ }),
-/* 144 */
+/* 161 */
 /***/ (function(module, exports) {
 
 module.exports = require("debug");
 
 /***/ }),
-/* 145 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26117,7 +26863,7 @@ exports.OracleQueryRunner = OracleQueryRunner;
 
 
 /***/ }),
-/* 146 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26143,7 +26889,7 @@ exports.Migration = Migration;
 
 
 /***/ }),
-/* 147 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27574,7 +28320,7 @@ exports.SqlServerQueryRunner = SqlServerQueryRunner;
 
 
 /***/ }),
-/* 148 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28484,7 +29230,7 @@ exports.MongoQueryRunner = MongoQueryRunner;
 
 
 /***/ }),
-/* 149 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28588,7 +29334,7 @@ exports.MongoSchemaBuilder = MongoSchemaBuilder;
 
 
 /***/ }),
-/* 150 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28626,7 +29372,7 @@ exports.NoNeedToReleaseEntityManagerError = NoNeedToReleaseEntityManagerError;
 
 
 /***/ }),
-/* 151 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28666,7 +29412,7 @@ exports.FindRelationsNotFoundError = FindRelationsNotFoundError;
 
 
 /***/ }),
-/* 152 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28707,7 +29453,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Subject_1 = __webpack_require__(153);
+var Subject_1 = __webpack_require__(170);
 var MongoDriver_1 = __webpack_require__(7);
 var OrmUtils_1 = __webpack_require__(3);
 /**
@@ -29491,7 +30237,7 @@ exports.SubjectBuilder = SubjectBuilder;
 
 
 /***/ }),
-/* 153 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29809,7 +30555,7 @@ exports.Subject = Subject;
 
 
 /***/ }),
-/* 154 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29853,7 +30599,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var OrmUtils_1 = __webpack_require__(3);
 var PromiseUtils_1 = __webpack_require__(20);
 var MongoDriver_1 = __webpack_require__(7);
-var Broadcaster_1 = __webpack_require__(87);
+var Broadcaster_1 = __webpack_require__(90);
 /**
  * Executes all database operations (inserts, updated, deletes) that must be executed
  * with given persistence subjects.
@@ -30858,7 +31604,7 @@ exports.SubjectOperationExecutor = SubjectOperationExecutor;
 
 
 /***/ }),
-/* 155 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30940,7 +31686,7 @@ exports.PlainObjectToNewEntityTransformer = PlainObjectToNewEntityTransformer;
 
 
 /***/ }),
-/* 156 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31121,7 +31867,7 @@ exports.PlainObjectToDatabaseEntityTransformer = PlainObjectToDatabaseEntityTran
 
 
 /***/ }),
-/* 157 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31156,7 +31902,7 @@ exports.CustomRepositoryDoesNotHaveEntityError = CustomRepositoryDoesNotHaveEnti
 
 
 /***/ }),
-/* 158 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31191,7 +31937,7 @@ exports.CustomRepositoryCannotInheritRepositoryError = CustomRepositoryCannotInh
 
 
 /***/ }),
-/* 159 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31229,7 +31975,7 @@ exports.RepositoryNotFoundError = RepositoryNotFoundError;
 
 
 /***/ }),
-/* 160 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31266,14 +32012,14 @@ exports.RepositoryNotTreeError = RepositoryNotTreeError;
 
 
 /***/ }),
-/* 161 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var TreeRepository_1 = __webpack_require__(49);
-var Repository_1 = __webpack_require__(26);
+var Repository_1 = __webpack_require__(27);
 var MongoDriver_1 = __webpack_require__(7);
 var MongoRepository_1 = __webpack_require__(59);
 /**
@@ -31326,7 +32072,7 @@ exports.RepositoryFactory = RepositoryFactory;
 
 
 /***/ }),
-/* 162 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31358,7 +32104,7 @@ exports.TreeRepositoryNotSupportedError = TreeRepositoryNotSupportedError;
 
 
 /***/ }),
-/* 163 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31538,7 +32284,7 @@ exports.DocumentToEntityTransformer = DocumentToEntityTransformer;
 
 
 /***/ }),
-/* 164 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31579,13 +32325,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var MissingPrimaryColumnError_1 = __webpack_require__(165);
-var CircularRelationsError_1 = __webpack_require__(166);
-var DepGraph_1 = __webpack_require__(167);
-var DataTypeNotSupportedError_1 = __webpack_require__(168);
+var MissingPrimaryColumnError_1 = __webpack_require__(182);
+var CircularRelationsError_1 = __webpack_require__(183);
+var DepGraph_1 = __webpack_require__(184);
+var DataTypeNotSupportedError_1 = __webpack_require__(185);
 var MongoDriver_1 = __webpack_require__(7);
 var SqlServerDriver_1 = __webpack_require__(6);
-var MysqlDriver_1 = __webpack_require__(32);
+var MysqlDriver_1 = __webpack_require__(33);
 /// todo: add check if there are multiple tables with the same name
 /// todo: add checks when generated column / table names are too long for the specific driver
 // todo: type in function validation, inverse side function validation
@@ -31776,7 +32522,7 @@ exports.EntityMetadataValidator = EntityMetadataValidator;
 
 
 /***/ }),
-/* 165 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31811,7 +32557,7 @@ exports.MissingPrimaryColumnError = MissingPrimaryColumnError;
 
 
 /***/ }),
-/* 166 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31845,7 +32591,7 @@ exports.CircularRelationsError = CircularRelationsError;
 
 
 /***/ }),
-/* 167 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32080,7 +32826,7 @@ exports.DepGraph = DepGraph;
 
 
 /***/ }),
-/* 168 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32113,7 +32859,7 @@ exports.DataTypeNotSupportedError = DataTypeNotSupportedError;
 
 
 /***/ }),
-/* 169 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32122,7 +32868,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var EntityManager_1 = __webpack_require__(38);
 var MongoEntityManager_1 = __webpack_require__(58);
 var MongoDriver_1 = __webpack_require__(7);
-var SqljsEntityManager_1 = __webpack_require__(90);
+var SqljsEntityManager_1 = __webpack_require__(93);
 var SqljsDriver_1 = __webpack_require__(60);
 /**
  * Helps to create entity managers.
@@ -32148,7 +32894,7 @@ exports.EntityManagerFactory = EntityManagerFactory;
 
 
 /***/ }),
-/* 170 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32201,7 +32947,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var QueryRunnerAlreadyReleasedError_1 = __webpack_require__(11);
 var OrmUtils_1 = __webpack_require__(3);
-var AbstractSqliteQueryRunner_1 = __webpack_require__(29);
+var AbstractSqliteQueryRunner_1 = __webpack_require__(30);
 /**
  * Runs queries on a single sqlite database connection.
  *
@@ -32392,22 +33138,22 @@ exports.SqljsQueryRunner = SqljsQueryRunner;
 
 
 /***/ }),
-/* 171 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var MissingDriverError_1 = __webpack_require__(172);
+var MissingDriverError_1 = __webpack_require__(189);
 var MongoDriver_1 = __webpack_require__(7);
-var WebsqlDriver_1 = __webpack_require__(173);
+var WebsqlDriver_1 = __webpack_require__(190);
 var SqlServerDriver_1 = __webpack_require__(6);
 var OracleDriver_1 = __webpack_require__(57);
-var SqliteDriver_1 = __webpack_require__(175);
-var CordovaDriver_1 = __webpack_require__(177);
+var SqliteDriver_1 = __webpack_require__(192);
+var CordovaDriver_1 = __webpack_require__(194);
 var SqljsDriver_1 = __webpack_require__(60);
-var MysqlDriver_1 = __webpack_require__(32);
-var PostgresDriver_1 = __webpack_require__(27);
+var MysqlDriver_1 = __webpack_require__(33);
+var PostgresDriver_1 = __webpack_require__(28);
 /**
  * Helps to create drivers.
  */
@@ -32452,7 +33198,7 @@ exports.DriverFactory = DriverFactory;
 
 
 /***/ }),
-/* 172 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32488,7 +33234,7 @@ exports.MissingDriverError = MissingDriverError;
 
 
 /***/ }),
-/* 173 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32541,7 +33287,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var DriverUtils_1 = __webpack_require__(35);
 var DriverOptionNotSetError_1 = __webpack_require__(50);
-var WebsqlQueryRunner_1 = __webpack_require__(174);
+var WebsqlQueryRunner_1 = __webpack_require__(191);
 var AbstractSqliteDriver_1 = __webpack_require__(16);
 /**
  * Organizes communication with WebSQL in the browser.
@@ -32652,7 +33398,7 @@ exports.WebsqlDriver = WebsqlDriver;
 
 
 /***/ }),
-/* 174 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32709,7 +33455,7 @@ var Table_1 = __webpack_require__(4);
 var QueryRunnerAlreadyReleasedError_1 = __webpack_require__(11);
 var OrmUtils_1 = __webpack_require__(3);
 var QueryFailedError_1 = __webpack_require__(12);
-var AbstractSqliteQueryRunner_1 = __webpack_require__(29);
+var AbstractSqliteQueryRunner_1 = __webpack_require__(30);
 /**
  * Runs queries on a single websql database connection.
  */
@@ -33075,7 +33821,7 @@ exports.WebsqlQueryRunner = WebsqlQueryRunner;
 
 
 /***/ }),
-/* 175 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33127,7 +33873,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
-var SqliteQueryRunner_1 = __webpack_require__(176);
+var SqliteQueryRunner_1 = __webpack_require__(193);
 var DriverOptionNotSetError_1 = __webpack_require__(50);
 var PlatformTools_1 = __webpack_require__(1);
 var AbstractSqliteDriver_1 = __webpack_require__(16);
@@ -33244,7 +33990,7 @@ exports.SqliteDriver = SqliteDriver;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(44).Buffer))
 
 /***/ }),
-/* 176 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33298,7 +34044,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var QueryRunnerAlreadyReleasedError_1 = __webpack_require__(11);
 var OrmUtils_1 = __webpack_require__(3);
 var QueryFailedError_1 = __webpack_require__(12);
-var AbstractSqliteQueryRunner_1 = __webpack_require__(29);
+var AbstractSqliteQueryRunner_1 = __webpack_require__(30);
 /**
  * Runs queries on a single sqlite database connection.
  *
@@ -33412,7 +34158,7 @@ exports.SqliteQueryRunner = SqliteQueryRunner;
 
 
 /***/ }),
-/* 177 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33464,7 +34210,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractSqliteDriver_1 = __webpack_require__(16);
-var CordovaQueryRunner_1 = __webpack_require__(178);
+var CordovaQueryRunner_1 = __webpack_require__(195);
 var DriverOptionNotSetError_1 = __webpack_require__(50);
 var DriverPackageNotInstalledError_1 = __webpack_require__(10);
 var CordovaDriver = /** @class */ (function (_super) {
@@ -33558,7 +34304,7 @@ exports.CordovaDriver = CordovaDriver;
 
 
 /***/ }),
-/* 178 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33612,7 +34358,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var QueryRunnerAlreadyReleasedError_1 = __webpack_require__(11);
 var OrmUtils_1 = __webpack_require__(3);
 var QueryFailedError_1 = __webpack_require__(12);
-var AbstractSqliteQueryRunner_1 = __webpack_require__(29);
+var AbstractSqliteQueryRunner_1 = __webpack_require__(30);
 /**
  * Runs queries on a single sqlite database connection.
  *
@@ -33737,7 +34483,7 @@ exports.CordovaQueryRunner = CordovaQueryRunner;
 
 
 /***/ }),
-/* 179 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34963,18 +35709,18 @@ exports.PostgresQueryRunner = PostgresQueryRunner;
 
 
 /***/ }),
-/* 180 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DirectoryExportedClassesLoader_1 = __webpack_require__(181);
+var DirectoryExportedClassesLoader_1 = __webpack_require__(198);
 var OrmUtils_1 = __webpack_require__(3);
 var container_1 = __webpack_require__(61);
 var index_1 = __webpack_require__(0);
-var EntityMetadataBuilder_1 = __webpack_require__(182);
-var EntitySchemaTransformer_1 = __webpack_require__(191);
+var EntityMetadataBuilder_1 = __webpack_require__(199);
+var EntitySchemaTransformer_1 = __webpack_require__(208);
 /**
  * Builds migration instances, subscriber instances and entity metadatas for the given classes.
  */
@@ -35027,7 +35773,7 @@ exports.ConnectionMetadataBuilder = ConnectionMetadataBuilder;
 
 
 /***/ }),
-/* 181 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35081,26 +35827,26 @@ exports.importJsonsFromDirectories = importJsonsFromDirectories;
 
 
 /***/ }),
-/* 182 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var EntityMetadata_1 = __webpack_require__(62);
-var ColumnMetadata_1 = __webpack_require__(30);
-var IndexMetadata_1 = __webpack_require__(93);
-var RelationMetadata_1 = __webpack_require__(183);
-var EmbeddedMetadata_1 = __webpack_require__(184);
-var RelationIdMetadata_1 = __webpack_require__(185);
-var RelationCountMetadata_1 = __webpack_require__(186);
-var MetadataUtils_1 = __webpack_require__(94);
-var JunctionEntityMetadataBuilder_1 = __webpack_require__(187);
-var ClosureJunctionEntityMetadataBuilder_1 = __webpack_require__(188);
-var RelationJoinColumnBuilder_1 = __webpack_require__(189);
-var EntityListenerMetadata_1 = __webpack_require__(190);
+var ColumnMetadata_1 = __webpack_require__(31);
+var IndexMetadata_1 = __webpack_require__(96);
+var RelationMetadata_1 = __webpack_require__(200);
+var EmbeddedMetadata_1 = __webpack_require__(201);
+var RelationIdMetadata_1 = __webpack_require__(202);
+var RelationCountMetadata_1 = __webpack_require__(203);
+var MetadataUtils_1 = __webpack_require__(97);
+var JunctionEntityMetadataBuilder_1 = __webpack_require__(204);
+var ClosureJunctionEntityMetadataBuilder_1 = __webpack_require__(205);
+var RelationJoinColumnBuilder_1 = __webpack_require__(206);
+var EntityListenerMetadata_1 = __webpack_require__(207);
 var ForeignKeyMetadata_1 = __webpack_require__(51);
-var LazyRelationsWrapper_1 = __webpack_require__(91);
+var LazyRelationsWrapper_1 = __webpack_require__(94);
 /**
  * Builds EntityMetadata objects and all its sub-metadatas.
  */
@@ -35576,7 +36322,7 @@ exports.EntityMetadataBuilder = EntityMetadataBuilder;
 
 
 /***/ }),
-/* 183 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35883,7 +36629,7 @@ exports.RelationMetadata = RelationMetadata;
 
 
 /***/ }),
-/* 184 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36063,7 +36809,7 @@ exports.EmbeddedMetadata = EmbeddedMetadata;
 
 
 /***/ }),
-/* 185 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36128,7 +36874,7 @@ exports.RelationIdMetadata = RelationIdMetadata;
 
 
 /***/ }),
-/* 186 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36171,16 +36917,16 @@ exports.RelationCountMetadata = RelationCountMetadata;
 
 
 /***/ }),
-/* 187 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var EntityMetadata_1 = __webpack_require__(62);
-var ColumnMetadata_1 = __webpack_require__(30);
+var ColumnMetadata_1 = __webpack_require__(31);
 var ForeignKeyMetadata_1 = __webpack_require__(51);
-var IndexMetadata_1 = __webpack_require__(93);
+var IndexMetadata_1 = __webpack_require__(96);
 /**
  * Creates EntityMetadata for junction tables.
  * Junction tables are tables generated by many-to-many relations.
@@ -36369,14 +37115,14 @@ exports.JunctionEntityMetadataBuilder = JunctionEntityMetadataBuilder;
 
 
 /***/ }),
-/* 188 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var EntityMetadata_1 = __webpack_require__(62);
-var ColumnMetadata_1 = __webpack_require__(30);
+var ColumnMetadata_1 = __webpack_require__(31);
 var ForeignKeyMetadata_1 = __webpack_require__(51);
 /**
  * Creates EntityMetadata for junction tables of the closure entities.
@@ -36476,13 +37222,13 @@ exports.ClosureJunctionEntityMetadataBuilder = ClosureJunctionEntityMetadataBuil
 
 
 /***/ }),
-/* 189 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ColumnMetadata_1 = __webpack_require__(30);
+var ColumnMetadata_1 = __webpack_require__(31);
 var ForeignKeyMetadata_1 = __webpack_require__(51);
 /**
  * Builds join column for the many-to-one and one-to-one owner relations.
@@ -36615,7 +37361,7 @@ exports.RelationJoinColumnBuilder = RelationJoinColumnBuilder;
 
 
 /***/ }),
-/* 190 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36679,13 +37425,13 @@ exports.EntityListenerMetadata = EntityListenerMetadata;
 
 
 /***/ }),
-/* 191 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var MetadataArgsStorage_1 = __webpack_require__(95);
+var MetadataArgsStorage_1 = __webpack_require__(98);
 /**
  * Transforms entity schema into metadata args storage.
  * The result will be just like entities read from decorators.
@@ -36841,7 +37587,7 @@ exports.EntitySchemaTransformer = EntitySchemaTransformer;
 
 
 /***/ }),
-/* 192 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37151,7 +37897,7 @@ exports.RawSqlResultsToEntityTransformer = RawSqlResultsToEntityTransformer;
 
 
 /***/ }),
-/* 193 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37187,7 +37933,7 @@ exports.PessimisticLockTransactionRequiredError = PessimisticLockTransactionRequ
 
 
 /***/ }),
-/* 194 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37223,7 +37969,7 @@ exports.NoVersionOrUpdateDateColumnError = NoVersionOrUpdateDateColumnError;
 
 
 /***/ }),
-/* 195 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37259,7 +38005,7 @@ exports.OptimisticLockVersionMismatchError = OptimisticLockVersionMismatchError;
 
 
 /***/ }),
-/* 196 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37295,7 +38041,7 @@ exports.OptimisticLockCanNotBeUsedError = OptimisticLockCanNotBeUsedError;
 
 
 /***/ }),
-/* 197 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37485,7 +38231,7 @@ exports.RelationIdLoader = RelationIdLoader;
 
 
 /***/ }),
-/* 198 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37548,7 +38294,7 @@ exports.RelationIdMetadataToAttributeTransformer = RelationIdMetadataToAttribute
 
 
 /***/ }),
-/* 199 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37701,7 +38447,7 @@ exports.RelationCountLoader = RelationCountLoader;
 
 
 /***/ }),
-/* 200 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37764,7 +38510,7 @@ exports.RelationCountMetadataToAttributeTransformer = RelationCountMetadataToAtt
 
 
 /***/ }),
-/* 201 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37778,8 +38524,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Alias_1 = __webpack_require__(202);
-var JoinAttribute_1 = __webpack_require__(96);
+var Alias_1 = __webpack_require__(219);
+var JoinAttribute_1 = __webpack_require__(99);
 var RelationIdAttribute_1 = __webpack_require__(65);
 var RelationCountAttribute_1 = __webpack_require__(66);
 /**
@@ -38034,7 +38780,7 @@ exports.QueryExpressionMap = QueryExpressionMap;
 
 
 /***/ }),
-/* 202 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38080,7 +38826,7 @@ exports.Alias = Alias;
 
 
 /***/ }),
-/* 203 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38257,7 +39003,7 @@ exports.RelationUpdater = RelationUpdater;
 
 
 /***/ }),
-/* 204 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38404,7 +39150,7 @@ exports.RelationRemover = RelationRemover;
 
 
 /***/ }),
-/* 205 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38440,7 +39186,7 @@ exports.LockNotSupportedOnGivenDriverError = LockNotSupportedOnGivenDriverError;
 
 
 /***/ }),
-/* 206 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38475,16 +39221,16 @@ exports.OffsetWithoutLimitNotSupportedError = OffsetWithoutLimitNotSupportedErro
 
 
 /***/ }),
-/* 207 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var SimpleConsoleLogger_1 = __webpack_require__(102);
-var AdvancedConsoleLogger_1 = __webpack_require__(103);
-var FileLogger_1 = __webpack_require__(104);
-var DebugLogger_1 = __webpack_require__(208);
+var SimpleConsoleLogger_1 = __webpack_require__(105);
+var AdvancedConsoleLogger_1 = __webpack_require__(106);
+var FileLogger_1 = __webpack_require__(107);
+var DebugLogger_1 = __webpack_require__(225);
 /**
  * Helps to create logger instances.
  */
@@ -38519,7 +39265,7 @@ exports.LoggerFactory = LoggerFactory;
 
 
 /***/ }),
-/* 208 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38623,14 +39369,14 @@ exports.DebugLogger = DebugLogger;
 
 
 /***/ }),
-/* 209 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var RedisQueryResultCache_1 = __webpack_require__(210);
-var DbQueryResultCache_1 = __webpack_require__(211);
+var RedisQueryResultCache_1 = __webpack_require__(227);
+var DbQueryResultCache_1 = __webpack_require__(228);
 /**
  * Caches query result into Redis database.
  */
@@ -38662,7 +39408,7 @@ exports.QueryResultCacheFactory = QueryResultCacheFactory;
 
 
 /***/ }),
-/* 210 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38893,7 +39639,7 @@ exports.RedisQueryResultCache = RedisQueryResultCache;
 
 
 /***/ }),
-/* 211 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39151,7 +39897,7 @@ exports.DbQueryResultCache = DbQueryResultCache;
 
 
 /***/ }),
-/* 212 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39187,7 +39933,7 @@ exports.ConnectionNotFoundError = ConnectionNotFoundError;
 
 
 /***/ }),
-/* 213 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39224,7 +39970,7 @@ exports.AlreadyHasActiveConnectionError = AlreadyHasActiveConnectionError;
 
 
 /***/ }),
-/* 214 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39305,7 +40051,7 @@ exports.ConnectionOptionsEnvReader = ConnectionOptionsEnvReader;
 
 
 /***/ }),
-/* 215 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39339,7 +40085,7 @@ exports.ConnectionOptionsYmlReader = ConnectionOptionsYmlReader;
 
 
 /***/ }),
-/* 216 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39445,7 +40191,7 @@ exports.ConnectionOptionsXmlReader = ConnectionOptionsXmlReader;
 
 
 /***/ }),
-/* 217 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39480,15 +40226,15 @@ exports.DiscriminatorColumn = DiscriminatorColumn;
 
 
 /***/ }),
-/* 218 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ColumnTypeUndefinedError_1 = __webpack_require__(219);
+var ColumnTypeUndefinedError_1 = __webpack_require__(236);
 var index_1 = __webpack_require__(0);
-var PrimaryColumnCannotBeNullableError_1 = __webpack_require__(220);
+var PrimaryColumnCannotBeNullableError_1 = __webpack_require__(237);
 /**
  * Column decorator is used to mark a specific class property as a table column.
  * Only properties decorated with this decorator will be persisted to the database when entity be saved.
@@ -39541,7 +40287,7 @@ exports.PrimaryColumn = PrimaryColumn;
 
 
 /***/ }),
-/* 219 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39574,7 +40320,7 @@ exports.ColumnTypeUndefinedError = ColumnTypeUndefinedError;
 
 
 /***/ }),
-/* 220 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39607,7 +40353,7 @@ exports.PrimaryColumnCannotBeNullableError = PrimaryColumnCannotBeNullableError;
 
 
 /***/ }),
-/* 221 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39635,7 +40381,7 @@ exports.UpdateDateColumn = UpdateDateColumn;
 
 
 /***/ }),
-/* 222 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39668,7 +40414,7 @@ exports.VersionColumn = VersionColumn;
 
 
 /***/ }),
-/* 223 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39704,7 +40450,7 @@ exports.ObjectIdColumn = ObjectIdColumn;
 
 
 /***/ }),
-/* 224 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39731,7 +40477,7 @@ exports.AfterInsert = AfterInsert;
 
 
 /***/ }),
-/* 225 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39758,7 +40504,7 @@ exports.AfterLoad = AfterLoad;
 
 
 /***/ }),
-/* 226 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39785,7 +40531,7 @@ exports.AfterRemove = AfterRemove;
 
 
 /***/ }),
-/* 227 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39812,7 +40558,7 @@ exports.AfterUpdate = AfterUpdate;
 
 
 /***/ }),
-/* 228 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39839,7 +40585,7 @@ exports.BeforeInsert = BeforeInsert;
 
 
 /***/ }),
-/* 229 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39866,7 +40612,7 @@ exports.BeforeRemove = BeforeRemove;
 
 
 /***/ }),
-/* 230 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39893,7 +40639,7 @@ exports.BeforeUpdate = BeforeUpdate;
 
 
 /***/ }),
-/* 231 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39918,7 +40664,7 @@ exports.EventSubscriber = EventSubscriber;
 
 
 /***/ }),
-/* 232 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39946,7 +40692,7 @@ exports.RelationId = RelationId;
 
 
 /***/ }),
-/* 233 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39974,7 +40720,7 @@ exports.ClassEntityChild = ClassEntityChild;
 
 
 /***/ }),
-/* 234 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40002,7 +40748,7 @@ exports.ClosureEntity = ClosureEntity;
 
 
 /***/ }),
-/* 235 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40029,7 +40775,7 @@ exports.SingleEntityChild = SingleEntityChild;
 
 
 /***/ }),
-/* 236 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40054,7 +40800,7 @@ exports.TableInheritance = TableInheritance;
 
 
 /***/ }),
-/* 237 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40145,7 +40891,7 @@ exports.Transaction = Transaction;
 
 
 /***/ }),
-/* 238 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40171,7 +40917,7 @@ exports.TransactionManager = TransactionManager;
 
 
 /***/ }),
-/* 239 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40208,7 +40954,7 @@ exports.TransactionRepository = TransactionRepository;
 
 
 /***/ }),
-/* 240 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40236,7 +40982,7 @@ exports.TreeLevelColumn = TreeLevelColumn;
 
 
 /***/ }),
-/* 241 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40276,7 +41022,7 @@ exports.TreeParent = TreeParent;
 
 
 /***/ }),
-/* 242 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40317,7 +41063,7 @@ exports.TreeChildren = TreeChildren;
 
 
 /***/ }),
-/* 243 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40350,7 +41096,7 @@ exports.Index = Index;
 
 
 /***/ }),
-/* 244 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40377,7 +41123,7 @@ exports.Generated = Generated;
 
 
 /***/ }),
-/* 245 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40403,7 +41149,7 @@ exports.DiscriminatorValue = DiscriminatorValue;
 
 
 /***/ }),
-/* 246 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40430,7 +41176,7 @@ exports.EntityRepository = EntityRepository;
 
 
 /***/ }),
-/* 247 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40442,18 +41188,759 @@ var PlatformTools_1 = __webpack_require__(1);
 
 
 /***/ }),
-/* 248 */
+/* 265 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Observable_1 = __webpack_require__(266);
+var Subscriber_1 = __webpack_require__(122);
+var Subscription_1 = __webpack_require__(74);
+var ObjectUnsubscribedError_1 = __webpack_require__(275);
+var SubjectSubscription_1 = __webpack_require__(276);
+var rxSubscriber_1 = __webpack_require__(75);
+/**
+ * @class SubjectSubscriber<T>
+ */
+var SubjectSubscriber = (function (_super) {
+    __extends(SubjectSubscriber, _super);
+    function SubjectSubscriber(destination) {
+        _super.call(this, destination);
+        this.destination = destination;
+    }
+    return SubjectSubscriber;
+}(Subscriber_1.Subscriber));
+exports.SubjectSubscriber = SubjectSubscriber;
+/**
+ * @class Subject<T>
+ */
+var Subject = (function (_super) {
+    __extends(Subject, _super);
+    function Subject() {
+        _super.call(this);
+        this.observers = [];
+        this.closed = false;
+        this.isStopped = false;
+        this.hasError = false;
+        this.thrownError = null;
+    }
+    Subject.prototype[rxSubscriber_1.rxSubscriber] = function () {
+        return new SubjectSubscriber(this);
+    };
+    Subject.prototype.lift = function (operator) {
+        var subject = new AnonymousSubject(this, this);
+        subject.operator = operator;
+        return subject;
+    };
+    Subject.prototype.next = function (value) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        if (!this.isStopped) {
+            var observers = this.observers;
+            var len = observers.length;
+            var copy = observers.slice();
+            for (var i = 0; i < len; i++) {
+                copy[i].next(value);
+            }
+        }
+    };
+    Subject.prototype.error = function (err) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.hasError = true;
+        this.thrownError = err;
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].error(err);
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.complete = function () {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        this.isStopped = true;
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+            copy[i].complete();
+        }
+        this.observers.length = 0;
+    };
+    Subject.prototype.unsubscribe = function () {
+        this.isStopped = true;
+        this.closed = true;
+        this.observers = null;
+    };
+    Subject.prototype._trySubscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else {
+            return _super.prototype._trySubscribe.call(this, subscriber);
+        }
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+        if (this.closed) {
+            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+        }
+        else if (this.hasError) {
+            subscriber.error(this.thrownError);
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else if (this.isStopped) {
+            subscriber.complete();
+            return Subscription_1.Subscription.EMPTY;
+        }
+        else {
+            this.observers.push(subscriber);
+            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+        }
+    };
+    Subject.prototype.asObservable = function () {
+        var observable = new Observable_1.Observable();
+        observable.source = this;
+        return observable;
+    };
+    Subject.create = function (destination, source) {
+        return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+}(Observable_1.Observable));
+exports.Subject = Subject;
+/**
+ * @class AnonymousSubject<T>
+ */
+var AnonymousSubject = (function (_super) {
+    __extends(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+        _super.call(this);
+        this.destination = destination;
+        this.source = source;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+        var destination = this.destination;
+        if (destination && destination.next) {
+            destination.next(value);
+        }
+    };
+    AnonymousSubject.prototype.error = function (err) {
+        var destination = this.destination;
+        if (destination && destination.error) {
+            this.destination.error(err);
+        }
+    };
+    AnonymousSubject.prototype.complete = function () {
+        var destination = this.destination;
+        if (destination && destination.complete) {
+            this.destination.complete();
+        }
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+        var source = this.source;
+        if (source) {
+            return this.source.subscribe(subscriber);
+        }
+        else {
+            return Subscription_1.Subscription.EMPTY;
+        }
+    };
+    return AnonymousSubject;
+}(Subject));
+exports.AnonymousSubject = AnonymousSubject;
+//# sourceMappingURL=Subject.js.map
+
+/***/ }),
+/* 266 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(73);
+var toSubscriber_1 = __webpack_require__(267);
+var observable_1 = __webpack_require__(272);
+var pipe_1 = __webpack_require__(273);
+/**
+ * A representation of any set of values over any amount of time. This is the most basic building block
+ * of RxJS.
+ *
+ * @class Observable<T>
+ */
+var Observable = (function () {
+    /**
+     * @constructor
+     * @param {Function} subscribe the function that is called when the Observable is
+     * initially subscribed to. This function is given a Subscriber, to which new values
+     * can be `next`ed, or an `error` method can be called to raise an error, or
+     * `complete` can be called to notify of a successful completion.
+     */
+    function Observable(subscribe) {
+        this._isScalar = false;
+        if (subscribe) {
+            this._subscribe = subscribe;
+        }
+    }
+    /**
+     * Creates a new Observable, with this Observable as the source, and the passed
+     * operator defined as the new observable's operator.
+     * @method lift
+     * @param {Operator} operator the operator defining the operation to take on the observable
+     * @return {Observable} a new observable with the Operator applied
+     */
+    Observable.prototype.lift = function (operator) {
+        var observable = new Observable();
+        observable.source = this;
+        observable.operator = operator;
+        return observable;
+    };
+    /**
+     * Invokes an execution of an Observable and registers Observer handlers for notifications it will emit.
+     *
+     * <span class="informal">Use it when you have all these Observables, but still nothing is happening.</span>
+     *
+     * `subscribe` is not a regular operator, but a method that calls Observable's internal `subscribe` function. It
+     * might be for example a function that you passed to a {@link create} static factory, but most of the time it is
+     * a library implementation, which defines what and when will be emitted by an Observable. This means that calling
+     * `subscribe` is actually the moment when Observable starts its work, not when it is created, as it is often
+     * thought.
+     *
+     * Apart from starting the execution of an Observable, this method allows you to listen for values
+     * that an Observable emits, as well as for when it completes or errors. You can achieve this in two
+     * following ways.
+     *
+     * The first way is creating an object that implements {@link Observer} interface. It should have methods
+     * defined by that interface, but note that it should be just a regular JavaScript object, which you can create
+     * yourself in any way you want (ES6 class, classic function constructor, object literal etc.). In particular do
+     * not attempt to use any RxJS implementation details to create Observers - you don't need them. Remember also
+     * that your object does not have to implement all methods. If you find yourself creating a method that doesn't
+     * do anything, you can simply omit it. Note however, that if `error` method is not provided, all errors will
+     * be left uncaught.
+     *
+     * The second way is to give up on Observer object altogether and simply provide callback functions in place of its methods.
+     * This means you can provide three functions as arguments to `subscribe`, where first function is equivalent
+     * of a `next` method, second of an `error` method and third of a `complete` method. Just as in case of Observer,
+     * if you do not need to listen for something, you can omit a function, preferably by passing `undefined` or `null`,
+     * since `subscribe` recognizes these functions by where they were placed in function call. When it comes
+     * to `error` function, just as before, if not provided, errors emitted by an Observable will be thrown.
+     *
+     * Whatever style of calling `subscribe` you use, in both cases it returns a Subscription object.
+     * This object allows you to call `unsubscribe` on it, which in turn will stop work that an Observable does and will clean
+     * up all resources that an Observable used. Note that cancelling a subscription will not call `complete` callback
+     * provided to `subscribe` function, which is reserved for a regular completion signal that comes from an Observable.
+     *
+     * Remember that callbacks provided to `subscribe` are not guaranteed to be called asynchronously.
+     * It is an Observable itself that decides when these functions will be called. For example {@link of}
+     * by default emits all its values synchronously. Always check documentation for how given Observable
+     * will behave when subscribed and if its default behavior can be modified with a {@link Scheduler}.
+     *
+     * @example <caption>Subscribe with an Observer</caption>
+     * const sumObserver = {
+     *   sum: 0,
+     *   next(value) {
+     *     console.log('Adding: ' + value);
+     *     this.sum = this.sum + value;
+     *   },
+     *   error() { // We actually could just remove this method,
+     *   },        // since we do not really care about errors right now.
+     *   complete() {
+     *     console.log('Sum equals: ' + this.sum);
+     *   }
+     * };
+     *
+     * Rx.Observable.of(1, 2, 3) // Synchronously emits 1, 2, 3 and then completes.
+     * .subscribe(sumObserver);
+     *
+     * // Logs:
+     * // "Adding: 1"
+     * // "Adding: 2"
+     * // "Adding: 3"
+     * // "Sum equals: 6"
+     *
+     *
+     * @example <caption>Subscribe with functions</caption>
+     * let sum = 0;
+     *
+     * Rx.Observable.of(1, 2, 3)
+     * .subscribe(
+     *   function(value) {
+     *     console.log('Adding: ' + value);
+     *     sum = sum + value;
+     *   },
+     *   undefined,
+     *   function() {
+     *     console.log('Sum equals: ' + sum);
+     *   }
+     * );
+     *
+     * // Logs:
+     * // "Adding: 1"
+     * // "Adding: 2"
+     * // "Adding: 3"
+     * // "Sum equals: 6"
+     *
+     *
+     * @example <caption>Cancel a subscription</caption>
+     * const subscription = Rx.Observable.interval(1000).subscribe(
+     *   num => console.log(num),
+     *   undefined,
+     *   () => console.log('completed!') // Will not be called, even
+     * );                                // when cancelling subscription
+     *
+     *
+     * setTimeout(() => {
+     *   subscription.unsubscribe();
+     *   console.log('unsubscribed!');
+     * }, 2500);
+     *
+     * // Logs:
+     * // 0 after 1s
+     * // 1 after 2s
+     * // "unsubscribed!" after 2.5s
+     *
+     *
+     * @param {Observer|Function} observerOrNext (optional) Either an observer with methods to be called,
+     *  or the first of three possible handlers, which is the handler for each value emitted from the subscribed
+     *  Observable.
+     * @param {Function} error (optional) A handler for a terminal event resulting from an error. If no error handler is provided,
+     *  the error will be thrown as unhandled.
+     * @param {Function} complete (optional) A handler for a terminal event resulting from successful completion.
+     * @return {ISubscription} a subscription reference to the registered handlers
+     * @method subscribe
+     */
+    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
+        var operator = this.operator;
+        var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
+        if (operator) {
+            operator.call(sink, this.source);
+        }
+        else {
+            sink.add(this.source || !sink.syncErrorThrowable ? this._subscribe(sink) : this._trySubscribe(sink));
+        }
+        if (sink.syncErrorThrowable) {
+            sink.syncErrorThrowable = false;
+            if (sink.syncErrorThrown) {
+                throw sink.syncErrorValue;
+            }
+        }
+        return sink;
+    };
+    Observable.prototype._trySubscribe = function (sink) {
+        try {
+            return this._subscribe(sink);
+        }
+        catch (err) {
+            sink.syncErrorThrown = true;
+            sink.syncErrorValue = err;
+            sink.error(err);
+        }
+    };
+    /**
+     * @method forEach
+     * @param {Function} next a handler for each value emitted by the observable
+     * @param {PromiseConstructor} [PromiseCtor] a constructor function used to instantiate the Promise
+     * @return {Promise} a promise that either resolves on observable completion or
+     *  rejects with the handled error
+     */
+    Observable.prototype.forEach = function (next, PromiseCtor) {
+        var _this = this;
+        if (!PromiseCtor) {
+            if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
+                PromiseCtor = root_1.root.Rx.config.Promise;
+            }
+            else if (root_1.root.Promise) {
+                PromiseCtor = root_1.root.Promise;
+            }
+        }
+        if (!PromiseCtor) {
+            throw new Error('no Promise impl found');
+        }
+        return new PromiseCtor(function (resolve, reject) {
+            // Must be declared in a separate statement to avoid a RefernceError when
+            // accessing subscription below in the closure due to Temporal Dead Zone.
+            var subscription;
+            subscription = _this.subscribe(function (value) {
+                if (subscription) {
+                    // if there is a subscription, then we can surmise
+                    // the next handling is asynchronous. Any errors thrown
+                    // need to be rejected explicitly and unsubscribe must be
+                    // called manually
+                    try {
+                        next(value);
+                    }
+                    catch (err) {
+                        reject(err);
+                        subscription.unsubscribe();
+                    }
+                }
+                else {
+                    // if there is NO subscription, then we're getting a nexted
+                    // value synchronously during subscription. We can just call it.
+                    // If it errors, Observable's `subscribe` will ensure the
+                    // unsubscription logic is called, then synchronously rethrow the error.
+                    // After that, Promise will trap the error and send it
+                    // down the rejection path.
+                    next(value);
+                }
+            }, reject, resolve);
+        });
+    };
+    Observable.prototype._subscribe = function (subscriber) {
+        return this.source.subscribe(subscriber);
+    };
+    /**
+     * An interop point defined by the es7-observable spec https://github.com/zenparsing/es-observable
+     * @method Symbol.observable
+     * @return {Observable} this instance of the observable
+     */
+    Observable.prototype[observable_1.observable] = function () {
+        return this;
+    };
+    /* tslint:enable:max-line-length */
+    /**
+     * Used to stitch together functional operators into a chain.
+     * @method pipe
+     * @return {Observable} the Observable result of all of the operators having
+     * been called in the order they were passed in.
+     *
+     * @example
+     *
+     * import { map, filter, scan } from 'rxjs/operators';
+     *
+     * Rx.Observable.interval(1000)
+     *   .pipe(
+     *     filter(x => x % 2 === 0),
+     *     map(x => x + x),
+     *     scan((acc, x) => acc + x)
+     *   )
+     *   .subscribe(x => console.log(x))
+     */
+    Observable.prototype.pipe = function () {
+        var operations = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            operations[_i - 0] = arguments[_i];
+        }
+        if (operations.length === 0) {
+            return this;
+        }
+        return pipe_1.pipeFromArray(operations)(this);
+    };
+    /* tslint:enable:max-line-length */
+    Observable.prototype.toPromise = function (PromiseCtor) {
+        var _this = this;
+        if (!PromiseCtor) {
+            if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
+                PromiseCtor = root_1.root.Rx.config.Promise;
+            }
+            else if (root_1.root.Promise) {
+                PromiseCtor = root_1.root.Promise;
+            }
+        }
+        if (!PromiseCtor) {
+            throw new Error('no Promise impl found');
+        }
+        return new PromiseCtor(function (resolve, reject) {
+            var value;
+            _this.subscribe(function (x) { return value = x; }, function (err) { return reject(err); }, function () { return resolve(value); });
+        });
+    };
+    // HACK: Since TypeScript inherits static properties too, we have to
+    // fight against TypeScript here so Subject can have a different static create signature
+    /**
+     * Creates a new cold Observable by calling the Observable constructor
+     * @static true
+     * @owner Observable
+     * @method create
+     * @param {Function} subscribe? the subscriber function to be passed to the Observable constructor
+     * @return {Observable} a new cold observable
+     */
+    Observable.create = function (subscribe) {
+        return new Observable(subscribe);
+    };
+    return Observable;
+}());
+exports.Observable = Observable;
+//# sourceMappingURL=Observable.js.map
+
+/***/ }),
+/* 267 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Subscriber_1 = __webpack_require__(122);
+var rxSubscriber_1 = __webpack_require__(75);
+var Observer_1 = __webpack_require__(125);
+function toSubscriber(nextOrObserver, error, complete) {
+    if (nextOrObserver) {
+        if (nextOrObserver instanceof Subscriber_1.Subscriber) {
+            return nextOrObserver;
+        }
+        if (nextOrObserver[rxSubscriber_1.rxSubscriber]) {
+            return nextOrObserver[rxSubscriber_1.rxSubscriber]();
+        }
+    }
+    if (!nextOrObserver && !error && !complete) {
+        return new Subscriber_1.Subscriber(Observer_1.empty);
+    }
+    return new Subscriber_1.Subscriber(nextOrObserver, error, complete);
+}
+exports.toSubscriber = toSubscriber;
+//# sourceMappingURL=toSubscriber.js.map
+
+/***/ }),
+/* 268 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.isArray = Array.isArray || (function (x) { return x && typeof x.length === 'number'; });
+//# sourceMappingURL=isArray.js.map
+
+/***/ }),
+/* 269 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function isObject(x) {
+    return x != null && typeof x === 'object';
+}
+exports.isObject = isObject;
+//# sourceMappingURL=isObject.js.map
+
+/***/ }),
+/* 270 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var errorObject_1 = __webpack_require__(124);
+var tryCatchTarget;
+function tryCatcher() {
+    try {
+        return tryCatchTarget.apply(this, arguments);
+    }
+    catch (e) {
+        errorObject_1.errorObject.e = e;
+        return errorObject_1.errorObject;
+    }
+}
+function tryCatch(fn) {
+    tryCatchTarget = fn;
+    return tryCatcher;
+}
+exports.tryCatch = tryCatch;
+;
+//# sourceMappingURL=tryCatch.js.map
+
+/***/ }),
+/* 271 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * An error thrown when one or more errors have occurred during the
+ * `unsubscribe` of a {@link Subscription}.
+ */
+var UnsubscriptionError = (function (_super) {
+    __extends(UnsubscriptionError, _super);
+    function UnsubscriptionError(errors) {
+        _super.call(this);
+        this.errors = errors;
+        var err = Error.call(this, errors ?
+            errors.length + " errors occurred during unsubscription:\n  " + errors.map(function (err, i) { return ((i + 1) + ") " + err.toString()); }).join('\n  ') : '');
+        this.name = err.name = 'UnsubscriptionError';
+        this.stack = err.stack;
+        this.message = err.message;
+    }
+    return UnsubscriptionError;
+}(Error));
+exports.UnsubscriptionError = UnsubscriptionError;
+//# sourceMappingURL=UnsubscriptionError.js.map
+
+/***/ }),
+/* 272 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var root_1 = __webpack_require__(73);
+function getSymbolObservable(context) {
+    var $$observable;
+    var Symbol = context.Symbol;
+    if (typeof Symbol === 'function') {
+        if (Symbol.observable) {
+            $$observable = Symbol.observable;
+        }
+        else {
+            $$observable = Symbol('observable');
+            Symbol.observable = $$observable;
+        }
+    }
+    else {
+        $$observable = '@@observable';
+    }
+    return $$observable;
+}
+exports.getSymbolObservable = getSymbolObservable;
+exports.observable = getSymbolObservable(root_1.root);
+/**
+ * @deprecated use observable instead
+ */
+exports.$$observable = exports.observable;
+//# sourceMappingURL=observable.js.map
+
+/***/ }),
+/* 273 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var noop_1 = __webpack_require__(274);
+/* tslint:enable:max-line-length */
+function pipe() {
+    var fns = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        fns[_i - 0] = arguments[_i];
+    }
+    return pipeFromArray(fns);
+}
+exports.pipe = pipe;
+/* @internal */
+function pipeFromArray(fns) {
+    if (!fns) {
+        return noop_1.noop;
+    }
+    if (fns.length === 1) {
+        return fns[0];
+    }
+    return function piped(input) {
+        return fns.reduce(function (prev, fn) { return fn(prev); }, input);
+    };
+}
+exports.pipeFromArray = pipeFromArray;
+//# sourceMappingURL=pipe.js.map
+
+/***/ }),
+/* 274 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/* tslint:disable:no-empty */
+function noop() { }
+exports.noop = noop;
+//# sourceMappingURL=noop.js.map
+
+/***/ }),
+/* 275 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * An error thrown when an action is invalid because the object has been
+ * unsubscribed.
+ *
+ * @see {@link Subject}
+ * @see {@link BehaviorSubject}
+ *
+ * @class ObjectUnsubscribedError
+ */
+var ObjectUnsubscribedError = (function (_super) {
+    __extends(ObjectUnsubscribedError, _super);
+    function ObjectUnsubscribedError() {
+        var err = _super.call(this, 'object unsubscribed');
+        this.name = err.name = 'ObjectUnsubscribedError';
+        this.stack = err.stack;
+        this.message = err.message;
+    }
+    return ObjectUnsubscribedError;
+}(Error));
+exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
+//# sourceMappingURL=ObjectUnsubscribedError.js.map
+
+/***/ }),
+/* 276 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Subscription_1 = __webpack_require__(74);
+/**
+ * We need this JSDoc comment for affecting ESDoc.
+ * @ignore
+ * @extends {Ignored}
+ */
+var SubjectSubscription = (function (_super) {
+    __extends(SubjectSubscription, _super);
+    function SubjectSubscription(subject, subscriber) {
+        _super.call(this);
+        this.subject = subject;
+        this.subscriber = subscriber;
+        this.closed = false;
+    }
+    SubjectSubscription.prototype.unsubscribe = function () {
+        if (this.closed) {
+            return;
+        }
+        this.closed = true;
+        var subject = this.subject;
+        var observers = subject.observers;
+        this.subject = null;
+        if (!observers || observers.length === 0 || subject.isStopped || subject.closed) {
+            return;
+        }
+        var subscriberIndex = observers.indexOf(this.subscriber);
+        if (subscriberIndex !== -1) {
+            observers.splice(subscriberIndex, 1);
+        }
+    };
+    return SubjectSubscription;
+}(Subscription_1.Subscription));
+exports.SubjectSubscription = SubjectSubscription;
+//# sourceMappingURL=SubjectSubscription.js.map
+
+/***/ }),
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = __webpack_require__(2);
-var _ = __webpack_require__(249);
-__webpack_require__(250);
+var _ = __webpack_require__(278);
+__webpack_require__(279);
 var isomorphic_rest_1 = __webpack_require__(8);
-var typeorm_1 = __webpack_require__(118);
-var typeorm_2 = __webpack_require__(118);
+var typeorm_1 = __webpack_require__(126);
+var typeorm_2 = __webpack_require__(126);
 exports.Connection = typeorm_2.Connection;
 function start(options) {
     return tslib_1.__awaiter(this, void 0, void 0, function () {
@@ -40491,19 +41978,19 @@ exports.start = start;
 
 
 /***/ }),
-/* 249 */
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = require("lodash");
 
 /***/ }),
-/* 250 */
+/* 279 */
 /***/ (function(module, exports) {
 
 module.exports = require("reflect-metadata");
 
 /***/ }),
-/* 251 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
