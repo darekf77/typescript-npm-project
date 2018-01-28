@@ -29,7 +29,7 @@ import { __ } from '../helpers';
 /**
  * Session time in miliseconds
  */
-const SESSION_TIME_SECONDS = 3600;
+const SESSION_TIME_SECONDS = 10;
 
 
 function clean(session: SESSION) {

@@ -16949,7 +16949,7 @@ var helpers_1 = __webpack_require__(41);
 /**
  * Session time in miliseconds
  */
-var SESSION_TIME_SECONDS = 3600;
+var SESSION_TIME_SECONDS = 10;
 function clean(session) {
     session.user = undefined;
     return session;
@@ -22761,11 +22761,11 @@ var AuthController = /** @class */ (function () {
                 },
                 info: function () {
                     return tslib_1.__awaiter(this, void 0, void 0, function () {
-                        var info, error_2;
+                        var info, error_2, err;
                         return tslib_1.__generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 2, , 3]);
+                                    _a.trys.push([0, 2, , 5]);
                                     return [4 /*yield*/, self.info().received];
                                 case 1:
                                     info = _a.sent();
@@ -22773,9 +22773,13 @@ var AuthController = /** @class */ (function () {
                                     return [2 /*return*/, info];
                                 case 2:
                                     error_2 = _a.sent();
+                                    err = error_2;
                                     log.er(error_2);
-                                    return [3 /*break*/, 3];
-                                case 3: return [2 /*return*/];
+                                    if (!(err.statusCode === 401)) return [3 /*break*/, 4];
+                                    return [4 /*yield*/, self.browser.logout()];
+                                case 3: return [2 /*return*/, _a.sent()];
+                                case 4: return [3 /*break*/, 5];
+                                case 5: return [2 /*return*/];
                             }
                         });
                     });

@@ -17,7 +17,7 @@ import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 //#endregion
 
-import { Resource, HttpResponse } from "ng2-rest";
+import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
 export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
 import { Observable } from "rxjs/Observable";
@@ -145,7 +145,11 @@ export class AuthController {
                     log.i('info', info)
                     return info;
                 } catch (error) {
+                    const err: HttpResponseError = error;
                     log.er(error)
+                    if (err.statusCode === 401) {
+                        return await self.browser.logout()
+                    }
                 }
             },
             async logout() {

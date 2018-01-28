@@ -24,7 +24,7 @@
     "watch": "~1.0.2",
     "@angular/cli": "^1.6.4",
     "gulp": "^3.9.1",
-    "typeorm": "0.1.11"
+    "webpack": "^3.10.0"
   },
   "dependencies": {
     "@angular/compiler": "^5.2.0",
@@ -55,6 +55,7 @@
     "pre-build-webpack": "^0.1.0",
     "tslib": "^1.8.1",
     "uglifyjs-webpack-plugin": "^1.1.6",
+    "webpack": "^3.10.0",
     "webpack-merge": "^4.1.1",
     "webpack-rxjs-externals": "^1.1.0"
   }
