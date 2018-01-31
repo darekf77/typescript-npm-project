@@ -29,7 +29,7 @@ import { __ } from '../helpers';
 /**
  * Session time in miliseconds
  */
-const SESSION_TIME_SECONDS = 10;
+const SESSION_TIME_SECONDS = 3600;
 
 
 function clean(session: SESSION) {
@@ -38,17 +38,17 @@ function clean(session: SESSION) {
 }
 
 
+
+
 @Entity(__(SESSION))
 export class SESSION {
 
-    private constructor() {
+    private constructor() { }
 
-    }
-
-    exp: number;
+    expireInSeconds: number;
     calculateExpirationTime(): number {
         const now = new Date();
-        return Math.round((this.expired_date.getTime() - now.getTime()) / 1000);
+        return Math.round((this.expiredDate.getTime() - now.getTime()) / 1000);
     }
 
     @PrimaryGeneratedColumn()
@@ -56,6 +56,7 @@ export class SESSION {
 
     @Column({ length: 100 })
     token: string;
+
     token_type = 'bearer';
 
     @Column({
@@ -65,12 +66,12 @@ export class SESSION {
     ip: string;
 
     @CreateDateColumn()
-    created: Date;
+    createdDate: Date;
 
     @Column({
         nullable: false
     })
-    expired_date: Date;
+    expiredDate: Date;
 
     @OneToOne(type => USER, user => user.id, {
         nullable: true
@@ -78,22 +79,28 @@ export class SESSION {
     @JoinColumn()
     user: USER;
 
-    createToken(token?: string) {
-        this.created = new Date();
-        const timestamp = this.created.getTime();
+    private createToken(token?: string) {
+        this.createdDate = new Date();
+        const timestamp = this.createdDate.getTime();
         this.token = token ? token : generate(this.user.id + timestamp + this.ip)
-        this.expired_date = new Date(timestamp + SESSION_TIME_SECONDS * 1000)
+        this.expiredDate = new Date(timestamp + SESSION_TIME_SECONDS * 1000)
     }
 
-    expired(when: Date = new Date()) {
+    isExpired(when: Date = new Date()) {
         let time = {
-            expire: this.expired_date.getTime(),
+            expire: this.expiredDate.getTime(),
             now: when.getTime()
         }
         return (time.expire < time.now);
     }
 
+    public static saveInLocalStorage(session: SESSION) {
+        window.localStorage.setItem('$$session', JSON.stringify(session));
+    }
 
+    public static getFromLocalStorage(): SESSION {
+
+    }
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
         //#region backend
@@ -107,7 +114,7 @@ export class SESSION {
             })
             .getOne()
         if (Session) {
-            Session.exp = Session.calculateExpirationTime();
+            Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion
@@ -120,7 +127,7 @@ export class SESSION {
             .setParameter('token', token)
             .getOne();
         if (Session) {
-            Session.exp = Session.calculateExpirationTime();
+            Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion
@@ -136,7 +143,7 @@ export class SESSION {
 
         Session = await repo.save(Session);
         if (Session) {
-            Session.exp = Session.calculateExpirationTime();
+            Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion

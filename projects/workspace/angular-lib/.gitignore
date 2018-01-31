@@ -4,8 +4,8 @@
 /tmp
 /out-tsc
 bundle.umd.js
-/index.*
-/client.*
+# /index.*
+# /client.*
 
 
 

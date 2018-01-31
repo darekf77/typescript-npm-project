@@ -102,8 +102,7 @@ export class AuthController {
             _subjects: {
                 login: new Subject()
             },
-            async init() {
-                if (!isBrowser) return;
+            _localSessionAuthorize(): SESSION {
                 let session: SESSION;
                 try {
                     const data = window.localStorage.getItem(self.browser._keys.session);
@@ -116,6 +115,10 @@ export class AuthController {
                 }
                 Resource.Headers.request.set(self.browser._keys.Authorization,
                     `${session.token_type} ${session.token}`)
+            },
+            async init() {
+                if (!isBrowser) return;
+                
                 try {
                     const user = await self.browser.info()
                     log.i('Authenticated user ', user)
@@ -140,6 +143,7 @@ export class AuthController {
                 }
             },
             async info() {
+                self.browser._localSessionAuthorize();
                 try {
                     const info = await self.info().received
                     log.i('info', info)
@@ -147,9 +151,9 @@ export class AuthController {
                 } catch (error) {
                     const err: HttpResponseError = error;
                     log.er(error)
-                    if (err.statusCode === 401) {
-                        return await self.browser.logout()
-                    }
+                    // if (err.statusCode === 401) {
+                    //     return await self.browser.logout()
+                    // }
                 }
             },
             async logout() {
@@ -555,7 +559,7 @@ export class AuthController {
             const Session = await SESSION.getByToken(token, repo.session);
 
             if (Session) {
-                if (Session.expired()) {
+                if (Session.isExpired()) {
                     await repo.session.remove(Session);
                     return cb(null, user);
                 }

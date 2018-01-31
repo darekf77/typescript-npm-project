@@ -1,8 +1,10 @@
 
 import * as _ from 'lodash';
+import * as fs from 'fs';
 import { run } from "../process";
 import config from "../config";
 import { LibType } from '../models';
+import * as path from 'path';
 
 
 function clearFiles(files: string[] | string) {
@@ -29,7 +31,7 @@ export const clear = {
         if (exit) process.exit(0)
     },
     forWatching: (libType?: LibType, exit = true) => {
-        clearFiles('dist/')
+        clearFiles('dist/*')
         clearFiles('tmp/')
         if (exit) process.exit(0)
     }
