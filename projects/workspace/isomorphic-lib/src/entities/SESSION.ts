@@ -21,27 +21,24 @@ import { verify, generate } from "password-hash";
 
 // local
 import { Log, Level } from "ng2-logger";
+import { Resource } from "ng2-rest";
 const log = Log.create(__filename);
 
 import { USER } from './USER';
 import { __ } from '../helpers';
 
-/**
- * Session time in miliseconds
- */
-const SESSION_TIME_SECONDS = 3600;
-
-
-function clean(session: SESSION) {
-    session.user = undefined;
-    return session;
-}
-
-
 
 
 @Entity(__(SESSION))
 export class SESSION {
+
+    private static get const() {
+        return {
+            SESSION_TIME_SECONDS: 3600,
+            SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
+            AUTHORIZATION_HEADER: 'Authorization'
+        }
+    }
 
     private constructor() { }
 
@@ -83,7 +80,7 @@ export class SESSION {
         this.createdDate = new Date();
         const timestamp = this.createdDate.getTime();
         this.token = token ? token : generate(this.user.id + timestamp + this.ip)
-        this.expiredDate = new Date(timestamp + SESSION_TIME_SECONDS * 1000)
+        this.expiredDate = new Date(timestamp + SESSION.const.SESSION_TIME_SECONDS * 1000)
     }
 
     isExpired(when: Date = new Date()) {
@@ -94,12 +91,32 @@ export class SESSION {
         return (time.expire < time.now);
     }
 
-    public static saveInLocalStorage(session: SESSION) {
-        window.localStorage.setItem('$$session', JSON.stringify(session));
+    public saveInLocalStorage() {
+        let session: SESSION = this;
+        window.localStorage.setItem(SESSION.const.SESSION_LOCAL_STORAGE, JSON.stringify(session));
     }
 
-    public static getFromLocalStorage(): SESSION {
+    public static fromLocalStorage(): SESSION {
+        let session: SESSION = new SESSION();
+        try {
+            const data = window.localStorage.getItem(SESSION.const.SESSION_LOCAL_STORAGE);
+            const s = JSON.parse(data) as SESSION;
+            session.token = s.token;
+            session.token_type = s.token_type;
+        } catch {
+            session = undefined;
+        }
+        return session;
+    }
 
+    public static removeFromLocalStorage() {
+        window.localStorage.removeItem(SESSION.const.SESSION_LOCAL_STORAGE);
+    }
+
+    public activateBrowserToken() {
+        const session: SESSION = this;
+        Resource.Headers.request.set(SESSION.const.AUTHORIZATION_HEADER,
+            `${session.token_type} ${session.token}`)
     }
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
