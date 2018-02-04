@@ -27,7 +27,7 @@
     "@types/lodash": "4.14.92",
     "codelyzer": "^4.0.2",
     "core-js": "2.5.3",
-    "isomorphic-rest": "^0.0.15",
+    "isomorphic-rest": "^0.0.16",
     "lodash": "4.17.4",
     "ng2-logger": "^2.0.25",
     "ng2-rest": "^9.0.8",

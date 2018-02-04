@@ -12,6 +12,7 @@
   </p>
 </ng-template>
 
+
 <div *ngIf="observable.isLoggedIn | async;else loader; let authOK">
   <h1> Is Logged in ? {{authOK}} </h1>
   <button (click)="logout()"> logout</button>
