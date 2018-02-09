@@ -1,5 +1,3 @@
-
-//#region controler
 const controllers = {};
 const entities = {};
 function addController(controller: Function) {

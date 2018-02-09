@@ -1,12 +1,18 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as rimraf from "rimraf";
+import * as glob from "glob";
+
 import { error, info, warn } from "./messages";
+import { run } from "./process";
+import { constants } from 'zlib';
 
 
-export function copy(sousrce: string, destination: string) {
+
+export function copyFile(sousrce: string, destination: string) {
     if (!fs.existsSync(sousrce)) {
-        warn(`[${copy.name}] No able to find source of ${sousrce}`);
+        warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
         return;
     }
     if (sousrce === destination) {
@@ -18,3 +24,69 @@ export function copy(sousrce: string, destination: string) {
 }
 
 
+export function deleteFiles(filesPattern: string, options?: { cwd?: string, filesToOmmit?: string[] }) {
+    let { cwd, filesToOmmit } = options;
+    if (!cwd) {
+        cwd = process.cwd()
+    }
+    return new Promise<string[]>((resolve, reject) => {
+        glob(filesPattern, { cwd }, (err, files) => {
+
+            if (err) {
+                reject(err);
+                return
+            }
+            if (Array.isArray(filesToOmmit) && filesToOmmit.length > 0) {
+                files = files.filter(f => {
+                    return filesToOmmit.filter(ommitFile => {
+                        return (path.resolve(path.join(cwd, ommitFile)) == path.resolve(path.join(cwd, f)))
+                    }).length === 0;
+                })
+            }
+
+            files.forEach(file => {
+                run(`rimraf ${file}`, { cwd }).sync();
+            });
+
+            resolve(files);
+        })
+    })
+}
+
+export function copyFiles(filesPattern: string, destinationFolder: string, options?: { cwd?: string, filesToOmmit?: string[] }) {
+    let { cwd, filesToOmmit } = options;
+    if (!cwd) {
+        cwd = process.cwd()
+    }
+    return new Promise<string[]>((resolve, reject) => {
+        glob(filesPattern, { cwd }, (err, files) => {
+            if (err) {
+                reject(err);
+                return
+            }
+            if (Array.isArray(filesToOmmit) && filesToOmmit.length > 0) {
+                files = files.filter(f => {
+                    return filesToOmmit.filter(ommitFile => {
+                        return (path.resolve(path.join(cwd, ommitFile)) == path.resolve(path.join(cwd, f)))
+                    }).length === 0;
+                })
+            }
+
+            files.forEach(file => {
+                const fileSource = file;
+                const fileDestination = path.join(destinationFolder, file);
+                const folder = fileDestination.substring(0, fileDestination.length - path.basename(fileDestination).length);
+                try {
+                    if (!fs.existsSync(folder)) {
+                        run(`mkdirp ${folder}`).sync();
+                    }
+                    run(`cp ${fileSource} ${fileDestination}`, { cwd }).sync();
+                } catch (error) {
+                    console.log(error)
+                }
+
+            });
+            resolve(files);
+        })
+    })
+}

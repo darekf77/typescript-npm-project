@@ -1,7 +1,9 @@
 # compiled output
 /bundle
 /dist
+/dist_client
 /tmp
+/tmp*
 /out-tsc
 bundle.umd.js
 

@@ -1,6 +1,6 @@
 
-import glob = require('glob')
-import path = require('path');
+import * as glob from 'glob'
+import * as path from 'path';
 
 const tControllers = {}
 glob.sync(path.join(__dirname, '/controllers/**/*.js'))

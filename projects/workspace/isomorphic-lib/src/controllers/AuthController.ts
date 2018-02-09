@@ -69,6 +69,7 @@ export interface IFacebook {
 
 @ENDPOINT({
     auth: (method) => {
+        //#region backend
         if (method === AuthController.prototype.login) {
             return;
         }
@@ -76,6 +77,7 @@ export interface IFacebook {
             return;
         }
         return authenticate('bearer', { session: false });
+        //#endregion
     }
 })
 export class AuthController {
@@ -158,8 +160,8 @@ export class AuthController {
 
     @GET('/')
     info(): Response<USER> {
-        const self = this;
         //#region backend
+        const self = this;
         return async (req, res) => {
             const repo = await self.__repos();
             if (!req.user) {
@@ -252,7 +254,7 @@ export class AuthController {
     }
 
     get __authorization() {
-
+        //#region backend
         const self = this;
         return {
             async facebook(body: IHelloJS): Promise<USER> {
@@ -317,11 +319,11 @@ export class AuthController {
                 }
             }
         };
-
+        //#endregion
     }
 
     get __handle() {
-
+        //#region backend
         const self = this;
         return {
             facebook() {
@@ -371,7 +373,7 @@ export class AuthController {
                 //#endregion
             }
         };
-
+        //#endregion
     }
 
 
@@ -390,7 +392,7 @@ export class AuthController {
 
 
     get __check() {
-
+        //#region backend
         const self = this;
         return {
             exist: {
@@ -436,7 +438,7 @@ export class AuthController {
                 return is.registration;
             }
         };
-
+        //#endregion
     }
 
     private async __repos() {

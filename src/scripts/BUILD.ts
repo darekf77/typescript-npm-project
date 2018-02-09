@@ -11,12 +11,12 @@ function build(prod = false, watch = false, project: Project = Project.Current, 
         prod, watch, project
     };
 
-    if (watch) {
-        clear.forWatching(project.type, false);
-    }
-    else {
-        clear.forBuild(project.type, false);
-    }
+    // if (watch) {
+    //     clear.forWatching(project.type, false);
+    // }
+    // else {
+    //     clear.forBuild(project.type, false);
+    // }
 
     project.build(options);
     if (!watch) {
@@ -33,5 +33,6 @@ export default {
     $BUILD: () => build(),
     $BUILD_PROD: () => build(true),
     BUILD_WATCH: () => build(false, true),
+    BUILD_WATCH_ONCE: () => build(false, true),
     BUILD_WATCH_PROD: () => build(true, true),
 }

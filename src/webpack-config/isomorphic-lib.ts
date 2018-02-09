@@ -1,29 +1,17 @@
-import * as fs from 'fs'
+// global
 import * as _ from 'lodash'
 import * as path from 'path'
+import * as child from 'child_process';
+import * as dateformat from "dateformat";
+// webpack plugins
 import * as WebpackOnBuildPlugin from 'on-build-webpack';
 import * as WebpackPreBuildPlugin from 'pre-build-webpack';
-import * as child from 'child_process';
-import { copy } from "../helpers";
+// local libs
+import { copyFile } from "../helpers";
 import { run } from "../process";
 import { Project } from "../project";
 import { BuildOptions } from "../models";
-import * as dateformat from "dateformat";
-
 import config from "../config";
-
-
-//#region handle node modules
-const nodeModules = {};
-fs.readdirSync('node_modules')
-    .filter(function (x) {
-        return ['.bin'].indexOf(x) === -1;
-    })
-    .forEach(function (mod) {
-        nodeModules[mod] = 'commonjs ' + mod;
-    });
-//#endregion
-
 
 module.exports = (env: BuildOptions) => {
     _.forIn(env, (v, k) => {
@@ -33,12 +21,12 @@ module.exports = (env: BuildOptions) => {
     })
     let buildOk = true;
 
-    const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + 'client.js';
+    const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + '/client.js';
     const outDir = env.watch ? config.folder.watchDist : config.folder.bundle;
-
+    
     return {
         //#region config
-        entry: './src/index.ts',
+        entry: `./${config.folder.tempSrc}/index.ts`,
         output: {
             filename,
             libraryTarget: "commonjs"
@@ -46,20 +34,21 @@ module.exports = (env: BuildOptions) => {
         resolve: {
             extensions: ['.ts', '.js']
         },
-        externals: nodeModules,
+        externals: [function (context, req, cb) {
+            !/^\./.test(req)
+                ? cb(null, req)
+                : cb(null, false);
+        }],
         node: {
             fs: 'empty',
             __dirname: false,
             __filename: false
         },
-        //#endregion
-        //#region modules
         module: {
             rules: [
                 {
                     test: /\.ts$/,
                     loader: [
-                        'isomorphic-region-loader',
                         {
                             "loader": "@ngtools/webpack",
                             "options": {
@@ -67,22 +56,15 @@ module.exports = (env: BuildOptions) => {
                             }
                         }
                     ]
-                },
-                {
-                    test: /\.js$/,
-                    loader: [
-                        'isomorphic-region-loader'
-                    ]
                 }
             ]
         },
-        //#endregion
         plugins: [
             new WebpackPreBuildPlugin(function (stats) {
-                const tscCommand = `npm-run tsc --outDir ${outDir}`;
                 const date = `[${dateformat(new Date(), 'HH:MM:ss')}]`;
                 try {
-                    run(tscCommand).sync();
+                    run(`npm-run tsc --outDir ${outDir}`).sync();
+                    run(`npm-run tnp create:temp:src`, { cwd: process.cwd() }).sync();                    
                     console.log(`${date} Typescript compilation OK`)
                 } catch (error) {
                     console.error(`${date} Typescript compilation ERROR`)
@@ -94,7 +76,7 @@ module.exports = (env: BuildOptions) => {
                     Project.Current
                         .filesToRecreateAfterBuild()
                         .forEach(file => {
-                            copy(file.from, file.where)
+                            copyFile(file.from, file.where)
                         });
                 }
             }),

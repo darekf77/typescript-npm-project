@@ -29,14 +29,18 @@
   "dependencies": {
     "@angular/compiler": "^5.2.0",
     "@angular/compiler-cli": "^5.2.0",
+    "@angular/core": "^5.2.3",
+    "@ngtools/webpack": "^1.9.8",
     "@types/chokidar": "^1.7.4",
     "@types/dateformat": "^1.0.1",
     "@types/express": "^4.11.0",
     "@types/fs-extra": "^5.0.0",
     "@types/lodash": "^4.14.93",
     "@types/node": "^9.3.0",
+    "@types/rimraf": "^2.0.2",
     "chalk": "^2.3.0",
     "chokidar": "^2.0.0",
+    "copy": "^0.3.1",
     "dateformat": "^3.0.2",
     "eval": "^0.1.2",
     "express": "^4.16.2",
@@ -53,10 +57,13 @@
     "npm": "^5.6.0",
     "on-build-webpack": "^0.1.0",
     "pre-build-webpack": "^0.1.0",
+    "rxjs": "^5.5.6",
     "tslib": "^1.8.1",
+    "typescript": "^2.7.1",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "webpack": "^3.10.0",
     "webpack-merge": "^4.1.1",
+    "webpack-node-externals": "^1.6.0",
     "webpack-rxjs-externals": "^1.1.0"
   }
 }

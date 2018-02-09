@@ -6,9 +6,13 @@
         "experimentalDecorators": true,
         "sourceMap": true,
         "outDir": "dist",
+        "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
+        "types": ["node"],
         "lib": [
-            "es2015"
+            "es2015",
+            "es2015.promise",
+            "es2015.generator"
         ],
         "typeRoots": [
             "node_modules/@types"

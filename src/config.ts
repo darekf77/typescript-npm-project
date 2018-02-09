@@ -10,12 +10,13 @@ import { LibType, RecreateFile, BuildOptions } from './models';
 import { error } from "./messages";
 import { Project } from "./project";
 
-const config = {
+export const config = {
     folder: {
-        watchDist: 'dist/',
-        bundle: 'bundle/'
+        watchDist: 'dist',
+        bundle: 'bundle',
+        src: 'src',
+        tempSrc: 'tmp-src'
     },
-
     webpack: {
         paramsFor(libType: LibType, prod = false, watch = false) {
             const o = {
@@ -30,6 +31,7 @@ const config = {
             return `${o.config} ${o.watch}  --bail ${o.env.join(' ')}`;
         },
         params(prod = false, watch = false) {
+            
             const o = {
                 env: [
                     '--env.prod=' + prod,

@@ -39,8 +39,8 @@
         "password-hash": "^1.2.2",
         "q": "^1.5.1",
         "sqlite3": "^3.1.13",
-        "validator": "^9.2.0",
-        "typeorm": "^0.1.11"
+        "typeorm": "^0.1.11",
+        "validator": "^9.2.0"
     },
     "devDependencies": {
         "@ngtools/webpack": "^1.9.3",

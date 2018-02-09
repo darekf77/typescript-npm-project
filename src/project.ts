@@ -11,7 +11,9 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
-import { copy } from "./helpers";
+import { copyFile, deleteFiles, copyFiles } from "./helpers";
+import { IsomorphicRegions } from "./isomorphic";
+
 export class Project {
     children: Project[];
     parent: Project;
@@ -95,11 +97,11 @@ export class Project {
     build(buildOptions?: BuildOptions) {
         const { prod, watch } = buildOptions;
 
-        this.packageJson.installNodeModules(buildOptions);
-        this.packageJson.getLinkedProjects().forEach(p => {
-            p.linkParentDependencies()
-        })
-        this.linkParentDependencies()
+        // this.packageJson.installNodeModules(buildOptions);
+        // this.packageJson.getLinkedProjects().forEach(p => {
+        //     p.linkParentDependencies()
+        // })
+        // this.linkParentDependencies()
         // this.filesToRecreateBeforeBuild()
         //     .forEach(file => copy(file.from, file.where));
 
@@ -170,6 +172,31 @@ export class Project {
             })
         }
         return files.concat(this.commonFiles())
+    }
+
+    async filesRecreateTemporaryScr() {
+
+        const src = path.join(this.location, config.folder.src);
+        const tempSrc = path.join(this.location, config.folder.tempSrc);
+        try {
+            if (!fs.existsSync(tempSrc)) {
+                fs.mkdirSync(tempSrc);
+            } 
+            // else {
+            //     await deleteFiles('./**/*.ts', {
+            //         cwd: tempSrc,
+            //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
+            //     })
+            // }
+            const files = await copyFiles('./**/*.ts', tempSrc, {
+                cwd: src
+            })
+            files.forEach(f => {
+                IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
+            })
+        } catch (err) {
+            error(err);
+        }
     }
 
     filesToRecreateAfterBuild(): RecreateFile[] {

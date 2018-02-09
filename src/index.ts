@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
 
+export { config } from './config';
+
 export function run(argsv: string[]) {
     glob.sync(
         path
