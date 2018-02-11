@@ -10,8 +10,11 @@ export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nod
 
 export type RecreateFile = { where: string; from: string };
 
+export type BuildDir  = 'dist' | 'bundle';
+
 export interface BuildOptions {
     prod: boolean;
+    outDir: 'dist' | 'bundle';
     watch?: boolean;
     project: Project;
 }

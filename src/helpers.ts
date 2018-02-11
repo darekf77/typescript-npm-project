@@ -1,4 +1,4 @@
-
+import * as _ from 'lodash'
 import * as fs from 'fs';
 import * as path from 'path';
 import * as rimraf from "rimraf";
@@ -8,7 +8,13 @@ import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
 
-
+export function fixWebpackEnv(env: Object) {
+    _.forIn(env, (v, k) => {
+        const value: string = v as any;
+        if (value === 'true') env[k] = true;
+        if (value === 'false') env[k] = false;
+    })
+}
 
 export function copyFile(sousrce: string, destination: string) {
     if (!fs.existsSync(sousrce)) {
@@ -23,6 +29,15 @@ export function copyFile(sousrce: string, destination: string) {
     fs.writeFileSync(destination, fs.readFileSync(sousrce), 'utf8')
 }
 
+
+export function clearFiles(files: string[] | string) {
+    if (!files) return;
+    const toDelete = !Array.isArray(files) ? [files] : files;
+    run(`rimraf ${toDelete.join(' ')}`).sync()
+    toDelete.forEach(file => {
+        console.log(`Deleted ${file}`)
+    })
+}
 
 export function deleteFiles(filesPattern: string, options?: { cwd?: string, filesToOmmit?: string[] }) {
     let { cwd, filesToOmmit } = options;
@@ -44,10 +59,7 @@ export function deleteFiles(filesPattern: string, options?: { cwd?: string, file
                 })
             }
 
-            files.forEach(file => {
-                run(`rimraf ${file}`, { cwd }).sync();
-            });
-
+            clearFiles(files)
             resolve(files);
         })
     })

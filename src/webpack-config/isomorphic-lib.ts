@@ -1,5 +1,4 @@
 // global
-import * as _ from 'lodash'
 import * as path from 'path'
 import * as child from 'child_process';
 import * as dateformat from "dateformat";
@@ -7,25 +6,18 @@ import * as dateformat from "dateformat";
 import * as WebpackOnBuildPlugin from 'on-build-webpack';
 import * as WebpackPreBuildPlugin from 'pre-build-webpack';
 // local libs
-import { copyFile } from "../helpers";
+import { copyFile, fixWebpackEnv } from "../helpers";
 import { run } from "../process";
 import { Project } from "../project";
 import { BuildOptions } from "../models";
 import config from "../config";
 
 module.exports = (env: BuildOptions) => {
-    _.forIn(env, (v, k) => {
-        const value: string = v as any;
-        if (value === 'true') env[k] = true;
-        if (value === 'false') env[k] = false;
-    })
+    fixWebpackEnv(env);
     let buildOk = true;
+    const filename = (env.outDir) + '/client.js';
 
-    const filename = (env.watch ? config.folder.watchDist : config.folder.bundle) + '/client.js';
-    const outDir = env.watch ? config.folder.watchDist : config.folder.bundle;
-    
     return {
-        //#region config
         entry: `./${config.folder.tempSrc}/index.ts`,
         output: {
             filename,
@@ -63,23 +55,14 @@ module.exports = (env: BuildOptions) => {
             new WebpackPreBuildPlugin(function (stats) {
                 const date = `[${dateformat(new Date(), 'HH:MM:ss')}]`;
                 try {
-                    run(`npm-run tsc --outDir ${outDir}`).sync();
-                    run(`npm-run tnp create:temp:src`, { cwd: process.cwd() }).sync();                    
+                    run(`npm-run tsc --outDir ${env.outDir}`).sync();
+                    run(`npm-run tnp create:temp:src`, { cwd: process.cwd() }).sync();
                     console.log(`${date} Typescript compilation OK`)
                 } catch (error) {
                     console.error(`${date} Typescript compilation ERROR`)
                     buildOk = false;
                 }
-            }),
-            new WebpackOnBuildPlugin(function (stats) {
-                if (env.watch && buildOk) {
-                    Project.Current
-                        .filesToRecreateAfterBuild()
-                        .forEach(file => {
-                            copyFile(file.from, file.where)
-                        });
-                }
-            }),
+            })
         ],
         stats: "normal"
 

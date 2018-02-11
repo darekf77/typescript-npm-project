@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, Dependencies } from "./models";
+import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
@@ -92,10 +92,8 @@ export class Project {
     //#endregion
 
     //#region build
-
-
     build(buildOptions?: BuildOptions) {
-        const { prod, watch } = buildOptions;
+        const { prod, watch, outDir } = buildOptions;
 
         // this.packageJson.installNodeModules(buildOptions);
         // this.packageJson.getLinkedProjects().forEach(p => {
@@ -109,7 +107,7 @@ export class Project {
 
             //#region isomorphic-lib
             case 'isomorphic-lib':
-                const webpackParams = config.webpack.params(prod, watch);
+                const webpackParams = config.webpack.params(prod, watch, outDir);
                 if (watch) {
                     watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
                 } else {
@@ -162,75 +160,78 @@ export class Project {
     //#endregion
 
     //#region files recreatetion
-    filesToRecreateBeforeBuild(): RecreateFile[] {
-        const isomorphicLib = Project.by('isomorphic-lib');
-        const files: RecreateFile[] = [];
-        if (this.type === 'isomorphic-lib' && this.location !== isomorphicLib.location) {
-            files.push({
-                from: path.join(isomorphicLib.location, 'src', 'client.ts'),
-                where: path.join(this.location, 'src', 'client.ts')
-            })
-        }
-        return files.concat(this.commonFiles())
-    }
+    get filesRecreation() {
+        const self = this;
+        return {
+            async createTemporaryBrowserSrc() {
 
-    async filesRecreateTemporaryScr() {
-
-        const src = path.join(this.location, config.folder.src);
-        const tempSrc = path.join(this.location, config.folder.tempSrc);
-        try {
-            if (!fs.existsSync(tempSrc)) {
-                fs.mkdirSync(tempSrc);
-            } 
-            // else {
-            //     await deleteFiles('./**/*.ts', {
-            //         cwd: tempSrc,
-            //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
+                const src = path.join(self.location, config.folder.src);
+                const tempSrc = path.join(self.location, config.folder.tempSrc);
+                try {
+                    if (!fs.existsSync(tempSrc)) {
+                        fs.mkdirSync(tempSrc);
+                    }
+                    // else {
+                    //     await deleteFiles('./**/*.ts', {
+                    //         cwd: tempSrc,
+                    //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
+                    //     })
+                    // }
+                    const files = await copyFiles('./**/*.ts', tempSrc, {
+                        cwd: src
+                    })
+                    files.forEach(f => {
+                        IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
+                    })
+                } catch (err) {
+                    error(err);
+                }
+            },
+            // createBrowserVersionIn(outDir: BuildDir) {
+            //     const files: RecreateFile[] = [];
+            //     if (self.type === 'isomorphic-lib') {
+            //         const f = ['client.d.ts', 'client.js', 'client.js.map']
+            //         f.forEach(file => {
+            //             files.push({
+            //                 where: path.join(self.location, file),
+            //                 from: path.join(self.location, outDir, file),
+            //             })
+            //         })
+            //     }
+            //     files.forEach(file => {
+            //         copyFile(file.from, file.where)
+            //     });
+            // },
+            // filesToRecreateBeforeBuild(): RecreateFile[] {
+            //     const isomorphicLib = Project.by('isomorphic-lib');
+            //     const files: RecreateFile[] = [];
+            //     if (this.type === 'isomorphic-lib' && this.location !== isomorphicLib.location) {
+            //         files.push({
+            //             from: path.join(isomorphicLib.location, 'src', 'client.ts'),
+            //             where: path.join(this.location, 'src', 'client.ts')
+            //         })
+            //     }
+            //     return files.concat(this.commonFiles())
+            // },
+            // commonFiles(): RecreateFile[] {
+            //     const wokrspace = Project.by('workspace');
+            //     const files = [
+            //         'index.js',
+            //         'index.d.ts',
+            //         'index.js.map',
+            //         '.npmrc',
+            //         '.gitignore',
+            //         '.npmignore',
+            //         'tslint.json'
+            //     ];
+            //     return files.map(file => {
+            //         return {
+            //             from: path.join(wokrspace.location, file),
+            //             where: path.join(this.location, file)
+            //         }
             //     })
             // }
-            const files = await copyFiles('./**/*.ts', tempSrc, {
-                cwd: src
-            })
-            files.forEach(f => {
-                IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
-            })
-        } catch (err) {
-            error(err);
         }
-    }
-
-    filesToRecreateAfterBuild(): RecreateFile[] {
-        const files: RecreateFile[] = [];
-        if (this.type === 'isomorphic-lib') {
-            const f = ['client.d.ts', 'client.js', 'client.js.map']
-            f.forEach(file => {
-                files.push({
-                    where: path.join(this.location, file),
-                    from: path.join(this.location, config.folder.watchDist, file),
-                })
-            })
-        }
-        return files;
-    }
-
-
-    private commonFiles(): RecreateFile[] {
-        const wokrspace = Project.by('workspace');
-        const files = [
-            'index.js',
-            'index.d.ts',
-            'index.js.map',
-            '.npmrc',
-            '.gitignore',
-            '.npmignore',
-            'tslint.json'
-        ];
-        return files.map(file => {
-            return {
-                from: path.join(wokrspace.location, file),
-                where: path.join(this.location, file)
-            }
-        })
     }
     //#endregion
 

@@ -6,36 +6,25 @@ import * as os from "os";
 
 import { clear } from "./scripts/CLEAR";
 
-import { LibType, RecreateFile, BuildOptions } from './models';
+import { LibType, RecreateFile, BuildOptions, BuildDir } from './models';
 import { error } from "./messages";
 import { Project } from "./project";
 
 export const config = {
     folder: {
-        watchDist: 'dist',
         bundle: 'bundle',
+        dist: 'dist',
         src: 'src',
         tempSrc: 'tmp-src'
     },
     webpack: {
-        paramsFor(libType: LibType, prod = false, watch = false) {
-            const o = {
-                env: [
-                    '--env.production=' + prod,
-                    '--env.watch=' + watch
-                ],
-                config: '--config=' + path.join(__dirname, '/webpack-config/angular-lib.' + (prod ? 'prod.' : '') + 'js'),
-                watch: watch ? '--watch' : '',
+        params(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
-            }
-            return `${o.config} ${o.watch}  --bail ${o.env.join(' ')}`;
-        },
-        params(prod = false, watch = false) {
-            
             const o = {
                 env: [
                     '--env.prod=' + prod,
-                    '--env.watch=' + watch
+                    '--env.watch=' + watch,
+                    '--env.outDir=' + outDir
                 ],
                 config: '--config=' + path.normalize(path.join(__dirname, '/webpack-config/isomorphic-lib.' + (prod ? 'prod.' : '') + 'js'))
             }

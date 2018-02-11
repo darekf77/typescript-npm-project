@@ -1,46 +1,30 @@
 
 import * as _ from 'lodash';
-import * as fs from 'fs';
-import { run } from "../process";
-import config from "../config";
-import { LibType } from '../models';
-import * as path from 'path';
-
-
-function clearFiles(files: string[] | string) {
-    if (!files) return;
-    const toDelete = !Array.isArray(files) ? [files] : files;
-    run(`rimraf ${toDelete.join(' ')}`).sync()
-    toDelete.forEach(file => {
-        console.log(`Deleted ${file}`)
-    })
-}
-
+import { LibType, BuildDir } from '../models';
+import { clearFiles } from "../helpers";
 
 export const clear = {
     all: () => {
         clearFiles('node_modules/')
         clearFiles('bundle/')
         clearFiles('dist/')
-        clearFiles('tmp/')
+        clearFiles('tmp*')
         process.exit(0)
     },
-    forBuild: (libType?: LibType, exit = true) => {
-        clearFiles('bundle/')
-        clearFiles('tmp/')
-        if (exit) process.exit(0)
-    },
-    forWatching: (libType?: LibType, exit = true) => {
-        clearFiles('dist/*')
-        clearFiles('tmp/')
+    forBuild: (options?: { outDir?: BuildDir, exit?: boolean; }) => {
+        const { outDir = 'bundle', exit = true } = options;
+        clearFiles('tmp*')
+        if (outDir) clearFiles(outDir);
         if (exit) process.exit(0)
     }
 };
 
 
 export default {
-    $CLEAN: () => clear.forBuild(),
-    $CLEAR: () => clear.forBuild(),
+    $CLEAN_DIST: () => clear.forBuild({ outDir: 'dist' }),
+    $CLEAR_DIST: () => clear.forBuild({ outDir: 'dist' }),
+    $CLEAN_BUNDLE: () => clear.forBuild({ outDir: 'bundle' }),
+    $CLEAR_BUNDLE: () => clear.forBuild({ outDir: 'bundle' }),
     $CLEAN_ALL: () => clear.all(),
     $CLEAR_ALL: () => clear.all()
 }

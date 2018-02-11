@@ -2,21 +2,15 @@
 import { run } from "../process";
 import { Project, BUILD_ISOMORPHIC_LIB_WEBPACK } from '../project';
 import { clear } from "./CLEAR";
-import { BuildOptions } from "../models";
+import { BuildOptions, BuildDir } from "../models";
 
 
-function build(prod = false, watch = false, project: Project = Project.Current, runAsync = false) {
+function build(prod = false, watch = false, outDir: BuildDir = 'dist', project: Project = Project.Current, runAsync = false) {
 
     const options: BuildOptions = {
-        prod, watch, project
+        prod, watch, project, outDir
     };
 
-    // if (watch) {
-    //     clear.forWatching(project.type, false);
-    // }
-    // else {
-    //     clear.forBuild(project.type, false);
-    // }
 
     project.build(options);
     if (!watch) {
@@ -30,9 +24,14 @@ export default {
     BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
         BUILD_ISOMORPHIC_LIB_WEBPACK(args)
     },
-    $BUILD: () => build(),
-    $BUILD_PROD: () => build(true),
-    BUILD_WATCH: () => build(false, true),
-    BUILD_WATCH_ONCE: () => build(false, true),
-    BUILD_WATCH_PROD: () => build(true, true),
+
+    $BUILD_DIST: () => build(),
+    $BUILD_DIST_PROD: () => build(true),
+
+    $BUILD_DIST_WATCH: () => build(false, true),
+    $BUILD_DIST_WATCH_PROD: () => build(true, true),
+
+    $BUILD_BUNDLE: () => build(false, false, 'bundle'),
+    $BUILD_BUNDLE_PROD: () => build(false, false, 'bundle')
+
 }

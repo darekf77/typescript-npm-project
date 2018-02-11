@@ -7,7 +7,7 @@ import { error } from "../messages";
 export default {
     $CREATE_TEMP_SRC: async (args: string) => {
         try {
-            await Project.Current.filesRecreateTemporaryScr()
+            await Project.Current.filesRecreation.createTemporaryBrowserSrc()
             process.exit(0)
         } catch (err) {
             error(err);

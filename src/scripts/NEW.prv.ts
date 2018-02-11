@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as path from 'path';
 
-
-
 import config from "../config";
 import { LibType } from '../models';
 import { run } from "../process";
