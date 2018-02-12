@@ -14,7 +14,6 @@ import config from "../config";
 
 module.exports = (env: BuildOptions) => {
     fixWebpackEnv(env);
-    let buildOk = true;
     const filename = (env.outDir) + '/client.js';
 
     return {
@@ -56,12 +55,17 @@ module.exports = (env: BuildOptions) => {
                 const date = `[${dateformat(new Date(), 'HH:MM:ss')}]`;
                 try {
                     run(`npm-run tsc --outDir ${env.outDir}`).sync();
-                    run(`npm-run tnp create:temp:src`, { cwd: process.cwd() }).sync();
+                    run(`npm-run tnp create:temp:src`, { cwd: process.cwd(), output: true }).sync();
                     console.log(`${date} Typescript compilation OK`)
                 } catch (error) {
                     console.error(`${date} Typescript compilation ERROR`)
-                    buildOk = false;
+                    process.exit(0)
                 }
+            }),
+            new WebpackOnBuildPlugin(function () {
+                const clientOutFile = path.join(process.cwd(), filename);
+                const browserOutFile = path.join(process.cwd(), env.outDir, 'browser.js');
+                copyFile(clientOutFile, browserOutFile);
             })
         ],
         stats: "normal"

@@ -1,5 +1,6 @@
 
 import * as fs from 'fs';
+import * as _ from 'lodash';
 
 function replace(c = '', words = []) {
     if (words.length === 0) return c;
@@ -9,12 +10,52 @@ function replace(c = '', words = []) {
     return replace(c, words);
 }
 
+export type PkgUsage = 'import' | 'export';
+
 export class IsomorphicRegions {
 
     public static deleteFrom(file: string): void {
-        const fileContent = fs.readFileSync(file, 'utf8').toString();
-        const resultContent = replace(fileContent, ["backend", "nodejs", "node"])
-        fs.writeFileSync(file, resultContent, 'utf8');
+        let fileContent = fs.readFileSync(file, 'utf8').toString();
+        fileContent = replace(fileContent, ["backend", "nodejs", "node"])
+        fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'import');
+        fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'export');
+        fs.writeFileSync(file, fileContent, 'utf8');
+    }
+
+    private static packageName(rawImport, usage: PkgUsage) {
+        rawImport = rawImport.replace(new RegExp(`${usage}.+from\\s+`), '')
+        rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim()
+        if (rawImport.startsWith(`./`)) return null;
+        const fisrtName = rawImport.match(new RegExp(`[a-zA-z]+\\/`))
+        let res: string = (_.isArray(fisrtName) && fisrtName.length > 0) ? fisrtName[0] : rawImport;
+        if (res.endsWith('/') && res.length > 1) {
+            res = res.substring(0, res.length - 1)
+        }
+        return res;
+    }
+
+    private static isPackageIsomorphic(packageName) {
+        return ['ng2-rest', 'typeorm', 'ng2-logger', 'isomorphic-rest', 'isomorphic-rest']
+            .filter(p => p == packageName)
+            .length === 1;
+    }
+
+
+    private static replaceBrowserLib(fileContent: string, usage: PkgUsage) {
+        if (!_.isString(fileContent)) return;
+        const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g')
+        let imports = fileContent.match(importRegex)
+
+        if (_.isArray(imports)) {
+            imports.forEach(imp => {
+                const pkgName = IsomorphicRegions.packageName(imp, usage);
+                if (IsomorphicRegions.isPackageIsomorphic(pkgName)) {
+                    const replacedImp = imp.replace(pkgName, `${pkgName}/browser`);
+                    fileContent = fileContent.replace(imp, replacedImp);
+                }
+            })
+        }
+        return fileContent;
     }
 
 

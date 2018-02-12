@@ -8,6 +8,7 @@
         "**/.DS_Store": true,
         // "index.*": true,
         // "client.*": true,
+        // "browser.*": true,
         "backend.*": true,
         // "dist": true,
         // "bundle": true,
