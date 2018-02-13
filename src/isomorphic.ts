@@ -35,14 +35,42 @@ export class IsomorphicRegions {
     }
 
     private static isPackageIsomorphic(packageName) {
-        return ['ng2-rest', 'typeorm', 'ng2-logger', 'isomorphic-rest', 'isomorphic-rest']
+        return ['ng2-rest', 'typeorm', 'ng2-logger', 'isomorphic-rest']
             .filter(p => p == packageName)
-            .length === 1;
+            .length >= 1;
     }
 
 
+    private static flattenImportsForContent(fileContent: string, usage: PkgUsage) {
+        const regexParialUsage = new RegExp(`${usage}\\s+{`)
+        const regexFrom = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`)
+        if (_.isString(fileContent)) {
+            let joiningLine = false;
+            let output = '';
+            fileContent.split('\n').forEach((line) => {
+                const importOrExportPart = regexParialUsage.test(line);
+                const fromLibPart = regexFrom.test(line)
+                // console.log(`I(${regexParialUsage.test(line)}) F(${regexFrom.test(line)})\t: ${line} `)
+                if (joiningLine) {
+                    if(!importOrExportPart && !fromLibPart) {
+                        output += ` ${line}`
+                    } else if(fromLibPart) {
+                        joiningLine = false;
+                        output += ` ${line}\n`
+                    }                    
+                } else {
+                    joiningLine = (importOrExportPart && !fromLibPart);
+                    output += `\n${line}`
+                } 
+            })
+            fileContent = output;
+        }
+        return fileContent;
+    }
+
     private static replaceBrowserLib(fileContent: string, usage: PkgUsage) {
         if (!_.isString(fileContent)) return;
+        fileContent = IsomorphicRegions.flattenImportsForContent(fileContent, usage)
         const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g')
         let imports = fileContent.match(importRegex)
 
