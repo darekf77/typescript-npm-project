@@ -17,10 +17,14 @@
         "sqlite3": false
     },
     "peerDependencies": {
-        "isomorphic-rest": "^0.0.15",
+        "morphi": "^0.0.1",
         "reflect-metadata": "^0.1.10",
         "rxjs": "^5.5.2",
-        "tslib": "^1.8.1"
+        "tslib": "^1.8.1",
+        "@ngtools/webpack": "^1.9.3",
+        "@types/node": "^9.3.0",
+        "typescript": "^2.6.2",
+        "webpack": "^3.10.0"
     },
     "dependencies": {
         "@types/bcrypt": "^1.0.0",
@@ -41,12 +45,5 @@
         "sqlite3": "^3.1.13",
         "typeorm": "^0.1.11",
         "validator": "^9.2.0"
-    },
-    "devDependencies": {
-        "@ngtools/webpack": "^1.9.3",
-        "@types/node": "^9.3.0",
-        "isomorphic-region-loader": "0.0.1",
-        "typescript": "^2.6.2",
-        "webpack": "^3.10.0"
     }
 }

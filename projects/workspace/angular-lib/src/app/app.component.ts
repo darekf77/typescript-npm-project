@@ -10,12 +10,12 @@ import { BarService } from 'components';
 })
 export class AppComponent {
 
-  value$: Observable<string>;
+  public value: Observable<string>;
 
   constructor(
     bar: BarService
   ) {
-    this.value$ = bar.value;
+    this.value = bar.value;
   }
 
 }
