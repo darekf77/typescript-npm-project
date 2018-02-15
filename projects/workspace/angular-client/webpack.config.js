@@ -416,12 +416,6 @@ module.exports = {
         "debug": "warning"
       }),
     new ProgressPlugin(),
-    new CircularDependencyPlugin({
-      "exclude": /(\\|\/)node_modules(\\|\/)/,
-      "failOnError": false,
-      "onDetected": false,
-      "cwd": "/Users/darek/Projects/npm/example-isomorphic-rest/cli-client"
-    }),
     new NamedLazyChunksWebpackPlugin(),
     new HtmlWebpackPlugin({
       "template": "./src/index.html",
