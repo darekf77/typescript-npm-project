@@ -383,16 +383,9 @@ module.exports = {
       {
         "test": /\.ts$/,
         "loader": [
-          'isomorphic-region-loader',
           "@ngtools/webpack"
         ]
-      },
-      {
-        test: /\.js$/,
-        loader: [
-          'isomorphic-region-loader'
-        ]
-      },
+      }
     ]
   },
   "plugins": [
