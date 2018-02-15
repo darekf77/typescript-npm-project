@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // thrid part
 import * as _ from 'lodash';
-import { init, replay } from 'morphi/browser';
+import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
 import { MyLibModule } from 'angular-lib';
 import { Controllers, Entities } from 'isomorphic-lib/browser';
@@ -14,6 +14,12 @@ import { Controllers, Entities } from 'isomorphic-lib/browser';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
+
+init('http://localhost:4000')
+  .angularProviders({
+    controllers: _.values(Controllers),
+    entities: _.values(Entities)
+  })
 
 @NgModule({
   declarations: [
@@ -28,11 +34,7 @@ import { routes } from "./app.routes";
     RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules })
   ],
   providers: [
-    init('http://localhost:4000')
-      .angularProviders({
-        controllers: _.values(Controllers),
-        entities: _.values(Entities)
-      }) as any
+    AngularProviders
   ],
   bootstrap: [AppComponent]
 })

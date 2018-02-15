@@ -24,7 +24,8 @@
     "watch": "~1.0.2",
     "@angular/cli": "^1.6.4",
     "gulp": "^3.9.1",
-    "webpack": "^3.10.0"
+    "webpack": "^3.10.0",
+    "http-server": "0.11.1"
   },
   "dependencies": {
     "@angular/compiler": "^5.2.0",
