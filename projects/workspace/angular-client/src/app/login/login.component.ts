@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthController } from 'isomorphic-lib';
+import { AuthController } from 'isomorphic-lib/browser';
 
 import { Log } from "ng2-logger";
 const log = Log.create('Login component')
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   }
 
   info() {
-    this.auth.browser.info()
+    // this.auth.browser.info()
   }
 
   logout() {

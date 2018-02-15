@@ -95,13 +95,14 @@ export class Project {
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
-        // this.packageJson.installNodeModules(buildOptions);
-        // this.packageJson.getLinkedProjects().forEach(p => {
-        //     p.linkParentDependencies()
-        // })
-        // this.linkParentDependencies()
-        // this.filesToRecreateBeforeBuild()
-        //     .forEach(file => copy(file.from, file.where));
+        this.filesRecreation.commonFiles()
+        this.filesRecreation.beforeBuild()
+
+        this.packageJson.installNodeModules(buildOptions);
+        this.packageJson.getLinkedProjects().forEach(p => {
+            p.linkParentDependencies()
+        })
+        this.linkParentDependencies()
 
         switch (this.type) {
 
@@ -187,50 +188,59 @@ export class Project {
                     error(err);
                 }
             },
-            // createBrowserVersionIn(outDir: BuildDir) {
-            //     const files: RecreateFile[] = [];
-            //     if (self.type === 'isomorphic-lib') {
-            //         const f = ['client.d.ts', 'client.js', 'client.js.map']
-            //         f.forEach(file => {
-            //             files.push({
-            //                 where: path.join(self.location, file),
-            //                 from: path.join(self.location, outDir, file),
-            //             })
-            //         })
-            //     }
-            //     files.forEach(file => {
-            //         copyFile(file.from, file.where)
-            //     });
-            // },
-            // filesToRecreateBeforeBuild(): RecreateFile[] {
-            //     const isomorphicLib = Project.by('isomorphic-lib');
-            //     const files: RecreateFile[] = [];
-            //     if (this.type === 'isomorphic-lib' && this.location !== isomorphicLib.location) {
-            //         files.push({
-            //             from: path.join(isomorphicLib.location, 'src', 'client.ts'),
-            //             where: path.join(this.location, 'src', 'client.ts')
-            //         })
-            //     }
-            //     return files.concat(this.commonFiles())
-            // },
-            // commonFiles(): RecreateFile[] {
-            //     const wokrspace = Project.by('workspace');
-            //     const files = [
-            //         'index.js',
-            //         'index.d.ts',
-            //         'index.js.map',
-            //         '.npmrc',
-            //         '.gitignore',
-            //         '.npmignore',
-            //         'tslint.json'
-            //     ];
-            //     return files.map(file => {
-            //         return {
-            //             from: path.join(wokrspace.location, file),
-            //             where: path.join(this.location, file)
-            //         }
-            //     })
-            // }
+            beforeBuild() {
+                const isomorphicLib = Project.by('isomorphic-lib');
+                const files: RecreateFile[] = [];
+                if (self.type === 'isomorphic-lib' && self.location !== isomorphicLib.location) {
+
+                    files.push({
+                        from: path.join(isomorphicLib.location, 'src', 'client.ts'),
+                        where: path.join(self.location, 'src', 'client.ts')
+                    })
+                    files.push({
+                        from: path.join(isomorphicLib.location, 'src', 'browser.ts'),
+                        where: path.join(self.location, 'src', 'browser.ts')
+                    })
+                    const fileFromRoot = [
+                        'index.js',
+                        'index.d.ts',
+                        'index.js.map',
+                        'client.js',
+                        'client.d.ts',
+                        'client.js.map',
+                        'browser.js',
+                        'browser.d.ts',
+                        'browser.js.map',
+                        "tsconfig.json"
+                    ]
+                    fileFromRoot.forEach(f => {
+                        files.push({
+                            from: path.join(isomorphicLib.location, f),
+                            where: path.join(self.location, f)
+                        })
+                    })
+                }
+                files.forEach(file => {
+                    copyFile(file.from, file.where)
+                })
+            },
+            commonFiles() {
+                const wokrspace = Project.by('workspace');
+                let files = [
+                    '.npmrc',
+                    '.gitignore',
+                    '.npmignore',
+                    'tslint.json'
+                ];
+                files.map(file => {
+                    return {
+                        from: path.join(wokrspace.location, file),
+                        where: path.join(self.location, file)
+                    }
+                }).forEach(file => {
+                    copyFile(file.from, file.where)
+                })
+            }
         }
     }
     //#endregion

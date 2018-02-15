@@ -2,6 +2,7 @@
 /bundle
 /dist
 /tmp
+/tmp-*
 /out-tsc
 bundle.umd.js
 
