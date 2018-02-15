@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import * as _ from 'lodash';
 import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
-import { MyLibModule } from 'angular-lib';
+// import { MyLibModule } from 'angular-lib';
 import { Controllers, Entities } from 'isomorphic-lib/browser';
 // local
 import { AppComponent } from './app.component';
@@ -30,7 +30,7 @@ init('http://localhost:4000')
     BrowserModule,
     FormsModule,
     HttpModule,
-    MyLibModule.forRoot(),
+    // MyLibModule.forRoot(),
     RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules })
   ],
   providers: [
