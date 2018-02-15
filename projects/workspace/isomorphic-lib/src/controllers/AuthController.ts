@@ -98,8 +98,7 @@ export class AuthController {
         const self = this;
         return {
             async init() {
-                if (!isBrowser) {
-                    log.er('Backend should not enter here')
+                if (isNode) {
                     return;
                 }
                 const session = SESSION.fromLocalStorage()
@@ -322,12 +321,13 @@ export class AuthController {
         //#endregion
     }
 
+    
     get __handle() {
-        //#region backend
+        //#region backend    
         const self = this;
         return {
             facebook() {
-                //#region  facebook
+                
                 const APP_ID = '1248048985308566';
                 return {
                     async getData(credentials: IHelloJS) {
@@ -370,15 +370,15 @@ export class AuthController {
                         return defer.promise;
                     }
                 };
-                //#endregion
+                
             }
         };
         //#endregion
     }
 
-
-    private get __validate() {
-        //#region backend
+    
+    private get __validate() {     
+        //#region backend   
         return {
             username(username) {
                 if (username && isLength(username, 3, 50)) {
@@ -386,11 +386,12 @@ export class AuthController {
                 }
                 return false;
             }
-        };
+        };        
         //#endregion
     }
+    
 
-
+    
     get __check() {
         //#region backend
         const self = this;
@@ -437,9 +438,10 @@ export class AuthController {
                 };
                 return is.registration;
             }
-        };
-        //#endregion
+        };       
+        //#endregion 
     }
+    
 
     private async __repos() {
         //#region backend

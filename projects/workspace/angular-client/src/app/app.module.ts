@@ -6,10 +6,10 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // thrid part
 import * as _ from 'lodash';
-import { init, replay } from 'isomorphic-rest';
+import { init, replay } from 'isomorphic-rest/browser';
 // my modules
 import { MyLibModule } from 'angular-lib';
-import { Controllers, Entities } from 'isomorphic-lib';
+import { Controllers, Entities } from 'isomorphic-lib/browser';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
