@@ -4,7 +4,7 @@ import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, BaseCRUD, BaseCRUDEntity, OrmConnection
-} from 'isomorphic-rest';
+} from 'morphi';
 
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";

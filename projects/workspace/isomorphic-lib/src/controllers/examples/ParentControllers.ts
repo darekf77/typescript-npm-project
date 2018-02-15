@@ -2,7 +2,7 @@ import {
     ENDPOINT, GET, POST, PUT, DELETE,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, getResponseValue, OrmConnection, Connection
-} from 'isomorphic-rest';
+} from 'morphi';
 
 
 @ENDPOINT()

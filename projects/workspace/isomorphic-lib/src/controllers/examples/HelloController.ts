@@ -2,7 +2,7 @@ import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, OrmConnection, Connection
-} from 'isomorphic-rest';
+} from 'morphi';
 import { Repository } from "typeorm";
 // local
 import { TestUser } from '../../entities/examples/User';

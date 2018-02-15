@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // thrid part
 import * as _ from 'lodash';
-import { init, replay } from 'isomorphic-rest/browser';
+import { init, replay } from 'morphi/browser';
 // my modules
 import { MyLibModule } from 'angular-lib';
 import { Controllers, Entities } from 'isomorphic-lib/browser';

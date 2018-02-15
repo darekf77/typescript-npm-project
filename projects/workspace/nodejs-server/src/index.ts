@@ -2,7 +2,7 @@ console.log('heeloa')
 import * as path from 'path';
 import * as _ from "lodash";
 import "reflect-metadata";
-import { init } from 'isomorphic-rest';
+import { init } from 'morphi';
 import { createConnection, useContainer, ConnectionOptions, Connection } from 'typeorm';
 export { Connection } from 'typeorm';
 

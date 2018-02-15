@@ -35,7 +35,7 @@ export class IsomorphicRegions {
     }
 
     private static isPackageIsomorphic(packageName) {
-        return ['ng2-rest', 'typeorm', 'ng2-logger', 'isomorphic-rest']
+        return ['ng2-rest', 'typeorm', 'ng2-logger', 'morphi']
             .filter(p => p == packageName)
             .length >= 1;
     }

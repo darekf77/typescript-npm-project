@@ -3,7 +3,7 @@ import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
     Response, OrmConnection, Errors, isBrowser
-} from 'isomorphic-rest';
+} from 'morphi';
 import { Connection } from "typeorm/connection/Connection";
 
 //#region backend

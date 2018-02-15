@@ -28,7 +28,7 @@
     "@types/node": "9.3.0",
     "codelyzer": "^4.0.2",
     "core-js": "2.5.3",
-    "isomorphic-rest": "^0.0.18",
+    "morphi": "^0.0.1",
     "lodash": "4.17.4",
     "ng2-logger": "^2.0.35",
     "ng2-rest": "^9.0.10",
@@ -37,11 +37,11 @@
     "ts-node": "^4.1.0",
     "tslib": "1.8.1",
     "tslint": "^5.9.1",
-    "typescript": "2.6.2",
-    "webpack": "3.10.0",
     "zone.js": "0.8.20"
   },
   "devDependencies": {
-    "nodemon": "1.14.1"
+    "nodemon": "1.14.1",
+    "typescript": "2.6.2",
+    "webpack": "3.10.0"
   }
 }
