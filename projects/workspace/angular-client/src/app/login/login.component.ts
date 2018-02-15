@@ -26,8 +26,8 @@ export class LoginComponent implements OnInit {
     this.auth.browser.login(data)
   }
 
-  info() {
-    // this.auth.browser.info()
+  async info() {
+    console.log(await this.auth.info().received)
   }
 
   logout() {

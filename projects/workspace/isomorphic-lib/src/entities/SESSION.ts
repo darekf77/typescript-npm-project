@@ -103,6 +103,7 @@ export class SESSION {
             const s = JSON.parse(data) as SESSION;
             session.token = s.token;
             session.token_type = s.token_type;
+            session.expiredDate = new Date(s.expiredDate as any);
         } catch {
             session = undefined;
         }
