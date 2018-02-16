@@ -6,11 +6,11 @@ export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencie
 
 export type Package = { name: string; version: string; };
 
-export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server' | 'workspace' | 'angular-cli';
+export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server' | 'workspace' | 'angular-cli' | 'docker';
 
 export type RecreateFile = { where: string; from: string };
 
-export type BuildDir  = 'dist' | 'bundle';
+export type BuildDir = 'dist' | 'bundle';
 
 export interface BuildOptions {
     prod: boolean;

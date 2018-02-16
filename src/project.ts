@@ -28,6 +28,20 @@ export class Project {
         return Project.from(path.join(__dirname, '..'));
     }
 
+    //#region run on port
+    runOn(port: number) {
+
+        if (this.type === 'workspace') {
+
+
+
+        }
+
+    }
+
+    //#endregion
+
+
     //#region link
     linkDependencies(type: Dependencies) {
         let self = this;

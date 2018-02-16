@@ -24,8 +24,7 @@ module.exports = merge(common, {
       hostReplacementPaths: {
         "environments/environment.ts": "environments/environment.ts"
       },
-      sourceMap: false,
-      skipCodeGeneration: false
+      sourceMap: false
     }),
     new PurifyPlugin(),
     new UglifyJSPlugin({
