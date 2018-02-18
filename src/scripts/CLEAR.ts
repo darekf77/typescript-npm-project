@@ -5,7 +5,7 @@ import { clearFiles } from "../helpers";
 
 export const clear = {
     all: () => {
-        clearFiles('node_modules/')
+        clearFiles('node_modules/', true)
         clearFiles('bundle/')
         clearFiles('dist/')
         clearFiles('tmp*')

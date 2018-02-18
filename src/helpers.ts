@@ -30,11 +30,21 @@ export function copyFile(sousrce: string, destination: string) {
 }
 
 
-export function clearFiles(files: string[] | string) {
+export function clearFiles(files: string[] | string, preserveSymlinks = false) {
     if (!files) return;
-    const toDelete = !Array.isArray(files) ? [files] : files;
-    run(`rimraf ${toDelete.join(' ')}`).sync()
-    toDelete.forEach(file => {
+    const filesPathesToDelete = !Array.isArray(files) ? [files] : files;
+    if (preserveSymlinks) {
+        filesPathesToDelete.forEach(file => {
+            if (fs.lstatSync(file).isSymbolicLink()) {
+                run(`rm ${file}`).sync()
+            } else {
+                run(`rimraf ${file}`).sync()
+            }
+        })
+    } else {
+        run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
+    }
+    filesPathesToDelete.forEach(file => {
         console.log(`Deleted ${file}`)
     })
 }

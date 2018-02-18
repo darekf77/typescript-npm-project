@@ -8,9 +8,5 @@
   "scripts": {
     "build": "rimraf dist && npm-run webpack --config=webpack.config.build.js",
     "build:aot": "rimraf dist && npm-run webpack --config=webpack.config.build.aot.js"
-  },
-  "dependencies": {
-    "angular-lib": "file:./angular-lib",
-    "isomorphic-lib": "file:./isomorphic-lib"
   }
 }

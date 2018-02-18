@@ -19,7 +19,7 @@ export class Project {
     parent: Project;
     preview: Project;
     type: LibType;
-    packageJson: PackageJSON;
+    private packageJson: PackageJSON;
     private static projects: Project[] = [];
     public static get Current() {
         return Project.from(process.cwd())
@@ -43,56 +43,103 @@ export class Project {
 
 
     //#region link
-    linkDependencies(type: Dependencies) {
-        let self = this;
-        const thisNodeModelsPath = path.join(this.location, 'node_modules');
-        return {
-            toProject(project: Project) {
-                const dependencies = self.packageJson.dependencies(type);
 
-                dependencies.some((d) => {
-                    if (!fs.existsSync(path.join(thisNodeModelsPath, d.name))) {
-                        self.packageJson.installNodeModules();
-                        return false;
-                    }
-                });
+    //#region  old linking
+    // linkDependencies(type: Dependencies) {
+    //     let self = this;
+    //     const thisNodeModelsPath = path.join(this.location, 'node_modules');
+    //     return {
+    //         toProject(project: Project) {
+    //             const dependencies = self.packageJson.dependencies(type);
 
-                info(`Linking parent workspace common packages to ${project.name}...`)
-                dependencies.forEach(d => {
-                    const destinationFolder = path.join(project.location, 'node_modules', d.name);
-                    const isOrganizationPackage = /.*\/.*/g.test(d.name);
-                    const linkName2 = isOrganizationPackage ? d.name.split('/')[0] : '';
-                    const destinationFolder2 = path.join(project.location, 'node_modules', linkName2);
-                    const parentSourcePackagePath = path.join(thisNodeModelsPath, d.name);
-                    const linkCommand = `tnp ln ${parentSourcePackagePath} .`;
-                    run(`rimraf ${destinationFolder}`).sync()
-                    run(`mkdirp  ${destinationFolder2}`).sync()
-                    run(linkCommand, { cwd: destinationFolder2 }).sync()
-                })
-                info('Linking Done.')
-            }
-        }
-    }
+    //             dependencies.some((d) => {
+    //                 if (!fs.existsSync(path.join(thisNodeModelsPath, d.name))) {
+    //                     self.packageJson.installNodeModules();
+    //                     return false;
+    //                 }
+    //             });
+
+    //             info(`Linking parent workspace common packages to ${project.name}...`)
+    //             dependencies.forEach(d => {
+    //                 const destinationFolder = path.join(project.location, 'node_modules', d.name);
+    //                 const isOrganizationPackage = /.*\/.*/g.test(d.name);
+    //                 const linkName2 = isOrganizationPackage ? d.name.split('/')[0] : '';
+    //                 const destinationFolder2 = path.join(project.location, 'node_modules', linkName2);
+    //                 const parentSourcePackagePath = path.join(thisNodeModelsPath, d.name);
+    //                 const linkCommand = `tnp ln ${parentSourcePackagePath} .`;
+    //                 run(`rimraf ${destinationFolder}`).sync()
+    //                 run(`mkdirp  ${destinationFolder2}`).sync()
+    //                 run(linkCommand, { cwd: destinationFolder2 }).sync()
+    //             })
+    //             info('Linking Done.')
+    //         }
+    //     }
+    // }
+
+    // linkParentDependencies() {
+    //     if (this.parent && this.parent.type === 'workspace') {
+    //         this.parent.linkDependencies('dependencies').toProject(this);
+    //     }
+    // }
+    //#endregion
 
     get node_modules() {
         const self = this;
         return {
-            linkToProject(project: Project) {
+            linkToProject(project: Project, force = false) {
                 if (!self.packageJson.checkNodeModulesInstalled()) {
                     self.packageJson.installNodeModules()
                 }
                 const localNodeModules = path.join(self.location, 'node_modules');
+                const projectNodeModules = path.join(project.location, 'node_modules');
+                if (force && fs.existsSync(projectNodeModules)) {
+                    run(`rimraf ${projectNodeModules}`);
+                }
                 const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
                 run(linkCommand).sync();
+            },
+            install() {
+                self.packageJson.installNodeModules()
+            },
+            installPackageFromLocalPath(packagePath) {
+                self.packageJson.installPackage(packagePath, '--save');
+            },
+            removeSymlinks(): string[] {
+                const symlinks = self.packageJson.getSymlinksLocalDependenciesNames();
+                // console.log(symlinks)
+                symlinks.forEach(pkgName => {
+                    const symPkgPath = path.join(self.location, 'node_modules', pkgName);
+                    if (fs.existsSync(symPkgPath)) {
+                        run(`rm ${symPkgPath}`).sync();
+                    }
+                })
+                return symlinks;
+            },
+            addLocalSymlinksFromFileDependecies() {
+                const symlinks = self.packageJson.getSymlinksLocalDependenciesPathes()
+                symlinks.forEach(p => {
+                    const absolutePkgPath = path.join(self.location, p);
+                    const destination = path.join(self.location, 'node_modules');
+                    run(`tnp ln ${absolutePkgPath} ${destination}`, { cwd: self.location }).sync();
+                })
+            },
+            // addLocalSymlinksfromChildrens() {
+            //     const children = self.children;
+            //     children.forEach(child => {
+            //         const childPackageFolder = path.join(child.location, 'node_modules', child.name);
+            //         const node_modules = path.join(self.location, 'node_modules');
+            //         if (!fs.existsSync(path.join(node_modules, child.name))) {
+            //             run(`tnp ln ${childPackageFolder} ${node_modules}`).sync();
+            //         }
+            //     })
+            // },
+            exist(): boolean {
+                return self.packageJson.checkNodeModulesInstalled();
             }
-        }
+        };
     }
 
-    linkParentDependencies() {
-        if (this.parent && this.parent.type === 'workspace') {
-            this.parent.linkDependencies('dependencies').toProject(this);
-        }
-    }
+
     //#endregion
 
     //#region release
@@ -126,10 +173,10 @@ export class Project {
         this.filesRecreation.commonFiles()
         this.filesRecreation.beforeBuild()
 
-        if (this.parent && this.parent.type === 'workspace') {
+        if (this.parent && this.parent.type === 'workspace' && !this.node_modules.exist()) {
             this.parent.node_modules.linkToProject(this);
         } else {
-            this.packageJson.installNodeModules(buildOptions);
+            this.node_modules.install();
         }
 
         switch (this.type) {
@@ -157,7 +204,7 @@ export class Project {
                     run('npm-run ng server').async()
                     watcher.run('npm run build:esm', 'components/src');
                 } else {
-                    run(`npm run build:lib`).sync();
+                    run(`npm run build:esm`).sync();
                 }
                 return;
             //#endregion
