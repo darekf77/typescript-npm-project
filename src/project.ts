@@ -74,6 +74,20 @@ export class Project {
         }
     }
 
+    get node_modules() {
+        const self = this;
+        return {
+            linkToProject(project: Project) {
+                if (!self.packageJson.checkNodeModulesInstalled()) {
+                    self.packageJson.installNodeModules()
+                }
+                const localNodeModules = path.join(self.location, 'node_modules');
+                const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
+                run(linkCommand).sync();
+            }
+        }
+    }
+
     linkParentDependencies() {
         if (this.parent && this.parent.type === 'workspace') {
             this.parent.linkDependencies('dependencies').toProject(this);
@@ -112,11 +126,11 @@ export class Project {
         this.filesRecreation.commonFiles()
         this.filesRecreation.beforeBuild()
 
-        this.packageJson.installNodeModules(buildOptions);
-        this.packageJson.getLinkedProjects().forEach(p => {
-            p.linkParentDependencies()
-        })
-        this.linkParentDependencies()
+        if (this.parent && this.parent.type === 'workspace') {
+            this.parent.node_modules.linkToProject(this);
+        } else {
+            this.packageJson.installNodeModules(buildOptions);
+        }
 
         switch (this.type) {
 
@@ -331,7 +345,7 @@ export class Project {
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 
-            this.children = this.findChildren();
+            // this.children = this.findChildren();
             this.parent = Project.from(path.join(location, '..'));
             this.preview = Project.from(path.join(location, 'preview'));
 

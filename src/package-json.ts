@@ -87,7 +87,7 @@ export class PackageJSON {
     //     }
     // }
 
-    private checkNodeModulesInstalled() {
+    checkNodeModulesInstalled() {
         const clientNodeModules = path.join(this.location, 'node_modules');
         // return (run("check-dependencies").sync().toString().trim() === '')
         // console.log('this.location', this.location)

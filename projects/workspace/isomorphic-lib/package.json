@@ -11,39 +11,5 @@
         "resources": [
             "README.md"
         ]
-    },
-    "bowser": {
-        "typeorm": false,
-        "sqlite3": false
-    },
-    "peerDependencies": {
-        "morphi": "^0.0.1",
-        "reflect-metadata": "^0.1.10",
-        "rxjs": "^5.5.2",
-        "tslib": "^1.8.1",
-        "@ngtools/webpack": "^1.9.3",
-        "@types/node": "^9.3.0",
-        "typescript": "^2.6.2",
-        "webpack": "^3.10.0"
-    },
-    "dependencies": {
-        "@types/bcrypt": "^1.0.0",
-        "@types/glob": "^5.0.34",
-        "@types/oauth2orize": "^1.8.0",
-        "@types/passport": "^0.3.3",
-        "@types/passport-http-bearer": "^1.0.30",
-        "@types/password-hash": "^1.2.19",
-        "@types/q": "^1.0.3",
-        "@types/validator": "^6.2.2",
-        "bcrypt": "^1.0.3",
-        "fbgraph": "^1.4.1",
-        "glob": "^7.1.2",
-        "passport": "^0.3.2",
-        "passport-http-bearer": "^1.0.1",
-        "password-hash": "^1.2.2",
-        "q": "^1.5.1",
-        "sqlite3": "^3.1.13",
-        "typeorm": "^0.1.11",
-        "validator": "^9.2.0"
     }
 }
