@@ -29,14 +29,32 @@ export function copyFile(sousrce: string, destination: string) {
     fs.writeFileSync(destination, fs.readFileSync(sousrce), 'utf8')
 }
 
+function removeSlashAtEnd(s: string) {
+    s = s.endsWith(`/`) ? s.slice(0, s.length - 1) : s;
+    return s;
+}
+
+function isSymbolicLink(filePath: string) {
+    if (!fs.existsSync(filePath)) return false;
+    try {
+        filePath = removeSlashAtEnd(filePath);
+        const command = `[[ -L "${filePath}" && -d "${filePath}" ]] && echo "symlink"`;
+        // console.log(command)
+        const res = run(command, { output: false }).sync().toString()
+        return res.trim() === "symlink"
+    } catch (error) {
+        return false;
+    }
+}
 
 export function clearFiles(files: string[] | string, preserveSymlinks = false) {
     if (!files) return;
     const filesPathesToDelete = !Array.isArray(files) ? [files] : files;
     if (preserveSymlinks) {
         filesPathesToDelete.forEach(file => {
-            if (fs.lstatSync(file).isSymbolicLink()) {
-                run(`rm ${file}`).sync()
+            const fpath = path.join(process.cwd(), file);
+            if (isSymbolicLink(fpath)) {
+                run(`rm ${removeSlashAtEnd(file)}`).sync()
             } else {
                 run(`rimraf ${file}`).sync()
             }
