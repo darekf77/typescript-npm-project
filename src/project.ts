@@ -41,7 +41,6 @@ export class Project {
 
     //#endregion
 
-
     //#region link
 
     //#region  old linking
@@ -216,6 +215,9 @@ export class Project {
                     watcher.run('npm run build:esm', 'components/src');
                 } else {
                     run(`npm run build:esm`).sync();
+                    if (outDir === 'bundle') {
+                        run(`npm-run ng build ${prod ? '--prod' : ''} --output-path ${outDir}-app`).sync()
+                    }
                 }
                 return;
             //#endregion
@@ -234,11 +236,14 @@ export class Project {
 
             //#region workspace
             case 'workspace':
-                // this.children.forEach(child => {
-                //     buildOptions.runAsync = true;
-                //     buildOptions.watch = true;
-                //     this.build(buildOptions)
-                // })
+                console.log('worksapce children', this.children.map(p => p.name))
+                console.log(`Outdir ${outDir}`)
+
+                if (outDir === 'bundle' && !watch) {
+                    this.children.forEach(child => {
+                        this.build(buildOptions)
+                    })
+                }
                 return;
             //#endregion 
 
@@ -316,8 +321,7 @@ export class Project {
                 let files = [
                     '.npmrc',
                     '.gitignore',
-                    '.npmignore',
-                    'tslint.json'
+                    '.npmignore'
                 ];
                 files.map(file => {
                     return {
@@ -404,7 +408,7 @@ export class Project {
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 
-            // this.children = this.findChildren();
+            this.children = this.findChildren();
             this.parent = Project.from(path.join(location, '..'));
             this.preview = Project.from(path.join(location, 'preview'));
 
@@ -446,7 +450,7 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     const browserTsc = path.join(tempSrc, 'tsconfig.json')
     copyFile(browserTemp, browserTsc);
     const folders = fs.readdirSync(tempSrc)
-    
+
     folders.forEach(f => {
         const file = path.join(tempSrc, f);
         // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
