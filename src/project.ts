@@ -11,7 +11,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, isSymbolicLink } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
 
 export class Project {
@@ -135,6 +135,12 @@ export class Project {
             // },
             exist(): boolean {
                 return self.packageJson.checkNodeModulesInstalled();
+            },
+            isSymbolicLink(): boolean {
+                return isSymbolicLink(self.node_modules.pathFolder);
+            },
+            get pathFolder() {
+                return path.join(self.location, 'node_modules');
             }
         };
     }
@@ -173,8 +179,13 @@ export class Project {
         this.filesRecreation.commonFiles()
         this.filesRecreation.beforeBuild()
 
-        if (this.parent && this.parent.type === 'workspace' && !this.node_modules.exist()) {
-            this.parent.node_modules.linkToProject(this);
+        if (this.parent && this.parent.type === 'workspace') {
+            if (!this.node_modules.exist()) {
+                this.parent.node_modules.linkToProject(this);
+            } else if (!this.node_modules.isSymbolicLink()) {
+                run(`rimraf ${this.node_modules.pathFolder}`).sync();
+                this.parent.node_modules.linkToProject(this);
+            }
         } else {
             this.node_modules.install();
         }

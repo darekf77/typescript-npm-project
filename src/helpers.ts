@@ -34,7 +34,7 @@ function removeSlashAtEnd(s: string) {
     return s;
 }
 
-function isSymbolicLink(filePath: string) {
+export function isSymbolicLink(filePath: string) {
     if (!fs.existsSync(filePath)) return false;
     try {
         filePath = removeSlashAtEnd(filePath);
