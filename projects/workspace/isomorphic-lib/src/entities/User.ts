@@ -52,7 +52,7 @@ export class USER implements IUSER {
     emails: EMAIL[] = [];
 
     public static async byUsername(username: string, repo: Repository<USER>) {
-        //#region backend
+        //#region backendFunc
         const User = await repo
             .createQueryBuilder(__(USER))
             .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')
@@ -64,7 +64,7 @@ export class USER implements IUSER {
     }
 
     public static async byId(id: number, repo: Repository<USER>) {
-        //#region backend
+        //#region backendFunc
         const User = await repo
             .createQueryBuilder(__(USER))
             .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')

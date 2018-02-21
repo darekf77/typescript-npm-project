@@ -15,9 +15,8 @@ import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
 
-//#region backend
 import { verify, generate } from "password-hash";
-//#endregion
+
 
 // local
 import { Log, Level } from "ng2-logger";
@@ -121,7 +120,7 @@ export class SESSION {
     }
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
-        //#region backend
+        //#region backendFunc
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.user = :id`)
@@ -138,7 +137,7 @@ export class SESSION {
         //#endregion
     }
     public static async getByToken(token: string, repo: Repository<SESSION>) {
-        //#region backend
+        //#region backendFunc
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.token = :token`)
@@ -152,7 +151,7 @@ export class SESSION {
     }
 
     public static async create(user: USER, ip: string, repo: Repository<SESSION>) {
-        //#region backend
+        //#region backendFunc
         let Session = new SESSION();
         Session.user = user;
         Session.ip = ip;

@@ -12,11 +12,24 @@ export type RecreateFile = { where: string; from: string };
 
 export type BuildDir = 'dist' | 'bundle';
 
-export interface BuildOptions {
+
+export class BuildOptions {
     prod: boolean;
-    outDir: 'dist' | 'bundle';
+    outDir: BuildDir;
     watch?: boolean;
-    project: Project;
+    project?: Project;
+
+    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist') {
+        const o = {
+            env: [
+                '--env.prod=' + prod,
+                '--env.watch=' + watch,
+                '--env.outDir=' + outDir
+            ]
+        }
+        return `${o.env.join(' ')}`;
+    }
+
 }
 
 export interface RunOptions {

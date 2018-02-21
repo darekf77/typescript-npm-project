@@ -7,6 +7,7 @@ import * as glob from "glob";
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
+import { BuildOptions } from './models';
 
 export function fixWebpackEnv(env: Object) {
     _.forIn(env, (v, k) => {
@@ -129,4 +130,19 @@ export function copyFiles(filesPattern: string, destinationFolder: string, optio
             resolve(files);
         })
     })
+}
+
+
+export function getWebpackEnv(params: string): BuildOptions {
+    const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z]|\\|\/|-)+`, 'g')
+    const match = params.match(regex1);
+    const env = {};
+    match.forEach(s => {
+        const split = s.split('=');
+        const key = split[0].replace('--env.', '')
+        const value = split[1];
+        env[key] = value;
+    })
+    fixWebpackEnv(env);
+    return env as any;
 }

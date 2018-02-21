@@ -11,7 +11,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run, watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles, isSymbolicLink } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
 
 export class Project {
@@ -194,7 +194,7 @@ export class Project {
 
             //#region isomorphic-lib
             case 'isomorphic-lib':
-                const webpackParams = config.webpack.params(prod, watch, outDir);
+                const webpackParams = BuildOptions.stringify(prod, watch, outDir);
                 if (watch) {
                     watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
                 } else {
@@ -430,7 +430,24 @@ export class Project {
 };
 
 
-export function BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams: string) {
+
+
+export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
+    const env = getWebpackEnv(params);
     //  --display-error-details to see more errors
-    run(`npm-run webpack ${webpackParams}`).sync()
+
+    run(`npm-run tsc --outDir ${env.outDir}`).sync();
+    run(`npm-run tnp create:temp:src`, { cwd: process.cwd(), output: true }).sync();
+    const browserOutDir = path.join('..', env.outDir, 'browser')
+    const tempSrc = path.join(process.cwd(), config.folder.tempSrc);
+
+    const browserTemp = path.join(process.cwd(), 'tsconfig.browser.json')
+    const browserTsc = path.join(tempSrc, 'tsconfig.json')
+    copyFile(browserTemp, browserTsc);
+    const tempFiles = ['client.ts', 'browser.ts', 'run.ts', 'backend.ts']
+    tempFiles.forEach(file => {
+        run(`rimraf ${path.join(tempSrc, file)}`).sync()
+    })
+
+    run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
 }

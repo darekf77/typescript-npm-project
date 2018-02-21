@@ -4,9 +4,14 @@ import * as _ from 'lodash';
 
 function replace(c = '', words = []) {
     if (words.length === 0) return c;
-    var word = words.shift();
+    let replacement = ''
+    let word = words.shift();
+    if (Array.isArray(word) && word.length === 2) {
+        replacement = word[1];
+        word = word[0]
+    }
     var regexPattern = new RegExp("[\\t ]*\\/\\/\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\/\\/\\s*#?endregion ?[\\t ]*\\n?", "g")
-    c = c.replace(regexPattern, '');
+    c = c.replace(regexPattern, replacement);
     return replace(c, words);
 }
 
@@ -16,7 +21,12 @@ export class IsomorphicRegions {
 
     public static deleteFrom(file: string): void {
         let fileContent = fs.readFileSync(file, 'utf8').toString();
-        fileContent = replace(fileContent, ["backend", "nodejs", "node"])
+        fileContent = replace(fileContent, [
+            ["backendFunc", `return undefined;` ],
+            "backend",
+            "nodejs",
+            "node"
+        ])
         fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'import');
         fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'export');
         fs.writeFileSync(file, fileContent, 'utf8');
@@ -52,16 +62,16 @@ export class IsomorphicRegions {
                 const fromLibPart = regexFrom.test(line)
                 // console.log(`I(${regexParialUsage.test(line)}) F(${regexFrom.test(line)})\t: ${line} `)
                 if (joiningLine) {
-                    if(!importOrExportPart && !fromLibPart) {
+                    if (!importOrExportPart && !fromLibPart) {
                         output += ` ${line}`
-                    } else if(fromLibPart) {
+                    } else if (fromLibPart) {
                         joiningLine = false;
                         output += ` ${line}\n`
-                    }                    
+                    }
                 } else {
                     joiningLine = (importOrExportPart && !fromLibPart);
                     output += `\n${line}`
-                } 
+                }
             })
             fileContent = output;
         }

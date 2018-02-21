@@ -55,7 +55,7 @@ export class EMAIL {
 
 
     public static async getUser(address: string, repo: Repository<EMAIL>) {
-        //#region backend
+        //#region backendFunc
         const Email = await repo.findOne({
             where: {
                 address
