@@ -297,7 +297,8 @@ export class Project {
                         'browser.js',
                         'browser.d.ts',
                         'browser.js.map',
-                        "tsconfig.json"
+                        "tsconfig.json",
+                        "tsconfig.browser.json"
                     ]
                     fileFromRoot.forEach(f => {
                         files.push({
