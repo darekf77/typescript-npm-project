@@ -445,9 +445,14 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     const browserTemp = path.join(process.cwd(), 'tsconfig.browser.json')
     const browserTsc = path.join(tempSrc, 'tsconfig.json')
     copyFile(browserTemp, browserTsc);
-    const tempFiles = ['client.ts', 'browser.ts', 'run.ts', 'backend.ts']
-    tempFiles.forEach(file => {
-        run(`rimraf ${path.join(tempSrc, file)}`).sync()
+    const folders = fs.readdirSync(tempSrc)
+    
+    folders.forEach(f => {
+        const file = path.join(tempSrc, f);
+        // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
+        if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
+            run(`rimraf ${file}`).sync()
+        }
     })
 
     run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
