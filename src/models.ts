@@ -17,6 +17,7 @@ export class BuildOptions {
     prod: boolean;
     outDir: BuildDir;
     watch?: boolean;
+    buildApp?: boolean;
     project?: Project;
 
     public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist') {
