@@ -2,6 +2,36 @@
   "name": "workspace",
   "version": "0.0.0",
   "license": "UNLICENSED",
+  "tnp": {
+    "type": "workspace",
+    "resources": [
+      "README.md"
+    ],
+    "router": {
+      "productionBuild": true,
+      "url": {
+        "prefix": "test",
+        "base": "/"
+      },
+      "routes": [
+        {
+          "url": "/",
+          "productionBuild": false,
+          "project": "angular-client"
+        },
+        {
+          "url": "/components",
+          "productionBuild": false,
+          "project": "angular-lib"
+        },
+        {
+          "prefix": "api",
+          "productionBuild": false,
+          "project": "isomorphic-lib"
+        }
+      ]
+    }
+  },
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.3.1",
     "@angular-devkit/schematics": "^0.0.42",
@@ -109,11 +139,5 @@
   "engines": {
     "node": ">=9.2.0",
     "npm": ">=5.6.0"
-  },
-  "tnp": {
-    "type": "workspace",
-    "resources": [
-      "README.md"
-    ]
   }
 }

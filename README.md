@@ -16,17 +16,18 @@ Helper project for my typescript npm libraries.
     - in *package.json* filed configuration 
     - generated project out of box ready to **npm link**
     - temporary folder:
-        - *dist* - current development build
-        - *bundle* - current production build
+        - *dist* - current build (static or for watching)
+        - *bundle* - for realse npm package purpose (angular-lib,isomorphc-lib)
     - **tnp release** for build, commit and publish production (path)
     - **tnp (clean|clear):(prod|dev)** remove production od development build
     - **tnp (clean|clear):all** remove all builds, node_modules
-    - **tnp task:start** npm-check, install node_modules, run **quick dev build**
+    - **tnp task:start** npm-check, install node_modules, run **quick development watching build**
 - Create
     - isomorphic-lib
         - preview (nodejs typescript | angular) app
     - angular-lib
         - preview angular app
+    - angular-client        
 - Build
     - quick development build with *ctrl*(*cmd*)+*shift*+*b*
     - **tnp build** for production build in *bundle*

@@ -1,13 +1,12 @@
 # compiled output
 /bundle
-/bundle-*
 /dist
 /dist-*
 /tmp
 /tmp-*
 /out-tsc
 bundle.umd.js
-
+/browser
 
 
 

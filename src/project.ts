@@ -215,22 +215,29 @@ export class Project {
                     watcher.run('npm run build:esm', 'components/src');
                 } else {
                     run(`npm run build:esm`).sync();
-                    if (outDir === 'bundle') {
-                        run(`npm-run ng build ${prod ? '--prod' : ''} --output-path ${outDir}-app`).sync()
-                    }
                 }
                 return;
             //#endregion
 
             //#region angular-cli
             case 'angular-cli':
-                run('npm-run ng server').sync()
+                if (watch) {
+                    run('npm-run ng server').sync()
+                }
                 return;
             //#endregion
 
             //#region angular-client
             case 'angular-client':
-                run(`npm-run webpack-dev-server --port=${4201}`).sync()
+                if (watch) {
+                    run(`npm-run webpack-dev-server --port=${4201}`).sync()
+                } else {
+                    if(prod) {
+                        run(`npm run build:aot`).sync()
+                    } else {
+                        run(`npm run build`).sync()
+                    }                    
+                }
                 return;
             //#endregion
 
@@ -459,7 +466,7 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
         }
     })
     run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
-    
+
     if (env.watch) { // create watching version
         // const browserTempOutDir = path.join(process.cwd(), 'browser')
         // const browserOutDir1 = path.join(process.cwd(), env.outDir, 'browser')
