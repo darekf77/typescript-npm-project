@@ -458,6 +458,17 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
             run(`rimraf ${file}`).sync()
         }
     })
-
     run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
+    
+    if (env.watch) { // create watching version
+        // const browserTempOutDir = path.join(process.cwd(), 'browser')
+        // const browserOutDir1 = path.join(process.cwd(), env.outDir, 'browser')
+        // if (fs.existsSync(browserTempOutDir)) {
+        //     run(`rimraf ${browserTempOutDir}`).sync()
+        // }
+        // run(`mkdir ${browserTempOutDir}`).sync()
+        // await copyFiles('./**/*.*', browserTempOutDir, { cwd: browserOutDir1 });
+        // console.log('END COPYING FILES')
+    }
+
 }
