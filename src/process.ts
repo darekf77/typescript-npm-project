@@ -47,18 +47,18 @@ function runAsyncIn(command: string, options?: RunOptions) {
 }
 
 export const watcher = {
-    run(command: string, folderPath: string = 'src') {
+    run(command: string, folderPath: string = 'src', cwd: string = process.cwd()) {
         let cmd = `tnp command ${command}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
         const toRun = `watch ${cmd} ${folderPath}`;
-        return run(toRun).async()
+        return run(toRun, { cwd }).async()
     },
 
-    call(fn: Function, params: string, folderPath: string = 'src') {
+    call(fn: Function, params: string, folderPath: string = 'src', cwd: string = process.cwd()) {
         let cmd = `tnp ${paramsFrom(fn.name)} ${params}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
         const toRun = `watch ${cmd} ${folderPath}`;
-        return run(toRun).async()
+        return run(toRun, { cwd }).async()
     }
 }
 

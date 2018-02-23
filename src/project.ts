@@ -6,10 +6,10 @@ import chalk from 'chalk';
 import * as path from 'path';
 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir } from "./models";
+import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
-import { run, watcher } from "./process";
+import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
@@ -92,10 +92,10 @@ export class Project {
                 const localNodeModules = path.join(self.location, 'node_modules');
                 const projectNodeModules = path.join(project.location, 'node_modules');
                 if (force && fs.existsSync(projectNodeModules)) {
-                    run(`rimraf ${projectNodeModules}`);
+                    this.run(`rimraf ${projectNodeModules}`);
                 }
                 const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
-                run(linkCommand).sync();
+                self.run(linkCommand).sync();
             },
             install() {
                 self.packageJson.installNodeModules()
@@ -109,7 +109,7 @@ export class Project {
                 symlinks.forEach(pkgName => {
                     const symPkgPath = path.join(self.location, 'node_modules', pkgName);
                     if (fs.existsSync(symPkgPath)) {
-                        run(`rm ${symPkgPath}`).sync();
+                        self.run(`rm ${symPkgPath}`).sync();
                     }
                 })
                 return symlinks;
@@ -119,7 +119,7 @@ export class Project {
                 symlinks.forEach(p => {
                     const absolutePkgPath = path.join(self.location, p);
                     const destination = path.join(self.location, 'node_modules');
-                    run(`tnp ln ${absolutePkgPath} ${destination}`, { cwd: self.location }).sync();
+                    self.run(`tnp ln ${absolutePkgPath} ${destination}`, { cwd: self.location }).sync();
                 })
             },
             // addLocalSymlinksfromChildrens() {
@@ -153,7 +153,7 @@ export class Project {
         const releseFilePath = path.join(
             __dirname, '..', 'templates',
             prod ? 'release-it-prod.json' : 'release-it.json');
-        run(`release-it -c ${releseFilePath}`).sync()
+        this.run(`release-it -c ${releseFilePath}`).sync()
     }
 
     bundleResources() {
@@ -172,6 +172,26 @@ export class Project {
     //#endregion
 
     //#region build
+    private run(command: string, options?: RunOptions) {
+        if (!options) options = {}
+        if (!options.cwd) options.cwd = this.location;
+        return __run(command, options);
+    }
+
+    private get watcher() {
+        const self = this;
+        return {
+            run(command: string, folderPath: string = 'src') {
+                const cwd: string = self.location;
+                return __watcher.run(command, folderPath, cwd);
+            },
+            call(fn: Function, params: string, folderPath: string = 'src') {
+                const cwd: string = self.location;
+                return __watcher.call(fn, params, folderPath, cwd);
+            }
+        }
+    }
+
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
@@ -182,7 +202,7 @@ export class Project {
             if (!this.node_modules.exist()) {
                 this.parent.node_modules.linkToProject(this);
             } else if (!this.node_modules.isSymbolicLink()) {
-                run(`rimraf ${this.node_modules.pathFolder}`).sync();
+                this.run(`rimraf ${this.node_modules.pathFolder}`).sync();
                 this.parent.node_modules.linkToProject(this);
             }
         } else {
@@ -195,26 +215,26 @@ export class Project {
             case 'isomorphic-lib':
                 const webpackParams = BuildOptions.stringify(prod, watch, outDir);
                 if (watch) {
-                    watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
+                    this.watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
                 } else {
-                    BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams)
+                    BUILD_ISOMORPHIC_LIB_WEBPACK.call(this, webpackParams)
                 }
                 return;
             //#endregion 
 
             //#region nodejs-server
             case 'nodejs-server':
-                run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
+                this.run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
                 return
             //#endregion
 
             //#region angular-lib
             case 'angular-lib':
                 if (watch) {
-                    run('npm-run ng server').async()
-                    watcher.run('npm run build:esm', 'components/src');
+                    this.run('npm-run ng server').async()
+                    this.watcher.run('npm run build:esm', 'components/src');
                 } else {
-                    run(`npm run build:esm`).sync();
+                    this.run(`npm run build:esm`).sync();
                 }
                 return;
             //#endregion
@@ -222,7 +242,7 @@ export class Project {
             //#region angular-cli
             case 'angular-cli':
                 if (watch) {
-                    run('npm-run ng server').sync()
+                    this.run('npm-run ng server').sync()
                 }
                 return;
             //#endregion
@@ -230,27 +250,32 @@ export class Project {
             //#region angular-client
             case 'angular-client':
                 if (watch) {
-                    run(`npm-run webpack-dev-server --port=${4201}`).sync()
+                    this.run(`npm-run webpack-dev-server --port=${4201}`).sync()
                 } else {
-                    if(prod) {
-                        run(`npm run build:aot`).sync()
+                    if (prod) {
+                        this.run(`npm run build:aot`).sync()
                     } else {
-                        run(`npm run build`).sync()
-                    }                    
+                        this.run(`npm run build`).sync()
+                    }
                 }
                 return;
             //#endregion
 
             //#region workspace
             case 'workspace':
-                console.log('worksapce children', this.children.map(p => p.name))
-                console.log(`Outdir ${outDir}`)
-
-                if (outDir === 'bundle' && !watch) {
-                    this.children.forEach(child => {
-                        this.build(buildOptions)
-                    })
-                }
+                console.log('Projects to build:')
+                this.children.forEach((project, i) => {
+                    console.log(`${i + 1}. ${project.name}`)
+                })
+                console.log('===================')
+                this.children.forEach(project => {
+                    project.build({
+                        project,
+                        prod,
+                        watch,
+                        outDir
+                    });
+                })
                 return;
             //#endregion 
 
@@ -442,18 +467,15 @@ export class Project {
 };
 
 
-
-
 export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     const env = getWebpackEnv(params);
     //  --display-error-details to see more errors
-
-    run(`npm-run tsc --outDir ${env.outDir}`).sync();
-    run(`npm-run tnp create:temp:src`, { cwd: process.cwd(), output: true }).sync();
+    this.run(`npm-run tsc --outDir ${env.outDir}`).sync();
+    this.run(`npm-run tnp create:temp:src`, { output: true }).sync();
     const browserOutDir = path.join('..', env.outDir, 'browser')
-    const tempSrc = path.join(process.cwd(), config.folder.tempSrc);
+    const tempSrc = path.join(this.location, config.folder.tempSrc);
 
-    const browserTemp = path.join(process.cwd(), 'tsconfig.browser.json')
+    const browserTemp = path.join(this.location, 'tsconfig.browser.json')
     const browserTsc = path.join(tempSrc, 'tsconfig.json')
     copyFile(browserTemp, browserTsc);
     const folders = fs.readdirSync(tempSrc)
@@ -462,20 +484,9 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
         const file = path.join(tempSrc, f);
         // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
         if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
-            run(`rimraf ${file}`).sync()
+            this.run(`rimraf ${file}`).sync()
         }
     })
-    run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
-
-    if (env.watch) { // create watching version
-        // const browserTempOutDir = path.join(process.cwd(), 'browser')
-        // const browserOutDir1 = path.join(process.cwd(), env.outDir, 'browser')
-        // if (fs.existsSync(browserTempOutDir)) {
-        //     run(`rimraf ${browserTempOutDir}`).sync()
-        // }
-        // run(`mkdir ${browserTempOutDir}`).sync()
-        // await copyFiles('./**/*.*', browserTempOutDir, { cwd: browserOutDir1 });
-        // console.log('END COPYING FILES')
-    }
-
+    this.run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
+    this.run(`cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
 }
