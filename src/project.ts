@@ -268,7 +268,22 @@ export class Project {
                     console.log(`${i + 1}. ${project.name}`)
                 })
                 console.log('===================')
+                const projectsIsomorphicLib = [];
+                const projectsAngularLib = []
+                const projectsAngularClient = []
+                const projectsAngularCLI = []
                 this.children.forEach(project => {
+                    if(project.type === 'isomorphic-lib') projectsIsomorphicLib.push(project);
+                })
+
+                const projects = [
+                    ...projectsIsomorphicLib,
+                    ...projectsAngularLib,
+                    ...projectsAngularClient,
+                    ...projectsAngularCLI
+                ];
+
+                projects.forEach(project => {
                     project.build({
                         project,
                         prod,
