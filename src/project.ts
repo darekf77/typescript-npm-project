@@ -555,7 +555,7 @@ export class ProjectAngularLib extends Project {
             this.run('tnp npm-run ng server').async()
             this.watcher.run('npm run build:esm', 'components/src');
         } else {
-            this.run(`tnp npm run build:esm`).sync();
+            this.run(`npm run build:esm`).sync();
         }
     }
 }
