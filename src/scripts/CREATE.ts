@@ -1,13 +1,17 @@
 
 import { run } from "../process";
-import { Project, BUILD_ISOMORPHIC_LIB_WEBPACK } from '../project';
+import { Project } from '../project';
 import { error } from "../messages";
+import { ProjectIsomorphicLib } from "../project";
 
 
 export default {
     $CREATE_TEMP_SRC: async (args: string) => {
         try {
-            await Project.Current.filesRecreation.createTemporaryBrowserSrc()
+            const project: ProjectIsomorphicLib = Project.Current as any;
+            if (project instanceof ProjectIsomorphicLib) {
+                await project.createTemporaryBrowserSrc()
+            }
             process.exit(0)
         } catch (err) {
             error(err);

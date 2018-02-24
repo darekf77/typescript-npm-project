@@ -15,7 +15,8 @@ import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, ReorganizeArray } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
 
-export class Project {
+//#region Project BASE
+export abstract class Project {
     children: Project[] = [];
     dependencies: Project[] = [];
     parent: Project;
@@ -30,60 +31,30 @@ export class Project {
         return Project.from(path.join(__dirname, '..'));
     }
 
-    //#region run on port
-    runOn(port: number) {
+    abstract runOn(port: number);
 
-        if (this.type === 'workspace') {
-
-
-
-        }
-
+    run(command: string, options?: RunOptions) {
+        if (!options) options = {}
+        if (!options.cwd) options.cwd = this.location;
+        return __run(command, options);
     }
 
-    //#endregion
+    get watcher() {
+        const self = this;
+        return {
+            run(command: string, folderPath: string = 'src') {
+                const cwd: string = self.location;
+                return __watcher.run(command, folderPath, cwd);
+            },
+            call(fn: Function, params: string, folderPath: string = 'src') {
+                const cwd: string = self.location;
+                return __watcher.call(fn, params, folderPath, cwd);
+            }
+        }
+    }
 
-    //#region link
-
-    //#region  old linking
-    // linkDependencies(type: Dependencies) {
-    //     let self = this;
-    //     const thisNodeModelsPath = path.join(this.location, 'node_modules');
-    //     return {
-    //         toProject(project: Project) {
-    //             const dependencies = self.packageJson.dependencies(type);
-
-    //             dependencies.some((d) => {
-    //                 if (!fs.existsSync(path.join(thisNodeModelsPath, d.name))) {
-    //                     self.packageJson.installNodeModules();
-    //                     return false;
-    //                 }
-    //             });
-
-    //             info(`Linking parent workspace common packages to ${project.name}...`)
-    //             dependencies.forEach(d => {
-    //                 const destinationFolder = path.join(project.location, 'node_modules', d.name);
-    //                 const isOrganizationPackage = /.*\/.*/g.test(d.name);
-    //                 const linkName2 = isOrganizationPackage ? d.name.split('/')[0] : '';
-    //                 const destinationFolder2 = path.join(project.location, 'node_modules', linkName2);
-    //                 const parentSourcePackagePath = path.join(thisNodeModelsPath, d.name);
-    //                 const linkCommand = `tnp ln ${parentSourcePackagePath} .`;
-    //                 run(`rimraf ${destinationFolder}`).sync()
-    //                 run(`mkdirp  ${destinationFolder2}`).sync()
-    //                 run(linkCommand, { cwd: destinationFolder2 }).sync()
-    //             })
-    //             info('Linking Done.')
-    //         }
-    //     }
-    // }
-
-    // linkParentDependencies() {
-    //     if (this.parent && this.parent.type === 'workspace') {
-    //         this.parent.linkDependencies('dependencies').toProject(this);
-    //     }
-    // }
-    //#endregion
-
+    
+    //#region node_modules
     get node_modules() {
         const self = this;
         return {
@@ -174,31 +145,13 @@ export class Project {
     //#endregion
 
     //#region build
-    private run(command: string, options?: RunOptions) {
-        if (!options) options = {}
-        if (!options.cwd) options.cwd = this.location;
-        return __run(command, options);
-    }
-
-    private get watcher() {
-        const self = this;
-        return {
-            run(command: string, folderPath: string = 'src') {
-                const cwd: string = self.location;
-                return __watcher.run(command, folderPath, cwd);
-            },
-            call(fn: Function, params: string, folderPath: string = 'src') {
-                const cwd: string = self.location;
-                return __watcher.call(fn, params, folderPath, cwd);
-            }
-        }
-    }
+    abstract buildSteps(buildOptions?: BuildOptions);
 
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
-        this.filesRecreation.commonFiles()
-        this.filesRecreation.beforeBuild()
+        this.filesRecreation.beforeBuild.commonFiles()
+        this.filesRecreation.beforeBuild.projectSpecyficFiles()
 
         if (this.parent && this.parent.type === 'workspace') {
             if (!this.node_modules.exist()) {
@@ -210,216 +163,52 @@ export class Project {
         } else {
             this.node_modules.install();
         }
-
-        switch (this.type) {
-
-            //#region isomorphic-lib
-            case 'isomorphic-lib':
-                const webpackParams = BuildOptions.stringify(prod, watch, outDir);
-                if (watch) {
-                    this.watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
-                } else {
-                    BUILD_ISOMORPHIC_LIB_WEBPACK.call(this, webpackParams)
-                }
-                return;
-            //#endregion 
-
-            //#region nodejs-server
-            case 'server-lib':
-                this.run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
-                return
-            //#endregion
-
-            //#region angular-lib
-            case 'angular-lib':
-                if (watch) {
-                    this.run('npm-run ng server').async()
-                    this.watcher.run('npm run build:esm', 'components/src');
-                } else {
-                    this.run(`npm run build:esm`).sync();
-                }
-                return;
-            //#endregion
-
-            //#region angular-cli
-            case 'angular-cli':
-                if (watch) {
-                    this.run('npm-run ng server').sync()
-                }
-                return;
-            //#endregion
-
-            //#region angular-client
-            case 'angular-client':
-                if (watch) {
-                    this.run(`npm-run webpack-dev-server --port=${4201}`).sync()
-                } else {
-                    if (prod) {
-                        this.run(`npm run build:aot`).sync()
-                    } else {
-                        this.run(`npm run build`).sync()
-                    }
-                }
-                return;
-            //#endregion
-
-            //#region workspace
-            case 'workspace':
-                console.log('Projects to build:')
-                this.children.forEach((project, i) => {
-                    console.log(`${i + 1}. ${project.name}`)
-                })
-                console.log('===================')
-                const projects = {
-                    serverLibs: [],
-                    isomorphicLibs: [],
-                    angularLibs: [],
-                    angularClients: [],
-                    angularCliClients: [],
-                    dockers: []
-                };
-                this.children.forEach(project => {
-                    if (project.type === 'docker') projects.dockers.push(project);
-                    else if (project.type === 'server-lib') projects.serverLibs.push(project);
-                    else if (project.type === 'isomorphic-lib') projects.isomorphicLibs.push(project);
-                    else if (project.type === 'angular-lib') projects.angularLibs.push(project);
-                    else if (project.type === 'angular-client') projects.angularClients.push(project);
-                    else if (project.type === 'angular-cli') projects.angularCliClients.push(project);
-                })
-
-
-                _.keys(projects).forEach((key) => {
-                    let libsProjects = (projects[key] as Project[]);
-
-                    function order(): boolean {
-                        let everthingOk = true;
-                        libsProjects.some(p => {
-                            const indexProject = _.indexOf(libsProjects, p);
-                            p.dependencies.some(pDep => {
-                                const indexDependency = _.indexOf(libsProjects, pDep);
-                                if (indexDependency > indexProject) {
-                                    libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
-                                    everthingOk = false;
-                                    return !everthingOk;
-                                }
-                            });
-                            return !everthingOk;
-                        });
-                        return everthingOk;
-                    }
-
-                    let cout = 0
-                    while (!order()) {
-                        console.log(`Sort(${++cout})`, libsProjects);
-                    }
-                });
-
-
-                process.exit(0)
-                const projectsInOrder: Project[] = [
-                    ...projects.serverLibs,
-                    ...projects.isomorphicLibs,
-                    ...projects.angularLibs,
-                    ...projects.angularClients,
-                    ...projects.angularCliClients
-                ];
-
-                projectsInOrder.forEach((project, i) => {
-                    console.log(`${i + 1}. project: ${project.name}`)
-                    // project.build({
-                    //     project,
-                    //     prod,
-                    //     watch,
-                    //     outDir
-                    // });
-                })
-                return;
-            //#endregion 
-
-        }
+        this.buildSteps(buildOptions);
     }
     //#endregion
 
     //#region files recreatetion
+    abstract projectSpecyficFiles(): string[];
+
     get filesRecreation() {
         const self = this;
         return {
-            async createTemporaryBrowserSrc() {
-
-                const src = path.join(self.location, config.folder.src);
-                const tempSrc = path.join(self.location, config.folder.tempSrc);
-                try {
-                    if (!fs.existsSync(tempSrc)) {
-                        fs.mkdirSync(tempSrc);
-                    }
-                    // else {
-                    //     await deleteFiles('./**/*.ts', {
-                    //         cwd: tempSrc,
-                    //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
-                    //     })
-                    // }
-                    const files = await copyFiles('./**/*.ts', tempSrc, {
-                        cwd: src
-                    })
-                    files.forEach(f => {
-                        IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
-                    })
-                } catch (err) {
-                    error(err);
-                }
-            },
-            beforeBuild() {
-                const isomorphicLib = Project.by('isomorphic-lib');
-                const files: RecreateFile[] = [];
-                if (self.type === 'isomorphic-lib' && self.location !== isomorphicLib.location) {
-
-                    files.push({
-                        from: path.join(isomorphicLib.location, 'src', 'client.ts'),
-                        where: path.join(self.location, 'src', 'client.ts')
-                    })
-                    files.push({
-                        from: path.join(isomorphicLib.location, 'src', 'browser.ts'),
-                        where: path.join(self.location, 'src', 'browser.ts')
-                    })
-                    const fileFromRoot = [
-                        'index.js',
-                        'index.d.ts',
-                        'index.js.map',
-                        'client.js',
-                        'client.d.ts',
-                        'client.js.map',
-                        'browser.js',
-                        'browser.d.ts',
-                        'browser.js.map',
-                        "tsconfig.json",
-                        "tsconfig.browser.json"
-                    ]
-                    fileFromRoot.forEach(f => {
-                        files.push({
-                            from: path.join(isomorphicLib.location, f),
-                            where: path.join(self.location, f)
+            get beforeBuild() {
+                return {
+                    projectSpecyficFiles() {
+                        const defaultProjectProptotype = Project.by(self.type);
+                        let files: RecreateFile[] = [];
+                        if (self.location !== defaultProjectProptotype.location) {
+                            self.projectSpecyficFiles().forEach(f => {
+                                files.push({
+                                    from: path.join(defaultProjectProptotype.location, f),
+                                    where: path.join(self.location, f)
+                                })
+                            })
+                            files.forEach(file => {
+                                copyFile(file.from, file.where)
+                            })
+                        }
+                    },
+                    commonFiles() {
+                        const wokrspace = Project.by('workspace');
+                        let files = [
+                            // '.npmrc',
+                            'tslint.json',
+                            '.gitignore',
+                            '.npmignore',
+                            '.editorconfig'
+                        ];
+                        files.map(file => {
+                            return {
+                                from: path.join(wokrspace.location, file),
+                                where: path.join(self.location, file)
+                            }
+                        }).forEach(file => {
+                            copyFile(file.from, file.where)
                         })
-                    })
-                }
-                files.forEach(file => {
-                    copyFile(file.from, file.where)
-                })
-            },
-            commonFiles() {
-                const wokrspace = Project.by('workspace');
-                let files = [
-                    '.npmrc',
-                    '.gitignore',
-                    '.npmignore'
-                ];
-                files.map(file => {
-                    return {
-                        from: path.join(wokrspace.location, file),
-                        where: path.join(self.location, file)
                     }
-                }).forEach(file => {
-                    copyFile(file.from, file.where)
-                })
+                };
             }
         }
     }
@@ -482,22 +271,27 @@ export class Project {
         if (alreadyExist) return alreadyExist;
         if (!fs.existsSync(location)) return;
         if (!PackageJSON.from(location)) return;
-        return new Project(location)
+        const type = Project.typeFrom(location);
+        if (type === 'isomorphic-lib') return new ProjectIsomorphicLib(location);
+        if (type === 'angular-lib') return new ProjectAngularLib(location);
+        if (type === 'angular-client') return new ProjectAngularClient(location);
+        if (type === 'workspace') return new ProjectWorkspace(location);
+        if (type === 'docker') return new ProjectDocker(location);
+        if (type === 'server-lib') return new ProjectServerLib(location);
+        if (type === 'angular-cli') return new ProjectAngularCliClient(location);
     }
 
-
+    private static typeFrom(location: string): LibType {
+        const packageJson = PackageJSON.from(location);
+        let type = packageJson.type;
+        return type;
+    }
 
     constructor(public location: string) {
         if (fs.existsSync(location)) {
 
             this.packageJson = PackageJSON.from(location);
             this.type = this.packageJson.type;
-            if (!this.type) {
-                if (fs.existsSync(path.join(location, 'angular-cli.json'))) {
-                    this.type = 'angular-cli';
-                }
-                error("Bad project type " + this.type)
-            }
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 
@@ -527,7 +321,167 @@ export class Project {
     //#endregion
 
 };
+//#endregion
 
+
+//#region Workspace
+export class ProjectWorkspace extends Project {
+
+    runOn(port: number) {
+
+    }
+    projectSpecyficFiles(): string[] {
+        return [];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        console.log('Projects to build:')
+        this.children.forEach((project, i) => {
+            console.log(`${i + 1}. ${project.name}`)
+        })
+        console.log('===================')
+        const projects = {
+            serverLibs: [],
+            isomorphicLibs: [],
+            angularLibs: [],
+            angularClients: [],
+            angularCliClients: [],
+            dockers: []
+        };
+        this.children.forEach(project => {
+            if (project.type === 'docker') projects.dockers.push(project);
+            else if (project.type === 'server-lib') projects.serverLibs.push(project);
+            else if (project.type === 'isomorphic-lib') projects.isomorphicLibs.push(project);
+            else if (project.type === 'angular-lib') projects.angularLibs.push(project);
+            else if (project.type === 'angular-client') projects.angularClients.push(project);
+            else if (project.type === 'angular-cli') projects.angularCliClients.push(project);
+        })
+
+
+        _.keys(projects).forEach((key) => {
+            let libsProjects = (projects[key] as Project[]);
+
+            function order(): boolean {
+                let everthingOk = true;
+                libsProjects.some(p => {
+                    const indexProject = _.indexOf(libsProjects, p);
+                    p.dependencies.some(pDep => {
+                        const indexDependency = _.indexOf(libsProjects, pDep);
+                        if (indexDependency > indexProject) {
+                            libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
+                            everthingOk = false;
+                            return !everthingOk;
+                        }
+                    });
+                    return !everthingOk;
+                });
+                return everthingOk;
+            }
+
+            let cout = 0
+            while (!order()) {
+                console.log(`Sort(${++cout})`, libsProjects);
+            }
+        });
+
+
+        process.exit(0)
+        const projectsInOrder: Project[] = [
+            ...projects.serverLibs,
+            ...projects.isomorphicLibs,
+            ...projects.angularLibs,
+            ...projects.angularClients,
+            ...projects.angularCliClients
+        ];
+
+        projectsInOrder.forEach((project, i) => {
+            console.log(`${i + 1}. project: ${project.name}`)
+            // project.build({
+            //     project,
+            //     prod,
+            //     watch,
+            //     outDir
+            // });
+        })
+        return;
+    }
+}
+//#endregion
+
+
+//#region Server Lib
+export class ProjectServerLib extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        this.run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
+    }
+}
+//#endregion
+
+
+//#region Isomorphic lib
+export class ProjectIsomorphicLib extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [
+            'index.js',
+            'index.d.ts',
+            'index.js.map',
+            "tsconfig.json",
+            "tsconfig.browser.json"
+        ];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        const webpackParams = BuildOptions.stringify(prod, watch, outDir);
+        if (watch) {
+            this.watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
+        } else {
+            BUILD_ISOMORPHIC_LIB_WEBPACK.call(this, webpackParams)
+        }
+        return;
+    }
+
+    async createTemporaryBrowserSrc() {
+
+        const src = path.join(this.location, config.folder.src);
+        const tempSrc = path.join(this.location, config.folder.tempSrc);
+        try {
+            if (!fs.existsSync(tempSrc)) {
+                fs.mkdirSync(tempSrc);
+            }
+            // else {
+            //     await deleteFiles('./**/*.ts', {
+            //         cwd: tempSrc,
+            //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
+            //     })
+            // }
+            const files = await copyFiles('./**/*.ts', tempSrc, {
+                cwd: src
+            })
+            files.forEach(f => {
+                IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
+            })
+        } catch (err) {
+            error(err);
+        }
+    }
+
+}
 
 export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     const env = getWebpackEnv(params);
@@ -552,3 +506,124 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     this.run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
     this.run(`cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
 }
+//#endregion
+
+
+//#region Docker
+export class ProjectDocker extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [
+
+        ];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+
+    }
+}
+//#endregion
+
+
+//#region Angular Lib
+export class ProjectAngularLib extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [
+            ...ProjectAngularCliClient.DEFAULT_FILES,
+            'index.js',
+            'index.d.ts',
+            'index.js.map',
+            'gulpfile.js',
+            'ng-package.json',
+            'tsconfig-aot.json'
+        ];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        if (watch) {
+            this.run('npm-run ng server').async()
+            this.watcher.run('npm run build:esm', 'components/src');
+        } else {
+            this.run(`npm run build:esm`).sync();
+        }
+    }
+}
+//#endregion
+
+
+//#region Angular Client
+export class ProjectAngularClient extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [
+            ...ProjectAngularCliClient.DEFAULT_FILES,
+            'index.js',
+            'index.d.ts',
+            'index.js.map',
+            'webpack.config.build.aot.js',
+            'webpack.config.build.js',
+            'webpack.config.common.js',
+            'webpack.config.js'
+        ];
+    }
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        if (watch) {
+            this.run(`npm-run webpack-dev-server --port=${4201}`).sync()
+        } else {
+            if (prod) {
+                this.run(`npm run build:aot`).sync()
+            } else {
+                this.run(`npm run build`).sync()
+            }
+        }
+    }
+}
+//#endregion
+
+
+//#region AngularCliClient
+export class ProjectAngularCliClient extends Project {
+
+    runOn(port: number) {
+
+    }
+
+    public static DEFAULT_FILES = [
+        '.angular-cli.json',
+        "tsconfig.json",
+        'src/tsconfig.app.json',
+        'src/tsconfig.spec.json',
+        'protractor.conf.js',
+        'karma.conf.js'
+    ]
+
+    projectSpecyficFiles(): string[] {
+        return ProjectAngularCliClient.DEFAULT_FILES;
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        if (watch) {
+            this.run('npm-run ng server').sync()
+        }
+    }
+
+}
+//#endregion
+

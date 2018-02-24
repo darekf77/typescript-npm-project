@@ -181,7 +181,11 @@ export class PackageJSON {
     }
 
     get type(): LibType {
-        return this.data.tnp.type;
+        const res = this.data.tnp ? this.data.tnp.type : undefined;
+        if (!res && fs.existsSync(path.join(this.location, 'angular-cli.json'))) {
+            return 'angular-cli';
+        }
+        return res;
     }
 
     get name() {

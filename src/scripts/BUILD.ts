@@ -1,7 +1,8 @@
 import { run } from "../process";
-import { Project, BUILD_ISOMORPHIC_LIB_WEBPACK } from '../project';
+import { Project } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir } from "../models";
+import { BUILD_ISOMORPHIC_LIB_WEBPACK } from "../project";
 
 
 export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {

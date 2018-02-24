@@ -6,15 +6,15 @@ import { clearFiles } from "../helpers";
 export const clear = {
     all: () => {
         clearFiles('node_modules/', true)
-        clearFiles('bundle/')
-        clearFiles('dist/')
+        clearFiles('bundle*')
+        clearFiles('dist*')
         clearFiles('tmp*')
         process.exit(0)
     },
     forBuild: (options?: { outDir?: BuildDir, exit?: boolean; }) => {
         const { outDir = 'bundle', exit = true } = options;
         clearFiles('tmp*')
-        if (outDir) clearFiles(outDir);
+        if (outDir) clearFiles(`${outDir}*`);
         if (exit) process.exit(0)
     }
 };
