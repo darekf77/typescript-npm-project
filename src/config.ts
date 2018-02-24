@@ -16,7 +16,16 @@ export const config = {
         dist: 'dist',
         src: 'src',
         tempSrc: 'tmp-src'
-    }
+    },
+    libsTypes: [
+        'workspace',
+        'docker',
+        'server-lib',
+        'isomorphic-lib',
+        'angular-lib',
+        'angular-client',
+        'angular-cli'
+    ] as LibType[]
 }
 
 

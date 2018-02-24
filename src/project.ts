@@ -434,7 +434,8 @@ export class Project {
         }
         projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
         if (!fs.existsSync(projectPath)) {
-            error(`Bad library type: ${libraryType}`)
+            error(`Bad library type: ${libraryType}`, true)
+            return undefined;
         }
         return Project.from(projectPath);
     }
@@ -464,7 +465,10 @@ export class Project {
         const options: fse.CopyOptions = {
             overwrite: true,
             recursive: true,
-            errorOnExist: true
+            errorOnExist: true,
+            filter: (src) => {
+                return !/.*node_modules.*/g.test(src);
+            }
         };
         fse.copySync(this.location, destinationPath, options);
         console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));

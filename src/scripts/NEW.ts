@@ -14,22 +14,29 @@ function getDestinationPath(projectName: string) {
     return path.join(process.cwd(), projectName);
 }
 
+function goodExamples() {
+    console.log(chalk.green(`Good examples:`));
+    config.libsTypes.forEach(t => {
+        console.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
+    })
+    error(chalk.red(`Please use example above.`));
+}
+
 function newProject(type: LibType, name: string) {
 
     const project = Project.by(type);
     const destinationPath = getDestinationPath(name);
-    if (type === 'angular-lib' || type === 'isomorphic-lib') {
+    if (project) {
         try {
             project.cloneTo(destinationPath);
-            info(`Project ${project.name} create sucessfullu`);
+            info(`Project ${project.name} create successfully`);
         } catch (err) {
             error(err);
         }
     } else {
-        error(`Bad library library type. Examples:`, true);
-        error(`\t${chalk.gray('tnp new')} ${chalk.black('angular-lib')} ${chalk.gray('mySuperLib')}`, true);
-        error(chalk.red(`\t${chalk.gray('tnp new')} ${chalk.black('isomorphic-lib')} ${chalk.gray('mySuperLib')}`));
+        goodExamples()
     }
+    process.exit(0)
 
 }
 
@@ -38,9 +45,7 @@ function handleArgs(args: string) {
     const argv = args.split(' ');
     if (!_.isArray(argv) || argv.length < 2) {
         error(`Top few argument for ${chalk.black('init')} parameter.`, true);
-        error(`Examples:`, true);
-        error(`\t${chalk.gray('tnp new angular-lib mySuperLib')}.`, true);
-        error(`\t${chalk.gray('tnp new isomorphic-lib mySuperLib')}.`);
+        goodExamples()
     }
     newProject(argv[0] as any, argv[1]);
 }
