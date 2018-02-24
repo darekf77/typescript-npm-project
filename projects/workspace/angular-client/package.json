@@ -6,7 +6,7 @@
     "type": "angular-client"
   },
   "scripts": {
-    "build": "rimraf dist && npm-run webpack --config=webpack.config.build.js",
-    "build:aot": "rimraf dist && npm-run webpack --config=webpack.config.build.aot.js"
+    "build": "tnp rimraf dist && tnp npm-run webpack --config=webpack.config.build.js",
+    "build:aot": "tnp rimraf dist && tnp npm-run webpack --config=webpack.config.build.aot.js"
   }
 }
