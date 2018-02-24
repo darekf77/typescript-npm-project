@@ -50,7 +50,7 @@ export const watcher = {
     run(command: string, folderPath: string = 'src', cwd: string = process.cwd()) {
         let cmd = `tnp command ${command}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
-        const toRun = `watch ${cmd} ${folderPath}`;
+        const toRun = `tnp watch ${cmd} ${folderPath}`;
         return run(toRun, { cwd }).async()
     },
 

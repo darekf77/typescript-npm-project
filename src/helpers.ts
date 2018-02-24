@@ -58,11 +58,11 @@ export function clearFiles(files: string[] | string, preserveSymlinks = false) {
             if (isSymbolicLink(fpath)) {
                 run(`rm ${removeSlashAtEnd(file)}`).sync()
             } else {
-                run(`rimraf ${file}`).sync()
+                run(`tnp rimraf ${file}`).sync()
             }
         })
     } else {
-        run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
+        run(`tnp rimraf ${filesPathesToDelete.join(' ')}`).sync()
     }
     filesPathesToDelete.forEach(file => {
         console.log(`Deleted ${file}`)
@@ -120,7 +120,7 @@ export function copyFiles(filesPattern: string, destinationFolder: string, optio
                 const folder = fileDestination.substring(0, fileDestination.length - path.basename(fileDestination).length);
                 try {
                     if (!fs.existsSync(folder)) {
-                        run(`mkdirp ${folder}`).sync();
+                        run(`tnp mkdirp ${folder}`).sync();
                     }
                     run(`cp ${fileSource} ${fileDestination}`, { cwd }).sync();
                 } catch (error) {

@@ -53,7 +53,7 @@ export abstract class Project {
         }
     }
 
-    
+
     //#region node_modules
     get node_modules() {
         const self = this;
@@ -65,7 +65,7 @@ export abstract class Project {
                 const localNodeModules = path.join(self.location, 'node_modules');
                 const projectNodeModules = path.join(project.location, 'node_modules');
                 if (force && fs.existsSync(projectNodeModules)) {
-                    this.run(`rimraf ${projectNodeModules}`);
+                    this.run(`tnp rimraf ${projectNodeModules}`);
                 }
                 const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
                 self.run(linkCommand).sync();
@@ -126,7 +126,7 @@ export abstract class Project {
         const releseFilePath = path.join(
             __dirname, '..', 'templates',
             prod ? 'release-it-prod.json' : 'release-it.json');
-        this.run(`release-it -c ${releseFilePath}`).sync()
+        this.run(`tnp release-it -c ${releseFilePath}`).sync()
     }
 
     bundleResources() {
@@ -157,7 +157,7 @@ export abstract class Project {
             if (!this.node_modules.exist()) {
                 this.parent.node_modules.linkToProject(this);
             } else if (!this.node_modules.isSymbolicLink()) {
-                this.run(`rimraf ${this.node_modules.pathFolder}`).sync();
+                this.run(`tnp rimraf ${this.node_modules.pathFolder}`).sync();
                 this.parent.node_modules.linkToProject(this);
             }
         } else {
@@ -422,7 +422,7 @@ export class ProjectServerLib extends Project {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        this.run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
+        this.run(`tnp npm-run tsc ${watch ? '-w' : ''}`).sync()
     }
 }
 //#endregion
@@ -486,8 +486,8 @@ export class ProjectIsomorphicLib extends Project {
 export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
     const env = getWebpackEnv(params);
     //  --display-error-details to see more errors
-    this.run(`npm-run tsc --outDir ${env.outDir}`).sync();
-    this.run(`npm-run tnp create:temp:src`, { output: true }).sync();
+    this.run(`tnp npm-run tsc --outDir ${env.outDir}`).sync();
+    this.run(`tnp npm-run tnp create:temp:src`, { output: true }).sync();
     const browserOutDir = path.join('..', env.outDir, 'browser')
     const tempSrc = path.join(this.location, config.folder.tempSrc);
 
@@ -500,11 +500,11 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
         const file = path.join(tempSrc, f);
         // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
         if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
-            this.run(`rimraf ${file}`).sync()
+            this.run(`tnp rimraf ${file}`).sync()
         }
     })
-    this.run(`npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
-    this.run(`cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
+    this.run(`tnp npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
+    this.run(`tnp cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
 }
 //#endregion
 
@@ -552,10 +552,10 @@ export class ProjectAngularLib extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         if (watch) {
-            this.run('npm-run ng server').async()
+            this.run('tnp npm-run ng server').async()
             this.watcher.run('npm run build:esm', 'components/src');
         } else {
-            this.run(`npm run build:esm`).sync();
+            this.run(`tnp npm run build:esm`).sync();
         }
     }
 }
@@ -584,7 +584,7 @@ export class ProjectAngularClient extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         if (watch) {
-            this.run(`npm-run webpack-dev-server --port=${4201}`).sync()
+            this.run(`tnp npm-run webpack-dev-server --port=${4201}`).sync()
         } else {
             if (prod) {
                 this.run(`npm run build:aot`).sync()

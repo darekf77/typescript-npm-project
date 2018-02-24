@@ -1,10 +1,36 @@
 import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
-
+import { run as runCommand } from "./process";
 export { config } from './config';
 
+const localLibs = [
+    'cpr',
+    'eslint',
+    'mkdirp',
+    'gulp',
+    'npm-run',
+    'rimraf',
+    'nodemon',
+    'release-it',
+    'tsc',
+    'watch',
+    'http-server',
+    'ts-node'
+]
+
 export function run(argsv: string[]) {
+
+    if (Array.isArray(argsv) && argsv.length >= 3) {
+        const localLib = argsv[2];
+        if (localLibs.includes(localLib)) {
+            const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
+            const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
+            runCommand(commadnToRun).sync()
+            process.exit(0)
+        }
+    }
+
     glob.sync(
         path
             .join(__dirname, '/scripts/*.js'))
@@ -37,7 +63,7 @@ function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: st
         const nameInKC = paramsFrom(name);
         const isWithoutDash = name.startsWith('$');
         const argInKC = paramsFrom(vv);
-
+        
         const condition =
             (isWithoutDash && argInKC === `${nameInKC}`)
             || argInKC === `${nameInKC}`

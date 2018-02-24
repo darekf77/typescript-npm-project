@@ -5,6 +5,7 @@ import { Project } from "../project";
 
 function version() {
     console.log(Project.Tnp.version);
+    process.exit(0)
 }
 
 export default {
