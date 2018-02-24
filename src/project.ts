@@ -12,7 +12,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, checkRules } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, ReorganizeArray } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
 
 export class Project {
@@ -289,25 +289,29 @@ export class Project {
 
 
                 _.keys(projects).forEach((key) => {
-                    const depRules: RuleDependency[] = [];
-                    const libsProjects = (projects[key] as Project[]);
-                    libsProjects.forEach(p => {
-                        const indexProject = _.indexOf(libsProjects, p);
-                        p.dependencies.forEach(pDep => {
-                            const indexDependency = _.indexOf(libsProjects, pDep);
-                            if (indexDependency > indexProject) {
-                                depRules.push({
-                                    dependencyLib: pDep,
-                                    beforeProject: p
-                                })
-                            }
-                        });
-                    });
+                    let libsProjects = (projects[key] as Project[]);
 
-                    while (true) {
-                        const shiftDeps = checkRules(depRules).forProjects(libsProjects)
+                    function order(): boolean {
+                        let everthingOk = true;
+                        libsProjects.some(p => {
+                            const indexProject = _.indexOf(libsProjects, p);
+                            p.dependencies.some(pDep => {
+                                const indexDependency = _.indexOf(libsProjects, pDep);
+                                if (indexDependency > indexProject) {
+                                    libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
+                                    everthingOk = false;
+                                    return !everthingOk;
+                                }
+                            });
+                            return !everthingOk;
+                        });
+                        return everthingOk;
                     }
 
+                    let cout = 0
+                    while (!order()) {
+                        console.log(`Sort(${++cout})`, libsProjects);
+                    }
                 });
 
 
@@ -479,7 +483,7 @@ export class Project {
 
 
 
-    private constructor(public location: string) {
+    constructor(public location: string) {
         if (fs.existsSync(location)) {
 
             this.packageJson = PackageJSON.from(location);

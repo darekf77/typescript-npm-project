@@ -149,15 +149,33 @@ export function getWebpackEnv(params: string): BuildOptions {
 }
 
 
-export function checkRules(rules: RuleDependency[]) {
-
+export function ReorganizeArray<T>(arr: T[]) {
     return {
-        forProjects(projects: Project[]): Project {
-            rules.forEach(r => {
-                r.
-            })
-
-            return undefined;;
+        moveElement(a: T) {
+            return {
+                before(b: T): T[] {
+                    let indexA = arr.indexOf(a);
+                    _.pullAt(arr, indexA);
+                    let indexB = arr.indexOf(b);
+                    if (indexB === 0) {
+                        arr.unshift(a);
+                    } else {
+                        arr = arr.splice(indexB - 1, 0, a);
+                    }
+                    return arr;
+                },
+                after(b: T) {
+                    let indexA = arr.indexOf(a);
+                    _.pullAt(arr, indexA);
+                    let indexB = arr.indexOf(b);
+                    if (indexB === arr.length - 1) {
+                        arr.push(a);
+                    } else {
+                        arr = arr.splice(indexB + 1, 0, a);
+                    }
+                    return arr;
+                }
+            }
         }
-    };
+    }
 }
