@@ -4,18 +4,20 @@ import * as fs from 'fs';
 import * as fse from "fs-extra";
 import chalk from 'chalk';
 import * as path from 'path';
+import * as _ from 'lodash';
 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions } from "./models";
+import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions, RuleDependency } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
 import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, checkRules } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
 
 export class Project {
-    children: Project[];
+    children: Project[] = [];
+    dependencies: Project[] = [];
     parent: Project;
     preview: Project;
     type: LibType;
@@ -223,7 +225,7 @@ export class Project {
             //#endregion 
 
             //#region nodejs-server
-            case 'nodejs-server':
+            case 'server-lib':
                 this.run(`npm-run tsc ${watch ? '-w' : ''}`).sync()
                 return
             //#endregion
@@ -268,28 +270,64 @@ export class Project {
                     console.log(`${i + 1}. ${project.name}`)
                 })
                 console.log('===================')
-                const projectsIsomorphicLib = [];
-                const projectsAngularLib = []
-                const projectsAngularClient = []
-                const projectsAngularCLI = []
+                const projects = {
+                    serverLibs: [],
+                    isomorphicLibs: [],
+                    angularLibs: [],
+                    angularClients: [],
+                    angularCliClients: [],
+                    dockers: []
+                };
                 this.children.forEach(project => {
-                    if(project.type === 'isomorphic-lib') projectsIsomorphicLib.push(project);
+                    if (project.type === 'docker') projects.dockers.push(project);
+                    else if (project.type === 'server-lib') projects.serverLibs.push(project);
+                    else if (project.type === 'isomorphic-lib') projects.isomorphicLibs.push(project);
+                    else if (project.type === 'angular-lib') projects.angularLibs.push(project);
+                    else if (project.type === 'angular-client') projects.angularClients.push(project);
+                    else if (project.type === 'angular-cli') projects.angularCliClients.push(project);
                 })
 
-                const projects = [
-                    ...projectsIsomorphicLib,
-                    ...projectsAngularLib,
-                    ...projectsAngularClient,
-                    ...projectsAngularCLI
+
+                _.keys(projects).forEach((key) => {
+                    const depRules: RuleDependency[] = [];
+                    const libsProjects = (projects[key] as Project[]);
+                    libsProjects.forEach(p => {
+                        const indexProject = _.indexOf(libsProjects, p);
+                        p.dependencies.forEach(pDep => {
+                            const indexDependency = _.indexOf(libsProjects, pDep);
+                            if (indexDependency > indexProject) {
+                                depRules.push({
+                                    dependencyLib: pDep,
+                                    beforeProject: p
+                                })
+                            }
+                        });
+                    });
+
+                    while (true) {
+                        const shiftDeps = checkRules(depRules).forProjects(libsProjects)
+                    }
+
+                });
+
+
+                process.exit(0)
+                const projectsInOrder: Project[] = [
+                    ...projects.serverLibs,
+                    ...projects.isomorphicLibs,
+                    ...projects.angularLibs,
+                    ...projects.angularClients,
+                    ...projects.angularCliClients
                 ];
 
-                projects.forEach(project => {
-                    project.build({
-                        project,
-                        prod,
-                        watch,
-                        outDir
-                    });
+                projectsInOrder.forEach((project, i) => {
+                    console.log(`${i + 1}. project: ${project.name}`)
+                    // project.build({
+                    //     project,
+                    //     prod,
+                    //     watch,
+                    //     outDir
+                    // });
                 })
                 return;
             //#endregion 
@@ -457,6 +495,7 @@ export class Project {
 
             this.children = this.findChildren();
             this.parent = Project.from(path.join(location, '..'));
+            this.dependencies = this.packageJson.requiredProjects;
             this.preview = Project.from(path.join(location, 'preview'));
 
         } else {

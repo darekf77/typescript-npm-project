@@ -15,7 +15,8 @@ export interface IPackageJSON {
     scripts: Object;
     tnp: {
         type: LibType;
-        resources: string[];
+        resources?: string[];
+        requiredLibs?: string[];
     };
     peerDependencies: Object;
     dependencies: Object;
@@ -163,6 +164,21 @@ export class PackageJSON {
     }
 
     //#region getters
+
+    get requiredProjects(): Project[] {
+        const projects: Project[] = [];
+        if (this.data && this.data.tnp && Array.isArray(this.data.tnp.requiredLibs)) {
+            const dependencies = this.data.tnp.requiredLibs;
+            dependencies.forEach(p => {
+                const projectPath = path.join(this.location, p);
+                if (!fs.existsSync(projectPath)) {
+                    error(`Dependency project: "${p}" doesn't exist.`)
+                }
+                projects.push(Project.from(projectPath));
+            })
+        }
+        return projects;
+    }
 
     get type(): LibType {
         return this.data.tnp.type;

@@ -6,18 +6,19 @@ export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencie
 
 export type Package = { name: string; version: string; };
 
-export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'nodejs-server' | 'workspace' | 'angular-cli' | 'docker';
+export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'server-lib' | 'workspace' | 'angular-cli' | 'docker';
 
 export type RecreateFile = { where: string; from: string };
 
 export type BuildDir = 'dist' | 'bundle';
+
+export type RuleDependency = { dependencyLib: Project; beforeProject: Project };
 
 
 export class BuildOptions {
     prod: boolean;
     outDir: BuildDir;
     watch?: boolean;
-    project?: Project;
 
     public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist') {
         const o = {

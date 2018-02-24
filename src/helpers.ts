@@ -7,7 +7,8 @@ import * as glob from "glob";
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
-import { BuildOptions } from './models';
+import { BuildOptions, RuleDependency } from './models';
+import { Project } from './project';
 
 export function fixWebpackEnv(env: Object) {
     _.forIn(env, (v, k) => {
@@ -145,4 +146,18 @@ export function getWebpackEnv(params: string): BuildOptions {
     })
     fixWebpackEnv(env);
     return env as any;
+}
+
+
+export function checkRules(rules: RuleDependency[]) {
+
+    return {
+        forProjects(projects: Project[]): Project {
+            rules.forEach(r => {
+                r.
+            })
+
+            return undefined;;
+        }
+    };
 }

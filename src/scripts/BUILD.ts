@@ -4,12 +4,13 @@ import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir } from "../models";
 
 
-export function build(prod = false, watch = false, outDir: BuildDir = 'dist', project: Project = Project.Current, runAsync = false) {
+export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
     const options: BuildOptions = {
-        prod, watch, project, outDir
+        prod, watch, outDir
     };
 
+    const project: Project = Project.Current;
 
     project.build(options);
     if (!watch) {
@@ -26,7 +27,7 @@ export default {
 
     $BUILD_DIST: () => build(),
     $BUILD_DIST_PROD: () => build(true),
-    
+
     $BUILD_BUNDLE: () => build(false, false, 'bundle'),
     $BUILD_BUNDLE_PROD: () => build(false, false, 'bundle')
 
