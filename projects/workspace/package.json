@@ -8,26 +8,22 @@
       "README.md"
     ],
     "router": {
-      "productionBuild": true,
       "url": {
         "prefix": "test",
         "base": "/"
       },
       "routes": [
         {
-          "url": "/",
-          "productionBuild": false,
-          "project": "angular-client"
-        },
-        {
           "url": "/components",
-          "productionBuild": false,
           "project": "angular-lib"
         },
         {
-          "prefix": "api",
-          "productionBuild": false,
+          "url": "/api",
           "project": "isomorphic-lib"
+        },
+        {
+          "url": "/",
+          "project": "angular-client"
         }
       ]
     }

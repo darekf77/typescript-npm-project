@@ -15,7 +15,8 @@ export const config = {
         bundle: 'bundle',
         dist: 'dist',
         src: 'src',
-        tempSrc: 'tmp-src'
+        tempSrc: 'tmp-src',
+        previewDistApp: 'dist-app'
     },
     libsTypes: [
         'workspace',

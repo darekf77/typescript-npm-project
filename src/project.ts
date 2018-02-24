@@ -31,15 +31,22 @@ export abstract class Project {
         return Project.from(path.join(__dirname, '..'));
     }
 
-    abstract runOn(port: number);
+    protected abstract defaultPort: number;
 
-    run(command: string, options?: RunOptions) {
+    start(port?: number, async?: boolean) {
+        console.log(`Project: ${this.name} is running ${async ? '(asynchronously)' : ''} on port ${port ? + port : this.defaultPort}`);
+        this.runOn(port, async)
+    }
+
+    protected abstract runOn(port?: number, async?: boolean);
+
+    protected run(command: string, options?: RunOptions) {
         if (!options) options = {}
         if (!options.cwd) options.cwd = this.location;
         return __run(command, options);
     }
 
-    get watcher() {
+    protected get watcher() {
         const self = this;
         return {
             run(command: string, folderPath: string = 'src') {
@@ -327,8 +334,10 @@ export abstract class Project {
 //#region Workspace
 export class ProjectWorkspace extends Project {
 
-    runOn(port: number) {
+    protected defaultPort: number;
 
+    runOn(port: number, async = false) {
+        // ROUTER IMPLEMENTATION
     }
     projectSpecyficFiles(): string[] {
         return [];
@@ -412,8 +421,16 @@ export class ProjectWorkspace extends Project {
 //#region Server Lib
 export class ProjectServerLib extends Project {
 
-    runOn(port: number) {
-
+    protected defaultPort: number = 4050;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        const command = `node dist/run.js -p ${port} -s`;
+        const options = {};
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
     }
 
     projectSpecyficFiles(): string[] {
@@ -422,7 +439,7 @@ export class ProjectServerLib extends Project {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        this.run(`tnp npm-run tsc ${watch ? '-w' : ''}`).sync()
+        this.run(`tnp npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
     }
 }
 //#endregion
@@ -431,8 +448,16 @@ export class ProjectServerLib extends Project {
 //#region Isomorphic lib
 export class ProjectIsomorphicLib extends Project {
 
-    runOn(port: number) {
-
+    protected defaultPort: number = 4000;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        const command = `node dist/run.js -p ${port}`;
+        const options = {};
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
     }
 
     projectSpecyficFiles(): string[] {
@@ -512,7 +537,8 @@ export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
 //#region Docker
 export class ProjectDocker extends Project {
 
-    runOn(port: number) {
+    protected defaultPort: number;
+    runOn(port: number, async = false) {
 
     }
 
@@ -533,8 +559,18 @@ export class ProjectDocker extends Project {
 //#region Angular Lib
 export class ProjectAngularLib extends Project {
 
-    runOn(port: number) {
 
+
+    protected defaultPort: number = 4100;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        const command = `tnp http-server -p ${port} -s`;
+        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
     }
 
     projectSpecyficFiles(): string[] {
@@ -556,6 +592,7 @@ export class ProjectAngularLib extends Project {
             this.watcher.run('npm run build:esm', 'components/src');
         } else {
             this.run(`npm run build:esm`).sync();
+            this.run(`npm run build`).sync();
         }
     }
 }
@@ -565,8 +602,16 @@ export class ProjectAngularLib extends Project {
 //#region Angular Client
 export class ProjectAngularClient extends Project {
 
-    runOn(port: number) {
-
+    protected defaultPort: number = 4300;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        const command = `tnp http-server -p ${port} -s`;
+        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
     }
 
     projectSpecyficFiles(): string[] {
@@ -600,8 +645,16 @@ export class ProjectAngularClient extends Project {
 //#region AngularCliClient
 export class ProjectAngularCliClient extends Project {
 
-    runOn(port: number) {
-
+    protected defaultPort: number = 4200;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        const command = `tnp http-server -p ${port} -s`;
+        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
     }
 
     public static DEFAULT_FILES = [
@@ -620,7 +673,9 @@ export class ProjectAngularCliClient extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         if (watch) {
-            this.run('npm-run ng server').sync()
+            this.run('npm-run ng serve').async()
+        } else {
+            this.run(`npm-run ng build --output-path ${config.folder.previewDistApp}`).sync()
         }
     }
 
