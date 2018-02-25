@@ -48,12 +48,11 @@ export class ProjectRouter {
 
     getProjectFrom(req: http.IncomingMessage): Project {
         const r = this.routes.find(r => {
-            return new RegExp(`${r.url}.*`, 'g').test(req.url)
+            return new RegExp(`${r.url}/.*`, 'g').test(req.url)
         })
         if (r) {
             return r.project;
         }
-        return undefined;
     }
 
     constructor(project: ProjectWorkspace) {
