@@ -14,6 +14,7 @@ import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, ReorganizeArray } from "./helpers";
 import { IsomorphicRegions } from "./isomorphic";
+import { ProjectRouter } from './router';
 
 //#region Project BASE
 export abstract class Project {
@@ -32,9 +33,21 @@ export abstract class Project {
     }
 
     protected abstract defaultPort: number;
+    protected currentPort: number;
 
+    public get isRunningOnPort(): number | null {
+        if (!this.isRunning) return null;
+        return this.currentPort;
+    }
+
+    // get BasePort() {
+    //     return this.defaultPort;
+    // }
+
+    protected isRunning = false;
     start(port?: number, async?: boolean) {
         console.log(`Project: ${this.name} is running ${async ? '(asynchronously)' : ''} on port ${port ? + port : this.defaultPort}`);
+        this.isRunning = true;
         this.runOn(port, async)
     }
 
@@ -58,6 +71,10 @@ export abstract class Project {
                 return __watcher.call(fn, params, folderPath, cwd);
             }
         }
+    }
+
+    get routes() {
+        return this.packageJson.routes;
     }
 
 
@@ -239,9 +256,11 @@ export abstract class Project {
     public findChildren(): Project[] {
         // console.log('from ' + this.location)
         const notAllowed: string[] = [
-            '.vscode', 'node_modules', 'dist', 'bundle',
-            'src', 'e2e', 'tmp', 'tests',
-            'components', '.git', 'bin'
+            '.vscode', 'node_modules',
+            ..._.values(config.folder),
+            'e2e', 'tmp', 'tests',
+            'components', '.git', 'bin',
+            '.'
         ]
         let subdirectories: string[] = Filehound.create()
             .path(this.location)
@@ -253,6 +272,7 @@ export abstract class Project {
 
         return subdirectories
             .map(dir => {
+                // console.log('dir:', dir)
                 return Project.from(dir);
             })
     }
@@ -274,6 +294,7 @@ export abstract class Project {
     }
 
     static from(location: string, parent?: Project): Project {
+
         const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
         if (alreadyExist) return alreadyExist;
         if (!fs.existsSync(location)) return;
@@ -334,9 +355,18 @@ export abstract class Project {
 //#region Workspace
 export class ProjectWorkspace extends Project {
 
-    protected defaultPort: number;
+    protected defaultPort: number = 5000;
 
     runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        this.currentPort = port;
+        // let childPort = port;
+        // this.children.forEach(p => {
+        //     p.start(++childPort, true);
+        // })
+
+        new ProjectRouter(this);
+
         // ROUTER IMPLEMENTATION
     }
     projectSpecyficFiles(): string[] {
@@ -424,6 +454,7 @@ export class ProjectServerLib extends Project {
     protected defaultPort: number = 4050;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
+        this.currentPort = port;
         const command = `node dist/run.js -p ${port} -s`;
         const options = {};
         if (async) {
@@ -451,6 +482,7 @@ export class ProjectIsomorphicLib extends Project {
     protected defaultPort: number = 4000;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
+        this.currentPort = port;
         const command = `node dist/run.js -p ${port}`;
         const options = {};
         if (async) {
@@ -539,7 +571,8 @@ export class ProjectDocker extends Project {
 
     protected defaultPort: number;
     runOn(port: number, async = false) {
-
+        if (!port) port = this.defaultPort;
+        this.currentPort = port;
     }
 
     projectSpecyficFiles(): string[] {
@@ -564,6 +597,7 @@ export class ProjectAngularLib extends Project {
     protected defaultPort: number = 4100;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
+        this.currentPort = port;
         const command = `tnp http-server -p ${port} -s`;
         const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
         if (async) {
@@ -605,6 +639,7 @@ export class ProjectAngularClient extends Project {
     protected defaultPort: number = 4300;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
+        this.currentPort = port;
         const command = `tnp http-server -p ${port} -s`;
         const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
         if (async) {
@@ -648,6 +683,7 @@ export class ProjectAngularCliClient extends Project {
     protected defaultPort: number = 4200;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
+        this.currentPort = port;
         const command = `tnp http-server -p ${port} -s`;
         const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
         if (async) {

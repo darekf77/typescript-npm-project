@@ -6,7 +6,9 @@ export function run(args: string) {
     const project: Project = Project.Current;
 
     project.start()
-    process.exit(0)
+    if(project.type !== 'workspace') {
+        process.exit(0)
+    }    
 }
 
 

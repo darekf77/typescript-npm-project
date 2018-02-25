@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { LibType, InstalationType, BuildOptions, Dependencies, Package } from "./models";
+import { LibType, InstalationType, BuildOptions, Dependencies, Package, TnpRouter, TnpRoute } from "./models";
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { Project } from "./project";
@@ -17,6 +17,7 @@ export interface IPackageJSON {
         type: LibType;
         resources?: string[];
         requiredLibs?: string[];
+        router: TnpRouter;
     };
     peerDependencies: Object;
     dependencies: Object;
@@ -92,6 +93,7 @@ export class PackageJSON {
     }
 
     public static from(location: string): PackageJSON {
+
         const isTnpProject = (location === path.join(__dirname, '..'));
         const filePath = path.join(location, 'package.json');
         if (!fs.existsSync(filePath)) {
@@ -102,7 +104,7 @@ export class PackageJSON {
             const file = fs.readFileSync(filePath, 'utf8').toString();
             const json = JSON.parse(file);
             if (!json.tnp && !isTnpProject) {
-                error(`Unrecognized project type ${filePath}`);
+                error(`Unrecognized project type ${filePath}, from location: ${location}`);
             }
             return new PackageJSON(json, location);
         } catch (err) {
@@ -186,6 +188,17 @@ export class PackageJSON {
             return 'angular-cli';
         }
         return res;
+    }
+
+    get routes(): TnpRoute[] {
+        if (this.data && this.data.tnp && this.data.tnp.router && Array.isArray(this.data.tnp.router.routes)) {
+            return this.data.tnp.router.routes.map(route => {
+                return {
+                    url: route.url,
+                    project: Project.from(path.join(this.location, route.project as any))
+                }
+            })
+        }
     }
 
     get name() {

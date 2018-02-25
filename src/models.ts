@@ -14,6 +14,14 @@ export type BuildDir = 'dist' | 'bundle';
 
 export type RuleDependency = { dependencyLib: Project; beforeProject: Project };
 
+export interface TnpRouter {
+    url?: {
+        prefix?: string;
+        base?: string;
+    };
+    routes: TnpRoute[];
+}
+export type TnpRoute = { url: string; project: Project; }
 
 export class BuildOptions {
     prod: boolean;

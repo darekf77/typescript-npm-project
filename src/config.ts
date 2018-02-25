@@ -16,7 +16,8 @@ export const config = {
         dist: 'dist',
         src: 'src',
         tempSrc: 'tmp-src',
-        previewDistApp: 'dist-app'
+        previewDistApp: 'dist-app',
+        browser: 'browser'
     },
     libsTypes: [
         'workspace',

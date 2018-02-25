@@ -57,6 +57,13 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/http-proxy@^1.16.0":
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.16.0.tgz#83819d7c6345ccc5957aa5815daece38afbe7df0"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+
 "@types/lodash@^4.14.93":
   version "4.14.104"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.104.tgz#53ee2357fa2e6e68379341d92eb2ecea4b11bb80"
@@ -2204,7 +2211,7 @@ http-cache-semantics@3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-3.8.1.tgz#39b0e16add9b605bf0a9ef3d9daaf4843b4cacd2"
 
-http-proxy@^1.8.1:
+http-proxy@^1.16.2, http-proxy@^1.8.1:
   version "1.16.2"
   resolved "https://registry.yarnpkg.com/http-proxy/-/http-proxy-1.16.2.tgz#06dff292952bf64dbe8471fa9df73066d4f37742"
   dependencies:
