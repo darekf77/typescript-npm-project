@@ -6,6 +6,7 @@ import { TnpRoute } from "models";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
+
 export class ProjectRouter {
 
     public static killProcessOn(portNumber: number) {
@@ -43,18 +44,33 @@ export class ProjectRouter {
         this.run(projects);
     }
 
+    routes: TnpRoute[] = [];
+
+    getProjectFrom(req: http.IncomingMessage): Project {
+        const r = this.routes.find(r => {
+            return new RegExp(`${r.url}.*`, 'g').test(req.url)
+        })
+        if (r) {
+            return r.project;
+        }
+        return undefined;
+    }
+
     constructor(project: ProjectWorkspace) {
         const proxy = httpProxy.createProxyServer({});
-        const server = http.createServer(function (req, res) {
-            console.log(req.url)
-            // You can define here your custom logic to handle the request
-            // and then proxy the request.
-            // proxy.web(req, res, { target: 'http://127.0.0.1:5060' });
-            res.write(JSON.stringify(req.headers))
-            res.end()
+        const server = http.createServer((req, res) => {
+            const p = this.getProjectFrom(req);
+            if (p) {
+                proxy.web(req, res, { target: `http://localhost:${p.activePort}` });
+            } else {
+                res.write('not found')
+                res.end();
+            }
         });
-        server.listen(project.isRunningOnPort)
-        // this.run(project.routes)
+        server.listen(project.activePort)
+        this.routes = [...project.routes];
+        const routes = [...project.routes];
+        this.run(routes)
 
     }
 

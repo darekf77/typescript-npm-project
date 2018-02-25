@@ -35,7 +35,7 @@ export abstract class Project {
     protected abstract defaultPort: number;
     protected currentPort: number;
 
-    public get isRunningOnPort(): number | null {
+    public get activePort(): number | null {
         if (!this.isRunning) return null;
         return this.currentPort;
     }
