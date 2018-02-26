@@ -22,7 +22,7 @@ export class IsomorphicRegions {
     public static deleteFrom(file: string): void {
         let fileContent = fs.readFileSync(file, 'utf8').toString();
         fileContent = replace(fileContent, [
-            ["backendFunc", `return undefined;` ],
+            ["backendFunc", `return undefined;`],
             "backend",
             "nodejs",
             "node"
@@ -57,7 +57,8 @@ export class IsomorphicRegions {
         if (_.isString(fileContent)) {
             let joiningLine = false;
             let output = '';
-            fileContent.split('\n').forEach((line) => {
+            fileContent.split(/\r?\n/).forEach((line) => {
+
                 const importOrExportPart = regexParialUsage.test(line);
                 const fromLibPart = regexFrom.test(line)
                 // console.log(`I(${regexParialUsage.test(line)}) F(${regexFrom.test(line)})\t: ${line} `)
@@ -70,6 +71,7 @@ export class IsomorphicRegions {
                     }
                 } else {
                     joiningLine = (importOrExportPart && !fromLibPart);
+                    // if (joiningLine) console.log('line', line)
                     output += `\n${line}`
                 }
             })
