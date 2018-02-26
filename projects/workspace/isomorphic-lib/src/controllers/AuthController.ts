@@ -6,7 +6,7 @@ import {
 } from 'morphi';
 import { Connection } from "typeorm/connection/Connection";
 
-//#region backend
+//#region @backend
 import { authenticate, use } from 'passport';
 import { Strategy, IStrategyOptions } from 'passport-http-bearer';
 import { isEmail, isLowercase, isLength } from 'validator';
@@ -69,7 +69,7 @@ export interface IFacebook {
 
 @ENDPOINT({
     auth: (method) => {
-        //#region backendFunc
+        //#region @backendFunc
         if (method === AuthController.prototype.login) {
             return;
         }
@@ -86,7 +86,7 @@ export class AuthController {
 
     constructor() {
         this.browser.init()
-        //#region backend
+        //#region @backend
         this.__init();
         //#endregion
     }
@@ -159,7 +159,7 @@ export class AuthController {
 
     @GET('/')
     info(): Response<USER> {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return async (req, res) => {
             const repo = await self.__repos();
@@ -178,7 +178,7 @@ export class AuthController {
 
     @GET('/check/exist/:username_or_email')
     checkExist( @PathParam('username_or_email') param: string): Response<Boolean> {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return async (req, res) => {
 
@@ -207,7 +207,7 @@ export class AuthController {
 
     @POST('/logout')
     logout(): Response<boolean> {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return async (req, res) => {
             const repo = await self.__repos();
@@ -233,7 +233,7 @@ export class AuthController {
 
     @POST('/login')
     login( @BodyParam() body: IHelloJS & IUSER): Response<SESSION> {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return async (req) => {
             const userIP = req.ip;
@@ -253,7 +253,7 @@ export class AuthController {
     }
 
     get __authorization() {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return {
             async facebook(body: IHelloJS): Promise<USER> {
@@ -323,7 +323,7 @@ export class AuthController {
 
     
     get __handle() {
-        //#region backendFunc    
+        //#region @backendFunc    
         const self = this;
         return {
             facebook() {
@@ -378,7 +378,7 @@ export class AuthController {
 
     
     private get __validate() {     
-        //#region backendFunc   
+        //#region @backendFunc   
         return {
             username(username) {
                 if (username && isLength(username, 3, 50)) {
@@ -393,7 +393,7 @@ export class AuthController {
 
     
     get __check() {
-        //#region backendFunc
+        //#region @backendFunc
         const self = this;
         return {
             exist: {
@@ -444,7 +444,7 @@ export class AuthController {
     
 
     private async __repos() {
-        //#region backendFunc
+        //#region @backendFunc
         const session = await this.connection.getRepository(SESSION);
         const user = await this.connection.getRepository(USER);
         const email = await this.connection.getRepository(EMAIL);
@@ -456,7 +456,7 @@ export class AuthController {
     }
 
     private async  __token(user: USER, ip: string) {
-        //#region backendFunc
+        //#region @backendFunc
         if (!user || !user.id) {
             throw new Error('No user to send token');
         }
@@ -473,7 +473,7 @@ export class AuthController {
     }
 
     private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
-        //#region backendFunc
+        //#region @backendFunc
         const repo = await this.__repos();
         let EmailType = await EMAIL_TYPE.getBy(EmailTypeName, repo.emailType);
         if (!EmailType) {
@@ -523,7 +523,7 @@ export class AuthController {
     }
 
     private async __mocks() {
-        //#region backendFunc
+        //#region @backendFunc
         const repo = await this.__repos();
         await this.__createUser({
             username: 'admin',
@@ -539,7 +539,7 @@ export class AuthController {
     }
 
     private async __init() {
-        //#region backendFunc
+        //#region @backendFunc
         const repo = await this.__repos();
         const types = await EMAIL_TYPE.init(repo.emailType);
 

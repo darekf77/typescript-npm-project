@@ -16,7 +16,7 @@ import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
 
-//#region backend
+//#region @backend
 import { Router, Request, Response } from "express";
 //#endregion
 
@@ -55,7 +55,7 @@ export class EMAIL {
 
 
     public static async getUser(address: string, repo: Repository<EMAIL>) {
-        //#region backendFunc
+        //#region @backendFunc
         const Email = await repo.findOne({
             where: {
                 address

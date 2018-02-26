@@ -18,7 +18,7 @@ test.books = [
 ]
 test.friend = new Author();
 
-//#region backend
+//#region @backend
 enum USER_GROUPS {
     ADMIN, USER, USER_PREMIU
 }
@@ -37,7 +37,7 @@ export class HelloController {
     user = new TestUser();
     constructor() {
         console.log('siema')
-        //#region backend
+        //#region @backend
         if (isNode) {
             console.log('I am in the contructor of HelloController !!', this.connection)
             // console.log('Pizda in constr', this['pizda'])
@@ -55,7 +55,7 @@ export class HelloController {
 
     @PUT('/db/:id')
     modifyUser( @PathParam('id') id: number, @BodyParam('user') user): Response<any> {
-        //#region backendFunc
+        //#region @backendFunc
         test.username = user.username;
         return { send: test };
         //#endregion
@@ -63,7 +63,7 @@ export class HelloController {
 
     @GET('/db/:id', true)
     getUser( @PathParam('id') id: number): Response<TestUser> {
-        //#region backendFunc
+        //#region @backendFunc
         // return { send: test }
 
         return async (req, res) => {
@@ -76,7 +76,7 @@ export class HelloController {
     @GET('/aaooaoaoa/test/:id', true)
     getUsersList( @PathParam('id') id: number): Response<TestUser[]> {
         console.log('test super')
-        //#region backendFunc
+        //#region @backendFunc
         return {
             send: (req, res) => {
                 res.set('aaaaaa', 'bbbb');
@@ -88,14 +88,14 @@ export class HelloController {
 
     @DELETE('/db/:id')
     deleteUser( @PathParam('id') id: number): Response<any> {
-        //#region backendFunc
+        //#region @backendFunc
         return { send: test }
         //#endregion
     };
 
     @GET('/:testing/basdasd/:foooo', true)
     getUserConfig( @PathParam('testing') test: string, @PathParam('foooo') booo: string): Response<any> {
-        //#region backendFunc
+        //#region @backendFunc
         console.log('I am original method');
         return { send: test };
         //#endregion
@@ -104,14 +104,14 @@ export class HelloController {
 
     @POST('/user')
     saveUSer( @QueryParam('id_usera') id: number, @BodyParam() user): Response<any> {
-        //#region backendFunc
+        //#region @backendFunc
         return { send: { id, user } };
         //#endregion
     }
 
     @PUT('/user/:id')
     updateUSer( @PathParam('id') id: number, @CookieParam('test_cookie', 112) testCookie): Response<any> {
-        //#region backendFunc
+        //#region @backendFunc
         return { send: { id, testCookie } };
         //#endregion
     }

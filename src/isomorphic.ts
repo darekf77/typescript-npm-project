@@ -22,10 +22,10 @@ export class IsomorphicRegions {
     public static deleteFrom(file: string): void {
         let fileContent = fs.readFileSync(file, 'utf8').toString();
         fileContent = replace(fileContent, [
-            ["backendFunc", `return undefined;`],
+            ["@backendFunc", `return undefined;`],
+            "@backend",
             "backend",
-            "nodejs",
-            "node"
+            "backendFunc"
         ])
         fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'import');
         fileContent = IsomorphicRegions.replaceBrowserLib(fileContent, 'export');

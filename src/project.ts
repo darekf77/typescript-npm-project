@@ -12,7 +12,7 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray, ClassHelper } from "./helpers";
 import { HelpersLinks } from "./helpers-links";
 import { IsomorphicRegions } from "./isomorphic";
 import { ProjectRouter } from './router';
@@ -509,9 +509,13 @@ export class ProjectIsomorphicLib extends Project {
         const { prod, watch, outDir } = buildOptions;
         const webpackParams = BuildOptions.stringify(prod, watch, outDir);
         if (watch) {
-            this.watcher.call(BUILD_ISOMORPHIC_LIB_WEBPACK, webpackParams);
+            const functionName = ClassHelper.getMethodName(
+                ProjectIsomorphicLib.prototype,
+                ProjectIsomorphicLib.prototype.BUILD_ISOMORPHIC_LIB_WEBPACK)
+
+            this.watcher.call(functionName, webpackParams);
         } else {
-            BUILD_ISOMORPHIC_LIB_WEBPACK.call(this, webpackParams)
+            this.BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams);
         }
         return;
     }
@@ -541,31 +545,37 @@ export class ProjectIsomorphicLib extends Project {
         }
     }
 
-}
+    BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
 
-export function BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
-    const env = getWebpackEnv(params);
-    //  --display-error-details to see more errors
-    this.run(`tnp npm-run tsc --outDir ${env.outDir}`).sync();
-    this.run(`tnp npm-run tnp create:temp:src`, { output: true }).sync();
-    const browserOutDir = path.join('..', env.outDir, 'browser')
-    const tempSrc = path.join(this.location, config.folder.tempSrc);
+        const env = getWebpackEnv(params);
+        //  --display-error-details to see more errors
+        this.run(`tnp npm-run tsc --outDir ${env.outDir}`).sync();
+        this.run(`tnp npm-run tnp create:temp:src`, { output: true }).sync();
+        const browserOutDir = path.join('..', env.outDir, 'browser')
+        const tempSrc = path.join(this.location, config.folder.tempSrc);
 
-    const browserTemp = path.join(this.location, 'tsconfig.browser.json')
-    const browserTsc = path.join(tempSrc, 'tsconfig.json')
-    copyFile(browserTemp, browserTsc);
-    const folders = fs.readdirSync(tempSrc)
+        const browserTemp = path.join(this.location, 'tsconfig.browser.json')
+        const browserTsc = path.join(tempSrc, 'tsconfig.json')
+        copyFile(browserTemp, browserTsc);
+        const folders = fs.readdirSync(tempSrc)
+        const isParentWorkspace = (this.parent && this.parent.type === 'workspace')
 
-    folders.forEach(f => {
-        const file = path.join(tempSrc, f);
-        // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
-        if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
-            this.run(`tnp rimraf ${file}`).sync()
+        if (isParentWorkspace) {
+            folders.forEach(f => {
+                const file = path.join(tempSrc, f);
+                // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
+                if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
+                    this.run(`tnp rimraf ${file}`).sync()
+                }
+            })
         }
-    })
-    this.run(`tnp npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
-    this.run(`tnp cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
+
+        this.run(`tnp npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
+        this.run(`tnp cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
+    }
+
 }
+
 //#endregion
 
 

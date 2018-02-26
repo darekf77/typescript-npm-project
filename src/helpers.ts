@@ -134,6 +134,27 @@ export function getWebpackEnv(params: string): BuildOptions {
     return env as any;
 }
 
+export class ClassHelper {
+    static getMethodName(obj, method) {
+        var methodName = null;
+        Object.getOwnPropertyNames(obj).forEach(prop => {
+            if (obj[prop] === method) {
+                methodName = prop;
+            }
+        });
+
+        if (methodName !== null) {
+            return methodName;
+        }
+
+        var proto = Object.getPrototypeOf(obj);
+        if (proto) {
+            return ClassHelper.getMethodName(proto, method);
+        }
+        return null;
+    }
+}
+
 
 export function ReorganizeArray<T>(arr: T[]) {
     return {

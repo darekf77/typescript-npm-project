@@ -120,7 +120,7 @@ export class SESSION {
     }
 
     public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
-        //#region backendFunc
+        //#region @backendFunc
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.user = :id`)
@@ -137,7 +137,7 @@ export class SESSION {
         //#endregion
     }
     public static async getByToken(token: string, repo: Repository<SESSION>) {
-        //#region backendFunc
+        //#region @backendFunc
         const Session = await repo.createQueryBuilder(__(SESSION))
             .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
             .where(`${__(SESSION)}.token = :token`)
@@ -151,7 +151,7 @@ export class SESSION {
     }
 
     public static async create(user: USER, ip: string, repo: Repository<SESSION>) {
-        //#region backendFunc
+        //#region @backendFunc
         let Session = new SESSION();
         Session.user = user;
         Session.ip = ip;

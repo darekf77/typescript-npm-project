@@ -1,8 +1,7 @@
 import { run } from "../process";
-import { Project } from '../project';
+import { Project, ProjectIsomorphicLib } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir } from "../models";
-import { BUILD_ISOMORPHIC_LIB_WEBPACK } from "../project";
 
 
 export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
@@ -23,7 +22,7 @@ export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
 export default {
     BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
-        BUILD_ISOMORPHIC_LIB_WEBPACK(args)
+        (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
     },
 
     $BUILD_DIST: () => build(),

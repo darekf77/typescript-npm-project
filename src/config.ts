@@ -12,6 +12,7 @@ import { Project } from "./project";
 
 export const config = {
     folder: {
+        tnp: 'tnp',
         bundle: 'bundle',
         dist: 'dist',
         src: 'src',

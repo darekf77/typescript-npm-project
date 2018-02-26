@@ -11,7 +11,7 @@ import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
 
-//#region backend
+//#region @backend
 import { Router, Request, Response } from 'express';
 import { authenticate } from "passport";
 //#endregion
@@ -52,7 +52,7 @@ export class USER implements IUSER {
     emails: EMAIL[] = [];
 
     public static async byUsername(username: string, repo: Repository<USER>) {
-        //#region backendFunc
+        //#region @backendFunc
         const User = await repo
             .createQueryBuilder(__(USER))
             .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')
@@ -64,7 +64,7 @@ export class USER implements IUSER {
     }
 
     public static async byId(id: number, repo: Repository<USER>) {
-        //#region backendFunc
+        //#region @backendFunc
         const User = await repo
             .createQueryBuilder(__(USER))
             .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')

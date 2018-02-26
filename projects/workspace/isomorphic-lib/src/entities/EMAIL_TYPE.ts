@@ -44,7 +44,7 @@ export class EMAIL_TYPE {
     emails: EMAIL[] = [];
 
     public static async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
-        //#region backendFunc
+        //#region @backendFunc
         const etype = await repo.findOne({
             where: {
                 name
@@ -55,7 +55,7 @@ export class EMAIL_TYPE {
     }
 
     public static async init(repo: Repository<EMAIL_TYPE>) {
-        //#region backendFunc
+        //#region @backendFunc
         const types = [
             await repo.save(EMAIL_TYPE.create('facebook')),
             await repo.save(EMAIL_TYPE.create('normal_auth')),
