@@ -12,7 +12,8 @@ import { error, info, warn } from "./messages";
 import config from "./config";
 import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
-import { copyFile, deleteFiles, copyFiles, isSymbolicLink, getWebpackEnv, ReorganizeArray } from "./helpers";
+import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray } from "./helpers";
+import { HelpersLinks } from "./helpers-links";
 import { IsomorphicRegions } from "./isomorphic";
 import { ProjectRouter } from './router';
 
@@ -133,7 +134,7 @@ export abstract class Project {
                 return self.packageJson.checkNodeModulesInstalled();
             },
             isSymbolicLink(): boolean {
-                return isSymbolicLink(self.node_modules.pathFolder);
+                return HelpersLinks.isLink(self.node_modules.pathFolder);
             },
             get pathFolder() {
                 return path.join(self.location, 'node_modules');

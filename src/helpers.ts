@@ -3,12 +3,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as rimraf from "rimraf";
 import * as glob from "glob";
+import * as os from "os";
 
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project';
+import { HelpersLinks } from "./helpers-links";
 
 export function fixWebpackEnv(env: Object) {
     _.forIn(env, (v, k) => {
@@ -31,23 +33,7 @@ export function copyFile(sousrce: string, destination: string) {
     fs.writeFileSync(destination, fs.readFileSync(sousrce), 'utf8')
 }
 
-function removeSlashAtEnd(s: string) {
-    s = s.endsWith(`/`) ? s.slice(0, s.length - 1) : s;
-    return s;
-}
 
-export function isSymbolicLink(filePath: string) {
-    if (!fs.existsSync(filePath)) return false;
-    try {
-        filePath = removeSlashAtEnd(filePath);
-        const command = `[[ -L "${filePath}" && -d "${filePath}" ]] && echo "symlink"`;
-        // console.log(command)
-        const res = run(command, { output: false }).sync().toString()
-        return res.trim() === "symlink"
-    } catch (error) {
-        return false;
-    }
-}
 
 export function clearFiles(files: string[] | string, preserveSymlinks = false) {
     if (!files) return;
@@ -55,8 +41,8 @@ export function clearFiles(files: string[] | string, preserveSymlinks = false) {
     if (preserveSymlinks) {
         filesPathesToDelete.forEach(file => {
             const fpath = path.join(process.cwd(), file);
-            if (isSymbolicLink(fpath)) {
-                run(`rm ${removeSlashAtEnd(file)}`).sync()
+            if (HelpersLinks.isLink(fpath)) {
+                run(`rm ${HelpersLinks.removeSlashAtEnd(file)}`).sync()
             } else {
                 run(`tnp rimraf ${file}`).sync()
             }
