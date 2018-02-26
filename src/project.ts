@@ -265,7 +265,9 @@ export abstract class Project {
         ]
         let subdirectories: string[] = Filehound.create()
             .path(this.location)
-            .depth(1)
+            .depth(0)
+            // .depth(1)  // change this in futre
+            // .discard( new RegExp(notAllowed.join('|')) )
             .directory()
             .findSync()
         subdirectories = subdirectories
