@@ -74,6 +74,8 @@ export abstract class Project {
         }
     }
 
+    protected abstract get removeBeforeBuild(): string[];
+
     get routes() {
         return this.packageJson.routes;
     }
@@ -188,6 +190,13 @@ export abstract class Project {
         } else {
             this.node_modules.install();
         }
+
+        if (_.isArray(this.removeBeforeBuild)) {
+            this.removeBeforeBuild.forEach(f => {
+                this.run(`tnp rimraf ${f}`).sync()
+            })
+        }
+
         this.buildSteps(buildOptions);
     }
     //#endregion
@@ -358,6 +367,7 @@ export abstract class Project {
 //#region Workspace
 export class ProjectWorkspace extends Project {
 
+    protected removeBeforeBuild: string[] = [];
     protected defaultPort: number = 5000;
 
     runOn(port: number, async = false) {
@@ -454,6 +464,7 @@ export class ProjectWorkspace extends Project {
 //#region Server Lib
 export class ProjectServerLib extends Project {
 
+    protected removeBeforeBuild: string[];
     protected defaultPort: number = 4050;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -482,6 +493,7 @@ export class ProjectServerLib extends Project {
 //#region Isomorphic lib
 export class ProjectIsomorphicLib extends Project {
 
+    protected removeBeforeBuild: string[] = ['src/client.ts', 'src/browser.ts'];
     protected defaultPort: number = 4000;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -582,6 +594,7 @@ export class ProjectIsomorphicLib extends Project {
 //#region Docker
 export class ProjectDocker extends Project {
 
+    protected removeBeforeBuild: string[];
     protected defaultPort: number;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -607,6 +620,7 @@ export class ProjectAngularLib extends Project {
 
 
 
+    protected removeBeforeBuild: string[];
     protected defaultPort: number = 4100;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -649,6 +663,7 @@ export class ProjectAngularLib extends Project {
 //#region Angular Client
 export class ProjectAngularClient extends Project {
 
+    protected removeBeforeBuild: string[];
     protected defaultPort: number = 4300;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -693,6 +708,7 @@ export class ProjectAngularClient extends Project {
 //#region AngularCliClient
 export class ProjectAngularCliClient extends Project {
 
+    protected removeBeforeBuild: string[];
     protected defaultPort: number = 4200;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
@@ -707,7 +723,6 @@ export class ProjectAngularCliClient extends Project {
     }
 
     public static DEFAULT_FILES = [
-        '.angular-cli.json',
         "tsconfig.json",
         'src/tsconfig.app.json',
         'src/tsconfig.spec.json',
