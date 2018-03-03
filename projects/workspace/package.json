@@ -6,27 +6,7 @@
     "type": "workspace",
     "resources": [
       "README.md"
-    ],
-    "router": {
-      "url": {
-        "prefix": "test",
-        "base": "/"
-      },
-      "routes": [
-        {
-          "url": "/components",
-          "project": "angular-lib"
-        },
-        {
-          "url": "/api",
-          "project": "isomorphic-lib"
-        },
-        {
-          "url": "/",
-          "project": "angular-client"
-        }
-      ]
-    }
+    ]
   },
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.3.1",
@@ -56,6 +36,7 @@
     "@types/q": "^1.0.3",
     "@types/validator": "^6.2.2",
     "angular-lib": "file:angular-lib",
+    "babel-preset-env": "^1.6.1",
     "bcrypt": "^1.0.3",
     "core-js": "2.5.3",
     "cors": "^2.8.4",
@@ -89,6 +70,7 @@
     "@types/jasminewd2": "~2.0.2",
     "@types/mocha": "^2.2.47",
     "autoprefixer": "^6.5.3",
+    "babel-cli": "^6.26.0",
     "chai": "^4.1.2",
     "circular-dependency-plugin": "^4.2.1",
     "codelyzer": "^4.0.2",
