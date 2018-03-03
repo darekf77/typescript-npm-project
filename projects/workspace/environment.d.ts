@@ -38,6 +38,12 @@ interface Config {
    */
   routes: { url: string; project: string; localEnvPort: string; }[]
   db: ConnectionOptions;
+  /**
+   * Get host for package
+   *
+   * @memberof Config
+   */
+  host: (packageName: string) => string;
 }
 
 

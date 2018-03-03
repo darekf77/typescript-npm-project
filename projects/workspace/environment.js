@@ -25,11 +25,23 @@ export default {
     dropSchema: true,
     logging: true
   },
+  host: (packageName) => {
+    const c = config.routes.find(({ url }) => url === packageName);
+    if (!c) {
+      throw new Error(`Bad routing config for: ${package}`)
+    }
+    if (config.useRouter()) {
+      if(c.url) {
+        return url;
+      }
+    }
+    return `http://localhost:${c.localEnvPort}`
+  },
   routes: [
     {
       url: '/components',
       project: './angular-lib',
-      localEnvPoart: 4201
+      localEnvPort: 4201
     },
     {
       url: '/api',
