@@ -5,6 +5,7 @@ import * as rimraf from "rimraf";
 import * as glob from "glob";
 import * as os from "os";
 
+import config from 'config';
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';

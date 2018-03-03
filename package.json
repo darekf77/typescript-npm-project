@@ -6,6 +6,9 @@
   "bin": {
     "tnp": "bin/tnp"
   },
+  "tnp": {
+    "type": "server-lib"
+  },
   "dependencies": {
     "@types/chokidar": "^1.7.4",
     "@types/dateformat": "^1.0.1",
