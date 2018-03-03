@@ -6,4 +6,4 @@ config.productionBuild = true;
 config.name = name(__filename)
 
 
-export default config;
+export default Object.freeze(config);

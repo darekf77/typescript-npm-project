@@ -8,4 +8,4 @@ config.db.logging = false
 config.db.dropSchema = false
 
 
-export default config;
+export default Object.freeze(config);
