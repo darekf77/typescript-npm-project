@@ -1,6 +1,6 @@
 import { ConnectionOptions } from "typeorm";
 
-interface Config {
+export interface Config {
 
   /**
    * Check wheter code is minified, mangled, gzipped
@@ -22,7 +22,7 @@ interface Config {
    * @type {Boolean}
    * @memberof Config
    */
-  name: Boolean;
+  name: 'local' | 'dev' | 'stage' | 'prod';
   /**
    * Use routes from package.json and random assigned ports
    *
