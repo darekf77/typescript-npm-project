@@ -11,8 +11,8 @@ import { error } from "./messages";
 import { Project } from "./project";
 
 export const config = {
+    tnp: 'tnp',
     folder: {
-        tnp: 'tnp',
         bundle: 'bundle',
         dist: 'dist',
         src: 'src',

@@ -5,6 +5,7 @@ import * as fse from "fs-extra";
 import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
+import { ChildProcess } from "child_process";
 
 import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions, RuleDependency } from "./models";
