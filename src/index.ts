@@ -17,7 +17,8 @@ const localLibs = [
     'watch',
     'http-server',
     'ts-node',
-    'sort-package-json'
+    'sort-package-json',
+    'concurrently'
 ]
 
 export function run(argsv: string[]) {
@@ -64,7 +65,7 @@ function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: st
         const nameInKC = paramsFrom(name);
         const isWithoutDash = name.startsWith('$');
         const argInKC = paramsFrom(vv);
-        
+
         const condition =
             (isWithoutDash && argInKC === `${nameInKC}`)
             || argInKC === `${nameInKC}`
