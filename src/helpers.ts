@@ -136,7 +136,7 @@ export function getWebpackEnv(params: string): BuildOptions {
 }
 
 export class ClassHelper {
-    static getMethodName(obj, method) {
+    static getMethodName(obj, method): string {
         var methodName = null;
         Object.getOwnPropertyNames(obj).forEach(prop => {
             if (obj[prop] === method) {

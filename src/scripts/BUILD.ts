@@ -2,6 +2,7 @@ import { run } from "../process";
 import { Project, ProjectIsomorphicLib } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir } from "../models";
+import { info } from "../messages";
 
 
 export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
@@ -22,7 +23,13 @@ export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
 export default {
     BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
-        (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
+        try {
+            (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
+            info('Isomorphic build ok')
+        } catch (error) {
+            error('Isomorphic build ERROR')
+        }
+        process.exit(0)
     },
 
     $BUILD_DIST: () => build(),

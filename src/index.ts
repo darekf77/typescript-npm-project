@@ -16,7 +16,8 @@ const localLibs = [
     'tsc',
     'watch',
     'http-server',
-    'ts-node'
+    'ts-node',
+    'sort-package-json'
 ]
 
 export function run(argsv: string[]) {

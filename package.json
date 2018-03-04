@@ -6,9 +6,6 @@
   "bin": {
     "tnp": "bin/tnp"
   },
-  "tnp": {
-    "type": "server-lib"
-  },
   "dependencies": {
     "@types/chokidar": "^1.7.4",
     "@types/dateformat": "^1.0.1",
@@ -31,16 +28,21 @@
     "http-server": "0.11.1",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
+    "morphi": "^0.0.8",
     "node-watch": "^0.5.5",
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "portfinder": "^1.0.13",
     "release-it": "^5.1.2",
     "rimraf": "^2.6.2",
+    "sort-package-json": "^1.11.0",
     "ts-node": "3.3.0",
     "tslint": "^5.9.1",
     "typescript": "2.6.2",
     "watch": "~1.0.2"
   },
-  "preferGlobal": true
+  "preferGlobal": true,
+  "tnp": {
+    "type": "server-lib"
+  }
 }

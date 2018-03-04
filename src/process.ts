@@ -54,8 +54,13 @@ export const watcher = {
         return run(toRun, { cwd }).async()
     },
 
-    call(fn: Function, params: string, folderPath: string = 'src', cwd: string = process.cwd()) {
-        let cmd = `tnp ${paramsFrom(fn.name)} ${params}`;
+    call(fn: Function | string, params: string, folderPath: string = 'src', cwd: string = process.cwd()) {
+        if (!fn) {
+            error(`Bad function: ${fn} for watcher on folder: ${folderPath}, with params: ${params}`)
+        }
+        const fnName = typeof fn === 'function' ? fn.name : fn;
+        // console.log('Function name ', fnName)
+        let cmd = `tnp ${paramsFrom(fnName)} ${params}`;
         cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
         const toRun = `watch ${cmd} ${folderPath}`;
         return run(toRun, { cwd }).async()

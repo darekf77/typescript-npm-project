@@ -5,6 +5,7 @@ import * as fse from "fs-extra";
 import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
+import { buildIsomorphicVersion } from "morphi";
 import { ChildProcess } from "child_process";
 
 import { PackageJSON } from "./package-json";
@@ -15,7 +16,6 @@ import { run as __run, watcher as __watcher } from "./process";
 import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray, ClassHelper } from "./helpers";
 import { HelpersLinks } from "./helpers-links";
-import { IsomorphicRegions } from "./isomorphic";
 import { ProjectRouter } from './router';
 
 //#region Project BASE
@@ -68,7 +68,7 @@ export abstract class Project {
                 const cwd: string = self.location;
                 return __watcher.run(command, folderPath, cwd);
             },
-            call(fn: Function, params: string, folderPath: string = 'src') {
+            call(fn: Function | string, params: string, folderPath: string = 'src') {
                 const cwd: string = self.location;
                 return __watcher.call(fn, params, folderPath, cwd);
             }
@@ -533,58 +533,16 @@ export class ProjectIsomorphicLib extends Project {
         return;
     }
 
-    async createTemporaryBrowserSrc() {
-
-        const src = path.join(this.location, config.folder.src);
-        const tempSrc = path.join(this.location, config.folder.tempSrc);
-        try {
-            if (!fs.existsSync(tempSrc)) {
-                fs.mkdirSync(tempSrc);
-            }
-            // else {
-            //     await deleteFiles('./**/*.ts', {
-            //         cwd: tempSrc,
-            //         filesToOmmit: [path.join(tempSrc, 'index.ts')]
-            //     })
-            // }
-            const files = await copyFiles('./**/*.ts', tempSrc, {
-                cwd: src
-            })
-            files.forEach(f => {
-                IsomorphicRegions.deleteFrom(path.join(tempSrc, f));
-            })
-        } catch (err) {
-            error(err);
-        }
-    }
-
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
 
         const env = getWebpackEnv(params);
-        //  --display-error-details to see more errors
-        this.run(`tnp npm-run tsc --outDir ${env.outDir}`).sync();
-        this.run(`tnp npm-run tnp create:temp:src`, { output: true }).sync();
-        const browserOutDir = path.join('..', env.outDir, 'browser')
-        const tempSrc = path.join(this.location, config.folder.tempSrc);
-
-        const browserTemp = path.join(this.location, 'tsconfig.browser.json')
-        const browserTsc = path.join(tempSrc, 'tsconfig.json')
-        copyFile(browserTemp, browserTsc);
-        const folders = fs.readdirSync(tempSrc)
-        const isParentWorkspace = (this.parent && this.parent.type === 'workspace')
-
-        if (isParentWorkspace) {
-            folders.forEach(f => {
-                const file = path.join(tempSrc, f);
-                // console.log('is dir -' + file + ' - :' + fs.lstatSync(file).isDirectory())
-                if (f !== 'tsconfig.json' && f !== 'index.ts' && !fs.lstatSync(file).isDirectory()) {
-                    this.run(`tnp rimraf ${file}`).sync()
-                }
-            })
-        }
-
-        this.run(`tnp npm-run tsc --outDir ${browserOutDir}`, { cwd: tempSrc }).sync();
-        this.run(`tnp cpr ${path.join(this.location, env.outDir, 'browser')} browser -o`).sync();
+        
+        buildIsomorphicVersion({
+            foldersPathes: {
+                dist: env.outDir
+            },
+            onlyMainIndex: (this.parent && this.parent.type === 'workspace')
+        });
     }
 
 }

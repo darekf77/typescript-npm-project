@@ -11,7 +11,6 @@ import {
 })
 export class AppTestComponent implements OnInit {
 
-
   constructor(
     private hello: HelloController,
     test: TestController,

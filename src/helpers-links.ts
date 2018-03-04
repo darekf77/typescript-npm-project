@@ -11,6 +11,7 @@ import { run } from "./process";
 import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project';
+import { Helpers } from "morphi";
 
 export namespace HelpersLinks {
 
@@ -42,23 +43,7 @@ export namespace HelpersLinks {
     }
 
     export function createLink(target, link) {
-        let command: string;
-        if (os.platform() === 'win32') {
-            if (target === '.' || target === './') {
-                target = path.win32.normalize(path.join(process.cwd(), path.basename(link)))
-            } else {
-                target = path.win32.normalize(path.join(target, path.basename(link)))
-            }
-            command = "mklink \/D "
-                + path.win32.normalize(target)
-                + " "
-                + path.win32.normalize(link)
-                + " >nul 2>&1 "
-            // console.log('LINK COMMAND', command)
-        } else {
-            command = `ln -sf "${link}" "${target}"`;
-        }
-        return run(command).sync()
+        return run(Helpers.createLink(target, link)).sync()
     }
 
 }
