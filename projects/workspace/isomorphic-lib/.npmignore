@@ -5,6 +5,10 @@ src/
 /docs
 /preview
 /tests
+/tmp*
+/browser
+/bundle*
+/dist*
 
 tsconfig.json
 npm-debug.log*

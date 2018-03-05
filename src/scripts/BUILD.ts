@@ -23,12 +23,7 @@ export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
 export default {
     BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
-        try {
-            (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
-            info('Isomorphic build ok')
-        } catch (error) {
-            error('Isomorphic build ERROR')
-        }
+        (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
         process.exit(0)
     },
 

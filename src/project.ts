@@ -5,7 +5,7 @@ import * as fse from "fs-extra";
 import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
-import { buildIsomorphicVersion } from "morphi";
+import { buildIsomorphic } from "morphi";
 import { ChildProcess } from "child_process";
 
 import { PackageJSON } from "./package-json";
@@ -166,7 +166,23 @@ export abstract class Project {
             if (!fs.existsSync(file)) {
                 error(`Resource file ${file} does not exist in ${this.location}`)
             }
-            fs.writeFileSync(dest, fs.readFileSync(file));
+            if (fs.lstatSync(file).isDirectory()) {
+                // console.log('IS DIRECTORY', file)
+                // console.log('IS DIRECTORY DEST', dest)
+                // this.run(`tnp cpr ${file}/ ${dest}/`).sync()
+                const options: fse.CopyOptions = {
+                    overwrite: true,
+                    recursive: true,
+                    errorOnExist: true,
+                    filter: (src) => {
+                        return !/.*node_modules.*/g.test(src);
+                    }
+                };
+                fse.copySync(file, dest, options);
+            } else {
+                // console.log('IS FILE', file)
+                fse.copyFileSync(file, dest);
+            }
         })
         info(`Resouces copied to release folde: ${config.folder.bundle}`)
     }
@@ -536,12 +552,17 @@ export class ProjectIsomorphicLib extends Project {
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
 
         const env = getWebpackEnv(params);
-        
-        buildIsomorphicVersion({
+
+        buildIsomorphic({
             foldersPathes: {
                 dist: env.outDir
             },
-            onlyMainIndex: (this.parent && this.parent.type === 'workspace')
+            toolsPathes: {
+                tsc: 'tnp tsc',
+                cpr: 'tnp cpr',
+                rimraf: 'tnp rimraf',
+                mkdirp: 'tnp mkdir'
+            }
         });
     }
 
