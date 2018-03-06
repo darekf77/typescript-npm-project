@@ -1,24 +1,19 @@
 
+const path = require('path');
+const { environmentName } = require('tnp')
 
-import path from path;
 
 const LOCAL_ENVIRONMENT_NAME = 'local'
 
-export function name(filename = __filename) {
-  let name = path.basename(filename)
-  name = name.replace(/\.js$/, '')
-  name = name.replace('environment', '')
-  name = name.replace(/\./g, '');
-  return name === '' ? LOCAL_ENVIRONMENT_NAME : name
-}
 
 
-export default {
+
+module.exports = exports = {
 
   productionBuild: false,
   aot: false,
   useRouter: () => config.name !== LOCAL_ENVIRONMENT_NAME,
-  name: name(),
+  name: environmentName(__filename, LOCAL_ENVIRONMENT_NAME),
   db: {
     database: 'tmp/db.sqlite3',
     type: 'sqlite',
@@ -32,7 +27,7 @@ export default {
       throw new Error(`Bad routing config for: ${package}`)
     }
     if (config.useRouter()) {
-      if(c.url) {
+      if (c.url) {
         return url;
       }
     }
@@ -57,3 +52,6 @@ export default {
   ]
 
 }
+
+
+

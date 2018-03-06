@@ -193,3 +193,11 @@ export function checkValidNpmPackageName(pkg) {
     if (!_.isString(pkg) || pkg.length > 214) return false;
     return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$').test(pkg);
 }
+
+export function environmentName(filename: string, LOCAL_ENVIRONMENT_NAME: string) {
+    let name = path.basename(filename)
+    name = name.replace(/\.js$/, '')
+    name = name.replace('environment', '')
+    name = name.replace(/\./g, '');
+    return name === '' ? LOCAL_ENVIRONMENT_NAME : name
+}

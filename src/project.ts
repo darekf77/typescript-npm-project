@@ -82,6 +82,21 @@ export abstract class Project {
         return this.packageJson.routes;
     }
 
+    get ownNpmPackage() {
+        const self = this;
+        return {
+            linkTo(project: Project) {
+                const targetLocation = path.join(project.location, 'node_modules', self.name)
+                // project.run(`tnp rimraf ${targetLocation}`).sync();
+                Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
+            },
+            unlinkFrom(project: Project) {
+                const targetLocation = path.join(project.location, 'node_modules', self.name)
+                // project.run(`tnp rimraf ${targetLocation}`).sync();
+            }
+        };
+    }
+
 
     //#region node_modules
     get node_modules() {
@@ -106,7 +121,7 @@ export abstract class Project {
                 self.packageJson.installPackage(packagePath, '--save');
             },
             get childrensLibsAsNpmPackages(): Project[] {
-                const childrens = [Project.Tnp]
+                const childrens = []
                 if (!_.isArray(self.children) || self.children.length === 0) return childrens;
                 const projectsForNodeModules: LibType[] = [
                     'server-lib',

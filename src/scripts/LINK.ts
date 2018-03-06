@@ -28,10 +28,12 @@ export function link(workspaceProject: Project) {
         onlyLibsChildrens(workspaceProject).forEach(c => {
             // console.log('link nodemoulse to ')
             workspaceProject.node_modules.linkToProject(c, true)
+            Project.Tnp.ownNpmPackage.linkTo(c);
         })
     }
     workspaceProject.node_modules.localChildrens.removeSymlinks();
     workspaceProject.node_modules.localChildrens.addSymlinks();
+    Project.Tnp.ownNpmPackage.linkTo(workspaceProject);
 }
 
 export default {

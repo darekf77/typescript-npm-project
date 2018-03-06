@@ -3,6 +3,7 @@ import glob = require('glob')
 import * as path from 'path';
 import { run as runCommand } from "./process";
 export { config } from './config';
+export * from './helpers'
 
 const localLibs = [
     'cpr',
