@@ -19,7 +19,8 @@ const localLibs = [
     'http-server',
     'ts-node',
     'sort-package-json',
-    'concurrently'
+    'concurrently',
+    'sloc'
 ]
 
 export function run(argsv: string[]) {
