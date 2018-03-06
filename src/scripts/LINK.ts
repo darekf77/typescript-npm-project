@@ -5,6 +5,18 @@ import { error } from "../messages";
 import * as _ from "lodash";
 import { LibType } from "../models";
 
+export function onlyLibsChildrens(workspaceProject: Project) {
+    // console.log(workspaceProject.children.map )
+    const chidrenTypeToNotLinkNodeModules: LibType[] = [
+        'workspace',
+        'docker'
+    ]
+    const children = workspaceProject.children
+        .filter(c => !chidrenTypeToNotLinkNodeModules.includes(c.type))
+    // console.log(children.map(c => c.location))
+    return children;
+}
+
 export function link(workspaceProject: Project) {
     if (workspaceProject.type !== 'workspace') {
         error(`This project is not workspace type project`)
@@ -13,13 +25,10 @@ export function link(workspaceProject: Project) {
         workspaceProject.node_modules.install();
     }
     if (_.isArray(workspaceProject.children)) {
-        const chidrenTypeToNotLinkNodeModules: LibType[] = [
-            'workspace',
-            'docker'
-        ]
-        workspaceProject.children
-            .filter(c => !chidrenTypeToNotLinkNodeModules.includes(c.type))
-            .forEach(c => workspaceProject.node_modules.linkToProject(c, true))
+        onlyLibsChildrens(workspaceProject).forEach(c => {
+            // console.log('link nodemoulse to ')
+            workspaceProject.node_modules.linkToProject(c, true)
+        })
     }
     workspaceProject.node_modules.localChildrens.removeSymlinks();
     workspaceProject.node_modules.localChildrens.addSymlinks();

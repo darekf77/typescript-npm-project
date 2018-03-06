@@ -2,6 +2,7 @@
 import * as Filehound from 'filehound';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
+import * as os from 'os';
 import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -148,6 +149,10 @@ export abstract class Project {
             },
             get pathFolder() {
                 return path.join(self.location, 'node_modules');
+            },
+            remove() {
+                // console.log('remove nm', self.location)
+                self.run('tnp rimraf node_modules').sync()
             }
         };
     }
@@ -296,21 +301,36 @@ export abstract class Project {
             'components', '.git', 'bin',
             '.'
         ]
-        let subdirectories: string[] = Filehound.create()
-            .path(this.location)
-            .depth(0)
-            // .depth(1)  // change this in futre
-            // .discard( new RegExp(notAllowed.join('|')) )
-            .directory()
-            .findSync()
+        let subdirectories: string[] = []
+
+        if (os.platform() === 'win32') {
+            subdirectories = Filehound.create()
+                .path(this.location)
+                .depth(1)
+                // .depth(1)  // change this in futre
+                // .discard( new RegExp(notAllowed.join('|')) )
+                .directory()
+                .findSync()
+        } else {
+            subdirectories = Filehound.create()
+                .path(this.location)
+                .depth(0)
+                // .depth(1)  // change this in futre
+                // .discard( new RegExp(notAllowed.join('|')) )
+                .directory()
+                .findSync()
+        }
+
+        // console.log(subdirectories)
         subdirectories = subdirectories
             .filter(f => !notAllowed.find(a => path.basename(f) == a));
 
         return subdirectories
             .map(dir => {
-                // console.log('dir:', dir)
+                // console.log('child:', dir)
                 return Project.from(dir);
             })
+            .filter(c => !!c)
     }
 
     cloneTo(destinationPath: string): Project {
@@ -343,6 +363,7 @@ export abstract class Project {
         if (type === 'docker') return new ProjectDocker(location);
         if (type === 'server-lib') return new ProjectServerLib(location);
         if (type === 'angular-cli') return new ProjectAngularCliClient(location);
+        if (type === 'ionic-client') return new ProjectIonicClient(location);
     }
 
     private static typeFrom(location: string): LibType {
