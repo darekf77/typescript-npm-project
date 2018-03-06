@@ -101,38 +101,45 @@ export abstract class Project {
             install() {
                 self.packageJson.installNodeModules()
             },
-            installPackageFromLocalPath(packagePath) {
+            installPackageFromNPM(packagePath) {
                 self.packageJson.installPackage(packagePath, '--save');
             },
-            removeSymlinks(): string[] {
-                const symlinks = self.packageJson.getSymlinksLocalDependenciesNames();
-                // console.log(symlinks)
-                symlinks.forEach(pkgName => {
-                    const symPkgPath = path.join(self.location, 'node_modules', pkgName);
-                    if (fs.existsSync(symPkgPath)) {
-                        self.run(`rm ${symPkgPath}`).sync();
+            get childrensLibsAsNpmPackages(): Project[] {
+                const childrens = [Project.Tnp]
+                if (!_.isArray(self.children) || self.children.length === 0) return childrens;
+                const projectsForNodeModules: LibType[] = [
+                    'server-lib',
+                    'isomorphic-lib',
+                    'angular-lib'
+                ]
+                self.children.forEach(c => {
+                    if (path.basename(c.location) != c.name) {
+                        error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
                     }
                 })
-                return symlinks;
+                return self.children.filter(c => projectsForNodeModules.includes(c.type)).concat(childrens)
             },
-            addLocalSymlinksFromFileDependecies() {
-                const symlinks = self.packageJson.getSymlinksLocalDependenciesPathes()
-                symlinks.forEach(p => {
-                    const absolutePkgPath = path.join(self.location, p);
-                    const destination = path.join(self.location, 'node_modules');
-                    self.run(`tnp ln ${absolutePkgPath} ${destination}`, { cwd: self.location }).sync();
-                })
+            get localChildrens() {
+                return {
+                    removeSymlinks() {
+                        const symlinks = self.node_modules.childrensLibsAsNpmPackages;
+                        symlinks.forEach(c => {
+                            const symPkgPath = path.join(self.location, 'node_modules', c.name);
+                            if (fs.existsSync(symPkgPath)) {
+                                self.run(`rm ${symPkgPath}`).sync();
+                            }
+                        })
+                    },
+                    addSymlinks() {
+                        const symlinks = self.node_modules.childrensLibsAsNpmPackages;
+                        symlinks.forEach(c => {
+                            const destination = path.join(self.location, 'node_modules');
+                            const command = `tnp ln ${c.location} ${destination}`;
+                            self.run(command).sync();
+                        })
+                    },
+                }
             },
-            // addLocalSymlinksfromChildrens() {
-            //     const children = self.children;
-            //     children.forEach(child => {
-            //         const childPackageFolder = path.join(child.location, 'node_modules', child.name);
-            //         const node_modules = path.join(self.location, 'node_modules');
-            //         if (!fs.existsSync(path.join(node_modules, child.name))) {
-            //             run(`tnp ln ${childPackageFolder} ${node_modules}`).sync();
-            //         }
-            //     })
-            // },
             exist(): boolean {
                 return self.packageJson.checkNodeModulesInstalled();
             },
@@ -726,3 +733,42 @@ export class ProjectAngularCliClient extends Project {
 }
 //#endregion
 
+
+//#region Ionic Client
+export class ProjectIonicClient extends Project {
+
+
+
+    protected removeBeforeBuild: string[];
+    protected defaultPort: number = 8100;
+    runOn(port: number, async = false) {
+        if (!port) port = this.defaultPort;
+        this.currentPort = port;
+        const command = `tnp npm-run ionic serve --no-open -p ${port} -s`;
+        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
+        if (async) {
+            this.run(command, options).async()
+        } else {
+            this.run(command, options).sync()
+        }
+    }
+
+    projectSpecyficFiles(): string[] {
+        return [
+            'index.js',
+            'index.d.ts',
+            'index.js.map',
+            'tsconfig.json'
+        ];
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir } = buildOptions;
+        if (watch) {
+            this.run(`tnp npm-run ionic serve --no-open -p ${this.defaultPort}`).async()
+        } else {
+            this.run(`tnp npm-run ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
+        }
+    }
+}
+//#endregion

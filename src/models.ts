@@ -6,7 +6,7 @@ export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencie
 
 export type Package = { name: string; version: string; };
 
-export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | 'server-lib' | 'workspace' | 'angular-cli' | 'docker';
+export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | "ionic-client" | 'server-lib' | 'workspace' | 'angular-cli' | 'docker';
 
 export type RecreateFile = { where: string; from: string };
 

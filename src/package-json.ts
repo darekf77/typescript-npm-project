@@ -122,19 +122,7 @@ export class PackageJSON {
         return packages;
     }
 
-    private addSymlinksNameFromObject(dependencies = {}, symlinks = []) {
-        if (dependencies) {
-            Object
-                .keys(dependencies)
-                .filter(name => {
 
-                    const res = /file\:.+/g.test(dependencies[name])
-                    // if (res) console.log(name)
-                    return res;
-                })
-                .forEach(p => symlinks.push(p))
-        }
-    }
 
     private addSymlinksPathesFromObject(dependencies = {}, symlinks = []) {
         if (dependencies) {
@@ -151,19 +139,6 @@ export class PackageJSON {
         }
     }
 
-    getSymlinksLocalDependenciesNames(): string[] {
-        const symlinks = [];
-        this.addSymlinksNameFromObject(this.data.dependencies, symlinks);
-        this.addSymlinksNameFromObject(this.data.devDependencies, symlinks);
-        return symlinks;
-    }
-
-    getSymlinksLocalDependenciesPathes(): string[] {
-        const symlinks = [];
-        this.addSymlinksPathesFromObject(this.data.dependencies, symlinks);
-        this.addSymlinksPathesFromObject(this.data.devDependencies, symlinks);
-        return symlinks;
-    }
 
     //#region getters
 

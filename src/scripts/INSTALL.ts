@@ -1,5 +1,7 @@
 import { run } from "../process";
 import { Project } from '../project';
+import { link } from "./LINK";
+import { checkValidNpmPackageName } from "../helpers";
 
 function install(args: string) {
     args = args.trim()
@@ -9,28 +11,27 @@ function install(args: string) {
     const parent = project.parent;
     if (args.length === 0) {
         if (isWorkspaceProject) { // PROJECT IN WORKSPACE, ADD PACKAGE tnp install
-            if (!parent.node_modules.exist()) {
-                parent.node_modules.install()
-            }
-            parent.node_modules.addLocalSymlinksFromFileDependecies();
-            parent.node_modules.linkToProject(project, true);
+            link(parent)
         } else { // Other normal porojects
             project.node_modules.install()
         }
     } if (args.length >= 1) {
-        const packagesToAdd = args.split(' ');
+        const npmPackagesToAdd = args
+            .split(' ')
+            .map(p => p.trim())
+            .filter(p => checkValidNpmPackageName(p))
         if (isWorkspaceProject) { // PROJECT IN WORKSPACE, ADD PACKAGE tnp install <pkg name>
-            parent.node_modules.removeSymlinks();
-            packagesToAdd.forEach(pkg => {
-                parent.node_modules.installPackageFromLocalPath(pkg)
+            parent.node_modules.localChildrens.removeSymlinks();
+            npmPackagesToAdd.forEach(npmPackageName => {
+                parent.node_modules.installPackageFromNPM(npmPackageName)
             })
-            parent.node_modules.addLocalSymlinksFromFileDependecies()
+            parent.node_modules.localChildrens.addSymlinks();
         } else { // WORKSPACE, ADD PACKAGE tnp install <pkg name>
-            project.node_modules.removeSymlinks();            
-            packagesToAdd.forEach(pkg => {
-                project.node_modules.installPackageFromLocalPath(pkg)
+            project.node_modules.localChildrens.removeSymlinks();
+            npmPackagesToAdd.forEach(npmPackageName => {
+                project.node_modules.installPackageFromNPM(npmPackageName)
             })
-            project.node_modules.addLocalSymlinksFromFileDependecies()
+            project.node_modules.localChildrens.addSymlinks();
         }
     }
     process.exit(0);
