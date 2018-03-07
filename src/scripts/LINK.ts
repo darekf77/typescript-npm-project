@@ -27,8 +27,7 @@ export function link(workspaceProject: Project) {
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => {
             // console.log('link nodemoulse to ')
-            workspaceProject.node_modules.linkToProject(c, true)
-            Project.Tnp.ownNpmPackage.linkTo(c);
+            workspaceProject.node_modules.linkToProject(c, true)            
         })
     }
     workspaceProject.node_modules.localChildrens.removeSymlinks();
