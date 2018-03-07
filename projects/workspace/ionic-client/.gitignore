@@ -1,35 +1,30 @@
-# Specifies intentionally untracked files to ignore when using Git
-# http://git-scm.com/docs/gitignore
+# compiled output
+/bundle*
+/dist*
+/tmp*
+/out-tsc
+bundle.umd.js
+/browser
+/.sourcemaps
+/www
 
+# dependencies
 /node_modules
-*~
-*.sw[mnpcod]
-*.log
-*.tmp
-*.tmp.*
-log.txt
-*.sublime-project
-*.sublime-workspace
-npm-debug.log*
 
-.idea/
-.sourcemaps/
-.sass-cache/
-.tmp/
-.versions/
-coverage/
-dist/
-node_modules/
-tmp/
-temp/
-hooks/
-platforms/
-plugins/
-plugins/android.json
-plugins/ios.json
-www/
-$RECYCLE.BIN/
 
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+# System Files
 .DS_Store
 Thumbs.db
-UserInterfaceState.xcuserstate

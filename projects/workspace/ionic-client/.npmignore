@@ -1,5 +1,10 @@
-.sourcemaps/
-/bundle*
-/dist*
-/tmp*
-/www
+.vscode
+dist/
+src/
+/scripts
+/docs
+/preview
+/tests
+
+tsconfig.json
+npm-debug.log*
