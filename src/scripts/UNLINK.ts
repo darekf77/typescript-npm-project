@@ -10,9 +10,6 @@ export function unlink(workspaceProject: Project) {
     if (workspaceProject.type !== 'workspace') {
         error(`This project is not workspace type project`)
     }
-    if (!workspaceProject.node_modules.exist()) {
-        workspaceProject.node_modules.install();
-    }
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => c.node_modules.remove())
     }

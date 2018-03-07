@@ -92,7 +92,7 @@ export abstract class Project {
             },
             unlinkFrom(project: Project) {
                 const targetLocation = path.join(project.location, 'node_modules', self.name)
-                // project.run(`tnp rimraf ${targetLocation}`).sync();
+                project.run(`tnp rimraf ${targetLocation}`).sync();
             }
         };
     }
@@ -166,7 +166,7 @@ export abstract class Project {
                 return path.join(self.location, 'node_modules');
             },
             remove() {
-                // console.log('remove nm', self.location)
+                // console.log('remove node_modules', self.location)
                 self.run('tnp rimraf node_modules').sync()
             }
         };
@@ -309,18 +309,23 @@ export abstract class Project {
 
     public findChildren(): Project[] {
         // console.log('from ' + this.location)
-        const notAllowed: string[] = [
-            '\.vscode', 'node_modules',
+
+        const notAllowed: RegExp[] = [
+            '\.vscode', 'node\_modules',
             ..._.values(config.folder),
-            'e2e', 'tmp*', 'tests',
+            'e2e', 'tmp.*', 'dist.*', 'tests',
             'components', '\.git', 'bin'
-        ]
-        let subdirectories: string[] = Filehound.create()
-            .path(this.location)
-            .depth(1)
-            .discard(notAllowed)
-            .directory()
-            .findSync()
+        ].map(s => new RegExp(s))
+
+        const isDirectory = source => fse.lstatSync(source).isDirectory()
+        const getDirectories = source =>
+            fse.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
+
+        let subdirectories = getDirectories(this.location)
+            .filter(f => {
+                const folderNam = path.basename(f);
+                return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+            })
 
         return subdirectories
             .map(dir => {
