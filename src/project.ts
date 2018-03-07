@@ -1,5 +1,4 @@
 
-import * as Filehound from 'filehound';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as os from 'os';
