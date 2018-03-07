@@ -2,13 +2,9 @@
 const path = require('path');
 const { environmentName } = require('tnp')
 
-
 const LOCAL_ENVIRONMENT_NAME = 'local'
 
-
-
-
-module.exports = exports = {
+const config = {
 
   productionBuild: false,
   aot: false,
@@ -22,9 +18,10 @@ module.exports = exports = {
     logging: true
   },
   host: (packageName) => {
-    const c = config.routes.find(({ url }) => url === packageName);
+    console.log('packageName', packageName)
+    const c = config.routes.find(({ project }) => project === packageName);
     if (!c) {
-      throw new Error(`Bad routing config for: ${package}`)
+      throw new Error(`Bad routing config for: ${packageName}`)
     }
     if (config.useRouter()) {
       if (c.url) {
@@ -36,22 +33,23 @@ module.exports = exports = {
   routes: [
     {
       url: '/components',
-      project: './angular-lib',
+      project: 'angular-lib',
       localEnvPort: 4201
     },
     {
       url: '/api',
-      project: './isomorphic-lib',
+      project: 'isomorphic-lib',
       localEnvPort: 4000
     },
     {
       url: '/',
-      project: './angular-client',
+      project: 'angular-client',
       localEnvPort: 4200
     }
   ]
 
 }
 
+module.exports = exports = config;
 
 

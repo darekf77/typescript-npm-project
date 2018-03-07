@@ -20,12 +20,11 @@ if (!fs.existsSync(envrionmentFilePath)) {
 }
 
 let config = require(envrionmentFilePath);
-
-
+const packageName = path.basename(path.resolve(path.join(__dirname, '..')));
 
 start({
   config: config.db as any,
-  host: config.host(path.join('..', __dirname)),
+  host: config.host(packageName),
   Controllers: Controllers as any,
   Entities: Entities as any,
   MockData

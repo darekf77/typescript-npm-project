@@ -109,7 +109,7 @@ export abstract class Project {
                 const localNodeModules = path.join(self.location, 'node_modules');
                 const projectNodeModules = path.join(project.location, 'node_modules');
                 if (force && fs.existsSync(projectNodeModules)) {
-                    this.run(`tnp rimraf ${projectNodeModules}`);
+                    self.run(`tnp rimraf ${projectNodeModules}`);
                 }
                 const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
                 self.run(linkCommand).sync();
@@ -310,35 +310,17 @@ export abstract class Project {
     public findChildren(): Project[] {
         // console.log('from ' + this.location)
         const notAllowed: string[] = [
-            '.vscode', 'node_modules',
+            '\.vscode', 'node_modules',
             ..._.values(config.folder),
-            'e2e', 'tmp', 'tests',
-            'components', '.git', 'bin',
-            '.'
+            'e2e', 'tmp*', 'tests',
+            'components', '\.git', 'bin'
         ]
-        let subdirectories: string[] = []
-
-        if (os.platform() === 'win32') {
-            subdirectories = Filehound.create()
-                .path(this.location)
-                .depth(1)
-                // .depth(1)  // change this in futre
-                // .discard( new RegExp(notAllowed.join('|')) )
-                .directory()
-                .findSync()
-        } else {
-            subdirectories = Filehound.create()
-                .path(this.location)
-                .depth(0)
-                // .depth(1)  // change this in futre
-                // .discard( new RegExp(notAllowed.join('|')) )
-                .directory()
-                .findSync()
-        }
-
-        // console.log(subdirectories)
-        subdirectories = subdirectories
-            .filter(f => !notAllowed.find(a => path.basename(f) == a));
+        let subdirectories: string[] = Filehound.create()
+            .path(this.location)
+            .depth(1)
+            .discard(notAllowed)
+            .directory()
+            .findSync()
 
         return subdirectories
             .map(dir => {
