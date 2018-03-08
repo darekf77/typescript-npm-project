@@ -30,7 +30,7 @@
     "http-server": "0.11.1",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
-    "morphi": "^0.0.18",
+    "morphi": "^1.0.2",
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "portfinder": "^1.0.13",
