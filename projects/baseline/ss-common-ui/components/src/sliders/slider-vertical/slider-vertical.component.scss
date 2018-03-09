@@ -1,0 +1,28 @@
+:host {
+    display: block;
+    position: relative;
+    #header {
+        position: fixed;
+        width: 100%;
+        left: 0px;
+        background: white;
+        pointer-events: none;
+        md-card {
+            pointer-events: all;
+        }
+        .scroll-header {
+            padding-bottom: 10px;
+            padding-top: 10px;
+        }
+    }
+    #wrapper {
+        display: block;
+        background: lightgreen;
+        overflow-y: scroll;
+        height: 100%;
+    }
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
