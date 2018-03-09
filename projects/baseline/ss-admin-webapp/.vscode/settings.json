@@ -21,10 +21,13 @@
     // ".tsconfig": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#da5a5a",
-    "activityBar.foreground": "#313129"
+    "activityBar.background": "#b58b0e",
+    "terminal.background": "#fff3d1"
   },
-  "editor.rulers": [100, 120],
+  "editor.rulers": [
+    100,
+    120
+  ],
   "html.format.wrapAttributes": "force-aligned",
   "workbench.colorTheme": "Default Light+",
   "tslint.enable": false
