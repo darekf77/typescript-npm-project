@@ -191,7 +191,7 @@ export function ReorganizeArray<T>(arr: T[]) {
 
 export function checkValidNpmPackageName(pkg) {
     if (!_.isString(pkg) || pkg.length > 214) return false;
-    return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$').test(pkg);
+    return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*(\@.+$)?').test(pkg);
 }
 
 export function environmentName(filename: string, LOCAL_ENVIRONMENT_NAME: string) {

@@ -75,6 +75,8 @@ export class PackageJSON {
     }
 
     installPackage(packageName?: string, type: InstalationType = '--save-dev') {
+        // console.log('packageName', packageName)
+        // console.log(this.location)
         const yarnLock = path.join(this.location, 'yarn.lock');
         if (fs.existsSync(yarnLock)) {
             info(`Installing npm packge: "${packageName}" with yarn.`)

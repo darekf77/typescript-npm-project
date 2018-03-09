@@ -2,14 +2,16 @@ import { run } from "../process";
 import { Project } from '../project';
 import { link } from "./LINK";
 import { checkValidNpmPackageName } from "../helpers";
+import { error } from "../messages";
 
 function cleanBeforeInstall(workspaceProject: Project) {
     workspaceProject.node_modules.localChildrens.removeSymlinks();
     Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
 }
 
-function install(args: string) {
-    args = args.trim()
+function install(a: string) {
+    const args = a.split(' ')
+
 
     const project = Project.Current;
     const isWorkspaceParentProject = (project.parent && project.parent.type === 'workspace');
@@ -22,13 +24,18 @@ function install(args: string) {
         }
     } if (args.length >= 1) { // NPM INSTALL <package name>
         const npmPackagesToAdd = args
-            .split(' ')
             .map(p => p.trim())
-            .filter(p => checkValidNpmPackageName(p))
-        if (isWorkspaceParentProject || project.type === 'workspace') {
+            .filter(p => {
+                const res = checkValidNpmPackageName(p)
+                if (!res) {
+                    error(`Invalid package to install: ${p}`, true)
+                }
+                return res;
+            })
+        if (isWorkspaceParentProject || project.type === 'workspace') {  // workspace project: npm i <package name>
             installInTnpWorkspace(isWorkspaceParentProject ? project.parent : project, npmPackagesToAdd)
         } else {
-            npmPackagesToAdd.forEach(npmPackageName => {
+            npmPackagesToAdd.forEach(npmPackageName => {  // Other normal porojects
                 project.node_modules.installPackageFromNPM(npmPackageName)
             })
         }
