@@ -5,8 +5,8 @@
   },
   "apps": [
     {
-      "root": "src",
       "name": "dev",
+      "root": "src",
       "outDir": "dist-app",
       "assets": [
         "assets",
@@ -30,8 +30,8 @@
       }
     },
     {
-      "root": "src",
       "name": "packages",
+      "root": "src",
       "outDir": "dist/app",
       "assets": [
         "assets",
@@ -78,6 +78,10 @@
   },
   "defaults": {
     "styleExt": "css",
-    "component": {}
+    "component": {
+    }
+  },
+  "warnings": {
+    "typescriptMismatch": false
   }
 }

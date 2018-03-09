@@ -46,11 +46,14 @@ function runAsyncIn(command: string, options?: RunOptions) {
     return log(child.exec(command, { cwd }), output);
 }
 
+function prepareWatchCommand(cmd) {
+    return os.platform() === 'win32' ? `"${cmd}"` : `"'${cmd}'"`
+}
+
 export const watcher = {
     run(command: string, folderPath: string = 'src', cwd: string = process.cwd()) {
         let cmd = `tnp command ${command}`;
-        cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
-        const toRun = `tnp watch ${cmd} ${folderPath}`;
+        const toRun = `tnp watch ${prepareWatchCommand(cmd)} ${folderPath}`;
         return run(toRun, { cwd }).async()
     },
 
@@ -61,8 +64,7 @@ export const watcher = {
         const fnName = typeof fn === 'function' ? fn.name : fn;
         // console.log('Function name ', fnName)
         let cmd = `tnp ${paramsFrom(fnName)} ${params}`;
-        cmd = os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
-        const toRun = `watch ${cmd} ${folderPath}`;
+        const toRun = `watch ${prepareWatchCommand(cmd)} ${folderPath}`;
         return run(toRun, { cwd }).async()
     }
 }

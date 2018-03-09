@@ -657,6 +657,7 @@ export class ProjectAngularLib extends Project {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
+        this.run('tnp npm-run ng set warnings.typescriptMismatch=false')
         if (watch) {
             this.run('tnp npm-run ng server').async()
             this.watcher.run('npm run build:esm', 'components/src');
