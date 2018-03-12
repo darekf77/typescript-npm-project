@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-slider-vertical',
@@ -9,11 +9,12 @@ import * as _ from "lodash";
 })
 export class SliderVerticalComponent implements OnInit {
 
-  numbers = _.times(100)
+  numbers = [];
 
   constructor() { }
 
   ngOnInit() {
+    this.numbers =  _.times(100);
   }
 
 }

@@ -1,30 +1,20 @@
 <div #header
      id="header"
      style="display: block;"
-     [ngClass]="{'is-scroll': is.scroll }"
-     [style.marginTop.px]="(-1)*paddingTop">
-  <mat-card *ngIf="!is.scroll"
-            class="normal-header"
-            [ngClass]="{'is-scroll': is.scroll }">
+     [style.marginTop.px]="(-1)*wrapperPaddingTop">
+  <h1 *ngIf="!is.scroll"
+      class="normal">
     <ng-content select="[header=normal]"></ng-content>
-  </mat-card>
-  <mat-card *ngIf="is.scroll"
-            class="scroll-header"
-            [ngClass]="{'is-scroll': is.scroll }">
+  </h1>
+  <h1 *ngIf="is.scroll"
+      class="scroll">
     <ng-content select="[header=scroll]"></ng-content>
-  </mat-card>
+  </h1>
 </div>
 
 <div #wrapper
      id="wrapper"
-     [ngClass]="{'is-scroll': is.scroll }"
      (DOMMouseScroll)="onMouseWheelFirefox($event)"
      (mousewheel)="onMouseWheel($event)">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-xs-12">
-        <ng-content select="[body]"></ng-content>
-      </div>
-    </div>
-  </div>
+  <ng-content select="[body]"></ng-content>
 </div>
