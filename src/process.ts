@@ -53,7 +53,7 @@ function prepareWatchCommand(cmd) {
 export const watcher = {
     run(command: string, folderPath: string = 'src', cwd: string = process.cwd()) {
         let cmd = `tnp command ${command}`;
-        const toRun = `tnp watch ${prepareWatchCommand(cmd)} ${folderPath}`;
+        const toRun = `watch ${prepareWatchCommand(cmd)} ${folderPath}`;
         return run(toRun, { cwd }).async()
     },
 
