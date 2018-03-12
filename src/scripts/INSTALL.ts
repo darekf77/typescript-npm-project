@@ -10,8 +10,7 @@ function cleanBeforeInstall(workspaceProject: Project) {
 }
 
 function install(a: string) {
-    const args = a.split(' ')
-
+    const args = a.split(' ').filter(a => !!a);
 
     const project = Project.Current;
     const isWorkspaceParentProject = (project.parent && project.parent.type === 'workspace');
