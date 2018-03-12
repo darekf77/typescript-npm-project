@@ -210,7 +210,7 @@ export abstract class Project {
                 fse.copyFileSync(file, dest);
             }
         })
-        info(`Resouces copied to release folde: ${config.folder.bundle}`)
+        info(`Resources copied to release folder: ${config.folder.bundle}`)
     }
     //#endregion
 
