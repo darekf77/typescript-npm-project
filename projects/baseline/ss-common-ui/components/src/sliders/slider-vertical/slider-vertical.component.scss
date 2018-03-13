@@ -1,27 +1,29 @@
 :host {
     display: block;
-    position: relative;
-    #header {
+    width: 100%;
+    height: 100%;;
+    .header {
         position: fixed;
         width: 100%;
         left: 0px;
-        background: white;
-        pointer-events: none;
-        h1 {
-          background: red;
+        background: red;
+        > h1 {
           margin: 0px;
-          pointer-events: all;
-        }
-        .scroll {
-            padding-bottom: 10px;
-            padding-top: 10px;
+          &.normal {
+            color: yellow;
+          }
+          &.scroll {
+            color: pink;
+          }
         }
     }
-    #wrapper {
+    .wrapper {
         display: block;
-        background: lightgreen;
-        height: 600px;
-        > div {
+        border: black dotted 2px;
+        overflow: hidden;
+        // height is calculated
+        > .slider {
+          display: block;
           height: 100%;
         }
     }

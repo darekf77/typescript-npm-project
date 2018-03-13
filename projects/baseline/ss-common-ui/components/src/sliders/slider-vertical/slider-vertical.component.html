@@ -1,6 +1,5 @@
 <div #header
-     id="header"
-     style="display: block;"
+     class="header"
      [style.marginTop.px]="(-1)*wrapperPaddingTop">
   <h1 *ngIf="!is.scroll"
       class="normal">
@@ -13,8 +12,12 @@
 </div>
 
 <div #wrapper
-     id="wrapper"
+     class="wrapper"
      (DOMMouseScroll)="onMouseWheelFirefox($event)"
-     (mousewheel)="onMouseWheel($event)">
-  <ng-content select="[body]"></ng-content>
+     (mousewheel)="onMouseWheel($event)"
+     [scrollTop]="css.wrapper.scrollTop"
+     [style.height.px]="css.wrapper.height"
+     [style.paddingTop.px]="css.wrapper.paddingTop">
+  <ng-content class="slider"
+              select="[body]"></ng-content>
 </div>

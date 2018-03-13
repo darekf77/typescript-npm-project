@@ -21,15 +21,40 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
 
   @ViewChild('wrapper') __wrapper: ElementRef;
   @ViewChild('header') __header: ElementRef;
-  @Input() thresholdScroll = 0;
-  wrapperHeight = 0;
-  wrapperPaddingTop = 0;
-  get wrapper(): HTMLElement {
-    return this.__wrapper ? this.__wrapper.nativeElement : undefined;
+  @ViewChild('slider') __slider: ElementRef;
+  get slider(): HTMLElement {
+    return this.__wrapper ? this.wrapper.firstElementChild as any : undefined;
   }
   get header(): HTMLElement {
     return this.__header ? this.__header.nativeElement : undefined;
   }
+  get wrapper(): HTMLElement {
+    return this.__wrapper ? this.__wrapper.nativeElement : undefined;
+  }
+  @Input() thresholdScroll = 0;
+
+  css = {
+    wrapper: {
+      height: 0,
+      paddingTop: 0,
+      scrollTop: 0
+    }
+  };
+
+  get computed() {
+    const slef = this;
+    return {
+      css: {
+        slider: {
+          get height() {
+            const sliderStyles = window.getComputedStyle(slef.slider);
+            return parseInt(sliderStyles.height.replace('px', ''), 10);
+          }
+        }
+      }
+    };
+  }
+
 
   is = {
     scroll: false,
@@ -59,19 +84,27 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   public onMouseWheel(e: WheelEvent, delta: number) {
     e.preventDefault();
     if (!delta) { delta = e.deltaY; }
-    const prev = this.is.scroll;
-    this.is.scroll = (this.wrapper.scrollTop > this.thresholdScroll);
+    const prevIsScroll = this.is.scroll;
+    this.is.scroll = (this.css.wrapper.scrollTop > this.thresholdScroll);
     log.i('delta', delta);
-    if (prev !== this.is.scroll) { this.calculateHeight(); }
-    if (this.wrapper.scrollTop + delta < 0) {
-      this.wrapper.scrollTop = 0;
-    } else {
-      this.wrapper.scrollTop += delta;
+
+    if (prevIsScroll !== this.is.scroll) {
+      this.calculateHeight();
     }
+
+    if (this.css.wrapper.scrollTop + delta < 0) {
+      this.css.wrapper.scrollTop = 0;
+    } else {
+      log.i('this.computed.css.slider.height', this.computed.css.slider.height);
+      if ((this.css.wrapper.scrollTop + delta) >= this.computed.css.slider.height) {
+        this.css.wrapper.scrollTop = this.computed.css.slider.height;
+      } else {
+        this.css.wrapper.scrollTop = this.css.wrapper.scrollTop + delta;
+      }
+    }
+
+    log.i('this.css.wrapper.scrollTop', this.css.wrapper.scrollTop);
   }
-
-
-
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -81,26 +114,20 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
 
 
   calculateHeight() {
-    setTimeout(() => {
-      const target = this.header.firstElementChild;
-      if (!target) {
-        log.er('no target!s');
-        return;
-      }
-      const header = window.getComputedStyle(target, null);
-      log.i('header', header.height);
-      const wrapperPaddingTop = parseInt(header.height.replace('px', ''));
-      log.i('wrapperPaddingTop', wrapperPaddingTop);
-      const wrapperHeight = (document.body.clientHeight);
-      log.i('wrapperHeight', wrapperHeight);
 
+    const header = this.header;
+    if (!header) {
+      log.er('no header element !');
+      return;
+    }
+    const headerStyles = window.getComputedStyle(header);
+    log.i('slider height', headerStyles.height);
+    this.css.wrapper.paddingTop = parseInt(headerStyles.height.replace('px', ''), 10);
+    const windowHeight = window.innerHeight - 100;  // TODO
+    log.i('windowHeight', windowHeight);
+    this.css.wrapper.height = windowHeight - this.css.wrapper.paddingTop;
+    log.i('css.wrapper.height', this.css.wrapper.height);
 
-      this.wrapperPaddingTop = wrapperPaddingTop;
-      // this.wrapperHeight = wrapperHeight;
-      // $(this.elem).slimScroll({
-      //     height: `${this.height - heightMinus}px`
-      // });
-    }, 2000);
   }
 
 
