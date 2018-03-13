@@ -22,9 +22,16 @@ export class GoToChildVerticalSliderDirective implements AfterContentInit {
   }
 
   ngAfterContentInit() {
-    // if (!this.parent) {
-    //   this.parent = this.findParent(this.element);
-    // }
+    if (!this.parent) {
+      setTimeout(() => {
+        const parent = SliderVerticalComponent.instances.find(p => {
+          const child = p.getChildBy(this.childHeader)
+          return !!child;
+        })
+        this.parent = parent;
+        log.i('founded parent in search', this.parent)
+      })
+    }
   }
 
   @Input() parent: SliderVerticalComponent;
@@ -39,17 +46,5 @@ export class GoToChildVerticalSliderDirective implements AfterContentInit {
       log.error('no parent element for directive gotoChildVerticalSlider="" ')
     }
   }
-
-  findParent(elem: HTMLElement): SliderVerticalComponent {
-
-    if (!elem) return;;
-    if (elem instanceof SliderVerticalComponent) {
-      log.i('parent founded!')
-      return elem;
-    }
-    log.d('elem search parent', elem.parentNode)
-    return this.findParent(elem.parentElement);
-  }
-
 
 }

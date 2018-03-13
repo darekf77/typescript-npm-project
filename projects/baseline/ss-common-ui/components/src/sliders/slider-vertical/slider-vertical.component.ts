@@ -20,6 +20,8 @@ const log = Log.create('slider vertical layout', Level.__NOTHING);
 
 export class SliderVerticalComponent implements AfterViewInit, OnInit {
 
+  public static instances: SliderVerticalComponent[] = [];
+
   @ContentChildren(SliderVertivalChildComponent) contentChildren: QueryList<SliderVertivalChildComponent>;
 
   @ViewChild('wrapper') __wrapper: ElementRef;
@@ -88,7 +90,9 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   };
 
   constructor() {
-
+    if (!SliderVerticalComponent.instances.find(d => d === this)) {
+      SliderVerticalComponent.instances.push(this)
+    }
   }
 
   ngOnInit() {
