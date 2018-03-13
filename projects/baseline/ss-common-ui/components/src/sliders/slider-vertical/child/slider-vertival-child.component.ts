@@ -4,7 +4,7 @@ import { Component, OnInit, Input, HostBinding, AfterContentInit, ElementRef } f
 
 import { Log, Level } from 'ng2-logger';
 import { SliderVerticalComponent } from '../slider-vertical.component';
-const log = Log.create('slider vertical child')
+const log = Log.create('slider vertical child', Level.__NOTHING)
 
 @Component({
   selector: 'slider-vertical-child',

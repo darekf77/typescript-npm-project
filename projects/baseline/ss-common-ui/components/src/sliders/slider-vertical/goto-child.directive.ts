@@ -5,7 +5,7 @@ import { Directive, Input, HostListener } from '@angular/core';
 
 import { Log, Level } from 'ng2-logger';
 import { SliderVerticalComponent } from './slider-vertical.component';
-const log = Log.create('go to vertival slider child')
+const log = Log.create('go to vertival slider child', Level.__NOTHING)
 
 @Directive({ selector: '[gotoChildVerticalSlider]' })
 export class GoToChildVerticalSliderDirective {

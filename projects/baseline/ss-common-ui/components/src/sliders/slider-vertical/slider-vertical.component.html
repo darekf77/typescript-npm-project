@@ -16,7 +16,8 @@
      (mousewheel)="onMouseWheel($event)"
      [scrollTop]="css.wrapper.scrollTop"
      [style.height.px]="css.wrapper.height"
-     [style.paddingTop.px]="css.wrapper.paddingTop">
+     [style.paddingTop.px]="css.wrapper.paddingTop"
+     [style.scrollBehavior]="css.wrapper.scrollBehavior">
   <ng-content class="slider"
               select="[body]"></ng-content>
 </div>

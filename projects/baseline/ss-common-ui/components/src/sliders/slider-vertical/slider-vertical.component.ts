@@ -8,7 +8,7 @@ import { Log, Level } from 'ng2-logger';
 import { SliderVertivalChildComponent } from './child/slider-vertival-child.component';
 
 
-const log = Log.create('slider vertical layout');
+const log = Log.create('slider vertical layout', Level.__NOTHING);
 
 
 
@@ -36,12 +36,23 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   }
   @Input() thresholdScroll = 0;
 
+  inSmoothScroll(fn: () => void) {
+    this.css.wrapper.scrollBehavior = 'smooth'
+    setTimeout(() => {
+      fn()
+      setTimeout(() => {
+        this.css.wrapper.scrollBehavior = undefined
+      });
+    })
+  }
+
 
   css = {
     wrapper: {
       height: 0,
       paddingTop: 0,
-      scrollTop: 0
+      scrollTop: 0,
+      scrollBehavior: undefined as 'smooth'
     }
   };
 
@@ -55,8 +66,8 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
             return parseInt(sliderStyles.height.replace('px', ''), 10);
           },
           get maxScrollTop() {
-            log.d('slider.scrollHeight ', self.slider.scrollHeight)
-            log.d('slider.clientTop ', self.slider.clientTop)
+            // log.d('slider.scrollHeight ', self.slider.scrollHeight)
+            // log.d('slider.clientTop ', self.slider.clientTop)
             const max = self.computed.css.slider.height - self.css.wrapper.height;
             return (max < 0) ? 0 : max;
           }
@@ -97,10 +108,29 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     }
   }
 
-  setScroll(position: number) {
+  private updateScrollPos(position: number) {
+    this.css.wrapper.scrollTop = position;
+
+    const prevIsScroll = this.is.scroll;
+    this.is.scroll = (this.css.wrapper.scrollTop > this.thresholdScroll);
+    if (prevIsScroll !== this.is.scroll) {
+      this.calculateHeight();
+      this.css.wrapper.scrollTop = position;
+    }
+
+  }
+
+  setScroll(position: number, smooth = false) {
     log.i('maxScrollTop', this.computed.css.slider.maxScrollTop)
     if (position > this.computed.css.slider.maxScrollTop) position = this.computed.css.slider.maxScrollTop;
-    this.css.wrapper.scrollTop = position;
+    if (smooth) {
+      this.inSmoothScroll(() => {
+        this.updateScrollPos(position)
+      })
+    } else {
+      this.updateScrollPos(position)
+    }
+
   }
 
   public onMouseWheelFirefox(e: MouseEvent) {
@@ -115,15 +145,6 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     this.onMouseWheel(e as any, -rolled);
   }
 
-  checkIfHeightRecaculation() {
-    const prevIsScroll = this.is.scroll;
-    this.is.scroll = (this.css.wrapper.scrollTop > this.thresholdScroll);
-
-
-    if (prevIsScroll !== this.is.scroll) {
-      this.calculateHeight();
-    }
-  }
 
   public onMouseWheel(e: WheelEvent, delta: number) {
     e.preventDefault();
@@ -132,10 +153,9 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
       delta = e.deltaY;
     }
     log.d('delta', delta);
-    this.checkIfHeightRecaculation()
 
     if (this.css.wrapper.scrollTop + delta < 0) {
-      this.css.wrapper.scrollTop = 0;
+      this.setScroll(0);
     } else {
       log.d('this.computed.css.slider.height', this.computed.css.slider.height);
       if ((this.css.wrapper.scrollTop + delta) >= this.computed.css.slider.height) {
@@ -189,8 +209,7 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
         let height = 0;
         this.contentChildren.forEach(c => {
           if (c === child) {
-            this.setScroll(height)
-            this.checkIfHeightRecaculation()
+            this.setScroll(height, true)
             log.i('goto height', height)
             return;
           } else {
