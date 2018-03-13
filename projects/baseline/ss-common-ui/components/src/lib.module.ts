@@ -2,6 +2,7 @@ import { NgModule, NgZone, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FooComponent } from './foo/foo.component';
 import { BarService } from './bar/bar.service';
+import { SliderVerticalModule } from "./sliders/slider-vertical/slider-vertical.module";
 
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -9,16 +10,22 @@ import {
   MatSlideToggleModule
 } from '@angular/material';
 
+const modules = [
+  SliderVerticalModule
+]
+
 @NgModule({
   imports: [
     CommonModule,
     MatSlideToggleModule,
-    MatCardModule
+    MatCardModule,
+    modules
   ],
   declarations: [
     FooComponent
   ],
   exports: [
+    modules,
     FooComponent,
     MatCardModule,
     MatSlideToggleModule

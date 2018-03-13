@@ -141,7 +141,7 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     log.d('fiefox scroll');
     let rolled = 0;
     if ('wheelDelta' in e) {
-      rolled = e['wheelDelta'];
+      rolled = e['wheelDelta'] as number;
     } else {  // Firefox
       // The measurement units of the detail and wheelDelta properties are different.
       rolled = -40 * e.detail;
@@ -173,7 +173,7 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  onResize(event: Event) {
     if (!this.is.afterViewInit) { return; }
     this.calculateHeight();
   }

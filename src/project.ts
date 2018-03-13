@@ -663,7 +663,7 @@ export class ProjectAngularLib extends Project {
             this.watcher.run('npm run build:esm', 'components/src');
         } else {
             this.run(`npm run build:esm`).sync();
-            this.run(`npm run build`).sync();
+            // this.run(`npm run build`).sync();
         }
     }
 }
