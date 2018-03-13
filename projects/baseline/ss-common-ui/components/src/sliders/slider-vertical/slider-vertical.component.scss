@@ -6,9 +6,12 @@
         position: fixed;
         width: 100%;
         left: 0px;
-        background: red;
+        background: gray;
         > h1 {
           margin: 0px;
+          position: fixed;
+          background: black;
+          width: 100%;
           &.normal {
             color: yellow;
           }

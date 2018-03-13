@@ -5,7 +5,6 @@ import {
 } from '@angular/core';
 
 import { Log, Level } from 'ng2-logger';
-import { ISlimScrollOptions } from 'ngx-slimscroll';
 
 
 const log = Log.create('slider vertical layout');
@@ -44,13 +43,18 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   };
 
   get computed() {
-    const slef = this;
+    const self = this;
     return {
       css: {
         slider: {
           get height() {
-            const sliderStyles = window.getComputedStyle(slef.slider);
+            const sliderStyles = window.getComputedStyle(self.slider);
             return parseInt(sliderStyles.height.replace('px', ''), 10);
+          }
+        },
+        header: {
+          get marginTop() {
+            return (self.is.scroll ? self.css.wrapper.paddingTop : 0);
           }
         }
       }
@@ -133,9 +137,9 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
         log.er('no header element !');
         return;
       }
-      const headerStyles = window.getComputedStyle(header);
-      log.i('slider height', headerStyles.height);
+      const headerStyles = window.getComputedStyle(header.firstElementChild);
       this.css.wrapper.paddingTop = parseInt(headerStyles.height.replace('px', ''), 10);
+      log.i('slider height', headerStyles.height);
       const windowHeight = window.innerHeight;
       log.i('windowHeight', windowHeight);
       this.css.wrapper.height = windowHeight - this.css.wrapper.paddingTop;
