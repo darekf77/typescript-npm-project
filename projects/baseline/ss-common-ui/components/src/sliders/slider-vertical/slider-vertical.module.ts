@@ -1,15 +1,17 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from "@angular/common";
-import { MatCardModule } from "@angular/material/card";
-
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+// third part
+import { NgSlimScrollModule, SLIMSCROLL_DEFAULTS } from 'ngx-slimscroll';
 // local
 import { SliderVerticalComponent } from './slider-vertical.component';
 
 
 const modules = [
   CommonModule,
-  MatCardModule
-]
+  MatCardModule,
+  NgSlimScrollModule
+];
 
 @NgModule({
   imports: [modules],

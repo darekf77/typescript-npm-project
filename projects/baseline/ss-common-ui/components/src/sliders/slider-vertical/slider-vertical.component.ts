@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 
 import { Log, Level } from 'ng2-logger';
+import { ISlimScrollOptions } from 'ngx-slimscroll';
 
 
 const log = Log.create('slider vertical layout');
@@ -32,6 +33,7 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     return this.__wrapper ? this.__wrapper.nativeElement : undefined;
   }
   @Input() thresholdScroll = 0;
+
 
   css = {
     wrapper: {
@@ -66,6 +68,7 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
+
   }
 
   ngAfterViewInit() {
@@ -77,13 +80,23 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
 
 
   public onMouseWheelFirefox(e: MouseEvent) {
-    const delta = parseInt(e['wheelDelta'] || -e.detail, undefined);
-    this.onMouseWheel(e as any, delta);
+    log.i('fiefox scroll');
+    let rolled = 0;
+    if ('wheelDelta' in e) {
+      rolled = e['wheelDelta'];
+    } else {  // Firefox
+      // The measurement units of the detail and wheelDelta properties are different.
+      rolled = -40 * e.detail;
+    }
+    this.onMouseWheel(e as any, -rolled);
   }
 
   public onMouseWheel(e: WheelEvent, delta: number) {
     e.preventDefault();
-    if (!delta) { delta = e.deltaY; }
+    if (!delta) {
+      log.i('chrome scroll');
+      delta = e.deltaY;
+    }
     const prevIsScroll = this.is.scroll;
     this.is.scroll = (this.css.wrapper.scrollTop > this.thresholdScroll);
     log.i('delta', delta);
@@ -114,20 +127,20 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
 
 
   calculateHeight() {
-
-    const header = this.header;
-    if (!header) {
-      log.er('no header element !');
-      return;
-    }
-    const headerStyles = window.getComputedStyle(header);
-    log.i('slider height', headerStyles.height);
-    this.css.wrapper.paddingTop = parseInt(headerStyles.height.replace('px', ''), 10);
-    const windowHeight = window.innerHeight - 100;  // TODO
-    log.i('windowHeight', windowHeight);
-    this.css.wrapper.height = windowHeight - this.css.wrapper.paddingTop;
-    log.i('css.wrapper.height', this.css.wrapper.height);
-
+    setTimeout(() => {
+      const header = this.header;
+      if (!header) {
+        log.er('no header element !');
+        return;
+      }
+      const headerStyles = window.getComputedStyle(header);
+      log.i('slider height', headerStyles.height);
+      this.css.wrapper.paddingTop = parseInt(headerStyles.height.replace('px', ''), 10);
+      const windowHeight = window.innerHeight;
+      log.i('windowHeight', windowHeight);
+      this.css.wrapper.height = windowHeight - this.css.wrapper.paddingTop;
+      log.i('css.wrapper.height', this.css.wrapper.height);
+    });
   }
 
 
