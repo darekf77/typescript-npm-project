@@ -1,10 +1,11 @@
 
 import {
-  Component, OnInit, HostBinding, AfterViewInit,
-  HostListener, Input, ElementRef, ViewChild
+  Component, OnInit, HostBinding, AfterViewInit, AfterContentInit,
+  HostListener, Input, ElementRef, ViewChild, ContentChildren, QueryList
 } from '@angular/core';
 
 import { Log, Level } from 'ng2-logger';
+import { SliderVertivalChildComponent } from './child/slider-vertival-child.component';
 
 
 const log = Log.create('slider vertical layout');
@@ -18,6 +19,8 @@ const log = Log.create('slider vertical layout');
 })
 
 export class SliderVerticalComponent implements AfterViewInit, OnInit {
+
+  @ContentChildren(SliderVertivalChildComponent) contentChildren: QueryList<SliderVertivalChildComponent>;
 
   @ViewChild('wrapper') __wrapper: ElementRef;
   @ViewChild('header') __header: ElementRef;
@@ -50,6 +53,12 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
           get height() {
             const sliderStyles = window.getComputedStyle(self.slider);
             return parseInt(sliderStyles.height.replace('px', ''), 10);
+          },
+          get maxScrollTop() {
+            log.d('slider.scrollHeight ', self.slider.scrollHeight)
+            log.d('slider.clientTop ', self.slider.clientTop)
+            const max = self.computed.css.slider.height - self.css.wrapper.height;
+            return (max < 0) ? 0 : max;
           }
         },
         header: {
@@ -81,10 +90,21 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     log.i('after view init!');
   }
 
+  ngAfterContentInit() {
+    log.i('childrens', this.contentChildren)
+    if (this.contentChildren) {
+      this.contentChildren.forEach(c => c.parent = this)
+    }
+  }
 
+  setScroll(position: number) {
+    log.i('maxScrollTop', this.computed.css.slider.maxScrollTop)
+    if (position > this.computed.css.slider.maxScrollTop) position = this.computed.css.slider.maxScrollTop;
+    this.css.wrapper.scrollTop = position;
+  }
 
   public onMouseWheelFirefox(e: MouseEvent) {
-    log.i('fiefox scroll');
+    log.d('fiefox scroll');
     let rolled = 0;
     if ('wheelDelta' in e) {
       rolled = e['wheelDelta'];
@@ -95,32 +115,37 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
     this.onMouseWheel(e as any, -rolled);
   }
 
-  public onMouseWheel(e: WheelEvent, delta: number) {
-    e.preventDefault();
-    if (!delta) {
-      log.i('chrome scroll');
-      delta = e.deltaY;
-    }
+  checkIfHeightRecaculation() {
     const prevIsScroll = this.is.scroll;
     this.is.scroll = (this.css.wrapper.scrollTop > this.thresholdScroll);
-    log.i('delta', delta);
+
 
     if (prevIsScroll !== this.is.scroll) {
       this.calculateHeight();
     }
+  }
+
+  public onMouseWheel(e: WheelEvent, delta: number) {
+    e.preventDefault();
+    if (!delta) {
+      log.d('chrome scroll');
+      delta = e.deltaY;
+    }
+    log.d('delta', delta);
+    this.checkIfHeightRecaculation()
 
     if (this.css.wrapper.scrollTop + delta < 0) {
       this.css.wrapper.scrollTop = 0;
     } else {
-      log.i('this.computed.css.slider.height', this.computed.css.slider.height);
+      log.d('this.computed.css.slider.height', this.computed.css.slider.height);
       if ((this.css.wrapper.scrollTop + delta) >= this.computed.css.slider.height) {
-        this.css.wrapper.scrollTop = this.computed.css.slider.height;
+        this.setScroll(this.computed.css.slider.height)
       } else {
-        this.css.wrapper.scrollTop = this.css.wrapper.scrollTop + delta;
+        this.setScroll(this.css.wrapper.scrollTop + delta)
       }
     }
 
-    log.i('this.css.wrapper.scrollTop', this.css.wrapper.scrollTop);
+    log.d('this.css.wrapper.scrollTop', this.css.wrapper.scrollTop);
   }
 
   @HostListener('window:resize', ['$event'])
@@ -145,6 +170,37 @@ export class SliderVerticalComponent implements AfterViewInit, OnInit {
       this.css.wrapper.height = windowHeight - this.css.wrapper.paddingTop;
       log.i('css.wrapper.height', this.css.wrapper.height);
     });
+  }
+
+  getChildBy(header: string) {
+    if (this.contentChildren) {
+      return this.contentChildren.find(c => c.header === header)
+    }
+  }
+
+  goTo(child: SliderVertivalChildComponent) {
+    if (!child) {
+      log.er('not child to go')
+      return;
+    }
+    setTimeout(() => {
+      log.i('go to child', child)
+      if (this.contentChildren) {
+        let height = 0;
+        this.contentChildren.forEach(c => {
+          if (c === child) {
+            this.setScroll(height)
+            this.checkIfHeightRecaculation()
+            log.i('goto height', height)
+            return;
+          } else {
+            log.i('child.height', child.height)
+            height += child.height;
+          }
+        })
+      }
+    })
+
   }
 
 

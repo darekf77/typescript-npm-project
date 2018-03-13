@@ -13,8 +13,14 @@ export class SliderVerticalComponent implements OnInit {
 
   constructor() { }
 
+  childs = _.times(10, d => {
+    return {
+      header: `test${d}`
+    }
+  })
+
   ngOnInit() {
-    this.numbers =  _.times(100);
+    this.numbers = _.times(10);
   }
 
 }

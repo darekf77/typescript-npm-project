@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 // local
 import { SliderVerticalComponent } from './slider-vertical.component';
 import { SliderVertivalChildComponent } from './child/slider-vertival-child.component';
-
+import { GoToChildVerticalSliderDirective } from './goto-child.directive'
 
 const modules = [
   CommonModule,
@@ -14,7 +14,8 @@ const modules = [
 
 const components = [
   SliderVertivalChildComponent,
-  SliderVerticalComponent
+  SliderVerticalComponent,
+  GoToChildVerticalSliderDirective
 ]
 
 @NgModule({
