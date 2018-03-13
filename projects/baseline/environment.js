@@ -33,17 +33,27 @@ const config = {
   routes: [
     {
       url: '/components',
-      project: 'angular-lib',
+      project: 'ss-common-ui',
       localEnvPort: 4201
     },
     {
       url: '/api',
-      project: 'isomorphic-lib',
+      project: 'ss-common-logic',
       localEnvPort: 4000
     },
     {
+      url: '/mobile',
+      project: 'ss-mobileapp',
+      localEnvPort: 4202
+    },
+    {
+      url: '/admin',
+      project: 'ss-admin-webapp',
+      localEnvPort: 4201
+    },
+    {
       url: '/',
-      project: 'angular-client',
+      project: 'ss-webapp',
       localEnvPort: 4200
     }
   ]

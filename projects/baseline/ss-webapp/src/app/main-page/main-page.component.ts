@@ -1,3 +1,4 @@
+import { times } from 'lodash';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,10 +9,18 @@ import { Component, OnInit } from '@angular/core';
 export class AppMainPageComponent implements OnInit {
 
 
-  constructor( ) { }
+  numbers = [];
 
-  ngOnInit(): void {
+  constructor() { }
 
+  childs = times(10, d => {
+    return {
+      header: `test${d}`
+    }
+  })
+
+  ngOnInit() {
+    this.numbers = times(10);
   }
 
 }

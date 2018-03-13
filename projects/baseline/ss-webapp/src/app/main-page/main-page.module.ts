@@ -2,26 +2,31 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppMainPageComponent } from './main-page.component';
 import { FormsModule } from '@angular/forms';
-
-import { MyLibModule } from 'angular-lib';
+// third paret
+import { SliderVerticalModule } from "ss-common-ui";
 import { Routes, RouterModule } from '@angular/router';
+import { LoginComponent } from '../login/login.component';
 
 
 export const routes: Routes = [
   {
-      path: '',
-      pathMatch: 'prefix',
-      component: AppMainPageComponent
+    path: '',
+    pathMatch: 'prefix',
+    component: AppMainPageComponent
   },
 ];
+
+const modules = [
+  SliderVerticalModule
+]
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
-    MyLibModule.forRoot()
+    modules
   ],
-  declarations: [AppMainPageComponent]
+  declarations: [AppMainPageComponent, LoginComponent]
 })
 export class AppMainPageModule { }

@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
-import { Controllers, Entities } from 'isomorphic-lib/browser';
+import { Controllers, Entities } from 'ss-common-logic/browser';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -24,7 +24,7 @@ init('http://localhost:4000')
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+
   ],
   imports: [
     BrowserModule,

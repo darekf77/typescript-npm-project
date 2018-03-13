@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
   HelloController, UsersController, TestController,
   ParentClass, ChildClass, ChildClass2
-} from 'isomorphic-lib/browser';
+} from 'ss-common-logic/browser';
 
 @Component({
   selector: 'app-app-test',
