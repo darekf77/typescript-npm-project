@@ -24,6 +24,7 @@
     .wrapper {
         display: block;
         overflow: hidden;
+        scroll-behavior: smooth;
         // height is calculated
         > .slider {
           display: block;
