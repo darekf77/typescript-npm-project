@@ -2,7 +2,7 @@ import { NgModule, NgZone, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FooComponent } from './foo/foo.component';
 import { BarService } from './bar/bar.service';
-import { SliderVerticalModule } from "./sliders/slider-vertical/slider-vertical.module";
+import { SliderVerticalModule } from "./sliders/slider-vertical";
 
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {

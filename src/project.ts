@@ -658,11 +658,12 @@ export class ProjectAngularLib extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         this.run('tnp npm-run ng set warnings.typescriptMismatch=false')
+        const moduleLink = outDir === 'dist' ? `&& tnp rimraf module && tnp ln ${outDir} module` : ''
         if (watch) {
             this.run('tnp npm-run ng server').async()
-            this.watcher.run('npm run build:esm', 'components/src');
+            this.watcher.run(`npm run build:esm ${moduleLink}`, 'components/src');
         } else {
-            this.run(`npm run build:esm`).sync();
+            this.run(`npm run build:esm ${moduleLink}`).sync();
             this.run(`npm run build`).sync();
         }
     }

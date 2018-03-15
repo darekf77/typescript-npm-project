@@ -11,7 +11,7 @@
     "test": "tnp npm-run ng test",
     "lint": "tnp npm-run ng lint",
     "e2e": "tnp npm-run ng e2e",
-    "build:esm": "tnp npm-run gulp inline-templates && npm run ngcompile && rimraf module && tnp ln dist module",
+    "build:esm": "tnp npm-run gulp inline-templates && npm run ngcompile",
     "build:esm:watch": "tnp npm-run gulp build:esm:watch",
     "ngcompile": "tnp npm-run ngc -p tsconfig-aot.json",
     "clean:tmp": "tnp rimraf coverage dist tmp"
