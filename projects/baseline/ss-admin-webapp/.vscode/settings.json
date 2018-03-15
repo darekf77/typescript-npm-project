@@ -21,8 +21,8 @@
     // ".tsconfig": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#b58b0e",
-    "terminal.background": "#fff3d1"
+    "activityBar.background": "#c2a062",
+    "activityBar.foreground": "#ffffff"
   },
   "editor.rulers": [
     100,

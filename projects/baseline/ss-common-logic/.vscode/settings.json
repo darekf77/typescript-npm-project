@@ -23,7 +23,8 @@
         // "browser": true
     },
     "workbench.colorCustomizations": {
-        "activityBar.background": "#3186d4"
+        "activityBar.background": "#6193c2",
+        "activityBar.foreground": "#ffffff"
     },
     "editor.rulers": [
         100,

@@ -22,7 +22,7 @@
     ".tsconfig": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#da5ac5",
+    "activityBar.background": "#d11ab3",
     "activityBar.foreground": "#313129"
   },
   "editor.rulers": [100, 120],
