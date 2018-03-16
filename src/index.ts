@@ -4,6 +4,18 @@ import * as path from 'path';
 import { run as runCommand } from "./process";
 export { config } from './config';
 export * from './helpers'
+import { Helpers } from "morphi";
+
+Helpers.checkEnvironment({
+    npm: [
+        { name: 'watch', version: '1.0.2' }
+    ],
+    programs: [
+        {
+            name: 'code',
+            website: 'https://code.visualstudio.com/'
+        }
+})
 
 const localLibs = [
     'cpr',

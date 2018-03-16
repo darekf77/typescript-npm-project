@@ -3,8 +3,8 @@
   "editor.rulers": [80, 100, 120],
   "tslint.enable": false,
   "workbench.colorCustomizations": {
-    "activityBar.background": "#ca8463",
-    "activityBar.foreground": "#313129"
+    "activityBar.background": "#d47447",
+    "activityBar.foreground": "#080800"
   },
   "workbench.colorTheme": "Default Light+"
 }
