@@ -619,7 +619,8 @@ export class ProjectIsomorphicLib extends Project {
                 tsc: 'tnp tsc',
                 cpr: 'tnp cpr',
                 rimraf: 'tnp rimraf',
-                mkdirp: 'tnp mkdir'
+                mkdirp: 'tnp mkdir',
+                ln: 'tnp ln'
             }
         });
     }
