@@ -22,7 +22,7 @@ export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
 
 export default {
-    BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
+    $BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
         (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
         process.exit(0)
     },

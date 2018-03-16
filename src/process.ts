@@ -47,7 +47,7 @@ function runAsyncIn(command: string, options?: RunOptions) {
 }
 
 function prepareWatchCommand(cmd) {
-    return os.platform() === 'win32' ? `"${cmd}"` : `"'${cmd}'"`
+    return os.platform() === 'win32' ? `"${cmd}"` : `'${cmd}'`
 }
 
 export const watcher = {
