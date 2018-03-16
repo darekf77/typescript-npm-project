@@ -39,8 +39,6 @@ export class SESSION {
         }
     }
 
-    private constructor() { }
-
     expireInSeconds: number;
     calculateExpirationTime(): number {
         const now = new Date();

@@ -30,12 +30,12 @@ import { EMAIL } from '../entities/EMAIL';
 import { EMAIL_TYPE, EMAIL_TYPE_NAME } from '../entities/EMAIL_TYPE';
 import { __ } from '../helpers';
 
-const entity = {
-    USER: __(USER),
-    EMAIL: __(EMAIL),
-    SESSION: __(SESSION),
-    EMAIL_TYPE: __(EMAIL_TYPE),
-};
+// const entity = {
+//     USER: __(USER),
+//     EMAIL: __(EMAIL),
+//     SESSION: __(SESSION),
+//     EMAIL_TYPE: __(EMAIL_TYPE),
+// };
 
 
 export interface IHelloJS {
@@ -321,13 +321,13 @@ export class AuthController {
         //#endregion
     }
 
-    
+
     get __handle() {
-        //#region @backendFunc    
+        //#region @backendFunc
         const self = this;
         return {
             facebook() {
-                
+
                 const APP_ID = '1248048985308566';
                 return {
                     async getData(credentials: IHelloJS) {
@@ -370,15 +370,15 @@ export class AuthController {
                         return defer.promise;
                     }
                 };
-                
+
             }
         };
         //#endregion
     }
 
-    
-    private get __validate() {     
-        //#region @backendFunc   
+
+    private get __validate() {
+        //#region @backendFunc
         return {
             username(username) {
                 if (username && isLength(username, 3, 50)) {
@@ -386,12 +386,12 @@ export class AuthController {
                 }
                 return false;
             }
-        };        
+        };
         //#endregion
     }
-    
 
-    
+
+
     get __check() {
         //#region @backendFunc
         const self = this;
@@ -438,10 +438,10 @@ export class AuthController {
                 };
                 return is.registration;
             }
-        };       
-        //#endregion 
+        };
+        //#endregion
     }
-    
+
 
     private async __repos() {
         //#region @backendFunc
