@@ -8,11 +8,12 @@ import * as _ from 'lodash';
 import { buildIsomorphic } from "morphi";
 import { ChildProcess } from "child_process";
 
+
 import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions, RuleDependency } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
-import { run as __run, watcher as __watcher } from "./process";
+import { run as __run, watcher as __watcher, questionYesNo } from "./process";
 import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray, ClassHelper } from "./helpers";
 import { HelpersLinks } from "./helpers-links";
@@ -175,12 +176,32 @@ export abstract class Project {
     //#endregion
 
     //#region release
-    release(prod = false) {
-        this.bundleResources();
-        const releseFilePath = path.join(
-            __dirname, '..', 'templates',
-            prod ? 'release-it-prod.json' : 'release-it.json');
-        this.run(`tnp release-it -c ${releseFilePath}`).sync()
+
+    async publish() {
+        await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
+            this.run('npm publish', {
+                cwd: path.join(this.location, config.folder.bundle),
+                output: true
+            }).sync()
+        })
+    }
+
+    async release(prod = false) {
+        const newVersion = Project.Current.versionPatchedPlusOne;
+        await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
+            this.run(`npm version patch`).sync()
+            this.run(`tnp clear:bundle`).sync();
+            this.build({
+                prod, outDir: config.folder.bundle as 'bundle'
+            })
+            this.bundleResources()
+        }, () => process.exit(0))
+        await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
+            this.run('npm publish', {
+                cwd: path.join(this.location, config.folder.bundle),
+                output: true
+            }).sync()
+        })
     }
 
     bundleResources() {
@@ -399,6 +420,14 @@ export abstract class Project {
 
     get version() {
         return this.packageJson.version;
+    }
+
+    get versionPatchedPlusOne() {
+        const ver = this.version.split('.');
+        if (ver.length > 0) {
+            ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
+        }
+        return ver.join('.')
     }
 
     get resources(): string[] {

@@ -1,6 +1,0 @@
-{
-    "buildCommand": "echo \"start\" && tnp build:bundle && echo \"next\" && tnp --copy-resources",
-    "npm": {
-        "publishPath": "bundle/"
-    }
-}

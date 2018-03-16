@@ -2,12 +2,12 @@
 import { Project } from "../project";
 
 export default {
-    $RELEASE: () => {
-        Project.Current.release()
+    $RELEASE: async () => {
+        await Project.Current.release()
         process.exit(0)
     },
-    $RELEASE_PROD: () => {
-        Project.Current.release(true)
+    $RELEASE_PROD: async () => {
+        await Project.Current.release(true)
         process.exit(0)
     },
     COPY_RESOURCES: () => {

@@ -34,7 +34,7 @@
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "portfinder": "^1.0.13",
-    "release-it": "^5.1.2",
+    "prompts": "^0.1.8",
     "rimraf": "^2.6.2",
     "sloc": "^0.2.0",
     "sort-package-json": "^1.11.0",

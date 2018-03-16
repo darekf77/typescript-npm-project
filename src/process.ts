@@ -10,6 +10,26 @@ import { error, info } from "./messages";
 import { RunOptions } from "./models";
 import config from './config';
 import { paramsFrom } from './index';
+const prompts = require('prompts');
+export async function questionYesNo(message: string,
+    callbackTrue: () => any, callbackFalse?: () => any) {
+    const response = await prompts({
+        type: 'toggle',
+        name: 'value',
+        message,
+        initial: true,
+        active: 'yes',
+        inactive: 'no'
+    });
+    if (response.value) {
+        callbackTrue()
+    } else {
+        if (_.isFunction(callbackFalse)) {
+            callbackFalse()
+        }
+    }
+}
+
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {
