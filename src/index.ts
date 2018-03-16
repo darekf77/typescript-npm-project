@@ -15,7 +15,8 @@ Helpers.checkEnvironment({
             name: 'code',
             website: 'https://code.visualstudio.com/'
         }
-})
+    ]
+});
 
 const localLibs = [
     'cpr',
