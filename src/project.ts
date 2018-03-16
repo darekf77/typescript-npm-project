@@ -120,25 +120,15 @@ export abstract class Project {
             installPackageFromNPM(packagePath) {
                 self.packageJson.installPackage(packagePath, '--save');
             },
-            get childrensLibsAsNpmPackages(): Project[] {
-                const childrens = []
-                if (!_.isArray(self.children) || self.children.length === 0) return childrens;
-                const projectsForNodeModules: LibType[] = [
-                    'server-lib',
-                    'isomorphic-lib',
-                    'angular-lib'
-                ]
-                self.children.forEach(c => {
+            get localChildrensWithRequiredLibs() {
+                const symlinks = self.dependencies.concat(self.children);
+                symlinks.forEach(c => {
                     if (path.basename(c.location) != c.name) {
                         error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
                     }
                 })
-                return self.children.filter(c => projectsForNodeModules.includes(c.type)).concat(childrens)
-            },
-            get localChildrens() {
                 return {
                     removeSymlinks() {
-                        const symlinks = self.node_modules.childrensLibsAsNpmPackages;
                         symlinks.forEach(c => {
                             const symPkgPath = path.join(self.location, 'node_modules', c.name);
                             if (fs.existsSync(symPkgPath)) {
@@ -147,7 +137,6 @@ export abstract class Project {
                         })
                     },
                     addSymlinks() {
-                        const symlinks = self.node_modules.childrensLibsAsNpmPackages;
                         symlinks.forEach(c => {
                             const destination = path.join(self.location, 'node_modules');
                             const command = `tnp ln ${c.location} ${destination}`;

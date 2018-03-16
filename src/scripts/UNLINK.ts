@@ -13,7 +13,7 @@ export function unlink(workspaceProject: Project) {
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => c.node_modules.remove())
     }
-    workspaceProject.node_modules.localChildrens.removeSymlinks();
+    workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
     Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
 }
 

@@ -5,7 +5,7 @@ import { checkValidNpmPackageName } from "../helpers";
 import { error } from "../messages";
 
 function cleanBeforeInstall(workspaceProject: Project) {
-    workspaceProject.node_modules.localChildrens.removeSymlinks();
+    workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
     Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
 }
 
@@ -43,12 +43,12 @@ function install(a: string) {
 }
 
 function installInTnpWorkspace(workspace: Project, npmPackagesToAdd: string[]) {
-    workspace.node_modules.localChildrens.removeSymlinks();
+    workspace.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
     Project.Tnp.ownNpmPackage.unlinkFrom(workspace);
     npmPackagesToAdd.forEach(npmPackageName => {
         workspace.node_modules.installPackageFromNPM(npmPackageName)
     })
-    workspace.node_modules.localChildrens.addSymlinks();
+    workspace.node_modules.localChildrensWithRequiredLibs.addSymlinks();
     Project.Tnp.ownNpmPackage.linkTo(workspace);
 }
 

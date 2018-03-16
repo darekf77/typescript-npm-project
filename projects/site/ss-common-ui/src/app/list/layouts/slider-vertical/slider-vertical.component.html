@@ -1,0 +1,30 @@
+<slider-vertical #mainSlider>
+
+  <span header="normal">
+    <h1>header normal</h1>
+    <h1>header normal</h1>
+    <a href="javascript:void(0)"
+       *ngFor="let child of childs"
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
+  </span>
+
+  <p header="scroll">
+    header scroll
+    <!-- <mat-tab label="label"></mat-tab>
+      <mat-tab label="label"></mat-tab> -->
+    <a href="javascript:void(0)"
+       *ngFor="let child of childs"
+       gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
+  </p>
+
+  <div body>
+
+    <slider-vertical-child *ngFor="let child of childs"
+                           [header]="child.header">
+      super! {{child.header}}
+      <h3 *ngFor="let num of numbers">{{num}}</h3>
+    </slider-vertical-child>
+  </div>
+
+</slider-vertical>
