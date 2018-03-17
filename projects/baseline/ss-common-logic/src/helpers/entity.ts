@@ -12,15 +12,18 @@ export function tableNameFrom(entityClass: Function | BASE_ENTITY) {
 };
 
 export interface META_INFO_ENTITY<T> {
-  api: T;
-  repo: Repository<T>;
+  db: Repository<T>;
   table: string;
 }
 
-export function $__<entityClass>(connection: Connection, entityClass: BASE_ENTITY) {
+export function getMeta<E, ER=E>(connection: Connection,
+  entityClass: Function,
+  entityCustomRepo?: Function) {
+
   return {
-    api: entityClass as any,
-    repo: connection.getRepository(entityClass as any),
+    get db() {
+      return entityCustomRepo ? connection.getCustomRepository(entityCustomRepo) : connection.getRepository(entityClass);
+    },
     table: tableNameFrom(entityClass)
-  } as META_INFO_ENTITY<entityClass>;
+  } as META_INFO_ENTITY<ER>;
 }

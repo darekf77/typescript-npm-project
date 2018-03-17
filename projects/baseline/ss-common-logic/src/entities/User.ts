@@ -10,6 +10,8 @@ import { Column } from "typeorm/decorator/columns/Column";
 import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
+import { EntityRepository } from 'typeorm/decorator/EntityRepository';
+import { getCustomRepository } from 'typeorm';
 
 //#region @backend
 import { Router, Request, Response } from 'express';
@@ -21,6 +23,8 @@ import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
 import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
+
+
 export interface IUSER {
   email?: string;
   username: string;
@@ -29,6 +33,8 @@ export interface IUSER {
   lastname?: string;
   city?: string;
 }
+
+
 
 
 @Entity(tableNameFrom(USER))
@@ -51,32 +57,33 @@ export class USER extends BASE_ENTITY implements IUSER {
   })
   emails: EMAIL[] = [];
 
-  get db(){
-    return {
-      async byUsername(username: string, repo: Repository<USER>) {
-        #region @backendFunc
-        nst User = await repo
-          .createQueryBuilder(tableNameFrom(USER))
-          .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-          .where(`${tableNameFrom(USER)}.username = :username`)
-          .setParameter('username', username)
-          .getOne()
-        return User;
-        //#endregion
-      },
+}
 
-      async byId(id: number, repo: Repository<USER>) {
-        //#region @backendFunc
-        const User = await repo
-          .createQueryBuilder(tableNameFrom(USER))
-          .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-          .where(`${tableNameFrom(USER)}.id = :id`)
-          .setParameter('id', id)
-          .getOne()
-        return User;
-        //#endregion
-      }
-    }
+@EntityRepository(USER)
+export class USER_REPOSITORY extends Repository<USER> {
+
+  byUsername(username: string) {
+    //#region @backendFunc
+    return this
+      .createQueryBuilder(tableNameFrom(USER))
+      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${tableNameFrom(USER)}.username = :username`)
+      .setParameter('username', username)
+      .getOne()
+    //#endregion
+  }
+
+  byId(id: number, repo: Repository<USER>) {
+    //#region @backendFunc
+    return this
+      .createQueryBuilder(tableNameFrom(USER))
+      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${tableNameFrom(USER)}.id = :id`)
+      .setParameter('id', id)
+      .getOne()
+    //#endregion
+  }
+
 }
 
 

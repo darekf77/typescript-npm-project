@@ -24,11 +24,11 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
-import { USER as tUSER, IUSER as tIUSER } from '../entities/USER';
+import { USER as tUSER, IUSER as tIUSER, USER_REPOSITORY } from '../entities/USER';
 import { SESSION as tSESSION } from '../entities/SESSION';
 import { EMAIL as tEMAIL } from '../entities/EMAIL';
 import { EMAIL_TYPE as tEMAIL_TYPE, EMAIL_TYPE_NAME as tEMAIL_TYPE_NAME } from '../entities/EMAIL_TYPE';
-import { tableNameFrom, $__, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
+import { tableNameFrom, getMeta, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
 
 
 
@@ -78,10 +78,10 @@ export class AuthController extends BASE_CONTROLLER {
 
   get ENTITIES() {
     return {
-      USER: $__<tUSER>(this.connection, tUSER),
-      SESSION: $__<tSESSION>(this.connection, tSESSION),
-      EMAIL: $__<tEMAIL>(this.connection, tEMAIL),
-      EMAIL_TYPE: $__<tEMAIL_TYPE>(this.connection, tEMAIL_TYPE)
+      USER: getMeta<tUSER, USER_REPOSITORY>(this.connection, tUSER, USER_REPOSITORY),
+      SESSION: getMeta<tSESSION>(this.connection, tSESSION),
+      EMAIL: getMeta<tEMAIL>(this.connection, tEMAIL),
+      EMAIL_TYPE: getMeta<tEMAIL_TYPE>(this.connection, tEMAIL_TYPE)
     }
   }
 
@@ -89,6 +89,8 @@ export class AuthController extends BASE_CONTROLLER {
 
   constructor() {
     super();
+    this.ENTITIES.USER.t
+
     this.browser.init()
     //#region @backend
     this.__init();
