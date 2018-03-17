@@ -24,131 +24,134 @@ import { Resource } from "ng2-rest";
 const log = Log.create(__filename);
 
 import { USER } from './USER';
-import { __ } from '../helpers';
+import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 
 
-@Entity(__(SESSION))
-export class SESSION {
+@Entity(tableNameFrom(SESSION))
+export class SESSION extends BASE_ENTITY {
 
-    private static get const() {
-        return {
-            SESSION_TIME_SECONDS: 3600,
-            SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
-            AUTHORIZATION_HEADER: 'Authorization'
-        }
+  private static get const() {
+    return {
+      SESSION_TIME_SECONDS: 3600,
+      SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
+      AUTHORIZATION_HEADER: 'Authorization'
     }
+  }
 
-    expireInSeconds: number;
-    calculateExpirationTime(): number {
-        const now = new Date();
-        return Math.round((this.expiredDate.getTime() - now.getTime()) / 1000);
+  expireInSeconds: number;
+  calculateExpirationTime(): number {
+    const now = new Date();
+    return Math.round((this.expiredDate.getTime() - now.getTime()) / 1000);
+  }
+
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ length: 100 })
+  token: string;
+
+  token_type = 'bearer';
+
+  @Column({
+    length: 50,
+    nullable: true
+  })
+  ip: string;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @Column({
+    nullable: false
+  })
+  expiredDate: Date;
+
+  @OneToOne(type => USER, user => user.id, {
+    nullable: true
+  })
+  @JoinColumn()
+  user: USER;
+
+  private createToken(token?: string) {
+    this.createdDate = new Date();
+    const timestamp = this.createdDate.getTime();
+    this.token = token ? token : generate(this.user.id + timestamp + this.ip)
+    this.expiredDate = new Date(timestamp + SESSION.const.SESSION_TIME_SECONDS * 1000)
+  }
+
+  isExpired(when: Date = new Date()) {
+    let time = {
+      expire: this.expiredDate.getTime(),
+      now: when.getTime()
     }
+    return (time.expire < time.now);
+  }
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  public saveInLocalStorage() {
+    let session: SESSION = this;
+    window.localStorage.setItem(SESSION.const.SESSION_LOCAL_STORAGE, JSON.stringify(session));
+  }
 
-    @Column({ length: 100 })
-    token: string;
+  public activateBrowserToken() {
+    const session: SESSION = this;
+    Resource.Headers.request.set(SESSION.const.AUTHORIZATION_HEADER,
+      `${session.token_type} ${session.token}`)
+  }
 
-    token_type = 'bearer';
 
-    @Column({
-        length: 50,
-        nullable: true
-    })
-    ip: string;
-
-    @CreateDateColumn()
-    createdDate: Date;
-
-    @Column({
-        nullable: false
-    })
-    expiredDate: Date;
-
-    @OneToOne(type => USER, user => user.id, {
-        nullable: true
-    })
-    @JoinColumn()
-    user: USER;
-
-    private createToken(token?: string) {
-        this.createdDate = new Date();
-        const timestamp = this.createdDate.getTime();
-        this.token = token ? token : generate(this.user.id + timestamp + this.ip)
-        this.expiredDate = new Date(timestamp + SESSION.const.SESSION_TIME_SECONDS * 1000)
-    }
-
-    isExpired(when: Date = new Date()) {
-        let time = {
-            expire: this.expiredDate.getTime(),
-            now: when.getTime()
-        }
-        return (time.expire < time.now);
-    }
-
-    public saveInLocalStorage() {
-        let session: SESSION = this;
-        window.localStorage.setItem(SESSION.const.SESSION_LOCAL_STORAGE, JSON.stringify(session));
-    }
-
-    public static fromLocalStorage(): SESSION {
+  public get db() {
+    return {
+      fromLocalStorage(): SESSION {
         let session: SESSION = new SESSION();
         try {
-            const data = window.localStorage.getItem(SESSION.const.SESSION_LOCAL_STORAGE);
-            const s = JSON.parse(data) as SESSION;
-            session.token = s.token;
-            session.token_type = s.token_type;
-            session.expiredDate = new Date(s.expiredDate as any);
+          const data = window.localStorage.getItem(SESSION.const.SESSION_LOCAL_STORAGE);
+          const s = JSON.parse(data) as SESSION;
+          session.token = s.token;
+          session.token_type = s.token_type;
+          session.expiredDate = new Date(s.expiredDate as any);
         } catch {
-            session = undefined;
+          session = undefined;
         }
         return session;
-    }
+      },
 
-    public static removeFromLocalStorage() {
+      removeFromLocalStorage() {
         window.localStorage.removeItem(SESSION.const.SESSION_LOCAL_STORAGE);
-    }
+      },
 
-    public activateBrowserToken() {
-        const session: SESSION = this;
-        Resource.Headers.request.set(SESSION.const.AUTHORIZATION_HEADER,
-            `${session.token_type} ${session.token}`)
-    }
-
-    public static async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
+      async getByUser(user: USER, ip: string, repo: Repository<SESSION>) {
         //#region @backendFunc
-        const Session = await repo.createQueryBuilder(__(SESSION))
-            .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
-            .where(`${__(SESSION)}.user = :id`)
-            .andWhere(`${__(SESSION)}.ip = :ip`)
-            .setParameters({
-                id: user.id,
-                ip
-            })
-            .getOne()
+        const Session = await repo.createQueryBuilder(tableNameFrom(SESSION))
+          .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
+          .where(`${tableNameFrom(SESSION)}.user = :id`)
+          .andWhere(`${tableNameFrom(SESSION)}.ip = :ip`)
+          .setParameters({
+            id: user.id,
+            ip
+          })
+          .getOne()
         if (Session) {
-            Session.expireInSeconds = Session.calculateExpirationTime();
+          Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion
-    }
-    public static async getByToken(token: string, repo: Repository<SESSION>) {
+      },
+      async getByToken(token: string, repo: Repository<SESSION>) {
         //#region @backendFunc
-        const Session = await repo.createQueryBuilder(__(SESSION))
-            .innerJoinAndSelect(`${__(SESSION)}.user`, __(USER))
-            .where(`${__(SESSION)}.token = :token`)
-            .setParameter('token', token)
-            .getOne();
+        const Session = await repo.createQueryBuilder(tableNameFrom(SESSION))
+          .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
+          .where(`${tableNameFrom(SESSION)}.token = :token`)
+          .setParameter('token', token)
+          .getOne();
         if (Session) {
-            Session.expireInSeconds = Session.calculateExpirationTime();
+          Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion
-    }
+      },
 
-    public static async create(user: USER, ip: string, repo: Repository<SESSION>) {
+      async create(user: USER, ip: string, repo: Repository<SESSION>) {
         //#region @backendFunc
         let Session = new SESSION();
         Session.user = user;
@@ -158,11 +161,15 @@ export class SESSION {
 
         Session = await repo.save(Session);
         if (Session) {
-            Session.expireInSeconds = Session.calculateExpirationTime();
+          Session.expireInSeconds = Session.calculateExpirationTime();
         }
         return Session;
         //#endregion
+      }
     }
+  }
+
+
 
 }
 

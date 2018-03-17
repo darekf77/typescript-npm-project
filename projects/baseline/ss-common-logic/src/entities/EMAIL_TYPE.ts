@@ -17,14 +17,13 @@ import { Entity } from "typeorm/decorator/entity/Entity";
 
 
 import { EMAIL } from "./EMAIL";
-import { __ } from '../helpers';
+import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
 
-@Entity(__(EMAIL_TYPE))
-export class EMAIL_TYPE {
-
+@Entity(tableNameFrom(EMAIL_TYPE))
+export class EMAIL_TYPE extends BASE_ENTITY {
 
   @PrimaryGeneratedColumn()
   id: number;
@@ -40,35 +39,41 @@ export class EMAIL_TYPE {
   })
   emails: EMAIL[] = [];
 
-  public static async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
-    //#region @backendFunc
-    const etype = await repo.findOne({
-      where: {
-        name
+  get db() {
+    return {
+      async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
+        //#region @backendFunc
+        const etype = await repo.findOne({
+          where: {
+            name
+          }
+        })
+        return etype;
+        //#endregion
+      },
+
+      async init(repo: Repository<EMAIL_TYPE>) {
+        //#region @backendFunc
+        const types = [
+          await repo.save(this.db.create('facebook')),
+          await repo.save(this.db.create('normal_auth')),
+          await repo.save(this.db.create('twitter')),
+          await repo.save(this.db.create('google_plus'))
+        ];
+        return types;
+        //#endregion
+      },
+
+
+      create(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
+        let t = new EMAIL_TYPE();
+        t.name = name;
+        return t;
       }
-    })
-    return etype;
-    //#endregion
-  }
-
-  public static async init(repo: Repository<EMAIL_TYPE>) {
-    //#region @backendFunc
-    const types = [
-      await repo.save(EMAIL_TYPE.create('facebook')),
-      await repo.save(EMAIL_TYPE.create('normal_auth')),
-      await repo.save(EMAIL_TYPE.create('twitter')),
-      await repo.save(EMAIL_TYPE.create('google_plus'))
-    ];
-    return types;
-    //#endregion
+    }
   }
 
 
-  private static create(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
-    let t = new EMAIL_TYPE();
-    t.name = name;
-    return t;
-  }
 
 }
 

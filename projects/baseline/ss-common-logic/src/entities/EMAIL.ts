@@ -23,47 +23,53 @@ import { Router, Request, Response } from "express";
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
 
-import { __ } from '../helpers';
+import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
-@Entity(__(EMAIL))
-export class EMAIL {
+@Entity(tableNameFrom(EMAIL))
+export class EMAIL extends BASE_ENTITY {
 
-    constructor(address: string) {
-        this.address = address;
-    }
+  constructor(address: string) {
+    super()
+    this.address = address;
+  }
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  public id: number;
 
-    @Column('varchar', { length: 100, unique: true })
-    address: string;
-
-
-    @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
-        cascadeInsert: false,
-        cascadeUpdate: false
-    })
-    @JoinTable()
-    types: EMAIL_TYPE[] = [];
+  @Column('varchar', { length: 100, unique: true })
+  address: string;
 
 
-    @ManyToOne(type => USER, user => user.id, {
-        cascadeAll: false
-    })
-    @JoinColumn()
-    user: USER;
+  @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  @JoinTable()
+  types: EMAIL_TYPE[] = [];
 
 
-    public static async getUser(address: string, repo: Repository<EMAIL>) {
+  @ManyToOne(type => USER, user => user.id, {
+    cascadeAll: false
+  })
+  @JoinColumn()
+  user: USER;
+
+  get db() {
+    return {
+      async getUser(address: string, repo: Repository<EMAIL>) {
         //#region @backendFunc
         const Email = await repo.findOne({
-            where: {
-                address
-            }
+          where: {
+            address
+          }
         });
         if (Email) return Email.user;
         //#endregion
+      }
     }
+  }
+
+
 
 }
 

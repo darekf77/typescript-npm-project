@@ -19,60 +19,63 @@ import { authenticate } from "passport";
 import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
-import { __ } from '../helpers';
+import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 export interface IUSER {
-    email?: string;
-    username: string;
-    password: string;
-    firstname?: string;
-    lastname?: string;
-    city?: string;
+  email?: string;
+  username: string;
+  password: string;
+  firstname?: string;
+  lastname?: string;
+  city?: string;
 }
 
 
-@Entity(__(USER))
-export class USER implements IUSER {
+@Entity(tableNameFrom(USER))
+export class USER extends BASE_ENTITY implements IUSER {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    session: SESSION;
+  session: SESSION;
 
-    @Column() username: string;
-    @Column() password: string;
-    @Column({ nullable: true }) firstname: string;
-    @Column({ nullable: true }) lastname: string;
-    @Column({ nullable: true }) email?: string;
+  @Column() username: string;
+  @Column() password: string;
+  @Column({ nullable: true }) firstname: string;
+  @Column({ nullable: true }) lastname: string;
+  @Column({ nullable: true }) email?: string;
 
-    @OneToMany(type => EMAIL, email => email.user, {
-        cascadeUpdate: false,
-        cascadeInsert: false
-    })
-    emails: EMAIL[] = [];
+  @OneToMany(type => EMAIL, email => email.user, {
+    cascadeUpdate: false,
+    cascadeInsert: false
+  })
+  emails: EMAIL[] = [];
 
-    public static async byUsername(username: string, repo: Repository<USER>) {
-        //#region @backendFunc
-        const User = await repo
-            .createQueryBuilder(__(USER))
-            .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')
-            .where(`${__(USER)}.username = :username`)
-            .setParameter('username', username)
-            .getOne()
+  get db(){
+    return {
+      async byUsername(username: string, repo: Repository<USER>) {
+        #region @backendFunc
+        nst User = await repo
+          .createQueryBuilder(tableNameFrom(USER))
+          .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+          .where(`${tableNameFrom(USER)}.username = :username`)
+          .setParameter('username', username)
+          .getOne()
         return User;
         //#endregion
-    }
+      },
 
-    public static async byId(id: number, repo: Repository<USER>) {
+      async byId(id: number, repo: Repository<USER>) {
         //#region @backendFunc
         const User = await repo
-            .createQueryBuilder(__(USER))
-            .innerJoinAndSelect(`${__(USER)}.emails`, 'emails')
-            .where(`${__(USER)}.id = :id`)
-            .setParameter('id', id)
-            .getOne()
+          .createQueryBuilder(tableNameFrom(USER))
+          .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+          .where(`${tableNameFrom(USER)}.id = :id`)
+          .setParameter('id', id)
+          .getOne()
         return User;
         //#endregion
+      }
     }
 }
 
