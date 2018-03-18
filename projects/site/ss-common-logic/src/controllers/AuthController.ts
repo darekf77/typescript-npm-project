@@ -3,11 +3,16 @@ import {
   ENDPOINT
 } from 'morphi';
 // thirdpart
-import { AuthController } from "baseline/ss-common-logic/bundle/controllers/AuthController";
+import { AuthController as BaselineAuthController } from "baseline/ss-common-logic/bundle/controllers/AuthController";
 
 
 @ENDPOINT()
-export class AuthControllerExtended extends AuthController {
+export class AuthController extends BaselineAuthController {
+
+  get ENTITIES() {
+    const config = super.
+
+  }
 
 }
 
