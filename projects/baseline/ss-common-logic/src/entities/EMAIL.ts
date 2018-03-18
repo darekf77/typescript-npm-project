@@ -58,7 +58,8 @@ export class EMAIL extends BASE_ENTITY {
 
 @EntityRepository(EMAIL)
 export class EMAIL_REPOSITORY extends Repository<EMAIL> {
-  async getUser(address: string) {
+  
+  async getUserBy(address: string) {
     //#region @backendFunc
     const Email = await this.findOne({
       where: {
@@ -68,6 +69,18 @@ export class EMAIL_REPOSITORY extends Repository<EMAIL> {
     if (Email) return Email.user;
     //#endregion
   }
+
+  async findBy(address: string) {
+    //#region @backendFunc
+    return await this
+      .createQueryBuilder(tableNameFrom(EMAIL))
+      .innerJoinAndSelect(`${tableNameFrom(EMAIL)}.user`, 'user')
+      .where(`${tableNameFrom(EMAIL)}.address = :email`)
+      .setParameter('email', address)
+      .getOne();
+    //#endregion
+  }
+
 }
 
 export default EMAIL;

@@ -73,7 +73,7 @@ export class USER_REPOSITORY extends Repository<USER> {
     //#endregion
   }
 
-  byId(id: number, repo: Repository<USER>) {
+  byId(id: number) {
     //#region @backendFunc
     return this
       .createQueryBuilder(tableNameFrom(USER))

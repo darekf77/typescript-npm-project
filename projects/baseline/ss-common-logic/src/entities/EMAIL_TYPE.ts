@@ -41,9 +41,9 @@ export class EMAIL_TYPE extends BASE_ENTITY {
 
 @EntityRepository(EMAIL_TYPE)
 export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
-  async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
+  async getBy(name: EMAIL_TYPE_NAME) {
     //#region @backendFunc
-    const etype = await repo.findOne({
+    const etype = await this.findOne({
       where: {
         name
       }
@@ -51,22 +51,24 @@ export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
     return etype;
     //#endregion
   }
-  async init(repo: Repository<EMAIL_TYPE>) {
+  async init() {
     //#region @backendFunc
     const types = [
-      await repo.save(this.createFrom('facebook')),
-      await repo.save(this.createFrom('normal_auth')),
-      await repo.save(this.createFrom('twitter')),
-      await repo.save(this.createFrom('google_plus'))
+      await this.save(this.createFrom('facebook')),
+      await this.save(this.createFrom('normal_auth')),
+      await this.save(this.createFrom('twitter')),
+      await this.save(this.createFrom('google_plus'))
     ];
     return types;
     //#endregion
   }
 
   createFrom(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
+    //#region @backendFunc
     let t = new EMAIL_TYPE();
     t.name = name;
     return t;
+    //#endregion
   }
 }
 

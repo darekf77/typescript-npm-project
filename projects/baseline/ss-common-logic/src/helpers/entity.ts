@@ -11,25 +11,27 @@ export function tableNameFrom(entityClass: Function | BASE_ENTITY) {
   return `tb_${entityClass.name.toLowerCase()}`
 };
 
-export interface META_INFO_ENTITY<T> {
-  db: Repository<T>;
+export interface META_INFO_ENTITY<E, ER> {
+  entityClass: { new(any?): E };
+  db: ER;
   table: string;
 }
 
-export function getMeta<E, ER=META_INFO_ENTITY<E>>(connection: Connection,
+export function getMeta<E, ER=Repository<E>>(connection: Connection,
   entityClass: Function,
   entityCustomRepo?: Function, config?: Object) {
   if (config) {
     Object.assign(entityClass.prototype, config);
   }
   return {
+    entityClass: entityClass,
     get db() {
       const res = entityCustomRepo ? connection.getCustomRepository(entityCustomRepo) : connection.getRepository(entityClass);
       if (config) {
         Object.assign(res, config)
       }
-      return res;
+      return res as ER;
     },
     table: tableNameFrom(entityClass)
-  } as ER & META_INFO_ENTITY<E>;
+  } as META_INFO_ENTITY<E, ER>;
 }

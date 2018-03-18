@@ -142,7 +142,7 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
     //#endregion
   }
 
-  async createWithIp(user: USER, ip: string) {
+  async getFrom(user: USER, ip: string) {
     //#region @backendFunc
     let Session = new SESSION();
     Session.user = user;
