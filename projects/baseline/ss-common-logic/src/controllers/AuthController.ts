@@ -24,10 +24,10 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
-import { USER as tUSER, IUSER as tIUSER, USER_REPOSITORY, } from '../entities/USER';
-import { SESSION as tSESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
-import { EMAIL as tEMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
-import { EMAIL_TYPE as tEMAIL_TYPE, EMAIL_TYPE_NAME as tEMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
+import { USER, IUSER, USER_REPOSITORY, } from '../entities/USER';
+import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
+import { EMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
 import { tableNameFrom, getMeta, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
 
 
@@ -78,17 +78,17 @@ export class AuthController extends BASE_CONTROLLER {
 
   get ENTITIES() {
     return {
-      USER: getMeta<tUSER, USER_REPOSITORY>(
-        this.connection, tUSER, USER_REPOSITORY
+      USER: getMeta<USER, USER_REPOSITORY>(
+        this.connection, USER, USER_REPOSITORY
       ),
-      SESSION: getMeta<tSESSION, SESSION_REPOSITORY>(
-        this.connection, tSESSION, SESSION_REPOSITORY, SESSION_CONFIG
+      SESSION: getMeta<SESSION, SESSION_REPOSITORY>(
+        this.connection, SESSION, SESSION_REPOSITORY, SESSION_CONFIG
       ),
-      EMAIL: getMeta<tEMAIL, EMAIL_REPOSITORY>(
-        this.connection, tEMAIL, EMAIL_REPOSITORY
+      EMAIL: getMeta<EMAIL, EMAIL_REPOSITORY>(
+        this.connection, EMAIL, EMAIL_REPOSITORY
       ),
-      EMAIL_TYPE: getMeta<tEMAIL_TYPE, EMAIL_TYPE_REPOSITORY>(
-        this.connection, tEMAIL_TYPE, EMAIL_TYPE_REPOSITORY
+      EMAIL_TYPE: getMeta<EMAIL_TYPE, EMAIL_TYPE_REPOSITORY>(
+        this.connection, EMAIL_TYPE, EMAIL_TYPE_REPOSITORY
       )
     }
   }
@@ -137,7 +137,7 @@ export class AuthController extends BASE_CONTROLLER {
           log.er(error)
         }
       },
-      async authorize(session: tSESSION) {
+      async authorize(session: SESSION) {
         self.ENTITIES.SESSION.db.localStorage.saveInLocalStorage(session);
         session.activateBrowserToken();
         try {
@@ -152,7 +152,7 @@ export class AuthController extends BASE_CONTROLLER {
           }
         }
       },
-      async logout(session?: tSESSION) {
+      async logout(session?: SESSION) {
         self._subIsLggedIn.next(false)
         if (session) {
           try {
@@ -170,7 +170,7 @@ export class AuthController extends BASE_CONTROLLER {
 
 
   @GET('/')
-  info(): Response<tUSER> {
+  info(): Response<USER> {
     //#region @backendFunc
     const self = this;
     return async (req, res) => {
@@ -224,7 +224,7 @@ export class AuthController extends BASE_CONTROLLER {
     const self = this;
     return async (req, res) => {
 
-      let User: tUSER = req.user;
+      let User: USER = req.user;
       if (!User) {
         throw 'No user for logout';
       }
@@ -245,12 +245,12 @@ export class AuthController extends BASE_CONTROLLER {
   }
 
   @POST('/login')
-  login(@BodyParam() body: IHelloJS & tIUSER): Response<tSESSION> {
+  login(@BodyParam() body: IHelloJS & IUSER): Response<SESSION> {
     //#region @backendFunc
     const self = this;
     return async (req) => {
       const userIP = req.ip;
-      let user: tUSER;
+      let user: USER;
       if (body.authResponse && body.network && body.network === 'facebook') {
         user = await self.__authorization.facebook(body);
       } else {
@@ -269,7 +269,7 @@ export class AuthController extends BASE_CONTROLLER {
     //#region @backendFunc
     const self = this;
     return {
-      async facebook(body: IHelloJS): Promise<tUSER> {
+      async facebook(body: IHelloJS): Promise<USER> {
 
         const fb = await self.__handle.facebook().getData(body);
         const dbEmail = await self.__check.exist.email(fb.email);
@@ -293,8 +293,8 @@ export class AuthController extends BASE_CONTROLLER {
 
       },
       email: {
-        async login(form: tIUSER): Promise<tUSER> {
-          function checkPassword(user: tUSER) {
+        async login(form: IUSER): Promise<USER> {
+          function checkPassword(user: USER) {
             if (user && bcrypt.compareSync(form.password, user.password)) {
               return user;
             }
@@ -320,7 +320,7 @@ export class AuthController extends BASE_CONTROLLER {
           }
           throw new Error('Wron email or username');
         },
-        async register(form: tIUSER): Promise<tUSER> {
+        async register(form: IUSER): Promise<USER> {
 
           const emailExist = await self.__check.exist.email(form.email);
           if (emailExist) {
@@ -422,7 +422,7 @@ export class AuthController extends BASE_CONTROLLER {
           return email;
         }
       },
-      ifRegistration(body: tIUSER) {
+      ifRegistration(body: IUSER) {
         const {
           email,
           username,
@@ -450,7 +450,7 @@ export class AuthController extends BASE_CONTROLLER {
   }
 
 
-  private async  __token(user: tUSER, ip: string) {
+  private async  __token(user: USER, ip: string) {
     //#region @backendFunc
     if (!user || !user.id) {
       throw new Error('No user to send token');
@@ -467,7 +467,7 @@ export class AuthController extends BASE_CONTROLLER {
     //#endregion
   }
 
-  private async __createUser(formData: tIUSER, EmailTypeName: tEMAIL_TYPE_NAME) {
+  private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
     let EmailType = await this.ENTITIES.EMAIL_TYPE.db.getBy(EmailTypeName);
@@ -538,7 +538,7 @@ export class AuthController extends BASE_CONTROLLER {
     const types = await this.ENTITIES.EMAIL_TYPE.db.init();
 
     const strategy = async (token, cb) => {
-      let user: tUSER = null;
+      let user: USER = null;
       const Session = await this.ENTITIES.SESSION.db.getByToken(token);
 
       if (Session) {
