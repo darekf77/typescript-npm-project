@@ -16,14 +16,20 @@ export interface META_INFO_ENTITY<T> {
   table: string;
 }
 
-export function getMeta<E, ER=E>(connection: Connection,
+export function getMeta<E, ER=META_INFO_ENTITY<E>>(connection: Connection,
   entityClass: Function,
-  entityCustomRepo?: Function) {
-
+  entityCustomRepo?: Function, config?: Object) {
+  if (config) {
+    Object.assign(entityClass.prototype, config);
+  }
   return {
     get db() {
-      return entityCustomRepo ? connection.getCustomRepository(entityCustomRepo) : connection.getRepository(entityClass);
+      const res = entityCustomRepo ? connection.getCustomRepository(entityCustomRepo) : connection.getRepository(entityClass);
+      if (config) {
+        Object.assign(res, config)
+      }
+      return res;
     },
     table: tableNameFrom(entityClass)
-  } as META_INFO_ENTITY<ER>;
+  } as ER & META_INFO_ENTITY<E>;
 }

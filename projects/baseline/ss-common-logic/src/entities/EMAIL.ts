@@ -1,3 +1,4 @@
+//#region typeorm imports
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";
 import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
@@ -15,6 +16,8 @@ import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
 import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
+import { EntityRepository } from 'typeorm';
+//#endregion
 
 //#region @backend
 import { Router, Request, Response } from "express";
@@ -22,7 +25,6 @@ import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-
 import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 @Entity(tableNameFrom(EMAIL))
@@ -39,7 +41,6 @@ export class EMAIL extends BASE_ENTITY {
   @Column('varchar', { length: 100, unique: true })
   address: string;
 
-
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
     cascadeInsert: false,
     cascadeUpdate: false
@@ -47,30 +48,26 @@ export class EMAIL extends BASE_ENTITY {
   @JoinTable()
   types: EMAIL_TYPE[] = [];
 
-
   @ManyToOne(type => USER, user => user.id, {
     cascadeAll: false
   })
   @JoinColumn()
   user: USER;
 
-  get db() {
-    return {
-      async getUser(address: string, repo: Repository<EMAIL>) {
-        //#region @backendFunc
-        const Email = await repo.findOne({
-          where: {
-            address
-          }
-        });
-        if (Email) return Email.user;
-        //#endregion
+}
+
+@EntityRepository(EMAIL)
+export class EMAIL_REPOSITORY extends Repository<EMAIL> {
+  async getUser(address: string) {
+    //#region @backendFunc
+    const Email = await this.findOne({
+      where: {
+        address
       }
-    }
+    });
+    if (Email) return Email.user;
+    //#endregion
   }
-
-
-
 }
 
 export default EMAIL;

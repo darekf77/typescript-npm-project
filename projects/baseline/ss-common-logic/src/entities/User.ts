@@ -1,3 +1,4 @@
+//#region typeorm imports
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";
 import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
@@ -12,6 +13,7 @@ import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGenerat
 import { Entity } from "typeorm/decorator/entity/Entity";
 import { EntityRepository } from 'typeorm/decorator/EntityRepository';
 import { getCustomRepository } from 'typeorm';
+//#endregion
 
 //#region @backend
 import { Router, Request, Response } from 'express';
@@ -24,7 +26,6 @@ import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
 import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 
-
 export interface IUSER {
   email?: string;
   username: string;
@@ -33,8 +34,6 @@ export interface IUSER {
   lastname?: string;
   city?: string;
 }
-
-
 
 
 @Entity(tableNameFrom(USER))
@@ -58,6 +57,7 @@ export class USER extends BASE_ENTITY implements IUSER {
   emails: EMAIL[] = [];
 
 }
+
 
 @EntityRepository(USER)
 export class USER_REPOSITORY extends Repository<USER> {

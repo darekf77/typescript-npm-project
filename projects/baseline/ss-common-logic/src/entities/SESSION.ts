@@ -1,3 +1,4 @@
+//#region typeorm imports
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";
 import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
@@ -14,31 +15,33 @@ import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
 import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
+import { EntityRepository } from 'typeorm';
+//#endregion
 
+//#region @backend
 import { verify, generate } from "password-hash";
+//#endregion
 
 
-// local
 import { Log, Level } from "ng2-logger";
 import { Resource } from "ng2-rest";
 const log = Log.create(__filename);
 
 import { USER } from './USER';
 import { tableNameFrom, BASE_ENTITY } from '../helpers';
-import { EntityRepository } from 'typeorm';
 
+export const SESSION_CONFIG = {
+  SESSION_TIME_SECONDS: 3600,
+  SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
+  AUTHORIZATION_HEADER: 'Authorization'
+}
 
 
 @Entity(tableNameFrom(SESSION))
 export class SESSION extends BASE_ENTITY {
 
-  public static get const() {
-    return {
-      SESSION_TIME_SECONDS: 3600,
-      SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
-      AUTHORIZATION_HEADER: 'Authorization'
-    }
-  }
+  AUTHORIZATION_HEADER = SESSION_CONFIG.AUTHORIZATION_HEADER;
+  SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
 
   expireInSeconds: number;
   calculateExpirationTime(): number {
@@ -74,12 +77,14 @@ export class SESSION extends BASE_ENTITY {
   @JoinColumn()
   user: USER;
 
+  //#region @backend
   public createToken(token?: string) {
     this.createdDate = new Date();
     const timestamp = this.createdDate.getTime();
     this.token = token ? token : generate(this.user.id + timestamp + this.ip)
-    this.expiredDate = new Date(timestamp + SESSION.const.SESSION_TIME_SECONDS * 1000)
+    this.expiredDate = new Date(timestamp + this.SESSION_TIME_SECONDS * 1000)
   }
+  //#endregion
 
   isExpired(when: Date = new Date()) {
     let time = {
@@ -89,47 +94,21 @@ export class SESSION extends BASE_ENTITY {
     return (time.expire < time.now);
   }
 
-  public saveInLocalStorage() {
-    let session: SESSION = this;
-    window.localStorage.setItem(SESSION.const.SESSION_LOCAL_STORAGE, JSON.stringify(session));
-  }
-
   public activateBrowserToken() {
     const session: SESSION = this;
-    Resource.Headers.request.set(SESSION.const.AUTHORIZATION_HEADER,
+    Resource.Headers.request.set(this.AUTHORIZATION_HEADER,
       `${session.token_type} ${session.token}`)
-  }
-
-
-  public get db() {
-    return {
-
-
-    }
   }
 
 }
 
 
+
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends Repository<SESSION> {
-  fromLocalStorage(): SESSION {
-    let session: SESSION = new SESSION();
-    try {
-      const data = window.localStorage.getItem(SESSION.const.SESSION_LOCAL_STORAGE);
-      const s = JSON.parse(data) as SESSION;
-      session.token = s.token;
-      session.token_type = s.token_type;
-      session.expiredDate = new Date(s.expiredDate as any);
-    } catch {
-      session = undefined;
-    }
-    return session;
-  }
 
-  removeFromLocalStorage() {
-    window.localStorage.removeItem(SESSION.const.SESSION_LOCAL_STORAGE);
-  }
+  SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
+  SESSION_LOCAL_STORAGE = SESSION_CONFIG.SESSION_LOCAL_STORAGE;
 
   async getByUser(user: USER, ip: string) {
     //#region @backendFunc
@@ -177,6 +156,33 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
     }
     return Session;
     //#endregion
+  }
+
+  public get localStorage() {
+
+    return {
+      saveInLocalStorage(session: SESSION) {
+        window.localStorage.setItem(this.SESSION_LOCAL_STORAGE, JSON.stringify(session));
+      },
+
+      fromLocalStorage(): SESSION {
+        let session: SESSION = new SESSION();
+        try {
+          const data = window.localStorage.getItem(this.SESSION_LOCAL_STORAGE);
+          const s = JSON.parse(data) as SESSION;
+          session.token = s.token;
+          session.token_type = s.token_type;
+          session.expiredDate = new Date(s.expiredDate as any);
+        } catch {
+          session = undefined;
+        }
+        return session;
+      },
+
+      removeFromLocalStorage() {
+        window.localStorage.removeItem(this.SESSION_LOCAL_STORAGE);
+      }
+    }
   }
 
 }

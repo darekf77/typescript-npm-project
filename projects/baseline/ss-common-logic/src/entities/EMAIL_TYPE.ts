@@ -1,3 +1,4 @@
+//#region typeorm imports
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";
 import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
@@ -14,13 +15,13 @@ import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
 import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
-
+import { EntityRepository } from 'typeorm';
+//#endregion
 
 import { EMAIL } from "./EMAIL";
 import { tableNameFrom, BASE_ENTITY } from '../helpers';
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
-
 
 @Entity(tableNameFrom(EMAIL_TYPE))
 export class EMAIL_TYPE extends BASE_ENTITY {
@@ -28,53 +29,45 @@ export class EMAIL_TYPE extends BASE_ENTITY {
   @PrimaryGeneratedColumn()
   id: number;
 
-
   @Column({ length: 50, unique: true })
   name: EMAIL_TYPE_NAME;
-
 
   @ManyToMany(type => EMAIL, email => email.types, {
     cascadeInsert: false,
     cascadeUpdate: false
   })
   emails: EMAIL[] = [];
+}
 
-  get db() {
-    return {
-      async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
-        //#region @backendFunc
-        const etype = await repo.findOne({
-          where: {
-            name
-          }
-        })
-        return etype;
-        //#endregion
-      },
-
-      async init(repo: Repository<EMAIL_TYPE>) {
-        //#region @backendFunc
-        const types = [
-          await repo.save(this.db.create('facebook')),
-          await repo.save(this.db.create('normal_auth')),
-          await repo.save(this.db.create('twitter')),
-          await repo.save(this.db.create('google_plus'))
-        ];
-        return types;
-        //#endregion
-      },
-
-
-      create(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
-        let t = new EMAIL_TYPE();
-        t.name = name;
-        return t;
+@EntityRepository(EMAIL_TYPE)
+export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
+  async getBy(name: EMAIL_TYPE_NAME, repo: Repository<EMAIL_TYPE>) {
+    //#region @backendFunc
+    const etype = await repo.findOne({
+      where: {
+        name
       }
-    }
+    })
+    return etype;
+    //#endregion
+  }
+  async init(repo: Repository<EMAIL_TYPE>) {
+    //#region @backendFunc
+    const types = [
+      await repo.save(this.createFrom('facebook')),
+      await repo.save(this.createFrom('normal_auth')),
+      await repo.save(this.createFrom('twitter')),
+      await repo.save(this.createFrom('google_plus'))
+    ];
+    return types;
+    //#endregion
   }
 
-
-
+  createFrom(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
+    let t = new EMAIL_TYPE();
+    t.name = name;
+    return t;
+  }
 }
 
 export default EMAIL_TYPE;

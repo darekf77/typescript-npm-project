@@ -24,10 +24,10 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
-import { USER as tUSER, IUSER as tIUSER, USER_REPOSITORY } from '../entities/USER';
-import { SESSION as tSESSION } from '../entities/SESSION';
-import { EMAIL as tEMAIL } from '../entities/EMAIL';
-import { EMAIL_TYPE as tEMAIL_TYPE, EMAIL_TYPE_NAME as tEMAIL_TYPE_NAME } from '../entities/EMAIL_TYPE';
+import { USER as tUSER, IUSER as tIUSER, USER_REPOSITORY, } from '../entities/USER';
+import { SESSION as tSESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
+import { EMAIL as tEMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
+import { EMAIL_TYPE as tEMAIL_TYPE, EMAIL_TYPE_NAME as tEMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
 import { tableNameFrom, getMeta, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
 
 
@@ -79,9 +79,9 @@ export class AuthController extends BASE_CONTROLLER {
   get ENTITIES() {
     return {
       USER: getMeta<tUSER, USER_REPOSITORY>(this.connection, tUSER, USER_REPOSITORY),
-      SESSION: getMeta<tSESSION>(this.connection, tSESSION),
-      EMAIL: getMeta<tEMAIL>(this.connection, tEMAIL),
-      EMAIL_TYPE: getMeta<tEMAIL_TYPE>(this.connection, tEMAIL_TYPE)
+      SESSION: getMeta<tSESSION, SESSION_REPOSITORY>(this.connection, tSESSION, SESSION_REPOSITORY, SESSION_CONFIG),
+      EMAIL: getMeta<tEMAIL>(this.connection, tEMAIL, EMAIL_REPOSITORY),
+      EMAIL_TYPE: getMeta<tEMAIL_TYPE>(this.connection, tEMAIL_TYPE, EMAIL_TYPE_REPOSITORY)
     }
   }
 
@@ -89,8 +89,8 @@ export class AuthController extends BASE_CONTROLLER {
 
   constructor() {
     super();
-    this.ENTITIES.USER.t
 
+    this.ENTITIES.SESSION.
     this.browser.init()
     //#region @backend
     this.__init();
@@ -107,7 +107,7 @@ export class AuthController extends BASE_CONTROLLER {
         if (isNode) {
           return;
         }
-        const session = self.ENTITIES.SESSION.class.API.fromLocalStorage()
+        const session = self.ENTITIES.SESSION.db. fromLocalStorage()
         if (!session) {
           self.browser.logout();
           return
