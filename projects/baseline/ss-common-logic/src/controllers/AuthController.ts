@@ -29,6 +29,7 @@ import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION
 import { EMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
 import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
 import { tableNameFrom, getMeta, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
+import * as ENTITIES from '../entities/index';
 
 
 
@@ -76,22 +77,7 @@ export interface IFacebook {
 })
 export class AuthController extends BASE_CONTROLLER {
 
-  get ENTITIES() {
-    return {
-      USER: getMeta<USER, USER_REPOSITORY>(
-        this.connection, USER, USER_REPOSITORY
-      ),
-      SESSION: getMeta<SESSION, SESSION_REPOSITORY>(
-        this.connection, SESSION, SESSION_REPOSITORY, SESSION_CONFIG
-      ),
-      EMAIL: getMeta<EMAIL, EMAIL_REPOSITORY>(
-        this.connection, EMAIL, EMAIL_REPOSITORY
-      ),
-      EMAIL_TYPE: getMeta<EMAIL_TYPE, EMAIL_TYPE_REPOSITORY>(
-        this.connection, EMAIL_TYPE, EMAIL_TYPE_REPOSITORY
-      )
-    }
-  }
+  ENTITIES = ENTITIES.ENTITIES();
 
   getEntities() {
     return this.ENTITIES;
@@ -471,7 +457,7 @@ export class AuthController extends BASE_CONTROLLER {
     //#endregion
   }
 
-  private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
+  private async __createUser(formData: IUSER, EmailTypeName: ENTITIES.EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
     let EmailType = await this.ENTITIES.EMAIL_TYPE.db.getBy(EmailTypeName);
