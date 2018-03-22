@@ -107,6 +107,12 @@ export class SESSION extends BASE_ENTITY {
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends Repository<SESSION> {
 
+  public get ENTITIES() {
+    return {
+      SESSION: SESSION_META()
+    }
+  }
+
   SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
   SESSION_LOCAL_STORAGE = SESSION_CONFIG.SESSION_LOCAL_STORAGE;
 
@@ -144,6 +150,7 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
 
   async getFrom(user: USER, ip: string) {
     //#region @backendFunc
+
     let Session = new SESSION();
     Session.user = user;
     Session.ip = ip;

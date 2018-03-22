@@ -13,7 +13,7 @@ export class META<E, ER> {
     return `tb_${entityClass.name.toLowerCase()}`
   };
 
-  public static get<E, ER=Repository<E>>(connection: Connection,
+  public static get<E, ER = Repository<E>>(connection: Connection,
     entityClass: Function,
     entityCustomRepo?: Function, config?: Object) {
     if (config) {
