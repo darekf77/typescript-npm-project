@@ -93,6 +93,10 @@ export class AuthController extends BASE_CONTROLLER {
     }
   }
 
+  getEntities() {
+    return this.ENTITIES;
+  }
+
   @OrmConnection connection: Connection;
 
   constructor() {
