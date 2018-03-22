@@ -23,7 +23,7 @@ import { authenticate } from "passport";
 import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
-import { tableNameFrom, BASE_ENTITY } from '../helpers';
+import { BASE_ENTITY, META } from '../helpers';
 
 
 export interface IUSER {
@@ -36,7 +36,7 @@ export interface IUSER {
 }
 
 
-@Entity(tableNameFrom(USER))
+@Entity(META.tableNameFrom(USER))
 export class USER extends BASE_ENTITY implements IUSER {
 
   @PrimaryGeneratedColumn()
@@ -65,9 +65,9 @@ export class USER_REPOSITORY extends Repository<USER> {
   byUsername(username: string) {
     //#region @backendFunc
     return this
-      .createQueryBuilder(tableNameFrom(USER))
-      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${tableNameFrom(USER)}.username = :username`)
+      .createQueryBuilder(META.tableNameFrom(USER))
+      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${META.tableNameFrom(USER)}.username = :username`)
       .setParameter('username', username)
       .getOne()
     //#endregion
@@ -76,9 +76,9 @@ export class USER_REPOSITORY extends Repository<USER> {
   byId(id: number) {
     //#region @backendFunc
     return this
-      .createQueryBuilder(tableNameFrom(USER))
-      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${tableNameFrom(USER)}.id = :id`)
+      .createQueryBuilder(META.tableNameFrom(USER))
+      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${META.tableNameFrom(USER)}.id = :id`)
       .setParameter('id', id)
       .getOne()
     //#endregion
@@ -86,5 +86,8 @@ export class USER_REPOSITORY extends Repository<USER> {
 
 }
 
+export const USER_META = function (connection: Connection) {
+  return META.getMeta<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY)
+}
 
 export default USER;

@@ -24,13 +24,11 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
-import { USER, IUSER, USER_REPOSITORY, } from '../entities/USER';
-import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
-import { EMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
-import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
-import { tableNameFrom, getMeta, META_INFO_ENTITY, BASE_CONTROLLER } from '../helpers';
-import * as ENTITIES from '../entities/index';
-
+import { USER, IUSER, USER_REPOSITORY, USER_META, } from '../entities/USER';
+import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY, SESSION_META } from '../entities/SESSION';
+import { EMAIL, EMAIL_REPOSITORY, EMAIL_META } from '../entities/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY, EMAIL_TYPE_META } from '../entities/EMAIL_TYPE';
+import { META, BASE_CONTROLLER } from '../helpers';
 
 
 export interface IHelloJS {
@@ -77,10 +75,13 @@ export interface IFacebook {
 })
 export class AuthController extends BASE_CONTROLLER {
 
-  ENTITIES = ENTITIES.ENTITIES();
-
-  getEntities() {
-    return this.ENTITIES;
+  public get ENTITIES() {
+    return {
+      USER: USER_META(this.connection),
+      SESSION: SESSION_META(this.connection),
+      EMAIL: EMAIL_META(this.connection),
+      EMAIL_TYPE: EMAIL_TYPE_META(this.connection)
+    }
   }
 
   @OrmConnection connection: Connection;
@@ -457,7 +458,7 @@ export class AuthController extends BASE_CONTROLLER {
     //#endregion
   }
 
-  private async __createUser(formData: IUSER, EmailTypeName: ENTITIES.EMAIL_TYPE_NAME) {
+  private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
     let EmailType = await this.ENTITIES.EMAIL_TYPE.db.getBy(EmailTypeName);

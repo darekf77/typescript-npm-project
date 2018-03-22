@@ -25,9 +25,9 @@ import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-import { tableNameFrom, BASE_ENTITY } from '../helpers';
+import { BASE_ENTITY, META } from '../helpers';
 
-@Entity(tableNameFrom(EMAIL))
+@Entity(META.tableNameFrom(EMAIL))
 export class EMAIL extends BASE_ENTITY {
 
   constructor(address: string) {
@@ -58,7 +58,7 @@ export class EMAIL extends BASE_ENTITY {
 
 @EntityRepository(EMAIL)
 export class EMAIL_REPOSITORY extends Repository<EMAIL> {
-  
+
   async getUserBy(address: string) {
     //#region @backendFunc
     const Email = await this.findOne({
@@ -73,14 +73,18 @@ export class EMAIL_REPOSITORY extends Repository<EMAIL> {
   async findBy(address: string) {
     //#region @backendFunc
     return await this
-      .createQueryBuilder(tableNameFrom(EMAIL))
-      .innerJoinAndSelect(`${tableNameFrom(EMAIL)}.user`, 'user')
-      .where(`${tableNameFrom(EMAIL)}.address = :email`)
+      .createQueryBuilder(META.tableNameFrom(EMAIL))
+      .innerJoinAndSelect(`${META.tableNameFrom(EMAIL)}.user`, 'user')
+      .where(`${META.tableNameFrom(EMAIL)}.address = :email`)
       .setParameter('email', address)
       .getOne();
     //#endregion
   }
 
+}
+
+export const EMAIL_META = function (connection: Connection) {
+  return META.getMeta<EMAIL, EMAIL_REPOSITORY>(connection, EMAIL, EMAIL_REPOSITORY)
 }
 
 export default EMAIL;

@@ -19,11 +19,11 @@ import { EntityRepository } from 'typeorm';
 //#endregion
 
 import { EMAIL } from "./EMAIL";
-import { tableNameFrom, BASE_ENTITY } from '../helpers';
+import { BASE_ENTITY, META } from '../helpers';
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
-@Entity(tableNameFrom(EMAIL_TYPE))
+@Entity(META.tableNameFrom(EMAIL_TYPE))
 export class EMAIL_TYPE extends BASE_ENTITY {
 
   @PrimaryGeneratedColumn()
@@ -71,5 +71,10 @@ export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
     //#endregion
   }
 }
+
+export const EMAIL_TYPE_META = function (connection: Connection) {
+  return META.getMeta<EMAIL_TYPE, EMAIL_TYPE_REPOSITORY>(connection, EMAIL_TYPE, EMAIL_TYPE_REPOSITORY)
+}
+
 
 export default EMAIL_TYPE;

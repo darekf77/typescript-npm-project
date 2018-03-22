@@ -28,7 +28,7 @@ import { Resource } from "ng2-rest";
 const log = Log.create(__filename);
 
 import { USER } from './USER';
-import { tableNameFrom, BASE_ENTITY } from '../helpers';
+import { BASE_ENTITY, META } from '../helpers';
 
 export const SESSION_CONFIG = {
   SESSION_TIME_SECONDS: 3600,
@@ -37,7 +37,7 @@ export const SESSION_CONFIG = {
 }
 
 
-@Entity(tableNameFrom(SESSION))
+@Entity(META.tableNameFrom(SESSION))
 export class SESSION extends BASE_ENTITY {
 
   AUTHORIZATION_HEADER = SESSION_CONFIG.AUTHORIZATION_HEADER;
@@ -112,10 +112,10 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
 
   async getByUser(user: USER, ip: string) {
     //#region @backendFunc
-    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
-      .where(`${tableNameFrom(SESSION)}.user = :id`)
-      .andWhere(`${tableNameFrom(SESSION)}.ip = :ip`)
+    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
+      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
+      .where(`${META.tableNameFrom(SESSION)}.user = :id`)
+      .andWhere(`${META.tableNameFrom(SESSION)}.ip = :ip`)
       .setParameters({
         id: user.id,
         ip
@@ -130,9 +130,9 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
 
   async getByToken(token: string) {
     //#region @backendFunc
-    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
-      .where(`${tableNameFrom(SESSION)}.token = :token`)
+    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
+      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
+      .where(`${META.tableNameFrom(SESSION)}.token = :token`)
       .setParameter('token', token)
       .getOne();
     if (Session) {
@@ -185,6 +185,11 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
     }
   }
 
+}
+
+
+export const SESSION_META = function (connection: Connection) {
+  return META.getMeta<SESSION, SESSION_REPOSITORY>(connection, SESSION, SESSION_REPOSITORY, SESSION_CONFIG)
 }
 
 
