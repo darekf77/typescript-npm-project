@@ -84,7 +84,7 @@ export class EMAIL_REPOSITORY extends Repository<EMAIL> {
 }
 
 export const EMAIL_META = function (connection: Connection) {
-  return META.getMeta<EMAIL, EMAIL_REPOSITORY>(connection, EMAIL, EMAIL_REPOSITORY)
+  return META.get<EMAIL, EMAIL_REPOSITORY>(connection, EMAIL, EMAIL_REPOSITORY)
 }
 
 export default EMAIL;

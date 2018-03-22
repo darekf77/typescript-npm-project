@@ -189,7 +189,7 @@ export class SESSION_REPOSITORY extends Repository<SESSION> {
 
 
 export const SESSION_META = function (connection: Connection) {
-  return META.getMeta<SESSION, SESSION_REPOSITORY>(connection, SESSION, SESSION_REPOSITORY, SESSION_CONFIG)
+  return META.get<SESSION, SESSION_REPOSITORY>(connection, SESSION, SESSION_REPOSITORY, SESSION_CONFIG)
 }
 
 

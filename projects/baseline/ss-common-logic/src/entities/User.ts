@@ -87,7 +87,7 @@ export class USER_REPOSITORY extends Repository<USER> {
 }
 
 export const USER_META = function (connection: Connection) {
-  return META.getMeta<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY)
+  return META.get<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY)
 }
 
 export default USER;
