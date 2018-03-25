@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { init } from 'morphi';
 import { createConnection, useContainer, ConnectionOptions, Connection } from 'typeorm';
 export { Connection } from 'typeorm';
+import { META } from "./meta-info";
 
 export interface IConnectionOptions {
     database: string;
@@ -16,9 +17,9 @@ export interface IConnectionOptions {
 export interface StartOptions {
     config: IConnectionOptions;
     host: string;
-    Controllers: Function[];
-    Entities?: Function[];
-    MockData?: Function[];
+    Controllers: META.BASE_CONTROLLER[];
+    Entities?: META.BASE_ENTITY[];
+    MockData?: META.BASE_MOCK_DATA[];
 }
 
 export async function start(options: StartOptions) {

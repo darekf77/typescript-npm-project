@@ -27,7 +27,7 @@ start({
   host: config.host(packageName),
   Controllers: Controllers as any,
   Entities: Entities as any,
-  MockData
+  MockData: MockData as any
 });
 
 //#endregion

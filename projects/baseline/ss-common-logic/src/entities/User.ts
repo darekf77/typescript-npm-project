@@ -22,72 +22,76 @@ import { authenticate } from "passport";
 
 import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
-import { EMAIL_TYPE_NAME } from "./EMAIL_TYPE";
-import { BASE_ENTITY, META } from '../helpers';
+import { EMAIL_TYPE } from "./EMAIL_TYPE";
+import { META } from '../helpers';
 
 
-export interface IUSER {
-  email?: string;
-  username: string;
-  password: string;
-  firstname?: string;
-  lastname?: string;
-  city?: string;
-}
+export namespace USER {
 
-
-@Entity(META.tableNameFrom(USER))
-export class USER extends BASE_ENTITY implements IUSER {
-
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  session: SESSION;
-
-  @Column() username: string;
-  @Column() password: string;
-  @Column({ nullable: true }) firstname: string;
-  @Column({ nullable: true }) lastname: string;
-  @Column({ nullable: true }) email?: string;
-
-  @OneToMany(type => EMAIL, email => email.user, {
-    cascadeUpdate: false,
-    cascadeInsert: false
-  })
-  emails: EMAIL[] = [];
-
-}
-
-
-@EntityRepository(USER)
-export class USER_REPOSITORY extends Repository<USER> {
-
-  byUsername(username: string) {
-    //#region @backendFunc
-    return this
-      .createQueryBuilder(META.tableNameFrom(USER))
-      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${META.tableNameFrom(USER)}.username = :username`)
-      .setParameter('username', username)
-      .getOne()
-    //#endregion
+  export interface IUSER {
+    email?: string;
+    username: string;
+    password: string;
+    firstname?: string;
+    lastname?: string;
+    city?: string;
   }
 
-  byId(id: number) {
-    //#region @backendFunc
-    return this
-      .createQueryBuilder(META.tableNameFrom(USER))
-      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${META.tableNameFrom(USER)}.id = :id`)
-      .setParameter('id', id)
-      .getOne()
-    //#endregion
+  @Entity(META.tableNameFrom(USER))
+  export class USER extends META.BASE_ENTITY implements IUSER {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    session: SESSION.SESSION;
+
+    @Column() username: string;
+    @Column() password: string;
+    @Column({ nullable: true }) firstname: string;
+    @Column({ nullable: true }) lastname: string;
+    @Column({ nullable: true }) email?: string;
+
+    @OneToMany(type => EMAIL.EMAIL, email => email.user, {
+      cascadeUpdate: false,
+      cascadeInsert: false
+    })
+    emails: EMAIL.EMAIL[] = [];
+
   }
 
-}
 
-export const USER_META = function (connection: Connection) {
-  return META.get<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY)
-}
+  @EntityRepository(USER)
+  export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
 
-export default USER;
+    ENTITIES: { [entities: string]: META.EntityClassMeta<any>; };
+
+    byUsername(username: string) {
+      //#region @backendFunc
+      return this
+        .createQueryBuilder(META.tableNameFrom(USER))
+        .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
+        .where(`${META.tableNameFrom(USER)}.username = :username`)
+        .setParameter('username', username)
+        .getOne()
+      //#endregion
+    }
+
+    byId(id: number) {
+      //#region @backendFunc
+      return this
+        .createQueryBuilder(META.tableNameFrom(USER))
+        .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
+        .where(`${META.tableNameFrom(USER)}.id = :id`)
+        .setParameter('id', id)
+        .getOne()
+      //#endregion
+    }
+
+  }
+
+  export const USER_META = function (connection: Connection) {
+    return META
+      .fromEntity<USER>(USER)
+      .metaWithDb<USER_REPOSITORY>(connection, USER_REPOSITORY);
+  }
+}

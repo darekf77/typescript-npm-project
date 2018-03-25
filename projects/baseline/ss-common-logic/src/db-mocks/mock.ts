@@ -2,30 +2,24 @@
 import { Repository, Connection } from 'typeorm';
 
 import {
-    Controllers, Entities, TestUser
+    Controllers, Entities, AuthController
 } from '../index';
 
+import { META } from "../helpers";
 
 
+export class MockData extends META.BASE_MOCK_DATA {
 
-export class MockData {
-
-    repo() {
+    get CONTROLLERS() {
         return {
-            users: this.connection.getRepository(TestUser)
+            AuthController: META
+                .fromController<AuthController.AuthController>(AuthController.AuthController)
         }
     }
 
-    constructor(private connection: Connection) {
-        this.createUser();
-        return this;
+    constructor(connection: Connection) {
+        super(connection)
     }
 
-    async createUser() {
-        const user = new TestUser();
-        user.name = 'Dariusz';
-        user.username = 'darekf77';
-        await this.repo().users.save(user);
-    }
 
 }

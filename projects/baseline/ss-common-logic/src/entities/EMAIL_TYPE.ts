@@ -19,62 +19,66 @@ import { EntityRepository } from 'typeorm';
 //#endregion
 
 import { EMAIL } from "./EMAIL";
-import { BASE_ENTITY, META } from '../helpers';
+import { META } from '../helpers';
 
-export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
+export namespace EMAIL_TYPE {
 
-@Entity(META.tableNameFrom(EMAIL_TYPE))
-export class EMAIL_TYPE extends BASE_ENTITY {
+  export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
-  @PrimaryGeneratedColumn()
-  id: number;
 
-  @Column({ length: 50, unique: true })
-  name: EMAIL_TYPE_NAME;
+  @Entity(META.tableNameFrom(EMAIL_TYPE))
+  export class EMAIL_TYPE extends META.BASE_ENTITY {
 
-  @ManyToMany(type => EMAIL, email => email.types, {
-    cascadeInsert: false,
-    cascadeUpdate: false
-  })
-  emails: EMAIL[] = [];
-}
+    @PrimaryGeneratedColumn()
+    id: number;
 
-@EntityRepository(EMAIL_TYPE)
-export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
-  async getBy(name: EMAIL_TYPE_NAME) {
-    //#region @backendFunc
-    const etype = await this.findOne({
-      where: {
-        name
-      }
+    @Column({ length: 50, unique: true })
+    name: EMAIL_TYPE_NAME;
+
+    @ManyToMany(type => EMAIL.EMAIL, email => email.types, {
+      cascadeInsert: false,
+      cascadeUpdate: false
     })
-    return etype;
-    //#endregion
-  }
-  async init() {
-    //#region @backendFunc
-    const types = [
-      await this.save(this.createFrom('facebook')),
-      await this.save(this.createFrom('normal_auth')),
-      await this.save(this.createFrom('twitter')),
-      await this.save(this.createFrom('google_plus'))
-    ];
-    return types;
-    //#endregion
+    emails: EMAIL.EMAIL[] = [];
   }
 
-  createFrom(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
-    //#region @backendFunc
-    let t = new EMAIL_TYPE();
-    t.name = name;
-    return t;
-    //#endregion
+  @EntityRepository(EMAIL_TYPE)
+  export class EMAIL_TYPE_REPOSITORY extends Repository<EMAIL_TYPE> {
+    async getBy(name: EMAIL_TYPE_NAME) {
+      //#region @backendFunc
+      const etype = await this.findOne({
+        where: {
+          name
+        }
+      })
+      return etype;
+      //#endregion
+    }
+    async init() {
+      //#region @backendFunc
+      const types = [
+        await this.save(this.createFrom('facebook')),
+        await this.save(this.createFrom('normal_auth')),
+        await this.save(this.createFrom('twitter')),
+        await this.save(this.createFrom('google_plus'))
+      ];
+      return types;
+      //#endregion
+    }
+
+    createFrom(name: EMAIL_TYPE_NAME): EMAIL_TYPE {
+      //#region @backendFunc
+      let t = new EMAIL_TYPE();
+      t.name = name;
+      return t;
+      //#endregion
+    }
   }
+
+  export const EMAIL_TYPE_META = function (connection: Connection) {
+    return META
+      .fromEntity<EMAIL_TYPE>(EMAIL_TYPE)
+      .metaWithDb<EMAIL_TYPE_REPOSITORY>(connection, EMAIL_TYPE_REPOSITORY);
+  }
+
 }
-
-export const EMAIL_TYPE_META = function (connection: Connection) {
-  return META.get<EMAIL_TYPE, EMAIL_TYPE_REPOSITORY>(connection, EMAIL_TYPE, EMAIL_TYPE_REPOSITORY)
-}
-
-
-export default EMAIL_TYPE;

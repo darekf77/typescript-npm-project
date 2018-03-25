@@ -15,7 +15,7 @@ const config = {
     type: 'sqlite',
     synchronize: true,
     dropSchema: true,
-    logging: true
+    logging: false
   },
   host: (packageName) => {
     console.log('packageName', packageName)
