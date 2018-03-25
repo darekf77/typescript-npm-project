@@ -10,7 +10,7 @@ import { META } from "../helpers";
 
 export class MockData extends META.BASE_MOCK_DATA {
 
-    get CONTROLLERS() {
+    CONTROLLERS() {
         return {
             AuthController: META
                 .fromController<AuthController>(AuthController)

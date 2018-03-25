@@ -1,6 +1,6 @@
 // global
 import { Entity } from "typeorm/decorator/entity/Entity";
-import { Repository, EntityRepository } from 'typeorm';
+import { Repository, EntityRepository, Connection } from 'typeorm';
 // thirdpart
 import {
   SESSION as BASELINE_SESSION,
@@ -26,6 +26,14 @@ export class SESSION_REPOSITORY extends BASELINE_SESSION_REPOSITORY {
 
 
 
+}
+
+
+export const SESSION_META = function (connection: Connection) {
+  return META
+    .fromEntity<SESSION>(SESSION)
+    .use(SESSION_CONFIG)
+    .metaWithDb<SESSION_REPOSITORY>(connection as any, SESSION_REPOSITORY);
 }
 
 export default SESSION;

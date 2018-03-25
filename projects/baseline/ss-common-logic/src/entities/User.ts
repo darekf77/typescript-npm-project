@@ -63,7 +63,7 @@ import { META } from '../helpers';
   @EntityRepository(USER)
   export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
 
-    ENTITIES: { [entities: string]: META.EntityClassMeta<any>; };
+    ENTITIES() { return {}; }
 
     byUsername(username: string) {
       //#region @backendFunc

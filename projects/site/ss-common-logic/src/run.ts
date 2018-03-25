@@ -1,9 +1,8 @@
 //#region @backend
 import { Controllers, Entities } from "./index";
-import { start } from './helpers';
+import { start } from 'baseline/ss-common-logic/bundle/helpers';
 import * as path from 'path';
 import * as fs from 'fs';
-import MockData from "./db-mocks";
 
 if (!process.env.environmentName) {
   process.env.environmentName = ''
@@ -26,8 +25,7 @@ start({
   config: config.db as any,
   host: config.host(packageName),
   Controllers: Controllers as any,
-  Entities: Entities as any,
-  MockData
+  Entities: Entities as any
 });
 
 //#endregion

@@ -60,7 +60,7 @@ export class EMAIL extends META.BASE_ENTITY {
 @EntityRepository(EMAIL)
 export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
 
-  ENTITIES: { [entities: string]: META.EntityClassMeta<any>; };
+  ENTITIES() { return {}; }
 
   async getUserBy(address: string) {
     //#region @backendFunc
