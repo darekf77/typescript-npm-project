@@ -13,7 +13,7 @@ export class MockData extends META.BASE_MOCK_DATA {
     get CONTROLLERS() {
         return {
             AuthController: META
-                .fromController<AuthController.AuthController>(AuthController.AuthController)
+                .fromController<AuthController>(AuthController)
         }
     }
 

@@ -26,7 +26,7 @@ import { EMAIL_TYPE } from "./EMAIL_TYPE";
 import { META } from '../helpers';
 
 
-export namespace USER {
+
 
   export interface IUSER {
     email?: string;
@@ -43,7 +43,7 @@ export namespace USER {
     @PrimaryGeneratedColumn()
     id: number;
 
-    session: SESSION.SESSION;
+    session: SESSION;
 
     @Column() username: string;
     @Column() password: string;
@@ -51,11 +51,11 @@ export namespace USER {
     @Column({ nullable: true }) lastname: string;
     @Column({ nullable: true }) email?: string;
 
-    @OneToMany(type => EMAIL.EMAIL, email => email.user, {
+    @OneToMany(type => EMAIL, email => email.user, {
       cascadeUpdate: false,
       cascadeInsert: false
     })
-    emails: EMAIL.EMAIL[] = [];
+    emails: EMAIL[] = [];
 
   }
 
@@ -94,4 +94,3 @@ export namespace USER {
       .fromEntity<USER>(USER)
       .metaWithDb<USER_REPOSITORY>(connection, USER_REPOSITORY);
   }
-}

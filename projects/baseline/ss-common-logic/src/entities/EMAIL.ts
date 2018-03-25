@@ -27,68 +27,67 @@ import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
 import { META } from '../helpers';
 
-export namespace EMAIL {
-  @Entity(META.tableNameFrom(EMAIL))
-  export class EMAIL extends META.BASE_ENTITY {
 
-    constructor(address: string) {
-      super()
-      this.address = address;
-    }
+@Entity(META.tableNameFrom(EMAIL))
+export class EMAIL extends META.BASE_ENTITY {
 
-    @PrimaryGeneratedColumn()
-    public id: number;
-
-    @Column('varchar', { length: 100, unique: true })
-    address: string;
-
-    @ManyToMany(type => EMAIL_TYPE.EMAIL_TYPE, type => type.emails, {
-      cascadeInsert: false,
-      cascadeUpdate: false
-    })
-    @JoinTable()
-    types: EMAIL_TYPE.EMAIL_TYPE[] = [];
-
-    @ManyToOne(type => USER.USER, user => user.id, {
-      cascadeAll: false
-    })
-    @JoinColumn()
-    user: USER.USER;
-
+  constructor(address: string) {
+    super()
+    this.address = address;
   }
 
-  @EntityRepository(EMAIL)
-  export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
+  @PrimaryGeneratedColumn()
+  public id: number;
 
-    ENTITIES: { [entities: string]: META.EntityClassMeta<any>; };
+  @Column('varchar', { length: 100, unique: true })
+  address: string;
 
-    async getUserBy(address: string) {
-      //#region @backendFunc
-      const Email = await this.findOne({
-        where: {
-          address
-        }
-      });
-      if (Email) return Email.user;
-      //#endregion
-    }
+  @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  @JoinTable()
+  types: EMAIL_TYPE[] = [];
 
-    async findBy(address: string) {
-      //#region @backendFunc
-      return await this
-        .createQueryBuilder(META.tableNameFrom(EMAIL))
-        .innerJoinAndSelect(`${META.tableNameFrom(EMAIL)}.user`, 'user')
-        .where(`${META.tableNameFrom(EMAIL)}.address = :email`)
-        .setParameter('email', address)
-        .getOne();
-      //#endregion
-    }
+  @ManyToOne(type => USER, user => user.id, {
+    cascadeAll: false
+  })
+  @JoinColumn()
+  user: USER;
 
+}
+
+@EntityRepository(EMAIL)
+export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
+
+  ENTITIES: { [entities: string]: META.EntityClassMeta<any>; };
+
+  async getUserBy(address: string) {
+    //#region @backendFunc
+    const Email = await this.findOne({
+      where: {
+        address
+      }
+    });
+    if (Email) return Email.user;
+    //#endregion
   }
 
-  export const EMAIL_META = function (connection: Connection) {
-    return META
-      .fromEntity<EMAIL>(EMAIL)
-      .metaWithDb<EMAIL_REPOSITORY>(connection, EMAIL_REPOSITORY);
+  async findBy(address: string) {
+    //#region @backendFunc
+    return await this
+      .createQueryBuilder(META.tableNameFrom(EMAIL))
+      .innerJoinAndSelect(`${META.tableNameFrom(EMAIL)}.user`, 'user')
+      .where(`${META.tableNameFrom(EMAIL)}.address = :email`)
+      .setParameter('email', address)
+      .getOne();
+    //#endregion
   }
+
+}
+
+export const EMAIL_META = function (connection: Connection) {
+  return META
+    .fromEntity<EMAIL>(EMAIL)
+    .metaWithDb<EMAIL_REPOSITORY>(connection, EMAIL_REPOSITORY);
 }

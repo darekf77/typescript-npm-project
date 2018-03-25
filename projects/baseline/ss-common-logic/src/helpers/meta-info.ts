@@ -44,7 +44,7 @@ export namespace META {
 
     private db<ER>(entityCustomRepo) {
       const res = entityCustomRepo ? this._connection.getCustomRepository(entityCustomRepo) :
-        this._connection.getRepository(this._entityClass);
+        this._connection.getRepository(this._meta.entityClass);
       if (this._config) {
         Object.assign(res, this._config)
       }
@@ -57,23 +57,25 @@ export namespace META {
     }
     private _meta: EntityClassMeta<E> = {} as any;
     private _config?: Object = {};
-    private _entityClass: Function;
 
     use(config?: Object) {
       this._config = config;
       if (config) {
-        Object.assign(this._entityClass.prototype, config);
+        Object.assign(this._meta.entityClass.prototype, config);
       }
       return this;
     }
 
     private static instaces = {};
-    public static get<E>(entityClass: Function) {
+    public static get<E>(entityClass: Function): META<E> {
       if (!META.instaces[entityClass.name]) {
         META.instaces[entityClass.name] = new META();
+      } else {
+        return META.instaces[entityClass.name]
       }
       const instance = META.instaces[entityClass.name] as META<E>;
-      instance._entityClass = entityClass;
+
+      instance._meta.entityClass = entityClass as any;
       instance._meta.table = tableNameFrom(entityClass);
       return instance;
     }

@@ -9,23 +9,23 @@ function addEntity(entity: Function) {
 
 import { AuthController } from './controllers/AuthController';
 export { AuthController } from './controllers/AuthController';
-addController(AuthController.AuthController);
+addController(AuthController);
 
 import { EMAIL_TYPE } from './entities/EMAIL_TYPE';
 export { EMAIL_TYPE } from './entities/EMAIL_TYPE';
-addEntity(EMAIL_TYPE.EMAIL_TYPE);
+addEntity(EMAIL_TYPE);
 
 import { EMAIL } from './entities/EMAIL';
 export { EMAIL } from './entities/EMAIL';
-addEntity(EMAIL.EMAIL);
+addEntity(EMAIL);
 
 import { USER } from './entities/USER';
 export { USER } from './entities/USER';
-addEntity(USER.USER);
+addEntity(USER);
 
 import { SESSION } from './entities/SESSION';
 export { SESSION } from './entities/SESSION';
-addEntity(SESSION.SESSION);
+addEntity(SESSION);
 
 export const Controllers = controllers;
 export const Entities = entities;
