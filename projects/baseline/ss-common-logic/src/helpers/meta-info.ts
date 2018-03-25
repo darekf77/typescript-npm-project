@@ -43,8 +43,12 @@ export namespace META {
     }
 
     private db<ER>(entityCustomRepo) {
-      const res = entityCustomRepo ? this._connection.getCustomRepository(entityCustomRepo) :
-        this._connection.getRepository(this._meta.entityClass);
+      let res = null;
+      if (entityCustomRepo) {
+        res = this._connection.getCustomRepository(entityCustomRepo);
+      } else {
+        res = this._connection.getRepository(this._meta.entityClass);
+      }
       if (this._config) {
         Object.assign(res, this._config)
       }
@@ -86,7 +90,7 @@ export namespace META {
 
   export abstract class BASE_REPOSITORY<E> extends Repository<E> {
 
-    abstract ENTITIES(): { [entities: string]: EntityClassMeta<any> };
+    abstract readonly ENTITIES: { [entities: string]: EntityClassMeta<any> };
 
   }
 
