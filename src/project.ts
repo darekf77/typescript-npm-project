@@ -587,10 +587,56 @@ export class ProjectIsomorphicLib extends Project {
         ];
     }
 
+
+
+    private get additionalParentIsomorphcLibs(): string[] {
+        const result: string[] = []
+        // console.log('this.dependencies', this.parent.dependencies)
+        const includedBaselines = this.parent.dependencies
+            .filter(d => d.type === 'workspace')
+
+        includedBaselines.forEach(b => {
+            console.log(b.name)
+            const baselineIsomorphicLibCHildrens = b.children.filter(f => f.type === 'isomorphic-lib');
+            baselineIsomorphicLibCHildrens.forEach(p => {
+                // TODO support for more nested isomorphic libs
+                // console.log('---- ', p.name);
+                result.push(`${b.name}/${p.name}/${config.folder.bundle}`);
+            })
+        })
+        // console.log(result)
+        // process.exit(0)
+        return result;
+    }
+
+    private get additionalRequiredIsomorphcLibs() {
+        const result: string[] = []
+        this.dependencies.forEach(d => {
+            result.push(d.name);
+        })
+        // console.log(result)
+        // process.exit(0)
+        return result;
+    }
+
+    private getIsomorphcLibNames(parentWorksapce = false) {
+        let result = [];
+        result = result.concat(this.additionalRequiredIsomorphcLibs);
+        if (parentWorksapce) {
+            result = result.concat(this.additionalParentIsomorphcLibs)
+        }
+        // console.log('result', result)
+        // process.exit(0)
+        return result;
+    }
+
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.parent.isBaseLine && outDir === 'bundle');
-        const webpackParams = BuildOptions.stringify(prod, watch, outDir, isBaseLineForSiteBuild);
+
+        const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
+        const isBaseLineForSiteBuild = (isParentIsWorksapce && this.parent.isBaseLine && outDir === 'bundle');
+
+        const webpackParams = BuildOptions.stringify(prod, watch, outDir, this.getIsomorphcLibNames(isParentIsWorksapce), isBaseLineForSiteBuild);
         if (watch) {
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,
@@ -607,6 +653,8 @@ export class ProjectIsomorphicLib extends Project {
 
         const env = getWebpackEnv(params);
 
+        // process.exit(0)
+
         buildIsomorphic({
             foldersPathes: {
                 dist: env.outDir
@@ -619,7 +667,8 @@ export class ProjectIsomorphicLib extends Project {
                 ln: 'tnp ln'
             },
             build: {
-                forSitePurpose: env.forSite
+                forSitePurpose: env.forSite,
+                otherIsomorphicLibs: env.additionalIsomorphicLibs
             }
         });
     }

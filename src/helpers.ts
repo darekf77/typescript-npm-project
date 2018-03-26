@@ -122,14 +122,23 @@ export function copyFiles(filesPattern: string, destinationFolder: string, optio
 
 
 export function getWebpackEnv(params: string): BuildOptions {
-    const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z]|\\|\/|-)+`, 'g')
+
+    // console.log('params', params)
+
+    const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z0-9]|\%|\\|\/|-)+`, 'g')
     const match = params.match(regex1);
+
+    // console.log('match', match)
+
     const env = {};
     match.forEach(s => {
         const split = s.split('=');
         const key = split[0].replace('--env.', '')
         const value = split[1];
-        env[key] = value;
+        env[key] = decodeURIComponent(value);
+        if ((env[key] as string).search(',') !== -1) {
+            env[key] = (env[key] as string).split(',')
+        }
     })
     fixWebpackEnv(env);
     return env as any;
