@@ -2,7 +2,7 @@
 import { Repository, Connection } from 'typeorm';
 
 import {
-    Controllers, Entities, AuthController
+  Controllers, Entities, AuthController
 } from '../index';
 
 import { META } from "../helpers";
@@ -10,16 +10,13 @@ import { META } from "../helpers";
 
 export class MockData extends META.BASE_MOCK_DATA {
 
-    CONTROLLERS() {
-        return {
-            AuthController: META
-                .fromController<AuthController>(AuthController)
-        }
-    }
+  get ENTITIES() {
+    return {}
+  }
 
-    constructor(connection: Connection) {
-        super(connection)
-    }
+  constructor(connection: Connection) {
+    super(connection)
+  }
 
 
 }

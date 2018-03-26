@@ -76,7 +76,7 @@ export interface IFacebook {
 })
 export class AuthController extends META.BASE_CONTROLLER {
 
-  public ENTITIES() {
+  get ENTITIES() {
     return {
       USER: USER_META(this.connection),
       SESSION: SESSION_META(this.connection),
@@ -85,9 +85,6 @@ export class AuthController extends META.BASE_CONTROLLER {
     }
   }
 
-  get _ENTITIES() {
-    return this.ENTITIES();
-  }
 
   @OrmConnection connection: Connection;
 
@@ -110,7 +107,7 @@ export class AuthController extends META.BASE_CONTROLLER {
         if (isNode) {
           return;
         }
-        const session = self.ENTITIES().SESSION.db.localStorage.fromLocalStorage()
+        const session = self.ENTITIES.SESSION.db.localStorage.fromLocalStorage()
         if (!session) {
           self.browser.logout();
           return
@@ -135,7 +132,7 @@ export class AuthController extends META.BASE_CONTROLLER {
         }
       },
       async authorize(session: SESSION) {
-        self.ENTITIES().SESSION.db.localStorage.saveInLocalStorage(session);
+        self.ENTITIES.SESSION.db.localStorage.saveInLocalStorage(session);
         session.activateBrowserToken();
         try {
           const info = await self.info().received
@@ -159,7 +156,7 @@ export class AuthController extends META.BASE_CONTROLLER {
             log.er(error)
           }
         }
-        self.ENTITIES().SESSION.db.localStorage.removeFromLocalStorage();
+        self.ENTITIES.SESSION.db.localStorage.removeFromLocalStorage();
       }
     }
 
@@ -175,13 +172,13 @@ export class AuthController extends META.BASE_CONTROLLER {
       if (!req.user) {
         throw new Error('Not loggin in user!');
       }
-      const User = await this.ENTITIES().USER.db.byId(req.user.id);
+      const User = await this.ENTITIES.USER.db.byId(req.user.id);
       if (User) {
-        User.session = await this.ENTITIES().SESSION.db.getByUser(User, req.ip);
+        User.session = await this.ENTITIES.SESSION.db.getByUser(User, req.ip);
         return User;
       }
 
-      throw Errors.entityNotFound(this.ENTITIES().USER.entityClass);
+      throw Errors.entityNotFound(this.ENTITIES.USER.entityClass);
     };
     //#endregion
   }
@@ -225,17 +222,17 @@ export class AuthController extends META.BASE_CONTROLLER {
       if (!User) {
         throw 'No user for logout';
       }
-      User = await this.ENTITIES().USER.db.byId(User.id);
+      User = await this.ENTITIES.USER.db.byId(User.id);
       if (!User) {
         log.w(`Cannot find user with id:${req.user} `);
         return false;
       }
-      const Session = await this.ENTITIES().SESSION.db.getByUser(User, req.ip);
+      const Session = await this.ENTITIES.SESSION.db.getByUser(User, req.ip);
       if (!Session) {
         log.w(`Cannot find session for user:${User.username} `);
         return false;
       }
-      await this.ENTITIES().SESSION.db.removeById(Session.id);
+      await this.ENTITIES.SESSION.db.removeById(Session.id);
       return true;
     };
     //#endregion
@@ -276,7 +273,7 @@ export class AuthController extends META.BASE_CONTROLLER {
         // create facebook user if not exist
         const facebookUserData = {
           email: fb.email,
-          email_type: await self.ENTITIES().EMAIL_TYPE.db.getBy('facebook'),
+          email_type: await self.ENTITIES.EMAIL_TYPE.db.getBy('facebook'),
           username: `_facebook_${fb.id}`,
           password: undefined,
           firstname: `_facebook_${fb.firstname}`,
@@ -409,13 +406,13 @@ export class AuthController extends META.BASE_CONTROLLER {
       exist: {
         async username(username: string) {
 
-          const user = await self.ENTITIES().USER.db.findOne({
+          const user = await self.ENTITIES.USER.db.findOne({
             where: { username }
           });
           return user;
         },
         async email(address: string) {
-          const email = self.ENTITIES().EMAIL.db.findBy(address);
+          const email = self.ENTITIES.EMAIL.db.findBy(address);
           return email;
         }
       },
@@ -453,13 +450,13 @@ export class AuthController extends META.BASE_CONTROLLER {
       throw new Error('No user to send token');
     }
 
-    let Session = await this.ENTITIES().SESSION.db.getByUser(user, ip);
+    let Session = await this.ENTITIES.SESSION.db.getByUser(user, ip);
     if (Session) {
       log.i(`Session already exist for: ${user.username}`);
       return Session;
     }
 
-    Session = await this.ENTITIES().SESSION.db.getFrom(user, ip);
+    Session = await this.ENTITIES.SESSION.db.getFrom(user, ip);
     return Session;
     //#endregion
   }
@@ -467,18 +464,18 @@ export class AuthController extends META.BASE_CONTROLLER {
   private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
-    let EmailType = await this.ENTITIES().EMAIL_TYPE.db.getBy(EmailTypeName);
+    let EmailType = await this.ENTITIES.EMAIL_TYPE.db.getBy(EmailTypeName);
     if (!EmailType) {
       throw new Error(`Bad email type: ${EmailTypeName}`);
     }
 
-    let Email = new this._ENTITIES.EMAIL.entityClass(formData.email);
+    let Email = new this.ENTITIES.EMAIL.entityClass(formData.email);
     Email.types.push(EmailType);
-    Email = await this.ENTITIES().EMAIL.db.save(Email);
+    Email = await this.ENTITIES.EMAIL.db.save(Email);
 
-    EmailType = await this.ENTITIES().EMAIL_TYPE.db.save(EmailType);
+    EmailType = await this.ENTITIES.EMAIL_TYPE.db.save(EmailType);
 
-    let User = await this.ENTITIES().EMAIL.db.getUserBy(Email.address);
+    let User = await this.ENTITIES.EMAIL.db.getUserBy(Email.address);
     if (User) {
       log.i(`User ${User.username} exist with mail ${Email.address}`);
       return User;
@@ -494,22 +491,22 @@ export class AuthController extends META.BASE_CONTROLLER {
       throw new Error(`Bad username length, shoudl be  3-5`);
     }
 
-    User = await this.ENTITIES().USER.db.findOne({
+    User = await this.ENTITIES.USER.db.findOne({
       where: { username: formData.username }
     });
     if (User) {
       throw new Error(`User with username: ${formData.username} already exist`);
     }
 
-    User = new this._ENTITIES.USER.entityClass();
+    User = new this.ENTITIES.USER.entityClass();
     User.username = formData.username;
     const salt = bcrypt.genSaltSync(5);
     User.password = bcrypt.hashSync(formData.password ? formData.password : 'ddd', salt);
     User.emails.push(Email);
-    User = await this.ENTITIES().USER.db.save(User);
+    User = await this.ENTITIES.USER.db.save(User);
 
     Email.user = User;
-    await this.ENTITIES().EMAIL.db.save(Email);
+    await this.ENTITIES.EMAIL.db.save(Email);
     return User;
     //#endregion
   }
@@ -532,15 +529,15 @@ export class AuthController extends META.BASE_CONTROLLER {
   private async __init() {
     //#region @backendFunc
 
-    const types = await this.ENTITIES().EMAIL_TYPE.db.init();
+    const types = await this.ENTITIES.EMAIL_TYPE.db.init();
 
     const strategy = async (token, cb) => {
       let user: USER = null;
-      const Session = await this.ENTITIES().SESSION.db.getByToken(token);
+      const Session = await this.ENTITIES.SESSION.db.getByToken(token);
 
       if (Session) {
         if (Session.isExpired()) {
-          await this.ENTITIES().SESSION.db.remove(Session);
+          await this.ENTITIES.SESSION.db.remove(Session);
           return cb(null, user);
         }
         user = Session.user;

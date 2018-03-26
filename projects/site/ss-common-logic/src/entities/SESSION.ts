@@ -24,6 +24,11 @@ export class SESSION extends BASELINE_SESSION {
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends BASELINE_SESSION_REPOSITORY {
 
+  get ENTITIES() {
+    return {
+      SESSION: META.fromEntity<SESSION>(SESSION).meta()
+    }
+  }
 
 }
 

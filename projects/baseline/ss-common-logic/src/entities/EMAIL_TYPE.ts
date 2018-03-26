@@ -45,7 +45,7 @@ export class EMAIL_TYPE extends META.BASE_ENTITY {
 @EntityRepository(EMAIL_TYPE)
 export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
 
-  ENTITIES() { return {}; }
+  get ENTITIES() { return {} }
 
   async getBy(name: EMAIL_TYPE_NAME) {
     //#region @backendFunc

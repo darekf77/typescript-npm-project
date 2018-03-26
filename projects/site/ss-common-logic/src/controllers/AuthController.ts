@@ -18,7 +18,7 @@ import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY, SESSION_META } from '../en
 export class AuthController extends BaselineAuthController {
 
 
-  public ENTITIES() {
+  public get ENTITIES() {
     return {
       USER: USER_META(this.connection as any),
       SESSION: SESSION_META(this.connection as any),

@@ -90,7 +90,7 @@ export namespace META {
 
   export abstract class BASE_REPOSITORY<E> extends Repository<E> {
 
-    abstract readonly ENTITIES: { [entities: string]: EntityClassMeta<any> };
+    abstract get ENTITIES(): { [entities: string]: EntityClassMeta<any> };
 
   }
 
@@ -102,7 +102,7 @@ export namespace META {
 
   export abstract class BASE_CONTROLLER {
 
-    abstract ENTITIES(): { [entities: string]: EntityDBClassMeta<any, any> };
+    abstract get ENTITIES(): { [entities: string]: EntityDBClassMeta<any, any> };
 
   }
 
@@ -111,7 +111,7 @@ export namespace META {
     constructor(public connection: Connection) {
 
     }
-    abstract CONTROLLERS(): { [controllers: string]: ControllerClassMeta<any> };
+    abstract get ENTITIES(): { [entities: string]: EntityDBClassMeta<any, any> };
 
   }
 
