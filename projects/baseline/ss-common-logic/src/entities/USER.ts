@@ -47,6 +47,7 @@ export class USER extends META.BASE_ENTITY implements IUSER {
 
   @Column() username: string;
   @Column() password: string;
+  @Column({ nullable: true }) whereCreated: 'baseline' | 'site' = 'baseline';
   @Column({ nullable: true }) firstname: string;
   @Column({ nullable: true }) lastname: string;
   @Column({ nullable: true }) email?: string;

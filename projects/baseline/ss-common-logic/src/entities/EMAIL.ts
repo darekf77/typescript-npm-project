@@ -42,6 +42,8 @@ export class EMAIL extends META.BASE_ENTITY {
   @Column('varchar', { length: 100, unique: true })
   address: string;
 
+
+  //#region joins
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
     cascadeInsert: false,
     cascadeUpdate: false
@@ -54,7 +56,7 @@ export class EMAIL extends META.BASE_ENTITY {
   })
   @JoinColumn()
   user: USER;
-
+  //#endregion
 }
 
 @EntityRepository(EMAIL)
