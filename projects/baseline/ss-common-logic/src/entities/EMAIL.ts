@@ -42,21 +42,23 @@ export class EMAIL extends META.BASE_ENTITY {
   @Column('varchar', { length: 100, unique: true })
   address: string;
 
-
-  //#region joins
+  //#region @cutForSite
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
     cascadeInsert: false,
     cascadeUpdate: false
   })
   @JoinTable()
+  //#endregion
   types: EMAIL_TYPE[] = [];
 
+  //#region @cutForSite
   @ManyToOne(type => USER, user => user.id, {
     cascadeAll: false
   })
   @JoinColumn()
-  user: USER;
   //#endregion
+  user: USER;
+
 }
 
 @EntityRepository(EMAIL)

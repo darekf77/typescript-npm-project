@@ -584,6 +584,7 @@ export class ProjectIsomorphicLib extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         const webpackParams = BuildOptions.stringify(prod, watch, outDir);
+        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.type === 'isomorphic-lib');
         if (watch) {
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,

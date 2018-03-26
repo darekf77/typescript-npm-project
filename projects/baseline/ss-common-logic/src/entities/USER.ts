@@ -52,10 +52,12 @@ export class USER extends META.BASE_ENTITY implements IUSER {
   @Column({ nullable: true }) lastname: string;
   @Column({ nullable: true }) email?: string;
 
+  //#region @cutForSite
   @OneToMany(type => EMAIL, email => email.user, {
     cascadeUpdate: false,
     cascadeInsert: false
   })
+  //#endregion
   emails: EMAIL[] = [];
 
 }
