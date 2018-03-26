@@ -1,9 +1,9 @@
 import {
-    USER as BASELINE_USER,
-    USER_REPOSITORY as BASELINE_USER_REPOSITORY
+  USER as BASELINE_USER,
+  USER_REPOSITORY as BASELINE_USER_REPOSITORY
 } from "baseline/ss-common-logic/bundle/entities/USER";
 export {
-    IUSER
+  IUSER
 } from "baseline/ss-common-logic/bundle/entities/USER";
 
 
@@ -15,13 +15,15 @@ import { EMAIL } from './EMAIL';
 @Entity(META.tableNameFrom(USER))
 export class USER extends BASELINE_USER {
 
-    @Column() whereCreated: 'baseline' | 'site' = 'site';
+  @Column() whereCreated: 'baseline' | 'site' = 'site';
 
-    @OneToMany(type => EMAIL, email => email.user, {
-        cascadeUpdate: false,
-        cascadeInsert: false
-    })
-    emails: EMAIL[] = [];
+  //#region @cutForSite
+  @OneToMany(type => EMAIL, email => email.user, {
+    cascadeUpdate: false,
+    cascadeInsert: false
+  })
+  //#endregion
+  emails: EMAIL[] = [];
 }
 
 @EntityRepository(USER)

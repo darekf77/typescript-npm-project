@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./tmp-site-src"
+  },
+  "include": [
+    "tmp-site-src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "preview",
+    "docs",
+    "dist",
+    "bundle",
+    "example",
+    "examples",
+    "browser",
+    "module",
+    "tests",
+    "tmp-src",
+    "src"
+  ]
+}

@@ -97,6 +97,10 @@ export abstract class Project {
         };
     }
 
+    get isBaseLine() {
+        return this.packageJson.isBaseLine;
+    }
+
 
     //#region node_modules
     get node_modules() {
@@ -577,14 +581,17 @@ export class ProjectIsomorphicLib extends Project {
             'index.d.ts',
             'index.js.map',
             "tsconfig.json",
-            "tsconfig.browser.json"
+            "tsconfig.browser.json",
+            "tsconfig.site.json",
+            "tsconfig.site.browser.json"
         ];
     }
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        const webpackParams = BuildOptions.stringify(prod, watch, outDir);
-        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.type === 'isomorphic-lib');
+        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.parent.isBaseLine);
+        console.log('isBaseLineForSiteBuild', isBaseLineForSiteBuild)
+        const webpackParams = BuildOptions.stringify(prod, watch, outDir, isBaseLineForSiteBuild);
         if (watch) {
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,
@@ -611,6 +618,9 @@ export class ProjectIsomorphicLib extends Project {
                 rimraf: 'tnp rimraf',
                 mkdirp: 'tnp mkdir',
                 ln: 'tnp ln'
+            },
+            build: {
+                forSitePurpose: env.forSite
             }
         });
     }

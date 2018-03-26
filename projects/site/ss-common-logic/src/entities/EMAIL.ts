@@ -4,8 +4,8 @@ import { Column, EntityRepository, ManyToMany, JoinTable, ManyToOne, JoinColumn 
 
 
 import {
-    EMAIL as BASELINE_EMAIL,
-    EMAIL_REPOSITORY as BASELINE_EMAIL_REPOSITORY
+  EMAIL as BASELINE_EMAIL,
+  EMAIL_REPOSITORY as BASELINE_EMAIL_REPOSITORY
 } from "baseline/ss-common-logic/bundle/entities/EMAIL";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
 import { USER } from './USER';
@@ -13,19 +13,22 @@ import { USER } from './USER';
 @Entity(META.tableNameFrom(EMAIL))
 export class EMAIL extends BASELINE_EMAIL {
 
-    @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
-        cascadeInsert: false,
-        cascadeUpdate: false
-    })
-    @JoinTable()
-    types: EMAIL_TYPE[] = [];
+  //#region @cutForSite
+  @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  @JoinTable()
+  //#endregion
+  types: EMAIL_TYPE[] = [];
 
-
-    @ManyToOne(type => USER, user => user.id, {
-        cascadeAll: false
-    })
-    @JoinColumn()
-    user: USER;
+  //#region @cutForSite
+  @ManyToOne(type => USER, user => user.id, {
+    cascadeAll: false
+  })
+  @JoinColumn()
+  //#endregion
+  user: USER;
 
 }
 

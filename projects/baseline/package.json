@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "tnp": {
     "type": "workspace",
+    "baseline": true,
     "resources": [
       "README.md"
     ]

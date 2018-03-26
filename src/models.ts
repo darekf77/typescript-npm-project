@@ -27,13 +27,15 @@ export class BuildOptions {
     prod: boolean;
     outDir: BuildDir;
     watch?: boolean;
+    forSite?: boolean;
 
-    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist') {
+    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', forSite = false) {
         const o = {
             env: [
                 '--env.prod=' + prod,
                 '--env.watch=' + watch,
-                '--env.outDir=' + outDir
+                '--env.outDir=' + outDir,
+                '--env.forSite=' + forSite
             ]
         }
         return `${o.env.join(' ')}`;

@@ -7,7 +7,6 @@
         "./**/*"
     ],
     "exclude": [
-        "src",
         "node_modules",
         "preview",
         "docs",

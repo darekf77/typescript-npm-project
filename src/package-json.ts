@@ -15,6 +15,7 @@ export interface IPackageJSON {
     scripts: Object;
     tnp: {
         type: LibType;
+        baseline: boolean,
         resources?: string[];
         requiredLibs?: string[];
         router: TnpRouter;
@@ -190,6 +191,14 @@ export class PackageJSON {
         const p = this.data.tnp;
         return Array.isArray(p.resources) ? p.resources : [];
     }
+
+    get isBaseLine() {
+        if (this.data.tnp && _.isBoolean(this.data.tnp.baseline)) {
+            return this.data.tnp.baseline;
+        }
+        return false;
+    }
+
     //#endregion
 
 }

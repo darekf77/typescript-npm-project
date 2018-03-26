@@ -31,6 +31,16 @@ export class SESSION extends BASELINE_SESSION {
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends BASELINE_SESSION_REPOSITORY {
 
+  //#region @cutForSite
+  @OneToOne(type => USER, user => user.id, {
+    nullable: true
+  })
+  @JoinColumn()
+  //#endregion
+  user: USER;
+
+  //#region @backend
+
 
 }
 
