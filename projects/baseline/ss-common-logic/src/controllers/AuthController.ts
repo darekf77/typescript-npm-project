@@ -24,11 +24,14 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
-import { USER, IUSER, USER_META, USER_REPOSITORY } from '../entities/USER';
-import { SESSION, SESSION_META, SESSION_REPOSITORY } from '../entities/SESSION';
-import { EMAIL, EMAIL_META, EMAIL_REPOSITORY } from '../entities/EMAIL';
-import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_META, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
+//#region entities
+import { USER, IUSER, USER_REPOSITORY } from '../entities/USER';
+import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
+import { EMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
+//#endregion
 import { META } from '../helpers';
+import { entities } from '../entities';
 
 
 
@@ -77,12 +80,7 @@ export interface IFacebook {
 export class AuthController extends META.BASE_CONTROLLER {
 
   get ENTITIES() {
-    return {
-      USER: USER_META(this.connection),
-      SESSION: SESSION_META(this.connection),
-      EMAIL: EMAIL_META(this.connection),
-      EMAIL_TYPE: EMAIL_TYPE_META(this.connection)
-    }
+    return entities(this.connection)
   }
 
 

@@ -63,7 +63,6 @@ export class USER extends META.BASE_ENTITY implements IUSER {
 @EntityRepository(USER)
 export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
 
-  get ENTITIES() { return {} }
 
   byUsername(username: string) {
     //#region @backendFunc
@@ -87,10 +86,4 @@ export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
     //#endregion
   }
 
-}
-
-export const USER_META = function (connection: Connection) {
-  return META
-    .fromEntity<USER>(USER)
-    .metaWithDb<USER_REPOSITORY>(connection, USER_REPOSITORY);
 }

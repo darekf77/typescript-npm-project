@@ -55,10 +55,6 @@ export namespace META {
       return res as ER;
     }
 
-
-    public meta() {
-      return this._meta;;
-    }
     private _meta: EntityClassMeta<E> = {} as any;
     private _config?: Object = {};
 
@@ -89,8 +85,6 @@ export namespace META {
 
 
   export abstract class BASE_REPOSITORY<E> extends Repository<E> {
-
-    abstract get ENTITIES(): { [entities: string]: EntityClassMeta<any> };
 
   }
 

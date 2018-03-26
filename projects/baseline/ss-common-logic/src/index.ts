@@ -1,10 +1,10 @@
 const controllers = {};
 const entities = {};
 function addController(controller: Function) {
-    controllers[controller.name] = controller;
+  controllers[controller.name] = controller;
 }
 function addEntity(entity: Function) {
-    entities[entity.name] = entity;
+  entities[entity.name] = entity;
 }
 
 import { AuthController } from './controllers/AuthController';
@@ -24,7 +24,7 @@ export { USER } from './entities/USER';
 addEntity(USER);
 
 import { SESSION } from './entities/SESSION';
-export { SESSION } from './entities/SESSION';
+export { SESSION} from './entities/SESSION';
 addEntity(SESSION);
 
 export const Controllers = controllers;

@@ -108,12 +108,6 @@ export class SESSION extends META.BASE_ENTITY {
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
 
-  get ENTITIES() {
-    return {
-      SESSION: META.fromEntity<SESSION>(SESSION).meta()
-    }
-  }
-
 
   SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
   SESSION_LOCAL_STORAGE = SESSION_CONFIG.SESSION_LOCAL_STORAGE;
@@ -153,7 +147,7 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
   async getFrom(user: USER, ip: string) {
     //#region @backendFunc
 
-    let Session = new this.ENTITIES.SESSION.entityClass();
+    let Session =  this.create();
     Session.user = user;
     Session.ip = ip;
 
@@ -195,12 +189,3 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
   }
 
 }
-
-export const SESSION_META = function (connection: Connection) {
-  return META
-    .fromEntity<SESSION>(SESSION)
-    .use(SESSION_CONFIG)
-    .metaWithDb<SESSION_REPOSITORY>(connection, SESSION_REPOSITORY);
-}
-
-

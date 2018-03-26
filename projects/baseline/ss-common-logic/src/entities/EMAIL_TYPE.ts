@@ -45,8 +45,6 @@ export class EMAIL_TYPE extends META.BASE_ENTITY {
 @EntityRepository(EMAIL_TYPE)
 export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
 
-  get ENTITIES() { return {} }
-
   async getBy(name: EMAIL_TYPE_NAME) {
     //#region @backendFunc
     const etype = await this.findOne({
@@ -78,10 +76,5 @@ export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
   }
 }
 
-export const EMAIL_TYPE_META = function (connection: Connection) {
-  return META
-    .fromEntity<EMAIL_TYPE>(EMAIL_TYPE)
-    .metaWithDb<EMAIL_TYPE_REPOSITORY>(connection, EMAIL_TYPE_REPOSITORY);
-}
 
 

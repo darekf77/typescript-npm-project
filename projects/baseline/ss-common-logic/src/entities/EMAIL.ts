@@ -60,7 +60,6 @@ export class EMAIL extends META.BASE_ENTITY {
 @EntityRepository(EMAIL)
 export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
 
-  get ENTITIES() { return {} }
 
   async getUserBy(address: string) {
     //#region @backendFunc
@@ -84,10 +83,4 @@ export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
     //#endregion
   }
 
-}
-
-export const EMAIL_META = function (connection: Connection) {
-  return META
-    .fromEntity<EMAIL>(EMAIL)
-    .metaWithDb<EMAIL_REPOSITORY>(connection, EMAIL_REPOSITORY);
 }
