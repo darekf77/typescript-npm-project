@@ -24,20 +24,7 @@ export class SESSION extends BASELINE_SESSION {
 @EntityRepository(SESSION)
 export class SESSION_REPOSITORY extends BASELINE_SESSION_REPOSITORY {
 
-  get ENTITIES() {
-    return {
-      SESSION: META.fromEntity<SESSION>(SESSION).meta()
-    }
-  }
 
-}
-
-
-export const SESSION_META = function (connection: Connection) {
-  return META
-    .fromEntity<SESSION>(SESSION)
-    .use(SESSION_CONFIG)
-    .metaWithDb<SESSION_REPOSITORY>(connection as any, SESSION_REPOSITORY);
 }
 
 export default SESSION;
