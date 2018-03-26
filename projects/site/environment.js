@@ -39,7 +39,7 @@ const config = {
     {
       url: '/api',
       project: 'ss-common-logic',
-      localEnvPort: 4000
+      localEnvPort: 4001
     },
     {
       url: '/mobile',

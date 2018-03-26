@@ -589,8 +589,7 @@ export class ProjectIsomorphicLib extends Project {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.parent.isBaseLine);
-        console.log('isBaseLineForSiteBuild', isBaseLineForSiteBuild)
+        const isBaseLineForSiteBuild = (this.parent.type === 'workspace' && this.parent.isBaseLine && outDir === 'bundle');
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isBaseLineForSiteBuild);
         if (watch) {
             const functionName = ClassHelper.getMethodName(
