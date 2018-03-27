@@ -596,19 +596,24 @@ export class ProjectIsomorphicLib extends Project {
 
     private get additionalParentIsomorphcLibs(): string[] {
         const result: string[] = []
-        // console.log('this.dependencies', this.parent.dependencies)
-        const includedBaselines = this.parent.dependencies
-            .filter(d => d.type === 'workspace')
+        if (this.parent && Array.isArray(this.parent.dependencies)) {
+            const includedBaselines = this.parent.dependencies
+                .filter(d => d.type === 'workspace')
 
-        includedBaselines.forEach(b => {
-            console.log(b.name)
-            const baselineIsomorphicLibCHildrens = b.children.filter(f => f.type === 'isomorphic-lib');
-            baselineIsomorphicLibCHildrens.forEach(p => {
-                // TODO support for more nested isomorphic libs
-                // console.log('---- ', p.name);
-                result.push(`${b.name}/${p.name}/${config.folder.bundle}`);
+            includedBaselines.forEach(b => {
+                console.log(b.name)
+                const baselineIsomorphicLibCHildrens = b.children.filter(f => f.type === 'isomorphic-lib');
+                baselineIsomorphicLibCHildrens.forEach(p => {
+                    // TODO support for more nested isomorphic libs
+                    // console.log('---- ', p.name);
+                    result.push(`${b.name}/${p.name}/${config.folder.bundle}`);
+                })
             })
-        })
+        } else {
+            console.log('Project with no parent: '+ this.name)
+        }
+        // console.log('this.dependencies', this.parent.dependencies)
+
         // console.log(result)
         // process.exit(0)
         return result;
