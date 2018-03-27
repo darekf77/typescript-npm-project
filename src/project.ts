@@ -576,15 +576,20 @@ export class ProjectIsomorphicLib extends Project {
     }
 
     projectSpecyficFiles(): string[] {
-        return [
+        let files = [
             'index.js',
             'index.d.ts',
             'index.js.map',
             "tsconfig.json",
-            "tsconfig.browser.json",
-            "tsconfig.site.json",
-            "tsconfig.site.browser.json"
+            "tsconfig.browser.json"
         ];
+        if (this.parent && this.parent.type === 'workspace' && !this.parent.isBaseLine) {
+            files = [
+                "tsconfig.site.json",
+                "tsconfig.site.browser.json"
+            ].concat(files);
+        }
+        return files;
     }
 
 
