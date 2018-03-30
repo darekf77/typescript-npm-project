@@ -1,6 +1,6 @@
 
 import { PopupInfo } from './popup-info';
-import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef } from '@angular/core';
+import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef, ElementRef } from '@angular/core';
 import { PopupComponent } from '../popup-component/popup.component';
 import { HTMLElementUtil } from './html-utls';
 
@@ -20,8 +20,12 @@ export class PopupControler {
         const pInfo: PopupInfo = new PopupInfo();
         const popupFactory = this.componentFactoryResolver
             .resolveComponentFactory(PopupComponent);
+
         const popupRef = this.viewContainerRef
             .createComponent(popupFactory);
+
+        popupRef.instance.parent = this;
+        popupRef.instance.template = component;
 
         if (this.bodyHtml == null) {
             this.bodyHtml = this.getBody(popupRef.location.nativeElement);
@@ -30,18 +34,8 @@ export class PopupControler {
         this.findPopupWrapperAndContent(pInfo.popup.location.nativeElement, pInfo);
         // Move the wrapper to the body tag
         HTMLElementUtil.RemoveElement(pInfo.popup.location.nativeElement);
-
         this.bodyHtml.appendChild(pInfo.popup.location.nativeElement);
 
-        // const popup = this.componentFactoryResolver.resolveComponentFactory(component);
-        // const componentRef = this.viewContainerRef.createComponent(popup) as ComponentRef<any>;
-        // const componentRef = this.viewContainerRef.createEmbeddedView(component);
-        // console.log(component);
-        // debugger;
-
-        // HTMLElementUtil.RemoveElement(component.elementRef.nativeElement);
-
-        pInfo.popupContent.appendChild(component.elementRef.nativeElement);
         this.popupQueue.push(pInfo);
         this.centerPositioning(pInfo.wrapper);
         return popupRef;
@@ -54,7 +48,7 @@ export class PopupControler {
 
     }
 
-    public StartDragAt = (startX: number, startY: number) => {
+    public StartDragAt(startX: number, startY: number) {
         const popup = this.popupQueue[this.popupQueue.length - 1];
 
         const top: number = + popup.wrapper.style.top.replace('px', '');
@@ -62,7 +56,7 @@ export class PopupControler {
         popup.dragYOffset = startY - top;
         popup.dragXOffset = startX - left;
     }
-    public moveTo = (x: number, y: number) => {
+    public moveTo(x: number, y: number) {
         const popup = this.popupQueue[this.popupQueue.length - 1];
 
         popup.wrapper.style.top = (y - popup.dragYOffset) + 'px';

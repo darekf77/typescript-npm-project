@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ViewContainerRef, TemplateRef, AfterViewInit } from '@angular/core';
 import { PopupControler } from '../model/popup-controller';
 
 @Component({
@@ -6,9 +6,11 @@ import { PopupControler } from '../model/popup-controller';
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.scss']
 })
-export class PopupComponent {
+export class PopupComponent implements AfterViewInit {
 
-  parent: PopupControler;
+  @ViewChild('container', { read: ViewContainerRef }) view;
+  @Input() public parent: PopupControler;
+  @Input() public template: TemplateRef<any>;
 
   closePopup(): void {
     this.parent.close();
@@ -21,6 +23,22 @@ export class PopupComponent {
     if (e.x > 0 && e.y > 0) {
       this.parent.moveTo(e.clientX, e.clientY);
     }
+
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+
+      this.view.createEmbeddedView(this.template
+        //   , {
+        //   model: this.model,
+        //   dialog: {
+        //     close: () => this.onClose()
+        //   }
+        // }
+      );
+
+    }, 500);
 
   }
 

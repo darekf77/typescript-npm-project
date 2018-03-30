@@ -1,7 +1,7 @@
 
 import {
     Component, OnInit, ViewContainerRef, TemplateRef,
-    ComponentFactoryResolver, ViewChild, Input, AfterContentInit
+    ComponentFactoryResolver, ViewChild, Input, AfterContentInit, ElementRef
 } from '@angular/core';
 import { PopupControler } from './model/popup-controller';
 
@@ -17,7 +17,8 @@ export class StandalonePopupComponent implements OnInit, AfterContentInit {
 
     constructor(
         private viewContainerRef: ViewContainerRef,
-        private componentFactoryResolver: ComponentFactoryResolver) {
+        private componentFactoryResolver: ComponentFactoryResolver
+    ) {
     }
     controller: PopupControler;
     public initPopup() {
