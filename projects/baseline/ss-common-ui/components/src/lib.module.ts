@@ -1,42 +1,36 @@
+// angular
 import { NgModule, NgZone, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FooComponent } from './foo/foo.component';
-import { BarService } from './bar/bar.service';
-import { SliderVerticalModule } from "./sliders/slider-vertical";
-
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+// local modules
 import {
-  MatCardModule,
-  MatSlideToggleModule
-} from '@angular/material';
+  BarService,
+  FooComponent
+} from './ui-elements';
+import { AppModule } from './preview';
+// exports
+export * from './layouts';
+export * from './preview';
+export * from './ui-elements';
 
-const modules = [
-  SliderVerticalModule
-]
 
 @NgModule({
   imports: [
-    CommonModule,
-    MatSlideToggleModule,
-    MatCardModule,
-    modules
+    CommonModule
   ],
   declarations: [
     FooComponent
   ],
   exports: [
-    modules,
-    FooComponent,
-    MatCardModule,
-    MatSlideToggleModule
+    FooComponent
   ]
 })
-export class MyLibModule {
+export class CommonUIModule {
 
   public static forRoot(): ModuleWithProviders {
 
     return {
-      ngModule: MyLibModule,
+      ngModule: CommonUIModule,
       providers: [
         BarService
       ]

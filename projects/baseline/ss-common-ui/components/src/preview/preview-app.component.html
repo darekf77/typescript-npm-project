@@ -1,0 +1,13 @@
+<standalone-popup [contentComponent]="popupContent"></standalone-popup>
+<ng-template #popupContent>
+    <ul>
+        <li>
+            <a [routerLink]="['/layout-slider-vertical']"> slider-vertical </a>
+        </li>
+        <li>
+            <a [routerLink]="['/layout-slider-vertical']"> slider-horizontal </a>
+        </li>
+    </ul>
+</ng-template>
+
+<router-outlet></router-outlet>
