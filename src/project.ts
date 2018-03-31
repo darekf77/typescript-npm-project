@@ -610,7 +610,7 @@ export class ProjectIsomorphicLib extends Project {
                 })
             })
         } else {
-            console.log('Project with no parent: '+ this.name)
+            console.log('Project with no parent: ' + this.name)
         }
         // console.log('this.dependencies', this.parent.dependencies)
 
@@ -746,13 +746,17 @@ export class ProjectAngularLib extends Project {
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
         this.run('tnp npm-run ng set warnings.typescriptMismatch=false')
-        const moduleLink = outDir === 'dist' ? `&& tnp rimraf module && tnp ln ${outDir} module` : ''
-        if (watch) {
+        const moduleLink = (outDir === 'dist' ? `&& tnp rimraf module && tnp ln ${outDir} module` : '')
+        if (watch && outDir === 'dist') {
             this.run('tnp npm-run ng server').async()
             this.watcher.run(`npm run build:esm ${moduleLink}`, 'components/src');
         } else {
-            this.run(`npm run build:esm ${moduleLink}`).sync();
-            this.run(`npm run build`).sync();
+            if (outDir === 'dist') {
+                this.run(`npm run build:esm ${moduleLink}`).sync();
+                this.run(`npm run build`).sync();
+            } else if (outDir === 'bundle') {
+                this.run(`npm run build:lib`).sync();
+            }
         }
     }
 }

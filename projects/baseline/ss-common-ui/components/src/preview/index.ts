@@ -1,1 +1,1 @@
-export * from './preview.app.module';
+export * from './preview-app.module';
