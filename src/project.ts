@@ -124,6 +124,35 @@ export abstract class Project {
             installPackageFromNPM(packagePath) {
                 self.packageJson.installPackage(packagePath, '--save');
             },
+            baselineSiteJoinedLinks(c: Project) {
+                return {
+                    remove() {
+                        if (c.isBaseLine && _.isArray(c.children)) {
+                            c.children.forEach(child => {
+                                const childBundleNewPath = path.join(self.location, 'node_modules', `${c.name}-${child.name}`);
+                                if (fs.existsSync(childBundleNewPath)) {
+                                    self.run(`tnp rimraf ${childBundleNewPath}`).sync();
+                                }
+                            })
+                        }
+                    },
+                    add() {
+                        if (c.isBaseLine && _.isArray(c.children)) {
+                            c.children.forEach(child => {
+                                const bundlePath = path.join(child.location, config.folder.bundle)
+                                if (fs.existsSync(bundlePath)) {
+                                    const destination = path.join(self.location, 'node_modules', `${c.name}-${child.name}`);
+                                    const command = `tnp cpr ${bundlePath} ${destination}`;
+                                    self.run(command).sync();
+                                } else {
+                                    console.log(`Project "${chalk.red(child.name)}" isn't ready for baseline/site model... missing bundle`)
+                                    console.log(`Run command: ${chalk.green('tnp build:bundle')} in folder: ${child.location} \n`)
+                                }
+                            })
+                        }
+                    }
+                }
+            },
             get localChildrensWithRequiredLibs() {
                 const symlinks = self.dependencies.concat(self.children);
                 symlinks.forEach(c => {
@@ -138,6 +167,7 @@ export abstract class Project {
                             if (fs.existsSync(symPkgPath)) {
                                 self.run(`rm ${symPkgPath}`).sync();
                             }
+                            self.node_modules.baselineSiteJoinedLinks(c).remove()
                         })
                     },
                     addSymlinks() {
@@ -145,6 +175,7 @@ export abstract class Project {
                             const destination = path.join(self.location, 'node_modules');
                             const command = `tnp ln ${c.location} ${destination}`;
                             self.run(command).sync();
+                            self.node_modules.baselineSiteJoinedLinks(c).add()
                         })
                     },
                 }
