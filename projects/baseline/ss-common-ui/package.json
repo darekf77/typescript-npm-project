@@ -2,20 +2,6 @@
   "name": "ss-common-ui",
   "version": "0.0.0",
   "license": "UNLICENSED",
-  "scripts": {
-    "ng": "tnp npm-run ng",
-    "start": "tnp npm-run ng serve",
-    "build": "tnp npm-run ng build",
-    "build:app": "tnp npm-run cpr bundle src/components && tnp npm-run ng build --app packages && tnp npm-run rimraf src/@my",
-    "build:lib": "tnp npm-run ng-packagr",
-    "test": "tnp npm-run ng test",
-    "lint": "tnp npm-run ng lint",
-    "e2e": "tnp npm-run ng e2e",
-    "build:esm": "tnp npm-run gulp inline-templates && npm run ngcompile",
-    "build:esm:watch": "tnp npm-run gulp build:esm:watch",
-    "ngcompile": "tnp npm-run ngc -p tsconfig-aot.json",
-    "clean:tmp": "tnp rimraf coverage dist tmp"
-  },
   "tnp": {
     "type": "angular-lib",
     "resources": [

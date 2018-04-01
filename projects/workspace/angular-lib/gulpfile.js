@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const _ = require('lodash');
 const sass = require('node-sass');
 const inlineTemplates = require('gulp-inline-ng2-template');
 const exec = require('child_process').exec;
@@ -7,9 +8,9 @@ const exec = require('child_process').exec;
  * Inline templates configuration.
  * @see  https://github.com/ludohenin/gulp-inline-ng2-template
  */
-const INLINE_TEMPLATES = {
+const INLINE_TEMPLATES_DIST = {
   SRC: './components/src/**/*.ts',
-  DIST: './tmp/src-inlined',
+  DIST: './tmp/src-inlined-dist',
   CONFIG: {
     base: '/components/src',
     target: 'es6',
@@ -18,35 +19,23 @@ const INLINE_TEMPLATES = {
   }
 };
 
+const INLINE_TEMPLATES_BUNDLE = _.cloneDeep(INLINE_TEMPLATES_DIST)
+INLINE_TEMPLATES_BUNDLE.DIST = './tmp/src-inlined-bundle'
+
 /**
  * Inline external HTML and SCSS templates into Angular component files.
  * @see: https://github.com/ludohenin/gulp-inline-ng2-template
  */
-gulp.task('inline-templates', () => {
-  return gulp.src(INLINE_TEMPLATES.SRC)
-    .pipe(inlineTemplates(INLINE_TEMPLATES.CONFIG))
-    .pipe(gulp.dest(INLINE_TEMPLATES.DIST));
+gulp.task('inline-templates-dist', () => {
+  return gulp.src(INLINE_TEMPLATES_DIST.SRC)
+    .pipe(inlineTemplates(INLINE_TEMPLATES_DIST.CONFIG))
+    .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST));
 });
 
-/**
- * Build ESM by running npm task.
- * This is a temporary solution until ngc is supported --watch mode.
- * @see: https://github.com/angular/angular/issues/12867
- */
-gulp.task('build:esm', ['inline-templates'], (callback) => {
-  exec('npm run ngcompile', function (error, stdout, stderr) {
-    console.log(stdout, stderr);
-    callback(error)
-  });
-});
-
-/**
- * Implements ESM build watch mode.
- * This is a temporary solution until ngc is supported --watch mode.
- * @see: https://github.com/angular/angular/issues/12867
- */
-gulp.task('build:esm:watch', ['build:esm'], () => {
-  gulp.watch('/components/src/**/*', ['build:esm']);
+gulp.task('inline-templates-bundle', () => {
+  return gulp.src(INLINE_TEMPLATES_BUNDLE.SRC)
+    .pipe(inlineTemplates(INLINE_TEMPLATES_BUNDLE.CONFIG))
+    .pipe(gulp.dest(INLINE_TEMPLATES_BUNDLE.DIST));
 });
 
 /**

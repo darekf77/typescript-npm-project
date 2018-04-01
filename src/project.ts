@@ -13,7 +13,7 @@ import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, Dependencies, BuildDir, RunOptions, RuleDependency } from "./models";
 import { error, info, warn } from "./messages";
 import config from "./config";
-import { run as __run, watcher as __watcher, questionYesNo } from "./process";
+import { run as __run, watcher as __watcher, questionYesNo, compilationWrapper } from "./process";
 import { create } from 'domain';
 import { copyFile, deleteFiles, copyFiles, getWebpackEnv, ReorganizeArray, ClassHelper } from "./helpers";
 import { HelpersLinks } from "./helpers-links";
@@ -742,14 +742,44 @@ export class ProjectDocker extends Project {
 }
 //#endregion
 
+export abstract class BaseAngularProject extends Project {
 
-//#region Angular Lib
-export class ProjectAngularLib extends Project {
+    get isEjectedProject() {
+        try {
+            const file = fs.readFileSync(path.join(this.location, '.angular-cli.json')).toString()
+            const config: { project: { ejected: boolean; } } = JSON.parse(file);
+            return (config.project && config.project.ejected);
+        } catch (e) {
+            error(e)
+        }
+    }
 
 
+    projectSpecyficFiles() {
+        return [
+            "tsconfig.json",
+            'src/tsconfig.app.json',
+            'src/tsconfig.spec.json',
+            'src/tsconfig.packages.json',
+            'protractor.conf.js',
+            'karma.conf.js'
+        ].concat(this.isEjectedProject ? [
+            'webpack.config.build.aot.js',
+            'webpack.config.build.js',
+            'webpack.config.common.js',
+            'webpack.config.js'
+        ] : [])
+    }
 
-    protected removeBeforeBuild: string[];
-    protected defaultPort: number = 4100;
+    preventWarningTypescirptMismatch() {
+        this.run('tnp npm-run ng set warnings.typescriptMismatch=false').sync()
+    }
+
+    serve(port: number) {
+        this.run(`tnp npm-run ng serve --port ${port}`).async()
+        return this;
+    }
+
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
@@ -762,120 +792,106 @@ export class ProjectAngularLib extends Project {
         }
     }
 
-    projectSpecyficFiles(): string[] {
-        return [
-            ...ProjectAngularCliClient.DEFAULT_FILES,
+    buildApp(watch = false, prod: boolean, port?: number) {
+        const outDirApp = 'dist-app';
+        if (watch) {
+            const p = (port !== undefined ? `--port ${port}` : '');
+            if (this.isEjectedProject) {
+                this.run(`tnp npm-run webpack-dev-server ${p}`, { biggerBuffer: true }).async()
+            } else {
+                this.run(`tnp npm-run ng serve ${p}`, { biggerBuffer: true }).async()
+            }
+        } else {
+            if (this.isEjectedProject) {
+                const aot = (prod ? 'aot.' : '');
+                this.run(`tnp rimraf ${outDirApp} && tnp npm-run webpack --config=webpack.config.build.${aot}js`, { biggerBuffer: true }).sync()
+            } else {
+                this.run(`npm-run ng build --output-path ${config.folder.previewDistApp}`, { biggerBuffer: true }).sync()
+            }
+        }
+
+    }
+
+    buildSteps(buildOptions?: BuildOptions) {
+        const { prod, watch, outDir, appBuild } = buildOptions;
+        if (this.isEjectedProject) {
+            this.preventWarningTypescirptMismatch()
+        }
+        if (appBuild) {
+            this.buildApp(watch, prod, this.defaultPort);
+        }
+    }
+
+}
+
+export abstract class BaseAngularLibProject extends BaseAngularProject {
+
+    projectSpecyficFiles() {
+        return super.projectSpecyficFiles().concat([
             'index.js',
             'index.d.ts',
             'index.js.map',
             'gulpfile.js',
             'ng-package.json',
-            'tsconfig-aot.json'
-        ];
+            'tsconfig-aot.bundle.json',
+            'tsconfig-aot.dist.json'
+        ]);
+    }
+
+    buildLib(outDir: BuildDir) {
+        compilationWrapper(() => {
+            this.run(`tnp rimraf outDir`).sync()
+            this.run(`tnp npm-run gulp inline-templates-${outDir}`, { output: false }).sync()
+            this.run(`tnp npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
+            if (outDir === 'dist') {
+                this.run(`tnp rimraf module && tnp ln ${outDir} module`).sync()
+            }
+        }, `angular-lib (project ${this.name})`)
+        return this;
     }
 
     buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir } = buildOptions;
-        this.run('tnp npm-run ng set warnings.typescriptMismatch=false')
-        const moduleLink = (outDir === 'dist' ? `&& tnp rimraf module && tnp ln ${outDir} module` : '')
-        if (watch && outDir === 'dist') {
-            this.run('tnp npm-run ng server').async()
-            this.watcher.run(`npm run build:esm ${moduleLink}`, 'components/src');
+        const { prod, watch, outDir, appBuild } = buildOptions;
+        if (appBuild) {
+            super.buildSteps(buildOptions);
         } else {
-            if (outDir === 'dist') {
-                this.run(`npm run build:esm ${moduleLink}`).sync();
-                this.run(`npm run build`).sync();
-            } else if (outDir === 'bundle') {
-                this.run(`npm run build:lib`).sync();
+            if (watch) {
+                const p = (prod ? ':prod' : '');
+                this.watcher.run(`tnp build:${outDir}${p}`, 'components/src');
+            } else {
+                this.buildLib(outDir)
             }
         }
     }
+
+}
+
+
+//#region Angular Lib
+export class ProjectAngularLib extends BaseAngularLibProject {
+
+    protected removeBeforeBuild: string[];
+    protected defaultPort: number = 4100;
+
 }
 //#endregion
 
 
 //#region Angular Client
-export class ProjectAngularClient extends Project {
+export class ProjectAngularClient extends BaseAngularProject {
 
     protected removeBeforeBuild: string[];
     protected defaultPort: number = 4300;
-    runOn(port: number, async = false) {
-        if (!port) port = this.defaultPort;
-        this.currentPort = port;
-        const command = `tnp http-server -p ${port} -s`;
-        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
-    }
 
-    projectSpecyficFiles(): string[] {
-        return [
-            ...ProjectAngularCliClient.DEFAULT_FILES,
-            'index.js',
-            'index.d.ts',
-            'index.js.map',
-            'webpack.config.build.aot.js',
-            'webpack.config.build.js',
-            'webpack.config.common.js',
-            'webpack.config.js'
-        ];
-    }
-    buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir } = buildOptions;
-        if (watch) {
-            this.run(`tnp npm-run webpack-dev-server --port=${4201}`).sync()
-        } else {
-            if (prod) {
-                this.run(`npm run build:aot`).sync()
-            } else {
-                this.run(`npm run build`).sync()
-            }
-        }
-    }
 }
 //#endregion
 
 
 //#region AngularCliClient
-export class ProjectAngularCliClient extends Project {
+export class ProjectAngularCliClient extends BaseAngularProject {
 
     protected removeBeforeBuild: string[];
     protected defaultPort: number = 4200;
-    runOn(port: number, async = false) {
-        if (!port) port = this.defaultPort;
-        this.currentPort = port;
-        const command = `tnp http-server -p ${port} -s`;
-        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
-    }
-
-    public static DEFAULT_FILES = [
-        "tsconfig.json",
-        'src/tsconfig.app.json',
-        'src/tsconfig.spec.json',
-        'protractor.conf.js',
-        'karma.conf.js'
-    ]
-
-    projectSpecyficFiles(): string[] {
-        return ProjectAngularCliClient.DEFAULT_FILES;
-    }
-
-    buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir } = buildOptions;
-        if (watch) {
-            this.run('npm-run ng serve').async()
-        } else {
-            this.run(`npm-run ng build --output-path ${config.folder.previewDistApp}`).sync()
-        }
-    }
 
 }
 //#endregion

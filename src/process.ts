@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from "os";
+import * as dateformat from "dateformat";
 
 import { error, info } from "./messages";
 import { RunOptions } from "./models";
@@ -30,6 +31,31 @@ export async function questionYesNo(message: string,
     }
 }
 
+function date() {
+    return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
+}
+
+export function compilationWrapper(fn: () => void, taskName: string = 'Task') {
+    if (!fn || !_.isFunction(fn)) {
+        return;
+    }
+    try {
+        console.log(chalk.gray(`${date()} Compilation of "${chalk.bold(taskName)}" started...`))
+        fn()
+        console.log(chalk.green(`${date()} Compilation of "${chalk.bold(taskName)}" finish OK...`))
+    } catch (error) {
+        console.log(chalk.red(error));
+        console.log(`${date()} Compilation of ${taskName} ERROR`)
+    }
+}
+
+
+export function clearConsole() {
+    if (process.platform === 'win32') {
+        run('cls').sync()
+    }
+    run('clear').sync()
+}
 
 export function log(process: child.ChildProcess, output = true) {
     process.stdout.on('data', (data) => {

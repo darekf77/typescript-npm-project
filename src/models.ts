@@ -28,6 +28,7 @@ export class BuildOptions {
     outDir: BuildDir;
     watch?: boolean;
     forSite?: boolean;
+    appBuild?: boolean;
     additionalIsomorphicLibs?: string[];
 
     public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = [], forSite = false) {

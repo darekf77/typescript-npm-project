@@ -5,6 +5,9 @@ import { run as runCommand } from "./process";
 export { config } from './config';
 export * from './helpers'
 import { Helpers } from "morphi";
+import { paramsFrom, match } from './helpers';
+import { isString } from 'util';
+import chalk from 'chalk';
 
 Helpers.checkEnvironment({
     npm: [
@@ -39,11 +42,20 @@ const localLibs = [
     'sloc'
 ]
 
+const helpAlias = [
+    '-h',
+    '--help',
+    '-help',
+    'help'
+]
+
 export function run(argsv: string[]) {
 
+    let recognized = false;
     if (Array.isArray(argsv) && argsv.length >= 3) {
         const localLib = argsv[2];
-        if (localLibs.includes(localLib)) {
+        if (!helpAlias.includes(localLib) && localLibs.includes(localLib)) {
+            recognized = true;
             const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
             const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
             runCommand(commadnToRun).sync()
@@ -51,48 +63,44 @@ export function run(argsv: string[]) {
         }
     }
 
-    glob.sync(
-        path
-            .join(__dirname, '/scripts/*.js'))
-        .forEach(function (file) {
-            let arr = require(path.resolve(file)).default;
-            if (_.isObject(arr)) {
-                _.forIn(arr, (v: Function, k) => {
-                    if (typeof v === 'function') {
+    const helpFile = glob.sync(path.join(__dirname, '/scripts/HELP.js'))[0]
+    const files = [helpFile]
+        .concat(glob.sync(path.join(__dirname, '/scripts/*.js')).filter(f => f != helpFile))
+
+    files.forEach(function (file) {
+        let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
+        if (_.isObject(defaultObjectFunctionsOrHelpString)) {
+            _.forIn(defaultObjectFunctionsOrHelpString, (v: Function | [Function, string] | string, k) => {
+                if (!isString(v)) {
+                    const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
+                    if (_.isFunction(vFn)) {
                         const check = match(k, argsv);
                         if (check.isMatch) {
-                            v.apply(null, [check.restOfArgs.join(' ')]);
+                            recognized = true;
+                            vFn.apply(null, [check.restOfArgs.join(' ')]);
                             process.stdin.resume();
                         }
                     }
-                })
-            }
-        });
-}
+                }
 
-export function paramsFrom(command: string) {
-    return _.kebabCase(command);
-}
-
-
-function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: string[] } {
-    let isMatch = false;
-    let restOfArgs = argv;
-
-    isMatch = argv.filter((vv, i) => {
-        const nameInKC = paramsFrom(name);
-        const isWithoutDash = name.startsWith('$');
-        const argInKC = paramsFrom(vv);
-
-        const condition =
-            (isWithoutDash && argInKC === `${nameInKC}`)
-            || argInKC === `${nameInKC}`
-            || argInKC === `${nameInKC.substr(0, 1)}`;
-        if (condition) {
-            restOfArgs = _.slice(argv, i + 1, argv.length);
+            })
         }
-        return condition;
-    }).length > 0;
-    return { isMatch, restOfArgs };
+    });
+    if (!recognized) {
+        if (Array.isArray(argsv) && argsv.length == 3) {
+            console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
+        } else if (Array.isArray(argsv) && argsv.length >= 3) {
+            console.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
+        } else {
+            console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
+        }
+        process.exit(1);
+    }
+
 }
+
+
+
+
+
 

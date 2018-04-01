@@ -21,8 +21,9 @@
     // ".tsconfig": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#c26262",
-    "activityBar.foreground": "#ffffff"
+    "activityBar.background": "#ffffff",
+    "activityBar.foreground": "#c26262",
+    "activityBar.border": "#c26262"
   },
   "editor.rulers": [100, 120],
   "html.format.wrapAttributes": "force-aligned",

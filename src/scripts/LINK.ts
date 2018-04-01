@@ -4,6 +4,7 @@ import { Project } from "../project";
 import { error } from "../messages";
 import * as _ from "lodash";
 import { LibType } from "../models";
+import chalk from "chalk";
 
 export function onlyLibsChildrens(workspaceProject: Project) {
     // console.log(workspaceProject.children.map )
@@ -27,7 +28,7 @@ export function link(workspaceProject: Project) {
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => {
             // console.log('link nodemoulse to ')
-            workspaceProject.node_modules.linkToProject(c, true)            
+            workspaceProject.node_modules.linkToProject(c, true)
         })
     }
     workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
@@ -36,8 +37,11 @@ export function link(workspaceProject: Project) {
 }
 
 export default {
-    $LINK: (args) => {
+    $LINK: [(args) => {
         link(Project.Current)
         process.exit(0)
-    }
+    }, `
+ln ${chalk.bold('source')} ${chalk.bold('target')}
+
+    `]
 }

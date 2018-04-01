@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FooComponent } from './foo/foo.component';
 import { BarService } from './bar/bar.service';
 
+
+
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatCardModule,

@@ -13,6 +13,31 @@ import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project';
 import { HelpersLinks } from "./helpers-links";
 
+export function paramsFrom(command: string) {
+    return _.kebabCase(command);
+}
+
+export function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: string[] } {
+    let isMatch = false;
+    let restOfArgs = argv;
+
+    isMatch = !!argv.find((vv, i) => {
+        const nameInKC = paramsFrom(name);
+        const isWithoutDash = name.startsWith('$');
+        const argInKC = paramsFrom(vv);
+
+        const condition =
+            (isWithoutDash && argInKC === `${nameInKC}`)
+            || argInKC === `${nameInKC}`
+            || argInKC === `${nameInKC.substr(0, 1)}`;
+        if (condition) {
+            restOfArgs = _.slice(argv, i + 1, argv.length);
+        }
+        return condition;
+    });
+    return { isMatch, restOfArgs };
+}
+
 export function fixWebpackEnv(env: Object) {
     _.forIn(env, (v, k) => {
         const value: string = v as any;

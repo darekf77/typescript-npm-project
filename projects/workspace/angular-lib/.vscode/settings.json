@@ -17,9 +17,9 @@
     // "karma.conf.js": true,
     // "bin": true,
     // ".gitignore": true,
-    ".npmignore": true,
-    ".npmrc": true,
-    ".tsconfig": true
+    // ".npmignore": true,
+    // ".npmrc": true,
+    // ".tsconfig": true
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#d11ab3",

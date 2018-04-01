@@ -1,7 +1,11 @@
 
 
-import { build } from "./BUILD";
+import { build, buildApp } from "./BUILD";
 
 export default {
-    $TASK_START: () => build(false, true)
+    $TASK_START: () => {
+        build(false, true)
+        buildApp(false, true)
+
+    }
 }

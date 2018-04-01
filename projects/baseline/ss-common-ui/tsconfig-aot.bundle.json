@@ -13,25 +13,25 @@
     "pretty": true,
     "stripInternal": true,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "rootDir": "./tmp/src-inlined",
+    "outDir": "bundle",
+    "rootDir": "./tmp/src-inlined-bundle",
     "lib": [
       "es2016",
       "dom"
     ]
   },
   "files": [
-    "./tmp/src-inlined/index.ts"
+    "./tmp/src-inlined-bundle/index.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist",
+    "bundle",
     "src",
     "e2e",
     "bundle"
   ],
   "angularCompilerOptions": {
-    "genDir": "dist",
+    "genDir": "bundle",
     "debug": false,
     "skipTemplateCodegen": true,
     "skipMetadataEmit": false,
