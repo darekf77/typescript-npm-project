@@ -1,7 +1,7 @@
 import { run } from "../process";
 import { Project, ProjectIsomorphicLib } from '../project';
 import { clear } from "./CLEAR";
-import { BuildOptions, BuildDir } from "../models";
+import { BuildOptions, BuildDir, LibType } from "../models";
 import { info, error } from "../messages";
 import chalk from "chalk";
 
@@ -14,15 +14,14 @@ export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
     const project: Project = Project.Current;
 
-    if (project.type !== 'angular-lib') {
+    if ((project.type === 'angular-lib') || (project.type === 'isomorphic-lib')) {
+        project.build(options);
+        if (!watch) {
+            process.exit(0)
+        }
+    } else {
         error(`Library build only for tnp ${chalk.bold('angular-lib')} project type`)
     }
-
-    project.build(options);
-    if (!watch) {
-        process.exit(0)
-    }
-
 }
 
 
@@ -34,10 +33,19 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist')
 
     const project: Project = Project.Current;
 
-    project.build(options);
-    if (!watch) {
-        process.exit(0)
+    const allowedLibs: LibType[] = ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker'];
+
+    if (allowedLibs.includes(project.type)) {
+        project.build(options);
+        if (!watch) {
+            process.exit(0)
+        }
+    } else {
+        error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
     }
+}
+
+
 }
 
 

@@ -5,7 +5,7 @@ import * as os from 'os';
 import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
-import { buildIsomorphic } from "morphi";
+import { buildIsomorphicVersion } from "morphi";
 import { ChildProcess } from "child_process";
 
 
@@ -696,22 +696,26 @@ export class ProjectIsomorphicLib extends Project {
 
         // process.exit(0)
 
-        buildIsomorphic({
-            foldersPathes: {
-                dist: env.outDir
-            },
-            toolsPathes: {
-                tsc: 'tnp tsc',
-                cpr: 'tnp cpr',
-                rimraf: 'tnp rimraf',
-                mkdirp: 'tnp mkdir',
-                ln: 'tnp ln'
-            },
-            build: {
-                forSitePurpose: env.forSite,
-                otherIsomorphicLibs: env.additionalIsomorphicLibs
-            }
-        });
+        compilationWrapper(() => {
+            buildIsomorphicVersion({
+                foldersPathes: {
+                    dist: env.outDir
+                },
+                toolsPathes: {
+                    tsc: 'tnp tsc',
+                    cpr: 'tnp cpr',
+                    rimraf: 'tnp rimraf',
+                    mkdirp: 'tnp mkdirp',
+                    ln: 'tnp ln'
+                },
+                build: {
+                    forSitePurpose: env.forSite,
+                    otherIsomorphicLibs: env.additionalIsomorphicLibs
+                }
+            });
+        }, `isomorphic-lib (project ${this.name})`)
+
+
     }
 
 }
