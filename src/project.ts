@@ -163,19 +163,25 @@ export abstract class Project {
                 return {
                     removeSymlinks() {
                         symlinks.forEach(c => {
-                            const symPkgPath = path.join(self.location, 'node_modules', c.name);
-                            if (fs.existsSync(symPkgPath)) {
-                                self.run(`rm ${symPkgPath}`).sync();
+                            if (c.type === 'workspace') {
+                                self.node_modules.baselineSiteJoinedLinks(c).remove()
+                            } else {
+                                const symPkgPath = path.join(self.location, 'node_modules', c.name);
+                                if (fs.existsSync(symPkgPath)) {
+                                    self.run(`rm ${symPkgPath}`).sync();
+                                }
                             }
-                            self.node_modules.baselineSiteJoinedLinks(c).remove()
                         })
                     },
                     addSymlinks() {
                         symlinks.forEach(c => {
-                            const destination = path.join(self.location, 'node_modules');
-                            const command = `tnp ln ${c.location} ${destination}`;
-                            self.run(command).sync();
-                            self.node_modules.baselineSiteJoinedLinks(c).add()
+                            if (c.type === 'workspace') {
+                                self.node_modules.baselineSiteJoinedLinks(c).add()
+                            } else {
+                                const destination = path.join(self.location, 'node_modules');
+                                const command = `tnp ln ${c.location} ${destination}`;
+                                self.run(command).sync();
+                            }
                         })
                     },
                 }

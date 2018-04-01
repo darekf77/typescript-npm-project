@@ -35,7 +35,7 @@ export class EMAIL_TYPE extends META.BASE_ENTITY {
   @Column({ length: 50, unique: true })
   name: EMAIL_TYPE_NAME;
 
-  //#region @cutForSite
+  //#region @joins
   @ManyToMany(type => EMAIL, email => email.types, {
     cascadeInsert: false,
     cascadeUpdate: false

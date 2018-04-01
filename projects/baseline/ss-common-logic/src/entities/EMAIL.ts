@@ -42,7 +42,7 @@ export class EMAIL extends META.BASE_ENTITY {
   @Column('varchar', { length: 100, unique: true })
   address: string;
 
-  //#region @cutForSite
+  //#region @joins
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
     cascadeInsert: false,
     cascadeUpdate: false
@@ -51,7 +51,7 @@ export class EMAIL extends META.BASE_ENTITY {
   //#endregion
   types: EMAIL_TYPE[] = [];
 
-  //#region @cutForSite
+  //#region @joins
   @ManyToOne(type => USER, user => user.id, {
     cascadeAll: false
   })

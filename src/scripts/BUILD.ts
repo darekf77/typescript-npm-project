@@ -46,7 +46,7 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist')
 }
 
 
-}
+
 
 
 export default {

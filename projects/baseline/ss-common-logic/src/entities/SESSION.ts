@@ -72,7 +72,7 @@ export class SESSION extends META.BASE_ENTITY {
   })
   expiredDate: Date;
 
-  //#region @cutForSite
+  //#region @joins
   @OneToOne(type => USER, user => user.id, {
     nullable: true
   })
