@@ -142,7 +142,7 @@ export abstract class Project {
                                 const bundlePath = path.join(child.location, config.folder.bundle)
                                 if (fs.existsSync(bundlePath)) {
                                     const destination = path.join(self.location, 'node_modules', `${c.name}-${child.name}`);
-                                    const command = `tnp cpr ${bundlePath} ${destination}`;
+                                    const command = `tnp cpr ${bundlePath} ${destination} --overwrite`;
                                     self.run(command).sync();
                                 } else {
                                     console.log(`Project "${chalk.red(child.name)}" isn't ready for baseline/site model... missing bundle`)
@@ -638,12 +638,12 @@ export class ProjectIsomorphicLib extends Project {
                 .filter(d => d.type === 'workspace')
 
             includedBaselines.forEach(b => {
-                console.log(b.name)
+                // console.log(b.name)
                 const baselineIsomorphicLibCHildrens = b.children.filter(f => f.type === 'isomorphic-lib');
                 baselineIsomorphicLibCHildrens.forEach(p => {
                     // TODO support for more nested isomorphic libs
                     // console.log('---- ', p.name);
-                    result.push(`${b.name}/${p.name}/${config.folder.bundle}`);
+                    result.push(`${b.name}-${p.name}`);
                 })
             })
         } else {
@@ -681,9 +681,9 @@ export class ProjectIsomorphicLib extends Project {
         const { prod, watch, outDir } = buildOptions;
 
         const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
-        const isBaseLineForSiteBuild = (isParentIsWorksapce && this.parent.isBaseLine && outDir === 'bundle');
-
-        const webpackParams = BuildOptions.stringify(prod, watch, outDir, this.getIsomorphcLibNames(isParentIsWorksapce), isBaseLineForSiteBuild);
+        const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
+        // console.log(isomorphicNames)
+        const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
         if (watch) {
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,
@@ -715,7 +715,6 @@ export class ProjectIsomorphicLib extends Project {
                     ln: 'tnp ln'
                 },
                 build: {
-                    forSitePurpose: env.forSite,
                     otherIsomorphicLibs: env.additionalIsomorphicLibs
                 }
             });

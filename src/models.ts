@@ -27,17 +27,15 @@ export class BuildOptions {
     prod: boolean;
     outDir: BuildDir;
     watch?: boolean;
-    forSite?: boolean;
     appBuild?: boolean;
     additionalIsomorphicLibs?: string[];
 
-    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = [], forSite = false) {
+    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = []) {
         const o = {
             env: [
                 '--env.prod=' + prod,
                 '--env.watch=' + watch,
                 '--env.outDir=' + outDir,
-                '--env.forSite=' + forSite,
                 '--env.additionalIsomorphicLibs=' + encodeURIComponent(additionalIsomorphicLibs.toString())
             ]
         }

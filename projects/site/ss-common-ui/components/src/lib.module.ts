@@ -1,1 +1,1 @@
-export * from 'baseline/ss-common-ui/bundle';
+export * from 'baseline-ss-common-ui';

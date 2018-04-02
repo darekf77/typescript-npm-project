@@ -11,7 +11,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { AppComponent } from './preview-app.component';
 import { StandalonePopupModule } from '../ui-elements/standalone-popup';
 import { previewRoutes } from './preview-app.routes';
-import { SliderVerticalComponent } from './preview-slider-vertical/preview-slider-vertical.component';
+import { PreviewSliderVerticalComponent } from './preview-slider-vertical/preview-slider-vertical.component';
 import { SliderVerticalModule } from '../layouts';
 
 const modules = [
@@ -24,7 +24,7 @@ const modules = [
 @NgModule({
   declarations: [
     AppComponent,
-    SliderVerticalComponent
+    PreviewSliderVerticalComponent
   ],
   imports: [
     NoopAnimationsModule,

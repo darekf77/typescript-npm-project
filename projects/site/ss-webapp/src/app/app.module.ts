@@ -15,7 +15,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
 
-init('http://localhost:4000')
+init('http://localhost:4001')
   .angularProviders({
     controllers: _.values(Controllers),
     entities: _.values(Entities)

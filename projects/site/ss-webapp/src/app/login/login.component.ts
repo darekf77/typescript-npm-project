@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthController } from 'ss-common-logic/browser';
+import { AuthControllerDecorator as AuthController } from 'ss-common-logic/browser';
 
 import { Log } from "ng2-logger";
 const log = Log.create('Login component')

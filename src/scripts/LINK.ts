@@ -36,6 +36,15 @@ export function link(workspaceProject: Project) {
     Project.Tnp.ownNpmPackage.linkTo(workspaceProject);
 }
 
+
+export function linkBaseline(projectWithBaselinesDependencies: Project) {
+    const baselines = projectWithBaselinesDependencies.dependencies.filter(b => b.type === 'workspace')
+    baselines.forEach(b => {
+        console.log(`Linking baseline: ${b.name} from ${b.location}`)
+        Project.Current.node_modules.baselineSiteJoinedLinks(b).add()
+    })
+}
+
 export default {
     $LINK: [(args) => {
         link(Project.Current)
@@ -43,5 +52,16 @@ export default {
     }, `
 ln ${chalk.bold('source')} ${chalk.bold('target')}
 
-    `]
+    `],
+    $LINK_BASELINE: (args) => {
+        if (Project.Current.type === 'workspace') {
+            linkBaseline(Project.Current)
+        } else if (Project.Current.parent && Project.Current.parent.type === 'workspace') {
+            linkBaseline(Project.Current.parent)
+        } else {
+            error(`No baseline projects to link...`)
+        }
+        process.exit(0)
+    }
+
 }

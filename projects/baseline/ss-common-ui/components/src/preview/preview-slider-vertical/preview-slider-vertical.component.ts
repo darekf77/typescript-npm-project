@@ -7,7 +7,7 @@ import * as _ from 'lodash';
   templateUrl: './preview-slider-vertical.component.html',
   styleUrls: ['./preview-slider-vertical.component.scss']
 })
-export class SliderVerticalComponent implements OnInit {
+export class PreviewSliderVerticalComponent implements OnInit {
 
   numbers = [];
 
