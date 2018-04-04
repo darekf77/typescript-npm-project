@@ -25,6 +25,9 @@ export abstract class Project {
     dependencies: Project[] = [];
     parent: Project;
     preview: Project;
+    get baseline(): Project {
+        return this.packageJson.basedOn;
+    }
     type: LibType;
     private packageJson: PackageJSON;
     private static projects: Project[] = [];
@@ -56,6 +59,55 @@ export abstract class Project {
 
     protected abstract runOn(port?: number, async?: boolean);
 
+    //#region generated files
+    public get generateFiles() {
+        const self = this;
+        return {
+            npmignore() {
+                const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
+                const canBeUseAsNpmPackage = allowedProject.includes(self.type);
+                const npmignoreFiles = [
+                    ".vscode",
+                    "dist/",
+                    'src/',
+                    "/scripts",
+                    "/docs",
+                    "/preview",
+                    '/tests',
+                    "tsconfig.json",
+                    "npm-debug.log*"
+                ];
+                fs.writeFileSync(path.join(self.location, '.npmignore'),
+                    npmignoreFiles.join('\n'), 'utf8');
+            },
+            gitignore() {
+                const isSiteFromBaselineProject = (fs.existsSync(path.join(self.location, config.folder.custom)));
+                const gitignoreFiles = [ // for sure ingored
+                    '/node_modules',
+                    '/tmp*',
+                    '/dist*',
+                    '/bundle*',
+                    '/browser',
+                    '/module',
+                    '/www',
+                    'bundle.umd.js'
+                ].concat([ // common small files
+                    'Thumbs.db',
+                    '.DS_Store',
+                    'npm-debug.log'
+                ].concat([ // not sure if ignored/needed
+                    '/.sass-cache',
+                    '/.sourcemaps'
+                ]).concat( // dendend 
+                    isSiteFromBaselineProject ? ['/src'] : []
+                ))
+                fs.writeFileSync(path.join(self.location, '.gitignore'),
+                    gitignoreFiles.join('\n'), 'utf8');
+            }
+        }
+    }
+    //#endregion
+
     protected run(command: string, options?: RunOptions) {
         if (!options) options = {}
         if (!options.cwd) options.cwd = this.location;
@@ -76,7 +128,6 @@ export abstract class Project {
         }
     }
 
-    protected abstract get removeBeforeBuild(): string[];
 
     get routes() {
         return this.packageJson.routes;
@@ -271,8 +322,8 @@ export abstract class Project {
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
-        this.filesRecreation.beforeBuild.commonFiles()
-        this.filesRecreation.beforeBuild.projectSpecyficFiles()
+        this.filesRecreationFromBeforeBuild.beforeBuild.commonFiles()
+        this.filesRecreationFromBeforeBuild.beforeBuild.projectSpecyficFiles()
 
         if (this.parent && this.parent.type === 'workspace') {
             if (!this.node_modules.exist()) {
@@ -285,12 +336,6 @@ export abstract class Project {
             this.node_modules.install();
         }
 
-        if (_.isArray(this.removeBeforeBuild)) {
-            this.removeBeforeBuild.forEach(f => {
-                this.run(`tnp rimraf ${f}`).sync()
-            })
-        }
-
         this.buildSteps(buildOptions);
     }
     //#endregion
@@ -298,7 +343,7 @@ export abstract class Project {
     //#region files recreatetion
     abstract projectSpecyficFiles(): string[];
 
-    get filesRecreation() {
+    get filesRecreationFromBeforeBuild() {
         const self = this;
         return {
             get beforeBuild() {
@@ -323,8 +368,6 @@ export abstract class Project {
                         let files = [
                             // '.npmrc',
                             'tslint.json',
-                            '.gitignore',
-                            '.npmignore',
                             '.editorconfig'
                         ];
                         files.map(file => {

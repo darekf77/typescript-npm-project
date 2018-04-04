@@ -5,6 +5,7 @@
     "main": "index.js",
     "tnp": {
         "type": "isomorphic-lib",
+        "baseline": true,
         "resources": [
             "README.md"
         ]

@@ -12,6 +12,9 @@ bundle.umd.js
 # dependencies
 /node_modules
 
+#site only
+/src
+
 
 # misc
 /.sass-cache

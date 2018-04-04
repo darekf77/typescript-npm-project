@@ -8,6 +8,7 @@
     "resources": [
       "README.md"
     ],
+    "basedOn": "../baseline/ss-common-login",
     "requiredLibs": [
       "../../workspace/isomorphic-lib"
     ]

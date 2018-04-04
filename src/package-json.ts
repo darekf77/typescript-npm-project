@@ -15,7 +15,9 @@ export interface IPackageJSON {
     scripts: Object;
     tnp: {
         type: LibType;
-        baseline: boolean,
+        isBaseline: boolean,
+        isCoreProject: boolean;
+        basedOn: Project | string,
         resources?: string[];
         requiredLibs?: string[];
         router: TnpRouter;
@@ -192,9 +194,19 @@ export class PackageJSON {
         return Array.isArray(p.resources) ? p.resources : [];
     }
 
+    get basedOn(): Project {
+        if (this.data.tnp && _.isObject(this.data.tnp.basedOn)) {
+            return Project.from(path.join(this.location, this.data.tnp.basedOn as string));
+        }
+    }
+
+    get isCoreProject() {
+        return (this.data.tnp && _.isObject(this.data.tnp.isCoreProject));
+    }
+
     get isBaseLine() {
-        if (this.data.tnp && _.isBoolean(this.data.tnp.baseline)) {
-            return this.data.tnp.baseline;
+        if (this.data.tnp && _.isBoolean(this.data.tnp.isBaseline)) {
+            return this.data.tnp.isBaseline;
         }
         return false;
     }

@@ -4,6 +4,7 @@
     "license": "UNLICENSED",
     "main": "index.js",
     "tnp": {
+        "isCoreProject": true,
         "type": "isomorphic-lib",
         "resources": [
             "README.md"

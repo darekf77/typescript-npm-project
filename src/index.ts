@@ -8,6 +8,10 @@ import { Helpers } from "morphi";
 import { paramsFrom, match } from './helpers';
 import { isString } from 'util';
 import chalk from 'chalk';
+import { initWatcherDB } from "./watcher-no-race";
+
+
+
 
 Helpers.checkEnvironment({
     npm: [
@@ -49,7 +53,7 @@ const helpAlias = [
     'help'
 ]
 
-export function run(argsv: string[]) {
+export async function run(argsv: string[]) {
 
     let recognized = false;
     if (Array.isArray(argsv) && argsv.length >= 3) {
@@ -63,9 +67,14 @@ export function run(argsv: string[]) {
         }
     }
 
+    await initWatcherDB();
+    // process.stdin.resume();
+
     const helpFile = glob.sync(path.join(__dirname, '/scripts/HELP.js'))[0]
     const files = [helpFile]
         .concat(glob.sync(path.join(__dirname, '/scripts/*.js')).filter(f => f != helpFile))
+
+
 
     files.forEach(function (file) {
         let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
@@ -77,6 +86,7 @@ export function run(argsv: string[]) {
                         const check = match(k, argsv);
                         if (check.isMatch) {
                             recognized = true;
+
                             vFn.apply(null, [check.restOfArgs.join(' ')]);
                             process.stdin.resume();
                         }
