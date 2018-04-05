@@ -15,7 +15,6 @@ export interface IPackageJSON {
     scripts: Object;
     tnp: {
         type: LibType;
-        isBaseline: boolean,
         isCoreProject: boolean;
         basedOn: Project | string,
         resources?: string[];
@@ -202,13 +201,6 @@ export class PackageJSON {
 
     get isCoreProject() {
         return (this.data.tnp && _.isObject(this.data.tnp.isCoreProject));
-    }
-
-    get isBaseLine() {
-        if (this.data.tnp && _.isBoolean(this.data.tnp.isBaseline)) {
-            return this.data.tnp.isBaseline;
-        }
-        return false;
     }
 
     //#endregion

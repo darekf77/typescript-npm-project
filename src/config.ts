@@ -19,6 +19,7 @@ export const config = {
         tempSrc: 'tmp-src',
         previewDistApp: 'dist-app',
         browser: 'browser',
+        module: 'module',
         custom: 'custom'
     },
     libsTypes: [
