@@ -18,25 +18,31 @@ import { BaseProjectRouter } from './base-project-router';
 import { ProjectFrom } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
+import { workers } from 'cluster';
 
 
 export abstract class Project extends BaseProjectRouter {
     abstract projectSpecyficFiles(): string[];
     abstract buildSteps(buildOptions?: BuildOptions);
-    children: Project[] = [];
-    dependencies: Project[] = [];
-    parent: Project;
-    preview: Project;
 
-    type: LibType;
-    public packageJson: PackageJSON;
-    public node_modules: NodeModules;
-    public recreate: FilesRecreator;
-    public static projects: Project[] = [];
-    public static get Current() {
+
+    readonly children: Project[] = [];
+    readonly requiredLibs: Project[] = [];
+    readonly parent: Project;
+    readonly preview: Project;
+    readonly baseline: Project;
+    readonly type: LibType;
+    readonly packageJson: PackageJSON;
+    readonly node_modules: NodeModules;
+    readonly recreate: FilesRecreator;
+
+
+    static projects: Project[] = [];
+
+    static get Current() {
         return ProjectFrom(process.cwd())
     }
-    public static get Tnp() {
+    static get Tnp() {
         return ProjectFrom(path.join(__dirname, '..', '..'));
     }
 
@@ -64,10 +70,6 @@ export abstract class Project extends BaseProjectRouter {
         return this.packageJson.resources;
     }
 
-    get baseline(): Project {
-        return this.packageJson.basedOn;
-    }
-
     get isSite() {
         return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
     }
@@ -85,12 +87,22 @@ export abstract class Project extends BaseProjectRouter {
 
             this.children = this.findChildren();
             this.parent = ProjectFrom(path.join(location, '..'));
-            this.dependencies = this.packageJson.requiredProjects;
+            this.requiredLibs = this.packageJson.requiredProjects;
             this.preview = ProjectFrom(path.join(location, 'preview'));
+            this.baseline = this.packageJson.basedOn;
+            if (this.baseline && this.type !== 'workspace') {
+                error(`Baseline is only for ${chalk.bold('workspace')} type projects.`);
+            }
 
         } else {
             warn(`Invalid project location: ${location}`);
         }
+    }
+
+    get customizableFolders() {
+        const files: string[] = ['src']
+        if (this.type === 'angular-lib') files.push('components');
+        return files;
     }
 
 

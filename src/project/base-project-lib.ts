@@ -27,6 +27,7 @@ export abstract class BaseProjectLib extends Project {
         ]
         return files;
     }
+    
 
     abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
    

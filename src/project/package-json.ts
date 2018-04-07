@@ -10,6 +10,7 @@ import { error, info, warn } from "../messages";
 import { run } from "../process";
 import { Project } from "./base-project";
 import { ProjectFrom } from "./index";
+import chalk from "chalk";
 
 
 export interface IPackageJSON {
@@ -122,8 +123,12 @@ export class PackageJSON {
     }
 
     get basedOn(): Project {
-        if (this.data.tnp && _.isObject(this.data.tnp.basedOn)) {
-            return ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
+        if (this.data.tnp && this.data.tnp.basedOn) {
+            const baseline = ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
+            if (baseline && baseline.type !== 'workspace') {
+                error(`Baseline project ${chalk.bold(baseline.name)} needs to ${'workspace'} type project.`);
+            }
+            return baseline;
         }
     }
 

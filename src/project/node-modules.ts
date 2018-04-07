@@ -8,6 +8,7 @@ export class NodeModules {
 
     constructor(private project: Project) { }
 
+    
     prepare() {
         if (this.project.parent && this.project.parent.type === 'workspace') {
             if (!this.project.node_modules.exist()) {
@@ -49,7 +50,10 @@ export class NodeModules {
         this.project.packageJson.installPackage(packagePath, '--save');
     }
     get localChildrensWithRequiredLibs() {
-        const symlinks = this.project.dependencies.concat(this.project.children);
+        const symlinks: Project[] = this.project.requiredLibs
+            .concat(this.project.children)
+            .concat(this.project.isSite ? [this.project.baseline] : [])
+
         symlinks.forEach(c => {
             if (path.basename(c.location) != c.name) {
                 error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)

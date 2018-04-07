@@ -6,7 +6,7 @@ import { info, error } from "../messages";
 import chalk from "chalk";
 
 
-function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
+export function buildLib(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
     const options: BuildOptions = {
         prod, watch, outDir
@@ -55,13 +55,13 @@ export default {
         process.exit(0)
     },
 
-    $BUILD_DIST: [() => build(), `Build dist version of project library.`],
-    $BUILD_DIST_WATCH: () => build(false, true),
-    $BUILD_DIST_PROD: () => build(true),
+    $BUILD_DIST: [() => buildLib(), `Build dist version of project library.`],
+    $BUILD_DIST_WATCH: () => buildLib(false, true),
+    $BUILD_DIST_PROD: () => buildLib(true),
 
-    $BUILD_BUNDLE: () => build(false, false, 'bundle'),
-    $BUILD_BUNDLE_WATCH: () => build(false, true, 'bundle'),
-    $BUILD_BUNDLE_PROD: () => build(true, false, 'bundle'),
+    $BUILD_BUNDLE: () => buildLib(false, false, 'bundle'),
+    $BUILD_BUNDLE_WATCH: () => buildLib(false, true, 'bundle'),
+    $BUILD_BUNDLE_PROD: () => buildLib(true, false, 'bundle'),
 
     $BUILD_APP: () => buildApp(false, false),
     $BUILD_APP_WATCH: () => buildApp(false, true),

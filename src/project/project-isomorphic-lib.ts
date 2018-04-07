@@ -32,8 +32,8 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     private get additionalParentIsomorphcLibs(): string[] {
         const result: string[] = []
-        if (this.parent && Array.isArray(this.parent.dependencies)) {
-            const includedBaselines = this.parent.dependencies
+        if (this.parent && Array.isArray(this.parent.requiredLibs)) {
+            const includedBaselines = this.parent.requiredLibs
                 .filter(d => d.type === 'workspace')
 
             includedBaselines.forEach(b => {
@@ -57,7 +57,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     private get additionalRequiredIsomorphcLibs() {
         const result: string[] = []
-        this.dependencies.forEach(d => {
+        this.requiredLibs.forEach(d => {
             result.push(d.name);
         })
         // console.log(result)

@@ -50,7 +50,7 @@ export class ProjectWorkspace extends Project {
                 let everthingOk = true;
                 libsProjects.some(p => {
                     const indexProject = _.indexOf(libsProjects, p);
-                    p.dependencies.some(pDep => {
+                    p.requiredLibs.some(pDep => {
                         const indexDependency = _.indexOf(libsProjects, pDep);
                         if (indexDependency > indexProject) {
                             libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
