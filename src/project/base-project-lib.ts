@@ -1,6 +1,9 @@
+import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
+import chalk from 'chalk';
+import * as dateformat from "dateformat";
 // local
 import { Project } from "./base-project";
 import { BuildDir, LibType } from "../models";
@@ -8,6 +11,12 @@ import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
 
+/**
+ * Project ready to be build/publish as npm package.
+ * Also ready to be linked as package in workspace.
+ *  - isomorphic-lib
+ *  - angular-lib
+ */
 export abstract class BaseProjectLib extends Project {
 
     projectSpecyficFiles() {
@@ -16,22 +25,14 @@ export abstract class BaseProjectLib extends Project {
             'index.d.ts',
             'index.js.map'
         ]
-        if (this.type === 'isomorphic-lib') files.push('browser')
-        if (this.type === 'angular-lib') files.push('module')
         return files;
     }
 
     abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
-
-    private chekcIfProjectIsLib() {
-        const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
-        if (!libs.includes(this.type)) {
-            error(`This project "${this.name}" isn't library project (${libs.join(',')}).`)
-        }
-    }
+   
 
     public async publish() {
-        this.chekcIfProjectIsLib()
+        this.checkIfReadyForNpm()
         await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
             this.run('npm publish', {
                 cwd: path.join(this.location, config.folder.bundle),
@@ -41,7 +42,7 @@ export abstract class BaseProjectLib extends Project {
     }
 
     public async release(prod = false) {
-        this.chekcIfProjectIsLib()
+        this.checkIfReadyForNpm()
         const newVersion = Project.Current.versionPatchedPlusOne;
         await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
             this.run(`npm version patch`).sync()
@@ -60,7 +61,7 @@ export abstract class BaseProjectLib extends Project {
     }
 
     public bundleResources() {
-        this.chekcIfProjectIsLib()
+        this.checkIfReadyForNpm()
         const bundleFolder = path.join(this.location, config.folder.bundle);
         if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);
         ['package.json'].concat(this.resources).forEach(res => {
@@ -89,5 +90,25 @@ export abstract class BaseProjectLib extends Project {
         })
         info(`Resources copied to release folder: ${config.folder.bundle}`)
     }
+
+    private date() {
+        return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
+    }
+
+
+    protected compilationWrapper(fn: () => void, taskName: string = 'Task') {
+        if (!fn || !_.isFunction(fn)) {
+            error(`Compilation wrapper: "${fs}" is not a function.`)
+        }
+        try {
+            console.log(chalk.gray(`${this.date()} Compilation of "${chalk.bold(taskName)}" started...`))
+            fn()
+            console.log(chalk.green(`${this.date()} Compilation of "${chalk.bold(taskName)}" finish OK...`))
+        } catch (error) {
+            console.log(chalk.red(error));
+            console.log(`${this.date()} Compilation of ${taskName} ERROR`)
+        }
+    }
+
 
 }

@@ -46,7 +46,7 @@ export function ProjectFrom(location: string, parent?: Project): Project {
     if (type === 'server-lib') resultProject = new ProjectServerLib(location);
     if (type === 'angular-cli') resultProject = new ProjectAngularCliClient(location);
     if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
-    console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
-        : ('NO PROJECT FROM LOCATION ' + location))
+    // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
+    //     : ('NO PROJECT FROM LOCATION ' + location))
     return resultProject;
 }

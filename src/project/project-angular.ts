@@ -39,11 +39,6 @@ export class AngularProject extends Project {
         this.run('tnp npm-run ng set warnings.typescriptMismatch=false').sync()
     }
 
-    serve(port: number) {
-        this.run(`tnp npm-run ng serve --port ${port}`).async()
-        return this;
-    }
-
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;

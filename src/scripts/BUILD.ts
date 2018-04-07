@@ -6,7 +6,7 @@ import { info, error } from "../messages";
 import chalk from "chalk";
 
 
-export function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
+function build(prod = false, watch = false, outDir: BuildDir = 'dist') {
 
     const options: BuildOptions = {
         prod, watch, outDir

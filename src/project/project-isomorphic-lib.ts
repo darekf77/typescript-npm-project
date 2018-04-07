@@ -1,7 +1,6 @@
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
-import { compilationWrapper } from "../process";
 // third part
 import { buildIsomorphicVersion } from "morphi";
 import { BaseProjectLib } from "./base-project-lib";
@@ -23,13 +22,10 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
 
     projectSpecyficFiles(): string[] {
-        return [
-            'index.js',
-            'index.d.ts',
-            'index.js.map',
+        return super.projectSpecyficFiles().concat([
             "tsconfig.json",
             "tsconfig.browser.json"
-        ];
+        ]);
     }
 
 
@@ -102,7 +98,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
 
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
-        compilationWrapper(() => {
+        this.compilationWrapper(() => {
             const env = getWebpackEnv(params);
             buildIsomorphicVersion({
                 foldersPathes: {

@@ -1,6 +1,5 @@
 import { BaseProjectLib } from "./base-project-lib";
 import { AngularProject } from "./project-angular";
-import { compilationWrapper } from "../process";
 import { BuildOptions, BuildDir } from "../models";
 import { error } from "../messages";
 import config from "../config";
@@ -22,6 +21,7 @@ export class ProjectAngularLib extends BaseProjectLib {
 
     projectSpecyficFiles() {
         return super.projectSpecyficFiles().concat([
+            'module',
             'gulpfile.js',
             'ng-package.json',
             'tsconfig-aot.bundle.json',
@@ -30,7 +30,7 @@ export class ProjectAngularLib extends BaseProjectLib {
     }
 
     buildLib(outDir: BuildDir) {
-        compilationWrapper(() => {
+        this.compilationWrapper(() => {
             this.run(`tnp rimraf ${outDir}`).sync()
             this.run(`tnp npm-run gulp inline-templates-${outDir}`, { output: false }).sync()
             this.run(`tnp npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()

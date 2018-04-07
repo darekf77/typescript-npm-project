@@ -7,44 +7,31 @@ import * as path from 'path';
 import * as _ from 'lodash';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
-
+// local 
 import { PackageJSON } from "./package-json";
-import {
-    LibType, BuildOptions, RecreateFile,
-    RunOptions
-} from "../models";
+import { LibType, BuildOptions, RecreateFile, RunOptions } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import {
-    run as __run, watcher as __watcher
-} from "../process";
-
-import {
-    copyFile
-} from "../helpers";
+import { run as __run, watcher as __watcher } from "../process";
+import { copyFile } from "../helpers";
 import { BaseProjectRouter } from './base-project-router';
-import {
-    ProjectFrom
-} from './index';
+import { ProjectFrom } from './index';
 import { NodeModules } from "./node-modules";
+import { FilesRecreator } from './files-builder';
 
 
 export abstract class Project extends BaseProjectRouter {
+    abstract projectSpecyficFiles(): string[];
+    abstract buildSteps(buildOptions?: BuildOptions);
     children: Project[] = [];
     dependencies: Project[] = [];
     parent: Project;
     preview: Project;
-    get baseline(): Project {
-        return this.packageJson.basedOn;
-    }
-
-    get isSite() {
-        return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
-    }
 
     type: LibType;
     public packageJson: PackageJSON;
     public node_modules: NodeModules;
+    public recreate: FilesRecreator;
     public static projects: Project[] = [];
     public static get Current() {
         return ProjectFrom(process.cwd())
@@ -57,58 +44,55 @@ export abstract class Project extends BaseProjectRouter {
         return this.packageJson.routes;
     }
 
+    get name(): string {
+        return this.packageJson.name;
+    }
 
-    //#region generated files
+    get version() {
+        return this.packageJson.version;
+    }
 
+    get versionPatchedPlusOne() {
+        const ver = this.version.split('.');
+        if (ver.length > 0) {
+            ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
+        }
+        return ver.join('.')
+    }
 
+    get resources(): string[] {
+        return this.packageJson.resources;
+    }
 
-    public get generateFiles() {
-        const self = this;
-        return {
-            npmignore() {
-                const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
-                const canBeUseAsNpmPackage = allowedProject.includes(self.type);
-                const npmignoreFiles = [
-                    ".vscode",
-                    "dist/",
-                    'src/',
-                    "/scripts",
-                    "/docs",
-                    "/preview",
-                    '/tests',
-                    "tsconfig.json",
-                    "npm-debug.log*"
-                ];
-                fs.writeFileSync(path.join(self.location, '.npmignore'),
-                    npmignoreFiles.join('\n'), 'utf8');
-            },
-            gitignore() {
+    get baseline(): Project {
+        return this.packageJson.basedOn;
+    }
 
-                const gitignoreFiles = [ // for sure ingored
-                    '/node_modules',
-                    '/tmp*',
-                    '/dist*',
-                    '/bundle*',
-                    '/browser',
-                    '/module',
-                    '/www',
-                    'bundle.umd.js'
-                ].concat([ // common small files
-                    'Thumbs.db',
-                    '.DS_Store',
-                    'npm-debug.log'
-                ].concat([ // not sure if ignored/needed
-                    '/.sass-cache',
-                    '/.sourcemaps'
-                ]).concat( // dendend 
-                    self.isSite ? ['/src'] : []
-                ))
-                fs.writeFileSync(path.join(self.location, '.gitignore'),
-                    gitignoreFiles.join('\n'), 'utf8');
-            }
+    get isSite() {
+        return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
+    }
+
+    constructor(public location: string) {
+        super();
+        if (fs.existsSync(location)) {
+
+            this.packageJson = PackageJSON.from(location);
+            this.node_modules = new NodeModules(this);
+            this.recreate = new FilesRecreator(this);
+            this.type = this.packageJson.type;
+            Project.projects.push(this);
+            // console.log(`Created project ${path.basename(this.location)}`)
+
+            this.children = this.findChildren();
+            this.parent = ProjectFrom(path.join(location, '..'));
+            this.dependencies = this.packageJson.requiredProjects;
+            this.preview = ProjectFrom(path.join(location, 'preview'));
+
+        } else {
+            warn(`Invalid project location: ${location}`);
         }
     }
-    //#endregion
+
 
     run(command: string, options?: RunOptions) {
         if (!options) options = {}
@@ -130,103 +114,27 @@ export abstract class Project extends BaseProjectRouter {
         }
     }
 
-
-
-
-    get ownNpmPackage() {
-        const self = this;
-        return {
-            linkTo(project: Project) {
-                const targetLocation = path.join(project.location, 'node_modules', self.name)
-                // project.run(`tnp rimraf ${targetLocation}`).sync();
-                Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
-            },
-            unlinkFrom(project: Project) {
-                const targetLocation = path.join(project.location, 'node_modules', self.name)
-                project.run(`tnp rimraf ${targetLocation}`).sync();
-            }
-        };
-    }
-
-
-
-    //#region build
-    abstract buildSteps(buildOptions?: BuildOptions);
-
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
-        this.filesRecreationFromBeforeBuild.beforeBuild.commonFiles()
-        this.filesRecreationFromBeforeBuild.beforeBuild.projectSpecyficFiles()
+        this.recreate.gitignore()
+        this.recreate.npmignore()
+        this.recreate.projectSpecyficFiles()
+        this.recreate.commonFiles()
 
-        if (this.parent && this.parent.type === 'workspace') {
-            if (!this.node_modules.exist()) {
-                this.parent.node_modules.linkToProject(this);
-            } else if (!this.node_modules.isSymbolicLink()) {
-                this.run(`tnp rimraf ${this.node_modules.folderPath}`).sync();
-                this.parent.node_modules.linkToProject(this);
-            }
-        } else {
-            this.node_modules.installPackages();
-        }
+        this.node_modules.prepare();
 
         this.buildSteps(buildOptions);
     }
-    //#endregion
 
-    //#region files recreatetion
-    abstract projectSpecyficFiles(): string[];
 
-    get filesRecreationFromBeforeBuild() {
-        const self = this;
-        return {
-            get beforeBuild() {
-                return {
-                    projectSpecyficFiles() {
-                        const defaultProjectProptotype = Project.by(self.type);
-                        let files: RecreateFile[] = [];
-                        if (self.location !== defaultProjectProptotype.location) {
-                            self.projectSpecyficFiles().forEach(f => {
-                                files.push({
-                                    from: path.join(defaultProjectProptotype.location, f),
-                                    where: path.join(self.location, f)
-                                })
-                            })
-                            files.forEach(file => {
-                                copyFile(file.from, file.where)
-                            })
-                        }
-                    },
-                    commonFiles() {
-                        const wokrspace = Project.by('workspace');
-                        let files = [
-                            // '.npmrc',
-                            'tslint.json',
-                            '.editorconfig'
-                        ];
-                        files.map(file => {
-                            return {
-                                from: path.join(wokrspace.location, file),
-                                where: path.join(self.location, file)
-                            }
-                        }).forEach(file => {
-                            copyFile(file.from, file.where)
-                        })
-                    }
-                };
-            }
-        }
-    }
-    //#endregion
-
-    //#region get project 
     public static by(libraryType: LibType): Project {
         // console.log('by libraryType ' + libraryType)
         let projectPath;
         if (libraryType === 'workspace') {
-            return ProjectFrom(path.join(__dirname, `../projects/workspace`));
+            return ProjectFrom(path.join(__dirname, `../../projects/workspace`));
         }
-        projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
+        projectPath = path.join(__dirname, `../../projects/workspace/${libraryType}`);
         if (!fs.existsSync(projectPath)) {
             error(`Bad library type: ${libraryType}`, true)
             return undefined;
@@ -278,49 +186,29 @@ export abstract class Project extends BaseProjectRouter {
         return project;
     }
 
-
-
-    constructor(public location: string) {
-        super();
-        if (fs.existsSync(location)) {
-
-            this.packageJson = PackageJSON.from(location);
-            this.node_modules = new NodeModules(this);
-            this.type = this.packageJson.type;
-            Project.projects.push(this);
-            // console.log(`Created project ${path.basename(this.location)}`)
-
-            this.children = this.findChildren();
-            this.parent = ProjectFrom(path.join(location, '..'));
-            this.dependencies = this.packageJson.requiredProjects;
-            this.preview = ProjectFrom(path.join(location, 'preview'));
-
-        } else {
-            warn(`Invalid project location: ${location}`);
+    public checkIfReadyForNpm() {
+        // console.log('TYPEEEEE', this.type)
+        const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
+        if (!libs.includes(this.type)) {
+            error(`This project "${chalk.bold(this.name)}" isn't library type project (${libs.join(', ')}).`)
         }
-    }
-    //#endregion
-
-    //#region getters
-    get name(): string {
-        return this.packageJson.name;
+        return true;
     }
 
-    get version() {
-        return this.packageJson.version;
-    }
 
-    get versionPatchedPlusOne() {
-        const ver = this.version.split('.');
-        if (ver.length > 0) {
-            ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
-        }
-        return ver.join('.')
+    get ownNpmPackage() {
+        const self = this;
+        return {
+            linkTo(project: Project) {
+                const targetLocation = path.join(project.location, 'node_modules', self.name)
+                // project.run(`tnp rimraf ${targetLocation}`).sync();
+                Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
+            },
+            unlinkFrom(project: Project) {
+                const targetLocation = path.join(project.location, 'node_modules', self.name)
+                project.run(`tnp rimraf ${targetLocation}`).sync();
+            }
+        };
     }
-
-    get resources(): string[] {
-        return this.packageJson.resources;
-    }
-    //#endregion
 
 };

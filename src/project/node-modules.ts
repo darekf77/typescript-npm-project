@@ -8,16 +8,29 @@ export class NodeModules {
 
     constructor(private project: Project) { }
 
-    linkToProject(project: Project, force = false) {
+    prepare() {
+        if (this.project.parent && this.project.parent.type === 'workspace') {
+            if (!this.project.node_modules.exist()) {
+                this.project.parent.node_modules.linkToProject(this.project);
+            } else if (!this.project.node_modules.isSymbolicLink()) {
+                this.project.run(`tnp rimraf ${this.project.node_modules.folderPath}`).sync();
+                this.project.parent.node_modules.linkToProject(this.project);
+            }
+        } else {
+            this.project.node_modules.installPackages();
+        }
+    }
+
+    linkToProject(target: Project, force = false) {
         if (!this.exist()) {
             this.project.node_modules.installPackages();
         }
         const localNodeModules = path.join(this.project.location, 'node_modules');
-        const projectNodeModules = path.join(project.location, 'node_modules');
+        const projectNodeModules = path.join(target.location, 'node_modules');
         if (force && fs.existsSync(projectNodeModules)) {
             this.project.run(`tnp rimraf ${projectNodeModules}`);
         }
-        const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
+        const linkCommand = `tnp ln ${localNodeModules} ${target.location}`;
         this.project.run(linkCommand).sync();
     }
     installPackages() {

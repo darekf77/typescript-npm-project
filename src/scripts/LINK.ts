@@ -45,6 +45,6 @@ export default {
     }, `
 ln ${chalk.bold('source')} ${chalk.bold('target')}
 
-    `]    
+    `]
 
 }
