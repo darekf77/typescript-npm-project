@@ -1,7 +1,7 @@
 import config from "../config";
 import { LibType } from '../models';
 import { clear } from "./CLEAR";
-import { Project } from "../project";
+import { Project } from "../project/base-project";
 
 function version() {
     console.log(Project.Tnp.version);

@@ -38,20 +38,20 @@ export class TnpProcess {
 export class RepoTnpProcess extends Repository<TnpProcess> {
 
     async reRunProcess(uniqueName: boolean) {
-        await this.manager.transaction<TnpProcess>(async transactionalEntityManager => {
-            let p = await transactionalEntityManager.createQueryBuilder(TnpProcess.name, 'tnp_process')
-                .where("tnp_process.uniqueName = :uniqueName", { uniqueName })
-                .getOne();
-            if (!p) {
-                const proc = transactionalEntityManager.create({ uniqueName })
-                p = await transactionalEntityManager.save(proc);
+        // await this.manager.transaction(async transactionalEntityManager => {
+        //     let p = await transactionalEntityManager.createQueryBuilder(TnpProcess.name, 'tnp_process')
+        //         .where("tnp_process.uniqueName = :uniqueName", { uniqueName })
+        //         .getOne();
+        //     if (!p) {
+        //         const proc = transactionalEntityManager.create({ uniqueName })
+        //         p = await transactionalEntityManager.save(proc);
 
-            } else {
-                p.runAgain = true;
-                await transactionalEntityManager.save(p);
-            }
-            return p;;
-        });
+        //     } else {
+        //         p.runAgain = true;
+        //         await transactionalEntityManager.save(p);
+        //     }
+        //     return p;;
+        // });
     }
 
     async

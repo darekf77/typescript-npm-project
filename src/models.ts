@@ -1,4 +1,4 @@
-import { Project } from "./project";
+import { Project } from "./project/base-project";
 
 export type InstalationType = '-g' | '--save' | '--save-dev';
 

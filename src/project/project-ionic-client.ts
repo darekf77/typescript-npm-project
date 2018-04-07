@@ -1,3 +1,9 @@
+import * as path from 'path';
+// local
+import { Project } from "./base-project";
+import config from "../config";
+import { BuildOptions } from '../models';
+
 export class ProjectIonicClient extends Project {
 
 

@@ -7,10 +7,10 @@ import { error } from "../messages";
 
 function $INCLUDE(argsString: string) {
     if (!Project.Current.node_modules.exist()) {
-        Project.Current.node_modules.install()
+        Project.Current.node_modules.installPackages()
     }
     const distFolder = path.join(Project.Tnp.location, c.folder.dist);
-    const targetNodeModules = path.join(Project.Current.node_modules.pathFolder, c.tnp);
+    const targetNodeModules = path.join(Project.Current.node_modules.folderPath, c.tnp);
     run(`${c.tnp} ln ${distFolder} ${targetNodeModules}`).sync();
     process.exit(0)
 }

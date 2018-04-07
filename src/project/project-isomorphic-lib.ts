@@ -1,4 +1,12 @@
-export class ProjectIsomorphicLib extends Project {
+import { Project } from "./base-project";
+import { BuildOptions } from "../models";
+import { ClassHelper, getWebpackEnv } from "../helpers";
+import { compilationWrapper } from "../process";
+// third part
+import { buildIsomorphicVersion } from "morphi";
+import { BaseProjectLib } from "./base-project-lib";
+
+export class ProjectIsomorphicLib extends BaseProjectLib {
 
 
     protected defaultPort: number = 4000;
@@ -74,10 +82,13 @@ export class ProjectIsomorphicLib extends Project {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
+        this.buildLib(outDir, prod, watch);
+        return;
+    }
 
+    buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
         const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
-        // console.log(isomorphicNames)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
         if (watch) {
             const functionName = ClassHelper.getMethodName(
@@ -88,16 +99,11 @@ export class ProjectIsomorphicLib extends Project {
         } else {
             this.BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams);
         }
-        return;
     }
 
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
-
-        const env = getWebpackEnv(params);
-
-        // process.exit(0)
-
         compilationWrapper(() => {
+            const env = getWebpackEnv(params);
             buildIsomorphicVersion({
                 foldersPathes: {
                     dist: env.outDir
@@ -114,8 +120,6 @@ export class ProjectIsomorphicLib extends Project {
                 }
             });
         }, `isomorphic-lib (project ${this.name})`)
-
-
     }
 
 }

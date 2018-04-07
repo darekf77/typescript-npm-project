@@ -1,6 +1,35 @@
 
 
-export abstract class Project {
+import * as fs from 'fs';
+import * as fse from "fs-extra";
+import chalk from 'chalk';
+import * as path from 'path';
+import * as _ from 'lodash';
+export { ChildProcess } from 'child_process';
+import { ChildProcess } from "child_process";
+
+import { PackageJSON } from "./package-json";
+import {
+    LibType, BuildOptions, RecreateFile,
+    RunOptions
+} from "../models";
+import { error, info, warn } from "../messages";
+import config from "../config";
+import {
+    run as __run, watcher as __watcher
+} from "../process";
+
+import {
+    copyFile
+} from "../helpers";
+import { BaseProjectRouter } from './base-project-router';
+import {
+    ProjectFrom
+} from './index';
+import { NodeModules } from "./node-modules";
+
+
+export abstract class Project extends BaseProjectRouter {
     children: Project[] = [];
     dependencies: Project[] = [];
     parent: Project;
@@ -10,37 +39,29 @@ export abstract class Project {
     }
 
     get isSite() {
-        return fs.existsSync(path.join(this.location, 'custom'));
+        return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
     }
 
     type: LibType;
-    private packageJson: PackageJSON;
-    private static projects: Project[] = [];
+    public packageJson: PackageJSON;
+    public node_modules: NodeModules;
+    public static projects: Project[] = [];
     public static get Current() {
-        return Project.from(process.cwd())
+        return ProjectFrom(process.cwd())
     }
     public static get Tnp() {
-        return Project.from(path.join(__dirname, '..'));
+        return ProjectFrom(path.join(__dirname, '..', '..'));
     }
 
-    protected abstract defaultPort: number;
-    protected currentPort: number;
-
-    public get activePort(): number | null {
-        if (!this.isRunning) return null;
-        return this.currentPort;
+    get routes() {
+        return this.packageJson.routes;
     }
 
-    protected isRunning = false;
-    start(port?: number, async?: boolean) {
-        console.log(`Project: ${this.name} is running ${async ? '(asynchronously)' : ''} on port ${port ? + port : this.defaultPort}`);
-        this.isRunning = true;
-        this.runOn(port, async)
-    }
-
-    protected abstract runOn(port?: number, async?: boolean);
 
     //#region generated files
+
+
+
     public get generateFiles() {
         const self = this;
         return {
@@ -62,7 +83,7 @@ export abstract class Project {
                     npmignoreFiles.join('\n'), 'utf8');
             },
             gitignore() {
-                const isSiteFromBaselineProject = (fs.existsSync(path.join(self.location, config.folder.custom)));
+
                 const gitignoreFiles = [ // for sure ingored
                     '/node_modules',
                     '/tmp*',
@@ -80,7 +101,7 @@ export abstract class Project {
                     '/.sass-cache',
                     '/.sourcemaps'
                 ]).concat( // dendend 
-                    isSiteFromBaselineProject ? ['/src'] : []
+                    self.isSite ? ['/src'] : []
                 ))
                 fs.writeFileSync(path.join(self.location, '.gitignore'),
                     gitignoreFiles.join('\n'), 'utf8');
@@ -89,7 +110,7 @@ export abstract class Project {
     }
     //#endregion
 
-    protected run(command: string, options?: RunOptions) {
+    run(command: string, options?: RunOptions) {
         if (!options) options = {}
         if (!options.cwd) options.cwd = this.location;
         return __run(command, options);
@@ -110,9 +131,7 @@ export abstract class Project {
     }
 
 
-    get routes() {
-        return this.packageJson.routes;
-    }
+
 
     get ownNpmPackage() {
         const self = this;
@@ -130,131 +149,6 @@ export abstract class Project {
     }
 
 
-    //#region node_modules
-    get node_modules() {
-        const self = this;
-        return {
-            linkToProject(project: Project, force = false) {
-                if (!self.packageJson.checkNodeModulesInstalled()) {
-                    self.packageJson.installNodeModules()
-                }
-                const localNodeModules = path.join(self.location, 'node_modules');
-                const projectNodeModules = path.join(project.location, 'node_modules');
-                if (force && fs.existsSync(projectNodeModules)) {
-                    self.run(`tnp rimraf ${projectNodeModules}`);
-                }
-                const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
-                self.run(linkCommand).sync();
-            },
-            install() {
-                self.packageJson.installNodeModules()
-            },
-            installPackageFromNPM(packagePath) {
-                self.packageJson.installPackage(packagePath, '--save');
-            },
-            get localChildrensWithRequiredLibs() {
-                const symlinks = self.dependencies.concat(self.children);
-                symlinks.forEach(c => {
-                    if (path.basename(c.location) != c.name) {
-                        error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
-                    }
-                })
-                return {
-                    removeSymlinks() {
-                        symlinks.forEach(c => {
-                            const symPkgPath = path.join(self.location, 'node_modules', c.name);
-                            if (fs.existsSync(symPkgPath)) {
-                                self.run(`rm ${symPkgPath}`).sync();
-                            }
-                        })
-                    },
-                    addSymlinks() {
-                        symlinks.forEach(c => {
-                            const destination = path.join(self.location, 'node_modules');
-                            const command = `tnp ln ${c.location} ${destination}`;
-                            self.run(command).sync();
-                        })
-                    },
-                }
-            },
-            exist(): boolean {
-                return self.packageJson.checkNodeModulesInstalled();
-            },
-            isSymbolicLink(): boolean {
-                return HelpersLinks.isLink(self.node_modules.pathFolder);
-            },
-            get pathFolder() {
-                return path.join(self.location, 'node_modules');
-            },
-            remove() {
-                // console.log('remove node_modules', self.location)
-                self.run('tnp rimraf node_modules').sync()
-            }
-        };
-    }
-
-
-    //#endregion
-
-    //#region release
-
-    async publish() {
-        await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
-            this.run('npm publish', {
-                cwd: path.join(this.location, config.folder.bundle),
-                output: true
-            }).sync()
-        })
-    }
-
-    async release(prod = false) {
-        const newVersion = Project.Current.versionPatchedPlusOne;
-        await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
-            this.run(`npm version patch`).sync()
-            this.run(`tnp clear:bundle`).sync();
-            this.build({
-                prod, outDir: config.folder.bundle as 'bundle'
-            })
-            this.bundleResources()
-        }, () => process.exit(0))
-        await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
-            this.run('npm publish', {
-                cwd: path.join(this.location, config.folder.bundle),
-                output: true
-            }).sync()
-        })
-    }
-
-    bundleResources() {
-        const bundleFolder = path.join(this.location, config.folder.bundle);
-        if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);
-        ['package.json'].concat(this.resources).forEach(res => {
-            const file = path.join(this.location, res);
-            const dest = path.join(bundleFolder, res);
-            if (!fs.existsSync(file)) {
-                error(`Resource file ${file} does not exist in ${this.location}`)
-            }
-            if (fs.lstatSync(file).isDirectory()) {
-                // console.log('IS DIRECTORY', file)
-                // console.log('IS DIRECTORY DEST', dest)
-                // this.run(`tnp cpr ${file}/ ${dest}/`).sync()
-                const options: fse.CopyOptions = {
-                    overwrite: true,
-                    recursive: true,
-                    errorOnExist: true,
-                    filter: (src) => {
-                        return !/.*node_modules.*/g.test(src);
-                    }
-                };
-                fse.copySync(file, dest, options);
-            } else {
-                // console.log('IS FILE', file)
-                fse.copyFileSync(file, dest);
-            }
-        })
-        info(`Resources copied to release folder: ${config.folder.bundle}`)
-    }
-    //#endregion
 
     //#region build
     abstract buildSteps(buildOptions?: BuildOptions);
@@ -269,11 +163,11 @@ export abstract class Project {
             if (!this.node_modules.exist()) {
                 this.parent.node_modules.linkToProject(this);
             } else if (!this.node_modules.isSymbolicLink()) {
-                this.run(`tnp rimraf ${this.node_modules.pathFolder}`).sync();
+                this.run(`tnp rimraf ${this.node_modules.folderPath}`).sync();
                 this.parent.node_modules.linkToProject(this);
             }
         } else {
-            this.node_modules.install();
+            this.node_modules.installPackages();
         }
 
         this.buildSteps(buildOptions);
@@ -330,14 +224,14 @@ export abstract class Project {
         // console.log('by libraryType ' + libraryType)
         let projectPath;
         if (libraryType === 'workspace') {
-            return Project.from(path.join(__dirname, `../projects/workspace`));
+            return ProjectFrom(path.join(__dirname, `../projects/workspace`));
         }
         projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
         if (!fs.existsSync(projectPath)) {
             error(`Bad library type: ${libraryType}`, true)
             return undefined;
         }
-        return Project.from(projectPath);
+        return ProjectFrom(projectPath);
     }
 
     public findChildren(): Project[] {
@@ -363,7 +257,7 @@ export abstract class Project {
         return subdirectories
             .map(dir => {
                 // console.log('child:', dir)
-                return Project.from(dir);
+                return ProjectFrom(dir);
             })
             .filter(c => !!c)
     }
@@ -379,46 +273,27 @@ export abstract class Project {
         };
         fse.copySync(this.location, destinationPath, options);
         console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));
-        const project = Project.from(destinationPath);
+        const project = ProjectFrom(destinationPath);
         console.log(chalk.green('Done.'));
         return project;
     }
 
-    static from(location: string, parent?: Project): Project {
 
-        const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
-        if (alreadyExist) return alreadyExist;
-        if (!fs.existsSync(location)) return;
-        if (!PackageJSON.from(location)) return;
-        const type = Project.typeFrom(location);
-        if (type === 'isomorphic-lib') return new ProjectIsomorphicLib(location);
-        if (type === 'angular-lib') return new ProjectAngularLib(location);
-        if (type === 'angular-client') return new ProjectAngularClient(location);
-        if (type === 'workspace') return new ProjectWorkspace(location);
-        if (type === 'docker') return new ProjectDocker(location);
-        if (type === 'server-lib') return new ProjectServerLib(location);
-        if (type === 'angular-cli') return new ProjectAngularCliClient(location);
-        if (type === 'ionic-client') return new ProjectIonicClient(location);
-    }
-
-    private static typeFrom(location: string): LibType {
-        const packageJson = PackageJSON.from(location);
-        let type = packageJson.type;
-        return type;
-    }
 
     constructor(public location: string) {
+        super();
         if (fs.existsSync(location)) {
 
             this.packageJson = PackageJSON.from(location);
+            this.node_modules = new NodeModules(this);
             this.type = this.packageJson.type;
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 
             this.children = this.findChildren();
-            this.parent = Project.from(path.join(location, '..'));
+            this.parent = ProjectFrom(path.join(location, '..'));
             this.dependencies = this.packageJson.requiredProjects;
-            this.preview = Project.from(path.join(location, 'preview'));
+            this.preview = ProjectFrom(path.join(location, 'preview'));
 
         } else {
             warn(`Invalid project location: ${location}`);

@@ -1,0 +1,76 @@
+import * as path from 'path';
+import * as fs from 'fs';
+// local
+import { Project } from "./base-project";
+import { error, info } from "../messages";
+import { HelpersLinks } from '../helpers-links';
+export class NodeModules {
+
+    constructor(private project: Project) { }
+
+    linkToProject(project: Project, force = false) {
+        if (!this.exist()) {
+            this.project.node_modules.installPackages();
+        }
+        const localNodeModules = path.join(this.project.location, 'node_modules');
+        const projectNodeModules = path.join(project.location, 'node_modules');
+        if (force && fs.existsSync(projectNodeModules)) {
+            this.project.run(`tnp rimraf ${projectNodeModules}`);
+        }
+        const linkCommand = `tnp ln ${localNodeModules} ${project.location}`;
+        this.project.run(linkCommand).sync();
+    }
+    installPackages() {
+        const yarnLock = path.join(this.project.location, 'yarn.lock');
+        if (!this.exist()) {
+            if (fs.existsSync(yarnLock)) {
+                info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
+                this.project.run('yarn install', { cwd: this.project.location, output: false }).sync()
+            } else {
+                info(`Installing npm packages in ${this.project.name}... `);
+                this.project.run('npm i', { cwd: this.project.location, output: false }).sync()
+            }
+        }
+    }
+    installPackage(packagePath) {
+        this.project.packageJson.installPackage(packagePath, '--save');
+    }
+    get localChildrensWithRequiredLibs() {
+        const symlinks = this.project.dependencies.concat(this.project.children);
+        symlinks.forEach(c => {
+            if (path.basename(c.location) != c.name) {
+                error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
+            }
+        })
+        return {
+            removeSymlinks() {
+                symlinks.forEach(c => {
+                    const symPkgPath = path.join(this.project.location, 'node_modules', c.name);
+                    if (fs.existsSync(symPkgPath)) {
+                        this.project.run(`rm ${symPkgPath}`).sync();
+                    }
+                })
+            },
+            addSymlinks() {
+                symlinks.forEach(c => {
+                    const destination = path.join(this.project.location, 'node_modules');
+                    const command = `tnp ln ${c.location} ${destination}`;
+                    this.project.run(command).sync();
+                })
+            },
+        }
+    }
+    exist(): boolean {
+        return fs.existsSync(path.join(this.project.location, 'node_modules'));
+    }
+    isSymbolicLink(): boolean {
+        return HelpersLinks.isLink(this.folderPath);
+    }
+    get folderPath() {
+        return path.join(this.project.location, 'node_modules');
+    }
+    remove() {
+        // console.log('remove node_modules', this.project.location)
+        this.project.run('tnp rimraf node_modules').sync()
+    }
+}

@@ -2,17 +2,19 @@ import * as _ from "lodash";
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { LibType, InstalationType, BuildOptions, Dependencies, Package, TnpRouter, TnpRoute } from "./models";
-import { error, info, warn } from "./messages";
-import { run } from "./process";
-import { Project } from "./project";
+import {
+    LibType, InstalationType, BuildOptions,
+    Dependencies, Package, TnpRouter, TnpRoute
+} from "../models";
+import { error, info, warn } from "../messages";
+import { run } from "../process";
+import { Project } from "./base-project";
+import { ProjectFrom } from "./index";
 
-//#region package json
+
 export interface IPackageJSON {
     name: string;
     version: string;
-    description: string;
-    scripts: Object;
     tnp: {
         type: LibType;
         isCoreProject: boolean;
@@ -21,59 +23,19 @@ export interface IPackageJSON {
         requiredLibs?: string[];
         router: TnpRouter;
     };
-    peerDependencies: Object;
-    dependencies: Object;
-    devDependencies: Object;
 }
-//#endregion
+
 
 export class PackageJSON {
 
     private data: IPackageJSON;
 
-    //#region constructor
     constructor(data: Object, private location: string) {
         this.data = _.merge({
-            dependencies: {},
-            devDependencies: {},
-            peerDependencies: {},
             tnp: {
                 resources: []
             }
         } as IPackageJSON, data as any);
-    }
-    //#endregion
-
-    installNodeModules() {
-        const yarnLock = path.join(this.location, 'yarn.lock');
-        if (!this.checkNodeModulesInstalled()) {
-            if (fs.existsSync(yarnLock)) {
-                info(`Installing npm packages in ${this.name}... from yarn.lock `)
-                run('yarn install', { cwd: this.location, output: false }).sync()
-            } else {
-                info(`Installing npm packages in ${this.name}... `);
-                run('npm i', { cwd: this.location, output: false }).sync()
-            }
-        }
-    }
-
-    private projectFromLocalVersion(version: string): Project {
-        if (/file\:.+/g.test(version)) {
-            const name = version.replace('file:', '');
-            const location = path.join(this.location, name)
-            return Project.from(location);
-        }
-    }
-
-    getLinkedProjects(dependencyType: Dependencies = 'dependencies'): Project[] {
-        if (!this.data) return [];
-        const dependencies = this.data.dependencies;
-        let localLinkedProjects: Project[] = [];
-        _.forEach(dependencies, (version, name) => {
-            const project = this.projectFromLocalVersion(version as any);
-            if (project) localLinkedProjects.push(project)
-        })
-        return localLinkedProjects;
     }
 
     installPackage(packageName?: string, type: InstalationType = '--save-dev') {
@@ -87,13 +49,6 @@ export class PackageJSON {
             info(`Installing npm packge: "${packageName}" with npm.`)
             run(`npm i ${packageName} ${type}`, { cwd: this.location }).sync()
         }
-    }
-
-    checkNodeModulesInstalled() {
-        const clientNodeModules = path.join(this.location, 'node_modules');
-        // return (run("check-dependencies").sync().toString().trim() === '')
-        // console.log('this.location', this.location)
-        return fs.existsSync(clientNodeModules)
     }
 
     public static from(location: string): PackageJSON {
@@ -117,33 +72,6 @@ export class PackageJSON {
         }
     }
 
-
-    dependencies(type: Dependencies): Package[] {
-        const packages: Package[] = [];
-        _.forIn(this.data[type], (version, name) => {
-            packages.push({ name, version: version as any })
-        })
-        return packages;
-    }
-
-
-
-    private addSymlinksPathesFromObject(dependencies = {}, symlinks = []) {
-        if (dependencies) {
-            Object
-                .keys(dependencies)
-                .filter(name => {
-
-                    const res = /file\:.+/g.test(dependencies[name])
-                    // if (res) console.log(name)
-                    return res;
-                })
-                .map(name => dependencies[name].replace('file:', ''))
-                .forEach(p => symlinks.push(p))
-        }
-    }
-
-
     //#region getters
 
     get requiredProjects(): Project[] {
@@ -155,7 +83,7 @@ export class PackageJSON {
                 if (!fs.existsSync(projectPath)) {
                     error(`Dependency project: "${p}" doesn't exist.`)
                 }
-                projects.push(Project.from(projectPath));
+                projects.push(ProjectFrom(projectPath));
             })
         }
         return projects;
@@ -174,7 +102,7 @@ export class PackageJSON {
             return this.data.tnp.router.routes.map(route => {
                 return {
                     url: route.url,
-                    project: Project.from(path.join(this.location, route.project as any))
+                    project: ProjectFrom(path.join(this.location, route.project as any))
                 }
             })
         }
@@ -195,7 +123,7 @@ export class PackageJSON {
 
     get basedOn(): Project {
         if (this.data.tnp && _.isObject(this.data.tnp.basedOn)) {
-            return Project.from(path.join(this.location, this.data.tnp.basedOn as string));
+            return ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
         }
     }
 

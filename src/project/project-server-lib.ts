@@ -1,3 +1,6 @@
+import { Project } from "./base-project";
+import { BuildOptions, InstalationType } from "../models";
+
 export class ProjectServerLib extends Project {
 
 

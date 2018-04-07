@@ -1,3 +1,6 @@
+import { Project } from "./base-project";
+import { BuildOptions } from "../models";
+
 export class ProjectDocker extends Project {
 
 

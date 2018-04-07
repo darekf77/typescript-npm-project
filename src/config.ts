@@ -8,7 +8,7 @@ import { clear } from "./scripts/CLEAR";
 
 import { LibType, RecreateFile, BuildOptions, BuildDir } from './models';
 import { error } from "./messages";
-import { Project } from "./project";
+import { Project } from "./project/base-project";
 
 export const config = {
     tnp: 'tnp',

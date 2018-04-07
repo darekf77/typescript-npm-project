@@ -19,7 +19,7 @@ function install(a: string) {
         if (isWorkspaceParentProject) { // PROJECT IN WORKSPACE, ADD PACKAGE tnp install
             link(parent)
         } else { // Other normal porojects
-            project.node_modules.install()
+            project.node_modules.installPackages()
         }
     } if (args.length >= 1) { // NPM INSTALL <package name>
         const npmPackagesToAdd = args
@@ -35,7 +35,7 @@ function install(a: string) {
             installInTnpWorkspace(isWorkspaceParentProject ? project.parent : project, npmPackagesToAdd)
         } else {
             npmPackagesToAdd.forEach(npmPackageName => {  // Other normal porojects
-                project.node_modules.installPackageFromNPM(npmPackageName)
+                project.node_modules.installPackage(npmPackageName)
             })
         }
     }
@@ -46,7 +46,7 @@ function installInTnpWorkspace(workspace: Project, npmPackagesToAdd: string[]) {
     workspace.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
     Project.Tnp.ownNpmPackage.unlinkFrom(workspace);
     npmPackagesToAdd.forEach(npmPackageName => {
-        workspace.node_modules.installPackageFromNPM(npmPackageName)
+        workspace.node_modules.installPackage(npmPackageName)
     })
     workspace.node_modules.localChildrensWithRequiredLibs.addSymlinks();
     Project.Tnp.ownNpmPackage.linkTo(workspace);

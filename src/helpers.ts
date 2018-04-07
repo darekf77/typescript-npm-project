@@ -10,7 +10,7 @@ import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
-import { Project } from './project';
+import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
 
 export function paramsFrom(command: string) {

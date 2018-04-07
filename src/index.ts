@@ -67,7 +67,7 @@ export async function run(argsv: string[]) {
         }
     }
 
-    await initWatcherDB();
+    // await initWatcherDB();
     // process.stdin.resume();
 
     const helpFile = glob.sync(path.join(__dirname, '/scripts/HELP.js'))[0]

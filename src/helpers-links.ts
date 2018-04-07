@@ -1,16 +1,10 @@
 
-import * as _ from 'lodash'
 import * as fs from 'fs';
 import * as path from 'path';
-import * as rimraf from "rimraf";
-import * as glob from "glob";
 import * as os from "os";
 
-import { error, info, warn } from "./messages";
+import { error} from "./messages";
 import { run } from "./process";
-import { constants } from 'zlib';
-import { BuildOptions, RuleDependency } from './models';
-import { Project } from './project';
 import { Helpers } from "morphi";
 
 export namespace HelpersLinks {

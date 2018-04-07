@@ -1,3 +1,10 @@
+import * as _ from 'lodash';
+// local
+import { Project } from "./base-project";
+import { BuildOptions } from "../models";
+import { ReorganizeArray } from "../helpers";
+
+
 export class ProjectWorkspace extends Project {
 
 
@@ -6,14 +13,7 @@ export class ProjectWorkspace extends Project {
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
-        // let childPort = port;
-        // this.children.forEach(p => {
-        //     p.start(++childPort, true);
-        // })
-
-        new ProjectRouter(this);
-
-        // ROUTER IMPLEMENTATION
+        this.activateServer()
     }
     projectSpecyficFiles(): string[] {
         return [];

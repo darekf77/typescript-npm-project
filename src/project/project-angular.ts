@@ -1,5 +1,13 @@
-export abstract class BaseAngularProject extends Project {
+import * as path from 'path';
+import * as fs from 'fs';
+// third part
+import { Project } from "./base-project";
+import { error } from "../messages";
+import config from "../config";
+import { BuildOptions } from '../models';
+export class AngularProject extends Project {
 
+    protected defaultPort: number = 4200;
     get isEjectedProject() {
         try {
             const file = fs.readFileSync(path.join(this.location, '.angular-cli.json')).toString()
