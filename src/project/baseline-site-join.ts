@@ -27,10 +27,10 @@ export class BaselineSiteJoin {
 
     getCustomFiles() {
         this.checkBaselineSiteStructure()
-        const files = glob.sync(path.join(
+        const globPath = path.join(
             this.project.location,
-            config.folder.custom)
-        )
+            config.folder.custom);
+        const files = glob.sync(`${globPath}/**/*.*`);
         return files;
     }
 
