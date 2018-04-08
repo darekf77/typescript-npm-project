@@ -1,12 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
+import * as watch from 'watch'
 // local
 import { Project } from "./base-project";
-import { LibType, RecreateFile } from "../models";
+import { LibType, RecreateFile, FileEvent } from "../models";
 import { copyFile } from '../helpers';
 import config from '../config';
 import { error } from '../messages';
+import chalk from 'chalk';
+
 
 
 
@@ -23,18 +26,62 @@ export class BaselineSiteJoin {
 
     }
 
+
+
     readonly PREFIX_BASELINE_SITE = '__'
 
-    getCustomFiles() {
-        this.checkBaselineSiteStructure()
-        const globPath = path.join(
-            this.project.location,
-            config.folder.custom);
-        const files = glob.sync(`${globPath}/**/*.*`);
-        return files;
+    get filesFrom() {
+        const self = this;
+        self.checkBaselineSiteStructure()
+        return {
+            get customFiles() {
+
+                const globPath = path.join(
+                    self.project.location,
+                    config.folder.custom);
+                const files = glob.sync(`${globPath}/**/*.*`);
+                return files;
+            },
+            get baselineFiles() {
+
+                let files = [];
+                // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
+
+                self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
+                    let globPath = self.getPathToBaselineFrom(self.project, customizableFileOrFolder)
+                    if (fs.statSync(globPath).isDirectory()) {
+                        const globFiles = glob.sync(`${globPath}/**/*.*`);
+                        files = files.concat(globFiles);
+                    } else {
+                        files.push(globPath)
+                    }
+
+                })
+                // console.log('OUTPUT', files.map(f => path.basename(f)))
+                return files;
+            },
+            get joinedFiles() {
+                let files = [];
+                // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
+
+                self.project.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
+                    let globPath = path.join(self.project.location, customizableFileOrFolder)
+                    if (fs.statSync(globPath).isDirectory()) {
+                        const globFiles = glob.sync(`${globPath}/**/*.*`);
+                        files = files.concat(globFiles);
+                    } else {
+                        files.push(globPath)
+                    }
+                })
+                // console.log('OUTPUT', files.map(f => path.basename(f)))
+                return files;
+            }
+        }
     }
 
-    getPathToBaselineFrom(project: Project, customzableFolder: string) {
+
+
+    private getPathToBaselineFrom(project: Project, customzableFolder: string) {
         const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
             : path.join(this.project.baseline.parent.name, this.project.baseline.name)
 
@@ -46,24 +93,7 @@ export class BaselineSiteJoin {
         );
     }
 
-    getBaselineFiles() {
-        this.checkBaselineSiteStructure()
-        let files = [];
-        // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
 
-        this.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
-            let globPath = this.getPathToBaselineFrom(this.project, customizableFileOrFolder)
-            if (fs.statSync(globPath).isDirectory()) {
-                const globFiles = glob.sync(`${globPath}/**/*.*`);
-                files = files.concat(globFiles);
-            } else {
-                files.push(globPath)
-            }
-
-        })
-        // console.log('OUTPUT', files.map(f => path.basename(f)))
-        return files;
-    }
 
 
     /**
@@ -76,39 +106,46 @@ export class BaselineSiteJoin {
      * example "<cwd>/custom/src/User.ts"
      * example "<cwd>/custom/components/module.ts"
      */
-    private joinWhenBaselineChnage(baselineFiles: string[], customFiles: string[]) {
-        this.checkBaselineSiteStructure()
-        const baselineReplacePath = path.join(this.project.location, 'node_modules', this.project.baseline.name, this.project.name);
-        baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
+    private get joinWhen() {
+        const self = this;
+        return {
+            baselineChnage(baselineFiles: string[], customFiles: string[]) {
+                self.checkBaselineSiteStructure()
+                const baselineReplacePath = path.join(self.project.location, 'node_modules', self.project.baseline.name, self.project.name);
+                baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
 
-        const customReplacePath = path.join(this.project.location, config.folder.custom);
-        customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
+                const customReplacePath = path.join(self.project.location, config.folder.custom);
+                customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
 
 
 
-        baselineFiles.forEach(baselineFile => {
-            const existInCustom = customFiles.includes(baselineFile);
-            const baselineAbsoluteLocation = path.join(
-                baselineReplacePath,
-                baselineFile
-            );
-            const siteAbsoluteDestination = path.join(
-                this.project.location,
-                existInCustom ? this.prefix(baselineFile,
-                    this.PREFIX_BASELINE_SITE) : baselineFile
-            );
-            copyFile(baselineAbsoluteLocation, siteAbsoluteDestination)
-            if (existInCustom) {
-                const customAbsoluteFilePath = path.join(
-                    this.project.location,
-                    config.folder.custom,
-                    baselineFile
-                )
-                copyFile(customAbsoluteFilePath, siteAbsoluteDestination)
+                baselineFiles.forEach(baselineFile => {
+                    const existInCustom = customFiles.includes(baselineFile);
+                    const baselineAbsoluteLocation = path.join(
+                        baselineReplacePath,
+                        baselineFile
+                    );
+                    const siteAbsoluteDestination = path.join(
+                        self.project.location,
+                        existInCustom ? self.prefix(baselineFile,
+                            self.PREFIX_BASELINE_SITE) : baselineFile
+                    );
+                    copyFile(baselineAbsoluteLocation, siteAbsoluteDestination)
+                    if (existInCustom) {
+                        const customAbsoluteFilePath = path.join(
+                            self.project.location,
+                            config.folder.custom,
+                            baselineFile
+                        )
+                        copyFile(customAbsoluteFilePath, siteAbsoluteDestination)
+                    }
+
+                });
+            },
+            customChnage(customFiles: string[], joinedLocationFiles: string[]) {
+
             }
-
-        });
-
+        }
     }
 
     private prefix(file: string, prefix: string) {
@@ -117,9 +154,62 @@ export class BaselineSiteJoin {
         return path.join(file, prefix, base);
     }
 
-    baselineSiteJoinFiles() {
+    init() {
+        // this.joinWhenBaselineChnage(this.baselineFiles, this.customFiles);
+        this.joinWhen.baselineChnage(this.filesFrom.baselineFiles, this.filesFrom.customFiles)
+        this.monitor((absolutePath, event, isCustomFolder) => {
+            console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
+            if (isCustomFolder) {
+                this.joinWhen.customChnage([absolutePath], this.filesFrom.joinedFiles);
+            } else {
+                this.joinWhen.baselineChnage([absolutePath], this.filesFrom.customFiles)
+            }
+        })
+    }
+
+    monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
+        this.monitorFilesAndFolders(this.project.baseline.location, this.project.baseline.customizableFilesAndFolders, callback);
+        this.monitorFilesAndFolders(this.project.location, [config.folder.custom], callback)
+    }
+
+    private monitorFilesAndFolders(location: string, customizableFilesOrFolders: string[],
+        filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any, ) {
 
 
+
+        this.checkBaselineSiteStructure()
+
+        const isCustomFolder = (customizableFilesOrFolders.filter(f => f === config.folder.custom).length === 1);
+
+        customizableFilesOrFolders.forEach(baselieFileOrFolder => {
+            const fileOrFolderPath = path.join(location, baselieFileOrFolder)
+            if (!fs.existsSync(fileOrFolderPath)) {
+                error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`)
+            }
+            if (fs.statSync(fileOrFolderPath).isDirectory()) {
+                console.log(`Monitoring directory: ${fileOrFolderPath}`)
+                watch.watchTree(fileOrFolderPath, (f, curr, prev) => {
+                    if (typeof f == "object" && prev === null && curr === null) {
+                        // Finished walking the tree
+                    } else if (prev === null) {
+                        filesEventCallback(f as any, 'created', isCustomFolder)
+                    } else if (curr.nlink === 0) {
+                        filesEventCallback(f as any, 'removed', isCustomFolder)
+                    } else {
+                        filesEventCallback(f as any, 'changed', isCustomFolder)
+                        // f was changed
+                    }
+                })
+            } else {
+                console.log(`Monitoring file: ${fileOrFolderPath}`)
+                fs.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
+                    // console.log(`NODE FS WATCH Event: ${event} for ${filename}`)
+                    filesEventCallback(fileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', isCustomFolder)
+                })
+            }
+
+
+        });
 
     }
 

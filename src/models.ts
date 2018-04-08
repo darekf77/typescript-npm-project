@@ -1,5 +1,8 @@
 import { Project } from "./project/base-project";
 
+
+export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
+
 export type InstalationType = '-g' | '--save' | '--save-dev';
 
 export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencies';
