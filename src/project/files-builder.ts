@@ -4,11 +4,20 @@ import * as path from 'path';
 import { Project } from "./base-project";
 import { LibType, RecreateFile } from "../models";
 import { copyFile } from '../helpers';
+import config from '../config';
+import { BaselineSiteJoin } from './baseline-site-join';
+
+
 
 
 export class FilesRecreator {
 
-    constructor(private project: Project) { }
+    readonly join: BaselineSiteJoin;
+
+    constructor(private project: Project) {
+        this.join = new BaselineSiteJoin(project);
+    }
+
 
     npmignore() {
         const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']

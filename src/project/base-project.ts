@@ -76,6 +76,7 @@ export abstract class Project extends BaseProjectRouter {
 
     constructor(public location: string) {
         super();
+
         if (fs.existsSync(location)) {
 
             this.packageJson = PackageJSON.from(location);
@@ -89,17 +90,30 @@ export abstract class Project extends BaseProjectRouter {
             this.parent = ProjectFrom(path.join(location, '..'));
             this.requiredLibs = this.packageJson.requiredProjects;
             this.preview = ProjectFrom(path.join(location, 'preview'));
-            this.baseline = this.packageJson.basedOn;
+
             if (this.baseline && this.type !== 'workspace') {
                 error(`Baseline is only for ${chalk.bold('workspace')} type projects.`);
+            } else if (this.parent && this.parent.type === 'workspace' && this.parent.baseline) {
+                this.baseline = ProjectFrom(path.join(this.parent.baseline.location, this.name))
+            } else {
+                this.baseline = this.packageJson.basedOn;
             }
 
+
         } else {
-            warn(`Invalid project location: ${location}`);
+            error(`Invalid project location: ${location}`);
         }
     }
 
-    get customizableFolders() {
+
+    get customizableFilesAndFolders() {
+        if (this.type === 'workspace') return [
+            'environment.d.ts',
+            'environment.js',
+            'environment.dev.js',
+            'environment.prod.js',
+            'environment.stage.js'
+        ]
         const files: string[] = ['src']
         if (this.type === 'angular-lib') files.push('components');
         return files;

@@ -123,7 +123,11 @@ export class PackageJSON {
     }
 
     get basedOn(): Project {
+        // console.log(this.data)
         if (this.data.tnp && this.data.tnp.basedOn) {
+            if (!_.isString(this.data.tnp.basedOn)) {
+                error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})`)
+            }
             const baseline = ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
             if (baseline && baseline.type !== 'workspace') {
                 error(`Baseline project ${chalk.bold(baseline.name)} needs to ${'workspace'} type project.`);

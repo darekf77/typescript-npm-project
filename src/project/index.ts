@@ -35,7 +35,8 @@ export function ProjectFrom(location: string, parent?: Project): Project {
     if (!fs.existsSync(location)) return;
     if (!PackageJSON.from(location)) return;
     const type = typeFrom(location);
-    // console.log('ProjectDocker', ProjectDocker)
+    // console.log('type', type)
+    // console.log('location', location)
     // process.exit(1)
     let resultProject: Project;
     if (type === 'isomorphic-lib') resultProject = new ProjectIsomorphicLib(location);

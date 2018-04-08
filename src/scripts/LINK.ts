@@ -27,7 +27,7 @@ export function link(workspaceProject: Project) {
     }
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => {
-            // console.log('link nodemoulse to ')
+            // console.log(`Link node_modules to: ${c.name}`)
             workspaceProject.node_modules.linkToProject(c, true)
         })
     }

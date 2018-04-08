@@ -20,7 +20,8 @@ export const config = {
         previewDistApp: 'dist-app',
         browser: 'browser',
         module: 'module',
-        custom: 'custom'
+        custom: 'custom',
+        node_modules: 'node_modules'
     },
     libsTypes: [
         'workspace',

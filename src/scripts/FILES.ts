@@ -1,0 +1,16 @@
+import { Project } from "../project";
+import { FilesRecreator } from "../project/files-builder";
+import { BaselineSiteJoin } from "../project/baseline-site-join";
+
+
+
+export default {
+    $FILES_CUSTOM: (args) => {
+        console.log(new BaselineSiteJoin(Project.Current).getCustomFiles())
+        process.exit(0)
+    },
+    $FILES_BASELINE: (args) => {
+        console.log(new BaselineSiteJoin(Project.Current).getBaselineFiles())
+        process.exit(0)
+    }
+}

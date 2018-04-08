@@ -7,9 +7,7 @@
     "resources": [
       "README.md"
     ],
-    "requiredLibs": [
-      "../baseline"
-    ]
+    "basedOn": "../baseline"
   },
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.3.1",
