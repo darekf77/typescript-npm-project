@@ -6,15 +6,15 @@ import { BaselineSiteJoin } from "../project/baseline-site-join";
 
 export default {
     $FILES_CUSTOM: (args) => {
-        console.log(new BaselineSiteJoin(Project.Current).filesFrom.customFiles)
+        console.log(new BaselineSiteJoin(Project.Current).files.allCustomFiles)
         process.exit(0)
     },
     $FILES_BASELINE: (args) => {
-        console.log(new BaselineSiteJoin(Project.Current).filesFrom.baselineFiles)
+        console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
         process.exit(0)
     },
     $FILES_JOIN: (args) => {
-        console.log(new BaselineSiteJoin(Project.Current).filesFrom.joinedFiles)
+        console.log(new BaselineSiteJoin(Project.Current).files.allJoinedFiles)
         process.exit(0)
     },
     $MONITOR_BASELINE_SITE: (args) => {

@@ -30,11 +30,11 @@ export class BaselineSiteJoin {
 
     readonly PREFIX_BASELINE_SITE = '__'
 
-    get filesFrom() {
+    get files() {
         const self = this;
         self.checkBaselineSiteStructure()
         return {
-            get customFiles() {
+            get allCustomFiles() {
 
                 const globPath = path.join(
                     self.project.location,
@@ -42,7 +42,7 @@ export class BaselineSiteJoin {
                 const files = glob.sync(`${globPath}/**/*.*`);
                 return files;
             },
-            get baselineFiles() {
+            get allBaselineFiles() {
 
                 let files = [];
                 // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
@@ -60,7 +60,7 @@ export class BaselineSiteJoin {
                 // console.log('OUTPUT', files.map(f => path.basename(f)))
                 return files;
             },
-            get joinedFiles() {
+            get allJoinedFiles() {
                 let files = [];
                 // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
 
@@ -156,13 +156,13 @@ export class BaselineSiteJoin {
 
     init() {
         // this.joinWhenBaselineChnage(this.baselineFiles, this.customFiles);
-        this.joinWhen.baselineChnage(this.filesFrom.baselineFiles, this.filesFrom.customFiles)
+        this.joinWhen.baselineChnage(this.files.allBaselineFiles, this.files.allCustomFiles)
         this.monitor((absolutePath, event, isCustomFolder) => {
             console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
             if (isCustomFolder) {
-                this.joinWhen.customChnage([absolutePath], this.filesFrom.joinedFiles);
+                this.joinWhen.customChnage([absolutePath], this.files.allJoinedFiles);
             } else {
-                this.joinWhen.baselineChnage([absolutePath], this.filesFrom.customFiles)
+                this.joinWhen.baselineChnage([absolutePath], this.files.allCustomFiles)
             }
         })
     }
