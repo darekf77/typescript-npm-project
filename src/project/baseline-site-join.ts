@@ -15,11 +15,7 @@ import chalk from 'chalk';
 
 export class BaselineSiteJoin {
 
-    private checkBaselineSiteStructure() {
-        if (!this.project.baseline) {
-            error(`There is no baseline project for "${this.project.name}" in ${this.project.location}`)
-        }
-    }
+
 
     constructor(private project: Project) {
         // console.log(project)
@@ -31,8 +27,8 @@ export class BaselineSiteJoin {
     readonly PREFIX_BASELINE_SITE = '__'
 
     get files() {
+        this.__checkBaselineSiteStructure()
         const self = this;
-        self.checkBaselineSiteStructure()
         return {
             get allCustomFiles() {
 
@@ -48,7 +44,10 @@ export class BaselineSiteJoin {
                 // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
 
                 self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
-                    let globPath = self.getPathToBaselineFrom(self.project, customizableFileOrFolder)
+                    let globPath = path.join(self.getPathToBaseline(), customizableFileOrFolder)
+                    if (!fs.existsSync(globPath)) {
+                        error(`Custombizable forder doesn't exist: ${globPath}`)
+                    }
                     if (fs.statSync(globPath).isDirectory()) {
                         const globFiles = glob.sync(`${globPath}/**/*.*`);
                         files = files.concat(globFiles);
@@ -56,22 +55,6 @@ export class BaselineSiteJoin {
                         files.push(globPath)
                     }
 
-                })
-                // console.log('OUTPUT', files.map(f => path.basename(f)))
-                return files;
-            },
-            get allJoinedFiles() {
-                let files = [];
-                // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
-
-                self.project.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
-                    let globPath = path.join(self.project.location, customizableFileOrFolder)
-                    if (fs.statSync(globPath).isDirectory()) {
-                        const globFiles = glob.sync(`${globPath}/**/*.*`);
-                        files = files.concat(globFiles);
-                    } else {
-                        files.push(globPath)
-                    }
                 })
                 // console.log('OUTPUT', files.map(f => path.basename(f)))
                 return files;
@@ -79,71 +62,71 @@ export class BaselineSiteJoin {
         }
     }
 
+    get merge() {
+        const self = this;
+        return {
+            /**
+                 * Join baseline file to site when changed
+                 * @param baselineFilePath File located in baselinem, relative path eg. src/file.ts
+                 */
+            baselineFile(baselineFilePath: string) {
+                const baselineFileInCustomPath = path.join(self.project.location, config.folder.custom, baselineFilePath)
+                const baselineFileIsInCustom = fs.existsSync(baselineFileInCustomPath);
+                const joinFilePath = path.join(self.project.location, baselineFilePath)
+                const baselineAbsoluteLocation = path.join(self.getPathToBaseline(), baselineFilePath)
+                if (baselineFileIsInCustom) {
 
+                    copyFile(baselineAbsoluteLocation, self.getPrefixedPathInJoin(baselineFilePath))
+                    copyFile(baselineFileInCustomPath, joinFilePath);
+                } else {
+                    copyFile(baselineAbsoluteLocation, joinFilePath)
+                }
+            },
 
-    private getPathToBaselineFrom(project: Project, customzableFolder: string) {
-        const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
-            : path.join(this.project.baseline.parent.name, this.project.baseline.name)
-
-        return path.join(
-            this.project.location,
-            config.folder.node_modules,
-            baselinePath,
-            customzableFolder
-        );
+            /**
+             * Join custom file to site when changed
+             * @param customFile File located in /custom folder, relative path without custom eg. src/file.ts
+             */
+            siteCustomFile(customFile: string) {
+                const baselineFileInCustomPath = path.join(self.project.location, config.folder.custom, customFile)
+                const cusomomFileEquivalentInBaseline = path.join(self.getPathToBaseline(), customFile)
+                const customFileEquivalentExistInBaseline = fs.existsSync(cusomomFileEquivalentInBaseline);
+                const joinFilePath = path.join(self.project.location, customFile)
+                if (customFileEquivalentExistInBaseline) {
+                    copyFile(cusomomFileEquivalentInBaseline, self.getPrefixedPathInJoin(customFile))
+                    copyFile(baselineFileInCustomPath, joinFilePath);
+                } else {
+                    copyFile(baselineFileInCustomPath, joinFilePath)
+                }
+            }
+        }
     }
 
 
-
-
-    /**
-     * 
-     * @param baselineFiles 
-     * example "<cwd>/node_modules/baseline/ss-common-ui/src/User.ts"
-     * example "<cwd>/node_modulesbaseline/ss-common-ui/components/module.ts"
-     * 
-     * @param customFiles 
-     * example "<cwd>/custom/src/User.ts"
-     * example "<cwd>/custom/components/module.ts"
-     */
-    private get joinWhen() {
+    private get join() {
         const self = this;
         return {
-            baselineChnage(baselineFiles: string[], customFiles: string[]) {
-                self.checkBaselineSiteStructure()
+            allBaselineSiteFiles() {
+                self.__checkBaselineSiteStructure()
+                let baselineFiles: string[] = this.files.allBaselineFiles;
+                let customFiles: string[] = this.files.allCustomFiles;
+
                 const baselineReplacePath = path.join(self.project.location, 'node_modules', self.project.baseline.name, self.project.name);
                 baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
 
                 const customReplacePath = path.join(self.project.location, config.folder.custom);
                 customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
-
-
-
-                baselineFiles.forEach(baselineFile => {
-                    const existInCustom = customFiles.includes(baselineFile);
-                    const baselineAbsoluteLocation = path.join(
-                        baselineReplacePath,
-                        baselineFile
-                    );
-                    const siteAbsoluteDestination = path.join(
-                        self.project.location,
-                        existInCustom ? self.prefix(baselineFile,
-                            self.PREFIX_BASELINE_SITE) : baselineFile
-                    );
-                    copyFile(baselineAbsoluteLocation, siteAbsoluteDestination)
-                    if (existInCustom) {
-                        const customAbsoluteFilePath = path.join(
-                            self.project.location,
-                            config.folder.custom,
-                            baselineFile
-                        )
-                        copyFile(customAbsoluteFilePath, siteAbsoluteDestination)
-                    }
-
-                });
+                baselineFiles.forEach(baselineFile => self.merge.baselineFile(baselineFile));
             },
-            customChnage(customFiles: string[], joinedLocationFiles: string[]) {
-
+            get watch() {
+                return {
+                    baselineFileChange(filePath: string) {
+                        self.merge.baselineFile(filePath);
+                    },
+                    siteFileChange(filePath: string) {
+                        self.merge.siteCustomFile(filePath);
+                    }
+                }
             }
         }
     }
@@ -155,29 +138,33 @@ export class BaselineSiteJoin {
     }
 
     init() {
-        // this.joinWhenBaselineChnage(this.baselineFiles, this.customFiles);
-        this.joinWhen.baselineChnage(this.files.allBaselineFiles, this.files.allCustomFiles)
+        // remove customizable
+        this.project.customizableFilesAndFolders.forEach(customizable => {
+            this.project.run(`tnp rimraf ${customizable}`)
+        });
+        // rejoin baseline/site files
+        this.join.allBaselineSiteFiles()
+
+        // watch and rejoin baseline/site changed files
         this.monitor((absolutePath, event, isCustomFolder) => {
             console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
             if (isCustomFolder) {
-                this.joinWhen.customChnage([absolutePath], this.files.allJoinedFiles);
+                this.join.watch.siteFileChange(absolutePath);
             } else {
-                this.joinWhen.baselineChnage([absolutePath], this.files.allCustomFiles)
+                this.join.watch.baselineFileChange(absolutePath);
             }
         })
     }
 
-    monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
-        this.monitorFilesAndFolders(this.project.baseline.location, this.project.baseline.customizableFilesAndFolders, callback);
-        this.monitorFilesAndFolders(this.project.location, [config.folder.custom], callback)
+    private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
+        this.watchFilesAndFolders(this.project.baseline.location, this.project.baseline.customizableFilesAndFolders, callback);
+        this.watchFilesAndFolders(this.project.location, [config.folder.custom], callback)
     }
 
-    private monitorFilesAndFolders(location: string, customizableFilesOrFolders: string[],
+    private watchFilesAndFolders(location: string, customizableFilesOrFolders: string[],
         filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any, ) {
 
-
-
-        this.checkBaselineSiteStructure()
+        this.__checkBaselineSiteStructure()
 
         const isCustomFolder = (customizableFilesOrFolders.filter(f => f === config.folder.custom).length === 1);
 
@@ -211,6 +198,33 @@ export class BaselineSiteJoin {
 
         });
 
+    }
+
+
+    private __checkBaselineSiteStructure() {
+        if (!this.project.baseline) {
+            error(`There is no baseline project for "${this.project.name}" in ${this.project.location}`)
+        }
+    }
+
+
+    private getPrefixedPathInJoin(relativeFilePath: string) {
+        const ext = path.extname(relativeFilePath);
+        const basename = path.basename(relativeFilePath, ext);
+        const dirPath = path.dirname(relativeFilePath);
+        const res = path.join(this.project.location, dirPath, basename, this.PREFIX_BASELINE_SITE, ext);
+        return res;
+    }
+
+    private getPathToBaseline() {
+        const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
+            : path.join(this.project.baseline.parent.name, this.project.baseline.name)
+
+        return path.join(
+            this.project.location,
+            config.folder.node_modules,
+            baselinePath
+        );
     }
 
 

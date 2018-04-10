@@ -13,11 +13,7 @@ export default {
         console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
         process.exit(0)
     },
-    $FILES_JOIN: (args) => {
-        console.log(new BaselineSiteJoin(Project.Current).files.allJoinedFiles)
-        process.exit(0)
-    },
-    $MONITOR_BASELINE_SITE: (args) => {
+    $BASELINE_SITE_START: (args) => {
         new BaselineSiteJoin(Project.Current).init()
         process.stdin.resume()
     }
