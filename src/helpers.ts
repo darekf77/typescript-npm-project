@@ -46,7 +46,9 @@ export function fixWebpackEnv(env: Object) {
     })
 }
 
-export function copyFile(sousrce: string, destination: string) {
+export function copyFile(sousrce: string, destination: string,
+    transformTextFn?: (input: string) => string) {
+
     if (!fs.existsSync(sousrce)) {
         warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
         return;
@@ -55,8 +57,20 @@ export function copyFile(sousrce: string, destination: string) {
         warn(`Trying to copy same file ${sousrce}`);
         return;
     }
+    const destDirPath = path.dirname(destination);
+    // console.log('destDirPath', destDirPath)
+    if (!fs.existsSync(destDirPath)) {
+        run(`tnp mkdirp ${destDirPath}`).sync()
+    }
+
+    let sourceData = fs.readFileSync(sousrce).toString();
+    if (transformTextFn) {
+        sourceData = transformTextFn(sourceData);
+    }
+
+    // process.exit(0)
     // console.log(`Copy from ${sousrce.slice(-20)} to ${destination.slice(-20)}`)
-    fs.writeFileSync(destination, fs.readFileSync(sousrce), 'utf8')
+    fs.writeFileSync(destination, sourceData, 'utf8')
 }
 
 

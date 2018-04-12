@@ -22,7 +22,17 @@ export class BaselineSiteJoin {
 
     }
 
+    getCleanPathes(baselineFiles: string[], customFiles: string[]) {
+        const baselineReplacePath = this.pathToBaseline;
 
+        baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
+
+        const customReplacePath = path.join(this.project.location, config.folder.custom);
+        customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
+        return {
+            baselineFiles, customFiles
+        }
+    }
 
     readonly PREFIX_BASELINE_SITE = '__'
 
@@ -36,6 +46,8 @@ export class BaselineSiteJoin {
                     self.project.location,
                     config.folder.custom);
                 const files = glob.sync(`${globPath}/**/*.*`);
+                // console.log('CUSTOM FIELS', files)
+
                 return files;
             },
             get allBaselineFiles() {
@@ -44,7 +56,7 @@ export class BaselineSiteJoin {
                 // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
 
                 self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
-                    let globPath = path.join(self.getPathToBaseline(), customizableFileOrFolder)
+                    let globPath = path.join(self.pathToBaseline, customizableFileOrFolder)
                     if (!fs.existsSync(globPath)) {
                         error(`Custombizable forder doesn't exist: ${globPath}`)
                     }
@@ -56,7 +68,8 @@ export class BaselineSiteJoin {
                     }
 
                 })
-                // console.log('OUTPUT', files.map(f => path.basename(f)))
+                // console.log('allBaselineFiles', files)
+
                 return files;
             }
         }
@@ -70,14 +83,30 @@ export class BaselineSiteJoin {
                  * @param baselineFilePath File located in baselinem, relative path eg. src/file.ts
                  */
             baselineFile(baselineFilePath: string) {
+                
+                const baselineFilePathNoExit = self.removeExtension(baselineFilePath);
                 const baselineFileInCustomPath = path.join(self.project.location, config.folder.custom, baselineFilePath)
                 const baselineFileIsInCustom = fs.existsSync(baselineFileInCustomPath);
                 const joinFilePath = path.join(self.project.location, baselineFilePath)
-                const baselineAbsoluteLocation = path.join(self.getPathToBaseline(), baselineFilePath)
+                const baselineAbsoluteLocation = path.join(self.pathToBaseline, baselineFilePath)
                 if (baselineFileIsInCustom) {
 
                     copyFile(baselineAbsoluteLocation, self.getPrefixedPathInJoin(baselineFilePath))
-                    copyFile(baselineFileInCustomPath, joinFilePath);
+                    copyFile(baselineFileInCustomPath, joinFilePath, input => {
+
+                        // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
+
+                        const toReplaceImportPath = `${path.join(self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'), baselineFilePathNoExit)}`;
+                        const replacement = `./${self.getPrefixedBasename(baselineFilePathNoExit)}`;
+                        // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
+                        // console.log(`replacement: "${replacement}"`)
+
+
+                        const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
+                        // console.log('AFTER TRANSFORMATION', res)
+                        // process.exit()
+                        return res;
+                    });
                 } else {
                     copyFile(baselineAbsoluteLocation, joinFilePath)
                 }
@@ -89,7 +118,7 @@ export class BaselineSiteJoin {
              */
             siteCustomFile(customFile: string) {
                 const baselineFileInCustomPath = path.join(self.project.location, config.folder.custom, customFile)
-                const cusomomFileEquivalentInBaseline = path.join(self.getPathToBaseline(), customFile)
+                const cusomomFileEquivalentInBaseline = path.join(self.pathToBaseline, customFile)
                 const customFileEquivalentExistInBaseline = fs.existsSync(cusomomFileEquivalentInBaseline);
                 const joinFilePath = path.join(self.project.location, customFile)
                 if (customFileEquivalentExistInBaseline) {
@@ -108,14 +137,15 @@ export class BaselineSiteJoin {
         return {
             allBaselineSiteFiles() {
                 self.__checkBaselineSiteStructure()
-                let baselineFiles: string[] = this.files.allBaselineFiles;
-                let customFiles: string[] = this.files.allCustomFiles;
 
-                const baselineReplacePath = path.join(self.project.location, 'node_modules', self.project.baseline.name, self.project.name);
-                baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
+                const { baselineFiles, customFiles } = self.getCleanPathes(
+                    self.files.allBaselineFiles,
+                    self.files.allCustomFiles);
 
-                const customReplacePath = path.join(self.project.location, config.folder.custom);
-                customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
+                // console.log('BASELINE FIELS AFTER', baselineFiles)
+                // console.log('CUSTOM FIELS AFTER', customFiles)
+                // process.exit(0)
+
                 baselineFiles.forEach(baselineFile => self.merge.baselineFile(baselineFile));
             },
             get watch() {
@@ -137,14 +167,8 @@ export class BaselineSiteJoin {
         return path.join(file, prefix, base);
     }
 
-    init() {
-        // remove customizable
-        this.project.customizableFilesAndFolders.forEach(customizable => {
-            this.project.run(`tnp rimraf ${customizable}`)
-        });
-        // rejoin baseline/site files
-        this.join.allBaselineSiteFiles()
-
+    initAndWatch() {
+        this.init()
         // watch and rejoin baseline/site changed files
         this.monitor((absolutePath, event, isCustomFolder) => {
             console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
@@ -154,6 +178,17 @@ export class BaselineSiteJoin {
                 this.join.watch.baselineFileChange(absolutePath);
             }
         })
+    }
+
+    init() {
+        // remove customizable
+        // console.log(this.project.customizableFilesAndFolders);
+        // process.exit(0)
+        this.project.customizableFilesAndFolders.forEach(customizable => {
+            this.project.run(`tnp rimraf ${customizable}`).sync()
+        });
+        // rejoin baseline/site files
+        this.join.allBaselineSiteFiles()
     }
 
     private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
@@ -174,7 +209,7 @@ export class BaselineSiteJoin {
                 error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`)
             }
             if (fs.statSync(fileOrFolderPath).isDirectory()) {
-                console.log(`Monitoring directory: ${fileOrFolderPath}`)
+                console.log(`Monitoring directory: ${fileOrFolderPath} `)
                 watch.watchTree(fileOrFolderPath, (f, curr, prev) => {
                     if (typeof f == "object" && prev === null && curr === null) {
                         // Finished walking the tree
@@ -188,9 +223,9 @@ export class BaselineSiteJoin {
                     }
                 })
             } else {
-                console.log(`Monitoring file: ${fileOrFolderPath}`)
+                console.log(`Monitoring file: ${fileOrFolderPath} `)
                 fs.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
-                    // console.log(`NODE FS WATCH Event: ${event} for ${filename}`)
+                    // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
                     filesEventCallback(fileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', isCustomFolder)
                 })
             }
@@ -203,22 +238,38 @@ export class BaselineSiteJoin {
 
     private __checkBaselineSiteStructure() {
         if (!this.project.baseline) {
-            error(`There is no baseline project for "${this.project.name}" in ${this.project.location}`)
+            error(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
         }
     }
 
+    private removeExtension(filePath: string) {
+        const ext = path.extname(filePath);
+        return path.join(path.dirname(filePath), path.basename(filePath, ext))
+    }
+
+
+    private getPrefixedBasename(relativeFilePath: string) {
+        const ext = path.extname(relativeFilePath);
+        const basename = path.basename(relativeFilePath, ext)
+            .replace(/\/$/g, ''); // replace last part of url /
+
+        return `${this.PREFIX_BASELINE_SITE}${basename}${ext}`;
+    }
 
     private getPrefixedPathInJoin(relativeFilePath: string) {
-        const ext = path.extname(relativeFilePath);
-        const basename = path.basename(relativeFilePath, ext);
+
         const dirPath = path.dirname(relativeFilePath);
-        const res = path.join(this.project.location, dirPath, basename, this.PREFIX_BASELINE_SITE, ext);
+
+        const res = path.join(
+            this.project.location,
+            dirPath,
+            this.getPrefixedBasename(relativeFilePath));
+
         return res;
     }
 
-    private getPathToBaseline() {
-        const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
-            : path.join(this.project.baseline.parent.name, this.project.baseline.name)
+    private get pathToBaseline() {
+        const baselinePath = this.pathToBaselineNodeModulesRelative;
 
         return path.join(
             this.project.location,
@@ -226,6 +277,15 @@ export class BaselineSiteJoin {
             baselinePath
         );
     }
+
+    private get pathToBaselineNodeModulesRelative() {
+        const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
+            : path.join(this.project.baseline.parent.name, this.project.baseline.name)
+
+        return baselinePath;
+    }
+
+
 
 
 }

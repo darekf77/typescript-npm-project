@@ -1,31 +1,13 @@
-# compiled output
-/bundle*
-/dist*
+/node_modules
 /tmp*
-/out-tsc
-bundle.umd.js
+/dist*
+/bundle*
 /browser
 /module
-/.sourcemaps
 /www
-
-# dependencies
-/node_modules
-
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-testem.log
-/typings
-
-# e2e
-/e2e/*.js
-/e2e/*.map
-
-# System Files
-.DS_Store
+bundle.umd.js
 Thumbs.db
+.DS_Store
+npm-debug.log
+/.sass-cache
+/.sourcemaps

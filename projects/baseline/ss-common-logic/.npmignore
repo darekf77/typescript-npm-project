@@ -5,6 +5,5 @@ src/
 /docs
 /preview
 /tests
-
 tsconfig.json
 npm-debug.log*

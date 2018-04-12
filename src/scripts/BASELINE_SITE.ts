@@ -15,6 +15,10 @@ export default {
     },
     $BASELINE_SITE_START: (args) => {
         new BaselineSiteJoin(Project.Current).init()
+        process.exit(0)
+    },
+    $BASELINE_SITE_START_WATCH: (args) => {
+        new BaselineSiteJoin(Project.Current).initAndWatch()
         process.stdin.resume()
     }
 }
