@@ -11,17 +11,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir = 'dist')
     const options: BuildOptions = {
         prod, watch, outDir
     };
-
-    const project: Project = Project.Current;
-
-    if ((project.type === 'angular-lib') || (project.type === 'isomorphic-lib')) {
-        project.build(options);
-        if (!watch) {
-            process.exit(0)
-        }
-    } else {
-        error(`Library build only for tnp ${chalk.bold('angular-lib')} project type`)
-    }
+    build(options, ['angular-lib', 'isomorphic-lib'])
 }
 
 
@@ -30,23 +20,36 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist')
     const options: BuildOptions = {
         prod, watch, outDir, appBuild: true
     };
-
-    const project: Project = Project.Current;
-
-    const allowedLibs: LibType[] = ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker'];
-
-    if (allowedLibs.includes(project.type)) {
-        project.build(options);
-        if (!watch) {
-            process.exit(0)
-        }
-    } else {
-        error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
-    }
+    build(options, ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker']);
 }
 
 
+function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
+    const { prod, watch, outDir, appBuild } = opt;
+
+    const project: Project = Project.Current;
+
+    if (allowedLibs.includes(project.type)) {
+        if (project.isSite) {
+            project.recreate.join.init()
+        }
+        project.build(opt);
+        if (watch) {
+            if(project.isSite) {
+                project.recreate.join.watch()
+            }
+        } else {
+            process.exit(0)
+        }
+    } else {
+        if (appBuild) {
+            error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
+        } else {
+            error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
+        }
+    }
+}
 
 
 export default {
