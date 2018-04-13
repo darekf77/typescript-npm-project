@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+// import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
@@ -85,26 +86,35 @@ export class BaselineSiteJoin {
 
         if (fs.existsSync(baselineFileInCustomPath)) {
 
-            copyFile(baselineAbsoluteLocation, this.getPrefixedPathInJoin(relativeBaselineCustomPath))
+            if (fs.existsSync(baselineAbsoluteLocation)) {
+                copyFile(baselineAbsoluteLocation, this.getPrefixedPathInJoin(relativeBaselineCustomPath))
+            } else {
+                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+            }
+
             copyFile(baselineFileInCustomPath, joinFilePath, input => {
 
                 // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
-
                 const toReplaceImportPath = `${path.join(
                     this.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
                     baselineFilePathNoExit)}`;
                 const replacement = `./${this.getPrefixedBasename(baselineFilePathNoExit)}`;
                 // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
                 // console.log(`replacement: "${replacement}"`)
-
-
                 const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
                 // console.log('AFTER TRANSFORMATION', res)
                 // process.exit()
                 return res;
             });
+
         } else {
-            copyFile(baselineAbsoluteLocation, joinFilePath)
+            if (fs.existsSync(baselineAbsoluteLocation)) {
+                copyFile(baselineAbsoluteLocation, joinFilePath)
+                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+            } else {
+                this.project.run(`tnp rimraf ${joinFilePath}`).sync()
+                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+            }
         }
     }
 
@@ -139,11 +149,13 @@ export class BaselineSiteJoin {
     watch() {
         this.monitor((absolutePath, event, isCustomFolder) => {
             console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
+
             if (isCustomFolder) {
                 this.join.watch.siteFileChange(absolutePath.replace(this.pathToCustom, ''));
             } else {
                 this.join.watch.baselineFileChange(absolutePath.replace(this.pathToBaselineAbsolute, ''));
             }
+
         })
     }
 
