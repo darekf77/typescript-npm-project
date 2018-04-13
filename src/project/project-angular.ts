@@ -24,7 +24,6 @@ export class AngularProject extends Project {
             "tsconfig.json",
             'src/tsconfig.app.json',
             'src/tsconfig.spec.json',
-            'src/tsconfig.packages.json',
             'protractor.conf.js',
             'karma.conf.js'
         ].concat(this.isEjectedProject ? [

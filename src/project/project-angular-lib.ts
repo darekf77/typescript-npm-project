@@ -24,7 +24,8 @@ export class ProjectAngularLib extends BaseProjectLib {
             'gulpfile.js',
             'ng-package.json',
             'tsconfig-aot.bundle.json',
-            'tsconfig-aot.dist.json'
+            'tsconfig-aot.dist.json',
+            'src/tsconfig.packages.json'
         ]).concat(this.angular.projectSpecyficFiles());
     }
 
