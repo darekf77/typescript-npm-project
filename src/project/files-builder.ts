@@ -32,7 +32,7 @@ export class FilesRecreator {
 
             get gitignore() {
                 const gitignoreFiles = [ // for sure ingored
-                    'node_modules',
+                    config.folder.node_modules,
                     'tmp*',
                     'dist*',
                     'bundle*',

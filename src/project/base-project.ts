@@ -159,8 +159,10 @@ export abstract class Project extends BaseProjectRouter {
         this.buildSteps(buildOptions);
     }
 
-    public clear() {
-        const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore.join(' ');
+    public clear(all = false) {
+        const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
+            .filter(f => !(all && f === config.folder.node_modules)) // link/unlink takes care of node_modules
+            .join(' ');
         // console.log(this.recreate.filesIgnoredBy.gitignore.join('\n'))
         this.run(`tnp rimraf ${gitginoredfiles}`).sync();
     }
