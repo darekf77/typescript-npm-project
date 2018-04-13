@@ -1,30 +1,24 @@
-# compiled output
-/bundle*
-/dist*
-/tmp*
-/out-tsc
-bundle.umd.js
-/browser
-/.sourcemaps
-/www
-
-# dependencies
-/node_modules
-
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-testem.log
-/typings
-
-# e2e
-/e2e/*.js
-/e2e/*.map
-
-# System Files
-.DS_Store
+node_modules
+tmp*
+dist*
+bundle*
+browser
+module
+www
 Thumbs.db
+.DS_Store
+npm-debug.log*
+.sass-cache
+.sourcemaps
+tslint.json
+.editorconfig
+tsconfig.json
+src/tsconfig.app.json
+src/tsconfig.spec.json
+src/tsconfig.packages.json
+protractor.conf.js
+karma.conf.js
+webpack.config.build.aot.js
+webpack.config.build.js
+webpack.config.common.js
+webpack.config.js

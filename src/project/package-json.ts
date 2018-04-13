@@ -137,7 +137,7 @@ export class PackageJSON {
     }
 
     get isCoreProject() {
-        if (this.data.tnp) {
+        if (this.data.tnp && this.data.tnp.isCoreProject) {
             if (_.isBoolean(this.data.tnp.isCoreProject)) {
                 return this.data.tnp.isCoreProject;
             }
