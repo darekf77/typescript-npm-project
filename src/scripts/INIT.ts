@@ -2,12 +2,18 @@
 import { Project } from "../project";
 import { run } from '../process';
 
+
+export function init() {
+    Project.Current.recreate.commonFiles();
+    Project.Current.recreate.projectSpecyficFiles();
+    Project.Current.recreate.gitignore();
+    Project.Current.recreate.npmignore();
+    Project.Current.recreate.customFolder();
+}
+
 export default {
     $INIT: (args) => {
-        Project.Current.recreate.commonFiles();
-        Project.Current.recreate.projectSpecyficFiles();
-        Project.Current.recreate.gitignore()
-        Project.Current.recreate.customFolder();
+        init()
         process.exit(0)
     },
     $INIT_EVERYWHERE: (args) => {

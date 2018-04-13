@@ -7,3 +7,5 @@ src/
 /tests
 tsconfig.json
 npm-debug.log*
+tslint.json
+.editorconfig

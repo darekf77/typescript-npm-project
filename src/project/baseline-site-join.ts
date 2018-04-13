@@ -74,42 +74,64 @@ export class BaselineSiteJoin {
         }
     }
 
-    private merge(relativeBaselineCustomPath: string) {
+    private replacePathFn(relativeBaselineCustomPath: string) {
+        return (input) => {
+            const baselineFilePathNoExit = this.removeExtension(relativeBaselineCustomPath);
+            // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
+            const toReplaceImportPath = `${path.join(
+                this.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
+                baselineFilePathNoExit)}`;
+            const replacement = `./${this.getPrefixedBasename(baselineFilePathNoExit)}`;
+            // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
+            // console.log(`replacement: "${replacement}"`)
+            const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
+            // console.log('AFTER TRANSFORMATION', res)
+            // process.exit()
+            return res;
+        }
+    }
 
-        const baselineFilePathNoExit = this.removeExtension(relativeBaselineCustomPath);
+    private ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
+    private copyToJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
+        const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
+        copyFile(
+            source,
+            dest,
+            replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined
+        )
+    }
+
+    private merge(relativeBaselineCustomPath: string) {
 
         const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
         const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
 
         const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath)
 
-
         if (fs.existsSync(baselineFileInCustomPath)) {
 
             if (fs.existsSync(baselineAbsoluteLocation)) {
-                copyFile(baselineAbsoluteLocation, this.getPrefixedPathInJoin(relativeBaselineCustomPath))
+                this.copyToJoin(
+                    baselineAbsoluteLocation,
+                    this.getPrefixedPathInJoin(relativeBaselineCustomPath),
+                    relativeBaselineCustomPath
+                )
             } else {
                 this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
             }
-
-            copyFile(baselineFileInCustomPath, joinFilePath, input => {
-
-                // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
-                const toReplaceImportPath = `${path.join(
-                    this.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
-                    baselineFilePathNoExit)}`;
-                const replacement = `./${this.getPrefixedBasename(baselineFilePathNoExit)}`;
-                // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
-                // console.log(`replacement: "${replacement}"`)
-                const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
-                // console.log('AFTER TRANSFORMATION', res)
-                // process.exit()
-                return res;
-            });
+            this.copyToJoin(
+                baselineFileInCustomPath,
+                joinFilePath,
+                relativeBaselineCustomPath
+            )
 
         } else {
             if (fs.existsSync(baselineAbsoluteLocation)) {
-                copyFile(baselineAbsoluteLocation, joinFilePath)
+                this.copyToJoin(
+                    baselineAbsoluteLocation,
+                    joinFilePath,
+                    relativeBaselineCustomPath
+                )
                 this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
             } else {
                 this.project.run(`tnp rimraf ${joinFilePath}`).sync()

@@ -19,6 +19,7 @@ import { ProjectFrom } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
 import { workers } from 'cluster';
+import { init } from '../scripts/INIT';
 
 
 export abstract class Project extends BaseProjectRouter {
@@ -168,19 +169,21 @@ export abstract class Project extends BaseProjectRouter {
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
-        this.recreate.gitignore()
-        this.recreate.npmignore()
-        this.recreate.projectSpecyficFiles()
-        this.recreate.commonFiles()
+        init();
 
         this.node_modules.prepare();
 
         this.buildSteps(buildOptions);
     }
 
-    public clear(all = false) {
+    public clear(includeNodeModules = false) {
         const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
-            .filter(f => !(all && f === config.folder.node_modules)) // link/unlink takes care of node_modules
+            .filter(f => {
+                if (f === config.folder.node_modules) {
+                    return includeNodeModules;
+                }
+                return true;
+            }) // link/unlink takes care of node_modules
             .join(' ');
         // console.log(this.recreate.filesIgnoredBy.gitignore.join('\n'))
         this.run(`tnp rimraf ${gitginoredfiles}`).sync();
