@@ -3,13 +3,14 @@ import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
 import chalk from 'chalk';
-import * as dateformat from "dateformat";
+
 // local
 import { Project } from "./base-project";
 import { BuildDir, LibType } from "../models";
 import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
+import { compilationWrapper } from '../helpers';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -92,23 +93,10 @@ export abstract class BaseProjectLib extends Project {
         info(`Resources copied to release folder: ${config.folder.bundle}`)
     }
 
-    private date() {
-        return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
-    }
 
 
     protected compilationWrapper(fn: () => void, taskName: string = 'Task') {
-        if (!fn || !_.isFunction(fn)) {
-            error(`Compilation wrapper: "${fs}" is not a function.`)
-        }
-        try {
-            console.log(chalk.gray(`${this.date()} Compilation of "${chalk.bold(taskName)}" started...`))
-            fn()
-            console.log(chalk.green(`${this.date()} Compilation of "${chalk.bold(taskName)}" finish OK...`))
-        } catch (error) {
-            console.log(chalk.red(error));
-            console.log(`${this.date()} Compilation of ${taskName} ERROR`)
-        }
+        return compilationWrapper(fn, taskName);
     }
 
 

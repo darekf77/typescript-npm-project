@@ -1,12 +1,12 @@
 import * as fs from 'fs';
-// import * as fse from 'fs-extra';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile, FileEvent } from "../models";
-import { copyFile } from '../helpers';
+import { copyFile, uniqArray, compilationWrapper } from '../helpers';
 import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
@@ -25,12 +25,20 @@ export class BaselineSiteJoin {
 
     }
 
-    getCleanPathes() {
+    get relativePathesBaseline() {
         let baselineFiles: string[] = this.files.allBaselineFiles;
         const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
         baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
 
         return baselineFiles;
+    }
+
+    get relativePathesCustom() {
+        let customFiles: string[] = this.files.allCustomFiles;
+        const customReplacePath = path.join(this.project.location, config.folder.custom);
+        customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
+
+        return customFiles;
     }
 
     readonly PREFIX_BASELINE_SITE = '__'
@@ -93,31 +101,53 @@ export class BaselineSiteJoin {
 
     private ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
     private copyToJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
+        // console.log(`Extname from ${source}: ${path.extname(source)}`)
+
         const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
+        const replaceFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
+        // console.log(`Replace fn for ${source} = ${!!replaceFn}`)
         copyFile(
             source,
             dest,
-            replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined
+            replaceFn
         )
     }
 
-    private merge(relativeBaselineCustomPath: string) {
+    private fastCopy(source: string, dest: string) {
 
+        const destDirPath = path.dirname(dest);
+        // console.log('destDirPath', destDirPath)
+        if (!fs.existsSync(destDirPath)) {
+            fse.mkdirpSync(destDirPath)
+        }
+        fse.copyFileSync(source, dest)
+    }
+
+    private fastUnlink(filePath) {
+        if (fs.existsSync(filePath)) {
+            fse.unlinkSync(filePath)
+        }
+    }
+
+    private merge(relativeBaselineCustomPath: string) {
+        // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
+
+        // compilationWrapper(() => {
         const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
         const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
 
         const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath)
+        let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
+
 
         if (fs.existsSync(baselineFileInCustomPath)) {
 
             if (fs.existsSync(baselineAbsoluteLocation)) {
-                this.copyToJoin(
-                    baselineAbsoluteLocation,
-                    this.getPrefixedPathInJoin(relativeBaselineCustomPath),
-                    relativeBaselineCustomPath
-                )
+                variant = 'join'
+                this.fastCopy(baselineAbsoluteLocation, this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             } else {
-                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+                variant = 'no-in-baseline'
+                this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             }
             this.copyToJoin(
                 baselineFileInCustomPath,
@@ -127,17 +157,17 @@ export class BaselineSiteJoin {
 
         } else {
             if (fs.existsSync(baselineAbsoluteLocation)) {
-                this.copyToJoin(
-                    baselineAbsoluteLocation,
-                    joinFilePath,
-                    relativeBaselineCustomPath
-                )
-                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+                variant = 'no-in-custom'
+                this.fastCopy(baselineAbsoluteLocation, joinFilePath);
+                this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             } else {
-                this.project.run(`tnp rimraf ${joinFilePath}`).sync()
-                this.project.run(`tnp rimraf ${this.getPrefixedPathInJoin(relativeBaselineCustomPath)}`).sync()
+                variant = 'deleted'
+                this.fastUnlink(joinFilePath)
+                this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             }
         }
+        // }, ` File: ${relativeBaselineCustomPath}`)
+
     }
 
 
@@ -146,8 +176,9 @@ export class BaselineSiteJoin {
         return {
             allBaselineSiteFiles() {
                 self.__checkBaselineSiteStructure()
-                const baselineFiles = self.getCleanPathes();
-                baselineFiles.forEach(baselineFile => self.merge(baselineFile));
+
+                uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
+                    .forEach(relativeFile => self.merge(relativeFile))
             },
             get watch() {
                 return {

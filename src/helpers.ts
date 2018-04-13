@@ -4,8 +4,9 @@ import * as path from 'path';
 import * as rimraf from "rimraf";
 import * as glob from "glob";
 import * as os from "os";
+import chalk from 'chalk';
+import * as dateformat from "dateformat";
 
-import config from 'config';
 import { error, info, warn } from "./messages";
 import { run } from "./process";
 import { constants } from 'zlib';
@@ -73,7 +74,30 @@ export function copyFile(sousrce: string, destination: string,
     fs.writeFileSync(destination, sourceData, 'utf8')
 }
 
+export function uniqArray<T=string>(array: any[]) {
+    var seen = {};
+    return array.filter(function (item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}
 
+
+export function compilationWrapper(fn: () => void, taskName: string = 'Task', executionType: 'Compilation' | 'Code execution' = 'Compilation') {
+    function date() {
+        return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
+    }
+    if (!fn || !_.isFunction(fn)) {
+        error(`${executionType} wrapper: "${fs}" is not a function.`)
+    }
+    try {
+        console.log(chalk.gray(`${date()} Compilation of "${chalk.bold(taskName)}" started...`))
+        fn()
+        console.log(chalk.green(`${date()} Compilation of "${chalk.bold(taskName)}" finish OK...`))
+    } catch (error) {
+        console.log(chalk.red(error));
+        console.log(`${date()} Compilation of ${taskName} ERROR`)
+    }
+}
 
 export function clearFiles(files: string[] | string, preserveSymlinks = false) {
     if (!files) return;
