@@ -19,9 +19,9 @@ gulpfile.js
 ng-package.json
 tsconfig-aot.bundle.json
 tsconfig-aot.dist.json
+src/tsconfig.packages.json
 tsconfig.json
 src/tsconfig.app.json
 src/tsconfig.spec.json
-src/tsconfig.packages.json
 protractor.conf.js
 karma.conf.js
