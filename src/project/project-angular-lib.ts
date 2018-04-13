@@ -21,7 +21,6 @@ export class ProjectAngularLib extends BaseProjectLib {
 
     projectSpecyficFiles() {
         return super.projectSpecyficFiles().concat([
-            'module',
             'gulpfile.js',
             'ng-package.json',
             'tsconfig-aot.bundle.json',

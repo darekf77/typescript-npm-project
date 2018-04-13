@@ -38,20 +38,21 @@ export class FilesRecreator {
                     'bundle*',
                     'browser',
                     'module',
-                    'www',
-                    'bundle.umd.js'
+                    'www'
                 ].concat([ // common small files
                     'Thumbs.db',
                     '.DS_Store',
-                    'npm-debug.log'
+                    'npm-debug.log*'
                 ].concat([ // not sure if ignored/needed
                     '.sass-cache',
                     '.sourcemaps'
                 ]).concat( // for site ignore auto-generate scr 
                     self.project.isSite ? self.project.customizableFilesAndFolders : []
-                )).concat(self.commonFilesForAllProjects)
-                    .concat(self.project.projectSpecyficFiles())
-
+                )).concat( // common files for all project
+                    self.project.isCoreProject ? [] : self.commonFilesForAllProjects
+                ).concat( // core files of projects types
+                    self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
+                )
                 return gitignoreFiles;
             },
             get npmignore() {
@@ -77,12 +78,12 @@ export class FilesRecreator {
 
     npmignore() {
         fs.writeFileSync(path.join(this.project.location, '.npmignore'),
-            this.filesIgnoredBy.npmignore.join('\n'), 'utf8');
+            this.filesIgnoredBy.npmignore.join('\n').concat('\n'), 'utf8');
     }
 
     gitignore() {
         fs.writeFileSync(path.join(this.project.location, '.gitignore'),
-            this.filesIgnoredBy.gitignore.join('\n'), 'utf8');
+            this.filesIgnoredBy.gitignore.join('\n').concat('\n'), 'utf8');
     }
 
     projectSpecyficFiles() {

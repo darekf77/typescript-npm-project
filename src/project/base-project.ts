@@ -74,10 +74,16 @@ export abstract class Project extends BaseProjectRouter {
         return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
     }
 
+    get isCoreProject() {
+        return this.packageJson.isCoreProject;
+    }
+
     constructor(public location: string) {
         super();
 
         if (fs.existsSync(location)) {
+
+            // console.log('PROJECT FROM', location)
 
             this.packageJson = PackageJSON.from(location);
             this.node_modules = new NodeModules(this);
@@ -155,7 +161,7 @@ export abstract class Project extends BaseProjectRouter {
 
     public clear() {
         const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore.join(' ');
-        console.log(`tnp rimraf ${gitginoredfiles}`)
+        // console.log(this.recreate.filesIgnoredBy.gitignore.join('\n'))
         this.run(`tnp rimraf ${gitginoredfiles}`).sync();
     }
 
@@ -179,8 +185,8 @@ export abstract class Project extends BaseProjectRouter {
         const notAllowed: RegExp[] = [
             '\.vscode', 'node\_modules',
             ..._.values(config.folder),
-            'e2e', 'tmp.*', 'dist.*', 'tests',
-            'components', '\.git', 'bin'
+            'e2e', 'tmp.*', 'dist.*', 'tests', 'module', 'browser', 'bundle*',
+            'components', '\.git', 'bin', 'custom'
         ].map(s => new RegExp(s))
 
         const isDirectory = source => fse.lstatSync(source).isDirectory()

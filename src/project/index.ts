@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { Project } from './base-project';
 import { PackageJSON } from './package-json';
 import { ProjectIsomorphicLib } from './project-isomorphic-lib';
@@ -10,6 +11,8 @@ import { ProjectServerLib } from './project-server-lib';
 import { ProjectAngularCliClient } from './project-angular-client-cli';
 import { ProjectIonicClient } from './project-ionic-client';
 import { LibType } from '../models';
+import config from '../config';
+import { run } from '../process';
 
 export * from './base-project';
 export * from './base-project-lib';
@@ -49,5 +52,19 @@ export function ProjectFrom(location: string, parent?: Project): Project {
     if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
     // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
+    if (resultProject) {
+        resultProject.recreate.gitignore()
+        recreateCustomFolder(resultProject)
+    }
     return resultProject;
+}
+
+
+function recreateCustomFolder(resultProject: Project) {
+    if (resultProject.baseline) {
+        const customFolder = path.join(resultProject.location, config.folder.custom)
+        if (!fs.existsSync(customFolder)) {
+            run(`tnp mkdirp ${customFolder}`).sync()
+        }
+    }
 }
