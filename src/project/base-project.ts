@@ -208,7 +208,7 @@ export abstract class Project extends BaseProjectRouter {
     }
 
     cloneTo(destinationPath: string): Project {
-        const options: fse.CopyOptions = {
+        const options: fse.CopyOptionsSync = {
             overwrite: true,
             recursive: true,
             errorOnExist: true,

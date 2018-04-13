@@ -27,10 +27,10 @@ export abstract class BaseProjectLib extends Project {
         ]
         return files;
     }
-    
+
 
     abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
-   
+
 
     public async publish() {
         this.checkIfReadyForNpm()
@@ -75,7 +75,7 @@ export abstract class BaseProjectLib extends Project {
                 // console.log('IS DIRECTORY', file)
                 // console.log('IS DIRECTORY DEST', dest)
                 // this.run(`tnp cpr ${file}/ ${dest}/`).sync()
-                const options: fse.CopyOptions = {
+                const options: fse.CopyOptionsSync = {
                     overwrite: true,
                     recursive: true,
                     errorOnExist: true,
