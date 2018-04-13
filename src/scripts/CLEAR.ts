@@ -9,7 +9,6 @@ export function clear(all = false) {
     process.exit(0)
 }
 
-
 export default {
     $CLEAN: (args) => clear(),
     $CLEAR: (args) => clear(),

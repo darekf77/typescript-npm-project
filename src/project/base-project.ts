@@ -71,7 +71,19 @@ export abstract class Project extends BaseProjectRouter {
     }
 
     get isSite() {
-        return this.baseline && fs.existsSync(path.join(this.location, 'custom'));
+        const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
+        const res = (this.baseline && customExist);
+        // if (res === undefined) {
+        //     console.log('customExist', customExist)
+        //     if (!_.isObject(this.baseline)) {
+        //         console.log(`baseline not object but ${typeof this.baseline} for ${this.location} `, )
+        //     }
+        //     console.log(Project.projects.map(p => {
+        //         return `${path.basename(path.dirname(p.location))} "${p.name}" baseline = ${typeof p.baseline} `
+        //     }))
+        //     process.exit(0)
+        // }
+        return res;
     }
 
     get isCoreProject() {
@@ -97,12 +109,19 @@ export abstract class Project extends BaseProjectRouter {
             this.requiredLibs = this.packageJson.requiredProjects;
             this.preview = ProjectFrom(path.join(location, 'preview'));
 
-            if (this.baseline && this.type !== 'workspace') {
-                error(`Baseline is only for ${chalk.bold('workspace')} type projects.`);
-            } else if (this.parent && this.parent.type === 'workspace' && this.parent.baseline) {
-                this.baseline = ProjectFrom(path.join(this.parent.baseline.location, this.name))
-            } else {
-                this.baseline = this.packageJson.basedOn;
+            if (!this.isCoreProject) {
+                if (this.baseline && this.type !== 'workspace') {
+                    error(`Baseline is only for ${chalk.bold('workspace')} type projects.`);
+                } else if (this.parent && this.parent.type === 'workspace' && this.parent.baseline) {
+                    this.baseline = ProjectFrom(path.join(this.parent.baseline.location, this.name))
+                } else {
+                    this.baseline = this.packageJson.basedOn;
+                }
+                // if (!!this.baseline) {
+                //     console.log(`Baseline resolved from ${location}`)
+                // } else {
+                //     console.log(`Baseline NOT resolved from ${location}`)
+                // }
             }
 
 

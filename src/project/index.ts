@@ -52,19 +52,8 @@ export function ProjectFrom(location: string, parent?: Project): Project {
     if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
     // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
-    if (resultProject) {
-        resultProject.recreate.gitignore()
-        recreateCustomFolder(resultProject)
-    }
+    
     return resultProject;
 }
 
 
-function recreateCustomFolder(resultProject: Project) {
-    if (resultProject.baseline) {
-        const customFolder = path.join(resultProject.location, config.folder.custom)
-        if (!fs.existsSync(customFolder)) {
-            run(`tnp mkdirp ${customFolder}`).sync()
-        }
-    }
-}

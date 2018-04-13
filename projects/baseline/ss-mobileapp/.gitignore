@@ -12,7 +12,4 @@ npm-debug.log*
 .sourcemaps
 tslint.json
 .editorconfig
-index.js
-index.d.ts
-index.js.map
 tsconfig.json

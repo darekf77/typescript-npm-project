@@ -54,6 +54,7 @@ export class FilesRecreator {
                     self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
                 )
                 // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
+                // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
                 return gitignoreFiles;
             },
             get npmignore() {
@@ -72,6 +73,15 @@ export class FilesRecreator {
                 ].concat(self.commonFilesForAllProjects)
 
                 return npmignoreFiles;
+            }
+        }
+    }
+
+    customFolder() {
+        if (this.project.baseline) {
+            const customFolder = path.join(this.project.location, config.folder.custom)
+            if (!fs.existsSync(customFolder)) {
+                this.project.run(`tnp mkdirp ${config.folder.custom}`).sync()
             }
         }
     }

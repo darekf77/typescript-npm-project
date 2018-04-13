@@ -22,9 +22,6 @@ export class ProjectIonicClient extends Project {
 
     projectSpecyficFiles(): string[] {
         return [
-            'index.js',
-            'index.d.ts',
-            'index.js.map',
             'tsconfig.json'
         ];
     }
