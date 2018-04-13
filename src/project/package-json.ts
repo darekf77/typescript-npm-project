@@ -137,7 +137,15 @@ export class PackageJSON {
     }
 
     get isCoreProject() {
-        return (this.data.tnp && _.isObject(this.data.tnp.isCoreProject));
+        if (this.data.tnp) {
+            if (_.isBoolean(this.data.tnp.isCoreProject)) {
+                return this.data.tnp.isCoreProject;
+            }
+            error(`Bad value in package.json, tnp.isCoreProject should be boolean.`, true);
+            error(`Location of package.json: ${this.location}`)
+
+        }
+        return false;
     }
 
     //#endregion

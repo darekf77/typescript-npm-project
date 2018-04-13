@@ -53,6 +53,7 @@ export class FilesRecreator {
                 ).concat( // core files of projects types
                     self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
                 )
+                // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
                 return gitignoreFiles;
             },
             get npmignore() {
