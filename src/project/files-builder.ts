@@ -18,48 +18,71 @@ export class FilesRecreator {
         this.join = new BaselineSiteJoin(project);
     }
 
+    private get commonFilesForAllProjects() {
+        return [
+            // '.npmrc',
+            'tslint.json',
+            '.editorconfig'
+        ]
+    }
+
+    get filesIgnoredBy() {
+        const self = this;
+        return {
+
+            get gitignore() {
+                const gitignoreFiles = [ // for sure ingored
+                    'node_modules',
+                    'tmp*',
+                    'dist*',
+                    'bundle*',
+                    'browser',
+                    'module',
+                    'www',
+                    'bundle.umd.js'
+                ].concat([ // common small files
+                    'Thumbs.db',
+                    '.DS_Store',
+                    'npm-debug.log'
+                ].concat([ // not sure if ignored/needed
+                    '.sass-cache',
+                    '.sourcemaps'
+                ]).concat( // for site ignore auto-generate scr 
+                    self.project.isSite ? self.project.customizableFilesAndFolders : []
+                )).concat(self.commonFilesForAllProjects)
+                    .concat(self.project.projectSpecyficFiles())
+
+                return gitignoreFiles;
+            },
+            get npmignore() {
+                const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
+                const canBeUseAsNpmPackage = allowedProject.includes(self.project.type);
+                const npmignoreFiles = [
+                    ".vscode",
+                    "dist/",
+                    'src/',
+                    "/scripts",
+                    "/docs",
+                    "/preview",
+                    '/tests',
+                    "tsconfig.json",
+                    "npm-debug.log*"
+                ].concat(self.commonFilesForAllProjects)
+
+                return npmignoreFiles;
+            }
+        }
+    }
+
 
     npmignore() {
-        const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
-        const canBeUseAsNpmPackage = allowedProject.includes(this.project.type);
-        const npmignoreFiles = [
-            ".vscode",
-            "dist/",
-            'src/',
-            "/scripts",
-            "/docs",
-            "/preview",
-            '/tests',
-            "tsconfig.json",
-            "npm-debug.log*"
-        ];
         fs.writeFileSync(path.join(this.project.location, '.npmignore'),
-            npmignoreFiles.join('\n'), 'utf8');
+            this.filesIgnoredBy.npmignore.join('\n'), 'utf8');
     }
 
     gitignore() {
-
-        const gitignoreFiles = [ // for sure ingored
-            '/node_modules',
-            '/tmp*',
-            '/dist*',
-            '/bundle*',
-            '/browser',
-            '/module',
-            '/www',
-            'bundle.umd.js'
-        ].concat([ // common small files
-            'Thumbs.db',
-            '.DS_Store',
-            'npm-debug.log'
-        ].concat([ // not sure if ignored/needed
-            '/.sass-cache',
-            '/.sourcemaps'
-        ]).concat( // for site ignore auto-generate scr 
-            this.project.isSite ? ['/src'] : []
-        ))
         fs.writeFileSync(path.join(this.project.location, '.gitignore'),
-            gitignoreFiles.join('\n'), 'utf8');
+            this.filesIgnoredBy.gitignore.join('\n'), 'utf8');
     }
 
     projectSpecyficFiles() {
@@ -80,11 +103,7 @@ export class FilesRecreator {
 
     commonFiles() {
         const wokrspace = Project.by('workspace');
-        let files = [
-            // '.npmrc',
-            'tslint.json',
-            '.editorconfig'
-        ];
+        const files = this.commonFilesForAllProjects;
         files.map(file => {
             return {
                 from: path.join(wokrspace.location, file),

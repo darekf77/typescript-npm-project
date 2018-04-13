@@ -153,6 +153,11 @@ export abstract class Project extends BaseProjectRouter {
         this.buildSteps(buildOptions);
     }
 
+    public clear() {
+        const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore.join(' ');
+        console.log(`tnp rimraf ${gitginoredfiles}`)
+        this.run(`tnp rimraf ${gitginoredfiles}`).sync();
+    }
 
     public static by(libraryType: LibType): Project {
         // console.log('by libraryType ' + libraryType)

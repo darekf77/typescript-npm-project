@@ -83,7 +83,7 @@ export class BaselineSiteJoin {
                  * @param baselineFilePath File located in baselinem, relative path eg. src/file.ts
                  */
             baselineFile(baselineFilePath: string) {
-                
+
                 const baselineFilePathNoExit = self.removeExtension(baselineFilePath);
                 const baselineFileInCustomPath = path.join(self.project.location, config.folder.custom, baselineFilePath)
                 const baselineFileIsInCustom = fs.existsSync(baselineFileInCustomPath);
@@ -167,9 +167,7 @@ export class BaselineSiteJoin {
         return path.join(file, prefix, base);
     }
 
-    initAndWatch() {
-        this.init()
-        // watch and rejoin baseline/site changed files
+    watch() {
         this.monitor((absolutePath, event, isCustomFolder) => {
             console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
             if (isCustomFolder) {
@@ -189,6 +187,7 @@ export class BaselineSiteJoin {
         });
         // rejoin baseline/site files
         this.join.allBaselineSiteFiles()
+        return this;
     }
 
     private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
