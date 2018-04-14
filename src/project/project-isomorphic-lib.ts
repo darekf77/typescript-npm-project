@@ -29,37 +29,16 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
 
 
-
-    private get additionalParentIsomorphcLibs(): string[] {
-        const result: string[] = []
-        if (this.parent && Array.isArray(this.parent.requiredLibs)) {
-            const includedBaselines = this.parent.requiredLibs
-                .filter(d => d.type === 'workspace')
-
-            includedBaselines.forEach(b => {
-                // console.log(b.name)
-                const baselineIsomorphicLibCHildrens = b.children.filter(f => f.type === 'isomorphic-lib');
-                baselineIsomorphicLibCHildrens.forEach(p => {
-                    // TODO support for more nested isomorphic libs
-                    // console.log('---- ', p.name);
-                    result.push(`${b.name}-${p.name}`);
-                })
-            })
-        } else {
-            console.log('Project with no parent: ' + this.name)
-        }
-        // console.log('this.dependencies', this.parent.dependencies)
-
-        // console.log(result)
-        // process.exit(0)
-        return result;
-    }
-
     private get additionalRequiredIsomorphcLibs() {
         const result: string[] = []
-        this.requiredLibs.forEach(d => {
-            result.push(d.name);
-        })
+
+        if(Array.isArray(this.requiredLibs)) { // TODO QUCIK_FIX not fixing this 
+            this.requiredLibs.forEach(d => {
+                result.push(d.name);
+            })
+        }
+
+        
         // console.log(result)
         // process.exit(0)
         return result;
@@ -68,9 +47,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     private getIsomorphcLibNames(parentWorksapce = false) {
         let result = [];
         result = result.concat(this.additionalRequiredIsomorphcLibs);
-        if (parentWorksapce) {
-            result = result.concat(this.additionalParentIsomorphcLibs)
-        }
+
         // console.log('result', result)
         // process.exit(0)
         return result;
@@ -87,6 +64,8 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
         if (watch) {
+
+            this.run(`tnp tsc -w --outDir ${outDir}`).async()
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,
                 ProjectIsomorphicLib.prototype.BUILD_ISOMORPHIC_LIB_WEBPACK)
@@ -100,16 +79,13 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
         this.compilationWrapper(() => {
             const env = getWebpackEnv(params);
+            console.log('WEBPACK PRAMS', env)
             buildIsomorphicVersion({
                 foldersPathes: {
                     dist: env.outDir
                 },
                 toolsPathes: {
-                    tsc: 'tnp tsc',
-                    cpr: 'tnp cpr',
-                    rimraf: 'tnp rimraf',
-                    mkdirp: 'tnp mkdirp',
-                    ln: 'tnp ln'
+                    tsc: 'tnp tsc'
                 },
                 build: {
                     otherIsomorphicLibs: env.additionalIsomorphicLibs
