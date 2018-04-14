@@ -129,9 +129,11 @@ export class BaselineSiteJoin {
         }
     }
 
-    private merge(relativeBaselineCustomPath: string) {
-        // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
-
+    private merge(relativeBaselineCustomPath: string, verbose = true) {
+        if (verbose) {
+            console.log(chalk.blue(`Baseline/Site modyfication detected...`))
+            console.log(`File: ${relativeBaselineCustomPath}`)
+        }
         // compilationWrapper(() => {
         const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
         const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
@@ -166,8 +168,9 @@ export class BaselineSiteJoin {
                 this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             }
         }
-        // }, ` File: ${relativeBaselineCustomPath}`)
-
+        if (verbose) {
+            console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
+        }
     }
 
 
@@ -177,8 +180,10 @@ export class BaselineSiteJoin {
             allBaselineSiteFiles() {
                 self.__checkBaselineSiteStructure()
 
-                uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
-                    .forEach(relativeFile => self.merge(relativeFile))
+                compilationWrapper(() => {
+                    uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
+                        .forEach(relativeFile => self.merge(relativeFile, false))
+                }, 'Baseline/Site join of all files')
             },
             get watch() {
                 return {
@@ -201,7 +206,7 @@ export class BaselineSiteJoin {
 
     watch() {
         this.monitor((absolutePath, event, isCustomFolder) => {
-            console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
+            // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
 
             if (isCustomFolder) {
                 this.join.watch.siteFileChange(absolutePath.replace(this.pathToCustom, ''));

@@ -43,7 +43,8 @@ const localLibs = [
     'ts-node',
     'sort-package-json',
     'concurrently',
-    'sloc'
+    'sloc',
+    'morphi'
 ]
 
 const helpAlias = [

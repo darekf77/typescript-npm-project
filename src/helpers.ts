@@ -81,6 +81,11 @@ export function uniqArray<T=string>(array: any[]) {
     });
 }
 
+export function isAsyncFunction(fn) {
+    return _.isFunction(fn) && fn.constructor.name === 'AsyncFunction';
+}
+
+
 
 export function compilationWrapper(fn: () => void, taskName: string = 'Task', executionType: 'Compilation' | 'Code execution' = 'Compilation') {
     function date() {
@@ -89,14 +94,31 @@ export function compilationWrapper(fn: () => void, taskName: string = 'Task', ex
     if (!fn || !_.isFunction(fn)) {
         error(`${executionType} wrapper: "${fs}" is not a function.`)
     }
-    try {
-        console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
-        fn()
-        console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
-    } catch (error) {
-        console.log(chalk.red(error));
-        console.log(`${date()} ${executionType} of ${taskName} ERROR`)
+    
+    if (isAsyncFunction(fn)) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
+                await fn()
+                console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
+                resolve()
+            } catch (error) {
+                console.log(chalk.red(error));
+                console.log(`${date()} ${executionType} of ${taskName} ERROR`)
+                reject(error)
+            }
+        })
+    } else {
+        try {
+            console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
+            fn()
+            console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
+        } catch (error) {
+            console.log(chalk.red(error));
+            console.log(`${date()} ${executionType} of ${taskName} ERROR`)
+        }
     }
+
 }
 
 export function clearFiles(files: string[] | string, preserveSymlinks = false) {

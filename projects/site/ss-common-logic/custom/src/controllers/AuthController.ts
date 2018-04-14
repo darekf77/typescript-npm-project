@@ -7,8 +7,6 @@ import {
     IFacebook, IHelloJS
 } from "baseline/ss-common-logic/src/controllers/AuthController";
 
-
-
 export {
     AuthController,
     //#region @backend

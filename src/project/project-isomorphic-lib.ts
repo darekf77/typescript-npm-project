@@ -85,13 +85,14 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
                     dist: env.outDir
                 },
                 toolsPathes: {
-                    tsc: 'tnp tsc'
+                    tsc: 'tnp tsc',
+                    morphi: 'tnp morphi'
                 },
                 build: {
                     otherIsomorphicLibs: env.additionalIsomorphicLibs
                 }
             });
-        }, ` isomorphic-lib (project ${this.name})`, 'Browser version compilation')
+        }, ` isomorphic-lib (project ${this.name})`, `Browser version compilation pid ${process.pid}, ppid ${process.ppid} `)
     }
 
 }
