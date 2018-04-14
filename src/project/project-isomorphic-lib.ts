@@ -32,13 +32,13 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     private get additionalRequiredIsomorphcLibs() {
         const result: string[] = []
 
-        if(Array.isArray(this.requiredLibs)) { // TODO QUCIK_FIX not fixing this 
+        if (Array.isArray(this.requiredLibs)) { // TODO QUCIK_FIX not fixing this 
             this.requiredLibs.forEach(d => {
                 result.push(d.name);
             })
         }
 
-        
+
         // console.log(result)
         // process.exit(0)
         return result;
@@ -79,7 +79,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
         this.compilationWrapper(() => {
             const env = getWebpackEnv(params);
-            console.log('WEBPACK PRAMS', env)
+            // console.log('WEBPACK PRAMS', env)
             buildIsomorphicVersion({
                 foldersPathes: {
                     dist: env.outDir
@@ -91,7 +91,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
                     otherIsomorphicLibs: env.additionalIsomorphicLibs
                 }
             });
-        }, `isomorphic-lib (project ${this.name})`)
+        }, ` isomorphic-lib (project ${this.name})`, 'Browser version compilation')
     }
 
 }

@@ -95,8 +95,8 @@ export abstract class BaseProjectLib extends Project {
 
 
 
-    protected compilationWrapper(fn: () => void, taskName: string = 'Task') {
-        return compilationWrapper(fn, taskName);
+    protected compilationWrapper(fn: () => void, taskName: string = 'Task', executionType?: string) {
+        return compilationWrapper(fn, taskName, executionType as any);
     }
 
 

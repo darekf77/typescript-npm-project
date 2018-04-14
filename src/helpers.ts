@@ -90,12 +90,12 @@ export function compilationWrapper(fn: () => void, taskName: string = 'Task', ex
         error(`${executionType} wrapper: "${fs}" is not a function.`)
     }
     try {
-        console.log(chalk.gray(`${date()} Compilation of "${chalk.bold(taskName)}" started...`))
+        console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
         fn()
-        console.log(chalk.green(`${date()} Compilation of "${chalk.bold(taskName)}" finish OK...`))
+        console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
     } catch (error) {
         console.log(chalk.red(error));
-        console.log(`${date()} Compilation of ${taskName} ERROR`)
+        console.log(`${date()} ${executionType} of ${taskName} ERROR`)
     }
 }
 
