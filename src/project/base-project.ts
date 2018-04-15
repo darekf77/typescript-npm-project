@@ -155,13 +155,13 @@ export abstract class Project extends BaseProjectRouter {
     protected get watcher() {
         const self = this;
         return {
-            run(command: string, folderPath: string = 'src') {
+            run(command: string, folderPath: string = 'src', wait?: number) {
                 const cwd: string = self.location;
-                return __watcher.run(command, folderPath, cwd);
+                return __watcher.run(command, folderPath, { cwd, wait });
             },
             call(fn: Function | string, params: string, folderPath: string = 'src') {
                 const cwd: string = self.location;
-                return __watcher.call(fn, params, folderPath, cwd);
+                return __watcher.call(fn, params, folderPath, { cwd });
             }
         }
     }

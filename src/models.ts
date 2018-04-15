@@ -60,3 +60,9 @@ export interface RunOptions {
      */
     biggerBuffer?: boolean;
 }
+
+
+export interface WatchOptions {
+    cwd: string;
+    wait?: number;
+}

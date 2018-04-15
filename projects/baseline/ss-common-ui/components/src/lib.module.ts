@@ -5,22 +5,28 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 // local modules
 import {
   BarService,
-  FooComponent
+  FooComponent,
+  SliderVerticalSectionComponent
 } from './ui-elements';
+
 // exports
 export * from './layouts';
 export * from './ui-elements';
 
+const CMP = [
+  FooComponent,
+  SliderVerticalSectionComponent
+];
 
 @NgModule({
   imports: [
     CommonModule
   ],
   declarations: [
-    FooComponent
+    ...CMP
   ],
   exports: [
-    FooComponent
+    ...CMP
   ]
 })
 export class CommonUIModule {

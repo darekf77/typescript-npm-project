@@ -8,7 +8,7 @@ import * as os from "os";
 
 
 import { error, info } from "./messages";
-import { RunOptions } from "./models";
+import { RunOptions, WatchOptions } from "./models";
 import config from './config';
 import { paramsFrom } from './index';
 const prompts = require('prompts');
@@ -81,13 +81,16 @@ function prepareWatchCommand(cmd) {
 }
 
 export const watcher = {
-    run(command: string, folderPath: string = 'src', cwd: string = process.cwd()) {
+    run(command: string, folderPath: string = 'src', options: WatchOptions) {
+        const { cwd = process.cwd(), wait } = options;
         let cmd = `tnp command ${command}`;
-        const toRun = `watch ${prepareWatchCommand(cmd)} ${folderPath}`;
+        const toRun = `watch ${prepareWatchCommand(cmd)} ${folderPath} ${wait ? ('--wait=' + wait) : ''}`;
+        console.log('WATCH COMMAND ', toRun)
         return run(toRun, { cwd }).async()
     },
 
-    call(fn: Function | string, params: string, folderPath: string = 'src', cwd: string = process.cwd()) {
+    call(fn: Function | string, params: string, folderPath: string = 'src', options: WatchOptions) {
+        const { cwd = process.cwd(), wait } = options;
         if (!fn) {
             error(`Bad function: ${fn} for watcher on folder: ${folderPath}, with params: ${params}`)
         }

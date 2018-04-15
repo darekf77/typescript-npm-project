@@ -48,7 +48,7 @@ export class ProjectAngularLib extends BaseProjectLib {
         } else {
             if (watch) {
                 const p = (prod ? ':prod' : '');
-                this.watcher.run(`tnp build:${outDir}${p}`, 'components/src');
+                this.watcher.run(`tnp build:${outDir}${p}`, 'components/src', 5);
             } else {
                 this.buildLib(outDir)
             }

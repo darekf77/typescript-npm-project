@@ -1,0 +1,13 @@
+:host {
+    
+    layout-slider-vertical {
+        span[header="normal"] {
+            background: whitesmoke;
+            > a {
+                font-size: 20px;
+                padding: 10;
+            }
+        }
+    }
+    
+}

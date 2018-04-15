@@ -22,6 +22,7 @@
     <layout-slider-vertical-child *ngFor="let child of childs"
                                   [header]="child.header">
       super! {{child.header}}
+      
       <h3 *ngFor="let num of numbers">{{num}}</h3>
     </layout-slider-vertical-child>
   </div>

@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { AppMainPageComponent } from './main-page.component';
 import { FormsModule } from '@angular/forms';
 // third paret
-import { SliderVerticalModule } from "ss-common-ui/module";
+import {
+  SliderVerticalModule,
+  CommonUIModule
+} from "ss-common-ui/module";
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
 
@@ -17,7 +20,8 @@ export const routes: Routes = [
 ];
 
 const modules = [
-  SliderVerticalModule
+  SliderVerticalModule,
+  // CommonUIModule
 ]
 
 @NgModule({
