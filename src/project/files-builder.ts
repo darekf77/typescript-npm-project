@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as JSON5 from 'json5';
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile } from "../models";
@@ -7,7 +8,9 @@ import { copyFile } from '../helpers';
 import config from '../config';
 import { BaselineSiteJoin } from './baseline-site-join';
 
-
+interface VSCodeSettings {
+    'files.exclude': { [files: string]: boolean; }
+}
 
 
 export class FilesRecreator {
@@ -29,7 +32,14 @@ export class FilesRecreator {
     get filesIgnoredBy() {
         const self = this;
         return {
-
+            get vscodeSidebarFilesView() {
+                return self.filesIgnoredBy.gitignore.concat([
+                    '.gitignore',
+                    '.npmignore',
+                    '.npmrc',
+                    '.babelrc'
+                ])
+            },
             get gitignore() {
                 const gitignoreFiles = [ // for sure ingored
                     config.folder.node_modules,
@@ -84,6 +94,34 @@ export class FilesRecreator {
                 return npmignoreFiles;
             }
         }
+    }
+
+    get vscode() {
+        const self = this;
+        return {
+            get settings() {
+                return {
+                    excludedFiles() {
+                        const pathSettingsVScode = path.join(self.project.location, '.vscode', 'settings.json')
+                        if (fs.existsSync(pathSettingsVScode)) {
+                            try {
+                                const settings: VSCodeSettings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
+                                settings["files.exclude"] = {};
+                                self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
+                                    settings["files.exclude"][f] = true
+                                })
+                                fs.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+                            } catch (e) {
+                                console.log(e)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
     }
 
     customFolder() {

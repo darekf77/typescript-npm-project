@@ -7,10 +7,8 @@ import {
   BarService,
   FooComponent
 } from './ui-elements';
-import { AppModule } from './preview';
 // exports
 export * from './layouts';
-export * from './preview';
 export * from './ui-elements';
 
 

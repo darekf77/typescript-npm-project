@@ -9,10 +9,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 // local
 import { AppComponent } from './preview-app.component';
-import { StandalonePopupModule } from '../ui-elements/standalone-popup';
 import { previewRoutes } from './preview-app.routes';
 import { PreviewSliderVerticalComponent } from './preview-slider-vertical/preview-slider-vertical.component';
-import { SliderVerticalModule } from '../layouts';
+import {
+  StandalonePopupModule, SliderVerticalModule
+} from 'components';
 
 const modules = [
   MatTabsModule,

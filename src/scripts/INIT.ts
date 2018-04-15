@@ -19,6 +19,10 @@ export default {
         }
         process.exit(0)
     },
+    $INIT_VSCODE: () => {
+        Project.Current.recreate.vscode.settings.excludedFiles();
+        process.exit(0)
+    },
     $INIT_EVERYWHERE: (args) => {
         Project.projects.forEach(p => {
             p.run(`tnp init`).sync()
