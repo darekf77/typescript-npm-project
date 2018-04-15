@@ -47,7 +47,12 @@ export class FilesRecreator {
                     '.sass-cache',
                     '.sourcemaps'
                 ]).concat( // for site ignore auto-generate scr 
-                    self.project.isSite ? self.project.customizableFilesAndFolders : []
+                    self.project.isSite ? (
+                        self.project.customizableFilesAndFolders
+                            .concat(self.project.customizableFilesAndFolders.map(f => {
+                                return BaselineSiteJoin.PREFIX(f);
+                            }))
+                    ) : []
                 )).concat( // common files for all project
                     self.project.isCoreProject ? [] : self.commonFilesForAllProjects
                 ).concat( // core files of projects types
@@ -55,6 +60,7 @@ export class FilesRecreator {
                 )
                 // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
                 // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
+                // console.log('ignoref iles', gitignoreFiles)
                 return gitignoreFiles;
             },
             get npmignore() {
@@ -93,6 +99,7 @@ export class FilesRecreator {
     }
 
     gitignore() {
+        console.log('REWRIGING gitignore')
         fs.writeFileSync(path.join(this.project.location, '.gitignore'),
             this.filesIgnoredBy.gitignore.join('\n').concat('\n'), 'utf8');
     }

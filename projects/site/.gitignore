@@ -15,5 +15,10 @@ environment.js
 environment.dev.js
 environment.prod.js
 environment.stage.js
+__environment.d.ts
+__environment.js
+__environment.dev.js
+__environment.prod.js
+__environment.stage.js
 tslint.json
 .editorconfig

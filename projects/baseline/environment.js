@@ -1,8 +1,6 @@
 
 const path = require('path');
-const { environmentName } = require('tnp')
-
-const LOCAL_ENVIRONMENT_NAME = 'local'
+const { environmentName, LOCAL_ENVIRONMENT_NAME } = require('tnp')
 
 const config = {
 

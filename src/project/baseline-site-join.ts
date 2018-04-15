@@ -41,7 +41,7 @@ export class BaselineSiteJoin {
         return customFiles;
     }
 
-    readonly PREFIX_BASELINE_SITE = '__'
+
 
     get files() {
         this.__checkBaselineSiteStructure()
@@ -198,10 +198,8 @@ export class BaselineSiteJoin {
         }
     }
 
-    private prefix(file: string, prefix: string) {
-        const base = path.basename(file);
-        file = file.replace(base, '');
-        return path.join(file, prefix, base);
+    public static PREFIX(baseFileName) {
+        return `__${baseFileName}`
     }
 
     watch() {
@@ -291,7 +289,7 @@ export class BaselineSiteJoin {
         const basename = path.basename(relativeFilePath, ext)
             .replace(/\/$/g, ''); // replace last part of url /
 
-        return `${this.PREFIX_BASELINE_SITE}${basename}${ext}`;
+        return BaselineSiteJoin.PREFIX(`${basename}${ext}`);
     }
 
     private getPrefixedPathInJoin(relativeFilePath: string) {
