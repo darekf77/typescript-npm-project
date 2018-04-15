@@ -88,3 +88,6 @@ export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
   }
 
 }
+
+
+export default EMAIL;

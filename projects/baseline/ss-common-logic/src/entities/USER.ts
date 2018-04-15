@@ -90,3 +90,6 @@ export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
   }
 
 }
+
+
+export default USER;

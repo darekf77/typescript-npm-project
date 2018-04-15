@@ -550,3 +550,6 @@ export class AuthController extends META.BASE_CONTROLLER {
   }
 
 }
+
+
+export default AuthController;

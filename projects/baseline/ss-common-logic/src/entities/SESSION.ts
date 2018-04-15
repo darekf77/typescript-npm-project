@@ -191,3 +191,6 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
   }
 
 }
+
+
+export default SESSION;

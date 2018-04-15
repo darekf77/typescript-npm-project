@@ -80,3 +80,4 @@ export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
 
 
 
+export default EMAIL_TYPE;

@@ -1,5 +1,5 @@
 //#region @backend
-import { Controllers, Entities } from "./index";
+import { Controllers, Entities } from "./backend";
 import { start } from './helpers';
 import * as path from 'path';
 import * as fs from 'fs';
