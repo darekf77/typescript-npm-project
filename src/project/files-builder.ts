@@ -52,6 +52,9 @@ export class FilesRecreator {
                             .concat(self.project.customizableFilesAndFolders.map(f => {
                                 return BaselineSiteJoin.PREFIX(f);
                             }))
+                            .concat(self.project.customizableFilesAndFolders.map(f => {
+                                return `!${path.join(config.folder.custom, f)}`
+                            }))
                     ) : []
                 )).concat( // common files for all project
                     self.project.isCoreProject ? [] : self.commonFilesForAllProjects

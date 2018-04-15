@@ -14,11 +14,17 @@ export function init() {
 export default {
     $INIT: (args) => {
         init()
+        if (Project.Current.isSite) {
+            Project.Current.run(`tnp baseline:site:start`).sync()
+        }
         process.exit(0)
     },
     $INIT_EVERYWHERE: (args) => {
         Project.projects.forEach(p => {
-            run(`tnp init`, { cwd: p.location }).sync()
+            p.run(`tnp init`).sync()
+            if (p.isSite) {
+                p.run(`tnp baseline:site:start`).sync()
+            }
         })
     }
 }
