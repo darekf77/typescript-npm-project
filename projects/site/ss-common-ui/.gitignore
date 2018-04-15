@@ -12,6 +12,10 @@ npm-debug.log*
 .sourcemaps
 src
 components
+__src
+__components
+!custom/src
+!custom/components
 tslint.json
 .editorconfig
 index.js

@@ -23,7 +23,7 @@
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#c468b6",
-    "activityBar.foreground": "#ffffff"
+    "activityBar.foreground": "#000000"
   },
   "editor.rulers": [100, 120],
   "html.format.wrapAttributes": "force-aligned",

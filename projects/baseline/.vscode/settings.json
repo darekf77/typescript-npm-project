@@ -4,7 +4,7 @@
   "tslint.enable": false,
   "workbench.colorCustomizations": {
     "activityBar.background": "#c98e72",
-    "activityBar.foreground": "#ffffff"
+    "activityBar.foreground": "#000000"
   },
   "workbench.colorTheme": "Default Light+"
 }

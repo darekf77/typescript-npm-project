@@ -22,9 +22,8 @@
     // "webpack.*": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#ffffff",
-    "activityBar.foreground": "#7acf6f",
-    "activityBar.border": "#7acf6f"
+    "activityBar.background": "#91d388",
+    "activityBar.foreground": "#ffffff"
   },
   "editor.rulers": [
     100,
