@@ -1,3 +1,4 @@
+//#region @backend
 
 import { Repository, Connection } from 'typeorm';
 
@@ -10,9 +11,6 @@ import { META } from "../helpers";
 
 export class MockData extends META.BASE_MOCK_DATA {
 
-  get ENTITIES() {
-    return {}
-  }
 
   constructor(connection: Connection) {
     super(connection)
@@ -20,3 +18,4 @@ export class MockData extends META.BASE_MOCK_DATA {
 
 
 }
+//#endregion

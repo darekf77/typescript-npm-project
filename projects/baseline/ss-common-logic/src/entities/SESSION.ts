@@ -37,12 +37,36 @@ export const SESSION_CONFIG = {
   AUTHORIZATION_HEADER: 'Authorization'
 }
 
+export class LocalStorage {
+  CONFIG = SESSION_CONFIG;
+
+  saveInLocalStorage(session: SESSION) {
+    window.localStorage.setItem(this.CONFIG.SESSION_LOCAL_STORAGE, JSON.stringify(session));
+  }
+
+  fromLocalStorage(): SESSION {
+    let session: SESSION = new SESSION();
+    try {
+      const data = window.localStorage.getItem(this.CONFIG.SESSION_LOCAL_STORAGE);
+      const s = JSON.parse(data) as SESSION;
+      session.token = s.token;
+      session.token_type = s.token_type;
+      session.expiredDate = new Date(s.expiredDate as any);
+    } catch {
+      session = undefined;
+    }
+    return session;
+  }
+
+  removeFromLocalStorage() {
+    window.localStorage.removeItem(this.CONFIG.SESSION_LOCAL_STORAGE);
+  }
+}
+
 
 @Entity(META.tableNameFrom(SESSION))
 export class SESSION extends META.BASE_ENTITY {
-
-  AUTHORIZATION_HEADER = SESSION_CONFIG.AUTHORIZATION_HEADER;
-  SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
+  CONFIG = SESSION_CONFIG;
 
   expireInSeconds: number;
   calculateExpirationTime(): number {
@@ -85,7 +109,7 @@ export class SESSION extends META.BASE_ENTITY {
     this.createdDate = new Date();
     const timestamp = this.createdDate.getTime();
     this.token = token ? token : generate(this.user.id + timestamp + this.ip)
-    this.expiredDate = new Date(timestamp + this.SESSION_TIME_SECONDS * 1000)
+    this.expiredDate = new Date(timestamp + this.CONFIG.SESSION_TIME_SECONDS * 1000)
   }
   //#endregion
 
@@ -99,9 +123,11 @@ export class SESSION extends META.BASE_ENTITY {
 
   public activateBrowserToken() {
     const session: SESSION = this;
-    Resource.Headers.request.set(this.AUTHORIZATION_HEADER,
+    Resource.Headers.request.set(this.CONFIG.AUTHORIZATION_HEADER,
       `${session.token_type} ${session.token}`)
   }
+
+  public static localStorage = new LocalStorage()
 
 }
 
@@ -111,8 +137,7 @@ export class SESSION extends META.BASE_ENTITY {
 export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
 
 
-  SESSION_TIME_SECONDS = SESSION_CONFIG.SESSION_TIME_SECONDS;
-  SESSION_LOCAL_STORAGE = SESSION_CONFIG.SESSION_LOCAL_STORAGE;
+  CONFIG = SESSION_CONFIG;
 
   async getByUser(user: USER, ip: string) {
     //#region @backendFunc
@@ -149,7 +174,7 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
   async getFrom(user: USER, ip: string) {
     //#region @backendFunc
 
-    let Session =  this.create();
+    let Session = this.create();
     Session.user = user;
     Session.ip = ip;
 
@@ -163,32 +188,6 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
     //#endregion
   }
 
-  public get localStorage() {
-
-    return {
-      saveInLocalStorage(session: SESSION) {
-        window.localStorage.setItem(this.SESSION_LOCAL_STORAGE, JSON.stringify(session));
-      },
-
-      fromLocalStorage(): SESSION {
-        let session: SESSION = new this.ENTITIES.SESSION.entityClass();
-        try {
-          const data = window.localStorage.getItem(this.SESSION_LOCAL_STORAGE);
-          const s = JSON.parse(data) as SESSION;
-          session.token = s.token;
-          session.token_type = s.token_type;
-          session.expiredDate = new Date(s.expiredDate as any);
-        } catch {
-          session = undefined;
-        }
-        return session;
-      },
-
-      removeFromLocalStorage() {
-        window.localStorage.removeItem(this.SESSION_LOCAL_STORAGE);
-      }
-    }
-  }
 
 }
 

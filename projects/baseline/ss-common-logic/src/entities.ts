@@ -9,18 +9,10 @@ import { META, Connection } from './helpers';
 
 export function entities(connection?: Connection) {
   return {
-    USER: META
-      .fromEntity<USER>(USER)
-      .metaWithDb<USER_REPOSITORY>(connection, USER_REPOSITORY),
-    SESSION: META
-      .fromEntity<SESSION>(SESSION)
-      .use(SESSION_CONFIG)
-      .metaWithDb<SESSION_REPOSITORY>(connection, SESSION_REPOSITORY),
-    EMAIL: META
-      .fromEntity<EMAIL>(EMAIL)
-      .metaWithDb<EMAIL_REPOSITORY>(connection, EMAIL_REPOSITORY),
-    EMAIL_TYPE: META
-      .fromEntity<EMAIL_TYPE>(EMAIL_TYPE)
-      .metaWithDb<EMAIL_TYPE_REPOSITORY>(connection, EMAIL_TYPE_REPOSITORY)
+    USER: META.repositoryFrom<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY),
+    SESSION: META.repositoryFrom<SESSION, SESSION_REPOSITORY>(connection, SESSION, SESSION_REPOSITORY),
+    EMAIL: META.repositoryFrom<EMAIL, EMAIL_REPOSITORY>(connection, EMAIL, EMAIL_REPOSITORY),
+    EMAIL_TYPE: META.repositoryFrom<EMAIL, EMAIL_TYPE_REPOSITORY>(connection, EMAIL, EMAIL_TYPE_REPOSITORY)
   }
+
 }

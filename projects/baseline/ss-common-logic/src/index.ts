@@ -1,33 +1,39 @@
-const controllers = {};
-const entities = {};
-function addController(controller: Function) {
-  controllers[controller.name] = controller;
-}
-function addEntity(entity: Function) {
-  entities[entity.name] = entity;
-}
 
-import { AuthController } from './controllers/AuthController';
 export { AuthController } from './controllers/AuthController';
-addController(AuthController);
-
-import { EMAIL_TYPE } from './entities/EMAIL_TYPE';
 export { EMAIL_TYPE } from './entities/EMAIL_TYPE';
-addEntity(EMAIL_TYPE);
-
-import { EMAIL } from './entities/EMAIL';
 export { EMAIL } from './entities/EMAIL';
-addEntity(EMAIL);
-
-import { USER } from './entities/USER';
 export { USER } from './entities/USER';
-addEntity(USER);
+export { SESSION } from './entities/SESSION';
 
-import { SESSION } from './entities/SESSION';
-export { SESSION} from './entities/SESSION';
-addEntity(SESSION);
+//#region @backend
+import glob = require('glob')
+import path = require('path');
 
-export const Controllers = controllers;
-export const Entities = entities;
 
+const tControllers = {}
+glob.sync(path.join(__dirname, '/controllers/**/*.js'))
+  .forEach(function (file) {
+    let controller: Function = require(path.resolve(file)).default;
+    if (typeof controller === "function") {
+      tControllers[controller.name] = controller;
+    }
+  })
+
+const tEntities = {}
+glob.sync(path.join(__dirname, '/entities/**/*.js'))
+  .forEach(function (file) {
+    let entity: Function = require(path.resolve(file)).default;
+    if (typeof entity === "function") {
+      tEntities[entity.name] = entity;
+    }
+  })
+
+
+
+
+export const Controllers = tControllers;
+export const Entities = tEntities;
+
+
+//#endregion
 
