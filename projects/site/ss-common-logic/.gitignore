@@ -11,6 +11,7 @@ npm-debug.log*
 .sass-cache
 .sourcemaps
 src
+__src
 tslint.json
 .editorconfig
 index.js

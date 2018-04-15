@@ -99,7 +99,6 @@ export class FilesRecreator {
     }
 
     gitignore() {
-        console.log('REWRIGING gitignore')
         fs.writeFileSync(path.join(this.project.location, '.gitignore'),
             this.filesIgnoredBy.gitignore.join('\n').concat('\n'), 'utf8');
     }
