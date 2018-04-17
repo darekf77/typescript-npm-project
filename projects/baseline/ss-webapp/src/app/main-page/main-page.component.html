@@ -1,29 +1,37 @@
 <layout-slider-vertical #mainSlider>
 
-  <span header="normal">
-    
+  <p header="normal">
+
     <a href="javascript:void(0)"
        *ngFor="let child of childs"
        [parent]="mainSlider"
-       gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
-  </span>
+       gotoChildVerticalSlider="{{child.id}}">{{child.title}} </a>
+    <app-login></app-login>
+  </p>
 
   <p header="scroll">
-    header scroll
-    <!-- <mat-tab label="label"></mat-tab>
-      <mat-tab label="label"></mat-tab> -->
     <a href="javascript:void(0)"
        *ngFor="let child of childs"
-       gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="{{child.id}}">{{child.title}} </a>
+    <app-login></app-login>
   </p>
 
   <div body>
-    <app-login></app-login>
-    <layout-slider-vertical-child *ngFor="let child of childs"
-                                  [header]="child.header">
-      super! {{child.header}}
-      
-      <h3 *ngFor="let num of numbers">{{num}}</h3>
+
+
+    <layout-slider-vertical-child class="horizontal-slider"
+                                  [header]="'horizontal-slider'">
+      <h1>Main slider</h1>
+
+    </layout-slider-vertical-child>
+    <layout-slider-vertical-child class="description"
+                                  [header]="'description'">
+      <h1>description</h1>
+    </layout-slider-vertical-child>
+    <layout-slider-vertical-child class="footer"
+                                  [header]="'footer'">
+      <h1>footer</h1>
     </layout-slider-vertical-child>
   </div>
 

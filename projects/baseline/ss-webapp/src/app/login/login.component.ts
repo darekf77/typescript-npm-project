@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser';
 
 import { Log } from "ng2-logger";
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 const log = Log.create('Login component')
 
 @Component({
@@ -11,10 +13,23 @@ const log = Log.create('Login component')
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private auth: AuthController) {
+  constructor(
+    private auth: AuthController,
+    private modalService: BsModalService
+  ) {
+
+  }
+
+  ngOnInit() {
     this.auth.isLoggedIn.subscribe(d => {
       log.i('data from auth observable !', d)
     })
+  }
+
+  modalRef: BsModalRef;
+
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template);
   }
 
   model = {
@@ -39,7 +54,6 @@ export class LoginComponent implements OnInit {
   }
 
 
-  ngOnInit() {
-  }
+
 
 }

@@ -1,13 +1,54 @@
+
+$font-size-header: 15px;
+
+.header-common {
+    background: whitesmoke;
+    > a {
+        font-size: $font-size-header;
+        font-weight: lighter;
+        text-decoration: none;
+        color: black;
+        vertical-align: middle;
+    }
+}
+
 :host {
     
     layout-slider-vertical {
-        span[header="normal"] {
-            background: whitesmoke;
-            > a {
-                font-size: 20px;
-                padding: 10;
+        p {
+            margin: 0px;
+            line-height: $font-size-header * 2;
+            > app-login {
+                float: right;
             }
         }
+        p[header="normal"] {            
+            @extend .header-common;   
+            padding: 10px;
+            > app-login {
+                margin-right: 5px;
+            }
+        }
+        p[header="scroll"] {
+            @extend .header-common;   
+            > app-login {
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .horizontal-slider {
+        height: 300px;
+        background: #729072;
+    }
+    .description {
+        height: 500px;
+        background: pink;
+    }
+
+    .footer {
+        height: 1000px;
+        background: gray;
     }
     
 }

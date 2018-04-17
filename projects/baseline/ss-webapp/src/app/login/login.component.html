@@ -1,21 +1,36 @@
 <ng-template #loader>
-  <p>
-    login works!
-    <input type="text"
-           [(ngModel)]="model.username"
-           placeholder="Username or email" />
-    <input type="text"
-           [(ngModel)]="model.password"
-           placeholder="Password" />
-    <button (click)="login(model)"> Login </button>
-    <button (click)="info()"> info </button>
-  </p>
+  <span (click)="openModal(template)">Login / Register</span>
 </ng-template>
 
 
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Modal</h4>
+    <button type="button"
+            class="close pull-right"
+            aria-label="Close"
+            (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      login works!
+      <input type="text"
+             [(ngModel)]="model.username"
+             placeholder="Username or email" />
+      <input type="text"
+             [(ngModel)]="model.password"
+             placeholder="Password" />
+      <button (click)="login(model)"> Login </button>
+      <button (click)="info()"> info </button>
+    </p>
+  </div>
+</ng-template>
+
 <div *ngIf="observable.isLoggedIn | async;else loader; let authOK">
-  <h1> Is Logged in ? {{authOK}} </h1>
-  <button (click)="logout()"> logout</button>
-  <button (click)="info()"> info </button>
-  <br>
+  <span> Logged in as ({{authOK}})</span>
+  <span (click)="logout()"> | Logout</span>
+  <!-- <span (click)="info()"> info </span> -->
+
 </div>

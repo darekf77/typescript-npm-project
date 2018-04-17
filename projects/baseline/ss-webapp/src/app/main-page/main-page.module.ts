@@ -9,7 +9,7 @@ import {
 } from "ss-common-ui/module";
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
-
+import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';
 
 export const routes: Routes = [
   {
@@ -21,7 +21,13 @@ export const routes: Routes = [
 
 const modules = [
   SliderVerticalModule,
+  
   // CommonUIModule
+]
+
+const components = [
+  AppMainPageComponent,
+  LoginComponent
 ]
 
 @NgModule({
@@ -29,8 +35,15 @@ const modules = [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
-    modules
+    ModalModule.forRoot(),
+    ...modules
   ],
-  declarations: [AppMainPageComponent, LoginComponent]
+  exports: [
+    ModalModule,
+    ...modules
+  ],
+  declarations: [
+    ...components
+  ]
 })
 export class AppMainPageModule { }

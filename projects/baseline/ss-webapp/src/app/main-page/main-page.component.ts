@@ -13,11 +13,16 @@ export class AppMainPageComponent implements OnInit {
 
   constructor() { }
 
-  childs = times(10, d => {
-    return {
-      header: `test${d}`
+  childs =[
+    {
+      id: 'horizontal-slider',
+      title: 'Home'
+    },
+    {
+      id: 'description',
+      title: 'Description'
     }
-  })
+  ]
 
   ngOnInit() {
     this.numbers = times(10);
