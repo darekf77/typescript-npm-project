@@ -5,7 +5,7 @@
 
 <ng-template #template>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">Modal</h4>
+    <h4 class="modal-title pull-left">Login</h4>
     <button type="button"
             class="close pull-right"
             aria-label="Close"
@@ -14,17 +14,25 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>
-      login works!
+    <p class="login-component-modal-form">
       <input type="text"
              [(ngModel)]="model.username"
              placeholder="Username or email" />
       <input type="text"
              [(ngModel)]="model.password"
              placeholder="Password" />
-      <button (click)="login(model)"> Login </button>
-      <button (click)="info()"> info </button>
+      <!-- <button (click)="login(model)"> Login </button>
+      <button (click)="info()"> info </button> -->
     </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-default"
+            (click)="bsModalRef.hide()"> Cancel </button>
+
+    <button type="button"
+            class="btn btn-primary"
+            (click)="login(model)">Login</button>
   </div>
 </ng-template>
 

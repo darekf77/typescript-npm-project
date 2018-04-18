@@ -15,6 +15,11 @@ $font-size-header: 15px;
 :host {
 
     layout-slider-vertical {
+
+        app-login {
+            line-height: $font-size-header * 2;
+        }
+
         p {
             margin: 0px;
             line-height: $font-size-header * 2;
@@ -31,6 +36,7 @@ $font-size-header: 15px;
         }
         p[header="scroll"] {
             @extend .header-common;   
+            padding: 5px;
             > app-login {
                 margin-right: 10px;
             }
