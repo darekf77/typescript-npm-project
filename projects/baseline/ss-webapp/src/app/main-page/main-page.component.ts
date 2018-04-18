@@ -21,6 +21,18 @@ export class AppMainPageComponent implements OnInit {
     {
       id: 'description',
       title: 'Description'
+    },
+    {
+      id: 'presentation',
+      title: 'Presentation'
+    },
+    {
+      id: 'footer',
+      title: 'Footer'
+    },
+    {
+      id: 'footer2',
+      title: 'Footer2'
     }
   ]
 

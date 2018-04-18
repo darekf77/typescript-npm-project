@@ -4,3 +4,17 @@ h1 {
   margin: 0px;
   background: green;
 }
+
+p[header="normal"]{
+  height: 150px;
+}
+
+p[header="scroll"]{
+  height: 50px;
+}
+
+:host {
+  .long {
+    height: 500px;
+  }
+}
