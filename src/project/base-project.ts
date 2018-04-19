@@ -9,7 +9,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, RunOptions } from "../models";
+import { LibType, BuildOptions, RecreateFile, RunOptions, Package } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
@@ -89,6 +89,13 @@ export abstract class Project extends BaseProjectRouter {
 
     get isCoreProject() {
         return this.packageJson.isCoreProject;
+    }
+
+    requiredDependencies(): Package[] {
+        return [
+            { name: "node-sass", version: "^4.7.2" },
+            { name: "typescript", version: "2.6.2" }
+        ]
     }
 
     constructor(public location: string) {

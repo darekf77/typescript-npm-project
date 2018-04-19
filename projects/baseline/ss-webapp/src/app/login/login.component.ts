@@ -4,6 +4,7 @@ import { AuthController } from 'ss-common-logic/browser';
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
+import { BaseComponent } from '../../shared';
 const log = Log.create('Login component')
 
 @Component({
@@ -11,19 +12,27 @@ const log = Log.create('Login component')
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends BaseComponent implements OnInit {
 
   constructor(
     private auth: AuthController,
     private modalService: BsModalService
   ) {
-
+    super()
   }
 
   ngOnInit() {
-    this.auth.isLoggedIn.subscribe(d => {
+    this.handlers.push(this.auth.isLoggedIn.subscribe(d => {
       log.i('data from auth observable !', d)
-    })
+      this.hideModal()
+    }))
+
+  }
+
+  hideModal() {
+    if (this.modalRef) {
+      this.modalRef.hide()
+    }
   }
 
   modalRef: BsModalRef;
@@ -45,8 +54,9 @@ export class LoginComponent implements OnInit {
     console.log(await this.auth.info().received)
   }
 
-  logout() {
-    this.auth.browser.logout()
+  async logout() {
+    await this.auth.browser.logout()
+    this.hideModal()
   }
 
   observable = {

@@ -37,6 +37,7 @@
 </ng-template>
 
 <div *ngIf="observable.isLoggedIn | async;else loader; let authOK">
+  <a [routerLink]="'/dashboard'">Dashboard </a>
   <span> Logged in as ({{authOK}})</span>
   <span (click)="logout()"> | Logout</span>
   <!-- <span (click)="info()"> info </span> -->

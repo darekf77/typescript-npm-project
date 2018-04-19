@@ -48,7 +48,7 @@ export abstract class BaseProjectLib extends Project {
         const newVersion = Project.Current.versionPatchedPlusOne;
         await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
             this.run(`npm version patch`).sync()
-            this.run(`tnp clear:bundle`).sync();
+            this.run(`tnp clear`).sync();
             this.build({
                 prod, outDir: config.folder.bundle as 'bundle'
             })

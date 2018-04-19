@@ -12,11 +12,16 @@ function $GIT_REMOVE_UNTRACKED() {
     gitginoredfiles.forEach(f => {
         const p = path.join(Project.Current.location, f);
         if (fs.existsSync(p)) {
-            if (fs.statSync(p).isDirectory()) {
-                Project.Current.run(`git rm -rf ${f}`).sync()
-            } else {
-                Project.Current.run(`git rm ${f}`).sync()
+            try {
+                if (fs.statSync(p).isDirectory()) {
+                    Project.Current.run(`git rm -rf ${f}`).sync()
+                } else {
+                    Project.Current.run(`git rm ${f}`).sync()
+                }
+            } catch (error) {
+                console.log(error)
             }
+
         }
     });
     process.exit(0)

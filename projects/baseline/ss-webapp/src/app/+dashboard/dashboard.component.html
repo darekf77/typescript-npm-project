@@ -1,0 +1,15 @@
+<h1>
+    Dashboard </h1>
+
+<columns-container>
+
+    <column [width]="200">
+        <a [routerLink]="'date'"> Date </a>
+        <a [routerLink]="'street'"> Street </a>
+
+    </column>
+    <column grow>
+        <router-outlet></router-outlet>
+    </column>
+
+</columns-container>
