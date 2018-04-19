@@ -17,7 +17,7 @@ export const routes: Routes = [
             },
             {
                 path: 'street',
-                loadChildren: './categories/date/date.module#StreetModule'
+                loadChildren: './categories/street/street.module#StreetModule'
             }
         ]
     }

@@ -16,26 +16,24 @@ $font-size-header: 15px;
 
     layout-slider-vertical {
 
-        app-login {
-            line-height: $font-size-header * 2;
-        }
 
         p {
             margin: 0px;
             line-height: $font-size-header * 2;
             > app-login {
                 float: right;
+                line-height: $font-size-header;
             }
         }
-        p[header="normal"] {            
-            @extend .header-common;   
+        p[header="normal"] {
+            @extend .header-common;
             padding: 10px;
             > app-login {
                 margin-right: 5px;
             }
         }
         p[header="scroll"] {
-            @extend .header-common;   
+            @extend .header-common;
             padding: 5px;
             > app-login {
                 margin-right: 10px;
@@ -55,11 +53,11 @@ $font-size-header: 15px;
     .presentation {
         height: 500px;
         background: red;
-    }   
+    }
 
     .footer {
         height: 500px;
         background: gray;
     }
-    
+
 }

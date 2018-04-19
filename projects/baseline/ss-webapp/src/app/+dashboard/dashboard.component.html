@@ -1,15 +1,23 @@
 <h1>
-    Dashboard </h1>
+  Dashboard </h1>
 
 <columns-container>
 
-    <column [width]="200">
-        <a [routerLink]="'date'"> Date </a>
-        <a [routerLink]="'street'"> Street </a>
+  <column [width]="200">
+    <ul>
+      <li>
+        <a [routerLink]="'./date'"> Date </a>
+      </li>
+      <li>
+        <a [routerLink]="'./street'"> Street </a>
+      </li>
+    </ul>
 
-    </column>
-    <column grow>
-        <router-outlet></router-outlet>
-    </column>
+
+
+  </column>
+  <column grow>
+    <router-outlet></router-outlet>
+  </column>
 
 </columns-container>
