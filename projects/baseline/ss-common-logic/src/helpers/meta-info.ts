@@ -1,5 +1,7 @@
 import { Repository } from 'typeorm';
 import { Connection } from "typeorm/connection/Connection";
+import { BaseCRUD } from 'morphi';
+import { entities } from '../entities';
 
 
 export namespace META {
@@ -27,10 +29,12 @@ export namespace META {
 
   }
 
-  export abstract class BASE_CONTROLLER {
+  export abstract class BASE_CONTROLLER<T> extends BaseCRUD<T> {
 
     //#region @backend
-    abstract get db(): { [entities: string]: Repository<any> };
+    get db() {
+      return entities(this.connection);
+    }
     //#endregion
 
   }

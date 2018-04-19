@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CategoriesComponent } from '../categories.component';
 
 @Component({
   selector: 'app-date',
-  templateUrl: './date.component.html',
-  styleUrls: ['./date.component.scss']
+  templateUrl: '../categories.component.html',
+  styleUrls: ['../categories.component.scss']
 })
-export class DateComponent implements OnInit {
+export class DateComponent extends CategoriesComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+    super("/assets/img/categories/date.jpg")
+  }
 
   ngOnInit() {
   }

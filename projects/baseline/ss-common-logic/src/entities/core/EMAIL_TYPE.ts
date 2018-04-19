@@ -19,7 +19,7 @@ import { EntityRepository } from 'typeorm';
 //#endregion
 
 import { EMAIL } from "./EMAIL";
-import { META } from '../helpers';
+import { META } from '../../helpers';
 
 
 
@@ -35,12 +35,11 @@ export class EMAIL_TYPE extends META.BASE_ENTITY {
   @Column({ length: 50, unique: true })
   name: EMAIL_TYPE_NAME;
 
-  //#region @joins
+
   @ManyToMany(type => EMAIL, email => email.types, {
     cascadeInsert: false,
     cascadeUpdate: false
   })
-  //#endregion
   emails: EMAIL[] = [];
 }
 

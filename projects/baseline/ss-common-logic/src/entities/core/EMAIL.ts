@@ -25,7 +25,7 @@ import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-import { META } from '../helpers';
+import { META } from '../../helpers';
 
 
 @Entity(META.tableNameFrom(EMAIL))
@@ -42,21 +42,19 @@ export class EMAIL extends META.BASE_ENTITY {
   @Column('varchar', { length: 100, unique: true })
   address: string;
 
-  //#region @joins
+
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
     cascadeInsert: false,
     cascadeUpdate: false
   })
   @JoinTable()
-  //#endregion
   types: EMAIL_TYPE[] = [];
 
-  //#region @joins
+
   @ManyToOne(type => USER, user => user.id, {
     cascadeAll: false
   })
   @JoinColumn()
-  //#endregion
   user: USER;
 
 }

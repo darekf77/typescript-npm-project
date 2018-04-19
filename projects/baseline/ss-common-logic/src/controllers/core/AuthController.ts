@@ -25,13 +25,13 @@ import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
 //#region entities
-import { USER, IUSER, USER_REPOSITORY } from '../entities/USER';
-import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/SESSION';
-import { EMAIL, EMAIL_REPOSITORY } from '../entities/EMAIL';
-import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/EMAIL_TYPE';
+import { USER, IUSER, USER_REPOSITORY } from '../../entities/core/USER';
+import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../../entities/core/SESSION';
+import { EMAIL, EMAIL_REPOSITORY } from '../../entities/core/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../../entities/core/EMAIL_TYPE';
 //#endregion
-import { META } from '../helpers';
-import { entities } from '../entities';
+import { META } from '../../helpers';
+import { entities } from '../../entities';
 
 
 
