@@ -4,9 +4,10 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
+import { Entity } from 'typeorm';
 
 
-
+@Entity(META.tableNameFrom(DIALOG))
 export class DIALOG extends META.BASE_ENTITY {
 
   @PrimaryGeneratedColumn()

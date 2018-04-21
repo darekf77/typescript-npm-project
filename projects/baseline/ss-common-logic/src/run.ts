@@ -3,7 +3,7 @@ import { Controllers, Entities } from "./index";
 import { start } from './helpers';
 import * as path from 'path';
 import * as fs from 'fs';
-import MockData from "./db-mocks";
+import mocks from "./db-mocks";
 
 if (!process.env.environmentName) {
   process.env.environmentName = ''
@@ -27,7 +27,7 @@ start({
   host: config.host(packageName),
   Controllers: Controllers as any,
   Entities: Entities as any,
-  MockData: MockData as any
+  MockData: mocks as any
 });
 
 //#endregion

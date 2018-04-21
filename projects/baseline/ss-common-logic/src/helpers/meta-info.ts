@@ -3,6 +3,16 @@ import { Connection } from "typeorm/connection/Connection";
 import { BaseCRUD } from 'morphi';
 import { entities } from '../entities';
 
+// entities
+import { USER, IUSER, USER_REPOSITORY } from '../entities/core/USER';
+import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../entities/core/SESSION';
+import { EMAIL, EMAIL_REPOSITORY } from '../entities/core/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/core/EMAIL_TYPE';
+// controllers
+import { AuthController } from '../controllers/core/AuthController'
+import { DialogController } from '../controllers/DialogController'
+import { controllers } from '../controllers';
+
 
 export namespace META {
 
@@ -21,6 +31,10 @@ export namespace META {
 
   export abstract class BASE_REPOSITORY<E> extends Repository<E> {
 
+    pagination() {
+      // TODO
+    }
+
   }
 
   export abstract class BASE_ENTITY {
@@ -32,21 +46,27 @@ export namespace META {
   export abstract class BASE_CONTROLLER<T> extends BaseCRUD<T> {
 
     //#region @backend
-    get db() {
-      return entities(this.connection);
-    }
+    abstract get db(): { [entities: string]: Repository<any> }
+    // abstract get ctrl(): { [controller: string]: META.BASE_CONTROLLER<any> }
     //#endregion
 
   }
 
+  //#region @backend
   export abstract class BASE_MOCK_DATA {
 
-    constructor(public connection: Connection) {
 
-    }
+    constructor(public connection: Connection) { }
+
+    abstract async init();
+
+    abstract get db(): { [entities: string]: Repository<any> }
+
+    abstract get ctrl(): { [controller: string]: META.BASE_CONTROLLER<any> }
+
 
   }
-
+  //#endregion
 
 
 }

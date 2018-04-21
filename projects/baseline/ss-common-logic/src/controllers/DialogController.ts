@@ -1,11 +1,10 @@
-import { META } from '../helpers';
 import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity } from 'morphi';
 import { authenticate } from 'passport';
-import { entities } from '../entities';
+// local
+import { META } from '../helpers';
 import { DIALOG } from '../entities/DIALOG';
-
-
-
+import * as entities from '../entities';
+import * as controllers from '../controllers';
 
 @ENDPOINT({
   auth: (method) => {
@@ -16,11 +15,19 @@ import { DIALOG } from '../entities/DIALOG';
 })
 export class DialogController extends META.BASE_CONTROLLER<DIALOG> {
 
-  @BaseCRUDEntity(DIALOG) public entity: DIALOG;
+  @OrmConnection connection: Connection;
 
-  constructor() {
-    super()
-    this.db.USER.findOne
+  @BaseCRUDEntity(DIALOG) public entity: entities.DIALOG;
+
+  get db() {
+    return entities.entities(this.connection as any);
   }
 
+  // get ctrl() {
+  //   return controllers.controllers()
+  // }
+
+
 }
+
+export default DialogController;

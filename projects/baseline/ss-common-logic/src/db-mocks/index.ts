@@ -1,8 +1,8 @@
 //#region @backend
-import { MockData } from './mock';
-export { MockData } from './mock';
+import { InitMockData } from './init-mock-data';
+export { InitMockData }  from './init-mock-data';
 
 export default [
-    MockData
+    InitMockData
 ]
 //#endregion

@@ -4,9 +4,10 @@ import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
 // local
 import { META } from '../helpers';
 import { DIALOG } from './DIALOG';
+import { Entity } from 'typeorm';
 
 
-
+@Entity(META.tableNameFrom(CATEGORY))
 export class CATEGORY extends META.BASE_ENTITY {
 
   @PrimaryGeneratedColumn()

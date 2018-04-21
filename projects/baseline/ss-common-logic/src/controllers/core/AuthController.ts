@@ -1,10 +1,9 @@
 
 import {
-  ENDPOINT, GET, POST, PUT, DELETE, isNode,
+  ENDPOINT, GET, POST, PUT, DELETE, isNode, Connection,
   PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-  Response, OrmConnection, Errors, isBrowser
+  Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity
 } from 'morphi';
-import { Connection } from "typeorm/connection/Connection";
 
 //#region @backend
 import { authenticate, use } from 'passport';
@@ -25,13 +24,16 @@ import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
 //#region entities
-import { USER, IUSER, USER_REPOSITORY } from '../../entities/core/USER';
-import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from '../../entities/core/SESSION';
-import { EMAIL, EMAIL_REPOSITORY } from '../../entities/core/EMAIL';
-import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../../entities/core/EMAIL_TYPE';
+import { USER, IUSER } from '../../entities/core/USER';
+import { SESSION, SESSION_CONFIG } from '../../entities/core/SESSION';
+import { EMAIL } from '../../entities/core/EMAIL';
+import { EMAIL_TYPE, EMAIL_TYPE_NAME } from '../../entities/core/EMAIL_TYPE';
 //#endregion
+
+
 import { META } from '../../helpers';
-import { entities } from '../../entities';
+import * as entities from '../../entities';
+import * as controllers from '../../controllers';
 
 
 
@@ -77,30 +79,33 @@ export interface IFacebook {
     //#endregion
   }
 })
-export class AuthController extends META.BASE_CONTROLLER {
+export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
-  //#region @backend
-  get db() {
-    return entities(this.connection)
-  }
-  //#endregion
-
-
+  @BaseCRUDEntity(SESSION) entity: SESSION;
   @OrmConnection connection: Connection;
+
+  get db() {
+    return entities.entities(this.connection as any);
+  }
+
+  // get ctrl() {
+  //   return controllers.controllers()
+  // }
 
 
   constructor() {
     super();
-    this.browser.init()
-    //#region @backend
+    isBrowser && this.browser.init()
+    //#region @backend538
     this.__init();
-    //#endregion
+    //#endregion  }
   }
 
   private _subIsLggedIn = new Subject<boolean>();
   isLoggedIn = this._subIsLggedIn.asObservable();
 
   public get browser() {
+
     const self = this;
     return {
       async init() {
@@ -462,7 +467,7 @@ export class AuthController extends META.BASE_CONTROLLER {
     //#endregion
   }
 
-  private async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
+  public async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
     let EmailType = await this.db.EMAIL_TYPE.getBy(EmailTypeName);

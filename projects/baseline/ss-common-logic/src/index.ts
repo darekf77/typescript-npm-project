@@ -1,14 +1,9 @@
-
-export { AuthController } from './controllers/AuthController';
-export { EMAIL_TYPE } from './entities/EMAIL_TYPE';
-export { EMAIL } from './entities/EMAIL';
-export { USER } from './entities/USER';
-export { SESSION } from './entities/SESSION';
-
 //#region @backend
+export * from './controllers';
+export * from './entities';
+
 import glob = require('glob')
 import path = require('path');
-
 
 const tControllers = {}
 glob.sync(path.join(__dirname, '/controllers/**/*.js'))
@@ -28,12 +23,6 @@ glob.sync(path.join(__dirname, '/entities/**/*.js'))
     }
   })
 
-
-
-
 export const Controllers = tControllers;
 export const Entities = tEntities;
-
-
 //#endregion
-
