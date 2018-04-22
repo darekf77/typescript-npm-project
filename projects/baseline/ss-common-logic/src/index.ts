@@ -1,27 +1,34 @@
 //#region @backend
+import * as c from './controllers';
+import * as e from './entities';
 export * from './controllers';
 export * from './entities';
 
 import glob = require('glob')
 import path = require('path');
+import { controllers } from './controllers';
 
 const tControllers = {}
-glob.sync(path.join(__dirname, '/controllers/**/*.js'))
-  .forEach(function (file) {
-    let controller: Function = require(path.resolve(file)).default;
-    if (typeof controller === "function") {
-      tControllers[controller.name] = controller;
-    }
-  })
-
 const tEntities = {}
-glob.sync(path.join(__dirname, '/entities/**/*.js'))
-  .forEach(function (file) {
-    let entity: Function = require(path.resolve(file)).default;
-    if (typeof entity === "function") {
-      tEntities[entity.name] = entity;
-    }
-  })
+
+function addController(controller: Function) {
+  tControllers[controller.name] = controller;
+}
+
+function addEntity(entity: Function) {
+  tControllers[entity.name] = entity;
+}
+
+
+addController(c.AuthController)
+addController(c.DialogController)
+
+addEntity(e.EMAIL)
+addEntity(e.EMAIL_REPOSITORY)
+addEntity(e.USER)
+addEntity(e.SESSION)
+addEntity(e.DIALOG)
+addEntity(e.CATEGORY)
 
 export const Controllers = tControllers;
 export const Entities = tEntities;

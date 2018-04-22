@@ -21,8 +21,6 @@ import { EntityRepository } from 'typeorm';
 import { EMAIL } from "./EMAIL";
 import { META } from '../../helpers';
 
-
-
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
 
