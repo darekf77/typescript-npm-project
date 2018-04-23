@@ -63,7 +63,11 @@ export async function run(argsv: string[]) {
             recognized = true;
             const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
             const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
-            runCommand(commadnToRun).sync()
+            try {
+                runCommand(commadnToRun).sync()
+            } catch (error) {
+                console.log(`Command ${localLib} ERROR...`);
+            }
             process.exit(0)
         }
     }

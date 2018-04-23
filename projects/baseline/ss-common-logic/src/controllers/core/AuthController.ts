@@ -20,6 +20,7 @@ import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
 export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
 import { Observable } from "rxjs/Observable";
+export { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController');
 
@@ -32,10 +33,12 @@ import { EMAIL_TYPE, EMAIL_TYPE_NAME } from '../../entities/core/EMAIL_TYPE';
 
 
 import { META } from '../../helpers';
+//#region @backend
+import '../../entities'
+import '../../controllers'
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
-
-
+//#endregion
 
 export interface IHelloJS {
   authResponse: {
@@ -81,24 +84,22 @@ export interface IFacebook {
 })
 export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
+  //#region @backend
   @BaseCRUDEntity(SESSION) entity: SESSION;
   @OrmConnection connection: Connection;
 
   get db() {
     return entities.entities(this.connection as any);
   }
-
-  // get ctrl() {
-  //   return controllers.controllers()
-  // }
+  //#endregion
 
 
   constructor() {
     super();
     isBrowser && this.browser.init()
-    //#region @backend538
+    //#region @backend
     this.__init();
-    //#endregion  }
+    //#endregion
   }
 
   private _subIsLggedIn = new Subject<boolean>();

@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Connection } from "typeorm/connection/Connection";
 import { BaseCRUD } from 'morphi';
-import { entities } from '../entities';
+
 
 // entities
 import { USER, IUSER, USER_REPOSITORY } from '../entities/core/USER';
@@ -11,7 +11,7 @@ import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from '../entities/
 // controllers
 import { AuthController } from '../controllers/core/AuthController'
 import { DialogController } from '../controllers/DialogController'
-import { controllers } from '../controllers';
+
 
 
 export namespace META {

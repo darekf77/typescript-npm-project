@@ -3,8 +3,12 @@ import { authenticate } from 'passport';
 // local
 import { META } from '../helpers';
 import { DIALOG } from '../entities/DIALOG';
+//#region @backend
+import '../../entities'
+import '../../controllers'
 import * as entities from '../entities';
 import * as controllers from '../controllers';
+//#endregion
 
 @ENDPOINT({
   auth: (method) => {
@@ -15,6 +19,7 @@ import * as controllers from '../controllers';
 })
 export class DialogController extends META.BASE_CONTROLLER<DIALOG> {
 
+  //#region @backend
   @OrmConnection connection: Connection;
 
   @BaseCRUDEntity(DIALOG) public entity: entities.DIALOG;
@@ -22,11 +27,7 @@ export class DialogController extends META.BASE_CONTROLLER<DIALOG> {
   get db() {
     return entities.entities(this.connection as any);
   }
-
-  // get ctrl() {
-  //   return controllers.controllers()
-  // }
-
+  //#endregion
 
 }
 
