@@ -19,9 +19,13 @@ import * as graph from 'fbgraph';
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
 export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
-import { Observable } from "rxjs/Observable";
-export { Observable } from "rxjs/Observable";
+
+import { Observable, Subscribable } from "rxjs/Observable";
+
+export { Observable } from "rxjs";
 import { Subject } from "rxjs/Subject";
+export { Subject } from "rxjs/Subject";
+
 const log = Log.create('AuthController');
 
 //#region entities
@@ -85,8 +89,8 @@ export interface IFacebook {
 export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
   //#region @backend
-  @BaseCRUDEntity(SESSION) entity: SESSION;
   @OrmConnection connection: Connection;
+  @BaseCRUDEntity(SESSION) entity: SESSION;  
 
   get db() {
     return entities.entities(this.connection as any);

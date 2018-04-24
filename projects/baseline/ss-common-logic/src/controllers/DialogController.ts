@@ -4,8 +4,6 @@ import { authenticate } from 'passport';
 import { META } from '../helpers';
 import { DIALOG } from '../entities/DIALOG';
 //#region @backend
-import '../../entities'
-import '../../controllers'
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 //#endregion

@@ -16,7 +16,7 @@ function addController(controller: Function) {
 }
 
 function addEntity(entity: Function) {
-  tControllers[entity.name] = entity;
+  tEntities[entity.name] = entity;
 }
 
 
@@ -24,7 +24,7 @@ addController(c.AuthController)
 addController(c.DialogController)
 
 addEntity(e.EMAIL)
-addEntity(e.EMAIL_REPOSITORY)
+addEntity(e.EMAIL_TYPE)
 addEntity(e.USER)
 addEntity(e.SESSION)
 addEntity(e.DIALOG)
