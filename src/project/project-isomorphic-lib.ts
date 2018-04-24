@@ -73,8 +73,13 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
             this.watcher.call(functionName, webpackParams);
         } else {
             this.compilationWrapper(() => {
-                this.run(`tnp tsc --outDir ${outDir}`).sync()
-            },` isomorphic-lib (project ${this.name})`,`Backend compilation` )
+                try {
+                    // console.log('command:', `npm-run tsc --outDir ${outDir}`)
+                    this.run(`npm-run tsc --outDir ${outDir}`).sync()
+                } catch (e) {
+                    process.exit(0)
+                }
+            }, ` isomorphic-lib (project ${this.name})`, `Backend compilation`)
             this.BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams);
         }
     }

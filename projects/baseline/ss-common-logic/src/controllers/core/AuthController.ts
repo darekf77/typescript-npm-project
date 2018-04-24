@@ -90,7 +90,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
   //#region @backend
   @OrmConnection connection: Connection;
-  @BaseCRUDEntity(SESSION) entity: SESSION;  
+  @BaseCRUDEntity(SESSION) entity: SESSION;
 
   get db() {
     return entities.entities(this.connection as any);

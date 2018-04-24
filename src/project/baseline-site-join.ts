@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
@@ -82,20 +83,63 @@ export class BaselineSiteJoin {
         }
     }
 
+    private replace(input: string, relativeBaselineCustomPath: string) {
+        const self = this;
+        return {
+            currentFilePath() {
+                const baselineFilePathNoExit = self.removeExtension(relativeBaselineCustomPath);
+                // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
+                const toReplaceImportPath = `${path.join(
+                    self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
+                    baselineFilePathNoExit)}`;
+                const replacement = `./${self.getPrefixedBasename(baselineFilePathNoExit)}`;
+                // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
+                // console.log(`replacement: "${replacement}"`)
+                const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
+                // console.log('AFTER TRANSFORMATION', res)
+                // process.exit()
+                return res;
+            },
+            baselinePath() {
+                // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
+                const levelBack = relativeBaselineCustomPath.split('/').length - 2;
+                const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
+                // console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
+                const pathToBaselineNodeModulesRelative = self.pathToBaselineNodeModulesRelative
+                    .replace('/', '\/')
+                    .replace('-', '\-')
+                    .replace('.', '\.')
+                    .replace('_', '\_')
+                const baselineRegex = `${pathToBaselineNodeModulesRelative}(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)*`
+                // console.log(`\nbaselineRegex: ${baselineRegex}`)
+                let patterns = input.match(new RegExp(baselineRegex, 'g'))
+                // console.log(`patterns\n`, patterns.map(d => `\t${d}`).join('\n'))
+                if (Array.isArray(patterns) && patterns.length >= 1) {
+                    patterns.forEach(p => {
+                        const patternWithoutBaselinePart = p.replace(self.pathToBaselineNodeModulesRelative, '');
+                        // console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
+                        // console.log('p', p)
+                        const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`
+                        // console.log('toReplace', toReplace)
+                        input = input.replace(p, toReplace)
+                    })
+                }
+                return input;
+            }
+        }
+
+    }
+
+
+
+
+
+
     private replacePathFn(relativeBaselineCustomPath: string) {
         return (input) => {
-            const baselineFilePathNoExit = this.removeExtension(relativeBaselineCustomPath);
-            // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
-            const toReplaceImportPath = `${path.join(
-                this.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
-                baselineFilePathNoExit)}`;
-            const replacement = `./${this.getPrefixedBasename(baselineFilePathNoExit)}`;
-            // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
-            // console.log(`replacement: "${replacement}"`)
-            const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
-            // console.log('AFTER TRANSFORMATION', res)
-            // process.exit()
-            return res;
+            input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
+            input = this.replace(input, relativeBaselineCustomPath).baselinePath()
+            return input;
         }
     }
 

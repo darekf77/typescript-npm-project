@@ -75,6 +75,7 @@ export function copyFile(sousrce: string, destination: string,
         fs.writeFileSync(destination, sourceData, 'utf8')
     } catch (e) {
         error(`Error while copying file: ${sousrce} to ${destination}`, true)
+        // console.log(e)
     }
 
 }
