@@ -65,7 +65,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
         if (watch) {
 
-            this.run(`tnp tsc -w --outDir ${outDir}`).async()
+            this.run(`tnp tsc -d false -w --outDir ${outDir}`).async()
             const functionName = ClassHelper.getMethodName(
                 ProjectIsomorphicLib.prototype,
                 ProjectIsomorphicLib.prototype.BUILD_ISOMORPHIC_LIB_WEBPACK)
@@ -75,7 +75,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
             this.compilationWrapper(() => {
                 try {
                     // console.log('command:', `npm-run tsc --outDir ${outDir}`)
-                    this.run(`npm-run tsc --outDir ${outDir}`).sync()
+                    this.run(`npm-run tsc -d false --outDir ${outDir}`).sync()
                 } catch (e) {
                     process.exit(0)
                 }

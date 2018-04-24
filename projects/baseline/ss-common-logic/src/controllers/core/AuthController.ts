@@ -28,21 +28,12 @@ export { Subject } from "rxjs/Subject";
 
 const log = Log.create('AuthController');
 
-//#region entities
-import { USER, IUSER } from '../../entities/core/USER';
-import { SESSION, SESSION_CONFIG } from '../../entities/core/SESSION';
-import { EMAIL } from '../../entities/core/EMAIL';
-import { EMAIL_TYPE, EMAIL_TYPE_NAME } from '../../entities/core/EMAIL_TYPE';
-//#endregion
-
 
 import { META } from '../../helpers';
-//#region @backend
-import '../../entities'
-import '../../controllers'
+
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
-//#endregion
+
 
 export interface IHelloJS {
   authResponse: {
@@ -86,14 +77,18 @@ export interface IFacebook {
     //#endregion
   }
 })
-export class AuthController extends META.BASE_CONTROLLER<SESSION> {
+export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   //#region @backend
   @OrmConnection connection: Connection;
-  @BaseCRUDEntity(SESSION) entity: SESSION;
+  @BaseCRUDEntity(entities.SESSION) entity: entities.SESSION;
 
   get db() {
     return entities.entities(this.connection as any);
+  }
+  
+  get ctrl() {
+    return controllers.controllers()
   }
   //#endregion
 
@@ -117,7 +112,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
         if (isNode) {
           return;
         }
-        const session = SESSION.localStorage.fromLocalStorage()
+        const session = entities.SESSION.localStorage.fromLocalStorage()
         if (!session) {
           self.browser.logout();
           return
@@ -141,8 +136,8 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
           log.er(error)
         }
       },
-      async authorize(session: SESSION) {
-        SESSION.localStorage.saveInLocalStorage(session);
+      async authorize(session: entities.SESSION) {
+        entities.SESSION.localStorage.saveInLocalStorage(session);
         session.activateBrowserToken();
         try {
           const info = await self.info().received
@@ -156,7 +151,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
           }
         }
       },
-      async logout(session?: SESSION) {
+      async logout(session?: entities.SESSION) {
         self._subIsLggedIn.next(false)
         if (session) {
           try {
@@ -166,7 +161,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
             log.er(error)
           }
         }
-        SESSION.localStorage.removeFromLocalStorage();
+        entities.SESSION.localStorage.removeFromLocalStorage();
       }
     }
 
@@ -174,7 +169,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
 
   @GET('/')
-  info(): Response<USER> {
+  info(): Response<entities.USER> {
     //#region @backendFunc
     const self = this;
     return async (req, res) => {
@@ -188,7 +183,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
         return User;
       }
 
-      throw Errors.entityNotFound(USER);
+      throw Errors.entityNotFound(entities.USER);
     };
     //#endregion
   }
@@ -229,7 +224,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
     const self = this;
     return async (req, res) => {
 
-      let User: USER = req.user;
+      let User: entities.USER = req.user;
       if (!User) {
         throw 'No user for logout';
       }
@@ -250,12 +245,12 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
   }
 
   @POST('/login')
-  login(@BodyParam() body: IHelloJS & IUSER): Response<SESSION> {
+  login(@BodyParam() body: IHelloJS & entities.IUSER): Response<entities.SESSION> {
     //#region @backendFunc
     const self = this;
     return async (req) => {
       const userIP = req.ip;
-      let user: USER;
+      let user: entities.USER;
       if (body.authResponse && body.network && body.network === 'facebook') {
         user = await self.__authorization.facebook(body);
       } else {
@@ -274,7 +269,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
     //#region @backendFunc
     const self = this;
     return {
-      async facebook(body: IHelloJS): Promise<USER> {
+      async facebook(body: IHelloJS): Promise<entities.USER> {
 
         const fb = await self.__handle.facebook().getData(body);
         const dbEmail = await self.__check.exist.email(fb.email);
@@ -298,8 +293,8 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
 
       },
       email: {
-        async login(form: IUSER): Promise<USER> {
-          function checkPassword(user: USER) {
+        async login(form: entities.IUSER): Promise<entities.USER> {
+          function checkPassword(user: entities.USER) {
             if (user && bcrypt.compareSync(form.password, user.password)) {
               return user;
             }
@@ -325,7 +320,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
           }
           throw new Error('Wron email or username');
         },
-        async register(form: IUSER): Promise<USER> {
+        async register(form: entities.IUSER): Promise<entities.USER> {
 
           const emailExist = await self.__check.exist.email(form.email);
           if (emailExist) {
@@ -427,7 +422,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
           return email;
         }
       },
-      ifRegistration(body: IUSER) {
+      ifRegistration(body: entities.IUSER) {
         const {
           email,
           username,
@@ -455,7 +450,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
   }
 
 
-  private async  __token(user: USER, ip: string) {
+  private async  __token(user: entities.USER, ip: string) {
     //#region @backendFunc
     if (!user || !user.id) {
       throw new Error('No user to send token');
@@ -472,7 +467,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
     //#endregion
   }
 
-  public async __createUser(formData: IUSER, EmailTypeName: EMAIL_TYPE_NAME) {
+  public async __createUser(formData: entities.IUSER, EmailTypeName: entities.EMAIL_TYPE_NAME) {
     //#region @backendFunc
 
     let EmailType = await this.db.EMAIL_TYPE.getBy(EmailTypeName);
@@ -480,7 +475,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
       throw new Error(`Bad email type: ${EmailTypeName}`);
     }
 
-    let Email = new EMAIL(formData.email);
+    let Email = new entities.EMAIL(formData.email);
     Email.types.push(EmailType);
     Email = await this.db.EMAIL.save(Email);
 
@@ -509,7 +504,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
       throw new Error(`User with username: ${formData.username} already exist`);
     }
 
-    User = new USER();
+    User = new entities.USER();
     User.username = formData.username;
     const salt = bcrypt.genSaltSync(5);
     User.password = bcrypt.hashSync(formData.password ? formData.password : 'ddd', salt);
@@ -543,7 +538,7 @@ export class AuthController extends META.BASE_CONTROLLER<SESSION> {
     const types = await this.db.EMAIL_TYPE.init();
 
     const strategy = async (token, cb) => {
-      let user: USER = null;
+      let user: entities.USER = null;
       const Session = await this.db.SESSION.getByToken(token);
 
       if (Session) {

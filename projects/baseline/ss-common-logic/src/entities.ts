@@ -1,7 +1,3 @@
-//#region @backend
-import { Repository } from "typeorm";
-export { Repository } from "typeorm";
-
 import { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 export { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 
@@ -20,8 +16,12 @@ export { DIALOG } from "./entities/DIALOG";
 import { CATEGORY } from "./entities/CATEGORY";
 export { CATEGORY } from "./entities/CATEGORY";
 
-import { META, Connection } from './helpers';
 
+//#region @backend
+import { Repository } from "typeorm";
+export { Repository } from "typeorm";
+
+import { META, Connection } from './helpers';
 export function entities(connection?: Connection) {
   return {
     USER: META.repositoryFrom<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY),
@@ -31,6 +31,5 @@ export function entities(connection?: Connection) {
     DIALOG: META.repositoryFrom<DIALOG>(connection, DIALOG),
     CATEGORY: META.repositoryFrom<CATEGORY>(connection, CATEGORY)
   }
-
 }
 //#endregion
