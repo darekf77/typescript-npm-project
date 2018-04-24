@@ -50,28 +50,33 @@ export function fixWebpackEnv(env: Object) {
 export function copyFile(sousrce: string, destination: string,
     transformTextFn?: (input: string) => string) {
 
-    if (!fs.existsSync(sousrce)) {
-        warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
-        return;
-    }
-    if (sousrce === destination) {
-        warn(`Trying to copy same file ${sousrce}`);
-        return;
-    }
-    const destDirPath = path.dirname(destination);
-    // console.log('destDirPath', destDirPath)
-    if (!fs.existsSync(destDirPath)) {
-        run(`tnp mkdirp ${destDirPath}`).sync()
+    try {
+        if (!fs.existsSync(sousrce)) {
+            warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
+            return;
+        }
+        if (sousrce === destination) {
+            warn(`Trying to copy same file ${sousrce}`);
+            return;
+        }
+        const destDirPath = path.dirname(destination);
+        // console.log('destDirPath', destDirPath)
+        if (!fs.existsSync(destDirPath)) {
+            run(`tnp mkdirp ${destDirPath}`).sync()
+        }
+
+        let sourceData = fs.readFileSync(sousrce).toString();
+        if (transformTextFn) {
+            sourceData = transformTextFn(sourceData);
+        }
+
+        // process.exit(0)
+        // console.log(`Copy from ${sousrce.slice(-20)} to ${destination.slice(-20)}`)
+        fs.writeFileSync(destination, sourceData, 'utf8')
+    } catch (e) {
+        error(`Error while copying file: ${sousrce} to ${destination}`, true)
     }
 
-    let sourceData = fs.readFileSync(sousrce).toString();
-    if (transformTextFn) {
-        sourceData = transformTextFn(sourceData);
-    }
-
-    // process.exit(0)
-    // console.log(`Copy from ${sousrce.slice(-20)} to ${destination.slice(-20)}`)
-    fs.writeFileSync(destination, sourceData, 'utf8')
 }
 
 export function uniqArray<T=string>(array: any[]) {
@@ -94,7 +99,7 @@ export function compilationWrapper(fn: () => void, taskName: string = 'Task', ex
     if (!fn || !_.isFunction(fn)) {
         error(`${executionType} wrapper: "${fs}" is not a function.`)
     }
-    
+
     if (isAsyncFunction(fn)) {
         return new Promise(async (resolve, reject) => {
             try {

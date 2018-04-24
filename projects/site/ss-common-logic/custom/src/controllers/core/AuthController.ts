@@ -5,7 +5,7 @@ import {
     HttpResponse,
     //#endregion
     IFacebook, IHelloJS
-} from "baseline/ss-common-logic/src/controllers/AuthController";
+} from "baseline/ss-common-logic/src/controllers/core/AuthController";
 
 export {
     AuthController,
@@ -14,7 +14,7 @@ export {
     HttpResponse,
     //#endregion
     IFacebook, IHelloJS
-} from "baseline/ss-common-logic/src/controllers/AuthController";
+} from "baseline/ss-common-logic/src/controllers/core/AuthController";
 
 export function amazing() {
 

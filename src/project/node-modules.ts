@@ -66,7 +66,7 @@ export class NodeModules {
                 symlinks.forEach(c => {
                     const symPkgPath = path.join(self.project.location, 'node_modules', c.name);
                     if (fs.existsSync(symPkgPath)) {
-                        console.log(`Removing symlink: ${c.name}`)
+                        console.log(`Removing symlinks: ${c.name}`)
                         self.project.run(`rm ${symPkgPath}`).sync();
                     }
                 })
@@ -75,7 +75,7 @@ export class NodeModules {
                 symlinks.forEach(c => {
                     const destination = path.join(self.project.location, 'node_modules');
                     const command = `tnp ln ${c.location} ${destination}`;
-                    console.log(`Adding symlink: ${c.name}`)
+                    console.log(`Adding symlinks: ${c.name}`)
                     self.project.run(command).sync();
                 })
             },
