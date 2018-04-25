@@ -93,7 +93,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
                     dist: env.outDir
                 },
                 toolsPathes: {
-                    tsc: 'tnp tsc',
+                    tsc: 'npm-run tsc',
                     morphi: 'tnp morphi'
                 },
                 build: {

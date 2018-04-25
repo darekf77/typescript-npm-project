@@ -83,9 +83,34 @@ export class BaselineSiteJoin {
         }
     }
 
+    private removeRootFolder(filePath: string) {
+        const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+        return filePath.replace(new RegExp(`^${pathPart}`, 'g'), '')
+    }
+
     private replace(input: string, relativeBaselineCustomPath: string) {
         const self = this;
         return {
+            customRelativePathes() {
+                self.relativePathesCustom.forEach(f => {
+                    if (f != relativeBaselineCustomPath) {
+                        let baselineFilePathNoExit = self.removeExtension(f);
+                        let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
+                        baselineFilePathNoExit = baselineFilePathNoExit
+                            .replace('/', '\/')
+                            .replace('-', '\-')
+                            .replace('.', '\.')
+                            .replace('_', '\_')
+                        baselineFilePathNoExit = `\.${self.removeRootFolder(baselineFilePathNoExit)}`
+                        const dirPath = path.dirname(f);
+                        toReplace = self.removeRootFolder(path.join(dirPath, toReplace))
+                        toReplace = `.${toReplace}`
+                        // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
+                        input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
+                    }
+                });
+                return input;
+            },
             currentFilePath() {
                 const baselineFilePathNoExit = self.removeExtension(relativeBaselineCustomPath);
                 // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
@@ -102,7 +127,7 @@ export class BaselineSiteJoin {
             },
             baselinePath() {
                 // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
-                const levelBack = relativeBaselineCustomPath.split('/').length - 2;
+                const levelBack = relativeBaselineCustomPath.split('/').length - 3;
                 const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
                 // console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
                 const pathToBaselineNodeModulesRelative = self.pathToBaselineNodeModulesRelative
@@ -110,13 +135,21 @@ export class BaselineSiteJoin {
                     .replace('-', '\-')
                     .replace('.', '\.')
                     .replace('_', '\_')
-                const baselineRegex = `${pathToBaselineNodeModulesRelative}(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)*`
+                const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+                // console.log('pathPart', pathPart)
+                const baselineRegex = `${pathToBaselineNodeModulesRelative}${pathPart}*`
                 // console.log(`\nbaselineRegex: ${baselineRegex}`)
                 let patterns = input.match(new RegExp(baselineRegex, 'g'))
                 // console.log(`patterns\n`, patterns.map(d => `\t${d}`).join('\n'))
                 if (Array.isArray(patterns) && patterns.length >= 1) {
                     patterns.forEach(p => {
-                        const patternWithoutBaselinePart = p.replace(self.pathToBaselineNodeModulesRelative, '');
+                        let patternWithoutBaselinePart = p
+                            .replace(self.pathToBaselineNodeModulesRelative, '')
+                        // console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
+                        patternWithoutBaselinePart = patternWithoutBaselinePart
+                            .replace(new RegExp(`^${pathPart}`, 'g'), '')
+                        // console.log('patternWithoutBaselinePart rep', patternWithoutBaselinePart)
+
                         // console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
                         // console.log('p', p)
                         const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`
@@ -139,6 +172,7 @@ export class BaselineSiteJoin {
         return (input) => {
             input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
             input = this.replace(input, relativeBaselineCustomPath).baselinePath()
+            input = this.replace(input, relativeBaselineCustomPath).customRelativePathes()
             return input;
         }
     }

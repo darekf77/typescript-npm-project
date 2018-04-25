@@ -5,7 +5,7 @@ import { authenticate, use } from 'passport';
 import { Strategy, IStrategyOptions } from 'passport-http-bearer';
 
 import {
-  Controllers, Entities, AuthController
+  Controllers, Entities
 } from '../index';
 
 import { META } from "../helpers";

@@ -1,12 +1,6 @@
 //#region @backend
-import * as c from './controllers';
-import * as e from './entities';
-export * from './controllers';
-export * from './entities';
-
-import glob = require('glob')
-import path = require('path');
-import { controllers } from './controllers';
+import * as controllers from './controllers';
+import * as entites from './entities';
 
 const tControllers = {}
 const tEntities = {}
@@ -20,15 +14,15 @@ function addEntity(entity: Function) {
 }
 
 
-addController(c.AuthController)
-addController(c.DialogController)
+addController(controllers.AuthController)
+addController(controllers.DialogController)
 
-addEntity(e.EMAIL)
-addEntity(e.EMAIL_TYPE)
-addEntity(e.USER)
-addEntity(e.SESSION)
-addEntity(e.DIALOG)
-addEntity(e.CATEGORY)
+addEntity(entites.EMAIL)
+addEntity(entites.EMAIL_TYPE)
+addEntity(entites.USER)
+addEntity(entites.SESSION)
+addEntity(entites.DIALOG)
+addEntity(entites.CATEGORY)
 
 export const Controllers = tControllers;
 export const Entities = tEntities;
