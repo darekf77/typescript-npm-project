@@ -16,7 +16,6 @@ import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 import config from '../../environment';
 import * as path from 'path';
-import { BaselineSiteJoin } from "tnp";
 //#endregion
 
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
@@ -94,17 +93,15 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
   get ctrl() {
     return controllers.controllers()
   }
-  protected isBaselineFile: boolean;
   //#endregion
 
-  constructor() {
+  constructor(private isBaselineFile = false) {
     super();
     // console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
 
     //#region @backend
-    this.isBaselineFile = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
-    if (this.isBaselineFile) {
+    if (isBaselineFile) {
       console.log(`Controller: ${AuthController.name} is in baseline file. Site file is extending it.`)
     } else {
       console.log(`Controller: ${AuthController.name} normal init.`)
@@ -545,7 +542,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  private async __init() {
+  protected async __init() {
     //#region @backendFunc
 
     const types = await this.db.EMAIL_TYPE.init();
