@@ -16,6 +16,7 @@ import { run } from '../process';
 
 export * from './base-project';
 export * from './base-project-lib';
+export * from './baseline-site-join';
 export * from './project-angular-client';
 export * from './project-angular-client-cli';
 export * from './project-angular-lib';

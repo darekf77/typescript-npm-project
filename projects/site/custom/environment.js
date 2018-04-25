@@ -2,6 +2,7 @@ const { environmentName, LOCAL_ENVIRONMENT_NAME } = require('tnp')
 
 const config = require('baseline/environment')
 
+config.isBaseline = false;
 config.name = environmentName(__filename, LOCAL_ENVIRONMENT_NAME)
 
 

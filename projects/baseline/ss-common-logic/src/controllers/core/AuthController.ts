@@ -14,6 +14,12 @@ import { Handler } from 'express';
 export { Handler } from 'express';
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
+import config from '../../environment';
+import * as path from 'path';
+import { BaselineSiteJoin } from "tnp";
+
+const file =
+const isBaseline = path.basename(__filename).match( new RegExp(`${BaselineSiteJoin.PREFIX}`) )
 //#endregion
 
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
@@ -33,6 +39,7 @@ import { META } from '../../helpers';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
+
 
 
 export interface IHelloJS {
@@ -86,7 +93,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
   get db() {
     return entities.entities(this.connection as any);
   }
-  
+
   get ctrl() {
     return controllers.controllers()
   }
@@ -95,6 +102,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   constructor() {
     super();
+    console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
     //#region @backend
     this.__init();
@@ -517,7 +525,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  private async __mocks() {
+  public async __mocks() {
     //#region @backendFunc
     await this.__createUser({
       username: 'admin',

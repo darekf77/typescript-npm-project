@@ -6,6 +6,7 @@ const config = {
 
   productionBuild: false,
   aot: false,
+  isBaseline: true,
   useRouter: () => config.name !== LOCAL_ENVIRONMENT_NAME,
   name: environmentName(__filename, LOCAL_ENVIRONMENT_NAME),
   db: {

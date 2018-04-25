@@ -3,6 +3,11 @@ import { ConnectionOptions } from "typeorm";
 export interface Config {
 
   /**
+   * Check where code comes from baseline or site
+   */
+  isBaseline: boolean;
+
+  /**
    * Check wheter code is minified, mangled, gzipped
    *
    * @type {Boolean}
