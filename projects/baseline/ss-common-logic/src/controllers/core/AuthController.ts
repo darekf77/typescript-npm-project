@@ -101,7 +101,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   constructor() {
     super();
-    console.log(`Super in base class: ${AuthController.name}`)
+    // console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
     //#region @backend
     if (isBaselineParent) {

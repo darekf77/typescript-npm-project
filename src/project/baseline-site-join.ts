@@ -12,6 +12,13 @@ import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
 
+function crossPlatofrmPath(p: string) {
+    if (process.platform === 'win32') {
+        return p.replace(/\\/g, '/');
+    }
+    return p;
+}
+
 
 interface JoinFilesOptions {
     baselineAbsoluteLocation: string;
@@ -73,7 +80,10 @@ export class BaselineSiteJoin {
     //#region files baseline/custom
     get relativePathesBaseline() {
         let baselineFiles: string[] = this.files.allBaselineFiles;
+        // console.log('baselineFiles', baselineFiles)
         const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
+        // console.log('baselineReplacePath', baselineReplacePath)
+        // process.exit(0)
         baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
 
         return baselineFiles;
@@ -81,7 +91,10 @@ export class BaselineSiteJoin {
 
     get relativePathesCustom() {
         let customFiles: string[] = this.files.allCustomFiles;
-        const customReplacePath = path.join(this.project.location, config.folder.custom);
+        // console.log('customFiles', customFiles)
+        const customReplacePath = crossPlatofrmPath(path.join(this.project.location, config.folder.custom));
+        // console.log('customReplacePath', customReplacePath)
+        // process.exit(0)
         customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
 
         return customFiles;
@@ -245,6 +258,7 @@ export class BaselineSiteJoin {
 
     //#region merge
     private merge(relativeBaselineCustomPath: string, verbose = true) {
+        console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
         if (verbose) {
             console.log(chalk.blue(`Baseline/Site modyfication detected...`))
             console.log(`File: ${relativeBaselineCustomPath}`)
@@ -380,19 +394,20 @@ export class BaselineSiteJoin {
         const basename = path.basename(relativeFilePath, ext)
             .replace(/\/$/g, ''); // replace last part of url /
 
-        return BaselineSiteJoin.PathHelper.PREFIX(`${basename}${ext}`);
+        const resultPath = BaselineSiteJoin.PathHelper.PREFIX(`${basename}${ext}`);
+        return crossPlatofrmPath(resultPath);
     }
 
     private getPrefixedPathInJoin(relativeFilePath: string) {
 
         const dirPath = path.dirname(relativeFilePath);
 
-        const res = path.join(
+        const resultPath = path.join(
             this.project.location,
             dirPath,
             this.getPrefixedBasename(relativeFilePath));
 
-        return res;
+        return crossPlatofrmPath(resultPath);
     }
 
     private get pathToBaselineAbsolute() {
@@ -406,28 +421,31 @@ export class BaselineSiteJoin {
             , config.folder.node_modules)
 
         // console.log('toReplace', toReplace)
-        return this.pathToBaselineThroughtNodeModules.replace(`${toReplace}/`, '')
+        const resultPath = this.pathToBaselineThroughtNodeModules.replace(`${toReplace}/`, '')
+        return crossPlatofrmPath(resultPath);
     }
 
     private get pathToBaselineThroughtNodeModules() {
         const baselinePath = this.pathToBaselineNodeModulesRelative;
 
-        return path.join(
+        const resultPath = path.join(
             this.project.location,
             config.folder.node_modules,
             baselinePath
         );
+        return crossPlatofrmPath(resultPath);
     }
 
     private get pathToCustom() {
-        return path.join(this.project.location, config.folder.custom);
+        const resultPath = path.join(this.project.location, config.folder.custom);
+        return crossPlatofrmPath(resultPath);
     }
 
     private get pathToBaselineNodeModulesRelative() {
         const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
             : path.join(this.project.baseline.parent.name, this.project.baseline.name)
 
-        return baselinePath;
+        return crossPlatofrmPath(baselinePath);
     }
     //#endregion
 

@@ -60,7 +60,7 @@ export class FilesRecreator {
                     self.project.isSite ? (
                         self.project.customizableFilesAndFolders
                             .concat(self.project.customizableFilesAndFolders.map(f => {
-                                return BaselineSiteJoin.PREFIX(f);
+                                return BaselineSiteJoin.PathHelper.PREFIX(f);
                             }))
                             .concat(self.project.customizableFilesAndFolders.map(f => {
                                 return `!${path.join(config.folder.custom, f)}`
