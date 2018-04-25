@@ -48,7 +48,7 @@ export class BaselineSiteJoin {
             },
             removeExtension(filePath: string) {
                 const ext = path.extname(filePath);
-                return path.join(path.dirname(filePath), path.basename(filePath, ext))
+                return crossPlatofrmPath(path.join(path.dirname(filePath), path.basename(filePath, ext)))
             },
             isBaselineParent(filePath: string) {
                 const basename = path.basename(filePath);
@@ -170,7 +170,7 @@ export class BaselineSiteJoin {
     }
     //#endregion
 
-    //#region  replace
+    //#region replace
     private replacePathFn(relativeBaselineCustomPath: string) {
         return (input) => {
             input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
@@ -195,7 +195,7 @@ export class BaselineSiteJoin {
                             .replace('_', '\_')
                         baselineFilePathNoExit = `\.${BaselineSiteJoin.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
                         const dirPath = path.dirname(f);
-                        toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(path.join(dirPath, toReplace))
+                        toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(crossPlatofrmPath(path.join(dirPath, toReplace)))
                         toReplace = `.${toReplace}`
                         // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
                         input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
@@ -206,9 +206,9 @@ export class BaselineSiteJoin {
             currentFilePath() {
                 const baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(relativeBaselineCustomPath);
                 // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
-                const toReplaceImportPath = `${path.join(
+                const toReplaceImportPath = crossPlatofrmPath(`${path.join(
                     self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
-                    baselineFilePathNoExit)}`;
+                    baselineFilePathNoExit)}`);
                 const replacement = `./${self.getPrefixedBasename(baselineFilePathNoExit)}`;
                 // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
                 // console.log(`replacement: "${replacement}"`)
@@ -258,7 +258,7 @@ export class BaselineSiteJoin {
 
     //#region merge
     private merge(relativeBaselineCustomPath: string, verbose = true) {
-        console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
+        // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
         if (verbose) {
             console.log(chalk.blue(`Baseline/Site modyfication detected...`))
             console.log(`File: ${relativeBaselineCustomPath}`)
