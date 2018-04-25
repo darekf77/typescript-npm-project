@@ -35,12 +35,20 @@ import { authenticate, use } from 'passport';
   }
 })
 export class AuthController extends BaselineAuthController {
-
   constructor() {
     super(true)
     //#region @backend
     this.__init();
     //#endregion
+  }
+
+  public async __mocks() {
+    await super.__mocks()
+    await this.__createUser({
+      username: 'site',
+      email: 'site@site.pl',
+      password: 'site'
+    }, 'normal_auth');
   }
 
 }
