@@ -19,7 +19,6 @@ export {
 //#region @backend
 import { authenticate, use } from 'passport';
 import { BaselineSiteJoin } from "tnp";
-const isBaselineParent = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
 //#endregion
 
 
@@ -38,9 +37,14 @@ const isBaselineParent = BaselineSiteJoin.PathHelper.isBaselineParent(__filename
 })
 export class AuthController extends BaselineAuthController {
 
+
   constructor() {
     super()
-    console.log('isBaselineParent from site: ', isBaselineParent)
+    //#region @backend
+
+    this.isBaselineFile = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
+    console.log('isBaselineParent from site: ', this.isBaselineFile)
+    //#endregion
   }
 
 }

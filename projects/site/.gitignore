@@ -20,10 +20,10 @@ __environment.js
 __environment.dev.js
 __environment.prod.js
 __environment.stage.js
-!custom/environment.d.ts
-!custom/environment.js
-!custom/environment.dev.js
-!custom/environment.prod.js
-!custom/environment.stage.js
+!custom\environment.d.ts
+!custom\environment.js
+!custom\environment.dev.js
+!custom\environment.prod.js
+!custom\environment.stage.js
 tslint.json
 .editorconfig

@@ -17,8 +17,6 @@ import * as graph from 'fbgraph';
 import config from '../../environment';
 import * as path from 'path';
 import { BaselineSiteJoin } from "tnp";
-
-const isBaselineParent = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
 //#endregion
 
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
@@ -96,17 +94,20 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
   get ctrl() {
     return controllers.controllers()
   }
+  protected isBaselineFile: boolean;
   //#endregion
-
 
   constructor() {
     super();
     // console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
+
     //#region @backend
-    if (isBaselineParent) {
-      console.log(`Super from baseline parent:  ${AuthController.name}, ok not init.`)
+    this.isBaselineFile = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
+    if (this.isBaselineFile) {
+      console.log(`Controller: ${AuthController.name} is in baseline file. Site file is extending it.`)
     } else {
+      console.log(`Controller: ${AuthController.name} normal init.`)
       this.__init();
     }
 

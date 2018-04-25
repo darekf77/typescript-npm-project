@@ -333,6 +333,7 @@ export class BaselineSiteJoin {
     watch() {
         this.monitor((absolutePath, event, isCustomFolder) => {
             // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
+            absolutePath = crossPlatofrmPath(absolutePath)
 
             if (isCustomFolder) {
                 this.join.watch.siteFileChange(absolutePath.replace(this.pathToCustom, ''));
