@@ -18,7 +18,8 @@ interface JoinFilesOptions {
 }
 
 export class BaselineSiteJoin {
-
+    private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
+    private static readonly prefix = '__';
 
 
     constructor(private project: Project) {
@@ -26,6 +27,50 @@ export class BaselineSiteJoin {
 
     }
 
+
+
+
+    public static get PathHelper() {
+        return {
+            PREFIX(baseFileName) {
+                return `${BaselineSiteJoin.prefix}${baseFileName}`
+            },
+            removeRootFolder(filePath: string) {
+                const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+                return filePath.replace(new RegExp(`^${pathPart}`, 'g'), '')
+            },
+            removeExtension(filePath: string) {
+                const ext = path.extname(filePath);
+                return path.join(path.dirname(filePath), path.basename(filePath, ext))
+            },
+            isBaselineParent(filePath: string) {
+                const basename = path.basename(filePath);
+                return basename.startsWith(BaselineSiteJoin.prefix)
+            }
+        }
+    }
+
+    //#region init
+    private __checkBaselineSiteStructure() {
+        if (!this.project.baseline) {
+            error(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
+        }
+    }
+
+    init() {
+        // remove customizable
+        // console.log(this.project.customizableFilesAndFolders);
+        // process.exit(0)
+        this.project.customizableFilesAndFolders.forEach(customizable => {
+            this.project.run(`tnp rimraf ${customizable}`).sync()
+        });
+        // rejoin baseline/site files
+        this.join.allBaselineSiteFiles()
+        return this;
+    }
+    //#endregion
+
+    //#region files baseline/custom
     get relativePathesBaseline() {
         let baselineFiles: string[] = this.files.allBaselineFiles;
         const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
@@ -41,8 +86,6 @@ export class BaselineSiteJoin {
 
         return customFiles;
     }
-
-
 
     get files() {
         this.__checkBaselineSiteStructure()
@@ -82,10 +125,46 @@ export class BaselineSiteJoin {
             }
         }
     }
+    //#endregion
 
-    private removeRootFolder(filePath: string) {
-        const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
-        return filePath.replace(new RegExp(`^${pathPart}`, 'g'), '')
+    //#region copy / unlink
+    private copyToJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
+        // console.log(`Extname from ${source}: ${path.extname(source)}`)
+
+        const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
+        const replaceFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
+        // console.log(`Replace fn for ${source} = ${!!replaceFn}`)
+        copyFile(
+            source,
+            dest,
+            replaceFn
+        )
+    }
+    private fastCopy(source: string, dest: string) {
+
+        const destDirPath = path.dirname(dest);
+        // console.log('destDirPath', destDirPath)
+        if (!fs.existsSync(destDirPath)) {
+            fse.mkdirpSync(destDirPath)
+        }
+        fse.copyFileSync(source, dest)
+    }
+
+    private fastUnlink(filePath) {
+        if (fs.existsSync(filePath)) {
+            fse.unlinkSync(filePath)
+        }
+    }
+    //#endregion
+
+    //#region  replace
+    private replacePathFn(relativeBaselineCustomPath: string) {
+        return (input) => {
+            input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
+            input = this.replace(input, relativeBaselineCustomPath).baselinePath()
+            input = this.replace(input, relativeBaselineCustomPath).customRelativePathes()
+            return input;
+        }
     }
 
     private replace(input: string, relativeBaselineCustomPath: string) {
@@ -94,16 +173,16 @@ export class BaselineSiteJoin {
             customRelativePathes() {
                 self.relativePathesCustom.forEach(f => {
                     if (f != relativeBaselineCustomPath) {
-                        let baselineFilePathNoExit = self.removeExtension(f);
+                        let baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(f);
                         let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
                         baselineFilePathNoExit = baselineFilePathNoExit
                             .replace('/', '\/')
                             .replace('-', '\-')
                             .replace('.', '\.')
                             .replace('_', '\_')
-                        baselineFilePathNoExit = `\.${self.removeRootFolder(baselineFilePathNoExit)}`
+                        baselineFilePathNoExit = `\.${BaselineSiteJoin.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
                         const dirPath = path.dirname(f);
-                        toReplace = self.removeRootFolder(path.join(dirPath, toReplace))
+                        toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(path.join(dirPath, toReplace))
                         toReplace = `.${toReplace}`
                         // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
                         input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
@@ -112,7 +191,7 @@ export class BaselineSiteJoin {
                 return input;
             },
             currentFilePath() {
-                const baselineFilePathNoExit = self.removeExtension(relativeBaselineCustomPath);
+                const baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(relativeBaselineCustomPath);
                 // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
                 const toReplaceImportPath = `${path.join(
                     self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
@@ -162,51 +241,9 @@ export class BaselineSiteJoin {
         }
 
     }
+    //#endregion
 
-
-
-
-
-
-    private replacePathFn(relativeBaselineCustomPath: string) {
-        return (input) => {
-            input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
-            input = this.replace(input, relativeBaselineCustomPath).baselinePath()
-            input = this.replace(input, relativeBaselineCustomPath).customRelativePathes()
-            return input;
-        }
-    }
-
-    private ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
-    private copyToJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
-        // console.log(`Extname from ${source}: ${path.extname(source)}`)
-
-        const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
-        const replaceFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
-        // console.log(`Replace fn for ${source} = ${!!replaceFn}`)
-        copyFile(
-            source,
-            dest,
-            replaceFn
-        )
-    }
-
-    private fastCopy(source: string, dest: string) {
-
-        const destDirPath = path.dirname(dest);
-        // console.log('destDirPath', destDirPath)
-        if (!fs.existsSync(destDirPath)) {
-            fse.mkdirpSync(destDirPath)
-        }
-        fse.copyFileSync(source, dest)
-    }
-
-    private fastUnlink(filePath) {
-        if (fs.existsSync(filePath)) {
-            fse.unlinkSync(filePath)
-        }
-    }
-
+    //#region merge
     private merge(relativeBaselineCustomPath: string, verbose = true) {
         if (verbose) {
             console.log(chalk.blue(`Baseline/Site modyfication detected...`))
@@ -250,8 +287,9 @@ export class BaselineSiteJoin {
             console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
         }
     }
+    //#endregion
 
-
+    //#region join
     private get join() {
         const self = this;
         return {
@@ -275,11 +313,9 @@ export class BaselineSiteJoin {
             }
         }
     }
+    //#endregion
 
-    public static PREFIX(baseFileName) {
-        return `__${baseFileName}`
-    }
-
+    //#region watch
     watch() {
         this.monitor((absolutePath, event, isCustomFolder) => {
             // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
@@ -291,18 +327,6 @@ export class BaselineSiteJoin {
             }
 
         })
-    }
-
-    init() {
-        // remove customizable
-        // console.log(this.project.customizableFilesAndFolders);
-        // process.exit(0)
-        this.project.customizableFilesAndFolders.forEach(customizable => {
-            this.project.run(`tnp rimraf ${customizable}`).sync()
-        });
-        // rejoin baseline/site files
-        this.join.allBaselineSiteFiles()
-        return this;
     }
 
     private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
@@ -348,26 +372,15 @@ export class BaselineSiteJoin {
         });
 
     }
+    //#endregion
 
-
-    private __checkBaselineSiteStructure() {
-        if (!this.project.baseline) {
-            error(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
-        }
-    }
-
-    private removeExtension(filePath: string) {
-        const ext = path.extname(filePath);
-        return path.join(path.dirname(filePath), path.basename(filePath, ext))
-    }
-
-
+    //#region pathes
     private getPrefixedBasename(relativeFilePath: string) {
         const ext = path.extname(relativeFilePath);
         const basename = path.basename(relativeFilePath, ext)
             .replace(/\/$/g, ''); // replace last part of url /
 
-        return BaselineSiteJoin.PREFIX(`${basename}${ext}`);
+        return BaselineSiteJoin.PathHelper.PREFIX(`${basename}${ext}`);
     }
 
     private getPrefixedPathInJoin(relativeFilePath: string) {
@@ -416,8 +429,6 @@ export class BaselineSiteJoin {
 
         return baselinePath;
     }
-
-
-
+    //#endregion
 
 }

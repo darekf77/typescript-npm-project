@@ -41,7 +41,11 @@ export abstract class Project extends BaseProjectRouter {
     static projects: Project[] = [];
 
     static get Current() {
-        return ProjectFrom(process.cwd())
+        const current = ProjectFrom(process.cwd())
+        if (!current) {
+            error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`)
+        }
+        return current;
     }
     static get Tnp() {
         return ProjectFrom(path.join(__dirname, '..', '..'));

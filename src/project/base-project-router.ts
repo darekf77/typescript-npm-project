@@ -1,7 +1,7 @@
 import * as child from 'child_process';
 import * as portfinder from 'portfinder';
 import { error } from "../messages";
-import { TnpRoute } from "models";
+import { TnpRoute } from "../models";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 import { ProjectWorkspace } from '.';

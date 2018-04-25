@@ -18,8 +18,7 @@ import config from '../../environment';
 import * as path from 'path';
 import { BaselineSiteJoin } from "tnp";
 
-const file =
-const isBaseline = path.basename(__filename).match( new RegExp(`${BaselineSiteJoin.PREFIX}`) )
+const isBaselineParent = BaselineSiteJoin.PathHelper.isBaselineParent(__filename);
 //#endregion
 
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
@@ -105,7 +104,12 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
     //#region @backend
-    this.__init();
+    if (isBaselineParent) {
+      console.log(`Super from baseline parent:  ${AuthController.name}, ok not init.`)
+    } else {
+      this.__init();
+    }
+
     //#endregion
   }
 

@@ -1,4 +1,4 @@
-import { run } from "../process";
+import { run, clearConsole } from "../process";
 import { Project, ProjectIsomorphicLib } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir, LibType } from "../models";
@@ -28,6 +28,10 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
     const { prod, watch, outDir, appBuild } = opt;
 
+    if (!watch) {
+        clearConsole()
+    }
+
     const project: Project = Project.Current;
 
     if (allowedLibs.includes(project.type)) {
@@ -36,7 +40,7 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
         }
         project.build(opt);
         if (watch) {
-            if(project.isSite) {
+            if (project.isSite) {
                 project.recreate.join.watch()
             }
         } else {
