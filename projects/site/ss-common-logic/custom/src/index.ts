@@ -7,7 +7,7 @@ function addController(controller: Function) {
 }
 
 function addEntity(entity: Function) {
-  tEntities[`baseline${entity.name}`] = entity;
+  tEntities[`__baseline${entity.name}`] = entity;
 }
 
 addEntity(USER);
