@@ -28,9 +28,8 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
     const { prod, watch, outDir, appBuild } = opt;
 
-    if (!watch) {
-        clearConsole()
-    }
+    clearConsole()
+
 
     const project: Project = Project.Current;
 
