@@ -29,15 +29,24 @@ export class ProjectAngularLib extends BaseProjectLib {
         ]).concat(this.angular.projectSpecyficFiles());
     }
 
-    buildLib(outDir: BuildDir) {
-        this.compilationWrapper(() => {
+    buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean) {
+        if (watch) {
             this.run(`tnp rimraf ${outDir}`).sync()
-            this.run(`tnp npm-run gulp inline-templates-${outDir}`, { output: false }).sync()
-            this.run(`tnp npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
             if (outDir === 'dist') {
                 this.run(`tnp rimraf ${config.folder.module} && tnp ln ${outDir} ${config.folder.module}`).sync()
             }
-        }, `angular-lib (project ${this.name})`)
+            this.run(`npm-run gulp inline-templates-${outDir}-watch`, { output: false }).async()
+            this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`).async()
+        } else {
+            this.compilationWrapper(() => {
+                this.run(`tnp rimraf ${outDir}`).sync()
+                this.run(`npm-run gulp inline-templates-${outDir}`, { output: false }).sync()
+                this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
+                if (outDir === 'dist') {
+                    this.run(`tnp rimraf ${config.folder.module} && tnp ln ${outDir} ${config.folder.module}`).sync()
+                }
+            }, `angular-lib (project ${this.name})`)
+        }
         return this;
     }
 
@@ -46,12 +55,13 @@ export class ProjectAngularLib extends BaseProjectLib {
         if (appBuild) {
             this.angular.buildSteps(buildOptions);
         } else {
-            if (watch) {
-                const p = (prod ? ':prod' : '');
-                this.watcher.run(`tnp build:${outDir}${p}`, 'components/src', 5);
-            } else {
-                this.buildLib(outDir)
-            }
+            this.buildLib(outDir, prod, watch)
+            // if (watch) {
+            //     const p = (prod ? ':prod' : '');
+            //     this.watcher.run(`tnp build:${outDir}${p}`, 'components/src', 5);
+            // } else {
+            //     this.buildLib(outDir)
+            // }
         }
     }
 

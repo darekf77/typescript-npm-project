@@ -38,6 +38,14 @@ gulp.task('inline-templates-bundle', () => {
     .pipe(gulp.dest(INLINE_TEMPLATES_BUNDLE.DIST));
 });
 
+gulp.task('inline-templates-dist-watch', function() {
+  gulp.watch('./components/src/**/*.*', ['inline-templates-dist']);
+});
+
+gulp.task('inline-templates-bundle-watch', function() {
+  gulp.watch('./components/src/**/*.*', ['inline-templates-bundle']);
+});
+
 /**
  * Compile SASS to CSS.
  * @see https://github.com/ludohenin/gulp-inline-ng2-template
