@@ -9,10 +9,11 @@ import * as _ from 'lodash';
 import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
-import {
-  AuthController,
-  USER, EMAIL, EMAIL_TYPE, SESSION
-} from 'ss-common-logic/browser';
+import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { USER } from 'ss-common-logic/browser/entities/core/USER';
+import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
+import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
+import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';

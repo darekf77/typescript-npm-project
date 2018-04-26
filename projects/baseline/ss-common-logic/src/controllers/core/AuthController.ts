@@ -35,6 +35,7 @@ import { META } from '../../helpers';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
+import { SESSION } from "../../entities/core/SESSION";
 
 
 
@@ -95,19 +96,10 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
   }
   //#endregion
 
-  constructor(private isBaselineFile = false) {
+  constructor() {
     super();
     // console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
-
-    //#region @backend
-    if (isBaselineFile) {
-      console.log(`Controller: ${AuthController.name} is in baseline file. Site file is extending it.`)
-    } else {
-      console.log(`Controller: ${AuthController.name} normal init.`)
-      this.__init();
-    }
-
     //#endregion
   }
 
@@ -542,30 +534,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  protected async __init() {
-    //#region @backendFunc
 
-    const types = await this.db.EMAIL_TYPE.init();
-
-    const strategy = async (token, cb) => {
-      let user: entities.USER = null;
-      const Session = await this.db.SESSION.getByToken(token);
-
-      if (Session) {
-        if (Session.isExpired()) {
-          await this.db.SESSION.remove(Session);
-          return cb(null, user);
-        }
-        user = Session.user;
-        user.password = undefined;
-      }
-      return cb(null, user);
-    };
-    use(new Strategy(strategy));
-
-    await this.__mocks();
-    //#endregion
-  }
 
 }
 

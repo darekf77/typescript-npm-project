@@ -36,13 +36,13 @@ export async function start(options: StartOptions) {
         connection: connection as any
     })
 
-    // if (_.isArray(MockData)) {
-    //     const promises: Promise<any>[] = []
-    //     MockData.forEach(Mock => {
-    //         promises.push((new (Mock as any)(connection) as META.BASE_MOCK_DATA).init())
-    //     })
-    //     await Promise.all(promises);
-    // }
+    if (_.isArray(MockData)) {
+        const promises: Promise<any>[] = []
+        MockData.forEach(Mock => {
+            promises.push((new (Mock as any)(connection) as META.BASE_MOCK_DATA).init())
+        })
+        await Promise.all(promises);
+    }
 
     return {
         connection,

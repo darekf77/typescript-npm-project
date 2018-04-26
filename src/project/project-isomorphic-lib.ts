@@ -55,7 +55,12 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        this.buildLib(outDir, prod, watch);
+        if (watch) {
+            this.buildLib(outDir, prod, false);
+            this.buildLib(outDir, prod, watch);
+        } else {
+            this.buildLib(outDir, prod, watch);
+        }
         return;
     }
 

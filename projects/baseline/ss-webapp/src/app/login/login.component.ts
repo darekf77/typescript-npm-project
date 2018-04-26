@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { AuthController } from 'ss-common-logic/browser';
+import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';

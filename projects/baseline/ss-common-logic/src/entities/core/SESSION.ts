@@ -96,12 +96,11 @@ export class SESSION extends META.BASE_ENTITY {
   })
   expiredDate: Date;
 
-  //#region @joins
+
   @OneToOne(type => USER, user => user.id, {
     nullable: true
   })
   @JoinColumn()
-  //#endregion
   user: USER;
 
   //#region @backend

@@ -27,22 +27,28 @@ export class InitMockData extends META.BASE_MOCK_DATA {
     super(connection)
   }
 
-
   async init() {
     //#region @backendFunc
 
-    await this.db.EMAIL_TYPE.init();
+    const types = await this.db.EMAIL_TYPE.init();
 
-    await this.ctrl.AuthController.__createUser({
-      username: 'admin',
-      email: 'admin@admin.pl',
-      password: 'admin'
-    }, 'normal_auth');
-    await this.ctrl.AuthController.__createUser({
-      username: 'postman',
-      email: 'postman@postman.pl',
-      password: 'postman'
-    }, 'normal_auth');
+    const strategy = async (token, cb) => {
+      let user: entities.USER = null;
+      const Session = await this.db.SESSION.getByToken(token);
+
+      if (Session) {
+        if (Session.isExpired()) {
+          await this.db.SESSION.remove(Session);
+          return cb(null, user);
+        }
+        user = Session.user;
+        user.password = undefined;
+      }
+      return cb(null, user);
+    };
+    use(new Strategy(strategy));
+
+    await this.ctrl.AuthController.__mocks();
     //#endregion
   }
 
