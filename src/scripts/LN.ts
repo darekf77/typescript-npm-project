@@ -13,7 +13,11 @@ function $LN(argsString: string) {
     }
     const link = args[0]
     let target = args[1]
-    HelpersLinks.createLink(target, link)
+    try {
+        HelpersLinks.createLink(target, link)
+    } catch (e) {
+        error(`Not able to craate link from: ${link} to  target: ${target} `, true)
+    }
     process.exit(0)
 }
 
