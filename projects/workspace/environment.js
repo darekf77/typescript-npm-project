@@ -1,6 +1,6 @@
 
 const path = require('path');
-const { environmentName } = require('tnp')
+const { environmentName } = require('morphi')
 
 const LOCAL_ENVIRONMENT_NAME = 'local'
 

@@ -1,4 +1,4 @@
-const { environmentName, LOCAL_ENVIRONMENT_NAME } = require('tnp')
+const { environmentName, LOCAL_ENVIRONMENT_NAME } = require('morphi')
 
 const config = require('baseline/environment')
 
