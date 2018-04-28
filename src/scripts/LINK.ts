@@ -33,7 +33,7 @@ export function link(workspaceProject: Project) {
     }
     workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
     workspaceProject.node_modules.localChildrensWithRequiredLibs.addSymlinks();
-    Project.Tnp.ownNpmPackage.linkTo(workspaceProject);
+    // Project.Tnp.ownNpmPackage.linkTo(workspaceProject);
 }
 
 

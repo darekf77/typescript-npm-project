@@ -14,7 +14,7 @@ export function unlink(workspaceProject: Project) {
         onlyLibsChildrens(workspaceProject).forEach(c => c.node_modules.remove())
     }
     workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
-    Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
+    // Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
 }
 
 export default {

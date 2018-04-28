@@ -6,7 +6,7 @@ import { error } from "../messages";
 
 function cleanBeforeInstall(workspaceProject: Project) {
     workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
-    Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
+    // Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
 }
 
 function install(a: string) {
@@ -44,12 +44,12 @@ function install(a: string) {
 
 function installInTnpWorkspace(workspace: Project, npmPackagesToAdd: string[]) {
     workspace.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
-    Project.Tnp.ownNpmPackage.unlinkFrom(workspace);
+    // Project.Tnp.ownNpmPackage.unlinkFrom(workspace);
     npmPackagesToAdd.forEach(npmPackageName => {
         workspace.node_modules.installPackage(npmPackageName)
     })
     workspace.node_modules.localChildrensWithRequiredLibs.addSymlinks();
-    Project.Tnp.ownNpmPackage.linkTo(workspace);
+    // Project.Tnp.ownNpmPackage.linkTo(workspace);
 }
 
 export default {

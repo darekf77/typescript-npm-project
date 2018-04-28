@@ -39,10 +39,10 @@ export class NodeModules {
         if (!this.exist()) {
             if (fs.existsSync(yarnLock)) {
                 info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
-                this.project.run('yarn install', { cwd: this.project.location, output: false }).sync()
+                this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
             } else {
                 info(`Installing npm packages in ${this.project.name}... `);
-                this.project.run('npm i', { cwd: this.project.location, output: false }).sync()
+                this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
             }
         }
     }
