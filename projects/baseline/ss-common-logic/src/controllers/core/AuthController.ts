@@ -481,7 +481,6 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     Email.types.push(EmailType);
     Email = await this.db.EMAIL.save(Email);
 
-    EmailType = await this.db.EMAIL_TYPE.save(EmailType);
 
     let User = await this.db.EMAIL.getUserBy(Email.address);
     if (User) {
