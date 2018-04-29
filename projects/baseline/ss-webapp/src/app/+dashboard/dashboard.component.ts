@@ -1,8 +1,11 @@
 
 import { Component, OnInit } from '@angular/core';
-import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
-
+// third part
 import { Log, Level } from "ng2-logger";
+// local
+import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
+import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+
 const log = Log.create('Dashboard')
 
 @Component({
@@ -11,20 +14,18 @@ const log = Log.create('Dashboard')
 })
 
 export class DashboardComponent implements OnInit {
-  constructor(public categoryCtrl: CategoryController) {
+  constructor(
+    public auth: AuthController,
+    public categoryCtrl: CategoryController) {
 
   }
 
   async ngOnInit() {
-    this.categoryCtrl.allCategories().received.then(d => {
-      log.i('categories', d)
-    })
+    await this.auth.browser.init()
+    const categories = await this.categoryCtrl.allCategories().received
 
-    this.categoryCtrl.__model.getAll().received.then(d => {
-      log.i('categories from base crud', d)
-    })
-
-
+    debugger
+    log.i('categories from base crud', categories.body.json)
   }
 
 

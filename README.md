@@ -3,6 +3,11 @@
 Helper project for my typescript npm libraries.
 
 
+
+
+# TO REMEBERS
+ - check if each controller, entity is added to morphi init
+
 ## Create, build, publish:
 - isomorphic typescript library
 - angular library

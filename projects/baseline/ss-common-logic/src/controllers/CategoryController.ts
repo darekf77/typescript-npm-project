@@ -29,6 +29,7 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     return controllers.controllers()
   }
 
+
   async initExampleDbData() {
 
     let c1d1 = new entities.DIALOG()
@@ -50,24 +51,30 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     await this.db.CATEGORY.save(c1)
 
 
-    // const c2d1 = new entities.DIALOG()
-    // c2d1.name = 'Picku introduction'
-    // await this.db.DIALOG.save(c2d1)
+    const c2d1 = new entities.DIALOG()
+    c2d1.name = 'Picku introduction'
 
-    // const c2 = new entities.CATEGORY()
-    // c2.name = 'STREET'
-    // c2.dialogs.push(c2d1)
-    // await this.db.CATEGORY.save(c2)
+
+    const c2 = new entities.CATEGORY()
+    c2.name = 'STREET'
+    c2.dialogs.push(c2d1)
+    c2d1.category = c2;
+    await this.db.DIALOG.save(c2d1)
+    await this.db.CATEGORY.save(c2)
   }
-
   //#endregion
+
 
   @GET('/Allcategories')
   allCategories(): Response<entities.CATEGORY[]> {
     //#region @backendFunc
     const self = this;
     return async () => {
-      const catergoires = await this.db.CATEGORY.find()
+      const catergoires = await this.db.CATEGORY
+        .createQueryBuilder(META.tableNameFrom(entities.CATEGORY))
+        .leftJoinAndSelect(`${META.tableNameFrom(entities.CATEGORY)}.dialogs`, 'dialogs')
+        .getMany()
+
       return catergoires;
     };
     //#endregion

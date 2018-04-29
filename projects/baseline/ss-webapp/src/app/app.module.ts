@@ -15,15 +15,19 @@ import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
 import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
 import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
+import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
 
+
 init('http://localhost:4000')
   .angularProviders({
     controllers: [AuthController, CategoryController],
-    entities: [USER, EMAIL, EMAIL_TYPE, SESSION]
+    entities: [
+      USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG]
   })
 
 @NgModule({
