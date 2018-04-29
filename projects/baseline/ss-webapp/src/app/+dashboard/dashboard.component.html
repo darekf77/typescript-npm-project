@@ -1,7 +1,12 @@
 <h1>
-  <a  [routerLink]="'/'"> main page </a> Dashboard </h1>
+  <a [routerLink]="'/'" class="logo-header-ffm" >    
+    <img class="logo-eiffel-tower" [src]="'/assets/img/logo/eiffel-tower-in-paris-france.png'" >
+    <span> French for man's </span>
+    <img class="logo-couple-kissing" [src]="'/assets/img/logo/couple-kissing.png'" >
+  </a>
+</h1>
 
-<columns-container class="middle-content" >
+<columns-container class="middle-content" [style.height.px]="content.height()" >
 
   <column [width]="200">
     <ul>
@@ -21,3 +26,6 @@
   </column>
 
 </columns-container>
+<footer>
+  &copy; 2018
+</footer>

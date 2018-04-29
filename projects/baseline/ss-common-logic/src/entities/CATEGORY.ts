@@ -5,6 +5,7 @@ import { Entity, JoinTable, OneToMany } from 'typeorm';
 // local
 import { META } from '../helpers';
 import { DIALOG } from './DIALOG';
+import { kebabCase } from 'lodash';
 
 
 @Entity(META.tableNameFrom(CATEGORY))
@@ -14,6 +15,10 @@ export class CATEGORY extends META.BASE_ENTITY {
   id: number;
 
   @Column() name: string;
+
+  path() {
+    return kebabCase(this.name);
+  }
 
 
   @OneToMany(type => DIALOG, dial => dial.category, {
