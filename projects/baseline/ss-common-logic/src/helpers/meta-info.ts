@@ -36,6 +36,9 @@ export namespace META {
     //#region @backend
     abstract get db(): { [entities: string]: Repository<any> }
     abstract get ctrl(): { [controller: string]: META.BASE_CONTROLLER<any> }
+
+    abstract async initExampleDbData();
+
     //#endregion
 
   }

@@ -518,8 +518,25 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  public async __mocks() {
+  public async initExampleDbData() {
     //#region @backendFunc
+
+    const strategy = async (token, cb) => {
+      let user: entities.USER = null;
+      const Session = await this.db.SESSION.getByToken(token);
+
+      if (Session) {
+        if (Session.isExpired()) {
+          await this.db.SESSION.remove(Session);
+          return cb(null, user);
+        }
+        user = Session.user;
+        user.password = undefined;
+      }
+      return cb(null, user);
+    };
+    use(new Strategy(strategy));
+
     await this.__createUser({
       username: 'admin',
       email: 'admin@admin.pl',

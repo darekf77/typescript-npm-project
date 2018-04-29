@@ -22,11 +22,13 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.handlers.push(this.auth.isLoggedIn.subscribe(d => {
       log.i('data from auth observable !', d)
       this.hideModal()
     }))
-
+    log.i('On init login !')
+    this.auth.browser.init()
   }
 
   hideModal() {

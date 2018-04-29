@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 // local
 import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
+import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 
 @NgModule({
     imports: [
@@ -15,7 +16,7 @@ import { routes } from "./dashboard.routes";
     ],
     exports: [],
     declarations: [DashboardComponent],
-    providers: [],
+    providers: [CategoryController],
 })
 export class DashboardModule { }
 

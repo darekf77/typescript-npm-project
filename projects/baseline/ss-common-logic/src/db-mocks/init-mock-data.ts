@@ -31,24 +31,8 @@ export class InitMockData extends META.BASE_MOCK_DATA {
     //#region @backendFunc
 
     const types = await this.db.EMAIL_TYPE.init();
-
-    const strategy = async (token, cb) => {
-      let user: entities.USER = null;
-      const Session = await this.db.SESSION.getByToken(token);
-
-      if (Session) {
-        if (Session.isExpired()) {
-          await this.db.SESSION.remove(Session);
-          return cb(null, user);
-        }
-        user = Session.user;
-        user.password = undefined;
-      }
-      return cb(null, user);
-    };
-    use(new Strategy(strategy));
-
-    await this.ctrl.AuthController.__mocks();
+    await this.ctrl.AuthController.initExampleDbData();
+    await this.ctrl.CategoryController.initExampleDbData()
     //#endregion
   }
 

@@ -15,7 +15,7 @@ function addEntity(entity: Function) {
 
 
 addController(controllers.AuthController)
-addController(controllers.DialogController)
+addController(controllers.CategoryController)
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)

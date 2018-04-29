@@ -1,13 +1,26 @@
 
 import { Component, OnInit } from '@angular/core';
+import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
+
+import { Log, Level } from "ng2-logger";
+const log = Log.create('Dashboard')
 
 @Component({
-    selector: 'app-dashboard-component',
-    templateUrl: 'dashboard.component.html'
+  selector: 'app-dashboard-component',
+  templateUrl: 'dashboard.component.html'
 })
 
 export class DashboardComponent implements OnInit {
-    constructor() { }
+  constructor(public categoryCtrl: CategoryController) {
 
-    ngOnInit() { }
+  }
+
+  async ngOnInit() {
+    this.categoryCtrl.allCategories('asd').received.then(d => {
+      log.i('categories', d)
+    })
+
+  }
+
+
 }

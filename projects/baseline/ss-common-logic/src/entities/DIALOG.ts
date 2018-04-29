@@ -5,6 +5,7 @@ import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
 import { Entity } from 'typeorm';
+import { CategoryController } from '../controllers';
 
 
 @Entity(META.tableNameFrom(DIALOG))
@@ -15,7 +16,8 @@ export class DIALOG extends META.BASE_ENTITY {
 
   @Column() name: string;
 
-  @ManyToOne(type => CATEGORY, category => category.id, {
+
+  @ManyToOne(type => CATEGORY, cat => cat.id, {
     cascadeAll: false
   })
   @JoinColumn()

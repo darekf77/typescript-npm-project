@@ -22,7 +22,7 @@ $font-size-header: 15px;
             line-height: $font-size-header * 2;
             > app-login {
                 float: right;
-                line-height: $font-size-header;
+                line-height: $font-size-header* 2;;
             }
         }
         p[header="normal"] {
