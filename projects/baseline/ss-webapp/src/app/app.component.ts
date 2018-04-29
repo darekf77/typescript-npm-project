@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -6,4 +8,18 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent { }
+export class AppComponent implements OnInit {
+
+  constructor(public auth: AuthController, public router: Router) {
+
+  }
+
+  ngOnInit() {
+    this.auth.isLoggedIn.subscribe(login => {
+      if (!login) {
+        this.router.navigateByUrl('/')
+      }
+    })
+  }
+
+}

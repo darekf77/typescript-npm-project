@@ -10,7 +10,8 @@ const log = Log.create('Dashboard')
 
 @Component({
   selector: 'app-dashboard-component',
-  templateUrl: 'dashboard.component.html'
+  templateUrl: 'dashboard.component.html',
+  styleUrls: ['dashboard.component.scss']
 })
 
 export class DashboardComponent implements OnInit {
@@ -23,8 +24,6 @@ export class DashboardComponent implements OnInit {
   async ngOnInit() {
     await this.auth.browser.init()
     const categories = await this.categoryCtrl.allCategories().received
-
-    debugger
     log.i('categories from base crud', categories.body.json)
   }
 
