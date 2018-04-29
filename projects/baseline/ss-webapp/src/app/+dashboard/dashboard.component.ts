@@ -16,9 +16,14 @@ export class DashboardComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.categoryCtrl.allCategories('asd').received.then(d => {
+    this.categoryCtrl.allCategories().received.then(d => {
       log.i('categories', d)
     })
+
+    this.categoryCtrl.__model.getAll().received.then(d => {
+      log.i('categories from base crud', d)
+    })
+
 
   }
 

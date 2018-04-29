@@ -1,9 +1,14 @@
+import * as fse from 'fs-extra';
+import * as path from 'path';
+import * as cpr from 'cpr';
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
 // third part
 import { buildIsomorphicVersion } from "morphi";
 import { BaseProjectLib } from "./base-project-lib";
+
+
 
 export class ProjectIsomorphicLib extends BaseProjectLib {
 
@@ -64,6 +69,19 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         return;
     }
 
+    private copyWhenExist(source: string, outDir: string, folder = false) {
+        const basename = source;
+        source = path.join(this.location, source);
+        outDir = path.join(this.location, outDir, basename);
+        if (fse.existsSync(source)) {
+            if (folder) {
+                fse.copySync(source, outDir, { overwrite: true, recursive: true })
+            } else {
+                fse.copyFileSync(source, outDir);
+            }
+        }
+    }
+
     buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
         const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
@@ -79,7 +97,11 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         } else {
             this.compilationWrapper(() => {
                 try {
-                    // console.log('command:', `npm-run tsc --outDir ${outDir}`)
+                    this.copyWhenExist('bin', outDir, true)
+                    this.copyWhenExist('package.json', outDir, true)
+                    this.copyWhenExist('.npmrc', outDir, true)
+                    this.copyWhenExist('.gitignore', outDir, true)
+                    
                     this.run(`npm-run tsc --noEmitOnError true --noEmit true --outDir ${outDir}`).sync()
                     this.run(`npm-run tsc -d false --outDir ${outDir}`).sync()
                 } catch (e) {

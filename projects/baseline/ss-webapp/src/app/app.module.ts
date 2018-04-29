@@ -10,6 +10,7 @@ import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
 import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
@@ -21,7 +22,7 @@ import { routes } from "./app.routes";
 
 init('http://localhost:4000')
   .angularProviders({
-    controllers: [AuthController],
+    controllers: [AuthController, CategoryController],
     entities: [USER, EMAIL, EMAIL_TYPE, SESSION]
   })
 
