@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 // third part
 import { Log, Level } from "ng2-logger";
 // local
@@ -25,9 +25,7 @@ export class DashboardComponent implements OnInit {
   categories: CATEGORY[] = [];
 
   content = {
-    height() {
-      return window.innerHeight - 100;
-    }
+    height: window.innerHeight - 100
   }
 
   async ngOnInit() {
@@ -36,6 +34,12 @@ export class DashboardComponent implements OnInit {
     log.i('categories from base crud', categories.body.json)
     this.categories = categories.body.json;
   }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.content.height = window.innerHeight - 100;
+  }
+
 
 
 }
