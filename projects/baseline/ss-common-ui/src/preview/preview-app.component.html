@@ -1,13 +1,16 @@
 <standalone-popup [contentComponent]="popupContent"></standalone-popup>
 <ng-template #popupContent>
-    <ul>
-        <li>
-            <a [routerLink]="['/layout-slider-vertical']"> slider-vertical </a>
-        </li>
-        <li>
-            <a [routerLink]="['/layout-slider-vertical']"> slider-horizontal </a>
-        </li>
-    </ul>
+  <ul>
+    <li>
+      <a [routerLink]="['/preview-components']"> Components </a>
+    </li>
+    <li>
+      <a [routerLink]="['/preview-layout-material']"> Layout Material </a>
+    </li>
+    <li>
+      <a [routerLink]="['/layout-slider-vertical']"> Layout Slider Vertical  </a>
+    </li>
+  </ul>
 </ng-template>
 
 <router-outlet></router-outlet>

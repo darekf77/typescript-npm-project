@@ -1,1 +1,2 @@
-export * from './slider-vertical';
+export * from './layout-slider-vertical';
+export * from './layout-material';

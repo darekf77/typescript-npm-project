@@ -10,22 +10,20 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 // local
 import { AppComponent } from './preview-app.component';
 import { previewRoutes } from './preview-app.routes';
-import { PreviewSliderVerticalComponent } from './preview-slider-vertical/preview-slider-vertical.component';
+
 import {
-  StandalonePopupModule, SliderVerticalModule
+  StandalonePopupModule
 } from 'components';
 
 const modules = [
   MatTabsModule,
-  MatSidenavModule,
-  SliderVerticalModule
+  MatSidenavModule
 ];
 
 
 @NgModule({
   declarations: [
-    AppComponent,
-    PreviewSliderVerticalComponent
+    AppComponent
   ],
   imports: [
     NoopAnimationsModule,
