@@ -41,7 +41,7 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
 
     const c1 = new entities.CATEGORY()
-    c1.name = 'COFFE SHOP'
+    c1.name = 'DATE'
     c1.dialogs.push(c1d1)
     c1.dialogs.push(c1d2)
     c1d1.category = c1;
@@ -65,9 +65,9 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
     const c3d1 = new entities.DIALOG()
     c3d1.name = 'Picku introduction'
-    
+
     const c3 = new entities.CATEGORY()
-    c3.name = 'STREET'
+    c3.name = 'COFFE-SHOP'
     c3.dialogs.push(c3d1)
     c3d1.category = c3;
     await this.db.DIALOG.save(c3d1)

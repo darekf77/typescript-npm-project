@@ -7,7 +7,6 @@ import { META } from '../helpers';
 import { DIALOG } from './DIALOG';
 import { kebabCase } from 'lodash';
 
-
 @Entity(META.tableNameFrom(CATEGORY))
 export class CATEGORY extends META.BASE_ENTITY {
 
@@ -16,10 +15,11 @@ export class CATEGORY extends META.BASE_ENTITY {
 
   @Column() name: string;
 
-  path() {
+  @Column('boolean') isPremium: boolean = false;
+
+  get path() {
     return kebabCase(this.name);
   }
-
 
   @OneToMany(type => DIALOG, dial => dial.category, {
     cascadeUpdate: false,

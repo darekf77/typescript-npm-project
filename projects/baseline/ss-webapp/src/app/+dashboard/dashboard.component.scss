@@ -14,7 +14,7 @@
     span {
       font-family: 'Rajdhani', sans-serif;
       font-size: 25px;
-      text-decoration: none !important;      
+      text-decoration: none !important;
       color: rgb(37, 35, 35);
     }
     .logo-couple-kissing{
@@ -27,6 +27,29 @@
       position: relative;
       left: 13px;
       top: -3px;
+    }
+  }
+
+  .content-left-panel {
+    > ul {
+      padding-left: 0px;
+      li {
+        padding: 20px;
+        cursor: pointer;
+        background-color: rgba(255,255,255,0);
+        &:hover {
+          background-color: rgba(255,255,255,0.2)
+        }
+
+        a {
+          font-family: 'Rajdhani', sans-serif;
+          color: white;
+          text-decoration: none !important;
+          &:hover {
+            text-decoration: none !important;
+          }
+        }
+      }
     }
   }
 

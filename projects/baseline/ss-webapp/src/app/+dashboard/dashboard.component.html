@@ -8,13 +8,14 @@
 
 <columns-container class="middle-content" [style.height.px]="content.height" >
 
-  <column [width]="200">
-    <ul>
-      <li>
-        <a [routerLink]="'./date'"> Date </a>
-      </li>
-      <li>
-        <a [routerLink]="'./street'"> Street </a>
+  <column [width]="200" class="content-left-panel" >
+    <br>
+    <h3 *ngIf="categories && categories.length === 0" >
+      Ładowanie kategori
+    </h3>
+    <ul  *ngIf="categories && categories.length > 0" >
+      <li *ngFor="let category of categories">
+        <a [routerLink]="'./'+category.path"> {{category.name}} </a>
       </li>
     </ul>
 
