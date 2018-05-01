@@ -10,6 +10,7 @@ const exec = require('child_process').exec;
  */
 const INLINE_TEMPLATES_DIST = {
   SRC: './components/src/**/*.ts',
+  SRC_ASSETS: './components/src/**/*.png',
   DIST: './tmp/src-inlined-dist',
   CONFIG: {
     base: '/components/src',
@@ -26,23 +27,33 @@ INLINE_TEMPLATES_BUNDLE.DIST = './tmp/src-inlined-bundle'
  * Inline external HTML and SCSS templates into Angular component files.
  * @see: https://github.com/ludohenin/gulp-inline-ng2-template
  */
-gulp.task('inline-templates-dist', () => {
+gulp.task('inline-templates-dist', ['copy-assets-dist'], () => {
   return gulp.src(INLINE_TEMPLATES_DIST.SRC)
     .pipe(inlineTemplates(INLINE_TEMPLATES_DIST.CONFIG))
     .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST));
 });
 
-gulp.task('inline-templates-bundle', () => {
+gulp.task('copy-assets-dist', () => {
+  return gulp.src(INLINE_TEMPLATES_DIST.SRC_ASSETS)
+    .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST));
+});
+
+gulp.task('inline-templates-bundle', ['copy-assets-bundle'], () => {
   return gulp.src(INLINE_TEMPLATES_BUNDLE.SRC)
     .pipe(inlineTemplates(INLINE_TEMPLATES_BUNDLE.CONFIG))
     .pipe(gulp.dest(INLINE_TEMPLATES_BUNDLE.DIST));
 });
 
-gulp.task('inline-templates-dist-watch', function() {
+gulp.task('copy-assets-bundle', () => {
+  return gulp.src(INLINE_TEMPLATES_DIST.SRC_ASSETS)
+    .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST));
+});
+
+gulp.task('inline-templates-dist-watch', function () {
   gulp.watch('./components/src/**/*.*', ['inline-templates-dist']);
 });
 
-gulp.task('inline-templates-bundle-watch', function() {
+gulp.task('inline-templates-bundle-watch', function () {
   gulp.watch('./components/src/**/*.*', ['inline-templates-bundle']);
 });
 
