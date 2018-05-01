@@ -1,17 +1,31 @@
 <layout-slider-vertical #mainSlider>
 
   <p header="normal">
-    <!-- <h1>header normal</h1>
-    <h1>header normal</h1> -->
+
+    <a href="javascript:void(0)"
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="first">First</a>
+
+    <a href="javascript:void(0)"
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="second">Second</a>
+
     <a href="javascript:void(0)"
        *ngFor="let child of childs"
        [parent]="mainSlider"
        gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
-    </p>
+  </p>
 
   <p header="scroll">
-    <!-- <mat-tab label="label"></mat-tab>
-      <mat-tab label="label"></mat-tab> -->
+
+    <a href="javascript:void(0)"
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="first">First</a>
+
+    <a href="javascript:void(0)"
+       [parent]="mainSlider"
+       gotoChildVerticalSlider="second">Second</a>
+
     <a href="javascript:void(0)"
        *ngFor="let child of childs"
        gotoChildVerticalSlider="{{child.header}}">{{child.header}} </a>
@@ -19,29 +33,25 @@
 
   <div body>
 
-    <layout-slider-vertical-child class="long" style="background: red;"
-                                  [header]="'test0'">
-      <h1>Super!!!1</h1>
+    <layout-slider-vertical-child class="long"
+                                  [header]="'first'">
+      <h3>First</h3>
       <!-- <h3 *ngFor="let num of numbers">{{num}}</h3> -->
     </layout-slider-vertical-child>
 
-    <layout-slider-vertical-child class="long" style="background: pink;"
-                                  [header]="'test1'">
-      <h1>Super!!!2</h1>
-      <!-- <h3 *ngFor="let num of numbers">{{num}}</h3> -->
+    <layout-slider-vertical-child class="long"
+                                  [header]="'second'">
+      <h3>Second</h3>
     </layout-slider-vertical-child>
 
-    <layout-slider-vertical-child class="long" style="background: green;"
-                                  [header]="'test2'">
-      <h1>Super!!3!</h1>
-      <!-- <h3 *ngFor="let num of numbers">{{num}}</h3> -->
+
+    <layout-slider-vertical-child *ngFor="let num of numbers"
+                                  class="long"
+                                  [header]="'test'+num">
+      <h3>{{'test'+num}}</h3>
     </layout-slider-vertical-child>
 
-    <layout-slider-vertical-child class="long" style="background: yellow;"
-                                  [header]="'test3'">
-      <h1>Super!!4!</h1>
-      <!-- <h3 *ngFor="let num of numbers">{{num}}</h3> -->
-    </layout-slider-vertical-child>
+    <!-- <h3 *ngFor="let num of numbers">{{num}}</h3> -->
 
   </div>
 

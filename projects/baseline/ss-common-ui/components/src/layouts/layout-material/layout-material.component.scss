@@ -2,6 +2,59 @@
 
 :host {
 
+  .header-wrapper {
+    padding-left: 0px;
+  }
+
+  app-logo {
+    zoom: 0.8;
+  }
+
+  .portal-logo {
+    position: relative;
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .hamburger {
+    cursor: pointer;
+    opacity: 0.7;
+    &.hover {
+      opacity: 1.0;
+    }
+    mat-icon {
+      line-height: 49px;
+    }
+  }
+
+
+  button {
+    width: 100%;
+  }
+
+  mat-panel-title {
+    text-transform: uppercase;
+  }
+
+  mat-panel-description {
+    font-size: 8px;
+  }
+
+  /deep/ mat-expansion-panel {
+    .mat-expansion-panel-body {
+      padding: 0 0px 16px;
+    }
+  }
+
+  .content-wrapper {
+    padding-left: 5px;
+    padding-right: 5px;
+    mat-card {
+      margin: 20px;
+    }
+  }
+
+
   display: block;
 
   header {
@@ -16,6 +69,7 @@
     text-align: center;
     background: whitesmoke;
     height: $footer-size;
+    overflow: hidden;
   }
 
 }

@@ -19,6 +19,18 @@ const variables: LayoutMaterialVariables = vars as any;
 const log = Log.create('layout material');
 
 
+export interface MenuItem {
+  name: string;
+  href?: string;
+  action?: (any) => void;
+  leftMenu?: LeftMenuGroupItem[];
+}
+
+export interface LeftMenuGroupItem {
+  name: string;
+  description?: string;
+  subitems: MenuItem[]
+}
 
 @Component({
   selector: 'layout-material',
@@ -27,6 +39,97 @@ const log = Log.create('layout material');
 })
 
 export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterContentInit {
+
+  //#region top menu
+  menu = {
+    left: {
+      items: []
+    },
+    top: {
+
+      items: [
+        {
+          name: 'Administration',
+          leftMenu: [
+            {
+              name: 'Setting',
+              // description: 'General settings',
+              subitems: [
+                {
+                  name: 'General'
+                },
+                {
+                  name: 'Initialization '
+                },
+                {
+                  name: 'Translations'
+                }
+              ]
+            },
+            {
+              name: 'Users',
+              // description: 'General settings',
+              subitems: [
+                {
+                  name: 'Config'
+                },
+                {
+                  name: 'List '
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'Statistics',
+          leftMenu: [
+            {
+              name: 'Payments',
+              // description: 'General settings',
+              subitems: [
+                {
+                  name: 'Config'
+                },
+                {
+                  name: 'List '
+                }
+              ]
+            },
+            {
+              name: 'Users',
+              // description: 'General settings',
+              subitems: [
+                {
+                  name: 'Config'
+                },
+                {
+                  name: 'List '
+                }
+              ]
+            },
+            {
+              name: 'Ad words',
+              // description: 'General settings',
+              subitems: [
+                {
+                  name: 'Config'
+                },
+                {
+                  name: 'List '
+                }
+              ]
+            }
+          ]
+        }
+      ] as MenuItem[]
+    }
+  }
+  //#endregion
+
+  selectedTopMenu(index: number) {
+    log.i('index', index)
+    this.menu.left.items = this.menu.top.items[index].leftMenu;
+  }
 
   elements = {
     content: {
@@ -70,7 +173,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
   }
 
   ngOnInit() {
-
+    this.selectedTopMenu(0)
   }
 
 
