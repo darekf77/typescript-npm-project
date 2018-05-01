@@ -1,4 +1,21 @@
+@import 'variables.scss';
+
 :host {
 
+  display: block;
+
+  header {
+    height: $header-size;
+  }
+
+  .middle-content {
+    background: #ecebeb;
+  }
+
+  footer {
+    text-align: center;
+    background: whitesmoke;
+    height: $footer-size;
+  }
 
 }

@@ -1,1 +1,55 @@
-awesome layout material
+<header>
+  <mat-card>
+    <columns-container>
+      <column [width]="elements.leftPanel.width">
+        logo
+      </column>
+      <column grow>
+        <mat-tab-group>
+          <mat-tab label="Tab 1"></mat-tab>
+          <mat-tab label="Tab 2"></mat-tab>
+        </mat-tab-group>
+      </column>
+    </columns-container>
+
+  </mat-card>
+</header>
+<columns-container class="middle-content" [style.height.px]="elements.content.height">
+  <column [width]="elements.leftPanel.width">
+    <br>
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            USERS
+          </mat-panel-title>
+          <!-- <mat-panel-description>
+            desc
+          </mat-panel-description> -->
+        </mat-expansion-panel-header>
+
+
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            PAYMENTS
+          </mat-panel-title>
+          <!-- <mat-panel-description>
+            desc
+          </mat-panel-description> -->
+        </mat-expansion-panel-header>
+        <p>I'm visible because I am open</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+  </column>
+
+  <column grow>
+    content
+  </column>
+
+</columns-container>
+<footer>
+  footer
+</footer>
