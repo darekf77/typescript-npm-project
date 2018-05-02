@@ -7,17 +7,11 @@ import * as watch from 'watch'
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile, FileEvent } from "../models";
-import { copyFile, uniqArray, compilationWrapper } from '../helpers';
+import { copyFile, uniqArray, compilationWrapper, crossPlatofrmPath } from '../helpers';
 import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
 
-function crossPlatofrmPath(p: string) {
-    if (process.platform === 'win32') {
-        return p.replace(/\\/g, '/');
-    }
-    return p;
-}
 
 
 interface JoinFilesOptions {

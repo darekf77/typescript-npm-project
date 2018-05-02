@@ -14,6 +14,14 @@ import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
 
+export function crossPlatofrmPath(p: string) {
+    if (process.platform === 'win32') {
+        return p.replace(/\\/g, '/');
+    }
+    return p;
+}
+
+
 export function paramsFrom(command: string) {
     return _.kebabCase(command);
 }

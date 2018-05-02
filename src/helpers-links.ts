@@ -9,6 +9,8 @@ import { Helpers } from "morphi";
 
 export namespace HelpersLinks {
 
+    
+
     export function removeSlashAtEnd(s: string) {
         s = s.endsWith(`/`) ? s.slice(0, s.length - 1) : s;
         return s;

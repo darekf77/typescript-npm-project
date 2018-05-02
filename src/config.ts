@@ -21,7 +21,9 @@ export const config = {
         browser: 'browser',
         module: 'module',
         custom: 'custom',
-        node_modules: 'node_modules'
+        components: 'components',
+        node_modules: 'node_modules',
+        assets:'assets'
     },
     libsTypes: [
         'workspace',

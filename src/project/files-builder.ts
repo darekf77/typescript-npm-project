@@ -1,12 +1,14 @@
 import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile } from "../models";
-import { copyFile } from '../helpers';
+import { copyFile, crossPlatofrmPath } from '../helpers';
 import config from '../config';
 import { BaselineSiteJoin } from './baseline-site-join';
+import { error } from '../messages';
 
 interface VSCodeSettings {
     'files.exclude': { [files: string]: boolean; }
@@ -70,7 +72,7 @@ export class FilesRecreator {
                     self.project.isCoreProject ? [] : self.commonFilesForAllProjects
                 ).concat( // core files of projects types
                     self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
-                )
+                ).concat(self.assetsToIgnore)
                 // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
                 // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
                 // console.log('ignoref iles', gitignoreFiles)
@@ -171,6 +173,71 @@ export class FilesRecreator {
         }).forEach(file => {
             copyFile(file.from, file.where)
         })
+    }
+
+    private assetsToIgnore = []; // TODO make this better, not dependedn gitgnore on it
+    assets() {
+        const filesPathesToIgnore = []
+        const project = this.project;
+
+        if (project.type === 'angular-lib') {
+            const libAssetsPath = path.join(
+                project.location,
+                config.folder.components,
+                config.folder.src,
+                config.folder.assets,
+                project.name
+            );
+            const previewAssetsPath = path.join(
+                project.location,
+                config.folder.src,
+                config.folder.assets,
+                project.name
+            );
+            if (fs.existsSync(previewAssetsPath)) {
+                fse.removeSync(previewAssetsPath)
+            }
+            if (fs.existsSync(libAssetsPath)) {
+                filesPathesToIgnore.push(path.join(
+                    config.folder.src,
+                    config.folder.assets,
+                    project.name))
+                fse.copySync(libAssetsPath, previewAssetsPath);
+            }
+        } else if (project.type === 'angular-client' && project.parent && project.parent.type === 'workspace') {
+            const parent = project.parent;
+            const childrenWithAssets = parent.children.filter(child => child.type === 'angular-lib');
+            childrenWithAssets.forEach(child => {
+                const libAssetsPath = path.join(
+                    child.location,
+                    config.folder.components,
+                    config.folder.src,
+                    config.folder.assets,
+                    child.name
+                );
+                const clientAssetsPath = path.join(
+                    project.location,
+                    config.folder.src,
+                    config.folder.assets,
+                    child.name
+                );
+                if (fs.existsSync(clientAssetsPath)) {
+                    fse.removeSync(clientAssetsPath);
+                }
+                if (fs.existsSync(libAssetsPath)) {
+                    filesPathesToIgnore.push(path.join(
+                        config.folder.src,
+                        config.folder.assets,
+                        child.name))
+                    fse.copySync(libAssetsPath, clientAssetsPath);
+                }
+            })
+        } else {
+            error(`You are not in ${config.libsTypes.filter(lib => {
+                lib === 'angular-client' || lib === 'angular-lib'
+            }).join(' or ')} project type.`)
+        }
+        this.assetsToIgnore = filesPathesToIgnore.map(p => crossPlatofrmPath(p))
     }
 
 

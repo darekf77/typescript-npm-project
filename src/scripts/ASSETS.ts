@@ -1,19 +1,16 @@
 import { Project } from "../project";
 import * as fse from 'fs-extra';
+import * as fs from 'fs';
+import * as path from 'path';
+import config from "../config";
 
 function recreate() {
-
-    const project = Project.Current;
-
-    if (project.type === 'angular-lib') {
-        
-
-    } else if (project.type === 'angular-client') {
-
-    }
+    Project.Current.recreate.assets()
+    Project.Current.recreate.gitignore()
+    process.exit(0)
 
 }
 
 export default {
-    $RECREATE: () => recreate()
+    $ASSETS_RECREATE: () => recreate()
 }
