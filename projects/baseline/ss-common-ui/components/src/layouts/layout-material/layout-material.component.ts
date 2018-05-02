@@ -13,8 +13,11 @@ export interface LayoutMaterialVariables {
   leftPanelSize: string;
 }
 
-import * as vars from '!sass-variable-loader!./variables.scss'
-const variables: LayoutMaterialVariables = vars as any;
+const variables: LayoutMaterialVariables = {
+  headerSize: '80px',
+  footerSize: '50px',
+  leftPanelSize: '250px'
+};
 
 const log = Log.create('layout material');
 
@@ -158,22 +161,22 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
           width() {
             self.elements.leftPanel.width = numValue(variables.leftPanelSize)
           }
-        }
+        };
       }
-    }
+    };
   }
 
   recalculatElement() {
-    this.calculate.content.height()
-    this.calculate.leftPanel.width()
+    this.calculate.content.height();
+    this.calculate.leftPanel.width();
   }
 
   constructor() {
-    log.i('variables', variables)
+    log.i('variables', variables);
   }
 
   ngOnInit() {
-    this.selectedTopMenu(0)
+    this.selectedTopMenu(0);
   }
 
 
@@ -181,7 +184,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
   ngAfterViewInit() {
     setTimeout(() => {
       this.recalculatElement()
-    })
+    });
   }
 
   ngAfterContentInit() {
@@ -190,7 +193,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
-    this.recalculatElement()
+    this.recalculatElement();
   }
 
 

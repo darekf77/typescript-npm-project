@@ -6,39 +6,45 @@
     box-sizing: content-box !important;
   }
 
-
-    display: block;
-    width: 100%;
+  app-logo {
+    zoom: 0.8;
+    background: whitesmoke;
     height: 100%;
+    position: relative;
+  }
 
-    .header {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  .header {
+      position: fixed;
+      z-index: 1;
+      width: 100%;
+      left: 0px;
+      // background: gray;
+      > h1 {
+        margin: 0px;
+        font-size: 15px;
         position: fixed;
-        z-index: 1;
+        background: white;
         width: 100%;
-        left: 0px;
-        // background: gray;
-        > h1 {
-          margin: 0px;
-          font-size: 15px;
-          position: fixed;
-          background: white;
-          width: 100%;
-          // &.normal {
-          //   color: yellow;
-          // }
-          // &.scroll {
-          //   color: pink;
-          // }
-        }
-    }
-    .wrapper {
+        // &.normal {
+        //   color: yellow;
+        // }
+        // &.scroll {
+        //   color: pink;
+        // }
+      }
+  }
+  .wrapper {
+      display: block;
+      overflow: hidden;
+      // height is calculated
+      > .slider {
         display: block;
-        overflow: hidden;
-        // height is calculated
-        > .slider {
-          display: block;
-          height: 100%;
-        }
-    }
+        height: 100%;
+      }
+  }
 
 }

@@ -8,10 +8,14 @@ import { GoToChildVerticalSliderDirective } from './goto-child.directive';
 import {
   SliderVertivalChildComponent
 } from './layout-slider-vertical-child/layout-slider-vertical-child.component';
+import { LogoModule } from '../../ui-elements';
+import { StaticColumnsModule } from 'static-columns';
 
 const modules = [
   CommonModule,
-  MatCardModule
+  MatCardModule,
+  LogoModule,
+  StaticColumnsModule
 ];
 
 const components = [

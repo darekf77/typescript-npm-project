@@ -2,11 +2,25 @@
      class="header">
   <h1 *ngIf="!is.scroll"
       class="normal">
-    <ng-content select="[header=normal]"></ng-content>
+    <columns-container>
+      <column [width]="200" >
+        <app-logo></app-logo>
+      </column>
+      <column grow>
+        <ng-content select="[header=normal]"></ng-content>
+      </column>
+    </columns-container>
   </h1>
   <h1 *ngIf="is.scroll"
       class="scroll">
-    <ng-content select="[header=scroll]"></ng-content>
+      <columns-container>
+        <column [width]="200" >
+          <app-logo></app-logo>
+        </column>
+        <column grow>
+          <ng-content select="[header=scroll]"></ng-content>
+        </column>
+      </columns-container>
   </h1>
 </div>
 
