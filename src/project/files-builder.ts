@@ -176,6 +176,10 @@ export class FilesRecreator {
     }
 
     private assetsToIgnore = []; // TODO make this better, not dependedn gitgnore on it
+
+    /**
+     * TODO needs to be before gitignore recreatino ! change it 
+     */
     assets() {
         const filesPathesToIgnore = []
         const project = this.project;
