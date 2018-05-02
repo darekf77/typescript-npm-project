@@ -4,24 +4,32 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity } from 'typeorm';
+import { Entity, OneToMany } from 'typeorm';
 import { CategoryController } from '../controllers';
-import { GROUP } from './GROUP';
+import { DIALOG } from './DIALOG';
 
 
-@Entity(META.tableNameFrom(DIALOG))
-export class DIALOG extends META.BASE_ENTITY {
+@Entity(META.tableNameFrom(GROUP))
+export class GROUP extends META.BASE_ENTITY {
 
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column() name: string;
 
-  @ManyToOne(type => GROUP, cat => cat.id, {
+
+  @ManyToOne(type => CATEGORY, cat => cat.id, {
     cascadeAll: false
   })
   @JoinColumn()
-  group: GROUP;
+  category: CATEGORY;
+
+
+  @OneToMany(type => DIALOG, dial => dial, {
+    cascadeUpdate: false,
+    cascadeInsert: false
+  })
+  dialogs: DIALOG[] = [];
 
 
 }

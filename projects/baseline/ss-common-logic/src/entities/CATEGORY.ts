@@ -4,8 +4,8 @@ import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
 import { Entity, JoinTable, OneToMany } from 'typeorm';
 // local
 import { META } from '../helpers';
-import { DIALOG } from './DIALOG';
 import { kebabCase } from 'lodash';
+import { GROUP } from './GROUP';
 
 @Entity(META.tableNameFrom(CATEGORY))
 export class CATEGORY extends META.BASE_ENTITY {
@@ -21,11 +21,11 @@ export class CATEGORY extends META.BASE_ENTITY {
     return kebabCase(this.name);
   }
 
-  @OneToMany(type => DIALOG, dial => dial.category, {
+  @OneToMany(type => GROUP, dial => dial.category, {
     cascadeUpdate: false,
     cascadeInsert: false
   })
-  dialogs: DIALOG[] = [];
+  groups: GROUP[] = [];
 
 }
 

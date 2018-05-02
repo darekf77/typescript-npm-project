@@ -1,24 +1,24 @@
 {
-    "categories": [
+  "categories": [
+    {
+      "name": "On street",
+      "groups": [
         {
-            "name": "On street",
-            "groups": [
-                {
-                    "name": "Asking for direction",
-                    "dialogs": [
-                        {
-                            "lang_pl": "Dzień dobry",
-                            "lang_en": "Good morning",
-                            "lang_fr": "Bonjour"
-                        },
-                        {
-                            "lang_pl": "Do widzenia",
-                            "lang_en": "See you",
-                            "lang_fr": "Au revoir"
-                        },
-                    ]
-                }
-            ]
+          "name": "Asking for direction",
+          "dialogs": [
+            {
+              "lang_pl": "Dzień dobry",
+              "lang_en": "Good morning",
+              "lang_fr": "Bonjour"
+            },
+            {
+              "lang_pl": "Do widzenia",
+              "lang_en": "See you",
+              "lang_fr": "Au revoir"
+            },
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }

@@ -16,6 +16,9 @@ export { DIALOG } from "./entities/DIALOG";
 import { CATEGORY } from "./entities/CATEGORY";
 export { CATEGORY } from "./entities/CATEGORY";
 
+import { GROUP } from "./entities/GROUP";
+export { GROUP } from "./entities/GROUP";
+
 
 //#region @backend
 import { Repository } from "typeorm";
@@ -29,7 +32,8 @@ export function entities(connection?: Connection) {
     EMAIL: META.repositoryFrom<EMAIL, EMAIL_REPOSITORY>(connection, EMAIL, EMAIL_REPOSITORY),
     EMAIL_TYPE: META.repositoryFrom<EMAIL, EMAIL_TYPE_REPOSITORY>(connection, EMAIL, EMAIL_TYPE_REPOSITORY),
     DIALOG: META.repositoryFrom<DIALOG>(connection, DIALOG),
-    CATEGORY: META.repositoryFrom<CATEGORY>(connection, CATEGORY)
+    CATEGORY: META.repositoryFrom<CATEGORY>(connection, CATEGORY),
+    GROUP: META.repositoryFrom<GROUP>(connection, GROUP)
   }
 }
 //#endregion
