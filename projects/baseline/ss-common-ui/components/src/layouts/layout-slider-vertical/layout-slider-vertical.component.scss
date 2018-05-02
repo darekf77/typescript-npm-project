@@ -6,12 +6,7 @@
     box-sizing: content-box !important;
   }
 
-  app-logo {
-    zoom: 0.8;
-    background: whitesmoke;
-    height: 100%;
-    position: relative;
-  }
+
 
   display: block;
   width: 100%;
@@ -29,12 +24,33 @@
         position: fixed;
         background: white;
         width: 100%;
-        // &.normal {
-        //   color: yellow;
-        // }
-        // &.scroll {
-        //   color: pink;
-        // }
+        columns-container {
+          background: whitesmoke;
+
+          app-logo {
+            zoom: 0.8;
+            background: whitesmoke;
+            height: 100%;
+            position: absolute;
+          }
+
+        }
+
+        &.normal {
+          columns-container {
+            height:70px;
+            line-height: 70px;
+          }
+        }
+        &.scroll {
+          columns-container {
+            height:40px;
+            line-height: 40px;
+            app-logo {
+              zoom: 0.6;
+            }
+          }
+        }
       }
   }
   .wrapper {

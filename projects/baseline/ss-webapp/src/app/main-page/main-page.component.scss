@@ -8,7 +8,7 @@ $font-size-header: 15px;
         font-weight: lighter;
         text-decoration: none;
         color: black;
-        vertical-align: middle;
+        // vertical-align: middle;
     }
 }
 
@@ -19,22 +19,22 @@ $font-size-header: 15px;
 
         p {
             margin: 0px;
-            line-height: $font-size-header * 2;
+            // line-height: $font-size-header * 2;
             > app-login {
                 float: right;
-                line-height: $font-size-header* 2;;
+                // line-height: $font-size-header* 2;;
             }
         }
         p[header="normal"] {
             @extend .header-common;
-            padding: 10px;
+            // padding: 10px;
             > app-login {
                 margin-right: 5px;
             }
         }
         p[header="scroll"] {
             @extend .header-common;
-            padding: 5px;
+            // padding: 5px;
             > app-login {
                 margin-right: 10px;
             }

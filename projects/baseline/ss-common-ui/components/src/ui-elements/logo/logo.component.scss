@@ -1,5 +1,9 @@
 :host {
   display: block;
+  img {
+    vertical-align: inherit;
+  }
+
   @import url('https://fonts.googleapis.com/css?family=Rajdhani');
   > a {
     left: -10px;
