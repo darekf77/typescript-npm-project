@@ -36,21 +36,43 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
   async initExampleDbData() {
 
-    const pathDatabaseJSON = path.join(__dirname, '../../../database.json')
+    const pathDatabaseJSON = path.join(__dirname, '../../database.json')
 
     let json: {
-      categories: entities.CATEGORY[]
+      categories: entities.ICATEGORY[]
     } = {} as any;
 
     try {
-      fs.readFileSync(pathDatabaseJSON, 'utf8')
+      json = JSON.parse(fs.readFileSync(pathDatabaseJSON, 'utf8').toString())
+
+      const categories: entities.CATEGORY[] = json.categories.map(c => {
+        let category = new entities.CATEGORY()
+        return category.fromRaw(c);
+      })
+
+      const categoriesPromises = []
+      const groupsPromises = []
+      const dialogsPromies = []
+
+      categories.forEach(category => {
+        categoriesPromises.push(this.db.CATEGORY.save(category))
+        category.groups && category.groups.forEach(group => {
+          groupsPromises.push(this.db.GROUP.save(group))
+          group.dialogs && group.dialogs.forEach(dialog => {
+            dialogsPromies.push(this.db.DIALOG.save(dialog))
+          })
+        })
+      })
+
+      await Promise.all(dialogsPromies);    
+      // await Promise.all(groupsPromises);
+      // await Promise.all(categoriesPromises)
+
     } catch (e) {
       console.log(`Error while reading database.json`);
       console.log(e);
       process.exit(0)
     }
-
-    // json.categories.forEach(  )
 
 
   }

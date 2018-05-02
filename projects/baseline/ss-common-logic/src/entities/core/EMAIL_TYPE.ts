@@ -25,7 +25,11 @@ export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twit
 
 
 @Entity(META.tableNameFrom(EMAIL_TYPE))
-export class EMAIL_TYPE extends META.BASE_ENTITY {
+export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> {
+
+  fromRaw(obj: Object): EMAIL_TYPE {
+    throw new Error("Method not implemented.");
+  }
 
   @PrimaryGeneratedColumn()
   id: number;

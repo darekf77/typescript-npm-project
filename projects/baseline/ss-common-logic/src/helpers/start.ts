@@ -19,7 +19,7 @@ export interface StartOptions {
     config: IConnectionOptions;
     host: string;
     Controllers: META.BASE_CONTROLLER<any>[];
-    Entities?: META.BASE_ENTITY[];
+    Entities?: META.BASE_ENTITY<any>[];
     MockData?: META.BASE_MOCK_DATA[];
 }
 

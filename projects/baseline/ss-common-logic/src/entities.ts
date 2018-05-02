@@ -10,14 +10,14 @@ export { EMAIL, EMAIL_REPOSITORY } from './entities/core/EMAIL';
 import { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from './entities/core/EMAIL_TYPE';
 export { EMAIL_TYPE, EMAIL_TYPE_NAME, EMAIL_TYPE_REPOSITORY } from './entities/core/EMAIL_TYPE';
 
-import { DIALOG } from "./entities/DIALOG";
-export { DIALOG } from "./entities/DIALOG";
+import { DIALOG, IDIALOG } from "./entities/DIALOG";
+export { DIALOG, IDIALOG } from "./entities/DIALOG";
 
-import { CATEGORY } from "./entities/CATEGORY";
-export { CATEGORY } from "./entities/CATEGORY";
+import { CATEGORY, ICATEGORY } from "./entities/CATEGORY";
+export { CATEGORY, ICATEGORY } from "./entities/CATEGORY";
 
-import { GROUP } from "./entities/GROUP";
-export { GROUP } from "./entities/GROUP";
+import { GROUP, IGROUP } from "./entities/GROUP";
+export { GROUP, IGROUP } from "./entities/GROUP";
 
 
 //#region @backend

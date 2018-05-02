@@ -4,7 +4,7 @@ import { BaseCRUD } from 'morphi';
 
 export namespace META {
 
-  export function tableNameFrom(entityClass: Function | BASE_ENTITY) {
+  export function tableNameFrom(entityClass: Function | BASE_ENTITY<any>) {
     entityClass = entityClass as Function;
     return `tb_${entityClass.name.toLowerCase()}`
   }
@@ -25,9 +25,11 @@ export namespace META {
 
   }
 
-  export abstract class BASE_ENTITY {
+  export abstract class BASE_ENTITY<T, TRAW=T> {
 
     abstract id: number;
+
+    abstract fromRaw(obj: TRAW): T
 
   }
 

@@ -65,7 +65,12 @@ export class LocalStorage {
 
 
 @Entity(META.tableNameFrom(SESSION))
-export class SESSION extends META.BASE_ENTITY {
+export class SESSION extends META.BASE_ENTITY<SESSION> {
+  
+  fromRaw(obj: Object): SESSION {
+    throw new Error("Method not implemented.");
+  }
+  
   CONFIG = SESSION_CONFIG;
 
   expireInSeconds: number;

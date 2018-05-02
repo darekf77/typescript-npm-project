@@ -6,11 +6,31 @@ import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
 import { Entity, OneToMany } from 'typeorm';
 import { CategoryController } from '../controllers';
-import { DIALOG } from './DIALOG';
+import { DIALOG, IDIALOG } from './DIALOG';
 
+export interface IGROUP {
+  id?: number;
+  name: string;
+  dialogs: IDIALOG[];
+}
 
 @Entity(META.tableNameFrom(GROUP))
-export class GROUP extends META.BASE_ENTITY {
+export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
+
+
+  fromRaw(obj: IGROUP): GROUP {
+    let group = new GROUP()
+    group.id = obj.id;
+    group.name = obj.name;
+    group.dialogs = obj.dialogs.map(d => {
+      let dialog = new DIALOG();
+      dialog = dialog.fromRaw(d);
+      dialog.group = group;
+      return dialog;
+    })
+    return group;
+  }
+
 
   @PrimaryGeneratedColumn()
   id: number;

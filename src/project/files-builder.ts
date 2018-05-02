@@ -236,11 +236,12 @@ export class FilesRecreator {
                     fse.copySync(libAssetsPath, clientAssetsPath);
                 }
             })
-        } else {
-            error(`You are not in ${config.libsTypes.filter(lib => {
-                lib === 'angular-client' || lib === 'angular-lib'
-            }).join(' or ')} project type.`)
         }
+        //  else {
+        //     error(`You are not in ${config.libsTypes.filter(lib => {
+        //         lib === 'angular-client' || lib === 'angular-lib'
+        //     }).join(' or ')} project type.`)
+        // }
         this.assetsToIgnore = filesPathesToIgnore.map(p => crossPlatofrmPath(p))
     }
 

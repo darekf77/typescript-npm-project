@@ -38,8 +38,13 @@ export interface IUSER {
 }
 
 @Entity(META.tableNameFrom(USER))
-export class USER extends META.BASE_ENTITY implements IUSER {
+export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
 
+  
+  fromRaw(obj: IUSER): USER {
+    throw new Error("Method not implemented.");
+  }
+  
   @PrimaryGeneratedColumn()
   id: number;
 

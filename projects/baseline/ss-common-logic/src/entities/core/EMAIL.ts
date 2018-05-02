@@ -29,7 +29,11 @@ import { META } from '../../helpers';
 
 
 @Entity(META.tableNameFrom(EMAIL))
-export class EMAIL extends META.BASE_ENTITY {
+export class EMAIL extends META.BASE_ENTITY<EMAIL> {
+
+  fromRaw(obj: Object): EMAIL {
+    throw new Error("Method not implemented.");
+  }
 
   constructor(address: string) {
     super()

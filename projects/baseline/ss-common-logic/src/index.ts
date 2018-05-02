@@ -22,6 +22,7 @@ addEntity(entites.EMAIL_TYPE)
 addEntity(entites.USER)
 addEntity(entites.SESSION)
 addEntity(entites.DIALOG)
+addEntity(entites.GROUP)
 addEntity(entites.CATEGORY)
 
 export const Controllers = tControllers;
