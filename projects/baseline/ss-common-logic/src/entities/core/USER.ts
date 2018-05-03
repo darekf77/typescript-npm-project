@@ -40,11 +40,11 @@ export interface IUSER {
 @Entity(META.tableNameFrom(USER))
 export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
 
-  
+
   fromRaw(obj: IUSER): USER {
     throw new Error("Method not implemented.");
   }
-  
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -66,10 +66,18 @@ export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
 
 }
 
+export interface USER_ALIASES {
+  //#region @backend
+  user:string;
+  //#endregion
+}
 
 @EntityRepository(USER)
-export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
+export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER,USER_ALIASES> {
 
+  //#region @backend
+  joinProperties:(keyof USER_ALIASES)[] = ['user']
+  //#endregion
 
   byUsername(username: string) {
     //#region @backendFunc
@@ -94,6 +102,3 @@ export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER> {
   }
 
 }
-
-
-export default USER;

@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
-import { Entity, JoinTable, OneToMany } from 'typeorm';
+import { Entity, JoinTable, OneToMany, EntityRepository } from 'typeorm';
 // local
 import { META } from '../helpers';
 import { kebabCase } from 'lodash';
@@ -46,4 +46,18 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 
 }
 
-export default CATEGORY;
+export interface CATEGORY_ALIASES {
+  //#region @backend
+  categories: string;
+  category: string;
+  //#endregion
+}
+
+@EntityRepository(CATEGORY)
+export class CATEGORY_REPOSITORY extends META.BASE_REPOSITORY<CATEGORY, CATEGORY_ALIASES> {
+
+  //#region @backend
+  joinProperties: ( keyof CATEGORY_ALIASES)[] = ['category', 'categories']
+  //#endregion
+
+}

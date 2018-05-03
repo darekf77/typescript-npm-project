@@ -87,7 +87,7 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
       console.log(e);
       process.exit(0)
     }
-    console.log('json',json)
+    console.log('json', json)
 
   }
   //#endregion
@@ -98,9 +98,12 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     //#region @backendFunc
     const self = this;
     return async () => {
+
+
       const catergoires = await this.db.CATEGORY
-        .createQueryBuilder(META.tableNameFrom(entities.CATEGORY))
-        .leftJoinAndSelect(`${META.tableNameFrom(entities.CATEGORY)}.dialogs`, 'dialogs')
+        .createQueryBuilder(this.db.CATEGORY.alias.prop.category)
+        .leftJoin(this.db.CATEGORY.alias.joinOn.groups, this.db.GROUP.alias.prop.groups)
+        .leftJoinAndSelect(this.db.GROUP.alias.joinOn.dialogs, this.db.DIALOG.alias.prop.dialogs)
         .getMany()
 
       return catergoires;

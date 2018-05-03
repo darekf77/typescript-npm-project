@@ -66,11 +66,11 @@ export class LocalStorage {
 
 @Entity(META.tableNameFrom(SESSION))
 export class SESSION extends META.BASE_ENTITY<SESSION> {
-  
+
   fromRaw(obj: Object): SESSION {
     throw new Error("Method not implemented.");
   }
-  
+
   CONFIG = SESSION_CONFIG;
 
   expireInSeconds: number;
@@ -135,11 +135,19 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
 
 }
 
+export interface SESSION_ALIASES {
+  //#region @backend
+  sesssion:string;
+  //#endregion
+}
 
 
 @EntityRepository(SESSION)
-export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
+export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_ALIASES> {
 
+  //#region @backend
+  joinProperties: (keyof SESSION_ALIASES)[] = ['sesssion'];
+  //#endregion
 
   CONFIG = SESSION_CONFIG;
 
@@ -195,5 +203,3 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION> {
 
 }
 
-
-export default SESSION;

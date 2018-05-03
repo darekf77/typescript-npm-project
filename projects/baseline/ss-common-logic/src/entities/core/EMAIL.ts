@@ -63,9 +63,19 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> {
 
 }
 
-@EntityRepository(EMAIL)
-export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
+export interface EMAIL_ALIASES {
+  //#region @backend
+  email: string;
+  emails: string;
+  //#endregion
+}
 
+@EntityRepository(EMAIL)
+export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL, EMAIL_ALIASES> {
+
+  //#region @backend
+  joinProperties: (keyof EMAIL_ALIASES)[] = ['email', 'emails']
+  //#endregion
 
   async getUserBy(address: string) {
     //#region @backendFunc
@@ -91,5 +101,3 @@ export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL> {
 
 }
 
-
-export default EMAIL;

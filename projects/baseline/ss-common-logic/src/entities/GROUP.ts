@@ -4,7 +4,7 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, OneToMany } from 'typeorm';
+import { Entity, OneToMany, EntityRepository } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { DIALOG, IDIALOG } from './DIALOG';
 
@@ -51,7 +51,21 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   })
   dialogs: DIALOG[] = [];
 
-
 }
 
-export default DIALOG;
+export interface GROUP_ALIASES {
+  //#region @backend
+  groups: string;
+  group: string;
+  //#endregion
+}
+
+
+@EntityRepository(GROUP)
+export class GROUP_REPOSITORY extends META.BASE_REPOSITORY<GROUP, GROUP_ALIASES> {
+
+  //#region @backend
+  joinProperties: (keyof GROUP_ALIASES)[] = ['group', 'groups'];
+  //#endregion
+
+}

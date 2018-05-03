@@ -45,8 +45,19 @@ export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> {
   emails: EMAIL[] = [];
 }
 
+export interface EMAIL_TYPE_ALIASES {
+  //#region @backend
+  type: string;
+  types: string;
+  //#endregion
+}
+
 @EntityRepository(EMAIL_TYPE)
-export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
+export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE, EMAIL_TYPE_ALIASES> {
+
+  //#region @backend
+  joinProperties: (keyof EMAIL_TYPE_ALIASES)[] = ['type', 'types']
+  //#endregion
 
   async getBy(name: EMAIL_TYPE_NAME) {
     //#region @backendFunc
@@ -79,6 +90,3 @@ export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE> {
   }
 }
 
-
-
-export default EMAIL_TYPE;
