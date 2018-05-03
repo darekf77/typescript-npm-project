@@ -99,11 +99,12 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     const self = this;
     return async () => {
 
+      // this.db.DIALOG._.dialogs
 
       const catergoires = await this.db.CATEGORY
-        .createQueryBuilder(this.db.CATEGORY.alias.prop.category)
-        .leftJoin(this.db.CATEGORY.alias.joinOn.groups, this.db.GROUP.alias.prop.groups)
-        .leftJoinAndSelect(this.db.GROUP.alias.joinOn.dialogs, this.db.DIALOG.alias.prop.dialogs)
+        .createQueryBuilder(this.db.CATEGORY._.category)
+        .leftJoinAndSelect(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
+        // .leftJoinAndSelect(this.db.GROUP.__.groups.dialogs, this.db.DIALOG._.dialogs)
         .getMany()
 
       return catergoires;

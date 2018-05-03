@@ -56,7 +56,7 @@ export interface EMAIL_TYPE_ALIASES {
 export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE, EMAIL_TYPE_ALIASES> {
 
   //#region @backend
-  joinProperties: (keyof EMAIL_TYPE_ALIASES)[] = ['type', 'types']
+  globalAliases: (keyof EMAIL_TYPE_ALIASES)[] = ['type', 'types']
   //#endregion
 
   async getBy(name: EMAIL_TYPE_NAME) {

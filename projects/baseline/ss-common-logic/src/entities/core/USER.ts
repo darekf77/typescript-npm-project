@@ -76,7 +76,7 @@ export interface USER_ALIASES {
 export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER,USER_ALIASES> {
 
   //#region @backend
-  joinProperties:(keyof USER_ALIASES)[] = ['user']
+  globalAliases:(keyof USER_ALIASES)[] = ['user']
   //#endregion
 
   byUsername(username: string) {

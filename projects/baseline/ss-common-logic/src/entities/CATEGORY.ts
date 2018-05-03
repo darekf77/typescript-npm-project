@@ -57,7 +57,7 @@ export interface CATEGORY_ALIASES {
 export class CATEGORY_REPOSITORY extends META.BASE_REPOSITORY<CATEGORY, CATEGORY_ALIASES> {
 
   //#region @backend
-  joinProperties: ( keyof CATEGORY_ALIASES)[] = ['category', 'categories']
+  globalAliases: ( keyof CATEGORY_ALIASES)[] = ['category', 'categories']
   //#endregion
 
 }

@@ -5,6 +5,21 @@ import { snakeCase, keys } from "lodash";
 
 export namespace META {
 
+  class Describer {
+    private static FRegEx = new RegExp(/(?:this\.)(.+?(?= ))/g);
+    static describe(val: Function, parent = false): string[] {
+      var result = [];
+      if (parent) {
+        var proto = Object.getPrototypeOf(val.prototype);
+        if (proto) {
+          result = result.concat(this.describe(proto.constructor, parent));
+        }
+      }
+      result = result.concat(val.toString().match(this.FRegEx) || []);
+      return result.map(prop => prop.replace('this.', ''))
+    }
+  }
+
   export function tableNameFrom(entityClass: Function | BASE_ENTITY<any>) {
     entityClass = entityClass as Function;
     return `tb_${entityClass.name.toLowerCase()}`
@@ -19,20 +34,22 @@ export namespace META {
     } else {
       repo = connection.getRepository(entity) as any;
     }
-    repo['alias'] = {};
+    repo['_'] = {};
+    repo['__'] = {};
 
-    const compolexProperties = (repo as META.BASE_REPOSITORY<any, any>).joinProperties.concat(keys(entity.prototype))
+    const compolexProperties = (repo as META.BASE_REPOSITORY<any, any>).globalAliases;
 
     if (Array.isArray(compolexProperties)) {
 
-      repo['alias']['joinOn'] = {}
       compolexProperties.forEach(alias => {
-        repo['alias']['joinOn'][alias] = `${snakeCase(entity.name)}.${alias}`; // TODO make it getter with reference
+        repo['__'][alias] = {};
+        Describer.describe(entity).concat(compolexProperties).forEach(prop => {
+          repo['__'][alias][prop] = `${alias}.${prop}`; // TODO make it getter with reference
+        })
       })
 
-      repo['alias']['prop'] = {}
       compolexProperties.forEach(alias => {
-        repo['alias']['prop'][alias] = alias; // TODO make it getter with reference
+        repo['_'][alias] = alias; // TODO make it getter with reference
       })
     }
 
@@ -44,13 +61,10 @@ export namespace META {
   // TODO fix it whe typescipt stable
   export abstract class BASE_REPOSITORY<Entity, GlobalAliases> extends Repository<Entity> {
     //#region @backend
-    alias: {
-      joinOn: { [propertyName in keyof Entity]: string } & GlobalAliases;
-      prop: { [propertyName in keyof Entity]: string } & GlobalAliases;
-    };
+    __: { [prop in keyof GlobalAliases]: { [propertyName in keyof Entity]: string } };
+    _: GlobalAliases;
 
-
-    abstract joinProperties: (keyof GlobalAliases)[];
+    abstract globalAliases: (keyof GlobalAliases)[];
 
     pagination() {
       // TODO

@@ -65,7 +65,7 @@ export interface GROUP_ALIASES {
 export class GROUP_REPOSITORY extends META.BASE_REPOSITORY<GROUP, GROUP_ALIASES> {
 
   //#region @backend
-  joinProperties: (keyof GROUP_ALIASES)[] = ['group', 'groups'];
+  globalAliases: (keyof GROUP_ALIASES)[] = ['group', 'groups'];
   //#endregion
 
 }

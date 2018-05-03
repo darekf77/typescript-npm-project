@@ -74,7 +74,7 @@ export interface EMAIL_ALIASES {
 export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL, EMAIL_ALIASES> {
 
   //#region @backend
-  joinProperties: (keyof EMAIL_ALIASES)[] = ['email', 'emails']
+  globalAliases: (keyof EMAIL_ALIASES)[] = ['email', 'emails']
   //#endregion
 
   async getUserBy(address: string) {

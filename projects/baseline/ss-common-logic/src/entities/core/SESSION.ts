@@ -146,7 +146,7 @@ export interface SESSION_ALIASES {
 export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_ALIASES> {
 
   //#region @backend
-  joinProperties: (keyof SESSION_ALIASES)[] = ['sesssion'];
+  globalAliases: (keyof SESSION_ALIASES)[] = ['sesssion'];
   //#endregion
 
   CONFIG = SESSION_CONFIG;

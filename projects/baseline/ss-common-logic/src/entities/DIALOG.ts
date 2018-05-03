@@ -61,7 +61,7 @@ export interface DIALOG_ALIASES {
 export class DIALOG_REPOSITORY extends META.BASE_REPOSITORY<DIALOG, DIALOG_ALIASES> {
 
   //#region @backend
-  joinProperties: (keyof DIALOG_ALIASES)[] = ['dialog', 'dialogs'];
+  globalAliases: (keyof DIALOG_ALIASES)[] = ['dialog', 'dialogs'];
   //#endregion
 
 }
