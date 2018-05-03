@@ -54,26 +54,40 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
       const groupsPromises = []
       const dialogsPromies = []
 
+      let groups: entities.GROUP[] = [];
+      let dialogs: entities.DIALOG[] = [];
+
       categories.forEach(category => {
         categoriesPromises.push(this.db.CATEGORY.save(category))
-        category.groups && category.groups.forEach(group => {
-          groupsPromises.push(this.db.GROUP.save(group))
-          group.dialogs && group.dialogs.forEach(dialog => {
-            dialogsPromies.push(this.db.DIALOG.save(dialog))
-          })
-        })
+        groups = groups.concat(category.groups);
+        category.groups = []
       })
 
-      await Promise.all(dialogsPromies);    
-      // await Promise.all(groupsPromises);
-      // await Promise.all(categoriesPromises)
+      await Promise.all(categoriesPromises)
+
+      groups.forEach(group => {
+        groupsPromises.push(this.db.GROUP.save(group))
+        dialogs = dialogs.concat(group.dialogs);
+        group.dialogs = [];
+      })
+
+      await Promise.all(groupsPromises);
+
+
+      dialogs.forEach(dialog => {
+        dialogsPromies.push(this.db.DIALOG.save(dialog))
+      })
+
+      await Promise.all(dialogsPromies);
+
+
 
     } catch (e) {
       console.log(`Error while reading database.json`);
       console.log(e);
       process.exit(0)
     }
-
+    console.log('json',json)
 
   }
   //#endregion

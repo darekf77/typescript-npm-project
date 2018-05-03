@@ -45,7 +45,7 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   category: CATEGORY;
 
 
-  @OneToMany(type => DIALOG, dial => dial, {
+  @OneToMany(type => DIALOG, dial => dial.id, {
     cascadeUpdate: false,
     cascadeInsert: false
   })

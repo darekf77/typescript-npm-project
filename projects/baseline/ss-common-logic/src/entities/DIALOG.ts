@@ -41,7 +41,7 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   }) comment: string;
 
 
-  @ManyToOne(type => GROUP, cat => cat.id, {
+  @ManyToOne(type => GROUP, group => group.id, {
     cascadeAll: false
   })
   @JoinColumn()
