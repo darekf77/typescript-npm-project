@@ -12,6 +12,7 @@ import {
 // exports
 export * from './layouts';
 export * from './ui-elements';
+export * from './helpers';
 
 const CMP = [
   FooComponent,
