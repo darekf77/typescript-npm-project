@@ -5,7 +5,7 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
 // third part
-import { buildIsomorphicVersion } from "morphi";
+import { IsomoprhicBuild } from "morphi";
 import { BaseProjectLib } from "./base-project-lib";
 
 
@@ -87,13 +87,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
         if (watch) {
-
             this.run(`npm-run tsc -d false -w --outDir ${outDir}`).async()
-            const functionName = ClassHelper.getMethodName(
-                ProjectIsomorphicLib.prototype,
-                ProjectIsomorphicLib.prototype.BUILD_ISOMORPHIC_LIB_WEBPACK)
-
-            this.watcher.call(functionName, webpackParams);
         } else {
             this.compilationWrapper(() => {
                 try {
@@ -101,34 +95,27 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
                     this.copyWhenExist('package.json', outDir, true)
                     this.copyWhenExist('.npmrc', outDir, true)
                     this.copyWhenExist('.gitignore', outDir, true)
-                    
+
                     this.run(`npm-run tsc --noEmitOnError true --noEmit true --outDir ${outDir}`).sync()
                     this.run(`npm-run tsc -d false --outDir ${outDir}`).sync()
                 } catch (e) {
+                    console.log(e)
                     process.exit(0)
                 }
             }, ` isomorphic-lib (project ${this.name})`, `Backend compilation`)
-            this.BUILD_ISOMORPHIC_LIB_WEBPACK(webpackParams);
         }
-    }
-
-    BUILD_ISOMORPHIC_LIB_WEBPACK(params: string) {
-        this.compilationWrapper(() => {
-            const env = getWebpackEnv(params);
-            // console.log('WEBPACK PRAMS', env)
-            buildIsomorphicVersion({
-                foldersPathes: {
-                    dist: env.outDir
-                },
-                toolsPathes: {
-                    tsc: 'npm-run tsc',
-                    morphi: 'tnp morphi'
-                },
-                build: {
-                    otherIsomorphicLibs: env.additionalIsomorphicLibs
-                }
-            });
-        }, ` isomorphic-lib (project ${this.name})`, `Browser version compilation pid ${process.pid}, ppid ${process.ppid} `)
+        new IsomoprhicBuild({
+            watch,
+            foldersPathes: {
+                dist: outDir as any
+            },
+            toolsPathes: {
+                tsc: 'tnp tsc'
+            },
+            build: {
+                otherIsomorphicLibs: isomorphicNames
+            }
+        }).init()
     }
 
 }
