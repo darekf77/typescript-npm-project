@@ -20,7 +20,6 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
         }
         copyToApps(argsObj.linkto)
     }
-    process.exit(1)
 
     const options: BuildOptions = {
         prod, watch, outDir

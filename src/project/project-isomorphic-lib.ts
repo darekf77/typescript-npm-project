@@ -60,12 +60,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
-        if (watch) {
-            this.buildLib(outDir, prod, false);
-            this.buildLib(outDir, prod, true);
-        } else {
-            this.buildLib(outDir, prod, false);
-        }
+        this.buildLib(outDir, prod, watch);
         return;
     }
 
@@ -86,19 +81,19 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
-        if (!watch) {
-            this.copyWhenExist('bin', outDir, true)
-            this.copyWhenExist('package.json', outDir, true)
-            this.copyWhenExist('.npmrc', outDir, true)
-            this.copyWhenExist('.gitignore', outDir, true)
-        }
+
+        this.copyWhenExist('bin', outDir, true)
+        this.copyWhenExist('package.json', outDir, true)
+        this.copyWhenExist('.npmrc', outDir, true)
+        this.copyWhenExist('.gitignore', outDir, true)
+
         new IsomoprhicBuild({
             watch,
             foldersPathes: {
                 dist: outDir as any
             },
             toolsPathes: {
-                tsc: 'tnp tsc'
+                tsc: 'tsc'
             },
             build: {
                 otherIsomorphicLibs: isomorphicNames
