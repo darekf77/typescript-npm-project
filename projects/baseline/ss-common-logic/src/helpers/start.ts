@@ -30,14 +30,6 @@ export async function start(options: StartOptions) {
   config['entities'] = entities as any;
   const connection = await createConnection(config as any);
 
-  const tablesToClear = [];
-  _.values(Entities).forEach(Entity => {
-    const tableName = META.tableNameFrom(Entity);
-    if (tableName !== 'tb_session') {
-      tablesToClear.push(connection.query(`DELETE FROM ${tableName}`));
-    }
-  })
-  await Promise.all(tablesToClear)
 
   init(host).expressApp({
     controllers,

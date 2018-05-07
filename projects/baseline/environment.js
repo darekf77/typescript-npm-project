@@ -13,7 +13,7 @@ const config = {
     database: 'tmp/db.sqlite3',
     type: 'sqlite',
     synchronize: true,
-    dropSchema: false,
+    dropSchema: true,
     logging: false
   },
   host: (packageName) => {

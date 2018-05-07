@@ -7,9 +7,9 @@
           "name": "Asking for direction",
           "dialogs": [
             {
-              "lang_pl": "Dzień dobry",
-              "lang_en": "Good morning",
-              "lang_fr": "Bonjour"
+              "lang_pl": "adasd Dzień dobry",
+              "lang_en": "adas aaa Good morning",
+              "lang_fr": "Bsdasdonjour"
             },
             {
               "lang_pl": "Do widzenia",
@@ -24,7 +24,7 @@
       "name": "Date",
       "groups": [
         {
-          "name": "Asking for direction",
+          "name": "Funckin for direction",
           "dialogs": [
             {
               "lang_pl": "Dzień dobry",

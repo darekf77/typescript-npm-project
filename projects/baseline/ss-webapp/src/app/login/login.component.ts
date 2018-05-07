@@ -4,7 +4,8 @@ import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthCon
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
-import { BaseComponent } from '../../shared';
+
+import { BaseComponent } from 'ss-common-ui/module';
 const log = Log.create('Login component')
 
 @Component({

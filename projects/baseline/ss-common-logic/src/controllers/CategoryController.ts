@@ -103,8 +103,8 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
       const catergoires = await this.db.CATEGORY
         .createQueryBuilder(this.db.CATEGORY._.category)
-        .leftJoinAndSelect(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
-        // .leftJoinAndSelect(this.db.GROUP.__.groups.dialogs, this.db.DIALOG._.dialogs)
+        .innerJoin(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
+        .innerJoinAndSelect(this.db.GROUP.__.groups.dialogs, this.db.DIALOG._.dialogs)
         .getMany()
 
       return catergoires;

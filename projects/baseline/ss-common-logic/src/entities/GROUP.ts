@@ -35,17 +35,20 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column() name: string;
+  @Column()
+  name: string;
+
+  @Column()
+  amazing: string = ' asdmasdas'
 
 
   @ManyToOne(type => CATEGORY, cat => cat.id, {
     cascadeAll: false
   })
-  @JoinColumn()
   category: CATEGORY;
 
 
-  @OneToMany(type => DIALOG, dial => dial.id, {
+  @OneToMany(type => DIALOG, dial => dial.group, {
     cascadeUpdate: false,
     cascadeInsert: false
   })

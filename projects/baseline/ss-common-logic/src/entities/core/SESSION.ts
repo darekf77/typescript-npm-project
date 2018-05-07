@@ -137,7 +137,7 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
 
 export interface SESSION_ALIASES {
   //#region @backend
-  sesssion:string;
+  sesssion: string;
   //#endregion
 }
 
@@ -190,7 +190,14 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_AL
     Session.user = user;
     Session.ip = ip;
 
-    Session.createToken(user.username == 'postman' ? 'postman' : undefined);
+    if (user.username == 'postman') {
+      Session.createToken('postman');
+    } else if (user.username == 'admin') {
+      Session.createToken('admin');
+    } else {
+      Session.createToken();
+    }
+
 
     Session = await this.save(Session);
     if (Session) {

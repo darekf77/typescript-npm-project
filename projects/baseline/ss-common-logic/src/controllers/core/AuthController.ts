@@ -469,7 +469,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  public async __createUser(formData: entities.IUSER, EmailTypeName: entities.EMAIL_TYPE_NAME) {
+  public async __createUser(formData: entities.IUSER, EmailTypeName: entities.EMAIL_TYPE_NAME, withActiveSession = false) {
     //#region @backendFunc
 
     let EmailType = await this.db.EMAIL_TYPE.getBy(EmailTypeName);
@@ -514,6 +514,15 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
     Email.user = User;
     await this.db.EMAIL.save(Email);
+
+    if (withActiveSession) {
+      const session = new SESSION()
+      session.user = User;
+      session.ip = '::1';
+      session.createToken(User.username)
+      await this.db.SESSION.save(session);
+    }
+
     return User;
     //#endregion
   }
@@ -541,12 +550,12 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
       username: 'admin',
       email: 'admin@admin.pl',
       password: 'admin'
-    }, 'normal_auth');
+    }, 'normal_auth', true);
     await this.__createUser({
       username: 'postman',
       email: 'postman@postman.pl',
       password: 'postman'
-    }, 'normal_auth');
+    }, 'normal_auth', true);
     //#endregion
   }
 
