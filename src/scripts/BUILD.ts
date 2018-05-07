@@ -56,11 +56,7 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
 
 export default {
-    $BUILD_ISOMORPHIC_LIB_WEBPACK: (args: string) => {
-        (Project.Current as ProjectIsomorphicLib).BUILD_ISOMORPHIC_LIB_WEBPACK(args);
-        process.exit(0)
-    },
-
+    
     $BUILD_DIST: [() => buildLib(), `Build dist version of project library.`],
     $BUILD_DIST_WATCH: () => buildLib(false, true),
     $BUILD_DIST_PROD: () => buildLib(true),

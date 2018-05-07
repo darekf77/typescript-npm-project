@@ -86,23 +86,11 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
-        if (watch) {
-            this.run(`npm-run tsc -d false -w --outDir ${outDir}`).async()
-        } else {
-            this.compilationWrapper(() => {
-                try {
-                    this.copyWhenExist('bin', outDir, true)
-                    this.copyWhenExist('package.json', outDir, true)
-                    this.copyWhenExist('.npmrc', outDir, true)
-                    this.copyWhenExist('.gitignore', outDir, true)
-
-                    this.run(`npm-run tsc --noEmitOnError true --noEmit true --outDir ${outDir}`).sync()
-                    this.run(`npm-run tsc -d false --outDir ${outDir}`).sync()
-                } catch (e) {
-                    console.log(e)
-                    process.exit(0)
-                }
-            }, ` isomorphic-lib (project ${this.name})`, `Backend compilation`)
+        if (!watch) {
+            this.copyWhenExist('bin', outDir, true)
+            this.copyWhenExist('package.json', outDir, true)
+            this.copyWhenExist('.npmrc', outDir, true)
+            this.copyWhenExist('.gitignore', outDir, true)
         }
         new IsomoprhicBuild({
             watch,
