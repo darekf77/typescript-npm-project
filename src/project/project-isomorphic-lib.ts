@@ -1,6 +1,5 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as cpr from 'cpr';
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
