@@ -80,10 +80,10 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined
 
   @Column({ length: 100 })
-  token: string;
+  token: string = undefined
 
   token_type = 'bearer';
 
@@ -91,22 +91,22 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
     length: 50,
     nullable: true
   })
-  ip: string;
+  ip: string = undefined
 
   @CreateDateColumn()
-  createdDate: Date;
+  createdDate: Date = undefined
 
   @Column({
     nullable: false
   })
-  expiredDate: Date;
+  expiredDate: Date = undefined
 
 
   @OneToOne(type => USER, user => user.id, {
     nullable: true
   })
   @JoinColumn()
-  user: USER;
+  user: USER = undefined
 
   //#region @backend
   public createToken(token?: string) {

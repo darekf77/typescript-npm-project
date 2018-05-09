@@ -10,7 +10,7 @@ import { DIALOG, IDIALOG } from './DIALOG';
 
 export interface IGROUP {
   id?: number;
-  name: string;
+  title: string;
   dialogs: IDIALOG[];
 }
 
@@ -21,7 +21,7 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   fromRaw(obj: IGROUP): GROUP {
     let group = new GROUP()
     group.id = obj.id;
-    group.name = obj.name;
+    group.title = obj.title;
     group.dialogs = obj.dialogs.map(d => {
       let dialog = new DIALOG();
       dialog = dialog.fromRaw(d);
@@ -33,19 +33,19 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
 
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined
 
   @Column()
-  name: string;
+  title: string = undefined
 
   @Column()
   amazing: string = ' asdmasdas'
 
 
   @ManyToOne(type => CATEGORY, cat => cat.id, {
-    cascadeAll: false
+    cascadeAll: false,
   })
-  category: CATEGORY;
+  category: CATEGORY = undefined
 
 
   @OneToMany(type => DIALOG, dial => dial.group, {

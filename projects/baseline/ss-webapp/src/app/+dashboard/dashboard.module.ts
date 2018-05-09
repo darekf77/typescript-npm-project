@@ -7,17 +7,18 @@ import { RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 
 @NgModule({
     imports: [
         StaticColumnsModule,
         RouterModule.forChild(routes),
-        CommonModule
+        CommonModule,
+        TabsModule.forRoot()
     ],
     exports: [],
     declarations: [DashboardComponent],
     providers: [CategoryController],
 })
 export class DashboardModule { }
-
-

@@ -22,10 +22,21 @@ export class DashboardComponent implements OnInit {
 
   }
 
+  selected: CATEGORY;
   categories: CATEGORY[] = [];
 
   content = {
     height: window.innerHeight - 100
+  }
+
+  isSelected(category: CATEGORY) {
+    return this.selected && this.selected.id == category.id;
+  }
+
+  async showCategory(category: CATEGORY) {
+    const cat = await this.categoryCtrl.categoryBy(category.id).received;
+    log.i('slected category', cat)
+    this.selected = cat.body.json;
   }
 
   async ngOnInit() {
@@ -33,6 +44,7 @@ export class DashboardComponent implements OnInit {
     const categories = await this.categoryCtrl.allCategories().received
     log.i('categories from base crud', categories.body.json)
     this.categories = categories.body.json;
+    await this.showCategory(this.categories[0])
   }
 
   @HostListener('window:resize', ['$event'])

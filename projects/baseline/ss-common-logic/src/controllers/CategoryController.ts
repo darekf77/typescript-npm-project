@@ -93,8 +93,8 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
   //#endregion
 
 
-  @GET('/Allcategories')
-  allCategories(): Response<entities.CATEGORY[]> {
+  @GET('/allCategories')
+  allCategoriesWithAllData(): Response<entities.CATEGORY[]> {
     //#region @backendFunc
     const self = this;
     return async () => {
@@ -103,7 +103,7 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
       const catergoires = await this.db.CATEGORY
         .createQueryBuilder(this.db.CATEGORY._.category)
-        .innerJoin(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
+        .innerJoinAndSelect(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
         .innerJoinAndSelect(this.db.GROUP.__.groups.dialogs, this.db.DIALOG._.dialogs)
         .getMany()
 
@@ -112,6 +112,37 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     //#endregion
   }
 
+
+  @GET('/categories')
+  allCategories(): Response<entities.CATEGORY[]> {
+    //#region @backendFunc
+    const self = this;
+    return async () => {
+      const catergoires = await this.db.CATEGORY.find()
+      return catergoires;
+    };
+    //#endregion
+  }
+
+  @GET('/categories/:id')
+  categoryBy(@PathParam('id') id: number): Response<entities.CATEGORY> {
+    //#region @backendFunc
+    const self = this;
+    return async () => {
+
+      const category = await this.db.CATEGORY
+        .createQueryBuilder(this.db.CATEGORY._.category)
+        .innerJoinAndSelect(this.db.CATEGORY.__.category.groups, this.db.GROUP._.groups)
+        .innerJoinAndSelect(this.db.GROUP.__.groups.dialogs, this.db.DIALOG._.dialogs)
+        .where(`${this.db.CATEGORY.__.category.id}=:id`, { id })
+        .getOne()
+      return category;
+    };
+    //#endregion
+  }
+
+
 }
+
 
 export default CategoryController;

@@ -1,32 +1,49 @@
 <h1>
-  <a [routerLink]="'/'" class="logo-header-ffm" >
-    <img class="logo-eiffel-tower" [src]="'/assets/img/logo/eiffel-tower-in-paris-france.png'" >
+  <a [routerLink]="'/'"
+     class="logo-header-ffm">
+    <img class="logo-eiffel-tower"
+         [src]="'/assets/img/logo/eiffel-tower-in-paris-france.png'">
     <span> French for man's </span>
-    <img class="logo-couple-kissing" [src]="'/assets/img/logo/couple-kissing.png'" >
+    <img class="logo-couple-kissing"
+         [src]="'/assets/img/logo/couple-kissing.png'">
   </a>
 </h1>
 
-<columns-container class="middle-content" [style.height.px]="content.height" >
+<columns-container class="middle-content"
+                   [style.height.px]="content.height">
 
-  <column [width]="200" class="content-left-panel" >
+  <column [width]="200"
+          class="content-left-panel">
     <br>
-    <h3 *ngIf="categories && categories.length === 0" >
+    <h3 *ngIf="categories && categories.length === 0">
       Ładowanie kategori
     </h3>
-    <ul  *ngIf="categories && categories.length > 0" >
-      <li *ngFor="let category of categories">
-        <a [routerLink]="'./'+category.path"> {{category.name}} </a>
+    <ul *ngIf="categories && categories.length > 0">
+      <li *ngFor="let category of categories" (click)="showCategory(category)"
+          [ngClass]="{'selected': isSelected(category)  }">
+        <a href="javascript:void(0)"
+           > {{category.name}} </a>
       </li>
     </ul>
 
 
 
   </column>
-  <column grow>
-    <router-outlet></router-outlet>
+  <column grow class="content" >
+    <tabset *ngIf="selected && selected.groups">
+
+      <tab heading="{{group.title}}"
+           *ngFor="let group of selected.groups">
+
+        <ul *ngFor="let dialog of group.dialogs">
+          {{dialog.lang_pl}}
+        </ul>
+
+      </tab>
+    </tabset>
   </column>
 
 </columns-container>
 <footer>
-  &copy; 2018
+  &copy; 2018asd
 </footer>

@@ -41,10 +41,10 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> {
   }
 
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id: number = undefined
 
   @Column('varchar', { length: 100, unique: true })
-  address: string;
+  address: string = undefined
 
 
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
@@ -59,7 +59,7 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> {
     cascadeAll: false
   })
   @JoinColumn()
-  user: USER;
+  user: USER = undefined
 
 }
 

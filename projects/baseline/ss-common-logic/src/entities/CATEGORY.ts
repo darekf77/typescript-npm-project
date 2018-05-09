@@ -28,9 +28,9 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined;
 
-  @Column() name: string;
+  @Column() name: string = undefined;
 
   @Column('boolean') isPremium: boolean = false;
 

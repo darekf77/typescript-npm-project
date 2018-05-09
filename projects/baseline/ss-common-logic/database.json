@@ -4,7 +4,22 @@
       "name": "On street",
       "groups": [
         {
-          "name": "Asking for direction",
+          "title": "Asking for direction",
+          "dialogs": [
+            {
+              "lang_pl": "adasd Dzień dobry",
+              "lang_en": "adas aaa Good morning",
+              "lang_fr": "Bsdasdonjour"
+            },
+            {
+              "lang_pl": "Do widzenia",
+              "lang_en": "See you",
+              "lang_fr": "Au revoir"
+            }
+          ]
+        },
+        {
+          "title": "Asking for something else",
           "dialogs": [
             {
               "lang_pl": "adasd Dzień dobry",
@@ -24,7 +39,22 @@
       "name": "Date",
       "groups": [
         {
-          "name": "Funckin for direction",
+          "title": "Hej ojojoojasd direction",
+          "dialogs": [
+            {
+              "lang_pl": "Dzień dobry",
+              "lang_en": "Good morning",
+              "lang_fr": "Bonjour"
+            },
+            {
+              "lang_pl": "Do widzenia",
+              "lang_en": "See you",
+              "lang_fr": "Au revoir"
+            }
+          ]
+        },
+        {
+          "title": "Hue hue!",
           "dialogs": [
             {
               "lang_pl": "Dzień dobry",

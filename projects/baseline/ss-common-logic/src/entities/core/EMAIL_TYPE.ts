@@ -32,10 +32,10 @@ export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined
 
   @Column({ length: 50, unique: true })
-  name: EMAIL_TYPE_NAME;
+  name: EMAIL_TYPE_NAME = undefined
 
 
   @ManyToMany(type => EMAIL, email => email.types, {

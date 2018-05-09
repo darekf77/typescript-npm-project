@@ -30,21 +30,21 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined
 
-  @Column() lang_pl: string;
-  @Column() lang_en: string;
-  @Column() lang_fr: string;
+  @Column() lang_pl: string = undefined
+  @Column() lang_en: string = undefined
+  @Column() lang_fr: string = undefined
 
   @Column({
     nullable: true
-  }) comment: string;
+  }) comment: string = undefined
 
 
   @ManyToOne(type => GROUP, group => group.id, {
     cascadeAll: false
   })
-  group: GROUP;
+  group: GROUP = undefined
 
 
 }

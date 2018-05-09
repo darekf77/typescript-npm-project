@@ -38,7 +38,7 @@ export interface IUSER {
 }
 
 @Entity(META.tableNameFrom(USER))
-export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
+export class USER extends META.BASE_ENTITY<USER, IUSER> implements IUSER {
 
 
   fromRaw(obj: IUSER): USER {
@@ -46,16 +46,16 @@ export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = undefined
 
-  session: SESSION;
+  session: SESSION = undefined
 
-  @Column() username: string;
-  @Column() password: string;
+  @Column() username: string = undefined
+  @Column() password: string = undefined
   @Column({ nullable: true }) whereCreated: 'baseline' | 'site' = 'baseline';
-  @Column({ nullable: true }) firstname: string;
-  @Column({ nullable: true }) lastname: string;
-  @Column({ nullable: true }) email?: string;
+  @Column({ nullable: true }) firstname: string = undefined
+  @Column({ nullable: true }) lastname: string = undefined
+  @Column({ nullable: true }) email?: string = undefined
 
 
   @OneToMany(type => EMAIL, email => email.user, {
@@ -68,15 +68,15 @@ export class USER extends META.BASE_ENTITY<USER,IUSER> implements IUSER {
 
 export interface USER_ALIASES {
   //#region @backend
-  user:string;
+  user: string;
   //#endregion
 }
 
 @EntityRepository(USER)
-export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER,USER_ALIASES> {
+export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER, USER_ALIASES> {
 
   //#region @backend
-  globalAliases:(keyof USER_ALIASES)[] = ['user']
+  globalAliases: (keyof USER_ALIASES)[] = ['user']
   //#endregion
 
   byUsername(username: string) {
