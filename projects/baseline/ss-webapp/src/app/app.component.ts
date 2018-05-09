@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.auth.isLoggedIn.subscribe(login => {
       if (!login) {
-        this.router.navigateByUrl('/')
+        this.router.navigateByUrl('/dashboard')
       }
     })
   }

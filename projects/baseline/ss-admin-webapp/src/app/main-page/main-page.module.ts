@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { AppMainPageComponent } from './main-page.component';
 import { FormsModule } from '@angular/forms';
 
-import { MyLibModule } from 'angular-lib';
 import { Routes, RouterModule } from '@angular/router';
 
 
@@ -19,8 +18,7 @@ export const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule.forChild(routes),
-    MyLibModule.forRoot()
+    RouterModule.forChild(routes)
   ],
   declarations: [AppMainPageComponent]
 })

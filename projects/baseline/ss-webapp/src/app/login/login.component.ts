@@ -8,6 +8,7 @@ import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 import { BaseComponent } from 'ss-common-ui/module';
 const log = Log.create('Login component')
 
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
