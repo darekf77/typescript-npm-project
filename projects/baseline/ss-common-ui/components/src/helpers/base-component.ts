@@ -2,7 +2,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 
 
-export abstract class BaseComponent implements OnDestroy {
+export class BaseComponent implements OnDestroy {
 
   handlers: Subscription[] = [];
 
