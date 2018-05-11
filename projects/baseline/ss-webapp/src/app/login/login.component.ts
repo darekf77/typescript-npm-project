@@ -58,6 +58,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     console.log(await this.auth.info().received)
   }
 
+  
   async logout() {
     await this.auth.browser.logout()
     this.hideModal()

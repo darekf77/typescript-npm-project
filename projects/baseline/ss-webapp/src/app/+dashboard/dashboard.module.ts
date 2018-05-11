@@ -8,13 +8,14 @@ import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 import { TabsModule } from 'ngx-bootstrap/tabs';
-
+import { LoginModule } from '../login/login.module';
 
 @NgModule({
     imports: [
         StaticColumnsModule,
         RouterModule.forChild(routes),
         CommonModule,
+        LoginModule,
         TabsModule.forRoot()
     ],
     exports: [],

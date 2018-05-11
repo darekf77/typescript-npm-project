@@ -10,6 +10,7 @@ import {
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';
+import { LoginModule } from '../login/login.module';
 
 export const routes: Routes = [
   {
@@ -21,13 +22,12 @@ export const routes: Routes = [
 
 const modules = [
   SliderVerticalModule,
-  
+  LoginModule
   // CommonUIModule
 ]
 
 const components = [
-  AppMainPageComponent,
-  LoginComponent
+  AppMainPageComponent
 ]
 
 @NgModule({
