@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, Input } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 
 import { Log } from "ng2-logger";
@@ -7,7 +7,6 @@ import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 
 import { BaseComponent } from 'ss-common-ui/module';
 const log = Log.create('Login component')
-
 
 @Component({
   selector: 'app-login',
@@ -22,6 +21,8 @@ export class LoginComponent extends BaseComponent implements OnInit {
   ) {
     super()
   }
+
+  @Input() showDashboard: boolean = true;
 
   ngOnInit() {
 
@@ -58,7 +59,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     console.log(await this.auth.info().received)
   }
 
-  
+
   async logout() {
     await this.auth.browser.logout()
     this.hideModal()

@@ -9,13 +9,29 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import * as _ from 'lodash';
 import { init, replay, AngularProviders } from 'morphi/browser';
 // my modules
-
-// local
+// import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
+import { USER } from 'ss-common-logic/browser/entities/core/USER';
+import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
+import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
+import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
+import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
+import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
+// local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
 import { LoginModule } from './login/login.module';
+
+
+init('http://localhost:4000')
+  .angularProviders({
+    controllers: [AuthController, CategoryController],
+    entities: [
+      USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP]
+  })
 
 @NgModule({
   declarations: [

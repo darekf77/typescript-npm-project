@@ -6,6 +6,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 
 import { BaseComponent } from 'ss-common-ui/module';
+import { Router } from '@angular/router';
 const log = Log.create('Login component')
 
 @Component({
@@ -16,28 +17,25 @@ const log = Log.create('Login component')
 export class LoginComponent extends BaseComponent implements OnInit {
 
   constructor(
-    private auth: AuthController
+    private auth: AuthController,
+    private router: Router
   ) {
     super()
   }
 
   ngOnInit() {
 
-    this.handlers.push(this.auth.isLoggedIn.subscribe(d => {
-      log.i('data from auth observable !', d)
-      this.hideModal()
+    this.handlers.push(this.auth.isLoggedIn.subscribe(isLoginIn => {
+      if (isLoginIn) {
+        this.router.navigateByUrl('/dashboard')
+      } else {
+        this.router.navigateByUrl('/')
+      }
     }))
     log.i('On init login !')
     this.auth.browser.init()
   }
 
-  hideModal() {
-    if (this.modalRef) {
-      this.modalRef.hide()
-    }
-  }
-
-  modalRef: BsModalRef;
 
   model = {
     username: 'admin',

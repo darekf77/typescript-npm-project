@@ -6,6 +6,12 @@ export const routes: Route[] = [
     loadChildren: './main-page/main-page.module#AppMainPageModule',
     pathMatch: 'prefix',
   },
+  {
+    path: 'dashboard',
+    pathMatch: 'prefix',
+    loadChildren: './+dashboard/dashboard.module#DashboardModule',
+    // canLoad: [CanLoadDashboard]
+  }
   // {
   //   path: 'test',
   //   loadChildren: './app-test/app-test.module#AppTestModule',
