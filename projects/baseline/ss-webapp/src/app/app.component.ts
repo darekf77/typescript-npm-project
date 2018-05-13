@@ -15,9 +15,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(typeof ENV)
     console.log('ENV', ENV)
-    console.log('ENV', ENV.name)
     debugger
     this.auth.isLoggedIn.subscribe(login => {
       if (login) {
