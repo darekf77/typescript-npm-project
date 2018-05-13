@@ -16,7 +16,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     console.log('ENV', ENV)
-    debugger
     this.auth.isLoggedIn.subscribe(login => {
       if (login) {
         this.router.navigateByUrl('/dashboard')
