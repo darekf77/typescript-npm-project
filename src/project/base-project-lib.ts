@@ -81,7 +81,7 @@ export abstract class BaseProjectLib extends Project {
         watch.watchTree(monitorDir, (f, curr, prev) => {
 
             if (_.isString(f)) {
-                f = f.replace(monitorDir, '')
+                f = f.replace(monitorDir, '') as any
                 // console.log(f)
             }
 
@@ -89,11 +89,11 @@ export abstract class BaseProjectLib extends Project {
             if (typeof f == "object" && prev === null && curr === null) {
                 // Finished walking the tree
             } else if (prev === null) {
-                this.copyToProjectsOnFinish('created', f);
+                this.copyToProjectsOnFinish('created', f as any);
             } else if (curr.nlink === 0) {
-                this.copyToProjectsOnFinish('removed', f);
+                this.copyToProjectsOnFinish('removed', f as any);
             } else {
-                this.copyToProjectsOnFinish('changed', f);
+                this.copyToProjectsOnFinish('changed', f as any);
                 // f was changed
             }
         })

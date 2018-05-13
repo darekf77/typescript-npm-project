@@ -19,5 +19,9 @@ if (!fs.existsSync(envrionmentFilePath)) {
 let config = require(envrionmentFilePath);
 
 
+global['ENV'] = config;
+
+
+
 export default config;
 //#endregion

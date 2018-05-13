@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -80,6 +81,24 @@ const postcssPlugins = function () {
 //   "sqlite3": ''
 // }
 
+
+// PROCESS ENV
+if (!process.env.environmentName) {
+  process.env.environmentName = ''
+}
+
+console.log(process.env)
+if (process.env.environmentName !== '') {
+  process.env.environmentName = `.${process.env.environmentName}`;
+}
+const envrionmentFilePath = path.join(__dirname, `../environment${process.env.environmentName}.js`);
+console.log(envrionmentFilePath)
+if (!fs.existsSync(envrionmentFilePath)) {
+  throw `File "${envrionmentFilePath}" doesn't exist`;
+}
+
+let ENV = require(envrionmentFilePath);
+//
 
 module.exports = {
   "resolve": {
@@ -388,6 +407,9 @@ module.exports = {
     ]
   },
   "plugins": [
+    new DefinePlugin({
+      "ENV": JSON.stringify(ENV)
+    }),
     new NoEmitOnErrorsPlugin(),
     new CopyWebpackPlugin([
       {
