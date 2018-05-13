@@ -1,11 +1,11 @@
 import { Component, OnInit, TemplateRef, Input } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 
+import { Subscription } from "rxjs/Subscription";
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 
-import { BaseComponent } from 'ss-common-ui/module';
 const log = Log.create('Login component')
 
 @Component({
@@ -13,13 +13,19 @@ const log = Log.create('Login component')
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent extends BaseComponent implements OnInit {
+export class LoginComponent  implements OnInit {
 
   constructor(
     private auth: AuthController,
     private modalService: BsModalService
   ) {
-    super()
+
+  }
+
+  handlers: Subscription[] = [];
+
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
   }
 
   @Input() showDashboard: boolean = true;

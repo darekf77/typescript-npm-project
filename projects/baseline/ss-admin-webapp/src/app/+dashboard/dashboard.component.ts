@@ -6,8 +6,8 @@ import { Log, Level } from "ng2-logger";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
-import { BaseComponent } from 'ss-common-ui/module';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs/Subscription';
 
 const log = Log.create('Dashboard')
 
@@ -17,11 +17,17 @@ const log = Log.create('Dashboard')
   styleUrls: ['dashboard.component.scss']
 })
 
-export class DashboardComponent extends BaseComponent implements OnInit {
+export class DashboardComponent implements OnInit {
   constructor(
     public auth: AuthController,
     private router: Router) {
-    super()
+
+  }
+
+  handlers: Subscription[] = [];
+
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
   }
 
   content = {

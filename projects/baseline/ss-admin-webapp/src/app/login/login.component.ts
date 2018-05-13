@@ -1,11 +1,12 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 
+import { Subscription } from "rxjs/Subscription";
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 
-import { BaseComponent } from 'ss-common-ui/module';
+
 import { Router } from '@angular/router';
 const log = Log.create('Login component')
 
@@ -14,14 +15,21 @@ const log = Log.create('Login component')
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent extends BaseComponent implements OnInit {
+export class LoginComponent implements OnInit {
 
   constructor(
     private auth: AuthController,
     private router: Router
   ) {
-    super()
+
   }
+
+  handlers: Subscription[] = [];
+
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
+  }
+
 
   ngOnInit() {
 
@@ -52,7 +60,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
 
   async logout() {
     await this.auth.browser.logout()
-    this.hideModal()
+    // this.hideModal()
   }
 
 }

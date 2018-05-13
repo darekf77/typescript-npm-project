@@ -6,6 +6,7 @@ import { Log, Level } from "ng2-logger";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { Subscription } from 'rxjs/Subscription';
 
 const log = Log.create('Dashboard')
 
@@ -20,6 +21,12 @@ export class DashboardComponent implements OnInit {
     public auth: AuthController,
     public categoryCtrl: CategoryController) {
 
+  }
+
+  handlers: Subscription[] = [];
+
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
   }
 
   selected: CATEGORY;
