@@ -9,7 +9,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, RunOptions, Package } from "../models";
+import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
@@ -177,8 +177,12 @@ export abstract class Project extends BaseProjectRouter {
         }
     }
 
+    
+
+    protected buildOptions?: BuildOptions;
     build(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
+        this.buildOptions = buildOptions;
 
         init();
 

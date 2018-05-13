@@ -1,14 +1,16 @@
 import { AngularProject } from "./project-angular";
 import * as path from "path";
+import * as fs from "fs";
 import { EnvConfig } from "../models";
 
 export class ProjectAngularClient extends AngularProject {
 
     constructor(location: string) {
         super(location);
-        if (this.parent && this.parent.type === 'workspace') {
+        const pathToWorkspaceProjectEnvironment = path.join(this.parent.location, 'environment');
+        if (this.parent && this.parent.type === 'workspace' && fs.existsSync(pathToWorkspaceProjectEnvironment)) {
             // console.log('path to search for envrionment', path.join(this.parent.location, 'environment'))
-            const env: EnvConfig = require(path.join(this.parent.location, 'environment')) as any;
+            const env: EnvConfig = require(pathToWorkspaceProjectEnvironment) as any;
             const route = env.routes.find(r => r.project === this.name);
             // console.log('route', route)
             this.defaultPort = route.localEnvPort;

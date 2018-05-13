@@ -37,6 +37,7 @@ export class ProjectAngularLib extends BaseProjectLib {
             }
             this.run(`npm-run gulp inline-templates-${outDir}-watch`, { output: false }).async()
             this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`).async()
+            this.watchOutDir()
         } else {
             this.compilationWrapper(() => {
                 this.run(`tnp rimraf ${outDir}`).sync()
@@ -46,6 +47,7 @@ export class ProjectAngularLib extends BaseProjectLib {
                     this.run(`tnp rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
                 }
             }, `angular-lib (project ${this.name})`)
+            this.copyToProjectsOnFinish();
         }
         return this;
     }

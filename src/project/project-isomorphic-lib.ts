@@ -98,6 +98,10 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
                 otherIsomorphicLibs: isomorphicNames
             }
         }).init()
+        this.copyToProjectsOnFinish();
+        if (watch) {
+            this.watchOutDir()
+        }
     }
 
 }

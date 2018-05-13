@@ -31,6 +31,7 @@ export class BuildOptions {
     outDir: BuildDir;
     watch?: boolean;
     appBuild?: boolean;
+    copyto?: Project[];
     additionalIsomorphicLibs?: string[];
 
     public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = []) {

@@ -13,12 +13,23 @@ import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
+import { ProjectFrom } from './index';
 
 export function crossPlatofrmPath(p: string) {
     if (process.platform === 'win32') {
         return p.replace(/\\/g, '/');
     }
     return p;
+}
+
+export function nearestProjectTo(location: string) {
+    const project = ProjectFrom(location);
+    if (project) {
+        return project;
+    }
+    location = path.join(location, '..');
+    if (!fs.existsSync(location)) return undefined;
+    return ProjectFrom(path.resolve(location));
 }
 
 

@@ -1,28 +1,32 @@
 import * as _ from 'lodash';
 import { run, clearConsole } from "../process";
-import { Project, ProjectIsomorphicLib } from '../project';
+import { Project, ProjectIsomorphicLib, ProjectFrom } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir, LibType } from "../models";
 import { info, error } from "../messages";
 
 import chalk from "chalk";
-
-export function copyToApps(apps: string[], watch = false) {
-    console.log('apps', apps)
-}
+import { nearestProjectTo } from '../helpers';
 
 export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
-    const argsObj: { linkto: string[] | string } = require('minimist')(args.split(' '));
-    if (argsObj.linkto) {
-        if (_.isString(argsObj.linkto)) {
-            argsObj.linkto = [argsObj.linkto]
+    const argsObj: { copyto: string[] | string } = require('minimist')(args.split(' '));
+    let copyto: Project[] = []
+    if (argsObj.copyto) {
+        if (_.isString(argsObj.copyto)) {
+            argsObj.copyto = [argsObj.copyto]
         }
-        copyToApps(argsObj.linkto)
+        copyto = argsObj.copyto.map(path => {
+            const project = nearestProjectTo(path);
+            if (!project) {
+                error(`Path doesn't contain tnp type project: ${path}`)
+            }
+            return project;
+        });
     }
 
     const options: BuildOptions = {
-        prod, watch, outDir
+        prod, watch, outDir, copyto
     };
     build(options, ['angular-lib', 'isomorphic-lib'])
 }
@@ -39,7 +43,7 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist')
 
 function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
-    const { prod, watch, outDir, appBuild } = opt;
+    const { prod, watch, outDir, appBuild, copyto } = opt;
 
     clearConsole()
 
