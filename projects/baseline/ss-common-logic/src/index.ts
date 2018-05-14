@@ -16,6 +16,7 @@ function addEntity(entity: Function) {
 
 addController(controllers.AuthController)
 addController(controllers.CategoryController)
+addController(controllers.MultimediaController)
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)
@@ -24,6 +25,7 @@ addEntity(entites.SESSION)
 addEntity(entites.DIALOG)
 addEntity(entites.GROUP)
 addEntity(entites.CATEGORY)
+addEntity(entites.MULTIMEDIA)
 
 export const Controllers = tControllers;
 export const Entities = tEntities;

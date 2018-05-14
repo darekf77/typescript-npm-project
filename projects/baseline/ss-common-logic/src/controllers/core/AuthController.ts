@@ -14,7 +14,6 @@ import { Handler } from 'express';
 export { Handler } from 'express';
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
-import config from '../../environment';
 import * as path from 'path';
 //#endregion
 

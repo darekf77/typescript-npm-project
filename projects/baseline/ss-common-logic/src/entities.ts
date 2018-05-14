@@ -4,6 +4,9 @@ export { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
 export { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
 
+import { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';
+export { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';
+
 import { EMAIL, EMAIL_REPOSITORY } from './entities/core/EMAIL';
 export { EMAIL, EMAIL_REPOSITORY } from './entities/core/EMAIL';
 
@@ -39,7 +42,9 @@ export function entities(connection?: Connection) {
 
     CATEGORY: META.repositoryFrom<CATEGORY, CATEGORY_REPOSITORY>(connection, CATEGORY, CATEGORY_REPOSITORY),
 
-    GROUP: META.repositoryFrom<GROUP, GROUP_REPOSITORY>(connection, GROUP, GROUP_REPOSITORY)
+    GROUP: META.repositoryFrom<GROUP, GROUP_REPOSITORY>(connection, GROUP, GROUP_REPOSITORY),
+
+    MULTIMEDIA: META.repositoryFrom<MULTIMEDIA, MULTIMEDIA_REPOSITORY>(connection, MULTIMEDIA, MULTIMEDIA_REPOSITORY),
   }
 }
 //#endregion

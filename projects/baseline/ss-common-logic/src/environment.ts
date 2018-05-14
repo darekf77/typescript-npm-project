@@ -19,9 +19,12 @@ if (!fs.existsSync(envrionmentFilePath)) {
 let config = require(envrionmentFilePath);
 
 
+
+
+let pkgjson = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8').toString();
+
+config['packageJson'] = JSON.parse(pkgjson);
+
 global['ENV'] = config;
 
-
-
-export default config;
 //#endregion

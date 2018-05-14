@@ -19,6 +19,13 @@ const config = {
   isBaseline: true,
   useRouter: () => config.name !== LOCAL_ENVIRONMENT_NAME,
   name: environmentName(__filename, LOCAL_ENVIRONMENT_NAME),
+  pathes: {
+    backup: {
+      audio: path.join(__dirname, 'backup', 'multimedia', 'audio'),
+      video: path.join(__dirname, 'backup', 'multimedia', 'video'),
+      picture: path.join(__dirname, 'backup', 'multimedia', 'picture')
+    }
+  },
   db: {
     database: 'tmp/db.sqlite3',
     type: 'sqlite',

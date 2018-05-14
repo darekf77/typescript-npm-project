@@ -7,6 +7,14 @@ export interface Config {
    */
   isBaseline: boolean;
 
+  pathes: {
+    backup: {
+      audio: string;
+      video: string;
+      picture: string;
+    }
+  },
+
   /**
    * Check wheter code is minified, mangled, gzipped
    *
