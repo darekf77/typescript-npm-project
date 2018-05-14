@@ -49,7 +49,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
 
   private static folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJson.name);
   get path() {
-
+    //#region @backend
     if (!this.type) {
       throw Error(`Bad multimedia type for id ${this.id}`)
     }
@@ -59,6 +59,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
     const res = path.join(MULTIMEDIA.folderPath, name)
 
     return res;
+    //#endregion
   }
 
   public static recreateFolder() {
