@@ -1,9 +1,11 @@
 //#region @backend
+import { prepareEnvironment } from './environment';
+prepareEnvironment()
 import * as path from 'path';
 import { Controllers, Entities } from "./index";
 import mocks from "./db-mocks";
 import { start } from './helpers';
-import './environment';
+
 
 console.log('ENV', ENV)
 

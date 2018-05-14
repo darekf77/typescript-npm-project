@@ -62,10 +62,12 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   }
 
   public static recreateFolder() {
+    //#region @backend
     MULTIMEDIA.folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJson.name);
     if (!fs.existsSync(MULTIMEDIA.folderPath)) {
       fse.mkdirpSync(MULTIMEDIA.folderPath)
     }
+    //#endregion
   }
 
   fromRaw(obj: IMULTIMEDIA): MULTIMEDIA {
