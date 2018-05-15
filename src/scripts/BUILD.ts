@@ -6,10 +6,13 @@ import { BuildOptions, BuildDir, LibType } from "../models";
 import { info, error } from "../messages";
 
 import chalk from "chalk";
-import { nearestProjectTo } from '../helpers';
+import { nearestProjectTo, crossPlatofrmPath } from '../helpers';
 
 export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
-
+    clearConsole()
+    if (process.platform === 'win32') {
+        args = args.replace(/\\/g, '\\\\')
+    }
     const argsObj: { copyto: string[] | string } = require('minimist')(args.split(' '));
     let copyto: Project[] = []
     if (argsObj.copyto) {
@@ -17,10 +20,15 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
             argsObj.copyto = [argsObj.copyto]
         }
         copyto = argsObj.copyto.map(path => {
+
+            path = crossPlatofrmPath(path);
+            // console.log('path', path)
             const project = nearestProjectTo(path);
             if (!project) {
                 error(`Path doesn't contain tnp type project: ${path}`)
             }
+            const what = `${project.name}/node_module/${Project.Current.name}`
+            info(`After each build finish ${what} will be update.`)
             return project;
         });
     }
@@ -33,7 +41,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 
 
 export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist') {
-
+    clearConsole()
     const options: BuildOptions = {
         prod, watch, outDir, appBuild: true
     };
@@ -44,8 +52,6 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist')
 function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
     const { prod, watch, outDir, appBuild, copyto } = opt;
-
-    clearConsole()
 
 
     const project: Project = Project.Current;

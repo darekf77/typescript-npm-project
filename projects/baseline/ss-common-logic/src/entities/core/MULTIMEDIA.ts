@@ -47,9 +47,12 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   @Column('varchar', { length: 20 })
   type: 'picture' | 'audio' | 'video' = undefined;
 
+  //#region @backend
   private static folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJson.name);
+  //#endregion
+
   get path() {
-    //#region @backend
+    //#region @backendFunc
     if (!this.type) {
       throw Error(`Bad multimedia type for id ${this.id}`)
     }

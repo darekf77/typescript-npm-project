@@ -15,6 +15,7 @@ import { MatInputModule } from "@angular/material/input";
 
 // third part
 import { StaticColumnsModule } from "static-columns";
+import { LogoModule } from 'ss-common-ui/module';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { StaticColumnsModule } from "static-columns";
         MatInputModule,
         MatFormFieldModule,
         // thrid part
-        StaticColumnsModule
+        StaticColumnsModule,
+        LogoModule
     ],
     exports: [LoginComponent],
     declarations: [LoginComponent]

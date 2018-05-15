@@ -44,7 +44,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
   get ctrl() {
     return controllers.controllers()
   }
-  //#endregion
+
 
   async initExampleDbData() {
 
@@ -57,6 +57,9 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
     console.log(m1.path)
 
   }
+  //#endregion
+
+
 
 
 }
