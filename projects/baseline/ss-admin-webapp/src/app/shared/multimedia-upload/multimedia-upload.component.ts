@@ -22,6 +22,7 @@ export class MultimediaUploadComponent implements OnInit {
       if (isLoggedIn) {
         let headers = [SESSION.localStorage.fromLocalStorage().activationTokenHeader]
         this.uploader = new FileUploader({ url: URL, headers });
+        this.uploader.onBeforeUploadItem = (item) => { item.withCredentials = false; console.log(item); };
       }
     })
     this.auth.browser.init()
