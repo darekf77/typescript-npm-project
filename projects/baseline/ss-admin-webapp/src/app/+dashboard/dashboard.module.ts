@@ -12,19 +12,27 @@ import { CategoryController } from "ss-common-logic/browser/controllers/Category
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
 import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
+import { MultimediaUploadModule } from '../shared/multimedia-upload/multimedia-upload.module';
+
+const modules = [
+  LayoutMaterialModule,
+  MultimediaUploadModule
+]
 
 @NgModule({
-    imports: [
-        StaticColumnsModule,
-        RouterModule.forChild(routes),
-        CommonModule,
-        LoginModule,
-        TabsModule.forRoot(),
-        MatCardModule,
-        LayoutMaterialModule
-    ],
-    exports: [],
-    declarations: [DashboardComponent],
-    providers: [CategoryController],
+  imports: [
+    StaticColumnsModule,
+    RouterModule.forChild(routes),
+    CommonModule,
+    LoginModule,
+    TabsModule.forRoot(),
+    MatCardModule,
+    ...modules
+  ],
+  exports: [
+    ...modules
+  ],
+  declarations: [DashboardComponent],
+  providers: [CategoryController],
 })
 export class DashboardModule { }

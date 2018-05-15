@@ -32,6 +32,33 @@ import * as controllers from '../../controllers';
 })
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
 
+  @POST('/upload')
+  upload(): Response<boolean> {
+    return async (req, res) => {
+      const files = req['files']
+
+      if (!files) {
+        throw 'No files were uploaded.';
+      }
+      console.log('files', files)
+
+
+      // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+      // let sampleFile = req.files.sampleFile;
+
+      // Use the mv() method to place the file somewhere on your server
+      // sampleFile.mv('/somewhere/on/your/server/filename.jpg', function (err) {
+      //   if (err)
+      //     return res.status(500).send(err);
+
+      //   res.send('File uploaded!');
+      // });
+
+
+      return true;
+    }
+  }
+
 
   //#region @backend
   @OrmConnection connection: Connection;

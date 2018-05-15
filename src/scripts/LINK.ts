@@ -19,9 +19,7 @@ export function onlyLibsChildrens(workspaceProject: Project) {
 }
 
 export function link(workspaceProject: Project) {
-    if (workspaceProject.type !== 'workspace') {
-        error(`This project is not workspace type project`)
-    }
+
     if (!workspaceProject.node_modules.exist()) {
         workspaceProject.node_modules.installPackages();
     }
@@ -40,7 +38,15 @@ export function link(workspaceProject: Project) {
 
 export default {
     $LINK: [(args) => {
-        link(Project.Current)
+        let workspaceProject: Project;
+        if (Project.Current.type === 'workspace') {
+            workspaceProject = Project.Current;
+        } else if (Project.Current.parent && Project.Current.parent.type === 'workspace') {
+            workspaceProject = Project.Current.parent;
+        } else {
+            error(`This project is not workspace type project`)
+        }
+        link(workspaceProject)
         process.exit(0)
     }, `
 ln ${chalk.bold('source')} ${chalk.bold('target')}

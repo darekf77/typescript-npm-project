@@ -83,18 +83,15 @@ const postcssPlugins = function () {
 
 
 // PROCESS ENV
-// console.log('process.env.environmentNam',process.env.environmentName)
-if (!process.env.environmentName) {
-  // console.log('replace here')
-  process.env.environmentName = ''
-}
 
-// console.log('process.env.environmentNam',process.env.environmentName)
-// console.log(process.env)
-if (process.env.environmentName !== '') {
-  process.env.environmentName = `.${process.env.environmentName}`;
+let environmentName = process.env.environmentName;
+if (!environmentName) {
+  environmentName = ''
 }
-const envrionmentFilePath = path.join(__dirname, `../environment${process.env.environmentName}.js`);
+if (environmentName !== '') {
+  environmentName = `.${environmentName}`;
+}
+const envrionmentFilePath = path.join(__dirname, `../environment${environmentName}.js`);
 // console.log(envrionmentFilePath)
 if (!fs.existsSync(envrionmentFilePath)) {
   throw `File "${envrionmentFilePath}" doesn't exist`;
