@@ -125,6 +125,11 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
     return (time.expire < time.now);
   }
 
+  public get activationTokenHeader() {
+    const session: SESSION = this;
+    return { name: this.CONFIG.AUTHORIZATION_HEADER, value: `${session.token_type} ${session.token}` };
+  }
+
   public activateBrowserToken() {
     const session: SESSION = this;
     Resource.Headers.request.set(this.CONFIG.AUTHORIZATION_HEADER,

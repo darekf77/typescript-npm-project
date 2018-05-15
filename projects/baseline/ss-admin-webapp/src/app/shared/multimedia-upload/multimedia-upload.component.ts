@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { FileUploader } from 'ng2-file-upload';
+import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
 const URL = 'http://localhost:4000/MultimediaController/upload';
 
 @Component({
@@ -10,11 +12,23 @@ const URL = 'http://localhost:4000/MultimediaController/upload';
 })
 export class MultimediaUploadComponent implements OnInit {
 
-  ngOnInit() {
-    console.log('ENV', ENV)
+  constructor(private auth: AuthController) {
+
   }
 
-  public uploader: FileUploader = new FileUploader({ url: URL });
+  ngOnInit() {
+    console.log('ENV', ENV)
+    this.auth.isLoggedIn.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        let headers = [SESSION.localStorage.fromLocalStorage().activationTokenHeader]
+        this.uploader = new FileUploader({ url: URL, headers });
+      }
+    })
+    this.auth.browser.init()
+  }
+
+  public uploader: FileUploader;
+
   public hasBaseDropZoneOver: boolean = false;
   public hasAnotherDropZoneOver: boolean = false;
 
