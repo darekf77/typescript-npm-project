@@ -9,7 +9,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local 
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir } from "../models";
+import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
@@ -136,6 +136,21 @@ export abstract class Project extends BaseProjectRouter {
                 // }
             }
 
+            if (this.parent && this.parent.type === 'workspace') {
+                let pathToWorkspaceProjectEnvironment = path.join(this.parent.location, 'environment');
+                if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
+                    // console.log('path to search for envrionment', path.join(this.parent.location, 'environment'))
+                    const env: EnvConfig = require(pathToWorkspaceProjectEnvironment) as any;
+                    const route = env.routes.find(r => r.project === this.name);
+                    if (route) {
+                        // console.log('route', route)
+                        this.defaultPort = route.localEnvPort;
+                        // console.log('new default port', this.defaultPort)
+                    } else {
+                        // console.log(`No route default port for ${this.name} in ${this.location}`)
+                    }
+                }
+            }
 
         } else {
             error(`Invalid project location: ${location}`);
@@ -177,7 +192,7 @@ export abstract class Project extends BaseProjectRouter {
         }
     }
 
-    
+
 
     protected buildOptions?: BuildOptions;
     build(buildOptions?: BuildOptions) {
