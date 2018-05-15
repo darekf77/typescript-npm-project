@@ -11,8 +11,8 @@ import chalk from 'chalk';
 export abstract class BaseProjectRouter {
 
     abstract name: string;
-    abstract routes: TnpRoute[];
-    protected abstract defaultPort: number;
+    abstract routes: TnpRoute[];   
+    protected defaultPort: number;
 
     public static killProcessOn(portNumber: number) {
         let pid = child.execFileSync(`lsof -t -i tcp:${portNumber}`).toString();

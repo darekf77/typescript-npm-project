@@ -6,7 +6,17 @@ import * as _ from "lodash";
 import { LibType } from "../models";
 import { onlyLibsChildrens } from "./LINK";
 
-export function unlink(workspaceProject: Project) {
+export function unlink(project: Project) {
+
+    let workspaceProject: Project;
+    if (project.type === 'workspace') {
+        workspaceProject = project;
+    } else if (project.parent && project.parent.type === 'workspace') {
+        workspaceProject = project.parent;
+    } else {
+        error(`This project is not workspace type project`)
+    }
+
     if (_.isArray(workspaceProject.children)) {
         onlyLibsChildrens(workspaceProject).forEach(c => c.node_modules.remove())
     }
@@ -16,15 +26,7 @@ export function unlink(workspaceProject: Project) {
 
 export default {
     $UNLINK: (args) => {
-        let workspaceProject: Project;
-        if (Project.Current.type === 'workspace') {
-            workspaceProject = Project.Current;
-        } else if (Project.Current.parent && Project.Current.parent.type === 'workspace') {
-            workspaceProject = Project.Current.parent;
-        } else {
-            error(`This project is not workspace type project`)
-        }
-        unlink(workspaceProject)
+        unlink(Project.Current)
         process.exit(0)
     }
 }

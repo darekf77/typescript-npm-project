@@ -7,9 +7,6 @@ import { ReorganizeArray } from "../helpers";
 
 export class ProjectWorkspace extends Project {
 
-    
-    protected defaultPort: number = 5000;
-
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;

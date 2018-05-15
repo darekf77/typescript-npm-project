@@ -4,7 +4,6 @@ import { BuildOptions, InstalationType } from "../models";
 export class ProjectServerLib extends Project {
 
 
-    protected defaultPort: number = 4050;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;

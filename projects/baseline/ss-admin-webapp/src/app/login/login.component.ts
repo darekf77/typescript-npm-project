@@ -20,9 +20,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private auth: AuthController,
     private router: Router
-  ) {
-
-  }
+  ) { }
 
   handlers: Subscription[] = [];
 

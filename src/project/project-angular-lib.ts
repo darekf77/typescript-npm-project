@@ -17,7 +17,6 @@ export class ProjectAngularLib extends BaseProjectLib {
         this.angular.runOn(port, async);
     }
 
-    protected defaultPort: number = 4100;
 
     projectSpecyficFiles() {
         return super.projectSpecyficFiles().concat([

@@ -102,6 +102,18 @@ export abstract class Project extends BaseProjectRouter {
         ]
     }
 
+    defaultPortByType(): number {
+        const type: LibType = this.type;
+        if (type === 'workspace') return 5000;
+        if (type === 'angular-cli') return 4200;
+        if (type === 'angular-client') return 4300;
+        if (type === 'angular-lib') return 4250;
+        if (type === 'ionic-client') return 8080;
+        if (type === 'docker') return 5000;
+        if (type === 'isomorphic-lib') return 4000;
+        if (type === 'server-lib') return 4050;
+    }
+
     constructor(public location: string) {
         super();
 
@@ -113,6 +125,7 @@ export abstract class Project extends BaseProjectRouter {
             this.node_modules = new NodeModules(this);
             this.recreate = new FilesRecreator(this);
             this.type = this.packageJson.type;
+            this.defaultPort = this.defaultPortByType()
             Project.projects.push(this);
             // console.log(`Created project ${path.basename(this.location)}`)
 

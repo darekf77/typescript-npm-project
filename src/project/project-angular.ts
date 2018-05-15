@@ -7,7 +7,7 @@ import config from "../config";
 import { BuildOptions } from '../models';
 export class AngularProject extends Project {
 
-    protected defaultPort: number = 4200;
+
     get isEjectedProject() {
         try {
             const file = fs.readFileSync(path.join(this.location, '.angular-cli.json')).toString()

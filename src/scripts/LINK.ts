@@ -18,7 +18,16 @@ export function onlyLibsChildrens(workspaceProject: Project) {
     return children;
 }
 
-export function link(workspaceProject: Project) {
+export function link(project: Project) {
+
+    let workspaceProject: Project;
+    if (project.type === 'workspace') {
+        workspaceProject = project;
+    } else if (project.parent && project.parent.type === 'workspace') {
+        workspaceProject = project.parent;
+    } else {
+        error(`This project is not workspace type project`)
+    }
 
     if (!workspaceProject.node_modules.exist()) {
         workspaceProject.node_modules.installPackages();
@@ -36,17 +45,10 @@ export function link(workspaceProject: Project) {
 
 
 
+
 export default {
     $LINK: [(args) => {
-        let workspaceProject: Project;
-        if (Project.Current.type === 'workspace') {
-            workspaceProject = Project.Current;
-        } else if (Project.Current.parent && Project.Current.parent.type === 'workspace') {
-            workspaceProject = Project.Current.parent;
-        } else {
-            error(`This project is not workspace type project`)
-        }
-        link(workspaceProject)
+        link(Project.Current)
         process.exit(0)
     }, `
 ln ${chalk.bold('source')} ${chalk.bold('target')}

@@ -8,7 +8,7 @@ import * as watch from 'watch'
 // local
 import { Project } from "./base-project";
 import { BuildDir, LibType, FileEvent } from "../models";
-import { questionYesNo } from "../process";
+import { questionYesNo, clearConsole } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { compilationWrapper } from '../helpers';
@@ -107,14 +107,20 @@ export abstract class BaseProjectLib extends Project {
                 cwd: path.join(this.location, config.folder.bundle),
                 output: true
             }).sync()
+            this.pushToGitRepo()
         })
     }
 
     public async release(prod = false) {
+        clearConsole()
         this.checkIfReadyForNpm()
         const newVersion = Project.Current.versionPatchedPlusOne;
         await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
-            this.run(`npm version patch`).sync()
+            try {
+                this.run(`npm version patch`).sync()
+            } catch (e) {
+                error(`Please commit your changes before release.`)
+            }
             this.run(`tnp clear`).sync();
             this.build({
                 prod, outDir: config.folder.bundle as 'bundle'
@@ -126,7 +132,16 @@ export abstract class BaseProjectLib extends Project {
                 cwd: path.join(this.location, config.folder.bundle),
                 output: true
             }).sync()
+            this.pushToGitRepo()
         })
+    }
+
+    pushToGitRepo() {
+        console.log('Pushing to git repository... ')
+        const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
+        console.log(`Git branch: ${branchName}`)
+        this.run(`git push origin ${branchName}`, { output: false }).sync()
+        info('Pushing to git repository done.')
     }
 
     public bundleResources() {

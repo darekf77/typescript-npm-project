@@ -6,8 +6,6 @@ import { BuildOptions } from '../models';
 
 export class ProjectIonicClient extends Project {
 
-
-    protected defaultPort: number = 8100;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;

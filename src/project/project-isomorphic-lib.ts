@@ -11,8 +11,6 @@ import { BaseProjectLib } from "./base-project-lib";
 
 export class ProjectIsomorphicLib extends BaseProjectLib {
 
-
-    protected defaultPort: number = 4000;
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
@@ -81,9 +79,10 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
         const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
 
-        this.copyWhenExist('bin', outDir, true)
+        this.copyWhenExist('bin', outDir, true) // TODO make this for each library
         this.copyWhenExist('package.json', outDir, true)
         this.copyWhenExist('.npmrc', outDir, true)
+        this.copyWhenExist('.npmignore', outDir, true)
         this.copyWhenExist('.gitignore', outDir, true)
 
         new IsomoprhicBuild({
