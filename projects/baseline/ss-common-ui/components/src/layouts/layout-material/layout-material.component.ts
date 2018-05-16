@@ -32,7 +32,11 @@ export interface MenuItem {
 export interface LeftMenuGroupItem {
   name: string;
   description?: string;
-  subitems: MenuItem[]
+  subitems: MenuItem[];
+}
+
+export interface Menu {
+  top: { items: MenuItem[]; };
 }
 
 @Component({
@@ -44,10 +48,8 @@ export interface LeftMenuGroupItem {
 export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterContentInit {
 
   //#region top menu
-  menu = {
-    left: {
-      items: []
-    },
+  menuLeft = { items: [] as LeftMenuGroupItem[] };
+  @Input() menu: Menu = {
     top: {
 
       items: [
@@ -126,13 +128,8 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
         }
       ] as MenuItem[]
     }
-  }
+  };
   //#endregion
-
-  selectedTopMenu(index: number) {
-    log.i('index', index)
-    this.menu.left.items = this.menu.top.items[index].leftMenu;
-  }
 
   elements = {
     content: {
@@ -141,8 +138,12 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
     leftPanel: {
       width: 0
     }
-  }
+  };
 
+  selectedTopMenu(index: number) {
+    log.i('index', index);
+    this.menuLeft.items = this.menu.top.items[index].leftMenu;
+  }
 
   get calculate() {
     const self = this;
@@ -150,16 +151,16 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
       get content() {
         return {
           height() {
-            self.elements.content.height = window.innerHeight - numValue(variables.footerSize) - numValue(variables.headerSize)
-            log.i('window.innerHeight', window.innerHeight)
-            log.i('self.content.height ', self.elements.content.height)
+            self.elements.content.height = window.innerHeight - numValue(variables.footerSize) - numValue(variables.headerSize);
+            log.i('window.innerHeight', window.innerHeight);
+            log.i('self.content.height ', self.elements.content.height);
           }
-        }
+        };
       },
       get leftPanel() {
         return {
           width() {
-            self.elements.leftPanel.width = numValue(variables.leftPanelSize)
+            self.elements.leftPanel.width = numValue(variables.leftPanelSize);
           }
         };
       }
@@ -183,7 +184,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.recalculatElement()
+      this.recalculatElement();
     });
   }
 

@@ -14,6 +14,12 @@
                    *ngFor="let item of menu.top.items"></mat-tab>
         </mat-tab-group>
       </column>
+      <column [width]="150"  >
+        <ng-content select="[profile]"></ng-content>
+      </column>
+      <column [width]="50">
+        <ng-content select="[hamburger]"></ng-content>
+      </column>
     </columns-container>
 
   </mat-card>
@@ -24,7 +30,7 @@
     <br>
     <br>
     <mat-accordion>
-      <mat-expansion-panel *ngFor="let item of menu.left.items">
+      <mat-expansion-panel *ngFor="let item of menuLeft.items">
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{item.name}}

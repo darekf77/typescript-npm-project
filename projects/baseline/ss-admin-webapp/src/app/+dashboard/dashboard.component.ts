@@ -8,6 +8,7 @@ import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthCon
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import { Menu } from 'ss-common-ui/module';
 
 const log = Log.create('Dashboard')
 
@@ -22,6 +23,106 @@ export class DashboardComponent implements OnInit {
     public auth: AuthController,
     private router: Router) {
 
+  }
+
+  menu: Menu = {
+    top: {
+      items: [
+        {
+          name: "Content Manager",
+          leftMenu: [
+            {
+              name: "Course",
+              subitems: [
+                {
+                  name: 'Introduction',
+                },
+                {
+                  name: 'Categories',
+                }
+              ]
+            },
+            {
+              name: "Main page",
+              subitems: [
+                {
+                  name: 'Slider'
+                },
+                {
+                  name: 'Description'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Administration",
+          leftMenu: [
+            {
+              name: "Media",
+              subitems: [
+                {
+                  name: 'Manage library'
+                },
+                {
+                  name: 'Settings'
+                }
+              ]
+            },
+            {
+              name: "Users",
+              subitems: [
+                {
+                  name: 'Manage users'
+                },
+                {
+                  name: 'Settings'
+                }
+              ]
+            },
+            {
+              name: "Payments",
+              subitems: [
+                {
+                  name: 'History'
+                },
+                {
+                  name: 'Settings'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Statistics",
+          leftMenu: [
+            {
+              name: "Money",
+              subitems: [
+                {
+                  name: 'This month'
+                },
+                {
+                  name: 'All'
+                }
+              ]
+            },
+            {
+              name: "User",
+              subitems: [
+                {
+                  name: 'Trafic'
+                },
+                {
+                  name: 'Focus'
+                }
+              ]
+            }
+          ]
+        }
+
+      ]
+    }
   }
 
   handlers: Subscription[] = [];

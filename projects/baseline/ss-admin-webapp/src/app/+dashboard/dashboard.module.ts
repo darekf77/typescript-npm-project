@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 //
 import { MatCardModule } from "@angular/material/card";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatIconModule } from "@angular/material/icon";
 // local
 import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
@@ -16,6 +18,8 @@ import { MultimediaUploadModule } from '../shared/multimedia-upload/multimedia-u
 
 const modules = [
   LayoutMaterialModule,
+  MatMenuModule,
+  MatIconModule,
   MultimediaUploadModule
 ]
 

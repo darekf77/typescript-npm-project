@@ -1,11 +1,25 @@
-<layout-material>
+<layout-material [menu]="menu">
 
-    <mat-card body>
-        <button (click)="logout()">Logout</button>
-        <app-multimedia-upload></app-multimedia-upload>
+  <mat-menu #appMenu="matMenu">
+    <button  (click)=logout() mat-menu-item>Logout</button>
+    <button mat-menu-item>Info</button>
+  </mat-menu>
 
-    </mat-card>
+  <span profile  class="profile" >
+    Logged in as administrator
+  </span>
 
-    <mat-card footer> &copy: Dariusz Filipiak 2018 </mat-card>
+  <button hamburger mat-icon-button class="hamburger"
+          [matMenuTriggerFor]="appMenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-card body>
+    <button (click)="logout()">Logout</button>
+    <app-multimedia-upload></app-multimedia-upload>
+
+  </mat-card>
+
+  <mat-card footer> &copy: Dariusz Filipiak 2018 </mat-card>
 
 </layout-material>

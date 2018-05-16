@@ -10,6 +10,16 @@
     background: url('/assets/img/backgrounds/spiration_dark.png')
   }
 
+  .hamburger {
+    float: right;
+  }
+
+  .profile {
+    font-size: 10px;
+    line-height: 45px;
+    float: right;
+  }
+
   @import url('https://fonts.googleapis.com/css?family=Rajdhani');
   .logo-header-ffm {
     &:hover {
@@ -33,7 +43,7 @@
       left: 13px;
       top: -3px;
     }
-    
+
   }
 
   .content-left-panel {
