@@ -78,11 +78,12 @@ export class NodeModules {
                     console.log(`Adding symlinks: ${c.name}`)
                     self.project.run(command).sync();
                 })
+                self.project.tnpHelper.install()
             },
         }
     }
     exist(): boolean {
-        return fs.existsSync(path.join(this.project.location, 'node_modules'));
+        return fs.existsSync(path.join(this.project.location, 'node_modules', '.bin')); // TODO qucik fix for tnp-helpers
     }
     isSymbolicLink(): boolean {
         return HelpersLinks.isLink(this.folderPath);

@@ -125,6 +125,13 @@ export abstract class Project extends BaseProjectRouter {
             this.type = this.packageJson.type;
             this.defaultPort = this.defaultPortByType()
             Project.projects.push(this);
+            if (Project.Current.location === this.location) {
+                if (this.parent && this.parent.type === 'workspace') {
+                    this.parent.tnpHelper.install()
+                }
+                this.tnpHelper.install()
+            }
+
             // console.log(`Created project ${path.basename(this.location)}`)
 
             this.children = this.findChildren();
@@ -303,12 +310,25 @@ export abstract class Project extends BaseProjectRouter {
     }
 
     public get tnpHelper() {
-        const pathTnpHelper = path.join(__dirname, '../../projects/tnp-helpers');
+        const helperName = 'tnp-helpers'
+        const pathTnpHelper = path.join(Project.Tnp.location, 'projects', helperName);
         const self = this;
         return {
-            link() {
-                const dest = path.join(self.location, config.folder.node_modules)
-                // console.log(HelpersLinks.createLink(dest, pathTnpHelper));
+            install() {
+                let project: Project;
+                if (self.parent && self.parent.type === 'workspace') {
+                    project = self.parent;
+                } else {
+                    project = self;
+                }
+
+                const dest = path.join(project.location, config.folder.node_modules, helperName)
+                if (fs.existsSync(dest)) {
+                    // console.log(`Removed tnp-helper from ${dest} `)
+                    fse.removeSync(dest)
+                }
+                fse.copySync(`${pathTnpHelper}/`, dest);
+                // console.log(`Tnp-helper installed in ${project.name} `)
             }
         }
     }

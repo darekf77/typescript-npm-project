@@ -39,6 +39,7 @@ export namespace HelpersLinks {
     }
 
     export function createLink(target, link) {
+        // console.log('Create link!')
         return run(Helpers.createLink(target, link)).sync()
     }
 

@@ -74,30 +74,35 @@ export abstract class BaseProjectLib extends Project {
     }
 
     protected watchOutDir() {
-
         const monitorDir = path.join(this.location, this.buildOptions.outDir);
 
-        // console.log(`Monitoring directory: ${monitorDir} `)
-        watch.watchTree(monitorDir, (f, curr, prev) => {
+        if (fs.existsSync(monitorDir)) {
+            // console.log(`Monitoring directory: ${monitorDir} `)
+            watch.watchTree(monitorDir, (f, curr, prev) => {
 
-            if (_.isString(f)) {
-                f = f.replace(monitorDir, '') as any
-                // console.log(f)
-            }
+                if (_.isString(f)) {
+                    f = f.replace(monitorDir, '') as any
+                    // console.log(f)
+                }
 
-            // process.exit(0)
-            if (typeof f == "object" && prev === null && curr === null) {
-                // Finished walking the tree
-            } else if (prev === null) {
-                this.copyToProjectsOnFinish('created', f as any);
-            } else if (curr.nlink === 0) {
-                this.copyToProjectsOnFinish('removed', f as any);
-            } else {
-                this.copyToProjectsOnFinish('changed', f as any);
-                // f was changed
-            }
-        })
-
+                // process.exit(0)
+                if (typeof f == "object" && prev === null && curr === null) {
+                    // Finished walking the tree
+                } else if (prev === null) {
+                    this.copyToProjectsOnFinish('created', f as any);
+                } else if (curr.nlink === 0) {
+                    this.copyToProjectsOnFinish('removed', f as any);
+                } else {
+                    this.copyToProjectsOnFinish('changed', f as any);
+                    // f was changed
+                }
+            })
+        } else {
+            console.log(`Waiting for outdir: ${this.buildOptions.outDir}`);
+            setTimeout(() => {
+                this.watchOutDir();
+            }, 1000)
+        }
     }
 
     public async publish() {
