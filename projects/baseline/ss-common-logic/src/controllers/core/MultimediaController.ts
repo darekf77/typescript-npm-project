@@ -4,7 +4,7 @@ import {
   PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
   Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity
 } from 'morphi';
-
+import { get } from "lodash";
 
 //#region @backend
 import { authenticate, use } from 'passport';
@@ -16,6 +16,7 @@ export { Handler } from 'express';
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 import * as path from 'path';
+import { UploadedFile } from "express-fileupload";
 //#endregion
 
 import { META } from '../../helpers';
@@ -34,29 +35,19 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
   @POST('/upload')
   upload(): Response<boolean> {
+    //#region @backendFunc
     return async (req, res) => {
-      const files = req['files']
+      const file: UploadedFile = get(req,'files.file');
 
-      if (!files) {
+
+      if (!file) {
         throw 'No files were uploaded.';
       }
-      console.log('files', files)
-
-
-      // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-      // let sampleFile = req.files.sampleFile;
-
-      // Use the mv() method to place the file somewhere on your server
-      // sampleFile.mv('/somewhere/on/your/server/filename.jpg', function (err) {
-      //   if (err)
-      //     return res.status(500).send(err);
-
-      //   res.send('File uploaded!');
-      // });
-
+      console.log('uploaded file', file)
 
       return true;
     }
+    //#endregion
   }
 
 
