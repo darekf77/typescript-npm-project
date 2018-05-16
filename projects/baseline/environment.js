@@ -1,16 +1,7 @@
 
 const path = require('path');
+const { environmentName, LOCAL_ENVIRONMENT_NAME } = require('tnp-helpers')
 
-const LOCAL_ENVIRONMENT_NAME = 'local';
-
-
-function environmentName(filename, local_env_name) {
-  let name = path.basename(filename)
-  name = name.replace(/\.js$/, '')
-  name = name.replace('environment', '')
-  name = name.replace(/\./g, '');
-  return name === '' ? local_env_name : name
-}
 
 const config = {
 

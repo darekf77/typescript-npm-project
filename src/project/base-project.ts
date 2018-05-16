@@ -20,6 +20,7 @@ import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
 import { workers } from 'cluster';
 import { init } from '../scripts/INIT';
+import { HelpersLinks } from '../helpers-links';
 
 
 export abstract class Project extends BaseProjectRouter {
@@ -298,6 +299,18 @@ export abstract class Project extends BaseProjectRouter {
         }
         return true;
     }
+
+    public get tnpHelper() {
+        const pathTnpHelper = path.join(__dirname, '../../projects/tnp-helpers');
+        const self = this;
+        return {
+            link() {
+                const dest = path.join(self.location, config.folder.node_modules)
+                // console.log(HelpersLinks.createLink(dest, pathTnpHelper));
+            }
+        }
+    }
+
 
     // TODO solve problem with ngc watch mode high cpu
     // get ownNpmPackage() {

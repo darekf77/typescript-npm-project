@@ -4,6 +4,7 @@ import { run } from '../process';
 
 
 export function init() {
+    Project.Current.tnpHelper.link()
     Project.Current.recreate.assets();
     Project.Current.recreate.commonFiles();
     Project.Current.recreate.projectSpecyficFiles();
