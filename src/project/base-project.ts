@@ -52,9 +52,6 @@ export abstract class Project extends BaseProjectRouter {
         return ProjectFrom(path.join(__dirname, '..', '..'));
     }
 
-    get routes() {
-        return this.packageJson.routes;
-    }
 
     get name(): string {
         return this.packageJson.name;
@@ -155,6 +152,11 @@ export abstract class Project extends BaseProjectRouter {
                 if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
                     // console.log('path to search for envrionment', path.join(this.parent.location, 'environment'))
                     const env: EnvConfig = require(pathToWorkspaceProjectEnvironment) as any;
+
+                    if (Array.isArray(env.routes)) {
+                        this.routes = env.routes;
+                    }
+
                     const route = env.routes.find(r => r.project === this.name);
                     if (route) {
                         // console.log('route', route)

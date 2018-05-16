@@ -41,8 +41,12 @@ export class AngularProject extends Project {
     runOn(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
+        const distAppFolder = path.join(this.location, config.folder.previewDistApp)
+        if (!fs.existsSync(distAppFolder)) {
+            this.build({ outDir: 'dist', watch: false, prod: false, appBuild: true })
+        }
         const command = `tnp http-server -p ${port} -s`;
-        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
+        const options = { cwd: distAppFolder };
         if (async) {
             this.run(command, options).async()
         } else {

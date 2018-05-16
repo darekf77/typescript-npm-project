@@ -4,14 +4,14 @@ import { error } from "../messages";
 import { TnpRoute } from "../models";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
-import { ProjectWorkspace } from '.';
+import { ProjectWorkspace, Project } from '.';
 import chalk from 'chalk';
 
 
 export abstract class BaseProjectRouter {
 
     abstract name: string;
-    abstract routes: TnpRoute[];   
+    protected routes: TnpRoute[] = [];
     protected defaultPort: number;
 
     public static killProcessOn(portNumber: number) {
@@ -52,9 +52,11 @@ export abstract class BaseProjectRouter {
 
     private async runOnRoutes(projects: TnpRoute[]) {
         if (projects.length === 0) return;
-        const p = projects.shift();
+        const childrenProjectName = projects.shift();
         const port = await BaseProjectRouter.getFreePort();
-        console.log(`port ${port} for ${p.project.name}`)
+        const worksapce: Project = this as any;
+        const project = worksapce.children.find(({ name }) => name === childrenProjectName.project);
+        console.log(`port ${port} for ${project.name}`)
         this.runOnRoutes(projects);
     }
 

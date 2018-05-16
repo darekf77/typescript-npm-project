@@ -22,7 +22,6 @@ export interface IPackageJSON {
         basedOn: Project | string,
         resources?: string[];
         requiredLibs?: string[];
-        router: TnpRouter;
     };
 }
 
@@ -96,17 +95,6 @@ export class PackageJSON {
             return 'angular-cli';
         }
         return res;
-    }
-
-    get routes(): TnpRoute[] {
-        if (this.data && this.data.tnp && this.data.tnp.router && Array.isArray(this.data.tnp.router.routes)) {
-            return this.data.tnp.router.routes.map(route => {
-                return {
-                    url: route.url,
-                    project: ProjectFrom(path.join(this.location, route.project as any))
-                }
-            })
-        }
     }
 
     get name() {
