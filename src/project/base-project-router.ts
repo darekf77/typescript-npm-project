@@ -40,15 +40,6 @@ export abstract class BaseProjectRouter {
 
     protected currentPort: number;
 
-    private isRunning = false;
-    start(port?: number, async?: boolean) {
-        console.log(`Project: ${this.name} is running ${async ? '(asynchronously)' : ''} on port ${port ? + port : this.defaultPort}`);
-        this.isRunning = true;
-        this.runOn(port, async)
-    }
-
-    protected abstract runOn(port?: number, async?: boolean);
-
 
     private async runOnRoutes(projects: TnpRoute[]) {
         if (projects.length === 0) return;

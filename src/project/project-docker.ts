@@ -4,9 +4,10 @@ import { BuildOptions } from "../models";
 export class ProjectDocker extends Project {
 
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
+        return 'echo "no docker support jet"'
     }
 
     projectSpecyficFiles(): string[] {

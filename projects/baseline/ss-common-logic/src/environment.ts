@@ -20,9 +20,6 @@ export function prepareEnvironment() {
 
   let config = require(envrionmentFilePath);
 
-
-
-
   let pkgjson = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8').toString();
 
   config['packageJson'] = JSON.parse(pkgjson);

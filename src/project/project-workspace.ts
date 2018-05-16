@@ -7,10 +7,12 @@ import { ReorganizeArray } from "../helpers";
 
 export class ProjectWorkspace extends Project {
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
-        this.activateServer()
+        this.activateServer()        
+        this.children.forEach(child => child.start());
+        return 'echo "Workspace server started"';
     }
     projectSpecyficFiles(): string[] {
         return [];

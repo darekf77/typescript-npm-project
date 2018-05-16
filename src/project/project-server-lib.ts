@@ -4,16 +4,11 @@ import { BuildOptions, InstalationType } from "../models";
 export class ProjectServerLib extends Project {
 
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
         const command = `node dist/run.js -p ${port} -s`;
-        const options = {};
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
+        return command;
     }
 
     projectSpecyficFiles(): string[] {

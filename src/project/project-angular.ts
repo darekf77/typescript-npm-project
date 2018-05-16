@@ -38,20 +38,12 @@ export class AngularProject extends Project {
         this.run('tnp npm-run ng set warnings.typescriptMismatch=false').sync()
     }
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
         const distAppFolder = path.join(this.location, config.folder.previewDistApp)
-        if (!fs.existsSync(distAppFolder)) {
-            this.build({ outDir: 'dist', watch: false, prod: false, appBuild: true })
-        }
         const command = `tnp http-server -p ${port} -s`;
-        const options = { cwd: distAppFolder };
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
+        return command;
     }
 
     buildApp(watch = false, prod: boolean, port?: number) {
@@ -59,22 +51,23 @@ export class AngularProject extends Project {
         if (watch) {
             const p = (port !== undefined ? `--port ${port}` : '');
             if (this.isEjectedProject) {
-                this.run(`tnp npm-run webpack-dev-server ${p}`, { biggerBuffer: true }).async()
+                this.run(`tnp npm - run webpack - dev - server ${p} `, { biggerBuffer: true }).async()
             } else {
-                this.run(`tnp npm-run ng serve ${p}`, { biggerBuffer: true }).async()
+                this.run(`tnp npm - run ng serve ${p} `, { biggerBuffer: true }).async()
             }
         } else {
             if (this.isEjectedProject) {
                 const aot = (prod ? 'aot.' : '');
-                this.run(`tnp rimraf ${outDirApp} && tnp npm-run webpack --config=webpack.config.build.${aot}js`, { biggerBuffer: true }).sync()
+                this.run(`tnp rimraf ${outDirApp} && tnp npm - run webpack--config = webpack.config.build.${aot} js`, { biggerBuffer: true }).sync()
             } else {
-                this.run(`npm-run ng build --output-path ${config.folder.previewDistApp}`, { biggerBuffer: true }).sync()
+                this.run(`npm - run ng build--output - path ${config.folder.previewDistApp} `, { biggerBuffer: true }).sync()
             }
         }
 
     }
 
     buildSteps(buildOptions?: BuildOptions) {
+        this.buildOptions = buildOptions;
         const { prod, watch, outDir, appBuild } = buildOptions;
         if (this.isEjectedProject) {
             this.preventWarningTypescirptMismatch()

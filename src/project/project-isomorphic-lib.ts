@@ -11,16 +11,11 @@ import { BaseProjectLib } from "./base-project-lib";
 
 export class ProjectIsomorphicLib extends BaseProjectLib {
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number, async = false) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
         const command = `node dist/run.js -p ${port}`;
-        const options = {};
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
+        return command;
     }
 
     projectSpecyficFiles(): string[] {

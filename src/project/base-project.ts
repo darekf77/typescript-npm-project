@@ -93,6 +93,18 @@ export abstract class Project extends BaseProjectRouter {
         return this.packageJson.isCoreProject;
     }
 
+    /**
+     * Start server on top of static build
+     * @param port  
+     */
+    start(port?: number) {
+        port = (port ? port : this.defaultPort)
+        console.log(`Project: ${this.name} is running on port ${port}`);
+        this.run(this.startOnCommand(port)).async()
+    }
+
+    protected abstract startOnCommand(port?: number): string;
+
     requiredDependencies(): Package[] {
         return [
             { name: "node-sass", version: "^4.7.2" },

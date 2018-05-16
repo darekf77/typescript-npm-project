@@ -40,16 +40,16 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 }
 
 
-export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist') {
+export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', noExit = false) {
     clearConsole()
     const options: BuildOptions = {
         prod, watch, outDir, appBuild: true
     };
-    build(options, ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker']);
+    build(options, ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker'], noExit);
 }
 
 
-function build(opt: BuildOptions, allowedLibs: LibType[]) {
+function build(opt: BuildOptions, allowedLibs: LibType[], noExit = false) {
 
     const { prod, watch, outDir, appBuild, copyto } = opt;
 
@@ -88,9 +88,20 @@ export default {
     $BUILD_BUNDLE_WATCH: (args) => buildLib(false, true, 'bundle', args),
     $BUILD_BUNDLE_PROD: (args) => buildLib(true, false, 'bundle', args),
 
+    $BUILD_APP_PROD: () => buildApp(true, false),
     $BUILD_APP: () => buildApp(false, false),
     $BUILD_APP_WATCH: () => buildApp(false, true),
-
+    $BUILD_APP_START: () => {
+        buildApp(false, false, 'dist', true);
+        Project.Current.start();
+    },
+    $BUILD_APP_PROD_START: () => {
+        buildApp(true, false, 'dist', true);
+        Project.Current.start();
+    },
+    $START_APP: () => {
+        Project.Current.start()
+    },
 
     'Documentation': `
 Building purpose:

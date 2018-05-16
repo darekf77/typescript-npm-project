@@ -6,16 +6,11 @@ import { BuildOptions } from '../models';
 
 export class ProjectIonicClient extends Project {
 
-    runOn(port: number, async = false) {
+    startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
         const command = `tnp npm-run ionic serve --no-open -p ${port} -s`;
-        const options = { cwd: path.join(this.location, config.folder.previewDistApp) };
-        if (async) {
-            this.run(command, options).async()
-        } else {
-            this.run(command, options).sync()
-        }
+        return command;
     }
 
     projectSpecyficFiles(): string[] {

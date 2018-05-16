@@ -56,7 +56,7 @@ export interface Config {
    *
    * @memberof Config
    */
-  host: (packageName: string) => string;
+  host: string;
 }
 
 
