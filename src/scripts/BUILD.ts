@@ -36,7 +36,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
     const options: BuildOptions = {
         prod, watch, outDir, copyto
     };
-    build(options, ['angular-lib', 'isomorphic-lib'])
+    build(options, ['angular-lib', 'isomorphic-lib', 'server-lib'])
 }
 
 

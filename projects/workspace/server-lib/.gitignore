@@ -10,9 +10,3 @@ Thumbs.db
 npm-debug.log*
 .sass-cache
 .sourcemaps
-tslint.json
-.editorconfig
-index.js
-index.d.ts
-index.js.map
-tsconfig.json

@@ -322,8 +322,9 @@ export abstract class Project extends BaseProjectRouter {
     }
 
     public get tnpHelper() {
-        const helperName = 'tnp-helpers'
-        const pathTnpHelper = path.join(Project.Tnp.location, 'projects', helperName);
+
+        const pathTnpCompiledJS = path.join(Project.Tnp.location, 'dist');
+        const pathTnpPackageJSON = path.join(Project.Tnp.location, 'package.json');
         const self = this;
         return {
             install() {
@@ -334,13 +335,15 @@ export abstract class Project extends BaseProjectRouter {
                     project = self;
                 }
 
-                const dest = path.join(project.location, config.folder.node_modules, helperName)
-                if (fs.existsSync(dest)) {
+                const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+                const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
+                if (fs.existsSync(destCompiledJs)) {
                     // console.log(`Removed tnp-helper from ${dest} `)
-                    fse.removeSync(dest)
+                    fse.removeSync(destCompiledJs)
                 }
-                fse.copySync(`${pathTnpHelper}/`, dest);
-                // console.log(`Tnp-helper installed in ${project.name} `)
+                fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+                fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+                console.log(`Tnp-helper installed in ${project.name} `)
             }
         }
     }

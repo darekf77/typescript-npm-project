@@ -1,5 +1,6 @@
-const { getEnvironmentName, LOCAL_ENVIRONMENT_NAME, gethost } = require('tnp-helpers')
-
+const path = require('path')
+const tnp = require('tnp')
+console.log('tnp', tnp)
 const routes = [
   {
     url: '/components',
@@ -34,7 +35,7 @@ const config = {
   productionBuild: false,
   aot: false,
   isBaseline: true,
-  name: getEnvironmentName(__filename),
+  // name: getEnvironmentName(__filename),
   pathes: {
     backup: {
       audio: path.join(__dirname, 'backup', 'multimedia', 'audio'),
@@ -49,7 +50,7 @@ const config = {
     dropSchema: true,
     logging: false
   },
-  host: gethost(__filename, routes),
+  // host: gethost(__filename, routes),
   routes
 
 }
