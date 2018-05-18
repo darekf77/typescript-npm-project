@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
-// local 
+// local
 import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig } from "../models";
 import { error, info, warn } from "../messages";
@@ -21,6 +21,7 @@ import { FilesRecreator } from './files-builder';
 import { workers } from 'cluster';
 import { init } from '../scripts/INIT';
 import { HelpersLinks } from '../helpers-links';
+import { EnvironmentConfig } from './environment-config';
 
 
 export abstract class Project extends BaseProjectRouter {
@@ -37,7 +38,7 @@ export abstract class Project extends BaseProjectRouter {
     readonly packageJson: PackageJSON;
     readonly node_modules: NodeModules;
     readonly recreate: FilesRecreator;
-
+    readonly env: EnvironmentConfig;
 
     static projects: Project[] = [];
 
@@ -95,7 +96,7 @@ export abstract class Project extends BaseProjectRouter {
 
     /**
      * Start server on top of static build
-     * @param port  
+     * @param port
      */
     start(port?: number) {
         port = (port ? port : this.defaultPort)
@@ -165,27 +166,7 @@ export abstract class Project extends BaseProjectRouter {
                 //     console.log(`Baseline NOT resolved from ${location}`)
                 // }
             }
-
-            if (this.parent && this.parent.type === 'workspace') {
-                let pathToWorkspaceProjectEnvironment = path.join(this.parent.location, 'environment');
-                if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-                    // console.log('path to search for envrionment', path.join(this.parent.location, 'environment'))
-                    const env: EnvConfig = require(pathToWorkspaceProjectEnvironment) as any;
-
-                    if (Array.isArray(env.routes)) {
-                        this.routes = env.routes;
-                    }
-
-                    const route = env.routes.find(r => r.project === this.name);
-                    if (route) {
-                        // console.log('route', route)
-                        this.defaultPort = route.localEnvPort;
-                        // console.log('new default port', this.defaultPort)
-                    } else {
-                        // console.log(`No route default port for ${this.name} in ${this.location}`)
-                    }
-                }
-            }
+            this.env = new EnvironmentConfig(this);
 
         } else {
             error(`Invalid project location: ${location}`);

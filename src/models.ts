@@ -18,89 +18,91 @@ export type BuildDir = 'dist' | 'bundle';
 export type RuleDependency = { dependencyLib: Project; beforeProject: Project };
 
 export interface TnpRouter {
-    url?: {
-        prefix?: string;
-        base?: string;
-    };
-    routes: TnpRoute[];
+  url?: {
+    prefix?: string;
+    base?: string;
+  };
+  routes: TnpRoute[];
 }
 export type TnpRoute = { url: string; localEnvPort: number, project: string; }
 
-export class BuildOptions {
-    prod: boolean;
-    outDir: BuildDir;
-    watch?: boolean;
-    appBuild?: boolean;
-    copyto?: Project[];
-    additionalIsomorphicLibs?: string[];
+export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod'
 
-    public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = []) {
-        const o = {
-            env: [
-                '--env.prod=' + prod,
-                '--env.watch=' + watch,
-                '--env.outDir=' + outDir,
-                '--env.additionalIsomorphicLibs=' + encodeURIComponent(additionalIsomorphicLibs.toString())
-            ]
-        }
-        return `${o.env.join(' ')}`;
+export class BuildOptions {
+  prod: boolean;
+  outDir: BuildDir;
+  watch?: boolean;
+  appBuild?: boolean;
+  copyto?: Project[];
+  environmentName: EnvironmentName;
+  additionalIsomorphicLibs?: string[];
+
+  public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = []) {
+    const o = {
+      env: [
+        '--env.prod=' + prod,
+        '--env.watch=' + watch,
+        '--env.outDir=' + outDir,
+        '--env.additionalIsomorphicLibs=' + encodeURIComponent(additionalIsomorphicLibs.toString())
+      ]
     }
+    return `${o.env.join(' ')}`;
+  }
 
 }
 
 export interface RunOptions {
 
-    /**
-     * Show process output
-     */
-    output?: boolean;
-    cwd?: string;
+  /**
+   * Show process output
+   */
+  output?: boolean;
+  cwd?: string;
 
-    /**
-     * Use big buffer for big webpack logs
-     */
-    biggerBuffer?: boolean;
+  /**
+   * Use big buffer for big webpack logs
+   */
+  biggerBuffer?: boolean;
 }
 
 
 export interface WatchOptions {
-    cwd: string;
-    wait?: number;
+  cwd: string;
+  wait?: number;
 }
 
 
 import { ConnectionOptions } from "typeorm";
 
+export interface EnvConfigProject {
+  baseUrl: string;
+  host?: string; // tnp generated
+  externalHost?: string;
+  name: string;  // tnp checked
+  port: string; // override tnp type port
+  type: LibType; // tnp checked
+  $db: ConnectionOptions;
+  isWatchBuild?: boolean; // tnp generated
+}
+
 export interface EnvConfig {
-    isBaseline: boolean;
-    name: 'local' | 'dev' | 'stage' | 'prod';
-    workspace: {
-        build: {
-            browser: {
-                minify: boolean;
-                aot: boolean;
-            },
-            server: {
-                minify: boolean;
-            }
-        },
-        projects: {
-            baseUrl: string;
-            host: string;
-            externalHost: string;
-            name: string;
-            port: string;
-            type: LibType;
-            $db: ConnectionOptions;
-        }[]
-    }
+  isCoreProject?: boolean; // tnp generated
+  isSiteProject?: boolean; // tnp generated
+  name?: EnvironmentName; // tnp generated
+  workspace: {
+    build?: {
+      browser: {
+        minify: boolean;
+        aot: boolean;
+      },
+      server: {
+        minify: boolean;
+      }
+    },
+    projects: EnvConfigProject[]
+  }
 
-    currentProject: {
-        baseUrl: string;
-        port: boolean;
-        host: boolean;
-
-    }
+  currentProject?: EnvConfigProject;
 
 }
 
