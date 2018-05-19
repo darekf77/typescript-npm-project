@@ -1,9 +1,10 @@
 import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
 import { Project } from './base-project';
-import { EnvConfig, BuildOptions } from '../models';
+import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
 import { walkObject } from '../helpers';
 
 
@@ -12,50 +13,68 @@ export class EnvironmentConfig {
 
   static woksapaceConfigs = {} as { [workspacePath in string]: EnvConfig; }
 
-  readonly configInWorkspace: EnvConfig;
+  readonly workspaceConfig: EnvConfig;
   private config: EnvConfig;
-  private isChildProject = false;
+  private kind: 'tnp-workspace' | 'tnp-workspace-child' | 'other' = 'other';
 
 
   constructor(private project: Project) {
 
+    const alreadyExistedWorksapceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location]
+
+    if (this.project.type === 'workspace') {
+      this.kind = 'tnp-workspace';
+    }
 
     if (this.project.parent && this.project.parent.type === 'workspace') {
-      this.isChildProject = true;
+      this.kind = 'tnp-workspace-child'
+    }
 
-      const alreadyExistedWorksapceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location]
+    //#region resolve worksapce config
+    if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
+      this.workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
+    } else {
 
-      if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
-        this.configInWorkspace = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
-      } else {
+      if (this.kind === 'tnp-workspace-child') {
         let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment');
         if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-          this.configInWorkspace = require(pathToWorkspaceProjectEnvironment) as any;
+          this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+        }
+      } else if (this.kind === 'tnp-workspace') {
+        let pathToProjectEnvironment = path.join(this.project.location, 'environment');
+        if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
+          this.workspaceConfig = require(pathToProjectEnvironment) as any;
         }
       }
-
     }
+    //#endregion
 
   }
 
+
+
   prepare(options: BuildOptions) {
-    if (!this.isChildProject) {
+    if (this.kind === 'other') {
       return
     }
     const { appBuild, prod, watch, environmentName } = options;
-    this.config = _.cloneDeep(this.configInWorkspace);
+    this.config = _.cloneDeep(this.workspaceConfig);
     this.config.name = environmentName ? environmentName : 'local';
     this.config.isCoreProject = this.project.isCoreProject;
-
-
-  private example: EnvConfig = {
-    workspace: {
-      projects: [
-      ]
+    this.config.currentProject = {
+      baseUrl: this.config
+      isWatchBuild: watch,
+      name: this.project.name,
+      type: this.project.type,
+      port: 'asd'
     }
+
+    const tmpEnvironmentFileName = 'tmp-environment.json';
+    const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
+    fse.writeJSONSync(tmpEnvironmentPath, this.config, {
+      encoding: 'utf8'
+    })
   }
-
-
 
 
   get configFor() {
@@ -76,36 +95,6 @@ export class EnvironmentConfig {
     }
   }
 
-  build(environmentName: string) {
-
-  }
-
-
-
-
-
-  aa() {
-    // if (this.parent && this.parent.type === 'workspace') {
-    //     let pathToWorkspaceProjectEnvironment = path.join(this.parent.location, 'environment');
-    //     if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-    //         // console.log('path to search for envrionment', path.join(this.parent.location, 'environment'))
-    //         const env: EnvConfig = require(pathToWorkspaceProjectEnvironment) as any;
-
-    //         if (Array.isArray(env.routes)) {
-    //             this.routes = env.routes;
-    //         }
-
-    //         const route = env.routes.find(r => r.project === this.name);
-    //         if (route) {
-    //             // console.log('route', route)
-    //             this.defaultPort = route.localEnvPort;
-    //             // console.log('new default port', this.defaultPort)
-    //         } else {
-    //             // console.log(`No route default port for ${this.name} in ${this.location}`)
-    //         }
-    //     }
-    // }
-  }
 
 
 }

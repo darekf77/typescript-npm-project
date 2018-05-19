@@ -219,6 +219,8 @@ export abstract class Project extends BaseProjectRouter {
 
         this.node_modules.prepare();
 
+        this.env.prepare(buildOptions);
+
         this.buildSteps(buildOptions);
     }
 
