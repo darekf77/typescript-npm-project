@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
@@ -82,23 +83,11 @@ const postcssPlugins = function () {
 // }
 
 
-// PROCESS ENV
 
-let environmentName = process.env.environmentName;
-if (!environmentName) {
-  environmentName = ''
-}
-if (environmentName !== '') {
-  environmentName = `.${environmentName}`;
-}
-const envrionmentFilePath = path.join(__dirname, `../environment${environmentName}.js`);
-// console.log(envrionmentFilePath)
-if (!fs.existsSync(envrionmentFilePath)) {
-  throw `File "${envrionmentFilePath}" doesn't exist`;
-}
+let ENV = fse.readJSONSync('./tmp-environment.json', {
+  'encoding': 'utf8'
+})
 
-let ENV = require(envrionmentFilePath);
-//
 
 module.exports = {
   "resolve": {

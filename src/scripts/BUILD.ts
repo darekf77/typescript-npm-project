@@ -2,18 +2,23 @@ import * as _ from 'lodash';
 import { run, clearConsole } from "../process";
 import { Project, ProjectIsomorphicLib, ProjectFrom } from '../project';
 import { clear } from "./CLEAR";
-import { BuildOptions, BuildDir, LibType } from "../models";
+import { BuildOptions, BuildDir, LibType, EnvironmentName } from "../models";
 import { info, error } from "../messages";
 
 import chalk from "chalk";
 import { nearestProjectTo, crossPlatofrmPath } from '../helpers';
 
-export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
-    clearConsole()
+export interface BuildArgs {
+    copyto: string[] | string;
+    environmentName: string;
+    envName: string;
+}
+
+function handleArguments(args: string) {
     if (process.platform === 'win32') {
         args = args.replace(/\\/g, '\\\\')
     }
-    const argsObj: { copyto: string[] | string } = require('minimist')(args.split(' '));
+    const argsObj: BuildArgs = require('minimist')(args.split(' '));
     let copyto: Project[] = []
     if (argsObj.copyto) {
         if (_.isString(argsObj.copyto)) {
@@ -32,18 +37,31 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
             return project;
         });
     }
+    let environmentName: EnvironmentName = 'local';
+    if (argsObj.environmentName || argsObj.envName) {
+        environmentName = (argsObj.environmentName ? argsObj.environmentName : argsObj.envName) as any;
+    }
+    return {
+        copyto, environmentName
+    }
+}
 
+
+export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
+    clearConsole()
+    const { copyto, environmentName } = handleArguments(args);
     const options: BuildOptions = {
-        prod, watch, outDir, copyto
+        prod, watch, outDir, copyto, environmentName
     };
     build(options, ['angular-lib', 'isomorphic-lib', 'server-lib'])
 }
 
 
-export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', noExit = false) {
+export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, noExit = false) {
     clearConsole()
+    const { copyto, environmentName } = handleArguments(args);
     const options: BuildOptions = {
-        prod, watch, outDir, appBuild: true
+        prod, watch, outDir, appBuild: true, environmentName
     };
     build(options, ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker'], noExit);
 }
@@ -88,15 +106,15 @@ export default {
     $BUILD_BUNDLE_WATCH: (args) => buildLib(false, true, 'bundle', args),
     $BUILD_BUNDLE_PROD: (args) => buildLib(true, false, 'bundle', args),
 
-    $BUILD_APP_PROD: () => buildApp(true, false),
-    $BUILD_APP: () => buildApp(false, false),
-    $BUILD_APP_WATCH: () => buildApp(false, true),
-    $BUILD_APP_START: () => {
-        buildApp(false, false, 'dist', true);
+    $BUILD_APP_PROD: (args) => buildApp(true, false, 'dist', args),
+    $BUILD_APP: (args) => buildApp(false, false, 'dist', args),
+    $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
+    $BUILD_APP_START: (args) => {
+        buildApp(false, false, 'dist', args, true);
         Project.Current.start();
     },
-    $BUILD_APP_PROD_START: () => {
-        buildApp(true, false, 'dist', true);
+    $BUILD_APP_PROD_START: (args) => {
+        buildApp(true, false, 'dist', args, true);
         Project.Current.start();
     },
     $START_APP: () => {

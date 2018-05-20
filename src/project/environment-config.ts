@@ -61,19 +61,24 @@ export class EnvironmentConfig {
     this.config = _.cloneDeep(this.workspaceConfig);
     this.config.name = environmentName ? environmentName : 'local';
     this.config.isCoreProject = this.project.isCoreProject;
-    this.config.currentProject = {
-      baseUrl: this.config
-      isWatchBuild: watch,
-      name: this.project.name,
-      type: this.project.type,
-      port: 'asd'
-    }
+
+    this.config.currentProject = this.config.workspace.projects
+      .find(p => p.name === this.project.name)
+
+    this.config.currentProject.isWatchBuild = watch;
 
     const tmpEnvironmentFileName = 'tmp-environment.json';
     const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
-    fse.writeJSONSync(tmpEnvironmentPath, this.config, {
-      encoding: 'utf8'
-    })
+    if (this.project.type === 'angular-client') {
+      fse.writeJSONSync(tmpEnvironmentPath, this.configFor.frontend, {
+        encoding: 'utf8'
+      })
+    } else if (this.project.type === 'isomorphic-lib') {
+      fse.writeJSONSync(tmpEnvironmentPath, this.configFor.backend, {
+        encoding: 'utf8'
+      })
+    }
+
   }
 
 

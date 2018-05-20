@@ -128,7 +128,7 @@ export abstract class BaseProjectLib extends Project {
             }
             this.run(`tnp clear`).sync();
             this.build({
-                prod, outDir: config.folder.bundle as 'bundle'
+                prod, outDir: config.folder.bundle as 'bundle', environmentName: 'local'
             })
             this.bundleResources()
         }, () => process.exit(0))

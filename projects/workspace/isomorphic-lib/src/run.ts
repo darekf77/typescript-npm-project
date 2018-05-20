@@ -3,6 +3,7 @@ import { Controllers, Entities } from "./index";
 import { start } from './helpers';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as vm from 'vm';
 import MockData from "./db-mocks";
 
 if (!process.env.environmentName) {
