@@ -326,7 +326,7 @@ export abstract class Project extends BaseProjectRouter {
                 }
                 fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
                 fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
-                console.log(`Tnp-helper installed in ${project.name} `)
+                // console.log(`Tnp-helper installed in ${project.name} `)
             }
         }
     }

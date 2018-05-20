@@ -79,9 +79,9 @@ export interface EnvConfigProject {
   host?: string; // tnp generated
   externalHost?: string;
   name: string;  // tnp checked
-  port: string; // override tnp type port
-  type: LibType; // tnp checked
-  $db: ConnectionOptions;
+  port: number; // override tnp type port
+  type?: LibType; // tnp checked
+  $db?: ConnectionOptions;
   isWatchBuild?: boolean; // tnp generated
 }
 
@@ -89,6 +89,7 @@ export interface EnvConfig {
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated
+  domain?: string;
   workspace: {
     build?: {
       browser: {
@@ -101,8 +102,21 @@ export interface EnvConfig {
     },
     projects: EnvConfigProject[]
   }
+  packageJSON?: IPackageJSON;
 
   currentProject?: EnvConfigProject;
 
 }
 
+
+export interface IPackageJSON {
+  name: string;
+  version: string;
+  tnp: {
+    type: LibType;
+    isCoreProject: boolean;
+    basedOn: Project | string,
+    resources?: string[];
+    requiredLibs?: string[];
+  };
+}

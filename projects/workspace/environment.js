@@ -1,34 +1,32 @@
 
-const path = require('path');
-
 const config = {
 
-  productionBuild: false,
-  aot: false,
-  db: {
-    database: 'tmp/db.sqlite3',
-    type: 'sqlite',
-    synchronize: true,
-    dropSchema: true,
-    logging: true
-  },
-  routes: [
-    {
-      url: '/components',
-      project: 'angular-lib',
-      localEnvPort: 4201
-    },
-    {
-      url: '/api',
-      project: 'isomorphic-lib',
-      localEnvPort: 4000
-    },
-    {
-      url: '/',
-      project: 'angular-client',
-      localEnvPort: 4200
-    }
-  ]
+  workspace: {
+    projects: [
+      {
+        baseUrl: '/components',
+        name: 'angular-lib',
+        port: 4201
+      },
+      {
+        baseUrl: '/api',
+        name: 'isomorphic-lib',
+        port: 4000,
+        $db: {
+          database: 'tmp/db.sqlite3',
+          type: 'sqlite',
+          synchronize: true,
+          dropSchema: true,
+          logging: true
+        }
+      },
+      {
+        baseUrl: '/',
+        name: 'angular-client',
+        port: 4200
+      }
+    ]
+  }
 
 }
 

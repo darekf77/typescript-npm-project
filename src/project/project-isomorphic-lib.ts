@@ -20,6 +20,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     projectSpecyficFiles(): string[] {
         return super.projectSpecyficFiles().concat([
+            "src/typings.d.ts",
             "tsconfig.json",
             "tsconfig.browser.json"
         ]);

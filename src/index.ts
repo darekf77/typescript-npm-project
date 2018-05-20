@@ -5,6 +5,7 @@ import { run as runCommand } from "./process";
 export { config } from './config';
 export * from './helpers'
 export * from './project'
+export * from './models'
 import { Helpers } from "morphi";
 import { paramsFrom, match } from './helpers';
 import { isString } from 'util';

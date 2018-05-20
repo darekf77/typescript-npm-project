@@ -24,11 +24,13 @@ export class TestController extends BaseCRUD<Book> {
     }
 
     async createBooks() {
+        //#region @backendFunc
         let book1 = new Book();
         book1.title = 'aaaasdasd'
         let book2 = new Book();
         book2.title = 'aaaasdasd'
         this.repository.save([book1, book2] as any)
+        //#endregion
     }
 }
 

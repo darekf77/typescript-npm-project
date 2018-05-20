@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import {
     LibType, InstalationType, BuildOptions,
-    Dependencies, Package, TnpRouter, TnpRoute
+    Dependencies, Package, TnpRouter, TnpRoute, IPackageJSON
 } from "../models";
 import { error, info, warn } from "../messages";
 import { run } from "../process";
@@ -13,22 +13,9 @@ import { ProjectFrom } from "./index";
 import chalk from "chalk";
 
 
-export interface IPackageJSON {
-    name: string;
-    version: string;
-    tnp: {
-        type: LibType;
-        isCoreProject: boolean;
-        basedOn: Project | string,
-        resources?: string[];
-        requiredLibs?: string[];
-    };
-}
-
-
 export class PackageJSON {
 
-    private data: IPackageJSON;
+    public data: IPackageJSON;
 
     constructor(data: Object, private location: string) {
         this.data = _.merge({
