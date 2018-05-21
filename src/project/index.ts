@@ -32,7 +32,7 @@ function typeFrom(location: string): LibType {
     return type;
 }
 
-export function ProjectFrom(location: string, parent?: Project): Project {
+export function ProjectFrom(location: string): Project {
     // console.log('PROJECT FROM', location)
     const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
     if (alreadyExist) return alreadyExist;
@@ -53,7 +53,7 @@ export function ProjectFrom(location: string, parent?: Project): Project {
     if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
     // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
-    
+
     return resultProject;
 }
 

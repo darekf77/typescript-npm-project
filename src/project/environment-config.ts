@@ -8,6 +8,8 @@ import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
 import { walkObject } from '../helpers';
 import { error } from '../messages';
 import chalk from 'chalk';
+import { ProjectFrom } from './index';
+import { BaseProjectRouter } from './base-project-router';
 
 
 
@@ -61,9 +63,22 @@ export class EnvironmentConfig {
       if (this.kind !== 'other') {
         this.validateWorkspaceConfig();
       }
+      this.overrideDefaultPorts()
+
     }
     //#endregion
 
+  }
+
+  overrideDefaultPorts() {
+    if (this.kind === 'tnp-workspace') {
+      this.workspaceConfig.workspace.projects.forEach(d => {
+        if (_.isNumber(d.port)) {
+          const p = path.join(this.project.location, d.name);
+          (ProjectFrom(p) as BaseProjectRouter).defaultPort = d.port;
+        }
+      })
+    }
   }
 
   private schema: EnvConfig = {

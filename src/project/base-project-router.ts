@@ -12,7 +12,7 @@ export abstract class BaseProjectRouter {
 
     abstract name: string;
     protected routes: TnpRoute[] = [];
-    protected defaultPort: number;
+    public defaultPort: number;
 
     public static killProcessOn(portNumber: number) {
         let pid = child.execFileSync(`lsof -t -i tcp:${portNumber}`).toString();
