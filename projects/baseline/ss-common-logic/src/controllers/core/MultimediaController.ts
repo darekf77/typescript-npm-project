@@ -16,6 +16,7 @@ export { Handler } from 'express';
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 import * as path from 'path';
+import * as fse from 'fs-extra';
 import { UploadedFile } from "express-fileupload";
 //#endregion
 
@@ -33,17 +34,30 @@ import * as controllers from '../../controllers';
 })
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
 
+  constructor() {
+    super()
+    entities.MULTIMEDIA.recreateFolder()
+  }
+
   @POST('/upload')
   upload(): Response<boolean> {
     //#region @backendFunc
     return async (req, res) => {
-      const file: UploadedFile = get(req,'files.file');
+      const file: UploadedFile = get(req, 'files.file');
 
 
       if (!file) {
         throw 'No files were uploaded.';
       }
-      console.log('uploaded file', file)
+      if (file.mimetype === "image/png") {
+        let m = new entities.MULTIMEDIA()
+        m.name = file.name;
+        m.type = 'picture';
+        m = await this.db.MULTIMEDIA.save(m)
+        const p = m.path;
+        await file.mv(m.path, undefined) as any;
+        console.log('uploaded file', file)
+      }
 
       return true;
     }

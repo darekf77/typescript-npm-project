@@ -39,31 +39,43 @@ export class EnvironmentConfig {
       this.kind = 'tnp-workspace-child'
     }
 
-    // console.log('kind', this.kind)
-    // console.log('kind', this.project.name)
-    //#region resolve worksapce config
-    if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
-      this.workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
-      // console.log('EnvironmentConfig.woksapaceConfigs', EnvironmentConfig.woksapaceConfigs)
-    } else {
+    // console.log('this.project ', this.project.name)
+    // console.log('this.project.parent ', this.project.parent ? this.project.parent.name : 'no parent')
+    // console.log('this.project.location   ', this.project.location)
+    // console.log('this.kind', this.kind)
 
-      if (this.kind === 'tnp-workspace-child') {
-        let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment');
-        // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
-        if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-          this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+    if (this.kind !== 'other') {
+      // console.log('kind', this.kind)
+      // console.log('kind', this.project.name)
+      //#region resolve worksapce config
+      if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
+        this.workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
+        // console.log('EnvironmentConfig.woksapaceConfigs', EnvironmentConfig.woksapaceConfigs)
+      } else {
+
+        if (this.kind === 'tnp-workspace-child') {
+          let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment');
+          // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
+          if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
+            this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+          } else {
+            this.kind = 'other';
+          }
+        } else if (this.kind === 'tnp-workspace') {
+          let pathToProjectEnvironment = path.join(this.project.location, 'environment');
+          // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
+          if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
+            this.workspaceConfig = require(pathToProjectEnvironment) as any;
+          } else {
+            this.kind = 'other';
+          }
         }
-      } else if (this.kind === 'tnp-workspace') {
-        let pathToProjectEnvironment = path.join(this.project.location, 'environment');
-        // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
-        if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
-          this.workspaceConfig = require(pathToProjectEnvironment) as any;
+        if (this.kind !== 'other') {
+          this.validateWorkspaceConfig();
+          this.overrideDefaultPorts()
         }
+
       }
-      if (this.kind !== 'other') {
-        this.validateWorkspaceConfig();
-      }
-      this.overrideDefaultPorts()
 
     }
     //#endregion
@@ -133,6 +145,7 @@ export class EnvironmentConfig {
   }
 
   prepare(options: BuildOptions) {
+    // console.log('this.kind', this.kind)
     if (this.kind === 'other') {
       return
     }

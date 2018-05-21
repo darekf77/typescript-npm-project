@@ -26,7 +26,7 @@ import { routes } from "./app.routes";
 import { LoginModule } from './login/login.module';
 
 
-init('http://localhost:4000')
+init(ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host)
   .angularProviders({
     controllers: [AuthController, CategoryController],
     entities: [

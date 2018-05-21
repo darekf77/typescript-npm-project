@@ -49,6 +49,7 @@ export class FilesRecreator {
                     'dist*',
                     'bundle*',
                     'browser',
+                    'backup',
                     'module',
                     'www'
                 ].concat([ // common small files
@@ -58,7 +59,7 @@ export class FilesRecreator {
                 ].concat([ // not sure if ignored/needed
                     '.sass-cache',
                     '.sourcemaps'
-                ]).concat( // for site ignore auto-generate scr 
+                ]).concat( // for site ignore auto-generate scr
                     self.project.isSite ? (
                         self.project.customizableFilesAndFolders
                             .concat(self.project.customizableFilesAndFolders.map(f => {
@@ -178,7 +179,7 @@ export class FilesRecreator {
     private assetsToIgnore = []; // TODO make this better, not dependedn gitgnore on it
 
     /**
-     * TODO needs to be before gitignore recreatino ! change it 
+     * TODO needs to be before gitignore recreatino ! change it
      */
     assets() {
         const filesPathesToIgnore = []

@@ -13,6 +13,8 @@ npm-debug.log*
 tslint.json
 .editorconfig
 tsconfig.json
+src/typings.d.ts
+src/main.ts
 src/tsconfig.app.json
 src/tsconfig.spec.json
 protractor.conf.js

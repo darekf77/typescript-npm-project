@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FileUploader } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
-const URL = 'http://localhost:4000/MultimediaController/upload';
+const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
 
 @Component({
   selector: 'app-multimedia-upload',

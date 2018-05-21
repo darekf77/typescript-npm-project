@@ -47,30 +47,29 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   @Column('varchar', { length: 20 })
   type: 'picture' | 'audio' | 'video' = undefined;
 
-  //#region @backend
-  private static folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJSON.name);
-  //#endregion
+
 
   get path() {
     //#region @backendFunc
     if (!this.type) {
       throw Error(`Bad multimedia type for id ${this.id}`)
     }
-
     let name = `${this.type}_${this.id}__${kebabCase(this.createdDate.getTime().toString())}_${this.name}`;
 
-    const res = path.join(MULTIMEDIA.folderPath, name)
+    if (this.type === 'picture') {
+      const res = path.join(ENV.pathes.backup.picture, name)
+      return res;
+    }
 
-    return res;
+
     //#endregion
   }
 
   public static recreateFolder() {
     //#region @backend
-    MULTIMEDIA.folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJSON.name);
-    if (!fs.existsSync(MULTIMEDIA.folderPath)) {
-      fse.mkdirpSync(MULTIMEDIA.folderPath)
-    }
+    fse.mkdirpSync(ENV.pathes.backup.video)
+    fse.mkdirpSync(ENV.pathes.backup.audio)
+    fse.mkdirpSync(ENV.pathes.backup.picture)
     //#endregion
   }
 
