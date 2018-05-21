@@ -1,10 +1,10 @@
 const controllers = {};
 const entities = {};
 function addController(controller: Function) {
-    controllers[controller.name] = controller;
+  controllers[controller.name] = controller;
 }
 function addEntity(entity: Function) {
-    entities[entity.name] = entity;
+  entities[entity.name] = entity;
 }
 
 import { UsersController } from './controllers/examples/UsersController';
@@ -64,8 +64,27 @@ import { SESSION } from './entities/SESSION';
 export { SESSION } from './entities/SESSION';
 addEntity(SESSION);
 
-
 export const Controllers = controllers;
 export const Entities = entities;
 
 
+//#region @backend
+
+import { start } from './helpers';
+import MockData from "./db-mocks";
+
+
+export default function () {
+  console.log('ENV', ENV)
+
+  start({
+    config: ENV.currentProject.$db as any,
+    host: ENV.currentProject.host,
+    Controllers: Controllers as any,
+    Entities: Entities as any,
+    MockData
+  });
+}
+
+
+//#endregion

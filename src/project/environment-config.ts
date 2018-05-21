@@ -135,6 +135,10 @@ export class EnvironmentConfig {
       this.config.packageJSON = this.project.parent.packageJson.data;
     }
 
+    this.config.workspace.projects.forEach(p => {
+      p.host = (!this.config.domain) ? `http://localhost:${p.port}` : `${this.config.domain}${p.baseUrl}`;
+    })
+
     this.config.currentProject = this.config.workspace.projects
       .find(p => p.name === this.project.name)
 
@@ -145,14 +149,17 @@ export class EnvironmentConfig {
 
     this.config.currentProject.isWatchBuild = watch;
 
+
+
+
     const tmpEnvironmentFileName = 'tmp-environment.json';
     const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
     if (this.project.type === 'angular-client') {
-      fse.writeJSONSync(tmpEnvironmentPath, this.configFor.frontend, {
+      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
         encoding: 'utf8'
       })
     } else if (this.project.type === 'isomorphic-lib') {
-      fse.writeJSONSync(tmpEnvironmentPath, this.configFor.backend, {
+      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.backend, null, 4), {
         encoding: 'utf8'
       })
     }

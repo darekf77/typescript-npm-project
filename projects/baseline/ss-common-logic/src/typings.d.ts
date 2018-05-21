@@ -1,8 +1,6 @@
 
-import { Config } from "../../environment";
+import { EnvConfig } from "tnp";
 
 declare global {
-  const ENV: Config & { packageJson: { name: string; } };
+    const ENV: EnvConfig;
 }
-
-

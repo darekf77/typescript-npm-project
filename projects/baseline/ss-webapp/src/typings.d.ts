@@ -1,11 +1,8 @@
-
-import { Config } from "../../environment";
+import { EnvConfig } from "tnp";
 
 declare global {
-  const ENV: Config;
-
+    const ENV: EnvConfig;
 }
-
 
 
 /* SystemJS module definition */
@@ -13,7 +10,6 @@ declare var module: NodeModule;
 interface NodeModule {
   id: string;
 }
-
 
 
 

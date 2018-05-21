@@ -16,8 +16,9 @@ import { HelpersLinks } from "./helpers-links";
 import { ProjectFrom } from './index';
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
+  lodashPath = (lodashPath === '') ? `` : `${lodashPath}.`;
   Object.keys(obj).forEach(key => {
-    const contactedPath = `${lodashPath}.${key}`
+    const contactedPath = `${lodashPath}${key}`
     callBackFn(contactedPath, key.startsWith('$'))
     const v = obj[key];
     const isObject = _.isObject(v)
@@ -26,7 +27,7 @@ export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefi
       walkObject(v, callBackFn, contactedPath)
     } else if (isArray) {
       (v as Array<any>).forEach((elem, i) => {
-        walkObject(elem, callBackFn, `${lodashPath}.${key}[${i}]`)
+        walkObject(elem, callBackFn, `${lodashPath}${key}[${i}]`)
       })
     }
   })

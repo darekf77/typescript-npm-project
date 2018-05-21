@@ -15,5 +15,8 @@ tslint.json
 index.js
 index.d.ts
 index.js.map
+.vscode/launch.json
+run.js
+src/typings.d.ts
 tsconfig.json
 tsconfig.browser.json

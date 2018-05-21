@@ -4,16 +4,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Standard server",
-      "program": "${workspaceFolder}/dist/run.js"
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/run.js"
     },
     {
       "type": "node",
       "request": "launch",
-      "remoteRoot": "${workspaceRoot}/dist",
+      "remoteRoot": "${workspaceRoot}",
       "name": "Nodemon server",
       "runtimeExecutable": "nodemon",
-      "program": "${workspaceFolder}/dist/run.js",
+      "program": "${workspaceFolder}/run.js",
       "restart": true,
       "sourceMaps": true,
       "console": "internalConsole",

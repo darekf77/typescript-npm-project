@@ -29,7 +29,7 @@ export class TestController extends BaseCRUD<Book> {
         book1.title = 'aaaasdasd'
         let book2 = new Book();
         book2.title = 'aaaasdasd'
-        this.repository.save([book1, book2] as any)
+        // this.repository.save([book1, book2] as any)
         //#endregion
     }
 }

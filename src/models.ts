@@ -86,6 +86,8 @@ export interface EnvConfigProject {
 }
 
 export interface EnvConfig {
+
+  pathes?: any;
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated

@@ -13,11 +13,12 @@ const config = {
         name: 'isomorphic-lib',
         port: 4000,
         $db: {
+          name: 'default',
           database: 'tmp/db.sqlite3',
           type: 'sqlite',
           synchronize: true,
           dropSchema: true,
-          logging: true
+          logging: false
         }
       },
       {

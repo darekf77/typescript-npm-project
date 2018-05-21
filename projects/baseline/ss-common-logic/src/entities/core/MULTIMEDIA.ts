@@ -48,7 +48,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   type: 'picture' | 'audio' | 'video' = undefined;
 
   //#region @backend
-  private static folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJson.name);
+  private static folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJSON.name);
   //#endregion
 
   get path() {
@@ -67,7 +67,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
 
   public static recreateFolder() {
     //#region @backend
-    MULTIMEDIA.folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJson.name);
+    MULTIMEDIA.folderPath = path.join(ENV.pathes.backup.audio, ENV.packageJSON.name);
     if (!fs.existsSync(MULTIMEDIA.folderPath)) {
       fse.mkdirpSync(MULTIMEDIA.folderPath)
     }

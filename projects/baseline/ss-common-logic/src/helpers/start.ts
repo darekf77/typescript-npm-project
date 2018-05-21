@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import "reflect-metadata";
 
 import { init } from 'morphi';
-import { createConnection, useContainer, ConnectionOptions, Connection } from 'typeorm';
+import { createConnections, useContainer, ConnectionOptions, Connection } from 'typeorm';
 export { Connection } from 'typeorm';
 import { META } from "./meta-info";
 
@@ -28,25 +28,25 @@ export async function start(options: StartOptions) {
   const entities = _.values(Entities) as any;
   const controllers = _.values(Controllers) as any;
   config['entities'] = entities as any;
-  const connection = await createConnection(config as any);
-
+  const connection = await createConnections([config] as any);
+  const firstConnection = connection[0];
 
   init(host).expressApp({
     controllers,
     entities,
-    connection: connection as any
+    connection: firstConnection as any
   })
 
   if (_.isArray(MockData)) {
     const promises: Promise<any>[] = []
     MockData.forEach(Mock => {
-      promises.push((new (Mock as any)(connection) as META.BASE_MOCK_DATA).init())
+      promises.push((new (Mock as any)(firstConnection) as META.BASE_MOCK_DATA).init())
     })
     await Promise.all(promises);
   }
 
   return {
-    connection,
+    connection: firstConnection,
     config,
     entities
   };
