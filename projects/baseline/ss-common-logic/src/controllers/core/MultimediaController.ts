@@ -49,7 +49,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
       if (!file) {
         throw 'No files were uploaded.';
       }
-      if (file.mimetype === "image/png") {
+      if (entities.MULTIMEDIA.mimetype.picture.includes(file.mimetype)) {
         let m = new entities.MULTIMEDIA()
         m.name = file.name;
         m.type = 'picture';

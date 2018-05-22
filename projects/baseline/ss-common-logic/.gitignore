@@ -3,6 +3,7 @@ tmp*
 dist*
 bundle*
 browser
+backup
 module
 www
 Thumbs.db

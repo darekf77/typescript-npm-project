@@ -47,7 +47,9 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   @Column('varchar', { length: 20 })
   type: 'picture' | 'audio' | 'video' = undefined;
 
-
+  public static mimetype = {
+    picture: ['image/jpeg', 'image/png']
+  }
 
   get path() {
     //#region @backendFunc

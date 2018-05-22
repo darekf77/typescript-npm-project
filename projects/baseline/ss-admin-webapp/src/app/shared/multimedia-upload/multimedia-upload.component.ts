@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+
+// material
+import { MatDialog,  MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 import { FileUploader } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
@@ -12,8 +15,18 @@ const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-log
 })
 export class MultimediaUploadComponent implements OnInit {
 
-  constructor(private auth: AuthController) {
+  @ViewChild('dialog')
+  private dialog: TemplateRef<any>;
 
+  constructor(
+    private auth: AuthController,
+    private materialDialog: MatDialog
+  ) {
+
+  }
+
+  open() {
+    this.materialDialog.open(this.dialog);
   }
 
   ngOnInit() {
