@@ -14,13 +14,14 @@ import { CategoryController } from "ss-common-logic/browser/controllers/Category
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
 import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
-import { MultimediaUploadModule } from '../shared/multimedia-upload/multimedia-upload.module';
+import { MultimediaModule } from '../shared/multimedia/multimedia.module';
+
 
 const modules = [
   LayoutMaterialModule,
   MatMenuModule,
   MatIconModule,
-  MultimediaUploadModule
+  MultimediaModule
 ]
 
 @NgModule({

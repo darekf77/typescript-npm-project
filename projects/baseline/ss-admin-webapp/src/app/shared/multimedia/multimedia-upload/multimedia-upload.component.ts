@@ -19,14 +19,9 @@ export class MultimediaUploadComponent implements OnInit {
   private dialog: TemplateRef<any>;
 
   constructor(
-    private auth: AuthController,
-    private materialDialog: MatDialog
+    private auth: AuthController
   ) {
 
-  }
-
-  open() {
-    this.materialDialog.open(this.dialog);
   }
 
   ngOnInit() {
