@@ -2,6 +2,7 @@
 
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
+import * as sleep from 'sleep';
 import * as fse from "fs-extra";
 import chalk from 'chalk';
 import * as path from 'path';
@@ -319,17 +320,31 @@ export abstract class Project extends BaseProjectRouter {
           project = self;
         }
 
-        const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
-        const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
-        if (fs.existsSync(destCompiledJs)) {
-          // console.log(`Removed tnp-helper from ${dest} `)
-          rimraf.sync(destCompiledJs)
+        if (process.platform === 'win32') {
+          try {
+            self.reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
+          } catch (error) {
+            console.log(`Trying to reinstall tnp...`)
+            sleep.sleep(2);
+            self.tnpHelper.install()
+          }
+        } else {
+          self.reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
         }
-        fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
-        fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
-        // console.log(`Tnp-helper installed in ${project.name} `)
       }
     }
+  }
+
+  private reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
+    const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+    const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
+    if (fs.existsSync(destCompiledJs)) {
+      // console.log(`Removed tnp-helper from ${dest} `)
+      rimraf.sync(destCompiledJs)
+    }
+    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+    fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+    // console.log(`Tnp-helper installed in ${project.name} `)
   }
 
 

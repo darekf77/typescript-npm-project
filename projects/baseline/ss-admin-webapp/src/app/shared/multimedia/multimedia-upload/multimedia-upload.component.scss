@@ -5,4 +5,18 @@
   .nv-file-over { border: dotted 3px red; } /* Default class applied to drop zones on over */
   .another-file-over-class { border: dotted 3px green; }
 
+  .my-drop-zone {
+    // height: 100px;
+    text-align: center;
+    line-height: 100px;
+  }
+
+  column {
+    padding: 10px;
+  }
+
+  ngx-datatable {
+    height: 100%;
+  }
+
 }

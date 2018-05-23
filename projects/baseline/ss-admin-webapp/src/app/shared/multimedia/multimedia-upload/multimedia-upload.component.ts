@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 
 // material
-import { MatDialog,  MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 import { FileUploader } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
@@ -24,6 +24,9 @@ export class MultimediaUploadComponent implements OnInit {
 
   }
 
+  rows = []
+  columns = [];
+
   ngOnInit() {
     console.log('ENV', ENV)
     this.auth.isLoggedIn.subscribe(isLoggedIn => {
@@ -34,19 +37,43 @@ export class MultimediaUploadComponent implements OnInit {
       }
     })
     this.auth.browser.init()
+
+    this.columns = [
+      {
+        prop: 'name'
+      },
+      {
+        prop: 'gender'
+      }
+    ]
+    this.rows = [
+      {
+        "name": "Ethel Price",
+        "gender": "female",
+        "company": "Johnson, Johnson and Partners, LLC CMP DDC",
+        "age": 22
+      },
+      {
+        "name": "Claudine Neal",
+        "gender": "female",
+        "company": "Sealoud",
+        "age": 55
+      },
+      {
+        "name": "Beryl Rice",
+        "gender": "female",
+        "company": "Velity",
+        "age": 67
+      }
+    ]
   }
 
   public uploader: FileUploader;
 
   public hasBaseDropZoneOver: boolean = false;
-  public hasAnotherDropZoneOver: boolean = false;
-
   public fileOverBase(e: any): void {
     this.hasBaseDropZoneOver = e;
   }
 
-  public fileOverAnother(e: any): void {
-    this.hasAnotherDropZoneOver = e;
-  }
 
 }
