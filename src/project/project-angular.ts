@@ -24,6 +24,7 @@ export class AngularProject extends Project {
       "tsconfig.json",
       'src/typings.d.ts',
       'src/main.ts',
+      'src/polyfills.ts',
       'src/tsconfig.app.json',
       'src/tsconfig.spec.json',
       'protractor.conf.js',

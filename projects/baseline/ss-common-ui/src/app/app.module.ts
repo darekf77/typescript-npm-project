@@ -8,8 +8,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 // local
-import { AppComponent } from './preview-app.component';
-import { previewRoutes } from './preview-app.routes';
+import { AppComponent } from './app.component';
+import { previewRoutes } from './app.routes';
 
 import {
   StandalonePopupModule
