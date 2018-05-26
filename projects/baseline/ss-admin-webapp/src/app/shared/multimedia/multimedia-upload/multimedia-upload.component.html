@@ -28,7 +28,6 @@
                      ng2FileSelect
                      [uploader]="uploader"
                      multiple />
-              <button mat-button>actionTwo</button>
             </mat-card-actions>
           </mat-card>
         </column>
@@ -37,18 +36,25 @@
           <ngx-datatable class="material"
                          [rows]="rows"
                          [columns]="columns"
-
-                         >
+                         [rowHeight]="50"
+                         [headerHeight]="0">
           </ngx-datatable>
         </column>
       </columns-container>
       <columns-container>
-        <column [width]="200">
-
-
+        <column grow>
+          <mat-progress-bar mode="determinate"
+                            value="{{uploader.progress * 100}}"></mat-progress-bar>
 
         </column>
-        <column grow>
+        <column [width]="200">
+          <button mat-button
+                  class="upload-all"
+                  (click)="uploader.uploadAll()"
+                  [disabled]="!uploader.getNotUploadedItems().length"
+                  mat-raised-button>
+            Upload All
+          </button>
           <!-- <div class="col-md-9"
                style="margin-bottom: 40px">
 
