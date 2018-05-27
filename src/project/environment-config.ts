@@ -95,6 +95,11 @@ export class EnvironmentConfig {
 
   private schema: EnvConfig = {
     workspace: {
+      workspace: {
+        baseUrl: '/info',
+        name: 'workspace-name',
+        port: 5000
+      },
       projects: [
         {
           baseUrl: '/some-api-endpoint',
@@ -156,10 +161,15 @@ export class EnvironmentConfig {
 
 
     if (this.kind === 'tnp-workspace') {
+      if (!this.config.workspace || !this.config.workspace.workspace) {
+        error(`You shoud define 'workspace' object inside config.workspace object`, true)
+        this.err()
+      }
       this.config.packageJSON = this.project.packageJson.data;
     }
 
     if (this.kind === 'tnp-workspace-child') {
+
       this.config.packageJSON = this.project.parent.packageJson.data;
     }
 
@@ -167,8 +177,12 @@ export class EnvironmentConfig {
       p.host = (!this.config.domain) ? `http://localhost:${p.port}` : `${this.config.domain}${p.baseUrl}`;
     })
 
-    this.config.currentProject = this.config.workspace.projects
-      .find(p => p.name === this.project.name)
+    if (this.kind === 'tnp-workspace-child') {
+      this.config.currentProject = this.config.workspace.projects
+        .find(p => p.name === this.project.name)
+    } else if (this.kind === 'tnp-workspace') {
+      this.config.currentProject = this.config.workspace.workspace
+    }
 
     if (!this.config.currentProject) {
       error(`Cannot find current project (${this.project.name}) in config worksapce projects.`, true)

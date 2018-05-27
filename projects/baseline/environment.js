@@ -11,6 +11,11 @@ const config = {
   },
 
   workspace: {
+    workspace: {
+      baseUrl: '/info',
+      name: 'workspace',
+      port: 5000
+    },
     projects: [
       {
         baseUrl: '/components',

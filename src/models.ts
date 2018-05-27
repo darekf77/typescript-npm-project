@@ -93,6 +93,7 @@ export interface EnvConfig {
   name?: EnvironmentName; // tnp generated
   domain?: string;
   workspace: {
+    workspace: EnvConfigProject;
     build?: {
       browser: {
         minify: boolean;

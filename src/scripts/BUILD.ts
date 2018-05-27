@@ -72,7 +72,14 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist',
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName
   };
-  build(options, ['angular-cli', 'angular-client', 'angular-lib', 'ionic-client', 'docker'], noExit);
+  build(options, [
+    'angular-cli',
+    'angular-client',
+    'angular-lib',
+    'ionic-client',
+    'docker',
+    'workspace'
+  ], noExit);
 }
 
 
