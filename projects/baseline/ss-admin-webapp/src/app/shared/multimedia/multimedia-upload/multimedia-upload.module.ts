@@ -13,6 +13,7 @@ import { MultimediaUploadComponent } from './multimedia-upload.component';
 import { FileUploadModule } from 'ng2-file-upload';
 import { StaticColumnsModule } from "static-columns";
 import { NgxDatatableModule } from "@swimlane/ngx-datatable";
+import { DialogWrapperModule } from '../../dialog-wrapper';
 
 const materialModules = [
   MatDialogModule,
@@ -30,6 +31,7 @@ const materialModules = [
     ...materialModules,
     FileUploadModule,
     StaticColumnsModule,
+    DialogWrapperModule,
     NgxDatatableModule
   ],
   exports: [

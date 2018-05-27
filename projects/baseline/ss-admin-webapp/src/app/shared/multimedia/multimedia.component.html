@@ -1,19 +1,19 @@
 <button (click)="open()"> Open upload! </button>
 
 <ng-template #dialog>
+  <dialog-wrapper>
+    <mat-tab-group>
+      <mat-tab label="Chooser">
 
-  <mat-tab-group>
-    <mat-tab label="Chooser">
+        <app-multimedia-chooser></app-multimedia-chooser>
 
-      <app-multimedia-chooser></app-multimedia-chooser>
+      </mat-tab>
+      <mat-tab label="Upload">
 
-    </mat-tab>
-    <mat-tab label="Upload">
+        <app-multimedia-upload></app-multimedia-upload>
 
-      <app-multimedia-upload></app-multimedia-upload>
-
-    </mat-tab>
-  </mat-tab-group>
-
+      </mat-tab>
+    </mat-tab-group>
+  </dialog-wrapper>
 
 </ng-template>

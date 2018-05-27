@@ -7,6 +7,7 @@ import { MatTableModule } from "@angular/material/table";
 import { CdkTableModule } from '@angular/cdk/table';
 import { MultimediaChooserModule } from './multimedia-chooser/multimedia-chooser.module';
 import { MultimediaUploadModule } from './multimedia-upload/multimedia-upload.module';
+import { DialogWrapperModule } from '../dialog-wrapper';
 
 const moduleMaterial = [
   MatTabsModule,
@@ -18,6 +19,7 @@ const moduleMaterial = [
 @NgModule({
   imports: [
     CommonModule,
+    DialogWrapperModule,
     ...moduleMaterial
   ],
   exports: [

@@ -1,3 +1,29 @@
+
+<ng-template #cellTemplateActions
+             let-row="row"
+             let-value="value"
+             let-column="column">
+
+
+  <button type="button"
+          (click)="value.upload()"
+          [disabled]="value.isReady || value.isUploading || value.isSuccess">
+    <span class="glyphicon glyphicon-upload"></span> Upload
+  </button>
+  <button type="button"
+          class="btn btn-warning btn-xs"
+          (click)="value.cancel()"
+          [disabled]="!value.isUploading">
+    <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+  </button>
+  <button type="button"
+          class="btn btn-danger btn-xs"
+          (click)="value.remove()">
+    <span class="glyphicon glyphicon-trash"></span> Remove
+  </button>
+
+</ng-template>
+
 <div class="container"
      *ngIf="uploader">
 
@@ -37,8 +63,13 @@
                          [rows]="rows"
                          [columns]="columns"
                          [rowHeight]="50"
+                         [columnMode]="'flex'"
+                         [externalSorting]="true"
                          [headerHeight]="0">
           </ngx-datatable>
+
+
+
         </column>
       </columns-container>
       <columns-container>

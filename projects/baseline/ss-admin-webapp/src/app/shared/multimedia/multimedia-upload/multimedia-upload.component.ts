@@ -1,22 +1,34 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
 
 // material
 import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Log, Level } from "ng2-logger/browser";
+const log = Log.create('multimedia-upload')
 
-import { FileUploader } from 'ng2-file-upload';
+import { FileUploader, FileItem } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
 const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
+
+import { TableColumn } from "@swimlane/ngx-datatable";
+interface TableRow {
+  name: string;
+  size: string;
+  progress: string;
+  actions?: string;
+  item: FileItem
+}
 
 @Component({
   selector: 'app-multimedia-upload',
   templateUrl: './multimedia-upload.component.html',
   styleUrls: ['./multimedia-upload.component.scss']
 })
-export class MultimediaUploadComponent implements OnInit {
+export class MultimediaUploadComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('dialog')
-  private dialog: TemplateRef<any>;
+  @ViewChild('dialog') private dialog: TemplateRef<any>;
+  @ViewChild('cellTemplateActions') cellTemplateActions: TemplateRef<any>;
+  @ViewChild('cellTemplateSize') cellTemplateSize: TemplateRef<any>;
 
   constructor(
     private auth: AuthController
@@ -24,8 +36,20 @@ export class MultimediaUploadComponent implements OnInit {
 
   }
 
-  rows = []
-  columns = [];
+  get rows(): { name: string; progress: number; }[] {
+    return (this.uploader && Array.isArray(this.uploader.queue)) ?
+      this.uploader.queue.map(i => {
+        return {
+          name: i.file.name,
+          size: `${((i.file && i.file.size) / 1024 / 1024).toFixed(2)} mb`,
+          progress: i.progress,
+          item: i
+        };
+      }) : []
+  }
+  columns: TableColumn[] = [];
+
+
 
   ngOnInit() {
     console.log('ENV', ENV)
@@ -38,35 +62,27 @@ export class MultimediaUploadComponent implements OnInit {
     })
     this.auth.browser.init()
 
+  }
+
+  ngAfterViewInit() {
+    log.i('this.cellTemplate', this.cellTemplateActions)
     this.columns = [
       {
         prop: 'name'
       },
       {
-        prop: 'gender'
-      }
-    ]
-    this.rows = [
-      {
-        "name": "Ethel Price",
-        "gender": "female",
-        "company": "Johnson, Johnson and Partners, LLC CMP DDC",
-        "age": 22
+        prop: 'size'
       },
       {
-        "name": "Claudine Neal",
-        "gender": "female",
-        "company": "Sealoud",
-        "age": 55
+        prop: 'progress'
       },
       {
-        "name": "Beryl Rice",
-        "gender": "female",
-        "company": "Velity",
-        "age": 67
+        prop: 'item',
+        cellTemplate: this.cellTemplateActions
       }
     ]
   }
+
 
   public uploader: FileUploader;
 
