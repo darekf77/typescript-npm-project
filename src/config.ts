@@ -23,7 +23,22 @@ export const config = {
         custom: 'custom',
         components: 'components',
         node_modules: 'node_modules',
-        assets:'assets'
+        assets: 'assets'
+    },
+    allowedTypes: {
+        app: [
+            'angular-cli',
+            'angular-client',
+            'angular-lib',
+            'ionic-client',
+            'docker',
+            'workspace'
+        ] as LibType[],
+        libs: [
+            'angular-lib',
+            'isomorphic-lib',
+            'server-lib'
+        ] as LibType[]
     },
     libsTypes: [
         'workspace',

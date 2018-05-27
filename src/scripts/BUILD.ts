@@ -8,6 +8,7 @@ import * as path from 'path';
 
 import chalk from "chalk";
 import { nearestProjectTo, crossPlatofrmPath } from '../helpers';
+import { config } from '../config';
 
 export interface BuildArgs {
   copyto: string[] | string;
@@ -62,7 +63,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
   const options: BuildOptions = {
     prod, watch, outDir, copyto, environmentName
   };
-  build(options, ['angular-lib', 'isomorphic-lib', 'server-lib'])
+  build(options, config.allowedTypes.libs)
 }
 
 
@@ -72,14 +73,7 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist',
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName
   };
-  build(options, [
-    'angular-cli',
-    'angular-client',
-    'angular-lib',
-    'ionic-client',
-    'docker',
-    'workspace'
-  ], noExit);
+  build(options, config.allowedTypes.app, noExit);
 }
 
 

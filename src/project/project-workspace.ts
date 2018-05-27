@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
+import { config } from '../config';
 
 
 export class ProjectWorkspace extends Project {
@@ -10,7 +11,7 @@ export class ProjectWorkspace extends Project {
     startOnCommand(port: number) {
         if (!port) port = this.defaultPort;
         this.currentPort = port;
-        this.activateServer()        
+        this.activateServer()
         this.children.forEach(child => child.start());
         return 'echo "Workspace server started"';
     }
@@ -19,6 +20,9 @@ export class ProjectWorkspace extends Project {
     }
 
     buildSteps(buildOptions?: BuildOptions) {
+
+        const { environmentName, prod, watch, outDir } = buildOptions;
+
         console.log('Projects to build:')
         this.children.forEach((project, i) => {
             console.log(`${i + 1}. ${project.name}`)
@@ -69,7 +73,7 @@ export class ProjectWorkspace extends Project {
         });
 
 
-        process.exit(0)
+
         const projectsInOrder: Project[] = [
             ...projects.serverLibs,
             ...projects.isomorphicLibs,
@@ -80,13 +84,30 @@ export class ProjectWorkspace extends Project {
 
         projectsInOrder.forEach((project, i) => {
             console.log(`${i + 1}. project: ${project.name}`)
-            // project.build({
-            //     project,
-            //     prod,
-            //     watch,
-            //     outDir
-            // });
+            let appBuild = config.allowedTypes.app.includes(project.type);
+
+            project.build({
+                watch: false,
+                appBuild,
+                prod,
+                outDir: 'dist',
+                environmentName
+            });
         })
+
+        projectsInOrder.forEach((project, i) => {
+            console.log(`${i + 1}. project: ${project.name}`)
+            let appBuild = config.allowedTypes.app.includes(project.type);
+
+            project.build({
+                watch: true,
+                appBuild,
+                prod,
+                outDir: 'dist',
+                environmentName
+            });
+        })
+        process.exit(0)
         return;
     }
 }
