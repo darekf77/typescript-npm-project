@@ -42,7 +42,7 @@ export function crossPlatofrmPath(p: string) {
 }
 
 export function nearestProjectTo(location: string) {
-  console.log('nearestPorjectLocaiont', location)
+  // console.log('nearestPorjectLocaiont', location)
   const project = ProjectFrom(location);
   if (project) {
     return project;

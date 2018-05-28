@@ -89,12 +89,12 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         dist: outDir as any
       },
       toolsPathes: {
-        tsc: 'tsc'
+        tsc: 'npm-run tsc'
       },
       build: {
         otherIsomorphicLibs: isomorphicNames
       }
-    }).init()
+    }).init(this.location)
     this.copyToProjectsOnFinish();
     if (watch) {
       this.watchOutDir()

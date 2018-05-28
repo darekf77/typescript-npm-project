@@ -21,6 +21,8 @@ function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
     args = args.replace(/\\/g, '\\\\')
   }
   const argsObj: BuildArgs = require('minimist')(args.split(' '));
+  // console.log('argsObj', argsObj)
+  // process.exit(0)
   let copyto: Project[] = []
   if (argsObj.copyto) {
     if (_.isString(argsObj.copyto)) {
