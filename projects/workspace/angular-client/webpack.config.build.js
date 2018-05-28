@@ -5,12 +5,9 @@ const { AngularCompilerPlugin } = require('@ngtools/webpack');
 const ngcWebpack = require('ngc-webpack');
 const common = require('./webpack.config.common.js');
 
-const isomorphic = require('isomorphic-lib')
+const { getReservedClassNames } = require('tnp')
 
-const classNames = [
-  ...Object.keys(isomorphic.Controllers).map(k => isomorphic.Controllers[k].name),
-  ...Object.keys(isomorphic.Entities).map(k => isomorphic.Entities[k].name)
-]
+const reserved = getReservedClassNames()
 
 
 module.exports = merge(common, {
@@ -29,7 +26,7 @@ module.exports = merge(common, {
     new UglifyJSPlugin({
       uglifyOptions: {
         mangle: {
-          reserved: classNames
+          reserved
         }
       }
     })

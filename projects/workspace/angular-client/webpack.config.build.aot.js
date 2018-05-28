@@ -5,12 +5,9 @@ const ngcWebpack = require('ngc-webpack');
 const common = require('./webpack.config.common.js');
 const PurifyPlugin = require('@angular-devkit/build-optimizer').PurifyPlugin;
 
-const isomorphic = require('isomorphic-lib')
+const { getReservedClassNames } = require('tnp')
 
-const classNames = [
-  ...Object.keys(isomorphic.Controllers).map(k => isomorphic.Controllers[k].name),
-  ...Object.keys(isomorphic.Entities).map(k => isomorphic.Entities[k].name)
-]
+const reserved = getReservedClassNames()
 
 const { AngularCompilerPlugin } = require('@ngtools/webpack');
 
@@ -30,7 +27,7 @@ module.exports = merge(common, {
     new UglifyJSPlugin({
       uglifyOptions: {
         mangle: {
-          reserved: classNames
+          reserved
         }
       }
     })

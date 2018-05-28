@@ -3,22 +3,21 @@ import { Project } from "../project";
 import { run } from '../process';
 
 
-export function init() {
-    
-    Project.Current.recreate.assets();
-    Project.Current.recreate.commonFiles();
-    Project.Current.recreate.projectSpecyficFiles();
-    Project.Current.recreate.gitignore();
-    Project.Current.recreate.npmignore();
-    Project.Current.recreate.customFolder();
+export function init(project = Project.Current) {
+    if (project.isSite) {
+        project.run(`tnp baseline:site:start`).sync()
+    }
+    project.recreate.assets();
+    project.recreate.commonFiles();
+    project.recreate.projectSpecyficFiles();
+    project.recreate.gitignore();
+    project.recreate.npmignore();
+    project.recreate.customFolder();
 }
 
 export default {
     $INIT: (args) => {
-        init()
-        if (Project.Current.isSite) {
-            Project.Current.run(`tnp baseline:site:start`).sync()
-        }
+        init()        
         process.exit(0)
     },
     $INIT_VSCODE: () => {
@@ -28,9 +27,6 @@ export default {
     $INIT_EVERYWHERE: (args) => {
         Project.projects.forEach(p => {
             p.run(`tnp init`).sync()
-            if (p.isSite) {
-                p.run(`tnp baseline:site:start`).sync()
-            }
         })
     }
 }

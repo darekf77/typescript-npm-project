@@ -23,7 +23,9 @@ export const config = {
         custom: 'custom',
         components: 'components',
         node_modules: 'node_modules',
-        assets: 'assets'
+        assets: 'assets',
+        entities: 'entities',
+        controllers: 'controllers'
     },
     allowedTypes: {
         app: [

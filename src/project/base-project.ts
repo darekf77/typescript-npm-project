@@ -49,6 +49,7 @@ export abstract class Project extends BaseProjectRouter {
     if (!current) {
       error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`)
     }
+    // console.log('CURRENT', current.location)
     return current;
   }
   static get Tnp() {
@@ -217,7 +218,7 @@ export abstract class Project extends BaseProjectRouter {
     const { prod, watch, outDir } = buildOptions;
     this.buildOptions = buildOptions;
 
-    init();
+    init(this);
 
     this.node_modules.prepare();
 
@@ -307,6 +308,15 @@ export abstract class Project extends BaseProjectRouter {
   }
 
   public get tnpHelper() {
+
+    if (!Project.Tnp) {
+      // console.log(Project.Current.location)
+      // console.log('dirname', __dirname)
+      return {
+        install(){}
+
+      } // TODO QUCIK FIX for tnp installd in node_modules
+    }
 
     const pathTnpCompiledJS = path.join(Project.Tnp.location, 'dist');
     const pathTnpPackageJSON = path.join(Project.Tnp.location, 'package.json');

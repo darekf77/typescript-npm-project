@@ -82,32 +82,55 @@ export class ProjectWorkspace extends Project {
             ...projects.angularCliClients
         ];
 
-        projectsInOrder.forEach((project, i) => {
-            console.log(`${i + 1}. project: ${project.name}`)
-            let appBuild = config.allowedTypes.app.includes(project.type);
+        const projectsLibs: Project[] = projectsInOrder.filter(project => {
+            return config.allowedTypes.libs.includes(project.type);
+        })
 
+        const projectsApps: Project[] = projectsInOrder.filter(project => {
+            return config.allowedTypes.app.includes(project.type);
+        })
+
+        projectsLibs.forEach((project, i) => {
+            console.log(`COMPILATIONL lib for: ${project.name}`)
+        });
+
+        projectsApps.forEach((project, i) => {
+            console.log(`COMPILATIONL app for: ${project.name}`)
+        });
+
+        projectsLibs.forEach((project, i) => {
             project.build({
                 watch: false,
-                appBuild,
+                appBuild: false,
                 prod,
                 outDir: 'dist',
                 environmentName
             });
         })
 
-        projectsInOrder.forEach((project, i) => {
-            console.log(`${i + 1}. project: ${project.name}`)
-            let appBuild = config.allowedTypes.app.includes(project.type);
-
+        projectsApps.forEach((project) => {
             project.build({
-                watch: true,
-                appBuild,
+                watch: false,
+                appBuild: true,
                 prod,
                 outDir: 'dist',
                 environmentName
             });
         })
-        process.exit(0)
-        return;
+
+        if (watch) {
+            projectsInOrder.forEach((project, i) => {
+                console.log(`${i + 1}. project: ${project.name}`)
+                let appBuild = config.allowedTypes.app.includes(project.type);
+
+                project.build({
+                    watch: true,
+                    appBuild,
+                    prod,
+                    outDir: 'dist',
+                    environmentName
+                });
+            })
+        }
     }
 }
