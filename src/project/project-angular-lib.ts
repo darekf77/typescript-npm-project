@@ -13,8 +13,8 @@ export class ProjectAngularLib extends BaseProjectLib {
         this.angular = new AngularProject(location);
     }
 
-    protected startOnCommand(port?: number) {
-        return this.angular.startOnCommand(port);
+    protected startOnCommand() {
+        return this.angular.startOnCommand();
     }
 
 

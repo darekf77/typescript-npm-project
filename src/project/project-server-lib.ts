@@ -5,10 +5,8 @@ import { BaseProjectLib } from "./base-project-lib";
 export class ProjectServerLib extends BaseProjectLib {
 
 
-    startOnCommand(port: number, async = false) {
-        if (!port) port = this.defaultPort;
-        this.currentPort = port;
-        const command = `node dist/run.js -p ${port}`;
+    startOnCommand() {
+        const command = `node run.js`;
         return command;
     }
 

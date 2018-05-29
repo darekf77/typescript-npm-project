@@ -22,9 +22,8 @@ export interface TnpRouter {
     prefix?: string;
     base?: string;
   };
-  routes: TnpRoute[];
+  routes: EnvConfigProject[];
 }
-export type TnpRoute = { url: string; localEnvPort: number, project: string; }
 
 export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod'
 

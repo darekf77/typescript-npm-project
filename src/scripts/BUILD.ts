@@ -13,10 +13,12 @@ import { config } from '../config';
 export interface BuildArgs {
   copyto: string[] | string;
   environmentName: string;
+  noConsoleClear: string;
   envName: string;
 }
 
 function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
+  let noConsoleClear = false;
   if (process.platform === 'win32') {
     args = args.replace(/\\/g, '\\\\')
   }
@@ -53,8 +55,13 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
   if (argsObj.environmentName || argsObj.envName) {
     environmentName = (argsObj.environmentName ? argsObj.environmentName : argsObj.envName) as any;
   }
+
+  if (argsObj.noConsoleClear) {
+    noConsoleClear = true;
+  }
+
   return {
-    copyto, environmentName
+    copyto, environmentName, noConsoleClear
   }
 }
 
@@ -70,8 +77,12 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 
 
 export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, noExit = false) {
-  clearConsole()
-  const { copyto, environmentName } = handleArguments(args, outDir, watch);
+
+  const { copyto, environmentName, noConsoleClear } = handleArguments(args, outDir, watch);
+  if (!noConsoleClear) {
+    clearConsole()
+  }
+
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName
   };

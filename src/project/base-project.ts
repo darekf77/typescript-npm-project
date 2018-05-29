@@ -101,13 +101,12 @@ export abstract class Project extends BaseProjectRouter {
    * Start server on top of static build
    * @param port
    */
-  start(port?: number) {
-    port = (port ? port : this.defaultPort)
-    console.log(`Project: ${this.name} is running on port ${port}`);
-    this.run(this.startOnCommand(port)).async()
+  start() {
+    console.log(`Project: ${this.name} is running on port ${this.defaultPort}`);
+    this.run(this.startOnCommand()).async()
   }
 
-  protected abstract startOnCommand(port?: number): string;
+  protected abstract startOnCommand(): string;
 
   requiredDependencies(): Package[] {
     return [
@@ -313,7 +312,7 @@ export abstract class Project extends BaseProjectRouter {
       // console.log(Project.Current.location)
       // console.log('dirname', __dirname)
       return {
-        install(){}
+        install() { }
 
       } // TODO QUCIK FIX for tnp installd in node_modules
     }

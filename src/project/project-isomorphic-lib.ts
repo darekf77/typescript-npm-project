@@ -1,5 +1,6 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as _ from 'lodash';
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
@@ -11,10 +12,8 @@ import { BaseProjectLib } from "./base-project-lib";
 
 export class ProjectIsomorphicLib extends BaseProjectLib {
 
-  startOnCommand(port: number, async = false) {
-    if (!port) port = this.defaultPort;
-    this.currentPort = port;
-    const command = `node dist/run.js -p ${port}`;
+  startOnCommand() {
+    const command = `node run.js`;
     return command;
   }
 

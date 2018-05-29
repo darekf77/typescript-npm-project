@@ -6,10 +6,8 @@ import { BuildOptions } from '../models';
 
 export class ProjectIonicClient extends Project {
 
-    startOnCommand(port: number) {
-        if (!port) port = this.defaultPort;
-        this.currentPort = port;
-        const command = `tnp npm-run ionic serve --no-open -p ${port} -s`;
+    startOnCommand() {
+        const command = `tnp npm-run ionic serve --no-open -s`;
         return command;
     }
 

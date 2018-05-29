@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import {
     LibType, InstalationType, BuildOptions,
-    Dependencies, Package, TnpRouter, TnpRoute, IPackageJSON
+    Dependencies, Package, TnpRouter, IPackageJSON
 } from "../models";
 import { error, info, warn } from "../messages";
 import { run } from "../process";

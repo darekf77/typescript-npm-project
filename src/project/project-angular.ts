@@ -41,11 +41,9 @@ export class AngularProject extends Project {
     this.run('tnp npm-run ng set warnings.typescriptMismatch=false').sync()
   }
 
-  startOnCommand(port: number) {
-    if (!port) port = this.defaultPort;
-    this.currentPort = port;
+  startOnCommand() {
     const distAppFolder = path.join(this.location, config.folder.previewDistApp)
-    const command = `tnp http-server -p ${port} -s`;
+    const command = `cd ${distAppFolder} && tnp http-server -s`;
     return command;
   }
 
