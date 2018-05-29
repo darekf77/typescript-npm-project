@@ -99,13 +99,17 @@ export class ProjectWorkspace extends Project {
         });
 
         projectsLibs.forEach((project, i) => {
-            project.build({
-                watch: false,
-                appBuild: false,
-                prod,
-                outDir: 'dist',
-                environmentName
-            });
+            if (project.type === 'isomorphic-lib') {
+                project.run(`tnp build:${outDir}${watch ? ':watch' : ''} --environmentName ${environmentName}`).sync()
+            } else {
+                project.build({
+                    watch: false,
+                    appBuild: false,
+                    prod,
+                    outDir: 'dist',
+                    environmentName
+                });
+            }
         })
 
         projectsApps.forEach((project) => {
