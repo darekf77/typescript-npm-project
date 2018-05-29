@@ -7,7 +7,7 @@ import { BuildOptions } from '../models';
 export class ProjectIonicClient extends Project {
 
     startOnCommand() {
-        const command = `tnp npm-run ionic serve --no-open -s`;
+        const command = `echo "hello from ionic"`;
         return command;
     }
 

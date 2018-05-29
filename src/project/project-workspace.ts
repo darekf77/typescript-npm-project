@@ -9,8 +9,16 @@ import { config } from '../config';
 export class ProjectWorkspace extends Project {
 
   startOnCommand() {
+    this.env.prepare({} as any);
+    this.routes = this.env.configFor.backend.workspace.projects;
+    console.log('this.routes', this.routes.map(r => r.name))
     this.activateServer()
-    this.children.forEach(child => child.start());
+    const workspace: Project = this as any;
+    workspace.children
+      .filter(child => {
+        return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
+      })
+      .forEach(child => child.start());
     return 'echo "Workspace server started"';
   }
   projectSpecyficFiles(): string[] {

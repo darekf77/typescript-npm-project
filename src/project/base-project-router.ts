@@ -50,6 +50,8 @@ export abstract class BaseProjectRouter {
   }
 
   private getProjectFrom(req: http.IncomingMessage): BaseProjectRouter {
+    console.log('this', this)
+    console.log('getProjectFrom', this.routes)
     const r = this.routes.find(r => {
       return new RegExp(`${r.baseUrl}/.*`, 'g').test(req.url)
     })
@@ -60,11 +62,14 @@ export abstract class BaseProjectRouter {
   }
 
   protected activateServer() {
-    const project: ProjectWorkspace = this as any;
-    if ((project as ProjectWorkspace).type === 'workspace') {
+    console.log('activate server this.routes', this.routes.map(r => r.name))
+    const workspace: Project = this as any;
+    if (workspace.type === 'workspace') {
       const proxy = httpProxy.createProxyServer({});
       const server = http.createServer((req, res) => {
+        console.log(req.url)
         const p = this.getProjectFrom(req);
+        console.log('Resolved project !', p && p.name)
         if (p) {
           proxy.web(req, res, { target: `http://localhost:${p.defaultPort}` });
         } else {
@@ -73,10 +78,10 @@ export abstract class BaseProjectRouter {
         }
       });
       server.listen(this.defaultPort)
-      this.runOnRoutes(this.routes)
+      this.runOnRoutes(_.cloneDeep(this.routes))
     } else {
-      error(`Bad project type "${project.type}" for server activation.`, true)
-      error(`Project "${project.name}" is not a ${chalk.bold('workspace')} type project.`)
+      error(`Bad project type "${workspace.type}" for server activation.`, true)
+      error(`Project "${workspace.name}" is not a ${chalk.bold('workspace')} type project.`)
     }
   }
 

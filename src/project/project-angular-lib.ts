@@ -14,7 +14,9 @@ export class ProjectAngularLib extends BaseProjectLib {
     }
 
     protected startOnCommand() {
-        return this.angular.startOnCommand();
+        const command = this.angular.startOnCommand();
+        console.log(`Command is running async: ${command}`)
+        return command;
     }
 
 

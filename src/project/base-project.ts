@@ -227,6 +227,7 @@ export abstract class Project extends BaseProjectRouter {
   }
 
   public clear(includeNodeModules = false) {
+    console.log(`Cleaning project: ${this.name}`);
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .filter(f => {
         if (f === config.folder.node_modules) {
@@ -235,8 +236,13 @@ export abstract class Project extends BaseProjectRouter {
         return true;
       }) // link/unlink takes care of node_modules
       .join(' ');
-    // console.log(this.recreate.filesIgnoredBy.gitignore.join('\n'))
+    // console.log(this.recreate.filesIgnotnp edBy.gitignore.join('\n'))
     this.run(`tnp rimraf ${gitginoredfiles}`).sync();
+    if (this.type === 'workspace' && Array.isArray(this.children) && this.children.length > 0) {
+      this.children.forEach(childProject => {
+        childProject.clear(includeNodeModules)
+      })
+    }
   }
 
   public static by(libraryType: LibType): Project {

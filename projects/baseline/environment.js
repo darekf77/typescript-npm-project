@@ -35,11 +35,6 @@ const config = {
         port: 4000
       },
       {
-        baseUrl: '/mobile',
-        name: 'ss-mobileapp',
-        port: 4202
-      },
-      {
         baseUrl: '/admin',
         name: 'ss-admin-webapp',
         port: 4201
