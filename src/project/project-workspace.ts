@@ -11,7 +11,7 @@ export class ProjectWorkspace extends Project {
   startOnCommand() {
     this.env.prepare({} as any);
     this.routes = this.env.configFor.backend.workspace.projects;
-    console.log('this.routes', this.routes.map(r => r.name))
+    // console.log('this.routes', this.routes.map(r => r.name))
     this.activateServer()
     const workspace: Project = this as any;
     workspace.children

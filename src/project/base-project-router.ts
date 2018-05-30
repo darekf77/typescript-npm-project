@@ -45,40 +45,46 @@ export abstract class BaseProjectRouter {
     const port = await BaseProjectRouter.getFreePort();
     const worksapce: Project = this as any;
     const project = worksapce.children.find(({ name }) => name === childrenProjectName.name);
-    console.log(`port ${port} for ${project.name}`)
+    console.log(`Auto assigned port ${port} for ${project.name}`)
     this.runOnRoutes(projects);
   }
 
   private getProjectFrom(req: http.IncomingMessage): BaseProjectRouter {
-    console.log('this', this)
-    console.log('getProjectFrom', this.routes)
+    // console.log('req', req)
+    // console.log('getProjectFrom routes', this.routes.map(r => r.baseUrl))
+    console.log(`Request url "${req.url}"`)
     const r = this.routes.find(r => {
-      return new RegExp(`${r.baseUrl}/.*`, 'g').test(req.url)
+      return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
     })
     if (r) {
+      // console.log('Founded route ', r.name)
       const worksapce: Project = this as any;
       return worksapce.children.find(p => p.name === r.name);
     }
   }
 
   protected activateServer() {
-    console.log('activate server this.routes', this.routes.map(r => r.name))
+    // console.log('activate server this.routes', this.routes.map(r => r.name))
     const workspace: Project = this as any;
     if (workspace.type === 'workspace') {
       const proxy = httpProxy.createProxyServer({});
       const server = http.createServer((req, res) => {
-        console.log(req.url)
+        // console.log(req.url)
         const p = this.getProjectFrom(req);
-        console.log('Resolved project !', p && p.name)
+        // console.log('Resolved project !', p && p.name)
+        const target = `http://localhost:${p.defaultPort}`
+        console.log('taget: ', target)
         if (p) {
-          proxy.web(req, res, { target: `http://localhost:${p.defaultPort}` });
+          proxy.web(req, res, { target });
         } else {
           res.write('not found')
           res.end();
         }
       });
-      server.listen(this.defaultPort)
-      this.runOnRoutes(_.cloneDeep(this.routes))
+      server.listen(this.defaultPort).on('error', e => {
+        console.log('error', e)
+      })
+      // this.runOnRoutes(_.cloneDeep(this.routes))
     } else {
       error(`Bad project type "${workspace.type}" for server activation.`, true)
       error(`Project "${workspace.name}" is not a ${chalk.bold('workspace')} type project.`)

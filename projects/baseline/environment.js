@@ -20,7 +20,7 @@ const config = {
       {
         baseUrl: '/components',
         name: 'ss-common-ui',
-        port: 4201
+        port: 4202
       },
       {
         baseUrl: '/api',
