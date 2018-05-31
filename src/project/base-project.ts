@@ -103,6 +103,7 @@ export abstract class Project extends BaseProjectRouter {
    */
   start() {
     console.log(`Project: ${this.name} is running on port ${this.defaultPort}`);
+    this.killProcessOn(this.defaultPort)
     this.run(this.startOnCommand()).async()
   }
 

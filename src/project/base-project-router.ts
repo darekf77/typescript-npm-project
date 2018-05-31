@@ -15,9 +15,16 @@ export abstract class BaseProjectRouter {
   protected routes: EnvConfigProject[] = [];
   public defaultPort: number;
 
-  public static killProcessOn(portNumber: number) {
-    let pid = child.execFileSync(`lsof -t -i tcp:${portNumber}`).toString();
-    child.execSync('kill -kill `lsof -t -i tcp:${portNumber}`');
+  public killProcessOn(portNumber: number) {
+    console.log(`Trying to kill process on port: ${portNumber}`)
+    try {
+      let pid = child.execFileSync(`lsof -t -i tcp:${portNumber}`).toString();
+      child.execSync('kill -kill `lsof -t -i tcp:${portNumber}`');
+      // console.log('Succedd')
+    } catch (error) {
+      // console.log('Error')
+    }
+
   }
 
   private static takenPorts = [];
@@ -57,38 +64,48 @@ export abstract class BaseProjectRouter {
       return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
     })
     if (r) {
+      req.url = req.url.replace(r.baseUrl, '');
       // console.log('Founded route ', r.name)
       const worksapce: Project = this as any;
-      return worksapce.children.find(p => p.name === r.name);
+      const project = worksapce.children.find(p => p.name === r.name);
+      return project;
     }
   }
+
+
 
   protected activateServer() {
     // console.log('activate server this.routes', this.routes.map(r => r.name))
     const workspace: Project = this as any;
     if (workspace.type === 'workspace') {
-      const proxy = httpProxy.createProxyServer({});
-      const server = http.createServer((req, res) => {
-        // console.log(req.url)
-        const p = this.getProjectFrom(req);
-        // console.log('Resolved project !', p && p.name)
-        const target = `http://localhost:${p.defaultPort}`
-        console.log('taget: ', target)
-        if (p) {
-          proxy.web(req, res, { target });
-        } else {
-          res.write('not found')
-          res.end();
-        }
-      });
-      server.listen(this.defaultPort).on('error', e => {
-        console.log('error', e)
-      })
+      this.server()
+
       // this.runOnRoutes(_.cloneDeep(this.routes))
     } else {
       error(`Bad project type "${workspace.type}" for server activation.`, true)
       error(`Project "${workspace.name}" is not a ${chalk.bold('workspace')} type project.`)
     }
+  }
+
+  private server() {
+    const proxy = httpProxy.createProxyServer({});
+    const server = http.createServer((req, res) => {
+      console.log(req.url)
+      const p = this.getProjectFrom(req);
+      console.log('Resolved project !', p && p.name)
+
+      if (p) {
+        const target = `http://localhost:${p.defaultPort}`
+        console.log('taget: ', target)
+        proxy.web(req, res, { target });
+      } else {
+        res.write('not found')
+        res.end();
+      }
+    });
+    server.listen(this.defaultPort).on('error', e => {
+      console.log('error', e)
+    })
   }
 
   private async portTests() {

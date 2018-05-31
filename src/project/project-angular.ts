@@ -42,8 +42,9 @@ export class AngularProject extends Project {
   }
 
   startOnCommand() {
-    const distAppFolder = path.join(this.location, config.folder.previewDistApp)
-    const command = `cd ${distAppFolder} && tnp http-server -s -p ${this.defaultPort}`;
+    const baseUrl = this.env.workspaceConfig.workspace.projects.find(({ name }) => name === this.name).baseUrl;
+    const command = `tnp serve --port ${this.defaultPort} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl}`;
+    console.log(`Angular command: ${command}`)
     return command;
   }
 
