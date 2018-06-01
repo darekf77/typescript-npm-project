@@ -9,8 +9,6 @@ import { walkObject } from '../helpers';
 import { error } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';
-import { BaseProjectRouter } from './base-project-router';
-
 
 
 export class EnvironmentConfig {
@@ -87,7 +85,7 @@ export class EnvironmentConfig {
       this.workspaceConfig.workspace.projects.forEach(d => {
         if (_.isNumber(d.port)) {
           const p = path.join(this.project.location, d.name);
-          (ProjectFrom(p) as BaseProjectRouter).defaultPort = d.port;
+          ProjectFrom(p).proxyRouter.defaultPort = d.port;
         }
       })
     }

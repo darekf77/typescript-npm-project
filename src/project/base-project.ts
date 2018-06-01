@@ -16,7 +16,6 @@ import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
 import { copyFile } from "../helpers";
-import { BaseProjectRouter } from './base-project-router';
 import { ProjectFrom } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
@@ -24,9 +23,10 @@ import { workers } from 'cluster';
 import { init } from '../scripts/INIT';
 import { HelpersLinks } from '../helpers-links';
 import { EnvironmentConfig } from './environment-config';
+import { ProxyRouter } from './proxy-router';
 
 
-export abstract class Project extends BaseProjectRouter {
+export abstract class Project {
   abstract projectSpecyficFiles(): string[];
   abstract buildSteps(buildOptions?: BuildOptions);
 
@@ -41,6 +41,7 @@ export abstract class Project extends BaseProjectRouter {
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
   readonly env: EnvironmentConfig;
+  readonly proxyRouter: ProxyRouter;
 
   static projects: Project[] = [];
 
@@ -56,6 +57,9 @@ export abstract class Project extends BaseProjectRouter {
     return ProjectFrom(path.join(__dirname, '..', '..'));
   }
 
+  get defaultPort() {
+    return this.proxyRouter && this.proxyRouter.defaultPort;
+  }
 
   get name(): string {
     return this.packageJson.name;
@@ -103,7 +107,7 @@ export abstract class Project extends BaseProjectRouter {
    */
   start() {
     console.log(`Project: ${this.name} is running on port ${this.defaultPort}`);
-    this.killProcessOn(this.defaultPort)
+    this.proxyRouter.killProcessOn(this.defaultPort)
     this.run(this.startOnCommand()).async()
   }
 
@@ -116,20 +120,9 @@ export abstract class Project extends BaseProjectRouter {
     ]
   }
 
-  defaultPortByType(): number {
-    const type: LibType = this.type;
-    if (type === 'workspace') return 5000;
-    if (type === 'angular-cli') return 4200;
-    if (type === 'angular-client') return 4300;
-    if (type === 'angular-lib') return 4250;
-    if (type === 'ionic-client') return 8080;
-    if (type === 'docker') return 5000;
-    if (type === 'isomorphic-lib') return 4000;
-    if (type === 'server-lib') return 4050;
-  }
+
 
   constructor(public location: string) {
-    super();
 
     if (fs.existsSync(location)) {
 
@@ -139,7 +132,6 @@ export abstract class Project extends BaseProjectRouter {
       this.node_modules = new NodeModules(this);
       this.recreate = new FilesRecreator(this);
       this.type = this.packageJson.type;
-      this.defaultPort = this.defaultPortByType()
       Project.projects.push(this);
       if (Project.Current.location === this.location) {
         if (this.parent && this.parent.type === 'workspace') {
@@ -170,6 +162,7 @@ export abstract class Project extends BaseProjectRouter {
         // }
       }
       this.env = new EnvironmentConfig(this);
+      this.proxyRouter = new ProxyRouter(this);
 
     } else {
       error(`Invalid project location: ${location}`);

@@ -1,17 +1,20 @@
 import * as child from 'child_process';
 import * as portfinder from 'portfinder';
 import { error } from "../messages";
-import { EnvConfigProject } from "../models";
+import { EnvConfigProject, LibType } from "../models";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
-import { ProjectWorkspace, Project } from '.';
+import { Project } from './base-project';
 import chalk from 'chalk';
 import * as _ from 'lodash';
 
 
-export abstract class BaseProjectRouter {
+export class ProxyRouter {
 
-  abstract name: string;
+  constructor(private project: Project) {
+
+  }
+
   protected routes: EnvConfigProject[] = [];
   public defaultPort: number;
 
@@ -32,13 +35,13 @@ export abstract class BaseProjectRouter {
   public static async getFreePort(from: number = 4000) {
     try {
       // console.log(ProjectRouter.takenPorts)
-      while (BaseProjectRouter.takenPorts.includes(from)) {
+      while (ProxyRouter.takenPorts.includes(from)) {
         from += 1;
       }
       // console.log('from ', from)
-      BaseProjectRouter.takenPorts.push(from)
+      ProxyRouter.takenPorts.push(from)
       const port = await portfinder.getPortPromise({ port: from })
-      BaseProjectRouter.takenPorts.push(port);
+      ProxyRouter.takenPorts.push(port);
       return port;
     } catch (err) {
       error(err)
@@ -49,14 +52,14 @@ export abstract class BaseProjectRouter {
   private async runOnRoutes(projects: EnvConfigProject[]) {
     if (projects.length === 0) return;
     const childrenProjectName = projects.shift();
-    const port = await BaseProjectRouter.getFreePort();
+    const port = await ProxyRouter.getFreePort();
     const worksapce: Project = this as any;
     const project = worksapce.children.find(({ name }) => name === childrenProjectName.name);
     console.log(`Auto assigned port ${port} for ${project.name}`)
     this.runOnRoutes(projects);
   }
 
-  private getProjectFrom(req: http.IncomingMessage): BaseProjectRouter {
+  private getProjectFrom(req: http.IncomingMessage): Project {
     // console.log('req', req)
     // console.log('getProjectFrom routes', this.routes.map(r => r.baseUrl))
     console.log(`Request url "${req.url}"`)
@@ -72,9 +75,22 @@ export abstract class BaseProjectRouter {
     }
   }
 
+  defaultPortByType(): number {
+    const type: LibType = this.project.type;
+    if (type === 'workspace') return 5000;
+    if (type === 'angular-cli') return 4200;
+    if (type === 'angular-client') return 4300;
+    if (type === 'angular-lib') return 4250;
+    if (type === 'ionic-client') return 8080;
+    if (type === 'docker') return 5000;
+    if (type === 'isomorphic-lib') return 4000;
+    if (type === 'server-lib') return 4050;
+  }
 
+  public activateServer() {
+    this.project.env.prepare({} as any);
+    this.routes = this.project.env.configFor.backend.workspace.projects;
 
-  protected activateServer() {
     // console.log('activate server this.routes', this.routes.map(r => r.name))
     const workspace: Project = this as any;
     if (workspace.type === 'workspace') {
@@ -109,9 +125,9 @@ export abstract class BaseProjectRouter {
   }
 
   private async portTests() {
-    console.log(await BaseProjectRouter.getFreePort())
-    console.log(await BaseProjectRouter.getFreePort())
-    console.log(await BaseProjectRouter.getFreePort())
+    console.log(await ProxyRouter.getFreePort())
+    console.log(await ProxyRouter.getFreePort())
+    console.log(await ProxyRouter.getFreePort())
   }
 
 }
