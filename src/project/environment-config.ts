@@ -85,7 +85,7 @@ export class EnvironmentConfig {
       this.workspaceConfig.workspace.projects.forEach(d => {
         if (_.isNumber(d.port)) {
           const p = path.join(this.project.location, d.name);
-          ProjectFrom(p).proxyRouter.defaultPort = d.port;
+          ProjectFrom(p).defaultPort = d.port;
         }
       })
     }

@@ -57,9 +57,7 @@ export abstract class Project {
     return ProjectFrom(path.join(__dirname, '..', '..'));
   }
 
-  get defaultPort() {
-    return this.proxyRouter && this.proxyRouter.defaultPort;
-  }
+  public defaultPort: number;
 
   get name(): string {
     return this.packageJson.name;

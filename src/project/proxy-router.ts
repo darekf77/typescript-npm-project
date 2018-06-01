@@ -16,7 +16,6 @@ export class ProxyRouter {
   }
 
   protected routes: EnvConfigProject[] = [];
-  public defaultPort: number;
 
   public killProcessOn(portNumber: number) {
     console.log(`Trying to kill process on port: ${portNumber}`)
@@ -119,7 +118,7 @@ export class ProxyRouter {
         res.end();
       }
     });
-    server.listen(this.defaultPort).on('error', e => {
+    server.listen(this.project.defaultPort).on('error', e => {
       console.log('error', e)
     })
   }
