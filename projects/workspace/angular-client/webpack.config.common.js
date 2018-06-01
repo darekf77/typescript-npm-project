@@ -1,6 +1,11 @@
 const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
+
+
+const argsObj = require('minimist')(process.argv.slice(2));
+
+
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -23,8 +28,10 @@ const realNodeModules = fs.realpathSync(nodeModules);
 const genDirNodeModules = path.join(process.cwd(), 'src', '$$_gendir', 'node_modules');
 const entryPoints = ["inline", "polyfills", "sw-register", "styles", "vendor", "main"];
 const minimizeCss = false;
-const baseHref = "";
+
+const baseHref = (argsObj.env && argsObj.env['base-href']) || "";
 const deployUrl = "";
+
 const postcssPlugins = function () {
   // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
   const importantCommentRe = /@preserve|@licen[cs]e|[@#]\s*source(?:Mapping)?URL|^!/i;
@@ -40,6 +47,7 @@ const postcssPlugins = function () {
         // Only convert root relative URLs, which CSS-Loader won't process into require().
         filter: ({ url }) => url.startsWith('/') && !url.startsWith('//'),
         url: ({ url }) => {
+
           if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
             // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
             return `${deployUrl.replace(/\/$/, '')}${url}`;
@@ -455,7 +463,7 @@ module.exports = {
         }
       }
     }),
-    new BaseHrefWebpackPlugin({}),
+    new BaseHrefWebpackPlugin({ baseHref }),
     new CommonsChunkPlugin({
       "name": [
         "inline"

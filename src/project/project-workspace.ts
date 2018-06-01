@@ -15,7 +15,7 @@ export class ProjectWorkspace extends Project {
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {
-        return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
+        return !!workspace.env.configFor.backend.workspace.projects.find(c => c.name === child.name);
       })
       .forEach(child => child.start());
     return 'echo "Workspace server started"';
@@ -102,6 +102,7 @@ export class ProjectWorkspace extends Project {
     projectsApps.forEach((project, i) => {
       console.log(`COMPILATIONL app for: ${project.name}`)
     });
+    console.log('===================')
 
     projectsLibs.forEach((project, i) => {
       if (project.type === 'isomorphic-lib') { // TODO QUICK_FIX morphi browser cwd build isnt working, tsc update needed

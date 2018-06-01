@@ -15,6 +15,8 @@ export interface BuildArgs {
   environmentName: string;
   noConsoleClear: string;
   envName: string;
+  baseHref: string;
+  '--base-href': string
 }
 
 function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
@@ -60,8 +62,10 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
     noConsoleClear = true;
   }
 
+  // let baseHref = argsObj.baseHref || argsObj['--base-href'] || ''
+
   return {
-    copyto, environmentName, noConsoleClear
+    copyto, environmentName, noConsoleClear //, baseHref
   }
 }
 
@@ -141,6 +145,7 @@ export default {
     Project.Current.start();
   },
   $START_APP: () => {
+
     Project.Current.start()
   },
 

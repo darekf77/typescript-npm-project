@@ -58,6 +58,17 @@ export abstract class Project {
   }
 
   public defaultPort: number;
+  defaultPortByType(): number {
+    const type: LibType = this.type;
+    if (type === 'workspace') return 5000;
+    if (type === 'angular-cli') return 4200;
+    if (type === 'angular-client') return 4300;
+    if (type === 'angular-lib') return 4250;
+    if (type === 'ionic-client') return 8080;
+    if (type === 'docker') return 5000;
+    if (type === 'isomorphic-lib') return 4000;
+    if (type === 'server-lib') return 4050;
+  }
 
   get name(): string {
     return this.packageJson.name;
@@ -104,6 +115,7 @@ export abstract class Project {
    * @param port
    */
   start() {
+    this.env.prepare()
     console.log(`Project: ${this.name} is running on port ${this.defaultPort}`);
     this.proxyRouter.killProcessOn(this.defaultPort)
     this.run(this.startOnCommand()).async()
@@ -130,6 +142,7 @@ export abstract class Project {
       this.node_modules = new NodeModules(this);
       this.recreate = new FilesRecreator(this);
       this.type = this.packageJson.type;
+
       Project.projects.push(this);
       if (Project.Current.location === this.location) {
         if (this.parent && this.parent.type === 'workspace') {
@@ -159,6 +172,7 @@ export abstract class Project {
         //     console.log(`Baseline NOT resolved from ${location}`)
         // }
       }
+      this.defaultPort = this.defaultPortByType()
       this.env = new EnvironmentConfig(this);
       this.proxyRouter = new ProxyRouter(this);
 

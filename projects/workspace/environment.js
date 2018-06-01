@@ -2,6 +2,11 @@
 const config = {
 
   workspace: {
+    workspace: {
+      baseUrl: '/info',
+      name: 'workspace',
+      port: 5000
+    },
     projects: [
       {
         baseUrl: '/components',
@@ -22,7 +27,7 @@ const config = {
         }
       },
       {
-        baseUrl: '/',
+        baseUrl: '/test',
         name: 'angular-client',
         port: 4200
       }

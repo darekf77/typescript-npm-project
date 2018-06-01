@@ -14,9 +14,23 @@ import { ProjectFrom } from './index';
 export class EnvironmentConfig {
 
   static woksapaceConfigs = {} as { [workspacePath in string]: EnvConfig; }
+  static preparedConfigs = {} as { [projectPath in string]: EnvConfig; }
 
-  readonly workspaceConfig: EnvConfig;
-  private config: EnvConfig;
+  private workspaceConfig: EnvConfig;
+
+  private get configPath() {
+    return (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
+      this.project.parent.location : this.project.location
+  }
+
+  public get config() {
+    return EnvironmentConfig.preparedConfigs[this.configPath];
+  }
+
+  public set config(value) {
+    // console.log('setting conifg with value:', value)
+    EnvironmentConfig.preparedConfigs[this.configPath] = value;
+  }
 
   private kind: 'tnp-workspace' | 'tnp-workspace-child' | 'other' = 'other';
 
@@ -81,11 +95,13 @@ export class EnvironmentConfig {
   }
 
   overrideDefaultPorts() {
+
     if (this.kind === 'tnp-workspace') {
       this.workspaceConfig.workspace.projects.forEach(d => {
         if (_.isNumber(d.port)) {
-          const p = path.join(this.project.location, d.name);
-          ProjectFrom(p).defaultPort = d.port;
+          const p = ProjectFrom(path.join(this.project.location, d.name))
+          console.log(`Overrided port from ${p.defaultPort} to ${d.port} in project: ${p.name}`)
+          p.defaultPort = d.port;
         }
       })
     }
@@ -147,63 +163,89 @@ export class EnvironmentConfig {
 
   }
 
-  prepare(options: BuildOptions) {
-    // console.log('this.kind', this.kind)
-    if (this.kind === 'other') {
-      return
+  get options() {
+    const filename = 'tmp-env-prepare.json';
+    const pathTmpEnvPrepareOptions = path.join(this.project.location, filename);
+    const self = this;
+    return {
+      get saved() {
+        if (!fs.existsSync(pathTmpEnvPrepareOptions)) {
+          error(`Please run: tnp build:app`)
+        }
+        return fse.readJSONSync(pathTmpEnvPrepareOptions)
+      },
+      save(options: BuildOptions) {
+        fse.writeJSONSync(pathTmpEnvPrepareOptions, options)
+      }
     }
-    const { appBuild, prod, watch, environmentName } = options;
-    this.config = _.cloneDeep(this.workspaceConfig);
-    this.config.name = environmentName ? environmentName : 'local';
-    this.config.isCoreProject = this.project.isCoreProject;
+  }
 
 
-    if (this.kind === 'tnp-workspace') {
-      if (!this.config.workspace || !this.config.workspace.workspace) {
-        error(`You shoud define 'workspace' object inside config.workspace object`, true)
+  prepare(options?: BuildOptions) {
+    const prepareForStart = !!options;
+    // console.log('this.kind in prepare', this.kind)
+    if (!this.config) {
+
+      if (this.kind === 'other') {
+        return
+      }
+      const { appBuild, prod, watch, environmentName } = prepareForStart ? this.options.saved : options;
+      if (!prepareForStart) {
+        this.options.save(options)
+      }
+      this.config = _.cloneDeep(this.workspaceConfig);
+      this.config.name = environmentName ? environmentName : 'local';
+      this.config.isCoreProject = this.project.isCoreProject;
+
+
+      if (this.kind === 'tnp-workspace') {
+        if (!this.config.workspace || !this.config.workspace.workspace) {
+          error(`You shoud define 'workspace' object inside config.workspace object`, true)
+          this.err()
+        }
+        this.config.packageJSON = this.project.packageJson.data;
+      }
+
+      if (this.kind === 'tnp-workspace-child') {
+
+        this.config.packageJSON = this.project.parent.packageJson.data;
+      }
+
+      this.config.workspace.projects.forEach(p => {
+        p.host = (!this.config.domain) ? `http://localhost:${p.port}` : `${this.config.domain}${p.baseUrl}`;
+      })
+
+      if (this.kind === 'tnp-workspace-child') {
+        this.config.currentProject = this.config.workspace.projects
+          .find(p => p.name === this.project.name)
+      } else if (this.kind === 'tnp-workspace') {
+        this.config.currentProject = this.config.workspace.workspace
+      }
+
+      if (!this.config.currentProject) {
+        error(`Cannot find current project (${this.project.name}) in config worksapce projects.`, true)
         this.err()
       }
-      this.config.packageJSON = this.project.packageJson.data;
+
+      this.config.currentProject.isWatchBuild = watch;
+
+
+
+
+      const tmpEnvironmentFileName = 'tmp-environment.json';
+      const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
+      if (this.project.type === 'angular-client') {
+        fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
+          encoding: 'utf8'
+        })
+      } else if (this.project.type === 'isomorphic-lib') {
+        fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.backend, null, 4), {
+          encoding: 'utf8'
+        })
+      }
+
+      // console.log('config prepared!', this.config)
     }
-
-    if (this.kind === 'tnp-workspace-child') {
-
-      this.config.packageJSON = this.project.parent.packageJson.data;
-    }
-
-    this.config.workspace.projects.forEach(p => {
-      p.host = (!this.config.domain) ? `http://localhost:${p.port}` : `${this.config.domain}${p.baseUrl}`;
-    })
-
-    if (this.kind === 'tnp-workspace-child') {
-      this.config.currentProject = this.config.workspace.projects
-        .find(p => p.name === this.project.name)
-    } else if (this.kind === 'tnp-workspace') {
-      this.config.currentProject = this.config.workspace.workspace
-    }
-
-    if (!this.config.currentProject) {
-      error(`Cannot find current project (${this.project.name}) in config worksapce projects.`, true)
-      this.err()
-    }
-
-    this.config.currentProject.isWatchBuild = watch;
-
-
-
-
-    const tmpEnvironmentFileName = 'tmp-environment.json';
-    const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
-    if (this.project.type === 'angular-client') {
-      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
-        encoding: 'utf8'
-      })
-    } else if (this.project.type === 'isomorphic-lib') {
-      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.backend, null, 4), {
-        encoding: 'utf8'
-      })
-    }
-
   }
 
 

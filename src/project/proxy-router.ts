@@ -18,13 +18,21 @@ export class ProxyRouter {
   protected routes: EnvConfigProject[] = [];
 
   public killProcessOn(portNumber: number) {
-    console.log(`Trying to kill process on port: ${portNumber}`)
+
     try {
-      let pid = child.execFileSync(`lsof -t -i tcp:${portNumber}`).toString();
-      child.execSync('kill -kill `lsof -t -i tcp:${portNumber}`');
-      // console.log('Succedd')
+      console.log(`Cleaning port number "${portNumber}"`)
+      if (process.platform === 'win32') {
+        let pid = child.execSync(`netstat -ano | findstr :${portNumber}`).toString();
+        console.log('Founded pid' + pid)
+        child.execSync(`taskkill /PID ${pid} /F `)
+      } else {
+        let pid = child.execSync(`lsof -t -i tcp:${portNumber}`).toString();
+        child.execSync('kill -kill `lsof -t -i tcp:${' + portNumber + '}`');
+      }
+      console.log(`Process killing on port: ${portNumber}: SUCCEED`)
     } catch (error) {
-      // console.log('Error')
+      console.log(`Process killing on port: ${portNumber}: FAIL`)
+      // console.log(error)
     }
 
   }
@@ -52,8 +60,8 @@ export class ProxyRouter {
     if (projects.length === 0) return;
     const childrenProjectName = projects.shift();
     const port = await ProxyRouter.getFreePort();
-    const worksapce: Project = this as any;
-    const project = worksapce.children.find(({ name }) => name === childrenProjectName.name);
+
+    const project = this.project.children.find(({ name }) => name === childrenProjectName.name);
     console.log(`Auto assigned port ${port} for ${project.name}`)
     this.runOnRoutes(projects);
   }
@@ -68,37 +76,27 @@ export class ProxyRouter {
     if (r) {
       req.url = req.url.replace(r.baseUrl, '');
       // console.log('Founded route ', r.name)
-      const worksapce: Project = this as any;
-      const project = worksapce.children.find(p => p.name === r.name);
+
+      const project = this.project.children.find(p => p.name === r.name);
       return project;
     }
   }
 
-  defaultPortByType(): number {
-    const type: LibType = this.project.type;
-    if (type === 'workspace') return 5000;
-    if (type === 'angular-cli') return 4200;
-    if (type === 'angular-client') return 4300;
-    if (type === 'angular-lib') return 4250;
-    if (type === 'ionic-client') return 8080;
-    if (type === 'docker') return 5000;
-    if (type === 'isomorphic-lib') return 4000;
-    if (type === 'server-lib') return 4050;
-  }
+
 
   public activateServer() {
     this.project.env.prepare({} as any);
     this.routes = this.project.env.configFor.backend.workspace.projects;
 
     // console.log('activate server this.routes', this.routes.map(r => r.name))
-    const workspace: Project = this as any;
-    if (workspace.type === 'workspace') {
+
+    if (this.project.type === 'workspace') {
       this.server()
 
       // this.runOnRoutes(_.cloneDeep(this.routes))
     } else {
-      error(`Bad project type "${workspace.type}" for server activation.`, true)
-      error(`Project "${workspace.name}" is not a ${chalk.bold('workspace')} type project.`)
+      error(`Bad project type "${this.project.type}" for server activation.`, true)
+      error(`Project "${this.project.name}" is not a ${chalk.bold('workspace')} type project.`)
     }
   }
 

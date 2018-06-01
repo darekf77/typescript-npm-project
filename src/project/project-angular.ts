@@ -5,6 +5,7 @@ import { Project } from "./base-project";
 import { error } from "../messages";
 import config from "../config";
 import { BuildOptions } from '../models';
+import { EnvironmentConfig } from './environment-config';
 export class AngularProject extends Project {
 
 
@@ -42,13 +43,14 @@ export class AngularProject extends Project {
   }
 
   startOnCommand() {
-    const baseUrl = this.env.workspaceConfig.workspace.projects.find(({ name }) => name === this.name).baseUrl;
+
+    const baseUrl = this.env.configFor.backend.workspace.projects.find(({ name }) => name === this.name).baseUrl;
     const command = `tnp serve --port ${this.defaultPort} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl}`;
     console.log(`Angular command: ${command}`)
     return command;
   }
 
-  buildApp(watch = false, prod: boolean, port?: number) {
+  buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
     const outDirApp = 'dist-app';
     if (watch) {
       const p = (port !== undefined ? `--port ${port}` : '');
@@ -58,11 +60,14 @@ export class AngularProject extends Project {
         this.run(`npm-run ng serve ${p} `, { biggerBuffer: true }).async()
       }
     } else {
+      baseHref = baseHref ? `base-href ${baseHref}` : ''
       if (this.isEjectedProject) {
+        baseHref = `--env.${baseHref}`
         const aot = (prod ? 'aot.' : '');
-        this.run(`tnp rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js`, { biggerBuffer: true }).sync()
+        this.run(`tnp rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, { biggerBuffer: true }).sync()
       } else {
-        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp}`, { biggerBuffer: true }).sync()
+        baseHref = `--${baseHref}`
+        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`, { biggerBuffer: true }).sync()
       }
     }
 
@@ -75,7 +80,9 @@ export class AngularProject extends Project {
       this.preventWarningTypescirptMismatch()
     }
     if (appBuild) {
-      this.buildApp(watch, prod, this.defaultPort);
+      const baseHref = this.env.configFor.backend && this.env.configFor.backend.currentProject.baseUrl;
+      // console.log('basehref for current project ', baseHref)
+      this.buildApp(watch, prod, this.defaultPort, baseHref && `${baseHref}/`);
     }
   }
 
