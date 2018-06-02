@@ -83,7 +83,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 }
 
 
-export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, noExit = false) {
+export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
   const { copyto, environmentName, noConsoleClear } = handleArguments(args, outDir, watch);
   if (!noConsoleClear) {
@@ -93,11 +93,11 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist',
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName
   };
-  build(options, config.allowedTypes.app, noExit);
+  build(options, config.allowedTypes.app);
 }
 
 
-function build(opt: BuildOptions, allowedLibs: LibType[], noExit = false) {
+function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
   const { prod, watch, outDir, appBuild, copyto } = opt;
 
@@ -138,19 +138,10 @@ export default {
 
   $BUILD_APP_PROD: (args) => buildApp(true, false, 'dist', args),
   $BUILD_APP: (args) => buildApp(false, false, 'dist', args),
-  $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
-  $BUILD_APP_START: (args) => {
-    buildApp(false, false, 'dist', args, true);
-    Project.Current.start();
-  },
-  $BUILD_APP_PROD_START: (args) => {
-    buildApp(true, false, 'dist', args, true);
-    Project.Current.start();
-  },
-  $START_APP: () => {
 
-    Project.Current.start()
-  },
+  $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
+
+  $START_APP: () => Project.Current.start(),
 
   'Documentation': `
 Building purpose:

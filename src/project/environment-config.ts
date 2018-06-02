@@ -79,7 +79,6 @@ export class EnvironmentConfig {
         }
         if (this.kind !== 'other') {
           this.validateWorkspaceConfig();
-          this.overrideDefaultPorts()
         }
 
       }
@@ -89,17 +88,36 @@ export class EnvironmentConfig {
 
   }
 
+  get workspaceProjectLocation() {
+    if (this.kind === 'tnp-workspace') {
+      return this.project.location;
+    } else if (this.kind === 'tnp-workspace-child') {
+      return this.project.parent.location;
+    }
+  }
+
   overrideDefaultPorts() {
 
-    if (this.kind === 'tnp-workspace') {
-      this.workspaceConfig.workspace.projects.forEach(d => {
-        if (_.isNumber(d.port)) {
-          const p = ProjectFrom(path.join(this.project.location, d.name))
-          // console.log(`Overrided port from ${p.defaultPort} to ${d.port} in project: ${p.name}`)
-          p.defaultPort = d.port;
+    const overridedProjectsName: string[] = []
+    this.workspaceConfig.workspace.projects.forEach(d => {
+      if (_.isNumber(d.port)) {
+        const p = ProjectFrom(path.join(this.workspaceProjectLocation, d.name))
+        if (p === undefined) {
+          error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
+        } else {
+          // console.log(`Overrided port from ${p.getDefaultPort()} to ${d.port} in project: ${p.name}`)
+          overridedProjectsName.push(d.name)
+          p.setDefaultPort(d.port);
         }
-      })
-    }
+      }
+    })
+    const workspace = ProjectFrom(this.workspaceProjectLocation)
+    workspace.children.forEach(childProject => {
+      if (!overridedProjectsName.includes(childProject.name)) {
+        childProject.setDefaultPortByType()
+      }
+    })
+
   }
 
   private schema: EnvConfig = {
@@ -171,62 +189,83 @@ export class EnvironmentConfig {
       },
       save(options: BuildOptions) {
         // console.log(`Prepare OPTIONS saved in ${pathTmpEnvPrepareOptions}`)
-        fse.writeJSONSync(pathTmpEnvPrepareOptions, options)
+        fse.writeJSONSync(pathTmpEnvPrepareOptions, options, {
+          spaces: 2
+        })
       }
     }
   }
 
 
   prepare(options?: BuildOptions) {
+    this.overrideDefaultPorts()
     if (this.project.type === 'workspace') {
       // console.log(`No need to prepare workspace config`)
       return
     }
-    const startMode = !!options;
+    const staticStartMode = !options;
+    // console.log('proxyRouterMode', proxyRouterMode)
     // console.log('this.kind in prepare', this.kind)
     if (!this.config) {
 
       if (this.kind === 'other') {
         return
       }
-      if (!startMode) {
+      if (staticStartMode) {
         options = this.options.saved;
+        if (options.watch) {
+          error(`Please run ${chalk.bold('tnp build:app')} before start:app command`);
+        }
       }
-      const { appBuild, prod, watch, environmentName } = options;
-
+      const { appBuild, prod, watch = false, environmentName } = options;
       this.options.save(options)
 
       // console.log('PREPARE options', options)
       this.config = _.cloneDeep(this.workspaceConfig);
+      this.config.proxyRouterMode = (
+        !options.watch &&
+        this.project.parent &&
+        this.project.parent.type === 'workspace'
+      );
       this.config.name = environmentName ? environmentName : 'local';
       this.config.isCoreProject = this.project.isCoreProject;
 
+      if (!this.config.workspace || !this.config.workspace.workspace) {
+        error(`You shoud define 'workspace' object inside config.workspace object`, true)
+        this.err()
+      }
+
+      if (this.config.domain) {
+        this.config.workspace.workspace.host =
+          `${this.config.domain}${this.config.workspace.workspace.baseUrl}`;
+      } else {
+        this.config.workspace.workspace.host =
+          `http://localhost:${this.config.workspace.workspace.port}`;
+      }
+
 
       if (this.kind === 'tnp-workspace') {
-        if (!this.config.workspace || !this.config.workspace.workspace) {
-          error(`You shoud define 'workspace' object inside config.workspace object`, true)
-          this.err()
-        }
         this.config.packageJSON = this.project.packageJson.data;
       }
 
       if (this.kind === 'tnp-workspace-child') {
-
         this.config.packageJSON = this.project.parent.packageJson.data;
       }
 
       this.config.workspace.projects.forEach(p => {
-        p.host = (!this.config.domain) ? `http://localhost:${p.port}` : `${this.config.domain}${p.baseUrl}`;
+        if (this.config.domain || this.config.proxyRouterMode) {
+          p.host = `${this.config.workspace.workspace.host}${p.baseUrl}`;
+        } else {
+          p.host = `http://localhost:${p.port}`;
+        }
       })
 
       if (this.kind === 'tnp-workspace-child') {
         this.config.currentProject = this.config.workspace.projects
           .find(p => p.name === this.project.name)
-      } else if (this.kind === 'tnp-workspace') {
-        this.config.currentProject = this.config.workspace.workspace
       }
 
-      if (!this.config.currentProject) {
+      if (!this.config.currentProject && this.kind === 'tnp-workspace-child') {
         error(`Cannot find current project (${this.project.name}) in config worksapce projects.`, true)
         this.err()
       }
@@ -241,7 +280,7 @@ export class EnvironmentConfig {
   saveConfig() {
     const tmpEnvironmentFileName = 'tmp-environment.json';
     const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
-    if (this.project.type === 'angular-client') {
+    if (this.project.type === 'angular-client' || this.project.type === 'angular-lib') {
       fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
         encoding: 'utf8'
       })
@@ -253,6 +292,9 @@ export class EnvironmentConfig {
     // console.log(`Config saved in ${tmpEnvironmentPath}`)
   }
 
+  /**
+   * Can be accesed only after env.prepare()
+   */
   get configFor() {
     if (this.project.type === 'workspace') {
       error(`Do not use ${chalk.bold('env.configFor.backend, env.configFor.frontend')} from worksapce level...`, true)

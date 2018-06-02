@@ -85,7 +85,7 @@ export class ProxyRouter {
 
 
   public activateServer() {
-    this.project.env.prepare({} as any);
+
     this.routes = this.project.env.workspaceConfig.workspace.projects;
 
     // console.log('activate server this.routes', this.routes.map(r => r.name))
@@ -107,14 +107,14 @@ export class ProxyRouter {
       const p = this.getProjectFrom(req);
       console.log('Resolved project !' + p && p.name + ` from url: ${req.url}`)
       if (p) {
-        const target = `http://localhost:${p.defaultPort}`
+        const target = `http://localhost:${p.getDefaultPort()}`
         proxy.web(req, res, { target, ws: true });
       } else {
         res.write('not found')
         res.end();
       }
     });
-    server.listen(this.project.defaultPort).on('error', e => {
+    server.listen(this.project.getDefaultPort()).on('error', e => {
       console.log('error', e)
     })
   }

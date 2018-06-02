@@ -16,7 +16,7 @@ import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
 import { copyFile } from "../helpers";
-import { ProjectFrom } from './index';
+import { ProjectFrom, BaseProjectLib } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
 import { workers } from 'cluster';
@@ -57,9 +57,22 @@ export abstract class Project {
     return ProjectFrom(path.join(__dirname, '..', '..'));
   }
 
-  public defaultPort: number;
-  defaultPortByType(): number {
-    const type: LibType = this.type;
+  protected __defaultPort: number;
+
+  public setDefaultPort(port: number) {
+    this.__defaultPort = port;
+  }
+
+  public getDefaultPort() {
+    return this.__defaultPort;
+  }
+
+  public setDefaultPortByType() {
+    this.setDefaultPort(Project.defaultPortByType(this.type))
+  }
+
+  public static defaultPortByType(type: LibType): number {
+
     if (type === 'workspace') return 5000;
     if (type === 'angular-cli') return 4200;
     if (type === 'angular-client') return 4300;
@@ -116,8 +129,8 @@ export abstract class Project {
    */
   start() {
     this.env.prepare()
-    console.log(`Project: ${this.name} is running on port ${this.defaultPort}`);
-    this.proxyRouter.killProcessOn(this.defaultPort)
+    console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
+    this.proxyRouter.killProcessOn(this.getDefaultPort())
     this.run(this.startOnCommand()).async()
   }
 
@@ -172,7 +185,7 @@ export abstract class Project {
         //     console.log(`Baseline NOT resolved from ${location}`)
         // }
       }
-      this.defaultPort = this.defaultPortByType()
+      this.__defaultPort = Project.defaultPortByType(this.type);
       // console.log(`Default port by type: "${this.defaultPort}" for ${this.name}`)
       this.env = new EnvironmentConfig(this);
       this.proxyRouter = new ProxyRouter(this);

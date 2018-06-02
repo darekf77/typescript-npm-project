@@ -3,6 +3,7 @@ import { AngularProject } from "./project-angular";
 import { BuildOptions, BuildDir } from "../models";
 import { error } from "../messages";
 import config from "../config";
+import { Project } from './base-project';
 
 export class ProjectAngularLib extends BaseProjectLib {
 
@@ -12,6 +13,14 @@ export class ProjectAngularLib extends BaseProjectLib {
         super(location);
         this.angular = new AngularProject(location);
         this.angular.env = this.env; // TODO QUICK_FIX
+    }
+
+    public setDefaultPort(port: number) {
+        this.angular.setDefaultPort(port)
+    }
+
+    public getDefaultPort() {
+        return this.angular.getDefaultPort()
     }
 
     protected startOnCommand() {

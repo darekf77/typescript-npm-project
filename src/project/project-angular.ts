@@ -49,7 +49,7 @@ export class AngularProject extends Project {
   startOnCommand() {
 
     const baseUrl = this.env.configFor.backend.workspace.projects.find(({ name }) => name === this.name).baseUrl;
-    const command = `tnp serve --port ${this.defaultPort} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl}`;
+    const command = `tnp serve --port ${this.getDefaultPort()} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl}`;
     console.log(`Angular command: ${command}`)
     return command;
   }
@@ -84,7 +84,7 @@ export class AngularProject extends Project {
       this.preventWarningTypescirptMismatch()
     }
     if (appBuild) {
-      this.buildApp(watch, prod, this.defaultPort, baseHref && `${baseHref}/`);
+      this.buildApp(watch, prod, this.getDefaultPort(), baseHref && `${baseHref}/`);
     }
   }
 

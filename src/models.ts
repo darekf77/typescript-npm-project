@@ -33,6 +33,7 @@ export class BuildOptions {
   watch?: boolean;
   appBuild?: boolean;
   baseHref?: string;
+  proxyRouterMode?: boolean;
   copyto?: Project[];
   environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];
@@ -91,6 +92,7 @@ export interface EnvConfig {
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated
+  proxyRouterMode?: boolean; // tnp generated
   domain?: string;
   workspace: {
     workspace: EnvConfigProject;
