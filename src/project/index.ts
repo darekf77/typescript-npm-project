@@ -53,7 +53,8 @@ export function ProjectFrom(location: string): Project {
     if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
     // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
-
+    
+    // console.log(`Result project: ${resultProject.name}`)
     return resultProject;
 }
 

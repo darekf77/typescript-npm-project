@@ -14,23 +14,18 @@ import { ProjectFrom } from './index';
 export class EnvironmentConfig {
 
   static woksapaceConfigs = {} as { [workspacePath in string]: EnvConfig; }
-  static preparedConfigs = {} as { [projectPath in string]: EnvConfig; }
 
-  private workspaceConfig: EnvConfig;
+  /**
+   * Avaliable for worksapce and children
+   * Use only for workspace things
+   */
+  public workspaceConfig: EnvConfig;
 
-  private get configPath() {
-    return (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
-      this.project.parent.location : this.project.location
-  }
-
-  public get config() {
-    return EnvironmentConfig.preparedConfigs[this.configPath];
-  }
-
-  public set config(value) {
-    // console.log('setting conifg with value:', value)
-    EnvironmentConfig.preparedConfigs[this.configPath] = value;
-  }
+  /**
+   * Children specyfic config onject
+   * available after prepare() for children project
+   */
+  private config: EnvConfig;
 
   private kind: 'tnp-workspace' | 'tnp-workspace-child' | 'other' = 'other';
 
@@ -100,7 +95,7 @@ export class EnvironmentConfig {
       this.workspaceConfig.workspace.projects.forEach(d => {
         if (_.isNumber(d.port)) {
           const p = ProjectFrom(path.join(this.project.location, d.name))
-          console.log(`Overrided port from ${p.defaultPort} to ${d.port} in project: ${p.name}`)
+          // console.log(`Overrided port from ${p.defaultPort} to ${d.port} in project: ${p.name}`)
           p.defaultPort = d.port;
         }
       })
@@ -175,6 +170,7 @@ export class EnvironmentConfig {
         return fse.readJSONSync(pathTmpEnvPrepareOptions)
       },
       save(options: BuildOptions) {
+        // console.log(`Prepare OPTIONS saved in ${pathTmpEnvPrepareOptions}`)
         fse.writeJSONSync(pathTmpEnvPrepareOptions, options)
       }
     }
@@ -182,17 +178,25 @@ export class EnvironmentConfig {
 
 
   prepare(options?: BuildOptions) {
-    const prepareForStart = !!options;
+    if (this.project.type === 'workspace') {
+      // console.log(`No need to prepare workspace config`)
+      return
+    }
+    const startMode = !!options;
     // console.log('this.kind in prepare', this.kind)
     if (!this.config) {
 
       if (this.kind === 'other') {
         return
       }
-      const { appBuild, prod, watch, environmentName } = prepareForStart ? this.options.saved : options;
-      if (!prepareForStart) {
-        this.options.save(options)
+      if (!startMode) {
+        options = this.options.saved;
       }
+      const { appBuild, prod, watch, environmentName } = options;
+
+      this.options.save(options)
+
+      // console.log('PREPARE options', options)
       this.config = _.cloneDeep(this.workspaceConfig);
       this.config.name = environmentName ? environmentName : 'local';
       this.config.isCoreProject = this.project.isCoreProject;
@@ -228,28 +232,32 @@ export class EnvironmentConfig {
       }
 
       this.config.currentProject.isWatchBuild = watch;
-
-
-
-
-      const tmpEnvironmentFileName = 'tmp-environment.json';
-      const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
-      if (this.project.type === 'angular-client') {
-        fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
-          encoding: 'utf8'
-        })
-      } else if (this.project.type === 'isomorphic-lib') {
-        fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.backend, null, 4), {
-          encoding: 'utf8'
-        })
-      }
-
+      this.saveConfig()
       // console.log('config prepared!', this.config)
     }
   }
 
 
+  saveConfig() {
+    const tmpEnvironmentFileName = 'tmp-environment.json';
+    const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
+    if (this.project.type === 'angular-client') {
+      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.frontend, null, 4), {
+        encoding: 'utf8'
+      })
+    } else if (this.project.type === 'isomorphic-lib') {
+      fse.writeFileSync(tmpEnvironmentPath, JSON.stringify(this.configFor.backend, null, 4), {
+        encoding: 'utf8'
+      })
+    }
+    // console.log(`Config saved in ${tmpEnvironmentPath}`)
+  }
+
   get configFor() {
+    if (this.project.type === 'workspace') {
+      error(`Do not use ${chalk.bold('env.configFor.backend, env.configFor.frontend')} from worksapce level...`, true)
+      error(`Try ${chalk.bold('env.workspaceConfig')} ...`)
+    }
     const self = this;
     return {
       get backend() {

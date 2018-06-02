@@ -86,7 +86,7 @@ export class ProxyRouter {
 
   public activateServer() {
     this.project.env.prepare({} as any);
-    this.routes = this.project.env.configFor.backend.workspace.projects;
+    this.routes = this.project.env.workspaceConfig.workspace.projects;
 
     // console.log('activate server this.routes', this.routes.map(r => r.name))
 

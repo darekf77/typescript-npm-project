@@ -173,6 +173,7 @@ export abstract class Project {
         // }
       }
       this.defaultPort = this.defaultPortByType()
+      // console.log(`Default port by type: "${this.defaultPort}" for ${this.name}`)
       this.env = new EnvironmentConfig(this);
       this.proxyRouter = new ProxyRouter(this);
 
@@ -223,10 +224,13 @@ export abstract class Project {
     const { prod, watch, outDir } = buildOptions;
     this.buildOptions = buildOptions;
 
+    // console.log(`Init assets/files for project: ${this.name}`)
     init(this);
 
+    // console.log(`Prepare node modules: ${this.name}`)
     this.node_modules.prepare();
 
+    // console.log(`Prepare environment for: ${this.name}`)
     this.env.prepare(buildOptions);
 
     this.buildSteps(buildOptions);

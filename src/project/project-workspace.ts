@@ -28,11 +28,6 @@ export class ProjectWorkspace extends Project {
 
     const { environmentName, prod, watch, outDir } = buildOptions;
 
-    console.log('Projects to build:')
-    this.children.forEach((project, i) => {
-      console.log(`${i + 1}. ${project.name}`)
-    })
-    console.log('===================')
     const projects = {
       serverLibs: [],
       isomorphicLibs: [],
@@ -85,7 +80,15 @@ export class ProjectWorkspace extends Project {
       ...projects.angularLibs,
       ...projects.angularClients,
       ...projects.angularCliClients
-    ];
+    ].filter(p => {
+      return !!this.env.workspaceConfig.workspace.projects.find(wp => wp.name === p.name)
+    });
+
+    console.log('Projects to build:')
+    projectsInOrder.forEach((project, i) => {
+      console.log(`${i + 1}. ${project.name}`)
+    })
+    console.log('===================')
 
     const projectsLibs: Project[] = projectsInOrder.filter(project => {
       return config.allowedTypes.libs.includes(project.type);
@@ -105,43 +108,12 @@ export class ProjectWorkspace extends Project {
     console.log('===================')
 
     projectsLibs.forEach((project, i) => {
-      if (project.type === 'isomorphic-lib') { // TODO QUICK_FIX morphi browser cwd build isnt working, tsc update needed
-        project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
-      } else {
-        project.build({
-          watch: false,
-          appBuild: false,
-          prod,
-          outDir: 'dist',
-          environmentName
-        });
-      }
+      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
     })
 
     projectsApps.forEach((project) => {
-      project.build({
-        watch: false,
-        appBuild: true,
-        prod,
-        outDir: 'dist',
-        environmentName
-      });
+      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
     })
 
-    if (watch) {
-      projectsInOrder.forEach((project, i) => {
-        console.log(`${i + 1}. project: ${project.name}`)
-        let appBuild = config.allowedTypes.app.includes(project.type);
-
-        project.build({
-          watch: true,
-          appBuild,
-          prod,
-          outDir: 'dist',
-          environmentName
-        });
-      })
-      this.proxyRouter.activateServer()
-    }
   }
 }

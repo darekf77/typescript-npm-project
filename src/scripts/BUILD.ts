@@ -71,8 +71,11 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
 
 
 export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
-  clearConsole()
-  const { copyto, environmentName } = handleArguments(args, outDir, watch);
+
+  const { copyto, environmentName, noConsoleClear } = handleArguments(args, outDir, watch);
+  if (!noConsoleClear) {
+    clearConsole()
+  }
   const options: BuildOptions = {
     prod, watch, outDir, copyto, environmentName
   };
