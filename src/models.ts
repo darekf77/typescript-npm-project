@@ -32,6 +32,7 @@ export class BuildOptions {
   outDir: BuildDir;
   watch?: boolean;
   appBuild?: boolean;
+  baseHref?: string;
   copyto?: Project[];
   environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];

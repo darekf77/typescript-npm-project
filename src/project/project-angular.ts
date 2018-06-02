@@ -6,6 +6,10 @@ import { error } from "../messages";
 import config from "../config";
 import { BuildOptions } from '../models';
 import { EnvironmentConfig } from './environment-config';
+
+/**
+ * DO NOT USE environment variables in this project directly
+ */
 export class AngularProject extends Project {
 
 
@@ -75,13 +79,11 @@ export class AngularProject extends Project {
 
   buildSteps(buildOptions?: BuildOptions) {
     this.buildOptions = buildOptions;
-    const { prod, watch, outDir, appBuild } = buildOptions;
+    const { prod, watch, outDir, appBuild, baseHref } = buildOptions;
     if (this.isEjectedProject) {
       this.preventWarningTypescirptMismatch()
     }
     if (appBuild) {
-      const baseHref = this.env.configFor.backend && this.env.configFor.backend.currentProject.baseUrl;
-      // console.log('basehref for current project ', baseHref)
       this.buildApp(watch, prod, this.defaultPort, baseHref && `${baseHref}/`);
     }
   }

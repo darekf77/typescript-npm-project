@@ -5,8 +5,9 @@ Helper project for my typescript npm libraries.
 
 
 
-# TO REMEBERS
+# TO REMEBER
  - check if each controller, entity is added to morphi init
+ - "assets" relative from html,css ,  "/assets" from scss
 
 ## Create, build, publish:
 - isomorphic typescript library

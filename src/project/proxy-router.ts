@@ -69,12 +69,12 @@ export class ProxyRouter {
   private getProjectFrom(req: http.IncomingMessage): Project {
     // console.log('req', req)
     // console.log('getProjectFrom routes', this.routes.map(r => r.baseUrl))
-    console.log(`Request url "${req.url}"`)
+    // console.log(`Request url "${req.url}"`)
     const r = this.routes.find(r => {
       return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
     })
     if (r) {
-      req.url = req.url.replace(r.baseUrl, '');
+      // req.url = req.url.replace(r.baseUrl, '');
       // console.log('Founded route ', r.name)
 
       const project = this.project.children.find(p => p.name === r.name);
@@ -103,14 +103,12 @@ export class ProxyRouter {
   private server() {
     const proxy = httpProxy.createProxyServer({});
     const server = http.createServer((req, res) => {
-      console.log(req.url)
+      console.log()
       const p = this.getProjectFrom(req);
-      console.log('Resolved project !', p && p.name)
-
+      console.log('Resolved project !' + p && p.name + ` from url: ${req.url}`)
       if (p) {
         const target = `http://localhost:${p.defaultPort}`
-        console.log('taget: ', target)
-        proxy.web(req, res, { target });
+        proxy.web(req, res, { target, ws: true });
       } else {
         res.write('not found')
         res.end();

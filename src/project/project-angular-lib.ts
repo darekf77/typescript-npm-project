@@ -11,6 +11,7 @@ export class ProjectAngularLib extends BaseProjectLib {
     constructor(public location: string) {
         super(location);
         this.angular = new AngularProject(location);
+        this.angular.env = this.env; // TODO QUICK_FIX
     }
 
     protected startOnCommand() {

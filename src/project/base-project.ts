@@ -40,7 +40,7 @@ export abstract class Project {
   readonly packageJson: PackageJSON;
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
-  readonly env: EnvironmentConfig;
+  env: EnvironmentConfig;
   readonly proxyRouter: ProxyRouter;
 
   static projects: Project[] = [];
@@ -232,6 +232,15 @@ export abstract class Project {
 
     // console.log(`Prepare environment for: ${this.name}`)
     this.env.prepare(buildOptions);
+
+    let baseHref: string;
+    if (this.type === 'workspace') {
+      baseHref = this.env.workspaceConfig.workspace.workspace.baseUrl;
+    } else if (this.parent && this.parent.type === 'workspace') {
+      baseHref = this.env.configFor.backend && this.env.configFor.backend.currentProject.baseUrl;
+    }
+    // console.log(`basehref for current project `, baseHref)
+    this.buildOptions.baseHref = baseHref;
 
     this.buildSteps(buildOptions);
   }

@@ -15,7 +15,7 @@ export class ProjectWorkspace extends Project {
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {
-        return !!workspace.env.configFor.backend.workspace.projects.find(c => c.name === child.name);
+        return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
       })
       .forEach(child => child.start());
     return 'echo "Workspace server started"';
