@@ -20,18 +20,21 @@ export class ProxyRouter {
   public killProcessOn(portNumber: number) {
 
     try {
-      console.log(`Cleaning port number "${portNumber}"`)
+      // console.log(`Cleaning port number "${portNumber}"`)
       if (process.platform === 'win32') {
         let pid = child.execSync(`netstat -ano | findstr :${portNumber}`).toString();
-        console.log('Founded pid' + pid)
+        // console.log('Founded pid' + pid)
         child.execSync(`taskkill /PID ${pid} /F `)
+      } else if (process.platform === 'darwin') {
+        let pid = child.execSync(`lsof -i :${portNumber}`).toString();
+        // console.log(`Pid to kill ${pid}`)
+        child.execSync(`kill -9 ${pid}`).toString();
       } else {
-        let pid = child.execSync(`lsof -t -i tcp:${portNumber}`).toString();
-        child.execSync('kill -kill `lsof -t -i tcp:${' + portNumber + '}`');
+
       }
-      console.log(`Process killing on port: ${portNumber}: SUCCEED`)
+      // console.log(`Process killing on port: ${portNumber}: SUCCEED`)
     } catch (error) {
-      console.log(`Process killing on port: ${portNumber}: FAIL`)
+      // console.log(`Process killing on port: ${portNumber}: FAIL`)
       // console.log(error)
     }
 
@@ -104,7 +107,7 @@ export class ProxyRouter {
     const proxy = httpProxy.createProxyServer({});
     const server = http.createServer((req, res) => {
       console.log()
-      const p = this.getProjectFrom(req);      
+      const p = this.getProjectFrom(req);
       if (p) {
         console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
         const target = `http://localhost:${p.getDefaultPort()}`

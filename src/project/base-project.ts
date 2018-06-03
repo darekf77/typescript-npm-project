@@ -123,6 +123,10 @@ export abstract class Project {
     return this.packageJson.isCoreProject;
   }
 
+  get isWorkspaceChildProject() {
+    return this.parent && this.parent.type === 'workspace';
+  }
+
   /**
    * Start server on top of static build
    * @param port
@@ -250,7 +254,10 @@ export abstract class Project {
     if (this.type === 'workspace') {
       baseHref = this.env.workspaceConfig.workspace.workspace.baseUrl;
     } else if (this.parent && this.parent.type === 'workspace') {
-      baseHref = this.env.configFor.backend && this.env.configFor.backend.currentProject.baseUrl;
+      baseHref = this.env.configFor.backend &&
+        this.env.configFor.backend.workspace.projects.find(p => {
+          return p.name === this.name
+        }).baseUrl
     }
     // console.log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;

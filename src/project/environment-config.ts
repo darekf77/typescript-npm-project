@@ -198,7 +198,9 @@ export class EnvironmentConfig {
 
 
   prepare(options?: BuildOptions) {
-    this.overrideDefaultPorts()
+    if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
+      this.overrideDefaultPorts()
+    }
     if (this.project.type === 'workspace') {
       // console.log(`No need to prepare workspace config`)
       return
@@ -260,17 +262,6 @@ export class EnvironmentConfig {
         }
       })
 
-      if (this.kind === 'tnp-workspace-child') {
-        this.config.currentProject = this.config.workspace.projects
-          .find(p => p.name === this.project.name)
-      }
-
-      if (!this.config.currentProject && this.kind === 'tnp-workspace-child') {
-        error(`Cannot find current project (${this.project.name}) in config worksapce projects.`, true)
-        this.err()
-      }
-
-      this.config.currentProject.isWatchBuild = watch;
       this.saveConfig()
       // console.log('config prepared!', this.config)
     }

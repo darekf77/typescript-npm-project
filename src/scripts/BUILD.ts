@@ -25,6 +25,17 @@ function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
     args = args.replace(/\\/g, '\\\\')
   }
   const argsObj: BuildArgs = require('minimist')(args.split(' '));
+
+  if (argsObj.noConsoleClear) {
+    noConsoleClear = true;
+  }
+
+  // let baseHref = argsObj.baseHref || argsObj['--base-href'] || ''
+  if (!noConsoleClear) {
+    clearConsole()
+  }
+
+
   // console.log('argsObj', argsObj)
   // process.exit(0)
   let copyto: Project[] = []
@@ -58,24 +69,19 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
     environmentName = (argsObj.environmentName ? argsObj.environmentName : argsObj.envName) as any;
   }
 
-  if (argsObj.noConsoleClear) {
-    noConsoleClear = true;
-  }
 
-  // let baseHref = argsObj.baseHref || argsObj['--base-href'] || ''
+
 
   return {
-    copyto, environmentName, noConsoleClear //, baseHref
+    copyto, environmentName //, baseHref
   }
 }
 
 
 export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
-  const { copyto, environmentName, noConsoleClear } = handleArguments(args, outDir, watch);
-  if (!noConsoleClear) {
-    clearConsole()
-  }
+  const { copyto, environmentName } = handleArguments(args, outDir, watch);
+
   const options: BuildOptions = {
     prod, watch, outDir, copyto, environmentName
   };
@@ -85,10 +91,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 
 export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
-  const { copyto, environmentName, noConsoleClear } = handleArguments(args, outDir, watch);
-  if (!noConsoleClear) {
-    clearConsole()
-  }
+  const { copyto, environmentName } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName

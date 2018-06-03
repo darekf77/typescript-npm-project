@@ -32,10 +32,15 @@ addEntity(entites.MULTIMEDIA)
 export const Controllers = tControllers;
 export const Entities = tEntities;
 
+const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
+
 export default function () {
   start({
-    config: ENV.currentProject.$db as any,
-    host: ENV.currentProject.host,
+    config: project.$db as any,
+    host: ENV.proxyRouterMode ?
+      `http://localhost:${project.port}${project.baseUrl}` :
+      `http://localhost:${project.port}`
+    ,
     Controllers: Controllers as any,
     Entities: Entities as any,
     MockData: mocks as any

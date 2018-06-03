@@ -109,8 +109,6 @@ export interface EnvConfig {
   }
   packageJSON?: IPackageJSON;
 
-  currentProject?: EnvConfigProject;
-
 }
 
 
