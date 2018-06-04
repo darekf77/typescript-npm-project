@@ -106,10 +106,9 @@ export class ProxyRouter {
   private server() {
     const proxy = httpProxy.createProxyServer({});
     const server = http.createServer((req, res) => {
-      console.log()
       const p = this.getProjectFrom(req);
       if (p) {
-        console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
+        // console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
         const target = `http://localhost:${p.getDefaultPort()}`
         proxy.web(req, res, { target, ws: true });
       } else {
