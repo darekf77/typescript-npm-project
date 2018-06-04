@@ -21,9 +21,7 @@ export class MultimediaComponent implements OnInit {
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      this.open()
-    })
+   
   }
 
 }
