@@ -79,12 +79,17 @@ export class AngularProject extends Project {
 
   buildSteps(buildOptions?: BuildOptions) {
     this.buildOptions = buildOptions;
-    const { prod, watch, outDir, appBuild, baseHref } = buildOptions;
+    const { prod, watch, outDir, appBuild } = buildOptions;
+    let baseHref = buildOptions.baseHref;
     if (this.isEjectedProject) {
       this.preventWarningTypescirptMismatch()
     }
     if (appBuild) {
-      this.buildApp(watch, prod, this.getDefaultPort(), baseHref && `${baseHref}/`);
+      if (baseHref) {
+        baseHref = `${baseHref}/`;
+        baseHref = baseHref.replace(/\/\//g, '/')
+      }
+      this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref);
     }
   }
 

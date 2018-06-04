@@ -40,7 +40,7 @@ const config = {
         port: 4201
       },
       {
-        baseUrl: '/test',
+        baseUrl: '/',
         name: 'ss-webapp',
         port: 4200
       }

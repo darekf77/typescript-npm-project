@@ -146,6 +146,10 @@ export default {
 
   $START_APP: () => Project.Current.start(),
 
+// aliases
+  $BUILD: (args) => buildApp(false, false, 'dist', args),
+  $START: () => Project.Current.start(),
+
   'Documentation': `
 Building purpose:
 - library

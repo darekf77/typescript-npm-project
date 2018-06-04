@@ -117,7 +117,9 @@ export class ProxyRouter {
         res.end();
       }
     });
-    server.listen(this.project.getDefaultPort()).on('error', e => {
+    server.listen(this.project.getDefaultPort(), () => {
+      console.log(`Proxy Router activate on http://localhost:${this.project.getDefaultPort()}`)
+    }).on('error', e => {
       console.log('error', e)
     })
   }
