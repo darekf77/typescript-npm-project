@@ -1,25 +1,30 @@
 <layout-material [menu]="menu">
 
   <mat-menu #appMenu="matMenu">
-    <button  (click)=logout() mat-menu-item>Logout</button>
+    <button (click)=logout()
+            mat-menu-item>Logout</button>
     <button mat-menu-item>Info</button>
   </mat-menu>
 
-  <span profile  class="profile" >
+  <span profile
+        class="profile">
     Logged in as administrator
   </span>
 
-  <button hamburger mat-icon-button class="hamburger"
+  <button hamburger
+          mat-icon-button
+          class="hamburger"
           [matMenuTriggerFor]="appMenu">
     <mat-icon>more_vert</mat-icon>
   </button>
 
-  <mat-card body>
-    <button (click)="logout()">Logout</button>
-    <app-multimedia></app-multimedia>
+  <div style="display: block"
+       body>
+    <!-- <button (click)="logout()">Logout</button>
+    <app-multimedia></app-multimedia> -->
     <router-outlet></router-outlet>
 
-  </mat-card>
+  </div>
 
   <mat-card footer> &copy: Dariusz Filipiak 2018 </mat-card>
 

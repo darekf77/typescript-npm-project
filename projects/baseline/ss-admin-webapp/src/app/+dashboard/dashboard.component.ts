@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit {
           leftMenu: [
             {
               name: "Course",
+              href: '/dashboard/course',
               subitems: [
                 {
                   name: 'Introduction',

@@ -8,16 +8,16 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: "prefix",
-        component: CourseComponent
-    },
-    {
-        path: 'introduction',
-        pathMatch: 'prefix',
-        loadChildren: './course-introduction/course-introduction.module#CourseIntroductionModule'
-    },
-    {
-        path: 'categories',
-        pathMatch: 'prefix',
-        loadChildren: './course-categories/course-categories.module#CourseCategoriesModule'
-    }
+        component: CourseComponent,
+        children: [
+            {
+                path: 'introduction',
+                loadChildren: './course-introduction/course-introduction.module#CourseIntroductionModule'
+            },
+            {
+                path: 'categories',
+                loadChildren: './course-categories/course-categories.module#CourseCategoriesModule'
+            }
+        ]
+    }    
 ];

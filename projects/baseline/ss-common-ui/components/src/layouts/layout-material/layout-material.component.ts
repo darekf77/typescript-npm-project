@@ -33,6 +33,7 @@ export interface MenuItem {
 export interface LeftMenuGroupItem {
   name: string;
   description?: string;
+  href?: string;
   subitems: MenuItem[];
 }
 

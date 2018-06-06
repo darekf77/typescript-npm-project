@@ -8,11 +8,12 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: "prefix",
-        component: DashboardComponent
-    },
-    {
-        path: 'course',
-        pathMatch: 'prefix',
-        loadChildren: './+course/course.module#CourseModule'
+        component: DashboardComponent,
+        children: [
+            {
+                path: 'course',
+                loadChildren: './+course/course.module#CourseModule'
+            }
+        ]
     }
 ];
