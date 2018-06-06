@@ -36,9 +36,11 @@ export class DashboardComponent implements OnInit {
               subitems: [
                 {
                   name: 'Introduction',
+                  href: '/dashboard/course/introduction'
                 },
                 {
                   name: 'Categories',
+                  href: '/dashboard/course/categories'
                 }
               ]
             },

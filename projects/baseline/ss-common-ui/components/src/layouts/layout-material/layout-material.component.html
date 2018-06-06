@@ -41,7 +41,7 @@
         </mat-expansion-panel-header>
         <mat-list>
           <mat-list-item *ngFor="let subitem of item.subitems">
-            <button mat-button>{{subitem.name}}</button>
+            <button mat-button (click)="open(subitem)" >{{subitem.name}}</button>
           </mat-list-item>
         </mat-list>
       </mat-expansion-panel>

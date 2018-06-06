@@ -6,6 +6,7 @@ import {
 
 import { Log, Level } from 'ng2-logger';
 import { numValue } from '../../helpers';
+import { Router } from '@angular/router';
 
 export interface LayoutMaterialVariables {
   footerSize: string;
@@ -140,6 +141,10 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
     }
   };
 
+  open(item: MenuItem) {
+    this.router.navigateByUrl(item.href);
+  }
+
   selectedTopMenu(index: number) {
     log.i('index', index);
     this.menuLeft.items = this.menu.top.items[index].leftMenu;
@@ -172,7 +177,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
     this.calculate.leftPanel.width();
   }
 
-  constructor() {
+  constructor(private router: Router) {
     log.i('variables', variables);
   }
 
