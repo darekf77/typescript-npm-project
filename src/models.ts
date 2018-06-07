@@ -61,6 +61,11 @@ export interface RunOptions {
   cwd?: string;
 
   /**
+   * Try command again after fail after n miliseconds
+   */
+  tryAgainWhenFailAfter?: number;
+
+  /**
    * Use big buffer for big webpack logs
    */
   biggerBuffer?: boolean;

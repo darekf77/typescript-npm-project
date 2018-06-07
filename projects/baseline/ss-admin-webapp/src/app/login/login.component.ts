@@ -33,7 +33,9 @@ export class LoginComponent implements OnInit {
 
     this.handlers.push(this.auth.isLoggedIn.subscribe(isLoginIn => {
       if (isLoginIn) {
-        this.router.navigateByUrl('/dashboard')
+        if (this.router.url.trim() === '/') {
+          this.router.navigateByUrl('/dashboard')
+        }
       } else {
         this.router.navigateByUrl('/')
       }

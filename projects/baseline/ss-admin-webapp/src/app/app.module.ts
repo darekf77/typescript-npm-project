@@ -44,7 +44,11 @@ init(ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host)
     FormsModule,
     HttpModule,
     // MyLibModule.forRoot(),
-    RouterModule.forRoot(routes, { useHash: true, preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      preloadingStrategy: PreloadAllModules,
+      enableTracing: false
+    })
   ],
   providers: [
     AngularProviders,

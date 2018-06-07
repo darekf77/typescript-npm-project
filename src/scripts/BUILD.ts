@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { run, clearConsole } from "../process";
-import { Project, ProjectIsomorphicLib, ProjectFrom } from '../project';
+import { Project, ProjectIsomorphicLib, ProjectFrom, BaseProjectLib } from '../project';
 import { clear } from "./CLEAR";
 import { BuildOptions, BuildDir, LibType, EnvironmentName } from "../models";
 import { info, error } from "../messages";
@@ -146,8 +146,24 @@ export default {
 
   $START_APP: () => Project.Current.start(),
 
-// aliases
-  $BUILD: (args) => buildApp(false, false, 'dist', args),
+  // aliases
+  $BUILD: (args) => {
+    if (config.allowedTypes.libs.includes(Project.Current.type)) {
+      buildLib(false, false, 'dist', args)
+    }
+    if (config.allowedTypes.app.includes(Project.Current.type)) {
+      buildApp(false, false, 'dist', args)
+    }
+  },
+
+  $BUILD_WATCH: (args) => {
+    if (config.allowedTypes.libs.includes(Project.Current.type)) {
+      buildLib(false, true, 'dist', args)
+    }
+    if (config.allowedTypes.app.includes(Project.Current.type)) {
+      buildApp(false, true, 'dist', args)
+    }
+  },
   $START: () => Project.Current.start(),
 
   'Documentation': `

@@ -5,7 +5,7 @@
   "command": "tnp",
   "isShellCommand": true,
   "args": [
-    "task:start"
+    "build:watch"
   ],
   "showOutput": "always"
 }

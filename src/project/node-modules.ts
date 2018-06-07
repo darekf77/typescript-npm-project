@@ -68,7 +68,7 @@ export class NodeModules {
           const symPkgPath = path.join(self.project.location, 'node_modules', c.name);
           if (fs.existsSync(symPkgPath)) {
             console.log(`Removing symlinks: ${c.name}`)
-            fse.unlinkSync(path.join(self.project.location, symPkgPath));
+            fse.unlinkSync(symPkgPath);
           }
         })
       },
