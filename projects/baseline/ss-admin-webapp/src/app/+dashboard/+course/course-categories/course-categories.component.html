@@ -1,3 +1,12 @@
-<p>
-  course-categories works!
-</p>
+<mat-list>
+  <mat-list-item *ngFor="let category of categories"
+                 (click)="open(category)">
+    <mat-icon matListIcon>folder</mat-icon>
+    <h3 matLine> {{category.name}} </h3>
+    <p matLine>
+      <span> {{category.description}} </span>
+      <!-- <span class="demo-2"> -- {{message.content}} </span> -->
+    </p>
+  </mat-list-item>
+</mat-list>
+<router-outlet></router-outlet>
