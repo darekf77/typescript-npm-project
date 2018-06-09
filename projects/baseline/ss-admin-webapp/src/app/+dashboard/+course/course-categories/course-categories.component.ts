@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
+import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, NavigationEnd } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
 import CategoryController from 'ss-common-logic/browser/controllers/CategoryController';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
@@ -17,21 +17,9 @@ const log = Log.create('Courese categories')
   styleUrls: ['./course-categories.component.scss'],
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseCategoriesComponent implements OnInit, Resolve<CATEGORY[]> {
+export class CourseCategoriesComponent implements OnInit {
 
-  messages = [
-    {
-      from: 'asdasd',
-      subject: 'Sibubasubduasbd',
-      content: 'contentntete'
-    },
-    {
-      from: '2222fromasdasd',
-      subject: '222Sibubasubduasbd',
-      content: '222contentntete'
-    }
-  ]
-  handlers: Subscription[] = [];
+
   constructor(
     private category: CategoryController,
     private route: ActivatedRoute,
@@ -41,15 +29,21 @@ export class CourseCategoriesComponent implements OnInit, Resolve<CATEGORY[]> {
 
   }
 
+  listView = true;
+
   public categories: CATEGORY[] = []
 
 
   ngOnInit() {
-    this.categories = this.route.snapshot.data.categories;
+
+    this.handlers.push(this.category.allCategories()
+      .received
+      .observable
+      .subscribe(d => this.categories = d.body.json))
   }
 
   ngOnDestroy() {
     this.handlers.forEach((f) => f.unsubscribe())
   }
-
+  handlers: Subscription[] = [];
 }

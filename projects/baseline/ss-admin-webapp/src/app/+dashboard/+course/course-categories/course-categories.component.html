@@ -1,5 +1,6 @@
-<mat-list>
+<mat-list *ngIf="listView">
   <mat-list-item *ngFor="let category of categories"
+                 (click)="listView=false"
                  routerLink="/dashboard/course/categories/category/{{category.id}}">
     <mat-icon matListIcon>folder</mat-icon>
     <h3 matLine> {{category.name}} </h3>
@@ -9,4 +10,7 @@
     </p>
   </mat-list-item>
 </mat-list>
+<button routerLink="/dashboard/course/categories"
+        *ngIf="!listView"
+        (click)="listView=true"> Back </button>
 <router-outlet></router-outlet>

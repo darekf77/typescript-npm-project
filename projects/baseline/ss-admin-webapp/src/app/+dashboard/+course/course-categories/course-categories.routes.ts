@@ -12,16 +12,10 @@ export const routes: Routes = [
         path: '',
         pathMatch: "prefix",
         component: CourseCategoriesComponent,
-        resolve: {
-            categories: CategoriesResolver
-        },
         children: [
             {
                 path: 'category/:id',
-                component: CategoryEditorComponent,
-                resolve: {
-                    category: CategoryResolver
-                }
+                component: CategoryEditorComponent
             }
         ]
     }
