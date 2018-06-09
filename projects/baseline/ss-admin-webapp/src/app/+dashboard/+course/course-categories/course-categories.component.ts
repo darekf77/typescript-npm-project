@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from "@angular/router";
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
 import CategoryController from 'ss-common-logic/browser/controllers/CategoryController';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
@@ -7,15 +7,17 @@ import { Log, Level } from "ng2-logger/browser";
 import { isNumber } from "lodash";
 import { Router } from "@angular/router";
 import { Location } from "@angular/common";
+import { Observable } from "rxjs/Observable";
 
 const log = Log.create('Courese categories')
 
 @Component({
   selector: 'app-course-categories',
   templateUrl: './course-categories.component.html',
-  styleUrls: ['./course-categories.component.scss']
+  styleUrls: ['./course-categories.component.scss'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseCategoriesComponent implements OnInit {
+export class CourseCategoriesComponent implements OnInit, Resolve<CATEGORY[]> {
 
   messages = [
     {
@@ -39,44 +41,15 @@ export class CourseCategoriesComponent implements OnInit {
 
   }
 
-  categories: CATEGORY[] = [];
-  selected: number;
+  public categories: CATEGORY[] = []
 
-  // open(category: CATEGORY) {
-  //   this.router.navigateByUrl(`/dashboard/course/categories?id=${category.id}`, {
-  //     replaceUrl: false
-  //   })
-  //   this.goToCategoryBy(category.id)
-  // }
 
-  // private async goToCategoryBy(id: number) {
-  //   log.i('id of category', id)
-  //   this.selected = (await this.category.categoryBy(id).received).body.json
-  //   log.i('selected', this.selected)
-  // }
-
-  // private async reload() {
-  //   this.selected = undefined;
-  //   const id = Number(this.route.snapshot.queryParams['id'])
-  //   if (!isNaN(id)) {
-  //     this.goToCategoryBy(id)
-  //   } else {
-  //     this.selected = undefined;
-  //     this.handlers.push(this.category.allCategories().received.observable.subscribe(categories => {
-  //       this.categories = categories.body.json
-  //     }))
-  //   }
-  // }
-
-  async ngOnInit() {
-    log.i('this.route.snapshot.queryParams', this.route.snapshot.queryParams)
-    // this.reload()
-    // this.router.routerState.snapshot.url
+  ngOnInit() {
+    this.categories = this.route.snapshot.data.categories;
   }
 
   ngOnDestroy() {
-    this.selected = undefined;
-    this.handlers.forEach(f => f.unsubscribe())
+    this.handlers.forEach((f) => f.unsubscribe())
   }
 
 }

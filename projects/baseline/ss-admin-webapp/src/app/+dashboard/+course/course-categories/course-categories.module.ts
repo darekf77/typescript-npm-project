@@ -6,6 +6,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { routes } from './course-categories.routes';
 import { CategoryEditorModule } from './category-editor/category-editor.module';
+import { CategoryResolver } from './model/categorie.resolve';
+import { CategoriesResolver } from './model/categories.resolve';
 
 
 const materialModules = [
@@ -18,6 +20,10 @@ const materialModules = [
     ...materialModules,
     RouterModule.forChild(routes),
   ],
-  declarations: [CourseCategoriesComponent]
+  declarations: [CourseCategoriesComponent],
+  providers:[
+    CategoryResolver,
+    CategoriesResolver
+  ]
 })
 export class CourseCategoriesModule { }

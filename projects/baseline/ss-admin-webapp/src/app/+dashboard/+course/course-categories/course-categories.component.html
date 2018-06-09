@@ -1,6 +1,6 @@
 <mat-list>
   <mat-list-item *ngFor="let category of categories"
-                 (click)="open(category)">
+                 routerLink="/dashboard/course/categories/category/{{category.id}}">
     <mat-icon matListIcon>folder</mat-icon>
     <h3 matLine> {{category.name}} </h3>
     <p matLine>
