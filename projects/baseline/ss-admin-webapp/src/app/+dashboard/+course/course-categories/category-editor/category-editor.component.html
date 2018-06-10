@@ -1,5 +1,31 @@
-<p>
-  category-editor works! id:
-  <span *ngIf="category"> {{category.id}} </span>
+<div class="example-container"
+     *ngIf="category">
+  <mat-form-field>
+    <input matInput
+           [(ngModel)]="category.name"
+           placeholder="Name">
+  </mat-form-field>
 
-</p>
+</div>
+
+
+<mat-tab-group *ngIf="category">
+  <mat-tab *ngFor="let group of category.groups"
+           label="{{group.title}}">
+
+
+    <div class="example-container">
+      <mat-form-field>
+        <input matInput
+               [(ngModel)]="group.title"
+               placeholder="Title">
+      </mat-form-field>
+      <mat-form-field>
+        <textarea matInput
+                  placeholder="Title"
+                  [(ngModel)]="group.description"></textarea>
+      </mat-form-field>
+
+    </div>
+  </mat-tab>
+</mat-tab-group>
