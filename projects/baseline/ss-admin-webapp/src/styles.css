@@ -6,3 +6,13 @@
 @import '~@swimlane/ngx-datatable/release/themes/material.css';
 @import '~@swimlane/ngx-datatable/release/assets/icons.css';
 @import '~font-awesome/css/font-awesome.css';
+
+
+mc-breadcrumbs ol {
+    list-style: none;
+}
+
+mc-breadcrumbs ol li {
+    display: inline-block;
+    margin-right: 10px;
+}

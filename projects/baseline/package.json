@@ -60,6 +60,7 @@
     "ng2-logger": "^2.0.35",
     "ng2-rest": "^9.0.11",
     "ngx-bootstrap": "^2.0.2",
+    "ngx-breadcrumbs": "0.0.3",
     "ngx-editor": "^3.3.0",
     "node-sass": "^4.7.2",
     "passport": "^0.3.2",

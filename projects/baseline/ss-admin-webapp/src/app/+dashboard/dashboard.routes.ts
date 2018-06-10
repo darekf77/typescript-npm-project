@@ -9,6 +9,9 @@ export const routes: Routes = [
         path: '',
         pathMatch: "prefix",
         component: DashboardComponent,
+        data: {
+            breadcrumbs: 'Dashboard'
+        },
         children: [
             {
                 path: 'course',

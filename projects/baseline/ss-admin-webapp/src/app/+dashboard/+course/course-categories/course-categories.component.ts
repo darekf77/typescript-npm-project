@@ -29,21 +29,9 @@ export class CourseCategoriesComponent implements OnInit {
 
   }
 
-  listView = true;
-
-  public categories: CATEGORY[] = []
-
-
   ngOnInit() {
 
-    this.handlers.push(this.category.allCategories()
-      .received
-      .observable
-      .subscribe(d => this.categories = d.body.json))
   }
 
-  ngOnDestroy() {
-    this.handlers.forEach((f) => f.unsubscribe())
-  }
-  handlers: Subscription[] = [];
+
 }

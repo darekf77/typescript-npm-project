@@ -15,7 +15,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
 import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
 import { MultimediaModule } from '../shared/multimedia/multimedia.module';
-
+// third part
+import { McBreadcrumbsModule } from 'ngx-breadcrumbs';
 
 const modules = [
   LayoutMaterialModule,
@@ -32,6 +33,7 @@ const modules = [
     LoginModule,
     TabsModule.forRoot(),
     MatCardModule,
+    McBreadcrumbsModule.forRoot(),
     ...modules
   ],
   exports: [

@@ -9,6 +9,9 @@ export const routes: Routes = [
         path: '',
         pathMatch: "prefix",
         component: CourseComponent,
+        data: {
+            breadcrumbs: 'Course'
+        },
         children: [
             {
                 path: 'introduction',
@@ -19,5 +22,5 @@ export const routes: Routes = [
                 loadChildren: './course-categories/course-categories.module#CourseCategoriesModule'
             }
         ]
-    }    
+    }
 ];

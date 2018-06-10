@@ -8,6 +8,7 @@ import { routes } from './course-categories.routes';
 import { CategoryEditorModule } from './category-editor/category-editor.module';
 import { CategoryResolver } from './model/categorie.resolve';
 import { CategoriesResolver } from './model/categories.resolve';
+import { CourseCategoriesListModule } from './course-categories-list/course-categories-list.module';
 
 
 const materialModules = [
@@ -18,6 +19,7 @@ const materialModules = [
     CommonModule,
     CategoryEditorModule,
     ...materialModules,
+    CourseCategoriesListModule,
     RouterModule.forChild(routes),
   ],
   declarations: [CourseCategoriesComponent],

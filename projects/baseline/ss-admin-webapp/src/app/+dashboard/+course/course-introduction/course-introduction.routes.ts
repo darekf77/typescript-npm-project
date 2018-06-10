@@ -8,6 +8,9 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: "prefix",
-        component: CourseIntroductionComponent
+        component: CourseIntroductionComponent,
+        data: {
+            breadcrumbs: 'Introduction'
+        },
     }
 ];
