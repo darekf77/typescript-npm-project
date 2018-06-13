@@ -1,0 +1,28 @@
+:host {
+
+  .example-full-width {
+    width: 100%;
+  };
+
+  .container {
+    height: 100%;
+    column {
+      padding: 5px;
+      &.content {
+        height: 100%;
+        background-color: rgba(0,0,0,.04)
+      }
+    }
+
+  }
+
+  mat-list {
+    mat-list-item {
+        &:hover {
+          cursor: pointer;
+          background: rgba(0,0,0, .04)
+        }
+    }
+  }
+
+}

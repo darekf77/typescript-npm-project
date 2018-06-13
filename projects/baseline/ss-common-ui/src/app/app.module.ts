@@ -9,7 +9,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 // local
 import { AppComponent } from './app.component';
-import { previewRoutes } from './app.routes';
+import { routes } from './app.routes';
 
 import {
   StandalonePopupModule
@@ -32,12 +32,17 @@ console.log('ENV', ENV);
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(previewRoutes, { useHash: true, preloadingStrategy: PreloadAllModules }),
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      preloadingStrategy: PreloadAllModules,
+      enableTracing: true
+    }),
     StandalonePopupModule,
     ...modules
   ],
   exports: [
-    ...modules
+    ...modules,
+
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,13 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 
-import * as _ from 'lodash';
+import { menuLeft } from './preview-components.routes';
 
 @Component({
   selector: 'preview-components',
-  templateUrl: './preview-components.component.html',
+  template: `
+asdasd
+    <router-outlet></router-outlet>
+  ` ,
   styleUrls: ['./preview-components.component.scss']
 })
 export class PreviewComponents implements OnInit {
+
+  menuLeft = menuLeft;
 
   constructor() { }
 

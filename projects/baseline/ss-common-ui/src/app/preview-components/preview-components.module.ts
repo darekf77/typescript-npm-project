@@ -6,15 +6,17 @@ import { RouterModule } from '@angular/router';
 import { PreviewComponents } from './preview-components.component';
 import { routes } from './preview-components.routes';
 import {
-
+  LayoutComponentsListDocsModule
 } from 'components';
+
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-
+    LayoutComponentsListDocsModule
   ],
+  exports: [PreviewComponents],
   declarations: [PreviewComponents],
   providers: [],
 })
