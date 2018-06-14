@@ -35,7 +35,7 @@ console.log('ENV', ENV);
     RouterModule.forRoot(routes, {
       useHash: true,
       preloadingStrategy: PreloadAllModules,
-      enableTracing: true
+      enableTracing: false
     }),
     StandalonePopupModule,
     ...modules

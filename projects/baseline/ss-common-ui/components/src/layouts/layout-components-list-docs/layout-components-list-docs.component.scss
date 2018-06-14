@@ -18,9 +18,13 @@
 
   mat-list {
     mat-list-item {
+      outline: none;
         &:hover {
           cursor: pointer;
-          background: rgba(0,0,0, .04)
+          background: rgba(0,0,0, .2)
+        }
+        &.active {
+          background: rgba(0,0,0, .08)
         }
     }
   }

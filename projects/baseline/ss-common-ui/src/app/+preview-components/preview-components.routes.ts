@@ -10,8 +10,17 @@ export const routes: Routes = [
     component: PreviewComponents,
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'tablewrapper'
+      },
+      {
         path: 'tablewrapper',
-        loadChildren: './+preview-table-wrapper/preview-table-wrapper.module#PreviewTableWrapperModule'
+        loadChildren: './components/+preview-table-wrapper/preview-table-wrapper.module#PreviewTableWrapperModule'
+      },
+      {
+        path: 'commonlogin',
+        loadChildren: './components/+preview-common-login/preview-common-login.module#PreviewCommonLoginModule'
       },
     ]
   }

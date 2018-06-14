@@ -37,11 +37,6 @@ export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit 
   ngOnInit() {
   }
 
-  open(item: ComponentsMenuItem) {
-    this.router.navigateByUrl(item.href);
-  }
-
-
   ngAfterViewInit() {
     setTimeout(() => {
       this.recalculatElement();

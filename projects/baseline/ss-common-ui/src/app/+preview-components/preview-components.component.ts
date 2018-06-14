@@ -5,6 +5,10 @@ export const menuLeft // : ComponentsMenuItem[]
   {
     href: '/previewcomponents/tablewrapper',
     name: 'MatTableWrapper'
+  },
+  {
+    href: '/previewcomponents/commonlogin',
+    name: 'Common Login'
   }
 ];
 

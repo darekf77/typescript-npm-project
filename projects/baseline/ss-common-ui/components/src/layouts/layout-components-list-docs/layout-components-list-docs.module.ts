@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LayoutComponentsListDocsComponent } from './layout-components-list-docs.component';
+import { RouterModule } from '@angular/router';
 // material
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatCardModule } from "@angular/material/card";
@@ -9,6 +9,8 @@ import { MatListModule } from "@angular/material/list";
 import { MatInputModule } from "@angular/material/input";
 // other
 import { StaticColumnsModule } from "static-columns";
+// local
+import { LayoutComponentsListDocsComponent } from './layout-components-list-docs.component';
 
 const materialModules = [
   MatTabsModule,
@@ -26,7 +28,8 @@ const otherModules = [
   imports: [
     CommonModule,
     ...materialModules,
-    ...otherModules
+    ...otherModules,
+    RouterModule.forChild([])
   ],
   exports: [
     LayoutComponentsListDocsComponent
