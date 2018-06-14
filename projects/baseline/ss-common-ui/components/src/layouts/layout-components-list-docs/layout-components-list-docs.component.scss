@@ -6,11 +6,13 @@
 
   .container {
     height: 100%;
+
     column {
       padding: 5px;
       &.content {
         height: 100%;
-        background-color: rgba(0,0,0,.04)
+        background-color: rgba(0,0,0,.04);
+        overflow-y: scroll;
       }
     }
 

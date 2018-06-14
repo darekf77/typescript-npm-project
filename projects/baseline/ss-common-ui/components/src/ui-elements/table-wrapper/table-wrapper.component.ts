@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
+import { times } from 'lodash';
 // import {  } from "@swimlane/ngx-datatable";
 
 @Component({
@@ -13,17 +14,12 @@ export class TableWrapperComponent implements OnInit {
     totalMessage: undefined
   };
 
-  @Input() rows = [
-    {
-      id: 1,
-      name: 'Amazing first row'
-    },
-    {
-      id: 2,
-      name: 'Amazing second row'
-    }
-
-  ];
+  @Input() rows = times(50, (id) => {
+    return {
+      id,
+      name: `Amazing ${id} row `
+    };
+  });
 
   @Input() columns = [
     {
