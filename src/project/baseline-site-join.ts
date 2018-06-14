@@ -63,7 +63,7 @@ export class BaselineSiteJoin {
         // console.log(this.project.customizableFilesAndFolders);
         // process.exit(0)
         this.project.customizableFilesAndFolders.forEach(customizable => {
-            this.project.run(`tnp rimraf ${customizable}`).sync()
+            this.project.run(`rimraf ${customizable}`).sync()
         });
         // rejoin baseline/site files
         this.join.allBaselineSiteFiles()

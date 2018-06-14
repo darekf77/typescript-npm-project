@@ -42,20 +42,20 @@ export class ProjectAngularLib extends BaseProjectLib {
 
   buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean) {
     if (watch) {
-      this.run(`tnp rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
+      this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
-        this.run(`tnp rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
+        this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
       }
       this.run(`npm-run gulp inline-templates-${outDir}-watch`, { output: false }).async()
       this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`).async()
       this.watchOutDir()
     } else {
       this.compilationWrapper(() => {
-        this.run(`tnp rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
+        this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
         this.run(`npm-run gulp inline-templates-${outDir}`, { output: false }).sync()
         this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
         if (outDir === 'dist') {
-          this.run(`tnp rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
+          this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
         }
       }, `angular-lib (project ${this.name})`)
       this.copyToProjectsOnFinish();

@@ -276,7 +276,7 @@ export abstract class Project {
       }) // link/unlink takes care of node_modules
       .join(' ');
     // console.log(this.recreate.filesIgnotnp edBy.gitignore.join('\n'))
-    this.run(`tnp rimraf ${gitginoredfiles}`).sync();
+    this.run(`rimraf ${gitginoredfiles}`).sync();
     if (this.type === 'workspace' && Array.isArray(this.children) && this.children.length > 0) {
       this.children.forEach(childProject => {
         childProject.clear(includeNodeModules)
@@ -408,12 +408,12 @@ export abstract class Project {
   //     return {
   //         linkTo(project: Project) {
   //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             // project.run(`tnp rimraf ${targetLocation}`).sync();
+  //             // project.run(`rimraf ${targetLocation}`).sync();
   //             Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
   //         },
   //         unlinkFrom(project: Project) {
   //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             project.run(`tnp rimraf ${targetLocation}`).sync();
+  //             project.run(`rimraf ${targetLocation}`).sync();
   //         }
   //     };
   // }

@@ -175,11 +175,11 @@ export function clearFiles(files: string[] | string, preserveSymlinks = false) {
       if (HelpersLinks.isLink(fpath)) {
         run(`rm ${HelpersLinks.removeSlashAtEnd(file)}`).sync()
       } else {
-        run(`tnp rimraf ${file}`).sync()
+        run(`rimraf ${file}`).sync()
       }
     })
   } else {
-    run(`tnp rimraf ${filesPathesToDelete.join(' ')}`).sync()
+    run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
   }
   filesPathesToDelete.forEach(file => {
     console.log(`Deleted ${file}`)

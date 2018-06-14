@@ -15,7 +15,7 @@ export class NodeModules {
       if (!this.project.node_modules.exist()) {
         this.project.parent.node_modules.linkToProject(this.project);
       } else if (!this.project.node_modules.isSymbolicLink()) {
-        this.project.run(`tnp rimraf ${this.project.node_modules.folderPath}`).sync();
+        this.project.run(`rimraf ${this.project.node_modules.folderPath}`).sync();
         this.project.parent.node_modules.linkToProject(this.project);
       }
     } else {
@@ -30,7 +30,7 @@ export class NodeModules {
     const localNodeModules = path.join(this.project.location, 'node_modules');
     const projectNodeModules = path.join(target.location, 'node_modules');
     if (force && fs.existsSync(projectNodeModules)) {
-      this.project.run(`tnp rimraf ${projectNodeModules}`);
+      this.project.run(`rimraf ${projectNodeModules}`);
     }
     const linkCommand = `tnp ln ${localNodeModules} ${target.location}`;
     this.project.run(linkCommand).sync();
@@ -94,6 +94,6 @@ export class NodeModules {
   }
   remove() {
     // console.log('remove node_modules', this.project.location)
-    this.project.run('tnp rimraf node_modules').sync()
+    this.project.run('rimraf node_modules').sync()
   }
 }

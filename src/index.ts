@@ -21,6 +21,7 @@ Helpers.checkEnvironment({
         { name: 'watch', version: '1.0.2' },
         { name: 'check-node-version' },
         { name: 'npm-run' },
+        { name: 'rimraf' },
         { name: 'cpr' }
     ],
     programs: [
