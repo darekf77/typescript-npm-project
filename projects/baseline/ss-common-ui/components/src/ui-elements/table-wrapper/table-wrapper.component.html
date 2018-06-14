@@ -1,0 +1,21 @@
+<ngx-datatable class="material"
+               *ngIf="rows && columns;else tableLoading"
+               [rows]="rows"
+               [columnMode]="'force'"
+               [sorts]="[{prop: 'id', dir: 'asc'}]"
+               [externalSorting]="true"
+               [columns]="columns"
+               [rowHeight]="'auto'"
+               [headerHeight]="'auto'"
+               >
+
+
+</ngx-datatable>
+
+<ng-template #tableLoading>
+  Loading table
+</ng-template>
+
+<!-- (sort)="on.sort($event)"
+  [loadingIndicator]="loadingIndicator"
+               [messages]="messages" -->
