@@ -2,12 +2,6 @@ import { Routes } from '@angular/router';
 import { PreviewComponents } from './preview-components.component';
 import { ComponentsMenuItem } from '../../../components/src/layouts/layout-components-list-docs/layout-components-list-docs.component';
 
-export const menuLeft: ComponentsMenuItem[] = [
-  {
-    href: '/preview-components/tablewrapper',
-    name: 'MatTableWrapper'
-  }
-];
 
 export const routes: Routes = [
   {

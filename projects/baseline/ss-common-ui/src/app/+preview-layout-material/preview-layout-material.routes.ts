@@ -3,7 +3,7 @@ import { PreviewLayoutMaterialComponent } from './preview-layout-material.compon
 export const routes: Routes = [
     {
         path: '',
-        pathMatch: 'prefix',
+        pathMatch: 'full',
         component: PreviewLayoutMaterialComponent
     }
-]
+];

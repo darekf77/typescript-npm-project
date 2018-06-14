@@ -16,9 +16,7 @@ import {
     RouterModule.forChild(routes),
     LayoutComponentsListDocsModule
   ],
-  exports: [PreviewComponents],
-  declarations: [PreviewComponents],
-  providers: [],
+  declarations: [PreviewComponents]
 })
 export class PreviewComponentsModule { }
 

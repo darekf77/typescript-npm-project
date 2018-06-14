@@ -8,15 +8,15 @@ export const routes: Routes = [
     children: [
       {
         path: 'layout-slider-vertical',
-        loadChildren: 'app/preview-slider-vertical/preview-slider-vertical.module#PreviewSliderVerticalModule',
+        loadChildren: './+preview-slider-vertical/preview-slider-vertical.module#PreviewSliderVerticalModule',
       },
       {
         path: 'previewcomponents',
-        loadChildren: './preview-components/preview-components.module#PreviewComponentsModule',
+        loadChildren: './+preview-components/preview-components.module#PreviewComponentsModule',
       },
       {
         path: 'preview-layout-material',
-        loadChildren: 'app/preview-layout-material/preview-layout-material.module#PreviewLayoutMaterialModule',
+        loadChildren: './+preview-layout-material/preview-layout-material.module#PreviewLayoutMaterialModule',
       }
     ]
   },

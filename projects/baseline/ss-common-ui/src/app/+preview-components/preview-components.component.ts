@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 
-import { menuLeft } from './preview-components.routes';
+export const menuLeft // : ComponentsMenuItem[]
+ = [
+  {
+    href: '/previewcomponents/tablewrapper',
+    name: 'MatTableWrapper'
+  }
+];
 
 @Component({
-  selector: 'preview-components',
-  template: `
-asdasd
-    <router-outlet></router-outlet>
-  ` ,
+  selector: 'app-preview-components',
+  templateUrl: './preview-components.component.html',
   styleUrls: ['./preview-components.component.scss']
 })
 export class PreviewComponents implements OnInit {

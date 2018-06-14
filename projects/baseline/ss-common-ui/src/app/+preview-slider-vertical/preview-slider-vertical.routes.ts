@@ -3,7 +3,7 @@ import { PreviewSliderVerticalComponent } from './preview-slider-vertical.compon
 export const routes: Routes = [
     {
         path: '',
-        pathMatch: 'prefix',
+        pathMatch: 'full',
         component: PreviewSliderVerticalComponent
     }
-]
+];
