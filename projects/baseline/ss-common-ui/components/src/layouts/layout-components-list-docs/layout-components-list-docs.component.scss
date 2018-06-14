@@ -26,6 +26,11 @@
         &.active {
           background: rgba(0,0,0, .08)
         }
+        &.disabled {
+          pointer-events: none;
+          background: inherit;
+          opacity: 0.5;
+        }
     }
   }
 

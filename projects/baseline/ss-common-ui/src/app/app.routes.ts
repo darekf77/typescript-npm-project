@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
-import { PreviewSliderVerticalComponent } from './preview-slider-vertical/preview-slider-vertical.component';
-import { AppComponent } from './app.component';
+
 export const routes: Routes = [
   {
     path: '',

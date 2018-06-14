@@ -24,6 +24,13 @@ export interface ComponentsMenuItem {
 })
 export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit {
 
+  filter = {
+    list: undefined as string,
+    change(e: Event) {
+      log.i('e', e);
+    }
+  };
+
   @Input() menuLeft: ComponentsMenuItem[] = [];
 
   elements = {

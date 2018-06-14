@@ -3,11 +3,14 @@
   <column [width]="300">
     <mat-form-field class="example-full-width">
       <input matInput
+             [(ngModel)]="filter.list"
+             (changed)="filter.change($event)"
              placeholder="Search for component">
     </mat-form-field>
     <mat-list>
-      <mat-list-item *ngFor="let item of menuLeft"
+      <mat-list-item *ngFor="let item of menuLeft | filterBy:['href','name']:filter.list"
                      routerLink="{{item.href}}"
+                     [ngClass]="{'disabled' : !item.href  }"
                      [routerLinkActive]="['active']">
         <mat-icon matListIcon>folder</mat-icon>
         <h3 matLine> {{item.name}} </h3>
