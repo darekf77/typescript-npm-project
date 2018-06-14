@@ -22,6 +22,10 @@ export const routes: Routes = [
         path: 'commonlogin',
         loadChildren: './components/+preview-common-login/preview-common-login.module#PreviewCommonLoginModule'
       },
+      {
+        path: 'logo',
+        loadChildren: './components/+preview-logo/preview-logo.module#PreviewLogoModule'
+      },
     ]
   }
 ];

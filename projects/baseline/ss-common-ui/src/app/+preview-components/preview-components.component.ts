@@ -12,6 +12,10 @@ export const menuLeft // : ComponentsMenuItem[]
     },
     {
       name: 'Select'
+    },
+    {
+      href: '/previewcomponents/logo',
+      name: 'Logo'
     }
   ];
 
