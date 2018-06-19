@@ -10,11 +10,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class CourseCategoriesListComponent implements OnInit {
 
-  constructor(
-    private category: CategoryController,
-  ) {
-
-  }
+  constructor(private category: CategoryController) { }
   
   public categories: CATEGORY[] = []
 

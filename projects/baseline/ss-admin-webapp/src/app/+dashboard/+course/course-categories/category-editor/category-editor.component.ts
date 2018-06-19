@@ -6,7 +6,8 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 import { CourseCategoriesComponent } from '../course-categories.component';
 import { Subscription } from 'rxjs/Subscription';
 import CategoryController from 'ss-common-logic/browser/controllers/CategoryController';
-const log = Log.create('category editor')
+
+const log = Log.create('category editor', Level.__NOTHING)
 
 @Component({
   selector: 'app-category-editor',
