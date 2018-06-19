@@ -91,6 +91,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         tsc: 'npm-run tsc'
       },
       build: {
+        generateDeclarations: !this.isWorkspaceChildProject, /// TODO QUICK_FIX
         otherIsomorphicLibs: isomorphicNames
       }
     }).init(this.location)
