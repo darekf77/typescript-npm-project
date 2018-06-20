@@ -3,7 +3,7 @@ import {
   ENDPOINT, GET, POST, PUT, DELETE, isNode, Connection,
   PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
   Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity,
-  CLASS_NAME, getClassName
+  CLASSNAME
 } from 'morphi';
 import { get } from "lodash";
 
@@ -26,7 +26,7 @@ import { META } from '../../helpers';
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
-@CLASS_NAME('MultimediaController')
+
 @ENDPOINT({
   auth: (method) => {
     //#region @backendFunc
@@ -34,6 +34,7 @@ import * as controllers from '../../controllers';
     //#endregion
   }
 })
+@CLASSNAME('MultimediaController')
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
 
   constructor() {
