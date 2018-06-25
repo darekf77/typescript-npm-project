@@ -29,6 +29,7 @@ const log = Log.create(__filename);
 
 import { USER } from './USER';
 import { META } from '../../helpers';
+import { CLASSNAME } from 'morphi';
 
 
 export const SESSION_CONFIG = {
@@ -63,8 +64,10 @@ export class LocalStorage {
   }
 }
 
-
+//#region @backend
 @Entity(META.tableNameFrom(SESSION))
+//#endregion
+@CLASSNAME('SESSION')
 export class SESSION extends META.BASE_ENTITY<SESSION> {
 
   fromRaw(obj: Object): SESSION {

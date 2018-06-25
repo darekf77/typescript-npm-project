@@ -143,6 +143,7 @@ export default {
   $BUILD_APP: (args) => buildApp(false, false, 'dist', args),
 
   $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
+  $BUILD_APP_WATCH_PROD: (args) => buildApp(false, true, 'dist', args),
 
   $START_APP: () => Project.Current.start(),
 
@@ -156,6 +157,15 @@ export default {
     }
   },
 
+  $BUILD_PROD: (args) => {
+    if (config.allowedTypes.libs.includes(Project.Current.type)) {
+      buildLib(true, false, 'dist', args)
+    }
+    if (config.allowedTypes.app.includes(Project.Current.type)) {
+      buildApp(true, false, 'dist', args)
+    }
+  },
+
   $BUILD_WATCH: (args) => {
     if (config.allowedTypes.libs.includes(Project.Current.type)) {
       buildLib(false, true, 'dist', args)
@@ -164,6 +174,9 @@ export default {
       buildApp(false, true, 'dist', args)
     }
   },
+  
+
+
   $START: () => Project.Current.start(),
 
   'Documentation': `

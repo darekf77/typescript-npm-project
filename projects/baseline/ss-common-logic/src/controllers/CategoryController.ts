@@ -1,4 +1,4 @@
-import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity, GET, PathParam, Response } from 'morphi';
+import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity, GET, PathParam, Response, CLASSNAME } from 'morphi';
 //#region @backend
 import { authenticate } from 'passport';
 import * as fs from 'fs';
@@ -18,6 +18,7 @@ import * as controllers from '../controllers';
     //#endregion
   }
 })
+@CLASSNAME('CategoryController')
 export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> {
 
   //#region @backend

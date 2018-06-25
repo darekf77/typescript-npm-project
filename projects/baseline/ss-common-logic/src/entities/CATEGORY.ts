@@ -6,13 +6,17 @@ import { Entity, JoinTable, OneToMany, EntityRepository } from 'typeorm';
 import { META } from '../helpers';
 import { kebabCase } from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
+import { CLASSNAME } from 'morphi';
 
 export interface ICATEGORY {
   name: string;
   groups: IGROUP[]
 }
 
+//#region @backend
 @Entity(META.tableNameFrom(CATEGORY))
+//#endregion
+@CLASSNAME('CATEGORY')
 export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 
   fromRaw(obj: ICATEGORY): CATEGORY {
@@ -57,7 +61,7 @@ export interface CATEGORY_ALIASES {
 export class CATEGORY_REPOSITORY extends META.BASE_REPOSITORY<CATEGORY, CATEGORY_ALIASES> {
 
   //#region @backend
-  globalAliases: ( keyof CATEGORY_ALIASES)[] = ['category', 'categories']
+  globalAliases: (keyof CATEGORY_ALIASES)[] = ['category', 'categories']
   //#endregion
 
 }

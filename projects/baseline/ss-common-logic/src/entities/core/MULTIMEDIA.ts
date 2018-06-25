@@ -23,13 +23,17 @@ import * as fse from "fs-extra";
 import * as fs from "fs";
 //#endregion
 import { kebabCase } from "lodash";
+import { CLASSNAME } from 'morphi';
 
 
 export interface IMULTIMEDIA {
 
 }
 
+//#region @backend
 @Entity(META.tableNameFrom(MULTIMEDIA))
+//#endregion
+@CLASSNAME('MULTIMEDIA')
 export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {
 
 

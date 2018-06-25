@@ -16,15 +16,18 @@ function install(a: string) {
 
     if (args.length === 0) { // NPM INSTALL
         if (project.type === 'workspace') {
+            console.log('** npm install in workspace')
             unlink(project)
             project.node_modules.installPackages()
             link(project)
         } else if (project.parent && project.parent.type === 'workspace') {
+            console.log('** npm install in child of workspace')
             const parent = project.parent;
             unlink(parent)
             parent.node_modules.installPackages()
             link(parent)
         } else {
+            console.log('** npm install in separated project')
             project.node_modules.installPackages()
         }
     } if (args.length >= 1) { // NPM INSTALL <package name>

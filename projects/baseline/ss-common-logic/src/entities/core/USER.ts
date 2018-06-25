@@ -24,6 +24,7 @@ import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE } from "./EMAIL_TYPE";
 import { META } from '../../helpers';
+import { CLASSNAME } from 'morphi';
 
 
 
@@ -37,7 +38,10 @@ export interface IUSER {
   city?: string;
 }
 
+//#region @backend
 @Entity(META.tableNameFrom(USER))
+//#endregion
+@CLASSNAME('USER')
 export class USER extends META.BASE_ENTITY<USER, IUSER> implements IUSER {
 
 

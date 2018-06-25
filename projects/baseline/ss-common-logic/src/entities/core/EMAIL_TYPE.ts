@@ -20,11 +20,14 @@ import { EntityRepository } from 'typeorm';
 
 import { EMAIL } from "./EMAIL";
 import { META } from '../../helpers';
+import { CLASSNAME } from 'morphi';
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
-
+//#region @backend
 @Entity(META.tableNameFrom(EMAIL_TYPE))
+//#endregion
+@CLASSNAME('EMAIL_TYPE')
 export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> {
 
   fromRaw(obj: Object): EMAIL_TYPE {

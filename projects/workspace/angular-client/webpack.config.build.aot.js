@@ -5,16 +5,12 @@ const ngcWebpack = require('ngc-webpack');
 const common = require('./webpack.config.common.js');
 const PurifyPlugin = require('@angular-devkit/build-optimizer').PurifyPlugin;
 
-const { getReservedClassNames } = require('tnp')
-
-const reserved = getReservedClassNames()
-
 const { AngularCompilerPlugin } = require('@ngtools/webpack');
 
 module.exports = merge(common, {
   plugins: [
     new ngcWebpack.NgcWebpackPlugin({
-      AOT: true,                            // alias for skipCodeGeneration: false
+      AOT: false,                            // alias for skipCodeGeneration: false
       tsConfigPath: './src/tsconfig.app.json',
       mainPath: 'main.ts',
       platform: 0,
@@ -23,11 +19,12 @@ module.exports = merge(common, {
       },
       sourceMap: false
     }),
-    new PurifyPlugin(),
+    // new PurifyPlugin(),
     new UglifyJSPlugin({
       uglifyOptions: {
-        mangle: {
-          reserved
+        compress: {
+          warnings: false,
+          // drop_debugger: false
         }
       }
     })

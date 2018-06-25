@@ -2,7 +2,7 @@
 import {
   ENDPOINT, GET, POST, PUT, DELETE, isNode, Connection,
   PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-  Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity
+  Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity, CLASSNAME
 } from 'morphi';
 
 //#region @backend
@@ -80,6 +80,7 @@ export interface IFacebook {
     //#endregion
   }
 })
+@CLASSNAME('AuthController')
 export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   //#region @backend
@@ -97,9 +98,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   constructor() {
     super();
-    // console.log(`Super in base class: ${AuthController.name}`)
     isBrowser && this.browser.init()
-    //#endregion
   }
 
   private _subIsLggedIn = new Subject<boolean>();

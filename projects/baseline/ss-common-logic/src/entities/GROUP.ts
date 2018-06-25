@@ -7,6 +7,7 @@ import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
 import { Entity, OneToMany, EntityRepository } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { DIALOG, IDIALOG } from './DIALOG';
+import { CLASSNAME } from 'morphi';
 
 export interface IGROUP {
   id?: number;
@@ -14,7 +15,10 @@ export interface IGROUP {
   dialogs: IDIALOG[];
 }
 
+//#region @backend
 @Entity(META.tableNameFrom(GROUP))
+//#endregion
+@CLASSNAME('GROUP')
 export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
 
 

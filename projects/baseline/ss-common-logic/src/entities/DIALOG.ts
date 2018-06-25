@@ -7,6 +7,7 @@ import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
 import { Entity, EntityRepository } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { GROUP } from './GROUP';
+import { CLASSNAME } from 'morphi';
 
 export interface IDIALOG {
   id?: number;
@@ -17,7 +18,10 @@ export interface IDIALOG {
 
 }
 
+//#region @backend
 @Entity(META.tableNameFrom(DIALOG))
+//#endregion
+@CLASSNAME('DIALOG')
 export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG {
 
   fromRaw(obj: IDIALOG): DIALOG {

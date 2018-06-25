@@ -26,9 +26,12 @@ import { Router, Request, Response } from "express";
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
 import { META } from '../../helpers';
+import { CLASSNAME } from 'morphi';
 
-
+//#region @backend
 @Entity(META.tableNameFrom(EMAIL))
+//#endregion
+@CLASSNAME('EMAIL')
 export class EMAIL extends META.BASE_ENTITY<EMAIL> {
 
   fromRaw(obj: Object): EMAIL {
@@ -100,4 +103,5 @@ export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL, EMAIL_ALIASES>
   }
 
 }
+
 
