@@ -6,7 +6,7 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
- - check if each controller, entity is added to morphi init
+ - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
  - "assets" relative from html,css ,  "/assets" from scss
 
 ## Create, build, publish:

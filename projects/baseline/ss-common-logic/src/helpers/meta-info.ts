@@ -43,8 +43,8 @@ export namespace META {
 
       compolexProperties.forEach(alias => {
         repo['__'][alias] = {};
-        Describer.describe(entity).concat(compolexProperties).forEach(prop => {
-          repo['__'][alias][prop] = `${alias}.${prop}`; // TODO make it getter with reference
+        Describer.describe(entity).concat(compolexProperties as any).forEach(prop => {
+          repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO make it getter with reference
         })
       })
 

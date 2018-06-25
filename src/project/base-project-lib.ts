@@ -120,6 +120,13 @@ export abstract class BaseProjectLib extends Project {
         clearConsole()
         this.checkIfReadyForNpm()
         const newVersion = Project.Current.versionPatchedPlusOne;
+        const self = this;
+        function removeTagAndCommit() {
+            console.log(`PLEASE RUN: `)
+            console.log(`git reset --hard`)
+            console.log(`git tag --delete v${newVersion}`)
+        }
+
         await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
             try {
                 this.run(`npm version patch`).sync()
@@ -133,11 +140,21 @@ export abstract class BaseProjectLib extends Project {
             this.bundleResources()
         }, () => process.exit(0))
         await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
-            this.run('npm publish', {
-                cwd: path.join(this.location, config.folder.bundle),
-                output: true
-            }).sync()
-            this.pushToGitRepo()
+            let successPublis = false;
+            try {
+                this.run('npm publish', {
+                    cwd: path.join(this.location, config.folder.bundle),
+                    output: true
+                }).sync()
+                successPublis = true;
+            } catch (error) {
+                removeTagAndCommit()
+            }
+            if (successPublis) {
+                this.pushToGitRepo()
+            }
+        }, () => {
+            removeTagAndCommit()
         })
     }
 

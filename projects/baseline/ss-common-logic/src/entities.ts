@@ -22,12 +22,16 @@ export { CATEGORY, ICATEGORY, CATEGORY_REPOSITORY } from "./entities/CATEGORY";
 import { GROUP, IGROUP, GROUP_REPOSITORY } from "./entities/GROUP";
 export { GROUP, IGROUP, GROUP_REPOSITORY } from "./entities/GROUP";
 
+import { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
+export { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
+
 
 //#region @backend
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";
 
 import { META, Connection } from './helpers';
+
 export function entities(connection?: Connection) {
   return {
     USER: META.repositoryFrom<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY),
@@ -45,6 +49,8 @@ export function entities(connection?: Connection) {
     GROUP: META.repositoryFrom<GROUP, GROUP_REPOSITORY>(connection, GROUP, GROUP_REPOSITORY),
 
     MULTIMEDIA: META.repositoryFrom<MULTIMEDIA, MULTIMEDIA_REPOSITORY>(connection, MULTIMEDIA, MULTIMEDIA_REPOSITORY),
+
+    EXAMPLE: META.repositoryFrom<EXAMPLE, EXAMPLE_REPOSITORY>(connection, EXAMPLE, EXAMPLE_REPOSITORY)
   }
 }
 //#endregion
