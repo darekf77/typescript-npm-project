@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 
 @Component({
   selector: 'app-preview-table-wrapper',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PreviewTableWrapperComponent implements OnInit {
 
-  constructor() { }
+  constructor(public exampleService: ExamplesController) {
+
+  }
 
   ngOnInit() {
+
   }
 
 }

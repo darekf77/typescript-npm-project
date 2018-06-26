@@ -1,6 +1,10 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { times } from 'lodash';
-// import {  } from "@swimlane/ngx-datatable";
+import { BaseCRUD } from 'morphi/browser';
+import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { Log, Level } from 'ng2-logger/browser';
+
+const log = Log.create('Table wrapper');
 
 @Component({
   selector: 'app-table-wrapper',
@@ -8,6 +12,8 @@ import { times } from 'lodash';
   styleUrls: ['./table-wrapper.component.scss']
 })
 export class TableWrapperComponent implements OnInit {
+
+  @Input() crud: BaseCRUD<any>;
 
   public messages = {
     emptyMessage: undefined,
@@ -33,6 +39,12 @@ export class TableWrapperComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    setTimeout(() => {
+      log.i('this.crud', this.crud);
+      this.crud.getAll().received.observable.subscribe(c => {
+        log.i('AMAZING!', c);
+      });
+    });
   }
 
 }

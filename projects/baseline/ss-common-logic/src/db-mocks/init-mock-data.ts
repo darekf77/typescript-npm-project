@@ -34,6 +34,7 @@ export class InitMockData extends META.BASE_MOCK_DATA {
     await this.ctrl.AuthController.initExampleDbData();
     await this.ctrl.CategoryController.initExampleDbData()
     await this.ctrl.MultimediaController.initExampleDbData()
+    await this.ctrl.ExamplesController.initExampleDbData()
     //#endregion
   }
 

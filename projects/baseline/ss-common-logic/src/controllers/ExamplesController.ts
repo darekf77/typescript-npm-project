@@ -31,9 +31,15 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
 
   async initExampleDbData() {
 
-    this.db.EXAMPLE.create({
-        test: 'Amazing Example !'
+    const c1 = this.db.EXAMPLE.create({
+      test: 'Amazing Example !'
     })
+
+    const c2 = this.db.EXAMPLE.create({
+      test: 'Super Example !'
+    })
+
+    await this.db.EXAMPLE.save([c1, c2])
 
   }
   //#endregion

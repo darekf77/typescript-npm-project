@@ -20,8 +20,7 @@ const modules = [
   MatSidenavModule
 ];
 
-import * as ENV from '../../tmp-environment.json';
-console.log('ENV', ENV);
+
 
 @NgModule({
   declarations: [

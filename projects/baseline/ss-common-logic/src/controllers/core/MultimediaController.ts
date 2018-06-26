@@ -70,7 +70,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
   //#region @backend
   @OrmConnection connection: Connection;
-  @BaseCRUDEntity(entities.SESSION) entity: entities.MULTIMEDIA;
+  @BaseCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
 
   get db() {
     return entities.entities(this.connection as any);
