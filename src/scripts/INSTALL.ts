@@ -44,18 +44,30 @@ function install(a: string) {
         //#endregion
 
         if (project.type === 'workspace') {  // workspace project: npm i <package name>
+            console.log('** npm install <package> in workspace')
             unlink(project)
+            if (!project.node_modules.exist()) {
+                project.node_modules.installPackages()
+            }
             npmPackagesToAdd.forEach(npmPackageName => {
                 project.node_modules.installPackage(npmPackageName)
             })
             link(project)
         } else if (project.parent && project.parent.type === 'workspace') {
+            console.log('** npm install <package> in child of workspace')
             unlink(project.parent)
+            if (!project.parent.node_modules.exist()) {
+                project.parent.node_modules.installPackages()
+            }
             npmPackagesToAdd.forEach(npmPackageName => {
                 project.parent.node_modules.installPackage(npmPackageName)
             })
             link(project.parent)
         } else {
+            console.log('** npm install <package> in separated project')
+            if (!project.node_modules.exist()) {
+                project.node_modules.installPackages()
+            }
             npmPackagesToAdd.forEach(npmPackageName => {  // Other normal porojects
                 project.node_modules.installPackage(npmPackageName)
             })
