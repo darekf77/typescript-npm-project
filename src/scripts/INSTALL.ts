@@ -5,14 +5,9 @@ import { checkValidNpmPackageName } from "../helpers";
 import { error } from "../messages";
 import { unlink } from "./UNLINK";
 
-function cleanBeforeInstall(workspaceProject: Project) {
-    workspaceProject.node_modules.localChildrensWithRequiredLibs.removeSymlinks();
-    // Project.Tnp.ownNpmPackage.unlinkFrom(workspaceProject);
-}
 
-function install(a: string) {
+export function install(a: string, project = Project.Current) {
     const args = a.split(' ').filter(a => !!a);
-    const project = Project.Current;
 
     if (args.length === 0) { // NPM INSTALL
         if (project.type === 'workspace') {

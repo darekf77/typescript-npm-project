@@ -24,6 +24,7 @@ import { init } from '../scripts/INIT';
 import { HelpersLinks } from '../helpers-links';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
+import { install } from '../scripts/INSTALL';
 
 
 export abstract class Project {
@@ -245,7 +246,7 @@ export abstract class Project {
     init(this);
 
     // console.log(`Prepare node modules: ${this.name}`)
-    this.node_modules.prepare();
+    install('', this);
 
     // console.log(`Prepare environment for: ${this.name}`)
     this.env.prepare(buildOptions);

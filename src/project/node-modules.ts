@@ -10,19 +10,6 @@ export class NodeModules {
   constructor(private project: Project) { }
 
 
-  prepare() {
-    if (this.project.parent && this.project.parent.type === 'workspace') {
-      if (!this.project.node_modules.exist()) {
-        this.project.parent.node_modules.linkToProject(this.project);
-      } else if (!this.project.node_modules.isSymbolicLink()) {
-        this.project.run(`rimraf ${this.project.node_modules.folderPath}`).sync();
-        this.project.parent.node_modules.linkToProject(this.project);
-      }
-    } else {
-      this.project.node_modules.installPackages();
-    }
-  }
-
   linkToProject(target: Project, force = false) {
     if (!this.exist()) {
       this.project.node_modules.installPackages();
