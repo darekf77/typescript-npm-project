@@ -31,7 +31,7 @@ init(ENV.workspace.projects.find(({ name }) => name === 'isomorphic-lib').host)
     FormsModule,
     HttpModule,
     // MyLibModule.forRoot(),
-    RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   providers: [
     AngularProviders

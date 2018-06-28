@@ -72,14 +72,17 @@ export const Entities = entities;
 
 import { start } from './helpers';
 import MockData from "./db-mocks";
-
+const project = ENV.workspace.projects.find(p => p.name === 'isomorphic-lib')
 
 export default function () {
-  console.log('ENV', ENV)
+  console.log('ENV', ENV);
 
   start({
-    config: ENV.currentProject.$db as any,
-    host: ENV.currentProject.host,
+    config: project.$db as any,
+    host: ENV.proxyRouterMode ?
+      `http://localhost:${project.port}${project.baseUrl}` :
+      `http://localhost:${project.port}`
+    ,
     Controllers: Controllers as any,
     Entities: Entities as any,
     MockData

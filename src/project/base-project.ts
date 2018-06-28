@@ -162,17 +162,18 @@ export abstract class Project {
       this.type = this.packageJson.type;
 
       Project.projects.push(this);
-      if (Project.Current.location === this.location) {
-        if (this.parent && this.parent.type === 'workspace') {
-          this.parent.tnpHelper.install()
-        }
-        this.tnpHelper.install()
-      }
 
       // console.log(`Created project ${path.basename(this.location)}`)
 
       this.children = this.findChildren();
       this.parent = ProjectFrom(path.join(location, '..'));
+
+      if (this.parent && this.parent.type === 'workspace') {
+        this.parent.tnpHelper.install()
+      } else {
+        this.tnpHelper.install()
+      }
+
       this.requiredLibs = this.packageJson.requiredProjects;
       this.preview = ProjectFrom(path.join(location, 'preview'));
 
@@ -246,7 +247,12 @@ export abstract class Project {
     init(this);
 
     // console.log(`Prepare node modules: ${this.name}`)
-    install('', this);
+    if (this.isWorkspaceChildProject && !this.parent.node_modules.exist()) {
+      install('', this.parent, false);
+    } else if (!this.node_modules.exist()) {
+      install('', this, false);
+    }
+
 
     // console.log(`Prepare environment for: ${this.name}`)
     this.env.prepare(buildOptions);
@@ -358,7 +364,9 @@ export abstract class Project {
       // console.log(Project.Current.location)
       // console.log('dirname', __dirname)
       return {
-        install() { }
+        install() {
+          console.log(`** ERR Project.Tnp not available yet`)
+        }
 
       } // TODO QUCIK FIX for tnp installd in node_modules
     }
@@ -377,30 +385,20 @@ export abstract class Project {
 
         if (process.platform === 'win32') {
           try {
-            self.reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
+            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
           } catch (error) {
             console.log(`Trying to reinstall tnp...`)
             sleep.sleep(2);
             self.tnpHelper.install()
           }
         } else {
-          self.reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
+          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
         }
       }
     }
   }
 
-  private reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
-    const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
-    const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
-    if (fs.existsSync(destCompiledJs)) {
-      // console.log(`Removed tnp-helper from ${dest} `)
-      rimraf.sync(destCompiledJs)
-    }
-    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
-    fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
-    // console.log(`Tnp-helper installed in ${project.name} `)
-  }
+
 
 
   // TODO solve problem with ngc watch mode high cpu
@@ -420,3 +418,15 @@ export abstract class Project {
   // }
 
 };
+
+function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
+  const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+  const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
+  if (fs.existsSync(destCompiledJs)) {
+    // console.log(`Removed tnp-helper from ${dest} `)
+    rimraf.sync(destCompiledJs)
+  }
+  fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+  fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+  // console.log(`Tnp-helper installed in ${project.name} `)
+}

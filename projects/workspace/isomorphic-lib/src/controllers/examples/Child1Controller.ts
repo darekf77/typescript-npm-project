@@ -1,12 +1,13 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, getResponseValue, OrmConnection, Connection
+    Response, getResponseValue, OrmConnection, Connection, CLASSNAME
 } from 'morphi';
 
 import { ParentClass } from "./ParentControllers";
 
 @ENDPOINT()
+@CLASSNAME('ChildClass')
 export class ChildClass extends ParentClass {
 
     @GET('/saySomething')

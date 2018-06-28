@@ -10,6 +10,7 @@ import { Column } from "typeorm/decorator/columns/Column";
 import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
+import { CLASSNAME } from "morphi";
 
 //#region @backend
 import { Router, Request, Response } from 'express';
@@ -30,8 +31,10 @@ export interface IUSER {
     city?: string;
 }
 
-
+//#region @backend
 @Entity(__(USER))
+//#endregion
+@CLASSNAME('USER')
 export class USER implements IUSER {
 
     @PrimaryGeneratedColumn()

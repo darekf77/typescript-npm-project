@@ -66,7 +66,6 @@ export class NodeModules {
           console.log(`Adding symlinks: ${c.name}`)
           self.project.run(command).sync();
         })
-        self.project.tnpHelper.install()
       },
     }
   }

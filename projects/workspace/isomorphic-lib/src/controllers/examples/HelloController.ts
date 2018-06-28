@@ -1,7 +1,7 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
     PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, OrmConnection, Connection
+    Response, OrmConnection, Connection, CLASSNAME
 } from 'morphi';
 import { Repository } from "typeorm";
 // local
@@ -31,6 +31,7 @@ export function aaa() {
 }
 
 @ENDPOINT({ path: '/test' })
+@CLASSNAME('HelloController')
 export class HelloController {
     @OrmConnection connection: Connection;
     private repository: Repository<TestUser>;
@@ -53,7 +54,7 @@ export class HelloController {
         //#endregion
     }
 
-    
+
     @PUT('/db/:id')
     modifyUser( @PathParam('id') id: number, @BodyParam('user') user): Response<any> {
         //#region @backendFunc

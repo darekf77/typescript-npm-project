@@ -1,24 +1,25 @@
 import {
-    ENDPOINT, GET, POST, PUT, DELETE,
-    PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, getResponseValue, OrmConnection, Connection
+  ENDPOINT, GET, POST, PUT, DELETE,
+  PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
+  Response, getResponseValue, OrmConnection, Connection, CLASSNAME
 } from 'morphi';
 
 
 @ENDPOINT()
+@CLASSNAME('ParentClass')
 export class ParentClass {
 
-    @OrmConnection connection: Connection;
+  @OrmConnection connection: Connection;
 
-    @GET('/hello')
-    get(): Response<any> {
-        return { send: 'root' }
-    }
+  @GET('/hello')
+  get(): Response<any> {
+    return { send: 'root' }
+  }
 
-    @GET('/loveme')
-    loveme(): Response<any> {
-        return { send: 'I love you' }
-    }
+  @GET('/loveme')
+  loveme(): Response<any> {
+    return { send: 'I love you' }
+  }
 
 }
 
