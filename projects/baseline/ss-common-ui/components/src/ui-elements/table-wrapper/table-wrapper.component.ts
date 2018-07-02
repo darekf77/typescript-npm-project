@@ -38,13 +38,15 @@ export class TableWrapperComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-    setTimeout(() => {
-      log.i('this.crud', this.crud);
-      this.crud.getAll().received.observable.subscribe(c => {
-        log.i('AMAZING!', c);
-      });
+  checkCrud() {
+    console.clear();
+    log.i('this.crud', this.crud);
+    this.crud.getAll().received.observable.subscribe(c => {
+      log.i('AMAZING!', c);
     });
+  }
+
+  ngOnInit() {
   }
 
 }

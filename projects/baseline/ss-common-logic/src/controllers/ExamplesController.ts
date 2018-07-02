@@ -1,4 +1,4 @@
-import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity, GET, PathParam, Response, CLASSNAME } from 'morphi';
+import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity, GET, PathParam, Response, CLASSNAME, isBrowser } from 'morphi';
 //#region @backend
 import { authenticate } from 'passport';
 import * as fs from 'fs';
@@ -10,10 +10,20 @@ import { META } from '../helpers';
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
+import { Log, Level } from "ng2-logger";
+const log = Log.create('ExamplesController')
 
 @ENDPOINT()
 @CLASSNAME('ExamplesController')
 export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
+
+  constructor() {
+    super();
+    if (isBrowser) {
+      log.i('ExamplesController, constructor', this)
+    }
+  }
+
 
   //#region @backend
   @OrmConnection connection: Connection;
@@ -25,26 +35,46 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
   }
 
   get ctrl() {
-    return controllers.controllers()
+    return controllers.controllers();
   }
 
-
+  
   async initExampleDbData() {
 
     const c1 = this.db.EXAMPLE.create({
       test: 'Amazing Example !'
-    })
+    });
 
     const c2 = this.db.EXAMPLE.create({
       test: 'Super Example !'
-    })
+    });
 
-    await this.db.EXAMPLE.save([c1, c2])
+    await this.db.EXAMPLE.save([c1, c2]);
 
   }
   //#endregion
 
+  @GET('/')
+  info(): Response<any> {
+    //#region @backendFunc
+    return {
+      send: {
+        hello: 'amazing'
+      }
+    };
+    //#endregion
+  }
 
+  @GET('/dupa')
+  info2(): Response<any> {
+    //#region @backendFunc
+    return {
+      send: {
+        hello: 'uuuuu'
+      }
+    };
+    //#endregion
+  }
 
 }
 

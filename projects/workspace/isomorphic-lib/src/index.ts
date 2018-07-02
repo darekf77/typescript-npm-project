@@ -31,6 +31,26 @@ import { ChildClass2 } from './controllers/examples/Child2Controller';
 export { ChildClass2 } from './controllers/examples/Child2Controller';
 addController(ChildClass2);
 
+import { CRUDchild } from './controllers/examples/CRUDchild';
+export { CRUDchild } from './controllers/examples/CRUDchild';
+addController(CRUDchild);
+
+import { CRUDparent } from './controllers/examples/CRUDparent';
+export { CRUDparent } from './controllers/examples/CRUDparent';
+addController(CRUDparent);
+
+
+import { CRUDGenericChild } from './controllers/examples/CRUDGenericChild';
+export { CRUDGenericChild } from './controllers/examples/CRUDGenericChild';
+addController(CRUDGenericChild);
+
+import { CRUDGenericParent } from './controllers/examples/CRUDGenericParent';
+export { CRUDGenericParent } from './controllers/examples/CRUDGenericParent';
+addController(CRUDGenericParent);
+
+
+
+
 import { AuthController } from './controllers/AuthController';
 export { AuthController } from './controllers/AuthController';
 addController(AuthController);

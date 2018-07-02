@@ -1,7 +1,10 @@
 import { Repository } from 'typeorm';
 import { Connection } from "typeorm/connection/Connection";
-import { BaseCRUD } from 'morphi';
+import { BaseCRUD, CLASSNAME, ENDPOINT } from 'morphi';
 import { snakeCase, keys } from "lodash";
+
+import { isBrowser, Log, Level } from 'ng2-logger';
+const log = Log.create('META')
 
 export namespace META {
 
@@ -81,7 +84,17 @@ export namespace META {
 
   }
 
+  @ENDPOINT()
+  @CLASSNAME('BASE_CONTROLLER')
   export abstract class BASE_CONTROLLER<T> extends BaseCRUD<T> {
+
+    constructor() {
+      super();
+      if (isBrowser) {
+        log.i('BASE_CONTROLLER, constructor', this)
+      }
+    }
+
 
     //#region @backend
     abstract get db(): { [entities: string]: Repository<any> }
