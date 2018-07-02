@@ -17,8 +17,12 @@ export function init(project = Project.Current) {
 
 export default {
     $INIT: (args) => {
-        init()        
+        init()
         process.exit(0)
+    },
+    $VSCODE: ()=> {
+      Project.Current.recreate.vscode.settings.excludedFiles();
+      process.exit(0)
     },
     $INIT_VSCODE: () => {
         Project.Current.recreate.vscode.settings.excludedFiles();
