@@ -3,8 +3,10 @@ import { times } from 'lodash';
 import { BaseCRUD } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
+import { Router } from '@angular/router';
 
 const log = Log.create('Table wrapper');
+
 
 @Component({
   selector: 'app-table-wrapper',
@@ -12,6 +14,9 @@ const log = Log.create('Table wrapper');
   styleUrls: ['./table-wrapper.component.scss']
 })
 export class TableWrapperComponent implements OnInit {
+
+  tableModes = ['edit_record', 'click_list']
+  tableMode: 'edit_record' | 'click_list' = 'click_list';
 
   @Input() rowHref: string;
 
@@ -29,6 +34,7 @@ export class TableWrapperComponent implements OnInit {
     };
   });
 
+
   @Input() columns = [
     {
       prop: 'id'
@@ -38,7 +44,7 @@ export class TableWrapperComponent implements OnInit {
     }
   ];
 
-  constructor() { }
+  constructor(private router: Router) { }
 
 
   async ngOnInit() {
@@ -57,6 +63,13 @@ export class TableWrapperComponent implements OnInit {
     } catch (error) {
 
     }
+  }
+
+  onTableContextMenu(e) {
+    // if (this.rowHref) {
+    //   this.router.navigateByUrl(this.rowHref)
+    // }
+    log.i('context menu event', e)
   }
 
 }

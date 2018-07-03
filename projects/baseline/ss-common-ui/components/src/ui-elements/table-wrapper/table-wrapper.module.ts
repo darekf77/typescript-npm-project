@@ -1,10 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+//material
+import { MatSelectModule } from "@angular/material/select";
 // other
 import { NgxDatatableModule } from "@swimlane/ngx-datatable";
 // local
 import { TableWrapperComponent } from './table-wrapper.component';
 
+const materialModules = [
+  MatSelectModule
+]
 
 const moduleOther = [
   NgxDatatableModule
@@ -13,7 +18,8 @@ const moduleOther = [
 @NgModule({
   imports: [
     CommonModule,
-    ...moduleOther
+    ...moduleOther,
+    ...materialModules
   ],
   exports: [
     TableWrapperComponent

@@ -1,16 +1,48 @@
-<ngx-datatable class="material"
-               *ngIf="rows && columns;else tableLoading"
-               [rows]="rows"
-               [columnMode]="'force'"
-               [sorts]="[{prop: 'id', dir: 'asc'}]"
-               [externalSorting]="true"
-               [columns]="columns"
-               [rowHeight]="'auto'"
-               [headerHeight]="'auto'"
-               >
+<mat-select placeholder="Favorite food"
+            style="width: 100px;background: white;"
+            [(value)]="tableMode">
+  <mat-option *ngFor="let mode of tableModes"
+              [value]="mode">
+    {{mode}}
+  </mat-option>
+</mat-select>
+<br>
+<br>
+
+<div [ngSwitch]="tableMode">
+  <div *ngSwitchCase="'edit_record'">
+    <ngx-datatable class="material"
+                   *ngIf="rows && columns;else tableLoading"
+                   [rows]="rows"
+                   [columnMode]="'force'"
+                   [sorts]="[{prop: 'id', dir: 'asc'}]"
+                   [externalSorting]="true"
+                   [columns]="columns"
+                   [rowHeight]="'auto'"
+                   [headerHeight]="'auto'">
+    </ngx-datatable>
+  </div>
+  <div *ngSwitchCase="'click_list'">
+    <ngx-datatable class="material"
+                   *ngIf="rows && columns;else tableLoading"
+                   [rows]="rows"
+                   [columnMode]="'force'"
+                   [sorts]="[{prop: 'id', dir: 'asc'}]"
+                   [externalSorting]="true"
+                   [columns]="columns"
+                   [rowHeight]="'auto'"
+                   [headerHeight]="'auto'"
+                   [selectionType]="'single'"
+                   (select)="onTableContextMenu($event)">
+    </ngx-datatable>
+  </div>
+  <div *ngSwitchDefault>
+    Incorrect table mode
+  </div>
+</div>
 
 
-</ngx-datatable>
+
 
 <ng-template #tableLoading>
   Loading table
