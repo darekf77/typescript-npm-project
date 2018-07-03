@@ -8,7 +8,7 @@ const log = Log.create('META')
 
 export namespace META {
 
-  class Describer {
+  export class Describer {
     private static FRegEx = new RegExp(/(?:this\.)(.+?(?= ))/g);
     static describe(val: Function, parent = false): string[] {
       var result = [];

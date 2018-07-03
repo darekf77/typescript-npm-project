@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { times } from 'lodash';
 import { BaseCRUD } from 'morphi/browser';
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 
 const log = Log.create('Table wrapper');
@@ -12,6 +12,8 @@ const log = Log.create('Table wrapper');
   styleUrls: ['./table-wrapper.component.scss']
 })
 export class TableWrapperComponent implements OnInit {
+
+  @Input() rowHref: string;
 
   @Input() crud: BaseCRUD<any>;
 
@@ -38,16 +40,23 @@ export class TableWrapperComponent implements OnInit {
 
   constructor() { }
 
-  checkCrud() {
-    console.clear();
-    log.i('this.crud', this.crud);
-    this.crud.getAll().received.observable.subscribe(c => {
-      log.i('AMAZING!', c);
-      this.rows = c.body.json;
-    });
-  }
 
-  ngOnInit() {
+  async ngOnInit() {
+    log.i('this.crud.entity', META.Describer.describe(this.crud.entity))
+    try {
+      const columns = META.Describer.describe(this.crud.entity).map(prop => {
+        return { prop }
+      })
+      this.columns = columns;
+      log.i('columns', columns)
+
+      const rows = await this.crud.getAll().received.observable.take(1).toPromise()
+      log.i('rows', rows.body.json)
+      this.rows = rows.body.json
+
+    } catch (error) {
+
+    }
   }
 
 }

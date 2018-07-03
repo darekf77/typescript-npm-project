@@ -27,7 +27,7 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
 
     @Column() test: string = undefined;
 
-
+    @Column() otherData: string = 'asdasdasd';
 }
 
 export interface EXAMPLE_ALIASES {

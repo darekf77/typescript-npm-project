@@ -24,11 +24,10 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
     }
   }
 
+  @BaseCRUDEntity(entities.EXAMPLE) public entity: entities.EXAMPLE;
 
   //#region @backend
   @OrmConnection connection: Connection;
-
-  @BaseCRUDEntity(entities.EXAMPLE) public entity: entities.EXAMPLE;
 
   get db() {
     return entities.entities(this.connection as any);
@@ -38,7 +37,7 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
     return controllers.controllers();
   }
 
-  
+
   async initExampleDbData() {
 
     const c1 = this.db.EXAMPLE.create({
