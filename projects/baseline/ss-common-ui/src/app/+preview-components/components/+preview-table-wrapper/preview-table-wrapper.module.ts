@@ -11,12 +11,14 @@ import { ExamplesController } from 'ss-common-logic/browser/controllers/Examples
 import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 
+const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
-init(ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host)
-  .angularProviders({
-    controllers: [ExamplesController],
-    entities: [EXAMPLE]
-  });
+init({
+  host,
+  controllers: [ExamplesController],
+  entities: [EXAMPLE]
+})
+  .angularProviders();
 
 @NgModule({
   imports: [

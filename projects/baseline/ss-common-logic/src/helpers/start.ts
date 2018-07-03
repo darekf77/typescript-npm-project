@@ -31,11 +31,11 @@ export async function start(options: StartOptions) {
   const connection = await createConnections([config] as any);
   const firstConnection = connection[0];
 
-  init(host).expressApp({
+  init({
+    host,
     controllers,
-    entities,
-    connection: firstConnection as any
-  })
+    entities
+  }).expressApp(firstConnection as any)
 
   if (_.isArray(MockData)) {
     const promises: Promise<any>[] = []

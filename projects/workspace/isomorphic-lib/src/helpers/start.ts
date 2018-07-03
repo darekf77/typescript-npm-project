@@ -36,11 +36,11 @@ export async function start(options: StartOptions) {
     })
   }
 
-  init(host).expressApp({
+  init({
     controllers,
     entities,
-    connection: firstConnection as any
-  });
+    host
+  }).expressApp(firstConnection);
   return {
     connection,
     config,

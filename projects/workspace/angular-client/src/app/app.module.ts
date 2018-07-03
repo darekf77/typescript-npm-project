@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // thrid part
 import * as _ from 'lodash';
-import { init, replay, AngularProviders } from 'morphi/browser';
+import { init, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
 import { Controllers, Entities } from 'isomorphic-lib/browser';
@@ -14,12 +14,14 @@ import { Controllers, Entities } from 'isomorphic-lib/browser';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
+const host = ENV.workspace.projects.find(({ name }) => name === 'isomorphic-lib').host
 
-init(ENV.workspace.projects.find(({ name }) => name === 'isomorphic-lib').host)
-  .angularProviders({
-    controllers: _.values(Controllers),
-    entities: _.values(Entities)
-  })
+init({
+  host,
+  controllers: _.values(Controllers),
+  entities: _.values(Entities)
+})
+  .angularProviders()
 
 @NgModule({
   declarations: [

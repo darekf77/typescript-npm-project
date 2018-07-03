@@ -1,12 +1,8 @@
 
 import {
-    ENDPOINT, GET, POST, PUT, DELETE,
-    PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, BaseCRUD, BaseCRUDEntity, Connection, OrmConnection,
-    CLASSNAME
+    ENDPOINT, BaseCRUD, CLASSNAME
 } from 'morphi';
 
-import { Book } from '../../entities/examples/Book';
 
 @ENDPOINT()
 @CLASSNAME('CRUDGenericParent')

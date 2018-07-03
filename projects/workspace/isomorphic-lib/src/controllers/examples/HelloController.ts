@@ -1,14 +1,16 @@
 import {
     ENDPOINT, GET, POST, PUT, DELETE, isNode,
-    PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, OrmConnection, Connection, CLASSNAME
+    PathParam, QueryParam, CookieParam, BodyParam,
+    Response, Connection, CLASSNAME,
+    //#region @backend
+    OrmConnection
+    //#endregion
 } from 'morphi';
 import { Repository } from "typeorm";
 // local
 import { TestUser } from '../../entities/examples/User';
 import { Book } from '../../entities/examples/Book';
 import { Author } from '../../entities/examples/Author';
-import { UsersController } from './UsersController';
 
 
 const test = new TestUser();
@@ -18,10 +20,6 @@ test.books = [
 ]
 test.friend = new Author();
 
-//#region @backend
-enum USER_GROUPS {
-    ADMIN, USER, USER_PREMIU
-}
 //#endregion
 
 console.log('life is amazing')
@@ -33,7 +31,11 @@ export function aaa() {
 @ENDPOINT({ path: '/test' })
 @CLASSNAME('HelloController')
 export class HelloController {
+
+    //#region @backend
     @OrmConnection connection: Connection;
+    //#endregion
+
     private repository: Repository<TestUser>;
     user = new TestUser();
     constructor() {
@@ -56,7 +58,7 @@ export class HelloController {
 
 
     @PUT('/db/:id')
-    modifyUser( @PathParam('id') id: number, @BodyParam('user') user): Response<any> {
+    modifyUser(@PathParam('id') id, @BodyParam('user') user): Response<any> {
         //#region @backendFunc
         test.username = user.username;
         return { send: test };
@@ -64,11 +66,11 @@ export class HelloController {
     }
 
     @GET('/db/:id', true)
-    getUser( @PathParam('id') id: number): Response<TestUser> {
+    getUser(@PathParam('id') id): Response<TestUser> {
         //#region @backendFunc
         // return { send: test }
 
-        return async (req, res) => {
+        return async () => {
             const user = await this.repository.findOne({});
             return user;
         }
@@ -76,7 +78,7 @@ export class HelloController {
     };
 
     @GET('/aaooaoaoa/test/:id', true)
-    getUsersList( @PathParam('id') id: number): Response<TestUser[]> {
+    getUsersList(@PathParam('id') id): Response<TestUser[]> {
         console.log('test super')
         //#region @backendFunc
         return {
@@ -89,14 +91,14 @@ export class HelloController {
     };
 
     @DELETE('/db/:id')
-    deleteUser( @PathParam('id') id: number): Response<any> {
+    deleteUser(@PathParam('id') id): Response<any> {
         //#region @backendFunc
         return { send: test }
         //#endregion
     };
 
     @GET('/:testing/basdasd/:foooo', true)
-    getUserConfig( @PathParam('testing') test: string, @PathParam('foooo') booo: string): Response<any> {
+    getUserConfig(@PathParam('testing') test: string): Response<any> {
         //#region @backendFunc
         console.log('I am original method');
         return { send: test };
@@ -105,14 +107,14 @@ export class HelloController {
 
 
     @POST('/user')
-    saveUSer( @QueryParam('id_usera') id: number, @BodyParam() user): Response<any> {
+    saveUSer(@QueryParam('id_usera') id: number, @BodyParam() user): Response<any> {
         //#region @backendFunc
         return { send: { id, user } };
         //#endregion
     }
 
     @PUT('/user/:id')
-    updateUSer( @PathParam('id') id: number, @CookieParam('test_cookie', 112) testCookie): Response<any> {
+    updateUSer(@PathParam('id') id: number, @CookieParam('test_cookie', 112) testCookie): Response<any> {
         //#region @backendFunc
         return { send: { id, testCookie } };
         //#endregion

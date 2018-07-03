@@ -1,13 +1,10 @@
 
 
 import {
-    ENDPOINT, GET, POST, PUT, DELETE, isNode,
-    PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, BaseCRUD, BaseCRUDEntity, OrmConnection, CLASSNAME
+    ENDPOINT, isNode,
+    BaseCRUDEntity, CLASSNAME
 } from 'morphi';
 
-import { Connection } from "typeorm/connection/Connection";
-import { Repository } from "typeorm/repository/Repository";
 
 // local
 import { Book } from '../../entities/examples/Book';

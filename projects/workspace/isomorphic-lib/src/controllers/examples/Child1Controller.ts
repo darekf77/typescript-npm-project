@@ -1,7 +1,5 @@
 import {
-    ENDPOINT, GET, POST, PUT, DELETE,
-    PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-    Response, getResponseValue, OrmConnection, Connection, CLASSNAME
+    ENDPOINT, GET, Response, getResponseValue, CLASSNAME
 } from 'morphi';
 
 import { ParentClass } from "./ParentControllers";
