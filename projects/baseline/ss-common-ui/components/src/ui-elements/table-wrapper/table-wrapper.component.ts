@@ -43,6 +43,7 @@ export class TableWrapperComponent implements OnInit {
     log.i('this.crud', this.crud);
     this.crud.getAll().received.observable.subscribe(c => {
       log.i('AMAZING!', c);
+      this.rows = c.body.json;
     });
   }
 
