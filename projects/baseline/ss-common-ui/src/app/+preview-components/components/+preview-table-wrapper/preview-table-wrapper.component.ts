@@ -14,7 +14,7 @@ export class PreviewTableWrapperComponent implements OnInit {
 
   ngOnInit() {
     setTimeout(async () => {
-      await this.exampleService.info().received.observable.take(1).toPromise();
+      // await this.exampleService.info().received.observable.take(1).toPromise();
       await this.exampleService.info2().received.observable.take(1).toPromise();
     });
   }

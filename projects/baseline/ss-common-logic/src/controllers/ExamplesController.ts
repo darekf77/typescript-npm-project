@@ -54,16 +54,6 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
   }
   //#endregion
 
-  @GET('/')
-  info(): Response<any> {
-    //#region @backendFunc
-    return {
-      send: {
-        hello: 'amazing'
-      }
-    };
-    //#endregion
-  }
 
   @GET('/dupa')
   info2(): Response<any> {
