@@ -3,8 +3,20 @@ import { Component, OnInit } from '@angular/core';
 export const menuLeft // : ComponentsMenuItem[]
   = [
     {
+      href: '/previewcomponents/formlyinputs',
+      name: '-- fromly inputs ---'
+    },
+    {
+      href: '/previewcomponents/selectwrapper',
+      name: 'SelectWrapper'
+    },
+    {
+      href: '/previewcomponents/listwrapper',
+      name: 'ListWrapper'
+    },
+    {
       href: '/previewcomponents/tablewrapper',
-      name: 'MatTableWrapper'
+      name: 'TableWrapper'
     },
     {
       href: '/previewcomponents/commonlogin',

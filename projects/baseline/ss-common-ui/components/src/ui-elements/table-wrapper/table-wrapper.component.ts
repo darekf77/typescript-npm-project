@@ -15,8 +15,6 @@ const log = Log.create('Table wrapper');
 })
 export class TableWrapperComponent implements OnInit {
 
-  tableModes = ['edit_record', 'click_list']
-  tableMode: 'edit_record' | 'click_list' = 'click_list';
 
   @Input() rowHref: string;
 
@@ -44,21 +42,21 @@ export class TableWrapperComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router) { }
+  constructor() { }
 
 
   async ngOnInit() {
-    log.i('this.crud.entity', META.Describer.describe(this.crud.entity))
+    log.i('this.crud.entity', META.Describer.describe(this.crud.entity));
     try {
       const columns = META.Describer.describe(this.crud.entity).map(prop => {
-        return { prop }
-      })
+        return { prop };
+      });
       this.columns = columns;
-      log.i('columns', columns)
+      log.i('columns', columns);
 
-      const rows = await this.crud.getAll().received.observable.take(1).toPromise()
-      log.i('rows', rows.body.json)
-      this.rows = rows.body.json
+      const rows = await this.crud.getAll().received.observable.take(1).toPromise();
+      log.i('rows', rows.body.json);
+      this.rows = rows.body.json;
 
     } catch (error) {
 
@@ -69,7 +67,7 @@ export class TableWrapperComponent implements OnInit {
     // if (this.rowHref) {
     //   this.router.navigateByUrl(this.rowHref)
     // }
-    log.i('context menu event', e)
+    log.i('context menu event', e);
   }
 
 }

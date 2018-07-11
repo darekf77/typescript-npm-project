@@ -26,6 +26,8 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
     id: number = undefined
 
     @Column() test: string = undefined;
+    @Column() href: string = undefined;
+    @Column() name: string = undefined;
 
     @Column() otherData: string = 'asdasdasd';
 }

@@ -41,11 +41,15 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
   async initExampleDbData() {
 
     const c1 = this.db.EXAMPLE.create({
-      test: 'Amazing Example !'
+      test: 'Amazing Example !',
+      href: 'Amazing Href',
+      name: 'C1 name'
     });
 
     const c2 = this.db.EXAMPLE.create({
-      test: 'Super Example !'
+      test: 'Super Example !',
+      href: 'Amazing Href 2',
+      name: 'C2 name'
     });
 
     await this.db.EXAMPLE.save([c1, c2]);

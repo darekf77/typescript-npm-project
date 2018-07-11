@@ -15,6 +15,18 @@ export const routes: Routes = [
         redirectTo: 'tablewrapper'
       },
       {
+        path: 'formlyinputs',
+        loadChildren: './components/+preview-formly-inputs/preview-formly-inputs.module#PreviewFormlyInputsModule'
+      },
+      {
+        path: 'listwrapper',
+        loadChildren: './components/+preview-list-wrapper/preview-list-wrapper.module#PreviewListWrapperModule'
+      },
+      {
+        path: 'selectwrapper',
+        loadChildren: './components/+preview-select-wrapper/preview-select-wrapper.module#PreviewSelectWrapperModule'
+      },
+      {
         path: 'tablewrapper',
         loadChildren: './components/+preview-table-wrapper/preview-table-wrapper.module#PreviewTableWrapperModule'
       },
