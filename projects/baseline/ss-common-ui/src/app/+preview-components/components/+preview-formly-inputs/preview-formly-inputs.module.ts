@@ -15,6 +15,7 @@ import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
+import { FormlyMaterialModule } from "@ngx-formly/material";
 
 const materialModules = [
   MatCardModule
@@ -36,6 +37,7 @@ init({
     ...materialModules,
     RouterModule.forChild(routes),
     ReactiveFormsModule,
+    FormlyMaterialModule,
     FormlyModule.forRoot({
       validationMessages: [
         { name: 'required', message: 'This field is required' },
