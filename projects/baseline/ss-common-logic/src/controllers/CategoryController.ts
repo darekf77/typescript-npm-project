@@ -21,10 +21,10 @@ import * as controllers from '../controllers';
 @CLASSNAME('CategoryController')
 export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> {
 
+  @BaseCRUDEntity(entities.CATEGORY) public entity: entities.CATEGORY;
+
   //#region @backend
   @OrmConnection connection: Connection;
-
-  @BaseCRUDEntity(entities.CATEGORY) public entity: entities.CATEGORY;
 
   get db() {
     return entities.entities(this.connection as any);

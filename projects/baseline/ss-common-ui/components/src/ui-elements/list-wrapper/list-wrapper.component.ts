@@ -20,6 +20,10 @@ export interface CRUDListWrapperLink {
 })
 export class ListWrapperComponent implements OnInit {
 
+  constructor(private router: Router) {
+
+  }
+
   isLoading = false;
 
   @Input() crud: BaseCRUD<any>;
@@ -45,6 +49,11 @@ export class ListWrapperComponent implements OnInit {
       prop: 'name'
     }
   ];
+
+  open(link: string) {
+    log.i(`open link: ${link}`)
+    this.router.navigateByUrl(link)
+  }
 
   async ngOnInit() {
     const columns = META.Describer.describe(this.crud.entity).map(prop => {

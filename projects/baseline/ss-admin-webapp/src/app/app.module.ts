@@ -7,11 +7,13 @@ import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // thrid part
 import * as _ from 'lodash';
-import { init,  AngularProviders } from 'morphi/browser';
+import { init, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
+import ExamplesController from 'ss-common-logic/browser/controllers/ExamplesController';
+// entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
 import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
@@ -27,10 +29,14 @@ import { routes } from "./app.routes";
 import { LoginModule } from './login/login.module';
 
 
+
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 init({
   host,
-  controllers: [AuthController, CategoryController],
+  controllers: [
+    AuthController,
+    CategoryController,
+    ExamplesController],
   entities: [
     USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE
   ]

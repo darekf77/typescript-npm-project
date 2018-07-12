@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 // material
 import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
@@ -25,6 +26,7 @@ const moduleOther = [
 @NgModule({
   imports: [
     CommonModule,
+    RouterModule,
     ...moduleOther,
     ...materialModules
   ],

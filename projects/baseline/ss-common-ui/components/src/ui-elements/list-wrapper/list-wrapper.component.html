@@ -2,7 +2,7 @@
 <mat-spinner *ngIf="isLoading" ></mat-spinner>
 <mat-nav-list *ngIf="!isLoading" >
   <mat-list-item *ngFor="let link of links">
-     <a matLine href="{{link.href}}"> {{link.href}} {{ link.name }}</a>
+     <span matLine  (click)="open(link.href)"> {{link.href}} {{ link.name }}</span>
      <mat-icon>info</mat-icon>
   </mat-list-item>
 </mat-nav-list>

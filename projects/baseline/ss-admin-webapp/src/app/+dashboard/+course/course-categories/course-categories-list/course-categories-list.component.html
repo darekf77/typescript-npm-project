@@ -1,12 +1,6 @@
-<mat-list>
-  <mat-list-item *ngFor="let category of categories"
-                 (click)="listView=false" 
-                 routerLink="/dashboard/course/categories/category/{{category.id}}">
-    <mat-icon matListIcon>folder</mat-icon>
-    <h3 matLine> {{category.name}} </h3>
-    <p matLine>
-      <span> {{category.description}} </span>
-      <!-- <span class="demo-2"> -- {{message.content}} </span> -->
-    </p>
-  </mat-list-item>
-</mat-list>
+<app-list-wrapper [crud]="category"
+                  [linkSchema]="'/dashboard/course/categories/category/:id'">
+</app-list-wrapper>
+
+<app-list-wrapper [crud]="example">
+</app-list-wrapper>
