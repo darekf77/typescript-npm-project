@@ -5,6 +5,7 @@ import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
+import { isString } from 'lodash';
 
 const log = Log.create('List wrapper');
 
@@ -51,8 +52,10 @@ export class ListWrapperComponent implements OnInit {
   ];
 
   open(link: string) {
-    log.i(`open link: ${link}`)
-    this.router.navigateByUrl(link)
+    if (link && isString(link) && link.trim() !== '') {
+      log.i(`open link: ${link}`);
+      this.router.navigateByUrl(link);
+    }
   }
 
   async ngOnInit() {
