@@ -7,7 +7,7 @@ import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
 
-const log = Log.create('List wrapper');
+const log = Log.create('List wrapper', Level.__NOTHING);
 
 export interface CRUDListWrapperLink {
   link: string;
@@ -51,9 +51,10 @@ export class ListWrapperComponent implements OnInit {
     }
   ];
 
-  open(link: string) {
+  open(d: CRUDListWrapperLink) {
+    const link = d.link;
+    log.i(`open link: ${link}`);
     if (link && isString(link) && link.trim() !== '') {
-      log.i(`open link: ${link}`);
       this.router.navigateByUrl(link);
     }
   }
@@ -83,6 +84,7 @@ export class ListWrapperComponent implements OnInit {
   }
 
   initLinks(rows: any[]) {
+    log.i('init links this.linkSchema', this.linkSchema);
     this.links = rows.map(r => {
       if (this.linkSchema) {
         const link = interpolateParamsToUrl(r, this.linkSchema);

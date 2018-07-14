@@ -4,7 +4,7 @@ import { BaseCRUD, CLASSNAME, ENDPOINT } from 'morphi';
 import { snakeCase, keys } from "lodash";
 
 import { isBrowser, Log, Level } from 'ng2-logger';
-const log = Log.create('META')
+const log = Log.create('META', Level.__NOTHING)
 
 export namespace META {
 

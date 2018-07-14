@@ -6,8 +6,10 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 import { CourseCategoriesComponent } from '../course-categories.component';
 import { Subscription } from 'rxjs/Subscription';
 import CategoryController from 'ss-common-logic/browser/controllers/CategoryController';
+import { FormGroup } from '@angular/forms';
+import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 
-const log = Log.create('category editor', Level.__NOTHING)
+const log = Log.create('category editor')
 
 @Component({
   selector: 'app-category-editor',
@@ -16,7 +18,28 @@ const log = Log.create('category editor', Level.__NOTHING)
 })
 export class CategoryEditorComponent implements OnInit {
 
-  category: CATEGORY;
+  form = new FormGroup({});
+  model: CATEGORY = {} as any;
+  options: FormlyFormOptions = {};
+  fields: FormlyFieldConfig[] = [
+    {
+      key: 'name',
+      type: 'input',
+      templateOptions: {
+        label: 'Name',
+        required: true,
+      }
+    },
+    {
+      key: 'isPremium',
+      type: 'checkbox',
+      defaultValue: false,
+      templateOptions: {
+        label: 'Premium?'
+      }
+    }
+  ];
+
 
   constructor(
     private route: ActivatedRoute,
@@ -39,8 +62,8 @@ export class CategoryEditorComponent implements OnInit {
       .received
       .observable
       .subscribe(d => {
-        this.category = d.body.json
-        log.i('this.category', this.category)
+        this.model = d.body.json
+        log.i('categories model', this.model)
       }))
   }
 
@@ -48,6 +71,11 @@ export class CategoryEditorComponent implements OnInit {
     this.handlers.forEach((f) => f.unsubscribe())
   }
   handlers: Subscription[] = [];
+
+  async submit(category: CATEGORY) {
+    log.i('category', category)
+    await this.categoryService.updateById(category.id, category);
+  }
 
 }
 

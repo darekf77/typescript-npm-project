@@ -20,7 +20,7 @@ const variables: LayoutMaterialVariables = {
   leftPanelSize: '250px'
 };
 
-const log = Log.create('layout material');
+const log = Log.create('layout material', Level.__NOTHING);
 
 
 export interface MenuItem {

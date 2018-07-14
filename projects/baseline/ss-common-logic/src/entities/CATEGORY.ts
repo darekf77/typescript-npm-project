@@ -10,6 +10,7 @@ import { CLASSNAME } from 'morphi';
 
 export interface ICATEGORY {
   name: string;
+  isPremium: boolean;
   groups: IGROUP[]
 }
 
@@ -22,6 +23,7 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
   fromRaw(obj: ICATEGORY): CATEGORY {
     let category = new CATEGORY();
     category.name = obj.name;
+    category.isPremium = obj.isPremium;
     category.groups = obj.groups.map(g => {
       let group = new GROUP()
       group = group.fromRaw(g);
@@ -36,7 +38,10 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 
   @Column() name: string = undefined;
 
-  @Column('boolean') isPremium: boolean = false;
+  @Column({
+    type: 'boolean',
+    nullable: true
+  }) isPremium: boolean = false;
 
   get path() {
     return kebabCase(this.name);
