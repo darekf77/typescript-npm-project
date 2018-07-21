@@ -14,6 +14,7 @@ import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
 import { ProjectFrom } from './index';
+import { sleep } from 'sleep';
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
   lodashPath = (lodashPath === '') ? `` : `${lodashPath}.`;
@@ -269,3 +270,13 @@ export function checkValidNpmPackageName(pkg) {
   return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*(\@.+$)?').test(pkg);
 }
 
+
+export function tryRemoveDir(dirpath) {
+  try {
+    rimraf.sync(dirpath)
+  } catch (e) {
+    console.log(`Trying to remove directory: ${dirpath}`)
+    sleep(1);
+    tryRemoveDir(dirpath);
+  }
+}

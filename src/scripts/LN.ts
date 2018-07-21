@@ -16,6 +16,7 @@ function $LN(argsString: string) {
     try {
         HelpersLinks.createLink(target, link)
     } catch (e) {
+        console.log(e)
         error(`Not able to craate link from: "${link}" to target: "${target}".`, true)
     }
     process.exit(0)
