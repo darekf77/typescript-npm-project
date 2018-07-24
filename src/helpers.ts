@@ -1,5 +1,6 @@
 import * as _ from 'lodash'
 import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as rimraf from "rimraf";
 import * as glob from "glob";
@@ -13,7 +14,7 @@ import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
-import { ProjectFrom } from './index';
+import { ProjectFrom, config } from './index';
 import { sleep } from 'sleep';
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
@@ -279,4 +280,33 @@ export function tryRemoveDir(dirpath) {
     sleep(1);
     tryRemoveDir(dirpath);
   }
+}
+
+
+export function findChildren<T>(location, createFn: (childLocation: string) => T): T[] {
+  // console.log('from ' + this.location)
+
+  const notAllowed: RegExp[] = [
+    '\.vscode', 'node\_modules',
+    ..._.values(config.folder),
+    'e2e', 'tmp.*', 'dist.*', 'tests', 'module', 'browser', 'bundle*',
+    'components', '\.git', 'bin', 'custom'
+  ].map(s => new RegExp(s))
+
+  const isDirectory = source => fse.lstatSync(source).isDirectory()
+  const getDirectories = source =>
+    fse.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
+
+  let subdirectories = getDirectories(location)
+    .filter(f => {
+      const folderNam = path.basename(f);
+      return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+    })
+
+  return subdirectories
+    .map(dir => {
+      // console.log('child:', dir)
+      return createFn(dir);
+    })
+    .filter(c => !!c)
 }

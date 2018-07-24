@@ -14,6 +14,8 @@ export const config = {
     tnp: 'tnp',
     folder: {
         bundle: 'bundle',
+        bower: 'bower',
+        vendor: 'vendor',
         dist: 'dist',
         src: 'src',
         tempSrc: 'tmp-src',

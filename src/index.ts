@@ -23,7 +23,8 @@ Helpers.checkEnvironment({
         { name: 'check-node-version' },
         { name: 'npm-run' },
         { name: 'rimraf' },
-        { name: 'cpr' }
+        { name: 'cpr' },
+        { name: 'renamer' }
     ],
     programs: [
         {
