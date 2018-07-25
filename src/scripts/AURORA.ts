@@ -18,7 +18,7 @@ const defaultColors = {
   'es-rs-ui': '#ff7e7e',
   'es-common': '#ffe552',
   'wvs-ui': '#925ca2',
-  'sce-ui': '#a2925c',
+  'sce-ui': '#be7d41',
 }
 
 const vscode = {
