@@ -3,6 +3,7 @@ import * as child from "child_process";
 import * as path from "path";
 import * as glob from "glob";
 import * as fse from "fs-extra";
+import * as simpleGit from 'simple-git/promise';
 import * as fs from "fs";
 import * as _ from "lodash";
 import { run as __run } from '../process';
@@ -11,6 +12,14 @@ import { pullCurrentBranch } from '../helpers-git';
 import { tryRemoveDir, findChildren } from '../helpers';
 import config from '../config';
 import { RunOptions } from '../models';
+
+const defaultColors = {
+  'gas-ui': "#72a25c",
+  'es-rs-ui': '#ff7e7e',
+  'es-common': '#ffe552',
+  'wvs-ui': '#925ca2',
+  'sce-ui': '#a2925c',
+}
 
 const vscode = {
   extensions: {
@@ -55,17 +64,15 @@ const vscode = {
     "workbench.colorTheme": "Default Dark+",
 
     "workbench.colorCustomizations": {
-      "activityBar.background": (location, name) => {
-        const defaultColors = {
-          'xxx-ui': "#72a25c",
-          'es-rs-ui': '#a25c5c',
-          'es-common': '#a1a25c',
-          'wvs-ui': '#925ca2',
-          'sce-ui': '#a2925c',
-        }
+      "activityBar.background": ({ name }) => {
+
         return (defaultColors[name]) ? defaultColors[name] : defaultColors['xxx-ui'];
       },
-      "activityBar.foreground": "#665968"
+      "activityBar.foreground": "#665968",
+      "statusBar.background": (project: ProjectAurora) => {
+        const hasParent = !!(project.parent)
+        return hasParent ? defaultColors[project.parent.name] : defaultColors[project.name]
+      }
     },
     "editor.rulers": [
       100, 120
@@ -163,7 +170,7 @@ class ProjectAurora {
         if (_.isObject(obj)) {
           Object.keys(obj).forEach(key => {
             if (_.isFunction(obj[key])) {
-              obj[key] = obj[key](self.location, self.name)
+              obj[key] = obj[key](self)
             } else if (_.isArray(obj[key])) {
               obj[key].forEach(o => self.fix.config(o))
             } else if (_.isObject(obj[key])) {
@@ -225,7 +232,7 @@ class ProjectAurora {
 
     this.name = this.nameFrom(this.location);
     this.updateVscode()
-    info(`Project ${this.name}, prefix ${this.prefix}`)
+    // info(`Project ${this.name}, prefix ${this.prefix}`)
   }
 
   private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common'];
@@ -265,6 +272,26 @@ class ProjectAurora {
     pullCurrentBranch(this.location);
   }
 
+  async rebase(targetRebaseBranch: string) {
+    let git = simpleGit(this.location);
+    let status = await git.status()
+    const remote = 'origin'
+    console.log('status', status)
+    let branch = child.execSync(`cd ${this.location} && git branch | sed -n '/\* /s///p'`).toString().trim()
+
+    let inStashChanges = false;
+    if (status.isClean) {
+      await git.pull(remote, branch)
+    } else {
+      this.run(`git stash`).sync();
+      await git.pull(remote, branch)
+      this.run(`git stash apply`).sync();
+    }
+    this.run(`git rebase ${targetRebaseBranch}`).sync();
+
+    process.exit(0)
+  }
+
   link() {
     if (this.Type === 'parent-baseline-fork') {
 
@@ -293,6 +320,7 @@ export default {
 
     let project = ProjectAurora.From(process.cwd())
     const a = args.split(' ');
+    let noExit = false;
 
     if (!project) {
       error(`This is not aurora type project`)
@@ -310,18 +338,36 @@ export default {
 
       } else {
         a.forEach((param, i) => {
-          if (param === 'link') {
-            project.link()
-          } else if (param === 'add') {
-            project.add(a[i + 1] as any);
-          } else if (param === 'git') {
-            project.pullCurrentBranch()
-          } else if (param === 'vscode') {
-            project.updateVscode()
-            project.children.forEach(c => {
-              c.updateVscode()
-            })
+
+          switch (param) {
+            case 'link':
+              project.link()
+              break;
+
+            case 'add':
+              project.add(a[i + 1] as any);
+              break;
+
+            case 'git':
+              project.pullCurrentBranch()
+              break;
+
+            case 'vscode':
+              project.updateVscode()
+              project.children.forEach(c => {
+                c.updateVscode()
+              })
+              break;
+
+            case 'rebase':
+              noExit = true;
+              project.rebase(a[i + 1])
+              break;
+
+            default:
+              break;
           }
+
         })
       }
 
@@ -329,8 +375,7 @@ export default {
       error(`Please start commands from folder level: xxx-ui`);
     }
 
-
-    process.exit(0)
+    !noExit && process.exit(0)
   }
 };
 
