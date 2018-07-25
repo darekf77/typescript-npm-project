@@ -100,10 +100,10 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
   //#endregion
 
 
-  @GET(`/${SYMBOL.}`)
-  updateById() {
+  // @GET(`/${SYMBOL.}`)
+  // updateById() {
 
-  }
+  // }
 
 
   @GET('/allCategories')

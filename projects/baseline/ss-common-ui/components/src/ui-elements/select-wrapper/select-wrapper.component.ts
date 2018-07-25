@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { times } from 'lodash';
-import { BaseCRUD } from 'morphi/browser';
+import { BaseCRUD, Describer } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
@@ -47,14 +47,14 @@ export class SelectWrapperComponent implements OnInit {
   ];
 
   async ngOnInit() {
-    const columns = META.Describer.describe(this.crud.entity).map(prop => {
+    const columns = Describer.describe(this.crud.entity).map(prop => {
       return { prop };
     });
     this.columns = columns;
 
     if (this.crud) {
       this.isLoading = true;
-      log.i('this.crud.entity', META.Describer.describe(this.crud.entity));
+      log.i('this.crud.entity', Describer.describe(this.crud.entity));
       try {
 
         log.i('columns', columns);

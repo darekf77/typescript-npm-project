@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { Connection } from "typeorm/connection/Connection";
-import { BaseCRUD, CLASSNAME, ENDPOINT } from 'morphi';
+import { BaseCRUD, CLASSNAME, ENDPOINT, Describer } from 'morphi';
 import { snakeCase, keys } from "lodash";
 
 import { isBrowser, Log, Level } from 'ng2-logger';
@@ -8,20 +8,6 @@ const log = Log.create('META', Level.__NOTHING)
 
 export namespace META {
 
-  export class Describer {
-    private static FRegEx = new RegExp(/(?:this\.)(.+?(?= ))/g);
-    static describe(val: Function, parent = false): string[] {
-      var result = [];
-      if (parent) {
-        var proto = Object.getPrototypeOf(val.prototype);
-        if (proto) {
-          result = result.concat(this.describe(proto.constructor, parent));
-        }
-      }
-      result = result.concat(val.toString().match(this.FRegEx) || []);
-      return result.map(prop => prop.replace('this.', ''))
-    }
-  }
 
   export function tableNameFrom(entityClass: Function | BASE_ENTITY<any>) {
     entityClass = entityClass as Function;
