@@ -4,8 +4,8 @@ import { RouterModule } from '@angular/router';
 // material
 import { MatCardModule } from '@angular/material/card';
 // local
-import { PreviewFormlyInputsComponent } from './preview-formly-inputs.component';
-import { routes } from './preview-formly-inputs.routes';
+import { PreviewFormWrapperComponent } from './preview-form-wrapper.component';
+import { routes } from './preview-form-wrapper.routes';
 import {
   ListWrapperModule
 } from 'components';
@@ -44,9 +44,9 @@ init({
       ],
     }),
   ],
-  declarations: [PreviewFormlyInputsComponent],
+  declarations: [PreviewFormWrapperComponent],
   providers: [
     AngularProviders
   ]
 })
-export class PreviewFormlyInputsModule { }
+export class PreviewFormWrapperModule { }

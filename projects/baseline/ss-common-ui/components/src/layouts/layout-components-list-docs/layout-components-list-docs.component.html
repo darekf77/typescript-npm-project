@@ -8,12 +8,14 @@
              placeholder="Search for component">
     </mat-form-field>
     <mat-list>
-      <mat-list-item *ngFor="let item of menuLeft | filterBy:['href','name']:filter.list"
+      <mat-list-item *ngFor="let item of menuLeft | filterBy:['href','name','group']:filter.list"
                      routerLink="{{item.href}}"
                      [ngClass]="{'disabled' : !item.href  }"
                      [routerLinkActive]="['active']">
-        <mat-icon matListIcon>folder</mat-icon>
-        <h3 matLine> {{item.name}} </h3>
+        <mat-icon *ngIf="item.name" matListIcon>folder</mat-icon>
+        <h3 *ngIf="item.name" matLine> {{item.name}} </h3>
+        <hr *ngIf="item.group && !item.name" >
+        <h5 *ngIf="item.group && !item.name" matLine> {{item.group}} </h5>
       </mat-list-item>
     </mat-list>
 

@@ -23,6 +23,10 @@ export const routes: Routes = [
         loadChildren: './components/+preview-list-wrapper/preview-list-wrapper.module#PreviewListWrapperModule'
       },
       {
+        path: 'formwrapper',
+        loadChildren: './components/+preview-form-wrapper/preview-form-wrapper.module#PreviewFormWrapperModule'
+      },
+      {
         path: 'selectwrapper',
         loadChildren: './components/+preview-select-wrapper/preview-select-wrapper.module#PreviewSelectWrapperModule'
       },

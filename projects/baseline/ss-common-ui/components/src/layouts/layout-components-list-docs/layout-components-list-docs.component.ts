@@ -15,6 +15,7 @@ const variables = {
 export interface ComponentsMenuItem {
   name: string;
   href?: string;
+  group?: string;
 }
 
 @Component({
@@ -42,6 +43,15 @@ export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit 
   constructor(private router: Router) { }
 
   ngOnInit() {
+    let group;
+    this.menuLeft = this.menuLeft.map(item => {
+      if (item.group) {
+        group = item.group;
+      } else if (group) {
+        item.group = group;
+      }
+      return item;
+    });
   }
 
   ngAfterViewInit() {

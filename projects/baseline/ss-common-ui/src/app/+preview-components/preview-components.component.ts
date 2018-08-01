@@ -7,8 +7,15 @@ export const menuLeft // : ComponentsMenuItem[]
       name: '-- fromly inputs ---'
     },
     {
+      group: 'High abstraction componetns'
+    },
+    {
       href: '/previewcomponents/selectwrapper',
       name: 'SelectWrapper'
+    },
+    {
+      href: '/previewcomponents/formwrapper',
+      name: 'FormWrapper'
     },
     {
       href: '/previewcomponents/listwrapper',
@@ -19,11 +26,14 @@ export const menuLeft // : ComponentsMenuItem[]
       name: 'TableWrapper'
     },
     {
+      group: 'Authentication'
+    },
+    {
       href: '/previewcomponents/commonlogin',
       name: 'Common Login'
     },
     {
-      name: 'Select'
+      group: 'Commoun ui parts'
     },
     {
       href: '/previewcomponents/logo',

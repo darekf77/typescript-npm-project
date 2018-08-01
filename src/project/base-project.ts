@@ -420,13 +420,19 @@ export abstract class Project {
 };
 
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
-  const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
-  const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
-  if (fs.existsSync(destCompiledJs)) {
-    // console.log(`Removed tnp-helper from ${dest} `)
-    rimraf.sync(destCompiledJs)
+  if (project.isWorkspaceChildProject || project.type === 'workspace') {
+
+
+    const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+    const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
+    if (fs.existsSync(destCompiledJs)) {
+      // console.log(`Removed tnp-helper from ${dest} `)
+      rimraf.sync(destCompiledJs)
+    }
+    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+    fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+    // console.log(`Tnp-helper installed in ${project.name} `)
+  } else {
+    warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }
-  fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
-  fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
-  // console.log(`Tnp-helper installed in ${project.name} `)
 }
