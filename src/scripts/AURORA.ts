@@ -12,6 +12,7 @@ import { pullCurrentBranch } from '../helpers-git';
 import { tryRemoveDir, findChildren } from '../helpers';
 import config from '../config';
 import { RunOptions } from '../models';
+import { run } from '../../node_modules/morphi';
 
 const defaultColors = {
   'gas-ui': "#72a25c",
@@ -19,6 +20,8 @@ const defaultColors = {
   'es-common': '#ffe552',
   'wvs-ui': '#925ca2',
   'sce-ui': '#be7d41',
+  'ncl-ui': '#be4175',
+  'vas-ui': '#be7d41',
 }
 
 const vscode = {
@@ -143,7 +146,14 @@ class ProjectAurora {
       error(`Cannot find aurora project in ${location} `, true)
       return
     }
-    const externalExist = (fs.existsSync(path.join(location, FOLDERS.EXTERNAL)));
+    let externalExist = (fs.existsSync(path.join(location, FOLDERS.EXTERNAL)));
+
+    if (!externalExist && path.basename(location).replace(/\-ui$/g, '').toLowerCase().length === 3) {
+      fse.mkdirpSync(path.join(location, FOLDERS.EXTERNAL));
+      info('"external" folder created... put baseline modules here.')
+      externalExist = true;
+    }
+
     const p = new ProjectAurora(
       location,
       externalExist ? 'parent-baseline-fork' : 'child-baseline-module',
