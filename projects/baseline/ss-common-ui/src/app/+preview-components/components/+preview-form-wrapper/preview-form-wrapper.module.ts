@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // material
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 // local
 import { PreviewFormWrapperComponent } from './preview-form-wrapper.component';
 import { routes } from './preview-form-wrapper.routes';
@@ -15,10 +16,14 @@ import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { FormlyMaterialModule } from '@ngx-formly/material';
+import {
+  FormlyMaterialModule,
+} from '@ngx-formly/material';
+import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 
 const materialModules = [
-  MatCardModule
+  MatCardModule,
+  MatButtonToggleModule
 ];
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
@@ -43,6 +48,7 @@ init({
         { name: 'required', message: 'This field is required' },
       ],
     }),
+    FormlyMatToggleModule,
   ],
   declarations: [PreviewFormWrapperComponent],
   providers: [

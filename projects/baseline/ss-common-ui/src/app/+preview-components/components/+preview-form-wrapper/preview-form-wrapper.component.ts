@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import * as _ from 'lodash';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
 import { getFromlyFrom } from 'morphi/browser';
@@ -20,7 +21,11 @@ export class PreviewFormWrapperComponent implements OnInit {
   }
 
   form = new FormGroup({});
-  model: any = {};
+  model: any = {
+    name: 'Dariusz',
+    href: 'asdasd',
+    isAmazing: true
+  };
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
@@ -38,7 +43,13 @@ export class PreviewFormWrapperComponent implements OnInit {
   ngOnInit() {
     const fields = getFromlyFrom(EXAMPLE);
     log.i('formly config from class example', fields);
+    _.merge(fields.find(({ key }) => key === 'isAmazing'), {
+      type: 'toogle'
+    });
+
     this.fields = fields;
+
+
     setTimeout(async () => {
       // await this.exampleService.info().received.observable.take(1).toPromise();
       await this.exampleService.info2().received.observable.take(1).toPromise();

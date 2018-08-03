@@ -24,7 +24,8 @@ Helpers.checkEnvironment({
         { name: 'npm-run' },
         { name: 'rimraf' },
         { name: 'cpr' },
-        { name: 'renamer' }
+        { name: 'renamer' },
+        { name: 'nodemon' }
     ],
     programs: [
         {
