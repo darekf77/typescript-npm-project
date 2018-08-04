@@ -3,7 +3,7 @@ import { ExamplesController } from 'ss-common-logic/browser/controllers/Examples
 import * as _ from 'lodash';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
-import { getFromlyFrom } from 'morphi/browser';
+import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 
@@ -16,44 +16,30 @@ const log = Log.create('preview-form-wrapper');
 })
 export class PreviewFormWrapperComponent implements OnInit {
 
+  entity = EXAMPLE;
+  model = {
+    id: 23,
+    test: 'asdasd',
+    href: 'http://onet.pl'
+  };
+
+  fields = [
+    {
+      key: 'href',
+      templateOptions: {
+        required: true
+      }
+    }
+  ];
+
   constructor(public exampleService: ExamplesController) {
 
   }
 
-  form = new FormGroup({});
-  model: any = {
-    name: 'Dariusz',
-    href: 'asdasd',
-    isAmazing: true
-  };
-  options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'Input',
-      type: 'input',
-      templateOptions: {
-        label: 'Input',
-        placeholder: 'Placeholder',
-        description: 'Description',
-        required: true,
-      },
-    },
-  ];
 
-  ngOnInit() {
-    const fields = getFromlyFrom(EXAMPLE);
-    log.i('formly config from class example', fields);
-    _.merge(fields.find(({ key }) => key === 'isAmazing'), {
-      type: 'toogle'
-    });
-
-    this.fields = fields;
-
-
-    setTimeout(async () => {
-      // await this.exampleService.info().received.observable.take(1).toPromise();
-      await this.exampleService.info2().received.observable.take(1).toPromise();
-    });
+  async ngOnInit() {
+    const models = await this.exampleService.getAll().received.observable.take(1).toPromise();
+    this.model = models[0];
   }
 
 }

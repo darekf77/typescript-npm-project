@@ -26,7 +26,9 @@ export class TestJSON {
 @DefaultModel<EXAMPLE>({
   'isAmazing': true,
   'href': '< http://defaulthref >',
-  'name': '< default name >'
+  'name': '< default name >',
+  'age': 23,
+  'birthDate': new Date('01-02-2000')
 })
 @ModelMapping<EXAMPLE>({
   testjson: TestJSON
@@ -50,6 +52,11 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
   @Column() test: string = undefined;
   @Column() href: string;
   @Column() name: string;
+
+  @Column() age: number;
+
+  @Column() birthDate: Date;
+
 
   @Column('boolean') isAmazing;
 

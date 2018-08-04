@@ -8,23 +8,21 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { PreviewFormWrapperComponent } from './preview-form-wrapper.component';
 import { routes } from './preview-form-wrapper.routes';
 import {
-  ListWrapperModule
+  ListWrapperModule, FormWrapperMaterialModule
 } from 'components';
 // third part
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { ReactiveFormsModule } from '@angular/forms';
-import { FormlyModule } from '@ngx-formly/core';
-import {
-  FormlyMaterialModule,
-} from '@ngx-formly/material';
-import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
+
 
 const materialModules = [
   MatCardModule,
   MatButtonToggleModule
 ];
+
+
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
@@ -41,14 +39,7 @@ init({
     ListWrapperModule,
     ...materialModules,
     RouterModule.forChild(routes),
-    ReactiveFormsModule,
-    FormlyMaterialModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' },
-      ],
-    }),
-    FormlyMatToggleModule,
+    FormWrapperMaterialModule
   ],
   declarations: [PreviewFormWrapperComponent],
   providers: [

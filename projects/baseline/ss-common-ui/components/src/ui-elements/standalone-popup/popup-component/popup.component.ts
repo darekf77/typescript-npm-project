@@ -23,7 +23,6 @@ export class PopupComponent implements AfterViewInit {
     if (e.x > 0 && e.y > 0) {
       this.parent.moveTo(e.clientX, e.clientY);
     }
-
   }
 
   ngAfterViewInit() {

@@ -6,3 +6,4 @@ export * from './list-wrapper';
 export * from './select-wrapper';
 export * from './standalone-popup';
 export * from './slider-vertical-section';
+export * from './form-wrapper-material';

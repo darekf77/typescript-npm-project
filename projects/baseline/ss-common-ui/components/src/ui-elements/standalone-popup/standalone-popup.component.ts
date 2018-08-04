@@ -24,6 +24,7 @@ export class StandalonePopupComponent implements OnInit, AfterContentInit {
     public initPopup() {
         this.controller = new PopupControler(this.viewContainerRef, this.componentFactoryResolver);
         this.controller.setContentComponent(this.contentComponent);
+        this.controller.reinitPos();
     }
 
     ngOnInit() {

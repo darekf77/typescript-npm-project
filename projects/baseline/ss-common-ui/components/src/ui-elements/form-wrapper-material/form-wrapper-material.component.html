@@ -1,0 +1,14 @@
+<form *ngIf="formly.form"  (ngSubmit)="ngSubmit(formly.model)"
+      [formGroup]="formly.form">
+  <formly-form [model]="formly.model"
+               [fields]="formly.fields"
+               [options]="formly.options"
+               [form]="formly.form">
+    <button mat-raised-button
+            type="submit"
+            [disabled]="!formly.form.valid">Submit</button>
+    <button mat-button
+            (click)="clear()">Clear</button>
+  </formly-form>
+
+</form>
