@@ -9,10 +9,17 @@ export interface IEXAMPLE {
   test: string;
 }
 
+@DefaultModelWithMapping<TestJSON>({
+  name: 'test',
+  age: 23,
+  isAwesome: true
+}, {
+
+  })
 export class TestJSON {
-  name = 'super!';
-  age = 23;
-  isAwesome = true;
+  name: string;
+  age: number;
+  isAwesome: Boolean;
 }
 
 
@@ -20,8 +27,8 @@ export class TestJSON {
 @Entity(META.tableNameFrom(EXAMPLE))
 //#endregion
 @FormlyForm((fields) => {
-  // console.log(fields)
-  return fields;
+  console.log(fields)
+  return []
 })
 @DefaultModelWithMapping<EXAMPLE>({
   'isAmazing': true,

@@ -1,0 +1,29 @@
+{
+  "PL-N100IJ7": {
+    "dfilipiak": {
+      "builds": [
+        {
+          "cwd": "C:/Users/dfilipiak/Projects/npm/ng2-rest",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto C:/Users/dfilipiak/Projects/npm/morphi",
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
+            "# C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "C:/Users/dfilipiak/Projects/npm/morphi",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
+            "# --copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
+          ]
+        }
+      ]
+    }
+  }
+}
