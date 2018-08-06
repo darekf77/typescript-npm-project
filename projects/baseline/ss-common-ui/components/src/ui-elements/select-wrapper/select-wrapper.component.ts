@@ -5,6 +5,7 @@ import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
+import { FieldType } from '@ngx-formly/core';
 
 const log = Log.create('List wrapper');
 
@@ -19,15 +20,14 @@ export interface CRUDSelectWrapperOption {
   templateUrl: './select-wrapper.component.html',
   styleUrls: ['./select-wrapper.component.scss']
 })
-export class SelectWrapperComponent implements OnInit {
+export class SelectWrapperComponent extends FieldType implements OnInit {
 
   isLoading = false;
 
   @Input() crud: BaseCRUD<any>;
 
-  @Input() options: CRUDSelectWrapperOption[] = [
+  @Input() selectOptions: CRUDSelectWrapperOption[] = [];
 
-  ];
 
   @Input() data = [
     { value: 'dupa', name: 'Onet' },
@@ -46,7 +46,19 @@ export class SelectWrapperComponent implements OnInit {
     }
   ];
 
+  @Input() lable: string;
+
   async ngOnInit() {
+    super.ngOnInit();
+
+    this.field = {
+      type: 'select',
+      templateOptions: {
+        label: 'Select Wrapper',
+        options: []
+      }
+    };
+
     const columns = Describer.describe(this.crud.entity).map(prop => {
       return { prop };
     });
@@ -71,10 +83,17 @@ export class SelectWrapperComponent implements OnInit {
   }
 
   initOptions(rows: any[]) {
-    this.options = rows.map(r => {
+    this.selectOptions = rows.map(r => {
       return { value: r[this.valueProp], name: r[this.nameProp] };
     });
-    log.i('options ', this.options);
+    log.i('options ', this.selectOptions);
+    this.field.templateOptions.options = this.selectOptions.map(o => {
+
+      return {
+        value: o.value,
+        lable: o.name
+      };
+    });
   }
 
 

@@ -129,12 +129,14 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
   }
 
   public get activationTokenHeader() {
+    // console.log('THIS', this)
     const session: SESSION = this;
     return { name: this.CONFIG.AUTHORIZATION_HEADER, value: `${session.token_type} ${session.token}` };
   }
 
   public activateBrowserToken() {
     const session: SESSION = this;
+    // console.log('THIS', this)
     Resource.Headers.request.set(this.CONFIG.AUTHORIZATION_HEADER,
       `${session.token_type} ${session.token}`)
   }

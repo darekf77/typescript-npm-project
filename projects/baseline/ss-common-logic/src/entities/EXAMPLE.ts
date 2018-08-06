@@ -2,7 +2,7 @@ import { META } from '../helpers';
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
 import { Entity, EntityRepository } from 'typeorm';
-import { CLASSNAME, FormlyForm, ModelMapping, DefaultModel } from 'morphi';
+import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 
 export interface IEXAMPLE {
   id?: number;
@@ -20,19 +20,18 @@ export class TestJSON {
 @Entity(META.tableNameFrom(EXAMPLE))
 //#endregion
 @FormlyForm((fields) => {
-  console.log(fields)
+  // console.log(fields)
   return fields;
 })
-@DefaultModel<EXAMPLE>({
+@DefaultModelWithMapping<EXAMPLE>({
   'isAmazing': true,
   'href': '< http://defaulthref >',
   'name': '< default name >',
   'age': 23,
   'birthDate': new Date('01-02-2000')
-})
-@ModelMapping<EXAMPLE>({
-  testjson: TestJSON
-})
+}, {
+    testjson: TestJSON
+  })
 @CLASSNAME('EXAMPLE')
 export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXAMPLE {
 

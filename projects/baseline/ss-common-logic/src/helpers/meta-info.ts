@@ -32,9 +32,20 @@ export namespace META {
 
       compolexProperties.forEach(alias => {
         repo['__'][alias] = {};
-        Describer.describe(entity).concat(compolexProperties as any).forEach(prop => {
-          repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO make it getter with reference
+
+        const describedProps = Describer.describe(entity)
+        // console.log(`describedProps  "${describedProps}" for ${entity.name}`)
+
+        describedProps.concat(compolexProperties as any).forEach(prop => {
+          repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO temp solution
         })
+
+        const props = Describer.describeByDefaultModel(entity)
+        // console.log(`props  "${props}" for ${entity.name}`)
+        props.forEach(prop => {
+          repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO ideal solution
+        })
+
       })
 
       compolexProperties.forEach(alias => {
