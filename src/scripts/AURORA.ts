@@ -18,6 +18,7 @@ const defaultColors = {
   'gas-ui': "#72a25c",
   'es-rs-ui': '#ff7e7e',
   'es-common': '#ffe552',
+  'es-ips-ui': '#59a2d3',
   'wvs-ui': '#925ca2',
   'sce-ui': '#be7d41',
   'ncl-ui': '#be4175',
@@ -245,8 +246,8 @@ class ProjectAurora {
     // info(`Project ${this.name}, prefix ${this.prefix}`)
   }
 
-  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common'];
-  add(subProjectName: 'es-rs-ui' | 'es-common') {
+  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common', 'es-ips-ui'];
+  add(subProjectName: 'es-rs-ui' | 'es-common' | 'es-ips-ui') {
     if (!this.allowedBaselineLibs.includes(subProjectName)) {
       error(`Wrong baseline lib type: ${subProjectName}`)
     }
