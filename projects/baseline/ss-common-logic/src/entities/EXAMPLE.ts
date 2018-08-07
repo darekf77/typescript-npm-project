@@ -27,8 +27,8 @@ export class TestJSON {
 @Entity(META.tableNameFrom(EXAMPLE))
 //#endregion
 @FormlyForm((fields) => {
-  console.log(fields)
-  return []
+
+  return fields;
 })
 @DefaultModelWithMapping<EXAMPLE>({
   'isAmazing': true,
