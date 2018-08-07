@@ -10,9 +10,11 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
-
+// custom formly components
+import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
 // material
 import { MatButtonModule } from "@angular/material/button";
+
 
 const materialModules = [
   MatButtonModule
@@ -21,6 +23,9 @@ const materialModules = [
 const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
+    types: [
+      { name: 'selectwrapper', component: SelectWrapperComponent }
+    ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
     ],
@@ -28,7 +33,9 @@ const formlyModules = [
   FormlyMatToggleModule,
   FormlyMatDatepickerModule,
   MatNativeDateModule,
-  FormlyMatSliderModule
+  FormlyMatSliderModule,
+  // custom
+  SelectWrapperModule
 ];
 
 @NgModule({

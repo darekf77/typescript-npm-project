@@ -9,17 +9,33 @@ export interface IEXAMPLE {
   test: string;
 }
 
-@DefaultModelWithMapping<TestJSON>({
-  name: 'test',
-  age: 23,
-  isAwesome: true
-}, {
+@DefaultModelWithMapping<AnotherJSON>(
+  {
+    isGood: true,
+    speed: 33
+  },
+  {
 
+  })
+export class AnotherJSON {
+  isGood: Boolean;
+  speed: Number;
+}
+
+@DefaultModelWithMapping<TestJSON>(
+  {
+    name: 'test',
+    age: 23,
+    isAwesome: true
+  },
+  {
+    test: AnotherJSON
   })
 export class TestJSON {
   name: string;
   age: number;
   isAwesome: Boolean;
+  test: AnotherJSON;
 }
 
 

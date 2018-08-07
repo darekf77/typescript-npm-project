@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 // material
 import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
@@ -10,6 +11,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // local
 import { SelectWrapperComponent } from './select-wrapper.component';
+// formly
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyMaterialModule, } from '@ngx-formly/material';
+
+const angularModules = [
+  ReactiveFormsModule
+];
 
 const materialModules = [
   MatSelectModule,
@@ -22,11 +30,22 @@ const moduleOther = [
   NgxDatatableModule
 ];
 
+const formlyModules = [
+  FormlyMaterialModule,
+  FormlyModule.forRoot({
+    validationMessages: [
+      { name: 'required', message: 'This field is required' },
+    ],
+  })
+];
+
 @NgModule({
   imports: [
     CommonModule,
+    ...angularModules,
     ...moduleOther,
-    ...materialModules
+    ...materialModules,
+    ...formlyModules
   ],
   exports: [
     SelectWrapperComponent

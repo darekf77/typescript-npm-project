@@ -39,6 +39,14 @@ export class PreviewFormWrapperComponent implements OnInit {
       key: 'href',
       templateOptions: {
         required: true
+      },
+    },
+    {
+      key: 'testaaaaa',
+      type: 'selectwrapper',
+      templateOptions: {
+        label: 'Amazing Select',
+        required: false
       }
     }
   ];

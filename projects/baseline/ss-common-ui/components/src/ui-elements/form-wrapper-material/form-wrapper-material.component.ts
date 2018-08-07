@@ -40,11 +40,15 @@ export class FormWrapperMaterialComponent implements OnInit {
   ngOnInit() {
     const fields = getFormlyFrom(this.entity);
     log.i('input fields', this.fields);
+    const keys = fields.map(c => c.key);
 
     if (_.isArray(this.fields)) {
+
       this.formly.fields = fields.map(field => {
         return _.merge(field, this.fields.find(f => f.key === field.key));
       });
+      this.formly.fields = this.formly.fields.concat(this.fields.filter(field => !keys.includes(field.key)));
+
     } else {
       this.formly.fields = fields;
     }
