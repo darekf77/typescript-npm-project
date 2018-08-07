@@ -25,6 +25,7 @@ import { HelpersLinks } from '../helpers-links';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 import { install } from '../scripts/INSTALL';
+import { pullCurrentBranch } from '../helpers-git';
 
 
 export abstract class Project {
@@ -120,12 +121,22 @@ export abstract class Project {
     return res;
   }
 
+  /**
+   * Core project with basic tested functionality
+   */
   get isCoreProject() {
     return this.packageJson.isCoreProject;
   }
 
   get isWorkspaceChildProject() {
     return this.parent && this.parent.type === 'workspace';
+  }
+
+  /**
+   * Standalone projects link: npm libs
+   */
+  get isStandaloneProject() {
+    return !this.isWorkspaceChildProject && this.type !== 'workspace';
   }
 
   /**
@@ -270,6 +281,15 @@ export abstract class Project {
     this.buildOptions.baseHref = baseHref;
 
     this.buildSteps(buildOptions);
+  }
+
+  public get git() {
+    const self = this;
+    return {
+      updateOrigin() {
+        pullCurrentBranch(self.location);
+      }
+    }
   }
 
   public clear(includeNodeModules = false) {

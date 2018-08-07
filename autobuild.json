@@ -25,5 +25,32 @@
         }
       ]
     }
+  },
+  "Dariuszs-MacBook-Pro-2.local": {
+    "darekf": {
+      "builds": [
+        {
+          "cwd": "/Users/darekf/projects/npm/ng2-rest",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto  /Users/darekf/projects/npm/morphi",
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
+            "#  /Users/darekf/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": " /Users/darekf/projects/npm/morphi",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
+            "# --copyto  /Users/darekf/projects/npm/tsc-npm-project"
+          ]
+        }
+      ]
+    }
   }
 }

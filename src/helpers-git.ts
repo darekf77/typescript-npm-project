@@ -3,6 +3,7 @@ import { info, error } from './messages';
 import { basename } from 'path';
 
 export function pullCurrentBranch(directoryPath) {
+  info(`Pulling git changes in "${directoryPath}" `)
   try {
     const cwd = directoryPath;
     let currentLocalBranch = child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()

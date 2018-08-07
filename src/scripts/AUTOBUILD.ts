@@ -39,6 +39,21 @@ export class AutoBuild {
     this.config = fse.readJsonSync(autobuildjsonfilePath, {
       encoding: 'utf8'
     });
+    this.validateConfig()
+  }
+
+  private validateConfig() {
+    const hostname = os.hostname();
+    const username = os.userInfo().username.toLowerCase();
+    if (!this.config) {
+      error('Bad autobuild.json config!')
+    }
+    if (!this.config[hostname]) {
+      error(`Hostname: "${hostname}" not found in autobuild.json config!`)
+    }
+    if (!this.config[hostname][username]) {
+      error(`Username: "${username}" not found in autobuild.json config!`)
+    }
   }
 
   build(watch = false) {
@@ -62,6 +77,7 @@ export class AutoBuild {
       error(`Not build for current project "${this.project.name}"   `)
     } else {
       clearConsole();
+      this.project.git.updateOrigin();
       this.project.run(`${watch ? build.commandWatch : build.command} ${(_.isArray(build.args) ? build.args.join(' ') : '')}`).sync()
     }
   }
@@ -79,6 +95,9 @@ export function autobuild(project: Project, watch = false) {
 
 export default {
   $AUTOBUILD: (args: string) => {
-    autobuild(Project.Current, args.split(' ').find(a => a == 'watch').length > 0)
+    autobuild(Project.Current, !!args.split(' ').find(a => a == 'watch'))
+  },
+  $AUTOBUILD_WATCH: () => {
+    autobuild(Project.Current, true)
   }
 }
