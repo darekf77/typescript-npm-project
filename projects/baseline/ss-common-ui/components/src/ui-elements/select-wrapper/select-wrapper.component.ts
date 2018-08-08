@@ -1,12 +1,12 @@
 // angular
-import { Component, OnInit, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, AfterViewInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 // formly
 import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
-import { times } from 'lodash';
+import * as _ from 'lodash';
 import { BaseCRUD, Describer } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
@@ -17,7 +17,7 @@ const log = Log.create('select wrapper');
 
 export interface CRUDSelectWrapperOption {
   value: string;
-  name: string;
+  label: string;
 }
 
 
@@ -26,7 +26,7 @@ export interface CRUDSelectWrapperOption {
   templateUrl: './select-wrapper.component.html',
   styleUrls: ['./select-wrapper.component.scss']
 })
-export class SelectWrapperComponent extends FieldType implements OnInit {
+export class SelectWrapperComponent extends FieldType implements OnInit, AfterViewInit {
 
   isLoading = false;
 
@@ -43,28 +43,14 @@ export class SelectWrapperComponent extends FieldType implements OnInit {
   @Input() valueProp = 'id';
   @Input() nameProp = 'name';
 
-  fields: FormlyFieldConfig[] = [];
+  // fields: FormlyFieldConfig[] = [];
 
-  @Input() lable: string;
+  // @Input() lable: string;
 
   async ngOnInit() {
     super.ngOnInit();
 
-    const self = this;
-
-    this.field = {
-      key: 'Select',
-      type: 'select',
-      templateOptions: {
-        label: 'Select',
-        placeholder: 'Placeholder',
-        description: 'Description',
-        required: true,
-        options: []
-      }
-    };
-
-    if (this.crud) {
+    if (_.isFunction(this.crud)) {
       this.isLoading = true;
       log.i('this.crud.entity', Describer.describe(this.crud.entity));
       try {
@@ -81,21 +67,16 @@ export class SelectWrapperComponent extends FieldType implements OnInit {
   }
 
   initOptions(rows: any[]) {
-    setTimeout(() => {
-      log.i('options ', this.selectOptions);
-      this.field.templateOptions.options = rows.map(o => {
-        if (!this.crud) {
-          return o;
-        }
-        return {
-          value: o[this.valueProp],
-          label: o[this.nameProp]
-        };
-      });
-      log.i('this field update with options', this.field);
-      this.fields = [this.field];
+    this.selectOptions = rows.map(r => {
+      if (!this.crud) {
+        return r;
+      }
+      return { value: r[this.valueProp], label: r[this.nameProp] };
     });
   }
 
+  ngAfterViewInit() {
+    // log.i('this', this.field);
+  }
 
 }

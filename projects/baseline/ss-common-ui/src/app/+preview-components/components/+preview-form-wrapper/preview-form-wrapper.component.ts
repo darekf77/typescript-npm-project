@@ -42,9 +42,10 @@ export class PreviewFormWrapperComponent implements OnInit {
       },
     },
     {
-      key: 'testaaaaa',
+      key: 'selectwrappertest',
       type: 'selectwrapper',
       templateOptions: {
+        placeholder: 'Choose love',
         label: 'Amazing Select',
         required: false
       }

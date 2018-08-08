@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // thrid part
 import * as _ from 'lodash';
-import { init, replay, AngularProviders } from 'morphi/browser';
+import { init, AngularProviders } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
@@ -24,12 +24,13 @@ import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
 
 
-init(ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host)
-  .angularProviders({
-    controllers: [AuthController, CategoryController],
-    entities: [
-      USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP]
-  })
+init({
+  host: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host,
+  controllers: [AuthController, CategoryController],
+  entities: [
+    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP]
+})
+  .angularProviders()
 
 @NgModule({
   declarations: [

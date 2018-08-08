@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { Router } from '@angular/router';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

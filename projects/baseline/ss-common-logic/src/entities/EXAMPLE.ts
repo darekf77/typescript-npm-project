@@ -13,9 +13,6 @@ export interface IEXAMPLE {
   {
     isGood: true,
     speed: 33
-  },
-  {
-
   })
 export class AnotherJSON {
   isGood: Boolean;

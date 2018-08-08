@@ -1,6 +1,10 @@
-<formly-form
-             [model]="model"
-             [fields]="fields"
-             [options]="options"
-             [form]="form">
-</formly-form>
+
+<mat-form-field *ngIf="field && field.formControl" >
+  <mat-select [placeholder]="field.templateOptions.placeholder"
+              [formControl]="field.formControl">
+    <mat-option *ngFor="let o of selectOptions"
+                [value]="o.value">
+      {{o.label}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
