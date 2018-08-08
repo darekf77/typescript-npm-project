@@ -128,6 +128,15 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
   }
 }
 
+function buildWatch(args) {
+  if (config.allowedTypes.libs.includes(Project.Current.type)) {
+    buildLib(false, true, 'dist', args)
+  }
+  if (config.allowedTypes.app.includes(Project.Current.type)) {
+    buildApp(false, true, 'dist', args)
+  }
+}
+
 
 export default {
 
@@ -166,15 +175,14 @@ export default {
     }
   },
 
-  $BUILD_WATCH: (args) => {
-    if (config.allowedTypes.libs.includes(Project.Current.type)) {
-      buildLib(false, true, 'dist', args)
-    }
-    if (config.allowedTypes.app.includes(Project.Current.type)) {
-      buildApp(false, true, 'dist', args)
-    }
+  $BUILDWATCH: (args) => {
+    buildWatch(args)
   },
-  
+
+  $BUILD_WATCH: (args) => {
+    buildWatch(args)
+  },
+
 
 
   $START: () => Project.Current.start(),

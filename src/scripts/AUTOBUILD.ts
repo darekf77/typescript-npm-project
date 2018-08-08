@@ -99,5 +99,8 @@ export default {
   },
   $AUTOBUILD_WATCH: () => {
     autobuild(Project.Current, true)
+  },
+  $AUTOBUILDWATCH: () => {
+    autobuild(Project.Current, true)
   }
 }
