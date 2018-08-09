@@ -2,6 +2,13 @@ import { Project } from "../project";
 import { info, error } from "../messages";
 import { run } from '../process';
 
+function killall() {
+  if (process.platform === 'win32') {
+    run(`taskkill /F /im node.exe`).sync();
+  } else {
+    run(`killall -9 node`).sync();
+  }
+}
 
 
 export default {
@@ -16,11 +23,10 @@ export default {
     process.exit(0)
   },
   $KILLALL_NODE: () => {
-    if (process.platform === 'win32') {
-      run(`taskkill /F /im node.exe`).sync();
-    } else {
-      run(`killall -9 node`).sync();
-    }
+    killall()
+  },
+  $KILLALLNODE: () => {
+    killall()
   }
 
 }
