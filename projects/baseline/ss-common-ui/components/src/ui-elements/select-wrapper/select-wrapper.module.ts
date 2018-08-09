@@ -14,6 +14,11 @@ import { SelectWrapperComponent } from './select-wrapper.component';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
+import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
+
 
 const angularModules = [
   ReactiveFormsModule
@@ -33,10 +38,17 @@ const moduleOther = [
 const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
+    types: [
+      { name: 'selectwrapper', component: SelectWrapperComponent }
+    ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
     ],
-  })
+  }),
+  FormlyMatToggleModule,
+  FormlyMatDatepickerModule,
+  MatNativeDateModule,
+  FormlyMatSliderModule
 ];
 
 @NgModule({

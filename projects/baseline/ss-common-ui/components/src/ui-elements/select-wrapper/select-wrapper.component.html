@@ -1,6 +1,8 @@
 
 <mat-form-field *ngIf="field && field.formControl" >
-  <mat-select [placeholder]="field.templateOptions.placeholder"
+  <mat-select [placeholder]="field.templateOptions.placeholder || field.templateOptions.label"
+              [aria-label]="field.templateOptions.label"
+              [required]="field.templateOptions.required"
               [formControl]="field.formControl">
     <mat-option *ngFor="let o of selectOptions"
                 [value]="o.value">

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 
 @Component({
   selector: 'app-preview-select-wrapper',
@@ -12,13 +14,27 @@ export class PreviewSelectWrapperComponent implements OnInit {
 
   }
 
+  form = new FormGroup({});
+
+  model: any = {};
+  options: FormlyFormOptions = {};
+  fields: FormlyFieldConfig[];
 
 
   ngOnInit() {
-    setTimeout(async () => {
-      // await this.exampleService.info().received.observable.take(1).toPromise();
-      await this.exampleService.info2().received.observable.take(1).toPromise();
-    });
+
+
+    this.fields = [
+      {
+        key: 'selectwrappertest',
+        type: 'selectwrapper',
+        templateOptions: {
+          required: true,
+          label: 'Amazing Select',
+          crud: this.exampleService
+        }
+      }
+    ];
   }
 
 }

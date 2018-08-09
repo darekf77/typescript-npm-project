@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 // material
 import { MatCardModule } from '@angular/material/card';
 // local
@@ -9,11 +10,17 @@ import { routes } from './preview-select-wrapper.routes';
 import {
   SelectWrapperModule
 } from 'components';
+// formly
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyMaterialModule } from '@ngx-formly/material';
 // third part
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 
+const angularModules = [
+  ReactiveFormsModule
+];
 
 const materialModules = [
   MatCardModule
@@ -33,7 +40,14 @@ init({
     CommonModule,
     SelectWrapperModule,
     ...materialModules,
-    RouterModule.forChild(routes)
+    ...angularModules,
+    RouterModule.forChild(routes),
+    FormlyMaterialModule,
+    FormlyModule.forRoot({
+      validationMessages: [
+        { name: 'required', message: 'This field is required' },
+      ],
+    }),
   ],
   declarations: [PreviewSelectWrapperComponent],
   providers: [

@@ -50,6 +50,10 @@ export class SelectWrapperComponent extends FieldType implements OnInit, AfterVi
   async ngOnInit() {
     super.ngOnInit();
 
+    if (!this.crud && _.isFunction(_.get(this.field, 'templateOptions.crud'))) {
+      this.crud = this.field.templateOptions.crud;
+    }
+
     if (_.isFunction(this.crud)) {
       this.isLoading = true;
       log.i('this.crud.entity', Describer.describe(this.crud.entity));
