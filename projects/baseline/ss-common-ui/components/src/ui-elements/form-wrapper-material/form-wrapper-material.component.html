@@ -1,6 +1,6 @@
-<form *ngIf="formly.form"  (ngSubmit)="ngSubmit(formly.model)"
+<form *ngIf="formly.form"  (ngSubmit)="ngSubmit(model)"
       [formGroup]="formly.form">
-  <formly-form [model]="formly.model"
+  <formly-form [model]="model"
                [fields]="formly.fields"
                [options]="formly.options"
                [form]="formly.form">

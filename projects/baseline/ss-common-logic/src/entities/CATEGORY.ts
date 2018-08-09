@@ -6,7 +6,7 @@ import { Entity, JoinTable, OneToMany, EntityRepository } from 'typeorm';
 import { META } from '../helpers';
 import { kebabCase } from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
-import { CLASSNAME } from 'morphi';
+import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 
 export interface ICATEGORY {
   name: string;
@@ -17,6 +17,11 @@ export interface ICATEGORY {
 //#region @backend
 @Entity(META.tableNameFrom(CATEGORY))
 //#endregion
+@FormlyForm<CATEGORY>(undefined, ['path'])
+@DefaultModelWithMapping<CATEGORY>({
+  isPremium: false,
+  name: ''
+})
 @CLASSNAME('CATEGORY')
 export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 

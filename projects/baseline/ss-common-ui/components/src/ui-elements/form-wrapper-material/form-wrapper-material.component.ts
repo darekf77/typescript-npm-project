@@ -1,10 +1,13 @@
+// angular
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import * as _ from 'lodash';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
+// formly
+import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+// other
+import * as _ from 'lodash';
+import { BaseCRUD, Describer } from 'morphi/browser';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-
 const log = Log.create('form warpper material component');
 
 @Component({
@@ -16,10 +19,10 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   formly = {
     form: (undefined) as FormGroup,
-    model: undefined,
     options: undefined as FormlyFormOptions,
     fields: undefined as FormlyFieldConfig[]
   };
+  @Input() crud: BaseCRUD<any>;
 
   @Input() form = new FormGroup({});
   @Input() model: any = {
@@ -38,38 +41,66 @@ export class FormWrapperMaterialComponent implements OnInit {
   @Input() entity: Function;
 
   ngOnInit() {
-    const fields = getFormlyFrom(this.entity);
-    log.i('input fields', this.fields);
-    const keys = fields.map(c => c.key);
-
-    if (_.isArray(this.fields)) {
-
-      this.formly.fields = fields.map(field => {
-        return _.merge(field, this.fields.find(f => f.key === field.key));
-      });
-      this.formly.fields = this.formly.fields.concat(this.fields.filter(field => !keys.includes(field.key)));
-
-    } else {
-      this.formly.fields = fields;
+    if (!this.entity && this.crud && this.crud.entity) {
+      this.entity = this.crud.entity;
     }
-    log.i('formly config from class example', this.formly.fields);
 
-    this.formly.options = this.options;
-    this.formly.form = this.form;
-    this.formly.model = this.model;
-    this.backupModel = _.cloneDeep(this.formly.model);
+    const fields = getFormlyFrom(this.entity);
+    log.i(`fields from : ${this.entity && this.entity.name}`, fields);
+    if (!fields) {
+      console.error(`
+
+      Please use:
+      @FormlyForm()
+      @DefaultModelWithMapping(...)
+
+      decorators for entity "${this.entity && _.trim(this.entity.name)}"
+
+      `);
+    } else {
+      log.i('input fields', this.fields);
+      const keys = fields.map(c => c.key);
+
+      if (_.isArray(this.fields)) {
+
+        this.formly.fields = fields.map(field => {
+          return _.merge(field, this.fields.find(f => f.key === field.key));
+        });
+        this.formly.fields = this.formly.fields.concat(this.fields.filter(field => !keys.includes(field.key)));
+
+      } else {
+        this.formly.fields = fields;
+      }
+      log.i('formly config from class example', this.formly.fields);
+
+      this.formly.options = this.options;
+      this.formly.form = this.form;
+      this.backupModel = _.cloneDeep(this.model);
+    }
+
   }
 
-  ngSubmit(model) {
+  async ngSubmit(model) {
+    const { id } = model;
     log.i('submit model', model);
-    this.submit.next(model);
+
+    if (this.crud) {
+      try {
+        const m = await this.crud.updateById(id, model);
+        log.i('Model update success', m);
+      } catch (e) {
+        log.er('Model update error', e);
+      }
+    } else if (this.crud) {
+      this.submit.next(model);
+    }
   }
 
 
 
   clear() {
-    this.formly.model = this.backupModel;
-    this.backupModel = _.cloneDeep(this.formly.model);
+    this.model = this.backupModel;
+    this.backupModel = _.cloneDeep(this.model);
   }
 
 }

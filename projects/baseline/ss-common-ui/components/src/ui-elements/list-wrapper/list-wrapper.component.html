@@ -4,6 +4,6 @@
   <mat-list-item *ngFor="let link of links"
                  (click)="open(link)">
     <span matLine> {{link.href}} {{ link.name }}</span>
-    <mat-icon>info</mat-icon>
+    <mat-icon>{{icon}}</mat-icon>
   </mat-list-item>
 </mat-nav-list>

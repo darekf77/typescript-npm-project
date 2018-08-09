@@ -11,6 +11,7 @@ const log = Log.create('List wrapper', Level.__NOTHING);
 export interface CRUDListWrapperLink {
   link: string;
   name: string;
+  lock?: boolean;
 }
 
 @Component({
@@ -23,6 +24,8 @@ export class ListWrapperComponent implements OnInit {
   constructor(private router: Router) {
 
   }
+
+  @Input() icon = 'info';
 
   isLoading = false;
 
@@ -40,6 +43,7 @@ export class ListWrapperComponent implements OnInit {
   @Input() linkProp = 'name';
   @Input() linkSchema;
   @Input() nameProp = 'href';
+  @Input() lockProp = '';
 
   columns = [
     {
@@ -59,6 +63,11 @@ export class ListWrapperComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+    if (this.lockProp) {
+      this.icon = 'lock';
+    }
+
     const columns = Describer.describe(this.crud.entity).map(prop => {
       return { prop };
     });
@@ -88,7 +97,7 @@ export class ListWrapperComponent implements OnInit {
       if (this.linkSchema) {
         const link = interpolateParamsToUrl(r, this.linkSchema);
         log.i('interpolated link', link);
-        return { link, name: r[this.nameProp] };
+        return { link, name: r[this.nameProp], lock: r[this.lockProp] };
       }
       return { link: r[this.linkProp], name: r[this.nameProp] };
     });

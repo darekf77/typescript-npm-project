@@ -2,10 +2,11 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
+import * as rimraf from 'rimraf';
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile } from "../models";
-import { copyFile, crossPlatofrmPath } from '../helpers';
+import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../helpers';
 import config from '../config';
 import { BaselineSiteJoin } from './baseline-site-join';
 import { error } from '../messages';
@@ -232,7 +233,7 @@ export class FilesRecreator {
           child.name
         );
         if (fs.existsSync(clientAssetsPath)) {
-          fse.removeSync(clientAssetsPath);
+          tryRemoveDir(clientAssetsPath)
         }
         if (fs.existsSync(libAssetsPath)) {
           filesPathesToIgnore.push(path.join(

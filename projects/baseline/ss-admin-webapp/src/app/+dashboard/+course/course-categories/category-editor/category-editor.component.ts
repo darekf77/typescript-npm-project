@@ -16,35 +16,15 @@ const log = Log.create('category editor')
   templateUrl: './category-editor.component.html',
   styleUrls: ['./category-editor.component.scss']
 })
-export class CategoryEditorComponent implements OnInit {
+export class CategoryEditorComponent   implements OnInit {
 
-  form = new FormGroup({});
   model: CATEGORY = {} as any;
-  options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'name',
-      type: 'input',
-      templateOptions: {
-        label: 'Name',
-        required: true,
-      }
-    },
-    {
-      key: 'isPremium',
-      type: 'checkbox',
-      defaultValue: false,
-      templateOptions: {
-        label: 'Premium?'
-      }
-    }
-  ];
 
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private categoryService: CategoryController
+    private crud: CategoryController
 
   ) {
 
@@ -58,7 +38,7 @@ export class CategoryEditorComponent implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'))
     log.i('id', id)
-    this.handlers.push(this.categoryService.categoryBy(id)
+    this.handlers.push(this.crud.categoryBy(id)
       .received
       .observable
       .subscribe(d => {
@@ -67,15 +47,12 @@ export class CategoryEditorComponent implements OnInit {
       }))
   }
 
-  ngOnDestroy() {
-    this.handlers.forEach((f) => f.unsubscribe())
-  }
   handlers: Subscription[] = [];
 
-  async submit(category: CATEGORY) {
-    log.i('category', category)
-    await this.categoryService.updateById(category.id, category);
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
   }
+
 
 }
 
