@@ -1,12 +1,13 @@
-import { Component, OnInit, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BaseCRUD, Describer } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
 
-const log = Log.create('List wrapper', Level.__NOTHING);
+const log = Log.create('List wrapper');
 
 export interface CRUDListWrapperLink {
   link: string;
@@ -21,9 +22,14 @@ export interface CRUDListWrapperLink {
 })
 export class ListWrapperComponent implements OnInit {
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private dialogService: MatDialog
+  ) {
 
   }
+
+  @ViewChild('create') templateCreate: TemplateRef<any>;
 
   @Input() icon = 'info';
 
@@ -53,6 +59,10 @@ export class ListWrapperComponent implements OnInit {
       prop: 'name'
     }
   ];
+
+  dialogRef: MatDialogRef<any>;
+
+  model = {}
 
   open(d: CRUDListWrapperLink) {
     const link = d.link;
@@ -97,12 +107,18 @@ export class ListWrapperComponent implements OnInit {
       if (this.linkSchema) {
         const link = interpolateParamsToUrl(r, this.linkSchema);
         log.i('interpolated link', link);
-        return { link, name: r[this.nameProp], lock: r[this.lockProp] };
+        const res = { link, name: r[this.nameProp], lock: r[this.lockProp] };
+        log.d('res', res);
+        return res;
       }
       return { link: r[this.linkProp], name: r[this.nameProp] };
     });
     log.i('links', this.links);
   }
 
+  createDialog() {
+    this.model = {};
+    this.dialogRef = this.dialogService.open(this.templateCreate);
+  }
 
 }

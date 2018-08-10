@@ -1,9 +1,24 @@
+<ng-template #create>
+
+  <app-form-wrapper-material *ngIf="crud && crud.entity"
+                             [entity]="crud.entity"
+                             [(model)]="model"
+                             [mode]="'create'"
+                             >
+
+  </app-form-wrapper-material>
+
+</ng-template>
+
 <mat-spinner *ngIf="isLoading">
 </mat-spinner>
+<button mat-min-fab
+        (click)="createDialog()">+</button>
 <mat-nav-list *ngIf="!isLoading">
   <mat-list-item *ngFor="let link of links"
                  (click)="open(link)">
     <span matLine> {{link.href}} {{ link.name }}</span>
-    <mat-icon>{{icon}}</mat-icon>
+    <mat-icon *ngIf="lockProp && link.lock">lock</mat-icon>
+    <mat-icon *ngIf="lockProp && !link.lock">lock_open</mat-icon>
   </mat-list-item>
 </mat-nav-list>

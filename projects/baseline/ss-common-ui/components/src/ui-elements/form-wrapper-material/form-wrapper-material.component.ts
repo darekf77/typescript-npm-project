@@ -22,6 +22,9 @@ export class FormWrapperMaterialComponent implements OnInit {
     options: undefined as FormlyFormOptions,
     fields: undefined as FormlyFieldConfig[]
   };
+
+  @Input() mode: 'update' | 'create' = 'update';
+
   @Input() crud: BaseCRUD<any>;
 
   @Input() form = new FormGroup({});
@@ -85,12 +88,26 @@ export class FormWrapperMaterialComponent implements OnInit {
     log.i('submit model', model);
 
     if (this.crud) {
-      try {
-        const m = await this.crud.updateById(id, model);
-        log.i('Model update success', m);
-      } catch (e) {
-        log.er('Model update error', e);
+      if (this.mode === 'update') {
+        try {
+          const m = await this.crud.updateById(id, model);
+          log.i('Model update success', m);
+          this.submit.next(model);
+        } catch (e) {
+          log.er('Model update error', e);
+          this.submit.error(e);
+        }
+      } else if (this.mode === 'create') {
+        try {
+          const m = await this.crud.create(model);
+          log.i('Model create success', m);
+          this.submit.next(model);
+        } catch (e) {
+          log.er('Model create error', e);
+          this.submit.error(e);
+        }
       }
+
     } else if (this.crud) {
       this.submit.next(model);
     }
