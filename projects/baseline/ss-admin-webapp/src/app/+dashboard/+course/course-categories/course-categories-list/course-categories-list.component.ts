@@ -15,7 +15,7 @@ const log = Log.create('coures categories list')
 export class CourseCategoriesListComponent implements OnInit {
 
   constructor(
-    private category: CategoryController,
+    public category: CategoryController,
     public example: ExamplesController
   ) { }
 
