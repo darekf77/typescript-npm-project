@@ -1,9 +1,11 @@
 <ng-template #create>
 
   <app-form-wrapper-material *ngIf="crud && crud.entity"
+                             [crud]="crud"
                              [entity]="crud.entity"
                              [(model)]="model"
                              [mode]="'create'"
+                             (complete)="complete($event)"
                              >
 
   </app-form-wrapper-material>

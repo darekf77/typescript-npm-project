@@ -6,6 +6,7 @@ import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
+import { CATEGORY } from 'ss-common-logic/browser/entities';
 
 const log = Log.create('List wrapper');
 
@@ -62,7 +63,7 @@ export class ListWrapperComponent implements OnInit {
 
   dialogRef: MatDialogRef<any>;
 
-  model = {}
+  model = {};
 
   open(d: CRUDListWrapperLink) {
     const link = d.link;
@@ -71,6 +72,15 @@ export class ListWrapperComponent implements OnInit {
       this.router.navigateByUrl(link);
     }
   }
+
+  complete(model) {
+    this.data.push(model);
+    this.initLinks(this.data);
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+  }
+
 
   async ngOnInit() {
 
@@ -91,7 +101,8 @@ export class ListWrapperComponent implements OnInit {
         log.i('columns', columns);
         const rows = await this.crud.getAll().received.observable.take(1).toPromise();
         this.isLoading = false;
-        this.initLinks(rows.body.json);
+        this.data = rows.body.json;
+        this.initLinks(this.data);
       } catch (error) {
         this.isLoading = false;
       }

@@ -39,6 +39,8 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   @Output() submit = new EventEmitter();
 
+  @Output() complete = new EventEmitter();
+
   constructor() { }
 
   @Input() entity: Function;
@@ -85,13 +87,15 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   async ngSubmit(model) {
     const { id } = model;
+    let resultModel = model;
     log.i('submit model', model);
 
     if (this.crud) {
       if (this.mode === 'update') {
         try {
-          const m = await this.crud.updateById(id, model);
+          const m = await this.crud.updateById(id, model).received;
           log.i('Model update success', m);
+          resultModel = m.body.json;
           this.submit.next(model);
         } catch (e) {
           log.er('Model update error', e);
@@ -99,8 +103,9 @@ export class FormWrapperMaterialComponent implements OnInit {
         }
       } else if (this.mode === 'create') {
         try {
-          const m = await this.crud.create(model);
+          const m = await this.crud.create(model).received;
           log.i('Model create success', m);
+          resultModel = m.body.json;
           this.submit.next(model);
         } catch (e) {
           log.er('Model create error', e);
@@ -111,6 +116,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     } else if (this.crud) {
       this.submit.next(model);
     }
+    this.complete.next(resultModel);
   }
 
 
