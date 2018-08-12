@@ -1,13 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // material
+
 import { MatCardModule } from "@angular/material/card";
 // formly
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import { Log, Level } from "ng2-logger/browser";
-const log = Log.create('category editor')
+const log = Log.create('category editor', Level.__NOTHING)
 import { Subscription } from 'rxjs/Subscription';
 // local
 import { CourseCategoriesComponent } from '../course-categories.component';
@@ -24,6 +25,15 @@ export class CategoryEditorComponent implements OnInit {
 
   model: CATEGORY = {} as any;
 
+  queryParamsForGroup = {
+    super: 'amazing',
+    dupa: 'kapitan',
+    jsonTest: {
+      smooth: true,
+      agressive: 'sometimes',
+      niceLevel: 12
+    }
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -32,7 +42,6 @@ export class CategoryEditorComponent implements OnInit {
     private GroupsController: GroupsController
 
   ) {
-    debugger
     router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.ngOnInit();

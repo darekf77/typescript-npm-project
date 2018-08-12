@@ -27,7 +27,7 @@ export { Observable } from "rxjs";
 import { Subject } from "rxjs/Subject";
 export { Subject } from "rxjs/Subject";
 
-const log = Log.create('AuthController');
+const log = Log.create('AuthController', Level.__NOTHING);
 
 
 import { META } from '../../helpers';

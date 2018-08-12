@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { isString } from 'lodash';
 import { CATEGORY } from 'ss-common-logic/browser/entities';
 
-const log = Log.create('List wrapper');
+const log = Log.create('List wrapper', Level.INFO);
 
 export interface CRUDListWrapperLink {
   link: string;
@@ -41,6 +41,8 @@ export class ListWrapperComponent implements OnInit {
   @Input() links: CRUDListWrapperLink[] = [
 
   ];
+
+  @Input() queryParams: { [params: string]: any; } = {};
 
   @Input() data = [
     { link: 'http://onet.pl', name: 'Onet' },
@@ -84,6 +86,7 @@ export class ListWrapperComponent implements OnInit {
 
   async ngOnInit() {
     log.i(`CRUD`, this.crud);
+    log.i(`CRUD ENTITY`, this.crud && this.crud.entity);
     if (this.lockProp) {
       this.icon = 'lock';
     }
@@ -94,14 +97,16 @@ export class ListWrapperComponent implements OnInit {
     this.columns = columns;
 
     if (this.crud) {
+
       this.isLoading = true;
       log.i('this.crud.entity', Describer.describe(this.crud.entity));
       try {
 
         log.i('columns', columns);
-        const rows = await this.crud.getAll().received.observable.take(1).toPromise();
+        const rows = await this.crud.getAll(this.queryParams).received;
         this.isLoading = false;
         this.data = rows.body.json;
+        log.i('init link with ', this.data);
         this.initLinks(this.data);
       } catch (error) {
         this.isLoading = false;
@@ -114,11 +119,11 @@ export class ListWrapperComponent implements OnInit {
 
   initLinks(rows: any[]) {
 
-    log.i('init links this.linkSchema', this.linkSchema);
+    log.d('init links this.linkSchema', this.linkSchema);
     this.links = rows.map(r => {
       if (this.linkSchema) {
         const link = interpolateParamsToUrl(r, this.linkSchema);
-        log.i('interpolated link', link);
+        log.d('interpolated link', link);
         const res = { link, name: r[this.nameProp], lock: r[this.lockProp] };
         log.d('res', res);
         return res;

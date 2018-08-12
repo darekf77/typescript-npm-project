@@ -1,5 +1,5 @@
 <ng-template #create>
-
+  <mat-icon (click)="dialogRef.close()">close</mat-icon>
   <app-form-wrapper-material *ngIf="crud && crud.entity"
                              [crud]="crud"
                              [entity]="crud.entity"

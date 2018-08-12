@@ -12,7 +12,8 @@ import { init, AngularProviders } from 'morphi/browser';
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
-import ExamplesController from 'ss-common-logic/browser/controllers/ExamplesController';
+import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 // entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
@@ -26,6 +27,7 @@ import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { routes } from "./app.routes";
+
 import { LoginModule } from './login/login.module';
 
 
@@ -35,6 +37,7 @@ init({
   host,
   controllers: [
     AuthController,
+    GroupsController,
     CategoryController,
     ExamplesController],
   entities: [

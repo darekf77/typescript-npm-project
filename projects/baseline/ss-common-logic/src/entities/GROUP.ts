@@ -7,7 +7,7 @@ import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
 import { Entity, OneToMany, EntityRepository } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { DIALOG, IDIALOG } from './DIALOG';
-import { CLASSNAME } from 'morphi';
+import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 
 export interface IGROUP {
   id?: number;
@@ -18,6 +18,11 @@ export interface IGROUP {
 //#region @backend
 @Entity(META.tableNameFrom(GROUP))
 //#endregion
+@FormlyForm<GROUP>()
+@DefaultModelWithMapping<GROUP>({
+  title: '',
+  dialogs: []
+})
 @CLASSNAME('GROUP')
 export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
 
