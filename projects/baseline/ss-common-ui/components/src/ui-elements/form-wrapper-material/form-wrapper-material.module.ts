@@ -1,8 +1,11 @@
+// angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 import { ReactiveFormsModule } from '@angular/forms';
-
+// material
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatDialogModule } from "@angular/material/dialog";
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
@@ -12,16 +15,24 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
-// material
-import { MatButtonModule } from "@angular/material/button";
 
 // other
 import { NgStringPipesModule } from "ngx-pipes";
+// local
+import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 
+
+const angularModules = [
+  CommonModule,
+  ReactiveFormsModule,
+];
 
 const materialModules = [
-  MatButtonModule
-]
+  MatButtonModule,
+  MatIconModule,
+  MatDialogModule
+];
+
 
 const formlyModules = [
   FormlyMaterialModule,
@@ -44,8 +55,7 @@ const formlyModules = [
 
 @NgModule({
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
+    ...angularModules,
     ...formlyModules,
     ...materialModules
   ],

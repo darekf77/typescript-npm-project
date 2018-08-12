@@ -1,6 +1,8 @@
 // angular
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+// material
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 // formly
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
@@ -17,12 +19,19 @@ const log = Log.create('form warpper material component', Level.__NOTHING);
 })
 export class FormWrapperMaterialComponent implements OnInit {
 
+  @ViewChild('templateDelete') templateDelete: TemplateRef<any>;
+
+  constructor(
+    private dialog: MatDialog
+  ) { }
+
   formly = {
     form: (undefined) as FormGroup,
     options: undefined as FormlyFormOptions,
     fields: undefined as FormlyFieldConfig[]
   };
 
+  id_toDelete: number;
   @Input() id: number;
   @Input() mode: 'update' | 'create' = 'update';
 
@@ -42,9 +51,9 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   @Output() complete = new EventEmitter();
 
-  constructor() { }
-
   @Input() entity: Function;
+
+  dialogRefDelete: MatDialogRef<any>;
 
   async ngOnInit() {
     if (!this.entity && this.crud && this.crud.entity) {
@@ -129,7 +138,24 @@ export class FormWrapperMaterialComponent implements OnInit {
     this.complete.next(resultModel);
   }
 
+  async delete(id) {
+    await this.crud.deleteById(id).received;
+  }
+  openDeleteDialog(id) {
+    log.i('openDeleteDialog to delete id: ', id);
+    this.id_toDelete = id;
+    this.dialogRefDelete = this.dialog.open(this.templateDelete);
+    this.dialogRefDelete.afterClosed().subscribe((result) => {
+      log.i(`dialog result: ${result} `);
+      if (result) {
+        this.complete.next();
+      }
+    });
+  }
 
+  onNoClick(): void {
+    this.dialogRefDelete.close();
+  }
 
   clear() {
     this.model = this.backupModel;
