@@ -1,3 +1,7 @@
-<app-form-wrapper-material [model]="model"
-                           [crud]="crud">
+<app-form-wrapper-material *ngIf="id"
+                           [id]="id"
+                           [model]="model"
+                           [crud]="crud"
+                           (complete)="complete()"
+                           >
 </app-form-wrapper-material>

@@ -8,7 +8,7 @@
     <button mat-raised-button
             *ngIf="mode === 'update'"
             type="submit"
-            [disabled]="!formly.form.valid">Submit
+            [disabled]="!formly.form.valid">{{mode | ucfirst}}
     </button>
     <button mat-raised-button
             *ngIf="mode === 'create'"

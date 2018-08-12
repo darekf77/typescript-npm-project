@@ -16,7 +16,7 @@ const log = Log.create('category editor')
   templateUrl: './category-editor.component.html',
   styleUrls: ['./category-editor.component.scss']
 })
-export class CategoryEditorComponent   implements OnInit {
+export class CategoryEditorComponent implements OnInit {
 
   model: CATEGORY = {} as any;
 
@@ -35,16 +35,17 @@ export class CategoryEditorComponent   implements OnInit {
     });
   }
 
-  ngOnInit() {
+  id: Number;
+
+
+  async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'))
-    log.i('id', id)
-    this.handlers.push(this.crud.categoryBy(id)
-      .received
-      .observable
-      .subscribe(d => {
-        this.model = d.body.json
-        log.i('categories model', this.model)
-      }))
+    log.i('id of category from routing', id)
+    this.id = id;
+  }
+
+  complete() {
+    this.router.navigateByUrl(`/dashboard/course/categories`);
   }
 
   handlers: Subscription[] = [];

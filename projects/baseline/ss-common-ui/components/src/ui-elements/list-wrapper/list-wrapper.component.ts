@@ -113,6 +113,7 @@ export class ListWrapperComponent implements OnInit {
   }
 
   initLinks(rows: any[]) {
+
     log.i('init links this.linkSchema', this.linkSchema);
     this.links = rows.map(r => {
       if (this.linkSchema) {

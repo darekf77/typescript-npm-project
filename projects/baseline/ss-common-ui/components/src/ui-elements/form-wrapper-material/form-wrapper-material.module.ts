@@ -15,6 +15,9 @@ import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
 // material
 import { MatButtonModule } from "@angular/material/button";
 
+// other
+import { NgStringPipesModule } from "ngx-pipes";
+
 
 const materialModules = [
   MatButtonModule
@@ -35,7 +38,8 @@ const formlyModules = [
   MatNativeDateModule,
   FormlyMatSliderModule,
   // custom
-  SelectWrapperModule
+  SelectWrapperModule,
+  NgStringPipesModule
 ];
 
 @NgModule({

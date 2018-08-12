@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { BaseCRUD, Describer } from 'morphi/browser';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component');
+const log = Log.create('form warpper material component', Level.__NOTHING);
 
 @Component({
   selector: 'app-form-wrapper-material',
@@ -23,6 +23,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     fields: undefined as FormlyFieldConfig[]
   };
 
+  @Input() id: number;
   @Input() mode: 'update' | 'create' = 'update';
 
   @Input() crud: BaseCRUD<any>;
@@ -45,7 +46,7 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   @Input() entity: Function;
 
-  ngOnInit() {
+  async ngOnInit() {
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
@@ -80,9 +81,18 @@ export class FormWrapperMaterialComponent implements OnInit {
 
       this.formly.options = this.options;
       this.formly.form = this.form;
-      this.backupModel = _.cloneDeep(this.model);
+      this.setModel(this.model);
     }
 
+    if ((!_.isUndefined(this.id))) {
+      const m = await this.crud.getBy(this.id).received;
+      this.setModel(m.body.json);
+    }
+  }
+
+  setModel(model) {
+    this.model = model;
+    this.backupModel = _.cloneDeep(this.model);
   }
 
   async ngSubmit(model) {
