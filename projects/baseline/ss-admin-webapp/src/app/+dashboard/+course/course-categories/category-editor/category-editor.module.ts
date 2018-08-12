@@ -11,6 +11,8 @@ import { MatButtonModule } from "@angular/material/button";
 // local
 import { CategoryEditorComponent } from './category-editor.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
+// components
+import { ListWrapperModule } from "ss-common-ui/module";
 
 const materialModules = [
   MatListModule,
@@ -26,7 +28,8 @@ const materialModules = [
   imports: [
     CommonModule,
     FormWrapperMaterialModule,
-    ...materialModules
+    ...materialModules,
+    ListWrapperModule
   ],
   exports: [
     CategoryEditorComponent

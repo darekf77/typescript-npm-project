@@ -11,6 +11,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
+import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
 import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
@@ -40,6 +41,9 @@ const modules = [
     ...modules
   ],
   declarations: [DashboardComponent],
-  providers: [CategoryController],
+  providers: [
+    CategoryController,
+    GroupsController
+  ],
 })
 export class DashboardModule { }

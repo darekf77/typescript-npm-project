@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { BaseCRUD, Describer } from 'morphi/browser';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component', Level.__NOTHING);
+const log = Log.create('form warpper material component');
 
 @Component({
   selector: 'app-form-wrapper-material',
@@ -56,6 +56,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   dialogRefDelete: MatDialogRef<any>;
 
   async ngOnInit() {
+    log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
@@ -105,6 +106,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   }
 
   async ngSubmit(model) {
+
     const { id } = model;
     let resultModel = model;
     log.i('submit model', model);

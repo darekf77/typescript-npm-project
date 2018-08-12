@@ -1,7 +1,19 @@
-<app-form-wrapper-material *ngIf="id"
-                           [id]="id"
-                           [model]="model"
-                           [crud]="crud"
-                           (complete)="complete()"
-                           >
-</app-form-wrapper-material>
+<mat-card>
+  <app-form-wrapper-material *ngIf="id"
+                             [id]="id"
+                             [model]="model"
+                             [crud]="crud"
+                             (complete)="complete()">
+  </app-form-wrapper-material>
+
+</mat-card>
+<br>
+<mat-card>
+  Groups:
+  <br>
+  <app-list-wrapper [crud]="GroupsController"
+                    [nameProp]="'name'"
+                    [lockProp]="'isPremium'"
+                    [linkSchema]="'/dashboard/course/categories/category/:id/groups/:groupid'">
+  </app-list-wrapper>
+</mat-card>

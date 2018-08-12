@@ -20,6 +20,7 @@ addController(controllers.AuthController)
 addController(controllers.CategoryController)
 addController(controllers.MultimediaController)
 addController(controllers.ExamplesController)
+addController(controllers.GroupsController);
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)

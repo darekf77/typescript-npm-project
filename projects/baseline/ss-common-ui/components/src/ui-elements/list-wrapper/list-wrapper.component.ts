@@ -83,7 +83,7 @@ export class ListWrapperComponent implements OnInit {
 
 
   async ngOnInit() {
-
+    log.i(`CRUD`, this.crud);
     if (this.lockProp) {
       this.icon = 'lock';
     }

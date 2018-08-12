@@ -9,6 +9,9 @@ export { MultimediaController } from './controllers/core/MultimediaController';
 import { CategoryController } from "./controllers/CategoryController";
 export { CategoryController } from "./controllers/CategoryController";
 
+import { GroupsController } from "./controllers/GroupsController";
+export { GroupsController } from "./controllers/GroupsController";
+
 import { ExamplesController } from './controllers/ExamplesController';
 export { ExamplesController } from './controllers/ExamplesController';
 
@@ -21,7 +24,8 @@ export function controllers() {
     AuthController: getSingleton<AuthController>(AuthController),
     CategoryController: getSingleton<CategoryController>(CategoryController),
     MultimediaController: getSingleton<MultimediaController>(MultimediaController),
-    ExamplesController: getSingleton<ExamplesController>(ExamplesController)
+    ExamplesController: getSingleton<ExamplesController>(ExamplesController),
+    GroupsController: getSingleton<GroupsController>(GroupsController)
   }
 }
 //#endregion
