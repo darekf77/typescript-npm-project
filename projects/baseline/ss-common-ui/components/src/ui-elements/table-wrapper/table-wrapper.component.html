@@ -1,11 +1,19 @@
+<h1 *ngIf="arrayDataConfig">
+  {{arrayDataConfig.config.pagination}}
+</h1>
 <ngx-datatable class="material"
-               *ngIf="rows && columns;else tableLoading"
+               *ngIf="rows && columns;else tableLoading && arrayDataConfig"
                [rows]="rows"
                [columnMode]="'force'"
                [sorts]="[{prop: 'id', dir: 'asc'}]"
                [externalSorting]="true"
+               [externalPaging]="true"
                [columns]="columns"
                [rowHeight]="'auto'"
+               (page)='setPage($event)'
+               [count]="arrayDataConfig.config.pagination.totalElements"
+               [offset]="arrayDataConfig.config.pagination.pageNumber"
+               [limit]="arrayDataConfig.config.pagination.rowsDisplayed"
                [headerHeight]="'auto'">
 </ngx-datatable>
 

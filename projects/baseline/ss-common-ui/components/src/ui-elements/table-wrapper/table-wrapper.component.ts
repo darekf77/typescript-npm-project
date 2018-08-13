@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import { times } from 'lodash';
-import { BaseCRUD, Describer } from 'morphi/browser';
+import { BaseCRUD, Describer, ArrayDataConfig } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { Router } from '@angular/router';
 
-const log = Log.create('Table wrapper', Level.__NOTHING);
+const log = Log.create('Table wrapper');
 
 
 @Component({
@@ -15,6 +15,7 @@ const log = Log.create('Table wrapper', Level.__NOTHING);
 })
 export class TableWrapperComponent implements OnInit {
 
+  arrayDataConfig = new ArrayDataConfig();
 
   @Input() rowHref: string;
 
@@ -45,22 +46,31 @@ export class TableWrapperComponent implements OnInit {
   constructor() { }
 
 
+  setPage(n: number) {
+    log.i(`set page ${n}`);
+  }
+
   async ngOnInit() {
-    log.i('this.crud.entity', Describer.describe(this.crud.entity));
+    this.arrayDataConfig.config.pagination.rowsDisplayed = 5;
+    log.i('arrayDataConfig', this.arrayDataConfig);
+    log.i('this.crud.entity', Describer.describeByEverything(this.crud.entity));
+
     try {
-      const columns = Describer.describe(this.crud.entity).map(prop => {
+      const columns = Describer.describeByEverything(this.crud.entity).map(prop => {
         return { prop };
       });
       this.columns = columns;
       log.i('columns', columns);
-
-      const rows = await this.crud.getAll().received.observable.take(1).toPromise();
-      log.i('rows', rows.body.json);
-      this.rows = rows.body.json;
+      await this.retriveData();
 
     } catch (error) {
 
     }
+  }
+  async retriveData() {
+    const rows = await this.crud.getAll(this.arrayDataConfig.config).received.observable.take(1).toPromise();
+    log.i('rows', rows.body.json);
+    this.rows = rows.body.json;
   }
 
   onTableContextMenu(e) {

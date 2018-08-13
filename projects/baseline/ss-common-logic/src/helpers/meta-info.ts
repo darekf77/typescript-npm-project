@@ -82,24 +82,6 @@ export namespace META {
   }
 
   @ENDPOINT()
-  @CLASSNAME('BASE_ENTITY_CRUD')
-  export abstract class BASE_ENTITY_CRUD<T, TRAW=T> extends BaseCRUD<T> {
-
-    abstract id: number;
-
-    abstract fromRaw(obj: TRAW): T;
-
-    //#region @backend
-    abstract get db(): { [entities: string]: Repository<any> }
-    abstract get ctrl(): { [controller: string]: META.BASE_CONTROLLER<any> }
-
-    abstract async initExampleDbData();
-
-    //#endregion
-
-  }
-
-  @ENDPOINT()
   @CLASSNAME('BASE_CONTROLLER')
   export abstract class BASE_CONTROLLER<T> extends BaseCRUD<T> {
 

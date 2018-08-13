@@ -12,16 +12,22 @@ function killall() {
 }
 
 function killonport(args) {
+  const port = parseInt(args.trim())
+  console.log(`Killing process on port ${port} in progress`);
   try {
-    const port = parseInt(args.trim())
-    if(os.platform() === 'linux') {
-      Project.Current.run(`lsof -i:${port}`, { output: false }).sync()  
-    }  else if(os.platform() === 'win32') {
-      Project.Current.run(`lsof -P | grep ':${port}' | awk '{print $2}'`, { output: false }).sync()
+
+    if (os.platform() === 'linux') {
+      Project.Current.run(`lsof -i:${port}`, { output: false }).sync()
+    } else if (os.platform() === 'win32') {
+      // run(`for /f "tokens=5" %a in ('netstat -aon ^| find ":${port}" ^| find "LISTENING"') do taskkill /f /pid %a`).sync()
+      const pid = run(`netstat -ano | findstr :${port} | grep LISTENING -m 1 |  awk '{print $NF}'`, { output: false }).sync().toString();
+      console.log(`Killing process on pid: ${pid} in progress`);
+      run(`tskill ${pid}`).sync();
+      info(`Done`);
     } else {
       Project.Current.run(`lsof -P | grep ':${port}' | awk '{print $2}'`, { output: false }).sync()
     }
-    
+
     info(`Process killed on port: ${port}`)
   } catch (e) {
     error(`Incorrect port: ${args}`)
@@ -32,11 +38,11 @@ function killonport(args) {
 
 export default {
   $KILL_ON_PORT: (args: string) => {
-      killonport(args);
+    killonport(args);
   },
   $KILLONPORT: (args: string) => {
     killonport(args);
-},
+  },
   $KILLALL_NODE: () => {
     killall()
   },

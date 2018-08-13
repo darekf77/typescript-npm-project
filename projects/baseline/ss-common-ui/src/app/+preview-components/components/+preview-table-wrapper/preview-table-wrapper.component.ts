@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { ExamplesPaginationController } from 'ss-common-logic/browser/controllers/ExamplesPaginationController';
+import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser/entities/EXAMPLE_PAGINATION';
 
 @Component({
   selector: 'app-preview-table-wrapper',
@@ -8,15 +9,12 @@ import { ExamplesController } from 'ss-common-logic/browser/controllers/Examples
 })
 export class PreviewTableWrapperComponent implements OnInit {
 
-  constructor(public exampleService: ExamplesController) {
+  constructor(public exampleService: ExamplesPaginationController) {
 
   }
 
   ngOnInit() {
-    setTimeout(async () => {
-      // await this.exampleService.info().received.observable.take(1).toPromise();
-      await this.exampleService.info2().received.observable.take(1).toPromise();
-    });
+
   }
 
 }

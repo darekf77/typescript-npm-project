@@ -15,8 +15,10 @@ export { GroupsController } from "./controllers/GroupsController";
 import { ExamplesController } from './controllers/ExamplesController';
 export { ExamplesController } from './controllers/ExamplesController';
 
-import { EXAMPLE_PAGINATION } from './entities/EXAMPLE_PAGINATION';
-export { EXAMPLE_PAGINATION } from './entities/EXAMPLE_PAGINATION';
+import { ExamplesPaginationController } from './controllers/ExamplesPaginationController';
+export { ExamplesPaginationController } from './controllers/ExamplesPaginationController';
+
+
 
 //#region @backend
 import { getSingleton } from "morphi";
@@ -29,7 +31,7 @@ export function controllers() {
     MultimediaController: getSingleton<MultimediaController>(MultimediaController),
     ExamplesController: getSingleton<ExamplesController>(ExamplesController),
     GroupsController: getSingleton<GroupsController>(GroupsController),
-    EXAMPLE_PAGINATION: getSingleton<EXAMPLE_PAGINATION>(EXAMPLE_PAGINATION),
+    ExamplesPaginationController: getSingleton<ExamplesPaginationController>(ExamplesPaginationController)
   }
 }
 //#endregion

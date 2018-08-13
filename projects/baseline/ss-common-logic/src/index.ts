@@ -21,7 +21,7 @@ addController(controllers.CategoryController)
 addController(controllers.MultimediaController)
 addController(controllers.ExamplesController)
 addController(controllers.GroupsController);
-addController(entites.EXAMPLE_PAGINATION);
+addController(controllers.ExamplesPaginationController);
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)

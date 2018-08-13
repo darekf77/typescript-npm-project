@@ -8,6 +8,8 @@ import {
 } from 'components';
 
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { ExamplesPaginationController } from 'ss-common-logic/browser/controllers/ExamplesPaginationController';
+import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser/entities/EXAMPLE_PAGINATION';
 import { init, AngularProviders } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 
@@ -15,8 +17,8 @@ const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic
 
 init({
   host,
-  controllers: [ExamplesController],
-  entities: [EXAMPLE]
+  controllers: [ExamplesController, ExamplesPaginationController],
+  entities: [EXAMPLE, EXAMPLE_PAGINATION]
 })
   .angularProviders();
 
