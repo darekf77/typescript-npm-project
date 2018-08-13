@@ -1,4 +1,3 @@
-import { Project } from '../project';
 import * as child from "child_process";
 import * as path from "path";
 import * as glob from "glob";
@@ -14,6 +13,7 @@ import config from '../config';
 import { RunOptions } from '../models';
 import { run } from '../../node_modules/morphi';
 
+//#region configs
 const defaultColors = {
   'gas-ui': "#72a25c",
   'es-rs-ui': '#ff7e7e',
@@ -100,14 +100,14 @@ const vscode = {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "0.1.0",
-    "command": "npm",
+    "command": "tnp",
     "isShellCommand": true,
     "showOutput": "always",
     "suppressTaskName": true,
     "tasks": [{
       "taskName": "install",
       "args": [
-        "run",
+        "aurora",
         "start"
       ],
       "isBuildCommand": true
@@ -123,17 +123,13 @@ const FOLDERS = {
   VENDOR: 'vendor'
 }
 
-
+//#endregion
 
 export type AurorProjectType = 'parent-baseline-fork' | 'child-baseline-module';
 
 class ProjectAurora {
 
-  readonly children: ProjectAurora[] = [];
-  readonly prefix: string;
-  readonly externalPath: string;
-  readonly name: string;
-
+  //#region static methods
   private static isAuroraProject(location: string) {
     // is aurora project - simple teest
     const bowerFile = path.join(location, 'bower.json');
@@ -162,17 +158,13 @@ class ProjectAurora {
     );
     return p;
   }
+  //#endregion
 
-  private clearLocation(location: string) {
-    if (location.endsWith('/')) {
-      location = location.replace(/\/+$/, '');
-    }
-
-    if (location.endsWith('\\')) {
-      location = location.replace(/\\+$/, '');
-    }
-    return location;
-  }
+  readonly children: ProjectAurora[] = [];
+  readonly prefix: string;
+  readonly externalPath: string;
+  readonly name: string;
+  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common', 'es-ips-ui'];
 
   get fix() {
     const self = this;
@@ -193,29 +185,6 @@ class ProjectAurora {
     }
   }
 
-  public updateVscode() {
-
-    const vscodeDir = path.join(this.location, '.vscode')
-    tryRemoveDir(vscodeDir)
-    fse.mkdirpSync(vscodeDir);
-    const vsc = _.cloneDeep(vscode);
-    Object.keys(vsc).forEach(key => {
-      // console.log('c', key)
-      const vscConfigFile = path.join(vscodeDir, `${key}.json`);
-      this.fix.config(vsc[key])
-
-      fse.writeJsonSync(vscConfigFile, vsc[key], {
-        encoding: 'utf8',
-        spaces: 2
-      })
-    })
-
-
-  }
-
-  nameFrom(location: string) {
-    return fse.readJsonSync(path.join(location, 'bower.json')).name;
-  }
 
   constructor(
 
@@ -246,7 +215,43 @@ class ProjectAurora {
     // info(`Project ${this.name}, prefix ${this.prefix}`)
   }
 
-  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common', 'es-ips-ui'];
+
+  private clearLocation(location: string) {
+    if (location.endsWith('/')) {
+      location = location.replace(/\/+$/, '');
+    }
+
+    if (location.endsWith('\\')) {
+      location = location.replace(/\\+$/, '');
+    }
+    return location;
+  }
+
+  public updateVscode() {
+
+    const vscodeDir = path.join(this.location, '.vscode')
+    tryRemoveDir(vscodeDir)
+    fse.mkdirpSync(vscodeDir);
+    const vsc = _.cloneDeep(vscode);
+    Object.keys(vsc).forEach(key => {
+      // console.log('c', key)
+      const vscConfigFile = path.join(vscodeDir, `${key}.json`);
+      this.fix.config(vsc[key])
+
+      fse.writeJsonSync(vscConfigFile, vsc[key], {
+        encoding: 'utf8',
+        spaces: 2
+      })
+    })
+
+
+  }
+
+  nameFrom(location: string) {
+    return fse.readJsonSync(path.join(location, 'bower.json')).name;
+  }
+
+
   add(subProjectName: 'es-rs-ui' | 'es-common' | 'es-ips-ui') {
     if (!this.allowedBaselineLibs.includes(subProjectName)) {
       error(`Wrong baseline lib type: ${subProjectName}`)
@@ -322,6 +327,11 @@ class ProjectAurora {
 
   }
 
+  start() {
+    this.run(`tnp killonport 9000`).sync()
+    this.run(`npm run start`).sync()
+  }
+
 }
 
 
@@ -373,6 +383,11 @@ export default {
           case 'rebase':
             noExit = true;
             project.rebase(a[i + 1])
+            break;
+
+          case 'start':
+            noExit = true;
+            project.start();
             break;
 
           default:

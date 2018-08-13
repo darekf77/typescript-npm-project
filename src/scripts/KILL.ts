@@ -1,4 +1,4 @@
-import { Project } from "../project";
+
 import { info, error } from "../messages";
 import { run } from '../process';
 import * as os from 'os';
@@ -17,15 +17,19 @@ function killonport(args) {
   try {
 
     if (os.platform() === 'linux') {
-      Project.Current.run(`lsof -i:${port}`, { output: false }).sync()
+      run(`lsof -i:${port}`, { output: false }).sync()
     } else if (os.platform() === 'win32') {
       // run(`for /f "tokens=5" %a in ('netstat -aon ^| find ":${port}" ^| find "LISTENING"') do taskkill /f /pid %a`).sync()
-      const pid = run(`netstat -ano | findstr :${port} | grep LISTENING -m 1 |  awk '{print $NF}'`, { output: false }).sync().toString();
+      const pid = Number(run(`netstat -ano | findstr :${port} | grep LISTENING -m 1 |  awk '{print $NF}'`, { output: false }).sync().toString());
+      if (pid === 0 || isNaN(pid)) {
+        console.log(`Port ${port} is not used byt any process...`)
+        process.exit(0)
+      }
       console.log(`Killing process on pid: ${pid} in progress`);
       run(`tskill ${pid}`).sync();
       info(`Done`);
     } else {
-      Project.Current.run(`lsof -P | grep ':${port}' | awk '{print $2}'`, { output: false }).sync()
+      run(`lsof -P | grep ':${port}' | awk '{print $2}'`, { output: false }).sync()
     }
 
     info(`Process killed on port: ${port}`)
