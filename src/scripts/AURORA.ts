@@ -280,6 +280,7 @@ class ProjectAurora {
 
 
   pullCurrentBranch() {
+    console.log(`Pulling from git project ${this.name}`)
     pullCurrentBranch(this.location);
   }
 
@@ -340,47 +341,44 @@ export default {
 
     if (project.Type === 'parent-baseline-fork') {
 
-      if (a.length == 0) {
-        project.link()
-        project.pullCurrentBranch()
-        project.children.forEach(c => {
-          c.pullCurrentBranch()
-        })
+      a.forEach((param, i) => {
 
-      } else {
-        a.forEach((param, i) => {
+        switch (param) {
+          case 'link':
+            project.link()
+            break;
 
-          switch (param) {
-            case 'link':
-              project.link()
-              break;
+          case 'add':
+            project.add(a[i + 1] as any);
+            break;
 
-            case 'add':
-              project.add(a[i + 1] as any);
-              break;
+          case 'git':
+            project.pullCurrentBranch()
+            break;
 
-            case 'git':
-              project.pullCurrentBranch()
-              break;
+          case 'update':
+            project.pullCurrentBranch()
+            project.children.forEach(c => {
+              c.pullCurrentBranch()
+            })
+            break;
 
-            case 'vscode':
-              project.updateVscode()
-              project.children.forEach(c => {
-                c.updateVscode()
-              })
-              break;
+          case 'vscode':
+            project.updateVscode()
+            project.children.forEach(c => {
+              c.updateVscode()
+            })
+            break;
 
-            case 'rebase':
-              noExit = true;
-              project.rebase(a[i + 1])
-              break;
+          case 'rebase':
+            noExit = true;
+            project.rebase(a[i + 1])
+            break;
 
-            default:
-              break;
-          }
-
-        })
-      }
+          default:
+            break;
+        }
+      })
 
     } else {
       error(`Please start commands from folder level: xxx-ui`);
