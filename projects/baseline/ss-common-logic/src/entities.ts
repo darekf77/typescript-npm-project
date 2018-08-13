@@ -25,12 +25,17 @@ export { GROUP, IGROUP, GROUP_REPOSITORY } from "./entities/GROUP";
 import { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
 export { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
 
+import { EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION, EXAMPLE_PAGINATION_REPOSITORY }
+  from './entities/EXAMPLE_PAGINATION';
+export { EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION, EXAMPLE_PAGINATION_REPOSITORY }
+  from './entities/EXAMPLE_PAGINATION';
 
 //#region @backend
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";
 
 import { META, Connection } from './helpers';
+
 
 export function entities(connection?: Connection) {
   return {
@@ -50,7 +55,14 @@ export function entities(connection?: Connection) {
 
     MULTIMEDIA: META.repositoryFrom<MULTIMEDIA, MULTIMEDIA_REPOSITORY>(connection, MULTIMEDIA, MULTIMEDIA_REPOSITORY),
 
-    EXAMPLE: META.repositoryFrom<EXAMPLE, EXAMPLE_REPOSITORY>(connection, EXAMPLE, EXAMPLE_REPOSITORY)
+    EXAMPLE: META.repositoryFrom<EXAMPLE, EXAMPLE_REPOSITORY>(connection, EXAMPLE, EXAMPLE_REPOSITORY),
+
+    EXAMPLE_PAGINATION: META
+      .repositoryFrom<EXAMPLE_PAGINATION, EXAMPLE_PAGINATION_REPOSITORY>(
+        connection,
+        EXAMPLE_PAGINATION,
+        EXAMPLE_PAGINATION_REPOSITORY
+      )
   }
 }
 //#endregion

@@ -7,6 +7,7 @@ $left-panel-size: 250px !default;
 
   .header-wrapper {
     padding-left: 0px;
+    z-index: 2147483638;
   }
 
   app-logo {
@@ -50,6 +51,7 @@ $left-panel-size: 250px !default;
   }
 
   .content-wrapper {
+    overflow: auto;
     padding-left: 5px;
     padding-right: 5px;
     mat-card {

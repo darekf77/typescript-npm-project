@@ -21,6 +21,7 @@ addController(controllers.CategoryController)
 addController(controllers.MultimediaController)
 addController(controllers.ExamplesController)
 addController(controllers.GroupsController);
+addController(entites.EXAMPLE_PAGINATION);
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)
@@ -31,6 +32,7 @@ addEntity(entites.GROUP)
 addEntity(entites.CATEGORY)
 addEntity(entites.MULTIMEDIA)
 addEntity(entites.EXAMPLE)
+addEntity(entites.EXAMPLE_PAGINATION);
 
 export const Controllers = tControllers;
 export const Entities = tEntities;
