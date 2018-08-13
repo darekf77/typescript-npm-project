@@ -211,7 +211,7 @@ class ProjectAurora {
 
 
     this.name = this.nameFrom(this.location);
-    this.updateVscode()
+    // this.updateVscode()
     // info(`Project ${this.name}, prefix ${this.prefix}`)
   }
 
@@ -328,7 +328,7 @@ class ProjectAurora {
   }
 
   start() {
-    this.run(`tnp killonport 9000`).sync()
+    // this.run(`tnp killonport 9000`).sync()
     this.run(`npm run start`).sync()
   }
 
@@ -350,6 +350,11 @@ export default {
 
 
     if (project.Type === 'parent-baseline-fork') {
+
+      project.updateVscode()
+      project.children.forEach(c => {
+        c.updateVscode()
+      })
 
       a.forEach((param, i) => {
 
@@ -373,12 +378,6 @@ export default {
             })
             break;
 
-          case 'vscode':
-            project.updateVscode()
-            project.children.forEach(c => {
-              c.updateVscode()
-            })
-            break;
 
           case 'rebase':
             noExit = true;
@@ -386,7 +385,7 @@ export default {
             break;
 
           case 'start':
-            noExit = true;
+
             project.start();
             break;
 
