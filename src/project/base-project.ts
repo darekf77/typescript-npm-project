@@ -467,7 +467,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
 
     const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
 
-    if (checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
+    if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
       console.log(`Reinstallation of "tnp" not needed in ${project.location} `);
       return;
     }
@@ -477,7 +477,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       // console.log(`Removed tnp - helper from ${ dest } `)
       rimraf.sync(destCompiledJs)
     }
-    fse.copySync(`${pathTnpCompiledJS} /`, destCompiledJs);
+    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
     fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
     // console.log(`Tnp-helper installed in ${project.name} `)
   } else {

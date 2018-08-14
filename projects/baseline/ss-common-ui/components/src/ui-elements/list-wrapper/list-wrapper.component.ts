@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { BaseCRUD, Describer } from 'morphi/browser';
+import { BaseCRUD, Describer, ArrayDataConfig, SYMBOL } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
@@ -30,6 +30,8 @@ export class ListWrapperComponent implements OnInit {
 
   }
 
+  @Input() arrayDataConfig = new ArrayDataConfig();
+
   @ViewChild('create') templateCreate: TemplateRef<any>;
 
   @Input() icon = 'info';
@@ -41,8 +43,6 @@ export class ListWrapperComponent implements OnInit {
   @Input() links: CRUDListWrapperLink[] = [
 
   ];
-
-  @Input() queryParams: { [params: string]: any; } = {};
 
   @Input() data = [
     { link: 'http://onet.pl', name: 'Onet' },
@@ -97,24 +97,32 @@ export class ListWrapperComponent implements OnInit {
     this.columns = columns;
 
     if (this.crud) {
+      log.i('columns', columns);
+      await this.retriveData();
 
-      this.isLoading = true;
-      log.i('this.crud.entity', Describer.describe(this.crud.entity));
-      try {
-
-        log.i('columns', columns);
-        const rows = await this.crud.getAll(this.queryParams).received;
-        this.isLoading = false;
-        this.data = rows.body.json;
-        log.i('init link with ', this.data);
-        this.initLinks(this.data);
-      } catch (error) {
-        this.isLoading = false;
-      }
     } else {
       this.initLinks(this.data);
     }
 
+  }
+
+  async retriveData() {
+    this.isLoading = true;
+    log.i('this.crud.entity', Describer.describe(this.crud.entity));
+    try {
+      log.i('this.arrayDataConfig', this.arrayDataConfig);
+      const rows = await this.crud.getAll(this.arrayDataConfig).received;
+      const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
+      this.isLoading = false;
+      if (!isNaN(totalElements)) {
+        this.arrayDataConfig.pagination.totalElements = totalElements;
+      }
+      this.data = rows.body.json;
+      log.i('init link with ', this.data);
+      this.initLinks(this.data);
+    } catch (error) {
+      this.isLoading = false;
+    }
   }
 
   initLinks(rows: any[]) {

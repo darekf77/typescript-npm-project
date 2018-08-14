@@ -10,6 +10,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('category editor', Level.__NOTHING)
 import { Subscription } from 'rxjs/Subscription';
+import { ArrayDataConfig } from 'morphi/browser';
 // local
 import { CourseCategoriesComponent } from '../course-categories.component';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
@@ -25,15 +26,10 @@ export class CategoryEditorComponent implements OnInit {
 
   model: CATEGORY = {} as any;
 
-  queryParamsForGroup = {
-    super: 'amazing',
-    dupa: 'kapitan',
-    jsonTest: {
-      smooth: true,
-      agressive: 'sometimes',
-      niceLevel: 12
-    }
-  }
+  arrayDataConfig = new ArrayDataConfig({
+    joins: ['category.id = 2'],
+    dupa: { hasdas: "asd" }
+  } as any);
 
   constructor(
     private route: ActivatedRoute,

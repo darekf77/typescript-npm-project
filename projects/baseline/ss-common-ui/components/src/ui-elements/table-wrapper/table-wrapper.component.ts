@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { BaseCRUD, Describer, ArrayDataConfig } from 'morphi/browser';
+import { BaseCRUD, Describer, ArrayDataConfig, SYMBOL } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { Router } from '@angular/router';
@@ -15,7 +15,7 @@ const log = Log.create('Table wrapper');
 })
 export class TableWrapperComponent implements OnInit {
 
-  arrayDataConfig = new ArrayDataConfig();
+  @Input() arrayDataConfig = new ArrayDataConfig();
 
   @Input() rowHref: string;
 
@@ -45,14 +45,18 @@ export class TableWrapperComponent implements OnInit {
 
   constructor() { }
 
+  async setSorting(e: {}) {
+    log.i('sorting', e);
+  }
+
 
   async setPage(e: { count: number, pageSize: number, limit: number, offset: number }) {
-    this.arrayDataConfig.config.pagination.pageNumber = e.offset + 1;
+    this.arrayDataConfig.pagination.pageNumber = e.offset + 1;
     await this.retriveData();
   }
 
   async ngOnInit() {
-    this.arrayDataConfig.config.pagination.rowsDisplayed = 5;
+    this.arrayDataConfig.pagination.rowsDisplayed = 5;
     log.i('arrayDataConfig', this.arrayDataConfig);
     log.i('this.crud.entity', Describer.describeByEverything(this.crud.entity));
 
@@ -69,7 +73,12 @@ export class TableWrapperComponent implements OnInit {
     }
   }
   async retriveData() {
-    const rows = await this.crud.getAll(this.arrayDataConfig.config).received.observable.take(1).toPromise();
+    const rows = await this.crud.getAll(this.arrayDataConfig).received.observable.take(1).toPromise();
+    const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
+    if (!isNaN(totalElements)) {
+      this.arrayDataConfig.pagination.totalElements = totalElements;
+    }
+    log.i(SYMBOL.X_TOTAL_COUNT, rows.headers.get(SYMBOL.X_TOTAL_COUNT));
     log.i('rows', rows.body.json);
     this.rows = rows.body.json;
   }

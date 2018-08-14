@@ -13,7 +13,7 @@
   <br>
   <app-list-wrapper [crud]="GroupsController"
                     [nameProp]="'title'"
-                    [queryParams]="queryParamsForGroup"
+                    [arrayDataConfig]="arrayDataConfig"
                     [lockProp]="'isPremium'"
                     [linkSchema]="'/dashboard/course/categories/category/:id/groups/:groupid'">
   </app-list-wrapper>
