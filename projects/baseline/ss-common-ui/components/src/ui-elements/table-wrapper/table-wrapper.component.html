@@ -1,6 +1,6 @@
-<h1 *ngIf="arrayDataConfig">
+<!-- <h1 *ngIf="arrayDataConfig">
   {{arrayDataConfig.config.pagination}}
-</h1>
+</h1>` -->
 <ngx-datatable class="material"
                *ngIf="rows && columns;else tableLoading && arrayDataConfig"
                [rows]="rows"
@@ -12,9 +12,10 @@
                [rowHeight]="'auto'"
                (page)='setPage($event)'
                [count]="arrayDataConfig.config.pagination.totalElements"
-               [offset]="arrayDataConfig.config.pagination.pageNumber"
+               [offset]="(arrayDataConfig.config.pagination.pageNumber - 1)"
                [limit]="arrayDataConfig.config.pagination.rowsDisplayed"
-               [headerHeight]="'auto'">
+               [headerHeight]="'auto'"
+               [footerHeight]="50">
 </ngx-datatable>
 
 

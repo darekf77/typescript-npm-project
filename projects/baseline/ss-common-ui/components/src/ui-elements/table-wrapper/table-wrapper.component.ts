@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
-import { times } from 'lodash';
+import * as _ from 'lodash';
 import { BaseCRUD, Describer, ArrayDataConfig } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
@@ -26,7 +26,7 @@ export class TableWrapperComponent implements OnInit {
     totalMessage: undefined
   };
 
-  @Input() rows = times(50, (id) => {
+  @Input() rows = _.times(50, (id) => {
     return {
       id,
       name: `Amazing ${id} row `
@@ -46,8 +46,9 @@ export class TableWrapperComponent implements OnInit {
   constructor() { }
 
 
-  setPage(n: number) {
-    log.i(`set page ${n}`);
+  async setPage(e: { count: number, pageSize: number, limit: number, offset: number }) {
+    this.arrayDataConfig.config.pagination.pageNumber = e.offset + 1;
+    await this.retriveData();
   }
 
   async ngOnInit() {

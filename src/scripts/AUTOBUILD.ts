@@ -23,7 +23,7 @@ export interface AutoBuildConfigComputer {
 }
 
 export interface JSONAutoBuildConfig {
-  [computerNames: string]: AutoBuildConfigComputer;
+  [computerNames: string]: AutoBuildConfigComputer | string;
 }
 
 export class AutoBuild {
@@ -43,7 +43,7 @@ export class AutoBuild {
   }
 
   private validateConfig() {
-    const hostname = os.hostname();
+    let hostname = this.hostname;
     const username = os.userInfo().username.toLowerCase();
     if (!this.config) {
       error('Bad autobuild.json config!')
@@ -56,9 +56,21 @@ export class AutoBuild {
     }
   }
 
+  get hostname() {
+    let hostname = os.hostname();
+    let orgHostname = hostname;
+    if (_.isString(this.config[hostname])) {
+      hostname = this.config[hostname] as string;
+      if (!this.config[hostname]) {
+        error(`Bad hostname alisas: "${orgHostname}":"${hostname}": `)
+      }
+    }
+    return hostname;
+  }
+
   build(watch = false) {
     console.log('config', this.config)
-    const hostname = os.hostname();
+    const hostname = this.hostname;
     const username = os.userInfo().username.toLowerCase();
     console.log('hostname', hostname)
     console.log('username', username)
