@@ -2,7 +2,6 @@
 // import * as omelette from 'omelette';
 // import chalk from 'chalk';
 
-
 // export function integrate() {
 //     console.log(`Integrating ${chalk.bold('tnp')} with system...`)
 

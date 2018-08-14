@@ -15,7 +15,7 @@ import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, Env
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
-import { copyFile } from "../helpers";
+import { copyFile, getMostRecentFilesNames } from "../helpers";
 import { ProjectFrom, BaseProjectLib } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
@@ -378,6 +378,8 @@ export abstract class Project {
     return true;
   }
 
+  reinstallCounter = 1;
+
   public get tnpHelper() {
 
     if (!Project.Tnp) {
@@ -407,7 +409,8 @@ export abstract class Project {
           try {
             reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
           } catch (error) {
-            console.log(`Trying to reinstall tnp...`)
+            console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
+            // console.log(error)
             sleep.sleep(2);
             self.tnpHelper.install()
           }
@@ -439,17 +442,42 @@ export abstract class Project {
 
 };
 
+function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
+  const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
+
+  return getMostRecentFilesNames(tnpDistCompiled)
+    .map(f => f.replace(tnpDistCompiled, ''))
+    .filter(f => {
+      const fileInDest = path.join(destination, f).replace(/\\/g, '\\\\');
+      const fileInTnp = path.join(tnpDistCompiled, f);
+
+      console.log(`
+        compare: ${ fileInDest}
+        with : ${ fileInTnp}
+
+      `)
+
+      return fs.readFileSync(fileInTnp).toString() === fs.readFileSync(fileInDest).toString()
+    }).length === 0;
+}
+
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
   if (project.isWorkspaceChildProject || project.type === 'workspace') {
 
 
     const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+
+    if (checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
+      console.log(`Reinstallation of "tnp" not needed in ${project.location} `);
+      return;
+    }
+
     const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
     if (fs.existsSync(destCompiledJs)) {
-      // console.log(`Removed tnp-helper from ${dest} `)
+      // console.log(`Removed tnp - helper from ${ dest } `)
       rimraf.sync(destCompiledJs)
     }
-    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+    fse.copySync(`${pathTnpCompiledJS} /`, destCompiledJs);
     fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
     // console.log(`Tnp-helper installed in ${project.name} `)
   } else {

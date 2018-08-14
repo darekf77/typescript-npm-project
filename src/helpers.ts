@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import * as  underscore from 'underscore';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -310,3 +311,52 @@ export function findChildren<T>(location, createFn: (childLocation: string) => T
     })
     .filter(c => !!c)
 }
+
+
+export function getRecrusiveFilesFrom(dir) {
+  let files = [];
+  const readed = fs.readdirSync(dir).map(f => {
+    const fullPath = path.join(dir, f);
+    // console.log(`is direcotry ${fs.lstatSync(fullPath).isDirectory()} `, fullPath)
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      getRecrusiveFilesFrom(fullPath).forEach(aa => files.push(aa))
+    }
+    return fullPath;
+  })
+  if (Array.isArray(readed)) {
+    readed.forEach(r => files.push(r))
+  }
+  return files;
+}
+
+
+
+/**
+ * Get the most recent changes file in direcory
+ * @param dir absoulute path to file
+ */
+export function getMostRecentFileName(dir): string {
+  let files = getRecrusiveFilesFrom(dir);
+
+  // use underscore for max()
+  return underscore.max(files, (f) => {
+    // console.log(f);
+    // ctime = creation time is used
+    // replace with mtime for modification time
+    // console.log( `${fs.statSync(f).mtimeMs} for ${f}`   )
+    return fs.statSync(f).mtimeMs;
+
+  });
+}
+
+export function getMostRecentFilesNames(dir): string[] {
+
+  const allFiles = getRecrusiveFilesFrom(dir);
+  const mrf = getMostRecentFileName(dir);
+  const mfrMtime = fs.lstatSync(mrf).mtimeMs;
+
+  return allFiles.filter(f => {
+    return fs.lstatSync(f).mtimeMs === mfrMtime;
+  })
+}
+
