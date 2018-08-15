@@ -1,0 +1,19 @@
+{
+    "recommendations": [
+        "alefragnani.Bookmarks",
+        "alexiv.vscode-angular2-files",
+        "Angular.ng-template",
+        "chrisdias.vscode-opennewinstance",
+        "eamodio.gitlens",
+        "EditorConfig.EditorConfig",
+        "eg2.tslint",
+        "IBM.output-colorizer",
+        "johnpapa.Angular2",
+        "Mikael.Angular-BeastCode",
+        "natewallace.angular2-inline",
+        "ritwickdey.create-file-folder",
+        "waderyan.gitblame",
+        "wcwhitehead.bootstrap-3-snippets",
+        "Zaczero.bootstrap-v4-snippets"
+    ]
+}
