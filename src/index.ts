@@ -17,7 +17,7 @@ import { IfObservable } from '../node_modules/rxjs/observable/IfObservable';
 import { Project } from './project';
 
 import build from './scripts/BUILD';
-import autobuild from './scripts/AUTOBUILD';
+import { autobuild } from './scripts/AUTOBUILD';
 
 
 Helpers.checkEnvironment({
@@ -114,8 +114,10 @@ export async function run(argsv: string[]) {
   if (!recognized) {
     if (Array.isArray(argsv) && argsv.length == 3) {
       console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
+      process.exit(0);
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
       console.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
+      process.exit(0);
     } else {
       const p = Project.Current;
 
@@ -124,16 +126,17 @@ export async function run(argsv: string[]) {
         if (p.isWorkspaceChildProject) {
           build.$BUILD_WATCH(argsv.join(' '));
         } else if (p.isStandaloneProject) {
-          autobuild.$AUTOBUILD_WATCH()
+          autobuild(Project.Current, true, false)
         }
         process.stdin.resume();
       } else {
         console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
-      }
-    }
-    process.exit(1);
+        process.exit(0);
+      }      
+    }    
   }
 
+  
 }
 
 

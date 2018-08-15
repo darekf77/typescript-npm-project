@@ -98,11 +98,13 @@ export class AutoBuild {
 
 }
 
-export function autobuild(project: Project, watch = false) {
+export function autobuild(project: Project, watch = false, exit = true) {
 
   const autobuild = new AutoBuild(project);
   autobuild.build(watch)
-  process.exit(0)
+  if (exit) {
+    process.exit(0)
+  }
 }
 
 

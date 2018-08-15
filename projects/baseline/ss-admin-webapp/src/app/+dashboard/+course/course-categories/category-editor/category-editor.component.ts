@@ -27,9 +27,8 @@ export class CategoryEditorComponent implements OnInit {
   model: CATEGORY = {} as any;
 
   arrayDataConfig = new ArrayDataConfig({
-    joins: ['category.id = 2'],
-    dupa: { hasdas: "asd" }
-  } as any);
+    where: ['category.id = 2']
+  });
 
   constructor(
     private route: ActivatedRoute,

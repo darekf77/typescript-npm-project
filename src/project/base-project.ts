@@ -451,29 +451,35 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
       const fileInDest = path.join(destination, f)
       const fileInTnp = path.join(tnpDistCompiled, f);
 
-      if(!fs.existsSync(fileInDest)) {
+      if (!fs.existsSync(fileInDest)) {
         // console.log(`File ${fileInDest} doesn't exist`)
         return true;
       }
 
+      const res = fs.readFileSync(fileInTnp).toString().trim() !== fs.readFileSync(fileInDest).toString().trim()
       // console.log(`
       //   compare: "${fileInDest}" ${fs.readFileSync(fileInDest).toString().length}
-      //   with : "${fileInTnp}" ${fs.readFileSync(fileInTnp ).toString().length}
-
+      //   with : "${fileInTnp}" ${fs.readFileSync(fileInTnp).toString().length}
+      //   result: ${res}
       // `)
-
-      return fs.readFileSync(fileInTnp).toString() === fs.readFileSync(fileInDest).toString()
+      return res;
     }).length === 0;
 }
 
+const notNeededReinstallationTnp = {};
+
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
+  if (notNeededReinstallationTnp[project.location]) {
+    return;
+  }
   if (project.isWorkspaceChildProject || project.type === 'workspace') {
 
 
     const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
 
     if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
-      console.log(`Reinstallation of "tnp" not needed in ${project.location} `);
+      notNeededReinstallationTnp[project.location] = true;
+      console.log(`Reinstallation of "tnp" not needed in ${project.name} `);
       return;
     }
 
@@ -484,8 +490,8 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
     fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
-    // console.log(`Tnp-helper installed in ${project.name} `)
+    console.log(`Tnp-helper installed in ${project.name} `)
   } else {
-    // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
+    warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }
 }
