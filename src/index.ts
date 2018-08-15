@@ -24,7 +24,7 @@ Helpers.checkEnvironment({
   npm: [
     { name: 'watch', version: '1.0.2' },
     { name: 'check-node-version' },
-    { name: 'npm-run' },
+    { name: 'npm-run', version: '4.1.2' },
     { name: 'rimraf' },
     { name: 'cpr' },
     { name: 'renamer' },

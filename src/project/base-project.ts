@@ -448,14 +448,19 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
   return getMostRecentFilesNames(tnpDistCompiled)
     .map(f => f.replace(tnpDistCompiled, ''))
     .filter(f => {
-      const fileInDest = path.join(destination, f).replace(/\\/g, '\\\\');
+      const fileInDest = path.join(destination, f)
       const fileInTnp = path.join(tnpDistCompiled, f);
 
-      console.log(`
-        compare: ${ fileInDest}
-        with : ${ fileInTnp}
+      if(!fs.existsSync(fileInDest)) {
+        // console.log(`File ${fileInDest} doesn't exist`)
+        return true;
+      }
 
-      `)
+      // console.log(`
+      //   compare: "${fileInDest}" ${fs.readFileSync(fileInDest).toString().length}
+      //   with : "${fileInTnp}" ${fs.readFileSync(fileInTnp ).toString().length}
+
+      // `)
 
       return fs.readFileSync(fileInTnp).toString() === fs.readFileSync(fileInDest).toString()
     }).length === 0;

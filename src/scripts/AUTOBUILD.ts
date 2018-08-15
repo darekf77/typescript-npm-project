@@ -74,7 +74,7 @@ export class AutoBuild {
     const username = os.userInfo().username.toLowerCase();
     console.log('hostname', hostname)
     console.log('username', username)
-    const build = this.config[hostname][username].builds
+    const build: ProjectForAutoBuild = this.config[hostname][username].builds
       .find(b => {
         const p = ProjectFrom(b.cwd);
         console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
@@ -90,7 +90,9 @@ export class AutoBuild {
     } else {
       clearConsole();
       this.project.git.updateOrigin();
-      this.project.run(`${watch ? build.commandWatch : build.command} ${(_.isArray(build.args) ? build.args.join(' ') : '')}`).sync()
+      this.project.run(`${watch ? build.commandWatch : build.command} ${(_.isArray(build.args) ? build.args
+        .filter(a => !a.trim().startsWith('#'))
+        .join(' ') : '')}`).sync()
     }
   }
 

@@ -26,6 +26,33 @@
       ]
     }
   },
+  "DESKTOP-1BP1I3F":{
+    "dariusz": {
+      "builds": [
+        {
+          "cwd": "C:/Users/Dariusz/projects/npm/ng2-rest",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto C:/Users/Dariusz/projects/npm/morphi",
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "# --copyto C:/Users/Dariusz/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "C:/Users/Dariusz/projects/npm/morphi",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "# --copyto C:/Users/Dariusz/projects/npm/tsc-npm-project"
+          ]
+        }
+      ]
+    }
+  },
   "dariuszs-mbp-2.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
   "Dariuszs-MacBook-Pro-2.local": {
     "darekf": {
