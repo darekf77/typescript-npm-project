@@ -408,9 +408,9 @@ export abstract class Project {
         if (process.platform === 'win32') {
           try {
             reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
-          } catch (error) {
+          } catch (e) {
             console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
-            // console.log(error)
+             console.log(e)
             sleep.sleep(2);
             self.tnpHelper.install()
           }

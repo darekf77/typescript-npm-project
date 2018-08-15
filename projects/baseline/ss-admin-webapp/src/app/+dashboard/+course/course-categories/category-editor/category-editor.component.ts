@@ -8,7 +8,7 @@ import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import { Log, Level } from "ng2-logger/browser";
-const log = Log.create('category editor', Level.__NOTHING)
+const log = Log.create('category editor')
 import { Subscription } from 'rxjs/Subscription';
 import { ArrayDataConfig } from 'morphi/browser';
 // local
@@ -27,7 +27,7 @@ export class CategoryEditorComponent implements OnInit {
   model: CATEGORY = {} as any;
 
   arrayDataConfig = new ArrayDataConfig({
-    where: ['category.id = 2']
+    joins: ['category']
   });
 
   constructor(
@@ -42,15 +42,18 @@ export class CategoryEditorComponent implements OnInit {
         this.ngOnInit();
       }
     });
+
+    const id = Number(this.route.snapshot.paramMap.get('id'))
+    log.i('id of category from routing', id)
+    this.id = id;
+    this.arrayDataConfig.where.push(`category.id = ${id}`)
   }
 
   id: Number;
 
 
   async ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'))
-    log.i('id of category from routing', id)
-    this.id = id;
+
   }
 
   complete() {
