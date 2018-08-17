@@ -25,19 +25,17 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'category/:id/groups/:groupid',
+        loadChildren: './dialogs-groups/dialogs-groups.module#DialogsGroupsModule'
+      },
+      {
         path: 'category/:id',
         component: CategoryEditorComponent,
         data: {
           breadcrumbs: 'Details'
-        },
-        children: [
-          {
-            path: '',
-            pathMatch: 'full',
-            loadChildren: './dialogs-groups/dialogs-groups.module#DialogsGroupsModule'
-          }
-        ]
+        }
       }
+
     ]
   }
 ];

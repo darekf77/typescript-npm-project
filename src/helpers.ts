@@ -356,7 +356,8 @@ export function getMostRecentFilesNames(dir): string[] {
   const mfrMtime = fs.lstatSync(mrf).mtimeMs;
 
   return allFiles.filter(f => {
-    return fs.lstatSync(f).mtimeMs === mfrMtime;
+    const info = fs.lstatSync(f);
+    return (info.mtimeMs === mfrMtime && !info.isDirectory())
   })
 }
 
