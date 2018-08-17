@@ -490,6 +490,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
     fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+    notNeededReinstallationTnp[project.location] = true;
     console.log(`Tnp-helper installed in ${project.name} `)
   } else {
     warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)

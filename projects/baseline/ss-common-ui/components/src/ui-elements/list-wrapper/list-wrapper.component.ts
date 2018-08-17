@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { isString } from 'lodash';
 import { CATEGORY } from 'ss-common-logic/browser/entities';
 
-const log = Log.create('List wrapper', Level.INFO);
+const log = Log.create('List wrapper');
 
 export interface CRUDListWrapperLink {
   link: string;
@@ -130,6 +130,7 @@ export class ListWrapperComponent implements OnInit {
     log.d('init links this.linkSchema', this.linkSchema);
     this.links = rows.map(r => {
       if (this.linkSchema) {
+        log.d('interpolated link row', r);
         const link = interpolateParamsToUrl(r, this.linkSchema);
         log.d('interpolated link', link);
         const res = { link, name: r[this.nameProp], lock: r[this.lockProp] };
