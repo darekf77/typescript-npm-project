@@ -9,8 +9,15 @@ import { CategoryController } from '../controllers';
 import { GROUP } from './GROUP';
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 
+export enum DialogType {
+  MAN,
+  WOMAN,
+  HINT
+}
+
 export interface IDIALOG {
   id?: number;
+  type?: DialogType;
   lang_pl: string;
   lang_en: string;
   lang_fr: string;
@@ -23,6 +30,7 @@ export interface IDIALOG {
 //#endregion
 @FormlyForm()
 @DefaultModelWithMapping<DIALOG>({
+  type: DialogType.HINT,
   comment: '',
   lang_en: '',
   lang_fr: '',
@@ -39,11 +47,19 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
     dialog.lang_en = obj.lang_en;
     dialog.lang_fr = obj.lang_fr;
     dialog.lang_pl = obj.lang_pl;
+    dialog.type = obj.type;
     return dialog;
   }
 
   @PrimaryGeneratedColumn()
   id: number = undefined
+
+  @Column() type: DialogType = DialogType.HINT;
+
+  get typeString() {
+    if(this.type === DialogType.HINT) return 'hint';
+    if(this.type === DialogType.MAN) return 'hint';
+  }
 
   @Column() lang_pl: string = undefined
   @Column() lang_en: string = undefined

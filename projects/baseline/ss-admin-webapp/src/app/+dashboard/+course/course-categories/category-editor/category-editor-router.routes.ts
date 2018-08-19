@@ -14,10 +14,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: CategoryEditorComponent,
-        data: {
-          breadcrumbs: 'Editor'
-        }
+        component: CategoryEditorComponent
       },
       {
         path: 'groups/:groupid',

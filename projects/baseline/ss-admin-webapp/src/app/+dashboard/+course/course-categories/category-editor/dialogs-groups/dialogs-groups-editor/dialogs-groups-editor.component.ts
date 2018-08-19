@@ -24,7 +24,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public dialogsCRUD: DialogsController,
+
     public groupCRUD: GroupsController
   ) {
 

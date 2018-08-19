@@ -1,0 +1,16 @@
+<p>
+  dialogs-conversation-editor works!
+</p>
+
+
+<ul>
+  <li *ngFor="let dialog of dialogs"
+      [ngClass]="{
+        'man':  dialog.type === DialogType.MAN,
+       'woman': dialog.type === DialogType.WOMAN,
+       'hint': dialog.type === DialogType.HINT
+      }">
+
+    {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
+  </li>
+</ul>

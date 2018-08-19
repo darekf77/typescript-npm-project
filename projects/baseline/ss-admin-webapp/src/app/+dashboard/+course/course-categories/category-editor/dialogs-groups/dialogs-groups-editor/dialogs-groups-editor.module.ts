@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card'
 // local
 import { DialogsGroupsEditorComponent } from './dialogs-groups-editor.component';
 import { TableWrapperModule, FormWrapperMaterialModule } from 'ss-common-ui/module';
+import { DialogsConversationEditorModule } from './dialogs-conversation-editor/dialogs-conversation-editor.module';
 
 const angularModules = [
   CommonModule
@@ -16,7 +17,8 @@ const materialModules = [
 
 const otherModuels = [
   TableWrapperModule,
-  FormWrapperMaterialModule
+  FormWrapperMaterialModule,
+  DialogsConversationEditorModule
 ]
 
 @NgModule({
