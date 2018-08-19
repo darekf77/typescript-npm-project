@@ -91,7 +91,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 
 export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
-  const { copyto, environmentName } = handleArguments(args, outDir, watch);
+  const { environmentName } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName

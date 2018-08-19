@@ -479,7 +479,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
 
     if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
       notNeededReinstallationTnp[project.location] = true;
-      console.log(`Reinstallation of "tnp" not needed in ${project.name} `);
+      // console.log(`Reinstallation of "tnp" not needed in ${project.name} `);
       return;
     }
 
@@ -491,8 +491,8 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
     fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
     notNeededReinstallationTnp[project.location] = true;
-    console.log(`Tnp-helper installed in ${project.name} `)
+    // console.log(`Tnp-helper installed in ${project.name} `)
   } else {
-    warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
+    // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }
 }
