@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-dialogs-groups',
-  template: `<router-outlet></router-outlet> asdasd`
+  template: `<router-outlet></router-outlet>`
 })
 export class DialogsGroupsComponent implements OnInit {
 

@@ -15,6 +15,9 @@ export { GroupsController } from "./controllers/GroupsController";
 import { ExamplesController } from './controllers/ExamplesController';
 export { ExamplesController } from './controllers/ExamplesController';
 
+import { DialogsController } from './controllers/DialogsController';
+export { DialogsController } from './controllers/DialogsController';
+
 import { ExamplesPaginationController } from './controllers/ExamplesPaginationController';
 export { ExamplesPaginationController } from './controllers/ExamplesPaginationController';
 
@@ -31,6 +34,7 @@ export function controllers() {
     MultimediaController: getSingleton<MultimediaController>(MultimediaController),
     ExamplesController: getSingleton<ExamplesController>(ExamplesController),
     GroupsController: getSingleton<GroupsController>(GroupsController),
+    DialogsController: getSingleton<DialogsController>(DialogsController),
     ExamplesPaginationController: getSingleton<ExamplesPaginationController>(ExamplesPaginationController)
   }
 }

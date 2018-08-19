@@ -19,6 +19,7 @@ export class TableWrapperComponent implements OnInit {
 
   @Input() rowHref: string;
 
+  @Input() allowedColumns: string[] = [];
   @Input() crud: BaseCRUD<any>;
 
   public messages = {
@@ -61,9 +62,11 @@ export class TableWrapperComponent implements OnInit {
     log.i('this.crud.entity', Describer.describeByEverything(this.crud.entity));
 
     try {
-      const columns = Describer.describeByEverything(this.crud.entity).map(prop => {
-        return { prop };
-      });
+      const columns = Describer.describeByEverything(this.crud.entity)
+        .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
+        .map(prop => {
+          return { prop };
+        });
       this.columns = columns;
       log.i('columns', columns);
       await this.retriveData();

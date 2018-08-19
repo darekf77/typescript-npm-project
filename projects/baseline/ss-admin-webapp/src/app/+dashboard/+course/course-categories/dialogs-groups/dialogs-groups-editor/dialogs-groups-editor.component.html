@@ -1,3 +1,13 @@
-<p>
-  dialogs-groups-editor works!
-</p>
+<mat-card>
+
+  <app-form-wrapper-material [crud]="groupCRUD"
+                             [(model)]="model">
+  </app-form-wrapper-material>
+  Dialogs
+  <br>
+  <app-table-wrapper [allowedColumns]="['id','lang_pl','lang_en','lang_fr']"
+                     [crud]="dialogsCRUD">
+  </app-table-wrapper>
+
+
+</mat-card>

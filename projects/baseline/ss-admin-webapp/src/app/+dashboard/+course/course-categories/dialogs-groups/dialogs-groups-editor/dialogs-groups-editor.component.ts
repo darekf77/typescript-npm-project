@@ -3,6 +3,9 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // other
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('dialogs groups editor')
+// local
+import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
+import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
 
 @Component({
   selector: 'app-dialogs-groups-editor',
@@ -11,8 +14,14 @@ const log = Log.create('dialogs groups editor')
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute,
-    private router: Router) {
+  model = {}
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    public dialogsCRUD: DialogsController,
+    public groupCRUD: GroupsController
+  ) {
 
     router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

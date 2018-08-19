@@ -2,7 +2,7 @@ import { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 export { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 
 import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
-export { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
+export { SESSION, SESSION_CONFIG , SESSION_REPOSITORY } from './entities/core/SESSION';
 
 import { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';
 export { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';

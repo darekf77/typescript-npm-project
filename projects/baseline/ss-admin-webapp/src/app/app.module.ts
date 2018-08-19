@@ -14,6 +14,8 @@ import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthCon
 import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
+import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
+
 // entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
@@ -39,7 +41,9 @@ init({
     AuthController,
     GroupsController,
     CategoryController,
-    ExamplesController],
+    ExamplesController,
+    DialogsController
+  ],
   entities: [
     USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE
   ]

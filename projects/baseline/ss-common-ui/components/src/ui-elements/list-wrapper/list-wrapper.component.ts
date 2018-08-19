@@ -54,6 +54,8 @@ export class ListWrapperComponent implements OnInit {
   @Input() nameProp = 'href';
   @Input() lockProp = '';
 
+  @Input() allowedColumns: string[] = [];
+
   columns = [
     {
       prop: 'id'
@@ -91,9 +93,11 @@ export class ListWrapperComponent implements OnInit {
       this.icon = 'lock';
     }
 
-    const columns = Describer.describe(this.crud.entity).map(prop => {
-      return { prop };
-    });
+    const columns = Describer.describe(this.crud.entity)
+    .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
+      .map(prop => {
+        return { prop };
+      });
     this.columns = columns;
 
     if (this.crud) {
