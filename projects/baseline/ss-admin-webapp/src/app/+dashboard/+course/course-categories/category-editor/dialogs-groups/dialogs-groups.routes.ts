@@ -3,6 +3,7 @@ import {
 } from '@angular/router';
 import { DialogsGroupsComponent } from './dialogs-groups.component';
 import { DialogsGroupsEditorComponent } from './dialogs-groups-editor';
+import { GroupResolver } from '../../resolver-group';
 
 
 export const routes: Routes = [
@@ -16,8 +17,12 @@ export const routes: Routes = [
         pathMatch: 'full',
         component: DialogsGroupsEditorComponent,
         data: {
-          breadcrumbs: 'Dialogs Editor'
+          // Interpolates values resolved by the router
+          breadcrumbs: 'Group ( "{{ group.title }}" )'
         },
+        resolve: {
+          group: GroupResolver
+        }
       }
     ]
   }

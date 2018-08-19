@@ -21,14 +21,7 @@ export const routes: Routes = [
       },
       {
         path: 'groups/:groupid',
-        loadChildren: './dialogs-groups/dialogs-groups.module#DialogsGroupsModule',
-        data: {
-          // Interpolates values resolved by the router
-          breadcrumbs: 'Group ( "{{ group.title }}" )'
-        },
-        resolve: {
-          group: GroupResolver
-        }
+        loadChildren: './dialogs-groups/dialogs-groups.module#DialogsGroupsModule'
       }
     ]
   }

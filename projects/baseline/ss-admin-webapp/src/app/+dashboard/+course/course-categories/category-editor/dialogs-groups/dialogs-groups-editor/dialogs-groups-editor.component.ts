@@ -3,6 +3,7 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // other
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('dialogs groups editor')
+import { ArrayDataConfig } from 'morphi/browser';
 // local
 import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
 import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
@@ -15,6 +16,9 @@ import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
+  arrayDataConfig = new ArrayDataConfig({
+    joins: ['group']
+  });
   model: GROUP;
 
   constructor(
@@ -35,6 +39,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
     log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
 
     this.model = this.route.snapshot.data['group']
+    this.arrayDataConfig.where.push(`group.id = ${groupid}`);
   }
 
   async complete() {

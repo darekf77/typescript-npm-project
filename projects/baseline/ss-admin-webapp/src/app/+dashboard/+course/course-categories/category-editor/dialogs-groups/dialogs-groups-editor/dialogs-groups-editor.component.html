@@ -2,13 +2,17 @@
 
   <app-form-wrapper-material [crud]="groupCRUD"
                              [(model)]="model"
-                             (complete)="complete()"
-                             >
+                             (complete)="complete()">
   </app-form-wrapper-material>
-  Dialogs
-  <br>
+</mat-card>
+<br>
+<mat-card>
+  <h4>
+    Dialogs
+  </h4>
   <app-table-wrapper [allowedColumns]="['id','lang_pl','lang_en','lang_fr']"
-                     [crud]="dialogsCRUD">
+                     [crud]="dialogsCRUD"
+                     [arrayDataConfig]="arrayDataConfig">
   </app-table-wrapper>
 
 
