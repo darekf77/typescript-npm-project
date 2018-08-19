@@ -1,19 +1,20 @@
 
 :host {
 
-  man.li {
-    text-align: right;
-    color: red;
-  }
 
-  hint.li {
-    text-align: center;
-    color: green;
-  }
+   .man {
+      text-align: right;
+      color: red;
+    }
+    .hint {
+      text-align: center;
+      color: green;
+    }
+    .woman {
+      text-align: left;
+      color: blue;
+    }
 
-  woman.li {
-    text-align: left;
-    color: blue;
-  }
+
 
 }

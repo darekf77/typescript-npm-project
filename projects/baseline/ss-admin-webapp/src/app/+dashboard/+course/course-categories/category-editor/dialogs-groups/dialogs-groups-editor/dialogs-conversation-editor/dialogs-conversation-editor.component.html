@@ -5,9 +5,7 @@
 {{DialogType | json}}
 <ul>
   <li *ngFor="let dialog of dialogs"
-      [ngClass]="{ 'man':  (dialog.type == DialogType.MAN) }">
-    <h5> {{dialog.typeString}} </h5>
-    <h6>{{ dialog.type == DialogType.MAN }} </h6>
+      class="{{dialog.typeString | lowercase }}">
     {{dialog.comment}} {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
   </li>
 </ul>
