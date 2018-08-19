@@ -8,6 +8,7 @@ import { Entity, EntityRepository } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { GROUP } from './GROUP';
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
+import { EnumValues } from 'enum-values';
 
 export enum DialogType {
   MAN,
@@ -18,10 +19,10 @@ export enum DialogType {
 export interface IDIALOG {
   id?: number;
   type?: DialogType;
-  lang_pl: string;
-  lang_en: string;
-  lang_fr: string;
-  comment: string;
+  lang_pl?: string;
+  lang_en?: string;
+  lang_fr?: string;
+  comment?: string;
 
 }
 
@@ -54,16 +55,15 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   @PrimaryGeneratedColumn()
   id: number = undefined
 
-  @Column() type: DialogType = DialogType.HINT;
+  @Column({ default: DialogType.HINT }) type: DialogType;
 
   get typeString() {
-    if(this.type === DialogType.HINT) return 'hint';
-    if(this.type === DialogType.MAN) return 'hint';
+    return EnumValues.getNameFromValue(DialogType, this.type)
   }
 
-  @Column() lang_pl: string = undefined
-  @Column() lang_en: string = undefined
-  @Column() lang_fr: string = undefined
+  @Column({ nullable: true }) lang_pl?: string = undefined
+  @Column({ nullable: true }) lang_en?: string = undefined
+  @Column({ nullable: true }) lang_fr?: string = undefined
 
   @Column({
     nullable: true
