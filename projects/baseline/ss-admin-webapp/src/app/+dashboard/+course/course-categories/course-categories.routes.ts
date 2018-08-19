@@ -1,11 +1,18 @@
 import {
-  Routes, RouterModule
+  Routes, RouterModule, ActivatedRouteSnapshot, RouterStateSnapshot
 } from '@angular/router';
 
+
 import { CourseCategoriesComponent } from './course-categories.component';
-import { CategoryEditorComponent } from './category-editor/category-editor.component';
 import { CourseCategoriesListComponent }
   from './course-categories-list/course-categories-list.component';
+import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { CategoryResolver } from './resolver-category';
+import { GroupResolver } from './resolver-group';
+
+
+
+
 
 export const routes: Routes = [
   {
@@ -13,7 +20,7 @@ export const routes: Routes = [
     pathMatch: "prefix",
     component: CourseCategoriesComponent,
     data: {
-      breadcrumbs: 'Category'
+      breadcrumbs: 'Categories'
     },
     children: [
       {
@@ -25,17 +32,16 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'category/:id/groups/:groupid',
-        loadChildren: './dialogs-groups/dialogs-groups.module#DialogsGroupsModule'
-      },
-      {
         path: 'category/:id',
-        component: CategoryEditorComponent,
+        loadChildren: './category-editor/category-editor-router.module#CategoryEditorModule',
         data: {
-          breadcrumbs: 'Details'
+          // Interpolates values resolved by the router
+          breadcrumbs: 'Category ("{{ category.name }}")'
+        },
+        resolve: {
+          category: CategoryResolver
         }
       }
-
     ]
   }
 ];

@@ -6,6 +6,7 @@ const log = Log.create('dialogs groups editor')
 // local
 import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
 import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
+import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 
 @Component({
   selector: 'app-dialogs-groups-editor',
@@ -14,7 +15,7 @@ import GroupsController from 'ss-common-logic/browser/controllers/GroupsControll
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
-  model = {}
+  model: GROUP;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +34,19 @@ export class DialogsGroupsEditorComponent implements OnInit {
     const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
     log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
 
+    this.model = this.route.snapshot.data['group']
+  }
+
+  async complete() {
+    let routerLink = this.route.parent.snapshot.pathFromRoot
+      .map(s => s.url)
+      .reduce((a, e) => a.concat(e))
+    routerLink = routerLink.slice(0, routerLink.length - 2)
+    let link = routerLink.map(s => s.path);
+
+    this.router.navigate(link);
+    // await this.router.navigate(['../../'], { relativeTo: this.route })
+    log.i('should be and navigation', link)
   }
 
   ngOnInit() {

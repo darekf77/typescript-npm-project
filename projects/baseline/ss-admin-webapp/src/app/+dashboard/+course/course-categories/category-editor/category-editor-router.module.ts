@@ -1,6 +1,7 @@
 // angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 // material
 import { MatListModule } from "@angular/material/list";
 import { MatTabsModule } from "@angular/material/tabs";
@@ -9,7 +10,8 @@ import { MatInputModule } from "@angular/material/input";
 import { MatCardModule } from "@angular/material/card";
 import { MatButtonModule } from "@angular/material/button";
 // local
-import { CategoryEditorComponent } from './category-editor.component';
+import { CategoryEditorComponent } from './category-editor/category-editor.component';
+import { CategoryEditorComponentRouter } from './category-editor-router.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
 // components
 import { ListWrapperModule } from "ss-common-ui/module";
@@ -23,18 +25,24 @@ const materialModules = [
   MatButtonModule
 ]
 
+import { routes } from './category-editor-router.routes';
 
 @NgModule({
   imports: [
     CommonModule,
     FormWrapperMaterialModule,
     ...materialModules,
-    ListWrapperModule
+    ListWrapperModule,
+    RouterModule.forChild(routes),
   ],
   exports: [
-    CategoryEditorComponent
+    CategoryEditorComponent,
+    CategoryEditorComponentRouter
   ],
-  declarations: [CategoryEditorComponent],
+  declarations: [
+    CategoryEditorComponent,
+    CategoryEditorComponentRouter
+  ],
   providers: []
 })
 export class CategoryEditorModule { }

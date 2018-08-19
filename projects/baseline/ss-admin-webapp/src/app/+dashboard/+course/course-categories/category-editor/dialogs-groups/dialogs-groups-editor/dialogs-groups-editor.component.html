@@ -1,7 +1,9 @@
 <mat-card>
 
   <app-form-wrapper-material [crud]="groupCRUD"
-                             [(model)]="model">
+                             [(model)]="model"
+                             (complete)="complete()"
+                             >
   </app-form-wrapper-material>
   Dialogs
   <br>

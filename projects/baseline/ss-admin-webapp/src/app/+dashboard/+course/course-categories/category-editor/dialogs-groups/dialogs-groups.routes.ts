@@ -10,14 +10,14 @@ export const routes: Routes = [
     path: '',
     pathMatch: "prefix",
     component: DialogsGroupsComponent,
-    data: {
-      breadcrumbs: 'Groups'
-    },
     children: [
       {
         path: '',
         pathMatch: 'full',
-        component: DialogsGroupsEditorComponent
+        component: DialogsGroupsEditorComponent,
+        data: {
+          breadcrumbs: 'Dialogs Editor'
+        },
       }
     ]
   }

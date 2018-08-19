@@ -12,7 +12,7 @@ const log = Log.create('category editor')
 import { Subscription } from 'rxjs/Subscription';
 import { ArrayDataConfig } from 'morphi/browser';
 // local
-import { CourseCategoriesComponent } from '../course-categories.component';
+
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
 import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';

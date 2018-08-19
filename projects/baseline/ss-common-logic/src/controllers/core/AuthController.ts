@@ -108,7 +108,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
     const self = this;
     return {
-      async init() {
+      async init(checkSession = true) {
         if (isNode) {
           return;
         }
@@ -121,7 +121,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
           self.browser.logout(session);
           return
         }
-        self.browser.authorize(session)
+        self.browser.authorize(session, checkSession)
       },
       async login({ username, password }) {
         log.i('username', username)
@@ -136,18 +136,20 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
           log.er(error)
         }
       },
-      async authorize(session: entities.SESSION) {
+      async authorize(session: entities.SESSION, checkSession = true) {
         entities.SESSION.localStorage.saveInLocalStorage(session);
         session.activateBrowserToken();
-        try {
-          const info = await self.info().received
-          log.i('info', info)
-          self._subIsLggedIn.next(true)
-        } catch (error) {
-          const err: HttpResponseError = error;
-          log.er(error)
-          if (err.statusCode === 401) {
-            self.browser.logout(session);
+        if (checkSession) {
+          try {
+            const info = await self.info().received
+            log.i('info', info)
+            self._subIsLggedIn.next(true)
+          } catch (error) {
+            const err: HttpResponseError = error;
+            log.er(error)
+            if (err.statusCode === 401) {
+              self.browser.logout(session);
+            }
           }
         }
       },
