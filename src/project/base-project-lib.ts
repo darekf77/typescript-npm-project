@@ -134,7 +134,7 @@ export abstract class BaseProjectLib extends Project {
     const self = this;
     function removeTagAndCommit() {
       console.log(`PLEASE RUN: `)
-      console.log(`git reset --hard`)
+      console.log(`git reset --hard HEAD~1`)
       console.log(`git tag --delete v${newVersion}`)
     }
 
