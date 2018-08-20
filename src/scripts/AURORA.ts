@@ -37,7 +37,8 @@ const vscode = {
       "dbaeumer.vscode-eslint",
       "nemesv.copy-file-name",
       "momoko8443.library-version",
-      "cg-cnu.vscode-path-tools"
+      "cg-cnu.vscode-path-tools",
+      "jack89ita.copy-filename"
     ]
   },
   settings: {
