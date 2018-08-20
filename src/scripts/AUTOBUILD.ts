@@ -81,17 +81,25 @@ export class AutoActions {
     const username = os.userInfo().username.toLowerCase();
     console.log('hostname', hostname)
     console.log('username', username)
-    const release: ProjectForAutoRelease = (this.config[hostname][username].autorelease as ProjectForAutoRelease[])
-      .find(b => {
-        return path.resolve(b.cwd) === path.resolve(this.project.location)
-      });
-    if (!release) {
-      error(`No autorelease for current project.`)
+    const autoreleases: ProjectForAutoRelease[] = this.config[hostname][username].autoreleases;
+    if (!_.isArray(autoreleases)) {
+      error(`No autoreleases in autobuild.json.`)
     }
+    const release = autoreleases.find(b => {
+      return path.resolve(b.cwd) === path.resolve(this.project.location)
+    });
+    if (!release) {
+      error(`No autoreleases for current project.`)
+    }
+    // console.log('release', release)
 
-    this.project.run(`${release.command} ${(_.isArray(release.args) ? release.args
+    const command = `${release.command} ${(_.isArray(release.args) ? release.args
       .filter(a => !a.trim().startsWith('#'))
-      .join(' ') : '')}`).sync()
+      .join(' ') : '')}`
+
+    // console.log(`"${command}"`)
+
+    this.project.run(command).sync()
 
     info(`Done`);
   }

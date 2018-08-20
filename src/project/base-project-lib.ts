@@ -7,7 +7,7 @@ import * as watch from 'watch'
 
 // local
 import { Project } from "./base-project";
-import { BuildDir, LibType, FileEvent } from "../models";
+import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
 import { questionYesNo, clearConsole } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
@@ -126,7 +126,7 @@ export abstract class BaseProjectLib extends Project {
     })
   }
 
-  public async release(c?: { prod?: boolean, bumbVersionIn?: string[] }) {
+  public async release(c?: ReleaseOptions) {
     const { prod = false, bumbVersionIn = [] } = c;
     clearConsole()
     this.checkIfReadyForNpm()
@@ -166,13 +166,19 @@ export abstract class BaseProjectLib extends Project {
           bumbVersionIn.forEach(p => {
             const packageJson = PackageJSON.from(p, true);
             if (packageJson) {
+              let versionBumped = false;
               if (_.isString(packageJson.data.dependencies)) {
+                versionBumped = true;
                 packageJson.data.dependencies[this.name] = newVersion;
               }
               if (_.isString(packageJson.data.devDependencies)) {
+                versionBumped = true;
                 packageJson.data.devDependencies[this.name] = newVersion
               }
               packageJson.save()
+              if (versionBumped) {
+                info(`Version of current project "${this.name}" bumped in ${packageJson.name}`)
+              }
             }
           });
         }

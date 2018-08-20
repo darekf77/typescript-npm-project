@@ -27,6 +27,11 @@ export interface TnpRouter {
 
 export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod'
 
+export interface ReleaseOptions {
+  prod?: boolean;
+  bumbVersionIn?: string[];
+}
+
 export class BuildOptions {
   prod: boolean;
   outDir: BuildDir;

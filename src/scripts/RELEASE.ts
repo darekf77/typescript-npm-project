@@ -1,18 +1,20 @@
 
 import { Project, BaseProjectLib } from "../project";
+import { ReleaseOptions } from '../models';
 
 export default {
   $RELEASE: async (args) => {
-    console.log('async release args', args)
-    process.exit(0);
+    const argsObj: ReleaseOptions = require('minimist')(args.split(' '));
     Project.Current.checkIfReadyForNpm();
-    await (Project.Current as BaseProjectLib).release()
+    await (Project.Current as BaseProjectLib).release(argsObj)
 
     process.exit(0)
   },
-  $RELEASE_PROD: async () => {
+  $RELEASE_PROD: async (args) => {
+    const argsObj: ReleaseOptions = require('minimist')(args.split(' '));
+    argsObj.prod = true;
     Project.Current.checkIfReadyForNpm();
-    await (Project.Current as BaseProjectLib).release({ prod: true })
+    await (Project.Current as BaseProjectLib).release(argsObj)
 
     process.exit(0)
   },

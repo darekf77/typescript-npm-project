@@ -65,8 +65,8 @@ export class PackageJSON {
       }
       return new PackageJSON(json, location);
     } catch (err) {
-      error(`Error while parsing package.json in: ${filePath}`);
-      error(err)
+      error(`Error while parsing package.json in: ${filePath}`, allowNoTnp);
+      error(err, allowNoTnp)
     }
   }
 

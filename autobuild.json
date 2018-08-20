@@ -55,6 +55,33 @@
   },
   "DESKTOP-1BP1I3F": {
     "dariusz": {
+      "autoreleases": [
+        {
+          "cwd": "C:/Users/Dariusz/projects/npm/ng2-rest",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/ng2-rest/preview/client",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/ng2-rest/preview/server",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/morphi",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/morphi/examples",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "C:/Users/Dariusz/projects/npm/morphi",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/morphi/examples",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn C:/Users/Dariusz/projects/npm/tsc-npm-project"
+          ]
+        }
+      ],
       "builds": [
         {
           "cwd": "C:/Users/Dariusz/projects/npm/ng2-rest",

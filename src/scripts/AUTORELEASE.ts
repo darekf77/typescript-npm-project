@@ -5,6 +5,7 @@ import { Project } from '../project';
 function autorelease(project: Project) {
   const autorelease = new AutoActions(project);
   autorelease.release()
+  process.exit(0)
 }
 
 export default {
