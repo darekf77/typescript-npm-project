@@ -120,6 +120,9 @@ export interface EnvConfig {
 export interface IPackageJSON {
   name: string;
   version: string;
+
+  dependencies?: { [name: string]: string; };
+  devDependencies?: { [name: string]: string; };
   tnp: {
     type: LibType;
     isCoreProject: boolean;

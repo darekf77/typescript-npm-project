@@ -12,6 +12,7 @@ import { questionYesNo, clearConsole } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { compilationWrapper } from '../helpers';
+import { PackageJSON } from './package-json';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -125,7 +126,8 @@ export abstract class BaseProjectLib extends Project {
     })
   }
 
-  public async release(prod = false) {
+  public async release(c?: { prod?: boolean, bumbVersionIn?: string[] }) {
+    const { prod = false, bumbVersionIn = [] } = c;
     clearConsole()
     this.checkIfReadyForNpm()
     const newVersion = Project.Current.versionPatchedPlusOne;
@@ -160,6 +162,20 @@ export abstract class BaseProjectLib extends Project {
         removeTagAndCommit()
       }
       if (successPublis) {
+        if (_.isArray(bumbVersionIn)) {
+          bumbVersionIn.forEach(p => {
+            const packageJson = PackageJSON.from(p, true);
+            if (packageJson) {
+              if (_.isString(packageJson.data.dependencies)) {
+                packageJson.data.dependencies[this.name] = newVersion;
+              }
+              if (_.isString(packageJson.data.devDependencies)) {
+                packageJson.data.devDependencies[this.name] = newVersion
+              }
+              packageJson.save()
+            }
+          });
+        }
         this.pushToGitRepo()
       }
     }, () => {

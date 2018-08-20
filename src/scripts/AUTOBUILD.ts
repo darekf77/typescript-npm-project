@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as _ from 'lodash';
 
 import { Project, ProjectFrom } from "../project";
-import { error } from '../messages';
+import { error, info } from '../messages';
 import { clearConsole } from '../process';
 
 export interface ProjectForAutoBuild {
@@ -14,22 +14,29 @@ export interface ProjectForAutoBuild {
   args?: string[];
 }
 
-export interface AutoBuildUser {
+export interface ProjectForAutoRelease {
+  cwd: string,
+  command: string;
+  args?: string[];
+}
+
+export interface AutoActionsUser {
   builds?: ProjectForAutoBuild[];
+  autoreleases?: ProjectForAutoRelease[];
 }
 
-export interface AutoBuildConfigComputer {
-  [userName: string]: AutoBuildUser;
+export interface AutoActionsConfigComputer {
+  [userName: string]: AutoActionsUser;
 }
 
-export interface JSONAutoBuildConfig {
-  [computerNames: string]: AutoBuildConfigComputer | string;
+export interface JSONAutoActionsConfig {
+  [computerNames: string]: AutoActionsConfigComputer | string;
 }
 
-export class AutoBuild {
+export class AutoActions {
 
 
-  readonly config: JSONAutoBuildConfig;
+  readonly config: JSONAutoActionsConfig;
 
 
 
@@ -68,6 +75,27 @@ export class AutoBuild {
     return hostname;
   }
 
+  release() {
+    console.log('config', this.config)
+    const hostname = this.hostname;
+    const username = os.userInfo().username.toLowerCase();
+    console.log('hostname', hostname)
+    console.log('username', username)
+    const release: ProjectForAutoRelease = (this.config[hostname][username].autorelease as ProjectForAutoRelease[])
+      .find(b => {
+        return path.resolve(b.cwd) === path.resolve(this.project.location)
+      });
+    if (!release) {
+      error(`No autorelease for current project.`)
+    }
+
+    this.project.run(`${release.command} ${(_.isArray(release.args) ? release.args
+      .filter(a => !a.trim().startsWith('#'))
+      .join(' ') : '')}`).sync()
+
+    info(`Done`);
+  }
+
   build(watch = false) {
     console.log('config', this.config)
     const hostname = this.hostname;
@@ -100,7 +128,7 @@ export class AutoBuild {
 
 export function autobuild(project: Project, watch = false, exit = true) {
 
-  const autobuild = new AutoBuild(project);
+  const autobuild = new AutoActions(project);
   autobuild.build(watch)
   if (exit) {
     process.exit(0)

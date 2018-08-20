@@ -1,6 +1,33 @@
 {
   "PL-N100IJ7": {
     "dfilipiak": {
+      "autoreleases": [
+        {
+          "cwd": "C:/Users/dfilipiak/Projects/npm/ng2-rest",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/ng2-rest/preview/client",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/ng2-rest/preview/server",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/morphi",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/morphi/examples",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "C:/Users/dfilipiak/Projects/npm/morphi",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/morphi/examples",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
+          ]
+        }
+      ],
       "builds": [
         {
           "cwd": "C:/Users/dfilipiak/Projects/npm/ng2-rest",
@@ -26,7 +53,7 @@
       ]
     }
   },
-  "DESKTOP-1BP1I3F":{
+  "DESKTOP-1BP1I3F": {
     "dariusz": {
       "builds": [
         {

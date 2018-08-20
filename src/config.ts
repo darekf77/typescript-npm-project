@@ -29,6 +29,9 @@ export const config = {
         entities: 'entities',
         controllers: 'controllers'
     },
+    file: {
+      package_json: 'package.json'
+    },
     allowedTypes: {
         app: [
             'angular-cli',
