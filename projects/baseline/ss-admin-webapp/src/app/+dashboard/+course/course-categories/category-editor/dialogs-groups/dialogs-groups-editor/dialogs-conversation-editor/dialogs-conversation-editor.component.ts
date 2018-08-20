@@ -13,6 +13,14 @@ import { DIALOG, DialogType } from 'ss-common-logic/browser/entities/DIALOG';
 })
 export class DialogsConversationEditorComponent implements OnInit {
 
+  model =  {
+    man: '',
+    woman: '',
+    hint: ''
+  }
+
+  editorConfig = {}
+
   DialogType = DialogType;
   dialogs: DIALOG[] = [];
   @Input() arrayDataConfig: ArrayDataConfig;

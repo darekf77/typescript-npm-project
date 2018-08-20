@@ -1,11 +1,32 @@
-<p>
-  dialogs-conversation-editor works!
-</p>
-
-{{DialogType | json}}
 <ul>
   <li *ngFor="let dialog of dialogs"
       class="{{dialog.typeString | lowercase }}">
-    {{dialog.comment}} {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
+    <span>
+      {{dialog.comment}} {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
+    </span>
+  </li>
+  <br>
+</ul>
+<ul>
+  <li class="man inline-with-others">
+    <span>
+      <textarea [placeholder]="'Men dialog...'"
+                [(ngModel)]="model.man">
+                      </textarea>
+    </span>
+  </li>
+  <li class="hint inline-with-others">
+    <span>
+      <textarea [placeholder]="'Hint, Comments...'"
+                [(ngModel)]="model.hint">
+              </textarea>
+    </span>
+  </li>
+  <li class="woman inline-with-others">
+    <span>
+      <textarea [placeholder]="'Woamn dialog...'"
+                [(ngModel)]="model.woman">
+                    </textarea>
+    </span>
   </li>
 </ul>
