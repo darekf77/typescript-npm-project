@@ -108,8 +108,36 @@
     }
   },
   "dariuszs-mbp-2.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
+  "Dariuszs-MBP-2": "Dariuszs-MacBook-Pro-2.local",
   "Dariuszs-MacBook-Pro-2.local": {
     "darekf": {
+      "autoreleases": [
+        {
+          "cwd": "/Users/darekf/projects/npm/ng2-rest",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /Users/darekf/projects/npm/ng2-rest/preview/client",
+            "--bumbVersionIn /Users/darekf/projects/npm/ng2-rest/preview/server",
+            "--bumbVersionIn /Users/darekf/projects/npm/morphi",
+            "--bumbVersionIn /Users/darekf/projects/npm/morphi/examples",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "/Users/darekf/projects/npm/morphi",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /Users/darekf/projects/npm/morphi/examples",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project"
+          ]
+        }
+      ],
       "builds": [
         {
           "cwd": "/Users/darekf/projects/npm/ng2-rest",

@@ -1,14 +1,14 @@
 {
+  "tnp": {
+    "resources": [
+      "README.md"
+    ],
+    "type": "workspace",
+    "baseline": true
+  },
   "name": "baseline",
   "version": "0.0.0",
   "license": "UNLICENSED",
-  "tnp": {
-    "type": "workspace",
-    "baseline": true,
-    "resources": [
-      "README.md"
-    ]
-  },
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.3.1",
     "@angular-devkit/schematics": "^0.0.42",
@@ -63,10 +63,10 @@
     "ionicons": "^3.0.0",
     "lodash": "4.17.4",
     "moment": "^2.22.2",
-    "morphi": "^1.0.41",
+    "morphi": "1.0.42",
     "ng2-file-upload": "^1.3.0",
     "ng2-logger": "^2.0.35",
-    "ng2-rest": "^9.1.3",
+    "ng2-rest": "9.1.7",
     "ngx-bootstrap": "^2.0.2",
     "ngx-breadcrumbs": "0.0.3",
     "ngx-editor": "^3.3.0",

@@ -1,4 +1,8 @@
 {
+  "tnp": {
+    "resources": [],
+    "type": "server-lib"
+  },
   "name": "tnp",
   "version": "0.0.3",
   "license": "UNLICENSED",
@@ -36,7 +40,7 @@
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "morphi": "^1.0.41",
+    "morphi": "1.0.42",
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "omelette": "^0.4.5",
@@ -55,8 +59,5 @@
     "underscore": "^1.9.1",
     "watch": "~1.0.2"
   },
-  "preferGlobal": true,
-  "tnp": {
-    "type": "server-lib"
-  }
+  "preferGlobal": true
 }

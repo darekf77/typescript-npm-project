@@ -126,9 +126,61 @@ export abstract class BaseProjectLib extends Project {
     })
   }
 
+  checkIfLogginInToNpm() {
+    try {
+      this.run('npm whoami').sync();
+    } catch (e) {
+      error(`Please login in to npm.`)
+    }
+  }
+
+  /**
+   * Return how many projects has changed
+   * @param bumbVersionIn 
+   * @param newVersion 
+   * @param onlyInThisProjectSubprojects 
+   */
+  bumpVersionInOtherProjects(bumbVersionIn: string[], newVersion, onlyInThisProjectSubprojects = false): Number {
+    let count = 0;
+    if (_.isArray(bumbVersionIn)) {
+      const currentProjectLocation = path.resolve(this.location);
+      bumbVersionIn = bumbVersionIn
+        .map(p => path.resolve(p))
+        .filter(p => p !== currentProjectLocation);
+
+      if (onlyInThisProjectSubprojects) {
+        bumbVersionIn = bumbVersionIn.filter(p => p.startsWith(currentProjectLocation));
+      } else {
+        bumbVersionIn = bumbVersionIn.filter(p => !p.startsWith(currentProjectLocation));
+      }
+
+      bumbVersionIn.forEach(p => {
+        const packageJson = PackageJSON.from(p, true);
+        if (packageJson && packageJson.data) {
+          let versionBumped = false;
+          if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
+            versionBumped = true;
+            packageJson.data.dependencies[this.name] = newVersion;
+          }
+          if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
+            versionBumped = true;
+            packageJson.data.devDependencies[this.name] = newVersion
+          }
+          if (versionBumped) {
+            packageJson.save()
+            info(`Version of current project "${this.name}" bumped in ${packageJson.name}`)
+            count++;
+          }
+        }
+      });
+    }
+    return count;
+  }
+
   public async release(c?: ReleaseOptions) {
+    this.checkIfLogginInToNpm()
     const { prod = false, bumbVersionIn = [] } = c;
-    clearConsole()
+    // clearConsole()
     this.checkIfReadyForNpm()
     const newVersion = Project.Current.versionPatchedPlusOne;
     const self = this;
@@ -139,11 +191,22 @@ export abstract class BaseProjectLib extends Project {
     }
 
     await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
+
+      this.bumpVersionInOtherProjects(bumbVersionIn, newVersion, true)
       try {
-        this.run(`npm version patch`).sync()
-      } catch (e) {
-        error(`Please commit your changes before release.`)
+        this.run(`git add --all . `).sync()
+      } catch (error) {
+        warn(`Failed to git add --all .`);
       }
+
+      try {
+        this.run(`git commit -m "new version ${newVersion}"`).sync()
+      } catch (error) {
+        warn(`Failed to git commit -m "new vers...`);
+      }
+
+      this.run(`npm version patch`).sync()
+
       this.run(`tnp clear`).sync();
       this.build({
         prod, outDir: config.folder.bundle as 'bundle', environmentName: 'local'
@@ -162,26 +225,7 @@ export abstract class BaseProjectLib extends Project {
         removeTagAndCommit()
       }
       if (successPublis) {
-        if (_.isArray(bumbVersionIn)) {
-          bumbVersionIn.forEach(p => {
-            const packageJson = PackageJSON.from(p, true);
-            if (packageJson) {
-              let versionBumped = false;
-              if (_.isString(packageJson.data.dependencies)) {
-                versionBumped = true;
-                packageJson.data.dependencies[this.name] = newVersion;
-              }
-              if (_.isString(packageJson.data.devDependencies)) {
-                versionBumped = true;
-                packageJson.data.devDependencies[this.name] = newVersion
-              }
-              packageJson.save()
-              if (versionBumped) {
-                info(`Version of current project "${this.name}" bumped in ${packageJson.name}`)
-              }
-            }
-          });
-        }
+        this.bumpVersionInOtherProjects(bumbVersionIn, newVersion);
         this.pushToGitRepo()
       }
     }, () => {
