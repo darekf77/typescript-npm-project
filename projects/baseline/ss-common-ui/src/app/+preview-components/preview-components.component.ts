@@ -10,10 +10,6 @@ export const menuLeft // : ComponentsMenuItem[]
       group: 'High abstraction componetns'
     },
     {
-      href: '/previewcomponents/selectwrapper',
-      name: 'SelectWrapper'
-    },
-    {
       href: '/previewcomponents/formwrapper',
       name: 'FormWrapper'
     },
@@ -24,6 +20,19 @@ export const menuLeft // : ComponentsMenuItem[]
     {
       href: '/previewcomponents/tablewrapper',
       name: 'TableWrapper'
+    },
+    {
+      group: 'Formly Fields'
+    },
+    {
+      name: 'PicturesField'
+    },
+    {
+      name: 'AudioField'
+    },
+    {
+      href: '/previewcomponents/selectwrapper',
+      name: 'SelectWrapper'
     },
     {
       group: 'Authentication'
