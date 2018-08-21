@@ -35,6 +35,15 @@ export const menuLeft // : ComponentsMenuItem[]
       name: 'SelectWrapper'
     },
     {
+      group: 'Custom Formly Fields'
+    },
+    {
+      name: 'DialogField'
+    },
+    {
+      name: 'DialogRepeatSecion'
+    },
+    {
       group: 'Authentication'
     },
     {

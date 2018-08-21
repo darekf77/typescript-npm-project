@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { isString } from 'lodash';
 import { CATEGORY } from 'ss-common-logic/browser/entities';
 
-const log = Log.create('List wrapper');
+const log = Log.create('List wrapper', Level.__NOTHING);
 
 export interface CRUDListWrapperLink {
   link: string;
@@ -94,7 +94,7 @@ export class ListWrapperComponent implements OnInit {
     }
 
     const columns = Describer.describe(this.crud.entity)
-    .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
+      .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
       .map(prop => {
         return { prop };
       });

@@ -3,6 +3,7 @@ export * from './foo';
 export * from './logo';
 export * from './table-wrapper';
 export * from './list-wrapper';
+export * from './dialog-field';
 export * from './select-wrapper';
 export * from './standalone-popup';
 export * from './slider-vertical-section';
