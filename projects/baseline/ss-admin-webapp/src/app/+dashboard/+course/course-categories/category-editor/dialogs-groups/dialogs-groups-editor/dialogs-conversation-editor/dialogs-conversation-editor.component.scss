@@ -7,12 +7,12 @@ $womanColor: rgba(130, 130, 249, 0.5);
   input, textarea {
     outline: 0px;
     border: 0px;
-    background-color: rgba(0,0,0,0.01);
-    font-size: 20px;
+    // background-color: rgba(0,0,0,0.01);
+    // font-size: 20px;
     width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    min-height: 100px;
+    // min-width: 100%;
+    // max-width: 100%;
+    // min-height: 100px;
   }
 
   ul {
@@ -40,7 +40,7 @@ $womanColor: rgba(130, 130, 249, 0.5);
           display: block;
           padding: 0px;
           input, textarea {
-            background: inherit;
+            background: transparent;
           }
         }
       }

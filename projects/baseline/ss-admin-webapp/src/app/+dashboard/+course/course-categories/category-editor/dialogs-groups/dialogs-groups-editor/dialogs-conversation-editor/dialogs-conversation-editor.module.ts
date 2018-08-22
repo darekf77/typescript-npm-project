@@ -6,11 +6,17 @@ import { HttpClientModule } from '@angular/common/http';
 import { DialogsConversationEditorComponent } from './dialogs-conversation-editor.component';
 // other
 import { NgxEditorModule } from 'ngx-editor';
+import { DialogPartComponent } from './dialog-part/dialog-part.component';
 
 const angularModules = [
   CommonModule,
   FormsModule,
   HttpClientModule
+]
+
+const localComponents = [
+  DialogsConversationEditorComponent,
+  DialogPartComponent
 ]
 
 @NgModule({
@@ -19,8 +25,10 @@ const angularModules = [
     NgxEditorModule
   ],
   exports: [
-    DialogsConversationEditorComponent
+    ...localComponents
   ],
-  declarations: [DialogsConversationEditorComponent]
+  declarations: [
+    ...localComponents
+  ]
 })
 export class DialogsConversationEditorModule { }

@@ -10,23 +10,21 @@
 <ul>
   <li class="man inline-with-others">
     <span>
-      <textarea [placeholder]="'Men dialog...'"
-                [(ngModel)]="model.man">
-                      </textarea>
+      <input type="text" [placeholder]="'Men dialog...'"
+                [(ngModel)]="model.man"/>
     </span>
   </li>
   <li class="hint inline-with-others">
     <span>
-      <textarea [placeholder]="'Hint, Comments...'"
-                [(ngModel)]="model.hint">
-              </textarea>
+      <input type="text"[placeholder]="'Hint, Comments...'"
+                [(ngModel)]="model.hint"/>
+
     </span>
   </li>
   <li class="woman inline-with-others">
     <span>
-      <textarea [placeholder]="'Woamn dialog...'"
-                [(ngModel)]="model.woman">
-                    </textarea>
+      <input type="text" [placeholder]="'Woamn dialog...'"
+                [(ngModel)]="model.woman"/>
     </span>
   </li>
 </ul>
