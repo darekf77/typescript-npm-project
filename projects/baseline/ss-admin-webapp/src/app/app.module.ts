@@ -15,6 +15,7 @@ import { CategoryController } from 'ss-common-logic/browser/controllers/Category
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
+import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
 
 // entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
@@ -25,6 +26,7 @@ import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
 import { DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
 import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
+import { CONFIG } from 'ss-common-logic/browser/entities/CONFIG';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -42,10 +44,11 @@ init({
     GroupsController,
     CategoryController,
     ExamplesController,
-    DialogsController
+    DialogsController,
+    ConfigController
   ],
   entities: [
-    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE
+    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE, CONFIG
   ]
 })
   .angularProviders()

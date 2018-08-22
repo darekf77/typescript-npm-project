@@ -5,6 +5,7 @@ const log = Log.create('dialog-conversations-editor')
 import { ArrayDataConfig } from 'morphi/browser';
 import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
 import { DIALOG, DialogType } from 'ss-common-logic/browser/entities/DIALOG';
+import { ConfigController, APP_LANGUAGE } from 'ss-common-logic/browser/controllers/ConfigController';
 
 @Component({
   selector: 'app-dialogs-conversation-editor',
@@ -13,23 +14,24 @@ import { DIALOG, DialogType } from 'ss-common-logic/browser/entities/DIALOG';
 })
 export class DialogsConversationEditorComponent implements OnInit {
 
-  model =  {
-    man: '',
-    woman: '',
-    hint: ''
-  }
-
-  editorConfig = {}
-
-  DialogType = DialogType;
   dialogs: DIALOG[] = [];
   @Input() arrayDataConfig: ArrayDataConfig;
 
-  constructor(public dialogsCRUD: DialogsController) {
+  constructor(
+    public dialogsCRUD: DialogsController,
+    private ConfigController: ConfigController
+  ) {
 
   }
 
+  public clientLang: APP_LANGUAGE;
+  public targetLang: APP_LANGUAGE;
+
   async ngOnInit() {
+    const config = await this.ConfigController.instance;
+    this.clientLang = config.course_client_language;
+    this.targetLang = config.course_target_language;
+    log.i('app config', config)
     const dialogs = await this.dialogsCRUD.getAll(this.arrayDataConfig).received;
     this.dialogs = dialogs.body.json;
     log.i('dialogs', this.dialogs)

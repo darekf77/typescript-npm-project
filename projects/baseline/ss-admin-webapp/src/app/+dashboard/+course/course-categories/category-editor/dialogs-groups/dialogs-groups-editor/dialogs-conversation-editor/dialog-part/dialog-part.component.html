@@ -1,3 +1,10 @@
-<div>
-  {{dialog.comment}} {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
+<!-- {{dialog | json}} -->
+<div *ngIf="type === DialogType.HINT">
+  {{dialog.comment}}
+</div>
+<div *ngIf="type === DialogType.MAN">
+  Man: {{dialog['lang_' + clientLang]}}
+</div>
+<div *ngIf="type === DialogType.WOMAN">
+  Woman: {{dialog['lang_'+ clientLang]}}
 </div>

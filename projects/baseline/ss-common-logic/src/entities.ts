@@ -2,7 +2,7 @@ import { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 export { USER, IUSER, USER_REPOSITORY } from './entities/core/USER';
 
 import { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
-export { SESSION, SESSION_CONFIG , SESSION_REPOSITORY } from './entities/core/SESSION';
+export { SESSION, SESSION_CONFIG, SESSION_REPOSITORY } from './entities/core/SESSION';
 
 import { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';
 export { MULTIMEDIA, IMULTIMEDIA, MULTIMEDIA_REPOSITORY } from './entities/core/MULTIMEDIA';
@@ -24,6 +24,9 @@ export { GROUP, IGROUP, GROUP_REPOSITORY } from "./entities/GROUP";
 
 import { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
 export { EXAMPLE, IEXAMPLE, EXAMPLE_REPOSITORY } from './entities/EXAMPLE';
+
+import { CONFIG, ICONFIG, CONFIG_REPOSITORY } from './entities/CONFIG';
+export { CONFIG, ICONFIG, CONFIG_REPOSITORY } from './entities/CONFIG';
 
 import { EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION, EXAMPLE_PAGINATION_REPOSITORY }
   from './entities/EXAMPLE_PAGINATION';
@@ -54,6 +57,8 @@ export function entities(connection?: Connection) {
     GROUP: META.repositoryFrom<GROUP, GROUP_REPOSITORY>(connection, GROUP, GROUP_REPOSITORY),
 
     MULTIMEDIA: META.repositoryFrom<MULTIMEDIA, MULTIMEDIA_REPOSITORY>(connection, MULTIMEDIA, MULTIMEDIA_REPOSITORY),
+
+    CONFIG: META.repositoryFrom<CONFIG, CONFIG_REPOSITORY>(connection, CONFIG, CONFIG_REPOSITORY);
 
     EXAMPLE: META.repositoryFrom<EXAMPLE, EXAMPLE_REPOSITORY>(connection, EXAMPLE, EXAMPLE_REPOSITORY),
 

@@ -23,6 +23,7 @@ addController(controllers.ExamplesController)
 addController(controllers.GroupsController);
 addController(controllers.ExamplesPaginationController);
 addController(controllers.DialogsController)
+addController(controllers.ConfigController)
 
 addEntity(entites.EMAIL)
 addEntity(entites.EMAIL_TYPE)
@@ -34,6 +35,7 @@ addEntity(entites.CATEGORY)
 addEntity(entites.MULTIMEDIA)
 addEntity(entites.EXAMPLE)
 addEntity(entites.EXAMPLE_PAGINATION);
+addEntity(entites.CONFIG);
 
 export const Controllers = tControllers;
 export const Entities = tEntities;

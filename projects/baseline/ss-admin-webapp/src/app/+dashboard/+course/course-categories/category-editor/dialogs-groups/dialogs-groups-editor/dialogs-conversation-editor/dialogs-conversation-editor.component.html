@@ -1,30 +1,5 @@
-<ul>
-  <li *ngFor="let dialog of dialogs"
-      class="{{dialog.typeString | lowercase }}">
-    <span>
-      {{dialog.comment}} {{dialog.lang_pl}} {{dialog.lang_fr}} {{dialog.lang_en}}
-    </span>
-  </li>
-  <br>
-</ul>
-<ul>
-  <li class="man inline-with-others">
-    <span>
-      <input type="text" [placeholder]="'Men dialog...'"
-                [(ngModel)]="model.man"/>
-    </span>
-  </li>
-  <li class="hint inline-with-others">
-    <span>
-      <input type="text"[placeholder]="'Hint, Comments...'"
-                [(ngModel)]="model.hint"/>
-
-    </span>
-  </li>
-  <li class="woman inline-with-others">
-    <span>
-      <input type="text" [placeholder]="'Woamn dialog...'"
-                [(ngModel)]="model.woman"/>
-    </span>
-  </li>
-</ul>
+<app-dialog-part *ngFor="let dialog of dialogs"
+                 [dialog]="dialog"
+                 [clientLang]="clientLang"
+                 [targetLang]="targetLang"
+                 ></app-dialog-part>

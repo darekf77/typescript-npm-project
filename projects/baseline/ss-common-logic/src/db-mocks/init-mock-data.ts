@@ -31,6 +31,7 @@ export class InitMockData extends META.BASE_MOCK_DATA {
     //#region @backendFunc
 
     const types = await this.db.EMAIL_TYPE.init();
+    await this.ctrl.ConfigController.initExampleDbData();
     await this.ctrl.AuthController.initExampleDbData();
     await this.ctrl.CategoryController.initExampleDbData()
     await this.ctrl.MultimediaController.initExampleDbData()

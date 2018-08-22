@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
+import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
 import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
@@ -43,7 +44,8 @@ const modules = [
   declarations: [DashboardComponent],
   providers: [
     CategoryController,
-    GroupsController
+    GroupsController,
+    ConfigController
   ],
 })
 export class DashboardModule { }
