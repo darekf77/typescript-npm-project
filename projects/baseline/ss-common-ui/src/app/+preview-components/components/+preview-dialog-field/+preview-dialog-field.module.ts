@@ -13,10 +13,7 @@ import {
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
-// third part
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
-import { init, AngularProviders } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
+import { AngularProviders } from 'morphi/browser';
 
 const angularModules = [
   CommonModule,

@@ -22,7 +22,6 @@ export interface IDIALOG {
   lang_pl?: string;
   lang_en?: string;
   lang_fr?: string;
-  comment?: string;
 
 }
 
@@ -32,7 +31,6 @@ export interface IDIALOG {
 @FormlyForm()
 @DefaultModelWithMapping<DIALOG>({
   type: DialogType.HINT,
-  comment: '',
   lang_en: '',
   lang_fr: '',
   lang_pl: ''
@@ -44,7 +42,6 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
 
   fromRaw(obj: IDIALOG): DIALOG {
     let dialog = new DIALOG();
-    dialog.comment = obj.comment;
     dialog.lang_en = obj.lang_en;
     dialog.lang_fr = obj.lang_fr;
     dialog.lang_pl = obj.lang_pl;
@@ -64,11 +61,6 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   @Column({ nullable: true }) lang_pl?: string = undefined
   @Column({ nullable: true }) lang_en?: string = undefined
   @Column({ nullable: true }) lang_fr?: string = undefined
-
-  @Column({
-    nullable: true
-  }) comment: string = undefined
-
 
   @ManyToOne(type => GROUP, group => group.id, {
     cascadeAll: false
