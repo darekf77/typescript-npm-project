@@ -8,7 +8,7 @@ import * as _ from "lodash";
 import { run as __run } from '../process';
 import { error, info } from '../messages';
 import { pullCurrentBranch } from '../helpers-git';
-import { tryRemoveDir, findChildren } from '../helpers';
+import { tryRemoveDir, findChildren, crossPlatofrmPath } from '../helpers';
 import config from '../config';
 import { RunOptions } from '../models';
 import { run } from '../../node_modules/morphi';
@@ -19,6 +19,7 @@ const defaultColors = {
   'es-rs-ui': '#ff7e7e',
   'es-common': '#ffe552',
   'es-ips-ui': '#59a2d3',
+  'es-global-ui': '#59e2d3',
   'wvs-ui': '#925ca2',
   'sce-ui': '#be7d41',
   'ncl-ui': '#be4175',
@@ -134,8 +135,8 @@ class ProjectAurora {
   private static isAuroraProject(location: string) {
     // is aurora project - simple teest
     const bowerFile = path.join(location, 'bower.json');
-    const bowerrc = path.join(location, '.bowerrc');
-    return fs.existsSync(bowerFile) && fs.existsSync(bowerrc);
+    // const bowerrc = path.join(location, '.bowerrc');
+    return fs.existsSync(bowerFile); // && fs.existsSync(bowerrc);
   }
 
   public static From(location: string, parent?: ProjectAurora): ProjectAurora {
@@ -165,7 +166,7 @@ class ProjectAurora {
   readonly prefix: string;
   readonly externalPath: string;
   readonly name: string;
-  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common', 'es-ips-ui'];
+  private readonly allowedBaselineLibs = ['es-rs-ui', 'es-common', 'es-ips-ui', 'es-global-ui'];
 
   get fix() {
     const self = this;
@@ -253,15 +254,15 @@ class ProjectAurora {
   }
 
 
-  add(subProjectName: 'es-rs-ui' | 'es-common' | 'es-ips-ui') {
+  add(subProjectName: 'es-rs-ui' | 'es-common' | 'es-ips-ui' | 'es-global-ui') {
     if (!this.allowedBaselineLibs.includes(subProjectName)) {
       error(`Wrong baseline lib type: ${subProjectName}`)
     }
     const paretOrigin = child.execSync(`git remote get-url --push origin`).toString().trim();
     const subProjectOrigin = paretOrigin.replace(`${this.prefix}-ui`, subProjectName);
     const newSubProjectName = `${this.prefix.toUpperCase()}-${subProjectName}`;
-    const newSubProjectLocation = path.join(this.location, FOLDERS.EXTERNAL, newSubProjectName)
-    const newSubProjectLocationOrigin = path.join(this.location, FOLDERS.EXTERNAL, subProjectName)
+    const newSubProjectLocation = crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL, newSubProjectName))
+    const newSubProjectLocationOrigin = crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL, subProjectName))
 
     if (fse.existsSync(newSubProjectLocation)) {
       tryRemoveDir(newSubProjectLocation)
@@ -272,7 +273,7 @@ class ProjectAurora {
     }
     const command = `git clone ${subProjectOrigin} ${newSubProjectName}`
     console.log(command)
-    this.run(command, { cwd: path.join(this.location, FOLDERS.EXTERNAL) }).sync()
+    this.run(command, { cwd: crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL)) }).sync()
     const project = ProjectAurora.From(newSubProjectLocation, this)
     this.children.push(project)
     project.link()
