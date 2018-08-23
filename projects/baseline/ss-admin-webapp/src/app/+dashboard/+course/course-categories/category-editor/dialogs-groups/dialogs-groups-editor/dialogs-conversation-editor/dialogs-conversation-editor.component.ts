@@ -24,6 +24,15 @@ export class DialogsConversationEditorComponent implements OnInit {
 
   }
 
+  mode = 'edit';
+  toogleMode() {
+    if(this.mode === 'view') {
+      this.mode = 'edit'
+      return;
+    }
+    this.mode = 'view';
+  }
+
   public clientLang: APP_LANGUAGE;
   public targetLang: APP_LANGUAGE;
 

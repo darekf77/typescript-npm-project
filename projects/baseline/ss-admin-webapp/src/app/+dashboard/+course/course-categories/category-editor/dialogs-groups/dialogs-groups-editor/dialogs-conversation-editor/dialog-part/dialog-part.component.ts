@@ -15,7 +15,10 @@ import { ConfigController, APP_LANGUAGE } from 'ss-common-logic/browser/controll
 })
 export class DialogPartComponent implements OnInit {
 
+  @Input() isEditingInline = false;
+
   DialogType = DialogType;
+  @Input() mode: 'view' | 'edit' = 'edit';
 
   @Input() dialog: DIALOG;
 

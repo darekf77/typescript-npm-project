@@ -5,4 +5,61 @@ $womanColor: rgba(130, 130, 249, 0.5);
 
 :host {
   display: block;
+
+  .inline-edit {
+    display: block;
+    height: 100px;
+    background: lightgray;
+  }
+
+  section {
+    &.view {
+      .edit-button {
+        display: none;
+        border: none;
+      }
+    }
+
+    &.edit {
+      .edit-button {
+        cursor: pointer;
+        opacity: 0.3;
+        &:hover {
+          opacity: 1.0;
+        }
+        position: absolute;
+      }
+      border: 1px solid black;
+    }
+
+    > * {
+      span {
+        width: 30%;
+        padding: 20px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+    }
+    .man {
+      text-align: left;
+      span {
+        background: #ffa9a9;
+      }
+
+    }
+    .woman {
+      text-align: right;
+      span {
+        background: #acffc3;
+      }
+    }
+    .hint {
+      text-align: center;
+     span {
+      color: lightgray;
+     }
+    }
+
+  }
+
 }

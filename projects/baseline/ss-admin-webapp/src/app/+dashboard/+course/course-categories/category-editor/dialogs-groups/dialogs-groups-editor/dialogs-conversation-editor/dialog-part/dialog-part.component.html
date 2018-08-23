@@ -1,10 +1,21 @@
-<!-- {{dialog | json}} -->
-<div *ngIf="type === DialogType.HINT">
-  {{dialog.comment}}
-</div>
-<div *ngIf="type === DialogType.MAN">
-  Man: {{dialog['lang_' + clientLang]}}
-</div>
-<div *ngIf="type === DialogType.WOMAN">
-  Woman: {{dialog['lang_'+ clientLang]}}
+<section [class]="mode">
+
+  <mat-icon *ngIf="!isEditingInline"
+            (click)="isEditingInline = true"
+            class="edit-button">edit</mat-icon>
+  <mat-icon *ngIf="isEditingInline"
+            (click)="isEditingInline = false"
+            class="edit-button">save</mat-icon>
+  <div [ngClass]="
+            dialog.typeString
+            |
+            lowercase
+            ">
+    <span>{{dialog['lang_' + clientLang]}}</span>
+  </div>
+</section>
+<div class="inline-edit"  *ngIf="isEditingInline" >
+
+
+
 </div>

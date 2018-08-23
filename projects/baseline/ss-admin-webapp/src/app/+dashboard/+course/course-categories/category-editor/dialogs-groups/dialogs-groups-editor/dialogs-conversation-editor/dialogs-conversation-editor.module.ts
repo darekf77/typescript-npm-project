@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+// material
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // local
 import { DialogsConversationEditorComponent } from './dialogs-conversation-editor.component';
 // other
@@ -14,6 +18,12 @@ const angularModules = [
   HttpClientModule
 ]
 
+const materialModules = [
+  MatIconModule,
+  MatButtonModule,
+  MatSlideToggleModule
+]
+
 const localComponents = [
   DialogsConversationEditorComponent,
   DialogPartComponent
@@ -22,10 +32,12 @@ const localComponents = [
 @NgModule({
   imports: [
     ...angularModules,
+    ...materialModules,
     NgxEditorModule
   ],
   exports: [
-    ...localComponents
+    ...localComponents,
+    ...materialModules
   ],
   declarations: [
     ...localComponents

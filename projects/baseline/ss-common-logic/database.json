@@ -46,12 +46,18 @@
             {
               "lang_pl": "adasd Dzień dobry",
               "lang_en": "adas aaa Good morning",
-              "lang_fr": "Bsdasdonjour"
+              "lang_fr": "Bsdasdonjour",
+              "type": 1
+            },
+            {
+              "lang_pl": "Be not nice",
+              "type": 2
             },
             {
               "lang_pl": "Do widzenia",
               "lang_en": "See you",
-              "lang_fr": "Au revoir"
+              "lang_fr": "Au revoir",
+              "type": 0
             }
           ]
         }
