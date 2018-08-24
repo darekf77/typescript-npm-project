@@ -10,7 +10,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('category editor')
 import { Subscription } from 'rxjs/Subscription';
-import { ArrayDataConfig } from 'morphi/browser';
+import { ModelDataConfig } from 'morphi/browser';
 // local
 
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
@@ -26,7 +26,7 @@ export class CategoryEditorComponent implements OnInit {
 
   model: CATEGORY = {} as any;
 
-  arrayDataConfig = new ArrayDataConfig({
+  arrayDataConfig = new ModelDataConfig({
     joins: ['category']
   });
 

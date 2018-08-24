@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { BaseCRUD, Describer, ArrayDataConfig, SYMBOL } from 'morphi/browser';
+import { BaseCRUD, Describer, ModelDataConfig, SYMBOL } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { Router } from '@angular/router';
@@ -15,7 +15,7 @@ const log = Log.create('Table wrapper');
 })
 export class TableWrapperComponent implements OnInit {
 
-  @Input() arrayDataConfig = new ArrayDataConfig();
+  @Input() arrayDataConfig = new ModelDataConfig();
 
   @Input() rowHref: string;
 

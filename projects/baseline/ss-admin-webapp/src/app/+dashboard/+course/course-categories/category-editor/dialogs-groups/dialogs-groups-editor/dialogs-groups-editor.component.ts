@@ -3,7 +3,7 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // other
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('dialogs groups editor')
-import { ArrayDataConfig } from 'morphi/browser';
+import { ModelDataConfig } from 'morphi/browser';
 // local
 import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
 import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
@@ -16,7 +16,7 @@ import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
-  arrayDataConfig = new ArrayDataConfig({
+  arrayDataConfig = new ModelDataConfig({
     joins: ['group']
   });
   model: GROUP;
@@ -34,12 +34,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
       }
     });
 
-    const categotryId = Number(this.route.snapshot.paramMap.get('id'))
-    const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
-    log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
 
-    this.model = this.route.snapshot.data['group']
-    this.arrayDataConfig.where.push(`group.id = ${groupid}`);
   }
 
   async complete() {
@@ -54,7 +49,13 @@ export class DialogsGroupsEditorComponent implements OnInit {
     log.i('should be and navigation', link)
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const categotryId = Number(this.route.snapshot.paramMap.get('id'))
+    const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
+    log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
+    this.arrayDataConfig.where.push(`group.id = ${groupid}`);
+    const data = await this.groupCRUD.getBy(groupid).received;
+    this.model = data.body.json;
   }
 
 }

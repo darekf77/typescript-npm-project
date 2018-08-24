@@ -9,6 +9,7 @@ import { routes } from "./dashboard.routes";
 import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
+import { DialogsConversationEditorModule } from 'ss-common-ui/module';
 
 @NgModule({
     imports: [
@@ -16,6 +17,7 @@ import { LoginModule } from '../login/login.module';
         RouterModule.forChild(routes),
         CommonModule,
         LoginModule,
+        DialogsConversationEditorModule,
         TabsModule.forRoot()
     ],
     exports: [],

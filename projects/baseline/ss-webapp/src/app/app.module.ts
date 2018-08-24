@@ -11,6 +11,9 @@ import { init, AngularProviders } from 'morphi/browser';
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
+import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
+import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
+import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
 import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
 import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
@@ -18,6 +21,7 @@ import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
 import { DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
 import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
+import { CONFIG } from 'ss-common-logic/browser/entities/CONFIG';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -26,9 +30,15 @@ import { routes } from "./app.routes";
 
 init({
   host: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host,
-  controllers: [AuthController, CategoryController],
+  controllers: [
+    AuthController,
+    CategoryController,
+    DialogsController,
+    ConfigController,
+    GroupsController
+  ],
   entities: [
-    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP]
+    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, CONFIG]
 })
   .angularProviders()
 
@@ -42,7 +52,7 @@ init({
     FormsModule,
     HttpModule,
     // MyLibModule.forRoot(),
-    RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   providers: [
     AngularProviders

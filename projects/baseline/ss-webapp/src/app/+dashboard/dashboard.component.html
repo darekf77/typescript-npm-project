@@ -7,7 +7,7 @@
     <img class="logo-couple-kissing"
          [src]="'assets/img/logo/couple-kissing.png'">
   </a>
-  <app-login [showDashboard]="false" ></app-login>
+  <app-login [showDashboard]="false"></app-login>
 </h1>
 
 <columns-container class="middle-content"
@@ -20,28 +20,32 @@
       Ładowanie kategori
     </h3>
     <ul *ngIf="categories && categories.length > 0">
-      <li *ngFor="let category of categories" (click)="showCategory(category)"
+      <li *ngFor="let category of categories"
+          (click)="navigateToCategory(category.id)"
           [ngClass]="{'selected': isSelected(category)  }">
-        <a href="javascript:void(0)"
-           > {{category.name}} </a>
+        <a href="javascript:void(0)"> {{category.name}} </a>
       </li>
     </ul>
 
-
-
   </column>
-  <column grow class="content" >
-    <tabset *ngIf="selected && selected.groups">
+  <column grow
+          class="content">
+    <div *ngIf="selected">
+      <ul>
+        <li *ngFor="let group of selected.groups"
+            (click)="navigateToCategory(selected.id,group.id)">
+          {{group.title}}"
+        </li>
+      </ul>
+      <app-dialogs-conversation-editor *ngIf="selectedGroup"
+                                       [mode]="'view'"
+                                       [(dialogs)]="selectedGroup.dialogs">
+      </app-dialogs-conversation-editor>
+      <h1 *ngIf="selectedGroup">
+        {{selectedGroup.dialogs | json }}
+      </h1>
+    </div>
 
-      <tab heading="{{group.title}}"
-           *ngFor="let group of selected.groups">
-
-        <ul *ngFor="let dialog of group.dialogs">
-          {{dialog.lang_pl}}
-        </ul>
-
-      </tab>
-    </tabset>
   </column>
 
 </columns-container>

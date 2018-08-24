@@ -5,6 +5,7 @@ import { Subscription } from "rxjs/Subscription";
 import { Log } from "ng2-logger";
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
+import { ActivatedRoute } from '@angular/router';
 
 const log = Log.create('Login component')
 
@@ -17,6 +18,7 @@ export class LoginComponent  implements OnInit {
 
   constructor(
     private auth: AuthController,
+    public route: ActivatedRoute,
     private modalService: BsModalService
   ) {
 

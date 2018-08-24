@@ -1,4 +1,4 @@
-<mat-slide-toggle (click)="toogleMode()" >View mode</mat-slide-toggle>
+<mat-slide-toggle  *ngIf="mode === 'edit'" (click)="toogleMode()" >View mode</mat-slide-toggle>
 <br>
 <br>
 <app-dialog-part *ngFor="let dialog of dialogs"

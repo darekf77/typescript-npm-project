@@ -1,3 +1,7 @@
+---------
+<span *ngIf="dialog" >
+  {{dialog | json}}
+</span>
 <section [class]="mode">
 
   <mat-icon *ngIf="!isEditingInline"
@@ -6,16 +10,13 @@
   <mat-icon *ngIf="isEditingInline"
             (click)="isEditingInline = false"
             class="edit-button">save</mat-icon>
-  <div [ngClass]="
-            dialog.typeString
-            |
-            lowercase
-            ">
+  <div [ngClass]="dialog.typeString | lowercase">
     <span>{{dialog['lang_' + clientLang]}}</span>
   </div>
 </section>
-<div class="inline-edit"  *ngIf="isEditingInline" >
+<div class="inline-edit"
+     *ngIf="isEditingInline">
 
-
+eiditing
 
 </div>

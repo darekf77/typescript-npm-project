@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { BaseCRUD, Describer, ArrayDataConfig, SYMBOL } from 'morphi/browser';
+import { BaseCRUD, Describer, ModelDataConfig, SYMBOL } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
@@ -30,7 +30,7 @@ export class ListWrapperComponent implements OnInit {
 
   }
 
-  @Input() arrayDataConfig = new ArrayDataConfig();
+  @Input() arrayDataConfig = new ModelDataConfig();
 
   @ViewChild('create') templateCreate: TemplateRef<any>;
 

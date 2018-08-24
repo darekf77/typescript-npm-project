@@ -36,14 +36,14 @@ export async function questionYesNo(message: string,
 
 
 export function clearConsole() {
-  try {
-    if (process.platform === 'win32') {
-      run('cls').sync()
-    }
-    run('clear').sync()
-  } catch (error) {
-    console.log('clear console not succedd')
-  }
+  // try {
+  //   if (process.platform === 'win32') {
+  //     run('cls').sync()
+  //   }
+  //   run('clear').sync()
+  // } catch (error) {
+  //   console.log('clear console not succedd')
+  // }
 
 }
 

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { stringifyToQueryParams } from 'ss-common-ui/module';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,13 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
-  constructor(public auth: AuthController, public router: Router) {
+  constructor(
+    public auth: AuthController,
+    public router: Router,
+    public route: ActivatedRoute
+  ) {
+
+
 
   }
 
@@ -17,7 +24,7 @@ export class AppComponent implements OnInit {
     console.log('ENV', ENV)
     this.auth.isLoggedIn.subscribe(login => {
       if (login) {
-        this.router.navigateByUrl('/dashboard')
+        this.router.navigateByUrl(`/dashboard?${stringifyToQueryParams(this.route.snapshot.queryParams)}`)
       } else {
         this.router.navigateByUrl('/')
       }
