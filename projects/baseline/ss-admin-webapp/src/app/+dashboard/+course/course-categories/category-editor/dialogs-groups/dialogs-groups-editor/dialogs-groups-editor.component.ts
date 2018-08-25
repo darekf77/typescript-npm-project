@@ -5,8 +5,8 @@ import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('dialogs groups editor')
 import { ModelDataConfig } from 'morphi/browser';
 // local
-import DialogsController from 'ss-common-logic/browser/controllers/DialogsController';
-import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
+import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
+import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 
 @Component({
@@ -16,16 +16,19 @@ import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
-  arrayDataConfig = new ModelDataConfig({
+  modelDataConfigDialogs = new ModelDataConfig();
+
+  modelDataConfigGroup = new ModelDataConfig({
     joins: ['group']
   });
-  model: GROUP;
+  group: GROUP;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
 
-    public groupCRUD: GroupsController
+    public groupCRUD: GroupsController,
+    public dialogsController: DialogsController
   ) {
 
     router.events.subscribe(event => {
@@ -36,6 +39,8 @@ export class DialogsGroupsEditorComponent implements OnInit {
 
 
   }
+
+  mode = 'edit';
 
   async complete() {
     let routerLink = this.route.parent.snapshot.pathFromRoot
@@ -53,9 +58,28 @@ export class DialogsGroupsEditorComponent implements OnInit {
     const categotryId = Number(this.route.snapshot.paramMap.get('id'))
     const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
     log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
-    this.arrayDataConfig.where.push(`group.id = ${groupid}`);
+    this.modelDataConfigGroup.where.push(`group.id = ${groupid}`);
     const data = await this.groupCRUD.getBy(groupid).received;
-    this.model = data.body.json;
+    this.group = data.body.json;
+    this.group.dialogs = await this.getDialgs(groupid);
+    log.i('this.model', this.group)
   }
+
+
+  async getDialgs(groupid) {
+
+    this.modelDataConfigDialogs.where.push(`group.id = ${groupid}`)
+    const data =  await this.dialogsController.getAll(this.modelDataConfigDialogs).received;
+    return data.body.json;
+  }
+
+  toogleMode() {
+    if (this.mode === 'view') {
+      this.mode = 'edit';
+      return;
+    }
+    this.mode = 'view';
+  }
+
 
 }

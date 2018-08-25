@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // material
 import { MatCardModule } from '@angular/material/card'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 // local
 import { DialogsGroupsEditorComponent } from './dialogs-groups-editor.component';
 import {
@@ -15,7 +16,8 @@ const angularModules = [
 ];
 
 const materialModules = [
-  MatCardModule
+  MatCardModule,
+  MatSlideToggleModule
 ]
 
 const otherModuels = [

@@ -1,12 +1,53 @@
 
 :host {
 
+
+
+  ul.tab {
+    list-style: none;
+    padding: 10px;
+    position: relative;
+    float: left;
+    margin-bottom: 0px;
+    > li {
+      opacity: 0.3;
+      cursor: pointer;
+      &.active {
+        opacity: 1.0;
+      }
+      position: relative;
+      float: left;
+      h4 {
+        padding: 5px;
+        background: white;
+        margin-left: 5px;
+      }
+
+    }
+  }
+
+
+
+  p.group-pic {
+    text-align: center;
+    background: white;
+    margin-top: 11px;
+    width: 100%;
+    position: relative;
+    float: left;
+    img {
+      display: inline-block;
+      height: 300px;
+    }
+  }
+
   app-login {
     float: right;
     margin-right: 10px;
   }
 
   .middle-content {
+        overflow-y: scroll;
     background: url('/assets/img/backgrounds/spiration_dark.png')
   }
 
@@ -33,7 +74,7 @@
       left: 13px;
       top: -3px;
     }
-    
+
   }
 
   .content-left-panel {
@@ -63,6 +104,8 @@
   }
 
   .content {
+    overflow-y: auto;
+    overflow-x: hidden;
     background-color: rgba(255,255,255,0.8);
   }
 

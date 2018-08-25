@@ -31,21 +31,29 @@
   <column grow
           class="content">
     <div *ngIf="selected">
-      <ul>
-        <li *ngFor="let group of selected.groups"
+
+
+      <ul class="tab">
+        <li *ngFor="let group of selected.groups" [ngClass]="{'active': (selectedGroup.id === group.id) }"
             (click)="navigateToCategory(selected.id,group.id)">
-          {{group.title}}"
+          <h4>{{group.title}}</h4>
+
         </li>
       </ul>
+
+
+      <p class="group-pic">
+        <img src="https://images.askmen.com/1080x540/2017/03/28-055100-online_dating_site_zoosk_reveals_the_best_tactics_for_single_guys_to_use.jpg"
+
+             alt="">
+      </p>
+
+
       <app-dialogs-conversation-editor *ngIf="selectedGroup"
                                        [mode]="'view'"
                                        [(dialogs)]="selectedGroup.dialogs">
       </app-dialogs-conversation-editor>
-      <h1 *ngIf="selectedGroup">
-        {{selectedGroup.dialogs | json }}
-      </h1>
     </div>
-
   </column>
 
 </columns-container>
