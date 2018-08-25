@@ -33,7 +33,7 @@ import { CLASSNAME } from 'morphi';
 
 
 export const SESSION_CONFIG = {
-  SESSION_TIME_SECONDS: 3600,
+  SESSION_TIME_SECONDS: 36000, // TODO smaller session on production
   SESSION_LOCAL_STORAGE: 'session-isomorphic-rest',
   AUTHORIZATION_HEADER: 'Authorization'
 }

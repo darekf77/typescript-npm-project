@@ -25,6 +25,7 @@ import * as fs from "fs";
 import { kebabCase } from "lodash";
 import { CLASSNAME } from 'morphi';
 
+export type MultimediaType = 'picture' | 'audio' | 'video';
 
 export interface IMULTIMEDIA {
 
@@ -47,9 +48,8 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   name: string = null
 
 
-
   @Column('varchar', { length: 20 })
-  type: 'picture' | 'audio' | 'video' = undefined;
+  type: MultimediaType;
 
   public static mimetype = {
     picture: ['image/jpeg', 'image/png']

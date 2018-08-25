@@ -82,11 +82,11 @@ export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
   private static cachedValues: ConfigValues = {} as any;
   public get instance() {
     return new Promise<ConfigValues>(async (resolve, reject) => {
-      if (Object.keys(ConfigController.cachedValues).length > 0) {
-        return ConfigController.cachedValues;
-      } else {
-        await this.refresh()
-      }
+      // if (Object.keys(ConfigController.cachedValues).length > 0) {
+      //   return ConfigController.cachedValues;
+      // } else {
+      await this.refresh()
+      // }
       resolve(ConfigController.cachedValues);
     });
   }
