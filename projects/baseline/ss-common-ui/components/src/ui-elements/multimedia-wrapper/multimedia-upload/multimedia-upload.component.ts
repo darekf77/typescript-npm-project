@@ -1,22 +1,22 @@
 import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
 
 // material
-import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Log, Level } from "ng2-logger/browser";
-const log = Log.create('multimedia-upload')
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Log, Level } from 'ng2-logger/browser';
+const log = Log.create('multimedia-upload');
 
 import { FileUploader, FileItem } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
 const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
 
-import { TableColumn } from "@swimlane/ngx-datatable";
+import { TableColumn } from '@swimlane/ngx-datatable';
 interface TableRow {
   name: string;
   size: string;
   progress: string;
   actions?: string;
-  item: FileItem
+  item: FileItem;
 }
 
 @Component({
@@ -25,10 +25,6 @@ interface TableRow {
   styleUrls: ['./multimedia-upload.component.scss']
 })
 export class MultimediaUploadComponent implements OnInit, AfterViewInit {
-
-  @ViewChild('dialog') private dialog: TemplateRef<any>;
-  @ViewChild('cellTemplateActions') cellTemplateActions: TemplateRef<any>;
-  @ViewChild('cellTemplateSize') cellTemplateSize: TemplateRef<any>;
 
   constructor(
     private auth: AuthController
@@ -45,27 +41,36 @@ export class MultimediaUploadComponent implements OnInit, AfterViewInit {
           progress: i.progress,
           item: i
         };
-      }) : []
+      }) : [];
   }
+
+  @ViewChild('dialog') private dialog: TemplateRef<any>;
+  @ViewChild('cellTemplateActions') cellTemplateActions: TemplateRef<any>;
+  @ViewChild('cellTemplateSize') cellTemplateSize: TemplateRef<any>;
   columns: TableColumn[] = [];
+
+
+  public uploader: FileUploader;
+
+  public hasBaseDropZoneOver = false;
 
 
 
   ngOnInit() {
-    console.log('ENV', ENV)
+    console.log('ENV', ENV);
     this.auth.isLoggedIn.subscribe(isLoggedIn => {
       if (isLoggedIn) {
-        let headers = [SESSION.localStorage.fromLocalStorage().activationTokenHeader]
+        const headers = [SESSION.localStorage.fromLocalStorage().activationTokenHeader];
         this.uploader = new FileUploader({ url: URL, headers });
         this.uploader.onBeforeUploadItem = (item) => { item.withCredentials = false; console.log(item); };
       }
-    })
-    this.auth.browser.init()
+    });
+    this.auth.browser.init();
 
   }
 
   ngAfterViewInit() {
-    log.i('this.cellTemplate', this.cellTemplateActions)
+    log.i('this.cellTemplate', this.cellTemplateActions);
     this.columns = [
       {
         prop: 'name'
@@ -80,13 +85,8 @@ export class MultimediaUploadComponent implements OnInit, AfterViewInit {
         prop: 'item',
         cellTemplate: this.cellTemplateActions
       }
-    ]
+    ];
   }
-
-
-  public uploader: FileUploader;
-
-  public hasBaseDropZoneOver: boolean = false;
   public fileOverBase(e: any): void {
     this.hasBaseDropZoneOver = e;
   }

@@ -25,10 +25,8 @@ export const menuLeft // : ComponentsMenuItem[]
       group: 'Formly Fields'
     },
     {
-      name: 'PicturesField'
-    },
-    {
-      name: 'AudioField'
+      href: '/previewcomponents/multimediawrapper',
+      name: 'MultimediaWrapper'
     },
     {
       href: '/previewcomponents/selectwrapper',
