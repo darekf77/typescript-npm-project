@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 // material
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 // third part
@@ -26,7 +27,8 @@ const angularModules = [
 
 const materialModules = [
   MatCardModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatSlideToggleModule
 ];
 
 const formlyModules = [

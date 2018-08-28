@@ -5,12 +5,17 @@
     height: 100%;
     position: relative !important;
     display: block;
+
     mat-icon {
+        z-index: 2147483647; // TODO max z index
         position: absolute !important;
         right: 10px ;
         top: 10px;
+        opacity: 0.7;
         cursor: pointer !important;
-        z-index: 1;
+        &:hover {
+          opacity: 1.0;
+        }
     }
     .gradient {
         z-index: 1;

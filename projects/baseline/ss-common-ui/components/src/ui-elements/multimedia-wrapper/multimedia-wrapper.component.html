@@ -1,23 +1,28 @@
-<p>
-  multimedia-wrapper works!
+<p *ngIf="mode === 'view'">
+  multimedia view mode
 </p>
+<p *ngIf="mode === 'edit'">
+  multimedia edit mode
+  <button (click)="open()"> Open upload! </button>
 
-<button (click)="open()"> Open upload! </button>
+  <ng-template #dialog>
+    <dialog-wrapper [dialogRef]="dialog">
+      <mat-tab-group>
+        <mat-tab label="ALL"></mat-tab>
+        <mat-tab label="Picture"></mat-tab>
+        <mat-tab label="Audio"></mat-tab>
+        <mat-tab label="Video"></mat-tab>
+      </mat-tab-group>
+      <mat-tab-group>
+        <mat-tab label="SELECT">
+          <app-multimedia-chooser></app-multimedia-chooser>
+        </mat-tab>
+        <mat-tab label="UPLOAD">
+          <app-multimedia-upload></app-multimedia-upload>
+        </mat-tab>
+      </mat-tab-group>
+    </dialog-wrapper>
 
-<ng-template #dialog>
-  <dialog-wrapper>
-    <mat-tab-group>
-      <mat-tab label="Chooser">
 
-        <app-multimedia-chooser></app-multimedia-chooser>
-
-      </mat-tab>
-      <mat-tab label="Upload">
-
-        <app-multimedia-upload></app-multimedia-upload>
-
-      </mat-tab>
-    </mat-tab-group>
-  </dialog-wrapper>
-
-</ng-template>
+  </ng-template>
+</p>

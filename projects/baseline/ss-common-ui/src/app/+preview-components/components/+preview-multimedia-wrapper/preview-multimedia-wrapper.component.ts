@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
 import * as _ from 'lodash';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
@@ -16,6 +16,17 @@ const log = Log.create('preview-multimedia-wrapper');
 })
 export class PreviewMultimediaWrapperComponent {
 
+  _mode = 'edit';
+
+  get mode() {
+    return this._mode;
+  }
+
+  set mode(v) {
+    this._mode = v;
+    this.fields[0].templateOptions.mode = this.mode;
+  }
+
   form = new FormGroup({});
   model: any = {};
   options: FormlyFormOptions = {};
@@ -24,6 +35,7 @@ export class PreviewMultimediaWrapperComponent {
       key: 'Input',
       type: 'multimediawrapper',
       templateOptions: {
+        openDialog: true,
         label: 'Input',
         placeholder: 'Placeholder',
         description: 'Description',
@@ -31,5 +43,6 @@ export class PreviewMultimediaWrapperComponent {
       },
     },
   ];
+
 
 }

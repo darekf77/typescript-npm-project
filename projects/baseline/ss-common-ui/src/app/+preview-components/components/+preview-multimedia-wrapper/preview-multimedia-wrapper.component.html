@@ -1,6 +1,10 @@
 <mat-card>
   <h4>multimedia wrapper</h4>
 
+  <mat-slide-toggle [checked]="mode === 'edit'"
+                    (change)="mode = (mode === 'edit' ? 'view': 'edit')">Edit mode</mat-slide-toggle>
+
+
   <form [formGroup]="form">
     <formly-form [model]="model"
                  [fields]="fields"

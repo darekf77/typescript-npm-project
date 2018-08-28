@@ -48,6 +48,8 @@ export class EXAMPLE_PAGINATION
 
   @Column() age: number;
 
+  @Column() price: number = 23
+
   @Column('boolean') isAmazing: boolean;
 
 }

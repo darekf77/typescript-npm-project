@@ -8,6 +8,8 @@ import {
 import { get } from "lodash";
 
 //#region @backend
+import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import { authenticate, use } from 'passport';
 import { Strategy, IStrategyOptions } from 'passport-http-bearer';
 import { isEmail, isLowercase, isLength } from 'validator';
@@ -17,23 +19,18 @@ export { Handler } from 'express';
 import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 import * as path from 'path';
-import * as fse from 'fs-extra';
 import { UploadedFile } from "express-fileupload";
 //#endregion
-
+import * as _ from 'lodash';
+import { getRecrusiveFilesFrom } from 'tnp';
 import { META } from '../../helpers';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
+import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 
 
-@ENDPOINT({
-  auth: (method) => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
-  }
-})
+@ENDPOINT()
 @CLASSNAME('MultimediaController')
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
 
@@ -81,9 +78,41 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
   }
 
 
+
+
+  private discover(folderName, type: MultimediaType) {
+    const res: MULTIMEDIA[] = []
+    const files: string[] = getRecrusiveFilesFrom(folderName);
+    files.forEach(name => {
+      let m = this.db.MULTIMEDIA.create({
+        name,
+        type
+      });
+      res.push(m)
+    })
+
+    return res.map(r => {
+      r.name = r.name.replace(folderName, '')
+      return r;
+    })
+  }
+
   async initExampleDbData() {
 
-    let m1 = new entities.MULTIMEDIA()
+    const assets = [
+      ...this.discover(ENV.pathes.backup.picture, 'picture'),
+      ...this.discover(ENV.pathes.backup.audio, 'audio'),
+      ...this.discover(ENV.pathes.backup.audio, 'video')
+    ].map(m => {
+      return this.db.MULTIMEDIA.save(m);
+    });
+
+    await Promise.all(assets);
+
+    let m1 = this.db.MULTIMEDIA.create({
+      name: ''
+    });
+
     m1.type = 'picture';
 
 

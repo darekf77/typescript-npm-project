@@ -13,12 +13,46 @@
 <ng-template #editTmpl
              let-row="row"
              let-value="value">
-  <img *ngIf="value === 'male'"
+  <div [ngSwitch]="row.type">
+    <div *ngSwitchCase="'picture'">
+      <h3>Picture</h3>
+      <p>
+        <img [src]="row.path" width="160" height="80" >
+      </p>
+    </div>
+    <div *ngSwitchCase="'video'">
+      <h3>Video</h3>
+      <p>
+        <video width="160"
+               height="80"
+               controls>
+          <source [src]="row.path"
+                  type="video/mp4">
+          <source [src]="row.path"
+                  type="video/ogg"> Your browser does not support the video tag.
+        </video>
+      </p>
+    </div>
+    <div *ngSwitchCase="'audio'">
+      <h3>Audio</h3>
+      <p>
+        <audio controls>
+          <source [src]="row.path"
+                  type="audio/ogg">
+          <source [src]="row.path"
+                  type="audio/mpeg"> Your browser does not support the audio element.
+        </audio>
+      </p>
+    </div>
+    <div *ngSwitchDefault>
+      unrecognized multimedia
+    </div>
+  </div>
+
+  <!-- <img *ngIf="value === 'male'"
        width="150"
        src="https://media.giphy.com/media/I8nepxWwlEuqI/giphy.gif" />
   <img *ngIf="value === 'female'"
        width="150"
-       src="https://media.giphy.com/media/sxSVG3XHf7yww/giphy.gif" />
+       src="https://media.giphy.com/media/sxSVG3XHf7yww/giphy.gif" /> -->
 </ng-template>
-
-

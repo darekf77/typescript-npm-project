@@ -22,8 +22,9 @@ import * as path from "path";
 import * as fse from "fs-extra";
 import * as fs from "fs";
 //#endregion
+import { EnumValues } from 'enum-values';
 import { kebabCase } from "lodash";
-import { CLASSNAME } from 'morphi';
+import { CLASSNAME, isNode, isBrowser } from 'morphi';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
@@ -52,30 +53,37 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   type: MultimediaType;
 
   public static mimetype = {
-    picture: ['image/jpeg', 'image/png']
+    picture: ['image/jpeg', 'image/png'],
+    audio: ['audio/mpeg', 'audio/mp3', 'audio/webm', 'audio/ogg'],
+    video: ['video/webm', 'video/ogg', 'video/mp4']
   }
 
   get path() {
-    //#region @backendFunc
-    if (!this.type) {
-      throw Error(`Bad multimedia type for id ${this.id}`)
+    //#region @backend
+    if (isNode) {
+      if (!this.type) {
+        throw Error(`Bad multimedia type for id ${this.id}`)
+      }
+      return path.join(ENV.pathes.backup[this.type], this.name)
     }
-    let name = `${this.type}_${this.id}__${kebabCase(this.createdDate.getTime().toString())}_${this.name}`;
-
-    if (this.type === 'picture') {
-      const res = path.join(ENV.pathes.backup.picture, name)
-      return res;
-    }
-
-
     //#endregion
+    return `/assets/${this.type}${this.name}`
   }
 
   public static recreateFolder() {
     //#region @backend
-    fse.mkdirpSync(ENV.pathes.backup.video)
-    fse.mkdirpSync(ENV.pathes.backup.audio)
-    fse.mkdirpSync(ENV.pathes.backup.picture)
+    if (!fse.existsSync(ENV.pathes.backup.video)) {
+      fse.mkdirpSync(ENV.pathes.backup.video)
+    }
+
+    if (!fse.existsSync(ENV.pathes.backup.audio)) {
+      fse.mkdirpSync(ENV.pathes.backup.audio)
+    }
+
+    if (!fse.existsSync(ENV.pathes.backup.picture)) {
+      fse.mkdirpSync(ENV.pathes.backup.picture)
+    }
+
     //#endregion
   }
 

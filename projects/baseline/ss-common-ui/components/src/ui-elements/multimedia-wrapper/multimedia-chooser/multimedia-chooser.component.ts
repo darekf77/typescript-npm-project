@@ -1,4 +1,13 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+// third part
+import { Describer } from 'morphi/browser';
+import { Log, Level } from 'ng2-logger/browser';
+const log = Log.create('multimedia chooser');
+// local
+import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
+import { MULTIMEDIA } from 'ss-common-logic/browser/entities/core/MULTIMEDIA';
+
+
 
 @Component({
   selector: 'app-multimedia-chooser',
@@ -10,40 +19,25 @@ export class MultimediaChooserComponent implements OnInit {
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   @ViewChild('hdrTpl') hdrTpl: TemplateRef<any>;
 
-  rows = []
+  rows = [];
   columns = [];
 
-  constructor() {
+  constructor(
+    private multimediaController: MultimediaController) {
 
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+
     this.columns = [{
       cellTemplate: this.editTmpl,
       headerTemplate: this.hdrTpl,
-      name: 'Gender'
+      prop: 'id'
     }];
 
-    this.rows = [
-      {
-        "name": "Ethel Price",
-        "gender": "female",
-        "company": "Johnson, Johnson and Partners, LLC CMP DDC",
-        "age": 22
-      },
-      {
-        "name": "Claudine Neal",
-        "gender": "female",
-        "company": "Sealoud",
-        "age": 55
-      },
-      {
-        "name": "Beryl Rice",
-        "gender": "female",
-        "company": "Velity",
-        "age": 67
-      }
-    ]
+    const data = await this.multimediaController.getAll().received;
+    this.rows = data.body.json;
+    log.i('multimedia', this.rows);
   }
 
 

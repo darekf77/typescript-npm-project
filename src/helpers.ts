@@ -313,7 +313,7 @@ export function findChildren<T>(location, createFn: (childLocation: string) => T
 }
 
 
-export function getRecrusiveFilesFrom(dir) {
+export function getRecrusiveFilesFrom(dir): string[] {
   let files = [];
   const readed = fs.readdirSync(dir).map(f => {
     const fullPath = path.join(dir, f);

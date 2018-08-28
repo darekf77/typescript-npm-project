@@ -1,8 +1,14 @@
-import { META } from '../helpers';
+
+
+import { Entity, EntityRepository, OneToOne, OneToMany, ManyToOne } from 'typeorm';
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
-import { Entity, EntityRepository } from 'typeorm';
+
+// thirdpart
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
+// local
+import { META } from '../helpers';
+import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 export interface IEXAMPLE {
   id?: number;
@@ -71,6 +77,13 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
   @Column() test: string = undefined;
   @Column() href: string;
   @Column() name: string;
+
+
+  @ManyToOne(type => MULTIMEDIA, multimedia => multimedia.id, {
+    nullable: true,
+    cascadeAll: false
+  })
+  multimediaExample?: MULTIMEDIA;
 
   @Column() age: number;
 
