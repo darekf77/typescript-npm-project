@@ -119,7 +119,7 @@ export class ListWrapperComponent implements OnInit {
       const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
       this.isLoading = false;
       if (!isNaN(totalElements)) {
-        this.arrayDataConfig.pagination.totalElements = totalElements;
+        this.arrayDataConfig.set.pagination.totalElement(totalElements);
       }
       this.data = rows.body.json;
       log.i('init link with ', this.data);

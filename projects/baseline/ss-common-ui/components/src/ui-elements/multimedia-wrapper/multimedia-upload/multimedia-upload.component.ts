@@ -56,17 +56,13 @@ export class MultimediaUploadComponent implements OnInit, AfterViewInit {
 
 
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log('ENV', ENV);
-    this.auth.isLoggedIn.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        const headers = [SESSION.localStorage.fromLocalStorage().activationTokenHeader];
-        this.uploader = new FileUploader({ url: URL, headers });
-        this.uploader.onBeforeUploadItem = (item) => { item.withCredentials = false; console.log(item); };
-      }
-    });
-    this.auth.browser.init();
-
+    await this.auth.browser.init(false);
+    const session = SESSION.localStorage.fromLocalStorage();
+    const headers = session ? [session.activationTokenHeader] : undefined;
+    this.uploader = new FileUploader({ url: URL, headers });
+    this.uploader.onBeforeUploadItem = (item) => { item.withCredentials = false; console.log(item); };
   }
 
   ngAfterViewInit() {

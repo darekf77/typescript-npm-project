@@ -28,6 +28,8 @@ import { CLASSNAME, isNode, isBrowser } from 'morphi';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
+const server = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
+
 export interface IMULTIMEDIA {
 
 }
@@ -67,7 +69,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
       return path.join(ENV.pathes.backup[this.type], this.name)
     }
     //#endregion
-    return `/assets/${this.type}${this.name}`
+    return `${server.host}/assets/${this.type}${this.name}`;
   }
 
   public static recreateFolder() {

@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy } from '@angular/core';
 // third part
-import { Describer } from 'morphi/browser';
+import { Subscription } from 'rxjs/Subscription';
+import { Describer, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia chooser');
 // local
@@ -9,13 +10,17 @@ import { MULTIMEDIA } from 'ss-common-logic/browser/entities/core/MULTIMEDIA';
 
 
 
+
 @Component({
   selector: 'app-multimedia-chooser',
   templateUrl: './multimedia-chooser.component.html',
   styleUrls: ['./multimedia-chooser.component.scss']
 })
-export class MultimediaChooserComponent implements OnInit {
+export class MultimediaChooserComponent implements OnInit, OnDestroy {
 
+
+  handlers: Subscription[] = [];
+  @Input() modelDataConfig: ModelDataConfig;
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   @ViewChild('hdrTpl') hdrTpl: TemplateRef<any>;
 
@@ -27,7 +32,21 @@ export class MultimediaChooserComponent implements OnInit {
 
   }
 
+  async initData() {
+    const data = await this.multimediaController.getAll(this.modelDataConfig).received;
+    this.rows = data.body.json;
+    log.i('multimedia', this.rows);
+  }
+
+  ngOnDestroy(): void {
+    this.handlers.forEach(h => h.unsubscribe());
+  }
+
   async ngOnInit() {
+
+    // this.handlers.push(this.modelDataConfig.onChange.subscribe(() => {
+    //   // this.initData();
+    // }));
 
     this.columns = [{
       cellTemplate: this.editTmpl,
@@ -35,9 +54,7 @@ export class MultimediaChooserComponent implements OnInit {
       prop: 'id'
     }];
 
-    const data = await this.multimediaController.getAll().received;
-    this.rows = data.body.json;
-    log.i('multimedia', this.rows);
+    await this.initData();
   }
 
 

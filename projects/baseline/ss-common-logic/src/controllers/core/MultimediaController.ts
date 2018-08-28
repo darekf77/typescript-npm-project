@@ -94,6 +94,9 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
     return res.map(r => {
       r.name = r.name.replace(folderName, '')
       return r;
+    }).filter(r => {
+      // console.log(`r.name ${r.name}`)
+      return r.name && r.name.trim() !== '' && !r.name.startsWith('/.')
     })
   }
 
@@ -102,23 +105,12 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
     const assets = [
       ...this.discover(ENV.pathes.backup.picture, 'picture'),
       ...this.discover(ENV.pathes.backup.audio, 'audio'),
-      ...this.discover(ENV.pathes.backup.audio, 'video')
+      ...this.discover(ENV.pathes.backup.video, 'video')
     ].map(m => {
       return this.db.MULTIMEDIA.save(m);
     });
 
     await Promise.all(assets);
-
-    let m1 = this.db.MULTIMEDIA.create({
-      name: ''
-    });
-
-    m1.type = 'picture';
-
-
-    m1 = await this.db.MULTIMEDIA.save(m1)
-
-    console.log(m1.path)
 
   }
   //#endregion

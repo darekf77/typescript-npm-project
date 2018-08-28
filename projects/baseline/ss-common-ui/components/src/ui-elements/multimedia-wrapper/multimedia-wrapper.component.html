@@ -7,7 +7,7 @@
 
   <ng-template #dialog>
     <dialog-wrapper [dialogRef]="dialog">
-      <mat-tab-group>
+      <mat-tab-group (selectedIndexChange)="typeChange($event)">
         <mat-tab label="ALL"></mat-tab>
         <mat-tab label="Picture"></mat-tab>
         <mat-tab label="Audio"></mat-tab>
@@ -15,7 +15,7 @@
       </mat-tab-group>
       <mat-tab-group>
         <mat-tab label="SELECT">
-          <app-multimedia-chooser></app-multimedia-chooser>
+          <app-multimedia-chooser [modelDataConfig]="modelDataConfig" *ngIf="!isReload" ></app-multimedia-chooser>
         </mat-tab>
         <mat-tab label="UPLOAD">
           <app-multimedia-upload></app-multimedia-upload>

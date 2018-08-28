@@ -4,6 +4,7 @@ const config = {
 
   pathes: {
     backup: {
+      assets: path.join(__dirname, 'backup', 'multimedia'),
       audio: path.join(__dirname, 'backup', 'multimedia', 'audio'),
       video: path.join(__dirname, 'backup', 'multimedia', 'video'),
       picture: path.join(__dirname, 'backup', 'multimedia', 'picture')

@@ -44,6 +44,7 @@ const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
 
 export default function () {
   start({
+    publicFilesFolder: '/assets',
     config: project.$db as any,
     host: ENV.proxyRouterMode ?
       `http://localhost:${project.port}${project.baseUrl}` :

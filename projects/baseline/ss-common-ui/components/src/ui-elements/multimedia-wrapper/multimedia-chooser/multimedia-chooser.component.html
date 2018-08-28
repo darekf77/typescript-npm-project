@@ -3,8 +3,10 @@
                [columns]="columns"
                [columnMode]="'force'"
                [headerHeight]="50"
-               [footerHeight]="50"
-               [rowHeight]="'auto'">
+               [footerHeight]="0"
+               [rowHeight]="200"
+               [scrollbarV]="true"
+               [scrollbarH]="true">
 </ngx-datatable>
 <ng-template #hdrTpl
              let-column="column">

@@ -52,12 +52,12 @@ export class TableWrapperComponent implements OnInit {
 
 
   async setPage(e: { count: number, pageSize: number, limit: number, offset: number }) {
-    this.arrayDataConfig.pagination.pageNumber = e.offset + 1;
+    this.arrayDataConfig.set.pagination.pageNumber(e.offset + 1);
     await this.retriveData();
   }
 
   async ngOnInit() {
-    this.arrayDataConfig.pagination.rowsDisplayed = 5;
+    this.arrayDataConfig.set.pagination.rowDisplayed(5);
     log.i('arrayDataConfig', this.arrayDataConfig);
     log.i('this.crud.entity', Describer.describeByEverything(this.crud.entity));
 
@@ -79,7 +79,7 @@ export class TableWrapperComponent implements OnInit {
     const rows = await this.crud.getAll(this.arrayDataConfig).received.observable.take(1).toPromise();
     const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
     if (!isNaN(totalElements)) {
-      this.arrayDataConfig.pagination.totalElements = totalElements;
+      this.arrayDataConfig.set.pagination.totalElement(totalElements);
     }
     log.i(SYMBOL.X_TOTAL_COUNT, rows.headers.get(SYMBOL.X_TOTAL_COUNT));
     log.i('rows', rows.body.json);
