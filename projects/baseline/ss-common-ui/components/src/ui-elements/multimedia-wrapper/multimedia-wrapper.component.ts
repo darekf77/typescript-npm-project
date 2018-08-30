@@ -9,7 +9,9 @@ const log = Log.create('multimedia wrapper');
 // local
 import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
 import { MultimediaType, MULTIMEDIA } from 'ss-common-logic/browser/entities/core/MULTIMEDIA';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
+
+export type DialogAction = 'select' | 'upload';
 
 @Component({
   selector: 'app-multimedia-wrapper',
@@ -19,10 +21,17 @@ import { MatDialog } from '@angular/material';
 export class MultimediaWrapperComponent extends FieldType implements OnInit {
 
   isReload = false;
+  currentAction: DialogAction = 'select';
+  selectionType: 'single' | 'multi' = 'single';
+  dialogRef: MatDialogRef<any>;
   modelDataConfig = new ModelDataConfig();
   @ViewChild('dialog') private dialog: TemplateRef<any>;
 
-  multimedia: MULTIMEDIA;
+
+  get multimedia(): MULTIMEDIA {
+    return this.formControl.value;
+  }
+  selected: MULTIMEDIA[] = [];
 
   get type(): MultimediaType {
     return this.multimedia && this.multimedia.type as any;
@@ -30,6 +39,12 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
 
   get mode(): 'view' | 'edit' {
     return this.field.templateOptions.mode ? this.field.templateOptions.mode : 'edit';
+  }
+
+  actionToString(action: number): DialogAction {
+    log.i('action num', action);
+    if (action === 0) { return 'select'; }
+    if (action === 1) { return 'upload'; }
   }
 
   typeToString(selection: number): MultimediaType {
@@ -47,7 +62,24 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
     super();
   }
 
+  selectMultimedia() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+    if (this.selectionType === 'single') {
+      this.formControl.setValue(_.first(this.selected));
+    } else {
+      this.formControl.setValue(this.selected);
+    }
+    log.i('form control value', this.formControl.value);
+  }
+
+  actionChange(e) {
+    this.currentAction = this.actionToString(e);
+  }
+
   typeChange(e) {
+    this.selected.length = 0;
     const t = this.typeToString(e) as MultimediaType;
     log.i('typechange ', t);
     this.modelDataConfig.set.where(`type=${t}`);
@@ -57,16 +89,14 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
     });
   }
 
-
   open() {
-    this.matDialog.open(this.dialog, {
+    this.dialogRef = this.matDialog.open(this.dialog, {
       minWidth: '900px'
     });
   }
 
   ngOnInit() {
     super.ngOnInit();
-    this.multimedia = this.field.templateOptions.multimedia;
     if (!_.isUndefined(this.field.templateOptions.openDialog)) {
       setTimeout(() => {
         this.open();

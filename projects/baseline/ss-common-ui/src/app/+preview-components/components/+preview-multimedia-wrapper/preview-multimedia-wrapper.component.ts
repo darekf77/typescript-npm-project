@@ -24,7 +24,9 @@ export class PreviewMultimediaWrapperComponent {
 
   set mode(v) {
     this._mode = v;
-    this.fields[0].templateOptions.mode = this.mode;
+    this.fields.forEach(f => {
+      f.templateOptions.mode = this.mode;
+    });
   }
 
   form = new FormGroup({});
@@ -32,10 +34,20 @@ export class PreviewMultimediaWrapperComponent {
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'Input',
+      key: 'amazingPicture',
       type: 'multimediawrapper',
       templateOptions: {
         openDialog: true,
+        label: 'Input',
+        placeholder: 'Placeholder',
+        description: 'Description',
+        required: true,
+      },
+    },
+    {
+      key: 'amazingPicture2',
+      type: 'multimediawrapper',
+      templateOptions: {
         label: 'Input',
         placeholder: 'Placeholder',
         description: 'Description',

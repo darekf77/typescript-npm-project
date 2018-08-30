@@ -1,28 +1,74 @@
-<p *ngIf="mode === 'view'">
-  multimedia view mode
-</p>
+
+<div *ngIf="mode === 'view' && multimedia"
+     [ngSwitch]="type">
+  <div *ngSwitchCase="'picture'">
+    <h3>Picture</h3>
+    <p>
+      <img [src]="multimedia.path"
+           width="160"
+           height="80">
+    </p>
+  </div>
+  <div *ngSwitchCase="'video'">
+    <h3>Video</h3>
+    <p>
+      <video width="160"
+             height="80"
+             controls>
+        <source [src]="multimedia.path"
+                type="video/mp4">
+        <source [src]="multimedia.path"
+                type="video/ogg"> Your browser does not support the video tag.
+      </video>
+    </p>
+  </div>
+  <div *ngSwitchCase="'audio'">
+    <h3>Audio</h3>
+    <p>
+      <audio controls>
+        <source [src]="multimedia.path"
+                type="audio/ogg">
+        <source [src]="multimedia.path"
+                type="audio/mpeg"> Your browser does not support the audio element.
+      </audio>
+    </p>
+  </div>
+  <div *ngSwitchDefault>
+    unrecognized multimedia
+  </div>
+</div>
+
+
 <p *ngIf="mode === 'edit'">
   multimedia edit mode
   <button (click)="open()"> Open upload! </button>
 
   <ng-template #dialog>
     <dialog-wrapper [dialogRef]="dialog">
-      <mat-tab-group (selectedIndexChange)="typeChange($event)">
+      <mat-tab-group (selectedIndexChange)="typeChange($event);">
         <mat-tab label="ALL"></mat-tab>
         <mat-tab label="Picture"></mat-tab>
         <mat-tab label="Audio"></mat-tab>
         <mat-tab label="Video"></mat-tab>
       </mat-tab-group>
-      <mat-tab-group>
+      <mat-tab-group (selectedIndexChange)="actionChange($event)">
         <mat-tab label="SELECT">
-          <app-multimedia-chooser [modelDataConfig]="modelDataConfig" *ngIf="!isReload" ></app-multimedia-chooser>
+          <app-multimedia-chooser [(selected)]="selected"
+                                  [(selectionType)]="selectionType"
+                                  [modelDataConfig]="modelDataConfig"
+                                  *ngIf="!isReload"></app-multimedia-chooser>
         </mat-tab>
         <mat-tab label="UPLOAD">
           <app-multimedia-upload></app-multimedia-upload>
         </mat-tab>
       </mat-tab-group>
     </dialog-wrapper>
-
+    <br>
+    <button mat-button
+            mat-raised-button
+            *ngIf="currentAction === 'select'"
+            (click)="selectMultimedia()"
+            [disabled]="selected.length === 0">SELECT</button>
 
   </ng-template>
 </p>

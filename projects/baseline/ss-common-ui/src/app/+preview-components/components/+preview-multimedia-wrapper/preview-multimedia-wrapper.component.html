@@ -4,6 +4,7 @@
   <mat-slide-toggle [checked]="mode === 'edit'"
                     (change)="mode = (mode === 'edit' ? 'view': 'edit')">Edit mode</mat-slide-toggle>
 
+  <!-- {{model | json}} -->
 
   <form [formGroup]="form">
     <formly-form [model]="model"

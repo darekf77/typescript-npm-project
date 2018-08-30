@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 // third part
 import { Subscription } from 'rxjs/Subscription';
 import { Describer, ModelDataConfig } from 'morphi/browser';
@@ -19,7 +19,13 @@ import { MULTIMEDIA } from 'ss-common-logic/browser/entities/core/MULTIMEDIA';
 export class MultimediaChooserComponent implements OnInit, OnDestroy {
 
 
+  @Input() selectionType: 'single' | 'multi' = 'single';
+
   handlers: Subscription[] = [];
+
+  @Input() selected: MULTIMEDIA[] = [];
+  @Output() selectedRow = new EventEmitter<MULTIMEDIA | MULTIMEDIA[]>();
+
   @Input() modelDataConfig: ModelDataConfig;
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   @ViewChild('hdrTpl') hdrTpl: TemplateRef<any>;
@@ -57,5 +63,9 @@ export class MultimediaChooserComponent implements OnInit, OnDestroy {
     await this.initData();
   }
 
+  onSelect({ selected }) {
+    // console.log('Select Event', selected);
+    // console.log('selected arr', this.selected);
+  }
 
 }

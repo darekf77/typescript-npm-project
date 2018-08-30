@@ -6,7 +6,11 @@
                [footerHeight]="0"
                [rowHeight]="200"
                [scrollbarV]="true"
-               [scrollbarH]="true">
+               [scrollbarH]="true"
+               [selected]="selected"
+               [selectionType]="selectionType"
+               (select)='onSelect($event)'
+               >
 </ngx-datatable>
 <ng-template #hdrTpl
              let-column="column">
@@ -19,7 +23,9 @@
     <div *ngSwitchCase="'picture'">
       <h3>Picture</h3>
       <p>
-        <img [src]="row.path" width="160" height="80" >
+        <img [src]="row.path"
+             width="160"
+             height="80">
       </p>
     </div>
     <div *ngSwitchCase="'video'">

@@ -12,9 +12,9 @@
                [rowHeight]="'auto'"
                (page)='setPage($event)'
                (sort)="setSorting($event)"
-               [count]="arrayDataConfig.pagination.totalElements"
-               [offset]="(arrayDataConfig.pagination.pageNumber - 1)"
-               [limit]="arrayDataConfig.pagination.rowsDisplayed"
+               [count]="arrayDataConfig.get.pagination.totalElements"
+               [offset]="(arrayDataConfig.get.pagination.pageNumber - 1)"
+               [limit]="arrayDataConfig.get.pagination.rowsDisplayed"
                [headerHeight]="'auto'"
                [footerHeight]="50">
 </ngx-datatable>
