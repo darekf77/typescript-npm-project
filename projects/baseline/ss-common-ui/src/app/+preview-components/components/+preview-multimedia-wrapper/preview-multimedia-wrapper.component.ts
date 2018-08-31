@@ -37,7 +37,7 @@ export class PreviewMultimediaWrapperComponent {
       key: 'amazingPicture',
       type: 'multimediawrapper',
       templateOptions: {
-        openDialog: true,
+        // openDialog: true,
         label: 'Input',
         placeholder: 'Placeholder',
         description: 'Description',

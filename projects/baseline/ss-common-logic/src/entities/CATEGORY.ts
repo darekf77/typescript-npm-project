@@ -7,11 +7,13 @@ import { META } from '../helpers';
 import { kebabCase } from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
+import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 export interface ICATEGORY {
   name: string;
   isPremium: boolean;
-  groups: IGROUP[]
+  picture?: MULTIMEDIA;
+  groups: IGROUP[];
 }
 
 //#region @backend
@@ -57,6 +59,12 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
     cascadeInsert: false,
   })
   groups: GROUP[] = [];
+
+  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  picture?: MULTIMEDIA;
 
 }
 

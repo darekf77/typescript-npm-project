@@ -16,6 +16,7 @@ import { ExamplesController } from 'ss-common-logic/browser/controllers/Examples
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
 import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
+import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
 
 // entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
@@ -45,7 +46,8 @@ init({
     CategoryController,
     ExamplesController,
     DialogsController,
-    ConfigController
+    ConfigController,
+    MultimediaController
   ],
   entities: [
     USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE, CONFIG

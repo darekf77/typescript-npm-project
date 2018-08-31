@@ -4,15 +4,17 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, OneToMany, EntityRepository } from 'typeorm';
+import { Entity, OneToMany, EntityRepository, ManyToMany } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { DIALOG, IDIALOG } from './DIALOG';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
+import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 export interface IGROUP {
   id?: number;
   title: string;
   dialogs: IDIALOG[];
+  picture?: MULTIMEDIA;
 }
 
 //#region @backend
@@ -62,6 +64,12 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
     cascadeInsert: false
   })
   dialogs: DIALOG[] = [];
+
+  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  picture?: MULTIMEDIA;
 
 }
 

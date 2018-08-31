@@ -163,10 +163,12 @@ export class EnvironmentConfig {
       this.workspaceConfig.workspace.build = {
         browser: {
           aot: false,
-          minify: false
+          minify: false,
+          production: false
         },
         server: {
-          minify: false
+          minify: false,
+          production: false
         }
       }
     }

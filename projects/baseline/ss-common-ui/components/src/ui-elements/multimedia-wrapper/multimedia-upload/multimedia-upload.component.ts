@@ -8,7 +8,7 @@ const log = Log.create('multimedia-upload');
 import { FileUploader, FileItem } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
 import { SESSION, SESSION_CONFIG } from 'ss-common-logic/browser/entities/core/SESSION';
-const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
+const URL = 'asd'; // `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
 
 
 import { TableColumn } from '@swimlane/ngx-datatable';
@@ -28,7 +28,7 @@ interface TableRow {
 export class MultimediaUploadComponent implements OnInit, AfterViewInit {
 
   @Input() public auth: AuthController;
-
+  @Input() public URL: string;
 
   get rows(): { name: string; progress: number; }[] {
     return (this.uploader && Array.isArray(this.uploader.queue)) ?

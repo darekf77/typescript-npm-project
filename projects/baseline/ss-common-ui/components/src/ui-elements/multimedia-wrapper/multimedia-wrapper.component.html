@@ -36,9 +36,11 @@
 
   <button (click)="open()"
           mat-button
+          type="button"
           *ngIf="multimedia"> <strong>Change:</strong> {{multimedia.name}} </button>
   <button (click)="open()"
           mat-button
+          type="button"
           *ngIf="!multimedia"> <strong>Choose multimedia</strong> </button>
 
   <ng-template #dialog>
@@ -57,7 +59,7 @@
                                   *ngIf="!isReload"></app-multimedia-chooser>
         </mat-tab>
         <mat-tab label="UPLOAD">
-          <!-- <app-multimedia-upload></app-multimedia-upload> -->
+          <!-- <app-multimedia-upload></app-multimedia-upload> asdasd -->
         </mat-tab>
       </mat-tab-group>
     </dialog-wrapper>
@@ -66,12 +68,14 @@
             mat-raised-button
             *ngIf="currentAction === 'select'"
             (click)="selectMultimedia()"
+            type="button"
             [disabled]="selected.length === 0">Select</button>
     <button mat-icon-button
+            type="button"
             *ngIf="currentAction === 'select' && multimedia"
             (click)="removeMultimedia()">
-            <mat-icon>delete_forever</mat-icon>
-          </button>
+      <mat-icon>delete_forever</mat-icon>
+    </button>
 
   </ng-template>
 </p>

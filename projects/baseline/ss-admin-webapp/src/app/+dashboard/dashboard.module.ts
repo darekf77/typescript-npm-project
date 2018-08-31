@@ -10,21 +10,17 @@ import { MatIconModule } from "@angular/material/icon";
 // local
 import { DashboardComponent } from './dashboard.component';
 import { routes } from "./dashboard.routes";
-import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
-import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
-import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
+
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
-import { LayoutMaterialModule } from "ss-common-ui/module/layouts";
-import { MultimediaModule } from '../shared/multimedia/multimedia.module';
+import { LayoutMaterialModule } from 'ss-common-ui/module';
 // third part
 import { McBreadcrumbsModule } from 'ngx-breadcrumbs';
 
 const modules = [
   LayoutMaterialModule,
   MatMenuModule,
-  MatIconModule,
-  MultimediaModule
+  MatIconModule
 ]
 
 @NgModule({
@@ -41,11 +37,6 @@ const modules = [
   exports: [
     ...modules
   ],
-  declarations: [DashboardComponent],
-  providers: [
-    CategoryController,
-    GroupsController,
-    ConfigController
-  ],
+  declarations: [DashboardComponent]
 })
 export class DashboardModule { }

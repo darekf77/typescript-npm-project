@@ -5,7 +5,7 @@ import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 import { MatCardModule } from "@angular/material/card";
 // formly
 import { FormGroup } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFormOptions, FormlyFieldConfig, FormlyField } from '@ngx-formly/core';
 // other
 import { Log, Level } from "ng2-logger/browser";
 const log = Log.create('category editor')
@@ -46,11 +46,25 @@ export class CategoryEditorComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'))
     log.i('id of category from routing', id)
     this.id = id;
-    this.arrayDataConfig.where.push(`category.id = ${id}`)
+    this.arrayDataConfig.set.where(`category.id = ${id}`)
   }
 
   id: Number;
 
+
+  fields: FormlyFieldConfig[] = [
+    {
+      key: 'picture',
+      type: 'multimediawrapper',
+      templateOptions: {
+        // openDialog: true,
+        label: 'Input',
+        placeholder: 'Placeholder',
+        description: 'Description',
+        required: true,
+      },
+    },
+  ]
 
   async ngOnInit() {
 

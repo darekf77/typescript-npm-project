@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 // material
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
@@ -15,9 +15,10 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
+import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../multimedia-wrapper';
 
 // other
-import { NgStringPipesModule } from "ngx-pipes";
+import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 
@@ -33,12 +34,17 @@ const materialModules = [
   MatDialogModule
 ];
 
+const myFormlyModules = [
+  SelectWrapperModule,
+  MultimediaWrapperModule,
+];
 
 const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
     types: [
-      { name: 'selectwrapper', component: SelectWrapperComponent }
+      { name: 'selectwrapper', component: SelectWrapperComponent },
+      { name: 'multimediawrapper', component: MultimediaWrapperComponent },
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
@@ -49,7 +55,6 @@ const formlyModules = [
   MatNativeDateModule,
   FormlyMatSliderModule,
   // custom
-  SelectWrapperModule,
   NgStringPipesModule
 ];
 
@@ -57,6 +62,7 @@ const formlyModules = [
   imports: [
     ...angularModules,
     ...formlyModules,
+    ...myFormlyModules,
     ...materialModules
   ],
   exports: [

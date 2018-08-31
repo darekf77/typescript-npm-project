@@ -4,11 +4,12 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, EntityRepository } from 'typeorm';
+import { Entity, EntityRepository, ManyToMany } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { GROUP } from './GROUP';
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 import { EnumValues } from 'enum-values';
+import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 export enum DialogType {
   MAN,
@@ -22,6 +23,10 @@ export interface IDIALOG {
   lang_pl?: string;
   lang_en?: string;
   lang_fr?: string;
+
+  audio_pl?: MULTIMEDIA;
+  audio_en?: MULTIMEDIA;
+  audio_fr?: MULTIMEDIA;
 
 }
 
@@ -66,6 +71,24 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
     cascadeAll: false
   })
   group: GROUP = undefined
+
+  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  audio_pl?: MULTIMEDIA;
+
+  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  audio_en?: MULTIMEDIA;
+
+  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+    cascadeInsert: false,
+    cascadeUpdate: false
+  })
+  audio_fr?: MULTIMEDIA;
 
 
 }

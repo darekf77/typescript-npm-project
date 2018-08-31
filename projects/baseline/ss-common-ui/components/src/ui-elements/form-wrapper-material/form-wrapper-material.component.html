@@ -14,7 +14,7 @@
   </div>
 
 </ng-template>
-
+<h3 *ngIf="model">{{model| json}}</h3>
 <form *ngIf="formly.form"
       (ngSubmit)="ngSubmit(model)"
       [formGroup]="formly.form">
@@ -36,7 +36,8 @@
             (click)="clear()">Clear</button>
 
 
-    <button mat-icon-button  *ngIf="mode !== 'create'"
+    <button mat-icon-button
+            *ngIf="mode !== 'create'"
             (click)="openDeleteDialog(model.id)"
             type="button">
       <mat-icon aria-label="Example icon-button with a heart icon">delete_forever</mat-icon>

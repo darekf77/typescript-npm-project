@@ -200,7 +200,7 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_AL
     Session.user = user;
     Session.ip = ip;
 
-    if (user.username == 'postman') {
+    if (!ENV.workspace.build.server.production && user.username == 'postman') {
       Session.createToken('postman');
     } else if (user.username == 'admin') {
       Session.createToken('admin');
