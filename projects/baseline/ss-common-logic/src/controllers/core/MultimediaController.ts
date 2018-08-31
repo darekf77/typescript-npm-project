@@ -30,7 +30,13 @@ import * as controllers from '../../controllers';
 import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 
 
-@ENDPOINT()
+@ENDPOINT({
+  auth: (method) => {
+    //#region @backendFunc
+    return authenticate('bearer', { session: false });
+    //#endregion
+  }
+})
 @CLASSNAME('MultimediaController')
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
 

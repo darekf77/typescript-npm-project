@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 // local
 import { MultimediaChooserModule } from './multimedia-chooser/multimedia-chooser.module';
 import { MultimediaUploadModule } from './multimedia-upload/multimedia-upload.module';
@@ -17,7 +18,8 @@ const angularModules = [
 const moduleMaterial = [
   MatTabsModule,
   MatDialogModule,
-  MatButtonModule
+  MatButtonModule,
+  MatIconModule
 ];
 
 const localModules = [

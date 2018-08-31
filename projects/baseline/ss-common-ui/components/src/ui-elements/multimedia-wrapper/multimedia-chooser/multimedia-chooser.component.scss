@@ -2,4 +2,19 @@
   ngx-datatable {
     height: 500px;
   }
+
+  .row-content {
+    > div {
+      section {
+        width: 49%;
+        position: relative;
+        float: left;
+        text-align: center;
+        > audio, video, img {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
 }

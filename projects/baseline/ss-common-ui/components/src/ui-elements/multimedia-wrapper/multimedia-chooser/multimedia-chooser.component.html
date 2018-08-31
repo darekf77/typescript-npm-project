@@ -2,55 +2,70 @@
                [rows]="rows"
                [columns]="columns"
                [columnMode]="'force'"
-               [headerHeight]="50"
+               [headerHeight]="0"
                [footerHeight]="0"
                [rowHeight]="200"
                [scrollbarV]="true"
                [scrollbarH]="true"
                [selected]="selected"
                [selectionType]="selectionType"
-               (select)='onSelect($event)'
-               >
+               (select)='onSelect($event)'>
 </ngx-datatable>
 <ng-template #hdrTpl
              let-column="column">
-  <strong>Fancy</strong>: {{column.name}} !!
+  <!-- Multimedia preview -->
 </ng-template>
 <ng-template #editTmpl
              let-row="row"
              let-value="value">
-  <div [ngSwitch]="row.type">
+  <div [ngSwitch]="row.type"
+       class="row-content">
     <div *ngSwitchCase="'picture'">
-      <h3>Picture</h3>
-      <p>
+      <section>
+        <h4>{{row.name}}</h4>
+      </section>
+      <section>
         <img [src]="row.path"
-             width="160"
-             height="80">
-      </p>
+             height="170">
+
+      </section>
+
+
     </div>
     <div *ngSwitchCase="'video'">
-      <h3>Video</h3>
-      <p>
-        <video width="160"
-               height="80"
+
+      <section>
+        <h4>{{row.name}}</h4>
+      </section>
+
+      <section>
+        <video height="170"
+               preload="none"
                controls>
           <source [src]="row.path"
                   type="video/mp4">
           <source [src]="row.path"
                   type="video/ogg"> Your browser does not support the video tag.
         </video>
-      </p>
+
+      </section>
+
     </div>
     <div *ngSwitchCase="'audio'">
-      <h3>Audio</h3>
-      <p>
-        <audio controls>
+
+      <section>
+        <h4>{{row.name}}</h4>
+      </section>
+      <section>
+        <audio controls
+               preload="none">
           <source [src]="row.path"
                   type="audio/ogg">
           <source [src]="row.path"
                   type="audio/mpeg"> Your browser does not support the audio element.
         </audio>
-      </p>
+      </section>
+
     </div>
     <div *ngSwitchDefault>
       unrecognized multimedia

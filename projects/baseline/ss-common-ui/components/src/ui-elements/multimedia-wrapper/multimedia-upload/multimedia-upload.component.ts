@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, Input } from '@angular/core';
 
 // material
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -7,8 +7,9 @@ const log = Log.create('multimedia-upload');
 
 import { FileUploader, FileItem } from 'ng2-file-upload';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
+import { SESSION, SESSION_CONFIG } from 'ss-common-logic/browser/entities/core/SESSION';
 const URL = `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
+
 
 import { TableColumn } from '@swimlane/ngx-datatable';
 interface TableRow {
@@ -26,11 +27,8 @@ interface TableRow {
 })
 export class MultimediaUploadComponent implements OnInit, AfterViewInit {
 
-  constructor(
-    private auth: AuthController
-  ) {
+  @Input() public auth: AuthController;
 
-  }
 
   get rows(): { name: string; progress: number; }[] {
     return (this.uploader && Array.isArray(this.uploader.queue)) ?
@@ -57,10 +55,15 @@ export class MultimediaUploadComponent implements OnInit, AfterViewInit {
 
 
   async ngOnInit() {
-    console.log('ENV', ENV);
-    await this.auth.browser.init(false);
-    const session = SESSION.localStorage.fromLocalStorage();
-    const headers = session ? [session.activationTokenHeader] : undefined;
+    // console.log('ENV', ENV);
+    let headers = [];
+    if (this.auth) {
+      await this.auth.browser.init(false);
+      const session = SESSION.localStorage.fromLocalStorage();
+      headers = session ? [session.activationTokenHeader] : undefined;
+    } else {
+      headers = [{ value: SESSION_CONFIG.AUTHORIZATION_HEADER, name: 'postman' }];
+    }
     this.uploader = new FileUploader({ url: URL, headers });
     this.uploader.onBeforeUploadItem = (item) => { item.withCredentials = false; console.log(item); };
   }

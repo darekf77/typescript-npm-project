@@ -110,9 +110,11 @@ export interface EnvConfig {
       browser: {
         minify: boolean;
         aot: boolean;
+        production: boolean;
       },
       server: {
         minify: boolean;
+        production: boolean;
       }
     },
     projects: EnvConfigProject[]

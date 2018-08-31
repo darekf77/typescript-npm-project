@@ -62,6 +62,13 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
     super();
   }
 
+  removeMultimedia() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+    this.formControl.setValue(undefined);
+  }
+
   selectMultimedia() {
     if (this.dialogRef) {
       this.dialogRef.close();
@@ -91,7 +98,7 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
 
   open() {
     this.dialogRef = this.matDialog.open(this.dialog, {
-      minWidth: '900px'
+      minWidth: '600px'
     });
   }
 
