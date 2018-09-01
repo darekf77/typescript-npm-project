@@ -63,10 +63,9 @@ export class USER extends META.BASE_ENTITY<USER, IUSER> implements IUSER {
 
 
   @OneToMany(type => EMAIL, email => email.user, {
-    cascadeUpdate: false,
-    cascadeInsert: false
+    cascade: false
   })
-  emails: EMAIL[] = [];
+  emails: EMAIL[];
 
 }
 

@@ -22,8 +22,7 @@ export interface IGROUP {
 //#endregion
 @FormlyForm<GROUP>()
 @DefaultModelWithMapping<GROUP>({
-  title: '',
-  dialogs: []
+  title: ''
 }, {
     picture: MULTIMEDIA
   })
@@ -56,20 +55,18 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
 
 
   @ManyToOne(type => CATEGORY, cat => cat.id, {
-    cascadeAll: false,
+    cascade: false
   })
   category: CATEGORY = undefined
 
 
   @OneToMany(type => DIALOG, dial => dial.group, {
-    cascadeUpdate: false,
-    cascadeInsert: false
+    cascade: false
   })
-  dialogs: DIALOG[] = [];
+  dialogs: DIALOG[];
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   @JoinTable()
   picture?: MULTIMEDIA;

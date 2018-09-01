@@ -42,10 +42,9 @@ export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> {
 
 
   @ManyToMany(type => EMAIL, email => email.types, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
-  emails: EMAIL[] = [];
+  emails: EMAIL[];
 }
 
 export interface EMAIL_TYPE_ALIASES {

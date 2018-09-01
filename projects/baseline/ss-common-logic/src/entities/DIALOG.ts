@@ -68,25 +68,22 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   @Column({ nullable: true }) lang_fr?: string = undefined
 
   @ManyToOne(type => GROUP, group => group.id, {
-    cascadeAll: false
+    cascade: false
   })
   group: GROUP = undefined
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   audio_pl?: MULTIMEDIA;
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   audio_en?: MULTIMEDIA;
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   audio_fr?: MULTIMEDIA;
 

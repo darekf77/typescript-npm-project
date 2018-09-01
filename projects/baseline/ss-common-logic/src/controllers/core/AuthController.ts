@@ -240,7 +240,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
         log.w(`Cannot find session for user:${User.username} `);
         return false;
       }
-      await this.db.SESSION.removeById(Session.id);
+      await this.db.SESSION.remove(Session);
       return true;
     };
     //#endregion
@@ -478,6 +478,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     }
 
     let Email = new entities.EMAIL(formData.email);
+    Email.types = [];
     Email.types.push(EmailType);
     Email = await this.db.EMAIL.save(Email);
 
@@ -506,6 +507,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     }
 
     User = new entities.USER();
+    User.emails = [];
     User.username = formData.username;
     const salt = bcrypt.genSaltSync(5);
     User.password = bcrypt.hashSync(formData.password ? formData.password : 'ddd', salt);

@@ -81,7 +81,7 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
 
   @ManyToOne(type => MULTIMEDIA, multimedia => multimedia.id, {
     nullable: true,
-    cascadeAll: false
+    cascade: false
   })
   multimediaExample?: MULTIMEDIA;
 

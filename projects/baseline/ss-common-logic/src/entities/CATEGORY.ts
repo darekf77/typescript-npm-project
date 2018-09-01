@@ -23,7 +23,7 @@ export interface ICATEGORY {
 @DefaultModelWithMapping<CATEGORY>({
   isPremium: false,
   name: '',
-  groups: []
+  // groups: []
 }, {
     groups: GROUP,
     picture: MULTIMEDIA
@@ -59,14 +59,12 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
   }
 
   @OneToMany(type => GROUP, group => group.category, {
-    cascadeUpdate: false,
-    cascadeInsert: false,
+    cascade: false
   })
-  groups: GROUP[] = [];
+  groups: GROUP[];
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   picture?: MULTIMEDIA;
 

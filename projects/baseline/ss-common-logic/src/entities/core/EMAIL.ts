@@ -51,15 +51,14 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> {
 
 
   @ManyToMany(type => EMAIL_TYPE, type => type.emails, {
-    cascadeInsert: false,
-    cascadeUpdate: false
+    cascade: false
   })
   @JoinTable()
-  types: EMAIL_TYPE[] = [];
+  types: EMAIL_TYPE[];
 
 
   @ManyToOne(type => USER, user => user.id, {
-    cascadeAll: false
+    cascade: false
   })
   @JoinColumn()
   user: USER = undefined
