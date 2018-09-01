@@ -1,0 +1,14 @@
+:host {
+  .preview {
+    img, button {
+      display: inline-block;
+    }
+    > div {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    img {
+      width: 60px;
+    }
+  }
+}

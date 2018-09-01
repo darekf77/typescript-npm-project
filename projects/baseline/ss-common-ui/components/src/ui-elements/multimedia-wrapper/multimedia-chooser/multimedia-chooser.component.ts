@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 // third part
 import { Subscription } from 'rxjs/Subscription';
-import { Describer, ModelDataConfig } from 'morphi/browser';
+import { describeClassProperites, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia chooser');
 // local

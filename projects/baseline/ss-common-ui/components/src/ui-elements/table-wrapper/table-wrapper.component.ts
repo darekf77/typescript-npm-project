@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { BaseCRUD, Describer, ModelDataConfig, SYMBOL } from 'morphi/browser';
+import { BaseCRUD, describeClassProperites, ModelDataConfig, SYMBOL } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { Router } from '@angular/router';
@@ -59,10 +59,10 @@ export class TableWrapperComponent implements OnInit {
   async ngOnInit() {
     this.arrayDataConfig.set.pagination.rowDisplayed(5);
     log.i('arrayDataConfig', this.arrayDataConfig);
-    log.i('this.crud.entity', describeClassProperitesByEverything(this.crud.entity));
+    log.i('this.crud.entity', describeClassProperites(this.crud.entity));
 
     try {
-      const columns = describeClassProperitesByEverything(this.crud.entity)
+      const columns = describeClassProperites(this.crud.entity)
         .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
         .map(prop => {
           return { prop };

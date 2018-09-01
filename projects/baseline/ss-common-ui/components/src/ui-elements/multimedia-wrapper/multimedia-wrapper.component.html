@@ -32,12 +32,49 @@
 </div>
 
 
-<p *ngIf="mode === 'edit'">
+<div *ngIf="mode === 'edit'">
 
-  <button (click)="open()"
-          mat-button
-          type="button"
-          *ngIf="multimedia"> <strong>Change:</strong> {{multimedia.name}} </button>
+  <div *ngIf="multimedia" class="preview" >
+    <button (click)="open()"
+            mat-button
+            type="button"> <strong>Change:</strong> {{multimedia.name}} </button>
+
+    <div [ngSwitch]="type">
+      <div *ngSwitchCase="'picture'">
+
+        <img [src]="multimedia.path">
+
+      </div>
+      <div *ngSwitchCase="'video'">
+
+        <video controls
+               height="40"
+               width="20">
+          <source [src]="multimedia.path"
+                  type="video/mp4">
+          <source [src]="multimedia.path"
+                  type="video/ogg"> Your browser does not support the video tag.
+        </video>
+
+      </div>
+      <div *ngSwitchCase="'audio'">
+
+        <audio controls>
+          <source [src]="multimedia.path"
+                  type="audio/ogg">
+          <source [src]="multimedia.path"
+                  type="audio/mpeg"> Your browser does not support the audio element.
+        </audio>
+
+      </div>
+      <div *ngSwitchDefault>
+
+        unrecognized multimedia
+      </div>
+    </div>
+
+  </div>
+
   <button (click)="open()"
           mat-button
           type="button"
@@ -78,4 +115,4 @@
     </button>
 
   </ng-template>
-</p>
+</div>

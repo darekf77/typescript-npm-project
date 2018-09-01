@@ -7,7 +7,7 @@ import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { BaseCRUD, Describer } from 'morphi/browser';
+import { BaseCRUD, describeClassProperites } from 'morphi/browser';
 import { META } from 'ss-common-logic/browser/helpers';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
