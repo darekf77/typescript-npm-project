@@ -70,7 +70,7 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   @ManyToOne(type => GROUP, group => group.id, {
     cascade: false
   })
-  group: GROUP = undefined
+  group: GROUP;
 
   @ManyToMany(type => MULTIMEDIA, m => m.id, {
     cascade: false

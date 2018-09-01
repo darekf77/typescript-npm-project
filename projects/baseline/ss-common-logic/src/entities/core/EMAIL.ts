@@ -61,7 +61,7 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> {
     cascade: false
   })
   @JoinColumn()
-  user: USER = undefined
+  user: USER;
 
 }
 

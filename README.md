@@ -6,6 +6,8 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
+- id, shoud be with undefined (TODO temp soluition)
+- class properties: arrays and object can't have defult propty
  - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
  - "assets" relative from html,css ,  "/assets" from scss
 

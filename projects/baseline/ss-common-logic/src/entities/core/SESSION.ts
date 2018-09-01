@@ -109,7 +109,7 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
     nullable: true
   })
   @JoinColumn()
-  user: USER = undefined
+  user: USER;
 
   //#region @backend
   public createToken(token?: string) {
