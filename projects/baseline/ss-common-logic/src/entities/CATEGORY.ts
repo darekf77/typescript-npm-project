@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
-import { Entity, JoinTable, OneToMany, EntityRepository } from 'typeorm';
+import { Entity, JoinTable, OneToMany, EntityRepository, JoinColumn, ManyToOne } from 'typeorm';
 // local
 import { META } from '../helpers';
 import { kebabCase } from 'lodash';
@@ -22,8 +22,12 @@ export interface ICATEGORY {
 @FormlyForm<CATEGORY>(undefined, ['path'])
 @DefaultModelWithMapping<CATEGORY>({
   isPremium: false,
-  name: ''
-})
+  name: '',
+  groups: []
+}, {
+    groups: GROUP,
+    picture: MULTIMEDIA
+  })
 @CLASSNAME('CATEGORY')
 export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 

@@ -53,17 +53,17 @@ export class CategoryEditorComponent implements OnInit {
 
 
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'picture',
-      type: 'multimediawrapper',
-      templateOptions: {
-        // openDialog: true,
-        label: 'Input',
-        placeholder: 'Placeholder',
-        description: 'Description',
-        required: true,
-      },
-    },
+    // {
+    //   key: 'picture',
+    //   type: 'multimediawrapper',
+    //   templateOptions: {
+    //     // openDialog: true,
+    //     label: 'Input',
+    //     placeholder: 'Placeholder',
+    //     description: 'Description',
+    //     required: true,
+    //   },
+    // },
   ]
 
   async ngOnInit() {

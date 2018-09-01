@@ -25,13 +25,15 @@ import * as fs from "fs";
 import { EnumValues } from 'enum-values';
 import { kebabCase } from "lodash";
 import { CLASSNAME, isNode, isBrowser } from 'morphi';
+import { CATEGORY } from '../CATEGORY';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
 const server = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
 
 export interface IMULTIMEDIA {
-
+  name: string;
+  createdDate: Date;
 }
 
 //#region @backend

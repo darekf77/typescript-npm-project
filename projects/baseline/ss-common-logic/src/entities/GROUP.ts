@@ -4,7 +4,7 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
 import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, OneToMany, EntityRepository, ManyToMany } from 'typeorm';
+import { Entity, OneToMany, EntityRepository, ManyToMany, JoinTable } from 'typeorm';
 import { CategoryController } from '../controllers';
 import { DIALOG, IDIALOG } from './DIALOG';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
@@ -24,7 +24,9 @@ export interface IGROUP {
 @DefaultModelWithMapping<GROUP>({
   title: '',
   dialogs: []
-})
+}, {
+    picture: MULTIMEDIA
+  })
 @CLASSNAME('GROUP')
 export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
 
@@ -69,6 +71,7 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
     cascadeInsert: false,
     cascadeUpdate: false
   })
+  @JoinTable()
   picture?: MULTIMEDIA;
 
 }

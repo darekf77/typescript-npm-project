@@ -22,7 +22,7 @@ import * as path from 'path';
 import { UploadedFile } from "express-fileupload";
 //#endregion
 import * as _ from 'lodash';
-import { getRecrusiveFilesFrom } from 'tnp';
+import { getRecrusiveFilesFrom } from 'morphi';
 import { META } from '../../helpers';
 
 import * as entities from '../../entities';
