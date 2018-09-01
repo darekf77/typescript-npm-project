@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { BaseCRUD, Describer, ModelDataConfig, SYMBOL } from 'morphi/browser';
+import { BaseCRUD, describeClassProperites, ModelDataConfig, SYMBOL } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
@@ -93,7 +93,7 @@ export class ListWrapperComponent implements OnInit {
       this.icon = 'lock';
     }
 
-    const columns = Describer.describe(this.crud.entity)
+    const columns = describeClassProperites(this.crud.entity)
       .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
       .map(prop => {
         return { prop };
@@ -112,7 +112,7 @@ export class ListWrapperComponent implements OnInit {
 
   async retriveData() {
     this.isLoading = true;
-    log.i('this.crud.entity', Describer.describe(this.crud.entity));
+    log.i('this.crud.entity', describeClassProperites(this.crud.entity));
     try {
       log.i('this.arrayDataConfig', this.arrayDataConfig);
       const rows = await this.crud.getAll(this.arrayDataConfig).received;

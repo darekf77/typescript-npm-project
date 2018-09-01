@@ -24,7 +24,7 @@ import * as fs from "fs";
 //#endregion
 import { EnumValues } from 'enum-values';
 import { kebabCase } from "lodash";
-import { CLASSNAME, isNode, isBrowser } from 'morphi';
+import { CLASSNAME, isNode, isBrowser, DefaultModelWithMapping } from 'morphi';
 import { CATEGORY } from '../CATEGORY';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
@@ -39,6 +39,9 @@ export interface IMULTIMEDIA {
 //#region @backend
 @Entity(META.tableNameFrom(MULTIMEDIA))
 //#endregion
+@DefaultModelWithMapping<MULTIMEDIA>({
+  name: ''
+})
 @CLASSNAME('MULTIMEDIA')
 export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {
 
@@ -55,6 +58,16 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
 
   @Column('varchar', { length: 20 })
   type: MultimediaType;
+
+
+  @OneToMany(type => CATEGORY, cat => cat.picture, {
+    cascade: false
+  })
+  catetories: CATEGORY[];
+
+
+
+
 
   public static mimetype = {
     picture: ['image/jpeg', 'image/png'],

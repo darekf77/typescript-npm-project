@@ -56,7 +56,7 @@ export class TestJSON {
   'age': 23,
   'birthDate': new Date('01-02-2000')
 }, {
-    testjson: TestJSON
+    testjson: 'TestJSON'
   })
 @CLASSNAME('EXAMPLE')
 export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXAMPLE {

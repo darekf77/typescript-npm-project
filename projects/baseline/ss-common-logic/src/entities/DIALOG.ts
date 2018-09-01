@@ -40,7 +40,7 @@ export interface IDIALOG {
   lang_fr: '',
   lang_pl: ''
 }, {
-    group: GROUP
+    group: 'GROUP'
   })
 @CLASSNAME('DIALOG')
 export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG {

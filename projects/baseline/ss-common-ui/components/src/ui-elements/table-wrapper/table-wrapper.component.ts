@@ -59,10 +59,10 @@ export class TableWrapperComponent implements OnInit {
   async ngOnInit() {
     this.arrayDataConfig.set.pagination.rowDisplayed(5);
     log.i('arrayDataConfig', this.arrayDataConfig);
-    log.i('this.crud.entity', Describer.describeByEverything(this.crud.entity));
+    log.i('this.crud.entity', describeClassProperitesByEverything(this.crud.entity));
 
     try {
-      const columns = Describer.describeByEverything(this.crud.entity)
+      const columns = describeClassProperitesByEverything(this.crud.entity)
         .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
         .map(prop => {
           return { prop };

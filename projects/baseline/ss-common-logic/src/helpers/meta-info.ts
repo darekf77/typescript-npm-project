@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { Connection } from "typeorm/connection/Connection";
-import { BaseCRUD, CLASSNAME, ENDPOINT, Describer } from 'morphi';
+import { BaseCRUD, CLASSNAME, ENDPOINT, describeClassProperites } from 'morphi';
 import { snakeCase, keys } from "lodash";
 
 import { isBrowser, Log, Level } from 'ng2-logger';
@@ -33,14 +33,14 @@ export namespace META {
       compolexProperties.forEach(alias => {
         repo['__'][alias] = {};
 
-        const describedProps = Describer.describe(entity)
+        const describedProps = describeClassProperites(entity)
         // console.log(`describedProps  "${describedProps}" for ${entity.name}`)
 
         describedProps.concat(compolexProperties as any).forEach(prop => {
           repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO temp solution
         })
 
-        const props = Describer.describeByDefaultModel(entity)
+        const props = describeClassProperites(entity)
         // console.log(`props  "${props}" for ${entity.name}`)
         props.forEach(prop => {
           repo['__'][alias][prop] = `${alias as any}.${prop}`; // TODO ideal solution

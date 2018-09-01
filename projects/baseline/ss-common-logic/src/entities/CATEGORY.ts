@@ -19,14 +19,14 @@ export interface ICATEGORY {
 //#region @backend
 @Entity(META.tableNameFrom(CATEGORY))
 //#endregion
-@FormlyForm<CATEGORY>(undefined, ['path'])
+@FormlyForm<CATEGORY>(undefined, ['path', 'groups', 'id'])
 @DefaultModelWithMapping<CATEGORY>({
   isPremium: false,
   name: '',
   // groups: []
 }, {
-    groups: GROUP,
-    picture: MULTIMEDIA
+    groups: 'GROUP',
+    picture: 'MULTIMEDIA'
   })
 @CLASSNAME('CATEGORY')
 export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
@@ -63,7 +63,8 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
   })
   groups: GROUP[];
 
-  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+
+  @ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
   picture?: MULTIMEDIA;

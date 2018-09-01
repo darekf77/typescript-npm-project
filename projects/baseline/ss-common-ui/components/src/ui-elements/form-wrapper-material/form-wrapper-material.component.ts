@@ -7,10 +7,10 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { BaseCRUD, Describer } from 'morphi/browser';
+import { BaseCRUD, Describer, ModelDataConfig } from 'morphi/browser';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component', Level.__NOTHING);
+const log = Log.create('form warpper material component');
 
 @Component({
   selector: 'app-form-wrapper-material',
@@ -19,6 +19,7 @@ const log = Log.create('form warpper material component', Level.__NOTHING);
 })
 export class FormWrapperMaterialComponent implements OnInit {
 
+  @Input() modelDataConfig = new ModelDataConfig();
   @ViewChild('templateDelete') templateDelete: TemplateRef<any>;
 
   constructor(
@@ -95,7 +96,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     }
 
     if ((!_.isUndefined(this.id))) {
-      const m = await this.crud.getBy(this.id).received;
+      const m = await this.crud.getBy(this.id, this.modelDataConfig).received;
       this.setModel(m.body.json);
     }
   }
@@ -114,7 +115,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     if (this.crud) {
       if (this.mode === 'update') {
         try {
-          const m = await this.crud.updateById(id, model).received;
+          const m = await this.crud.updateById(id, model, this.modelDataConfig).received;
           log.i('Model update success', m);
           resultModel = m.body.json;
           this.submit.next(model);
@@ -124,7 +125,7 @@ export class FormWrapperMaterialComponent implements OnInit {
         }
       } else if (this.mode === 'create') {
         try {
-          const m = await this.crud.create(model).received;
+          const m = await this.crud.create(model, this.modelDataConfig).received;
           log.i('Model create success', m);
           resultModel = m.body.json;
           this.submit.next(model);

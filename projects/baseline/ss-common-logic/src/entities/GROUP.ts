@@ -24,7 +24,7 @@ export interface IGROUP {
 @DefaultModelWithMapping<GROUP>({
   title: ''
 }, {
-    picture: MULTIMEDIA
+    picture: 'MULTIMEDIA'
   })
 @CLASSNAME('GROUP')
 export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {

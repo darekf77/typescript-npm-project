@@ -56,7 +56,7 @@ export class SelectWrapperComponent extends FieldType implements OnInit, AfterVi
 
     if (_.isFunction(this.crud)) {
       this.isLoading = true;
-      log.i('this.crud.entity', Describer.describe(this.crud.entity));
+      log.i('this.crud.entity', describeClassProperites(this.crud.entity));
       try {
         const rows = await this.crud.getAll().received.observable.take(1).toPromise();
         this.initOptions(rows.body.json);
