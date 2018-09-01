@@ -20,7 +20,7 @@ export interface IGROUP {
 //#region @backend
 @Entity(META.tableNameFrom(GROUP))
 //#endregion
-@FormlyForm<GROUP>()
+@FormlyForm<GROUP>(undefined, ['id'])
 @DefaultModelWithMapping<GROUP>({
   title: ''
 }, {
@@ -65,10 +65,9 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   })
   dialogs: DIALOG[];
 
-  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+  @ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
-  @JoinTable()
   picture?: MULTIMEDIA;
 
 }

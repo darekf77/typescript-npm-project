@@ -8,6 +8,7 @@ import { ModelDataConfig } from 'morphi/browser';
 import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
 import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
 import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
 @Component({
   selector: 'app-dialogs-groups-editor',
@@ -16,10 +17,24 @@ import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 })
 export class DialogsGroupsEditorComponent implements OnInit {
 
+  fields: FormlyFieldConfig[] = [
+    {
+      key: 'picture',
+      type: 'multimediawrapper',
+      templateOptions: {
+        // openDialog: true,
+        label: 'Input',
+        placeholder: 'Placeholder',
+        description: 'Description',
+        required: true,
+      },
+    },
+  ]
+
   modelDataConfigDialogs = new ModelDataConfig();
 
   modelDataConfigGroup = new ModelDataConfig({
-    joins: ['group']
+    joins: ['picture']
   });
   group: GROUP;
 
@@ -58,8 +73,8 @@ export class DialogsGroupsEditorComponent implements OnInit {
     const categotryId = Number(this.route.snapshot.paramMap.get('id'))
     const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
     log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
-    this.modelDataConfigGroup.set.where(`group.id = ${groupid}`);
-    const data = await this.groupCRUD.getBy(groupid).received;
+    // this.modelDataConfigGroup.set.where(`group.id = ${groupid}`);
+    const data = await this.groupCRUD.getBy(groupid, this.modelDataConfigGroup).received;
     this.group = data.body.json;
     this.group.dialogs = await this.getDialgs(groupid);
     log.i('this.model', this.group)
@@ -69,7 +84,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
   async getDialgs(groupid) {
 
     this.modelDataConfigDialogs.set.where(`group.id = ${groupid}`)
-    const data =  await this.dialogsController.getAll(this.modelDataConfigDialogs).received;
+    const data = await this.dialogsController.getAll(this.modelDataConfigDialogs).received;
     return data.body.json;
   }
 

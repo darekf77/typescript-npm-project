@@ -26,6 +26,7 @@ import { EnumValues } from 'enum-values';
 import { kebabCase } from "lodash";
 import { CLASSNAME, isNode, isBrowser, DefaultModelWithMapping } from 'morphi';
 import { CATEGORY } from '../CATEGORY';
+import { GROUP } from '../GROUP';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
@@ -64,6 +65,12 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
     cascade: false
   })
   catetories: CATEGORY[];
+
+
+  @OneToMany(type => GROUP, group => group.picture, {
+    cascade: false
+  })
+  groups: GROUP[];
 
 
 
