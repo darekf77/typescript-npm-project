@@ -34,7 +34,8 @@
 
 
       <ul class="tab">
-        <li *ngFor="let group of selected.groups" [ngClass]="{'active': (selectedGroup.id === group.id) }"
+        <li *ngFor="let group of selected.groups"
+            [ngClass]="{'active': (selectedGroup && selectedGroup.id === group.id) }"
             (click)="navigateToCategory(selected.id,group.id)">
           <h4>{{group.title}}</h4>
 
@@ -42,9 +43,10 @@
       </ul>
 
 
-      <p class="group-pic">
-        <img src="https://images.askmen.com/1080x540/2017/03/28-055100-online_dating_site_zoosk_reveals_the_best_tactics_for_single_guys_to_use.jpg"
-
+      <p class="group-pic"
+         *ngIf="selectedGroup && selectedGroup.picture">
+        <!-- {{selectedGroup | json}} -->
+        <img [src]="selectedGroup.picture.path"
              alt="">
       </p>
 

@@ -26,11 +26,11 @@ const log = Log.create('Dashboard')
 export class DashboardComponent implements OnInit {
 
   modelDataConfigCategory = new ModelDataConfig({
-    joins: ['groups']
+    joins: ['groups', 'groups.picture']
   });
 
   modelDataConfigGroups = new ModelDataConfig({
-    joins: ['dialogs']
+    joins: ['dialogs', 'picture']
   });
   constructor(
     public auth: AuthController,
@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit {
   }
 
   selected: CATEGORY;
-  selectedGroup:GROUP;
+  selectedGroup: GROUP;
   categories: CATEGORY[] = [];
 
   content = {
