@@ -1,18 +1,24 @@
 <section [class]="mode">
 
   <mat-icon *ngIf="!isEditingInline"
-            (click)="isEditingInline = true"
+            (click)="toogleEditing()"
             class="edit-button">edit</mat-icon>
   <mat-icon *ngIf="isEditingInline"
-            (click)="isEditingInline = false"
+            (click)="toogleEditing()"
             class="edit-button">save</mat-icon>
   <div [ngClass]="dialog.typeString | lowercase">
     <span>{{dialog['lang_' + clientLang]}}</span>
   </div>
 </section>
 <div class="inline-edit"
-     *ngIf="isEditingInline">
-
-eiditing
+     *ngIf="isEditingInline && mode !== 'view'">
+  <br>
+  <app-form-wrapper-material [crud]="dialogsController"
+                             [(model)]="dialog"
+                             [fields]="fields"
+                             [exclude]="['type','group','id']"
+                             (complete)="complete()">
+  </app-form-wrapper-material>
+  <br>
 
 </div>

@@ -31,7 +31,9 @@ export class DialogsGroupsEditorComponent implements OnInit {
     },
   ]
 
-  modelDataConfigDialogs = new ModelDataConfig();
+  modelDataConfigDialogs = new ModelDataConfig({
+    joins: ['audio_pl', 'audio_fr', 'audio_en']
+  });
 
   modelDataConfigGroup = new ModelDataConfig({
     joins: ['picture']

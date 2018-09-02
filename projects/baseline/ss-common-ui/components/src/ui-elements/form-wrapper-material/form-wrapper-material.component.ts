@@ -34,6 +34,13 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   id_toDelete: number;
   @Input() id: number;
+
+  /**
+   * Exclude specyfic generated form fields
+   */
+  @Input() exclude: string[] = [];
+
+
   @Input() mode: 'update' | 'create' = 'update';
 
   @Input() crud: BaseCRUD<any>;
@@ -56,25 +63,31 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   dialogRefDelete: MatDialogRef<any>;
 
+  waringAboutDecorator() {
+    console.error(`
+
+    Please use:
+    @FormlyForm()
+    @DefaultModelWithMapping(...)
+
+    decorators for entity "${this.entity && _.trim(this.entity.name)}"
+
+    `);
+  }
+
   async ngOnInit() {
     log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
 
-    const fields = getFormlyFrom(this.entity);
+    let fields = getFormlyFrom(this.entity);
     log.i(`fields from : ${this.entity && this.entity.name}`, fields);
     if (!fields) {
-      console.error(`
-
-      Please use:
-      @FormlyForm()
-      @DefaultModelWithMapping(...)
-
-      decorators for entity "${this.entity && _.trim(this.entity.name)}"
-
-      `);
+      this.waringAboutDecorator();
     } else {
+      log.i('exclude pathes', this.exclude);
+      fields = fields.filter(({ key }) => !this.exclude.includes(key));
       log.i('input fields', this.fields);
       const keys = fields.map(c => c.key);
 

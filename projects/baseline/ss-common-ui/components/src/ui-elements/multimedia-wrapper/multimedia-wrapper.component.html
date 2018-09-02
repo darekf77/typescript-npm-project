@@ -34,7 +34,9 @@
 
 <div *ngIf="mode === 'edit'">
 
-  <div *ngIf="multimedia" class="preview" >
+  <div *ngIf="multimedia"
+       class="preview">
+    <h6>{{field.templateOptions.label}}</h6>
     <button (click)="open()"
             mat-button
             type="button"> <strong>Change:</strong> {{multimedia.name}} </button>
@@ -74,11 +76,14 @@
     </div>
 
   </div>
+  <div *ngIf="!multimedia"
+       class="preview">
+    <h6>{{field.templateOptions.label}}</h6>
+    <button (click)="open()"
+            mat-button
+            type="button"> <strong>Choose multimedia</strong> </button>
+  </div>
 
-  <button (click)="open()"
-          mat-button
-          type="button"
-          *ngIf="!multimedia"> <strong>Choose multimedia</strong> </button>
 
   <ng-template #dialog>
     <dialog-wrapper [dialogRef]="dialog">

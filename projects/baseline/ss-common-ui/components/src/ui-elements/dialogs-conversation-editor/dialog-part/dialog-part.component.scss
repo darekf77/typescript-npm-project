@@ -4,12 +4,20 @@ $womanColor: rgba(130, 130, 249, 0.5);
 
 
 :host {
+
+  app-form-wrapper-material {
+    display: block;
+    padding: 10px;
+  }
+
   display: block;
 
   .inline-edit {
     display: block;
-    height: 100px;
-    background: lightgray;
+    border-bottom: none;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+
   }
 
   section {
@@ -30,6 +38,7 @@ $womanColor: rgba(130, 130, 249, 0.5);
         position: absolute;
       }
       border: 1px solid black;
+      border-bottom: none;
     }
 
     > * {

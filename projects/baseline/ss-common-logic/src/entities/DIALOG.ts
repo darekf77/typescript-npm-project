@@ -72,17 +72,17 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
   })
   group: GROUP;
 
-  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+  @ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
   audio_pl?: MULTIMEDIA;
 
-  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+  @ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
   audio_en?: MULTIMEDIA;
 
-  @ManyToMany(type => MULTIMEDIA, m => m.id, {
+  @ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
   audio_fr?: MULTIMEDIA;

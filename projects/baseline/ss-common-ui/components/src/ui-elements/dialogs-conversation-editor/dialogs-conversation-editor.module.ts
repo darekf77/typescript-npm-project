@@ -11,6 +11,7 @@ import { DialogsConversationEditorComponent } from './dialogs-conversation-edito
 // other
 import { NgxEditorModule } from 'ngx-editor';
 import { DialogPartComponent } from './dialog-part/dialog-part.component';
+import { FormWrapperMaterialModule } from '../form-wrapper-material';
 
 const angularModules = [
   CommonModule,
@@ -22,18 +23,19 @@ const materialModules = [
   MatIconModule,
   MatButtonModule,
   MatSlideToggleModule
-]
+];
 
 const localComponents = [
   DialogsConversationEditorComponent,
   DialogPartComponent
-]
+];
 
 @NgModule({
   imports: [
     ...angularModules,
     ...materialModules,
-    NgxEditorModule
+    NgxEditorModule,
+    FormWrapperMaterialModule
   ],
   exports: [
     ...localComponents,

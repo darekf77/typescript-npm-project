@@ -27,6 +27,7 @@ import { kebabCase } from "lodash";
 import { CLASSNAME, isNode, isBrowser, DefaultModelWithMapping } from 'morphi';
 import { CATEGORY } from '../CATEGORY';
 import { GROUP } from '../GROUP';
+import { DIALOG } from '../DIALOG';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
@@ -71,6 +72,13 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
     cascade: false
   })
   groups: GROUP[];
+
+
+
+  @OneToMany(type => DIALOG, dialog => dialog.id, {
+    cascade: false
+  })
+  dialogs: DIALOG[];
 
 
 

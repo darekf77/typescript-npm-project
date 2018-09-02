@@ -1,7 +1,12 @@
 :host {
   .preview {
-    img, button {
+    img, button,h6 {
       display: inline-block;
+    }
+    h6 {
+        color: gray;
+        font-weight: normal;
+        text-decoration: underline;
     }
     > div {
       display: inline-block;
