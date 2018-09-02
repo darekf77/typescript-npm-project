@@ -21,6 +21,8 @@ import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../multimed
 import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
+import { EditorWrapperModule, EditorWrapperComponent } from '../editor-wrapper';
+import { ButtonWithActionComponent } from './additional-types';
 
 
 const angularModules = [
@@ -37,6 +39,7 @@ const materialModules = [
 const myFormlyModules = [
   SelectWrapperModule,
   MultimediaWrapperModule,
+  EditorWrapperModule
 ];
 
 const formlyModules = [
@@ -45,6 +48,8 @@ const formlyModules = [
     types: [
       { name: 'selectwrapper', component: SelectWrapperComponent },
       { name: 'multimediawrapper', component: MultimediaWrapperComponent },
+      { name: 'editorwrapper', component: EditorWrapperComponent },
+      { name: 'button', component: ButtonWithActionComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
@@ -66,8 +71,9 @@ const formlyModules = [
     ...materialModules
   ],
   exports: [
-    FormWrapperMaterialComponent
+    FormWrapperMaterialComponent,
+    ButtonWithActionComponent
   ],
-  declarations: [FormWrapperMaterialComponent]
+  declarations: [FormWrapperMaterialComponent, ButtonWithActionComponent]
 })
 export class FormWrapperMaterialModule { }

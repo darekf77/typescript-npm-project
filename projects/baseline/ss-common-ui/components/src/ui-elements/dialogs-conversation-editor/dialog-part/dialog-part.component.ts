@@ -16,6 +16,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 })
 export class DialogPartComponent implements OnInit {
 
+
   get type() {
     return this.dialog && this.dialog.type;
   }
@@ -32,7 +33,7 @@ export class DialogPartComponent implements OnInit {
   fields = [
     {
       key: 'lang_pl',
-      type: 'textarea',
+      type: 'editorwrapper',
       hideExpression: () => this.clientLang === 'en'
     },
     {
@@ -44,8 +45,15 @@ export class DialogPartComponent implements OnInit {
       }
     },
     {
+      id: 'translateButton',
+      type: 'button',
+      templateOptions: {
+        label: 'Translate'
+      }
+    },
+    {
       key: 'lang_fr',
-      type: 'textarea'
+      type: 'editorwrapper'
     },
     {
       key: 'audio_fr',
@@ -56,7 +64,7 @@ export class DialogPartComponent implements OnInit {
     },
     {
       key: 'lang_en',
-      type: 'textarea',
+      type: 'editorwrapper',
       hideExpression: () => this.clientLang === 'pl'
     },
     {

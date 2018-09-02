@@ -1,0 +1,6 @@
+<h6 *ngIf="field && field.templateOptions && field.templateOptions.label">
+  {{field.templateOptions.label}} </h6>
+<ngx-wig [content]="field.formControl.value"
+         (contentChange)="contentChange($event)"
+         [buttons]="buttons">
+</ngx-wig>

@@ -31,6 +31,10 @@ export const routes: Routes = [
         loadChildren: './components/+preview-select-wrapper/preview-select-wrapper.module#PreviewSelectWrapperModule'
       },
       {
+        path: 'editorwrapper',
+        loadChildren: './components/+preview-editor-wrapper/+preview-editor-wrapper.module#PreviewEditorWrapperModule'
+      },
+      {
         path: 'multimediawrapper',
         loadChildren: './components/+preview-multimedia-wrapper/preview-multimedia-wrapper.module#PreviewMultimediaWrapperModule'
       },

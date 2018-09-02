@@ -40,6 +40,7 @@ export class FormWrapperMaterialComponent implements OnInit {
    */
   @Input() exclude: string[] = [];
 
+  @Input() fieldsOrder: string[];
 
   @Input() mode: 'update' | 'create' = 'update';
 
@@ -75,42 +76,69 @@ export class FormWrapperMaterialComponent implements OnInit {
     `);
   }
 
+  resolveFields() {
+    let fields = getFormlyFrom(this.entity);
+    log.i(`fields from : ${this.entity && this.entity.name}`, fields);
+
+    if (!fields) {
+      this.waringAboutDecorator();
+    }
+
+    if (_.isArray(this.fields)) {
+      const keys = fields.map(c => c.key);
+      fields = fields.map(field => {
+        return _.merge(field, this.fields.find(f => f.key === field.key));
+      });
+      fields = fields.concat(this.fields.filter(field => !keys.includes(field.key)));
+
+    }
+
+    fields = fields.filter(({ key }) => !this.exclude.includes(key));
+    log.i('fields filter', fields);
+
+    this.formly.fields = fields;
+  }
+
   async ngOnInit() {
     log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
+    this.resolveFields();
 
-    let fields = getFormlyFrom(this.entity);
-    log.i(`fields from : ${this.entity && this.entity.name}`, fields);
-    if (!fields) {
-      this.waringAboutDecorator();
-    } else {
-      log.i('exclude pathes', this.exclude);
-      fields = fields.filter(({ key }) => !this.exclude.includes(key));
-      log.i('input fields', this.fields);
-      const keys = fields.map(c => c.key);
+    this.formly.options = this.options;
+    this.formly.form = this.form;
+    this.setModel(this.model);
 
-      if (_.isArray(this.fields)) {
-
-        this.formly.fields = fields.map(field => {
-          return _.merge(field, this.fields.find(f => f.key === field.key));
-        });
-        this.formly.fields = this.formly.fields.concat(this.fields.filter(field => !keys.includes(field.key)));
-
-      } else {
-        this.formly.fields = fields;
-      }
-      log.i('formly config from class example', this.formly.fields);
-
-      this.formly.options = this.options;
-      this.formly.form = this.form;
-      this.setModel(this.model);
-    }
 
     if ((!_.isUndefined(this.id))) {
       const m = await this.crud.getBy(this.id, this.modelDataConfig).received;
       this.setModel(m.body.json);
+    }
+
+    this.createOrder();
+  }
+
+  createOrder() {
+
+    if (!this.fieldsOrder) {
+      this.fieldsOrder = [];
+    }
+    if (_.isString(this.fieldsOrder)) {
+      this.fieldsOrder = this.fieldsOrder.split(',');
+    }
+    log.i('create order!', this.fieldsOrder);
+    const fieldsNewOrder = [];
+
+    if (this.fieldsOrder.length > 0) {
+      this.fieldsOrder.forEach(orderKey => {
+        const f = this.formly.fields.find(({ key, id }) => (key === orderKey || id === orderKey));
+        if (f) {
+          fieldsNewOrder.push(f);
+        }
+      });
+      this.formly.fields = fieldsNewOrder.concat(this.formly.fields.filter(f => !fieldsNewOrder.includes(f)));
+      log.i('new Order', this.formly.fields.map(f => f.key).join(','));
     }
   }
 

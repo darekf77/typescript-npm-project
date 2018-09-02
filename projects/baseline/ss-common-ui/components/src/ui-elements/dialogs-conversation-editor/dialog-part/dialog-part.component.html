@@ -7,7 +7,7 @@
             (click)="toogleEditing()"
             class="edit-button">save</mat-icon>
   <div [ngClass]="dialog.typeString | lowercase">
-    <span>{{dialog['lang_' + clientLang]}}</span>
+    <span [innerHTML]="dialog['lang_' + targetLang]" ></span>
   </div>
 </section>
 <div class="inline-edit"
@@ -16,7 +16,8 @@
   <app-form-wrapper-material [crud]="dialogsController"
                              [(model)]="dialog"
                              [fields]="fields"
-                             [exclude]="['type','group','id']"
+                             [exclude]="['type','group','id','audio_' + clientLang ]"
+                             [fieldsOrder]="['lang_' + clientLang , 'translateButton',  'lang_fr', 'audio_fr']"
                              (complete)="complete()">
   </app-form-wrapper-material>
   <br>

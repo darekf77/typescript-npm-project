@@ -33,6 +33,10 @@ export const menuLeft // : ComponentsMenuItem[]
       name: 'SelectWrapper'
     },
     {
+      href: '/previewcomponents/editorwrapper',
+      name: 'EditorWrapper'
+    },
+    {
       group: 'Custom Formly Fields'
     },
     {
