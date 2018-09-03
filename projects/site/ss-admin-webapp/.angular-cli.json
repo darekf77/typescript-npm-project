@@ -58,5 +58,8 @@
     "styleExt": "css",
     "component": {
     }
+  },
+  "warnings": {
+    "typescriptMismatch": false
   }
 }

@@ -189,7 +189,7 @@ export class FilesRecreator {
     if (this.project.baseline) {
       const customFolder = path.join(this.project.location, config.folder.custom)
       if (!fs.existsSync(customFolder)) {
-        this.project.run(`tnp mkdirp ${config.folder.custom}`).sync()
+        this.project.run(`tnp mkdirp ${config.folder.custom} ${config.folder.src}`).sync()
       }
     }
   }
