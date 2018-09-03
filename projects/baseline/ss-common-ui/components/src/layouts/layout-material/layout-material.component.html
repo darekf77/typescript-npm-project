@@ -30,7 +30,7 @@
     <br>
     <br>
     <mat-accordion>
-      <mat-expansion-panel *ngFor="let item of menuLeft.items">
+      <mat-expansion-panel *ngFor="let item of menuLeft.items" [expanded]="menu.top.items.length === 1" >
         <mat-expansion-panel-header>
           <mat-panel-title (click)="item.href && open(item)" >
             {{item.name}}
