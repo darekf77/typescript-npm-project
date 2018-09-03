@@ -5,8 +5,8 @@ import { run } from '../process';
 
 export function init(project = Project.Current) {
     if (project.isSite) {
-        project.run(`tnp baseline:site:start`).sync()
-    }
+        project.recreate.join.init()
+    }    
     project.recreate.assets();
     project.recreate.commonFiles();
     project.recreate.projectSpecyficFiles();
@@ -20,12 +20,17 @@ export default {
         init()
         process.exit(0)
     },
+
+
+    
     $VSCODE: ()=> {
       Project.Current.recreate.vscode.settings.excludedFiles();
+      Project.Current.recreate.vscode.settings.colorsFromWorkspace()
       process.exit(0)
     },
     $INIT_VSCODE: () => {
         Project.Current.recreate.vscode.settings.excludedFiles();
+        Project.Current.recreate.vscode.settings.colorsFromWorkspace()
         process.exit(0)
     },
     $INIT_EVERYWHERE: (args) => {

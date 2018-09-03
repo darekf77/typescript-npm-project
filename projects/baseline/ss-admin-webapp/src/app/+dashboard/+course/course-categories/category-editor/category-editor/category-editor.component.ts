@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+  import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // material
 

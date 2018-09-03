@@ -12,6 +12,16 @@ import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
 
+const REGEXS = {
+
+    /**
+     *   "baseline/ss-common-logic/src/db-mocks";
+     *                            |<--------->|
+     */
+    baselinePart: `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+
+}
+
 
 
 interface JoinFilesOptions {
@@ -221,12 +231,17 @@ export class BaselineSiteJoin {
                     .replace('-', '\-')
                     .replace('.', '\.')
                     .replace('_', '\_')
-                const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+                const pathPart = REGEXS.baselinePart;
                 // console.log('pathPart', pathPart)
                 const baselineRegex = `${pathToBaselineNodeModulesRelative}${pathPart}*`
                 // console.log(`\nbaselineRegex: ${baselineRegex}`)
                 let patterns = input.match(new RegExp(baselineRegex, 'g'))
-                // console.log(`patterns\n`, patterns.map(d => `\t${d}`).join('\n'))
+                // if (relativeBaselineCustomPath === "/src/index.ts") {
+                //     // console.log('input', input)
+                //     console.log(patterns)
+                //     //     console.log(`patterns\n`, patterns.map(d => `\t${d}`).join('\n'))
+                // }
+
                 if (Array.isArray(patterns) && patterns.length >= 1) {
                     patterns.forEach(p => {
                         let patternWithoutBaselinePart = p
@@ -236,11 +251,11 @@ export class BaselineSiteJoin {
                             .replace(new RegExp(`^${pathPart}`, 'g'), '')
                         // console.log('patternWithoutBaselinePart rep', patternWithoutBaselinePart)
 
-                        // console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
+                        //  console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
                         // console.log('p', p)
                         const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`
                         // console.log('toReplace', toReplace)
-                        input = input.replace(p, toReplace)
+                        input = input.replace(p, `.${toReplace}`.replace('...', '..'))
                     })
                 }
                 return input;

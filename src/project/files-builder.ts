@@ -12,8 +12,24 @@ import { BaselineSiteJoin } from './baseline-site-join';
 import { error } from '../messages';
 
 interface VSCodeSettings {
-  'files.exclude': { [files: string]: boolean; }
+  'files.exclude': { [files: string]: boolean; };
+  "workbench.colorCustomizations": {
+    "activityBar.background"?: string;
+    "activityBar.foreground"?: string;
+    "statusBar.background"?: string;
+  }
 }
+
+
+function getVscodeSettingsFrom(project: Project) {
+  let settings: VSCodeSettings;
+  const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
+  try {
+    settings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
+  } catch (e) { }
+  return settings;
+}
+
 
 
 export class FilesRecreator {
@@ -100,25 +116,66 @@ export class FilesRecreator {
     }
   }
 
+
+
+  private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
+    const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
+    if (fs.existsSync(pathSettingsVScode)) {
+      try {
+        let settings: VSCodeSettings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
+        settings = modifyFN(settings, this.project);
+        fs.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
+
   get vscode() {
     const self = this;
     return {
       get settings() {
         return {
-          excludedFiles() {
-            const pathSettingsVScode = path.join(self.project.location, '.vscode', 'settings.json')
-            if (fs.existsSync(pathSettingsVScode)) {
-              try {
-                const settings: VSCodeSettings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
-                settings["files.exclude"] = {};
-                self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
-                  settings["files.exclude"][f] = true
-                })
-                fs.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
-              } catch (e) {
-                console.log(e)
+
+          colorsFromWorkspace() {
+            self.modifyVscode((settings, project) => {
+
+              if (project.isWorkspaceChildProject) {
+
+                if (!settings["workbench.colorCustomizations"]) {
+                  settings["workbench.colorCustomizations"] = {};
+                }
+
+                // update activity bar color  
+                const parentSettings = getVscodeSettingsFrom(project.parent);
+                const statuBarColor = parentSettings &&
+                  parentSettings["workbench.colorCustomizations"] &&
+                  parentSettings["workbench.colorCustomizations"]["statusBar.background"];
+                settings["workbench.colorCustomizations"]["statusBar.background"] = statuBarColor;
+
+                // update background color
+                if (project.isSite) {
+                  const baselineColor = getVscodeSettingsFrom(project.baseline);
+                  const activityBarBcg = baselineColor &&
+                    baselineColor["workbench.colorCustomizations"] &&
+                    baselineColor["workbench.colorCustomizations"]["activityBar.background"];
+                  settings["workbench.colorCustomizations"]["activityBar.background"] = activityBarBcg;
+                }
+
               }
-            }
+
+              return settings;
+            });
+          },
+
+          excludedFiles() {
+            self.modifyVscode(settings => {
+              settings["files.exclude"] = {};
+              self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
+                settings["files.exclude"][f] = true
+              })
+              return settings;
+            });
           }
         }
       }
@@ -254,3 +311,6 @@ export class FilesRecreator {
 
 
 }
+
+
+

@@ -37,6 +37,11 @@ export abstract class Project {
   readonly requiredLibs: Project[] = [];
   readonly parent: Project;
   readonly preview: Project;
+
+  /**
+   * For site worksapce is baseline worksapace
+   * For child site worksapce is baseline worksapce child
+   */
   readonly baseline: Project;
   readonly type: LibType;
   readonly packageJson: PackageJSON;
@@ -215,7 +220,7 @@ export abstract class Project {
 
   get customizableFilesAndFolders() {
     if (this.type === 'workspace') return [
-      'environment.d.ts',
+      // 'environment.d.ts',
       'environment.js',
       'environment.dev.js',
       'environment.prod.js',
@@ -397,26 +402,26 @@ export abstract class Project {
     const pathTnpPackageJSON = path.join(Project.Tnp.location, 'package.json');
     const self = this;
     return {
-      install() {
-        let project: Project;
-        if (self.parent && self.parent.type === 'workspace') {
-          project = self.parent;
-        } else {
-          project = self;
-        }
+      install() { // install
+        // let project: Project;
+        // if (self.parent && self.parent.type === 'workspace') {
+        //   project = self.parent;
+        // } else {
+        //   project = self;
+        // }
 
-        if (process.platform === 'win32') {
-          try {
-            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
-          } catch (e) {
-            console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
-             console.log(e)
-            sleep.sleep(2);
-            self.tnpHelper.install()
-          }
-        } else {
-          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
-        }
+        // if (process.platform === 'win32') {
+        //   try {
+        //     reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
+        //   } catch (e) {
+        //     console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
+        //      console.log(e)
+        //     sleep.sleep(2);
+        //     self.tnpHelper.install()
+        //   }
+        // } else {
+        //   reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
+        // }
       }
     }
   }

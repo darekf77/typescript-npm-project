@@ -5,8 +5,8 @@ import {
   HttpResponse,
   //#endregion
   IFacebook, IHelloJS
-} from "baseline/ss-common-logic/src/controllers/core/AuthController";
-import { ENDPOINT } from "morphi";
+} from 'baseline/ss-common-logic/src/controllers/core/AuthController';
+import { ENDPOINT } from 'morphi';
 
 export {
   //#region @backend
@@ -14,7 +14,7 @@ export {
   HttpResponse,
   //#endregion
   IFacebook, IHelloJS
-} from "baseline/ss-common-logic/src/controllers/core/AuthController";
+} from 'baseline/ss-common-logic/src/controllers/core/AuthController';
 
 //#region @backend
 import { authenticate, use } from 'passport';
@@ -35,21 +35,21 @@ import { authenticate, use } from 'passport';
   }
 })
 export class AuthController extends BaselineAuthController {
-  constructor() {
-    super(true)
-    //#region @backend
-    this.__init();
-    //#endregion
-  }
+  // constructor() {
+  //   super()
+  //   //#region @backend
+  //   this.__init();
+  //   //#endregion
+  // }
 
-  public async __mocks() {
-    await super.__mocks()
-    await this.__createUser({
-      username: 'site',
-      email: 'site@site.pl',
-      password: 'site'
-    }, 'normal_auth');
-  }
+  // public async __mocks() {
+  //   await super.__mocks()
+  //   await this.__createUser({
+  //     username: 'site',
+  //     email: 'site@site.pl',
+  //     password: 'site'
+  //   }, 'normal_auth');
+  // }
 
 }
 
