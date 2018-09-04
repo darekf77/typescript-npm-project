@@ -31,8 +31,9 @@ function killonport(args) {
       console.log(`Killing process on pid: ${pid} in progress`);
       run(`tskill ${pid}`).sync();
       info(`Done`);
-    } else {
-      run(`lsof -P | grep ':${port}' | awk '{print $2}'`, { output: false }).sync()
+    } else if (os.platform() === 'darwin') {
+      info('System mac osx')
+      run(`lsof -P | grep ':${port}' | awk '{print $2}' | xargs kill -9 `, { output: false }).sync()
     }
 
     info(`Process killed on port: ${port}`)

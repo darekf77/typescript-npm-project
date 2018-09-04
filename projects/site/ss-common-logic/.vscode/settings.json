@@ -34,7 +34,7 @@
   "workbench.colorCustomizations": {
     "activityBar.background": "#6193c2",
     "activityBar.foreground": "#ffffff",
-    "statusBar.background": "#bcdd70"
+    "statusBar.background": "#bcdd70",
   },
   "editor.rulers": [
     100,
