@@ -6,6 +6,7 @@ export interface IBUILD {
   name: string;
 }
 
+
 //#region @backend
 @Entity(META.tableNameFrom(BUILD))
 //#endregion
@@ -23,15 +24,10 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     throw new Error("Method not implemented.");
   }
 
-  @Column({ nullable: true }) domain: string;
+
   @Column({ nullable: true }) port: string;
   @Column() gitRemote: string;
-
-  @Column({ nullable: true }) gitFolder: string;
-
-  start() {
-
-  }
+  @Column({ nullable: true, default: '/' }) gitFolder: string;
 
 
 }

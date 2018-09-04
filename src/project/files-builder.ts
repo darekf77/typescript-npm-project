@@ -160,6 +160,8 @@ export class FilesRecreator {
                     baselineColor["workbench.colorCustomizations"] &&
                     baselineColor["workbench.colorCustomizations"]["activityBar.background"];
                   settings["workbench.colorCustomizations"]["activityBar.background"] = activityBarBcg;
+                  settings["workbench.colorCustomizations"]["activityBar.debuggingBackground"] = activityBarBcg;
+
                 }
 
               }

@@ -191,18 +191,30 @@ export class BaselineSiteJoin {
                 self.relativePathesCustom.forEach(f => {
                     if (f != relativeBaselineCustomPath) {
                         let baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(f);
-                        let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
-                        baselineFilePathNoExit = baselineFilePathNoExit
-                            .replace('/', '\/')
-                            .replace('-', '\-')
-                            .replace('.', '\.')
-                            .replace('_', '\_')
-                        baselineFilePathNoExit = `\.${BaselineSiteJoin.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
-                        const dirPath = path.dirname(f);
-                        toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(crossPlatofrmPath(path.join(dirPath, toReplace)))
-                        toReplace = `.${toReplace}`
-                        // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
-                        input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
+
+                        const pathToBaselineFile = crossPlatofrmPath(path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit))
+                        // console.log('pathToBaselineFile', pathToBaselineFile)
+                        if (fse.existsSync(pathToBaselineFile)) {
+                            let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
+                            // if (f === '/src/entities/BUILD.ts' && relativeBaselineCustomPath === '/src/entities.ts') {
+                            //     console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
+                            //     console.log('f', f)
+                            //     console.log('baselineFilePathNoExit', baselineFilePathNoExit)
+                            //     console.log('toReplace', toReplace)
+                            // }
+
+                            baselineFilePathNoExit = baselineFilePathNoExit
+                                .replace('/', '\/')
+                                .replace('-', '\-')
+                                .replace('.', '\.')
+                                .replace('_', '\_')
+                            baselineFilePathNoExit = `\.${BaselineSiteJoin.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
+                            const dirPath = path.dirname(f);
+                            toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(crossPlatofrmPath(path.join(dirPath, toReplace)))
+                            toReplace = `.${toReplace}`
+                            // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
+                            input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
+                        }
                     }
                 });
                 return input;
@@ -359,7 +371,7 @@ export class BaselineSiteJoin {
     }
 
     private watchFilesAndFolders(location: string, customizableFilesOrFolders: string[],
-        filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any, ) {
+        filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
 
         this.__checkBaselineSiteStructure()
 

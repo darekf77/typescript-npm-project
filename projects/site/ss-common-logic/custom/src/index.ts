@@ -3,6 +3,7 @@ import { Controllers as tControllers, Entities as tEntities } from "baseline/ss-
 import mocks from "baseline/ss-common-logic/src/db-mocks";
 import { USER } from "./entities/core/USER";
 import { start } from "baseline/ss-common-logic/src/helpers";
+import { BUILD } from "./entities/BUILD";
 
 function addController(controller: Function) {
   tControllers[`__baseline${controller.name}`] = controller;
@@ -13,6 +14,7 @@ function addEntity(entity: Function) {
 }
 
 addEntity(USER);
+addEntity(BUILD);
 
 const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
 
