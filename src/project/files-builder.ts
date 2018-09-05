@@ -152,6 +152,7 @@ export class FilesRecreator {
                   parentSettings["workbench.colorCustomizations"] &&
                   parentSettings["workbench.colorCustomizations"]["statusBar.background"];
                 settings["workbench.colorCustomizations"]["statusBar.background"] = statuBarColor;
+                settings["workbench.colorCustomizations"]["statusBar.debuggingBackground"] = statuBarColor;
 
                 // update background color
                 if (project.isSite) {
@@ -160,7 +161,6 @@ export class FilesRecreator {
                     baselineColor["workbench.colorCustomizations"] &&
                     baselineColor["workbench.colorCustomizations"]["activityBar.background"];
                   settings["workbench.colorCustomizations"]["activityBar.background"] = activityBarBcg;
-                  settings["workbench.colorCustomizations"]["activityBar.debuggingBackground"] = activityBarBcg;
 
                 }
 

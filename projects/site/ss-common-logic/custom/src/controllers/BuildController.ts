@@ -23,10 +23,14 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   async initExampleDbData() {
 
-    await this.db.BUILD.create({
+
+    await this.db.BUILD.save(this.db.BUILD.create({
       gitFolder: '/projects/baseline',
       gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
-    })
+    }))
+
+    console.log('example builds loaded!')
+
   }
   //#endregion
 

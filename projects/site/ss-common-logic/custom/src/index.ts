@@ -1,10 +1,12 @@
 //#region @backend
-import { Controllers as BaselienController, Entities as BaselineEntites } from "baseline/ss-common-logic/src/index";
+import {
+  Controllers as BaselienController, Entities as BaselineEntites,
+  InitDataPriority
+} from "baseline/ss-common-logic/src/index";
 
 import * as controllers from './controllers';
 import * as entites from './entities';
 
-import mocks from "baseline/ss-common-logic/src/db-mocks";
 import { start } from "baseline/ss-common-logic/src/helpers";
 
 const tControllers = BaselienController;
@@ -43,7 +45,7 @@ export default function () {
     ,
     Controllers: Controllers as any,
     Entities: Entities as any,
-    MockData: mocks as any
+    InitDataPriority: InitDataPriority as any
   });
 }
 
