@@ -27,10 +27,12 @@ export const config = {
         node_modules: 'node_modules',
         assets: 'assets',
         entities: 'entities',
-        controllers: 'controllers'
+        controllers: 'controllers',
+        
     },
     file: {
-      package_json: 'package.json'
+      package_json: 'package.json',
+      tnpBundle: 'tnp-bundle'
     },
     allowedTypes: {
         app: [

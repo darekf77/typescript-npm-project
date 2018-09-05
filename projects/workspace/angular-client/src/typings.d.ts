@@ -1,4 +1,4 @@
-import { EnvConfig } from "tnp";
+import { EnvConfig } from "tnp-bundle";
 
 declare global {
     const ENV: EnvConfig;

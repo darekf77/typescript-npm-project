@@ -399,29 +399,32 @@ export abstract class Project {
     }
 
     const pathTnpCompiledJS = path.join(Project.Tnp.location, 'dist');
-    const pathTnpPackageJSON = path.join(Project.Tnp.location, 'package.json');
+    const pathTnpPackageJSONData = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json));
+    pathTnpPackageJSONData.name = config.file.tnpBundle;
+
+
     const self = this;
     return {
       install() { // install
-        // let project: Project;
-        // if (self.parent && self.parent.type === 'workspace') {
-        //   project = self.parent;
-        // } else {
-        //   project = self;
-        // }
+        let project: Project;
+        if (self.parent && self.parent.type === 'workspace') {
+          project = self.parent;
+        } else {
+          project = self;
+        }
 
-        // if (process.platform === 'win32') {
-        //   try {
-        //     reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
-        //   } catch (e) {
-        //     console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
-        //      console.log(e)
-        //     sleep.sleep(2);
-        //     self.tnpHelper.install()
-        //   }
-        // } else {
-        //   reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSON)
-        // }
+        if (process.platform === 'win32') {
+          try {
+            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
+          } catch (e) {
+            console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
+            console.log(e)
+            sleep.sleep(2);
+            self.tnpHelper.install()
+          }
+        } else {
+          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
+        }
       }
     }
   }
@@ -473,14 +476,14 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
 
 const notNeededReinstallationTnp = {};
 
-function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSON: string) {
+function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: string) {
   if (notNeededReinstallationTnp[project.location]) {
     return;
   }
   if (project.isWorkspaceChildProject || project.type === 'workspace') {
 
 
-    const destCompiledJs = path.join(project.location, config.folder.node_modules, 'tnp')
+    const destCompiledJs = path.join(project.location, config.folder.node_modules, config.file.tnpBundle)
 
     if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
       notNeededReinstallationTnp[project.location] = true;
@@ -488,13 +491,18 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       return;
     }
 
-    const destPackageJSON = path.join(project.location, config.folder.node_modules, 'tnp', 'package.json')
+    const destPackageJSON = path.join(project.location, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
+
     if (fs.existsSync(destCompiledJs)) {
       // console.log(`Removed tnp - helper from ${ dest } `)
       rimraf.sync(destCompiledJs)
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
-    fs.copyFileSync(pathTnpPackageJSON, destPackageJSON)
+    fse.writeJson(destPackageJSON, pathTnpPackageJSONData, {
+      encoding: 'utf8',
+      spaces: 2
+    })
+    
     notNeededReinstallationTnp[project.location] = true;
     // console.log(`Tnp-helper installed in ${project.name} `)
   } else {
