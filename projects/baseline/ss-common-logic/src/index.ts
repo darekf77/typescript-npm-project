@@ -1,8 +1,8 @@
 //#region @backend
 import * as controllers from './controllers';
 import * as entites from './entities';
-import mocks from "./db-mocks";
-import { start } from './helpers';
+
+import { start, META } from './helpers';
 
 const tControllers = {}
 const tEntities = {}
@@ -40,6 +40,11 @@ addEntity(entites.CONFIG);
 export const Controllers = tControllers;
 export const Entities = tEntities;
 
+export const InitDataPriority: META.BASE_CONTROLLER<any>[] = [
+  controllers.ConfigController as any,
+  controllers.AuthController as any
+]
+
 const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
 
 export default function () {
@@ -52,7 +57,7 @@ export default function () {
     ,
     Controllers: Controllers as any,
     Entities: Entities as any,
-    MockData: mocks as any
+    InitDataPriority
   });
 }
 

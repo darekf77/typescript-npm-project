@@ -531,7 +531,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   public async initExampleDbData() {
     //#region @backendFunc
-     await this.db.EMAIL_TYPE.init();
+    await this.db.EMAIL_TYPE.init();
     const strategy = async (token, cb) => {
       let user: entities.USER = null;
       const Session = await this.db.SESSION.getByToken(token);

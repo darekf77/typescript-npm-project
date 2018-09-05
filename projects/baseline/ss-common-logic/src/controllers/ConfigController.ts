@@ -71,11 +71,13 @@ export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
   //#endregion
 
   private async refresh() {
+    if (isBrowser) {
+      const config = await this.getAll().received;
+      config.body.json.forEach(({ key, value }) => {
+        ConfigController.cachedValues[key] = value;
+      })
+    }
 
-    const config = await this.getAll().received;
-    config.body.json.forEach(({ key, value }) => {
-      ConfigController.cachedValues[key] = value;
-    })
   }
 
 

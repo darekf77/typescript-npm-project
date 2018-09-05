@@ -10,6 +10,7 @@ Helper project for my typescript npm libraries.
 - class properties: arrays and object can't have defult propty
  - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
  - "assets" relative from html,css ,  "/assets" from scss
+- in site, if you are decorating entities REMEMBER to overrirde EntityRepository
 
 ## Create, build, publish:
 - isomorphic typescript library
