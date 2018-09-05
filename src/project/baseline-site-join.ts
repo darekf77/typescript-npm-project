@@ -219,16 +219,15 @@ export class BaselineSiteJoin {
             },
             currentFilePath() {
                 const baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(relativeBaselineCustomPath);
-                // console.log(`baselineFilePathNoExit "${baselineFilePathNoExit}"`)
+
+
                 const toReplaceImportPath = crossPlatofrmPath(`${path.join(
                     self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
                     baselineFilePathNoExit)}`);
                 const replacement = `./${self.getPrefixedBasename(baselineFilePathNoExit)}`;
-                // console.log(`toReplaceImportPath "${toReplaceImportPath}" `)
-                // console.log(`replacement: "${replacement}"`)
-                const res = input.replace(new RegExp(toReplaceImportPath, 'g'), replacement);
-                // console.log('AFTER TRANSFORMATION', res)
-                // process.exit()
+
+                const res = input.replace(new RegExp(`(\"|\')${toReplaceImportPath}(\"|\')`, 'g'), `'${replacement}'`);
+                
                 return res;
             },
             baselinePath() {

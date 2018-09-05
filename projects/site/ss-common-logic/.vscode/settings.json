@@ -35,6 +35,7 @@
     "activityBar.background": "#6193c2",
     "activityBar.foreground": "#ffffff",
     "statusBar.background": "#bcdd70",
+    "activityBar.debuggingBackground": "#6193c2"
   },
   "editor.rulers": [
     100,
