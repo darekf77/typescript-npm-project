@@ -127,6 +127,9 @@ export interface EnvConfig {
 export interface IPackageJSON {
   name: string;
   version: string;
+  bin?:any;
+  main?: string;
+  preferGlobal?: boolean;
 
   dependencies?: { [name: string]: string; };
   devDependencies?: { [name: string]: string; };

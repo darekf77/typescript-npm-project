@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
-var run = require('../dist/index.js').run;
+var run = require('../dist/run.js').run;
 run(process.argv);

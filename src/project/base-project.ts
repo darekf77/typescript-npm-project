@@ -11,7 +11,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig } from "../models";
+import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
@@ -399,9 +399,15 @@ export abstract class Project {
     }
 
     const pathTnpCompiledJS = path.join(Project.Tnp.location, 'dist');
-    const pathTnpPackageJSONData = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json));
-    pathTnpPackageJSONData.name = config.file.tnpBundle;
+    const pathTnpPackageJSONData: IPackageJSON = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
 
+    pathTnpPackageJSONData.name = config.file.tnpBundle;
+    pathTnpPackageJSONData.tnp = undefined;
+    pathTnpPackageJSONData.bin = undefined;
+    pathTnpPackageJSONData.main = undefined;
+    pathTnpPackageJSONData.preferGlobal = undefined;
+    pathTnpPackageJSONData.dependencies = undefined;
+    
 
     const self = this;
     return {
@@ -476,7 +482,7 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
 
 const notNeededReinstallationTnp = {};
 
-function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: string) {
+function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
   if (notNeededReinstallationTnp[project.location]) {
     return;
   }

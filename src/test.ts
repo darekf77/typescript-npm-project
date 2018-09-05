@@ -1,5 +1,5 @@
 
-import { run } from "./index";
+import { run } from "./run";
 // import * as express from "express";
 
 // const app = express()

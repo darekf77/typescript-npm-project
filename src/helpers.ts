@@ -15,7 +15,8 @@ import { constants } from 'zlib';
 import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
-import { ProjectFrom, config } from './index';
+import { ProjectFrom } from './index';
+import { config } from './run';
 import { sleep } from 'sleep';
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {

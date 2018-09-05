@@ -1,6 +1,6 @@
 
 import config from './environment';
-const { getEnvironmentName, LOCAL_ENVIRONMENT_NAME, gethost } = require('tnp-helpers');
+const { getEnvironmentName } = require('tnp-bundle');
 
 config.productionBuild = true;
 config.name = getEnvironmentName(__filename)
