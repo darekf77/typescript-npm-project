@@ -1,4 +1,4 @@
-import { ENDPOINT } from 'morphi';
+import { ENDPOINT, CLASSNAME } from 'morphi';
 import { META } from 'baseline/ss-common-logic/src/helpers';
 import { BUILD } from '../entities/BUILD';
 
@@ -9,6 +9,7 @@ import * as controllers from '../controllers';
 //#endregion
 
 @ENDPOINT()
+@CLASSNAME('BuildController')
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   //#region @backend

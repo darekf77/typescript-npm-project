@@ -2,9 +2,11 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 // third part
 import { Log, Level } from "ng2-logger";
+import * as _ from 'lodash';
 // local
 
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
@@ -21,6 +23,7 @@ const log = Log.create('Dashboard')
 export class DashboardComponent implements OnInit {
   constructor(
     public auth: AuthController,
+    public buildController: BuildController,
     private router: Router) {
 
   }
@@ -68,6 +71,17 @@ export class DashboardComponent implements OnInit {
 
 
   async ngOnInit() {
+
+    const data = await this.buildController.getAll().received;
+    log.i('data', data.body.json)
+
+    _.first(_.first(this.menu.top.items).leftMenu).subitems = data.body.json.map(b => {
+      return {
+        name: b.gitRemote,
+        href: '/dashboard/builds'
+      }
+    })
+
     this.handlers.push(this.auth.isLoggedIn.subscribe(isLoginIn => {
       if (isLoginIn) {
         if (this.router.url.trim() === '/') {
