@@ -498,11 +498,11 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       rimraf.sync(destCompiledJs)
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
-    fse.writeJson(destPackageJSON, pathTnpPackageJSONData, {
+    fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
       encoding: 'utf8',
       spaces: 2
     })
-    
+
     notNeededReinstallationTnp[project.location] = true;
     // console.log(`Tnp-helper installed in ${project.name} `)
   } else {
