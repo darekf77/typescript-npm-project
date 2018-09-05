@@ -1,11 +1,14 @@
 //#region @backend
+import { Controllers as BaselienController, Entities as BaselineEntites } from "baseline/ss-common-logic/src/index";
+
 import * as controllers from './controllers';
 import * as entites from './entities';
+
 import mocks from "baseline/ss-common-logic/src/db-mocks";
 import { start } from "baseline/ss-common-logic/src/helpers";
 
-const tControllers = {}
-const tEntities = {}
+const tControllers = BaselienController;
+const tEntities = BaselineEntites;
 
 
 
@@ -18,29 +21,10 @@ function addEntity(entity: Function) {
 }
 
 
-addController(controllers.AuthController)
-addController(controllers.CategoryController)
-addController(controllers.MultimediaController)
-addController(controllers.ExamplesController)
-addController(controllers.GroupsController);
-addController(controllers.ExamplesPaginationController);
-addController(controllers.DialogsController)
-addController(controllers.ConfigController)
 addController(controllers.BuildController)
 
-addEntity(entites.EMAIL)
-addEntity(entites.EMAIL_TYPE)
-addEntity(entites.USER)
-addEntity(entites.SESSION)
-addEntity(entites.DIALOG)
-addEntity(entites.GROUP)
-addEntity(entites.CATEGORY)
-addEntity(entites.MULTIMEDIA)
-addEntity(entites.EXAMPLE)
-addEntity(entites.EXAMPLE_PAGINATION);
-addEntity(entites.CONFIG);
 addEntity(entites.BUILD);
-addEntity(entites.BASELINE_USER);
+
 
 
 const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
