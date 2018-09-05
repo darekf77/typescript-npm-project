@@ -3,11 +3,13 @@ import { META } from 'baseline/ss-common-logic/src/helpers';
 import { BUILD } from '../entities/BUILD';
 
 
-import * as entities from '../../src/entities';
-import * as controllers from '../../src/controllers';
+import * as entities from '../entities';
+import * as controllers from '../controllers';
 
 @ENDPOINT()
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
+
+  //#region @backend
   get db() {
     return entities.entities(this.connection as any);
   }
@@ -24,6 +26,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
       gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
     })
   }
+  //#endregion
 
 }
 

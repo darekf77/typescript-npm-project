@@ -187,21 +187,19 @@ export class BaselineSiteJoin {
     private replace(input: string, relativeBaselineCustomPath: string) {
         const self = this;
         return {
+            normalizePathes() { // TODO
+
+            },
             customRelativePathes() {
                 self.relativePathesCustom.forEach(f => {
                     if (f != relativeBaselineCustomPath) {
                         let baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(f);
 
+                        const pathToSiteeFile = crossPlatofrmPath(path.join(self.project.location, baselineFilePathNoExit))
                         const pathToBaselineFile = crossPlatofrmPath(path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit))
-                        // console.log('pathToBaselineFile', pathToBaselineFile)
-                        if (fse.existsSync(pathToBaselineFile)) {
+
+                        if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
                             let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
-                            // if (f === '/src/entities/BUILD.ts' && relativeBaselineCustomPath === '/src/entities.ts') {
-                            //     console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
-                            //     console.log('f', f)
-                            //     console.log('baselineFilePathNoExit', baselineFilePathNoExit)
-                            //     console.log('toReplace', toReplace)
-                            // }
 
                             baselineFilePathNoExit = baselineFilePathNoExit
                                 .replace('/', '\/')
