@@ -7,7 +7,6 @@ import { DashboardComponent } from './dashboard.component';
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: "prefix",
     component: DashboardComponent,
     data: {
       breadcrumbs: 'Dashboard'

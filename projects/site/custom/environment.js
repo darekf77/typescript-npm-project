@@ -4,6 +4,8 @@ const config = {
 
   pathes: {
     backup: {
+      repositories: path.join(__dirname, 'backup', 'repositories'),
+      builds: path.join(__dirname, 'backup', 'builds'),
       assets: path.join(__dirname, 'backup', 'multimedia'),
       audio: path.join(__dirname, 'backup', 'multimedia', 'audio'),
       video: path.join(__dirname, 'backup', 'multimedia', 'video'),

@@ -6,7 +6,7 @@ import {
   //#endregion
   IFacebook, IHelloJS
 } from 'baseline/ss-common-logic/src/controllers/core/AuthController';
-import { ENDPOINT } from 'morphi';
+import { ENDPOINT, CLASSNAME } from 'morphi';
 
 export {
   //#region @backend
@@ -34,6 +34,7 @@ import { authenticate, use } from 'passport';
     //#endregion
   }
 })
+@CLASSNAME('AuthController')
 export class AuthController extends BaselineAuthController {
   // constructor() {
   //   super()

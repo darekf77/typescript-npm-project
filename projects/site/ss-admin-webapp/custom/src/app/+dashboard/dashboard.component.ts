@@ -38,16 +38,7 @@ export class DashboardComponent implements OnInit {
             {
               name: "Worksapces",
               href: '/dashboard/builds',
-              subitems: [
-                {
-                  name: 'Project 1',
-                  href: '/dashboard/builds'
-                },
-                {
-                  name: 'Project 2',
-                  href: '/dashboard/builds'
-                }
-              ]
+              subitems: []
             }
           ]
         }
@@ -77,8 +68,8 @@ export class DashboardComponent implements OnInit {
 
     _.first(_.first(this.menu.top.items).leftMenu).subitems = data.body.json.map(b => {
       return {
-        name: b.gitRemote,
-        href: '/dashboard/builds'
+        name: b.name,
+        href: `/dashboard/builds/build/${b.id}`
       }
     })
 

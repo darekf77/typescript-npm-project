@@ -1,0 +1,12 @@
+<p>
+  build-editor works! id: {{id}}
+
+  <app-form-wrapper-material *ngIf="id"
+                             [id]="id"
+                             [fields]="fields"
+                             [crud]="buildController"
+                             [modelDataConfig]="modelDataConfig"
+                             (complete)="complete()">
+  </app-form-wrapper-material>
+
+</p>

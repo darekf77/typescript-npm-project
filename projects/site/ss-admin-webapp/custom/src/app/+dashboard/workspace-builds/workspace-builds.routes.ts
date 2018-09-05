@@ -7,10 +7,15 @@ import { WorkspaceBuildsComponent } from './workspace-builds.component';
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: "prefix",
     component: WorkspaceBuildsComponent,
     data: {
       breadcrumbs: 'Builds'
-    }
+    },
+    children: [
+      {
+        path: 'build/:id',
+        loadChildren: './build-editor/build-editor.module#BuildEditorModule'
+      }
+    ]
   }
 ];
