@@ -3,19 +3,24 @@ import { META } from 'baseline/ss-common-logic/src/helpers';
 import { BUILD } from '../entities/BUILD';
 
 
-import * as entities from '../entities';
-import * as controllers from '../controllers';
+//#region @backend
+import * as _ from 'lodash';
+import * as entitiesBaseline from 'baseline/ss-common-logic/src/entities';
+import * as controllersBaseline from 'baseline/ss-common-logic/src/controllers';
+import * as entitiesDecorators from '../entities-decorators';
+import * as controllersDecorators from '../controllers-decorators';
+//#endregion
 
 @ENDPOINT()
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   //#region @backend
   get db() {
-    return entities.entities(this.connection as any);
+    return entitiesBaseline.entities(this.connection as any, entitiesDecorators.entities(this.connection as any))
   }
 
   get ctrl() {
-    return controllers.controllers()
+    return controllersBaseline.controllers(controllersDecorators.controllers())
   }
 
 
@@ -30,4 +35,4 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 }
 
-export default controllers;
+export default BuildController;

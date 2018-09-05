@@ -36,12 +36,13 @@ export { EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION, EXAMPLE_PAGINATION_REPOSITORY 
 //#region @backend
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";
+import * as _ from 'lodash'
 
 import { META, Connection } from './helpers';
 
 
-export function entities(connection?: Connection) {
-  return {
+export function entities<ADDITIONAL={}>(connection?: Connection, decoratorsEntities?: ADDITIONAL) {
+  return _.merge({
     USER: META.repositoryFrom<USER, USER_REPOSITORY>(connection, USER, USER_REPOSITORY),
 
     SESSION: META.repositoryFrom<SESSION, SESSION_REPOSITORY>(connection, SESSION, SESSION_REPOSITORY),
@@ -68,6 +69,6 @@ export function entities(connection?: Connection) {
         EXAMPLE_PAGINATION,
         EXAMPLE_PAGINATION_REPOSITORY
       )
-  }
+  }, decoratorsEntities);
 }
 //#endregion

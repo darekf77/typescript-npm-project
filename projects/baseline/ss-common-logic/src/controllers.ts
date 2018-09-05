@@ -28,10 +28,11 @@ export { ExamplesPaginationController } from './controllers/ExamplesPaginationCo
 
 //#region @backend
 import { getSingleton } from "morphi";
+import * as _ from 'lodash'
 
 
-export function controllers() {
-  return {
+export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
+  return _.merge({
     AuthController: getSingleton<AuthController>(AuthController),
     CategoryController: getSingleton<CategoryController>(CategoryController),
     MultimediaController: getSingleton<MultimediaController>(MultimediaController),
@@ -40,6 +41,6 @@ export function controllers() {
     DialogsController: getSingleton<DialogsController>(DialogsController),
     ConfigController: getSingleton<ConfigController>(ConfigController),
     ExamplesPaginationController: getSingleton<ExamplesPaginationController>(ExamplesPaginationController)
-  }
+  }, decoratorsControllers);
 }
 //#endregion

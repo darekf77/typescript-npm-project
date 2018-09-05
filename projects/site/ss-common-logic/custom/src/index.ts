@@ -1,8 +1,8 @@
 //#region @backend
 import { Controllers as BaselienController, Entities as BaselineEntites } from "baseline/ss-common-logic/src/index";
 
-import * as controllers from './controllers';
-import * as entites from './entities';
+import * as controllers from './controllers-decorators';
+import * as entites from './entities-decorators';
 
 import mocks from "baseline/ss-common-logic/src/db-mocks";
 import { start } from "baseline/ss-common-logic/src/helpers";
