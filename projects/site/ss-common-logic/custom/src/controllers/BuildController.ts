@@ -4,11 +4,8 @@ import { BUILD } from '../entities/BUILD';
 
 
 //#region @backend
-import * as _ from 'lodash';
-import * as entitiesBaseline from 'baseline/ss-common-logic/src/entities';
-import * as controllersBaseline from 'baseline/ss-common-logic/src/controllers';
-import * as entitiesDecorators from '../entities-decorators';
-import * as controllersDecorators from '../controllers-decorators';
+import * as entities from '../entities';
+import * as controllers from '../controllers';
 //#endregion
 
 @ENDPOINT()
@@ -16,11 +13,11 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   //#region @backend
   get db() {
-    return entitiesBaseline.entities(this.connection as any, entitiesDecorators.entities(this.connection as any))
+    return entities.entities(this.connection as any)
   }
 
   get ctrl() {
-    return controllersBaseline.controllers(controllersDecorators.controllers())
+    return controllers.controllers()
   }
 
 

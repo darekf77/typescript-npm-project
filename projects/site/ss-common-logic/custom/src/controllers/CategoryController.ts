@@ -9,7 +9,7 @@ export class CategoryController extends BaselineCategoryController {
 
 
   async initExampleDbData() {
-    console.log('Don not init this! OK ')
+    // console.log('Don not init this! OK ')
   }
 
 }
