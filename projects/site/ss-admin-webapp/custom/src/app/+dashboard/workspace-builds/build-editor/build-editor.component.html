@@ -2,9 +2,9 @@
   <dialog-wrapper [dialogRef]="dialogBuild">
     <h3>Realtime build logs:</h3>
     <h4 *ngIf="!textBuildLogs"> <strong>empty build logs files</strong> </h4>
-    <p *ngIf="textBuildLogs"
+    <code *ngIf="textBuildLogs"
        [innerHtml]="textBuildLogs">
-    </p>
+  </code>
   </dialog-wrapper>
 </ng-template>
 
@@ -13,9 +13,9 @@
   <dialog-wrapper [dialogRef]="dialogServe">
     <h3>Realtime serve logs:</h3>
     <h4 *ngIf="!textServeLogs"> <strong>empty serve logs files</strong> </h4>
-    <p *ngIf="textServeLogs"
+    <code *ngIf="textServeLogs"
        [innerHtml]="textServeLogs">
-    </p>
+  </code>
   </dialog-wrapper>
 </ng-template>
 

@@ -23,9 +23,26 @@ export class BuildEditorComponent implements OnInit {
   modelDataConfig = new ModelDataConfig()
   id: number;
 
+  clear = {
+    type: 'button',
+    templateOptions: {
+      label: 'Clear Build',
+      action: async () => {
+        this.clear.templateOptions.disabled = true;
+        try {
+          await this.buildController.clearById(this.model.id).received
 
+          log.i('Project clear complete')
+        } catch (e) {
+          log.er('error during clear')
+        }
+        this.clear.templateOptions.disabled = false;
+      }
+    }
+  } as FormlyFieldConfig;
 
   fields = [
+    this.clear,
     {
       type: 'button',
       templateOptions: {

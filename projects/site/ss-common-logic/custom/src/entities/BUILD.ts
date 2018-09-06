@@ -55,6 +55,11 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   }
 
 
+  clear(all = false) {
+    run(`tnp clear${all ? ':all' : ''}`,
+      { cwd: this.localPath.repositoryFolder, output: false }).sync()
+  }
+
 
   startBuilding() {
 
@@ -63,6 +68,10 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     fse.writeFileSync(this.localPath.buildLog, '');
 
     p.stdout.addListener('data', (chunk) => {
+      fse.appendFileSync(this.localPath.buildLog, chunk)
+    });
+
+    p.stderr.addListener('data', (chunk) => {
       fse.appendFileSync(this.localPath.buildLog, chunk)
     });
 
@@ -78,6 +87,10 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     p.stdout.addListener('data', (chunk) => {
       fse.appendFileSync(this.localPath.serveLog, chunk)
     });
+
+    p.stderr.addListener('data', (chunk) => {
+      fse.appendFileSync(this.localPath.serveLog, chunk)
+    })
 
     this.pidServeProces = p.pid;
     return p;

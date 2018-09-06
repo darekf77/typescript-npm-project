@@ -5,7 +5,7 @@ const { AngularCompilerPlugin } = require('@ngtools/webpack');
 const ngcWebpack = require('ngc-webpack');
 const common = require('./webpack.config.common.js');
 
-const { getReservedClassNames } = require('tnp')
+const { getReservedClassNames } = require('tnp-bundle')
 
 const reserved = getReservedClassNames()
 

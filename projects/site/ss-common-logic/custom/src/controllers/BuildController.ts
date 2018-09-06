@@ -64,6 +64,13 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   //#endregion
 
 
+  cutLast(s: string, nLines: number) {
+    const lines = s.split('\n')
+
+    return ((lines.length - nLines) <= 0) ? lines : lines.slice(lines.length - nLines, lines.length)
+  }
+
+
   @GET('/lines/build/:id')
   getByIdLastNLinesFromBuildLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
     //#region @backendFunc
@@ -75,8 +82,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
       if (!fse.existsSync(build.localPath.buildLog)) {
         throw `Log for build doesn't exist  ${build.localPath.buildLog}`;
       }
-      const result = await getLinesFromFiles(build.localPath.buildLog, n);
-      return result;
+
+      return this.cutLast(fse.readFileSync(build.localPath.buildLog).toString(), n);
     }
     //#endregion
   }
@@ -92,12 +99,24 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
       if (!fse.existsSync(build.localPath.serveLog)) {
         throw `Log for build doesn't exist  ${build.localPath.serveLog}`;
       }
-      const result = await getLinesFromFiles(build.localPath.serveLog, n);
-      return result;
+
+      return this.cutLast(fse.readFileSync(build.localPath.serveLog).toString(), n);
     }
     //#endregion
   }
 
+  @PUT('/clear/:id')
+  clearById(@PathParam('id') id: number, @QueryParam('all') all = false): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.findOne(id);
+      if (!build) {
+        throw `Cannot find build with id ${id}`
+      }
+      build.clear();
+    }
+    //#endregion
+  }
 
   @PUT('/start/build/:id')
   startBuildById(@PathParam('id') id: number): Response<void> {
