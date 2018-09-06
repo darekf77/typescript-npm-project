@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { BuildEditorComponent } from './build-editor.component';
 import { RouterModule } from '@angular/router';
 import { routes } from './build-editor.routes';
-import { FormWrapperMaterialModule } from 'ss-common-ui/module';
+import { FormWrapperMaterialModule, DialogWrapperModule } from 'ss-common-ui/module';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    FormWrapperMaterialModule
+    FormWrapperMaterialModule,
+    DialogWrapperModule
   ],
   exports: [BuildEditorComponent],
   declarations: [BuildEditorComponent]

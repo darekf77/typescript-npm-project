@@ -9,11 +9,12 @@ import * as _ from 'lodash';
 @Component({
   selector: 'app-formly-button-with-action',
   template: `
-     <button mat-button (click)="action()" >{{field.templateOptions.label}}</button>
+     <button mat-raised-button type="button" (click)="action()" >{{field.templateOptions.label}}</button>
   `,
   styles: [`
     :host {
       display: block;
+      padding-bottom: 20px;
     }
   `]
 })
@@ -26,7 +27,11 @@ export class ButtonWithActionComponent extends FieldType implements OnInit {
     }
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    if (!this.field.templateOptions.label) {
+      this.field.templateOptions.label = 'button with action';
+    }
+  }
 
 }
 

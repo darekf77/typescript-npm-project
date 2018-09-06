@@ -78,22 +78,27 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   resolveFields() {
     let fields = getFormlyFrom(this.entity);
-    log.i(`fields from : ${this.entity && this.entity.name}`, fields);
+    log.i(`fields from entity : ${this.entity && this.entity.name}`, fields);
 
     if (!fields) {
       this.waringAboutDecorator();
     }
 
     if (_.isArray(this.fields)) {
+      log.i('field from input', this.fields);
+
       const keys = fields.map(c => c.key);
+
       fields = fields.map(field => {
         return _.merge(field, this.fields.find(f => f.key === field.key));
       });
-      fields = fields.concat(this.fields.filter(field => !keys.includes(field.key)));
+      fields = fields
+        .concat(this.fields.filter(field => !keys.includes(field.key)));
+      log.i('field affer contact', fields);
 
     }
 
-    fields = fields.filter(({ key }) => !this.exclude.includes(key));
+    fields = fields.filter(({ key }) => !(key && this.exclude.includes(key)));
     log.i('fields filter', fields);
 
     this.formly.fields = fields;

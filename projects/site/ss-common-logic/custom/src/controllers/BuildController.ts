@@ -1,4 +1,4 @@
-import { ENDPOINT, CLASSNAME, BaseCRUDEntity, POST, PathParam, QueryParam, GET, Response } from 'morphi';
+import { ENDPOINT, CLASSNAME, BaseCRUDEntity, POST, PathParam, QueryParam, GET, Response, PUT } from 'morphi';
 import { META } from 'baseline/ss-common-logic/src/helpers';
 import { BUILD } from '../entities/BUILD';
 
@@ -64,8 +64,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   //#endregion
 
 
-  @GET('/lines/:id')
-  getByIdLastNLines(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
+  @GET('/lines/build/:id')
+  getByIdLastNLinesFromBuildLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.findOne(id);
@@ -75,21 +75,95 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
       if (!fse.existsSync(build.localPath.buildLog)) {
         throw `Log for build doesn't exist  ${build.localPath.buildLog}`;
       }
-      return getLinesFromFiles(build.localPath.buildLog);
+      const result = await getLinesFromFiles(build.localPath.buildLog, n);
+      return result;
     }
     //#endregion
   }
 
-
-  @POST('/start/:id')
-  startById(@PathParam('id') id) {
+  @GET('/lines/serve/:id')
+  getByIdLastNLinesFromServeLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.findOne(id);
       if (!build) {
         throw `Cannot find build with id ${id}`
       }
-      build.start();
+      if (!fse.existsSync(build.localPath.serveLog)) {
+        throw `Log for build doesn't exist  ${build.localPath.serveLog}`;
+      }
+      const result = await getLinesFromFiles(build.localPath.serveLog, n);
+      return result;
+    }
+    //#endregion
+  }
+
+
+  @PUT('/start/build/:id')
+  startBuildById(@PathParam('id') id: number): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.findOne(id);
+      if (!build) {
+        throw `Cannot find build with id ${id}`
+      }
+
+      const p = build.startBuilding();
+      p.on('exit', async () => {
+        build.pidBuildProces = null;
+        await this.db.BUILD.update(id, build);
+      })
+      await this.db.BUILD.update(id, build);
+
+    }
+    //#endregion
+  }
+
+  @PUT('/stop/build/:id')
+  stopBuildById(@PathParam('id') id: number): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.findOne(id);
+      if (!build) {
+        throw `Cannot find build with id ${id}`
+      }
+      build.stopBuilding();
+      await this.db.BUILD.update(id, build);
+
+    }
+    //#endregion
+  }
+
+  @PUT('/start/serve/:id')
+  startServeById(@PathParam('id') id: number): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.findOne(id);
+      if (!build) {
+        throw `Cannot find build with id ${id}`
+      }
+      const p = build.startServing();
+      p.on('exit', async () => {
+        build.pidServeProces = null;
+        await this.db.BUILD.update(id, build);
+      })
+      await this.db.BUILD.update(id, build);
+
+    }
+    //#endregion
+  }
+
+  @PUT('/stop/serve/:id')
+  stopServeById(@PathParam('id') id: number): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.findOne(id);
+      if (!build) {
+        throw `Cannot find build with id ${id}`
+      }
+      build.stopServeing();
+      await this.db.BUILD.update(id, build);
+
     }
     //#endregion
   }

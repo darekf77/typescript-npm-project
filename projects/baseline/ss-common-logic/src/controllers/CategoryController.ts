@@ -3,7 +3,7 @@ import {
   BaseCRUDEntity,
   GET, SYMBOL,
   PathParam,
-  Response, CLASSNAME
+  Response, CLASSNAME, POST, BodyParam
 } from 'morphi';
 //#region @backend
 import { authenticate } from 'passport';
@@ -15,6 +15,7 @@ import { META } from '../helpers';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
+import { CATEGORY } from '../entities/CATEGORY';
 
 
 @ENDPOINT({
@@ -153,6 +154,15 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     };
     //#endregion
   }
+
+  // @POST('/:id')
+  // categoryUpdate(@BodyParam() categor: CATEGORY) {
+
+
+  //   return async () => {
+
+  //   }
+  // }
 
 
 }

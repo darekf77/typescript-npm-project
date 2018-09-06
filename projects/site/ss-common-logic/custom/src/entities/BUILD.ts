@@ -12,6 +12,8 @@ import { run, HelpersLinks } from 'tnp-bundle';
 
 export interface IBUILD {
   name: string;
+  pidBuildProces: number;
+  pidServeProces: number;
 }
 
 
@@ -37,7 +39,8 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
       repository: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote),
       repositoryFolder: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote, this.gitFolder),
       buildFolder: path.join(ENV.pathes.backup.builds, this.nameFromIdAndRemote),
-      buildLog: path.join(ENV.pathes.backup.builds, `${this.nameFromIdAndRemote}.txt`),
+      buildLog: path.join(ENV.pathes.backup.builds, `build-${this.nameFromIdAndRemote}.txt`),
+      serveLog: path.join(ENV.pathes.backup.builds, `serve-${this.nameFromIdAndRemote}.txt`)
     }
 
   }
@@ -51,18 +54,53 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     HelpersLinks.createLink(this.localPath.buildFolder, this.localPath.repositoryFolder);
   }
 
-  start() {
 
-    let p = run(`tnp build`, { cwd: this.localPath.repositoryFolder }).async()
+
+  startBuilding() {
+
+    let p = run(`tnp build`, { cwd: this.localPath.repositoryFolder, output: false }).async()
+
+    fse.writeFileSync(this.localPath.buildLog, '');
+
     p.stdout.addListener('data', (chunk) => {
-      console.log(chunk)
-      if (!fse.existsSync(this.localPath.buildLog)) {
-        fse.createFileSync(this.localPath.buildLog);
-      }
-      fse.appendFileSync(this.localPath.buildLog, chunk, {
-        encoding: 'utf8'
-      })
+      fse.appendFileSync(this.localPath.buildLog, chunk)
     });
+
+    this.pidBuildProces = p.pid;
+    return p;
+  }
+
+  startServing() {
+    let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
+
+    fse.writeFileSync(this.localPath.serveLog, '');
+
+    p.stdout.addListener('data', (chunk) => {
+      fse.appendFileSync(this.localPath.serveLog, chunk)
+    });
+
+    this.pidServeProces = p.pid;
+    return p;
+  }
+
+
+  stopBuilding() {
+    try {
+      run(`kill -9 ${this.pidBuildProces}`).sync()
+    } catch (e) {
+      console.log(e)
+    }
+
+    this.pidBuildProces = undefined;
+  }
+
+  stopServeing() {
+    try {
+      run(`kill -9 ${this.pidServeProces}`).sync()
+    } catch (e) {
+      console.log(e)
+    }
+    this.pidServeProces = undefined
   }
 
 
@@ -89,6 +127,11 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column({ nullable: true }) port: string;
   @Column() gitRemote: string;
+
+  @Column({ nullable: true }) pidBuildProces: number;
+  @Column({ nullable: true }) pidServeProces: number;
+
+
   @Column({ nullable: true, default: '/' }) gitFolder: string;
 
 

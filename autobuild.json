@@ -36,6 +36,7 @@
           "args": [
             "--copyto C:/Users/dfilipiak/Projects/npm/morphi",
             "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/site",
             "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
             "# C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
           ]
@@ -46,6 +47,7 @@
           "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/site",
             "--copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project/projects/workspace",
             "# --copyto C:/Users/dfilipiak/Projects/npm/tsc-npm-project"
           ]
@@ -90,6 +92,7 @@
           "args": [
             "--copyto C:/Users/Dariusz/projects/npm/morphi",
             "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/site",
             "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
             "# --copyto C:/Users/Dariusz/projects/npm/tsc-npm-project"
           ]
@@ -100,6 +103,7 @@
           "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/site",
             "--copyto C:/Users/Dariusz/projects/npm/tsc-npm-project/projects/workspace",
             "# --copyto C:/Users/Dariusz/projects/npm/tsc-npm-project"
           ]
@@ -146,6 +150,7 @@
           "args": [
             "--copyto  /Users/darekf/projects/npm/morphi",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
             "#  /Users/darekf/projects/npm/tsc-npm-project"
           ]
@@ -156,6 +161,7 @@
           "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
             "# --copyto  /Users/darekf/projects/npm/tsc-npm-project"
           ]
@@ -173,6 +179,7 @@
           "args": [
             "--copyto  /home/dariusz/projects/npm/morphi",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
             "#  /home/dariusz/projects/npm/tsc-npm-project"
           ]
@@ -183,6 +190,7 @@
           "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
             "# --copyto  /home/dariusz/projects/npm/tsc-npm-project"
           ]
