@@ -105,15 +105,15 @@ export class AutoActions {
   }
 
   private getBuild() {
-    console.log('config', this.config)
+    // console.log('config', this.config)
     const hostname = this.hostname;
     const username = os.userInfo().username.toLowerCase();
-    console.log('hostname', hostname)
-    console.log('username', username)
+    // console.log('hostname', hostname)
+    // console.log('username', username)
     const build: ProjectForAutoBuild = this.config[hostname][username].builds
       .find(b => {
         const p = ProjectFrom(b.cwd);
-        console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
+        // console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
         if (!p) {
           error(`Please fix your autobuild.json`);
         }
