@@ -53,8 +53,10 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
   }
 
   buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir } = buildOptions;
-    this.buildLib(outDir, prod, watch);
+    const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
+    if (!onlyWatchNoBuild) {
+      this.buildLib(outDir, prod, watch);
+    }
     return;
   }
 
@@ -95,10 +97,8 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         otherIsomorphicLibs: isomorphicNames
       }
     }).init(this.location)
-    this.copyToProjectsOnFinish();
-    if (watch) {
-      this.watchOutDir()
-    }
+
+    this.copytToManager.build(this.buildOptions);
   }
 
 }

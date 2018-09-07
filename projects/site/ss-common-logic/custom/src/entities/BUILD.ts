@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import { META } from "baseline/ss-common-logic/src/helpers";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, EntityRepository } from "typeorm";
 import { FormlyForm, DefaultModelWithMapping, CLASSNAME } from 'morphi';
 
 //#region @backend
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { run, HelpersLinks } from 'tnp-bundle';
+import { run, HelpersLinks, killProcess } from 'tnp-bundle';
 //#endregion
 
 export interface IBUILD {
@@ -60,8 +60,20 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
       { cwd: this.localPath.repositoryFolder, output: false }).sync()
   }
 
+  public get start() {
+    const self = this;
+    return {
+      building() {
+        return self.startBuilding()
+      },
+      serving() {
+        return self.startServing()
+      }
+    }
+  }
 
-  startBuilding() {
+
+  private startBuilding() {
 
     let p = run(`tnp build`, { cwd: this.localPath.repositoryFolder, output: false }).async()
 
@@ -79,7 +91,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return p;
   }
 
-  startServing() {
+  private startServing() {
     let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
 
     fse.writeFileSync(this.localPath.serveLog, '');
@@ -96,10 +108,21 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return p;
   }
 
+  public get stop() {
+    const self = this;
+    return {
+      building() {
+        return self.stopBuilding();
+      },
+      serving() {
+        return self.startServing()
+      }
+    }
+  }
 
-  stopBuilding() {
+  private stopBuilding() {
     try {
-      run(`kill -9 ${this.pidBuildProces}`).sync()
+      killProcess(this.pidBuildProces);
     } catch (e) {
       console.log(e)
     }
@@ -107,9 +130,9 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     this.pidBuildProces = undefined;
   }
 
-  stopServeing() {
+  private stopServeing() {
     try {
-      run(`kill -9 ${this.pidServeProces}`).sync()
+      killProcess(this.pidServeProces);
     } catch (e) {
       console.log(e)
     }
@@ -149,5 +172,25 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
 
 }
+
+export interface BUILD_ALIASES {
+  builds: string;
+  build: string;
+}
+
+@EntityRepository(BUILD)
+export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES> {
+  globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
+
+  async getById(id: number) {
+    const build = await this.findOne(id);
+    if (!build) {
+      throw `Cannot find build with id ${id}`
+    }
+    return build;
+  }
+
+}
+
 
 export default BUILD;

@@ -145,7 +145,7 @@ export class BaselineSiteJoin {
     //#endregion
 
     //#region copy / unlink
-    private copyToJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
+    private copyJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
         // console.log(`Extname from ${source}: ${path.extname(source)}`)
 
         const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
@@ -298,7 +298,7 @@ export class BaselineSiteJoin {
                 variant = 'no-in-baseline'
                 this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
             }
-            this.copyToJoin(
+            this.copyJoin(
                 baselineFileInCustomPath,
                 joinFilePath,
                 relativeBaselineCustomPath

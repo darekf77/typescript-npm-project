@@ -17,13 +17,17 @@ export class ProjectServerLib extends BaseProjectLib {
     }
 
     buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
-        this.run(`tnp npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
+        this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
     }
 
     buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir } = buildOptions;
-        this.buildLib(outDir, prod, watch);
-        return;
+        const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
+        
+
+        if (!onlyWatchNoBuild) {
+            this.buildLib(outDir, prod, watch);
+        }
+        this.copytToManager.build(this.buildOptions)
     }
 }
 

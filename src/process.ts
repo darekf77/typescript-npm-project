@@ -33,7 +33,9 @@ export async function questionYesNo(message: string,
 }
 
 
-
+export function killProcess(byPid: number) {
+  run(`kill -9 ${byPid}`).sync()
+}
 
 export function clearConsole() {
   // try {

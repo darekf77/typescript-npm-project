@@ -15,6 +15,7 @@ export interface BuildArgs {
   environmentName: string;
   noConsoleClear: string;
   envName: string;
+  onlyWatchNoBuild?: boolean;
   baseHref: string;
   '--base-href': string
 }
@@ -25,6 +26,8 @@ function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
     args = args.replace(/\\/g, '\\\\')
   }
   const argsObj: BuildArgs = require('minimist')(args.split(' '));
+
+  argsObj.noConsoleClear
 
   if (argsObj.noConsoleClear) {
     noConsoleClear = true;
@@ -70,20 +73,23 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
   }
 
 
-
+  let onlyWatchNoBuild = false;
+  if (argsObj.onlyWatchNoBuild as any === 'true') {
+    onlyWatchNoBuild = true;
+  }
 
   return {
-    copyto, environmentName //, baseHref
+    copyto, environmentName, onlyWatchNoBuild  //, baseHref
   }
 }
 
 
 export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
-  const { copyto, environmentName } = handleArguments(args, outDir, watch);
+  const { copyto, environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, copyto, environmentName
+    prod, watch, outDir, copyto, environmentName, onlyWatchNoBuild
   };
   build(options, config.allowedTypes.libs)
 }
@@ -91,10 +97,10 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
 
 export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
-  const { environmentName } = handleArguments(args, outDir, watch);
+  const { environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, appBuild: true, environmentName
+    prod, watch, outDir, appBuild: true, environmentName, onlyWatchNoBuild
   };
   build(options, config.allowedTypes.app);
 }

@@ -38,6 +38,7 @@ export class BuildOptions {
   watch?: boolean;
   appBuild?: boolean;
   baseHref?: string;
+  onlyWatchNoBuild?: boolean;
   proxyRouterMode?: boolean;
   copyto?: Project[];
   environmentName: EnvironmentName;

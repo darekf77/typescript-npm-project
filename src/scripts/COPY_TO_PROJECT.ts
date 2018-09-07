@@ -10,7 +10,7 @@ function copyto(args: string) {
   if (!destination) {
     error(`Incorect project in: ${destLocaiton}`)
   }
-  currentLib.copyToProjectNodeModules(destination);
+  currentLib.copytToManager.copyToProjectNodeModules(destination);
   info(`Current project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
   process.exit(0)
 }

@@ -104,7 +104,7 @@ export class AutoActions {
     info(`Done`);
   }
 
-  build(watch = false) {
+  private getBuild() {
     console.log('config', this.config)
     const hostname = this.hostname;
     const username = os.userInfo().username.toLowerCase();
@@ -121,11 +121,18 @@ export class AutoActions {
       });
 
     console.log('build', build)
+    return build;
+  }
+
+  build(watch = false) {
+    const build = this.getBuild();
     if (!build) {
       error(`Not build for current project "${this.project.name}"   `)
     } else {
       clearConsole();
-      this.project.git.updateOrigin();
+      if (!this.project.isTnp) {
+        this.project.git.updateOrigin();
+      }
       this.project.run(`${watch ? build.commandWatch : build.command} ${(_.isArray(build.args) ? build.args
         .filter(a => !a.trim().startsWith('#'))
         .join(' ') : '')}`).sync()
@@ -155,4 +162,5 @@ export default {
   $AUTOBUILDWATCH: () => {
     autobuild(Project.Current, true)
   }
+
 }

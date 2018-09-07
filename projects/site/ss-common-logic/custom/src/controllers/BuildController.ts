@@ -71,14 +71,13 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   }
 
 
+
   @GET('/lines/build/:id')
   getByIdLastNLinesFromBuildLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
+      const build = await this.db.BUILD.getById(id);
+
       if (!fse.existsSync(build.localPath.buildLog)) {
         throw `Log for build doesn't exist  ${build.localPath.buildLog}`;
       }
@@ -92,10 +91,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   getByIdLastNLinesFromServeLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
+      const build = await this.db.BUILD.getById(id);
       if (!fse.existsSync(build.localPath.serveLog)) {
         throw `Log for build doesn't exist  ${build.localPath.serveLog}`;
       }
@@ -109,10 +105,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   clearById(@PathParam('id') id: number, @QueryParam('all') all = false): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
+      const build = await this.db.BUILD.getById(id);
       build.clear();
     }
     //#endregion
@@ -122,12 +115,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   startBuildById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
-
-      const p = build.startBuilding();
+      const build = await this.db.BUILD.getById(id);
+      const p = build.start.building();
       p.on('exit', async () => {
         build.pidBuildProces = null;
         await this.db.BUILD.update(id, build);
@@ -142,11 +131,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   stopBuildById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
-      build.stopBuilding();
+      const build = await this.db.BUILD.getById(id);
+      build.stop.building();
       await this.db.BUILD.update(id, build);
 
     }
@@ -157,11 +143,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   startServeById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
-      const p = build.startServing();
+      const build = await this.db.BUILD.getById(id);
+      const p = build.start.serving();
       p.on('exit', async () => {
         build.pidServeProces = null;
         await this.db.BUILD.update(id, build);
@@ -176,11 +159,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   stopServeById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.findOne(id);
-      if (!build) {
-        throw `Cannot find build with id ${id}`
-      }
-      build.stopServeing();
+      const build = await this.db.BUILD.getById(id);
+      build.stop.serveing();
       await this.db.BUILD.update(id, build);
 
     }

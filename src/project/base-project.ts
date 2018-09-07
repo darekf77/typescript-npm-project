@@ -26,6 +26,7 @@ import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 import { install } from '../scripts/INSTALL';
 import { pullCurrentBranch } from '../helpers-git';
+import { CopyToManager } from './copyto-manager';
 
 
 export abstract class Project {
@@ -49,6 +50,7 @@ export abstract class Project {
   readonly recreate: FilesRecreator;
   env: EnvironmentConfig;
   readonly proxyRouter: ProxyRouter;
+  readonly copytToManager: CopyToManager;
 
   static projects: Project[] = [];
 
@@ -133,6 +135,10 @@ export abstract class Project {
     return this.packageJson.isCoreProject;
   }
 
+  get isTnp() {
+    return this.location === Project.Tnp.location;
+  }
+
   get isWorkspaceChildProject() {
     return this.parent && this.parent.type === 'workspace';
   }
@@ -211,6 +217,7 @@ export abstract class Project {
       // console.log(`Default port by type: "${this.defaultPort}" for ${this.name}`)
       this.env = new EnvironmentConfig(this);
       this.proxyRouter = new ProxyRouter(this);
+      this.copytToManager = new CopyToManager(this);
 
     } else {
       error(`Invalid project location: ${location}`);
@@ -407,7 +414,7 @@ export abstract class Project {
     pathTnpPackageJSONData.main = undefined;
     pathTnpPackageJSONData.preferGlobal = undefined;
     pathTnpPackageJSONData.dependencies = undefined;
-    
+
 
     const self = this;
     return {

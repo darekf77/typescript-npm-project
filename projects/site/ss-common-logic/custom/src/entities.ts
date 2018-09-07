@@ -1,8 +1,8 @@
 import * as baslineEntites from 'baseline/ss-common-logic/src/entities';
 export * from 'baseline/ss-common-logic/src/entities';
 
-import { BUILD } from './entities/BUILD';
-export { BUILD } from './entities/BUILD';
+import { BUILD, BUILD_REPOSITORY } from './entities/BUILD';
+export { BUILD, BUILD_REPOSITORY } from './entities/BUILD';
 
 
 //#region @backend
@@ -12,7 +12,7 @@ import { META, Connection } from "baseline/ss-common-logic/src/helpers";
 export function entities(connection?: Connection) {
   return _.merge(baslineEntites.entities(connection), {
 
-    BUILD: META.repositoryFrom<BUILD>(connection as any, BUILD)
+    BUILD: META.repositoryFrom<BUILD, BUILD_REPOSITORY>(connection as any, BUILD, BUILD_REPOSITORY)
 
   });
 }

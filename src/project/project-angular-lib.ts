@@ -48,7 +48,6 @@ export class ProjectAngularLib extends BaseProjectLib {
       }
       this.run(`npm-run gulp inline-templates-${outDir}-watch`, { output: false }).async()
       this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`).async()
-      this.watchOutDir()
     } else {
       this.compilationWrapper(() => {
         this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
@@ -58,28 +57,26 @@ export class ProjectAngularLib extends BaseProjectLib {
           this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
         }
       }, `angular-lib (project ${this.name})`)
-      this.copyToProjectsOnFinish();
     }
+    this.copytToManager.build(this.buildOptions);
     return this;
   }
 
   buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, appBuild } = buildOptions;
-    if (appBuild) {
-      this.angular.buildSteps(buildOptions);
-    } else {
-      if (watch) {
-        this.buildLib(outDir, prod, false);
-        this.buildLib(outDir, prod, true)
+    const { prod, watch, outDir, appBuild, onlyWatchNoBuild } = buildOptions;
+
+    if (!onlyWatchNoBuild) {
+      if (appBuild) {
+        this.angular.buildSteps(buildOptions);
       } else {
-        this.buildLib(outDir, prod, watch)
+        if (watch) {
+          this.buildLib(outDir, prod, false);
+          this.buildLib(outDir, prod, true)
+        } else {
+          this.buildLib(outDir, prod, watch)
+        }
       }
-      // if (watch) {
-      //     const p = (prod ? ':prod' : '');
-      //     this.watcher.run(`tnp build:${outDir}${p}`, 'components/src', 5);
-      // } else {
-      //     this.buildLib(outDir)
-      // }
+      this.copytToManager.build(this.buildOptions);
     }
   }
 
