@@ -43,14 +43,15 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
     if (project.isSite) {
       if (watch) {
-        project.recreate.join.init().watch()
+        // console.log("HERE !!")
+        project.join.init().watch()
         if (project.isWorkspaceChildProject) {
-          project.parent.recreate.join.init().watch()
+          project.parent.join.init().watch()
         }
       } else {
-        project.recreate.join.init()
+        project.join.init()
         if (project.isWorkspaceChildProject) {
-          project.parent.recreate.join.init()
+          project.parent.join.init()
         }
       }
 

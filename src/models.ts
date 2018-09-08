@@ -139,6 +139,6 @@ export interface IPackageJSON {
     isCoreProject: boolean;
     basedOn: Project | string,
     resources?: string[];
-    requiredLibs?: string[];
+    // requiredLibs?: string[];
   };
 }

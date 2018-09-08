@@ -3,12 +3,12 @@ export function error(details: any, noExit = false) {
     if (typeof details === 'object') {
         try {
             const json = JSON.stringify(details)
-            console.log(chalk.red(json));
+            console.trace(chalk.red(json));
         } catch (error) {
-            console.log(details);
-        }       
+            console.trace(details);
+        }
     } else {
-        console.log(chalk.red(details));
+        console.trace(chalk.red(details));
     }
 
     if (!noExit) {

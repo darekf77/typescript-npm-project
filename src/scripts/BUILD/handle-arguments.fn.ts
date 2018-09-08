@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
-import { run, clearConsole } from "../../process";
-import { Project, ProjectIsomorphicLib, ProjectFrom, BaseProjectLib } from '../../project';
-import { clear } from ".././CLEAR";
-import { BuildOptions, BuildDir, LibType, EnvironmentName } from "../../models";
+import { clearConsole } from "../../process";
+import { Project } from '../../project';
+import { BuildDir, EnvironmentName } from "../../models";
 import { info, error } from "../../messages";
 import * as path from 'path';
 import { BuildArgs } from './build-args.model';

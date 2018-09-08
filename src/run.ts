@@ -2,18 +2,10 @@ import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
 import { run as runCommand } from "./process";
-export { config } from './config';
-export * from './helpers'
-export * from './helpers-isomorphic'
-export * from './helpers-git'
-export * from './project'
-export * from './models'
 import { Helpers } from "morphi";
-import { paramsFrom, match } from './helpers';
+import { match } from './helpers';
 import { isString } from 'util';
 import chalk from 'chalk';
-import { initWatcherDB } from "./watcher-no-race";
-import { IfObservable } from '../node_modules/rxjs/observable/IfObservable';
 import { Project } from './project';
 
 import build from './scripts/BUILD/index';
@@ -63,6 +55,8 @@ const helpAlias = [
   '-help',
   'help'
 ]
+
+
 
 export async function run(argsv: string[]) {
 

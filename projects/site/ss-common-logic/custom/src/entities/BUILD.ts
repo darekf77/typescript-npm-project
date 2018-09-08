@@ -46,14 +46,20 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   }
 
   initialize(staticFolder = undefined) {
-    console.log('staticFolder', staticFolder)
-    console.log('localPath.repository', this.localPath.repository)
-    console.log('localPath.buildFolder', this.localPath.buildFolder)
-    console.log('localPath.repositoryFolder', this.localPath.repositoryFolder)
+    // console.log('staticFolder', staticFolder)
+    // console.log('localPath.repository', this.localPath.repository)
+    // console.log('localPath.buildFolder', this.localPath.buildFolder)
+    // console.log('localPath.repositoryFolder', this.localPath.repositoryFolder)
     if (staticFolder) {
+      if (fse.existsSync(this.localPath.repository)) {
+        fse.removeSync(this.localPath.repository)
+      }
       HelpersLinks.createLink(this.localPath.repository, staticFolder);
     } else {
       run(`git clone ${this.gitRemote} ${this.nameFromIdAndRemote}`, { cwd: ENV.pathes.repositories })
+    }
+    if (fse.existsSync(this.localPath.buildFolder)) {
+      fse.removeSync(this.localPath.buildFolder)
     }
     HelpersLinks.createLink(this.localPath.buildFolder, this.localPath.repositoryFolder);
   }

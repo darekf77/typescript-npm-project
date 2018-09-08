@@ -16,7 +16,7 @@ import { BuildOptions, RuleDependency } from './models';
 import { Project } from './project/base-project';
 import { HelpersLinks } from "./helpers-links";
 import { ProjectFrom } from './index';
-import { config } from './run';
+import { config } from './config';
 import { sleep } from 'sleep';
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
@@ -170,25 +170,25 @@ export function compilationWrapper(fn: () => void, taskName: string = 'Task', ex
 
 }
 
-export function clearFiles(files: string[] | string, preserveSymlinks = false) {
-  if (!files) return;
-  const filesPathesToDelete = !Array.isArray(files) ? [files] : files;
-  if (preserveSymlinks) {
-    filesPathesToDelete.forEach(file => {
-      const fpath = path.join(process.cwd(), file);
-      if (HelpersLinks.isLink(fpath)) {
-        run(`rm ${HelpersLinks.removeSlashAtEnd(file)}`).sync()
-      } else {
-        run(`rimraf ${file}`).sync()
-      }
-    })
-  } else {
-    run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
-  }
-  filesPathesToDelete.forEach(file => {
-    console.log(`Deleted ${file}`)
-  })
-}
+// export function clearFiles(files: string[] | string, preserveSymlinks = false) {
+//   if (!files) return;
+//   const filesPathesToDelete = !Array.isArray(files) ? [files] : files;
+//   if (preserveSymlinks) {
+//     filesPathesToDelete.forEach(file => {
+//       const fpath = path.join(process.cwd(), file);
+//       if (HelpersLinks.isLink(fpath)) {
+//         run(`rm ${HelpersLinks.removeSlashAtEnd(file)}`).sync()
+//       } else {
+//         run(`rimraf ${file}`).sync()
+//       }
+//     })
+//   } else {
+//     run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
+//   }
+//   filesPathesToDelete.forEach(file => {
+//     console.log(`Deleted ${file}`)
+//   })
+// }
 
 
 export function getWebpackEnv(params: string): BuildOptions {

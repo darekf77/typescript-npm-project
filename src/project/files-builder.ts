@@ -34,10 +34,10 @@ function getVscodeSettingsFrom(project: Project) {
 
 export class FilesRecreator {
 
-  readonly join: BaselineSiteJoin;
+
 
   constructor(private project: Project) {
-    this.join = new BaselineSiteJoin(project);
+
   }
 
   private get commonFilesForAllProjects() {
@@ -189,7 +189,7 @@ export class FilesRecreator {
   }
 
   customFolder() {
-    if (this.project.baseline) {
+    if (this.project.isBasedOnOtherProject) {
       const customFolder = path.join(this.project.location, config.folder.custom)
       if (!fs.existsSync(customFolder)) {
         this.project.run(`tnp mkdirp ${config.folder.custom} ${config.folder.src}`).sync()

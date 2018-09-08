@@ -64,7 +64,19 @@ export class EnvironmentConfig {
           let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment');
           // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
           if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-            this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+
+
+            try {
+              this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+            } catch (error) {
+              if (this.project.isSite) { // QUICK_FIX to get in site child last worksapce changes
+                console.log('INIT WORKSPACE CHILD, BUT RECREATE SITE WORKSPACE')
+                this.project.parent.join.init() // fix parent for recreating site
+              }
+              this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
+            }
+
+
           } else {
             this.kind = 'other';
           }
@@ -72,7 +84,21 @@ export class EnvironmentConfig {
           let pathToProjectEnvironment = path.join(this.project.location, 'environment');
           // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
           if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
-            this.workspaceConfig = require(pathToProjectEnvironment) as any;
+
+
+
+            try {
+              this.workspaceConfig = require(pathToProjectEnvironment) as any;
+            } catch (error) {
+              if (this.project.isSite) { // QUICK_FIX to get in site child last worksapce changes
+                console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
+                this.project.join.init() // fix for recreating site
+              }
+              this.workspaceConfig = require(pathToProjectEnvironment) as any;
+            }
+
+
+
           } else {
             this.kind = 'other';
           }
@@ -88,7 +114,104 @@ export class EnvironmentConfig {
 
   }
 
-  get workspaceProjectLocation() {
+  public init(options?: BuildOptions) {
+    if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
+      this.overrideDefaultPorts()
+    }
+    if (this.project.type === 'workspace') {
+      // console.log(`No need to prepare workspace config`)
+      return
+    }
+    const staticStartMode = !options;
+    // console.log('proxyRouterMode', proxyRouterMode)
+    // console.log('this.kind in prepare', this.kind)
+    if (!!this.config) {
+      return
+    }
+
+    if (this.kind === 'other') {
+      return
+    }
+    if (staticStartMode) {
+      options = this.options.saved;
+      if (options.watch) {
+        error(`Please run ${chalk.bold('tnp build:app')} before start:app command`);
+      }
+    }
+    const { appBuild, prod, watch = false, environmentName } = options;
+    this.options.save(options)
+
+    // console.log('PREPARE options', options)
+    this.config = _.cloneDeep(this.workspaceConfig);
+    this.config.proxyRouterMode = (
+      !options.watch &&
+      this.project.parent &&
+      this.project.parent.type === 'workspace'
+    );
+    this.config.name = environmentName ? environmentName : 'local';
+    this.config.isCoreProject = this.project.isCoreProject;
+
+    if (!this.config.workspace || !this.config.workspace.workspace) {
+      error(`You shoud define 'workspace' object inside config.workspace object`, true)
+      this.err()
+    }
+
+    if (this.config.domain) {
+      this.config.workspace.workspace.host =
+        `${this.config.domain}${this.config.workspace.workspace.baseUrl}`;
+    } else {
+      this.config.workspace.workspace.host =
+        `http://localhost:${this.config.workspace.workspace.port}`;
+    }
+
+
+    if (this.kind === 'tnp-workspace') {
+      this.config.packageJSON = this.project.packageJson.data;
+    }
+
+    if (this.kind === 'tnp-workspace-child') {
+      this.config.packageJSON = this.project.parent.packageJson.data;
+    }
+
+    this.config.workspace.projects.forEach(p => {
+      if (this.config.domain || this.config.proxyRouterMode) {
+        p.host = `${this.config.workspace.workspace.host}${p.baseUrl}`;
+      } else {
+        p.host = `http://localhost:${p.port}`;
+      }
+    })
+
+    this.saveConfig()
+    // console.log('config prepared!', this.config)
+
+  }
+
+  /**
+   * Can be accesed only after env.prepare()
+   */
+  public get configFor() {
+    if (this.project.type === 'workspace') {
+      error(`Do not use ${chalk.bold('env.configFor.backend, env.configFor.frontend')} from worksapce level...`, true)
+      error(`Try ${chalk.bold('env.workspaceConfig')} ...`)
+    }
+    const self = this;
+    return {
+      get backend() {
+        return self.config;
+      },
+      get frontend() {
+        const c = _.cloneDeep(self.configFor.backend);
+        walkObject(c, (lodashPath, isPrefixed) => {
+          if (isPrefixed) {
+            _.set(c, lodashPath, null)
+          }
+        })
+        return c;
+      }
+    }
+  }
+
+  private get workspaceProjectLocation() {
     if (this.kind === 'tnp-workspace') {
       return this.project.location;
     } else if (this.kind === 'tnp-workspace-child') {
@@ -96,21 +219,27 @@ export class EnvironmentConfig {
     }
   }
 
-  overrideDefaultPorts() {
+  private overrideDefaultPorts() {
+
+    // console.log(this.workspaceConfig)
 
     const overridedProjectsName: string[] = []
     this.workspaceConfig.workspace.projects.forEach(d => {
-      if (_.isNumber(d.port)) {
+      const port = Number(d.port);
+      if (!_.isNaN(port)) {
         const p = ProjectFrom(path.join(this.workspaceProjectLocation, d.name))
         if (p === undefined) {
           error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
         } else {
-          // console.log(`Overrided port from ${p.getDefaultPort()} to ${d.port} in project: ${p.name}`)
+
+          // console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
           overridedProjectsName.push(d.name)
-          p.setDefaultPort(d.port);
+          p.setDefaultPort(port);
         }
       }
     })
+    // console.log('OWEVERRIDINGINGIGNIGNIN',overridedProjectsName)
+    // process.exit(0)
     const workspace = ProjectFrom(this.workspaceProjectLocation)
     workspace.children.forEach(childProject => {
       if (!overridedProjectsName.includes(childProject.name)) {
@@ -142,7 +271,7 @@ export class EnvironmentConfig {
     }
   }
 
-  err() {
+  private err() {
     error(`Please follow worksapce schema:\n${chalk.bold(JSON.stringify(this.schema, null, 4))}
     \n
     \n your config\n : ${JSON.stringify(this.workspaceConfig, null, 4)}
@@ -178,7 +307,7 @@ export class EnvironmentConfig {
 
   }
 
-  get options() {
+  private get options() {
     const filename = 'tmp-env-prepare.json';
     const pathTmpEnvPrepareOptions = path.join(this.project.location, filename);
     const self = this;
@@ -199,78 +328,10 @@ export class EnvironmentConfig {
   }
 
 
-  prepare(options?: BuildOptions) {
-    if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
-      this.overrideDefaultPorts()
-    }
-    if (this.project.type === 'workspace') {
-      // console.log(`No need to prepare workspace config`)
-      return
-    }
-    const staticStartMode = !options;
-    // console.log('proxyRouterMode', proxyRouterMode)
-    // console.log('this.kind in prepare', this.kind)
-    if (!this.config) {
-
-      if (this.kind === 'other') {
-        return
-      }
-      if (staticStartMode) {
-        options = this.options.saved;
-        if (options.watch) {
-          error(`Please run ${chalk.bold('tnp build:app')} before start:app command`);
-        }
-      }
-      const { appBuild, prod, watch = false, environmentName } = options;
-      this.options.save(options)
-
-      // console.log('PREPARE options', options)
-      this.config = _.cloneDeep(this.workspaceConfig);
-      this.config.proxyRouterMode = (
-        !options.watch &&
-        this.project.parent &&
-        this.project.parent.type === 'workspace'
-      );
-      this.config.name = environmentName ? environmentName : 'local';
-      this.config.isCoreProject = this.project.isCoreProject;
-
-      if (!this.config.workspace || !this.config.workspace.workspace) {
-        error(`You shoud define 'workspace' object inside config.workspace object`, true)
-        this.err()
-      }
-
-      if (this.config.domain) {
-        this.config.workspace.workspace.host =
-          `${this.config.domain}${this.config.workspace.workspace.baseUrl}`;
-      } else {
-        this.config.workspace.workspace.host =
-          `http://localhost:${this.config.workspace.workspace.port}`;
-      }
 
 
-      if (this.kind === 'tnp-workspace') {
-        this.config.packageJSON = this.project.packageJson.data;
-      }
 
-      if (this.kind === 'tnp-workspace-child') {
-        this.config.packageJSON = this.project.parent.packageJson.data;
-      }
-
-      this.config.workspace.projects.forEach(p => {
-        if (this.config.domain || this.config.proxyRouterMode) {
-          p.host = `${this.config.workspace.workspace.host}${p.baseUrl}`;
-        } else {
-          p.host = `http://localhost:${p.port}`;
-        }
-      })
-
-      this.saveConfig()
-      // console.log('config prepared!', this.config)
-    }
-  }
-
-
-  saveConfig() {
+  private saveConfig() {
     const tmpEnvironmentFileName = 'tmp-environment.json';
     const tmpEnvironmentPath = path.join(this.project.location, tmpEnvironmentFileName)
     if (this.project.type === 'angular-client' || this.project.type === 'angular-lib') {
@@ -285,30 +346,7 @@ export class EnvironmentConfig {
     // console.log(`Config saved in ${tmpEnvironmentPath}`)
   }
 
-  /**
-   * Can be accesed only after env.prepare()
-   */
-  get configFor() {
-    if (this.project.type === 'workspace') {
-      error(`Do not use ${chalk.bold('env.configFor.backend, env.configFor.frontend')} from worksapce level...`, true)
-      error(`Try ${chalk.bold('env.workspaceConfig')} ...`)
-    }
-    const self = this;
-    return {
-      get backend() {
-        return self.config;
-      },
-      get frontend() {
-        const c = _.cloneDeep(self.configFor.backend);
-        walkObject(c, (lodashPath, isPrefixed) => {
-          if (isPrefixed) {
-            _.set(c, lodashPath, null)
-          }
-        })
-        return c;
-      }
-    }
-  }
+
 
 
 

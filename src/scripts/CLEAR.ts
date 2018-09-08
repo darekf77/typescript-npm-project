@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
 import { LibType, BuildDir } from '../models';
-import { clearFiles } from "../helpers";
+
 import { Project } from '../project';
 import { clearConsole } from '../process';
 

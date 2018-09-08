@@ -16,7 +16,7 @@ import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher } from "../process";
 import { copyFile, getMostRecentFilesNames } from "../helpers";
-import { ProjectFrom, BaseProjectLib } from './index';
+import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
 import { workers } from 'cluster';
@@ -33,21 +33,47 @@ export abstract class Project {
   abstract projectSpecyficFiles(): string[];
   abstract buildSteps(buildOptions?: BuildOptions);
 
-
-  readonly children: Project[] = [];
-  readonly requiredLibs: Project[] = [];
-  readonly parent: Project;
-  readonly preview: Project;
+  readonly requiredLibs: Project[] = []; // TODO FIX THIS
+  get parent(): Project {
+    return ProjectFrom(path.join(this.location, '..'));
+  }
+  get preview(): Project {
+    return ProjectFrom(path.join(this.location, 'preview'));
+  }
 
   /**
+   * Check if project is based on baseline ( in package json workspace )
+   * (method works from any level)
+   */
+  get isBasedOnOtherProject() {
+    if (this.isWorkspace) {
+      return !!this.packageJson.pathToBaseline;
+    } else if (this.isWorkspaceChildProject) {
+      return this.parent && !!this.parent.packageJson.pathToBaseline;
+    }
+  }
+
+  /**
+   * DONT USE WHEN IS NOT TO RESOLVE BASELINE PROJECT
+   * USE isBasedOnOtherProject instead
+   *
    * For site worksapce is baseline worksapace
    * For child site worksapce is baseline worksapce child
    */
-  readonly baseline: Project;
+  get baseline(): Project {
+
+    if (this.isWorkspace) {
+      return this.packageJson.pathToBaseline && ProjectFrom(this.packageJson.pathToBaseline);
+    } else if (this.isWorkspaceChildProject) {
+      return this.parent && this.parent.baseline && ProjectFrom(path.join(this.parent.baseline.location, this.name));
+    }
+  }
+
   readonly type: LibType;
   readonly packageJson: PackageJSON;
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
+  readonly join: BaselineSiteJoin;
   env: EnvironmentConfig;
   readonly proxyRouter: ProxyRouter;
   readonly copytToManager: CopyToManager;
@@ -113,23 +139,19 @@ export abstract class Project {
   }
 
   get isSite() {
-    const res = !!this.baseline;
+    const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
+    let basedOn = '';
+    if (this.isWorkspace) {
+      basedOn = this.packageJson.pathToBaseline;
+    } else if (this.isWorkspaceChildProject) {
+      basedOn = this.parent.packageJson.pathToBaseline;
+    }
+
+    // console.log('basedOn', basedOn)
+
+    const res = (basedOn && basedOn !== '');
     // console.log(`Project "${this.location}" is site: ${res}`)
     return res;
-
-    // const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
-    // const res = (this.baseline && customExist);
-    // if (res === undefined) {
-    //     console.log('customExist', customExist)
-    //     if (!_.isObject(this.baseline)) {
-    //         console.log(`baseline not object but ${typeof this.baseline} for ${this.location} `, )
-    //     }
-    //     console.log(Project.projects.map(p => {
-    //         return `${path.basename(path.dirname(p.location))} "${p.name}" baseline = ${typeof p.baseline} `
-    //     }))
-    //     process.exit(0)
-    // }
-    // return res;
   }
 
   /**
@@ -147,6 +169,10 @@ export abstract class Project {
     return this.parent && this.parent.type === 'workspace';
   }
 
+  get isWorkspace() {
+    return this.type === 'workspace';
+  }
+
   /**
    * Standalone projects link: npm libs
    */
@@ -159,7 +185,7 @@ export abstract class Project {
    * @param port
    */
   start() {
-    this.env.prepare()
+    this.env.init()
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     this.proxyRouter.killProcessOn(this.getDefaultPort())
     this.run(this.startOnCommand()).async()
@@ -185,40 +211,22 @@ export abstract class Project {
       this.packageJson = PackageJSON.from(location);
       this.node_modules = new NodeModules(this);
       this.recreate = new FilesRecreator(this);
+      this.join = new BaselineSiteJoin(this);
       this.type = this.packageJson.type;
 
       Project.projects.push(this);
 
-      // console.log(`Created project ${path.basename(this.location)}`)
-
-      this.children = this.findChildren();
-      this.parent = ProjectFrom(path.join(location, '..'));
-
-      if (this.parent && this.parent.type === 'workspace') {
+      if (this.isWorkspaceChildProject) {
         this.parent.tnpHelper.install()
       } else {
         this.tnpHelper.install()
       }
 
-      this.requiredLibs = this.packageJson.requiredProjects;
-      this.preview = ProjectFrom(path.join(location, 'preview'));
+      // this.requiredLibs = this.packageJson.requiredProjects;
 
-      if (!this.isCoreProject) {
-        if (this.baseline && this.type !== 'workspace') {
-          error(`Baseline is only for ${chalk.bold('workspace')} type projects.`);
-        } else if (this.parent && this.parent.type === 'workspace' && this.parent.baseline) {
-          this.baseline = ProjectFrom(path.join(this.parent.baseline.location, this.name))
-        } else {
-          this.baseline = this.packageJson.basedOn;
-        }
-        // if (!!this.baseline) {
-        //     console.log(`Baseline resolved from ${location}`)
-        // } else {
-        //     console.log(`Baseline NOT resolved from ${location}`)
-        // }
-      }
+
       this.__defaultPort = Project.defaultPortByType(this.type);
-      // console.log(`Default port by type: "${this.defaultPort}" for ${this.name}`)
+      // console.log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
       this.env = new EnvironmentConfig(this);
       this.proxyRouter = new ProxyRouter(this);
       this.copytToManager = new CopyToManager(this);
@@ -282,7 +290,7 @@ export abstract class Project {
 
 
     // console.log(`Prepare environment for: ${this.name}`)
-    this.env.prepare(buildOptions);
+    this.env.init(buildOptions);
 
     let baseHref: string;
     if (this.type === 'workspace') {
@@ -341,7 +349,9 @@ export abstract class Project {
     return ProjectFrom(projectPath);
   }
 
-  public findChildren(): Project[] {
+
+  get children(): Project[] {
+
     // console.log('from ' + this.location)
 
     const notAllowed: RegExp[] = [

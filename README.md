@@ -11,6 +11,7 @@ Helper project for my typescript npm libraries.
  - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
  - "assets" relative from html,css ,  "/assets" from scss
 - in site, if you are decorating entities REMEMBER to overrirde EntityRepository
+- if you are changing environment setting you have to start build (or watch:build) again
 
 ## Create, build, publish:
 - isomorphic typescript library

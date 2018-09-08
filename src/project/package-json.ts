@@ -72,20 +72,20 @@ export class PackageJSON {
 
   //#region getters
 
-  get requiredProjects(): Project[] {
-    const projects: Project[] = [];
-    if (this.data && this.data.tnp && Array.isArray(this.data.tnp.requiredLibs)) {
-      const dependencies = this.data.tnp.requiredLibs;
-      dependencies.forEach(p => {
-        const projectPath = path.join(this.location, p);
-        if (!fs.existsSync(projectPath)) {
-          error(`Dependency project: "${p}" doesn't exist.`)
-        }
-        projects.push(ProjectFrom(projectPath));
-      })
-    }
-    return projects;
-  }
+  // get requiredProjects(): Project[] {
+  //   const projects: Project[] = [];
+  //   if (this.data && this.data.tnp && Array.isArray(this.data.tnp.requiredLibs)) {
+  //     const dependencies = this.data.tnp.requiredLibs;
+  //     dependencies.forEach(p => {
+  //       const projectPath = path.join(this.location, p);
+  //       if (!fs.existsSync(projectPath)) {
+  //         error(`Dependency project: "${p}" doesn't exist.`)
+  //       }
+  //       projects.push(ProjectFrom(projectPath));
+  //     })
+  //   }
+  //   return projects;
+  // }
 
   get type(): LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
@@ -108,19 +108,31 @@ export class PackageJSON {
     return Array.isArray(p.resources) ? p.resources : [];
   }
 
-  get basedOn(): Project {
-    // console.log(this.data)
-    if (this.data.tnp && this.data.tnp.basedOn) {
-      if (!_.isString(this.data.tnp.basedOn)) {
-        error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})`)
+
+  get pathToBaseline(): string {
+    if (this.data && this.data.tnp &&
+      _.isString(this.data.tnp.basedOn)) {
+      const p = path.join(this.location, this.data.tnp.basedOn);
+      if (fs.existsSync(p)) {
+        return p;
       }
-      const baseline = ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
-      if (baseline && baseline.type !== 'workspace') {
-        error(`Baseline project ${chalk.bold(baseline.name)} needs to ${'workspace'} type project.`);
-      }
-      return baseline;
+      error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})`)
     }
   }
+
+  // get basedOn(): Project {
+  //   // console.log(this.data)
+  //   if (this.data.tnp && this.data.tnp.basedOn) {
+  //     if (!_.isString(this.data.tnp.basedOn)) {
+  //       error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})`)
+  //     }
+  //     const baseline = ProjectFrom(path.join(this.location, this.data.tnp.basedOn as string));
+  //     if (baseline && baseline.type !== 'workspace') {
+  //       error(`Baseline project ${chalk.bold(baseline.name)} needs to ${'workspace'} type project.`);
+  //     }
+  //     return baseline;
+  //   }
+  // }
 
   get isCoreProject() {
     if (this.data.tnp && this.data.tnp.isCoreProject) {
