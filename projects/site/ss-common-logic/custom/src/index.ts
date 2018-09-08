@@ -24,8 +24,10 @@ function addEntity(entity: Function) {
 
 
 addController(controllers.BuildController)
+addController(controllers.DomainsController)
 
 addEntity(entites.BUILD);
+addEntity(entites.DOMAIN);
 
 
 

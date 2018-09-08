@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess } from 'tnp-bundle';
+import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 //#endregion
 
 export interface IBUILD {
@@ -176,6 +177,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidServeProces: number;
+
 
 
   @Column({ nullable: true, default: '/' }) gitFolder: string;

@@ -43,13 +43,23 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   private async createFirstBuildFromCurrentTnpProject() {
 
+    const tnpLocation = path.resolve(path.join(__dirname, '../../../../../'));
+
     const b1 = await this.db.BUILD.save(this.db.BUILD.create({
       gitFolder: '/projects/baseline',
       gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
     }))
 
-    const tnpLocation = path.resolve(path.join(__dirname, '../../../../../'));
+
     b1.initialize(tnpLocation);
+
+
+    const b2 = await this.db.BUILD.save(this.db.BUILD.create({
+      gitFolder: '/projects/workspace',
+      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
+    }))
+
+    b2.initialize(tnpLocation);
 
   }
 

@@ -18,6 +18,8 @@ import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsCo
 import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
 import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { DomainsController } from 'ss-common-logic/browser/controllers/DomainsController';
+
 
 // entities
 import { USER } from 'ss-common-logic/browser/entities/core/USER';
@@ -30,6 +32,7 @@ import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { CONFIG } from 'ss-common-logic/browser/entities/CONFIG';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
+import { DOMAIN } from 'ss-common-logic/browser/entities/DOMAIN';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -50,10 +53,11 @@ init({
     DialogsController,
     ConfigController,
     MultimediaController,
-    BuildController
+    BuildController,
+    DomainsController
   ],
   entities: [
-    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE, CONFIG, BUILD
+    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE, CONFIG, BUILD, DOMAIN
   ]
 })
   .angularProviders()

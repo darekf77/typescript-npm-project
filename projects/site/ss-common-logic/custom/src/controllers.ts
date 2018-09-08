@@ -4,6 +4,9 @@ export * from 'baseline/ss-common-logic/src/controllers';
 import { BuildController } from './controllers/BuildController';
 export { BuildController } from './controllers/BuildController';
 
+import { DomainsController } from './controllers/DomainsController';
+export { DomainsController } from './controllers/DomainsController';
+
 //#region @backend
 import * as _ from 'lodash';
 import { getSingleton } from "morphi";
@@ -12,7 +15,9 @@ import { getSingleton } from "morphi";
 export function controllers() {
   return _.merge(controllersBaseline.controllers(), {
 
-    BuildController: getSingleton<BuildController>(BuildController)
+    BuildController: getSingleton<BuildController>(BuildController),
+
+    DomainsController: getSingleton<DomainsController>(DomainsController),
 
   });
 }
