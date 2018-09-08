@@ -120,7 +120,7 @@ export class AutoActions {
         return path.resolve(p.location) === path.resolve(this.project.location)
       });
 
-    console.log('build', build)
+    // console.log('build', build)
     return build;
   }
 

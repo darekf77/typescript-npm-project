@@ -46,6 +46,10 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   }
 
   initialize(staticFolder = undefined) {
+    console.log('staticFolder', staticFolder)
+    console.log('localPath.repository', this.localPath.repository)
+    console.log('localPath.buildFolder', this.localPath.buildFolder)
+    console.log('localPath.repositoryFolder', this.localPath.repositoryFolder)
     if (staticFolder) {
       HelpersLinks.createLink(this.localPath.repository, staticFolder);
     } else {

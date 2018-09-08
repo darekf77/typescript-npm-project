@@ -72,6 +72,7 @@ export class FilesRecreator {
         ].concat([ // common small files
           'Thumbs.db',
           '.DS_Store',
+          '**/.DS_Store',
           'npm-debug.log*'
         ].concat([ // not sure if ignored/needed
           '.sass-cache',
@@ -146,7 +147,7 @@ export class FilesRecreator {
                   settings["workbench.colorCustomizations"] = {};
                 }
 
-                // update activity bar color  
+                // update activity bar color
                 const parentSettings = getVscodeSettingsFrom(project.parent);
                 const statuBarColor = parentSettings &&
                   parentSettings["workbench.colorCustomizations"] &&

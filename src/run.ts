@@ -16,7 +16,7 @@ import { initWatcherDB } from "./watcher-no-race";
 import { IfObservable } from '../node_modules/rxjs/observable/IfObservable';
 import { Project } from './project';
 
-import build from './scripts/BUILD';
+import build from './scripts/BUILD/index';
 import { autobuild } from './scripts/AUTOBUILD';
 
 
@@ -87,7 +87,7 @@ export async function run(argsv: string[]) {
 
   const helpFile = glob.sync(path.join(__dirname, '/scripts/HELP.js'))[0]
   const files = [helpFile]
-    .concat(glob.sync(path.join(__dirname, '/scripts/*.js')).filter(f => f != helpFile))
+    .concat(glob.sync(path.join(__dirname, '/scripts/**/*.js')).filter(f => f != helpFile))
 
 
 
@@ -132,11 +132,11 @@ export async function run(argsv: string[]) {
       } else {
         console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
         process.exit(0);
-      }      
-    }    
+      }
+    }
   }
 
-  
+
 }
 
 

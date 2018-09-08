@@ -1,0 +1,74 @@
+import * as _ from 'lodash';
+import { run, clearConsole } from "../../process";
+import { Project, ProjectIsomorphicLib, ProjectFrom, BaseProjectLib } from '../../project';
+import { clear } from ".././CLEAR";
+import { BuildOptions, BuildDir, LibType, EnvironmentName } from "../../models";
+import { info, error } from "../../messages";
+import * as path from 'path';
+import { BuildArgs } from './build-args.model';
+import { crossPlatofrmPath, nearestProjectTo } from '../../helpers';
+
+
+
+export function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
+  let noConsoleClear = false;
+  if (process.platform === 'win32') {
+    args = args.replace(/\\/g, '\\\\')
+  }
+  const argsObj: BuildArgs = require('minimist')(args.split(' '));
+
+  argsObj.noConsoleClear
+
+  if (argsObj.noConsoleClear) {
+    noConsoleClear = true;
+  }
+
+  // let baseHref = argsObj.baseHref || argsObj['--base-href'] || ''
+  if (!noConsoleClear) {
+    clearConsole()
+  }
+
+
+  // console.log('argsObj', argsObj)
+  // process.exit(0)
+  let copyto: Project[] = []
+  if (argsObj.copyto) {
+    if (_.isString(argsObj.copyto)) {
+      argsObj.copyto = [argsObj.copyto]
+    }
+    copyto = argsObj.copyto.map(argPath => {
+      // console.log('argPath', argPath)
+      if (process.platform === 'win32') {
+        if (!argPath.match(/\\/g) && !argPath.match(/\//g)) {
+          error(`On windows.. please wrap your "copyto" parameter with double-quote like this:\n
+tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
+          process.exit(1)
+        }
+      }
+      // console.log('raw arg', args)
+      argPath = crossPlatofrmPath(argPath);
+      // console.log('path', argPath)
+      const project = nearestProjectTo(argPath);
+      if (!project) {
+        error(`Path doesn't contain tnp type project: ${argPath}`)
+      }
+      const what = path.normalize(`${project.location}/node_module/${Project.Current.name}`)
+      info(`After each build finish ${what} will be update.`)
+      return project;
+    });
+  }
+  let environmentName: EnvironmentName = 'local';
+  if (argsObj.environmentName || argsObj.envName) {
+    environmentName = (argsObj.environmentName ? argsObj.environmentName : argsObj.envName) as any;
+  }
+
+
+  let onlyWatchNoBuild = false;
+  if (argsObj.onlyWatchNoBuild as any === 'true') {
+    onlyWatchNoBuild = true;
+  }
+
+  return {
+    copyto, environmentName, onlyWatchNoBuild  //, baseHref
+  }
+}

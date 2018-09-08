@@ -113,8 +113,12 @@ export abstract class Project {
   }
 
   get isSite() {
-    const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
-    const res = (this.baseline && customExist);
+    const res = !!this.baseline;
+    // console.log(`Project "${this.location}" is site: ${res}`)
+    return res;
+
+    // const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
+    // const res = (this.baseline && customExist);
     // if (res === undefined) {
     //     console.log('customExist', customExist)
     //     if (!_.isObject(this.baseline)) {
@@ -125,7 +129,7 @@ export abstract class Project {
     //     }))
     //     process.exit(0)
     // }
-    return res;
+    // return res;
   }
 
   /**
