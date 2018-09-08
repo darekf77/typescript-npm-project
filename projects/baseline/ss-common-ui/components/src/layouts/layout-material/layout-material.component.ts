@@ -3,6 +3,7 @@ import {
   Component, OnInit, HostBinding, AfterViewInit, AfterContentInit,
   HostListener, Input, ElementRef, ViewChild, ContentChildren, QueryList
 } from '@angular/core';
+import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger';
 import { numValue } from '../../helpers';
@@ -34,6 +35,7 @@ export interface LeftMenuGroupItem {
   name: string;
   description?: string;
   href?: string;
+  action?: (any) => void;
   subitems: MenuItem[];
 }
 
@@ -143,7 +145,12 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
   };
 
   open(item: MenuItem) {
-    this.router.navigateByUrl(item.href);
+    if (item.href) {
+      this.router.navigateByUrl(item.href);
+    } else if (_.isFunction(item.action)) {
+      item.action()
+    }
+
   }
 
   selectedTopMenu(index: number) {

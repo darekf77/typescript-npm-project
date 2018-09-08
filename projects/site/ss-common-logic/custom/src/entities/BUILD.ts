@@ -7,8 +7,10 @@ import { FormlyForm, DefaultModelWithMapping, CLASSNAME } from 'morphi';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
+import * as child from 'child_process';
 import { run, HelpersLinks, killProcess } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
+import { async } from 'baseline/node_modules/@types/q';
 //#endregion
 
 export interface IBUILD {
@@ -41,7 +43,9 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
       repositoryFolder: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote, this.gitFolder),
       buildFolder: path.join(ENV.pathes.backup.builds, this.nameFromIdAndRemote),
       buildLog: path.join(ENV.pathes.backup.builds, `build-${this.nameFromIdAndRemote}.txt`),
-      serveLog: path.join(ENV.pathes.backup.builds, `serve-${this.nameFromIdAndRemote}.txt`)
+      buildErrorLog: path.join(ENV.pathes.backup.builds, `build-error-${this.nameFromIdAndRemote}.txt`),
+      serveLog: path.join(ENV.pathes.backup.builds, `serve-${this.nameFromIdAndRemote}.txt`),
+      serveErrorLog: path.join(ENV.pathes.backup.builds, `serve-error-${this.nameFromIdAndRemote}.txt`)
     }
 
   }
@@ -71,53 +75,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
       { cwd: this.localPath.repositoryFolder, output: false }).sync()
   }
 
-  public get start() {
-    const self = this;
-    return {
-      building() {
-        return self.startBuilding()
-      },
-      serving() {
-        return self.startServing()
-      }
-    }
-  }
-
-
-  private startBuilding() {
-
-    let p = run(`tnp build`, { cwd: this.localPath.repositoryFolder, output: false }).async()
-
-    fse.writeFileSync(this.localPath.buildLog, '');
-
-    p.stdout.addListener('data', (chunk) => {
-      fse.appendFileSync(this.localPath.buildLog, chunk)
-    });
-
-    p.stderr.addListener('data', (chunk) => {
-      fse.appendFileSync(this.localPath.buildLog, chunk)
-    });
-
-    this.pidBuildProces = p.pid;
-    return p;
-  }
-
-  private startServing() {
-    let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
-
-    fse.writeFileSync(this.localPath.serveLog, '');
-
-    p.stdout.addListener('data', (chunk) => {
-      fse.appendFileSync(this.localPath.serveLog, chunk)
-    });
-
-    p.stderr.addListener('data', (chunk) => {
-      fse.appendFileSync(this.localPath.serveLog, chunk)
-    })
-
-    this.pidServeProces = p.pid;
-    return p;
-  }
 
   public get stop() {
     const self = this;
@@ -200,6 +157,85 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       throw `Cannot find build with id ${id}`
     }
     return build;
+  }
+
+  get start() {
+    const self = this;
+    return {
+
+      async servingById(id: number) {
+        const build = await self.getById(id);
+        let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
+
+        fse.writeFileSync(build.localPath.serveLog, '');
+
+        self.attachListeners(p, {
+          msgAction: (chunk) => {
+            fse.appendFileSync(build.localPath.serveLog, chunk)
+          },
+          errorAction: (chunk) => {
+            fse.appendFileSync(build.localPath.serveErrorLog, chunk)
+          },
+          endAction: async () => {
+            this.pidServeProces = null;
+            await self.update(id, build)
+            console.log('END ACTION SERVING')
+          }
+        })
+
+        this.pidServeProces = p.pid;
+        await self.update(id, build)
+      },
+
+      async buildingById(id: number) {
+        const build = await self.getById(id);
+
+        let p = run(`tnp build`, { cwd: build.localPath.repositoryFolder, output: false }).async()
+
+        fse.writeFileSync(build.localPath.buildLog, '');
+
+        self.attachListeners(p, {
+          msgAction: (chunk) => {
+            fse.appendFileSync(build.localPath.buildLog, chunk)
+          },
+          errorAction: (chunk) => {
+            fse.appendFileSync(build.localPath.buildErrorLog, chunk)
+          },
+          endAction: async () => {
+            build.pidBuildProces = null;
+            await self.update(id, build)
+            console.log('END ACTION BUILDING')
+          }
+        })
+
+        build.pidBuildProces = p.pid;
+        await self.update(id, build)
+      }
+
+    }
+  }
+
+  private attachListeners(p: child.ChildProcess, actions: {
+    msgAction: (message: string) => void;
+    endAction: (exitCode: number) => void;
+    errorAction: (message: string) => void
+  }) {
+
+    const { msgAction, endAction, errorAction } = actions;
+
+    p.stdout.on('data', (m) => {
+      msgAction(m.toString());
+    })
+
+    p.stdout.on('error', (m) => {
+      errorAction(JSON.stringify(m))
+    })
+
+    p.stdout.on('close', (m) => {
+      endAction(m)
+    });
+
+    p.stderr.on('readable')
   }
 
 }

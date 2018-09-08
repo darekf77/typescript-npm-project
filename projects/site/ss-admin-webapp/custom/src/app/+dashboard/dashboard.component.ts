@@ -39,13 +39,11 @@ export class DashboardComponent implements OnInit {
           leftMenu: [
             {
               name: "Builds",
-              href: '/dashboard/builds',
               subitems: []
             },
 
             {
               name: "Domains",
-              href: '/dashboard/domains',
               subitems: []
             }
 
@@ -76,7 +74,8 @@ export class DashboardComponent implements OnInit {
     return data.body.json.map(b => {
       return {
         name: b.name,
-        href: `/dashboard/builds/build/${b.id}`
+        href: `/dashboard/builds/build/${b.id}`,
+        id: b.id
       }
     })
   }
@@ -87,7 +86,8 @@ export class DashboardComponent implements OnInit {
     return data.body.json.map(b => {
       return {
         name: b.path,
-        href: `/dashboard/domains/domain/${b.id}`
+        href: `/dashboard/domains/domain/${b.id}`,
+        id: b.id
       }
     })
   }
@@ -97,9 +97,19 @@ export class DashboardComponent implements OnInit {
 
 
     const builds = _.first(this.menu.top.items).leftMenu[0]
+    builds.action = () => {
+      const id = _.first(builds.subitems)['id'];
+      log.i('navigate hererere to build id ', id)
+      this.router.navigateByUrl(`/dashboard/builds/build/${id}`);
+    }
     builds.subitems = await this.getBuilds()
 
     const domains = _.first(this.menu.top.items).leftMenu[1]
+    domains.action = () => {
+      const id = _.first(domains.subitems)['id'];
+      log.i('navigate hererere to domain id ', id)
+      this.router.navigateByUrl(`/dashboard/domains/domain/${id}`);
+    }
     domains.subitems = await this.getDomains()
 
 

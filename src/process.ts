@@ -50,13 +50,16 @@ export function clearConsole() {
 }
 
 export function log(process: child.ChildProcess, output = true) {
-  process.stdout.on('data', (data) => {
-    console.log(data.toString());
-  })
 
-  process.stderr.on('data', (data) => {
-    console.log(data.toString());
-  })
+  if (output) {
+    process.stdout.on('data', (data) => {
+      console.log(data.toString());
+    })
+
+    process.stderr.on('data', (data) => {
+      console.log(data.toString());
+    })
+  }
 
   return process;
 }

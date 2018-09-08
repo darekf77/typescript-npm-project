@@ -6,6 +6,7 @@ import { info, error } from "../../messages";
 import * as path from 'path';
 import { BuildArgs } from './build-args.model';
 import { crossPlatofrmPath, nearestProjectTo } from '../../helpers';
+import { config } from '../../config';
 
 
 
@@ -51,7 +52,8 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
       if (!project) {
         error(`Path doesn't contain tnp type project: ${argPath}`)
       }
-      const what = path.normalize(`${project.location}/node_module/${Project.Current.name}`)
+      const projectName = Project.Current.isTnp ? config.file.tnpBundle : Project.Current.name;
+      const what = path.normalize(`${project.location}/node_module/${projectName}`)
       info(`After each build finish ${what} will be update.`)
       return project;
     });

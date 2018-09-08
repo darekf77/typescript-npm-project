@@ -126,11 +126,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.getById(id);
-      const p = build.start.building();
-      p.on('exit', async () => {
-        build.pidBuildProces = null;
-        await this.db.BUILD.update(id, build);
-      })
+      build.start.building();
       await this.db.BUILD.update(id, build);
 
     }
