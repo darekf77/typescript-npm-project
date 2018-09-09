@@ -1,16 +1,33 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BuildEditorComponent } from './build-editor.component';
 import { RouterModule } from '@angular/router';
-import { routes } from './build-editor.routes';
+// material
+import { MatCardModule } from "@angular/material/card";
+// thirdpart
 import { FormWrapperMaterialModule, DialogWrapperModule } from 'ss-common-ui/module';
+// local
+import { BuildEditorComponent } from './build-editor.component';
+import { routes } from './build-editor.routes';
+import { BuildingProcessModule } from './building-process/building-process.module';
+import { ServingProcessModule } from './serving-process/serving-process.module';
+
+const localModules = [
+  BuildingProcessModule,
+  ServingProcessModule
+]
+
+const materialModules = [
+  MatCardModule
+]
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     FormWrapperMaterialModule,
-    DialogWrapperModule
+    DialogWrapperModule,
+    ...localModules,
+    ...materialModules
   ],
   exports: [BuildEditorComponent],
   declarations: [BuildEditorComponent]

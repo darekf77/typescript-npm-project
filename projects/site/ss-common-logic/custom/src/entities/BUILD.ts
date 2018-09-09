@@ -49,7 +49,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     }
 
   }
-
   initialize(staticFolder = undefined) {
     // console.log('staticFolder', staticFolder)
     // console.log('localPath.repository', this.localPath.repository)
@@ -74,39 +73,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     run(`tnp clear${all ? ':all' : ''}`,
       { cwd: this.localPath.repositoryFolder, output: false }).sync()
   }
-
-
-  public get stop() {
-    const self = this;
-    return {
-      building() {
-        return self.stopBuilding();
-      },
-      serving() {
-        return self.startServing()
-      }
-    }
-  }
-
-  private stopBuilding() {
-    try {
-      killProcess(this.pidBuildProces);
-    } catch (e) {
-      console.log(e)
-    }
-
-    this.pidBuildProces = undefined;
-  }
-
-  private stopServeing() {
-    try {
-      killProcess(this.pidServeProces);
-    } catch (e) {
-      console.log(e)
-    }
-    this.pidServeProces = undefined
-  }
-
 
   //#endregion
 
@@ -135,8 +101,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidServeProces: number;
 
-
-
   @Column({ nullable: true, default: '/' }) gitFolder: string;
 
 
@@ -151,6 +115,7 @@ export interface BUILD_ALIASES {
 export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES> {
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
 
+  //#region @backend
   async getById(id: number) {
     const build = await this.findOne(id);
     if (!build) {
@@ -215,6 +180,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     }
   }
 
+
   private attachListeners(p: child.ChildProcess, actions: {
     msgAction: (message: string) => void;
     endAction: (exitCode: number) => void;
@@ -232,12 +198,43 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     })
 
     p.stdout.on('close', (m) => {
+      p.stdout.removeAllListeners();
       endAction(m)
     });
 
-    p.stderr.on('readable')
   }
 
+
+  public get stop() {
+    const self = this;
+    return {
+      async buildingById(id: number) {
+        const build = await self.getById(id);
+        try {
+          killProcess(build.pidBuildProces);
+        } catch (e) {
+          console.log(e)
+        }
+
+        build.pidBuildProces = undefined;
+        await self.update(id, build)
+      },
+
+      async serveingById(id: number) {
+        const build = await self.getById(id);
+        try {
+          killProcess(build.pidServeProces);
+        } catch (e) {
+          console.log(e)
+        }
+
+        build.pidServeProces = undefined;
+        await self.update(id, build)
+
+      }
+    }
+  }
+  //#endregion
 }
 
 

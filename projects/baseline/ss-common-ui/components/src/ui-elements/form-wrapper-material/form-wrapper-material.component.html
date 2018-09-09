@@ -23,21 +23,22 @@
                [options]="formly.options"
                [form]="formly.form">
     <button mat-raised-button
-            *ngIf="mode === 'update'"
+            *ngIf="showButtons && mode === 'update'"
             type="submit"
             [disabled]="!formly.form.valid">{{mode | ucfirst}}
     </button>
     <button mat-raised-button
-            *ngIf="mode === 'create'"
+            *ngIf="showButtons && mode === 'create'"
             type="submit"
             [disabled]="!formly.form.valid">Create
     </button>
     <button mat-button
+            *ngIf="showButtons"
             (click)="clear()">Clear</button>
 
 
     <button mat-icon-button
-            *ngIf="mode !== 'create'"
+            *ngIf="showButtons && mode !== 'create'"
             (click)="openDeleteDialog(model.id)"
             type="button">
       <mat-icon aria-label="Example icon-button with a heart icon">delete_forever</mat-icon>

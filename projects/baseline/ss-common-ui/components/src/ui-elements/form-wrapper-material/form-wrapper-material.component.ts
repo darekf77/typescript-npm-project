@@ -47,11 +47,8 @@ export class FormWrapperMaterialComponent implements OnInit {
   @Input() crud: BaseCRUD<any>;
 
   @Input() form = new FormGroup({});
-  @Input() model: any = {
-    name: 'Dariusz',
-    href: 'asdasd',
-    isAmazing: true
-  };
+  @Input() model = {};
+  @Input() showButtons = true;
   @Input() options: FormlyFormOptions = {};
   @Input() fields: FormlyFieldConfig[] = [];
   private backupModel = {};
@@ -80,28 +77,34 @@ export class FormWrapperMaterialComponent implements OnInit {
     let fields = getFormlyFrom(this.entity);
     log.i(`fields from entity : ${this.entity && this.entity.name}`, fields);
 
-    if (!fields) {
+    if (_.isFunction(this.entity) && !fields) {
       this.waringAboutDecorator();
     }
 
     if (_.isArray(this.fields)) {
       log.i('field from input', this.fields);
 
-      const keys = fields.map(c => c.key);
+      if (_.isArray(fields)) {
+        const keys = fields.map(c => c.key);
 
-      fields = fields.map(field => {
-        return _.merge(field, this.fields.find(f => f.key === field.key));
-      });
-      fields = fields
-        .concat(this.fields.filter(field => !keys.includes(field.key)));
-      log.i('field affer contact', fields);
+        fields = fields.map(field => {
+          return _.merge(field, this.fields.find(f => f.key === field.key));
+        });
+        fields = fields
+          .concat(this.fields.filter(field => !keys.includes(field.key)));
+        log.i('field affer contact', fields);
+      }
 
+    }
+    if (!_.isArray(fields)) {
+      fields = this.fields;
     }
 
     fields = fields.filter(({ key }) => !(key && this.exclude.includes(key)));
     log.i('fields filter', fields);
 
     this.formly.fields = fields;
+    log.i('FORMLY FIELDS', this.formly.fields);
   }
 
   async ngOnInit() {

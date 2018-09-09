@@ -125,10 +125,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   startBuildById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      build.start.building();
-      await this.db.BUILD.update(id, build);
-
+      await this.db.BUILD.start.buildingById(id);
     }
     //#endregion
   }
@@ -137,10 +134,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   stopBuildById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      build.stop.building();
-      await this.db.BUILD.update(id, build);
-
+      await this.db.BUILD.stop.buildingById(id);
     }
     //#endregion
   }
@@ -149,14 +143,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   startServeById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      const p = build.start.serving();
-      p.on('exit', async () => {
-        build.pidServeProces = null;
-        await this.db.BUILD.update(id, build);
-      })
-      await this.db.BUILD.update(id, build);
-
+      await this.db.BUILD.start.servingById(id)
     }
     //#endregion
   }
@@ -165,10 +152,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   stopServeById(@PathParam('id') id: number): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      build.stop.serving();
-      await this.db.BUILD.update(id, build);
-
+      await this.db.BUILD.stop.serveingById(id);
     }
     //#endregion
   }

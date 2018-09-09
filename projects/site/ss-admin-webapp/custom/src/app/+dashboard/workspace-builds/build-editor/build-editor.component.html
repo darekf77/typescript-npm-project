@@ -1,24 +1,3 @@
-<ng-template #buildLogs>
-  <dialog-wrapper [dialogRef]="dialogBuild">
-    <h3>Realtime build logs:</h3>
-    <h4 *ngIf="!textBuildLogs"> <strong>empty build logs files</strong> </h4>
-    <code *ngIf="textBuildLogs"
-       [innerHtml]="textBuildLogs">
-  </code>
-  </dialog-wrapper>
-</ng-template>
-
-
-<ng-template #serveLogs>
-  <dialog-wrapper [dialogRef]="dialogServe">
-    <h3>Realtime serve logs:</h3>
-    <h4 *ngIf="!textServeLogs"> <strong>empty serve logs files</strong> </h4>
-    <code *ngIf="textServeLogs"
-       [innerHtml]="textServeLogs">
-  </code>
-  </dialog-wrapper>
-</ng-template>
-
 <app-form-wrapper-material *ngIf="id"
                            [(model)]="model"
                            [fields]="fields"
@@ -27,3 +6,12 @@
                            [modelDataConfig]="modelDataConfig"
                            (complete)="complete()">
 </app-form-wrapper-material>
+<br>
+
+<mat-card style="background: lightgray" >
+  <app-building-process [model]="model"
+                        (refreshModel)="refreshModel()"></app-building-process>
+</mat-card>
+
+<!-- <app-serving-process [model]="model"
+                     (refreshModel)="refreshModel()"></app-serving-process> -->
