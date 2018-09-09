@@ -130,6 +130,11 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
       async servingById(id: number) {
         const build = await self.getById(id);
+
+        if (build.pidServeProces) {
+          throw `Serving already started on port ${build.pidServeProces}`;
+        }
+
         let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
 
         fse.writeFileSync(build.localPath.serveLog, '');
@@ -154,6 +159,10 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
       async buildingById(id: number) {
         const build = await self.getById(id);
+
+        if (build.pidBuildProces) {
+          throw `Build already started on port ${build.pidBuildProces}`;
+        }
 
         let p = run(`tnp build`, { cwd: build.localPath.repositoryFolder, output: false }).async()
 
@@ -210,26 +219,30 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return {
       async buildingById(id: number) {
         const build = await self.getById(id);
-        try {
-          killProcess(build.pidBuildProces);
-        } catch (e) {
-          console.log(e)
-        }
+        if (build.pidBuildProces) {
+          try {
+            killProcess(build.pidBuildProces);
+          } catch (e) {
+            console.log(e)
+          }
 
-        build.pidBuildProces = undefined;
-        await self.update(id, build)
+          build.pidBuildProces = undefined;
+          await self.update(id, build)
+        }
       },
 
       async serveingById(id: number) {
         const build = await self.getById(id);
-        try {
-          killProcess(build.pidServeProces);
-        } catch (e) {
-          console.log(e)
-        }
+        if (build.pidServeProces) {
+          try {
+            killProcess(build.pidServeProces);
+          } catch (e) {
+            console.log(e)
+          }
 
-        build.pidServeProces = undefined;
-        await self.update(id, build)
+          build.pidServeProces = undefined;
+          await self.update(id, build)
+        }
 
       }
     }
