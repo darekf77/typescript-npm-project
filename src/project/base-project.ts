@@ -24,7 +24,7 @@ import { init } from '../scripts/INIT';
 import { HelpersLinks } from '../helpers-links';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
-import { install } from '../scripts/INSTALL';
+
 import { pullCurrentBranch } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 
@@ -276,18 +276,7 @@ export abstract class Project {
   protected buildOptions?: BuildOptions;
   build(buildOptions?: BuildOptions) {
     const { prod, watch, outDir } = buildOptions;
-    this.buildOptions = buildOptions;
-
-    // console.log(`Init assets/files for project: ${this.name}`)
-    init(this);
-
-    // console.log(`Prepare node modules: ${this.name}`)
-    if (this.isWorkspaceChildProject && !this.parent.node_modules.exist()) {
-      install('', this.parent, false);
-    } else if (!this.node_modules.exist()) {
-      install('', this, false);
-    }
-
+    this.buildOptions = buildOptions;    
 
     // console.log(`Prepare environment for: ${this.name}`)
     this.env.init(buildOptions);

@@ -21,9 +21,9 @@ export function onlyLibsChildrens(workspaceProject: Project) {
 export function link(project: Project) {
 
     let workspaceProject: Project;
-    if (project.type === 'workspace') {
+    if (project.isWorkspace) {
         workspaceProject = project;
-    } else if (project.parent && project.parent.type === 'workspace') {
+    } else if (project.isWorkspaceChildProject) {
         workspaceProject = project.parent;
     } else {
         error(`This project is not workspace type project`)

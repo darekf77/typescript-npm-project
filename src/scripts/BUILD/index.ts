@@ -6,6 +6,7 @@ import { BuildOptions, BuildDir, LibType } from "../../models";
 import { error } from "../../messages";
 import { config } from '../../config';
 import { handleArguments } from './handle-arguments.fn';
+import { install } from '../INSTALL';
 
 
 
@@ -38,37 +39,49 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
   const project: Project = Project.Current;
 
-  if (allowedLibs.includes(project.type)) {
-
-
-    if (project.isSite) {
-      if (watch) {
-        // console.log("HERE !!")
-        project.join.init().watch()
-        if (project.isWorkspaceChildProject) {
-          project.parent.join.init().watch()
-        }
-      } else {
-        project.join.init()
-        if (project.isWorkspaceChildProject) {
-          project.parent.join.init()
-        }
-      }
-
-    }
-    project.build(opt);
-    if (!watch) {
-      process.exit(0)
-    }
-
-
-  } else {
+  if (!allowedLibs.includes(project.type)) {
     if (appBuild) {
       error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
     } else {
       error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
     }
   }
+
+  // console.log(`Prepare node modules: ${this.name}`)
+  if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
+    install('', project.parent, false);
+  } else if (!project.node_modules.exist()) {
+    install('', project, false);
+  }
+
+
+  project.recreate.init();
+
+  if (project.isSite) {
+    project.baseline.recreate.init();
+
+    if (watch) {
+      // console.log("HERE !!")
+
+      project.join.init().watch()
+      if (project.isWorkspaceChildProject) {
+        project.parent.join.init().watch()
+      }
+    } else {
+      project.join.init()
+      if (project.isWorkspaceChildProject) {
+        project.parent.join.init()
+      }
+    }
+
+  }
+  project.build(opt);
+  if (!watch) {
+    process.exit(0)
+  }
+
+
+
 }
 
 function buildWatch(args) {

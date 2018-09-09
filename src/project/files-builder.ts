@@ -40,6 +40,17 @@ export class FilesRecreator {
 
   }
 
+  public init() {
+    this.assets();
+    this.commonFiles();
+    this.projectSpecyficFiles();
+    this.gitignore();
+    this.npmignore();
+    this.customFolder();
+    this.vscode.settings.excludedFiles();
+    this.vscode.settings.colorsFromWorkspace()
+  }
+
   private get commonFilesForAllProjects() {
     return [
       // '.npmrc',

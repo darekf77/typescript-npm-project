@@ -4,15 +4,12 @@ import { run } from '../process';
 
 
 export function init(project = Project.Current) {
+  project.recreate.init();
   if (project.isSite) {
+    project.baseline.recreate.init()
     project.join.init()
   }
-  project.recreate.assets();
-  project.recreate.commonFiles();
-  project.recreate.projectSpecyficFiles();
-  project.recreate.gitignore();
-  project.recreate.npmignore();
-  project.recreate.customFolder();
+
 }
 
 export default {
@@ -20,7 +17,6 @@ export default {
     init()
     process.exit(0)
   },
-
 
 
   $VSCODE: () => {

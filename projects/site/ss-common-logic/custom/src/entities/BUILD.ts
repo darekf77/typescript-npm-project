@@ -10,7 +10,6 @@ import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { run, HelpersLinks, killProcess } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
-import { async } from 'baseline/node_modules/@types/q';
 //#endregion
 
 export interface IBUILD {
