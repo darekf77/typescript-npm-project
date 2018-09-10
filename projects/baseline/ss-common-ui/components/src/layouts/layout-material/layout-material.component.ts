@@ -10,7 +10,7 @@ import { numValue } from '../../helpers';
 import { Router } from '@angular/router';
 
 export interface LayoutMaterialVariables {
-  footerSize: string;
+  footerSize?: string;
   headerSize: string;
   leftPanelSize: string;
 }
@@ -51,6 +51,7 @@ export interface Menu {
 
 export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterContentInit {
 
+  test1 = '';
   //#region top menu
   menuLeft = { items: [] as LeftMenuGroupItem[] };
   @Input() menu: Menu = {
@@ -148,7 +149,7 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
     if (item.href) {
       this.router.navigateByUrl(item.href);
     } else if (_.isFunction(item.action)) {
-      item.action()
+      item.action();
     }
 
   }

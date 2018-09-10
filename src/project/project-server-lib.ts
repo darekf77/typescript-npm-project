@@ -27,7 +27,7 @@ export class ProjectServerLib extends BaseProjectLib {
         if (!onlyWatchNoBuild) {
             this.buildLib(outDir, prod, watch);
         }
-        this.copytToManager.build(this.buildOptions)
+        this.copytToManager.initCopyingOnBuildFinish(this.buildOptions)
     }
 }
 

@@ -20,7 +20,8 @@ Helpers.checkEnvironment({
     { name: 'rimraf' },
     { name: 'cpr' },
     { name: 'renamer' },
-    { name: 'nodemon' }
+    { name: 'nodemon' },
+    { name: 'increase-memory-limit' }
   ],
   programs: [
     {

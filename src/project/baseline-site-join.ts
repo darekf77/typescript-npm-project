@@ -331,7 +331,7 @@ export class BaselineSiteJoin {
         compilationWrapper(() => {
           uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
             .forEach(relativeFile => self.merge(relativeFile, false))
-        }, `Baseline/Site join of all files for site project: ${self.project.name}`)
+        }, `Site join of all files for site project: ${self.project.name}`)
       },
       get watch() {
         return {

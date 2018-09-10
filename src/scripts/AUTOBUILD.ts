@@ -6,6 +6,13 @@ import * as _ from 'lodash';
 import { Project, ProjectFrom } from "../project";
 import { error, info } from '../messages';
 import { clearConsole } from '../process';
+import { walkObject } from '../helpers';
+import chalk from 'chalk';
+
+// function popertyKey(key: string) {
+
+//   return
+// }
 
 export interface ProjectForAutoBuild {
   cwd: string,
@@ -47,6 +54,7 @@ export class AutoActions {
       encoding: 'utf8'
     });
     this.validateConfig()
+    this.trimConfigPropsValues();
   }
 
   private validateConfig() {
@@ -104,17 +112,31 @@ export class AutoActions {
     info(`Done`);
   }
 
+  private trimConfigPropsValues() { // TODO make this works, lodash path with dot
+    // // walkObject(this.config, lodashPath => {
+    // //   const p = _.get(this.config, lodashPath);
+    // //   if (_.isString(p)) {
+    // //     console.log(`${lodashPath} v: "${chalk.bold(p)}"`)
+    // //     _.set(this.config, lodashPath, p.trim())
+    // //   }
+    // })
+  }
+
   private getBuild() {
     // console.log('config', this.config)
     const hostname = this.hostname;
     const username = os.userInfo().username.toLowerCase();
-    // console.log('hostname', hostname)
-    // console.log('username', username)
+
+
+
     const build: ProjectForAutoBuild = this.config[hostname][username].builds
       .find(b => {
         const p = ProjectFrom(b.cwd);
-        // console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
+
         if (!p) {
+          console.log('hostname', hostname)
+          console.log('username', username)
+          console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
           error(`Please fix your autobuild.json`);
         }
         return path.resolve(p.location) === path.resolve(this.project.location)

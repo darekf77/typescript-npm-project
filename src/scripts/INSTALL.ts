@@ -29,6 +29,13 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       console.log('** npm install in separated project')
       project.node_modules.installPackages()
     }
+
+    if (project.isWorkspace) {
+      project.run(`increase-memory-limit`).sync();
+    } else if (project.isWorkspaceChildProject) {
+      project.baseline.run(`increase-memory-limit`).sync();
+    }
+
   } if (args.length >= 1) { // NPM INSTALL <package name>
     //#region npm packages
     const npmPackagesToAdd = args

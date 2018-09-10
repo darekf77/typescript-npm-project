@@ -98,7 +98,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       }
     }).init(this.location)
 
-    this.copytToManager.build(this.buildOptions);
+    this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
   }
 
 }

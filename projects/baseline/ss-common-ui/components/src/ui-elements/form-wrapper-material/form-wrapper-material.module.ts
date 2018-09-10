@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 // material
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
@@ -13,6 +14,7 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
+
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
 import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../multimedia-wrapper';
@@ -23,6 +25,7 @@ import { NgStringPipesModule } from 'ngx-pipes';
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 import { EditorWrapperModule, EditorWrapperComponent } from '../editor-wrapper';
 import { ButtonWithActionComponent } from './additional-types';
+import { FormlySwitchComponent } from './additional-types/formly-switch';
 
 
 const angularModules = [
@@ -33,7 +36,9 @@ const angularModules = [
 const materialModules = [
   MatButtonModule,
   MatIconModule,
-  MatDialogModule
+  MatDialogModule,
+  FormlyMatToggleModule,
+  MatSlideToggleModule
 ];
 
 const myFormlyModules = [
@@ -49,7 +54,8 @@ const formlyModules = [
       { name: 'selectwrapper', component: SelectWrapperComponent },
       { name: 'multimediawrapper', component: MultimediaWrapperComponent },
       { name: 'editorwrapper', component: EditorWrapperComponent },
-      { name: 'button', component: ButtonWithActionComponent }
+      { name: 'button', component: ButtonWithActionComponent },
+      { name: 'switch', component: FormlySwitchComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
@@ -63,6 +69,12 @@ const formlyModules = [
   NgStringPipesModule
 ];
 
+const customComponetns = [
+  FormWrapperMaterialComponent,
+  ButtonWithActionComponent,
+  FormlySwitchComponent
+];
+
 @NgModule({
   imports: [
     ...angularModules,
@@ -71,9 +83,10 @@ const formlyModules = [
     ...materialModules
   ],
   exports: [
-    FormWrapperMaterialComponent,
-    ButtonWithActionComponent
+    ...customComponetns
   ],
-  declarations: [FormWrapperMaterialComponent, ButtonWithActionComponent]
+  declarations: [
+    ...customComponetns
+  ]
 })
 export class FormWrapperMaterialModule { }
