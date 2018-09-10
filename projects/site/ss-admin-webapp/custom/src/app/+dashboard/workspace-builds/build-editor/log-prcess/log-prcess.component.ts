@@ -37,7 +37,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   }
 
   async pullLastLoop() {
-    await this.getLastNlinesOfLog(10)
+    await this.getLastNlinesOfLog(20)
     if (this.isRealtime) {
       setTimeout(() => {
         this.pullLastLoop()

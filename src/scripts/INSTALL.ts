@@ -30,10 +30,12 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       project.node_modules.installPackages()
     }
 
-    if (project.isWorkspace) {
-      project.run(`increase-memory-limit`).sync();
-    } else if (project.isWorkspaceChildProject) {
-      project.baseline.run(`increase-memory-limit`).sync();
+    if (process.platform === 'darwin') {
+      if (project.isWorkspace) {
+        project.run(`increase-memory-limit`).sync();
+      } else if (project.isWorkspaceChildProject) {
+        project.baseline.run(`increase-memory-limit`).sync();
+      }
     }
 
   } if (args.length >= 1) { // NPM INSTALL <package name>

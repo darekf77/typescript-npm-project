@@ -66,6 +66,71 @@
         }
       ]
     }
+  },
+  "dariusz-ubuntu": {
+    "dariusz": {
+      "autoreleases": [
+        {
+          "cwd": "/home/dariusz/projects/npm/ng2-rest",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /home/dariusz/projects/npm/ng2-rest/preview/client",
+            "--bumbVersionIn /home/dariusz/projects/npm/ng2-rest/preview/server",
+            "--bumbVersionIn /home/dariusz/projects/npm/morphi",
+            "--bumbVersionIn /home/dariusz/projects/npm/morphi/examples",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "/home/dariusz/projects/npm/morphi",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /home/dariusz/projects/npm/morphi/examples",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project"
+          ]
+        }
+      ],
+      "builds": [
+        {
+          "cwd": "/home/dariusz/projects/npm/tsc-npm-project",
+          "command": "tnp build:dist --onlyWatchNoBuild true ",
+          "commandWatch": "tnp build:dist:watch --onlyWatchNoBuild true",
+          "args": [
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace"
+          ]
+        },
+        {
+          "cwd": "/home/dariusz/projects/npm/ng2-rest",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto  /home/dariusz/projects/npm/morphi",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "#  /home/dariusz/projects/npm/tsc-npm-project"
+          ]
+        },
+        {
+          "cwd": "/home/dariusz/projects/npm/morphi",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
+          "args": [
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
+            "# --copyto  /home/dariusz/projects/npm/tsc-npm-project"
+          ]
+        }
+      ]
+    }
   }
-
 }
