@@ -1,17 +1,23 @@
-<app-form-wrapper-material *ngIf="id"
-                           [(model)]="model"
-                           [fields]="fields"
-                           [crud]="buildController"
-                           [exclude]="['id']"
-                           [modelDataConfig]="modelDataConfig"
-                           (complete)="complete()">
-</app-form-wrapper-material>
+<mat-card>
+  <app-form-wrapper-material *ngIf="id"
+                             [(model)]="model"
+                             [fields]="fields"
+                             [crud]="buildController"
+                             [exclude]="['id']"
+                             [modelDataConfig]="modelDataConfig"
+                             (complete)="complete()">
+  </app-form-wrapper-material>
+</mat-card>
 <br>
 
-<mat-card style="background: lightgray" >
+<mat-card>
+  <mat-card-subtitle>Build</mat-card-subtitle>
   <app-building-process [model]="model"
                         (refreshModel)="refreshModel()"></app-building-process>
 </mat-card>
-
-<!-- <app-serving-process [model]="model"
-                     (refreshModel)="refreshModel()"></app-serving-process> -->
+<br>
+<mat-card>
+  <mat-card-subtitle>Serve</mat-card-subtitle>
+  <app-serving-process [model]="model"
+                       (refreshModel)="refreshModel()"></app-serving-process>
+</mat-card>

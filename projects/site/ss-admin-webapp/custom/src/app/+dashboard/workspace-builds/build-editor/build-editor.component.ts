@@ -41,6 +41,15 @@ export class BuildEditorComponent implements OnInit {
 
   }
 
+  fields = [
+    {
+      type: 'switch',
+      templateOptions: {
+        label: 'Git folder'
+      }
+    }
+  ] as FormlyFieldConfig[];
+
   private async refreshModel() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
 

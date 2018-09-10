@@ -11,7 +11,9 @@ const log = Log.create('formly switch');
 @Component({
   selector: 'app-formly-switch',
   template: `
-     <mat-slide-toggle [checked]="formControl.value" (change)="change($event)"  >Slide me!</mat-slide-toggle>
+     <mat-slide-toggle  [formControl]="field.formControl"  >
+        {{field.templateOptions.label}}
+     </mat-slide-toggle>
   `,
   styles: [`
     :host {
@@ -21,7 +23,7 @@ const log = Log.create('formly switch');
 })
 export class FormlySwitchComponent extends FieldType implements OnInit {
 
-  value: boolean;
+
 
   change(e: MatSlideToggleChange) {
     this.formControl.setValue(e.checked);

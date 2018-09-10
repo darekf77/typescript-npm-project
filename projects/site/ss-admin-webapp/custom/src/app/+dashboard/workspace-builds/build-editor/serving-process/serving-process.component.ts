@@ -18,62 +18,54 @@ export class ServingProcessComponent implements OnInit {
 
   fields = [
     {
-      fieldGroupClassName: 'display-flex',
-      fieldGroup: [
-        {
-          className: 'flex-1',
-          type: 'button',
-          templateOptions: {
-            label: 'Start serve',
-            action: async () => {
-              await this.buildController.startServeById(this.model.id).received
-              this.refreshModel.emit()
-              log.i('serve process started!')
-            }
-          },
-          hideExpression: () => (!this.model || _.isNumber(this.model.pidServeProces))
-        },
-        {
-          className: 'flex-1',
-          type: 'button',
-          templateOptions: {
-            label: 'Stop serve',
-            action: async () => {
-              await this.buildController.stopServeById(this.model.id).received
-              this.refreshModel.emit()
-              log.i('serve process stopped!')
-            }
-          },
-          hideExpression: () => (!this.model || !this.model.pidServeProces)
-        },
-        {
-          className: 'flex-1',
-          type: 'button',
-          templateOptions: {
-            label: 'See serve logs',
-            action: async () => {
-              this.displayServeLogs();
-            }
-          },
-          hideExpression: () => (!this.model || !this.model.pidServeProces)
-        },
-      ]
+
+      type: 'iconbutton',
+      templateOptions: {
+        icon: 'play_arrow',
+        action: async () => {
+          await this.buildController.startServeById(this.model.id).received
+          this.refreshModel.emit()
+          log.i('serve process started!')
+        }
+      },
+      hideExpression: () => (!this.model || _.isNumber(this.model.pidServeProces))
     },
     {
-      fieldGroupClassName: 'display-flex',
-      fieldGroup: [
-        {
-          className: 'flex-1',
-          template: `
-            <h3>Realtime serve logs:</h3>
-            <h4 *ngIf="!textServeLogs"> <strong>empty serve logs files</strong> </h4>
-            <code *ngIf="textServeLogs"
-              [innerHtml]="textServeLogs">
-            </code>
-          `
+
+      type: 'iconbutton',
+      templateOptions: {
+        icon: 'stop',
+        action: async () => {
+          await this.buildController.stopServeById(this.model.id).received
+          this.refreshModel.emit()
+          log.i('serve process stopped!')
         }
-      ]
-    }
+      },
+      hideExpression: () => (!this.model || !this.model.pidServeProces)
+    },
+    {
+
+      type: 'iconbutton',
+      templateOptions: {
+        icon: 'screen_share',
+        label: 'Display',
+        action: async () => {
+          // window.open()
+        }
+      },
+    },
+    {
+
+      type: 'iconbutton',
+      templateOptions: {
+        icon: 'dvr',
+        label: 'Logs',
+        action: async () => {
+          this.displayServeLogs();
+        }
+      }
+    },
+
   ] as FormlyFieldConfig[]
 
   textServeLogs = ''

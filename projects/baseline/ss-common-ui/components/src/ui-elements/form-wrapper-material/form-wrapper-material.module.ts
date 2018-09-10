@@ -26,6 +26,7 @@ import { FormWrapperMaterialComponent } from './form-wrapper-material.component'
 import { EditorWrapperModule, EditorWrapperComponent } from '../editor-wrapper';
 import { ButtonWithActionComponent } from './additional-types';
 import { FormlySwitchComponent } from './additional-types/formly-switch';
+import { IconButtonWithActionComponent } from './additional-types/formly-icon-button-with-action';
 
 
 const angularModules = [
@@ -55,7 +56,8 @@ const formlyModules = [
       { name: 'multimediawrapper', component: MultimediaWrapperComponent },
       { name: 'editorwrapper', component: EditorWrapperComponent },
       { name: 'button', component: ButtonWithActionComponent },
-      { name: 'switch', component: FormlySwitchComponent }
+      { name: 'switch', component: FormlySwitchComponent },
+      { name: 'iconbutton', component: IconButtonWithActionComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
@@ -72,7 +74,8 @@ const formlyModules = [
 const customComponetns = [
   FormWrapperMaterialComponent,
   ButtonWithActionComponent,
-  FormlySwitchComponent
+  FormlySwitchComponent,
+  IconButtonWithActionComponent
 ];
 
 @NgModule({

@@ -5,6 +5,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 // local
 import { BuildingProcessComponent } from './building-process.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
+import { LogPrcessModule } from '../log-prcess/log-prcess.module';
 
 
 const materialModules = [
@@ -15,6 +16,7 @@ const materialModules = [
   imports: [
     CommonModule,
     FormWrapperMaterialModule,
+    LogPrcessModule,
     ...materialModules
   ],
   exports: [BuildingProcessComponent],
