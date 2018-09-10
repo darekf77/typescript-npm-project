@@ -34,7 +34,7 @@ export abstract class BaseProjectLib extends Project {
 
   abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
 
-  
+
 
   public async publish() {
     this.checkIfReadyForNpm()
@@ -57,9 +57,9 @@ export abstract class BaseProjectLib extends Project {
 
   /**
    * Return how many projects has changed
-   * @param bumbVersionIn 
-   * @param newVersion 
-   * @param onlyInThisProjectSubprojects 
+   * @param bumbVersionIn
+   * @param newVersion
+   * @param onlyInThisProjectSubprojects
    */
   bumpVersionInOtherProjects(bumbVersionIn: string[], newVersion, onlyInThisProjectSubprojects = false): Number {
     let count = 0;
@@ -105,9 +105,11 @@ export abstract class BaseProjectLib extends Project {
     this.checkIfReadyForNpm()
     const newVersion = Project.Current.versionPatchedPlusOne;
     const self = this;
-    function removeTagAndCommit() {
+    function removeTagAndCommit(tagOnly = false) {
       console.log(`PLEASE RUN: `)
-      console.log(`git reset --hard HEAD~1`)
+      if (!tagOnly) {
+        console.log(`git reset --hard HEAD~1`)
+      }
       console.log(`git tag --delete v${newVersion}`)
     }
 
@@ -126,9 +128,16 @@ export abstract class BaseProjectLib extends Project {
         warn(`Failed to git commit -m "new vers...`);
       }
 
-      this.run(`npm version patch`).sync()
+      try {
+        this.run(`npm version patch`).sync()
+      } catch (e) {
+        removeTagAndCommit(true)
+        error(e);
+      }
 
       this.run(`tnp clear`).sync();
+
+      this.recreate.init();
       this.build({
         prod, outDir: config.folder.bundle as 'bundle', environmentName: 'local'
       })

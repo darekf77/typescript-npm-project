@@ -82,34 +82,33 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
 
-  @GET('/lines/build/:id')
-  getByIdLastNLinesFromBuildLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
+  /**
+   *
+   * @param lines undefied value means "get whole log"
+   */
+  @GET('/lines/log/:id')
+  getByIdLog(@PathParam('id') id, @QueryParam('type') type: 'build' | 'serve', @QueryParam('lines') lines = 1000): Response<string[]> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.getById(id);
+      if (type === 'build') {
+        if (!fse.existsSync(build.localPath.buildLog)) {
+          throw `Log for build doesn't exist  ${build.localPath.buildLog}`;
+        }
 
-      if (!fse.existsSync(build.localPath.buildLog)) {
-        throw `Log for build doesn't exist  ${build.localPath.buildLog}`;
+        return this.cutLast(fse.readFileSync(build.localPath.buildLog).toString(), lines);
+      } else if (type === 'serve') {
+        if (!fse.existsSync(build.localPath.serveLog)) {
+          throw `Log for build doesn't exist  ${build.localPath.serveLog}`;
+        }
+
+        return this.cutLast(fse.readFileSync(build.localPath.serveLog).toString(), lines);
       }
 
-      return this.cutLast(fse.readFileSync(build.localPath.buildLog).toString(), n);
     }
     //#endregion
   }
 
-  @GET('/lines/serve/:id')
-  getByIdLastNLinesFromServeLog(@PathParam('id') id, @QueryParam('lines') n = 1000): Response<string[]> {
-    //#region @backendFunc
-    return async () => {
-      const build = await this.db.BUILD.getById(id);
-      if (!fse.existsSync(build.localPath.serveLog)) {
-        throw `Log for build doesn't exist  ${build.localPath.serveLog}`;
-      }
-
-      return this.cutLast(fse.readFileSync(build.localPath.serveLog).toString(), n);
-    }
-    //#endregion
-  }
 
   @PUT('/clear/:id')
   clearById(@PathParam('id') id: number, @QueryParam('all') all = false): Response<void> {

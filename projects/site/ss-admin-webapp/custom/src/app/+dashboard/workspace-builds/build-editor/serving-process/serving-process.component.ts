@@ -61,7 +61,7 @@ export class ServingProcessComponent implements OnInit {
         icon: 'dvr',
         label: 'Logs',
         action: async () => {
-          this.displayServeLogs();
+
         }
       }
     },
@@ -82,20 +82,7 @@ export class ServingProcessComponent implements OnInit {
   }
 
 
-  private async displayServeLogs() {
 
-    this.isShowingServeLogs = true;
-
-    const data = await this.buildController.getByIdLastNLinesFromServeLog(this.model.id, 10).received;
-    log.i('displayServeLogs data', data)
-    this.textServeLogs = data.body.json.join('<br>')
-
-    setTimeout(() => {
-      if (this.isShowingServeLogs) {
-        this.displayServeLogs()
-      }
-    }, 1000)
-  }
 
 
 }

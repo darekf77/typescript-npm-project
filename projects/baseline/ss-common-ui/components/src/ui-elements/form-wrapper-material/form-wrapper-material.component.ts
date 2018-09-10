@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { BaseCRUD, describeClassProperites, ModelDataConfig } from 'morphi/browser';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component');
+const log = Log.create('form warpper material component', Level.__NOTHING);
 
 @Component({
   selector: 'app-form-wrapper-material',

@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import { META } from "baseline/ss-common-logic/src/helpers";
 import { Entity, Column, PrimaryGeneratedColumn, EntityRepository } from "typeorm";
-import { FormlyForm, DefaultModelWithMapping, CLASSNAME } from 'morphi';
+import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global } from 'morphi';
 
 //#region @backend
 import * as path from 'path';
+import * as rimraf from 'rimraf';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
@@ -31,6 +32,7 @@ export interface IBUILD {
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
 
+
   //#region @backend
   get nameFromIdAndRemote() {
     return `${this.id}-${this.nameFromRemote}`;
@@ -55,10 +57,25 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     // console.log('localPath.buildFolder', this.localPath.buildFolder)
     // console.log('localPath.repositoryFolder', this.localPath.repositoryFolder)
     if (staticFolder) {
-      if (fse.existsSync(this.localPath.repository)) {
-        fse.removeSync(this.localPath.repository)
+      const toCopy = path.join(staticFolder, this.gitFolder);
+      const dest = path.join(this.localPath.repository, this.gitFolder)
+
+      const options: fse.CopyOptionsSync = {
+        overwrite: true,
+        recursive: true,
+        errorOnExist: true,
+        filter: (src) => {
+          return !/.*node_modules.*/g.test(src) &&
+            !/.*tmp.*/g.test(src) &&
+            !/.*dist.*/g.test(src);
+        }
+      };
+
+      if (!fse.existsSync(dest)) {
+        fse.copySync(toCopy, dest, options);
       }
-      HelpersLinks.createLink(this.localPath.repository, staticFolder);
+
+      // HelpersLinks.createLink(this.localPath.repository, staticFolder);
     } else {
       run(`git clone ${this.gitRemote} ${this.nameFromIdAndRemote}`, { cwd: ENV.pathes.repositories })
     }
@@ -141,13 +158,13 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return {
 
       async servingById(id: number) {
-        const build = await self.getById(id);
+        let build = await self.getById(id);
 
         if (build.pidServeProces) {
           throw `Serving already started on port ${build.pidServeProces}`;
         }
 
-        let p = run(`tnp start`, { cwd: this.localPath.repositoryFolder, output: false }).async()
+        let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder, output: false }).async()
 
         fse.writeFileSync(build.localPath.serveLog, '');
 
@@ -159,7 +176,8 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             fse.appendFileSync(build.localPath.serveErrorLog, chunk)
           },
           endAction: async () => {
-            this.pidServeProces = null;
+            build = await self.getById(id);
+            build.pidServeProces = null;
             await self.update(id, build)
             console.log('END ACTION SERVING')
           }
@@ -170,7 +188,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       },
 
       async buildingById(id: number) {
-        const build = await self.getById(id);
+        let build = await self.getById(id);
 
         if (build.pidBuildProces) {
           throw `Build already started on port ${build.pidBuildProces}`;
@@ -188,8 +206,10 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             fse.appendFileSync(build.localPath.buildErrorLog, chunk)
           },
           endAction: async () => {
+            build = await self.getById(id);
             build.pidBuildProces = null;
             await self.update(id, build)
+            Global.vars.socket.BE.emit('endofbuild', build);
             console.log('END ACTION BUILDING')
           }
         })

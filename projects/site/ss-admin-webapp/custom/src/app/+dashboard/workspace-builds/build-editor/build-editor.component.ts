@@ -42,12 +42,12 @@ export class BuildEditorComponent implements OnInit {
   }
 
   fields = [
-    {
-      type: 'switch',
-      templateOptions: {
-        label: 'Git folder'
-      }
-    }
+    // {
+    //   type: 'switch',
+    //   templateOptions: {
+    //     label: 'Git folder'
+    //   }
+    // }
   ] as FormlyFieldConfig[];
 
   private async refreshModel() {

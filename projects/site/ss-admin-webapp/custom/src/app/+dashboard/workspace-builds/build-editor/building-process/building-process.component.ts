@@ -5,6 +5,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('building process')
+import { Global } from 'morphi/browser'
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
@@ -54,8 +55,8 @@ export class BuildingProcessComponent implements OnInit {
       templateOptions: {
         icon: 'dvr',
         label: 'Logs',
-        action: async () => {
-          this.displayBuildLogs();
+        action: () => {
+          this.isShowingBuildLogs = true;
         }
       }
     },
@@ -79,7 +80,7 @@ export class BuildingProcessComponent implements OnInit {
           return (this.model && !!this.model.pidClearProces) ? 'is clearing... ' : 'Clear';
         }
       },
-    },
+    }
 
   ] as FormlyFieldConfig[];
 
@@ -96,24 +97,12 @@ export class BuildingProcessComponent implements OnInit {
 
   ) { }
 
-  ngOnInit() { }
-
-
-
-  private async displayBuildLogs() {
-
-    this.matDialog.open(LogPrcessComponent, {
-
+  ngOnInit() {
+    Global.vars.socket.FE.on('endofbuild', (data) => {
+      log.i('DATA FROM SOCKET', data)
+      this.refreshModel.next()
     })
-
-    // const data = await this.buildController.getByIdLastNLinesFromBuildLog(this.model.id, 10).received;
-    // log.i('displayBuildLogs data', data)
-    // this.textBuildLogs = data.body.json.join('<br>')
-    // setTimeout(() => {
-    //   if (this.isShowingBuildLogs) {
-    //     this.displayBuildLogs()
-    //   }
-    // }, 1000)
   }
+
 
 }

@@ -1,6 +1,6 @@
-:host {
-  .log-window {
-    max-width: 400px;
+ .log-window {
+    display: block;
+    height: 300px;
     overflow-y: auto;
   }
-}
+
