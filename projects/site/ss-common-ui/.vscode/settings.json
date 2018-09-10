@@ -10,6 +10,7 @@
     "www": true,
     "Thumbs.db": true,
     ".DS_Store": true,
+    "**/.DS_Store": true,
     "npm-debug.log*": true,
     ".sass-cache": true,
     ".sourcemaps": true,
@@ -37,6 +38,7 @@
     "src/tsconfig.spec.json": true,
     "protractor.conf.js": true,
     "karma.conf.js": true,
+    "src/assets/ss-common-ui": true,
     ".gitignore": true,
     ".npmignore": true,
     ".npmrc": true,
@@ -45,7 +47,8 @@
   "workbench.colorCustomizations": {
     "activityBar.background": "#c468b6",
     "activityBar.foreground": "#ffffff",
-    "statusBar.background": "#bcdd70"
+    "statusBar.background": "#bcdd70",
+    "statusBar.debuggingBackground": "#bcdd70"
   },
   "editor.rulers": [
     100,

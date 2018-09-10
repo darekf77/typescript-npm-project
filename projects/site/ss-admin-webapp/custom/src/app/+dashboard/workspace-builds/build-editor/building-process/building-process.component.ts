@@ -20,28 +20,32 @@ export class BuildingProcessComponent implements OnInit {
     {
       fieldGroupClassName: 'display-flex flex-1',
       fieldGroup: [
-        // {
-        //   type: 'button',
-        //   templateOptions: {
-        //     label: 'Clear Build',
-        //     action: async () => {
-        //       this.clear.templateOptions.disabled = true;
-        //       try {
-        //         await this.buildController.clearById(this.model.id).received
-
-        //         log.i('Project clear complete')
-        //       } catch (e) {
-        //         log.er('error during clear')
-        //       }
-        //       this.clear.templateOptions.disabled = false;
-        //     }
-        //   }
-        // },
+        {
+          type: 'button',
+          templateOptions: {
+            label: 'Clear',
+            action: async () => {
+              this.buildController.clearById(this.model.id).received.observable.subscribe(async () => {
+                this.refreshModel.emit()
+                log.i('CLEAR COMPLETE')
+              })
+              this.refreshModel.emit()
+            }
+          },
+          expressionProperties: {
+            'templateOptions.disabled': () => {
+              return (this.model && !!this.model.pidClearProces)
+            },
+            'templateOptions.label': () => {
+              return (this.model && !!this.model.pidClearProces) ? 'is clearing... ' : 'Clear';
+            }
+          },
+        },
         {
           className: 'flex-1',
           type: 'button',
           templateOptions: {
-            label: 'Start build',
+            label: 'Start',
             action: async () => {
               await this.buildController.startBuildById(this.model.id).received
               this.refreshModel.next()
@@ -54,7 +58,7 @@ export class BuildingProcessComponent implements OnInit {
           className: 'flex-1',
           type: 'button',
           templateOptions: {
-            label: 'Stop build',
+            label: 'Stop',
             action: async () => {
               await this.buildController.stopBuildById(this.model.id).received
               this.refreshModel.next()
@@ -74,9 +78,10 @@ export class BuildingProcessComponent implements OnInit {
           },
           hideExpression: () => (!this.model || !this.model.pidBuildProces)
         },
+        
         {
           className: 'flex-2',
-          template: `
+          template: `            
             <h3>Realtime build logs:</h3>
             <h4 *ngIf="!textBuildLogs"> <strong>empty build logs files</strong> </h4>
             <code *ngIf="textBuildLogs"
@@ -86,6 +91,7 @@ export class BuildingProcessComponent implements OnInit {
         }
       ]
     },
+
     // {
     //   fieldGroupClassName: 'display-flex',
     //   fieldGroup: [

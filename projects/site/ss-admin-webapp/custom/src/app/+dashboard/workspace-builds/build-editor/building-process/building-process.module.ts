@@ -1,12 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+// material
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+// local
 import { BuildingProcessComponent } from './building-process.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
+
+
+const materialModules = [
+  MatSlideToggleModule
+]
 
 @NgModule({
   imports: [
     CommonModule,
-    FormWrapperMaterialModule
+    FormWrapperMaterialModule,
+    ...materialModules
   ],
   exports: [BuildingProcessComponent],
   declarations: [BuildingProcessComponent]

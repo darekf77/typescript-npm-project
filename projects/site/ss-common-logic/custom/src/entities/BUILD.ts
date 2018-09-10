@@ -15,6 +15,7 @@ import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 export interface IBUILD {
   name: string;
   pidBuildProces: number;
+  pidClearProces: number;
   pidServeProces: number;
 }
 
@@ -67,12 +68,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     HelpersLinks.createLink(this.localPath.buildFolder, this.localPath.repositoryFolder);
   }
 
-
-  clear(all = false) {
-    run(`tnp clear${all ? ':all' : ''}`,
-      { cwd: this.localPath.repositoryFolder, output: false }).sync()
-  }
-
   //#endregion
 
 
@@ -98,6 +93,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column() gitRemote: string;
 
   @Column({ nullable: true }) pidBuildProces: number;
+  @Column({ nullable: true }) pidClearProces: number;
   @Column({ nullable: true }) pidServeProces: number;
 
   @Column({ nullable: true, default: '/' }) gitFolder: string;
@@ -121,6 +117,23 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       throw `Cannot find build with id ${id}`
     }
     return build;
+  }
+
+  async clearById(id: number, all = false) {
+    const build = await this.getById(id);
+
+    if (!!build.pidClearProces) {
+      throw `Clear process already in progress, id ${id}, pid: ${build.pidClearProces}`
+    }
+
+    const p = run(`tnp clear${all ? ':all' : ''}`,
+      { cwd: build.localPath.repositoryFolder, output: false }).async()
+    build.pidClearProces = p.pid;
+    p.on('close', async () => {
+      build.pidClearProces = null;
+      await this.update(id, build)
+    })
+    await this.update(id, build)
   }
 
   get start() {

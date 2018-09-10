@@ -115,8 +115,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   clearById(@PathParam('id') id: number, @QueryParam('all') all = false): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      build.clear();
+      await this.db.BUILD.clearById(id);
     }
     //#endregion
   }
