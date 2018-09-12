@@ -61,7 +61,7 @@ export class ServingProcessComponent implements OnInit {
         icon: 'dvr',
         label: 'Logs',
         action: async () => {
-
+          this.isShowingServeLogs = true;
         }
       }
     },

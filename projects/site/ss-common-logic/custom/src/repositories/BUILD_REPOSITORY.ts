@@ -51,7 +51,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           throw `Serving already started on port ${build.pidServeProces}`;
         }
 
-        let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder, output: false }).async()
+        let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder }).async()
 
         fse.writeFileSync(build.localPath.serveLog, '');
 
@@ -70,7 +70,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           }
         })
 
-        this.pidServeProces = p.pid;
+        build.pidServeProces = p.pid;
         await self.update(id, build)
       },
 

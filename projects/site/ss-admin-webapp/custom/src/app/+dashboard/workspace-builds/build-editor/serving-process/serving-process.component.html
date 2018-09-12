@@ -1,3 +1,7 @@
 <app-form-wrapper-material [showButtons]="false"
                            [fields]="fields">
 </app-form-wrapper-material>
+<app-log-prcess *ngIf="isShowingServeLogs"
+                [type]="'serve'"
+                (hide)="isShowingServeLogs = false"
+                [build]="model"></app-log-prcess>
