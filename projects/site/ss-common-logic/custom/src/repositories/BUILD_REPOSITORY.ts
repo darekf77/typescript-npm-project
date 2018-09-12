@@ -2,7 +2,7 @@ import { EntityRepository, Global } from "morphi";
 import { BUILD } from "../entities";
 import * as fse from 'fs-extra';
 import { META } from "baseline/ss-common-logic/src/helpers";
-import { run, HelpersLinks, killProcess } from 'tnp-bundle';
+import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
 
 export interface BUILD_ALIASES {
@@ -51,6 +51,8 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           throw `Serving already started on port ${build.pidServeProces}`;
         }
 
+        build.init();
+
         let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder }).async()
 
         fse.writeFileSync(build.localPath.serveLog, '');
@@ -87,6 +89,11 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
         self.attachListeners(p, {
           msgAction: (chunk) => {
+            let progress = build.resovelProgress(chunk);
+            if (progress) {
+              // console.log('progress founded', progress)
+              Global.vars.socket.BE.emit('newprogress', progress);
+            }
             fse.appendFileSync(build.localPath.buildLog, chunk)
           },
           errorAction: (chunk) => {

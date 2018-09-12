@@ -47,19 +47,21 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
     const b1 = await this.db.BUILD.save(this.db.BUILD.create({
       gitFolder: '/projects/baseline',
-      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
+      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
+      staticFolder: tnpLocation
     }))
 
 
-    b1.initialize(tnpLocation);
+    b1.init()
 
 
     const b2 = await this.db.BUILD.save(this.db.BUILD.create({
       gitFolder: '/projects/workspace',
-      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git'
+      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
+      staticFolder: tnpLocation
     }))
 
-    b2.initialize(tnpLocation);
+    b2.init()
 
   }
 
@@ -114,7 +116,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   clearById(@PathParam('id') id: number, @QueryParam('all') all = false): Response<void> {
     //#region @backendFunc
     return async () => {
-      await this.db.BUILD.clearById(id);
+      await this.db.BUILD.clearById(id, all);
     }
     //#endregion
   }

@@ -9,8 +9,9 @@ import * as rimraf from 'rimraf';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
-import { run, HelpersLinks, killProcess } from 'tnp-bundle';
+import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
+import { ProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
 //#endregion
 
 export interface IBUILD {
@@ -37,6 +38,23 @@ export enum BuildStatus {
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
 
+  public resovelProgress(l: string) {
+    let progress;
+
+    if (/\[\[\[.*\]\]\]/g.test(l.trim())) {
+      l = l.trim().replace(/^\[\[\[/g, '').replace(/\]\]\]$/g, '');
+      progress = l;
+    }
+    if (!_.isUndefined(progress)) {
+      try {
+        const p = JSON.parse(progress);
+        const res = _.merge(new ProgressBarData(), p);
+        return res;
+      } catch (error) {
+        // console.log('fail to parse', progress)
+      }
+    }
+  }
 
   //#region @backend
   get nameFromIdAndRemote() {
@@ -56,40 +74,67 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     }
 
   }
-  initialize(staticFolder = undefined) {
-    // console.log('staticFolder', staticFolder)
-    // console.log('localPath.repository', this.localPath.repository)
-    // console.log('localPath.buildFolder', this.localPath.buildFolder)
-    // console.log('localPath.repositoryFolder', this.localPath.repositoryFolder)
-    if (staticFolder) {
-      const toCopy = path.join(staticFolder, this.gitFolder);
-      const dest = path.join(this.localPath.repository, this.gitFolder)
 
-      const options: fse.CopyOptionsSync = {
-        overwrite: true,
-        recursive: true,
-        errorOnExist: true,
-        filter: (src) => {
-          return !/.*node_modules.*/g.test(src) &&
-            !/.*tmp.*/g.test(src) &&
-            !/\.vscode.*/g.test(src) &&
-            !/.*dist.*/g.test(src);
-        }
-      };
 
-      if (!fse.existsSync(dest)) {
+
+  init() {
+    if (_.isString(this.staticFolder) && this.staticFolder !== '') {
+      this.reinitFrom.folder()
+    } else {
+      this.reinitFrom.repository()
+    }
+  }
+
+  private get reinitFrom() {
+    const self = this;
+    return {
+      folder() {
+
+        const toCopy = path.join(self.staticFolder, self.gitFolder);
+        const dest = path.join(self.localPath.repository, self.gitFolder)
+
+        const options: fse.CopyOptionsSync = {
+          overwrite: true,
+          recursive: true,
+          filter: (src) => {
+            return !/.*node_modules.*/g.test(src) &&
+              !/.*tmp.*/g.test(src) &&
+              !/\.vscode.*/g.test(src) &&
+              !/.*dist.*/g.test(src) &&
+              !fs.lstatSync(src).isSymbolicLink();
+          }
+        };
+
         fse.copySync(toCopy, dest, options);
+
+        run(`tnp claer`, { cwd: dest });
+        self.linkRepoToBuild()
+      },
+
+      repository() {
+        const p = path.join(ENV.pathes.repositories, self.nameFromIdAndRemote);
+        if (fse.existsSync(p)) {
+          pullCurrentBranch(this.localPath.repositoryFolder);
+        } else {
+          run(`git clone ${self.gitRemote} ${self.nameFromIdAndRemote}`, { cwd: ENV.pathes.repositories })
+        }
+        self.linkRepoToBuild()
       }
 
-      // HelpersLinks.createLink(this.localPath.repository, staticFolder);
-    } else {
-      run(`git clone ${this.gitRemote} ${this.nameFromIdAndRemote}`, { cwd: ENV.pathes.repositories })
+
     }
+
+
+  }
+
+  private linkRepoToBuild() {
     if (fse.existsSync(this.localPath.buildFolder)) {
       fse.removeSync(this.localPath.buildFolder)
     }
+
     HelpersLinks.createLink(this.localPath.buildFolder, this.localPath.repositoryFolder);
   }
+
 
   //#endregion
 
@@ -118,6 +163,8 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidClearProces: number;
   @Column({ nullable: true }) pidServeProces: number;
+
+  @Column({ nullable: true }) staticFolder: string;
 
   @Column({ default: BuildStatus.NONE }) status: BuildStatus;
 

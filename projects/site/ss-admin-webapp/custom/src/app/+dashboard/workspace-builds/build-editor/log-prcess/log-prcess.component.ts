@@ -4,6 +4,11 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs/Subscription';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
+import { ProgressBarData } from 'ss-common-ui/module';
+import * as _ from 'lodash';
+
+import { Log, Level } from 'ng2-logger/browser';
+const log = Log.create('log progress')
 
 @Component({
   selector: 'app-log-prcess',
@@ -13,8 +18,10 @@ import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   @Input() type: 'build' | 'serve';
+  @Output() progress = new EventEmitter<ProgressBarData>();
   @ViewChild('dialogTmpl') dialogTmpl: TemplateRef<any>;
   isRealtime = false;
+  currentProgress: ProgressBarData;
   constructor(
     public buildController: BuildController,
     private matDialog: MatDialog
@@ -37,7 +44,8 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   }
 
   async pullLastLoop() {
-    await this.getLastNlinesOfLog(20)
+    await this.getLastNlinesOfLog(50)
+    this.isRealtime = (!!this.build.pidBuildProces);
     if (this.isRealtime) {
       setTimeout(() => {
         this.pullLastLoop()
@@ -47,24 +55,49 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   async getWholeLog() {
     const data = await this.buildController.getByIdLog(this.build.id, this.type).received
+    this.clear(data.body.json)
     this.content = data.body.json.join('<br>')
+  }
+
+  private clear(logs: string[]) {
+    // let progress = '';
+    logs.forEach((l, i) => {
+      if (/\[\[\[.*\]\]\]/g.test(l.trim())) {
+        l = l.replace(/^\[\[\[/g, '').replace(/\]\]\]$/g, '');
+        // progress = l;
+        logs[i] = '';
+      }
+    })
+
+    // try {
+    //   const p = JSON.parse(progress);
+    //   const res = _.merge(new ProgressBarData(), p);
+    //   this.progress.emit(res);
+    //   this.currentProgress = res
+    //   log.i('new progress', res)
+    // } catch (error) {
+    //   log.er('error trying to parse json from progress')
+    // }
   }
 
   async getLastNlinesOfLog(n: number) {
     const data = await this.buildController.getByIdLog(this.build.id, this.type, n).received
+    this.clear(data.body.json)
     this.content = data.body.json.join('<br>')
   }
 
-  async refresh() {
-    await this.getWholeLog();
-  }
 
   @Output() hide = new EventEmitter<boolean>();
 
 
   handlers: Subscription[] = [];
   ngOnInit() {
-
+    this.isRealtime = (!!this.build.pidBuildProces);
+    if (this.isRealtime) {
+      this.pullLastLoop();
+    } else {
+      this.getWholeLog()
+    }
   }
 
   ngAfterContentInit() {

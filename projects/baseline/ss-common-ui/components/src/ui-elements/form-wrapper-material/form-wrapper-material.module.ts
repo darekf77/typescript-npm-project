@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule  } from '@angular/material/progress-bar'
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
@@ -24,7 +25,7 @@ import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 import { EditorWrapperModule, EditorWrapperComponent } from '../editor-wrapper';
-import { ButtonWithActionComponent } from './additional-types';
+import { ButtonWithActionComponent, FormlyProgressbardComponent } from './additional-types';
 import { FormlySwitchComponent } from './additional-types/formly-switch';
 import { IconButtonWithActionComponent } from './additional-types/formly-icon-button-with-action';
 
@@ -39,7 +40,8 @@ const materialModules = [
   MatIconModule,
   MatDialogModule,
   FormlyMatToggleModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatProgressBarModule
 ];
 
 const myFormlyModules = [
@@ -57,7 +59,8 @@ const formlyModules = [
       { name: 'editorwrapper', component: EditorWrapperComponent },
       { name: 'button', component: ButtonWithActionComponent },
       { name: 'switch', component: FormlySwitchComponent },
-      { name: 'iconbutton', component: IconButtonWithActionComponent }
+      { name: 'iconbutton', component: IconButtonWithActionComponent },
+      { name: 'infoprogressbar', component: FormlyProgressbardComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
@@ -75,7 +78,8 @@ const customComponetns = [
   FormWrapperMaterialComponent,
   ButtonWithActionComponent,
   FormlySwitchComponent,
-  IconButtonWithActionComponent
+  IconButtonWithActionComponent,
+  FormlyProgressbardComponent
 ];
 
 @NgModule({
