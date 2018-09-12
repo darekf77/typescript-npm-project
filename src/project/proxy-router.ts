@@ -7,6 +7,7 @@ import * as http from 'http';
 import { Project } from './base-project';
 import chalk from 'chalk';
 import * as _ from 'lodash';
+import { killonport } from '../scripts/KILL';
 
 
 export class ProxyRouter {
@@ -16,29 +17,6 @@ export class ProxyRouter {
   }
 
   protected routes: EnvConfigProject[] = [];
-
-  public killProcessOn(portNumber: number) {
-
-    try {
-      // console.log(`Cleaning port number "${portNumber}"`)
-      if (process.platform === 'win32') {
-        let pid = child.execSync(`netstat -ano | findstr :${portNumber}`).toString();
-        // console.log('Founded pid' + pid)
-        child.execSync(`taskkill /PID ${pid} /F `)
-      } else if (process.platform === 'darwin') {
-        let pid = child.execSync(`lsof -i :${portNumber}`).toString();
-        // console.log(`Pid to kill ${pid}`)
-        child.execSync(`kill -9 ${pid}`).toString();
-      } else {
-
-      }
-      // console.log(`Process killing on port: ${portNumber}: SUCCEED`)
-    } catch (error) {
-      // console.log(`Process killing on port: ${portNumber}: FAIL`)
-      // console.log(error)
-    }
-
-  }
 
   private static takenPorts = [];
 
@@ -68,6 +46,7 @@ export class ProxyRouter {
     console.log(`Auto assigned port ${port} for ${project.name}`)
     this.runOnRoutes(projects);
   }
+
 
   private getProjectFrom(req: http.IncomingMessage): Project {
     // console.log('req', req)
@@ -104,18 +83,37 @@ export class ProxyRouter {
   }
 
   private server() {
-    const proxy = httpProxy.createProxyServer({});
+    const proxy = httpProxy.createProxyServer({ ws: true });
+
     const server = http.createServer((req, res) => {
       const p = this.getProjectFrom(req);
+      // console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
       if (p) {
-        // console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
-        const target = `http://localhost:${p.getDefaultPort()}`
-        proxy.web(req, res, { target, ws: true });
+
+        const target = p.routerTargetHttp();
+        proxy.web(req, res, {
+          target,
+          ws: true
+        });
       } else {
         res.write('not found')
         res.end();
       }
     });
+
+    // server.on('upgrade', (req, socket, head) => {
+    //   const p = this.getProjectFrom(req);
+    //   console.log('resolve project from ws ', p && p.name)
+
+    //   const target = p ? p.routerTargetWebSocket() : ''
+    //   proxy.ws(req, socket, head, {
+    //     target,
+    //     ws: true
+    //   });
+
+    // });
+
+
     server.listen(this.project.getDefaultPort(), () => {
       console.log(`Proxy Router activate on http://localhost:${this.project.getDefaultPort()}`)
     }).on('error', e => {

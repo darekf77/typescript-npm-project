@@ -30,6 +30,7 @@ import { routes } from "./app.routes";
 
 init({
   host: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host,
+  hostSocket: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').hostSocket,
   controllers: [
     AuthController,
     CategoryController,

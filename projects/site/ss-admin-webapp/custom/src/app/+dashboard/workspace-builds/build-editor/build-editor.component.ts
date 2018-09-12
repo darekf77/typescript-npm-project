@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 // other
 import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('build-editor')
+const log = Log.create('build-editor', Level.__NOTHING)
 import { ModelDataConfig } from 'morphi/browser';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';

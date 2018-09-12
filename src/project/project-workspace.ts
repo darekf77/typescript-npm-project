@@ -4,6 +4,7 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
+import { info } from '../messages';
 
 
 export class ProjectWorkspace extends Project {
@@ -17,7 +18,9 @@ export class ProjectWorkspace extends Project {
       .filter(child => {
         return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
       })
-      .forEach(child => child.start());
+      .forEach(child => {
+        child.start()
+      });
     return 'echo "Workspace server started"';
   }
   projectSpecyficFiles(): string[] {
@@ -108,10 +111,12 @@ export class ProjectWorkspace extends Project {
     console.log('===================')
 
     projectsLibs.forEach((project, i) => {
+      info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
       project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
     })
 
     projectsApps.forEach((project) => {
+      info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
       project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
     })
 

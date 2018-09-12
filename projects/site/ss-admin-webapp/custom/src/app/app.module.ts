@@ -45,6 +45,7 @@ import { LoginModule } from './login/login.module';
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 init({
   host,
+  hostSocket: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').hostSocket,
   controllers: [
     AuthController,
     GroupsController,

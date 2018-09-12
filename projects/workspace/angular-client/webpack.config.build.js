@@ -7,8 +7,10 @@ const common = require('./webpack.config.common.js');
 
 const { getReservedClassNames } = require('tnp-bundle')
 
-const reserved = getReservedClassNames()
+let reserved = getReservedClassNames()
+reserved = reserved.concat(['BaseCRUD', 'ModelDataConfig'])
 
+console.log('reserved',reserved)
 
 module.exports = merge(common, {
   plugins: [

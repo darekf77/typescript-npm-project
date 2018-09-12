@@ -45,6 +45,7 @@ export default function () {
       `http://localhost:${project.port}${project.baseUrl}` :
       `http://localhost:${project.port}`
     ,
+    hostSocket: `http://localhost:${project.port}`,
     Controllers: Controllers as any,
     Entities: Entities as any,
     InitDataPriority: InitDataPriority as any

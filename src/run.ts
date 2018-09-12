@@ -90,15 +90,17 @@ export async function run(argsv: string[]) {
     let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {
       _.forIn(defaultObjectFunctionsOrHelpString, (v: Function | [Function, string] | string, k) => {
+        if (recognized) {
+          return
+        }
         if (!isString(v)) {
           const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
           if (_.isFunction(vFn)) {
             const check = match(k, argsv);
             if (check.isMatch) {
               recognized = true;
-
               vFn.apply(null, [check.restOfArgs.join(' ')]);
-              process.stdin.resume();
+              return;
             }
           }
         }
@@ -106,7 +108,9 @@ export async function run(argsv: string[]) {
       })
     }
   });
-  if (!recognized) {
+  if (recognized) {
+    process.stdin.resume();
+  } else {
     if (Array.isArray(argsv) && argsv.length == 3) {
       console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
       process.exit(0);

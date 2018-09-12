@@ -156,6 +156,12 @@ export class EnvironmentConfig {
       this.err()
     }
 
+    if (this.config.ip) {
+      this.config.workspace.workspace.hostSocket = `http://${this.config.ip}:${this.config.workspace.workspace.port}`;
+    } else {
+      this.config.workspace.workspace.hostSocket = `http://localhost:${this.config.workspace.workspace.port}`;
+    }
+
     if (this.config.domain) {
       this.config.workspace.workspace.host =
         `${this.config.domain}${this.config.workspace.workspace.baseUrl}`;
@@ -174,6 +180,13 @@ export class EnvironmentConfig {
     }
 
     this.config.workspace.projects.forEach(p => {
+
+      if (this.config.ip) {
+        p.hostSocket = `http://${this.config.ip}:${p.port}`;
+      } else {
+        p.hostSocket = `http://localhost:${p.port}`;
+      }
+
       if (this.config.domain || this.config.proxyRouterMode) {
         p.host = `${this.config.workspace.workspace.host}${p.baseUrl}`;
       } else {

@@ -37,6 +37,22 @@ export function killProcess(byPid: number) {
   run(`kill -9 ${byPid}`).sync()
 }
 
+export function killProcessByPort(port: number) {
+  console.log(`Killing process on port ${port} in progress`);
+  try {
+    if (os.platform() === 'linux') {
+      run(`lsof -i:${port}`, { output: false }).sync()
+    } else if (os.platform() === 'darwin') {
+      run(`lsof -P | grep ':${port}' | awk '{print $2}' | xargs kill -9 `, { output: false }).sync()
+    }
+    info(`Process killed on port: ${port}`)
+  } catch (e) {
+    error(`Problem with killing process on port ${port}:
+    ${e}
+    `, true)
+  }
+}
+
 export function clearConsole() {
   // try {
   //   if (process.platform === 'win32') {
@@ -49,19 +65,41 @@ export function clearConsole() {
 
 }
 
-export function log(process: child.ChildProcess, output = true) {
+
+
+
+
+
+const processes: child.ChildProcess[] = [];
+// const cleanExit = function () {
+//   processes.forEach(p => {
+//     p.kill('SIGINT')
+//     p.kill('SIGTERM')
+//     console.log(`Killing child process on ${p.pid}`)
+//   })
+//   console.log(`Killing parent on ${process.pid}`)
+//   process.exit()
+// };
+// process.on('SIGINT', cleanExit); // catch ctrl-c
+// process.on('SIGTERM', cleanExit); // catch kill
+// process.on('uncaughtException', cleanExit)
+// process.on('unhandledRejection', cleanExit)
+
+
+export function log(proc: child.ChildProcess, output = true) {
+  processes.push(proc);
 
   if (output) {
-    process.stdout.on('data', (data) => {
+    proc.stdout.on('data', (data) => {
       console.log(data.toString());
     })
 
-    process.stderr.on('data', (data) => {
+    proc.stderr.on('data', (data) => {
       console.log(data.toString());
     })
   }
 
-  return process;
+  return proc;
 }
 
 function checkProcess(dirPath: string, command: string) {

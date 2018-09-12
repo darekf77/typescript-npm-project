@@ -110,7 +110,9 @@ export default {
   $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
   $BUILD_APP_WATCH_PROD: (args) => buildApp(false, true, 'dist', args),
 
-  $START_APP: () => Project.Current.start(),
+  $START_APP: () => {
+    Project.Current.start()
+  },
 
   // aliases
   $BUILD: (args) => {
@@ -141,7 +143,10 @@ export default {
 
 
 
-  $START: () => Project.Current.start(),
+  $START: () => {
+
+    Project.Current.start()
+  },
 
   'Documentation': `
 Building purpose:

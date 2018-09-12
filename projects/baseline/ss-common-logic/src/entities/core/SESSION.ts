@@ -163,6 +163,11 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_AL
 
   async getByUser(user: USER, ip: string) {
     //#region @backendFunc
+    // TODO QUICK_FIX localhost
+    if (ip === '::ffff:127.0.0.1') {
+      ip = '::1'
+    }
+
     const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
       .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
       .where(`${META.tableNameFrom(SESSION)}.user = :id`)

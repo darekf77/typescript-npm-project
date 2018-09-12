@@ -1,7 +1,7 @@
 
 import { Component, OnInit, HostListener } from '@angular/core';
 // third part
-import { Log, Level } from "ng2-logger";
+import { Log, Level } from 'ng2-logger';
 import * as _ from 'lodash';
 // local
 
@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module';
 import DomainsController from 'ss-common-logic/browser/controllers/DomainsController';
 
-const log = Log.create('Dashboard')
+const log = Log.create('Dashboard', Level.__NOTHING);
 
 @Component({
   selector: 'app-dashboard-component',
@@ -35,15 +35,15 @@ export class DashboardComponent implements OnInit {
     top: {
       items: [
         {
-          name: "Builds",
+          name: 'Builds',
           leftMenu: [
             {
-              name: "Builds",
+              name: 'Builds',
               subitems: []
             },
 
             {
-              name: "Domains",
+              name: 'Domains',
               subitems: []
             }
 
@@ -51,66 +51,66 @@ export class DashboardComponent implements OnInit {
         }
       ]
     }
-  }
+  };
 
   handlers: Subscription[] = [];
+
+  content = {
+    height: window.innerHeight - 100
+  };
 
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe());
   }
 
-  content = {
-    height: window.innerHeight - 100
-  }
-
   async logout() {
-    await this.auth.browser.logout()
+    await this.auth.browser.logout();
   }
 
 
   async getBuilds() {
     const data = await this.buildController.getAll().received;
-    log.i('data', data.body.json)
+    log.i('data', data.body.json);
     return data.body.json.map(b => {
       return {
         name: b.name,
         href: `/dashboard/builds/build/${b.id}`,
         id: b.id
-      }
-    })
+      };
+    });
   }
 
   async getDomains() {
     const data = await this.domainsController.getAll().received;
-    log.i('data', data.body.json)
+    log.i('data', data.body.json);
     return data.body.json.map(b => {
       return {
         name: b.path,
         href: `/dashboard/domains/domain/${b.id}`,
         id: b.id
-      }
-    })
+      };
+    });
   }
 
   async ngOnInit() {
 
 
 
-    const builds = _.first(this.menu.top.items).leftMenu[0]
+    const builds = _.first(this.menu.top.items).leftMenu[0];
     builds.action = () => {
       const id = _.first(builds.subitems)['id'];
-      log.i('navigate hererere to build id ', id)
+      log.i('navigate hererere to build id ', id);
       this.router.navigateByUrl(`/dashboard/builds/build/${id}`);
-    }
-    builds.subitems = await this.getBuilds()
+    };
+    builds.subitems = await this.getBuilds();
 
-    const domains = _.first(this.menu.top.items).leftMenu[1]
+    const domains = _.first(this.menu.top.items).leftMenu[1];
     domains.action = () => {
       const id = _.first(domains.subitems)['id'];
-      log.i('navigate hererere to domain id ', id)
+      log.i('navigate hererere to domain id ', id);
       this.router.navigateByUrl(`/dashboard/domains/domain/${id}`);
-    }
-    domains.subitems = await this.getDomains()
+    };
+    domains.subitems = await this.getDomains();
 
 
 
@@ -118,13 +118,13 @@ export class DashboardComponent implements OnInit {
     this.handlers.push(this.auth.isLoggedIn.subscribe(isLoginIn => {
       if (isLoginIn) {
         if (this.router.url.trim() === '/') {
-          this.router.navigateByUrl('/dashboard')
+          this.router.navigateByUrl('/dashboard');
         }
       } else {
-        this.router.navigateByUrl('/')
+        this.router.navigateByUrl('/');
       }
-    }))
-    await this.auth.browser.init()
+    }));
+    await this.auth.browser.init();
 
   }
 

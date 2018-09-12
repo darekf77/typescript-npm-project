@@ -89,6 +89,7 @@ import { ConnectionOptions } from "typeorm";
 export interface EnvConfigProject {
   baseUrl: string;
   host?: string; // tnp generated
+  hostSocket?: string; // tnp generated
   externalHost?: string;
   name: string;  // tnp checked
   port: number; // override tnp type port
@@ -105,6 +106,7 @@ export interface EnvConfig {
   name?: EnvironmentName; // tnp generated
   proxyRouterMode?: boolean; // tnp generated
   domain?: string;
+  ip?: string;
   workspace: {
     workspace: EnvConfigProject;
     build?: {

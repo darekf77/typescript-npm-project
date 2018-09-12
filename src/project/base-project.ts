@@ -14,7 +14,7 @@ import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { run as __run, watcher as __watcher } from "../process";
+import { run as __run, watcher as __watcher, killProcessByPort } from "../process";
 import { copyFile, getMostRecentFilesNames } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
@@ -32,6 +32,14 @@ import { CopyToManager } from './copyto-manager';
 export abstract class Project {
   abstract projectSpecyficFiles(): string[];
   abstract buildSteps(buildOptions?: BuildOptions);
+
+  routerTargetHttp() {
+    return `http://localhost:${this.getDefaultPort()}`;
+  }
+
+  routerTargetWebSocket() {
+    return `ws://localhost:${this.getDefaultPort()}`;
+  }
 
   readonly requiredLibs: Project[] = []; // TODO FIX THIS
   get parent(): Project {
@@ -187,7 +195,7 @@ export abstract class Project {
   start() {
     this.env.init()
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-    this.proxyRouter.killProcessOn(this.getDefaultPort())
+    // killProcessByPort(this.getDefaultPort())
     this.run(this.startOnCommand()).async()
   }
 
@@ -276,7 +284,7 @@ export abstract class Project {
   protected buildOptions?: BuildOptions;
   build(buildOptions?: BuildOptions) {
     const { prod, watch, outDir } = buildOptions;
-    this.buildOptions = buildOptions;    
+    this.buildOptions = buildOptions;
 
     // console.log(`Prepare environment for: ${this.name}`)
     this.env.init(buildOptions);
@@ -402,7 +410,8 @@ export abstract class Project {
       // console.log('dirname', __dirname)
       return {
         install() {
-          console.log(`** ERR Project.Tnp not available yet`)
+          console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
+          console.trace(`** ERR Project.Tnp not available yet`)
         }
 
       } // TODO QUCIK FIX for tnp installd in node_modules

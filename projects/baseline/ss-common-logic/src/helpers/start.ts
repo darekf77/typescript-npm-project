@@ -19,6 +19,7 @@ export interface IConnectionOptions {
 export interface StartOptions {
   config: IConnectionOptions;
   host: string;
+  hostSocket?: string;
   publicFilesFolder?: string;
   Controllers: META.BASE_CONTROLLER<any>[];
   Entities?: META.BASE_ENTITY<any>[];
@@ -26,7 +27,7 @@ export interface StartOptions {
 }
 
 export async function start(options: StartOptions) {
-  const { config, host, Controllers, Entities, InitDataPriority, publicFilesFolder } = options;
+  const { config, host, Controllers, Entities, InitDataPriority, publicFilesFolder, hostSocket } = options;
   const entities = _.values(Entities) as any;
   const controllers = _.values(Controllers) as any;
   config['entities'] = entities as any;
@@ -35,6 +36,7 @@ export async function start(options: StartOptions) {
 
   const app = init({
     host,
+    hostSocket,
     controllers,
     entities
   }).expressApp(firstConnection as any)
