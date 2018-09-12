@@ -109,7 +109,7 @@ export class FilesRecreator {
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)
-        return gitignoreFiles;
+        return gitignoreFiles.map(f => `/${f}`)
       },
       get npmignore() {
         const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
