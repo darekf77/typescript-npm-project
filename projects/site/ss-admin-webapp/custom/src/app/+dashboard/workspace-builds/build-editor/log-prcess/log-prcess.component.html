@@ -1,7 +1,7 @@
 <ng-template #dialogTmpl>
 
   <!-- <mat-slide-toggle (change)="change($event)"> Realtime </mat-slide-toggle> -->
-  <button mat-button  type="button" (click)="refresh()" *ngIf="!isRealtime" >
+  <button mat-button  type="button" (click)="getWholeLog()">
       <mat-icon>refresh</mat-icon>
       Refresh
   </button>

@@ -11,8 +11,8 @@ import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
-import { ProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
 //#endregion
+import { ProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
 
 export interface IBUILD {
   name: string;
@@ -37,6 +37,7 @@ export enum BuildStatus {
 })
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
+
 
   public resovelProgress(l: string) {
     let progress;

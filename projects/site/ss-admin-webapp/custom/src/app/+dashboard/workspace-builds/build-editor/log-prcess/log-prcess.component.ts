@@ -4,10 +4,11 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs/Subscription';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { ProgressBarData } from 'ss-common-ui/module';
+// import { ProgressBarData } from 'ss-common-ui/module';
 import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger/browser';
+import { ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
 const log = Log.create('log progress')
 
 @Component({
@@ -36,22 +37,22 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   change(e: MatSlideToggleChange) {
     this.isRealtime = e.checked;
-    if (this.isRealtime) {
-      this.pullLastLoop()
-    } else {
-      this.getWholeLog()
-    }
+    // if (this.isRealtime) {
+    //   this.pullLastLoop()
+    // } else {
+    this.getWholeLog()
+    // }
   }
 
-  async pullLastLoop() {
-    await this.getLastNlinesOfLog(50)
-    this.isRealtime = (!!this.build.pidBuildProces);
-    if (this.isRealtime) {
-      setTimeout(() => {
-        this.pullLastLoop()
-      }, 1000)
-    }
-  }
+  // async pullLastLoop() {
+  //   await this.getLastNlinesOfLog(50)
+  //   this.isRealtime = (!!this.build.pidBuildProces);
+  //   if (this.isRealtime) {
+  //     setTimeout(() => {
+  //       this.pullLastLoop()
+  //     }, 1000)
+  //   }
+  // }
 
   async getWholeLog() {
     const data = await this.buildController.getByIdLog(this.build.id, this.type).received
@@ -93,11 +94,11 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   handlers: Subscription[] = [];
   ngOnInit() {
     this.isRealtime = (!!this.build.pidBuildProces);
-    if (this.isRealtime) {
-      this.pullLastLoop();
-    } else {
-      this.getWholeLog()
-    }
+    // if (this.isRealtime) {
+    //   this.pullLastLoop();
+    // } else {
+    this.getWholeLog()
+    // }
   }
 
   ngAfterContentInit() {

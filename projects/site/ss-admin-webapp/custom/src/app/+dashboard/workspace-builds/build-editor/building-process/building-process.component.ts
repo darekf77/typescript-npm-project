@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // third part
@@ -12,6 +12,9 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { MatDialog } from '@angular/material';
 import { LogPrcessComponent } from '../log-prcess/log-prcess.component';
 import { ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
+import { ProviderData } from '@angular/core/src/view';
 
 @Component({
   selector: 'app-building-process',
@@ -84,50 +87,78 @@ export class BuildingProcessComponent implements OnInit {
           return (this.model && !!this.model.pidClearProces) ? 'is clearing... ' : 'Clear';
         }
       },
-    },
-    {
-      type: 'infoprogressbar',
-      templateOptions: {
-        label: " Build progress"
-      }
     }
-
   ] as FormlyFieldConfig[];
 
 
-  textBuildLogs = ''
   isShowingBuildLogs = false;
 
   @Input() model: BUILD;
+  progress = new ProgressBarData();
+
+  get info() {
+    if (this.progress) {
+      if (this.progress.status === 'error') {
+        return `<strong style="color:red" >${this.progress.info}</strong>`
+      } else if (this.progress.status === 'complete') {
+        return `<strong style="color:green" >${this.progress.info}</strong>`
+      } else if (this.progress.status === 'inprogress') {
+        return `<span >${this.progress.info}</span>`
+      }
+    }
+    return `
+      <span style="color:lightgreen;opacity:0.7;"   >  -- process not stated -- </span>
+    `
+  }
+
   @Output() refreshModel = new EventEmitter();
 
   constructor(
     public buildController: BuildController,
-    public matDialog: MatDialog
+    public matDialog: MatDialog,
+    private ngZone: NgZone
 
   ) { }
 
   ngOnInit() {
-    Global.vars.socket.FE.on('endofbuild', (data) => {
-      log.i('DATA FROM SOCKET', data)
+
+
+    let s = new Subject();
+
+    s.asObservable().subscribe((data) => {
+      log.i('new progress', data);
+      _.merge(this.progress, data);
       this.refreshModel.next()
     })
 
     Global.vars.socket.FE.on('newprogress', (data) => {
-      log.i('new progress', data);
-      const prog = this.fields.find(({ type }) => type === 'infoprogressbar');
-      if (prog) {
-        if (!prog.templateOptions['value']) {
-          prog.templateOptions['value'] = new ProgressBarData()
-        }
-        _.merge((prog.templateOptions['value'] as ProgressBarData), data);
-        log.i('field updated', prog)
-        this.refreshModel.next()
-      } else {
-        log.i('canno find field')
-      }
+      this.ngZone.run(() => {
+        s.next(data);
+      })
 
     })
+
+    this.getEndOfbuild().subscribe(data => {
+      log.i('END OF BUILD - DATA FROM SOCKET', data)
+      this.refreshModel.next()
+    })
+
+  }
+
+  getEndOfbuild() {
+    let observable = new Observable(observer => {
+
+      Global.vars.socket.FE.on('endofbuild', (data) => {
+        this.ngZone.run(() => {
+          observer.next(data);
+        })
+      })
+
+      return () => {
+        log.i('something on disconnect')
+      };
+    })
+    return observable;
   }
 
 

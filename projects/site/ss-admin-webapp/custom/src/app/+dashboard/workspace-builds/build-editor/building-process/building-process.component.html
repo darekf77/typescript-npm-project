@@ -1,6 +1,14 @@
 <app-form-wrapper-material [showButtons]="false"
-                           [fields]="fields">
+                           [fields]="fields"
+                           [model]="model">
 </app-form-wrapper-material>
+
+<h6>
+  <span> Build progress: </span>
+  <span [innerHTML]="info"></span>
+</h6>
+<mat-progress-bar mode="determinate"
+                  value="{{ progress.value }}"> </mat-progress-bar>
 
 <app-log-prcess *ngIf="isShowingBuildLogs"
                 [type]="'build'"

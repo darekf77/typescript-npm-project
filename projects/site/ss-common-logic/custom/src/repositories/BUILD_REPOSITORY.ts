@@ -91,7 +91,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           msgAction: (chunk) => {
             let progress = build.resovelProgress(chunk);
             if (progress) {
-              // console.log('progress founded', progress)
+              console.log('progress founded', progress)
               Global.vars.socket.BE.emit('newprogress', progress);
             }
             fse.appendFileSync(build.localPath.buildLog, chunk)

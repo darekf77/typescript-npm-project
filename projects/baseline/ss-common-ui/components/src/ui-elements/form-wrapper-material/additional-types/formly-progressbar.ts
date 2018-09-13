@@ -12,12 +12,13 @@ import { ProgressBarStatus, ProgressBarType, ProgressBarData } from 'ss-common-l
 @Component({
   selector: 'app-formly-progressbar',
   template: `
-
+      <!-- <h5 *ngIf="progressBarData" > progressBarData {{progressBarData | json}} </h5> -->
       <h6>
+
         <span *ngIf="field && field.templateOptions && field.templateOptions.label"> {{ field.templateOptions.label }} </span>
-        <span [innerHTML]="info"></span>
+        <span  [innerHTML]="info"></span>
       </h6>
-      <mat-progress-bar mode="determinate" value="{{ field.templateOptions['value'] && field.templateOptions['value'].value }}" > </mat-progress-bar>
+      <mat-progress-bar mode="determinate" value="{{ field.formControl.value && field.formControl.value.value }}" > </mat-progress-bar>
         `,
   styles: [`
     : host {
@@ -41,25 +42,8 @@ export class FormlyProgressbardComponent extends FieldType implements OnInit, Af
   // constructor() { }
 
   get progressBarData(): ProgressBarData {
-    return this.field && this.field.templateOptions && this.field.templateOptions.value;
+    return this.field.formControl.value;
   }
-
-  get progresValue() {
-    return this.progressBarData ? this.progressBarData.value : 0;
-  }
-
-  // get mode(): ProgressBarType {
-  //   if (this.field) {
-  //     if (!_.isUndefined(this.field.templateOptions.mode)) {
-  //       return this.field.templateOptions.mode;
-  //     }
-  //     if (this.field.formControl.value instanceof ProgressBarData) {
-  //       return 'determinate';
-  //     }
-  //   }
-
-  //   return 'indeterminate';
-  // }
 
   get info() {
     if (this.progressBarData) {
@@ -77,17 +61,7 @@ export class FormlyProgressbardComponent extends FieldType implements OnInit, Af
   }
 
   ngAfterViewInit() {
-    // setTimeout(() => {
-    //   if (_.isUndefined(this.model)) {
-    //     this.field.templateOptions.value = new ProgressBarData();
-    //   }
 
-    //   if (_.isNumber(this.field.templateOptions.value)) {
-    //     this.model.value = this.field.templateOptions.value;
-    //   }
-
-    //   log.i('model', this.model)
-    // })
   }
 
   ngOnInit() {
