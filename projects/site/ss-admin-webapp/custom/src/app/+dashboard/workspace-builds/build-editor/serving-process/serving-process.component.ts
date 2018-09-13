@@ -8,7 +8,8 @@ const log = Log.create('building process')
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
-import { ProgressBarData } from 'ss-common-ui/module';
+// import { ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
+
 
 @Component({
   selector: 'app-serving-process',
@@ -84,7 +85,7 @@ export class ServingProcessComponent implements OnInit {
   }
 
 
-  progress(p: ProgressBarData) {
+  progress(p) {
 
   }
 

@@ -112,7 +112,7 @@ export class ProjectWorkspace extends Project {
     });
     console.log('===================')
 
-    const sum = projectsLibs.length + projectsApps.length;
+    const sum = 2 * (projectsLibs.length + projectsApps.length);
     let count = 1;
 
 
@@ -121,12 +121,14 @@ export class ProjectWorkspace extends Project {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })}]]]`)
       project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
+      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' })}]]]`)
     })
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' })}]]]`)
       project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
+      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' })}]]]`)
     })
 
     console.log(`[[[${JSON.stringify({ value: 100, info: `Process Complete`, status: 'complete' })}]]]`)

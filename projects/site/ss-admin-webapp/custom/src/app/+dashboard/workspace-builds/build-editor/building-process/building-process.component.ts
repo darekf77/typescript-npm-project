@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // third part
@@ -21,7 +21,7 @@ import { ProviderData } from '@angular/core/src/view';
   templateUrl: './building-process.component.html',
   styleUrls: ['./building-process.component.scss']
 })
-export class BuildingProcessComponent implements OnInit {
+export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
 
 
@@ -99,15 +99,15 @@ export class BuildingProcessComponent implements OnInit {
   get info() {
     if (this.progress) {
       if (this.progress.status === 'error') {
-        return `<strong style="color:red" >${this.progress.info}</strong>`
+        return `<strong class="color-red" >${this.progress.info}</strong>`
       } else if (this.progress.status === 'complete') {
-        return `<strong style="color:green" >${this.progress.info}</strong>`
+        return `<strong class="color-green" >${this.progress.info}</strong>`
       } else if (this.progress.status === 'inprogress') {
-        return `<span >${this.progress.info}</span>`
+        return `<span class="color-blue" >${this.progress.info}</span>`
       }
     }
     return `
-      <span style="color:lightgreen;opacity:0.7;"   >  -- process not stated -- </span>
+      <span class="color-muted"   >  -- process not stated -- </span>
     `
   }
 
@@ -121,6 +121,7 @@ export class BuildingProcessComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
 
 
     let s = new Subject();
@@ -143,6 +144,12 @@ export class BuildingProcessComponent implements OnInit {
       this.refreshModel.next()
     })
 
+  }
+
+  ngAfterViewInit(): void {
+    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
+    //Add 'implements AfterViewInit' to the class.
+    this.progress = _.merge(new ProgressBarData(), this.model && this.model.progress)
   }
 
   getEndOfbuild() {

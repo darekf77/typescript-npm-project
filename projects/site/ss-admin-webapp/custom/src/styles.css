@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+
+@import '~@swimlane/ngx-datatable/release/index.css';
+@import '~@swimlane/ngx-datatable/release/themes/material.css';
+@import '~@swimlane/ngx-datatable/release/assets/icons.css';
+@import '~font-awesome/css/font-awesome.css';
+
+
+mc-breadcrumbs ol {
+    list-style: none;
+}
+
+mc-breadcrumbs ol li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.color-red {
+  color: red;
+}
+
+.color-blue {
+  color: blue;
+}
+
+.color-green {
+  color: greenyellow;
+}
+
+.color-muted {
+  color:  lightgray;
+  opacity: 0.7;
+}

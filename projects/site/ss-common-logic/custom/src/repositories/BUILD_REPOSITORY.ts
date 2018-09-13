@@ -4,6 +4,8 @@ import * as fse from 'fs-extra';
 import { META } from "baseline/ss-common-logic/src/helpers";
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
+import { ProgressBarData } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR";
+import { async } from "baseline/node_modules/@types/q";
 
 export interface BUILD_ALIASES {
   builds: string;
@@ -89,11 +91,12 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
         self.attachListeners(p, {
           msgAction: (chunk) => {
-            let progress = build.resovelProgress(chunk);
-            if (progress) {
-              console.log('progress founded', progress)
+            ProgressBarData.resolveFrom(chunk, async (progress) => {
+              let b = await self.getById(id);
+              b.progress = progress;
+              await self.update(id, b)
               Global.vars.socket.BE.emit('newprogress', progress);
-            }
+            })
             fse.appendFileSync(build.localPath.buildLog, chunk)
           },
           errorAction: (chunk) => {

@@ -12,7 +12,7 @@ import * as child from 'child_process';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 //#endregion
-import { ProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
+import { ProgressBarData, IProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
 
 export interface IBUILD {
   name: string;
@@ -38,24 +38,6 @@ export enum BuildStatus {
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
 
-
-  public resovelProgress(l: string) {
-    let progress;
-
-    if (/\[\[\[.*\]\]\]/g.test(l.trim())) {
-      l = l.trim().replace(/^\[\[\[/g, '').replace(/\]\]\]$/g, '');
-      progress = l;
-    }
-    if (!_.isUndefined(progress)) {
-      try {
-        const p = JSON.parse(progress);
-        const res = _.merge(new ProgressBarData(), p);
-        return res;
-      } catch (error) {
-        // console.log('fail to parse', progress)
-      }
-    }
-  }
 
   //#region @backend
   get nameFromIdAndRemote() {
@@ -91,6 +73,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return {
       folder() {
 
+        pullCurrentBranch(self.staticFolder);
         const toCopy = path.join(self.staticFolder, self.gitFolder);
         const dest = path.join(self.localPath.repository, self.gitFolder)
 
@@ -157,6 +140,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return _.first(this.gitRemote.match(/([a-z-])+\.git/g)).replace('.git', '');
   }
 
+  @Column('simple-json', { nullable: true }) progress: ProgressBarData;
 
   @Column({ nullable: true }) port: string;
   @Column() gitRemote: string;

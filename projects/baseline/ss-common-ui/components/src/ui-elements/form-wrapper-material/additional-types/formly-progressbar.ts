@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('formly progressbar')
 
-import { ProgressBarStatus, ProgressBarType, ProgressBarData } from 'ss-common-logic/src/entities/PROGRESS_BAR';
+import { ProgressBarStatus, ProgressBarType, ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
 
 @Component({
   selector: 'app-formly-progressbar',
@@ -45,20 +45,7 @@ export class FormlyProgressbardComponent extends FieldType implements OnInit, Af
     return this.field.formControl.value;
   }
 
-  get info() {
-    if (this.progressBarData) {
-      if (this.progressBarData.status === 'error') {
-        return `<strong style="color:red" >${this.progressBarData.info}</strong>`
-      } else if (this.progressBarData.status === 'complete') {
-        return `<strong style="color:green" >${this.progressBarData.info}</strong>`
-      } else if (this.progressBarData.status === 'inprogress') {
-        return `<span >${this.progressBarData.info}</span>`
-      }
-    }
-    return `
-      <span style="color:lightgreen;opacity:0.7;"   >  -- process not stated -- </span>
-    `
-  }
+
 
   ngAfterViewInit() {
 
