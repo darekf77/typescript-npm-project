@@ -25,7 +25,7 @@ export interface TnpRouter {
   routes: EnvConfigProject[];
 }
 
-export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod'
+export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod' | 'online';
 
 export interface ReleaseOptions {
   prod?: boolean;

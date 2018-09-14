@@ -9,7 +9,8 @@ import { walkObject } from '../helpers';
 import { error } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';
-
+import { isValidIp } from '../helpers-environment';
+import globalConfig from '../config';
 
 export class EnvironmentConfig {
 
@@ -31,10 +32,12 @@ export class EnvironmentConfig {
 
 
   constructor(private project: Project) {
+    this.resolveEnvironemtnConifg();
+  }
 
-
-    const alreadyExistedWorksapceConfig = (project && project.parent && project.parent.type === 'workspace') ?
-      EnvironmentConfig.woksapaceConfigs[project.parent.location] : null;
+  private resolveEnvironemtnConifg() {
+    const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
+      EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
 
     // console.log('alreadyExistedWorksapceConfig', alreadyExistedWorksapceConfig)
 
@@ -54,14 +57,14 @@ export class EnvironmentConfig {
     if (this.kind !== 'other') {
       // console.log('kind', this.kind)
       // console.log('kind', this.project.name)
-      //#region resolve worksapce config
+
       if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
         this.workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
         // console.log('EnvironmentConfig.woksapaceConfigs', EnvironmentConfig.woksapaceConfigs)
       } else {
 
         if (this.kind === 'tnp-workspace-child') {
-          let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment');
+          let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment', globalConfig.env);
           // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
           if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
 
@@ -81,7 +84,7 @@ export class EnvironmentConfig {
             this.kind = 'other';
           }
         } else if (this.kind === 'tnp-workspace') {
-          let pathToProjectEnvironment = path.join(this.project.location, 'environment');
+          let pathToProjectEnvironment = path.join(this.project.location, 'environment', globalConfig.env);
           // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
           if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
 
@@ -110,9 +113,9 @@ export class EnvironmentConfig {
       }
 
     }
-    //#endregion
-
   }
+
+
 
   public init(options?: BuildOptions) {
     if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
@@ -155,19 +158,22 @@ export class EnvironmentConfig {
       error(`You shoud define 'workspace' object inside config.workspace object`, true)
       this.err()
     }
-
-    if (this.config.ip) {
-      this.config.workspace.workspace.hostSocket = `http://${this.config.ip}:${this.config.workspace.workspace.port}`;
+    if (!this.config.ip) {
+      this.config.ip = 'localhost'
     } else {
-      this.config.workspace.workspace.hostSocket = `http://localhost:${this.config.workspace.workspace.port}`;
+      if (!isValidIp(this.config.ip)) {
+        error(`Bad ip address in your environment .json config`)
+      }
     }
+
+    this.config.workspace.workspace.hostSocket = `http://${this.config.ip}:${this.config.workspace.workspace.port}`;
 
     if (this.config.domain) {
       this.config.workspace.workspace.host =
         `${this.config.domain}${this.config.workspace.workspace.baseUrl}`;
     } else {
       this.config.workspace.workspace.host =
-        `http://localhost:${this.config.workspace.workspace.port}`;
+        `http://${this.config.ip}:${this.config.workspace.workspace.port}`;
     }
 
 
@@ -181,16 +187,12 @@ export class EnvironmentConfig {
 
     this.config.workspace.projects.forEach(p => {
 
-      if (this.config.ip) {
-        p.hostSocket = `http://${this.config.ip}:${p.port}`;
-      } else {
-        p.hostSocket = `http://localhost:${p.port}`;
-      }
+      p.hostSocket = `http://${this.config.ip}:${p.port}`;
 
       if (this.config.domain || this.config.proxyRouterMode) {
         p.host = `${this.config.workspace.workspace.host}${p.baseUrl}`;
       } else {
-        p.host = `http://localhost:${p.port}`;
+        p.host = `http://${this.config.ip}:${p.port}`;
       }
     })
 
@@ -245,7 +247,7 @@ export class EnvironmentConfig {
           error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
         } else {
 
-          // console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
           overridedProjectsName.push(d.name)
           p.setDefaultPort(port);
         }

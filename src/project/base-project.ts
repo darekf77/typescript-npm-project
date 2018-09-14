@@ -37,9 +37,6 @@ export abstract class Project {
     return `http://localhost:${this.getDefaultPort()}`;
   }
 
-  routerTargetWebSocket() {
-    return `ws://localhost:${this.getDefaultPort()}`;
-  }
 
   readonly requiredLibs: Project[] = []; // TODO FIX THIS
   get parent(): Project {
@@ -252,7 +249,8 @@ export abstract class Project {
       'environment.js',
       'environment.dev.js',
       'environment.prod.js',
-      'environment.stage.js'
+      'environment.stage.js',
+      'environment.online.js'
     ]
     const files: string[] = ['src']
     if (this.type === 'angular-lib') files.push('components');

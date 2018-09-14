@@ -52,10 +52,10 @@ export default function () {
     publicFilesFolder: '/assets',
     config: project.$db as any,
     host: ENV.proxyRouterMode ?
-      `http://localhost:${project.port}${project.baseUrl}` :
-      `http://localhost:${project.port}`
+      `http://${ENV.ip}:${project.port}${project.baseUrl}` :
+      `http://${ENV.ip}:${project.port}`
     ,
-    hostSocket: `http://localhost:${project.port}`,
+    hostSocket: `http://${ENV.ip}:${project.port}`,
     Controllers: Controllers as any,
     Entities: Entities as any,
     InitDataPriority
