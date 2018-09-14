@@ -16,7 +16,7 @@ export function rebuildTnp() {
         const backupDist = path.join(p.location, backupFolderDist);
         if (fs.existsSync(backupDist)) {
             p.run(`rimraf ${backupFolderDist}`);
-            error(`Tnp self update not successfull`);
+            error(`Tnp self update not successfull`, false, true);
         } else {
             info(`Tnp self update success`);
         }

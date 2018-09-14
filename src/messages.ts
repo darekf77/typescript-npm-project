@@ -1,14 +1,28 @@
 import chalk from 'chalk';
-export function error(details: any, noExit = false) {
+export function error(details: any, noExit = false, noTrace = false) {
     if (typeof details === 'object') {
         try {
             const json = JSON.stringify(details)
-            console.trace(chalk.red(json));
+            if(noTrace) {
+                console.log(chalk.red(json));
+            } else {
+                console.trace(chalk.red(json));
+            }
+            
         } catch (error) {
-            console.trace(details);
+            if(noTrace) {   
+                console.log(details);
+            } else {
+                console.trace(details);
+            }            
         }
     } else {
-        console.trace(chalk.red(details));
+        if(noTrace) {
+            console.log(chalk.red(details));
+        } else {
+            console.trace(chalk.red(details));
+        }
+        
     }
 
     if (!noExit) {
