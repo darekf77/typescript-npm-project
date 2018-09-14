@@ -16,8 +16,7 @@ function killall() {
 
 export function killonport(args, noExit = false) {
   const port = parseInt(args.trim())
-  run(`fkill -f :${port}`).sync()
-  // killProcessByPort(port);
+  killProcessByPort(port);
   if (!noExit) {
     process.exit(0)
   }

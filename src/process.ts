@@ -8,7 +8,7 @@ import * as os from "os";
 import * as sleep from 'sleep';
 
 
-import { error, info } from "./messages";
+import { error, info, warn } from "./messages";
 import { RunOptions, WatchOptions } from "./models";
 import config from './config';
 import { paramsFrom } from './index';
@@ -38,19 +38,27 @@ export function killProcess(byPid: number) {
 }
 
 export function killProcessByPort(port: number) {
-  console.log(`Killing process on port ${port} in progress`);
   try {
-    if (os.platform() === 'linux') {
-      run(`lsof -i:${port}`, { output: false }).sync()
-    } else if (os.platform() === 'darwin') {
-      run(`lsof -P | grep ':${port}' | awk '{print $2}' | xargs kill -9 `, { output: false }).sync()
-    }
-    info(`Process killed on port: ${port}`)
+    run(`fkill -f :${this.getDefaultPort()}`).sync()
+    info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
-    error(`Problem with killing process on port ${port}:
-    ${e}
-    `, true)
+    warn(`Cannot kill process on port: ${port}... `)
   }
+
+
+  // console.log(`Killing process on port ${port} in progress`);
+  // try {
+  //   if (os.platform() === 'linux') {
+  //     run(`lsof -i:${port}`, { output: false }).sync()
+  //   } else if (os.platform() === 'darwin') {
+  //     run(`lsof -P | grep ':${port}' | awk '{print $2}' | xargs kill -9 `, { output: false }).sync()
+  //   }
+  //   info(`Process killed on port: ${port}`)
+  // } catch (e) {
+  //   error(`Problem with killing process on port ${port}:
+  //   ${e}
+  //   `, true)
+  // }
 }
 
 export function clearConsole() {

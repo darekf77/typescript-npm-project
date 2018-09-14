@@ -195,8 +195,8 @@ export abstract class Project {
   start() {
     this.env.init()
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-    // killProcessByPort(this.getDefaultPort())
-    run(`fkill -f :${this.getDefaultPort()}`).sync()
+    killProcessByPort(this.getDefaultPort())
+
     this.run(this.startOnCommand()).async()
   }
 
