@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Project } from './base-project';
 import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
 import { walkObject } from '../helpers';
-import { error } from '../messages';
+import { error, warn } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';
 import { isValidIp } from '../helpers-environment';
@@ -241,11 +241,30 @@ export class EnvironmentConfig {
     }
   }
 
+  private overrideWorksapceRouterPort() {
+    if (this.workspaceConfig.workspace && this.workspaceConfig.workspace.workspace) {
+      const p = ProjectFrom(this.workspaceProjectLocation)
+      if (p) {
+        const port = Number(this.workspaceConfig.workspace.workspace.port);
+        if (!isNaN(port)) {
+          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+          p.setDefaultPort(port)
+        }
+      }
+    } else {
+      warn(`Router (worksapce) port is not defined in your environment.js `);
+    }
+
+  }
+
   private overrideDefaultPorts() {
 
     // console.log(this.workspaceConfig)
+    this.overrideWorksapceRouterPort()
 
     const overridedProjectsName: string[] = []
+    this.workspaceConfig.workspace.workspace.port
+
     this.workspaceConfig.workspace.projects.forEach(d => {
       const port = Number(d.port);
       if (!_.isNaN(port)) {

@@ -410,8 +410,8 @@ export abstract class Project {
       // console.log('dirname', __dirname)
       return {
         install() {
-          console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
-          console.trace(`** ERR Project.Tnp not available yet`)
+          // console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
+          // console.trace(`** ERR Project.Tnp not available yet`)
         }
 
       } // TODO QUCIK FIX for tnp installd in node_modules

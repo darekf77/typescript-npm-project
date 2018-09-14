@@ -18,6 +18,7 @@ Helpers.checkEnvironment({
     { name: 'check-node-version' },
     { name: 'npm-run', version: '4.1.2' },
     { name: 'rimraf' },
+    { name: 'mkdirp' },
     { name: 'cpr' },
     { name: 'renamer' },
     { name: 'nodemon' },

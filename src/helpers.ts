@@ -105,7 +105,7 @@ export function copyFile(sousrce: string, destination: string,
     const destDirPath = path.dirname(destination);
     // console.log('destDirPath', destDirPath)
     if (!fs.existsSync(destDirPath)) {
-      run(`tnp mkdirp ${destDirPath}`).sync()
+      run(`mkdirp ${destDirPath}`).sync()
     }
 
     let sourceData = fs.readFileSync(sousrce).toString();
