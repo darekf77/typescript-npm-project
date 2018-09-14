@@ -39,7 +39,7 @@ export function killProcess(byPid: number) {
 
 export function killProcessByPort(port: number) {
   try {
-    run(`fkill -f :${this.getDefaultPort()}`).sync()
+    run(`fkill -f :${port}`).sync()
     info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
     warn(`Cannot kill process on port: ${port}... `)
