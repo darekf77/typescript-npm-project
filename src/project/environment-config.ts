@@ -36,7 +36,7 @@ export class EnvironmentConfig {
   }
 
   private resolveEnvironmentWorksapceConifg() {
-    console.log('project: ', this.project && this.project.name)
+    console.log('\n\n\nProject: ', this.project && this.project.name, '  location: ', this.project && this.project.location)
     let pathToConfig = ''
     const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
       EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
@@ -69,7 +69,7 @@ export class EnvironmentConfig {
 
         if (this.kind === 'tnp-workspace-child') {
           let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, 'environment', globalConfig.env);
-          // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
+          console.log('tnp-workspace-child pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
           if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
 
             pathToConfig = pathToWorkspaceProjectEnvironment;
@@ -89,7 +89,7 @@ export class EnvironmentConfig {
           }
         } else if (this.kind === 'tnp-workspace') {
           let pathToProjectEnvironment = path.join(this.project.location, 'environment', globalConfig.env);
-          // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
+          console.log('tnp-workspace pathToProjectEnvironment', pathToProjectEnvironment)
           if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
 
             pathToConfig = pathToProjectEnvironment;
