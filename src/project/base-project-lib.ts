@@ -143,7 +143,7 @@ export abstract class BaseProjectLib extends Project {
       }
 
       this.recreate.init();
-      this.build({
+      await this.build({
         prod, outDir: config.folder.bundle as 'bundle', environmentName: 'local'
       })
       this.bundleResources()

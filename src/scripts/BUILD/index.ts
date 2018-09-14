@@ -10,29 +10,29 @@ import { install } from '../INSTALL';
 
 
 
-export function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
+export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
   const { copyto, environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, copyto, environmentName, onlyWatchNoBuild, args
   };
-  build(options, config.allowedTypes.libs)
+  await build(options, config.allowedTypes.libs)
 }
 
 
-export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
+export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
   const { environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, environmentName, onlyWatchNoBuild, args
   };
-  build(options, config.allowedTypes.app);
+  await build(options, config.allowedTypes.app);
 }
 
 
-function build(opt: BuildOptions, allowedLibs: LibType[]) {
+async function build(opt: BuildOptions, allowedLibs: LibType[]) {
 
   const { watch, appBuild } = opt;
 
@@ -77,7 +77,7 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
     }
 
   }
-  project.build(opt);
+  await project.build(opt);
   if (!watch) {
     process.exit(0)
   }
@@ -112,8 +112,8 @@ export default {
   $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
   $BUILD_APP_WATCH_PROD: (args) => buildApp(false, true, 'dist', args),
 
-  $START_APP: () => {
-    Project.Current.start()
+  $START_APP: (args) => {
+    Project.Current.start(args)
   },
 
   // aliases
@@ -145,9 +145,9 @@ export default {
 
 
 
-  $START: () => {
+  $START: (args) => {
 
-    Project.Current.start()
+    Project.Current.start(args)
   },
 
   'Documentation': `

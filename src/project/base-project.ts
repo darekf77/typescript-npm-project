@@ -189,8 +189,8 @@ export abstract class Project {
    * Start server on top of static build
    * @param port
    */
-  start(args?: string) {
-    this.env.init()
+  async start(args?: string) {
+    await this.env.init(args)
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     killProcessByPort(this.getDefaultPort())
 
@@ -281,12 +281,14 @@ export abstract class Project {
 
 
   protected buildOptions?: BuildOptions;
-  build(buildOptions?: BuildOptions) {
+  async build(buildOptions?: BuildOptions) {
+
     const { prod, watch, outDir } = buildOptions;
+
     this.buildOptions = buildOptions;
 
     // console.log(`Prepare environment for: ${this.name}`)
-    this.env.init(buildOptions);
+    await this.env.init(buildOptions);
 
     let baseHref: string;
     if (this.type === 'workspace') {

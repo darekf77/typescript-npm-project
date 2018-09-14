@@ -22,14 +22,15 @@ export class ProxyRouter {
 
   public static async getFreePort(from: number = 4000) {
     try {
+
       // console.log(ProjectRouter.takenPorts)
-      while (ProxyRouter.takenPorts.includes(from)) {
+      while (this.takenPorts.includes(from)) {
         from += 1;
       }
       // console.log('from ', from)
-      ProxyRouter.takenPorts.push(from)
+      this.takenPorts.push(from)
       const port = await portfinder.getPortPromise({ port: from })
-      ProxyRouter.takenPorts.push(port);
+      this.takenPorts.push(port);
       return port;
     } catch (err) {
       error(err)
@@ -37,15 +38,15 @@ export class ProxyRouter {
   }
 
 
-  private async runOnRoutes(projects: EnvConfigProject[]) {
-    if (projects.length === 0) return;
-    const childrenProjectName = projects.shift();
-    const port = await ProxyRouter.getFreePort();
+  // private async runOnRoutes(projects: EnvConfigProject[]) {
+  //   if (projects.length === 0) return;
+  //   const childrenProjectName = projects.shift();
+  //   const port = await ProxyRouter.getFreePort();
 
-    const project = this.project.children.find(({ name }) => name === childrenProjectName.name);
-    console.log(`Auto assigned port ${port} for ${project.name}`)
-    this.runOnRoutes(projects);
-  }
+  //   const project = this.project.children.find(({ name }) => name === childrenProjectName.name);
+  //   console.log(`Auto assigned port ${port} for ${project.name}`)
+  //   this.runOnRoutes(projects);
+  // }
 
 
   private getProjectFrom(req: http.IncomingMessage): Project {
@@ -121,10 +122,10 @@ export class ProxyRouter {
     })
   }
 
-  private async portTests() {
-    console.log(await ProxyRouter.getFreePort())
-    console.log(await ProxyRouter.getFreePort())
-    console.log(await ProxyRouter.getFreePort())
-  }
+  // private async portTests() {
+  //   console.log(await ProxyRouter.getFreePort())
+  //   console.log(await ProxyRouter.getFreePort())
+  //   console.log(await ProxyRouter.getFreePort())
+  // }
 
 }

@@ -10,7 +10,8 @@ import { error, warn } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';
 import { isValidIp } from '../helpers-environment';
-import globalConfig from '../config';
+import globalConfig, { allowedEnvironments } from '../config';
+import { ProxyRouter } from './proxy-router';
 
 export class EnvironmentConfig {
 
@@ -123,16 +124,20 @@ export class EnvironmentConfig {
 
 
 
-  public init(options?: BuildOptions) {
+  public async init(optionsOrArgs?: BuildOptions | string) {
     this.resolveEnvironmentWorksapceConifg()
     if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
-      this.overrideDefaultPorts()
+      let args: string;
+      if (_.isString(optionsOrArgs)) {
+        args = optionsOrArgs;
+      }
+      await this.overrideDefaultPortsAndWorkspaceConfig(args)
     }
     if (this.project.type === 'workspace') {
       // console.log(`No need to prepare workspace config`)
       return
     }
-    const staticStartMode = !options;
+    const staticStartMode = _.isString(optionsOrArgs);
     // console.log('proxyRouterMode', proxyRouterMode)
     // console.log('this.kind in prepare', this.kind)
     if (!!this.config) {
@@ -143,22 +148,25 @@ export class EnvironmentConfig {
       return
     }
     if (staticStartMode) {
-      options = this.options.saved;
-      if (options.watch) {
+      optionsOrArgs = this.options.saved as BuildOptions; // change args to saved options
+      if (optionsOrArgs.watch) {
         error(`Please run ${chalk.bold('tnp build:app')} before start:app command`);
       }
     }
-    const { appBuild, prod, watch = false, environmentName } = options;
-    this.options.save(options)
+
+    optionsOrArgs = optionsOrArgs as BuildOptions;
+
+    const { appBuild, prod, watch = false, environmentName } = optionsOrArgs;
+    this.options.save(optionsOrArgs)
 
     // console.log('PREPARE options', options)
     this.config = _.cloneDeep(this.workspaceConfig);
     this.config.proxyRouterMode = (
-      !options.watch &&
+      !optionsOrArgs.watch &&
       this.project.parent &&
       this.project.parent.type === 'workspace'
     );
-    this.config.name = environmentName ? environmentName : 'local';
+    this.config.name = (!this.config.name) ? (environmentName ? environmentName : 'local') : this.config.name;
     this.config.isCoreProject = this.project.isCoreProject;
 
     if (!this.config.workspace || !this.config.workspace.workspace) {
@@ -241,14 +249,21 @@ export class EnvironmentConfig {
     }
   }
 
-  private overrideWorksapceRouterPort() {
+  private async overrideWorksapceRouterPort(allIpsGeneratedDynamicly: boolean = false) {
     if (this.workspaceConfig.workspace && this.workspaceConfig.workspace.workspace) {
       const p = ProjectFrom(this.workspaceProjectLocation)
       if (p) {
-        const port = Number(this.workspaceConfig.workspace.workspace.port);
-        if (!isNaN(port)) {
-          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
-          p.setDefaultPort(port)
+        if (allIpsGeneratedDynamicly) {
+          const port = await ProxyRouter.getFreePort();
+          console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+          p.setDefaultPort(port);
+          this.workspaceConfig.workspace.workspace.port = port;
+        } else {
+          const port = Number(this.workspaceConfig.workspace.workspace.port);
+          if (!isNaN(port)) {
+            console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+            p.setDefaultPort(port)
+          }
         }
       }
     } else {
@@ -257,36 +272,65 @@ export class EnvironmentConfig {
 
   }
 
-  private overrideDefaultPorts() {
+  private environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
+  private async overrideDefaultPortsAndWorkspaceConfig(args: string) {
+
+    let saveNewWorkspaceConfig = false;
+    let allIpsGeneratedDynamicly = false;
+    if (_.isString(args)) {
+      let { env, generateIps }: { env: EnvironmentName, generateIps: boolean } = require('minimist')(args.split(' '));
+
+      if (allowedEnvironments.includes(env)) {
+        saveNewWorkspaceConfig = true;
+        this.workspaceConfig.name = env;
+      }
+
+      console.log(`typeof generateIps`, typeof generateIps)
+      allIpsGeneratedDynamicly = (this.environmentWithGeneratedIps.includes(env)) || generateIps;
+      if (allIpsGeneratedDynamicly) {
+        saveNewWorkspaceConfig = true;
+      }
+    }
 
     // console.log(this.workspaceConfig)
-    this.overrideWorksapceRouterPort()
+    await this.overrideWorksapceRouterPort(allIpsGeneratedDynamicly)
 
     const overridedProjectsName: string[] = []
     this.workspaceConfig.workspace.workspace.port
 
-    this.workspaceConfig.workspace.projects.forEach(d => {
-      const port = Number(d.port);
+    for (let i = 0; i < this.workspaceConfig.workspace.projects.length; i++) {
+      const d = this.workspaceConfig.workspace.projects[i];
+      let port = Number(d.port);
       if (!_.isNaN(port)) {
         const p = ProjectFrom(path.join(this.workspaceProjectLocation, d.name))
         if (p === undefined) {
           error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
         } else {
-
-          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
           overridedProjectsName.push(d.name)
-          p.setDefaultPort(port);
+          if (allIpsGeneratedDynamicly) {
+            port = await ProxyRouter.getFreePort();
+            console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+            p.setDefaultPort(port);
+            d.port = port;
+          } else {
+            console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
+            p.setDefaultPort(port);
+          }
+
         }
       }
-    })
-    // console.log('OWEVERRIDINGINGIGNIGNIN',overridedProjectsName)
-    // process.exit(0)
+    }
+
     const workspace = ProjectFrom(this.workspaceProjectLocation)
     workspace.children.forEach(childProject => {
       if (!overridedProjectsName.includes(childProject.name)) {
         childProject.setDefaultPortByType()
       }
     })
+
+    if (saveNewWorkspaceConfig) {
+      this.saveConfig()
+    }
 
   }
 
