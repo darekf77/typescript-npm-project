@@ -13,6 +13,7 @@ import { error, info, warn } from "../messages";
 import config from "../config";
 import { compilationWrapper } from '../helpers';
 import { PackageJSON } from './package-json';
+import { install } from '../scripts/INSTALL';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -136,6 +137,10 @@ export abstract class BaseProjectLib extends Project {
       }
 
       this.run(`tnp clear`).sync();
+
+      if (!this.node_modules.exist()) {
+        install('', this, false);
+      }
 
       this.recreate.init();
       this.build({

@@ -321,7 +321,8 @@ export abstract class Project {
         }
         return true;
       }) // link/unlink takes care of node_modules
-      .join(' ');
+      .map(f => f.startsWith('/') ? f.substr(1) : f)
+      .join(' ')
     // console.log(this.recreate.filesIgnotnp edBy.gitignore.join('\n'))
     this.run(`rimraf ${gitginoredfiles}`).sync();
     if (this.type === 'workspace' && Array.isArray(this.children) && this.children.length > 0) {

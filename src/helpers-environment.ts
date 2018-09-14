@@ -1,6 +1,5 @@
 import * as fse from 'fs-extra';
 
-fse.readJSONSync('asd')
 
 const path = require('path');
 
