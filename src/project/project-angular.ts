@@ -43,7 +43,7 @@ export class AngularProject extends Project {
   }
 
   preventWarningTypescirptMismatch() {
-    this.run('tnp npm-run ng set warnings.typescriptMismatch=false').sync()
+    this.run('npm-run ng set warnings.typescriptMismatch=false').sync()
   }
 
   startOnCommand(args: string) {
@@ -79,7 +79,7 @@ export class AngularProject extends Project {
 
   buildSteps(buildOptions?: BuildOptions) {
     this.buildOptions = buildOptions;
-    const { prod, watch, outDir, appBuild } = buildOptions;
+    const { prod, watch, outDir, appBuild, args } = buildOptions;
     let baseHref = buildOptions.baseHref;
     if (this.isEjectedProject) {
       this.preventWarningTypescirptMismatch()

@@ -14,7 +14,7 @@ export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', '
 let { env }: { env: EnvironmentName } = require('minimist')(process.argv);
 
 env = allowedEnvironments.includes(env) ? `.${env}` : '' as any;
-console.log(`Current environment prefix: "${env}"`);
+console.log(`Current environment prefix: "${env}"  , args: ${JSON.stringify(process.argv)}`);
 
 export const config = {
   tnp: 'tnp',
