@@ -55,7 +55,7 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
   }
 
   if (project.parent) {
-    project.recreate.init();// TODO QUICK IFX
+    project.parent.recreate.init();// TODO QUICK IFX
   }
   project.recreate.init();
 
