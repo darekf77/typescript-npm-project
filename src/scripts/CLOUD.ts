@@ -10,10 +10,9 @@ function rebuildTnp() {
   p.run(`git pull origin master`).sync();
   try {
     p.run(`cpr dist ${backupFolderDist}`).sync()
-    p.run(`rimraf dist && tsc`).sync()
+    p.run(`(rimraf dist && tsc) || (cpr ${backupFolderDist} dist  && echo "Something went wrong with rebuild of tnp") `).sync()
   } catch (error) {
-    p.run(`rimraf dist && cpr ${backupFolderDist} dist`).sync()
-    error(`Error during rebuild of tsc-npm-project...`);
+
   }
 }
 
