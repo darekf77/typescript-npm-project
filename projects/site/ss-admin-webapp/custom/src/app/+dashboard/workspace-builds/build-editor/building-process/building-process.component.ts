@@ -41,7 +41,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process started!')
         }
       },
-      hideExpression: () => (!this.model || _.isNumber(this.model.pidBuildProces))
+      hideExpression: () => (!this.model || _.isNumber(this.model.pidBuildProces) || !!this.model.pidClearProces)
     },
     {
 
@@ -54,7 +54,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process stopped!')
         }
       },
-      hideExpression: () => (!this.model || !this.model.pidBuildProces)
+      hideExpression: () => (!this.model || !this.model.pidBuildProces || !!this.model.pidClearProces)
     },
     {
 
@@ -87,6 +87,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           return (this.model && !!this.model.pidClearProces) ? 'is clearing... ' : 'Clear';
         }
       },
+      hideExpression: () => (this.model && !!this.model.pidBuildProces)
     }
   ] as FormlyFieldConfig[];
 
@@ -144,12 +145,34 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       this.refreshModel.next()
     })
 
+    this.getEndOfClear().subscribe((data) => {
+      log.i('END OF CLEAR - DATA FROM SOCKET', data)
+      this.refreshModel.next()
+    })
+
   }
 
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
     this.progress = _.merge(new ProgressBarData(), this.model && this.model.progress)
+  }
+
+
+  getEndOfClear() {
+    let observable = new Observable(observer => {
+
+      Global.vars.socket.FE.on('clearbuildend', (data) => {
+        this.ngZone.run(() => {
+          observer.next(data);
+        })
+      })
+
+      return () => {
+        log.i('something on disconnect')
+      };
+    })
+    return observable;
   }
 
   getEndOfbuild() {

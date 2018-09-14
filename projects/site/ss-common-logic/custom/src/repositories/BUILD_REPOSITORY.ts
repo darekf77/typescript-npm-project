@@ -37,6 +37,8 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     p.on('close', async () => {
       build.pidClearProces = null;
       await this.update(id, build)
+      console.log('CLERR COMPLETE  all ? ', all)
+      Global.vars.socket.BE.emit('clearbuildend', build);
     })
     await this.update(id, build)
   }
