@@ -36,6 +36,7 @@ export class EnvironmentConfig {
   }
 
   private resolveEnvironmentWorksapceConifg() {
+    let pathToConfig = ''
     const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
       EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
 
@@ -68,7 +69,7 @@ export class EnvironmentConfig {
           // console.log('pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
           if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
 
-
+            pathToConfig = pathToWorkspaceProjectEnvironment;
             try {
               this.workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
             } catch (error) {
@@ -88,7 +89,7 @@ export class EnvironmentConfig {
           // console.log('pathToProjectEnvironment', pathToProjectEnvironment)
           if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
 
-
+            pathToConfig = pathToProjectEnvironment;
 
             try {
               this.workspaceConfig = require(pathToProjectEnvironment) as any;
@@ -113,6 +114,8 @@ export class EnvironmentConfig {
       }
 
     }
+    console.log('workspace config resolve: ', this.workspaceConfig && JSON.stringify(this.workspaceConfig));
+    console.log('Path to worksapce config: ', pathToConfig);
   }
 
 
