@@ -54,7 +54,9 @@ function build(opt: BuildOptions, allowedLibs: LibType[]) {
     install('', project, false);
   }
 
-
+  if (project.parent) {
+    project.recreate.init();// TODO QUICK IFX
+  }
   project.recreate.init();
 
   if (project.isSite) {

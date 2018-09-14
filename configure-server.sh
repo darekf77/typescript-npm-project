@@ -12,7 +12,7 @@ read -n1 -r -p "Please add the ssh key above to your github ssh keys..." key
 git clone git@github.com:darekf77/tsc-npm-project.git
 cd tsc-npm-project
 npm i && tsc && npm link
-
+export LC_ALL="en_US.UTF-8"
 cd projects/site && tnp build
 tnp start 2>&1 >/dev/null &
 
