@@ -12,7 +12,7 @@ import build from './scripts/BUILD/index';
 import { autobuild } from './scripts/AUTOBUILD';
 
 
-Helpers.checkEnvironment({
+Helpers.checkEnv asd asd as asd ironment({
   npm: [
     { name: 'watch', version: '1.0.2' },
     { name: 'check-node-version' },
