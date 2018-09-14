@@ -49,6 +49,7 @@ export class EnvironmentConfig {
     if (this.project.parent && this.project.parent.type === 'workspace') {
       this.kind = 'tnp-workspace-child'
     }
+    console.trace('project kind: ', this.kind)
 
     // console.log('this.project ', this.project.name)
     // console.log('this.project.parent ', this.project.parent ? this.project.parent.name : 'no parent')
@@ -61,7 +62,7 @@ export class EnvironmentConfig {
 
       if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
         this.workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
-        // console.log('EnvironmentConfig.woksapaceConfigs', EnvironmentConfig.woksapaceConfigs)
+        console.log('Already exist workspaceconfig ', EnvironmentConfig.woksapaceConfigs)
       } else {
 
         if (this.kind === 'tnp-workspace-child') {
