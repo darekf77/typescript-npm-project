@@ -18,27 +18,27 @@ function rebuildTnp() {
 
 
 export default {
-  $CLOUD_RESTART: () => {
+  $CLOUD_RESTART: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp start`).async();
+    cloudProject.run(`tnp start ${args}`).async();
   },
-  $CLOUD_REBUILD: () => {
+  $CLOUD_REBUILD: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp build`).sync();
+    cloudProject.run(`tnp build ${args}`).sync();
     process.exit(0)
   },
-  $CLOUD_CLEAR_ALL: () => {
+  $CLOUD_CLEAR_ALL: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp clear:all`).sync();
+    cloudProject.run(`tnp clear:all ${args}`).sync();
     process.exit(0)
   },
-  $CLOUD_CLEAR: () => {
+  $CLOUD_CLEAR: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp clear`).sync();
+    cloudProject.run(`tnp clear ${args}`).sync();
     process.exit(0)
   }
 }

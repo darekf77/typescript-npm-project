@@ -32,10 +32,10 @@ export class EnvironmentConfig {
 
 
   constructor(private project: Project) {
-    this.resolveEnvironemtnConifg();
+    this.resolveEnvironmentWorksapceConifg();
   }
 
-  private resolveEnvironemtnConifg() {
+  private resolveEnvironmentWorksapceConifg() {
     const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
       EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
 
@@ -118,6 +118,7 @@ export class EnvironmentConfig {
 
 
   public init(options?: BuildOptions) {
+    this.resolveEnvironmentWorksapceConifg()
     if (this.project.type === 'workspace' || this.project.isWorkspaceChildProject) {
       this.overrideDefaultPorts()
     }
