@@ -12,16 +12,16 @@ export function rebuildTnp() {
     p.run(`git pull origin master`).sync();
     try {
         p.run(`cpr dist ${backupFolderDist}`).sync()
-        p.run(`(rimraf dist && tsc) || (cpr ${backupFolderDist} dist && rimraf ${backupFolderDist}  && echo "Something went wrong with rebuild of tnp") `).sync()
+        p.run(`(rimraf dist && tsc && rimraf ${backupFolderDist}) || (cpr ${backupFolderDist} dist  && echo "Something went wrong with rebuild of tnp") `, { output: true }).sync()
         const backupDist = path.join(p.location, backupFolderDist);
         if (fs.existsSync(backupDist)) {
             p.run(`rimraf ${backupFolderDist}`);
-            error(`Tnp self update not successfull`);            
+            error(`Tnp self update not successfull`);
         } else {
             info(`Tnp self update success`);
         }
     } catch (e) {
-         
+
     }
 }
 
