@@ -23,12 +23,12 @@ Helpers.checkEnvironment({
     { name: 'nodemon' },
     { name: 'increase-memory-limit' }
   ],
-  // programs: [
+  programs: [
   //   {
   //     name: 'code',
   //     website: 'https://code.visualstudio.com/'
   //   }
-  // ]
+  ]
 });
 
 const localLibs = [
