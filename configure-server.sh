@@ -14,5 +14,5 @@ cd tsc-npm-project
 npm i && tsc && npm link
 
 cd projects/site && tnp build
-tnp start &> /dev/null &
+tnp start 2>&1 >/dev/null &
 

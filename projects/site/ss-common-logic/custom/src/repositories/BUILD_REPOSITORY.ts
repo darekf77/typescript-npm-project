@@ -5,7 +5,6 @@ import { META } from "baseline/ss-common-logic/src/helpers";
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
 import { ProgressBarData } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR";
-import { async } from "baseline/node_modules/@types/q";
 
 export interface BUILD_ALIASES {
   builds: string;
