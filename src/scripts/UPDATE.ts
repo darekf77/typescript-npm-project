@@ -15,13 +15,13 @@ export function rebuildTnp() {
         p.run(`(rimraf dist && tsc) || (cpr ${backupFolderDist} dist && rimraf ${backupFolderDist}  && echo "Something went wrong with rebuild of tnp") `).sync()
         const backupDist = path.join(p.location, backupFolderDist);
         if (fs.existsSync(backupDist)) {
-            error(`Tnp self update not successfull`);
             p.run(`rimraf ${backupFolderDist}`);
+            error(`Tnp self update not successfull`);            
         } else {
             info(`Tnp self update success`);
         }
     } catch (error) {
-
+        error(`Tnp self update not successfull 22222`); 
     }
 }
 
