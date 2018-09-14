@@ -189,15 +189,15 @@ export abstract class Project {
    * Start server on top of static build
    * @param port
    */
-  start() {
+  start(args?: string) {
     this.env.init()
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     killProcessByPort(this.getDefaultPort())
 
-    this.run(this.startOnCommand()).async()
+    this.run(this.startOnCommand(args)).async()
   }
 
-  protected abstract startOnCommand(): string;
+  protected abstract startOnCommand(args: string): string;
 
   requiredDependencies(): Package[] {
     return [

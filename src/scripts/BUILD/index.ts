@@ -15,7 +15,7 @@ export function buildLib(prod = false, watch = false, outDir: BuildDir, args: st
   const { copyto, environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, copyto, environmentName, onlyWatchNoBuild
+    prod, watch, outDir, copyto, environmentName, onlyWatchNoBuild, args
   };
   build(options, config.allowedTypes.libs)
 }
@@ -26,7 +26,7 @@ export function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist',
   const { environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, appBuild: true, environmentName, onlyWatchNoBuild
+    prod, watch, outDir, appBuild: true, environmentName, onlyWatchNoBuild, args
   };
   build(options, config.allowedTypes.app);
 }

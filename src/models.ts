@@ -36,6 +36,7 @@ export class BuildOptions {
   prod: boolean;
   outDir: BuildDir;
   watch?: boolean;
+  args?: string;
   appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
@@ -130,7 +131,7 @@ export interface EnvConfig {
 export interface IPackageJSON {
   name: string;
   version: string;
-  bin?:any;
+  bin?: any;
   main?: string;
   preferGlobal?: boolean;
 

@@ -9,7 +9,7 @@ import { info } from '../messages';
 
 export class ProjectWorkspace extends Project {
 
-  startOnCommand() {
+  startOnCommand(args: string) {
 
     // console.log('this.routes', this.routes.map(r => r.name))
     this.proxyRouter.activateServer()
@@ -19,7 +19,7 @@ export class ProjectWorkspace extends Project {
         return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
       })
       .forEach(child => {
-        child.start()
+        child.start(args)
       });
     return 'echo "Workspace server started"';
   }
@@ -29,7 +29,7 @@ export class ProjectWorkspace extends Project {
 
   buildSteps(buildOptions?: BuildOptions) {
 
-    const { environmentName, prod, watch, outDir } = buildOptions;
+    const { environmentName, prod, watch, outDir, args } = buildOptions;
 
     const projects = {
       serverLibs: [],
@@ -120,14 +120,14 @@ export class ProjectWorkspace extends Project {
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })}]]]`)
-      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
+      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear ${args}`).sync()
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' })}]]]`)
     })
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' })}]]]`)
-      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear`).sync()
+      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear  ${args}`).sync()
       console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' })}]]]`)
     })
 

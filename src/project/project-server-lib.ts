@@ -5,29 +5,29 @@ import { BaseProjectLib } from "./base-project-lib";
 export class ProjectServerLib extends BaseProjectLib {
 
 
-    startOnCommand() {
-        const command = `node run.js`;
-        return command;
-    }
+  startOnCommand(args: string) {
+    const command = `node run.js ${args}`;
+    return command;
+  }
 
-    projectSpecyficFiles(): string[] {
-        return super.projectSpecyficFiles().concat([
-            "tsconfig.json"
-        ]);
-    }
+  projectSpecyficFiles(): string[] {
+    return super.projectSpecyficFiles().concat([
+      "tsconfig.json"
+    ]);
+  }
 
-    buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
-        this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
-    }
+  buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
+    this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
+  }
 
-    buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
-        
+  buildSteps(buildOptions?: BuildOptions) {
+    const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
 
-        if (!onlyWatchNoBuild) {
-            this.buildLib(outDir, prod, watch);
-        }
-        this.copytToManager.initCopyingOnBuildFinish(this.buildOptions)
+
+    if (!onlyWatchNoBuild) {
+      this.buildLib(outDir, prod, watch);
     }
+    this.copytToManager.initCopyingOnBuildFinish(this.buildOptions)
+  }
 }
 

@@ -12,8 +12,8 @@ import { BaseProjectLib } from "./base-project-lib";
 
 export class ProjectIsomorphicLib extends BaseProjectLib {
 
-  startOnCommand() {
-    const command = `node run.js`;
+  startOnCommand(args: string) {
+    const command = `node run.js ${args}`;
     return command;
   }
 

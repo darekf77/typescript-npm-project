@@ -23,8 +23,8 @@ export class ProjectAngularLib extends BaseProjectLib {
     return this.angular.getDefaultPort()
   }
 
-  protected startOnCommand() {
-    const command = this.angular.startOnCommand();
+  protected startOnCommand(args) {
+    const command = this.angular.startOnCommand(args);
     // console.log(`Command is running async: ${command}`)
     return command;
   }

@@ -6,23 +6,23 @@ import { BuildOptions } from '../models';
 
 export class ProjectIonicClient extends Project {
 
-    startOnCommand() {
-        const command = `echo "hello from ionic"`;
-        return command;
-    }
+  startOnCommand(args: string) {
+    const command = `echo "hello from ionic" ${args}`;
+    return command;
+  }
 
-    projectSpecyficFiles(): string[] {
-        return [
-            'tsconfig.json'
-        ];
-    }
+  projectSpecyficFiles(): string[] {
+    return [
+      'tsconfig.json'
+    ];
+  }
 
-    buildSteps(buildOptions?: BuildOptions) {
-        const { prod, watch, outDir } = buildOptions;
-        if (watch) {
-            this.run(`tnp npm-run ionic serve --no-open -p ${this.getDefaultPort()}`).async()
-        } else {
-            this.run(`tnp npm-run ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
-        }
+  buildSteps(buildOptions?: BuildOptions) {
+    const { prod, watch, outDir } = buildOptions;
+    if (watch) {
+      this.run(`tnp npm-run ionic serve --no-open -p ${this.getDefaultPort()}`).async()
+    } else {
+      this.run(`tnp npm-run ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
     }
+  }
 }
