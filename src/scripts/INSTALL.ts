@@ -34,7 +34,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       if (project.isWorkspace) {
         project.run(`increase-memory-limit`).sync();
       } else if (project.isWorkspaceChildProject) {
-        project.baseline.run(`increase-memory-limit`).sync();
+        project.parent.run(`increase-memory-limit`).sync();
       }
     }
 
