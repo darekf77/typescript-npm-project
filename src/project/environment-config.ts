@@ -36,6 +36,7 @@ export class EnvironmentConfig {
   }
 
   private resolveEnvironmentWorksapceConifg() {
+    console.log('project: ', this.project && this.project.name)
     let pathToConfig = ''
     const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
       EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
@@ -50,6 +51,7 @@ export class EnvironmentConfig {
       this.kind = 'tnp-workspace-child'
     }
     console.trace('project kind: ', this.kind)
+    console.log('project kind: ', this.kind)
 
     // console.log('this.project ', this.project.name)
     // console.log('this.project.parent ', this.project.parent ? this.project.parent.name : 'no parent')
