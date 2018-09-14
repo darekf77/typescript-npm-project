@@ -6,6 +6,7 @@ function rebuildTnp() {
   const p = Project.Tnp;
   const backupFolderDist = 'tmp-dist-current';
   p.run(`rimraf ${backupFolderDist}`).sync();
+  p.run(`git reset --hard`).sync();
   p.run(`git pull origin master`).sync();
   try {
     p.run(`cpr dist ${backupFolderDist}`).sync()
