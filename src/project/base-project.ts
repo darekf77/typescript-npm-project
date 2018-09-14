@@ -14,7 +14,7 @@ import { PackageJSON } from "./package-json";
 import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { run as __run, watcher as __watcher, killProcessByPort } from "../process";
+import { run as __run, watcher as __watcher, killProcessByPort, run } from "../process";
 import { copyFile, getMostRecentFilesNames } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
@@ -196,6 +196,7 @@ export abstract class Project {
     this.env.init()
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     // killProcessByPort(this.getDefaultPort())
+    run(`fkill -f :${this.getDefaultPort()}`).sync()
     this.run(this.startOnCommand()).async()
   }
 

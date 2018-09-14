@@ -21,7 +21,8 @@ Helpers.checkEnvironment({
     { name: 'cpr' },
     { name: 'renamer' },
     { name: 'nodemon' },
-    { name: 'increase-memory-limit' }
+    { name: 'increase-memory-limit' },
+    { name: 'fkill' }
   ],
   programs: [
   //   {
