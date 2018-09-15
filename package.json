@@ -1,7 +1,7 @@
 {
   "tnp": {
     "resources": [],
-    "type": "server-lib"
+    "type": "isomorphic-lib"
   },
   "name": "tnp",
   "version": "0.0.3",

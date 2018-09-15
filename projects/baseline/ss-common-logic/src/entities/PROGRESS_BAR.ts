@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { CLASSNAME } from 'morphi';
 export type ProgressBarStatus = 'notstarted' | 'inprogress' | 'complete' | 'error';
 
 export type ProgressBarType = 'determinate' | 'indeterminate' | 'buffer' | 'query';
@@ -18,6 +19,8 @@ export const log = {
   }
 
 }
+
+@CLASSNAME('ProgressBarData')
 export class ProgressBarData implements IProgressBarData {
 
 
