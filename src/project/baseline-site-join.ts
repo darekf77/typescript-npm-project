@@ -144,9 +144,7 @@ export class BaselineSiteJoin {
       }
     }
   }
-  //#endregion
 
-  //#region copy / unlink
   private copyJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
     // console.log(`Extname from ${source}: ${path.extname(source)}`)
 
@@ -174,9 +172,7 @@ export class BaselineSiteJoin {
       fse.unlinkSync(filePath)
     }
   }
-  //#endregion
 
-  //#region replace
   private replacePathFn(relativeBaselineCustomPath: string) {
     return (input) => {
       input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
@@ -274,9 +270,8 @@ export class BaselineSiteJoin {
     }
 
   }
-  //#endregion
 
-  //#region merge
+
   private merge(relativeBaselineCustomPath: string, verbose = true) {
     // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
     if (verbose) {
@@ -321,9 +316,7 @@ export class BaselineSiteJoin {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
   }
-  //#endregion
 
-  //#region join
   private get join() {
     const self = this;
     return {
@@ -347,9 +340,7 @@ export class BaselineSiteJoin {
       }
     }
   }
-  //#endregion
 
-  //#region watch
   watch() {
     this.monitor((absolutePath, event, isCustomFolder) => {
       // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
@@ -407,9 +398,7 @@ export class BaselineSiteJoin {
     });
 
   }
-  //#endregion
 
-  //#region pathes
   private getPrefixedBasename(relativeFilePath: string) {
     const ext = path.extname(relativeFilePath);
     const basename = path.basename(relativeFilePath, ext)
