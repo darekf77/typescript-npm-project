@@ -1,3 +1,4 @@
+//#region @backend
 import * as path from 'path';
 import { watcher } from "./process";
 import {
@@ -145,3 +146,4 @@ export async function initWatcherDB() {
     }
     return w;
 }
+//#endregion

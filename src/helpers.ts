@@ -1,23 +1,22 @@
-import * as _ from 'lodash'
+//#region @backend
+import chalk from 'chalk';
 import * as  underscore from 'underscore';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as rimraf from "rimraf";
-import * as glob from "glob";
-import * as os from "os";
-import chalk from 'chalk';
-import * as dateformat from "dateformat";
-
-import { error, info, warn } from "./messages";
 import { run } from "./process";
-import { constants } from 'zlib';
-import { BuildOptions, RuleDependency } from './models';
-import { Project } from './project/base-project';
-import { HelpersLinks } from "./helpers-links";
-import { ProjectFrom } from './index';
-import { config } from './config';
 import { sleep } from 'sleep';
+import { ProjectFrom } from './index';
+import * as dateformat from "dateformat";
+//#endregion
+
+import * as _ from 'lodash'
+
+import { error, warn } from "./messages";
+import { BuildOptions } from './models';
+import { config } from './config';
+
 
 export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
   lodashPath = (lodashPath === '') ? `` : `${lodashPath}.`;
@@ -38,12 +37,14 @@ export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefi
 }
 
 
+//#region @backend
 export function crossPlatofrmPath(p: string) {
   if (process.platform === 'win32') {
     return p.replace(/\\/g, '/');
   }
   return p;
 }
+
 
 export function nearestProjectTo(location: string) {
   // console.log('nearestPorjectLocaiont', location)
@@ -122,18 +123,6 @@ export function copyFile(sousrce: string, destination: string,
   }
 
 }
-
-export function uniqArray<T=string>(array: any[]) {
-  var seen = {};
-  return array.filter(function (item) {
-    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-  });
-}
-
-export function isAsyncFunction(fn) {
-  return _.isFunction(fn) && fn.constructor.name === 'AsyncFunction';
-}
-
 
 
 export function compilationWrapper(fn: () => void, taskName: string = 'Task', executionType: 'Compilation' | 'Code execution' = 'Compilation') {
@@ -233,44 +222,6 @@ export class ClassHelper {
     }
     return null;
   }
-}
-
-
-export function ReorganizeArray<T>(arr: T[]) {
-  return {
-    moveElement(a: T) {
-      return {
-        before(b: T): T[] {
-          let indexA = arr.indexOf(a);
-          _.pullAt(arr, indexA);
-          let indexB = arr.indexOf(b);
-          if (indexB === 0) {
-            arr.unshift(a);
-          } else {
-            arr = arr.splice(indexB - 1, 0, a);
-          }
-          return arr;
-        },
-        after(b: T) {
-          let indexA = arr.indexOf(a);
-          _.pullAt(arr, indexA);
-          let indexB = arr.indexOf(b);
-          if (indexB === arr.length - 1) {
-            arr.push(a);
-          } else {
-            arr = arr.splice(indexB + 1, 0, a);
-          }
-          return arr;
-        }
-      }
-    }
-  }
-}
-
-
-export function checkValidNpmPackageName(pkg) {
-  if (!_.isString(pkg) || pkg.length > 214) return false;
-  return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*(\@.+$)?').test(pkg);
 }
 
 
@@ -397,3 +348,56 @@ export function getLinesFromFiles(filename: string, lineCount?: number) {
   })
 
 };
+
+//#endregion
+
+export function uniqArray(array: any[]) {
+  var seen = {};
+  return array.filter(function (item) {
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  });
+}
+
+export function isAsyncFunction(fn) {
+  return _.isFunction(fn) && fn.constructor.name === 'AsyncFunction';
+}
+
+
+export function ReorganizeArray<T>(arr: T[]) {
+  return {
+    moveElement(a: T) {
+      return {
+        before(b: T): T[] {
+          let indexA = arr.indexOf(a);
+          _.pullAt(arr, indexA);
+          let indexB = arr.indexOf(b);
+          if (indexB === 0) {
+            arr.unshift(a);
+          } else {
+            arr = arr.splice(indexB - 1, 0, a);
+          }
+          return arr;
+        },
+        after(b: T) {
+          let indexA = arr.indexOf(a);
+          _.pullAt(arr, indexA);
+          let indexB = arr.indexOf(b);
+          if (indexB === arr.length - 1) {
+            arr.push(a);
+          } else {
+            arr = arr.splice(indexB + 1, 0, a);
+          }
+          return arr;
+        }
+      }
+    }
+  }
+}
+
+
+export function checkValidNpmPackageName(pkg) {
+  if (!_.isString(pkg) || pkg.length > 214) return false;
+  return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*(\@.+$)?').test(pkg);
+}
+
+

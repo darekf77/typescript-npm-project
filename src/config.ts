@@ -1,14 +1,7 @@
 import * as _ from 'lodash';
-import * as path from 'path';
-import chalk from 'chalk';
-import fs from 'fs';
-import * as os from "os";
 
-import { clear } from "./scripts/CLEAR";
 
-import { LibType, RecreateFile, BuildOptions, BuildDir, EnvironmentName } from './models';
-import { error } from "./messages";
-import { Project } from "./project/base-project";
+import { LibType, EnvironmentName } from './models';
 
 export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'];
 let { env }: { env: EnvironmentName } = require('minimist')(process.argv);

@@ -1,3 +1,4 @@
+//#region @backend
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as path from 'path';
@@ -74,3 +75,4 @@ export function ProjectFrom(location: string, warnings = false): Project {
 }
 
 
+//#endregion
