@@ -1,10 +1,11 @@
+//#region @backend
 import { Project } from '../project';
 import { info, error } from '../messages';
 import * as fs from 'fs';
 import * as path from 'path';
 
 
-//#region @backend
+
 export function rebuildTnp() {
     const p = Project.Tnp;
     const backupFolderDist = 'tmp-dist-current';

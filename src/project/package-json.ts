@@ -71,7 +71,7 @@ export class PackageJSON {
     }
   }
 
-  //#region getters
+
 
   // get requiredProjects(): Project[] {
   //   const projects: Project[] = [];
@@ -147,7 +147,7 @@ export class PackageJSON {
     return false;
   }
 
-  //#endregion
+
 
 }
 //#endregion
