@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from "lodash";
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
@@ -149,3 +150,4 @@ export class PackageJSON {
   //#endregion
 
 }
+//#endregion

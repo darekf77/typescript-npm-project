@@ -1,3 +1,4 @@
+//#region @backend
 // import { Project } from "../project";
 // import * as fse from 'fs-extra';
 // import * as fs from 'fs';
@@ -14,3 +15,4 @@
 // export default {
 //     $ASSETS_RECREATE: () => recreate()
 // }
+//#endregion

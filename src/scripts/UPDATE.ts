@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 
+//#region @backend
 export function rebuildTnp() {
     const p = Project.Tnp;
     const backupFolderDist = 'tmp-dist-current';
@@ -32,3 +33,4 @@ export default {
         process.exit(0)
     }
 }
+//#endregion

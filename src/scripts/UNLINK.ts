@@ -1,3 +1,4 @@
+//#region @backend
 import * as os from "os";
 import { run } from "../process";
 import { Project } from "../project";
@@ -30,3 +31,4 @@ export default {
         process.exit(0)
     }
 }
+//#endregion

@@ -1,3 +1,4 @@
+//#region @backend
 import { run } from "../process";
 import { info } from "../messages";
 
@@ -13,3 +14,4 @@ function $COMMAND(args) {
 export default {
     $COMMAND
 }
+//#endregion

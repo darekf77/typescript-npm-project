@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import { clearConsole } from "../../process";
 import { Project } from '../../project';
@@ -73,3 +74,4 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
     copyto, environmentName, onlyWatchNoBuild  //, baseHref
   }
 }
+//#endregion

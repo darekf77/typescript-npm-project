@@ -1,3 +1,4 @@
+//#region @backend
 import * as fs from 'fs';
 import * as path from 'path';
 import { Project } from "../project";
@@ -36,3 +37,4 @@ export default {
         process.exit(0)
     }
 }
+//#endregion

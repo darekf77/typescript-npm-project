@@ -1,3 +1,4 @@
+//#region @backend
 import config from "../config";
 import { LibType } from '../models';
 import { clear } from "./CLEAR";
@@ -11,3 +12,4 @@ function version() {
 export default {
     VERSION: ()=> version()
 }
+//#endregion

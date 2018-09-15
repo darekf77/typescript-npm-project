@@ -1,4 +1,4 @@
-
+//#region @backend
 
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
@@ -536,3 +536,4 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
     // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }
 }
+//#endregion

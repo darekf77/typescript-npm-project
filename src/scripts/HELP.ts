@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import * as fs from 'fs';
 import glob = require('glob')
@@ -83,3 +84,4 @@ export default {
         help(args)
     }
 }
+//#endregion

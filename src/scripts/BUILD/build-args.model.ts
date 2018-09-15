@@ -1,3 +1,4 @@
+//#region @backend
 export interface BuildArgs {
   copyto: string[] | string;
   environmentName: string;
@@ -7,3 +8,4 @@ export interface BuildArgs {
   baseHref: string;
   '--base-href': string
 }
+//#endregion

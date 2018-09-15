@@ -1,3 +1,4 @@
+//#region @backend
 import * as path from 'path';
 import * as fs from 'fs';
 // third part
@@ -94,4 +95,4 @@ export class AngularProject extends Project {
   }
 
 }
-
+//#endregion

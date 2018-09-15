@@ -1,3 +1,4 @@
+//#region @backend
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
@@ -83,3 +84,4 @@ export class NodeModules {
     this.project.run('rimraf node_modules').sync()
   }
 }
+//#endregion

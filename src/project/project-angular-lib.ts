@@ -1,3 +1,4 @@
+//#region @backend
 import { BaseProjectLib } from "./base-project-lib";
 import { AngularProject } from "./project-angular";
 import { BuildOptions, BuildDir } from "../models";
@@ -83,3 +84,4 @@ export class ProjectAngularLib extends BaseProjectLib {
 
 }
 
+//#endregion

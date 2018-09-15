@@ -55,8 +55,7 @@
     "sqlite3": "^4.0.0",
     "ts-node": "3.3.0",
     "tslint": "^5.9.1",
-    "typeorm": "^0.1.20",
-    "typescript": "^2.6.2",
+    "typescript": "2.6.2",
     "underscore": "^1.9.1",
     "watch": "~1.0.2"
   },

@@ -1,3 +1,4 @@
+//#region @backend
 import { run } from '../process';
 import * as _ from "lodash";
 
@@ -12,3 +13,4 @@ export default {
     process.exit(0)
   }
 }
+//#endregion

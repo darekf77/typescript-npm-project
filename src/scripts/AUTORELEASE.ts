@@ -1,3 +1,4 @@
+//#region @backend
 import { AutoActions } from './AUTOBUILD';
 import { Project } from '../project';
 
@@ -13,3 +14,5 @@ export default {
     autorelease(Project.Current)
   }
 }
+
+//#endregion
