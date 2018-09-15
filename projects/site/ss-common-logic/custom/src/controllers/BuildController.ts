@@ -11,12 +11,30 @@ import * as path from 'path';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
+import { EventSubscriber } from 'typeorm';
 
 
-@ENDPOINT()
+@ENDPOINT({ realtime: true })
 @CLASSNAME('BuildController')
+@EventSubscriber()
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
+  constructor() {
+    super(
+      //#region @backend
+      {
+      afterInsert(e) {
+        console.log('after inser', e)
+        console.log('after inser this', this)
+      },
+      afterLoad: (e) => {
+        console.log('after load', e)
+        console.log('after load this ', this)
+      }
+    }
+    //#endregion
+    )
+  }
 
   @BaseCRUDEntity(entities.BUILD) public entity: entities.BUILD;
   //#region @backend

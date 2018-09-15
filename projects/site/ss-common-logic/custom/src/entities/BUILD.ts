@@ -14,6 +14,8 @@ import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 //#endregion
 import { ProgressBarData, IProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
 
+
+
 export interface IBUILD {
   name: string;
   pidBuildProces: number;
@@ -73,7 +75,10 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return {
       folder() {
 
-        pullCurrentBranch(self.staticFolder);
+        if (ENV.name !== 'local') {
+          pullCurrentBranch(self.staticFolder);
+        }
+
         const toCopy = path.join(self.staticFolder, self.gitFolder);
         const dest = path.join(self.localPath.repository, self.gitFolder)
 

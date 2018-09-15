@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import * as express from "express";
 import "reflect-metadata";
 
-import { init, getSingleton } from 'morphi';
+import { init, getSingleton, isRealtimeEndpoint } from 'morphi';
 import { createConnections, useContainer, ConnectionOptions, Connection } from 'typeorm';
 export { Connection } from 'typeorm';
 import { META } from "./meta-info";
@@ -31,6 +31,7 @@ export async function start(options: StartOptions) {
   const entities = _.values(Entities) as any;
   const controllers = _.values(Controllers) as any;
   config['entities'] = entities as any;
+  config['subscribers'] = _.values(Controllers).filter(a => isRealtimeEndpoint(a as any)) as any;
   const connection = await createConnections([config] as any);
   const firstConnection = connection[0];
 
