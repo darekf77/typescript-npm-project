@@ -62,7 +62,6 @@ export class BaselineSiteJoin {
     }
   }
 
-  //#region init
   private __checkBaselineSiteStructure() {
     if (!this.project.isBasedOnOtherProject) {
       console.trace(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
@@ -80,9 +79,7 @@ export class BaselineSiteJoin {
     this.join.allBaselineSiteFiles()
     return this;
   }
-  //#endregion
 
-  //#region files baseline/custom
   get relativePathesBaseline() {
     let baselineFiles: string[] = this.files.allBaselineFiles;
     // console.log('baselineFiles', baselineFiles)
@@ -471,7 +468,6 @@ export class BaselineSiteJoin {
 
     return crossPlatofrmPath(baselinePath);
   }
-  //#endregion
 
 }
 //#endregion

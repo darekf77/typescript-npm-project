@@ -40,7 +40,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
     }
 
   } if (args.length >= 1) { // NPM INSTALL <package name>
-    //#region npm packages
+
     const npmPackagesToAdd = args
       .map(p => p.trim())
       .filter(p => {
@@ -50,7 +50,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
         }
         return res;
       })
-    //#endregion
+
 
     if (project.type === 'workspace') {  // workspace project: npm i <package name>
       console.log('** npm install <package> in workspace')

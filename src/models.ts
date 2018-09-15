@@ -1,5 +1,6 @@
+//#region @backend
 import { Project } from "./project/base-project";
-
+//#endregion
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
@@ -15,7 +16,7 @@ export type RecreateFile = { where: string; from: string };
 
 export type BuildDir = 'dist' | 'bundle';
 
-export type RuleDependency = { dependencyLib: Project; beforeProject: Project };
+
 
 export interface TnpRouter {
   url?: {
@@ -32,6 +33,7 @@ export interface ReleaseOptions {
   bumbVersionIn?: string[];
 }
 
+//#region @backend
 export class BuildOptions {
   prod: boolean;
   outDir: BuildDir;
@@ -58,6 +60,7 @@ export class BuildOptions {
   }
 
 }
+//#endregion
 
 export interface RunOptions {
 
@@ -140,7 +143,7 @@ export interface IPackageJSON {
   tnp: {
     type: LibType;
     isCoreProject: boolean;
-    basedOn: Project | string,
+    basedOn: string,
     resources?: string[];
     // requiredLibs?: string[];
   };

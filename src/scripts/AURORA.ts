@@ -14,7 +14,7 @@ import config from '../config';
 import { RunOptions } from '../models';
 import { run } from '../../node_modules/morphi';
 
-//#region configs
+
 const defaultColors = {
   'gas-ui': "#72a25c",
   'es-rs-ui': '#ff7e7e',
@@ -126,13 +126,13 @@ const FOLDERS = {
   VENDOR: 'vendor'
 }
 
-//#endregion
+
 
 export type AurorProjectType = 'parent-baseline-fork' | 'child-baseline-module';
 
 class ProjectAurora {
 
-  //#region static methods
+
   private static isAuroraProject(location: string) {
     // is aurora project - simple teest
     const bowerFile = path.join(location, 'bower.json');
@@ -161,7 +161,8 @@ class ProjectAurora {
     );
     return p;
   }
-  //#endregion
+
+
 
   readonly children: ProjectAurora[] = [];
   readonly prefix: string;
