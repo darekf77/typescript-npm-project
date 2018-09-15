@@ -8,6 +8,7 @@ import * as rimraf from "rimraf";
 import { run } from "./process";
 import { sleep } from 'sleep';
 import { ProjectFrom } from './index';
+import { Project } from './index';
 import * as dateformat from "dateformat";
 //#endregion
 
