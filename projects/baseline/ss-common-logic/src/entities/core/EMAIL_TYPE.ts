@@ -19,7 +19,7 @@ import { EntityRepository } from 'typeorm';
 //#endregion
 
 import { EMAIL } from "./EMAIL";
-import { META } from '../../helpers';
+import { META } from 'morphi';
 import { CLASSNAME } from 'morphi';
 
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';

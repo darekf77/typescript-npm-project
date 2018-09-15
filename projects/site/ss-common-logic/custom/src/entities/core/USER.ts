@@ -1,7 +1,6 @@
 
 import { Column, Entity } from "typeorm";
-import { META } from "baseline/ss-common-logic/src/helpers";
-import { CLASSNAME, EntityRepository } from "morphi";
+import { CLASSNAME, EntityRepository, META } from "morphi";
 
 import {
   USER as BASELINE_USER, USER_REPOSITORY as BASELINE_USER_REPOSITORY

@@ -25,7 +25,7 @@ import { Router, Request, Response } from "express";
 
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-import { META } from '../../helpers';
+import { META } from 'morphi';
 import { CLASSNAME } from 'morphi';
 
 //#region @backend

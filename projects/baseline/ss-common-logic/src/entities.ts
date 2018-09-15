@@ -38,7 +38,7 @@ import { Repository } from "typeorm";
 export { Repository } from "typeorm";
 import * as _ from 'lodash'
 
-import { META, Connection } from './helpers';
+import { META, Connection } from 'morphi';
 
 
 export function entities<ADDITIONAL={}>(connection?: Connection, decoratorsEntities?: ADDITIONAL) {

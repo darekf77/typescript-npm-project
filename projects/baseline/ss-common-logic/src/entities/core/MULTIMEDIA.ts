@@ -1,4 +1,4 @@
-import { META } from '../../helpers';
+import { META } from 'morphi';
 //#region typeorm imports
 import { Connection } from "typeorm/connection/Connection";
 import { Repository } from "typeorm/repository/Repository";

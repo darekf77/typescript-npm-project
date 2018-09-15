@@ -30,7 +30,7 @@ export { Subject } from "rxjs/Subject";
 const log = Log.create('AuthController', Level.__NOTHING);
 
 
-import { META } from '../../helpers';
+import { META } from 'morphi';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';

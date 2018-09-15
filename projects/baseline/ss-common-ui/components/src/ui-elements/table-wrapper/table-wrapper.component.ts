@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
 import { BaseCRUD, describeClassProperites, ModelDataConfig, SYMBOL } from 'morphi/browser';
-import { META } from 'ss-common-logic/browser/helpers';
+
 import { Log, Level } from 'ng2-logger/browser';
 import { Router } from '@angular/router';
 

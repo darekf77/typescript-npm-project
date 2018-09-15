@@ -1,7 +1,6 @@
-import { EntityRepository, Global } from "morphi";
+import { EntityRepository, Global, META } from "morphi";
 import { BUILD } from "../entities";
 import * as fse from 'fs-extra';
-import { META } from "baseline/ss-common-logic/src/helpers";
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
 import { ProgressBarData } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR";

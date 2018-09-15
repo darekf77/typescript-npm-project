@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 //#endregion
 // local
-import { META } from '../helpers';
+import { META } from 'morphi';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';

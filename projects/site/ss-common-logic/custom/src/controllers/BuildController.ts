@@ -1,5 +1,7 @@
-import { ENDPOINT, CLASSNAME, BaseCRUDEntity, POST, PathParam, QueryParam, GET, Response, PUT } from 'morphi';
-import { META } from 'baseline/ss-common-logic/src/helpers';
+import {
+  ENDPOINT, CLASSNAME, BaseCRUDEntity, META,
+  POST, PathParam, QueryParam, GET, Response, PUT
+} from 'morphi';
 import { BUILD } from '../entities/BUILD';
 
 //#region @backend
@@ -23,16 +25,16 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     super(
       //#region @backend
       {
-      afterInsert(e) {
-        console.log('after inser', e)
-        console.log('after inser this', this)
-      },
-      afterLoad: (e) => {
-        console.log('after load', e)
-        console.log('after load this ', this)
+        afterInsert(e) {
+          console.log('after inser', e)
+          console.log('after inser this', this)
+        },
+        afterLoad: (e) => {
+          console.log('after load', e)
+          console.log('after load this ', this)
+        }
       }
-    }
-    //#endregion
+      //#endregion
     )
   }
 

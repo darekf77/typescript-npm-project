@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 //#endregion
 // local
-import { META } from '../helpers';
+import { META } from 'morphi';
 
 import { Log, Logger } from 'ng2-logger';
 const log = Log.create('CondigController')

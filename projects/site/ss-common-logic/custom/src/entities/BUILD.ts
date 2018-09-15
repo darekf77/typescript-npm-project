@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
-import { META } from "baseline/ss-common-logic/src/helpers";
 import { Entity, Column, PrimaryGeneratedColumn, EntityRepository } from "typeorm";
-import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global } from 'morphi';
+import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global, META } from 'morphi';
 
 //#region @backend
 import * as path from 'path';

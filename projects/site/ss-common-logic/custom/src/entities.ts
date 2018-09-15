@@ -15,7 +15,7 @@ export { DOMAIN, DOMAIN_REPOSITORY } from './entities/DOMAIN';
 
 //#region @backend
 import * as _ from 'lodash';
-import { META, Connection } from "baseline/ss-common-logic/src/helpers";
+import { META, Connection } from "morphi";
 
 
 export function entities(connection?: Connection) {

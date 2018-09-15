@@ -28,7 +28,7 @@ import { Resource } from "ng2-rest";
 const log = Log.create(__filename);
 
 import { USER } from './USER';
-import { META } from '../../helpers';
+import { META } from 'morphi';
 import { CLASSNAME } from 'morphi';
 
 

@@ -7,7 +7,7 @@ import { Column } from 'typeorm/decorator/columns/Column';
 // thirdpart
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 // local
-import { META } from '../helpers';
+import { META } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 export interface IEXAMPLE {

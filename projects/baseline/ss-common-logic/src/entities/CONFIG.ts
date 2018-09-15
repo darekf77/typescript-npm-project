@@ -1,4 +1,4 @@
-import { META } from '../helpers';
+import { META } from 'morphi';
 import * as _ from 'lodash';
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';

@@ -2,7 +2,7 @@
 import * as controllers from './controllers';
 import * as entites from './entities';
 
-import { start, META } from './helpers';
+import { start, META } from 'morphi';
 
 const tControllers = {}
 const tEntities = {}

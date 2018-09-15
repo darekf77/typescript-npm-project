@@ -7,7 +7,7 @@ import {
 import * as controllers from './controllers';
 import * as entites from './entities';
 
-import { start } from "baseline/ss-common-logic/src/helpers";
+import { start } from "morphi";
 
 const tControllers = BaselienController;
 const tEntities = BaselineEntites;

@@ -23,7 +23,7 @@ import { authenticate } from "passport";
 import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
 import { EMAIL_TYPE } from "./EMAIL_TYPE";
-import { META } from '../../helpers';
+import { META } from 'morphi';
 import { CLASSNAME } from 'morphi';
 
 

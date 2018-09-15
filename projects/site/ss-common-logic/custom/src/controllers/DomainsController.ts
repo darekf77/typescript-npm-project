@@ -1,6 +1,5 @@
 
-import { ENDPOINT, CLASSNAME, BaseCRUDEntity } from 'morphi';
-import { META } from 'baseline/ss-common-logic/src/helpers';
+import { ENDPOINT, CLASSNAME, BaseCRUDEntity, META } from 'morphi';
 import { DOMAIN } from '../entities';
 
 import * as entities from '../entities';

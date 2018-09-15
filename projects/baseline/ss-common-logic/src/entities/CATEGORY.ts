@@ -3,7 +3,7 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
 import { Entity, JoinTable, OneToMany, EntityRepository, JoinColumn, ManyToOne } from 'typeorm';
 // local
-import { META } from '../helpers';
+import { META } from 'morphi';
 import { kebabCase } from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';

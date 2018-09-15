@@ -24,7 +24,7 @@ import { getRecrusiveFilesFrom } from 'morphi';
 //#endregion
 import * as _ from 'lodash';
 
-import { META } from '../../helpers';
+import { META } from 'morphi';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
