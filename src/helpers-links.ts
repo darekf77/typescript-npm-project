@@ -1,4 +1,5 @@
 
+//#region @backend
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from "os";
@@ -9,7 +10,7 @@ import { Helpers } from "morphi";
 
 export namespace HelpersLinks {
 
-    
+
 
     export function removeSlashAtEnd(s: string) {
         s = s.endsWith(`/`) ? s.slice(0, s.length - 1) : s;
@@ -44,3 +45,4 @@ export namespace HelpersLinks {
     }
 
 }
+//#endregion
