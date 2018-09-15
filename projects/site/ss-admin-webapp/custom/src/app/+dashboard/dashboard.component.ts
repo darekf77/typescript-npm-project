@@ -42,10 +42,10 @@ export class DashboardComponent implements OnInit {
               subitems: []
             },
 
-            {
-              name: 'Domains',
-              subitems: []
-            }
+            // {
+            //   name: 'Domains',
+            //   subitems: []
+            // }
 
           ]
         }
@@ -104,13 +104,13 @@ export class DashboardComponent implements OnInit {
     };
     builds.subitems = await this.getBuilds();
 
-    const domains = _.first(this.menu.top.items).leftMenu[1];
-    domains.action = () => {
-      const id = _.first(domains.subitems)['id'];
-      log.i('navigate hererere to domain id ', id);
-      this.router.navigateByUrl(`/dashboard/domains/domain/${id}`);
-    };
-    domains.subitems = await this.getDomains();
+    // const domains = _.first(this.menu.top.items).leftMenu[1];
+    // domains.action = () => {
+    //   const id = _.first(domains.subitems)['id'];
+    //   log.i('navigate hererere to domain id ', id);
+    //   this.router.navigateByUrl(`/dashboard/domains/domain/${id}`);
+    // };
+    // domains.subitems = await this.getDomains();
 
 
 
