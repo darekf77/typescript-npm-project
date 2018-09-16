@@ -17,7 +17,7 @@ const tmpEnvironmentFileNameBE = 'tmp-environment-be.json';
 const tmpEnvironmentFileNameFE = 'tmp-environment-fe.json';
 export const tmpEnvironmentFileName = 'tmp-environment.json';
 
-const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
+
 
 export const schema: EnvConfig = {
   workspace: {
@@ -77,11 +77,11 @@ export function validateWorkspaceConfig(workspaceConfig: EnvConfig) {
 
 }
 
-export async function overrideWorksapceRouterPort(workspaceProjectLocation: string, workspaceConfig: EnvConfig, allIpsGeneratedDynamicly: boolean = false) {
+export async function overrideWorksapceRouterPort(workspaceProjectLocation: string, workspaceConfig: EnvConfig) {
   if (workspaceConfig.workspace && workspaceConfig.workspace.workspace) {
     const p = ProjectFrom(workspaceProjectLocation)
     if (p) {
-      if (allIpsGeneratedDynamicly) {
+      if (workspaceConfig.dynamicGenIps) {
         const port = await ProxyRouter.getFreePort();
         console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
         p.setDefaultPort(port);
@@ -101,26 +101,11 @@ export async function overrideWorksapceRouterPort(workspaceProjectLocation: stri
 }
 
 
+
 export async function overrideDefaultPortsAndWorkspaceConfig(
   workspaceProjectLocation: string,
-  workspaceConfig: EnvConfig,
-  args: string
+  workspaceConfig: EnvConfig
 ) {
-
-
-  let allIpsGeneratedDynamicly = false;
-  if (_.isString(args)) {
-    let { env, generateIps }: { env: EnvironmentName, generateIps: boolean } = require('minimist')(args.split(' '));
-
-    if (allowedEnvironments.includes(env)) {
-      workspaceConfig.name = env;
-    }
-    console.log(`typeof generateIps`, typeof generateIps)
-    allIpsGeneratedDynamicly = (environmentWithGeneratedIps.includes(env)) || generateIps;
-  }
-
-
-  await overrideWorksapceRouterPort(workspaceProjectLocation, workspaceConfig, allIpsGeneratedDynamicly)
 
   const overridedProjectsName: string[] = []
   workspaceConfig.workspace.workspace.port
@@ -134,7 +119,7 @@ export async function overrideDefaultPortsAndWorkspaceConfig(
         error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
       } else {
         overridedProjectsName.push(d.name)
-        if (allIpsGeneratedDynamicly) {
+        if (workspaceConfig.dynamicGenIps) {
           port = await ProxyRouter.getFreePort();
           console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
           p.setDefaultPort(port);
@@ -173,7 +158,8 @@ function frontendCuttedVersion(workspaceConfig: EnvConfig) {
   return c;
 }
 
-export function saveConfigFor(project: Project, workspaceConfig: EnvConfig) {
+export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig) {
+  workspaceConfig.currentProjectName = project.name;
 
   if (project.isWorkspace) {
     const tmpEnvironmentPathBE = path.join(project.location, tmpEnvironmentFileNameBE)
@@ -187,27 +173,81 @@ export function saveConfigFor(project: Project, workspaceConfig: EnvConfig) {
     fse.writeFileSync(tmpEnvironmentPathFE, JSON.stringify(frontendCuttedVersion(workspaceConfig), null, 4), {
       encoding: 'utf8'
     })
+    console.log(`REGERNATEED FILE WORKSPACE ${project.name}`)
+
+    project.children.forEach(p => {
+      saveConfigWorkspca(p, workspaceConfig);
+    })
 
   } else if (project.isWorkspaceChildProject) {
 
     const tmpEnvironmentParentPathBE = path.join(project.parent.location, tmpEnvironmentFileNameBE)
     const tmpEnvironmentParentPathFE = path.join(project.parent.location, tmpEnvironmentFileNameFE)
 
-    if (!fse.existsSync(tmpEnvironmentParentPathBE) || !fse.existsSync(tmpEnvironmentParentPathFE)) {
-      saveConfigFor(project.parent, workspaceConfig);
-    }
+    // if (!fse.existsSync(tmpEnvironmentParentPathBE) || !fse.existsSync(tmpEnvironmentParentPathFE)) {
+    //   saveConfigWorkspca(project.parent, workspaceConfig);
+    // }
 
     const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
     removeIfExist(tmpEnvironmentPath);
 
     if (project.type === 'angular-client' || project.type === 'angular-lib') {
-      HelpersLinks.createLink(tmpEnvironmentPath, tmpEnvironmentParentPathFE);
-    } else if (project.type === 'isomorphic-lib') {
-      HelpersLinks.createLink(tmpEnvironmentPath, tmpEnvironmentParentPathBE);
+      fse.copyFileSync(tmpEnvironmentParentPathFE, tmpEnvironmentPath);
+    } else if (project.type === 'isomorphic-lib' || project.type === 'server-lib') {
+      fse.copyFileSync(tmpEnvironmentParentPathBE, tmpEnvironmentPath);
     }
+    console.log(`REGERNATEED FILE FOR ${project.name}`)
   }
 }
 
+
+
+
+
+export const existedConfigs = {} as { [workspacePath in string]: EnvConfig; }
+
+
+export function workspaceConfigBy(workspace: Project, environment: EnvironmentName): EnvConfig {
+  let config: EnvConfig;
+
+  const alreadyExistProject = (workspace && workspace.isWorkspace) ? existedConfigs[workspace.location] : null;
+
+  // console.log('alreadyExistedWorksapceConfig', alreadyExistedWorksapceConfig)
+
+
+  if (!workspace.isWorkspace) {
+    error(`Funciton only accessible from workspace type project`);
+  }
+
+  if (_.isObject(alreadyExistProject) && alreadyExistProject !== null) {
+    config = alreadyExistProject;
+    // console.log('Already exist workspaceconfig ', EnvironmentConfig.woksapaceConfigs)
+  } else {
+    const envSurfix = (environment === 'local') ? '' : `.${environment}`;
+    let pathToProjectEnvironment = path.join(workspace.location, `environment${envSurfix}`);
+
+    if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
+      error(`Workspace ${workspace.location}
+        ...without environment${envSurfix}.js config.`);
+    }
+
+    try {
+      config = require(pathToProjectEnvironment) as any;
+    } catch (error) {
+      if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
+        console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
+        workspace.join.init() // fix for recreating site
+      }
+      config = require(pathToProjectEnvironment) as any;
+    }
+
+  }
+  validateWorkspaceConfig(config);
+  existedConfigs[workspace.location] = config;
+
+
+  return config;
+}
 
 
 //#endregion

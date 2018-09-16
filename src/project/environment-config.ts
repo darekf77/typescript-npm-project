@@ -13,12 +13,15 @@ import { ProjectFrom } from './index';
 import { isValidIp } from '../helpers-environment';
 import globalConfig, { allowedEnvironments } from '../config';
 import { ProxyRouter } from './proxy-router';
-import { validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigFor, tmpEnvironmentFileName } from './environment-config-helpers';
+import {
+  validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
+} from './environment-config-helpers';
 
+const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
 
 export class EnvironmentConfig {
 
-  private static woksapaceConfigs = {} as { [workspacePath in string]: EnvConfig; }
+
 
   constructor(private project: Project) { }
 
@@ -27,108 +30,66 @@ export class EnvironmentConfig {
      * Avaliable for worksapce and children
      * Use only for workspace things
      */
-  private get workspaceConfig(): EnvConfig {
-    let workspaceConfig: EnvConfig;
-
-    // console.log('\n\n\nProject: ', this.project && this.project.name, '  location: ', this.project && this.project.location)
-    let pathToConfig = ''
-    const alreadyExistedWorksapceConfig = (this.project && this.project.parent && this.project.parent.type === 'workspace') ?
-      EnvironmentConfig.woksapaceConfigs[this.project.parent.location] : null;
-
-    // console.log('alreadyExistedWorksapceConfig', alreadyExistedWorksapceConfig)
 
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+  /// TODO remove children config links
 
-      if (_.isObject(alreadyExistedWorksapceConfig) && alreadyExistedWorksapceConfig !== null) {
-        workspaceConfig = EnvironmentConfig.woksapaceConfigs[this.project.parent.location];
-        // console.log('Already exist workspaceconfig ', EnvironmentConfig.woksapaceConfigs)
-      } else {
-
-        if (this.project.isWorkspaceChildProject) {
-          let pathToWorkspaceProjectEnvironment = path.join(this.project.parent.location, `environment${globalConfig.env}`);
-          // console.log('tnp-workspace-child pathToWorkspaceProjectEnvironment', pathToWorkspaceProjectEnvironment)
-          if (fs.existsSync(`${pathToWorkspaceProjectEnvironment}.js`)) {
-
-            pathToConfig = pathToWorkspaceProjectEnvironment;
-            try {
-              workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
-            } catch (error) {
-              if (this.project.isSite) { // QUICK_FIX to get in site child last worksapce changes
-                console.log('INIT WORKSPACE CHILD, BUT RECREATE SITE WORKSPACE')
-                this.project.parent.join.init() // fix parent for recreating site
-              }
-              workspaceConfig = require(pathToWorkspaceProjectEnvironment) as any;
-            }
-
-
-          }
-        } else if (this.project.isWorkspace) {
-          let pathToProjectEnvironment = path.join(this.project.location, `environment${globalConfig.env}`);
-          // console.log('tnp-workspace pathToProjectEnvironment', pathToProjectEnvironment)
-          if (fs.existsSync(`${pathToProjectEnvironment}.js`)) {
-
-            pathToConfig = pathToProjectEnvironment;
-
-            try {
-              workspaceConfig = require(pathToProjectEnvironment) as any;
-            } catch (error) {
-              if (this.project.isSite) { // QUICK_FIX to get in site child last worksapce changes
-                console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
-                this.project.join.init() // fix for recreating site
-              }
-              workspaceConfig = require(pathToProjectEnvironment) as any;
-            }
-
-          }
-        }
+  private removeChildsConfig() {
+    this.project.children.forEach(p => {
+      const f = path.join(p.location, tmpEnvironmentFileName);
+      if (fse.existsSync(f)) {
+        fse.unlinkSync(f);
       }
-      validateWorkspaceConfig(workspaceConfig);
-    }
-    // console.log('workspace config resolve: ', this.workspaceConfig && JSON.stringify(this.workspaceConfig));
-    // console.log('Path to worksapce config: ', pathToConfig);
-    return workspaceConfig;
+    })
   }
 
- /// TODO remove children config links
+  get isChildProjectWithoutConfig() {
+    const f = path.join(this.project.location, tmpEnvironmentFileName);
+    return !fse.existsSync(f);
+  }
 
   public async init(optionsOrArgs?: BuildOptions | string) {
+    // console.log('INIT ENV CALLELD !!!,', optionsOrArgs)
+    // console.log(`PROJECT: ${this.project.name}  this.project.isWorkspaceChildProjec `, this.project.isWorkspaceChildProject)
+    // console.log(`PROJECT: ${this.project.name}  this.isChildProjectWithoutConfig `, this.isChildProjectWithoutConfig)
+    if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
+      this.project.parent.env.init(optionsOrArgs);
+      return
+    }
     if (!this.project.isWorkspace) {
       return
     }
+    this.removeChildsConfig();
 
-    let config = this.workspaceConfig;
+    let config = workspaceConfigBy(this.project, globalConfig.environmentName);
     const workspaceProjectLocation = path.join(this.project.location)
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      let args: string;
-      if (_.isString(optionsOrArgs)) {
-        args = optionsOrArgs;
-      }
-      await overrideDefaultPortsAndWorkspaceConfig(workspaceProjectLocation, config, args);
+
+    let args: string;
+    if (_.isString(optionsOrArgs)) {
+      args = optionsOrArgs;
     }
 
-    const staticStartMode = _.isString(optionsOrArgs);
+    config.proxyRouterMode = _.isString(optionsOrArgs);
 
-    if (staticStartMode) {
+    if (config.proxyRouterMode) {
       optionsOrArgs = this.options.saved as BuildOptions; // change args to saved options
-      if (optionsOrArgs.watch) {
-        error(`Please run ${chalk.bold('tnp build:app')} before start:app command`);
-      }
     }
-
     optionsOrArgs = optionsOrArgs as BuildOptions;
-
-    const { appBuild, prod, watch = false, environmentName } = optionsOrArgs;
+    config.buildOptions = optionsOrArgs;
     this.options.save(optionsOrArgs)
 
+    const { environmentName } = optionsOrArgs;
+    config.name = (!environmentName ? 'local' : environmentName);
 
-    config.proxyRouterMode = (
-      !optionsOrArgs.watch &&
-      this.project.parent &&
-      this.project.parent.type === 'workspace'
-    );
-    config.name = (!config.name) ? (environmentName ? environmentName : 'local') : config.name;
+    const env: EnvironmentName = config.name;
+    const { generateIps }: { generateIps: boolean } =
+      _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
+    config.dynamicGenIps = (environmentWithGeneratedIps.includes(env)) || generateIps;
+
+    await overrideWorksapceRouterPort(workspaceProjectLocation, config)
+    await overrideDefaultPortsAndWorkspaceConfig(workspaceProjectLocation, config);
+
     config.isCoreProject = this.project.isCoreProject;
 
     if (!config.workspace || !config.workspace.workspace) {
@@ -166,19 +127,19 @@ export class EnvironmentConfig {
       }
     })
 
-    saveConfigFor(this.project, config)
-    // console.log('config prepared!', this.config)
-
+    saveConfigWorkspca(this.project, config)
   }
 
   /**
    * Can be accesed only after env.prepare()
    */
   public get config() {
-    const configLocation = (this.project.isWorkspaceChildProject ?
-      this.project.parent.location : this.project.location, tmpEnvironmentFileName);
+    const configLocation = (
+      this.project.isWorkspaceChildProject ? this.project.parent.location : this.project.location,
+      tmpEnvironmentFileName);
 
-    return fse.readJsonSync(configLocation, {
+    const configPath = path.join(this.project.location, configLocation);
+    return fse.readJsonSync(configPath, {
       encoding: 'utf8'
     });
   }
@@ -195,7 +156,7 @@ export class EnvironmentConfig {
         if (!fs.existsSync(pathTmpEnvPrepareOptions)) {
           error(`Please run: tnp build:app`)
         }
-        return fse.readJSONSync(pathTmpEnvPrepareOptions)
+        return BuildOptions.fromRaw(fse.readJSONSync(pathTmpEnvPrepareOptions))
       },
       save(options: BuildOptions) {
         // console.log(`Prepare OPTIONS saved in ${pathTmpEnvPrepareOptions}`)
@@ -213,4 +174,3 @@ export class EnvironmentConfig {
 
 
 //#endregion
-

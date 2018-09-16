@@ -17,7 +17,7 @@ export class ProjectWorkspace extends Project {
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {
-        return !!workspace.env.workspaceConfig.workspace.projects.find(c => c.name === child.name);
+        return !!workspace.env.config.workspace.projects.find(c => c.name === child.name);
       })
       .forEach(child => {
         child.start(args)
@@ -85,7 +85,7 @@ export class ProjectWorkspace extends Project {
       ...projects.angularClients,
       ...projects.angularCliClients
     ].filter(p => {
-      return !!this.env.workspaceConfig.workspace.projects.find(wp => wp.name === p.name)
+      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name)
     });
 
     console.log(`[[[${JSON.stringify({ value: 0, info: `Process started`, status: 'inprogress' })}]]]`)

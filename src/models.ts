@@ -1,5 +1,6 @@
 //#region @backend
 import { Project } from "./project/base-project";
+import * as _ from 'lodash';
 //#endregion
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
@@ -34,7 +35,8 @@ export interface ReleaseOptions {
 }
 
 //#region @backend
-export class BuildOptions {
+
+export interface IBuildOptions {
   prod: boolean;
   outDir: BuildDir;
   watch?: boolean;
@@ -46,6 +48,24 @@ export class BuildOptions {
   copyto?: Project[];
   environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];
+}
+
+export class BuildOptions implements IBuildOptions {
+  prod: boolean;
+  outDir: BuildDir;
+  watch?: boolean;
+  args?: string;
+  appBuild?: boolean;
+  baseHref?: string;
+  onlyWatchNoBuild?: boolean;
+  proxyRouterMode?: boolean;
+  copyto?: Project[];
+  environmentName: EnvironmentName;
+  additionalIsomorphicLibs?: string[];
+
+  public static fromRaw(options: IBuildOptions): BuildOptions {
+    return _.merge(new BuildOptions(), options);
+  }
 
   public static stringify(prod = false, watch = false, outDir: BuildDir = 'dist', additionalIsomorphicLibs = []) {
     const o = {
@@ -111,6 +131,8 @@ export interface EnvConfig {
   name?: EnvironmentName; // tnp generated
   proxyRouterMode?: boolean; // tnp generated
   domain?: string;
+  dynamicGenIps?: boolean;
+  buildOptions?: BuildOptions;
   ip?: string;
   workspace: {
     workspace: EnvConfigProject;
@@ -127,6 +149,7 @@ export interface EnvConfig {
     },
     projects: EnvConfigProject[]
   }
+  currentProjectName?: string;
   packageJSON?: IPackageJSON;
 
 }

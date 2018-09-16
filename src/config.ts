@@ -4,10 +4,15 @@ import * as _ from 'lodash';
 import { LibType, EnvironmentName } from './models';
 
 export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'];
-let { env }: { env: EnvironmentName } = require('minimist')(process.argv);
+let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
-env = allowedEnvironments.includes(env) ? `.${env}` : '' as any;
-console.log(`Current environment prefix: "${env}"  , args: ${JSON.stringify(process.argv)}`);
+if (_.isString(env)) {
+  environmentName = env;
+}
+
+environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
+environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
+// console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
 
 export const config = {
   tnp: 'tnp',
@@ -57,7 +62,7 @@ export const config = {
     'angular-client',
     'angular-cli'
   ] as LibType[],
-  env
+  environmentName
 }
 
 
