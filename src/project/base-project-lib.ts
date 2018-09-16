@@ -36,6 +36,7 @@ export abstract class BaseProjectLib extends Project {
 
   abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
 
+  // abstract get isBuildedForOther();
 
 
   public async publish() {
@@ -53,7 +54,7 @@ export abstract class BaseProjectLib extends Project {
     try {
       this.run('npm whoami').sync();
     } catch (e) {
-      error(`Please login in to npm.`)
+      error(`Please login in to npm.`, false, true)
     }
   }
 

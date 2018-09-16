@@ -19,13 +19,6 @@ export type BuildDir = 'dist' | 'bundle';
 
 
 
-export interface TnpRouter {
-  url?: {
-    prefix?: string;
-    base?: string;
-  };
-  routes: EnvConfigProject[];
-}
 
 export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod' | 'online';
 
@@ -132,7 +125,7 @@ export interface EnvConfig {
   proxyRouterMode?: boolean; // tnp generated
   domain?: string;
   dynamicGenIps?: boolean;
-  ip?: string;
+  ip?: string | 'localhost';
   workspace: {
     workspace: EnvConfigProject;
     build?: {

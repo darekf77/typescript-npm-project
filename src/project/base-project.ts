@@ -31,7 +31,7 @@ import { CopyToManager } from './copyto-manager';
 
 export abstract class Project {
 
-  
+
   //#region @backend
   abstract projectSpecyficFiles(): string[];
   abstract buildSteps(buildOptions?: BuildOptions);
@@ -294,7 +294,7 @@ export abstract class Project {
     await this.env.init(buildOptions);
 
     let baseHref: string;
-    console.log('AM HERE')
+    // console.log('AM HERE')
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.parent && this.parent.type === 'workspace') {
@@ -462,7 +462,7 @@ export abstract class Project {
   }
 
 
-//#region @backend
+  //#region @backend
 
   // TODO solve problem with ngc watch mode high cpu
   // get ownNpmPackage() {
@@ -529,7 +529,11 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       // console.log(`Removed tnp - helper from ${ dest } `)
       rimraf.sync(destCompiledJs)
     }
-    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs);
+    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs, {
+      filter: (src: string, dest: string) => {        
+        return !src.endsWith('/dist/bin');
+      }
+    });
     fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
       encoding: 'utf8',
       spaces: 2

@@ -25,7 +25,6 @@ export class EnvironmentConfig {
 
   constructor(private project: Project) { }
 
-
   /**
      * Avaliable for worksapce and children
      * Use only for workspace things
@@ -50,23 +49,36 @@ export class EnvironmentConfig {
 
   private childOptions: BuildOptions | string;
   public async init(optionsOrArgs?: BuildOptions | string) {
-    // console.log('INIT ENV CALLELD !!!,', optionsOrArgs)
-    // console.log(`PROJECT: ${this.project.name}  this.project.isWorkspaceChildProjec `, this.project.isWorkspaceChildProject)
-    // console.log(`PROJECT: ${this.project.name}  this.isChildProjectWithoutConfig `, this.isChildProjectWithoutConfig)
+    let workspaceProjectLocation: string;
+
+    if (this.project.isWorkspace) {
+      workspaceProjectLocation = path.join(this.project.location);
+    } else if (this.project.isWorkspaceChildProject) {
+      workspaceProjectLocation = path.join(this.project.parent.location);
+    } else {
+      return;
+    }
+
+
     if (this.project.isWorkspaceChildProject) {
       this.childOptions = optionsOrArgs;
     }
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
       await this.project.parent.env.init(optionsOrArgs);
-      return
     }
+    
+    if (this.project.isWorkspaceChildProject) {
+      await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: this.config }, false)
+      await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: this.config }, false);
+    }
+
     if (!this.project.isWorkspace) {
       return
     }
     this.removeChildsConfig();
 
     let config = workspaceConfigBy(this.project, globalConfig.environmentName);
-    const workspaceProjectLocation = path.join(this.project.location)
+
 
 
     let args: string;
@@ -80,7 +92,7 @@ export class EnvironmentConfig {
       optionsOrArgs = this.options.saved as BuildOptions; // change args to saved options
     }
     optionsOrArgs = optionsOrArgs as BuildOptions;
-    
+
     this.options.save(optionsOrArgs)
 
     const { environmentName } = optionsOrArgs;
@@ -91,8 +103,8 @@ export class EnvironmentConfig {
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(env)) || generateIps;
 
-    await overrideWorksapceRouterPort(workspaceProjectLocation, config)
-    await overrideDefaultPortsAndWorkspaceConfig(workspaceProjectLocation, config);
+    await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
+    await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
 
     config.isCoreProject = this.project.isCoreProject;
 
@@ -104,7 +116,8 @@ export class EnvironmentConfig {
       config.ip = 'localhost'
     } else {
       if (!isValidIp(config.ip)) {
-        error(`Bad ip address in your environment .json config`)
+        error(`Bad ip address in your environment .json config`, true)
+        err(config)
       }
     }
 
@@ -137,15 +150,17 @@ export class EnvironmentConfig {
   /**
    * Can be accesed only after env.prepare()
    */
-  public get config() {
+  public get config(): EnvConfig {
     const configLocation = (
       this.project.isWorkspaceChildProject ? this.project.parent.location : this.project.location,
       tmpEnvironmentFileName);
 
     const configPath = path.join(this.project.location, configLocation);
-    const res = fse.readJsonSync(configPath) as EnvConfig;
+    if (fse.existsSync(configPath)) {
+      const res = fse.readJsonSync(configPath) as EnvConfig;
+      return res;
+    }
 
-    return res;
   }
 
 

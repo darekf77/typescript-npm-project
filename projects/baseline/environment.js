@@ -15,13 +15,13 @@ const config = {
     workspace: {
       baseUrl: '/info',
       name: 'workspace',
-      port: 5000
+      port: 6000
     },
     projects: [
       {
         baseUrl: '/components',
         name: 'ss-common-ui',
-        port: 4202
+        port: 6001
       },
       {
         baseUrl: '/api',
@@ -33,17 +33,17 @@ const config = {
           dropSchema: true,
           logging: false
         },
-        port: 4000
+        port: 6002
       },
       {
         baseUrl: '/admin',
         name: 'ss-admin-webapp',
-        port: 4201
+        port: 6003
       },
       {
         baseUrl: '/',
         name: 'ss-webapp',
-        port: 4200
+        port: 6004
       }
     ]
   }

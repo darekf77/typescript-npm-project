@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 // local
 import globalConfig, { allowedEnvironments } from '../config';
-import { EnvConfig, EnvironmentName } from '../models';
+import { EnvConfig, EnvironmentName, EnvConfigProject } from '../models';
 import { error, warn } from '../messages';
 import { ProjectFrom } from './index';
 import { ProxyRouter } from './proxy-router';
@@ -13,8 +13,7 @@ import { Project } from './base-project';
 import { HelpersLinks } from '../helpers-links';
 import { walkObject } from '../helpers';
 
-const tmpEnvironmentFileNameBE = 'tmp-environment-be.json';
-const tmpEnvironmentFileNameFE = 'tmp-environment-fe.json';
+
 export const tmpEnvironmentFileName = 'tmp-environment.json';
 
 
@@ -77,76 +76,67 @@ export function validateWorkspaceConfig(workspaceConfig: EnvConfig) {
 
 }
 
-export async function overrideWorksapceRouterPort(workspaceProjectLocation: string, workspaceConfig: EnvConfig) {
-  if (workspaceConfig.workspace && workspaceConfig.workspace.workspace) {
-    const p = ProjectFrom(workspaceProjectLocation)
-    if (p) {
-      if (workspaceConfig.dynamicGenIps) {
-        const port = await ProxyRouter.getFreePort();
-        console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
-        p.setDefaultPort(port);
-        workspaceConfig.workspace.workspace.port = port;
-      } else {
-        const port = Number(workspaceConfig.workspace.workspace.port);
-        if (!isNaN(port)) {
-          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
-          p.setDefaultPort(port)
-        }
-      }
-    }
+export interface OverridePortType {
+  workspaceProjectLocation: string;
+  workspaceConfig: EnvConfig;
+}
+
+async function handleProject(project: Project, configProject: EnvConfigProject, generatePorts) {
+  if (generatePorts) {
+    const port = await ProxyRouter.getFreePort();
+    // console.log(`Overrided/Generated port from ${project.getDefaultPort()} to ${port} in project: ${project.name}`)
+    project.setDefaultPort(port);
+    configProject.port = port;
   } else {
-    warn(`Router (worksapce) port is not defined in your environment.js `);
+    const port = Number(configProject.port);
+    if (!isNaN(port)) {
+      if (port != project.getDefaultPort()) {
+        // console.log(`Overrided port from ${project.getDefaultPort()} to ${port} in project: ${project.name}`)
+      }
+      project.setDefaultPort(port)
+    } else {
+      project.setDefaultPortByType()
+      // console.log(`Default port ${project.getDefaultPort()} is set to project: ${project.name}`)
+    }
   }
+}
+
+export async function overrideWorksapceRouterPort(options: OverridePortType, generatePorts = true) {
+  const { workspaceProjectLocation, workspaceConfig } = options;
+
+  if (!workspaceConfig.workspace || !workspaceConfig.workspace.workspace) {
+    err(workspaceConfig);
+  }
+
+  const project = ProjectFrom(workspaceProjectLocation)
+  if (project === undefined) {
+    error(`Router (worksapce) port is not defined in your environment.js `);
+  }
+
+  const configProject = workspaceConfig.workspace.workspace;
+
+  await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps);
 
 }
 
 
 
-export async function overrideDefaultPortsAndWorkspaceConfig(
-  workspaceProjectLocation: string,
-  workspaceConfig: EnvConfig
-) {
+export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePortType, generatePorts = true) {
 
-  const overridedProjectsName: string[] = []
+  const { workspaceProjectLocation, workspaceConfig } = options;
+
   workspaceConfig.workspace.workspace.port
 
   for (let i = 0; i < workspaceConfig.workspace.projects.length; i++) {
-    const d = workspaceConfig.workspace.projects[i];
-    let port = Number(d.port);
-    if (!_.isNaN(port)) {
-      const p = ProjectFrom(path.join(workspaceProjectLocation, d.name))
-      if (p === undefined) {
-        error(`Undefined project: ${d.name} inside environment.js workpace.projects`);
-      } else {
-        overridedProjectsName.push(d.name)
-        if (workspaceConfig.dynamicGenIps) {
-          port = await ProxyRouter.getFreePort();
-          console.log(`Overrided/Generated port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
-          p.setDefaultPort(port);
-          d.port = port;
-        } else {
-          console.log(`Overrided port from ${p.getDefaultPort()} to ${port} in project: ${p.name}`)
-          p.setDefaultPort(port);
-        }
-
-      }
+    const configProject = workspaceConfig.workspace.projects[i];
+    const project = ProjectFrom(path.join(workspaceProjectLocation, configProject.name))
+    if (project === undefined) {
+      error(`Undefined project: ${configProject.name} inside environment.js workpace.projects`);
     }
-  }
-
-  const workspace = ProjectFrom(workspaceProjectLocation)
-  workspace.children.forEach(childProject => {
-    if (!overridedProjectsName.includes(childProject.name)) {
-      childProject.setDefaultPortByType()
-    }
-  })
-}
-
-
-function removeIfExist(file: string) {
-  if (fse.existsSync(file)) {
-    fse.unlinkSync(file)
+    await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
   }
 }
+
 
 function frontendCuttedVersion(workspaceConfig: EnvConfig) {
   const c = _.cloneDeep(workspaceConfig);
@@ -160,20 +150,14 @@ function frontendCuttedVersion(workspaceConfig: EnvConfig) {
 
 export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
+  const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 
   if (project.isWorkspace) {
-    const tmpEnvironmentPathBE = path.join(project.location, tmpEnvironmentFileNameBE)
 
-    removeIfExist(tmpEnvironmentPathBE)
-    fse.writeFileSync(tmpEnvironmentPathBE, JSON.stringify(workspaceConfig, null, 4), {
-      encoding: 'utf8'
+    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+      encoding: 'utf8',
+      spaces: 2
     })
-    const tmpEnvironmentPathFE = path.join(project.location, tmpEnvironmentFileNameFE)
-    removeIfExist(tmpEnvironmentPathFE);
-    fse.writeFileSync(tmpEnvironmentPathFE, JSON.stringify(frontendCuttedVersion(workspaceConfig), null, 4), {
-      encoding: 'utf8'
-    })
-    console.log(`REGERNATEED FILE WORKSPACE ${project.name}`)
 
     project.children.forEach(p => {
       saveConfigWorkspca(p, workspaceConfig);
@@ -181,18 +165,8 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 
   } else if (project.isWorkspaceChildProject) {
 
-    const tmpEnvironmentParentPathBE = path.join(project.parent.location, tmpEnvironmentFileNameBE)
-    const tmpEnvironmentParentPathFE = path.join(project.parent.location, tmpEnvironmentFileNameFE)
-
-    // if (!fse.existsSync(tmpEnvironmentParentPathBE) || !fse.existsSync(tmpEnvironmentParentPathFE)) {
-    //   saveConfigWorkspca(project.parent, workspaceConfig);
-    // }
-
-    const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
-    // removeIfExist(tmpEnvironmentPath);
-
     if (project.type === 'angular-client' || project.type === 'angular-lib') {
-      fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+      fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
         encoding: 'utf8',
         spaces: 2
       })
@@ -202,7 +176,6 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
         spaces: 2
       })
     }
-    console.log(`REGERNATEED FILE FOR ${project.name}`)
   }
 }
 
