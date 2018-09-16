@@ -49,7 +49,7 @@ export class AngularProject extends Project {
 
   startOnCommand(args: string) {
 
-    const baseUrl = this.env.configFor.backend.workspace.projects.find(({ name }) => name === this.name).baseUrl;
+    const baseUrl = this.env.config.workspace.projects.find(({ name }) => name === this.name).baseUrl;
     const command = `tnp serve --port ${this.getDefaultPort()} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl} ${args}`;
     // console.log(`Angular command: ${command}`)
     return command;

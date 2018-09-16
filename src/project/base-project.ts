@@ -292,10 +292,10 @@ export abstract class Project {
 
     let baseHref: string;
     if (this.type === 'workspace') {
-      baseHref = this.env.workspaceConfig.workspace.workspace.baseUrl;
+      baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.parent && this.parent.type === 'workspace') {
-      baseHref = this.env.configFor.backend &&
-        this.env.configFor.backend.workspace.projects.find(p => {
+      baseHref = this.env.config &&
+        this.env.config.workspace.projects.find(p => {
           return p.name === this.name
         }).baseUrl
     }
