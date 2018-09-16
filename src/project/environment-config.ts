@@ -53,7 +53,7 @@ export class EnvironmentConfig {
     // console.log(`PROJECT: ${this.project.name}  this.project.isWorkspaceChildProjec `, this.project.isWorkspaceChildProject)
     // console.log(`PROJECT: ${this.project.name}  this.isChildProjectWithoutConfig `, this.isChildProjectWithoutConfig)
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      this.project.parent.env.init(optionsOrArgs);
+      await this.project.parent.env.init(optionsOrArgs);
       return
     }
     if (!this.project.isWorkspace) {
@@ -139,9 +139,7 @@ export class EnvironmentConfig {
       tmpEnvironmentFileName);
 
     const configPath = path.join(this.project.location, configLocation);
-    return fse.readJsonSync(configPath, {
-      encoding: 'utf8'
-    });
+    return fse.readJsonSync(configPath);
   }
 
 
@@ -150,7 +148,7 @@ export class EnvironmentConfig {
   private get options() {
     const filename = 'tmp-env-prepare.json';
     const pathTmpEnvPrepareOptions = path.join(this.project.location, filename);
-    const self = this;
+    // const self = this;
     return {
       get saved() {
         if (!fs.existsSync(pathTmpEnvPrepareOptions)) {

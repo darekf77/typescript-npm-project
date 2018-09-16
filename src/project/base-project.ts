@@ -291,6 +291,7 @@ export abstract class Project {
     await this.env.init(buildOptions);
 
     let baseHref: string;
+    console.log('AM HERE')
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.parent && this.parent.type === 'workspace') {
@@ -317,15 +318,15 @@ export abstract class Project {
   public clear(includeNodeModules = false) {
     console.log(`Cleaning project: ${this.name}`);
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
+      .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
         if (f === config.folder.node_modules) {
           return includeNodeModules;
         }
         return true;
       }) // link/unlink takes care of node_modules
-      .map(f => f.startsWith('/') ? f.substr(1) : f)
       .join(' ')
-    console.log(`rimraf ${gitginoredfiles}`)
+    // console.log(`rimraf ${gitginoredfiles}`)
     this.run(`rimraf ${gitginoredfiles}`).sync();
     if (this.type === 'workspace' && Array.isArray(this.children) && this.children.length > 0) {
       this.children.forEach(childProject => {

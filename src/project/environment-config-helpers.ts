@@ -189,12 +189,18 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
     // }
 
     const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
-    removeIfExist(tmpEnvironmentPath);
+    // removeIfExist(tmpEnvironmentPath);
 
     if (project.type === 'angular-client' || project.type === 'angular-lib') {
-      fse.copyFileSync(tmpEnvironmentParentPathFE, tmpEnvironmentPath);
+      fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+        encoding: 'utf8',
+        spaces: 2
+      })
     } else if (project.type === 'isomorphic-lib' || project.type === 'server-lib') {
-      fse.copyFileSync(tmpEnvironmentParentPathBE, tmpEnvironmentPath);
+      fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+        encoding: 'utf8',
+        spaces: 2
+      })
     }
     console.log(`REGERNATEED FILE FOR ${project.name}`)
   }
