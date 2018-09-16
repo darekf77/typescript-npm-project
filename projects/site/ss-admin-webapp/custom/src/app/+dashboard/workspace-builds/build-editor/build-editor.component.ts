@@ -56,9 +56,13 @@ export class BuildEditorComponent implements OnInit {
     const data = await this.buildController.getBy(this.id, this.modelDataConfig).received
 
     log.i('REFRESH MODE current build id ', this.id)
+    if (this.model) {
+      this.model.realtimeEntity.deactivate();
+    }
 
     this.model = data.body.json;
-    log.i('REFRESHED model', this.model)
+    this.model.realtimeEntity.activate()
+    log.i('REFRESHED adn activated model', this.model)
 
 
   }

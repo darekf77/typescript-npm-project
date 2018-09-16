@@ -1,5 +1,5 @@
 
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 // third part
 import { Log, Level } from 'ng2-logger';
 import * as _ from 'lodash';
@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module';
 import DomainsController from 'ss-common-logic/browser/controllers/DomainsController';
+import { Global } from 'morphi/browser';
 
 const log = Log.create('Dashboard', Level.__NOTHING);
 
@@ -26,8 +27,10 @@ export class DashboardComponent implements OnInit {
     public auth: AuthController,
     public buildController: BuildController,
     public domainsController: DomainsController,
+    public ngZone: NgZone,
     private router: Router) {
 
+      Global.vars.ngZone = ngZone;
   }
 
 

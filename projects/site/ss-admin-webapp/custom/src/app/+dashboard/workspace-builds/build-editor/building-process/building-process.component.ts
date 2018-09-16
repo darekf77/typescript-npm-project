@@ -125,30 +125,30 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
 
 
-    let s = new Subject();
+    // let s = new Subject();
 
-    s.asObservable().subscribe((data) => {
-      log.i('new progress', data);
-      _.merge(this.progress, data);
-      this.refreshModel.next()
-    })
+    // s.asObservable().subscribe((data) => {
+    //   log.i('new progress', data);
+    //   _.merge(this.progress, data);
+    //   this.refreshModel.next()
+    // })
 
-    Global.vars.socket.FE.on('newprogress', (data) => {
-      this.ngZone.run(() => {
-        s.next(data);
-      })
+    // Global.vars.socket.FE.on('newprogress', (data) => {
+    //   this.ngZone.run(() => {
+    //     s.next(data);
+    //   })
 
-    })
+    // })
 
-    this.getEndOfbuild().subscribe(data => {
-      log.i('END OF BUILD - DATA FROM SOCKET', data)
-      this.refreshModel.next()
-    })
+    // this.getEndOfbuild().subscribe(data => {
+    //   log.i('END OF BUILD - DATA FROM SOCKET', data)
+    //   this.refreshModel.next()
+    // })
 
-    this.getEndOfClear().subscribe((data) => {
-      log.i('END OF CLEAR - DATA FROM SOCKET', data)
-      this.refreshModel.next()
-    })
+    // this.getEndOfClear().subscribe((data) => {
+    //   log.i('END OF CLEAR - DATA FROM SOCKET', data)
+    //   this.refreshModel.next()
+    // })
 
   }
 
@@ -159,37 +159,37 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   }
 
 
-  getEndOfClear() {
-    let observable = new Observable(observer => {
+  // getEndOfClear() {
+  //   let observable = new Observable(observer => {
 
-      Global.vars.socket.FE.on('clearbuildend', (data) => {
-        this.ngZone.run(() => {
-          observer.next(data);
-        })
-      })
+  //     Global.vars.socket.FE.on('clearbuildend', (data) => {
+  //       this.ngZone.run(() => {
+  //         observer.next(data);
+  //       })
+  //     })
 
-      return () => {
-        log.i('something on disconnect')
-      };
-    })
-    return observable;
-  }
+  //     return () => {
+  //       log.i('something on disconnect')
+  //     };
+  //   })
+  //   return observable;
+  // }
 
-  getEndOfbuild() {
-    let observable = new Observable(observer => {
+  // getEndOfbuild() {
+  //   let observable = new Observable(observer => {
 
-      Global.vars.socket.FE.on('endofbuild', (data) => {
-        this.ngZone.run(() => {
-          observer.next(data);
-        })
-      })
+  //     Global.vars.socket.FE.on('endofbuild', (data) => {
+  //       this.ngZone.run(() => {
+  //         observer.next(data);
+  //       })
+  //     })
 
-      return () => {
-        log.i('something on disconnect')
-      };
-    })
-    return observable;
-  }
+  //     return () => {
+  //       log.i('something on disconnect')
+  //     };
+  //   })
+  //   return observable;
+  // }
 
 
 

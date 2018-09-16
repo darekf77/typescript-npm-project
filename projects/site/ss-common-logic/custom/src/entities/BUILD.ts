@@ -34,7 +34,8 @@ export enum BuildStatus {
 @FormlyForm<BUILD>()
 @DefaultModelWithMapping<BUILD>({
   gitFolder: '/',
-  gitRemote: ''
+  gitRemote: '',
+  friendlyName: 'fiiendly name'
 })
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
@@ -158,6 +159,9 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column({ default: BuildStatus.NONE }) status: BuildStatus;
 
   @Column({ nullable: true, default: '/' }) gitFolder: string;
+
+  @Column({ nullable: true, default: 'friendlyName' }) friendlyName: string;
+
 
 
 }

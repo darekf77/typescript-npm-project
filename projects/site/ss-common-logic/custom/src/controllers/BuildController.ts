@@ -13,7 +13,7 @@ import * as path from 'path';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
-import { EventSubscriber } from 'typeorm';
+import { EventSubscriber, UpdateEvent } from 'typeorm';
 
 
 @ENDPOINT({ realtime: true })
@@ -25,13 +25,11 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     super(
       //#region @backend
       {
-        afterInsert(e) {
-          console.log('after inser', e)
-          console.log('after inser this', this)
+        afterUpdate: (e) => {
+          console.log('after update', e)
         },
-        afterLoad: (e) => {
-          console.log('after load', e)
-          console.log('after load this ', this)
+        afterInsert: (e) => {
+          console.log('after insert!', e)
         }
       }
       //#endregion
