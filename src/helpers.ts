@@ -11,11 +11,12 @@ import { ProjectFrom } from './index';
 import { Project } from './index';
 import * as dateformat from "dateformat";
 import { BuildOptions } from './models';
+import { error, warn } from "./messages";
 //#endregion
 
 import * as _ from 'lodash'
 
-import { error, warn } from "./messages";
+
 
 import { config } from './config';
 
