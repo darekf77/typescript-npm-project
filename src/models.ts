@@ -1,6 +1,6 @@
-//#region @backend
 import * as _ from 'lodash';
-//#endregion
+
+
 import { Project } from "./project/base-project";
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
@@ -132,7 +132,6 @@ export interface EnvConfig {
   proxyRouterMode?: boolean; // tnp generated
   domain?: string;
   dynamicGenIps?: boolean;
-  buildOptions?: BuildOptions;
   ip?: string;
   workspace: {
     workspace: EnvConfigProject;

@@ -48,10 +48,14 @@ export class EnvironmentConfig {
     return !fse.existsSync(f);
   }
 
+  private childOptions: BuildOptions | string;
   public async init(optionsOrArgs?: BuildOptions | string) {
     // console.log('INIT ENV CALLELD !!!,', optionsOrArgs)
     // console.log(`PROJECT: ${this.project.name}  this.project.isWorkspaceChildProjec `, this.project.isWorkspaceChildProject)
     // console.log(`PROJECT: ${this.project.name}  this.isChildProjectWithoutConfig `, this.isChildProjectWithoutConfig)
+    if (this.project.isWorkspaceChildProject) {
+      this.childOptions = optionsOrArgs;
+    }
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
       await this.project.parent.env.init(optionsOrArgs);
       return
@@ -76,7 +80,7 @@ export class EnvironmentConfig {
       optionsOrArgs = this.options.saved as BuildOptions; // change args to saved options
     }
     optionsOrArgs = optionsOrArgs as BuildOptions;
-    config.buildOptions = optionsOrArgs;
+    
     this.options.save(optionsOrArgs)
 
     const { environmentName } = optionsOrArgs;
@@ -139,7 +143,9 @@ export class EnvironmentConfig {
       tmpEnvironmentFileName);
 
     const configPath = path.join(this.project.location, configLocation);
-    return fse.readJsonSync(configPath);
+    const res = fse.readJsonSync(configPath) as EnvConfig;
+
+    return res;
   }
 
 
