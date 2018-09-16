@@ -1,7 +1,7 @@
 //#region @backend
-import { Project } from "./project/base-project";
 import * as _ from 'lodash';
 //#endregion
+import { Project } from "./project/base-project";
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
@@ -34,7 +34,7 @@ export interface ReleaseOptions {
   bumbVersionIn?: string[];
 }
 
-//#region @backend
+
 
 export interface IBuildOptions {
   prod: boolean;
@@ -107,7 +107,7 @@ export interface WatchOptions {
   cwd: string;
   wait?: number;
 }
-//#endregion
+
 
 import { ConnectionOptions } from "typeorm";
 

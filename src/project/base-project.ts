@@ -27,9 +27,12 @@ import { ProxyRouter } from './proxy-router';
 
 import { pullCurrentBranch } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
-
+//#endregion
 
 export abstract class Project {
+
+  
+  //#region @backend
   abstract projectSpecyficFiles(): string[];
   abstract buildSteps(buildOptions?: BuildOptions);
 
@@ -316,7 +319,7 @@ export abstract class Project {
   }
 
   public clear(includeNodeModules = false) {
-    console.log(`Cleaning project: ${this.name}`);
+    console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
@@ -455,10 +458,11 @@ export abstract class Project {
         }
       }
     }
+    //#endregion
   }
 
 
-
+//#region @backend
 
   // TODO solve problem with ngc watch mode high cpu
   // get ownNpmPackage() {
