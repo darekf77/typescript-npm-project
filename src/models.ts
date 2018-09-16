@@ -60,7 +60,7 @@ export class BuildOptions {
   }
 
 }
-//#endregion
+
 
 export interface RunOptions {
 
@@ -82,11 +82,12 @@ export interface RunOptions {
 }
 
 
+
 export interface WatchOptions {
   cwd: string;
   wait?: number;
 }
-
+//#endregion
 
 import { ConnectionOptions } from "typeorm";
 

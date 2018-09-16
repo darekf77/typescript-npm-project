@@ -1,28 +1,29 @@
+//#region @backend
 import chalk from 'chalk';
 export function error(details: any, noExit = false, noTrace = false) {
     if (typeof details === 'object') {
         try {
             const json = JSON.stringify(details)
-            if(noTrace) {
+            if (noTrace) {
                 console.log(chalk.red(json));
             } else {
                 console.trace(chalk.red(json));
             }
-            
+
         } catch (error) {
-            if(noTrace) {   
+            if (noTrace) {
                 console.log(details);
             } else {
                 console.trace(details);
-            }            
+            }
         }
     } else {
-        if(noTrace) {
+        if (noTrace) {
             console.log(chalk.red(details));
         } else {
             console.trace(chalk.red(details));
         }
-        
+
     }
 
     if (!noExit) {
@@ -37,3 +38,4 @@ export function info(details: string) {
 export function warn(details: string) {
     console.log(chalk.yellow(details))
 }
+//#endregion
