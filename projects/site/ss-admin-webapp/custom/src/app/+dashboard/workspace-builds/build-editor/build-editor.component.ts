@@ -59,6 +59,7 @@ export class BuildEditorComponent implements OnInit {
     this.model = data.body.json;
     this.model.realtimeEntity.subscribe(
       (d) => {
+        log.i('indece from realtime',Object.getPrototypeOf(d).constructor.name )
         this.model = d;
       }
     )

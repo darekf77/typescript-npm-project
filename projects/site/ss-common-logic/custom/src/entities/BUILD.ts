@@ -133,7 +133,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   id: number;
 
   fromRaw(obj: BUILD): BUILD {
-    throw new Error("Method not implemented.");
+    return _.merge(new BUILD(), obj);
   }
 
   get name() {
