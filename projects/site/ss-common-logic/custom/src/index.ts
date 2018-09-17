@@ -7,7 +7,8 @@ import {
 import * as controllers from './controllers';
 import * as entites from './entities';
 
-import { start } from "morphi";
+import { start, RemoveEvent, UpdateEvent, InsertEvent, EntitySubscriberInterface, EventSubscriber } from "morphi";
+import { BUILD } from "./entities/BUILD";
 
 const tControllers = BaselienController;
 const tEntities = BaselineEntites;
@@ -37,6 +38,20 @@ export const Controllers = tControllers;
 export const Entities = tEntities;
 
 
+@EventSubscriber()
+export class EverythingSubscriber implements EntitySubscriberInterface<BUILD> {
+
+  listenTo() {
+    return BUILD;
+  }
+
+  afterUpdate(event: UpdateEvent<any>) {
+    console.log(`AFTER ENTITY UPDATED: `, event.entity);
+  }
+
+
+}
+
 export default function () {
   start({
     publicFilesFolder: '/assets',
@@ -48,7 +63,8 @@ export default function () {
     hostSocket: `http://localhost:${project.port}`,
     Controllers: Controllers as any,
     Entities: Entities as any,
-    InitDataPriority: InitDataPriority as any
+    InitDataPriority: InitDataPriority as any,
+    subscribers: [EverythingSubscriber]
   });
 }
 

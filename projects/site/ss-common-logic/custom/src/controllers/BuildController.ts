@@ -16,7 +16,7 @@ import * as controllers from '../controllers';
 import { EventSubscriber, UpdateEvent } from 'typeorm';
 
 
-@ENDPOINT({ realtime: true })
+@ENDPOINT()
 @CLASSNAME('BuildController')
 @EventSubscriber()
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
