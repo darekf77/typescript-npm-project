@@ -1,5 +1,5 @@
 
-import { Component, OnInit, HostListener, NgZone } from '@angular/core';
+import { Component, OnInit, HostListener, NgZone, ApplicationRef } from '@angular/core';
 // third part
 import { Log, Level } from 'ng2-logger';
 import * as _ from 'lodash';
@@ -27,10 +27,12 @@ export class DashboardComponent implements OnInit {
     public auth: AuthController,
     public buildController: BuildController,
     public domainsController: DomainsController,
+    public ref: ApplicationRef,
     public ngZone: NgZone,
     private router: Router) {
 
-      Global.vars.ngZone = ngZone;
+    Global.vars.ngZone = ngZone;
+    Global.vars.ApplicationRef = ref;
   }
 
 

@@ -159,38 +159,5 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   }
 
 
-  // getEndOfClear() {
-  //   let observable = new Observable(observer => {
-
-  //     Global.vars.socket.FE.on('clearbuildend', (data) => {
-  //       this.ngZone.run(() => {
-  //         observer.next(data);
-  //       })
-  //     })
-
-  //     return () => {
-  //       log.i('something on disconnect')
-  //     };
-  //   })
-  //   return observable;
-  // }
-
-  // getEndOfbuild() {
-  //   let observable = new Observable(observer => {
-
-  //     Global.vars.socket.FE.on('endofbuild', (data) => {
-  //       this.ngZone.run(() => {
-  //         observer.next(data);
-  //       })
-  //     })
-
-  //     return () => {
-  //       log.i('something on disconnect')
-  //     };
-  //   })
-  //   return observable;
-  // }
-
-
 
 }

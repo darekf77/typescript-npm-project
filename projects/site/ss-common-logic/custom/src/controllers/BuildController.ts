@@ -25,12 +25,12 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     super(
       //#region @backend
       {
-        afterUpdate: (e) => {
-          console.log('after update', e)
-        },
-        afterInsert: (e) => {
-          console.log('after insert!', e)
-        }
+        // afterUpdate: (e) => {
+        //   console.log('after update', e)
+        // },
+        // afterInsert: (e) => {
+        //   // console.log('after insert!', e)
+        // }
       }
       //#endregion
     )

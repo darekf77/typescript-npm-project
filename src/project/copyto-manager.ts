@@ -11,7 +11,7 @@ import { watch } from 'chokidar'
 import config from "../config";
 import { Project } from './base-project';
 import { FileEvent, BuildOptions } from '../models';
-import { info } from '../messages';
+import { info, warn } from '../messages';
 
 export class CopyToManager {
 
@@ -71,32 +71,41 @@ export class CopyToManager {
           this.buildOptions.outDir, specificFile));
 
         this.buildOptions.copyto.forEach(p => {
+          if (p && p.location) {
+            if (this.project.isTnp) {
+              p.tnpHelper.install();
+              return;
+            }
 
-          if (this.project.isTnp) {
-            p.tnpHelper.install();
-            return;
+            const projectOudFileDest = path.normalize(path.join(p.location,
+              config.folder.node_modules,
+              this.project.name,
+              specificFile));
+            // console.log(`Copy file: ${monitoredSpecificFile} to ${projectOudFileDest} `)
+            fse.copySync(monitoredSpecificFile, projectOudFileDest);
+          } else {
+            warn(`Invalid project: ${p}`)
           }
 
-          const projectOudFileDest = path.normalize(path.join(p.location,
-            config.folder.node_modules,
-            this.project.name,
-            specificFile));
-          // console.log(`Copy file: ${monitoredSpecificFile} to ${projectOudFileDest} `)
-          fse.copySync(monitoredSpecificFile, projectOudFileDest);
         })
 
       } else {
         this.buildOptions.copyto.forEach(p => {
 
-          if (this.project.isTnp) {
-            p.tnpHelper.install();
-            return;
+          if (p && p.location) {
+            if (this.project.isTnp) {
+              p.tnpHelper.install();
+              return;
+            }
+
+            const projectOudDirDest = path.join(p.location,
+              config.folder.node_modules,
+              this.project.name);
+            fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
+          } else {
+            warn(`Invalid project: ${p}`)
           }
 
-          const projectOudDirDest = path.join(p.location,
-            config.folder.node_modules,
-            this.project.name);
-          fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
         })
       }
     }

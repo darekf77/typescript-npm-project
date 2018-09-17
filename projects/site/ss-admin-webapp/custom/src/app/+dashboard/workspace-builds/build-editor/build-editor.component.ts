@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, NgZone } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 // other
@@ -28,6 +28,7 @@ export class BuildEditorComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private matDialog: MatDialog,
+    private ngZone: NgZone,
 
     public buildController: BuildController
   ) {
@@ -55,14 +56,13 @@ export class BuildEditorComponent implements OnInit {
 
     const data = await this.buildController.getBy(this.id, this.modelDataConfig).received
 
-    log.i('REFRESH MODE current build id ', this.id)
-    if (this.model) {
-      this.model.realtimeEntity.deactivate();
-    }
-
     this.model = data.body.json;
-    this.model.realtimeEntity.activate()
-    log.i('REFRESHED adn activated model', this.model)
+    this.model.realtimeEntity.subscribe(
+      (d) => {
+        this.model = d;
+      }
+    )
+    log.i('REFRESHE and ACTIVATE for sockets model', this.model)
 
 
   }

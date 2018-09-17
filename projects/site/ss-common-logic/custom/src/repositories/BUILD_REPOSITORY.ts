@@ -1,4 +1,4 @@
-import { EntityRepository, Global, META } from "morphi";
+import { EntityRepository, META } from "morphi";
 import { BUILD } from "../entities";
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
@@ -37,7 +37,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       build.pidClearProces = null;
       await this.update(id, build)
       console.log('CLERR COMPLETE  all ? ', all)
-      Global.vars.socket.BE.emit('clearbuildend', build);
+      // Global.vars.socket.BE.emit('clearbuildend', build);
     })
     await this.update(id, build)
   }
@@ -95,7 +95,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
               let b = await self.getById(id);
               b.progress = progress;
               await self.update(id, b)
-              Global.vars.socket.BE.emit('newprogress', progress);
+              // Global.vars.socket.BE.emit('newprogress', progress);
             })
             fse.appendFileSync(build.localPath.buildLog, chunk)
           },
@@ -106,7 +106,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             build = await self.getById(id);
             build.pidBuildProces = null;
             await self.update(id, build)
-            Global.vars.socket.BE.emit('endofbuild', build);
+            // Global.vars.socket.BE.emit('endofbuild', build);
             console.log('END ACTION BUILDING')
           }
         })

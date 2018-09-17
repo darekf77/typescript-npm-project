@@ -38,20 +38,6 @@ export const Controllers = tControllers;
 export const Entities = tEntities;
 
 
-@EventSubscriber()
-export class EverythingSubscriber implements EntitySubscriberInterface<BUILD> {
-
-  listenTo() {
-    return BUILD;
-  }
-
-  afterUpdate(event: UpdateEvent<any>) {
-    console.log(`AFTER ENTITY UPDATED: `, event.entity);
-  }
-
-
-}
-
 export default function () {
   start({
     publicFilesFolder: '/assets',
@@ -64,7 +50,7 @@ export default function () {
     Controllers: Controllers as any,
     Entities: Entities as any,
     InitDataPriority: InitDataPriority as any,
-    subscribers: [EverythingSubscriber]
+    subscribers: []
   });
 }
 

@@ -51,13 +51,15 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
       // console.log('path', argPath)
       const project = nearestProjectTo(argPath);
       if (!project) {
-        error(`Path doesn't contain tnp type project: ${argPath}`)
+        error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
+      } else {
+        const projectName = Project.Current.isTnp ? config.file.tnpBundle : Project.Current.name;
+        const what = path.normalize(`${project.location}/node_module/${projectName}`)
+        info(`After each build finish ${what} will be update.`)
+        return project;
       }
-      const projectName = Project.Current.isTnp ? config.file.tnpBundle : Project.Current.name;
-      const what = path.normalize(`${project.location}/node_module/${projectName}`)
-      info(`After each build finish ${what} will be update.`)
-      return project;
-    });
+
+    }).filter(p => !!p)
   }
   let environmentName: EnvironmentName = 'local';
   if (argsObj.environmentName || argsObj.envName) {
