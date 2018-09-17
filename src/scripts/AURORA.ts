@@ -332,7 +332,7 @@ class ProjectAurora {
   }
 
   start() {
-    // this.run(`tnp killonport 9000`).sync()
+    this.run(`tnp killonport 9000`).sync()
     this.run(`npm run start`).sync()
   }
 
