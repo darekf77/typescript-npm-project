@@ -220,8 +220,8 @@ export abstract class Project {
       this.packageJson = PackageJSON.from(location);
       this.node_modules = new NodeModules(this);
       this.type = this.packageJson.type;
+      this.recreate = new FilesRecreator(this);
       if (!this.isStandaloneProject) {
-        this.recreate = new FilesRecreator(this);
         this.join = new BaselineSiteJoin(this);
       }
 
