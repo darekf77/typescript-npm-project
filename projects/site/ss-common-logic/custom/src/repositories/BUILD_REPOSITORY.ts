@@ -1,9 +1,10 @@
+//#region @backend
 import { EntityRepository, META } from "morphi";
-import { BUILD } from "../entities";
+import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
-import { ProgressBarData } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR";
+import { PROGRESS_BAR_DATA } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR_DATA";
 
 export interface BUILD_ALIASES {
   builds: string;
@@ -14,7 +15,7 @@ export interface BUILD_ALIASES {
 export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES> {
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
 
-  //#region @backend
+
   async getById(id: number) {
     const build = await this.findOne(id);
     if (!build) {
@@ -91,7 +92,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
         self.attachListeners(p, {
           msgAction: (chunk) => {
-            ProgressBarData.resolveFrom(chunk, async (progress) => {
+            PROGRESS_BAR_DATA.resolveFrom(chunk, async (progress) => {
               let b = await self.getById(id);
               b.progress = progress;
               await self.update(id, b)
@@ -184,5 +185,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       }
     }
   }
-  //#endregion
+
 }
+
+//#endregion

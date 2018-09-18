@@ -4,11 +4,11 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs/Subscription';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-// import { ProgressBarData } from 'ss-common-ui/module';
+
 import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger/browser';
-import { ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
+import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
 const log = Log.create('log progress')
 
 @Component({
@@ -19,10 +19,10 @@ const log = Log.create('log progress')
 export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   @Input() type: 'build' | 'serve';
-  @Output() progress = new EventEmitter<ProgressBarData>();
+  @Output() progress = new EventEmitter<PROGRESS_BAR_DATA>();
   @ViewChild('dialogTmpl') dialogTmpl: TemplateRef<any>;
   isRealtime = false;
-  currentProgress: ProgressBarData;
+  currentProgress: PROGRESS_BAR_DATA;
   constructor(
     public buildController: BuildController,
     private matDialog: MatDialog
@@ -70,15 +70,6 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
       }
     })
 
-    // try {
-    //   const p = JSON.parse(progress);
-    //   const res = _.merge(new ProgressBarData(), p);
-    //   this.progress.emit(res);
-    //   this.currentProgress = res
-    //   log.i('new progress', res)
-    // } catch (error) {
-    //   log.er('error trying to parse json from progress')
-    // }
   }
 
   async getLastNlinesOfLog(n: number) {

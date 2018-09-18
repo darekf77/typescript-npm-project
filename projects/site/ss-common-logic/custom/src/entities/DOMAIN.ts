@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess } from 'tnp-bundle';
+
 //#endregion
 
 export enum DOMAIN_ENVIRONMENT {
@@ -52,24 +53,5 @@ export class DOMAIN extends META.BASE_ENTITY<DOMAIN> {
 
   @Column({ default: DOMAIN_ENVIRONMENT.PROD }) environment: DOMAIN_ENVIRONMENT;
 
-
-}
-
-export interface BUILD_ALIASES {
-  domain: string;
-  domains: string;
-}
-
-@EntityRepository(DOMAIN)
-export class DOMAIN_REPOSITORY extends META.BASE_REPOSITORY<DOMAIN, BUILD_ALIASES> {
-  globalAliases: (keyof BUILD_ALIASES)[] = ['domain', 'domains']
-
-  async getById(id: number) {
-    const domain = await this.findOne(id);
-    if (!domain) {
-      throw `Cannot find domain with id ${id} `
-    }
-    return domain;
-  }
 
 }

@@ -5,6 +5,7 @@ import { run } from '../process';
 
 export function init(project = Project.Current) {
   project.recreate.init();
+
   if (project.isSite) {
     project.baseline.recreate.init()
     project.join.init()

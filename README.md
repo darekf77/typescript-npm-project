@@ -12,6 +12,11 @@ Helper project for my typescript npm libraries.
  - "assets" relative from html,css ,  "/assets" from scss
 - in site, if you are decorating entities REMEMBER to overrirde EntityRepository
 - if you are changing environment setting you have to start build (or watch:build) again
+- watch for circural typescript dependencies !
+- typescipt weird path issue exist stil  :
+import { DIALOG } from '../entities'; // ERROR 
+import { DIALOG } from '../entities/DIALOG'; // OK
+// entites is folder and file at the same time, maybe that ?
 
 ## Create, build, publish:
 - isomorphic typescript library

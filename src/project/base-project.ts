@@ -34,6 +34,9 @@ export abstract class Project {
 
   //#region @backend
   abstract projectSpecyficFiles(): string[];
+  public projectSpecyficIgnoredFiles() {
+    return [];
+  }
   abstract buildSteps(buildOptions?: BuildOptions);
 
   routerTargetHttp() {
@@ -170,7 +173,7 @@ export abstract class Project {
   }
 
   get isTnp() {
-    return this.location === Project.Tnp.location;
+    return this.name === 'tnp';
   }
 
   get isWorkspaceChildProject() {
@@ -226,12 +229,6 @@ export abstract class Project {
       }
 
       Project.projects.push(this);
-
-      if (this.isWorkspaceChildProject) {
-        this.parent.tnpHelper.install()
-      } else if (this.isWorkspace) {
-        this.tnpHelper.install()
-      }
 
       // this.requiredLibs = this.packageJson.requiredProjects;
 
@@ -294,6 +291,12 @@ export abstract class Project {
 
     this.buildOptions = buildOptions;
 
+    if (this.isWorkspaceChildProject) {
+      this.parent.tnpHelper.install()
+    } else if (this.isWorkspace) {
+      this.tnpHelper.install()
+    }
+
     // console.log(`Prepare environment for: ${this.name}`)
     if (!this.isStandaloneProject) {
       await this.env.init(buildOptions);
@@ -334,7 +337,7 @@ export abstract class Project {
         if (f === config.folder.node_modules) {
           return includeNodeModules;
         }
-        if (f === config.folder.bundle && this.isTnp) {
+        if (f.startsWith(config.folder.bundle) && this.isTnp) {
           return false;
         }
         return true;
@@ -342,7 +345,7 @@ export abstract class Project {
       .join(' ')
     // console.log(`rimraf ${gitginoredfiles}`)
     this.run(`rimraf ${gitginoredfiles}`).sync();
-    if (this.type === 'workspace' && Array.isArray(this.children) && this.children.length > 0) {
+    if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
       this.children.forEach(childProject => {
         childProject.clear(includeNodeModules)
       })
@@ -353,9 +356,17 @@ export abstract class Project {
     // console.log('by libraryType ' + libraryType)
     let projectPath;
     if (libraryType === 'workspace') {
-      return ProjectFrom(path.join(__dirname, `../../projects/workspace`));
+      let p = ProjectFrom(path.join(__dirname, `../../projects/workspace`));
+      if (!p) {
+        p = ProjectFrom(path.join(__dirname, `../projects/workspace`));
+      }
+      return p;
     }
     projectPath = path.join(__dirname, `../../projects/workspace/${libraryType}`);
+    if (fse.existsSync(projectPath)) {
+      return ProjectFrom(projectPath);
+    }
+    projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
     if (!fs.existsSync(projectPath)) {
       error(`Bad library type: ${libraryType}`, true)
       return undefined;
@@ -434,7 +445,10 @@ export abstract class Project {
       } // TODO QUCIK FIX for tnp installd in node_modules
     }
 
-    const pathTnpCompiledJS = path.join(Project.Tnp.location, 'dist');
+    let pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.dist);
+    if (!fse.existsSync(pathTnpCompiledJS)) {
+      pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.bundle);
+    }
     const pathTnpPackageJSONData: IPackageJSON = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
 
     pathTnpPackageJSONData.name = config.file.tnpBundle;
@@ -520,6 +534,10 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
 const notNeededReinstallationTnp = {};
 
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
+  if (project.isTnp) {
+    return
+  }
+
   if (notNeededReinstallationTnp[project.location]) {
     return;
   }
@@ -542,13 +560,17 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs, {
       filter: (src: string, dest: string) => {
-        return !src.endsWith('/dist/bin');
+        return !src.endsWith('/dist/bin') &&
+          !src.endsWith('/bin') &&
+          !/.*node_modules.*/g.test(src);
       }
     });
     fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
       encoding: 'utf8',
       spaces: 2
     })
+    let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
+    console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
 
     notNeededReinstallationTnp[project.location] = true;
     // console.log(`Tnp-helper installed in ${project.name} `)

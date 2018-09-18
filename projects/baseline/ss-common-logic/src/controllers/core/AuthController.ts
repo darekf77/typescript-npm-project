@@ -17,13 +17,15 @@ import * as graph from 'fbgraph';
 import * as path from 'path';
 //#endregion
 
+import * as entities from '../../entities';
+import * as controllers from '../../controllers';
+
 import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
 export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
-
 import { Observable, Subscribable } from "rxjs/Observable";
 
-export { Observable } from "rxjs";
+export { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 export { Subject } from "rxjs/Subject";
 
@@ -32,9 +34,9 @@ const log = Log.create('AuthController', Level.__NOTHING);
 
 import { META } from 'morphi';
 
-import * as entities from '../../entities';
-import * as controllers from '../../controllers';
+
 import { SESSION } from "../../entities/core/SESSION";
+import { EMAIL_TYPE_NAME } from '../../entities/core/EMAIL_TYPE';
 
 
 
@@ -83,9 +85,10 @@ export interface IFacebook {
 @CLASSNAME('AuthController')
 export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
+  @BaseCRUDEntity(entities.SESSION) entity: entities.SESSION;
+
   //#region @backend
   @OrmConnection connection: Connection;
-  @BaseCRUDEntity(entities.SESSION) entity: entities.SESSION;
 
   get db() {
     return entities.entities(this.connection as any);
@@ -469,7 +472,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  public async __createUser(formData: entities.IUSER, EmailTypeName: entities.EMAIL_TYPE_NAME, withActiveSession = false) {
+  public async __createUser(formData: entities.IUSER, EmailTypeName: EMAIL_TYPE_NAME, withActiveSession = false) {
     //#region @backendFunc
 
     let EmailType = await this.db.EMAIL_TYPE.getBy(EmailTypeName);

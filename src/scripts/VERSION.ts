@@ -5,11 +5,15 @@ import { clear } from "./CLEAR";
 import { Project } from "../project/base-project";
 
 function version() {
-    console.log(Project.Tnp.version);
-    process.exit(0)
+  console.log(Project.Tnp.version);
+  process.exit(0)
 }
 
 export default {
-    VERSION: ()=> version()
+  VERSION: () => version(),
+  PATH: () => {
+    console.log(Project.Tnp.location);
+    process.exit(0)
+  }
 }
 //#endregion

@@ -1,17 +1,16 @@
-import { ENDPOINT, OrmConnection, Connection, BaseCRUDEntity, GET, PathParam, Response, CLASSNAME, isBrowser } from 'morphi';
-//#region @backend
-import { authenticate } from 'passport';
-import * as fs from 'fs';
-import * as path from 'path';
-//#endregion
-// local
-import { META } from 'morphi';
+import {
+  ENDPOINT, OrmConnection, Connection, BaseCRUDEntity,
+  GET, META, Response, CLASSNAME, isBrowser
+} from 'morphi';
+import { Log, Level } from "ng2-logger";
+const log = Log.create('ExamplesController')
+
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
-import { Log, Level } from "ng2-logger";
-const log = Log.create('ExamplesController')
+
+
 
 @ENDPOINT()
 @CLASSNAME('ExamplesController')

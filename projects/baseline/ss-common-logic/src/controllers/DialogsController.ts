@@ -1,24 +1,21 @@
 import {
   ENDPOINT, OrmConnection, Connection,
   BaseCRUDEntity,
-  GET, SYMBOL,
-  PathParam,
-  Response, CLASSNAME
+  META,
+  CLASSNAME
 } from 'morphi';
+
 //#region @backend
 import { authenticate } from 'passport';
-import * as fs from 'fs';
-import * as path from 'path';
 //#endregion
-// local
-import { META } from 'morphi';
+
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
 
 @ENDPOINT({
-  auth: (method) => {
+  auth: () => {
     //#region @backendFunc
     return authenticate('bearer', { session: false });
     //#endregion

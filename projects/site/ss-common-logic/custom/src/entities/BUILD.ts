@@ -10,8 +10,11 @@ import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import { DOMAIN_ENVIRONMENT } from './DOMAIN';
+
 //#endregion
-import { ProgressBarData, IProgressBarData } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR';
+import {
+  PROGRESS_BAR_DATA
+} from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR_DATA';
 
 
 
@@ -145,7 +148,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return _.first(this.gitRemote.match(/([a-z-])+\.git/g)).replace('.git', '');
   }
 
-  @Column('simple-json', { nullable: true }) progress: ProgressBarData;
+  @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
 
   @Column({ nullable: true }) port: string;
   @Column() gitRemote: string;

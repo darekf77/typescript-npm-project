@@ -11,6 +11,8 @@ import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 import { EnumValues } from 'enum-values';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
 
+
+
 export enum DialogType {
   MAN,
   WOMAN,
@@ -90,18 +92,3 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
 
 }
 
-export interface DIALOG_ALIASES {
-  //#region @backend
-  dialog: string;
-  dialogs: string;
-  //#endregion
-}
-
-@EntityRepository(DIALOG)
-export class DIALOG_REPOSITORY extends META.BASE_REPOSITORY<DIALOG, DIALOG_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof DIALOG_ALIASES)[] = ['dialog', 'dialogs'];
-  //#endregion
-
-}

@@ -1,14 +1,12 @@
-
-
 import { Entity, EntityRepository, OneToOne, OneToMany, ManyToOne } from 'typeorm';
 import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
-
-// thirdpart
 import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
-// local
 import { META } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
+
+
+
 
 export interface IEXAMPLE {
   id?: number;
@@ -93,21 +91,4 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
   @Column('boolean') isAmazing;
 
   @Column() otherData: string = 'asdasdasd';
-}
-
-export interface EXAMPLE_ALIASES {
-  //#region @backend
-  example: string;
-  examples: string;
-  //#endregion
-}
-
-
-@EntityRepository(EXAMPLE)
-export class EXAMPLE_REPOSITORY extends META.BASE_REPOSITORY<EXAMPLE, EXAMPLE_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof EXAMPLE_ALIASES)[] = ['example', 'examples'];
-  //#endregion
-
 }

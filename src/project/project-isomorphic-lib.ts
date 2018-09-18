@@ -8,6 +8,8 @@ import { ClassHelper, getWebpackEnv } from "../helpers";
 // third part
 import { IsomoprhicBuild } from "morphi";
 import { BaseProjectLib } from "./base-project-lib";
+import { HelpersLinks } from '../helpers-links';
+import { config } from '../config';
 
 
 
@@ -26,6 +28,13 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       "tsconfig.json",
       "tsconfig.browser.json"
     ]);
+  }
+
+  projectSpecyficIgnoredFiles() {
+    return [
+      "src/entities.ts",
+      "src/controllers.ts"
+    ]
   }
 
 
@@ -73,17 +82,36 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       }
     }
   }
+  private linkWhenExist(source: string, outLInk: string) {
+    const basename = source;
+    source = path.join(this.location, source);
+    outLInk = path.join(this.location, outLInk, basename);
+    if (fse.existsSync(outLInk)) {
+      fse.unlinkSync(outLInk);
+    }
+    if (fse.existsSync(source)) {
+      HelpersLinks.createLink(outLInk, source)
+    }
+  }
 
   buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
-    const isParentIsWorksapce = (this.parent && this.parent.type === 'workspace')
-    const isomorphicNames = this.getIsomorphcLibNames(isParentIsWorksapce)
-    const webpackParams = BuildOptions.stringify(prod, watch, outDir, isomorphicNames);
+    const isomorphicNames = this.getIsomorphcLibNames(this.isWorkspaceChildProject)
 
-    this.copyWhenExist('bin', outDir, true) // TODO make this for each library
+    if (!this.isTnp) {
+      this.copyWhenExist('bin', outDir, true) // TODO make this for each library
+    }
     this.copyWhenExist('package.json', outDir, true)
     this.copyWhenExist('.npmrc', outDir, true)
     this.copyWhenExist('.npmignore', outDir, true)
     this.copyWhenExist('.gitignore', outDir, true)
+    if (outDir === 'bundle') {
+      this.linkWhenExist(config.folder.node_modules, outDir);
+      if (this.isTnp) {
+        this.linkWhenExist('projects', outDir);
+        this.linkWhenExist('tests', outDir);
+        this.linkWhenExist('autobuild.json', outDir);
+      }
+    }
 
     new IsomoprhicBuild({
       watch,

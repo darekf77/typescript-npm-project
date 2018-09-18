@@ -1,6 +1,6 @@
 
 import { ENDPOINT, CLASSNAME, BaseCRUDEntity, META } from 'morphi';
-import { DOMAIN } from '../entities';
+import { DOMAIN } from '../entities/DOMAIN';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';

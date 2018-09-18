@@ -1,33 +1,19 @@
 import { META } from 'morphi';
-//#region typeorm imports
-import { Connection } from "typeorm/connection/Connection";
-import { Repository } from "typeorm/repository/Repository";
-import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
-import { AfterUpdate } from "typeorm/decorator/listeners/AfterUpdate";
-import { BeforeUpdate } from "typeorm/decorator/listeners/BeforeUpdate";
 import { OneToMany } from "typeorm/decorator/relations/OneToMany";
-import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
-import { JoinTable } from "typeorm/decorator/relations/JoinTable";
 import { Column } from "typeorm/decorator/columns/Column";
-import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
-import { EntityRepository } from 'typeorm/decorator/EntityRepository';
 import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
-import { getCustomRepository } from 'typeorm';
-//#endregion
+import { CLASSNAME, isNode, DefaultModelWithMapping } from 'morphi';
+import { CATEGORY } from '../CATEGORY';
+import { GROUP } from '../GROUP';
+import { DIALOG } from '../DIALOG';
 
 //#region @backend
 import * as path from "path";
 import * as fse from "fs-extra";
-import * as fs from "fs";
+
 //#endregion
-import { EnumValues } from 'enum-values';
-import { kebabCase } from "lodash";
-import { CLASSNAME, isNode, isBrowser, DefaultModelWithMapping } from 'morphi';
-import { CATEGORY } from '../CATEGORY';
-import { GROUP } from '../GROUP';
-import { DIALOG } from '../DIALOG';
 
 export type MultimediaType = 'picture' | 'audio' | 'video';
 
@@ -62,20 +48,20 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
   type: MultimediaType;
 
 
-  @OneToMany(type => CATEGORY, cat => cat.picture, {
+  @OneToMany(() => CATEGORY, cat => cat.picture, {
     cascade: false
   })
   catetories: CATEGORY[];
 
 
-  @OneToMany(type => GROUP, group => group.picture, {
+  @OneToMany(() => GROUP, group => group.picture, {
     cascade: false
   })
   groups: GROUP[];
 
 
 
-  @OneToMany(type => DIALOG, dialog => dialog.id, {
+  @OneToMany(() => DIALOG, dialog => dialog.id, {
     cascade: false
   })
   dialogs: DIALOG[];
@@ -126,22 +112,4 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
 
 }
 
-export interface MULTIMEDIA_ALIASES {
-  //#region @backend
-  picture: string;
-  audio: string;
-  video: string;
-  //#endregion
-}
-
-
-@EntityRepository(MULTIMEDIA)
-export class MULTIMEDIA_REPOSITORY extends META.BASE_REPOSITORY<MULTIMEDIA, MULTIMEDIA_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof MULTIMEDIA_ALIASES)[] = ['audio', 'video', 'picture']
-  //#endregion
-
-
-}
 

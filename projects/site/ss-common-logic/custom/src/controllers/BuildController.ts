@@ -10,15 +10,11 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 //#endregion
 
-
 import * as entities from '../entities';
 import * as controllers from '../controllers';
-import { EventSubscriber, UpdateEvent } from 'typeorm';
-
 
 @ENDPOINT()
 @CLASSNAME('BuildController')
-@EventSubscriber()
 export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   constructor() {

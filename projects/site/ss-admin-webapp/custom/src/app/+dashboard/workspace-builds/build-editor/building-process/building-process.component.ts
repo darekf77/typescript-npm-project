@@ -11,7 +11,7 @@ import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 import { MatDialog } from '@angular/material';
 import { LogPrcessComponent } from '../log-prcess/log-prcess.component';
-import { ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
+import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { ProviderData } from '@angular/core/src/view';
@@ -95,7 +95,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   isShowingBuildLogs = false;
 
   @Input() model: BUILD;
-  progress = new ProgressBarData();
+  progress = new PROGRESS_BAR_DATA();
 
   get info() {
     if (this.progress) {
@@ -155,7 +155,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
-    this.progress = _.merge(new ProgressBarData(), this.model && this.model.progress)
+    this.progress = _.merge(new PROGRESS_BAR_DATA(), this.model && this.model.progress)
   }
 
 

@@ -2,12 +2,12 @@ import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGenerat
 import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
 import { Entity, JoinTable, OneToMany, EntityRepository, JoinColumn, ManyToOne } from 'typeorm';
-// local
 import { META } from 'morphi';
 import { kebabCase } from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
+
 
 export interface ICATEGORY {
   name: string;
@@ -71,18 +71,3 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
 
 }
 
-export interface CATEGORY_ALIASES {
-  //#region @backend
-  categories: string;
-  category: string;
-  //#endregion
-}
-
-@EntityRepository(CATEGORY)
-export class CATEGORY_REPOSITORY extends META.BASE_REPOSITORY<CATEGORY, CATEGORY_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof CATEGORY_ALIASES)[] = ['category', 'categories']
-  //#endregion
-
-}

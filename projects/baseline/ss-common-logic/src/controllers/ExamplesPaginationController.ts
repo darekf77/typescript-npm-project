@@ -1,29 +1,19 @@
 import {
   ENDPOINT, OrmConnection, Connection, BaseCRUDEntity,
-  GET, PathParam, Response, CLASSNAME, isBrowser
+  GET, PathParam, Response, CLASSNAME, isBrowser, META
 } from 'morphi';
 import * as _ from 'lodash';
-//#region @backend
-import { authenticate } from 'passport';
-import * as fs from 'fs';
-import * as path from 'path';
-//#endregion
-// local
-import { META } from 'morphi';
+import { Log, Level } from "ng2-logger";
+const log = Log.create('ExamplesController')
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
-import { Log, Level } from "ng2-logger";
-const log = Log.create('ExamplesController')
+
 
 @ENDPOINT()
 @CLASSNAME('ExamplesPaginationController')
 export class ExamplesPaginationController extends META.BASE_CONTROLLER<entities.EXAMPLE_PAGINATION> {
-
-  constructor() {
-    super();
-  }
 
   @BaseCRUDEntity(entities.EXAMPLE_PAGINATION) public entity: entities.EXAMPLE_PAGINATION;
 

@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('formly progressbar')
 
-import { ProgressBarStatus, ProgressBarType, ProgressBarData } from 'ss-common-logic/browser/entities/PROGRESS_BAR';
+import { ProgressBarStatus, ProgressBarType, PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
 
 @Component({
   selector: 'app-formly-progressbar',
@@ -41,7 +41,7 @@ import { ProgressBarStatus, ProgressBarType, ProgressBarData } from 'ss-common-l
 export class FormlyProgressbardComponent extends FieldType implements OnInit, AfterViewInit {
   // constructor() { }
 
-  get progressBarData(): ProgressBarData {
+  get progressBarData(): PROGRESS_BAR_DATA {
     return this.field.formControl.value;
   }
 

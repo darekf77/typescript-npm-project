@@ -1,35 +1,19 @@
-//#region typeorm imports
-import { Connection } from "typeorm/connection/Connection";
-import { Repository } from "typeorm/repository/Repository";
-import { AfterInsert } from "typeorm/decorator/listeners/AfterInsert";
-import { AfterUpdate } from "typeorm/decorator/listeners/AfterUpdate";
-import { BeforeUpdate } from "typeorm/decorator/listeners/BeforeUpdate";
-import { BeforeInsert } from "typeorm/decorator/listeners/BeforeInsert";
-import { OneToMany } from "typeorm/decorator/relations/OneToMany";
+
 import { OneToOne } from "typeorm/decorator/relations/OneToOne";
-import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
-import { JoinTable } from "typeorm/decorator/relations/JoinTable";
 import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
 import { Column } from "typeorm/decorator/columns/Column";
 import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
-import { PrimaryColumn } from "typeorm/decorator/columns/PrimaryColumn";
 import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
 import { Entity } from "typeorm/decorator/entity/Entity";
-import { EntityRepository } from 'typeorm';
-//#endregion
-
-//#region @backend
-import { verify, generate } from "password-hash";
-//#endregion
-
-
-import { Log, Level } from "ng2-logger";
 import { Resource } from "ng2-rest";
-const log = Log.create(__filename);
-
 import { USER } from './USER';
 import { META } from 'morphi';
 import { CLASSNAME } from 'morphi';
+
+//#region @backend
+import { generate } from "password-hash";
+
+//#endregion
 
 
 export const SESSION_CONFIG = {
@@ -64,11 +48,17 @@ export class LocalStorage {
   }
 }
 
+
+export interface ISESSION {
+
+}
+
+
 //#region @backend
 @Entity(META.tableNameFrom(SESSION))
 //#endregion
 @CLASSNAME('SESSION')
-export class SESSION extends META.BASE_ENTITY<SESSION> {
+export class SESSION extends META.BASE_ENTITY<SESSION> implements ISESSION {
 
   fromRaw(obj: Object): SESSION {
     throw new Error("Method not implemented.");
@@ -105,7 +95,7 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
   expiredDate: Date = undefined
 
 
-  @OneToOne(type => USER, user => user.id, {
+  @OneToOne(() => USER, user => user.id, {
     nullable: true
   })
   @JoinColumn()
@@ -145,83 +135,4 @@ export class SESSION extends META.BASE_ENTITY<SESSION> {
 
 }
 
-export interface SESSION_ALIASES {
-  //#region @backend
-  sesssion: string;
-  //#endregion
-}
-
-
-@EntityRepository(SESSION)
-export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof SESSION_ALIASES)[] = ['sesssion'];
-  //#endregion
-
-  CONFIG = SESSION_CONFIG;
-
-  async getByUser(user: USER, ip: string) {
-    //#region @backendFunc
-    // TODO QUICK_FIX localhost
-    if (ip === '::ffff:127.0.0.1') {
-      ip = '::1'
-    }
-
-    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
-      .where(`${META.tableNameFrom(SESSION)}.user = :id`)
-      .andWhere(`${META.tableNameFrom(SESSION)}.ip = :ip`)
-      .setParameters({
-        id: user.id,
-        ip
-      })
-      .getOne()
-    if (Session) {
-      Session.expireInSeconds = Session.calculateExpirationTime();
-    }
-    return Session;
-    //#endregion
-  }
-
-  async getByToken(token: string) {
-    //#region @backendFunc
-    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
-      .where(`${META.tableNameFrom(SESSION)}.token = :token`)
-      .setParameter('token', token)
-      .getOne();
-    if (Session) {
-      Session.expireInSeconds = Session.calculateExpirationTime();
-    }
-    return Session;
-    //#endregion
-  }
-
-  async getFrom(user: USER, ip: string) {
-    //#region @backendFunc
-
-    let Session = this.create();
-    Session.user = user;
-    Session.ip = ip;
-
-    if (!ENV.workspace.build.server.production && user.username == 'postman') {
-      Session.createToken('postman');
-    } else if (user.username == 'admin') {
-      Session.createToken('admin');
-    } else {
-      Session.createToken();
-    }
-
-
-    Session = await this.save(Session);
-    if (Session) {
-      Session.expireInSeconds = Session.calculateExpirationTime();
-    }
-    return Session;
-    //#endregion
-  }
-
-
-}
 

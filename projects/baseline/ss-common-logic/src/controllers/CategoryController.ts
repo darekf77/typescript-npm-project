@@ -1,21 +1,21 @@
 import {
   ENDPOINT, OrmConnection, Connection,
   BaseCRUDEntity,
-  GET, SYMBOL,
+  GET, META,
   PathParam,
   Response, CLASSNAME, POST, BodyParam
 } from 'morphi';
+
+
 //#region @backend
 import { authenticate } from 'passport';
 import * as fs from 'fs';
 import * as path from 'path';
 //#endregion
-// local
-import { META } from 'morphi';
+
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
-import { CATEGORY } from '../entities/CATEGORY';
 
 
 @ENDPOINT({

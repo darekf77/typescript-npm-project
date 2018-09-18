@@ -8,6 +8,7 @@ import {
 } from 'morphi';
 
 
+
 export interface IEXAMPLE_PAGINATION {
   id?: number;
   name: string;
@@ -51,22 +52,5 @@ export class EXAMPLE_PAGINATION
   @Column() price: number = 23
 
   @Column('boolean') isAmazing: boolean;
-
-}
-
-export interface EXAMPLE_PAGINATION_ALIASES {
-  //#region @backend
-  example: string;
-  examples: string;
-  //#endregion
-}
-
-@EntityRepository(EXAMPLE_PAGINATION)
-export class EXAMPLE_PAGINATION_REPOSITORY
-  extends META.BASE_REPOSITORY<EXAMPLE_PAGINATION, EXAMPLE_PAGINATION_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof EXAMPLE_PAGINATION_ALIASES)[] = ['example', 'examples'];
-  //#endregion
 
 }

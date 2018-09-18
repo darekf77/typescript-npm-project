@@ -3,12 +3,12 @@ import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGenerat
 import { Column } from 'typeorm/decorator/columns/Column';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
 import { CATEGORY } from './CATEGORY';
-import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, OneToMany, EntityRepository, ManyToMany, JoinTable } from 'typeorm';
-import { CategoryController } from '../controllers';
+import { Entity, OneToMany } from 'typeorm';
 import { DIALOG, IDIALOG } from './DIALOG';
 import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
+
+
 
 export interface IGROUP {
   id?: number;
@@ -54,37 +54,20 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
   amazing: string = ' asdmasdas'
 
 
-  @ManyToOne(type => CATEGORY, cat => cat.id, {
+  @ManyToOne(() => CATEGORY, cat => cat.id, {
     cascade: false
   })
   category: CATEGORY;
 
 
-  @OneToMany(type => DIALOG, dial => dial.group, {
+  @OneToMany(() => DIALOG, dial => dial.group, {
     cascade: false
   })
   dialogs: DIALOG[];
 
-  @ManyToOne(type => MULTIMEDIA, m => m.id, {
+  @ManyToOne(() => MULTIMEDIA, m => m.id, {
     cascade: false
   })
   picture?: MULTIMEDIA;
-
-}
-
-export interface GROUP_ALIASES {
-  //#region @backend
-  groups: string;
-  group: string;
-  //#endregion
-}
-
-
-@EntityRepository(GROUP)
-export class GROUP_REPOSITORY extends META.BASE_REPOSITORY<GROUP, GROUP_ALIASES> {
-
-  //#region @backend
-  globalAliases: (keyof GROUP_ALIASES)[] = ['group', 'groups'];
-  //#endregion
 
 }

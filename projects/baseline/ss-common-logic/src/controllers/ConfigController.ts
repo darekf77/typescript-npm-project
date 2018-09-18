@@ -1,23 +1,22 @@
 import {
   ENDPOINT, OrmConnection, Connection,
-  BaseCRUDEntity,
-  GET, SYMBOL,
-  PathParam,
-  Response, CLASSNAME, isBrowser, getSingleton
+  BaseCRUDEntity, META,
+  CLASSNAME, isBrowser
 } from 'morphi';
+import { Log } from 'ng2-logger';
+
+const log = Log.create('CondigController')
+
 //#region @backend
 import { authenticate } from 'passport';
-import * as fs from 'fs';
-import * as path from 'path';
 //#endregion
-// local
-import { META } from 'morphi';
 
-import { Log, Logger } from 'ng2-logger';
-const log = Log.create('CondigController')
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
+
+
+
 
 export type APP_LANGUAGE = 'pl' | 'en' | 'fr';
 
@@ -33,7 +32,7 @@ const APP_CONFIG: ConfigValues = Object.freeze<ConfigValues>({
 })
 
 @ENDPOINT({
-  auth: (method) => {
+  auth: () => {
     //#region @backendFunc
     return authenticate('bearer', { session: false });
     //#endregion
@@ -83,7 +82,7 @@ export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
 
   private static cachedValues: ConfigValues = {} as any;
   public get instance() {
-    return new Promise<ConfigValues>(async (resolve, reject) => {
+    return new Promise<ConfigValues>(async (resolve) => {
       // if (Object.keys(ConfigController.cachedValues).length > 0) {
       //   return ConfigController.cachedValues;
       // } else {

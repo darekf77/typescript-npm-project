@@ -22,12 +22,17 @@ import * as path from 'path';
 import { UploadedFile } from "express-fileupload";
 import { getRecrusiveFilesFrom } from 'morphi';
 //#endregion
+
+
+import * as entities from '../../entities';
+import * as controllers from '../../controllers';
+
+
 import * as _ from 'lodash';
 
 import { META } from 'morphi';
 
-import * as entities from '../../entities';
-import * as controllers from '../../controllers';
+
 import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 
 
@@ -40,6 +45,8 @@ import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 })
 @CLASSNAME('MultimediaController')
 export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
+
+  @BaseCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
 
   constructor() {
     super()
@@ -74,7 +81,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
   //#region @backend
   @OrmConnection connection: Connection;
-  @BaseCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
+
 
   get db() {
     return entities.entities(this.connection as any);

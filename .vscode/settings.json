@@ -1,34 +1,47 @@
-// Place your settings in this file to overwrite default and user settings.
 {
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "projects": false
-        // "node_modules": true,
-        // "index.*": true,
-        // "dist": true,
-        // "bin": true,
-        // ".gitignore": true,
-        // ".npmignore": true,
-        // ".npmrc": true,
-        // "tsconfig.json": true
-    },
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "**/projects": true,
-        "projects": true
-    },
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#5c3735"
-    },
-    "editor.rulers": [
-        100,
-        120
-    ],
-    "html.format.wrapAttributes": "force-aligned",
-    "workbench.colorTheme": "Default Light+"
+  "files.exclude": {
+    "/node_modules": true,
+    "/tmp*": true,
+    "/dist*": true,
+    "/bundle*": true,
+    "/browser": true,
+    "/backup": true,
+    "/module": true,
+    "/www": true,
+    "/Thumbs.db": true,
+    "/.DS_Store": true,
+    "/**/.DS_Store": true,
+    "/npm-debug.log*": true,
+    "/.sass-cache": true,
+    "/.sourcemaps": true,
+    "/tslint.json": true,
+    "/.editorconfig": true,
+    "/index.js": true,
+    "/index.d.ts": true,
+    "/index.js.map": true,
+    "/.vscode/launch.json": true,
+    "/run.js": true,
+    "/src/typings.d.ts": true,
+    "/tsconfig.json": true,
+    "/tsconfig.browser.json": true,
+    ".gitignore": true,
+    ".npmignore": true,
+    ".npmrc": true,
+    ".babelrc": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/projects": true,
+    "projects": true
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#5c3735"
+  },
+  "editor.rulers": [
+    100,
+    120
+  ],
+  "html.format.wrapAttributes": "force-aligned",
+  "workbench.colorTheme": "Default Light+"
 }

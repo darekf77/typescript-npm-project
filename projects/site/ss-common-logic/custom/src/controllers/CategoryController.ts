@@ -8,10 +8,11 @@ import { ENDPOINT, CLASSNAME } from 'morphi';
 @CLASSNAME('CategoryController')
 export class CategoryController extends BaselineCategoryController {
 
-
+  //#region @backend
   async initExampleDbData() {
     // console.log('Don not init this! OK ')
   }
+  //#endregion
 
 }
 
