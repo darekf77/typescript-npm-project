@@ -41,7 +41,7 @@
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "morphi": "1.0.54",
+    "morphi": "1.0.55",
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "omelette": "^0.4.5",

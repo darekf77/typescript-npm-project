@@ -110,7 +110,7 @@ export class FilesRecreator {
         ).concat( // core files of projects types
           self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
         ).concat(self.assetsToIgnore)
-          .concat(self.project.projectSpecyficIgnoredFiles())
+          .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)
@@ -385,7 +385,7 @@ export class FilesRecreator {
         ${controllersFiles
         .map(f => this.controllersArray(cwd, f))
         .join(',\n')}
-      ]${isSite ? '.concat(BaselineControllers as any)':''} as any;
+      ]${isSite ? '.concat(BaselineControllers as any)' : ''} as any;
 
       //#${'region'} @backend
 
