@@ -62,7 +62,7 @@ const helpAlias = [
 
 
 
-export async function run(argsv: string[]) {
+export async function start(argsv: string[]) {
 
   let recognized = false;
   if (Array.isArray(argsv) && argsv.length >= 3) {

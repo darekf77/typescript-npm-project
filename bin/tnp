@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 //#region @backend
 var fs = require('fs')
-if (fs.existsSync('../dist/run.js')) {
-    var run = require('../dist/run.js').run;
+var path = require('path')
+var pathToDistRun = path.join(__dirname, '../dist/start.js');
+var pathToBundletRun = path.join(__dirname, '../start.js');
+
+if (fs.existsSync(pathToDistRun)) {
+  var run = require(pathToDistRun.replace(/\.js$/g, '')).run;
 } else {
-    var run = require('../run.js').run;
-}a
+  var run = require(pathToBundletRun.replace(/\.js$/g, '')).run;
+}
 run(process.argv);
 //#endregion

@@ -185,7 +185,7 @@ export abstract class Project {
    * Standalone projects link: npm libs
    */
   get isStandaloneProject() {
-    return !this.isWorkspaceChildProject && this.type !== 'workspace';
+    return !this.isWorkspaceChildProject && !this.isWorkspace;
   }
 
   /**
@@ -219,15 +219,17 @@ export abstract class Project {
 
       this.packageJson = PackageJSON.from(location);
       this.node_modules = new NodeModules(this);
-      this.recreate = new FilesRecreator(this);
-      this.join = new BaselineSiteJoin(this);
       this.type = this.packageJson.type;
+      if (!this.isStandaloneProject) {
+        this.recreate = new FilesRecreator(this);
+        this.join = new BaselineSiteJoin(this);
+      }
 
       Project.projects.push(this);
 
       if (this.isWorkspaceChildProject) {
         this.parent.tnpHelper.install()
-      } else {
+      } else if (this.isWorkspace) {
         this.tnpHelper.install()
       }
 
@@ -236,8 +238,10 @@ export abstract class Project {
 
       this.__defaultPort = Project.defaultPortByType(this.type);
       // console.log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
-      this.env = new EnvironmentConfig(this);
-      this.proxyRouter = new ProxyRouter(this);
+      if (!this.isStandaloneProject) {
+        this.env = new EnvironmentConfig(this);
+        this.proxyRouter = new ProxyRouter(this);
+      }
       this.copytToManager = new CopyToManager(this);
 
     } else {
@@ -530,7 +534,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       rimraf.sync(destCompiledJs)
     }
     fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs, {
-      filter: (src: string, dest: string) => {        
+      filter: (src: string, dest: string) => {
         return !src.endsWith('/dist/bin');
       }
     });

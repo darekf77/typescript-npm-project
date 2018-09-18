@@ -1,5 +1,5 @@
 //#region @backend
-import { run } from "./run";
+import { start } from "./start";
 // import * as express from "express";
 
 // const app = express()
@@ -11,6 +11,6 @@ import { run } from "./run";
 //     console.log('Port busy')
 // })
 
-run(["--build-watch"])
+start(["--build-watch"])
 
 //#endregion
