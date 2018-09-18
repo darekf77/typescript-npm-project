@@ -327,11 +327,15 @@ export abstract class Project {
 
   public clear(includeNodeModules = false) {
     console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
+
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
         if (f === config.folder.node_modules) {
           return includeNodeModules;
+        }
+        if (f === config.folder.bundle && this.isTnp) {
+          return false;
         }
         return true;
       }) // link/unlink takes care of node_modules
