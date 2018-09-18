@@ -295,13 +295,16 @@ export abstract class Project {
     this.buildOptions = buildOptions;
 
     // console.log(`Prepare environment for: ${this.name}`)
-    await this.env.init(buildOptions);
+    if (!this.isStandaloneProject) {
+      await this.env.init(buildOptions);
+    }
+
 
     let baseHref: string;
     // console.log('AM HERE')
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
-    } else if (this.parent && this.parent.type === 'workspace') {
+    } else if (this.isWorkspaceChildProject) {
       baseHref = this.env.config &&
         this.env.config.workspace.projects.find(p => {
           return p.name === this.name
