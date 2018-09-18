@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 //#region @backend
-var run = require('../dist/run.js').run;
+var fs = require('fs')
+if (fs.existsSync('../dist/run.js')) {
+    var run = require('../dist/run.js').run;
+} else {
+    var run = require('../run.js').run;
+}a
 run(process.argv);
 //#endregion
