@@ -6,9 +6,9 @@ var pathToDistRun = path.join(__dirname, '../dist/start.js');
 var pathToBundletRun = path.join(__dirname, '../start.js');
 
 if (fs.existsSync(pathToDistRun)) {
-  var run = require(pathToDistRun.replace(/\.js$/g, '')).run;
+  var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 } else {
-  var run = require(pathToBundletRun.replace(/\.js$/g, '')).run;
+  var start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
 }
-run(process.argv);
+start(process.argv);
 //#endregion
