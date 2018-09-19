@@ -15,9 +15,7 @@ import { info, warn } from '../messages';
 
 export class CopyToManager {
 
-  constructor(private project: Project) {
-
-  }
+  constructor(private project: Project) { }
 
   private buildOptions: BuildOptions;
 
@@ -72,17 +70,14 @@ export class CopyToManager {
 
         this.buildOptions.copyto.forEach(p => {
           if (p && p.location) {
-            if (this.project.isTnp) {
-              p.tnpHelper.install();
-              return;
-            }
 
             const projectOudFileDest = path.normalize(path.join(p.location,
               config.folder.node_modules,
-              this.project.name,
+              this.project.isTnp ? config.file.tnpBundle : this.project.name,
               specificFile));
-            // console.log(`Copy file: ${monitoredSpecificFile} to ${projectOudFileDest} `)
+            // console.log(`Copy file !: ${monitoredSpecificFile} to ${projectOudFileDest} `)
             fse.copySync(monitoredSpecificFile, projectOudFileDest);
+
           } else {
             warn(`Invalid project: ${p}`)
           }
@@ -94,14 +89,14 @@ export class CopyToManager {
 
           if (p && p.location) {
             if (this.project.isTnp) {
-              p.tnpHelper.install();
-              return;
+              p.tnpHelper.install(true);
+            } else {
+              const projectOudDirDest = path.join(p.location,
+                config.folder.node_modules,
+                this.project.isTnp ? config.file.tnpBundle : this.project.name
+              );
+              fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
             }
-
-            const projectOudDirDest = path.join(p.location,
-              config.folder.node_modules,
-              this.project.name);
-            fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
           } else {
             warn(`Invalid project: ${p}`)
           }
@@ -114,9 +109,10 @@ export class CopyToManager {
   private watchOutDir() {
     const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
 
+    // console.log('watching   folder for as copy source !! ', monitorDir)
+
     if (fs.existsSync(monitorDir)) {
       watch(monitorDir, {
-        atomic: true,
         followSymlinks: false
       }).on('change', (f) => {
         if (_.isString(f)) {

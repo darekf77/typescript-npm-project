@@ -4,7 +4,7 @@ import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
-import { PROGRESS_BAR_DATA } from "baseline/ss-common-logic/src/entities/PROGRESS_BAR_DATA";
+import { PROGRESS_BAR_DATA } from "tnp-bundle";
 
 export interface BUILD_ALIASES {
   builds: string;
@@ -94,14 +94,22 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           msgAction: (chunk) => {
             PROGRESS_BAR_DATA.resolveFrom(chunk, async (progress) => {
               let b = await self.getById(id);
-              b.progress = progress;
+              b.progress = progress as any;
               await self.update(id, b)
+              console.log('progress updated', progress)
               // Global.vars.socket.BE.emit('newprogress', progress);
             })
             fse.appendFileSync(build.localPath.buildLog, chunk)
           },
-          errorAction: (chunk) => {
+          errorAction: async (chunk) => {
             fse.appendFileSync(build.localPath.buildErrorLog, chunk)
+            let b = await self.getById(id);
+            let p = new PROGRESS_BAR_DATA();
+            p.info = 'Build error';
+            p.status = 'error';
+            p.value = b.progress && b.progress.value;
+            b.progress = p as any;
+            await self.update(id, b)
           },
           endAction: async () => {
             build = await self.getById(id);

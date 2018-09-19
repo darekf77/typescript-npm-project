@@ -23,8 +23,10 @@ DOMAIN
 
 
 import {   BUILD_REPOSITORY } from './repositories/BUILD_REPOSITORY';
+export {   BUILD_REPOSITORY } from './repositories/BUILD_REPOSITORY';
 
 import {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
+export {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";

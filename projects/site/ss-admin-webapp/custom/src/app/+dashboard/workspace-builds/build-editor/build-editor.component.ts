@@ -5,6 +5,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('build-editor')
+
 import { ModelDataConfig } from 'morphi/browser';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
@@ -54,13 +55,13 @@ export class BuildEditorComponent implements OnInit {
   private async refreshModel() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
 
-    const data = await this.buildController.getBy(this.id, this.modelDataConfig).received
-
+    const data = await this.buildController.getBy(this.id).received
     this.model = data.body.json;
+
     this.model.realtimeEntity.subscribe(
       (d) => {
-        log.i('indece from realtime',Object.getPrototypeOf(d).constructor.name )
-        this.model = d;
+        log.i('BUILD UPDATE FROM SOCKET', d)
+        _.merge(this.model, d)
       }
     )
     log.i('REFRESHE and ACTIVATE for sockets model', this.model)

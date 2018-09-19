@@ -38,8 +38,10 @@ export enum BuildStatus {
 @DefaultModelWithMapping<BUILD>({
   gitFolder: '/',
   gitRemote: '',
-  friendlyName: 'fiiendly name'
-})
+  friendlyName: 'fiiendly name',
+}, {
+    progress: PROGRESS_BAR_DATA
+  })
 @CLASSNAME('BUILD')
 export class BUILD extends META.BASE_ENTITY<BUILD> {
 

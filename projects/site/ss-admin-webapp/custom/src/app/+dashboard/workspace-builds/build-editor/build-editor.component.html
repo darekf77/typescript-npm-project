@@ -1,6 +1,6 @@
 <mat-card>
   <app-form-wrapper-material *ngIf="id"
-                             [(model)]="model"
+                             [model]="model"
                              [fields]="fields"
                              [crud]="buildController"
                              [exclude]="['id']"
@@ -10,14 +10,13 @@
 </mat-card>
 <br>
 
+{{model | json}}
 <mat-card>
   <mat-card-subtitle>Build</mat-card-subtitle>
-  <app-building-process [model]="model"
-                        (refreshModel)="refreshModel()"></app-building-process>
+  <app-building-process [model]="model"></app-building-process>
 </mat-card>
 <br>
 <mat-card>
   <mat-card-subtitle>Serve</mat-card-subtitle>
-  <app-serving-process [model]="model"
-                       (refreshModel)="refreshModel()"></app-serving-process>
+  <app-serving-process [model]="model"></app-serving-process>
 </mat-card>

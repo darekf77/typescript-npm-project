@@ -26,7 +26,6 @@ export class ServingProcessComponent implements OnInit {
         icon: 'play_arrow',
         action: async () => {
           await this.buildController.startServeById(this.model.id).received
-          this.refreshModel.emit()
           log.i('serve process started!')
         }
       },
@@ -39,7 +38,6 @@ export class ServingProcessComponent implements OnInit {
         icon: 'stop',
         action: async () => {
           await this.buildController.stopServeById(this.model.id).received
-          this.refreshModel.emit()
           log.i('serve process stopped!')
         }
       },
@@ -75,7 +73,6 @@ export class ServingProcessComponent implements OnInit {
   isShowingServeLogs = false;
 
   @Input() model: BUILD;
-  @Output() refreshModel = new EventEmitter();
 
   constructor(
     public buildController: BuildController

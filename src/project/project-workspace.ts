@@ -6,6 +6,7 @@ import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info } from '../messages';
+import { PROGRESS_BAR_DATA } from '../progress-output';
 
 
 export class ProjectWorkspace extends Project {
@@ -29,7 +30,7 @@ export class ProjectWorkspace extends Project {
   }
 
   buildSteps(buildOptions?: BuildOptions) {
-
+    PROGRESS_BAR_DATA.log({ info: 'Process started', status: 'inprogress', value: 0 })
     const { environmentName, prod, watch, outDir, args } = buildOptions;
 
     const projects = {
@@ -88,7 +89,8 @@ export class ProjectWorkspace extends Project {
       return !!this.env.config.workspace.projects.find(wp => wp.name === p.name)
     });
 
-    console.log(`[[[${JSON.stringify({ value: 0, info: `Process started`, status: 'inprogress' })}]]]`)
+
+    PROGRESS_BAR_DATA.log({ value: 0, info: `Process started`, status: 'inprogress' })
 
     console.log('Projects to build:')
     projectsInOrder.forEach((project, i) => {
@@ -120,19 +122,19 @@ export class ProjectWorkspace extends Project {
 
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
-      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })}]]]`)
+      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })
       project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear ${args}`).sync()
-      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' })}]]]`)
+      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' });
     })
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
-      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' })}]]]`)
+      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' });
       project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''} --environmentName ${environmentName} --noConsoleClear  ${args}`).sync()
-      console.log(`[[[${JSON.stringify({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' })}]]]`)
+      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' });
     })
 
-    console.log(`[[[${JSON.stringify({ value: 100, info: `Process Complete`, status: 'complete' })}]]]`)
+    PROGRESS_BAR_DATA.log({ value: 100, info: `Process Complete`, status: 'complete' });
 
   }
 }

@@ -33,8 +33,8 @@
       "builds": [
         {
           "cwd": "/Users/darekf/projects/npm/tsc-npm-project",
-          "command": "tnp build:dist --onlyWatchNoBuild true ",
-          "commandWatch": "tnp build:dist:watch --onlyWatchNoBuild true",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/site",
@@ -102,8 +102,8 @@
       "builds": [
         {
           "cwd": "/home/dariusz/projects/npm/tsc-npm-project",
-          "command": "tnp build:dist --onlyWatchNoBuild true ",
-          "commandWatch": "tnp build:dist:watch --onlyWatchNoBuild true",
+          "command": "tnp build:dist",
+          "commandWatch": "tnp build:dist:watch",
           "args": [
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",

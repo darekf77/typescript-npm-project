@@ -37,7 +37,6 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
         // label: 'Start',
         action: async () => {
           await this.buildController.startBuildById(this.model.id).received
-          this.refreshModel.next()
           log.i('build process started!')
         }
       },
@@ -49,8 +48,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       templateOptions: {
         icon: 'stop',
         action: async () => {
-          await this.buildController.stopBuildById(this.model.id).received
-          this.refreshModel.next()
+          await this.buildController.stopBuildById(this.model.id).received          
           log.i('build process stopped!')
         }
       },
@@ -73,10 +71,8 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
         icon: 'refresh',
         action: async () => {
           this.buildController.clearById(this.model.id).received.observable.subscribe(async () => {
-            this.refreshModel.emit()
             log.i('CLEAR COMPLETE')
           })
-          this.refreshModel.emit()
         }
       },
       expressionProperties: {
@@ -95,7 +91,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   isShowingBuildLogs = false;
 
   @Input() model: BUILD;
-  progress = new PROGRESS_BAR_DATA();
+  get progress() {
+    return (this.model && this.model.progress);
+  }
 
   get info() {
     if (this.progress) {
@@ -112,7 +110,6 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
     `
   }
 
-  @Output() refreshModel = new EventEmitter();
 
   constructor(
     public buildController: BuildController,
@@ -155,7 +152,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
-    this.progress = _.merge(new PROGRESS_BAR_DATA(), this.model && this.model.progress)
+    // this.progress = _.merge(new PROGRESS_BAR_DATA(), this.model && this.model.progress)
   }
 
 

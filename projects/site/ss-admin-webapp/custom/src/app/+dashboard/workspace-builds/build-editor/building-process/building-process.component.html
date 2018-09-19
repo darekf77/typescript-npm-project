@@ -7,10 +7,11 @@
   <span> Build progress: </span>
   <span [innerHTML]="info"></span>
 </h6>
-<mat-progress-bar mode="determinate"
+<mat-progress-bar *ngIf="progress"
+                  mode="determinate"
                   value="{{ progress.value }}"> </mat-progress-bar>
 
-<app-log-prcess *ngIf="isShowingBuildLogs"
+<!-- <app-log-prcess *ngIf="isShowingBuildLogs"
                 [type]="'build'"
                 (hide)="isShowingBuildLogs = false"
-                [build]="model"></app-log-prcess>
+                [build]="model"></app-log-prcess> -->
