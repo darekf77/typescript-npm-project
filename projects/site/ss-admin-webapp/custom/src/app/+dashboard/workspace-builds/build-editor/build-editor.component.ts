@@ -22,7 +22,9 @@ import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 })
 export class BuildEditorComponent implements OnInit {
 
-  modelDataConfig = new ModelDataConfig()
+  modelDataConfig = new ModelDataConfig({
+    joins: ['project', 'project.children']
+  })
   id: number;
 
 
@@ -56,7 +58,7 @@ export class BuildEditorComponent implements OnInit {
   private async refreshModel() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
 
-    const data = await this.buildController.getBy(this.id).received
+    const data = await this.buildController.getBy(this.id, this.modelDataConfig).received
     this.model = data.body.json;
 
     this.model.realtimeEntity.subscribe(
@@ -74,20 +76,22 @@ export class BuildEditorComponent implements OnInit {
 
   async ngOnInit() {
     await this.refreshModel()
-    await this.getProject()
+    await this.getEnv()
+    await this.getEnvNames()
   }
 
   complete() {
 
   }
 
-  project: TNP_PROJECT;
-  async getProject() {
-
-    const data = await this.buildController.getProjectBy(this.model.id).received
-    log.i('project', data.body.json)
-    this.project = data.body.json;
+  async getEnv() {
+    const data = await this.buildController.getEnvironment(this.model.id).received;
+    log.i('environment', data.body.json)
   }
 
+  async getEnvNames() {
+    const data = await this.buildController.getEnvironmentNames(this.model.id).received;
+    log.i('environment names', data.body.json)
+  }
 
 }

@@ -1,3 +1,4 @@
+export * from './config';
 export * from './helpers';
 export * from './helpers-environment';
 export * from './models';

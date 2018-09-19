@@ -93,7 +93,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
   @Input() model: BUILD;
 
-  @Input() project: TNP_PROJECT;
+  get project(): TNP_PROJECT {
+    return this.model && this.model.project;
+  }
 
   get progress() {
     return (this.model && this.model.progress);

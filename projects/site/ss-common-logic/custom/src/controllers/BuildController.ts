@@ -1,11 +1,11 @@
 import {
   ENDPOINT, CLASSNAME, BaseCRUDEntity, META,
-  POST, PathParam, QueryParam, GET, Response, PUT
+  POST, PathParam, QueryParam, GET, Response, PUT, ModelDataConfig
 } from 'morphi';
 import { BUILD } from '../entities/BUILD';
-
+import * as _ from 'lodash';
+import {  EnvironmentName } from 'tnp-bundle'
 //#region @backend
-import { run, HelpersLinks, getLinesFromFiles, ProjectFrom } from 'tnp-bundle'
 import * as fse from 'fs-extra';
 import * as path from 'path';
 //#endregion
@@ -55,6 +55,18 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     }
   }
 
+  private async saveProject(build: BUILD) {
+    if (build.project) {
+      if (build.project.children) {
+        for (let i = 0; i < build.project.children.length; i++) {
+          const child = build.project.children[i];
+          await this.db.TNP_PROJECT.save(child);
+        }
+      }
+      await this.db.TNP_PROJECT.save(build.project);
+    }
+  }
+
   private async createFirstBuildFromCurrentTnpProject() {
 
     const tnpLocation = path.resolve(path.join(__dirname, '../../../../../'));
@@ -67,6 +79,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
     b1.init()
+    await this.saveProject(b1)
+    await this.db.BUILD.update(b1.id, b1);
 
 
     const b2 = await this.db.BUILD.save(this.db.BUILD.create({
@@ -76,6 +90,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     }))
 
     b2.init()
+    await this.saveProject(b2)
+    await this.db.BUILD.update(b2.id, b2);
 
   }
 
@@ -171,19 +187,38 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#endregion
   }
 
-  @GET('/tnp/project/from/:id')
+  @GET('/environment/:id')
 
-  getProjectBy(@PathParam('id') id: number): Response<entities.TNP_PROJECT> {
+  getEnvironment(@PathParam('id') id: number): Response<entities.ENVIRONMENT> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.getById(id);
-      const location = build.localPath.buildFolder;
-      const project = entities.TNP_PROJECT.from(location);
+      const config = new ModelDataConfig({
+        joins: ['project', 'project.children']
+      });
+      const build = await this.db.BUILD.findOne({
+        where: { id },
+        join: config && config.db && config.db.join
+      });
+      const env = entities.ENVIRONMENT.from(build.project);
+      return env;
+    }
+    //#endregion
+  }
 
-      if (!project) {
-        throw `Bo tnp project inside ${location}`
-      }
-      return project;
+
+  @GET('/environment/names/:id')
+  getEnvironmentNames(@PathParam('id') id: number): Response<EnvironmentName[]> {
+    //#region @backendFunc
+    return async () => {
+      const config = new ModelDataConfig({
+        joins: ['project', 'project.children']
+      });
+      const build = await this.db.BUILD.findOne({
+        where: { id },
+        join: config && config.db && config.db.join
+      });
+      const names = entities.ENVIRONMENT.namesFrom(build.project);
+      return names;
     }
     //#endregion
   }

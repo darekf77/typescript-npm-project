@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Entity, Column, PrimaryGeneratedColumn, EntityRepository } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, EntityRepository, OneToOne, JoinColumn } from "typeorm";
 import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global, META } from 'morphi';
 
 //#region @backend
@@ -15,6 +15,7 @@ import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 import {
   PROGRESS_BAR_DATA
 } from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR_DATA';
+import { TNP_PROJECT } from './TNP_PROJECT';
 
 
 
@@ -65,14 +66,15 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   }
 
-
-
   init() {
     if (_.isString(this.staticFolder) && this.staticFolder !== '') {
       this.reinitFrom.folder()
     } else {
       this.reinitFrom.repository()
     }
+    const location = this.localPath.buildFolder;
+    const project = TNP_PROJECT.from(location);
+    this.project = project;
   }
 
   private get reinitFrom() {
@@ -153,6 +155,12 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
 
   @Column({ nullable: true }) port: string;
+
+
+  @OneToOne(type => TNP_PROJECT)
+  @JoinColumn()
+  project: TNP_PROJECT;
+
   @Column() gitRemote: string;
 
   @Column({ nullable: true }) pidBuildProces: number;

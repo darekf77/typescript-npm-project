@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 // local
-import globalConfig, { allowedEnvironments } from '../config';
+import globalConfig, { allowedEnvironments, config } from '../config';
 import { EnvConfig, EnvironmentName, EnvConfigProject } from '../models';
 import { error, warn } from '../messages';
 import { ProjectFrom } from './index';
@@ -14,8 +14,8 @@ import { HelpersLinks } from '../helpers-links';
 import { walkObject } from '../helpers';
 
 
-export const tmpEnvironmentFileName = 'tmp-environment.json';
 
+export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
 export const schema: EnvConfig = {

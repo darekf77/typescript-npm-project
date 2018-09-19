@@ -36,7 +36,9 @@ export const config = {
   },
   file: {
     package_json: 'package.json',
-    tnpBundle: 'tnp-bundle'
+    tnpBundle: 'tnp-bundle',
+    tnpEnvironment_json: 'tmp-environment.json',
+    environment: 'environment'
   },
   allowedTypes: {
     app: [
