@@ -19,9 +19,7 @@ import { copyFile, getMostRecentFilesNames } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
-import { workers } from 'cluster';
-import { init } from '../scripts/INIT';
-import { HelpersLinks } from '../helpers-links';
+
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 
@@ -31,6 +29,13 @@ import { CopyToManager } from './copyto-manager';
 
 export abstract class Project {
 
+  public get name(): string {
+    //#region @backendFunc
+    return this.packageJson.name;
+    //#endregion
+  }
+
+  public readonly location: string;
 
   //#region @backend
   abstract projectSpecyficFiles(): string[];
@@ -129,9 +134,7 @@ export abstract class Project {
     if (type === 'server-lib') return 4050;
   }
 
-  get name(): string {
-    return this.packageJson.name;
-  }
+  
 
   get version() {
     return this.packageJson.version;
@@ -214,7 +217,8 @@ export abstract class Project {
 
 
 
-  constructor(public location: string) {
+  constructor(location: string) {
+    this.location = location;
 
     if (fs.existsSync(location)) {
 

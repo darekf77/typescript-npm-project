@@ -3,19 +3,23 @@ import { Project } from "../project";
 import { run } from '../process';
 
 
-export function init(project = Project.Current) {
+export function init(args, project = Project.Current) {
   project.recreate.init();
 
   if (project.isSite) {
     project.baseline.recreate.init()
-    project.join.init()
+  }
+
+  if (project.isWorkspace) {
+    project.env.init(args)
   }
 
 }
 
 export default {
   $INIT: (args) => {
-    init()
+    init(args)
+
     process.exit(0)
   },
 

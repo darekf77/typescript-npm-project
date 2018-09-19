@@ -40,6 +40,14 @@ export const config = {
     tnpEnvironment_json: 'tmp-environment.json',
     environment: 'environment'
   },
+  names: {
+    env: {
+      prod: 'prod',
+      dev: 'dev',
+      stage: 'stage',
+      local: 'local'
+    }
+  },
   allowedTypes: {
     app: [
       'angular-cli',

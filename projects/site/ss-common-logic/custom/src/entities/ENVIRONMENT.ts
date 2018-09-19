@@ -1,8 +1,6 @@
-import { Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn, Column, TreeChildren, TreeParent, Tree } from "morphi";
-import BUILD from "./BUILD";
+import { Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn } from "morphi";
 import * as _ from 'lodash';
 import {
-  PROGRESS_BAR_DATA, Project, ProjectFrom,
   EnvironmentName, config, EnvConfig, EnvConfigProject, IPackageJSON
 } from "tnp-bundle";
 import { CLASSNAME, FormlyForm } from "morphi";

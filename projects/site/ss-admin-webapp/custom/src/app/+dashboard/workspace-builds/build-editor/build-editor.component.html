@@ -1,9 +1,12 @@
 <mat-card>
+
+
+
   <app-form-wrapper-material *ngIf="id"
                              [model]="model"
                              [fields]="fields"
                              [crud]="buildController"
-                             [exclude]="['id']"
+                             [exclude]="['id','progress']"
                              [modelDataConfig]="modelDataConfig"
                              (complete)="complete()">
   </app-form-wrapper-material>
@@ -11,8 +14,20 @@
 <br>
 
 <mat-card>
-  <mat-card-subtitle>Build</mat-card-subtitle>
-  <app-building-process [model]="model"></app-building-process>
+  <mat-tab-group>
+    <mat-tab label="Build">
+      <br>
+      <app-building-process [model]="model"></app-building-process>
+    </mat-tab>
+    <mat-tab label="Environment">
+      <br>
+      <p *ngIf="environmentConfig">
+          <tree-root [nodes]="nodes" [options]="treeOptions"></tree-root>
+        {{environmentConfig | json}}
+      </p>
+    </mat-tab>
+  </mat-tab-group>
+
 </mat-card>
 <br>
 <mat-card>

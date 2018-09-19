@@ -38,6 +38,7 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
   }
 
   static from(location: string) {
+    //#region @backendFunc
     const proj = ProjectFrom(location)
     const p = this.fromProject(proj);
 
@@ -47,6 +48,7 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
       })
     }
     return p;
+    //#endregion
   }
 
   @PrimaryGeneratedColumn()

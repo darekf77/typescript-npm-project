@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Entity, Column, PrimaryGeneratedColumn, EntityRepository, OneToOne, JoinColumn } from "typeorm";
-import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global, META } from 'morphi';
+import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global, META, environmentName } from 'morphi';
+import { config } from 'tnp-bundle';
 
 //#region @backend
 import * as path from 'path';
@@ -162,6 +163,8 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   project: TNP_PROJECT;
 
   @Column() gitRemote: string;
+
+  @Column({ default: config.names.env.dev }) environmentName: string;
 
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidClearProces: number;

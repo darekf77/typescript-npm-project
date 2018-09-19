@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // material
 import { MatCardModule } from "@angular/material/card";
+import { MatRadioModule } from '@angular/material/radio'
+import { MatTabsModule } from '@angular/material/tabs'
 // thirdpart
 import { FormWrapperMaterialModule, DialogWrapperModule } from 'ss-common-ui/module';
+import { TreeModule } from 'angular-tree-component';
 // local
 import { BuildEditorComponent } from './build-editor.component';
 import { routes } from './build-editor.routes';
@@ -17,7 +20,9 @@ const localModules = [
 ]
 
 const materialModules = [
-  MatCardModule
+  MatCardModule,
+  MatRadioModule,
+  MatTabsModule
 ]
 
 @NgModule({
@@ -26,6 +31,7 @@ const materialModules = [
     RouterModule.forChild(routes),
     FormWrapperMaterialModule,
     DialogWrapperModule,
+    TreeModule.forRoot(),
     ...localModules,
     ...materialModules
   ],
