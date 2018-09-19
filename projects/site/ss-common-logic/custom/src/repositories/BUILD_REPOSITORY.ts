@@ -4,7 +4,8 @@ import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
 import * as child from 'child_process';
-import { PROGRESS_BAR_DATA } from "tnp-bundle";
+import { PROGRESS_BAR_DATA, ProjectFrom } from "tnp-bundle";
+import { TNP_PROJECT } from "../entities/TNP_PROJECT";
 
 export interface BUILD_ALIASES {
   builds: string;
@@ -14,7 +15,6 @@ export interface BUILD_ALIASES {
 @EntityRepository(BUILD)
 export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES> {
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
-
 
   async getById(id: number) {
     const build = await this.findOne(id);

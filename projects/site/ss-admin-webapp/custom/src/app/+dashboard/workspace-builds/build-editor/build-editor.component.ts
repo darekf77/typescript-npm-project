@@ -12,6 +12,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
 
 @Component({
@@ -73,10 +74,20 @@ export class BuildEditorComponent implements OnInit {
 
   async ngOnInit() {
     await this.refreshModel()
+    await this.getProject()
   }
 
   complete() {
 
   }
+
+  project: TNP_PROJECT;
+  async getProject() {
+
+    const data = await this.buildController.getProjectBy(this.model.id).received
+    log.i('project', data.body.json)
+    this.project = data.body.json;
+  }
+
 
 }

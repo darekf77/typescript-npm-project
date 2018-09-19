@@ -33,6 +33,8 @@ import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
 import { CONFIG } from 'ss-common-logic/browser/entities/CONFIG';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { DOMAIN } from 'ss-common-logic/browser/entities/DOMAIN';
+import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -58,7 +60,8 @@ init({
     DomainsController
   ],
   entities: [
-    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY, DIALOG, GROUP, EXAMPLE, CONFIG, BUILD, DOMAIN
+    USER, EMAIL, EMAIL_TYPE, SESSION, CATEGORY,
+    DIALOG, GROUP, EXAMPLE, CONFIG, BUILD, DOMAIN, TNP_PROJECT
   ]
 })
   .angularProviders()

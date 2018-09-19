@@ -15,6 +15,7 @@ import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { ProviderData } from '@angular/core/src/view';
+import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
 @Component({
   selector: 'app-building-process',
@@ -48,7 +49,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       templateOptions: {
         icon: 'stop',
         action: async () => {
-          await this.buildController.stopBuildById(this.model.id).received          
+          await this.buildController.stopBuildById(this.model.id).received
           log.i('build process stopped!')
         }
       },
@@ -91,6 +92,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   isShowingBuildLogs = false;
 
   @Input() model: BUILD;
+
+  @Input() project: TNP_PROJECT;
+
   get progress() {
     return (this.model && this.model.progress);
   }

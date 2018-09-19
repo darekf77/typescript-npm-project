@@ -5,7 +5,7 @@ import {
 import { BUILD } from '../entities/BUILD';
 
 //#region @backend
-import { run, HelpersLinks, getLinesFromFiles } from 'tnp-bundle'
+import { run, HelpersLinks, getLinesFromFiles, ProjectFrom } from 'tnp-bundle'
 import * as fse from 'fs-extra';
 import * as path from 'path';
 //#endregion
@@ -167,6 +167,23 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#region @backendFunc
     return async () => {
       await this.db.BUILD.stop.serveingById(id);
+    }
+    //#endregion
+  }
+
+  @GET('/tnp/project/from/:id')
+
+  getProjectBy(@PathParam('id') id: number): Response<entities.TNP_PROJECT> {
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.getById(id);
+      const location = build.localPath.buildFolder;
+      const project = entities.TNP_PROJECT.from(location);
+
+      if (!project) {
+        throw `Bo tnp project inside ${location}`
+      }
+      return project;
     }
     //#endregion
   }

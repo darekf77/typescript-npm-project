@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { META, CLASSNAME } from 'morphi';
 import * as _ from 'lodash';
-console.log('updated lodash')
 
 export type ProgressBarStatus = 'notstarted' | 'inprogress' | 'complete' | 'error';
 

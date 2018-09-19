@@ -10,10 +10,10 @@
 </mat-card>
 <br>
 
-{{model | json}}
 <mat-card>
   <mat-card-subtitle>Build</mat-card-subtitle>
-  <app-building-process [model]="model"></app-building-process>
+  <app-building-process [model]="model"
+                        [project]="project"></app-building-process>
 </mat-card>
 <br>
 <mat-card>

@@ -14,9 +14,13 @@ export { BUILD, IBUILD } from './entities/BUILD';
 import { DOMAIN, IDOMAIN } from './entities/DOMAIN';
 export { DOMAIN, IDOMAIN } from './entities/DOMAIN';
 
+import { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
+export { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
+
 export const Entities:META.BASE_ENTITY<any>[] = [
 BUILD,
-DOMAIN
+DOMAIN,
+TNP_PROJECT
 ].concat(BaselineEntities as any) as any;
 
 //#region @backend
@@ -27,6 +31,7 @@ export {   BUILD_REPOSITORY } from './repositories/BUILD_REPOSITORY';
 
 import {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 export {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
+
 
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";
@@ -40,6 +45,8 @@ return _.merge(baslineEntites.entities(connection),{
 BUILD: META.repositoryFrom<BUILD , BUILD_REPOSITORY>(connection, BUILD , BUILD_REPOSITORY),
 
 DOMAIN: META.repositoryFrom<DOMAIN , DOMAIN_REPOSITORY>(connection, DOMAIN , DOMAIN_REPOSITORY),
+
+TNP_PROJECT: META.repositoryFrom<TNP_PROJECT>(connection, TNP_PROJECT),
 }  );
 }
 //#endregion

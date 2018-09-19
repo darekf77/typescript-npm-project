@@ -572,10 +572,10 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       spaces: 2
     })
     let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
-    console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
+    // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
 
     notNeededReinstallationTnp[project.location] = true;
-    // console.log(`Tnp-helper installed in ${project.name} `)
+    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} `)
   } else {
     // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }
