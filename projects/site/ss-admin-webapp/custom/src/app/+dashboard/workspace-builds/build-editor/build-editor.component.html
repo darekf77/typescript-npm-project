@@ -22,8 +22,26 @@
     <mat-tab label="Environment">
       <br>
       <p *ngIf="environmentConfig">
-          <tree-root [nodes]="nodes" [options]="treeOptions"></tree-root>
-        {{environmentConfig | json}}
+        <!-- {{environmentConfig | json}} -->
+        <tree-root [nodes]="nodes" #tree
+                   [options]="treeOptions">
+
+          <ng-template #treeNodeTemplate
+                       let-node
+                       let-index="index">
+            <span>{{ node.data.name }}</span>
+            <strong *ngIf="node.data.value && node.data.name !== 'name'">:
+              <!-- {{ nodeValue(node.data.value) }} -->
+              <input type="text"
+                     [(ngModel)]="node.data.value">
+            </strong>
+            <strong *ngIf="node.data.value && node.data.name === 'name'">:
+              {{ nodeValue(node.data.value) }}
+            </strong>
+            <!-- <button (click)="go($event)">Custom Action</button> -->
+          </ng-template>
+        </tree-root>
+        <!-- {{environmentConfig | json}} -->
       </p>
     </mat-tab>
   </mat-tab-group>

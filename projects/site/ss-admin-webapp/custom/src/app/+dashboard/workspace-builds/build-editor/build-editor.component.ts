@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, NgZone } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, NgZone, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 // material
 
@@ -24,33 +24,9 @@ import { EnvConfig } from 'tnp-bundle/browser';
   templateUrl: './build-editor.component.html',
   styleUrls: ['./build-editor.component.scss']
 })
-export class BuildEditorComponent implements OnInit {
+export class BuildEditorComponent implements OnInit, AfterViewInit {
 
-  nodes = [
-    {
-      id: 1,
-      name: 'root1',
-      children: [
-        { id: 2, name: 'child1' },
-        { id: 3, name: 'child2' }
-      ]
-    },
-    {
-      id: 4,
-      name: 'root2',
-      children: [
-        { id: 5, name: 'child2.1' },
-        {
-          id: 6,
-          name: 'child2.2',
-          children: [
-            { id: 7, name: 'subsub' }
-          ]
-        }
-      ]
-    }
-  ];
-  treeOptions = {};
+
 
   modelDataConfig = new ModelDataConfig({
     joins: ['project', 'project.children']
@@ -126,13 +102,93 @@ export class BuildEditorComponent implements OnInit {
 
   }
 
+  nodes = [
+    {
+      id: 1,
+      name: 'root1',
+      children: [
+        { id: 2, name: 'child1' },
+        { id: 3, name: 'child2' }
+      ]
+    },
+    {
+      id: 4,
+      name: 'root2',
+      children: [
+        { id: 5, name: 'child2.1' },
+        {
+          id: 6,
+          name: 'child2.2',
+          children: [
+            { id: 7, name: 'subsub' }
+          ]
+        }
+      ]
+    }
+  ];
+
+  @ViewChild('tree') tree;
+  treeOptions = { isExpandedField: 'expanded' }
+
+  objectToNode(o: any, ValueKey: string | number = '', parentObj: any = {}) {
+    // log.color = 'red'
+    // log.d('ValueKey', ValueKey)
+    if (!_.isArray(o) && !_.isObject(o)) {
+      // log.d('is simple', o)
+      return {
+        name: ValueKey,
+        get value() {
+          return o;
+        },
+        set value(v) {
+          parentObj[ValueKey] = v;
+        }
+      }
+    }
+    if (_.isArray(o)) {
+      // log.d('is array', o)
+      return {
+        name: ValueKey,
+        children: o.map((va, i) => {
+          return this.objectToNode(va, i, o);
+        })
+      }
+    }
+    // log.d('is object', o)
+    return {
+      expanded: true,
+      name: o.name ? o.name : ValueKey,
+      children: Object.keys(o).map(objKey => {
+        return this.objectToNode(o[objKey], objKey, o)
+      })
+    }
+
+  }
+
+  nodeValue(v) {
+    if (_.isBoolean(v)) {
+      return v ? 'true' : 'false'
+    }
+    return v
+  }
 
   environmentConfig: EnvConfig;
   async getEnv() {
     const data = await this.buildController.getEnvironment(this.model.id).received;
     log.i('environment', data.body.json)
-    this.nodes = [data.body.json]
-    this.environmentConfig = data.body.json;
+    let body = data.body.json;
+    body.packageJSON = undefined;
+    const n = [this.objectToNode(body)]
+
+    log.i('n', n)
+    this.nodes = n;
+    this.environmentConfig = body;
+  }
+
+  ngAfterViewInit(): void {
+    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
+    //Add 'implements AfterViewInit' to the class.
+    this.tree.treeModel.expandAll();
   }
 
   selected: EnvironmentName;
