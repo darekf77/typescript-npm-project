@@ -136,7 +136,9 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     if (!_.isArray(o) && !_.isObject(o)) {
       // log.d('is simple', o)
       return {
+        type: typeof o,
         name: ValueKey,
+        isSimple: true,
         get value() {
           return o;
         },
@@ -156,11 +158,13 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     }
     // log.d('is object', o)
     return {
-      expanded: true,
       name: o.name ? o.name : ValueKey,
-      children: Object.keys(o).map(objKey => {
-        return this.objectToNode(o[objKey], objKey, o)
-      })
+      children: Object
+        .keys(o)
+        .filter( objKey => objKey !== 'name' )
+        .map(objKey => {
+          return this.objectToNode(o[objKey], objKey, o)
+        })
     }
 
   }
@@ -178,7 +182,7 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     log.i('environment', data.body.json)
     let body = data.body.json;
     body.packageJSON = undefined;
-    const n = [this.objectToNode(body)]
+    const n = this.objectToNode(body).children;
 
     log.i('n', n)
     this.nodes = n;
@@ -188,7 +192,7 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
-    this.tree.treeModel.expandAll();
+    // this.tree.treeModel.expandAll();
   }
 
   selected: EnvironmentName;

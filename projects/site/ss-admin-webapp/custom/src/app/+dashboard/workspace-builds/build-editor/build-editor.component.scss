@@ -10,4 +10,9 @@
     margin-right: 50px;
   }
 
+  /deep/ .toggle-children {
+    transform: scale(1.5);
+
+  }
+
 }

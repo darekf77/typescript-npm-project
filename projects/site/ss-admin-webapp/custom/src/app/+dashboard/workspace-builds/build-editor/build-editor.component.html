@@ -23,20 +23,18 @@
       <br>
       <p *ngIf="environmentConfig">
         <!-- {{environmentConfig | json}} -->
-        <tree-root [nodes]="nodes" #tree
+        <tree-root [nodes]="nodes"
+                   #tree
                    [options]="treeOptions">
 
           <ng-template #treeNodeTemplate
                        let-node
                        let-index="index">
-            <span>{{ node.data.name }}</span>
-            <strong *ngIf="node.data.value && node.data.name !== 'name'">:
+            <span *ngIf="node.data.name !== 'name'">{{ node.data.name }}</span>
+            <strong *ngIf="node.data.name !== 'name'">
               <!-- {{ nodeValue(node.data.value) }} -->
-              <input type="text"
-                     [(ngModel)]="node.data.value">
-            </strong>
-            <strong *ngIf="node.data.value && node.data.name === 'name'">:
-              {{ nodeValue(node.data.value) }}
+              <input  *ngIf="node.data.isSimple" type="{{ node.data.type === 'boolean' ? 'checkbox': 'text' }}"
+                     [(ngModel)]="node.data.value" [disabled]="true" >
             </strong>
             <!-- <button (click)="go($event)">Custom Action</button> -->
           </ng-template>
