@@ -22,7 +22,8 @@ import { TNP_PROJECT } from './TNP_PROJECT';
 
 export interface IBUILD {
   name: string;
-  
+  gitFolder: string;
+
 }
 
 export enum BuildStatus {
@@ -151,28 +152,38 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return _.first(this.gitRemote.match(/([a-z-])+\.git/g)).replace('.git', '');
   }
 
-  @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
-
-
-
-
   @OneToOne(type => TNP_PROJECT)
   @JoinColumn()
   project: TNP_PROJECT;
 
   @Column() gitRemote: string;
 
-  @Column({ default: config.names.env.dev }) environmentName: string;  
+  @Column({ default: config.names.env.dev }) environmentName: string;
 
   @Column({ nullable: true }) staticFolder: string;
-
-  @Column({ default: BuildStatus.NONE }) status: BuildStatus;
 
   @Column({ nullable: true, default: '/' }) gitFolder: string;
 
   @Column({ nullable: true, default: 'friendlyName' }) friendlyName: string;
 
-
+  //#region @backend
+  run(command: string) {
+    return {
+      async() {
+        return run(command, {
+          output: false,
+          cwd: this.localPath.buildFolder
+        }).async()
+      },
+      sync() {
+        return run(command, {
+          output: false,
+          cwd: this.localPath.buildFolder
+        }).sync()
+      },
+    }
+  }
+  //#endregion
 
 }
 

@@ -1,8 +1,8 @@
 //#region @backend
-import { EntityRepository, META } from "morphi";
+import { EntityRepository, META, ModelDataConfig, PathParam } from "morphi";
 import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
-import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
+import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
 import * as child from 'child_process';
 import { PROGRESS_BAR_DATA, ProjectFrom } from "tnp-bundle";
 import { TNP_PROJECT } from "../entities/TNP_PROJECT";
@@ -17,25 +17,39 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
 
   async getById(id: number) {
-    const build = await this.findOne(id);
+    const config = new ModelDataConfig({
+      joins: ['project', 'project.children']
+    });
+    const build = await this.findOne({
+      where: { id },
+      join: config && config.db && config.db.join
+    });
+
     if (!build) {
       throw `Cannot find build with id ${id}`
     }
     return build;
   }
 
+  async changeEnvironmentByid(id: number, @PathParam('envname') envname: EnvironmentName = 'dev') {
+    let build = await this.getById(id);
+    build.run(`tnp init --env ${envname}`).sync();
+    build.environmentName = envname;
+    await this.update(id, build)
+  }
+
   async clearById(id: number, all = false) {
     const build = await this.getById(id);
 
-    if (!!build.pidClearProces) {
-      throw `Clear process already in progress, id ${id}, pid: ${build.pidClearProces}`
+    if (!!build.project.pidClearProces) {
+      throw `Clear process already in progress, id ${id}, pid: ${build.project.pidClearProces}`
     }
 
     const p = run(`tnp clear${all ? ':all' : ''}`,
       { cwd: build.localPath.repositoryFolder, output: false }).async()
-    build.pidClearProces = p.pid;
+    build.project.pidClearProces = p.pid;
     p.on('close', async () => {
-      build.pidClearProces = null;
+      build.project.pidClearProces = null;
       await this.update(id, build)
       console.log('CLERR COMPLETE  all ? ', all)
       // Global.vars.socket.BE.emit('clearbuildend', build);
@@ -50,8 +64,8 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
       async servingById(id: number) {
         let build = await self.getById(id);
 
-        if (build.pidServeProces) {
-          throw `Serving already started on port ${build.pidServeProces}`;
+        if (build.project.pidServeProces) {
+          throw `Serving already started on port ${build.project.pidServeProces}`;
         }
 
         build.init();
@@ -69,21 +83,21 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           },
           endAction: async () => {
             build = await self.getById(id);
-            build.pidServeProces = null;
+            build.project.pidServeProces = null;
             await self.update(id, build)
             console.log('END ACTION SERVING')
           }
         })
 
-        build.pidServeProces = p.pid;
+        build.project.pidServeProces = p.pid;
         await self.update(id, build)
       },
 
       async buildingById(id: number) {
         let build = await self.getById(id);
 
-        if (build.pidBuildProces) {
-          throw `Build already started on port ${build.pidBuildProces}`;
+        if (build.project.pidBuildProces) {
+          throw `Build already started on port ${build.project.pidBuildProces}`;
         }
 
         let p = run(`tnp build`, { cwd: build.localPath.repositoryFolder, output: false }).async()
@@ -94,7 +108,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
           msgAction: (chunk) => {
             PROGRESS_BAR_DATA.resolveFrom(chunk, async (progress) => {
               let b = await self.getById(id);
-              b.progress = progress as any;
+              b.project.progress = progress as any;
               await self.update(id, b)
               console.log('progress updated', progress)
               // Global.vars.socket.BE.emit('newprogress', progress);
@@ -107,20 +121,20 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             let p = new PROGRESS_BAR_DATA();
             p.info = 'Build error';
             p.status = 'error';
-            p.value = b.progress && b.progress.value;
-            b.progress = p as any;
+            p.value = b.project.progress && b.project.progress.value;
+            b.project.progress = p as any;
             await self.update(id, b)
           },
           endAction: async () => {
             build = await self.getById(id);
-            build.pidBuildProces = null;
+            build.project.pidBuildProces = null;
             await self.update(id, build)
             // Global.vars.socket.BE.emit('endofbuild', build);
             console.log('END ACTION BUILDING')
           }
         })
 
-        build.pidBuildProces = p.pid;
+        build.project.pidBuildProces = p.pid;
         await self.update(id, build)
       }
 
@@ -165,28 +179,28 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return {
       async buildingById(id: number) {
         const build = await self.getById(id);
-        if (build.pidBuildProces) {
+        if (build.project.pidBuildProces) {
           try {
-            killProcess(build.pidBuildProces);
+            killProcess(build.project.pidBuildProces);
           } catch (e) {
             console.log(e)
           }
 
-          build.pidBuildProces = undefined;
+          build.project.pidBuildProces = undefined;
           await self.update(id, build)
         }
       },
 
       async serveingById(id: number) {
         const build = await self.getById(id);
-        if (build.pidServeProces) {
+        if (build.project.pidServeProces) {
           try {
-            killProcess(build.pidServeProces);
+            killProcess(build.project.pidServeProces);
           } catch (e) {
             console.log(e)
           }
 
-          build.pidServeProces = undefined;
+          build.project.pidServeProces = undefined;
           await self.update(id, build)
         }
 

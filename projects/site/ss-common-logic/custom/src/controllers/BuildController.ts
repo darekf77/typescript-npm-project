@@ -4,7 +4,7 @@ import {
 } from 'morphi';
 import { BUILD } from '../entities/BUILD';
 import * as _ from 'lodash';
-import {  EnvironmentName } from 'tnp-bundle'
+import { EnvironmentName } from 'tnp-bundle'
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -192,17 +192,16 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   getEnvironment(@PathParam('id') id: number): Response<entities.ENVIRONMENT> {
     //#region @backendFunc
     return async () => {
-      const config = new ModelDataConfig({
-        joins: ['project', 'project.children']
-      });
-      const build = await this.db.BUILD.findOne({
-        where: { id },
-        join: config && config.db && config.db.join
-      });
+      const build = await this.db.BUILD.getById(id);
       const env = entities.ENVIRONMENT.from(build.project);
       return env;
     }
     //#endregion
+  }
+
+  @PUT('/change/build/:id/env/to/:envname')
+  changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName) {
+
   }
 
 
@@ -210,13 +209,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   getEnvironmentNames(@PathParam('id') id: number): Response<EnvironmentName[]> {
     //#region @backendFunc
     return async () => {
-      const config = new ModelDataConfig({
-        joins: ['project', 'project.children']
-      });
-      const build = await this.db.BUILD.findOne({
-        where: { id },
-        join: config && config.db && config.db.join
-      });
+      const build = await this.db.BUILD.getById(id);
       const names = entities.ENVIRONMENT.namesFrom(build.project);
       return names;
     }

@@ -11,7 +11,7 @@ import { ProjectFrom } from "tnp-bundle";
 
 export interface ITNP_PROJECT {
   name: string;
-  
+
   pidBuildProces: number;
   pidClearProces: number;
   pidServeProces: number;
