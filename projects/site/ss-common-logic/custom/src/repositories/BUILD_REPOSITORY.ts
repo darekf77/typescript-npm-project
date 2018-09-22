@@ -33,7 +33,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
   async changeEnvironmentByid(id: number, @PathParam('envname') envname: EnvironmentName = 'dev') {
     let build = await this.getById(id);
-    build.run(`tnp init --env ${envname}`).sync();
+    build.project.run(`tnp init --env ${envname}`).sync();
     build.environmentName = envname;
     await this.update(id, build)
   }

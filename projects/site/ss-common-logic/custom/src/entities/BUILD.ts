@@ -26,12 +26,6 @@ export interface IBUILD {
 
 }
 
-export enum BuildStatus {
-  NONE,
-  FAIL,
-  SUCCES
-}
-
 //#region @backend
 @Entity(META.tableNameFrom(BUILD))
 //#endregion
@@ -166,24 +160,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column({ nullable: true, default: 'friendlyName' }) friendlyName: string;
 
-  //#region @backend
-  run(command: string) {
-    return {
-      async() {
-        return run(command, {
-          output: false,
-          cwd: this.localPath.buildFolder
-        }).async()
-      },
-      sync() {
-        return run(command, {
-          output: false,
-          cwd: this.localPath.buildFolder
-        }).sync()
-      },
-    }
-  }
-  //#endregion
+
 
 }
 

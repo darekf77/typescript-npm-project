@@ -29,7 +29,7 @@ export { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 export { Subject } from "rxjs/Subject";
 
-const log = Log.create('AuthController', Level.__NOTHING);
+const log = Log.create('AuthController');
 
 
 import { META } from 'morphi';

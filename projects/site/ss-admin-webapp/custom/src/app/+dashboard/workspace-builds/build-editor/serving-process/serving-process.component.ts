@@ -29,7 +29,7 @@ export class ServingProcessComponent implements OnInit {
           log.i('serve process started!')
         }
       },
-      hideExpression: () => (!this.model || _.isNumber(this.model.pidServeProces))
+      hideExpression: () => (!this.model || _.isNumber(this.model.project.pidServeProces))
     },
     {
 
@@ -41,7 +41,7 @@ export class ServingProcessComponent implements OnInit {
           log.i('serve process stopped!')
         }
       },
-      hideExpression: () => (!this.model || !this.model.pidServeProces)
+      hideExpression: () => (!this.model || !this.model.project.pidServeProces)
     },
     {
 

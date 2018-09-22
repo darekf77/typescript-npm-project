@@ -46,7 +46,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   // async pullLastLoop() {
   //   await this.getLastNlinesOfLog(50)
-  //   this.isRealtime = (!!this.build.pidBuildProces);
+  //   this.isRealtime = (!!this.build.project.pidBuildProces);
   //   if (this.isRealtime) {
   //     setTimeout(() => {
   //       this.pullLastLoop()
@@ -84,7 +84,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   handlers: Subscription[] = [];
   ngOnInit() {
-    this.isRealtime = (!!this.build.pidBuildProces);
+    this.isRealtime = (!!this.build.project.pidBuildProces);
     // if (this.isRealtime) {
     //   this.pullLastLoop();
     // } else {

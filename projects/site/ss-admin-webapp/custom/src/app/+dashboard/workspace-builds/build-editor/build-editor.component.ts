@@ -17,6 +17,7 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 import { EnvironmentName } from 'tnp-bundle';
 import { EnvConfig } from 'tnp-bundle/browser';
+import { MatRadioChange } from '@angular/material';
 
 
 @Component({
@@ -69,7 +70,10 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
         // description: 'Description',
         // required: true,
         options: [],
-      },
+        change: (field, change: MatRadioChange) => {
+          log.i('environment changed to: ', change.value)
+        }
+      }
     },
   ] as FormlyFieldConfig[];
 
@@ -161,7 +165,7 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
       name: o.name ? o.name : ValueKey,
       children: Object
         .keys(o)
-        .filter( objKey => objKey !== 'name' )
+        .filter(objKey => objKey !== 'name')
         .map(objKey => {
           return this.objectToNode(o[objKey], objKey, o)
         })

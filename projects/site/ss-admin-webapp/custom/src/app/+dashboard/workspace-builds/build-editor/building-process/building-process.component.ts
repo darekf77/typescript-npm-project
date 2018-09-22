@@ -10,12 +10,9 @@ import { Global } from 'morphi/browser'
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 import { MatDialog } from '@angular/material';
-import { LogPrcessComponent } from '../log-prcess/log-prcess.component';
-import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { ProviderData } from '@angular/core/src/view';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+
+
 
 @Component({
   selector: 'app-building-process',
@@ -24,7 +21,7 @@ import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 })
 export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
-  
+
 
 
   fields = [
@@ -41,7 +38,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process started!')
         }
       },
-      hideExpression: () => (!this.model || _.isNumber(this.model.project.pidBuildProces) || !!this.model.pidClearProces)
+      hideExpression: () => (!this.model ||
+        _.isNumber(this.model.project.pidBuildProces) ||
+        !!this.model.project.pidClearProces)
     },
     {
 
@@ -53,7 +52,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process stopped!')
         }
       },
-      hideExpression: () => (!this.model || !this.model.pidBuildProces || !!this.model.pidClearProces)
+      hideExpression: () => (!this.model ||
+        !this.model.project.pidBuildProces ||
+        !!this.model.project.pidClearProces)
     },
     {
 
@@ -78,13 +79,13 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       },
       expressionProperties: {
         'templateOptions.disabled': () => {
-          return (this.model && !!this.model.pidClearProces)
+          return (this.model && !!this.model.project.pidClearProces)
         },
         'templateOptions.label': () => {
-          return (this.model && !!this.model.pidClearProces) ? 'is clearing... ' : 'Clear';
+          return (this.model && !!this.model.project.pidClearProces) ? 'is clearing... ' : 'Clear';
         }
       },
-      hideExpression: () => (this.model && !!this.model.pidBuildProces)
+      hideExpression: () => (this.model && !!this.model.project.pidBuildProces)
     }
   ] as FormlyFieldConfig[];
 
@@ -98,7 +99,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   }
 
   get progress() {
-    return (this.model && this.model.progress);
+    return (this.model && this.model.project.progress);
   }
 
   get info() {

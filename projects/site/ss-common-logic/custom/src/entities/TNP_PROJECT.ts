@@ -1,4 +1,7 @@
-import { Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn, Column, TreeChildren, TreeParent, Tree } from "morphi";
+import {
+  Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn,
+  Column, TreeChildren, TreeParent, Tree
+} from "morphi";
 import BUILD from "./BUILD";
 import * as _ from 'lodash';
 
@@ -6,6 +9,7 @@ import { PROGRESS_BAR_DATA, Project } from "tnp-bundle";
 import { CLASSNAME, FormlyForm } from "morphi";
 
 //#region @backend
+import { run } from "tnp-bundle";
 import { ProjectFrom } from "tnp-bundle";
 //#endregion
 
@@ -77,5 +81,24 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidClearProces: number;
   @Column({ nullable: true }) pidServeProces: number;
+
+  //#region @backend
+  run(command: string) {
+    return {
+      async() {
+        return run(command, {
+          output: false,
+          cwd: this.localPath.buildFolder
+        }).async()
+      },
+      sync() {
+        return run(command, {
+          output: false,
+          cwd: this.localPath.buildFolder
+        }).sync()
+      },
+    }
+  }
+  //#endregion
 
 }

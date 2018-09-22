@@ -8,6 +8,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // thrid part
 import * as _ from 'lodash';
 import { init, AngularProviders } from 'morphi/browser';
+import { LoadingBarHttpModule } from '@ngx-loading-bar/http';
+import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
+import { LoadingBarModule } from '@ngx-loading-bar/core';
+
+const loadingBar = [
+  LoadingBarHttpModule,
+  LoadingBarRouterModule,
+  LoadingBarModule
+]
+
 // my modules
 // import { MyLibModule } from 'angular-lib';
 import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
@@ -81,7 +91,8 @@ init({
       useHash: true,
       preloadingStrategy: PreloadAllModules,
       enableTracing: false
-    })
+    }),
+    ...loadingBar
   ],
   providers: [
     AngularProviders,
