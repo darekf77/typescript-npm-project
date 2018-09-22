@@ -24,7 +24,7 @@ import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 })
 export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
-
+  
 
 
   fields = [
@@ -41,7 +41,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process started!')
         }
       },
-      hideExpression: () => (!this.model || _.isNumber(this.model.pidBuildProces) || !!this.model.pidClearProces)
+      hideExpression: () => (!this.model || _.isNumber(this.model.project.pidBuildProces) || !!this.model.pidClearProces)
     },
     {
 
@@ -124,42 +124,9 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
   ) { }
 
-  ngOnInit() {
+  ngOnInit() { }
 
-
-
-    // let s = new Subject();
-
-    // s.asObservable().subscribe((data) => {
-    //   log.i('new progress', data);
-    //   _.merge(this.progress, data);
-    //   this.refreshModel.next()
-    // })
-
-    // Global.vars.socket.FE.on('newprogress', (data) => {
-    //   this.ngZone.run(() => {
-    //     s.next(data);
-    //   })
-
-    // })
-
-    // this.getEndOfbuild().subscribe(data => {
-    //   log.i('END OF BUILD - DATA FROM SOCKET', data)
-    //   this.refreshModel.next()
-    // })
-
-    // this.getEndOfClear().subscribe((data) => {
-    //   log.i('END OF CLEAR - DATA FROM SOCKET', data)
-    //   this.refreshModel.next()
-    // })
-
-  }
-
-  ngAfterViewInit(): void {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
-    // this.progress = _.merge(new PROGRESS_BAR_DATA(), this.model && this.model.progress)
-  }
+  ngAfterViewInit() { }
 
 
 

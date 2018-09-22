@@ -22,9 +22,7 @@ import { TNP_PROJECT } from './TNP_PROJECT';
 
 export interface IBUILD {
   name: string;
-  pidBuildProces: number;
-  pidClearProces: number;
-  pidServeProces: number;
+  
 }
 
 export enum BuildStatus {
@@ -155,7 +153,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
 
-  @Column({ nullable: true }) port: string;
+
 
 
   @OneToOne(type => TNP_PROJECT)
@@ -164,11 +162,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column() gitRemote: string;
 
-  @Column({ default: config.names.env.dev }) environmentName: string;
-
-  @Column({ nullable: true }) pidBuildProces: number;
-  @Column({ nullable: true }) pidClearProces: number;
-  @Column({ nullable: true }) pidServeProces: number;
+  @Column({ default: config.names.env.dev }) environmentName: string;  
 
   @Column({ nullable: true }) staticFolder: string;
 

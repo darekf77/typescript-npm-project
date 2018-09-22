@@ -10,7 +10,11 @@ import { ProjectFrom } from "tnp-bundle";
 //#endregion
 
 export interface ITNP_PROJECT {
-
+  name: string;
+  
+  pidBuildProces: number;
+  pidClearProces: number;
+  pidServeProces: number;
 }
 
 
@@ -69,5 +73,9 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
   @TreeParent()
   parent: TNP_PROJECT;
 
+  @Column({ nullable: true }) port: string;
+  @Column({ nullable: true }) pidBuildProces: number;
+  @Column({ nullable: true }) pidClearProces: number;
+  @Column({ nullable: true }) pidServeProces: number;
 
 }
