@@ -79,19 +79,20 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
     b1.init()
+    await this.db.BUILD.changeEnvironmentBy(b1, 'dev');
     await this.saveProject(b1)
     await this.db.BUILD.update(b1.id, b1);
 
 
-    const b2 = await this.db.BUILD.save(this.db.BUILD.create({
-      gitFolder: '/projects/workspace',
-      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
-      staticFolder: tnpLocation
-    }))
+    // const b2 = await this.db.BUILD.save(this.db.BUILD.create({
+    //   gitFolder: '/projects/workspace',
+    //   gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
+    //   staticFolder: tnpLocation
+    // }))
 
-    b2.init()
-    await this.saveProject(b2)
-    await this.db.BUILD.update(b2.id, b2);
+    // b2.init()
+    // await this.saveProject(b2)
+    // await this.db.BUILD.update(b2.id, b2);
 
   }
 
@@ -201,7 +202,12 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   @PUT('/change/build/:id/env/to/:envname')
   changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName) {
-
+    //#region @backendFunc
+    return async () => {
+      const build = await this.db.BUILD.changeEnvironmentBy(id, envname);
+      return build;
+    }
+    //#endregion
   }
 
 

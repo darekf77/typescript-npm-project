@@ -70,14 +70,9 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
     const project = TNP_PROJECT.from(location);
     this.project = project;
-
-    const environmentFile = path.join(location, config.file.tnpEnvironment_json)
-    if (!fse.existsSync(environmentFile)) {
-      console.log(`project ${this.environmentName} is initing.....`)
-      this.project.run(`pwd && tnp init --env ${this.environmentName}`, { output: true } ).sync()
-      console.log(`project ${this.environmentName} is inited`)
-    }
   }
+
+  recreateEnvironment
 
   private get reinitFrom() {
     const self = this;

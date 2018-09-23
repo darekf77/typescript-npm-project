@@ -2,6 +2,7 @@
 import { EntityRepository, META, ModelDataConfig, PathParam } from "morphi";
 import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
+import * as _ from 'lodash';
 import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
 import * as child from 'child_process';
 import { PROGRESS_BAR_DATA, ProjectFrom } from "tnp-bundle";
@@ -31,11 +32,11 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return build;
   }
 
-  async changeEnvironmentByid(id: number, @PathParam('envname') envname: EnvironmentName = 'dev') {
-    let build = await this.getById(id);
+  async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName = 'dev') {
+    let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
     build.project.run(`tnp init --env ${envname}`).sync();
     build.environmentName = envname;
-    await this.update(id, build)
+    await this.update(build.id, build)
   }
 
   async clearById(id: number, all = false) {
@@ -62,35 +63,35 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return {
 
       async servingById(id: number) {
-        let build = await self.getById(id);
+        // let build = await self.getById(id);
 
-        if (build.project.pidServeProces) {
-          throw `Serving already started on port ${build.project.pidServeProces}`;
-        }
+        // if (build.project.pidServeProces) {
+        //   throw `Serving already started on port ${build.project.pidServeProces}`;
+        // }
 
-        build.init();
+        // build.init();
 
-        let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder }).async()
+        // let p = run(`tnp start`, { cwd: build.localPath.repositoryFolder }).async()
 
-        fse.writeFileSync(build.localPath.serveLog, '');
+        // fse.writeFileSync(build.localPath.serveLog, '');
 
-        self.attachListeners(p, {
-          msgAction: (chunk) => {
-            fse.appendFileSync(build.localPath.serveLog, chunk)
-          },
-          errorAction: (chunk) => {
-            fse.appendFileSync(build.localPath.serveErrorLog, chunk)
-          },
-          endAction: async () => {
-            build = await self.getById(id);
-            build.project.pidServeProces = null;
-            await self.update(id, build)
-            console.log('END ACTION SERVING')
-          }
-        })
+        // self.attachListeners(p, {
+        //   msgAction: (chunk) => {
+        //     fse.appendFileSync(build.localPath.serveLog, chunk)
+        //   },
+        //   errorAction: (chunk) => {
+        //     fse.appendFileSync(build.localPath.serveErrorLog, chunk)
+        //   },
+        //   endAction: async () => {
+        //     build = await self.getById(id);
+        //     build.project.pidServeProces = null;
+        //     await self.update(id, build)
+        //     console.log('END ACTION SERVING')
+        //   }
+        // })
 
-        build.project.pidServeProces = p.pid;
-        await self.update(id, build)
+        // build.project.pidServeProces = p.pid;
+        // await self.update(id, build)
       },
 
       async buildingById(id: number) {
