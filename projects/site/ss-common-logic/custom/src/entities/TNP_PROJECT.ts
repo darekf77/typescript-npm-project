@@ -10,7 +10,7 @@ import { CLASSNAME, FormlyForm } from "morphi";
 
 //#region @backend
 import { run } from "tnp-bundle";
-import { ProjectFrom } from "tnp-bundle";
+import { ProjectFrom, RunOptions } from "tnp-bundle";
 //#endregion
 
 export interface ITNP_PROJECT {
@@ -83,19 +83,27 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
   @Column({ nullable: true }) pidServeProces: number;
 
   //#region @backend
-  run(command: string) {
+  run(command: string, options?: RunOptions) {
+    const self = this;
+    if (!options) {
+      options = {};
+    }
     return {
       async() {
-        return run(command, {
-          output: false,
-          cwd: this.localPath.buildFolder
-        }).async()
+        return run(command,
+          _.merge(options, {
+            // output: false,
+            cwd: self.location
+          })
+        ).async()
       },
       sync() {
-        return run(command, {
-          output: false,
-          cwd: this.localPath.buildFolder
-        }).sync()
+        return run(command,
+          _.merge(options, {
+            // output: false,
+            cwd: self.location
+          })
+        ).sync()
       },
     }
   }

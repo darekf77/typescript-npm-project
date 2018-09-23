@@ -47,7 +47,6 @@ export class EnvironmentConfig {
     return !fse.existsSync(f);
   }
 
-  private childOptions: BuildOptions | string;
   public async init(optionsOrArgs?: BuildOptions | string) {
     let workspaceProjectLocation: string;
 
@@ -59,14 +58,10 @@ export class EnvironmentConfig {
       return;
     }
 
-
-    if (this.project.isWorkspaceChildProject) {
-      this.childOptions = optionsOrArgs;
-    }
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
       await this.project.parent.env.init(optionsOrArgs);
     }
-    
+
     if (this.project.isWorkspaceChildProject) {
       await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: this.config }, false)
       await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: this.config }, false);
@@ -88,20 +83,15 @@ export class EnvironmentConfig {
 
     config.proxyRouterMode = _.isString(optionsOrArgs);
 
-    if (config.proxyRouterMode) {
-      optionsOrArgs = this.options.saved as BuildOptions; // change args to saved options
-    }
-    optionsOrArgs = optionsOrArgs as BuildOptions;
+    const { environmentName } = config.proxyRouterMode ? {} as any : optionsOrArgs;
 
-    this.options.save(optionsOrArgs)
-
-    const { environmentName } = optionsOrArgs;
     config.name = (!environmentName ? 'local' : environmentName);
 
-    const env: EnvironmentName = config.name;
-    const { generateIps }: { generateIps: boolean } =
+    let { generateIps, env }: { generateIps: boolean, env: EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
-    config.dynamicGenIps = (environmentWithGeneratedIps.includes(env)) || generateIps;
+    config.name = (_.isString(env) && env.trim() !== '') ? env : config.name;
+
+    config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
 
     await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
     await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
@@ -166,25 +156,6 @@ export class EnvironmentConfig {
 
 
 
-  private get options() {
-    const filename = 'tmp-env-prepare.json';
-    const pathTmpEnvPrepareOptions = path.join(this.project.location, filename);
-    // const self = this;
-    return {
-      get saved() {
-        if (!fs.existsSync(pathTmpEnvPrepareOptions)) {
-          error(`Please run: tnp build:app`)
-        }
-        return BuildOptions.fromRaw(fse.readJSONSync(pathTmpEnvPrepareOptions))
-      },
-      save(options: BuildOptions) {
-        // console.log(`Prepare OPTIONS saved in ${pathTmpEnvPrepareOptions}`)
-        fse.writeJSONSync(pathTmpEnvPrepareOptions, options, {
-          spaces: 2
-        })
-      }
-    }
-  }
 
 
 }

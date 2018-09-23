@@ -1,9 +1,10 @@
 //#region @backend
 import { Project } from "../project";
 import { run } from '../process';
+import { error } from '../messages';
 
 
-export function init(args, project = Project.Current) {
+export async function init(args, project = Project.Current) {
   project.recreate.init();
 
   if (project.isSite) {
@@ -11,14 +12,15 @@ export function init(args, project = Project.Current) {
   }
 
   if (project.isWorkspace) {
-    project.env.init(args)
+    await project.env.init(args)
   }
 
 }
 
 export default {
-  $INIT: (args) => {
-    init(args)
+  $INIT: async (args) => {
+
+    await init(args)
 
     process.exit(0)
   },

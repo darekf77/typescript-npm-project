@@ -1,9 +1,10 @@
+const path = require('path')
 
-import config from './environment';
-const { getEnvironmentName } = require('tnp-bundle');
+const config = require('./environment');
 
-config.productionBuild = true;
-config.name = getEnvironmentName(__filename)
+console.log('dev config')
+
+module.exports = exports = config;
 
 
-export default Object.freeze(config);
+

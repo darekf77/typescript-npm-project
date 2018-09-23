@@ -158,6 +158,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
       encoding: 'utf8',
       spaces: 2
     })
+    console.log('config saved in worksapce', tmpEnvironmentPath)
 
     project.children.forEach(p => {
       saveConfigWorkspca(p, workspaceConfig);
@@ -176,6 +177,9 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
         spaces: 2
       })
     }
+
+    console.log('config saved in child', tmpEnvironmentPath)
+
   }
 }
 
