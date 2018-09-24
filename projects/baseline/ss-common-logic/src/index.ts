@@ -18,7 +18,7 @@ export default function () {
   start({
     publicFilesFolder: '/assets',
     config: project.$db as any,
-    host: ENV.proxyRouterMode ?
+    host: ENV.name !== 'local' ?
       `http://${ENV.ip}:${project.port}${project.baseUrl}` :
       `http://${ENV.ip}:${project.port}`
     ,
