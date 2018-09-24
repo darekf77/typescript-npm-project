@@ -7,6 +7,7 @@ import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info } from '../messages';
 import { PROGRESS_BAR_DATA } from '../progress-output';
+import { ProxyRouter } from './proxy-router';
 
 
 export class ProjectWorkspace extends Project {
@@ -14,7 +15,29 @@ export class ProjectWorkspace extends Project {
   startOnCommand(args: string) {
 
     // console.log('this.routes', this.routes.map(r => r.name))
-    this.proxyRouter.activateServer()
+    this.proxyRouter.activateServer((port) => {
+      if (this.env.config.name !== 'local') {
+        const address = `${this.env.config.ip}:${port}`;
+        const domain = this.env.config.domain;
+        console.log(`Activation https domain "${domain}" for address "${address}"`)
+        const proxy = require('redbird')({ port });
+        const letsencryptPort = ProxyRouter.getFreePort()
+        console.log(`Port for letsencrypt: ${letsencryptPort}`)
+
+        proxy.register(domain, address, {
+          letsencrypt: {
+            port: letsencryptPort
+          },
+          ssl: {
+            letsencrypt: {
+              email: 'darekf77@gmail.com', // Domain owner/admin email
+              production: (this.env.config.name === 'prod'), // WARNING: Only use this flag when the proxy is verified to work correctly to avoid being banned!
+            }
+          }
+        });
+      }
+
+    })
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {

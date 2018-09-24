@@ -1,5 +1,7 @@
 //#region @backend
 import * as child from 'child_process';
+
+
 import * as portfinder from 'portfinder';
 import { error } from "../messages";
 import { EnvConfigProject, LibType } from "../models";
@@ -68,14 +70,14 @@ export class ProxyRouter {
 
 
 
-  public activateServer() {
+  public activateServer(onServerReady: (serverPort?: number) => void) {
 
     this.routes = this.project.env.config.workspace.projects;
 
     // console.log('activate server this.routes', this.routes.map(r => r.name))
 
     if (this.project.type === 'workspace') {
-      this.server()
+      this.server(onServerReady)
 
       // this.runOnRoutes(_.cloneDeep(this.routes))
     } else {
@@ -84,7 +86,7 @@ export class ProxyRouter {
     }
   }
 
-  private server() {
+  private server(onServerReady: (serverPort?: number) => void) {
     const proxy = httpProxy.createProxyServer({ ws: true });
 
     const server = http.createServer((req, res) => {
@@ -117,7 +119,12 @@ export class ProxyRouter {
 
 
     server.listen(this.project.getDefaultPort(), () => {
-      console.log(`Proxy Router activate on http://localhost:${this.project.getDefaultPort()}`)
+      const serverPort = this.project.getDefaultPort();
+      console.log(`Proxy Router activate on http://localhost:${serverPort}`)
+
+      if (_.isFunction(onServerReady)) {
+        onServerReady(serverPort);
+      }
     }).on('error', e => {
       console.log('error', e)
     })

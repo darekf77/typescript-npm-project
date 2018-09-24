@@ -47,6 +47,7 @@
     "omelette": "^0.4.5",
     "portfinder": "^1.0.13",
     "prompts": "^0.1.8",
+    "redbird": "^0.7.0",
     "rimraf": "^2.6.2",
     "simple-git": "^1.96.0",
     "sleep": "^5.1.1",
