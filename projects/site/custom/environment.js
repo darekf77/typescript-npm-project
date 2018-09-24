@@ -2,6 +2,7 @@ const path = require('path')
 
 const { config } = require('baseline/environment');
 
+config.domain = 'ss-cloud.com'
 
 config.workspace.workspace.port = `1${config.workspace.workspace.port}`;
 config.workspace.projects.forEach(p => {

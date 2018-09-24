@@ -194,9 +194,15 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     body.packageJSON = undefined;
     const n = this.objectToNode(body).children;
 
-    log.i('n', n)
-    this.nodes = n;
-    this.environmentConfig = body;
+
+    this.nodes = []
+    this.environmentConfig = undefined;
+
+    setTimeout(() => {
+      log.i('new nodes', n)
+      this.nodes = n;
+      this.environmentConfig = body;
+    }, 2000)
 
     // this.model.project.children = this.model.project.children.map(c => {
     //   c.

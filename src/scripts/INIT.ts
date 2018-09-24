@@ -43,11 +43,13 @@ async function initialize(
   // console.log(`Prepare environment for: ${this.name}`)
   if (!project.isStandaloneProject) {
 
-    if (!project.env.config || (project.isWorkspaceChildProject && !project.parent.env.config)) {
-      await project.env.init(pArgs);
-    } else {
+    const initFromScratch = (!project.env.config || (project.isWorkspaceChildProject && !project.parent.env.config));
+
+    await project.env.init(pArgs, !initFromScratch);
+
+    if (!initFromScratch) {
       console.log(`Config alredy ${chalk.bold('init')}ed tnp.
-Environment: ${project.env.config.name}`)
+${chalk.green('Environment')}: ${chalk.bold(project.env.config.name)}`)
     }
 
   }

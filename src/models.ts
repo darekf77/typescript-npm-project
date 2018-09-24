@@ -122,7 +122,6 @@ export interface EnvConfig {
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated
-  proxyRouterMode?: boolean; // tnp generated
   domain?: string;
   dynamicGenIps?: boolean;
   ip?: string | 'localhost';

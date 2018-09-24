@@ -47,7 +47,7 @@ export class EnvironmentConfig {
     return !fse.existsSync(f);
   }
 
-  public async init(args?: string) {
+  public async init(args?: string, overridePortsOnly = false) {
     let workspaceProjectLocation: string;
 
     if (this.project.isWorkspace) {
@@ -78,12 +78,16 @@ export class EnvironmentConfig {
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
 
     config.name = (_.isString(env) && env.trim() !== '') ? env : 'local'
-    config.proxyRouterMode = (config.name !== 'local');
 
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
 
     await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
     await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
+
+    if (overridePortsOnly) {
+      console.log('Only ports overriding.. ')
+      return
+    }
 
     config.isCoreProject = this.project.isCoreProject;
 
@@ -102,7 +106,7 @@ export class EnvironmentConfig {
 
     config.workspace.workspace.hostSocket = `http://${config.ip}:${config.workspace.workspace.port}`;
 
-    if (config.domain) {
+    if (config.domain && config.name !== 'local') {
       config.workspace.workspace.host =
         `${config.domain}${config.workspace.workspace.baseUrl}`;
     } else {
@@ -116,7 +120,7 @@ export class EnvironmentConfig {
 
       p.hostSocket = `http://${config.ip}:${p.port}`;
 
-      if (config.domain || config.proxyRouterMode) {
+      if (config.domain && config.name !== 'local') {
         p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
       } else {
         p.host = `http://${config.ip}:${p.port}`;

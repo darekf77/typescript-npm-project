@@ -34,28 +34,31 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
   async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName = 'dev') {
     let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
+    build.project.run('tnp clear').sync()
     build.project.run(`tnp init --env ${envname}`).sync();
     build.environmentName = envname;
     await this.update(build.id, build)
   }
 
-  async clearById(id: number, all = false) {
-    const build = await this.getById(id);
+  async clearById(idOrBuild: number | BUILD, all = false) {
+    let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
 
     if (!!build.project.pidClearProces) {
-      throw `Clear process already in progress, id ${id}, pid: ${build.project.pidClearProces}`
+      throw `Clear process already in progress, id ${build.id}, pid: ${build.project.pidClearProces}`
     }
 
     const p = run(`tnp clear${all ? ':all' : ''}`,
       { cwd: build.localPath.repositoryFolder, output: false }).async()
     build.project.pidClearProces = p.pid;
+
     p.on('close', async () => {
       build.project.pidClearProces = null;
-      await this.update(id, build)
+      await this.update(build.id, build)
       console.log('CLERR COMPLETE  all ? ', all)
       // Global.vars.socket.BE.emit('clearbuildend', build);
     })
-    await this.update(id, build)
+
+    await this.update(build.id, build)
   }
 
   get start() {

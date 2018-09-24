@@ -12,36 +12,16 @@ import { ProxyRouter } from './proxy-router';
 import { Project } from './base-project';
 import { HelpersLinks } from '../helpers-links';
 import { walkObject } from '../helpers';
+import { config as schemaConfig } from '../environment-config';
 
 
 
 export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
-export const schema: EnvConfig = {
-  workspace: {
-    workspace: {
-      baseUrl: '/info',
-      name: 'workspace-name',
-      port: 5000
-    },
-    projects: [
-      {
-        baseUrl: '/some-api-endpoint',
-        name: 'project-name-in-workspace',
-        port: 3000
-      },
-      {
-        baseUrl: '/',
-        name: 'other-example-projet-name',
-        port: 4000
-      }
-    ]
-  }
-}
 
 export function err(workspaceConfig: EnvConfig) {
-  error(`Please follow worksapce schema:\n${chalk.bold(JSON.stringify(schema, null, 4))}
+  error(`Please follow worksapce schema:\n${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
   \n
   \n your config\n : ${JSON.stringify(workspaceConfig, null, 4)}
       `)

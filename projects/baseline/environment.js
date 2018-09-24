@@ -1,6 +1,9 @@
 const path = require('path')
+let { config } = require('tnp-bundle/environment-config')
 
-const config = {
+config = {
+
+  domain: 'francuzkidlamezczyzn.pl',
 
   pathes: {
     backup: {
@@ -10,7 +13,7 @@ const config = {
       picture: path.join(__dirname, 'backup', 'multimedia', 'picture')
     }
   },
-
+  
   workspace: {
     workspace: {
       baseUrl: '/info',
