@@ -28,7 +28,6 @@ import { MatRadioChange } from '@angular/material';
 export class BuildEditorComponent implements OnInit, AfterViewInit {
 
 
-
   modelDataConfig = new ModelDataConfig({
     joins: ['project', 'project.children']
   })
@@ -60,22 +59,7 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
   };
   environments: EnvironmentName[] = []
 
-  fields = [
-    {
-      key: 'environmentName',
-      type: 'radio',
-      templateOptions: {
-        // label: 'Radio',
-        placeholder: 'Environment',
-        // description: 'Description',
-        // required: true,
-        options: [],
-        change: (field, change: MatRadioChange) => {
-          log.i('environment changed to: ', change.value)
-        }
-      }
-    },
-  ] as FormlyFieldConfig[];
+  fields: FormlyFieldConfig[] = [];
 
   private async refreshModel() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -97,6 +81,27 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
   model: BUILD;
 
   async ngOnInit() {
+
+
+    this.fields = [
+      {
+        key: 'environmentName',
+        type: 'radio',
+        templateOptions: {
+          // label: 'Radio',
+          placeholder: 'Environment',
+          // description: 'Description',
+          // required: true,
+          options: [],
+          change: async (field, change: MatRadioChange) => {
+            log.i('environment changed to: ', change.value)
+            await this.buildController.changeEnvironment(this.model.id, change.value);
+          }
+        }
+      },
+    ] as FormlyFieldConfig[];
+
+
     await this.refreshModel()
     await this.getEnvNames()
     await this.getEnv()

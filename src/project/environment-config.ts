@@ -47,7 +47,7 @@ export class EnvironmentConfig {
     return !fse.existsSync(f);
   }
 
-  public async init(optionsOrArgs?: BuildOptions | string) {
+  public async init(args?: string) {
     let workspaceProjectLocation: string;
 
     if (this.project.isWorkspace) {
@@ -59,7 +59,7 @@ export class EnvironmentConfig {
     }
 
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      await this.project.parent.env.init(optionsOrArgs);
+      await this.project.parent.env.init(args);
     }
 
     if (this.project.isWorkspaceChildProject) {
@@ -74,22 +74,11 @@ export class EnvironmentConfig {
 
     let config = workspaceConfigBy(this.project, globalConfig.environmentName);
 
-
-
-    let args: string;
-    if (_.isString(optionsOrArgs)) {
-      args = optionsOrArgs;
-    }
-
-    config.proxyRouterMode = _.isString(optionsOrArgs);
-
-    const { environmentName } = config.proxyRouterMode ? {} as any : optionsOrArgs;
-
-    config.name = (!environmentName ? 'local' : environmentName);
-
     let { generateIps, env }: { generateIps: boolean, env: EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
-    config.name = (_.isString(env) && env.trim() !== '') ? env : config.name;
+
+    config.name = (_.isString(env) && env.trim() !== '') ? env : 'local'
+    config.proxyRouterMode = (config.name !== 'local');
 
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
 

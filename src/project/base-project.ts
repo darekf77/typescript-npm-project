@@ -25,6 +25,7 @@ import { ProxyRouter } from './proxy-router';
 
 import { pullCurrentBranch } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
+import { build } from '../scripts/BUILD';
 //#endregion
 
 export abstract class Project {
@@ -118,6 +119,17 @@ export abstract class Project {
     return this.__defaultPort;
   }
 
+  public get isBuildedLib() {
+    if (this.type === 'angular-lib') {
+      return fse.existsSync(path.join(this.location && config.folder.module)) &&
+        fse.existsSync(path.join(this.location && config.folder.dist));
+    }
+    if (this.type === 'isomorphic-lib') {
+      return fse.existsSync(path.join(this.location && config.folder.browser)) &&
+        fse.existsSync(path.join(this.location && config.folder.dist));
+    }
+  }
+
   public setDefaultPortByType() {
     this.setDefaultPort(Project.defaultPortByType(this.type))
   }
@@ -134,7 +146,7 @@ export abstract class Project {
     if (type === 'server-lib') return 4050;
   }
 
-  
+
 
   get version() {
     return this.packageJson.version;
@@ -291,8 +303,6 @@ export abstract class Project {
   protected buildOptions?: BuildOptions;
   async build(buildOptions?: BuildOptions) {
 
-    const { prod, watch, outDir } = buildOptions;
-
     this.buildOptions = buildOptions;
 
     if (this.isWorkspaceChildProject) {
@@ -300,12 +310,6 @@ export abstract class Project {
     } else if (this.isWorkspace) {
       this.tnpHelper.install()
     }
-
-    // console.log(`Prepare environment for: ${this.name}`)
-    if (!this.isStandaloneProject) {
-      await this.env.init(buildOptions);
-    }
-
 
     let baseHref: string;
     // console.log('AM HERE')
@@ -317,8 +321,24 @@ export abstract class Project {
           return p.name === this.name
         }).baseUrl
     }
+
     // console.log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;
+
+    // TODO do this for isomorphic lib also
+    // QUCIK_FIX for lazy programmers :P
+    // IS IS NOT WOKRING BECOUSE morphi cwd typescript bug
+    // if (this.isWorkspaceChildProject && this.type === 'angular-client') {
+    //   const requiredLibs = this.parent.children
+    //     .filter(c => (c.type === 'angular-lib' || c.type === 'isomorphic-lib') && !c.isBuildedLib)
+
+    //   for (let i = 0; i < requiredLibs.length; i++) {
+    //     const c = requiredLibs[i];
+    //     await build(_.merge(buildOptions, {
+    //       watch: false
+    //     }), undefined, c);
+    //   }
+    // }
 
     this.buildSteps(buildOptions);
   }

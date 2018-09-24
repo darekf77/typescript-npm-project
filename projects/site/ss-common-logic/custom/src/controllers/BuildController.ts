@@ -200,12 +200,11 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#endregion
   }
 
-  @PUT('/change/build/:id/env/to/:envname')
-  changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName) {
+  @PUT('/change/build/:id/env/:envname')
+  changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName): Response<void> {
     //#region @backendFunc
     return async () => {
-      const build = await this.db.BUILD.changeEnvironmentBy(id, envname);
-      return build;
+      await this.db.BUILD.changeEnvironmentBy(id, envname);
     }
     //#endregion
   }

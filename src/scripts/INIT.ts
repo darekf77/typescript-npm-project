@@ -3,28 +3,81 @@ import { Project } from "../project";
 import { run } from '../process';
 import { error } from '../messages';
 
+async function initialize(
+  pArgs?: string,
+  project = Project.Current, watch = false) {
 
-export async function init(args, project = Project.Current) {
+  if (project.parent) {
+    project.parent.recreate.init();// TODO QUICK IFX
+  }
+
   project.recreate.init();
 
   if (project.isSite) {
-    project.baseline.recreate.init()
+    if (project.baseline && project.baseline.isWorkspaceChildProject) {
+      project.baseline.parent.recreate.init()
+    }
+    project.baseline.recreate.init();
+
+    if (watch) {
+      // console.log("HERE !!")
+
+      project.join.init().watch()
+
+      if (project.isWorkspaceChildProject
+        // QUICK_FIX for webpack fails
+        // when parent is angular project
+        && project.type === 'isomorphic-lib'
+      ) {
+        project.parent.join.init().watch()
+      }
+    } else {
+      project.join.init()
+      if (project.isWorkspaceChildProject) {
+        project.parent.join.init()
+      }
+    }
   }
 
-  if (project.isWorkspace) {
-    await project.env.init(args)
+  // console.log(`Prepare environment for: ${this.name}`)
+  if (!project.isStandaloneProject) {
+    await project.env.init(pArgs);
   }
 
 }
 
+export function init(args: string,
+  options?: { watch: boolean }) {
+
+  if (!options) {
+    options = { watch: false };
+  }
+
+  const { watch } = options;
+
+  return {
+    get watch() {
+      return init(args, { watch: true })
+    },
+    async project(p: Project = Project.Current) {
+      await initialize(args, p, watch)
+    }
+  }
+
+}
+
+// init().project();
+// init().watch.project()
+
 export default {
   $INIT: async (args) => {
-
-    await init(args)
-
+    await init(args).project()
     process.exit(0)
   },
 
+  $INIT_WATCH: async (args) => {
+    await init(args).watch.project()
+  },
 
   $VSCODE: () => {
     Project.Current.recreate.vscode.settings.excludedFiles();

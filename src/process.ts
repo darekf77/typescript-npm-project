@@ -94,13 +94,13 @@ const processes: child.ChildProcess[] = [];
 // process.on('unhandledRejection', cleanExit)
 
 
-process.once('unhandledRejection', (err, aa) => {
-  error(`'Exiting unhandledRejection
-      
-    Reason: ${err} 
-    ${JSON.stringify(aa)}
-  `);
-})
+// process.once('unhandledRejection', (err, aa) => {
+//   error(`'Exiting unhandledRejection
+
+//     Reason: ${err}
+//     ${JSON.stringify(aa)}
+//   `);
+// })
 
 
 export function log(proc: child.ChildProcess, output = true) {

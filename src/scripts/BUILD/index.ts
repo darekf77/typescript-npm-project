@@ -8,6 +8,7 @@ import { error } from "../../messages";
 import { config } from '../../config';
 import { handleArguments } from './handle-arguments.fn';
 import { install } from '../INSTALL';
+import { init } from '../INIT';
 
 
 
@@ -33,14 +34,11 @@ export async function buildApp(prod = false, watch = false, outDir: BuildDir = '
 }
 
 
-async function build(opt: BuildOptions, allowedLibs: LibType[]) {
+export async function build(opt: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current) {
 
-  const { watch, appBuild } = opt;
+  const { watch, appBuild, args } = opt;
 
-
-  const project: Project = Project.Current;
-
-  if (!allowedLibs.includes(project.type)) {
+  if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
     if (appBuild) {
       error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
     } else {
@@ -55,29 +53,12 @@ async function build(opt: BuildOptions, allowedLibs: LibType[]) {
     install('', project, false);
   }
 
-  if (project.parent) {
-    project.parent.recreate.init();// TODO QUICK IFX
+  if (watch) {
+    await init(args).watch.project(project)
+  } else {
+    await init(args).project(project);
   }
-  project.recreate.init();
 
-  if (project.isSite) {
-    project.baseline.recreate.init();
-
-    if (watch) {
-      // console.log("HERE !!")
-
-      project.join.init().watch()
-      if (project.isWorkspaceChildProject) {
-        project.parent.join.init().watch()
-      }
-    } else {
-      project.join.init()
-      if (project.isWorkspaceChildProject) {
-        project.parent.join.init()
-      }
-    }
-
-  }
   await project.build(opt);
   if (!watch) {
     process.exit(0)
