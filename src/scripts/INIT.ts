@@ -2,6 +2,7 @@
 import { Project } from "../project";
 import { run } from '../process';
 import { error } from '../messages';
+import chalk from 'chalk';
 
 async function initialize(
   pArgs?: string,
@@ -41,7 +42,14 @@ async function initialize(
 
   // console.log(`Prepare environment for: ${this.name}`)
   if (!project.isStandaloneProject) {
-    await project.env.init(pArgs);
+
+    if (!project.env.config || (project.isWorkspaceChildProject && !project.parent.env.config)) {
+      await project.env.init(pArgs);
+    } else {
+      console.log(`Config alredy ${chalk.bold('init')}ed tnp.
+Environment: ${project.env.config.name}`)
+    }
+
   }
 
 }

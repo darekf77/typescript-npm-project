@@ -5,7 +5,7 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
-import { info } from '../messages';
+import { info, warn } from '../messages';
 import { PROGRESS_BAR_DATA } from '../progress-output';
 import { ProxyRouter } from './proxy-router';
 
@@ -19,22 +19,29 @@ export class ProjectWorkspace extends Project {
       if (this.env.config.name !== 'local') {
         const address = `${this.env.config.ip}:${port}`;
         const domain = this.env.config.domain;
-        console.log(`Activation https domain "${domain}" for address "${address}"`)
-        const proxy = require('redbird')({ port });
-        const letsencryptPort = ProxyRouter.getFreePort()
-        console.log(`Port for letsencrypt: ${letsencryptPort}`)
+        if (_.isString(domain) && domain.trim() !== '') {
+          console.log(`Activation https domain "${domain}" for address "${address}"`)
+          const proxy = require('redbird')({ port });
+          const letsencryptPort = ProxyRouter.getFreePort()
+          console.log(`Port for letsencrypt: ${letsencryptPort}`)
 
-        proxy.register(domain, address, {
-          letsencrypt: {
-            port: letsencryptPort
-          },
-          ssl: {
+          proxy.register(domain, address, {
             letsencrypt: {
-              email: 'darekf77@gmail.com', // Domain owner/admin email
-              production: (this.env.config.name === 'prod'), // WARNING: Only use this flag when the proxy is verified to work correctly to avoid being banned!
+              port: letsencryptPort
+            },
+            ssl: {
+              letsencrypt: {
+                email: 'darekf77@gmail.com', // Domain owner/admin email
+                production: (this.env.config.name === 'prod'), // WARNING: Only use this flag when the proxy is verified to work correctly to avoid being banned!
+              }
             }
-          }
-        });
+          });
+        } else {
+          warn(`Domain is missing or is invalid in config for environment: "${this.env.config.name}"
+            Your domain value: ${domain}
+          `)
+        }
+
       }
 
     })
