@@ -1,9 +1,11 @@
+const path = require('path')
 
-import config from './environment';
-import { name } from './environment';
-
-config.productionBuild = true;
-config.name = name(__filename)
+const { config } = require('./environment');
 
 
-export default Object.freeze(config);
+console.log('dev config')
+
+module.exports = exports = { config };
+
+
+

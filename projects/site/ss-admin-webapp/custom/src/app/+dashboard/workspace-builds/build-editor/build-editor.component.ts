@@ -71,6 +71,7 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
       (d) => {
         log.i('BUILD UPDATE FROM SOCKET', d)
         _.merge(this.model, d)
+        this.getEnv()
       }
     )
     log.i('REFRESHE and ACTIVATE for sockets model', this.model)

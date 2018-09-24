@@ -14,3 +14,4 @@
 /.sourcemaps
 /tslint.json
 /.editorconfig
+/environment.d.ts

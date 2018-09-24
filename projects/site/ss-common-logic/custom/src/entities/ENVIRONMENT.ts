@@ -86,6 +86,7 @@ export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvCon
     const patter = `${project.location}/${config.file.environment}.*`;
     let names = glob
       .sync(patter)
+      .filter(f => f.split('.').pop() === 'js')
       .map(f => path
         .basename(f)
         .replace(`${config.file.environment}.`, '')

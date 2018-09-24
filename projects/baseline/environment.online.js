@@ -1,9 +1,9 @@
 const path = require('path')
 
-const config = require('./environment');
+const { config } = require('./environment');
 
 console.log('baseline config')
 
-module.exports = exports = config;
+module.exports = exports = { config };
 
 

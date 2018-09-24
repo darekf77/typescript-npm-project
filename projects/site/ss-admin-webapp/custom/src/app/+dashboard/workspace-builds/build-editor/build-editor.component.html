@@ -34,7 +34,7 @@
             <strong *ngIf="node.data.name !== 'name'">
               <!-- {{ nodeValue(node.data.value) }} -->
               <input  *ngIf="node.data.isSimple" type="{{ node.data.type === 'boolean' ? 'checkbox': 'text' }}"
-                     [(ngModel)]="node.data.value" [disabled]="true" >
+                     [(ngModel)]="node.data.value" [(checked)]="node.data.value" [disabled]="true"  [style.width.px]="200" >
             </strong>
             <!-- <button (click)="go($event)">Custom Action</button> -->
           </ng-template>

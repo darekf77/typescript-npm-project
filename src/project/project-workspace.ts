@@ -26,7 +26,7 @@ export class ProjectWorkspace extends Project {
     return 'echo "Workspace server started"';
   }
   projectSpecyficFiles(): string[] {
-    return [];
+    return ['environment.d.ts'];
   }
 
   buildSteps(buildOptions?: BuildOptions) {

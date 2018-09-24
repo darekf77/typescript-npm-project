@@ -50,6 +50,6 @@ const config = {
 
 }
 
-module.exports = exports = config;
+module.exports = exports = { config };
 
 

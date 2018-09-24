@@ -1,6 +1,6 @@
 const path = require('path')
 
-const config = require('baseline/environment');
+const { config } = require('baseline/environment');
 
 
 config.workspace.workspace.port = `1${config.workspace.workspace.port}`;
@@ -12,6 +12,6 @@ config.pathes.backup.repositories = path.join(__dirname, 'backup', 'repositories
 config.pathes.backup.builds = path.join(__dirname, 'backup', 'builds');
 
 
-module.exports = exports = config;
+module.exports = exports = { config };
 
 

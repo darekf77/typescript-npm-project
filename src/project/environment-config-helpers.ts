@@ -215,13 +215,13 @@ export function workspaceConfigBy(workspace: Project, environment: EnvironmentNa
     }
 
     try {
-      config = require(pathToProjectEnvironment) as any;
+      config = require(pathToProjectEnvironment).config as any;
     } catch (error) {
       if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
         console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
         workspace.join.init() // fix for recreating site
       }
-      config = require(pathToProjectEnvironment) as any;
+      config = require(pathToProjectEnvironment).config as any;
     }
 
   }

@@ -29,3 +29,4 @@
 /!custom/environment.online.js
 /tslint.json
 /.editorconfig
+/environment.d.ts
