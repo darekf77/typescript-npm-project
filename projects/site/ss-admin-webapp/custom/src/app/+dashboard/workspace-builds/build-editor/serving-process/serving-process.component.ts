@@ -27,7 +27,13 @@ export class ServingProcessComponent implements OnInit {
         action: async () => {
           await this.buildController.startServeById(this.model.id).received
           log.i('serve process started!')
-        }
+        },
+      },
+      expressionProperties: {
+        'templateOptions.disabled': () => (!this.model ||
+          !this.model.project ||
+          !this.model.project.progress ||
+          this.model.project.progress.status !== 'complete')
       },
       hideExpression: () => (!this.model || _.isNumber(this.model.project.pidServeProces))
     },
@@ -49,6 +55,7 @@ export class ServingProcessComponent implements OnInit {
       templateOptions: {
         icon: 'screen_share',
         label: 'Display',
+        // disabled: true,
         action: async () => {
           // window.open()
         }

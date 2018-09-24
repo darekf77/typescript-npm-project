@@ -9,7 +9,8 @@ import * as _ from 'lodash';
 @Component({
   selector: 'app-formly-button-with-action',
   template: `
-     <button mat-raised-button type="button" (click)="action()" >{{field.templateOptions.label}}</button>
+     <button mat-raised-button type="button" [disabled]="field.templateOptions.disabled"
+     (click)="action()" >{{field.templateOptions.label}}</button>
   `,
   styles: [`
     :host {

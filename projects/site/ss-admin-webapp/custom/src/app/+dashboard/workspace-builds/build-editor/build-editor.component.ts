@@ -197,6 +197,11 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     log.i('n', n)
     this.nodes = n;
     this.environmentConfig = body;
+
+    // this.model.project.children = this.model.project.children.map(c => {
+    //   c.
+    // })
+
   }
 
   ngAfterViewInit(): void {
