@@ -41,7 +41,7 @@
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "morphi": "1.0.57",
+    "morphi": "1.0.58",
     "nodemon": "^1.14.11",
     "npm-run": "^4.1.2",
     "omelette": "^0.4.5",
@@ -56,6 +56,7 @@
     "sqlite3": "^4.0.0",
     "ts-node": "3.3.0",
     "tslint": "^5.9.1",
+    "typeorm": "^0.2.7",
     "typescript": "2.6.2",
     "underscore": "^1.9.1",
     "watch": "~1.0.2"

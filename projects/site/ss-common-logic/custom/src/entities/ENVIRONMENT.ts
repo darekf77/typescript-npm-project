@@ -31,7 +31,6 @@ export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvCon
   pathes?: any;
   isCoreProject?: boolean;
   isSiteProject?: boolean;
-  proxyRouterMode?: boolean;
   domain?: string;
   dynamicGenIps?: boolean;
   ip?: string;

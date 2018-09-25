@@ -34,9 +34,21 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
   async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName = 'dev') {
     let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
-    build.project.run('tnp clear').sync()
-    build.project.run(`tnp init --env ${envname}`).sync();
-    build.environmentName = envname;
+    if (build.pidChangeEnvProces) {
+        throw 'changing environment process alredy in progress'
+    }
+    console.log(`start changeing environment to ${envname}`)
+    const p = build.project.run(`tnp clear --onlyWorkspace && tnp init --env ${envname}`,{
+      output: false
+    }).async();
+    p.once('exit', async () => {
+      build = await this.getById(build.id)
+      build.pidChangeEnvProces = undefined;
+      build.environmentName = envname;
+      console.log(`end changeing environment to ${envname}`)
+      await this.updateRealtime(build.id, build)
+    })
+    build.pidChangeEnvProces = p.pid;
     await this.update(build.id, build)
   }
 
@@ -53,7 +65,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
 
     p.on('close', async () => {
       build.project.pidClearProces = null;
-      await this.update(build.id, build)
+      await this.updateRealtime(build.id, build)
       console.log('CLERR COMPLETE  all ? ', all)
       // Global.vars.socket.BE.emit('clearbuildend', build);
     })
@@ -113,7 +125,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             PROGRESS_BAR_DATA.resolveFrom(chunk, async (progress) => {
               let b = await self.getById(id);
               b.project.progress = progress as any;
-              await self.update(id, b)
+              await self.updateRealtime(id, b)
               console.log('progress updated', progress)
               // Global.vars.socket.BE.emit('newprogress', progress);
             })
@@ -127,12 +139,12 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
             p.status = 'error';
             p.value = b.project.progress && b.project.progress.value;
             b.project.progress = p as any;
-            await self.update(id, b)
+            await self.updateRealtime(id, b)
           },
           endAction: async () => {
             build = await self.getById(id);
             build.project.pidBuildProces = null;
-            await self.update(id, build)
+            await self.updateRealtime(id, build)
             // Global.vars.socket.BE.emit('endofbuild', build);
             console.log('END ACTION BUILDING')
           }

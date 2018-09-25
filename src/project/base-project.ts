@@ -352,7 +352,7 @@ export abstract class Project {
     }
   }
 
-  public clear(includeNodeModules = false) {
+  public clear(includeNodeModules = false, onlyWorkspace = false) {
     console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
 
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
@@ -369,11 +369,14 @@ export abstract class Project {
       .join(' ')
     // console.log(`rimraf ${gitginoredfiles}`)
     this.run(`rimraf ${gitginoredfiles}`).sync();
-    if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
-      this.children.forEach(childProject => {
-        childProject.clear(includeNodeModules)
-      })
+    if (!onlyWorkspace) {
+      if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
+        this.children.forEach(childProject => {
+          childProject.clear(includeNodeModules)
+        })
+      }
     }
+
   }
 
   public static by(libraryType: LibType): Project {

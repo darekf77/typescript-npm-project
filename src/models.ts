@@ -37,7 +37,6 @@ export interface IBuildOptions {
   appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
-  proxyRouterMode?: boolean;
   copyto?: Project[];
   environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];
@@ -51,7 +50,6 @@ export class BuildOptions implements IBuildOptions {
   appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
-  proxyRouterMode?: boolean;
   copyto?: Project[];
   environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];

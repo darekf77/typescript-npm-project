@@ -6,12 +6,11 @@ import { Project } from '../project';
 import { clearConsole } from '../process';
 
 export function clear(args, all = false) {
-  let { ignore } = require('minimist')(args.split(' '));
-  if (ignore) {
-    console.log('ignore', ignore)
-  }
+  let { onlyWorkspace } = require('minimist')(args.split(' '));
+  // console.log('onlyWorkspace', onlyWorkspace)
+
   clearConsole()
-  Project.Current.clear(all)
+  Project.Current.clear(all,onlyWorkspace)
   process.exit(0)
 }
 

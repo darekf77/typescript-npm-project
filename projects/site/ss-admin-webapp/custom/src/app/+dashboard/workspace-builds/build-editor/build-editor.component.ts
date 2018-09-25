@@ -43,11 +43,11 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     public buildController: BuildController
   ) {
 
-    router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.ngOnInit();
-      }
-    });
+    // router.events.subscribe(event => {
+    //   if (event instanceof NavigationEnd) {
+    //     this.ngOnInit();
+    //   }
+    // });
 
 
   }
@@ -64,25 +64,26 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
   private async refreshModel() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
 
-    const data = await this.buildController.getBy(this.id, this.modelDataConfig).received
+    let data = await this.buildController.getBy(this.id, this.modelDataConfig).received
     this.model = data.body.json;
 
     this.model.realtimeEntity.subscribe(
-      (d) => {
+      async (d) => {
         log.i('BUILD UPDATE FROM SOCKET', d)
-        _.merge(this.model, d)
-        this.getEnv()
+        // data = await this.buildController.getBy(this.id, this.modelDataConfig).received
+        _.merge(this.model, data.body.json);
+        // await this.getEnvNames()
+        await this.getEnv()
       }
     )
     log.i('REFRESHE and ACTIVATE for sockets model', this.model)
-
 
   }
 
   model: BUILD;
 
   async ngOnInit() {
-
+    log.i('ON INIT')
 
     this.fields = [
       {
@@ -96,7 +97,13 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
           options: [],
           change: async (field, change: MatRadioChange) => {
             log.i('environment changed to: ', change.value)
-            await this.buildController.changeEnvironment(this.model.id, change.value);
+            const data = await this.buildController.changeEnvironment(this.model.id, change.value).received
+            this.model.pidChangeEnvProces = data.body.json.pidChangeEnvProces;
+          }
+        },
+        expressionProperties: {
+          'templateOptions.disabled': () => {
+            return !this.model || _.isNumber(this.model.pidChangeEnvProces)
           }
         }
       },
@@ -195,19 +202,8 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     const n = this.objectToNode(body).children;
 
 
-    this.nodes = []
-    this.environmentConfig = undefined;
-
-    setTimeout(() => {
-      log.i('new nodes', n)
-      this.nodes = n;
-      this.environmentConfig = body;
-    }, 2000)
-
-    // this.model.project.children = this.model.project.children.map(c => {
-    //   c.
-    // })
-
+    this.nodes = n;
+    this.environmentConfig = body;
   }
 
   ngAfterViewInit(): void {

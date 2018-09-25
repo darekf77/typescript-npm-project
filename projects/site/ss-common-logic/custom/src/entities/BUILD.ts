@@ -140,6 +140,18 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     return _.merge(new BUILD(), obj);
   }
 
+  get isInProgressBuilding() {
+    return this.project && _.isNumber(this.project.pidBuildProces);
+  }
+
+  get isInProgressServing() {
+    return this.project && _.isNumber(this.project.pidServeProces);
+  }
+
+  get isInProgressClearing() {
+    return this.project && _.isNumber(this.project.pidClearProces);
+  }
+
   get name() {
     return (this.gitFolder !== '/') ? _.startCase(this.gitFolder) : _.startCase(this.nameFromRemote);
   }
@@ -158,6 +170,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column({ default: config.names.env.dev }) environmentName: string;
 
   @Column({ nullable: true }) staticFolder: string;
+  @Column({ nullable: true }) pidChangeEnvProces: number;
 
   @Column({ nullable: true, default: '/' }) gitFolder: string;
 
