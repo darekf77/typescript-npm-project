@@ -305,12 +305,6 @@ export abstract class Project {
 
     this.buildOptions = buildOptions;
 
-    if (this.isWorkspaceChildProject) {
-      this.parent.tnpHelper.install()
-    } else if (this.isWorkspace) {
-      this.tnpHelper.install()
-    }
-
     let baseHref: string;
     // console.log('AM HERE')
     if (this.type === 'workspace') {

@@ -194,15 +194,15 @@ export function workspaceConfigBy(workspace: Project, environment: EnvironmentNa
         ...without environment${envSurfix}.js config.`);
     }
 
-    try {
-      config = require(pathToProjectEnvironment).config as any;
-    } catch (error) {
-      if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
-        console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
-        workspace.join.init() // fix for recreating site
-      }
-      config = require(pathToProjectEnvironment).config as any;
-    }
+    // try {
+    config = require(pathToProjectEnvironment).config as any;
+    // } catch (error) {
+    //   if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
+    //     console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
+    //     workspace.join.init() // fix for recreating site
+    //   }
+    //   config = require(pathToProjectEnvironment).config as any;
+    // }
 
   }
   validateWorkspaceConfig(config);

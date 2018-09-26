@@ -8,6 +8,12 @@ async function initialize(
   pArgs?: string,
   project = Project.Current, watch = false) {
 
+  if (project.isWorkspaceChildProject) {
+    project.parent.tnpHelper.install()
+  } else if (project.isWorkspace) {
+    project.tnpHelper.install()
+  }
+
   if (project.parent) {
     project.parent.recreate.init();// TODO QUICK IFX
   }
@@ -15,6 +21,13 @@ async function initialize(
   project.recreate.init();
 
   if (project.isSite) {
+
+    if (project.isWorkspaceChildProject) {
+      project.parent.baseline.tnpHelper.install()
+    } else if (project.isWorkspace) {
+      project.baseline.tnpHelper.install()
+    }
+
     if (project.baseline && project.baseline.isWorkspaceChildProject) {
       project.baseline.parent.recreate.init()
     }

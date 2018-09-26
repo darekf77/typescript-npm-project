@@ -68,9 +68,9 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     this.model = data.body.json;
 
     this.model.realtimeEntity.subscribe(
-      async (d) => {
-        log.i('BUILD UPDATE FROM SOCKET', d)
-        // data = await this.buildController.getBy(this.id, this.modelDataConfig).received
+      async () => {
+        log.i('BUILD UPDATE FROM SOCKET')
+        data = await this.buildController.getBy(this.id, this.modelDataConfig).received
         _.merge(this.model, data.body.json);
         // await this.getEnvNames()
         await this.getEnv()
