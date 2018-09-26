@@ -322,17 +322,18 @@ export abstract class Project {
     // TODO do this for isomorphic lib also
     // QUCIK_FIX for lazy programmers :P
     // IS IS NOT WOKRING BECOUSE morphi cwd typescript bug
-    // if (this.isWorkspaceChildProject && this.type === 'angular-client') {
-    //   const requiredLibs = this.parent.children
-    //     .filter(c => (c.type === 'angular-lib' || c.type === 'isomorphic-lib') && !c.isBuildedLib)
+    if (this.isWorkspaceChildProject && this.type === 'angular-client') {
+      const requiredLibs = this.parent.children
+        .filter(c => (c.type === 'angular-lib') && !c.isBuildedLib)
 
-    //   for (let i = 0; i < requiredLibs.length; i++) {
-    //     const c = requiredLibs[i];
-    //     await build(_.merge(buildOptions, {
-    //       watch: false
-    //     }), undefined, c);
-    //   }
-    // }
+      for (let i = 0; i < requiredLibs.length; i++) {
+        const c = requiredLibs[i];
+        await build(_.merge(buildOptions, {
+          watch: false,
+          appBuild: false
+        } as BuildOptions), undefined, c, false);
+      }
+    }
 
     this.buildSteps(buildOptions);
   }

@@ -34,7 +34,7 @@ export async function buildApp(prod = false, watch = false, outDir: BuildDir = '
 }
 
 
-export async function build(opt: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current) {
+export async function build(opt: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current, exit = true) {
 
   const { watch, appBuild, args } = opt;
 
@@ -60,7 +60,7 @@ export async function build(opt: BuildOptions, allowedLibs: LibType[], project: 
   }
 
   await project.build(opt);
-  if (!watch) {
+  if (exit && !watch) {
     process.exit(0)
   }
 
