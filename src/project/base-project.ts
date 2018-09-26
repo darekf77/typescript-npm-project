@@ -328,7 +328,7 @@ export abstract class Project {
 
       for (let i = 0; i < requiredLibs.length; i++) {
         const c = requiredLibs[i];
-        await build(_.merge(buildOptions, {
+        await build(_.merge(_.cloneDeep(buildOptions), {
           watch: false,
           appBuild: false
         } as BuildOptions), undefined, c, false);
