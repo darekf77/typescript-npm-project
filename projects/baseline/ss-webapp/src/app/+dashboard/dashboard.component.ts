@@ -12,7 +12,7 @@ import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
 import { Subscription } from 'rxjs/Subscription';
 
 import { stringifyToQueryParams } from 'ss-common-ui/module';
-import GroupsController from 'ss-common-logic/browser/controllers/GroupsController';
+import {GroupsController} from 'ss-common-logic/browser/controllers/GroupsController';
 import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
 
 const log = Log.create('Dashboard')

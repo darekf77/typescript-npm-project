@@ -54,5 +54,3 @@ export class DomainsController extends META.BASE_CONTROLLER<DOMAIN> {
   //#endregion
 
 }
-
-export default DomainsController;

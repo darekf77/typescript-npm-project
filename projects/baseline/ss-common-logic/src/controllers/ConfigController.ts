@@ -94,5 +94,3 @@ export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
 
 }
 
-
-export default ConfigController;

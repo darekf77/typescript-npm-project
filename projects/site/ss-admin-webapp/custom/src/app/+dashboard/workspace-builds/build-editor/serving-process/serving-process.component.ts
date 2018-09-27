@@ -8,7 +8,7 @@ const log = Log.create('building process')
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
-
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 
 
 @Component({
@@ -18,6 +18,10 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 })
 export class ServingProcessComponent implements OnInit {
 
+  constructor(
+    public projectController: TnpProjectController
+  ) { }
+
   fields = [
     {
 
@@ -25,7 +29,7 @@ export class ServingProcessComponent implements OnInit {
       templateOptions: {
         icon: 'play_arrow',
         action: async () => {
-          await this.buildController.startServeById(this.model.id).received
+          await this.projectController.startServeById(this.model.project.id).received
           log.i('serve process started!')
         },
       },
@@ -43,7 +47,7 @@ export class ServingProcessComponent implements OnInit {
       templateOptions: {
         icon: 'stop',
         action: async () => {
-          await this.buildController.stopServeById(this.model.id).received
+          await this.projectController.stopServeById(this.model.project.id).received
           log.i('serve process stopped!')
         }
       },
@@ -81,9 +85,7 @@ export class ServingProcessComponent implements OnInit {
 
   @Input() model: BUILD;
 
-  constructor(
-    public buildController: BuildController
-  ) { }
+
 
   ngOnInit() {
   }

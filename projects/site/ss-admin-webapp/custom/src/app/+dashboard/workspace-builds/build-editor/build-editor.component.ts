@@ -1,4 +1,7 @@
-import { Component, OnInit, ViewChild, TemplateRef, NgZone, AfterViewInit } from '@angular/core';
+import {
+  Component, OnInit, ViewChild, TemplateRef,
+  NgZone, OnDestroy, AfterViewInit
+} from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 // material
 
@@ -14,6 +17,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 import { EnvironmentName } from 'tnp-bundle';
 import { EnvConfig } from 'tnp-bundle/browser';
@@ -25,30 +29,40 @@ import { MatRadioChange } from '@angular/material';
   templateUrl: './build-editor.component.html',
   styleUrls: ['./build-editor.component.scss']
 })
-export class BuildEditorComponent implements OnInit, AfterViewInit {
+export class BuildEditorComponent implements OnInit, OnDestroy {
 
-
-  modelDataConfig = new ModelDataConfig({
-    joins: ['project', 'project.children']
+  modelDataConfigBuild = new ModelDataConfig({
+    joins: ['project',
+      //  'project.children'
+    ]
   })
+
+  modelDataConfigProject = new ModelDataConfig({
+    // joins: ['children']
+  })
+
   id: number;
+
+  environments: EnvironmentName[] = []
+
+  fields: FormlyFieldConfig[] = [];
+
+  model: BUILD;
+
+  nodes = [];
+  environmentConfig: EnvConfig;
+  selected: EnvironmentName;
+
+  @ViewChild('tree') tree;
+  treeOptions = { isExpandedField: 'expanded' }
+
 
 
   constructor(
     public route: ActivatedRoute,
-    private router: Router,
-    private matDialog: MatDialog,
-    private ngZone: NgZone,
-
-    public buildController: BuildController
+    public buildController: BuildController,
+    public projectController: TnpProjectController
   ) {
-
-    // router.events.subscribe(event => {
-    //   if (event instanceof NavigationEnd) {
-    //     this.ngOnInit();
-    //   }
-    // });
-
 
   }
 
@@ -57,33 +71,10 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
       return { 'value': e, 'label': `${_.upperCase(e)}` }
     }) : []
   };
-  environments: EnvironmentName[] = []
 
-  fields: FormlyFieldConfig[] = [];
 
-  private async refreshModel() {
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
-
-    let data = await this.buildController.getBy(this.id, this.modelDataConfig).received
-    this.model = data.body.json;
-
-    this.model.realtimeEntity.subscribe(
-      async () => {
-        log.i('BUILD UPDATE FROM SOCKET')
-        data = await this.buildController.getBy(this.id, this.modelDataConfig).received
-        _.merge(this.model, data.body.json);
-        // await this.getEnvNames()
-        await this.getEnv()
-      }
-    )
-    log.i('REFRESHE and ACTIVATE for sockets model', this.model)
-
-  }
-
-  model: BUILD;
 
   async ngOnInit() {
-    log.i('ON INIT')
 
     this.fields = [
       {
@@ -110,42 +101,12 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     ] as FormlyFieldConfig[];
 
 
-    await this.refreshModel()
-    await this.getEnvNames()
-    await this.getEnv()
+    await this.updateModel()
   }
 
-  complete() {
+  complete() { }
 
-  }
 
-  nodes = [
-    {
-      id: 1,
-      name: 'root1',
-      children: [
-        { id: 2, name: 'child1' },
-        { id: 3, name: 'child2' }
-      ]
-    },
-    {
-      id: 4,
-      name: 'root2',
-      children: [
-        { id: 5, name: 'child2.1' },
-        {
-          id: 6,
-          name: 'child2.2',
-          children: [
-            { id: 7, name: 'subsub' }
-          ]
-        }
-      ]
-    }
-  ];
-
-  @ViewChild('tree') tree;
-  treeOptions = { isExpandedField: 'expanded' }
 
   objectToNode(o: any, ValueKey: string | number = '', parentObj: any = {}) {
     // log.color = 'red'
@@ -193,10 +154,38 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     return v
   }
 
-  environmentConfig: EnvConfig;
-  async getEnv() {
+
+
+  async updateProject(project: TNP_PROJECT) {
+    project.realtimeEntity.subscribe(async () => {
+      const data = await this.projectController.getBy(this.model.project.id, this.modelDataConfigProject).received
+      log.i('REALTIME ACTION PROJECT',data)
+      _.merge(project, data.body.json)
+    })
+  }
+
+  async updateModel() {
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
+    let data = await this.buildController.getBy(this.id, this.modelDataConfigBuild).received
+    this.model = data.body.json;
+
+    // log.i('REFRESHE and ACTIVATE for sockets model', this.model)
+    this.model.realtimeEntity.subscribe(async () => {
+      data = await this.buildController.getBy(this.id, this.modelDataConfigBuild).received
+      log.i('REALTIME ACTION BUILD',data)
+      _.merge(this.model, data.body.json)
+      await this.getEnv()
+      await this.getEnvNames()
+    })
+    this.updateProject(this.model.project);
+
+    await this.getEnv()
+    await this.getEnvNames()
+  }
+
+  private async getEnv() {
     const data = await this.buildController.getEnvironment(this.model.id).received;
-    log.i('environment', data.body.json)
+    // log.i('environment', data.body.json)
     let body = data.body.json;
     body.packageJSON = undefined;
     const n = this.objectToNode(body).children;
@@ -206,21 +195,18 @@ export class BuildEditorComponent implements OnInit, AfterViewInit {
     this.environmentConfig = body;
   }
 
-  ngAfterViewInit(): void {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
-    // this.tree.treeModel.expandAll();
-  }
-
-  selected: EnvironmentName;
-
-
-
-  async getEnvNames() {
+  private async getEnvNames() {
     const data = await this.buildController.getEnvironmentNames(this.model.id).received;
-    log.i('environment names', data.body.json)
+    // log.i('environment names', data.body.json)
     this.environments = data.body.json.filter(e => !['local', 'online'].includes(e))
     this.fields.find(({ key }) => key === 'environmentName').templateOptions.options = this.options;
+  }
+
+  ngOnDestroy(): void {
+    //Called once, before the instance is destroyed.
+    //Add 'implements OnDestroy' to the class.
+    this.model.realtimeEntity.unsubscribe()
+    this.model.project.realtimeEntity.unsubscribe()
   }
 
 }

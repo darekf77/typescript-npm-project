@@ -47,5 +47,3 @@ export class GroupsController extends META.BASE_CONTROLLER<entities.GROUP> {
 
 }
 
-
-export default GroupsController;

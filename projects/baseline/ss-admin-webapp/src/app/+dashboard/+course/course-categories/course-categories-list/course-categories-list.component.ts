@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
-import CategoryController from 'ss-common-logic/browser/controllers/CategoryController';
-import ExamplesController from 'ss-common-logic/browser/controllers/ExamplesController';
+import {CategoryController} from 'ss-common-logic/browser/controllers/CategoryController';
+import {ExamplesController} from 'ss-common-logic/browser/controllers/ExamplesController';
 import { Subscription } from 'rxjs/Subscription';
 import { Log } from 'ng2-logger';
 

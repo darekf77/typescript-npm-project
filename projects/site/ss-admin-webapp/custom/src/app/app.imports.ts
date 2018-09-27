@@ -3,6 +3,7 @@ import * as baseline from 'baseline/ss-admin-webapp/src/app/app.imports';
 
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 import { DomainsController } from 'ss-common-logic/browser/controllers/DomainsController';
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { DOMAIN } from 'ss-common-logic/browser/entities/DOMAIN';
@@ -13,7 +14,8 @@ export const moprhi = baseline.moprhi
 
 moprhi.controllers = moprhi.controllers.concat([
   BuildController,
-  DomainsController
+  DomainsController,
+  TnpProjectController
 ] as any)
 
 moprhi.entities = moprhi.entities.concat([

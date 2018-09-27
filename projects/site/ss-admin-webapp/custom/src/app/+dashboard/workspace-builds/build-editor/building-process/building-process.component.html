@@ -2,7 +2,7 @@
                            [fields]="fields"
                            [model]="model">
 </app-form-wrapper-material>
-
+<!-- <h2 *ngIf="progress" >{{progress | json}}</h2> -->
 <h6>
   <span> Build progress: </span>
   <span [innerHTML]="info"></span>
@@ -32,7 +32,7 @@
 </mat-accordion> -->
 
 
-<!-- <app-log-prcess *ngIf="isShowingBuildLogs"
+<app-log-prcess *ngIf="isShowingBuildLogs"
                 [type]="'build'"
                 (hide)="isShowingBuildLogs = false"
-                [build]="model"></app-log-prcess> -->
+                [model]="model"></app-log-prcess>

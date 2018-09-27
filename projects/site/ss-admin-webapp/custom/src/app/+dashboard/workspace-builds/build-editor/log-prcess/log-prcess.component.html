@@ -1,14 +1,26 @@
 <ng-template #dialogTmpl>
 
   <!-- <mat-slide-toggle (change)="change($event)"> Realtime </mat-slide-toggle> -->
-  <button mat-button  type="button" (click)="getWholeLog()">
-      <mat-icon>refresh</mat-icon>
-      Refresh
+  <button mat-button
+          type="button"
+          (click)="getWholeLog()">
+    <mat-icon>refresh</mat-icon>
+    Refresh
   </button>
-  <h5 *ngIf="currentProgress" > {{currentProgress}} </h5>
+  <!-- <h5 *ngIf="currentProgress" > {{currentProgress}} </h5> -->
 
-  <div class="log-window"
-       [innerHTML]="content">
-  </div>
+  <mat-tab-group>
+    <mat-tab label="Output">
+      <div class="log-window"
+           [innerHTML]="content">
+      </div>
+    </mat-tab>
+    <mat-tab label="Errors">
+      <div class="log-window"
+           [innerHTML]="content">
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
 
 </ng-template>

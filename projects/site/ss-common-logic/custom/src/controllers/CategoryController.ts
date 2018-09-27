@@ -15,5 +15,3 @@ export class CategoryController extends BaselineCategoryController {
   //#endregion
 
 }
-
-export default CategoryController;

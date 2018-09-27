@@ -46,5 +46,3 @@ export class DialogsController extends META.BASE_CONTROLLER<entities.DIALOG> {
 
 }
 
-
-export default DialogsController;

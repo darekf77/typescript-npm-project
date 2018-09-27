@@ -5,7 +5,7 @@ import { ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('domains-editor')
 // local
-import DomainsController from 'ss-common-logic/browser/controllers/DomainsController';
+import {DomainsController} from 'ss-common-logic/browser/controllers/DomainsController';
 import { DOMAIN } from 'ss-common-logic/browser/entities/DOMAIN';
 
 

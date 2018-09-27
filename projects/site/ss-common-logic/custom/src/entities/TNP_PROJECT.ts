@@ -9,6 +9,7 @@ import { PROGRESS_BAR_DATA, Project } from "tnp-bundle";
 import { CLASSNAME, FormlyForm } from "morphi";
 
 //#region @backend
+import * as path from 'path';
 import { run } from "tnp-bundle";
 import { ProjectFrom, RunOptions } from "tnp-bundle";
 //#endregion
@@ -58,6 +59,25 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
     return p;
     //#endregion
   }
+
+  //#region @backend
+  get servelogFilePath() {
+    return path.join(this.location, 'tmp-server-log.txt');
+  }
+
+  get serverErrorslogFilePath() {
+    return path.join(this.location, 'tmp-serve-errors-log.txt');
+  }
+
+  get buildlogFilePath() {
+    return path.join(this.location, 'tmp-build-log.txt');
+  }
+
+  get buildErrorslogFilePath() {
+    return path.join(this.location, 'tmp-build-errors-log.txt');
+  }
+
+  //#endregion
 
   @PrimaryGeneratedColumn()
   id: number;

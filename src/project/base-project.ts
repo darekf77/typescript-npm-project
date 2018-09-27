@@ -121,12 +121,12 @@ export abstract class Project {
 
   public get isBuildedLib() {
     if (this.type === 'angular-lib') {
-      return fse.existsSync(path.join(this.location && config.folder.module)) &&
-        fse.existsSync(path.join(this.location && config.folder.dist));
+      return fse.existsSync(path.join(this.location, config.folder.module)) &&
+        fse.existsSync(path.join(this.location, config.folder.dist));
     }
     if (this.type === 'isomorphic-lib') {
-      return fse.existsSync(path.join(this.location && config.folder.browser)) &&
-        fse.existsSync(path.join(this.location && config.folder.dist));
+      return fse.existsSync(path.join(this.location, config.folder.browser)) &&
+        fse.existsSync(path.join(this.location, config.folder.dist));
     }
   }
 

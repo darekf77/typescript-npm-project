@@ -6,12 +6,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
 
 const materialModules = [
   MatButtonModule,
   MatIconModule,
   MatDialogModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatCardModule,
+  MatTabsModule
 ];
 
 

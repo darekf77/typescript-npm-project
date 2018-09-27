@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, ViewChild, TemplateRef, AfterContentInit } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs/Subscription';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
@@ -24,7 +25,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   isRealtime = false;
   currentProgress: PROGRESS_BAR_DATA;
   constructor(
-    public buildController: BuildController,
+    public projectController: TnpProjectController,
     private matDialog: MatDialog
   ) {
 
@@ -33,7 +34,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   content: string;
 
-  @Input() build: BUILD;
+  @Input() model: BUILD;
 
   change(e: MatSlideToggleChange) {
     this.isRealtime = e.checked;
@@ -55,7 +56,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   // }
 
   async getWholeLog() {
-    const data = await this.buildController.getByIdLog(this.build.id, this.type).received
+    const data = await this.projectController.getByIdLog(this.model.project.id, this.type).received
     this.clear(data.body.json)
     this.content = data.body.json.join('<br>')
   }
@@ -73,7 +74,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
   }
 
   async getLastNlinesOfLog(n: number) {
-    const data = await this.buildController.getByIdLog(this.build.id, this.type, n).received
+    const data = await this.projectController.getByIdLog(this.model.id, this.type, n).received
     this.clear(data.body.json)
     this.content = data.body.json.join('<br>')
   }
@@ -84,7 +85,7 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
 
   handlers: Subscription[] = [];
   ngOnInit() {
-    this.isRealtime = (!!this.build.project.pidBuildProces);
+    this.isRealtime = (!!this.model.project.pidBuildProces);
     // if (this.isRealtime) {
     //   this.pullLastLoop();
     // } else {
@@ -97,10 +98,10 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
       this.dialog = this.matDialog.open(this.dialogTmpl, {
         height: '400px'
       });
-      this.handlers.push(this.dialog.afterClosed().subscribe(() => {
-        this.isRealtime = false;
-        this.hide.emit()
-      }))
+      // this.dialog.afterClosed().subscribe(() => {
+      //   this.isRealtime = false;
+      //   this.hide.emit()
+      // })
       this.getWholeLog()
     })
   }

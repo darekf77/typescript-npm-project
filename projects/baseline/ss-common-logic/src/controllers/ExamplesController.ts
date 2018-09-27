@@ -70,5 +70,3 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
 
 }
 
-
-export default ExamplesController;

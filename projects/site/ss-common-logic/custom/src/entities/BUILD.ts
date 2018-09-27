@@ -49,13 +49,8 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   get localPath() {
 
     return {
-      repository: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote),
       repositoryFolder: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote, this.gitFolder),
-      buildFolder: path.join(ENV.pathes.backup.builds, this.nameFromIdAndRemote),
-      buildLog: path.join(ENV.pathes.backup.builds, `build-${this.nameFromIdAndRemote}.txt`),
-      buildErrorLog: path.join(ENV.pathes.backup.builds, `build-error-${this.nameFromIdAndRemote}.txt`),
-      serveLog: path.join(ENV.pathes.backup.builds, `serve-${this.nameFromIdAndRemote}.txt`),
-      serveErrorLog: path.join(ENV.pathes.backup.builds, `serve-error-${this.nameFromIdAndRemote}.txt`)
+      buildFolder: path.join(ENV.pathes.backup.builds, this.nameFromIdAndRemote)
     }
 
   }
@@ -72,7 +67,6 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
     this.project = project;
   }
 
-  recreateEnvironment
 
   private get reinitFrom() {
     const self = this;
@@ -84,7 +78,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
         }
 
         const toCopy = path.join(self.staticFolder, self.gitFolder);
-        const dest = path.join(self.localPath.repository, self.gitFolder)
+        const dest = self.localPath.repositoryFolder;
 
         const options: fse.CopyOptionsSync = {
           overwrite: true,

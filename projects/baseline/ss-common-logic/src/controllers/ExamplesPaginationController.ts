@@ -57,4 +57,3 @@ export class ExamplesPaginationController extends META.BASE_CONTROLLER<entities.
 }
 
 
-export default ExamplesPaginationController;

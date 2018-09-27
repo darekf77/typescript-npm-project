@@ -37,6 +37,8 @@ import {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 export {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 
 
+import {   TNP_PROJECT_REPOSITORY } from './repositories/TNP_PROJECT_REPOSITORY';
+export {   TNP_PROJECT_REPOSITORY } from './repositories/TNP_PROJECT_REPOSITORY';
 
 import { Repository } from "typeorm";
 export { Repository } from "typeorm";
@@ -53,7 +55,7 @@ DOMAIN: META.repositoryFrom<DOMAIN , DOMAIN_REPOSITORY>(connection, DOMAIN , DOM
 
 ENVIRONMENT: META.repositoryFrom<ENVIRONMENT>(connection, ENVIRONMENT),
 
-TNP_PROJECT: META.repositoryFrom<TNP_PROJECT>(connection, TNP_PROJECT),
+TNP_PROJECT: META.repositoryFrom<TNP_PROJECT , TNP_PROJECT_REPOSITORY>(connection, TNP_PROJECT , TNP_PROJECT_REPOSITORY),
 }  );
 }
 //#endregion

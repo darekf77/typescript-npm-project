@@ -167,5 +167,3 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
 
 }
 
-
-export default CategoryController;

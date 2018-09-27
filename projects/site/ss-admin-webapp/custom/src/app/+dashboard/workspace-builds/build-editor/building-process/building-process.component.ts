@@ -9,6 +9,7 @@ import { Global } from 'morphi/browser'
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 import { MatDialog } from '@angular/material';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
@@ -21,6 +22,12 @@ import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 })
 export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
+  constructor(
+    public projectController: TnpProjectController,
+
+    public matDialog: MatDialog
+
+  ) { }
 
 
 
@@ -34,7 +41,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
         icon: 'play_arrow',
         // label: 'Start',
         action: async () => {
-          await this.buildController.startBuildById(this.model.id).received
+          await this.projectController.startBuildById(this.model.project.id).received
           log.i('build process started!')
         }
       },
@@ -48,7 +55,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       templateOptions: {
         icon: 'stop',
         action: async () => {
-          await this.buildController.stopBuildById(this.model.id).received
+          await this.projectController.stopBuildById(this.model.project.id).received
           log.i('build process stopped!')
         }
       },
@@ -72,17 +79,17 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       templateOptions: {
         icon: 'refresh',
         action: async () => {
-          this.buildController.clearById(this.model.id).received.observable.subscribe(async () => {
+          this.projectController.clearById(this.model.project.id).received.observable.subscribe(async () => {
             log.i('CLEAR COMPLETE')
           })
         }
       },
       expressionProperties: {
         'templateOptions.disabled': () => {
-          return (this.model && !!this.model.project.pidClearProces)
+          return (this.model && _.isNumber(this.model.project.pidClearProces))
         },
         'templateOptions.label': () => {
-          return (this.model && !!this.model.project.pidClearProces) ? 'is clearing... ' : 'Clear';
+          return (this.model && _.isNumber(this.model.project.pidClearProces)) ? 'is clearing... ' : 'Clear';
         }
       },
       hideExpression: () => (this.model && !!this.model.project.pidBuildProces)
@@ -118,12 +125,6 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   }
 
 
-  constructor(
-    public buildController: BuildController,
-    public matDialog: MatDialog,
-    private ngZone: NgZone
-
-  ) { }
 
   ngOnInit() { }
 

@@ -11,7 +11,7 @@ import { BuildController } from 'ss-common-logic/browser/controllers/BuildContro
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module';
-import DomainsController from 'ss-common-logic/browser/controllers/DomainsController';
+import { DomainsController } from 'ss-common-logic/browser/controllers/DomainsController';
 import { Global } from 'morphi/browser';
 
 const log = Log.create('Dashboard', Level.__NOTHING);

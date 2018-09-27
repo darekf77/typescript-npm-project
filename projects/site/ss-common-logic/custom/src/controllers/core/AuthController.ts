@@ -54,5 +54,3 @@ export class AuthController extends BaselineAuthController {
 
 }
 
-
-export default AuthController;

@@ -29,7 +29,7 @@ export { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 export { Subject } from "rxjs/Subject";
 
-const log = Log.create('AuthController');
+const log = Log.create('AuthController', Level.__NOTHING);
 
 
 import { META } from 'morphi';
@@ -569,6 +569,3 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
 
 }
-
-
-export default AuthController;
