@@ -68,7 +68,10 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
           throw `Build already started on port ${project.pidBuildProces}`;
         }
 
-        let p = run(`tnp build`, { cwd: project.location, output: false }).async()
+        let p = run(`tnp build`, {
+          cwd: project.location, output: false,
+          biggerBuffer: true
+        }).async()
 
         fse.writeFileSync(project.buildlogFilePath, '');
 
