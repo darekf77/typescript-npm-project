@@ -33,12 +33,12 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
 
   modelDataConfigBuild = new ModelDataConfig({
     joins: ['project',
-      //  'project.children'
+      'project.children'
     ]
   })
 
   modelDataConfigProject = new ModelDataConfig({
-    // joins: ['children']
+    joins: ['children']
   })
 
   id: number;
@@ -159,7 +159,7 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
   async updateProject(project: TNP_PROJECT) {
     project.realtimeEntity.subscribe(async () => {
       const data = await this.projectController.getBy(this.model.project.id, this.modelDataConfigProject).received
-      log.i('REALTIME ACTION PROJECT',data)
+      log.i('REALTIME ACTION PROJECT', data)
       _.merge(project, data.body.json)
     })
   }
@@ -172,7 +172,7 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
     // log.i('REFRESHE and ACTIVATE for sockets model', this.model)
     this.model.realtimeEntity.subscribe(async () => {
       data = await this.buildController.getBy(this.id, this.modelDataConfigBuild).received
-      log.i('REALTIME ACTION BUILD',data)
+      log.i('REALTIME ACTION BUILD', data)
       _.merge(this.model, data.body.json)
       await this.getEnv()
       await this.getEnvNames()
@@ -193,6 +193,14 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
 
     this.nodes = n;
     this.environmentConfig = body;
+    if (this.model && this.model.project && this.model.project.children
+      && body.workspace && body.workspace.projects
+    ) {
+      this.model.project.children.forEach(c => {
+        let s = body.workspace.projects.find(p => p.name === c.name);
+        _.merge(c, s);
+      })
+    }
   }
 
   private async getEnvNames() {

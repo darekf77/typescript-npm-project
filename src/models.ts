@@ -108,10 +108,13 @@ export interface EnvConfigProject {
   hostSocket?: string; // tnp generated
   externalHost?: string;
   name: string;  // tnp checked
-  port: number; // override tnp type port
   type?: LibType; // tnp checked
+
+  //#region @backend
+  port: number; // override tnp type port
   $db?: ConnectionOptions;
   isWatchBuild?: boolean; // tnp generated
+  //#endregion
 }
 
 export interface EnvConfig {

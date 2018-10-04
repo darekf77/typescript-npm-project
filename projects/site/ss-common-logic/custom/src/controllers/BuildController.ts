@@ -8,6 +8,7 @@ import { EnvironmentName } from 'tnp-bundle'
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as sleep from 'sleep';
 //#endregion
 
 import * as entities from '../entities';
@@ -87,7 +88,17 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.getById(id);
-      const env = entities.ENVIRONMENT.from(build.project);
+      let env;
+      function tryToGenEnvironment() {
+        try {
+          env = entities.ENVIRONMENT.from(build.project);
+        } catch (error) {
+          console.log(`Trying get evironment by id ${id}`)
+          sleep.sleep(1);
+          tryToGenEnvironment();
+        }
+      }
+      tryToGenEnvironment()
       return env;
     }
     //#endregion
@@ -109,7 +120,17 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.getById(id);
-      const names = entities.ENVIRONMENT.namesFrom(build.project);
+      let names = []
+      function tryAssignNames() {
+        try {
+          names = entities.ENVIRONMENT.namesFrom(build.project);
+        } catch (error) {
+          console.log('Trying get evironment names..')
+          sleep.sleep(1);
+          tryAssignNames();
+        }
+      }
+      tryAssignNames()
       return names;
     }
     //#endregion

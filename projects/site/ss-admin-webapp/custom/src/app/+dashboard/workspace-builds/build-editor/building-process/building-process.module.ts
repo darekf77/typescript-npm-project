@@ -5,6 +5,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatRadioModule } from '@angular/material/radio'
+import { MatButtonModule } from '@angular/material/button'
+import { MatIconModule } from '@angular/material/icon'
+import { MatTooltipModule } from '@angular/material/tooltip'
 // local
 import { BuildingProcessComponent } from './building-process.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
@@ -15,7 +18,10 @@ const materialModules = [
   MatSlideToggleModule,
   MatProgressBarModule,
   MatExpansionModule,
-  MatRadioModule
+  MatRadioModule,
+  MatButtonModule,
+  MatIconModule,
+  MatTooltipModule
 ]
 
 @NgModule({

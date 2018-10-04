@@ -3,23 +3,29 @@ import { EnvConfig } from './models';
 
 
 export const config: EnvConfig = {
+  workspace: {
     workspace: {
-      workspace: {
-        baseUrl: '/info',
-        name: 'workspace-name',
-        port: 5000
+      baseUrl: '/info',
+      name: 'workspace-name',
+      //#region @backend
+      port: 5000
+      //#endregion
+    },
+    projects: [
+      {
+        baseUrl: '/some-api-endpoint',
+        name: 'project-name-in-workspace',
+        //#region @backend
+        port: 3000
+        //#endregion
       },
-      projects: [
-        {
-          baseUrl: '/some-api-endpoint',
-          name: 'project-name-in-workspace',
-          port: 3000
-        },
-        {
-          baseUrl: '/',
-          name: 'other-example-projet-name',
-          port: 4000
-        }
-      ]
-    }
+      {
+        baseUrl: '/',
+        name: 'other-example-projet-name',
+        //#region @backend
+        port: 4000
+        //#endregion
+      }
+    ]
   }
+}

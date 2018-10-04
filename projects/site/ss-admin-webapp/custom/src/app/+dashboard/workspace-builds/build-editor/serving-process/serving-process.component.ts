@@ -37,7 +37,7 @@ export class ServingProcessComponent implements OnInit {
         'templateOptions.disabled': () => (!this.model ||
           !this.model.project ||
           !this.model.project.progress ||
-          this.model.project.progress.status !== 'complete')
+          this.model.project.progress.value < 100)
       },
       hideExpression: () => (!this.model || _.isNumber(this.model.project.pidServeProces))
     },

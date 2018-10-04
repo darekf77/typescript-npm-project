@@ -5,7 +5,7 @@ import {
 import BUILD from "./BUILD";
 import * as _ from 'lodash';
 
-import { PROGRESS_BAR_DATA, Project } from "tnp-bundle";
+import { PROGRESS_BAR_DATA, Project, EnvConfigProject, LibType } from "tnp-bundle";
 import { CLASSNAME, FormlyForm } from "morphi";
 
 //#region @backend
@@ -34,7 +34,12 @@ export interface ITNP_PROJECT {
     progress: PROGRESS_BAR_DATA
   })
 @CLASSNAME('TNP_PROJECT')
-export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
+export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvConfigProject {
+  baseUrl: string;
+  host?: string;
+  hostSocket?: string;
+  externalHost?: string;
+  type?: LibType;
   fromRaw(obj: ITNP_PROJECT): TNP_PROJECT {
     return _.merge(new TNP_PROJECT(), obj);
   }
@@ -97,7 +102,19 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT>  {
   @TreeParent()
   parent: TNP_PROJECT;
 
-  @Column({ nullable: true }) port: string;
+  get buildInProgress() {
+    return (_.isNumber(this.pidBuildProces));
+  }
+
+  get serveInProgress() {
+    return (_.isNumber(this.pidServeProces));
+  }
+
+  get clearInProgress() {
+    return (_.isNumber(this.pidServeProces));
+  }
+
+  @Column({ nullable: true }) port: number;
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidClearProces: number;
   @Column({ nullable: true }) pidServeProces: number;

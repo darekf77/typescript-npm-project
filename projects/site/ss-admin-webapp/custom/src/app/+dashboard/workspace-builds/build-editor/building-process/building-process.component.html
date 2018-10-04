@@ -15,21 +15,51 @@
                   (closed)="panelOpenState = false" -->
 
 
+<br>
+<mat-accordion *ngIf="project">
 
-<!-- <mat-accordion *ngIf="project">
-
-  <mat-expansion-panel *ngFor="let p of project.children">
+  <mat-expansion-panel *ngFor="let p of project.children"
+                       [disabled]="project.pidClearProces ||
+                        project.pidBuildProces ||
+                        project.pidServeProces">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{p.name}}
       </mat-panel-title>
       <mat-panel-description>
-        Currently I am {{panelOpenState ? 'open' : 'closed'}}
+        {{ p.buildInProgress ? 'REBUILDING IN PROGRESS:': '' }} {{p.baseUrl}}
       </mat-panel-description>
     </mat-expansion-panel-header>
-    <p>I'm visible because I am open</p>
+
+    <div class="accordion-wrap">
+      <span> Link to project:
+        <a *ngIf="project.serveInProgress"
+           [href]="p.host">{{p.host}}</a>
+        <a href="javascript:void(0)"
+           *ngIf="!project.serveInProgress"
+           [class.a-disabled]="!project.progress || project.progress.value < 100"
+           matTooltip="Please run server first">{{p.host}}</a>
+      </span>
+      <br>
+      <br>
+
+      <a href="javascript:void(0)"
+         (click)="rebuild(p)"
+         [class.a-disabled]="!project.progress || project.progress.value < 100
+         || childresProjectsBuildsOrClearInProgress(project)"
+         matTooltip="Please build project!"
+         *ngIf="!p.buildInProgress">
+        Rebuild project
+      </a>
+      <a (click)="stopRebuild(p)"
+         *ngIf="p.buildInProgress">
+        Stop rebuilding...
+      </a>
+    </div>
+
+
   </mat-expansion-panel>
-</mat-accordion> -->
+</mat-accordion>
 
 
 <app-log-prcess *ngIf="isShowingBuildLogs"

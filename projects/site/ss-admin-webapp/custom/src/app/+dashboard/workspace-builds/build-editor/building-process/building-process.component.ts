@@ -10,7 +10,7 @@ import { Global } from 'morphi/browser'
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatCheckboxChange } from '@angular/material';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
 
@@ -79,9 +79,8 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
       templateOptions: {
         icon: 'refresh',
         action: async () => {
-          this.projectController.clearById(this.model.project.id).received.observable.subscribe(async () => {
-            log.i('CLEAR COMPLETE')
-          })
+          log.d('includeNodeModulesWhileClear', this.includeNodeModulesWhileClear)
+          await this.projectController.clearById(this.model.project.id).received
         }
       },
       expressionProperties: {
@@ -93,13 +92,31 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
         }
       },
       hideExpression: () => (this.model && !!this.model.project.pidBuildProces)
-    }
+    },
+    // {
+    //   // name: 'includeNodeModulesWhileClear',
+    //   type: 'checkbox',
+    //   // defaultValue: false,
+    //   templateOptions: {
+    //     label: "include node modules",
+    //     change: (e: MatCheckboxChange) => {
+    //       this.includeNodeModulesWhileClear = e.checked
+    //     }
+    //   }
+    // }
   ] as FormlyFieldConfig[];
 
+
+  includeNodeModulesWhileClear = false;
 
   isShowingBuildLogs = false;
 
   @Input() model: BUILD;
+
+  childresProjectsBuildsOrClearInProgress(p: TNP_PROJECT) {
+    return p && _.isArray(p.children) &&
+      p.children.filter(c => _.isNumber(c.pidBuildProces) || _.isNumber(c.pidClearProces)).length > 0
+  }
 
   get project(): TNP_PROJECT {
     return this.model && this.model.project;
@@ -124,7 +141,13 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
     `
   }
 
+  async rebuild(p: TNP_PROJECT) {
+    await this.projectController.startBuildById(p.id).received
+  }
 
+  async stopRebuild(p: TNP_PROJECT) {
+    await this.projectController.stopBuildById(p.id).received
+  }
 
   ngOnInit() { }
 
