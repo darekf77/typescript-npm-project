@@ -94,8 +94,8 @@ export default {
   $BUILD_APP_WATCH: (args) => buildApp(false, true, 'dist', args),
   $BUILD_APP_WATCH_PROD: (args) => buildApp(false, true, 'dist', args),
 
-  $START_APP: (args) => {
-    Project.Current.start(args)
+  $START_APP: async (args) => {
+   await Project.Current.start(args)
   },
 
   // aliases
@@ -127,9 +127,9 @@ export default {
 
 
 
-  $START: (args) => {
+  $START: async (args) => {
 
-    Project.Current.start(args)
+    await Project.Current.start(args)
   },
 
   'Documentation': `

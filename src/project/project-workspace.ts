@@ -14,7 +14,6 @@ export class ProjectWorkspace extends Project {
 
   startOnCommand(args: string) {
 
-    // console.log('this.routes', this.routes.map(r => r.name))
     this.proxyRouter.activateServer((port) => {
       if (this.env.config.name !== 'local') {
         const address = `${this.env.config.ip}:${port}`;
@@ -53,7 +52,7 @@ export class ProjectWorkspace extends Project {
       .forEach(child => {
         child.start(args)
       });
-    return 'echo "Workspace server started"';
+    return undefined;
   }
   projectSpecyficFiles(): string[] {
     return ['environment.d.ts'];

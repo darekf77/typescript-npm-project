@@ -19,7 +19,6 @@ export class ProxyRouter {
 
   }
 
-  protected routes: EnvConfigProject[] = [];
 
   private static takenPorts = [];
 
@@ -41,22 +40,11 @@ export class ProxyRouter {
   }
 
 
-  // private async runOnRoutes(projects: EnvConfigProject[]) {
-  //   if (projects.length === 0) return;
-  //   const childrenProjectName = projects.shift();
-  //   const port = await ProxyRouter.getFreePort();
-
-  //   const project = this.project.children.find(({ name }) => name === childrenProjectName.name);
-  //   console.log(`Auto assigned port ${port} for ${project.name}`)
-  //   this.runOnRoutes(projects);
-  // }
-
-
   private getProjectFrom(req: http.IncomingMessage): Project {
     // console.log('req', req)
     // console.log('getProjectFrom routes', this.routes.map(r => r.baseUrl))
     // console.log(`Request url "${req.url}"`)
-    const r = this.routes.find(r => {
+    const r = this.project.env.config.workspace.projects.find(r => {
       return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
     })
     if (r) {
@@ -70,16 +58,13 @@ export class ProxyRouter {
 
 
 
-  public activateServer(onServerReady: (serverPort?: number) => void) {
-
-    this.routes = this.project.env.config.workspace.projects;
+  public async activateServer(onServerReady: (serverPort?: number) => void) {
 
     // console.log('activate server this.routes', this.routes.map(r => r.name))
 
     if (this.project.type === 'workspace') {
-      this.server(onServerReady)
 
-      // this.runOnRoutes(_.cloneDeep(this.routes))
+      this.server(onServerReady)
     } else {
       error(`Bad project type "${this.project.type}" for server activation.`, true)
       error(`Project "${this.project.name}" is not a ${chalk.bold('workspace')} type project.`)
@@ -87,7 +72,7 @@ export class ProxyRouter {
   }
 
   private server(onServerReady: (serverPort?: number) => void) {
-    const proxy = httpProxy.createProxyServer({ ws: true });
+    const proxy = httpProxy.createProxyServer({});
 
     const server = http.createServer((req, res) => {
       const p = this.getProjectFrom(req);
@@ -117,16 +102,15 @@ export class ProxyRouter {
 
     // });
 
-
-    server.listen(this.project.getDefaultPort(), () => {
-      const serverPort = this.project.getDefaultPort();
+    const serverPort = this.project.getDefaultPort();
+    server.listen(serverPort, () => {
       console.log(`Proxy Router activate on http://localhost:${serverPort}`)
 
       if (_.isFunction(onServerReady)) {
         onServerReady(serverPort);
       }
     }).on('error', e => {
-      console.log('error', e)
+      console.log('proxy server error', e)
     })
   }
 

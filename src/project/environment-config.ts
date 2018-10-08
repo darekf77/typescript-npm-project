@@ -96,12 +96,12 @@ export class EnvironmentConfig {
 
     config.workspace.workspace.hostSocket = `http://${config.ip}:${config.workspace.workspace.port}`;
 
-    if (config.domain && config.name !== 'local') {
-      config.workspace.workspace.host =
-        `${config.domain}${config.workspace.workspace.baseUrl}`;
-    } else {
+    if (config.name === 'local' || (config.ip === 'localhost' && !config.domain)) {
       config.workspace.workspace.host =
         `http://${config.ip}:${config.workspace.workspace.port}`;
+    } else {
+      config.workspace.workspace.host =
+        `${config.domain}${config.workspace.workspace.baseUrl}`;
     }
 
     config.packageJSON = this.project.packageJson.data;
@@ -110,24 +110,31 @@ export class EnvironmentConfig {
 
       p.hostSocket = `http://${config.ip}:${p.port}`;
 
-      if (config.domain && config.name !== 'local') {
-        p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
-      } else {
+      if (config.name === 'local') {
         p.host = `http://${config.ip}:${p.port}`;
+      } else {
+        p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
       }
+
     })
 
     saveConfigWorkspca(this.project, config)
   }
+
+  private static configs: { [location: string]: EnvConfig } = {};
 
   /**
    * Can be accesed only after env.prepare()
    */
   public get config(): EnvConfig {
 
-    const configPath = path.join(this.project.location, tmpEnvironmentFileName);
+    const configPath = path.resolve(path.join(this.project.location, tmpEnvironmentFileName));
+    if (EnvironmentConfig.configs[configPath]) {
+      return EnvironmentConfig.configs[configPath];
+    }
     if (fse.existsSync(configPath)) {
       const res = fse.readJsonSync(configPath) as EnvConfig;
+      EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
       error(`confg doesnt exist: ${configPath}`, true)

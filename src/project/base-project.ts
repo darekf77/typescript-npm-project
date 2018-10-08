@@ -212,30 +212,16 @@ export abstract class Project {
    */
   async start(args?: string) {
     await this.env.init(args, true)
-    console.log(`Killing process on port ${this.getDefaultPort()} ...`);
-    // killProcessByPort(this.getDefaultPort())
-
+    console.log(`Killing proces on port ${this.getDefaultPort()}`);
+    killProcessByPort(this.getDefaultPort())
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-
-    let command = this.startOnCommand(args);
+    const command = this.startOnCommand(args);
     if (_.isString(command)) {
-      let p = this.run(this.startOnCommand(args)).async()
-      p.once('exit', (e) => {
-        console.trace(`EXISTED PROCESSSSSSSSSSS ${this.name}  ${this.getDefaultPort()}`)
-        console.log(e)
-      })
-    } else {
-      console.log('RUN PROCESS SYNC')
-      process.stdin.resume()
-      process.once('beforeExit', () => {
-        console.trace('asdasdasd')
-      })
-      process.on('exit', () => {
-        console.log('SYNC PROCESS EXISTED !!!')
-      })
-      console.log('NOT STAYING ABOVE')
+      const p = this.run(this.startOnCommand(args)).async()
+      // p.on('exit', (ee) => {
+      //   console.trace('exit !!!!', ee)
+      // })
     }
-
   }
 
   protected abstract startOnCommand(args: string): string;
