@@ -112,8 +112,10 @@ export async function start(argsv: string[]) {
     }
   });
   if (recognized) {
+    // console.log("RECOGNIZED !!")
     process.stdin.resume();
   } else {
+    // console.log("NOT RECOGNIZED !!")
     if (Array.isArray(argsv) && argsv.length == 3) {
       console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
       process.exit(0);

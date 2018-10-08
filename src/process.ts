@@ -78,7 +78,7 @@ export function clearConsole() {
 
 
 
-const processes: child.ChildProcess[] = [];
+// const processes: child.ChildProcess[] = [];
 // const cleanExit = function () {
 //   processes.forEach(p => {
 //     p.kill('SIGINT')
@@ -104,7 +104,7 @@ const processes: child.ChildProcess[] = [];
 
 
 export function log(proc: child.ChildProcess, output = true) {
-  processes.push(proc);
+  // processes.push(proc);
 
   if (output) {
     proc.stdout.on('data', (data) => {

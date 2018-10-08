@@ -45,6 +45,11 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           log.i('build process started!')
         }
       },
+      expressionProperties: {
+        'templateOptions.disabled': () => {
+          return !this.model || !this.model.project || _.isNumber(this.model.project.pidServeProces)
+        }
+      },
       hideExpression: () => (!this.model ||
         _.isNumber(this.model.project.pidBuildProces) ||
         !!this.model.project.pidClearProces)
@@ -83,9 +88,14 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
           await this.projectController.clearById(this.model.project.id).received
         }
       },
+
       expressionProperties: {
         'templateOptions.disabled': () => {
-          return (this.model && _.isNumber(this.model.project.pidClearProces))
+          return (this.model && this.model.project && (
+            _.isNumber(this.model.project.pidClearProces) ||
+            _.isNumber(this.model.project.pidBuildProces) ||
+            _.isNumber(this.model.project.pidServeProces)
+            ))
         },
         'templateOptions.label': () => {
           return (this.model && _.isNumber(this.model.project.pidClearProces)) ? 'is clearing... ' : 'Clear';
@@ -143,10 +153,16 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
   async rebuild(p: TNP_PROJECT) {
     await this.projectController.startBuildById(p.id).received
+    p.realtimeEntity.subscribe(async () => {
+      const data = await this.projectController.getBy(p.id).received
+      log.d('update child entity', data.body.json)
+      _.merge(p, data.body.json);
+    })
   }
 
   async stopRebuild(p: TNP_PROJECT) {
     await this.projectController.stopBuildById(p.id).received
+    p.realtimeEntity.unsubscribe()
   }
 
   ngOnInit() { }

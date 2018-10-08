@@ -57,18 +57,6 @@ export class ServingProcessComponent implements OnInit {
 
       type: 'iconbutton',
       templateOptions: {
-        icon: 'screen_share',
-        label: 'Display',
-        // disabled: true,
-        action: async () => {
-          // window.open()
-        }
-      },
-    },
-    {
-
-      type: 'iconbutton',
-      templateOptions: {
         icon: 'dvr',
         label: 'Logs',
         action: async () => {
@@ -76,6 +64,18 @@ export class ServingProcessComponent implements OnInit {
         }
       }
     },
+    {
+
+      type: 'iconbutton',
+      templateOptions: {
+        icon: 'screen_share',
+        label: 'Display',
+        // disabled: true,
+        action: async () => {
+          // window.open()
+        }
+      },
+    }
 
 
   ] as FormlyFieldConfig[]

@@ -1,7 +1,7 @@
 //#region @backend
 export interface BuildArgs {
   copyto: string[] | string;
-  environmentName: string;
+
   noConsoleClear: string;
   envName: string;
   onlyWatchNoBuild?: boolean;

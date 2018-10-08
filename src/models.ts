@@ -20,7 +20,7 @@ export type BuildDir = 'dist' | 'bundle';
 
 
 
-export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod' | 'online';
+export type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod' | 'online' | 'test';
 
 export interface ReleaseOptions {
   prod?: boolean;
@@ -38,7 +38,6 @@ export interface IBuildOptions {
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
   copyto?: Project[];
-  environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];
 }
 
@@ -51,7 +50,6 @@ export class BuildOptions implements IBuildOptions {
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
   copyto?: Project[];
-  environmentName: EnvironmentName;
   additionalIsomorphicLibs?: string[];
 
   public static fromRaw(options: IBuildOptions): BuildOptions {

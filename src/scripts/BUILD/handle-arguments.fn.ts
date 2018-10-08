@@ -61,11 +61,6 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
 
     }).filter(p => !!p)
   }
-  let environmentName: EnvironmentName = 'local';
-  if (argsObj.environmentName || argsObj.envName) {
-    environmentName = (argsObj.environmentName ? argsObj.environmentName : argsObj.envName) as any;
-  }
-
 
   let onlyWatchNoBuild = false;
   if (argsObj.onlyWatchNoBuild as any === 'true') {
@@ -73,7 +68,7 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
   }
 
   return {
-    copyto, environmentName, onlyWatchNoBuild  //, baseHref
+    copyto, onlyWatchNoBuild  //, baseHref
   }
 }
 //#endregion

@@ -98,10 +98,10 @@ export class LogPrcessComponent implements OnInit, OnDestroy, AfterContentInit {
       this.dialog = this.matDialog.open(this.dialogTmpl, {
         height: '400px'
       });
-      // this.dialog.afterClosed().subscribe(() => {
-      //   this.isRealtime = false;
-      //   this.hide.emit()
-      // })
+      this.dialog.afterClosed().subscribe(() => {
+        this.isRealtime = false;
+        this.hide.emit()
+      })
       this.getWholeLog()
     })
   }

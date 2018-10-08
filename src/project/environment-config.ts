@@ -33,15 +33,6 @@ export class EnvironmentConfig {
 
   /// TODO remove children config links
 
-  private removeChildsConfig() {
-    this.project.children.forEach(p => {
-      const f = path.join(p.location, tmpEnvironmentFileName);
-      if (fse.existsSync(f)) {
-        fse.unlinkSync(f);
-      }
-    })
-  }
-
   get isChildProjectWithoutConfig() {
     const f = path.join(this.project.location, tmpEnvironmentFileName);
     return !fse.existsSync(f);
@@ -59,7 +50,7 @@ export class EnvironmentConfig {
     }
 
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      await this.project.parent.env.init(args);
+      await this.project.parent.env.init(args, overridePortsOnly);
     }
 
     if (this.project.isWorkspaceChildProject) {
@@ -70,7 +61,6 @@ export class EnvironmentConfig {
     if (!this.project.isWorkspace) {
       return
     }
-    this.removeChildsConfig();
 
     let config = workspaceConfigBy(this.project, globalConfig.environmentName);
 
@@ -134,14 +124,13 @@ export class EnvironmentConfig {
    * Can be accesed only after env.prepare()
    */
   public get config(): EnvConfig {
-    const configLocation = (
-      this.project.isWorkspaceChildProject ? this.project.parent.location : this.project.location,
-      tmpEnvironmentFileName);
 
-    const configPath = path.join(this.project.location, configLocation);
+    const configPath = path.join(this.project.location, tmpEnvironmentFileName);
     if (fse.existsSync(configPath)) {
       const res = fse.readJsonSync(configPath) as EnvConfig;
       return res;
+    } else {
+      error(`confg doesnt exist: ${configPath}`, true)
     }
 
   }

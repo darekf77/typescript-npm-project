@@ -211,11 +211,31 @@ export abstract class Project {
    * @param port
    */
   async start(args?: string) {
-    await this.env.init(args)
-    console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-    killProcessByPort(this.getDefaultPort())
+    await this.env.init(args, true)
+    console.log(`Killing process on port ${this.getDefaultPort()} ...`);
+    // killProcessByPort(this.getDefaultPort())
 
-    this.run(this.startOnCommand(args)).async()
+    console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
+
+    let command = this.startOnCommand(args);
+    if (_.isString(command)) {
+      let p = this.run(this.startOnCommand(args)).async()
+      p.once('exit', (e) => {
+        console.trace(`EXISTED PROCESSSSSSSSSSS ${this.name}  ${this.getDefaultPort()}`)
+        console.log(e)
+      })
+    } else {
+      console.log('RUN PROCESS SYNC')
+      process.stdin.resume()
+      process.once('beforeExit', () => {
+        console.trace('asdasdasd')
+      })
+      process.on('exit', () => {
+        console.log('SYNC PROCESS EXISTED !!!')
+      })
+      console.log('NOT STAYING ABOVE')
+    }
+
   }
 
   protected abstract startOnCommand(args: string): string;
@@ -330,7 +350,7 @@ export abstract class Project {
         const c = requiredLibs[i];
         await build(_.merge(_.cloneDeep(buildOptions), {
           watch: false,
-          appBuild: false
+          appBuild: false,
         } as BuildOptions), undefined, c, false);
       }
     }
@@ -347,7 +367,7 @@ export abstract class Project {
     }
   }
 
-  public clear(includeNodeModules = false, onlyWorkspace = false) {
+  public clear(includeNodeModules = false, recrusive = false) {
     console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
 
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
@@ -364,7 +384,7 @@ export abstract class Project {
       .join(' ')
     // console.log(`rimraf ${gitginoredfiles}`)
     this.run(`rimraf ${gitginoredfiles}`).sync();
-    if (!onlyWorkspace) {
+    if (recrusive) {
       if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
         this.children.forEach(childProject => {
           childProject.clear(includeNodeModules)

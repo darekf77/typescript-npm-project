@@ -14,10 +14,10 @@ import { init } from '../INIT';
 
 export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
-  const { copyto, environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
+  const { copyto, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, copyto, environmentName, onlyWatchNoBuild, args
+    prod, watch, outDir, copyto, onlyWatchNoBuild, args
   };
   await build(options, config.allowedTypes.libs)
 }
@@ -25,10 +25,10 @@ export async function buildLib(prod = false, watch = false, outDir: BuildDir, ar
 
 export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
 
-  const { environmentName, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
+  const { onlyWatchNoBuild } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, appBuild: true, environmentName, onlyWatchNoBuild, args
+    prod, watch, outDir, appBuild: true, onlyWatchNoBuild, args
   };
   await build(options, config.allowedTypes.app);
 }

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { LibType, EnvironmentName } from './models';
 
-export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'];
+export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
 let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
 if (_.isString(env)) {
