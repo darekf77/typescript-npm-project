@@ -88,10 +88,18 @@ export class EnvironmentConfig {
     if (!config.ip) {
       config.ip = 'localhost'
     } else {
+      if (_.isString(config.ip)) {
+        config.ip = config.ip.replace(/^https?:\/\//, '');
+      }
       if (!isValidIp(config.ip)) {
         error(`Bad ip address in your environment .json config`, true)
         err(config)
       }
+    }
+
+    if (_.isString(config.domain)) {
+      config.domain = config.domain.replace(/\/$/, '');
+      config.domain = config.domain.replace(/^https?:\/\//, '');
     }
 
     config.workspace.workspace.hostSocket = `http://${config.ip}:${config.workspace.workspace.port}`;
@@ -100,9 +108,12 @@ export class EnvironmentConfig {
       config.workspace.workspace.host =
         `http://${config.ip}:${config.workspace.workspace.port}`;
     } else {
+      const workspaceBaseUrl = _.isString(config.workspace.workspace.baseUrl) ? config.workspace.workspace.baseUrl : ''
       config.workspace.workspace.host =
-        `https://${config.domain}${config.workspace.workspace.baseUrl}`;
+        `https://${config.domain}${workspaceBaseUrl}`;
     }
+
+    config.workspace.workspace.host = config.workspace.workspace.host.replace(/\/$/, '');
 
     config.packageJSON = this.project.packageJson.data;
 

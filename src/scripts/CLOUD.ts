@@ -10,7 +10,7 @@ import { rebuildTnp } from './UPDATE';
 export default {
   $CLOUD_RESTART: (args) => {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp start </dev/null &>/dev/null &`).sync();
+    cloudProject.run(`tnp start </dev/null &>/dev/null &`).  sync();
     process.exit(0)
   },
   $CLOUD_REBUILD: (args) => {

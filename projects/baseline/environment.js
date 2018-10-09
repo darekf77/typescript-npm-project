@@ -16,7 +16,7 @@ config = {
 
   workspace: {
     workspace: {
-      baseUrl: '/info',
+      // baseUrl: '/info',
       name: 'workspace',
       port: 5555
     },
