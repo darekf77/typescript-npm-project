@@ -77,6 +77,7 @@ export interface RunOptions {
    * Show process output
    */
   output?: boolean;
+  // detached?: boolean;
   cwd?: string;
 
   /**
