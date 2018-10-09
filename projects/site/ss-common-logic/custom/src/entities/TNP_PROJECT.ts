@@ -119,6 +119,10 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
   @Column({ nullable: true }) pidClearProces: number;
   @Column({ nullable: true }) pidServeProces: number;
 
+  get info() {
+    return this.progress && this.progress.html;
+  }
+
   //#region @backend
   run(command: string, options?: RunOptions) {
     const self = this;

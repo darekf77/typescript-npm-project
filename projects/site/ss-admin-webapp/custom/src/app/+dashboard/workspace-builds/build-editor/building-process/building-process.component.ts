@@ -95,7 +95,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
             _.isNumber(this.model.project.pidClearProces) ||
             _.isNumber(this.model.project.pidBuildProces) ||
             _.isNumber(this.model.project.pidServeProces)
-            ))
+          ))
         },
         'templateOptions.label': () => {
           return (this.model && _.isNumber(this.model.project.pidClearProces)) ? 'is clearing... ' : 'Clear';
@@ -156,7 +156,8 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
     p.realtimeEntity.subscribe(async () => {
       const data = await this.projectController.getBy(p.id).received
       log.d('update child entity', data.body.json)
-      _.merge(p, data.body.json);
+      const project = data.body.json;
+      _.merge(p, { pidBuildProces: project.pidBuildProces });
     })
   }
 

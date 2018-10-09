@@ -20,8 +20,7 @@
 
   <mat-expansion-panel *ngFor="let p of project.children"
                        [disabled]="project.pidClearProces ||
-                        project.pidBuildProces ||
-                        project.pidServeProces">
+                        project.pidBuildProces">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{p.name}}
@@ -34,6 +33,7 @@
     <div class="accordion-wrap">
       <span> Link to project:
         <a *ngIf="project.serveInProgress"
+           target="_blank"
            [href]="p.host">{{p.host}}</a>
         <a href="javascript:void(0)"
            *ngIf="!project.serveInProgress"
@@ -47,7 +47,6 @@
          (click)="rebuild(p)"
          [class.a-disabled]="!project.progress || project.progress.value < 100
          || childresProjectsBuildsOrClearInProgress(project)"
-         matTooltip="Please build project!"
          *ngIf="!p.buildInProgress">
         Rebuild project
       </a>
@@ -55,6 +54,7 @@
          *ngIf="p.buildInProgress">
         Stop rebuilding...
       </a>
+      <span [innerHTML]="p.info"></span>
     </div>
 
 

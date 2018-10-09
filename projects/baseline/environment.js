@@ -13,12 +13,12 @@ config = {
       picture: path.join(__dirname, 'backup', 'multimedia', 'picture')
     }
   },
-  
+
   workspace: {
     workspace: {
       baseUrl: '/info',
       name: 'workspace',
-      port: 6000
+      port: 5555
     },
     projects: [
       {
