@@ -96,12 +96,12 @@ export class EnvironmentConfig {
 
     config.workspace.workspace.hostSocket = `http://${config.ip}:${config.workspace.workspace.port}`;
 
-    if (config.name === 'local' || (config.ip === 'localhost' && !config.domain)) {
+    if (config.name === 'local' || !config.domain) {
       config.workspace.workspace.host =
         `http://${config.ip}:${config.workspace.workspace.port}`;
     } else {
       config.workspace.workspace.host =
-        `${config.domain}${config.workspace.workspace.baseUrl}`;
+        `https://${config.domain}${config.workspace.workspace.baseUrl}`;
     }
 
     config.packageJSON = this.project.packageJson.data;

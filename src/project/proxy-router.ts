@@ -103,8 +103,9 @@ export class ProxyRouter {
     // });
 
     const serverPort = this.project.getDefaultPort();
+
     server.listen(serverPort, () => {
-      console.log(`Proxy Router activate on http://localhost:${serverPort}`)
+      console.log(`Proxy Router activate on http://${this.project.env.config.workspace.workspace.host}`)
 
       if (_.isFunction(onServerReady)) {
         onServerReady(serverPort);
