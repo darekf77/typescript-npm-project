@@ -15,7 +15,9 @@ export class ProjectWorkspace extends Project {
   startOnCommand(args: string) {
 
     this.proxyRouter.activateServer(async (port) => {
-      if (this.env.config.name !== 'local') {
+      if (this.env.config.name !== 'local' && _.isString(this.env.config.domain) &&
+        this.env.config.domain.trim() !== ''
+      ) {
         const address = `${this.env.config.ip}:${port}`;
         const domain = this.env.config.domain;
         if (_.isString(domain) && domain.trim() !== '') {
