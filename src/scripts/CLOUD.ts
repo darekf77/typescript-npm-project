@@ -12,12 +12,13 @@ export default {
   $CLOUD_RESTART: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp start ${args}`).async();
+    cloudProject.run(`tnp start`).async();
   },
   $CLOUD_REBUILD: (args) => {
     rebuildTnp()
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp build ${args}`).sync();
+    cloudProject.run(`tnp init --env=online`).sync();
+    cloudProject.run(`tnp build`).sync();
     process.exit(0)
   },
   $CLOUD_CLEAR_ALL: (args) => {
