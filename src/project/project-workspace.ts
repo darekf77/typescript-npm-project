@@ -14,14 +14,14 @@ export class ProjectWorkspace extends Project {
 
   startOnCommand(args: string) {
 
-    this.proxyRouter.activateServer((port) => {
+    this.proxyRouter.activateServer(async (port) => {
       if (this.env.config.name !== 'local') {
         const address = `${this.env.config.ip}:${port}`;
         const domain = this.env.config.domain;
         if (_.isString(domain) && domain.trim() !== '') {
           console.log(`Activation https domain "${domain}" for address "${address}"`)
           const proxy = require('redbird')({ port });
-          const letsencryptPort = ProxyRouter.getFreePort()
+          const letsencryptPort = await ProxyRouter.getFreePort()
           console.log(`Port for letsencrypt: ${letsencryptPort}`)
 
           proxy.register(domain, address, {
@@ -29,6 +29,8 @@ export class ProjectWorkspace extends Project {
               port: letsencryptPort
             },
             ssl: {
+              // http2: true,
+              port: 443,
               letsencrypt: {
                 email: 'darekf77@gmail.com', // Domain owner/admin email
                 production: (this.env.config.name === 'prod'), // WARNING: Only use this flag when the proxy is verified to work correctly to avoid being banned!

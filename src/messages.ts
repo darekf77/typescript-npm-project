@@ -36,7 +36,11 @@ export function info(details: string) {
   console.log(chalk.green(details))
 }
 
-export function warn(details: string) {
-  console.log(chalk.yellow(details))
+export function warn(details: string, trace = false) {
+  if (trace) {
+    console.trace(chalk.yellow(details))
+  } else {
+    console.log(chalk.yellow(details))
+  }
 }
 //#endregion

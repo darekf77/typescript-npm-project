@@ -137,7 +137,7 @@ export class EnvironmentConfig {
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      error(`confg doesnt exist: ${configPath}`, true)
+      warn(`confg doesnt exist: ${configPath}`)
     }
 
   }
