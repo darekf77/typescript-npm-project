@@ -3,15 +3,15 @@ import * as _ from 'lodash';
 
 import { LibType, EnvironmentName } from './models';
 
-export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
-let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
+// export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
+// let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
-if (_.isString(env)) {
-  environmentName = env;
-}
+// if (_.isString(env)) {
+//   environmentName = env;
+// }
 
-environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
-environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
+// environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
+// environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
 
 export const config = {
@@ -72,7 +72,7 @@ export const config = {
     'angular-client',
     'angular-cli'
   ] as LibType[],
-  environmentName
+  // environmentName
 }
 
 

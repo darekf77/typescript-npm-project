@@ -11,7 +11,6 @@ import { error, warn } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';
 import { isValidIp } from '../helpers-environment';
-import globalConfig, { allowedEnvironments } from '../config';
 import { ProxyRouter } from './proxy-router';
 import {
   validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
@@ -62,12 +61,13 @@ export class EnvironmentConfig {
       return
     }
 
-    let config = workspaceConfigBy(this.project, globalConfig.environmentName);
-
-    let { generateIps, env }: { generateIps: boolean, env: EnvironmentName } =
+    const { generateIps, env }: { generateIps: boolean, env: EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
 
-    config.name = (_.isString(env) && env.trim() !== '') ? env : 'local'
+    const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
+
+    const config = workspaceConfigBy(this.project, environmentName);
+    config.name = environmentName;
 
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
 

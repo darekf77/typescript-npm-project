@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 // local
-import globalConfig, { allowedEnvironments, config } from '../config';
+import { config } from '../config';
 import { EnvConfig, EnvironmentName, EnvConfigProject } from '../models';
 import { error, warn } from '../messages';
 import { ProjectFrom } from './index';
