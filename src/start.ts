@@ -26,7 +26,7 @@ Helpers.checkEnvironment({
     { name: 'increase-memory-limit' },
     { name: 'bower' },
     { name: 'fkill', installName:'fkill-cli' }
-  ] as any,
+  ],
   programs: [
   //   {
   //     name: 'code',
