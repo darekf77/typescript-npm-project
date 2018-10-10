@@ -24,8 +24,9 @@ Helpers.checkEnvironment({
     { name: 'renamer' },
     { name: 'nodemon' },
     { name: 'increase-memory-limit' },
-    { name: 'fkill' }
-  ],
+    { name: 'bower' },
+    { name: 'fkill', installName:'fkill-cli' }
+  ] as any,
   programs: [
   //   {
   //     name: 'code',

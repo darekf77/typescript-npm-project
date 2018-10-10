@@ -228,7 +228,7 @@ class ProjectAurora {
     if (location.endsWith('\\')) {
       location = location.replace(/\\+$/, '');
     }
-    return location;
+    return crossPlatofrmPath(location);
   }
 
   public updateVscode() {
@@ -266,16 +266,15 @@ class ProjectAurora {
     const newSubProjectLocation = crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL, newSubProjectName))
     const newSubProjectLocationOrigin = crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL, subProjectName))
 
-    if (fse.existsSync(newSubProjectLocation)) {
-      tryRemoveDir(newSubProjectLocation)
-    }
 
     if (fse.existsSync(newSubProjectLocationOrigin)) {
       tryRemoveDir(newSubProjectLocationOrigin)
     }
     const command = `git clone ${subProjectOrigin} ${newSubProjectName}`
     console.log(command)
-    this.run(command, { cwd: crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL)) }).sync()
+    if (!fse.existsSync(newSubProjectLocation)) {
+      this.run(command, { cwd: crossPlatofrmPath(path.join(this.location, FOLDERS.EXTERNAL)) }).sync()
+    }
     const project = ProjectAurora.From(newSubProjectLocation, this)
     this.children.push(project)
     project.link()
@@ -319,14 +318,18 @@ class ProjectAurora {
       this.children.forEach(child => child.link())
 
     } else if (this.Type === 'child-baseline-module') {
-      const vendor = path.join(this.parent.location, FOLDERS.VENDOR)
-      const vendorSubPorject = path.join(vendor, this.name)
+      const vendor = crossPlatofrmPath(path.join(this.parent.location, FOLDERS.VENDOR))
+      const vendorSubPorject = crossPlatofrmPath(path.join(vendor, this.name))
       if (fse.existsSync(vendorSubPorject)) {
         tryRemoveDir(vendorSubPorject)
       }
-      const command = `tnp ln ${this.location} ${vendor} && cd ${vendor} && tnp mv ${path.basename(this.location)} ${this.name}`
-      // console.log(command)
-      this.run(command).sync()
+      
+      // fse.mkdirpSync(vendorSubPorject)
+      // console.log(vendorSubPorject)
+      // console.log(this.location)
+      
+      this.run(`cd ${vendor} && rimraf ${path.basename(this.location)} ${this.name}`).sync()
+      this.run(`tnp ln ${this.location} ${vendor} && cd ${vendor} && tnp mv ${path.basename(this.location)} ${this.name}`).sync()
     }
 
   }
