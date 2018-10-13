@@ -4,7 +4,7 @@ const vm = require('vm');
 const fse = require('fs-extra');
 
 
-const ENV = '{}';
+let ENV = '{}';
 if (fse.existsSync('./tmp-environment.json')) {
   ENV = fse.readFileSync('./tmp-environment.json', {
     encoding: 'utf8'

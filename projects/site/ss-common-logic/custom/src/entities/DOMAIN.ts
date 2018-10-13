@@ -11,17 +11,24 @@ import { run, HelpersLinks, killProcess } from 'tnp-bundle';
 
 //#endregion
 
-export enum DOMAIN_ENVIRONMENT {
-  DEV = 1,
-  STAGE,
-  PROD
 
-}
 
 
 export interface IDOMAIN {
+
+  /**
+   * Domain name
+   * Example: mydomain.com
+   */
   name: string;
 
+  /**
+   * Traget address
+   * Example: http://87.34.22.123:5012
+   */
+  target: string;
+
+  production: boolean;
 }
 
 
@@ -31,10 +38,11 @@ export interface IDOMAIN {
 @FormlyForm<DOMAIN>()
 @DefaultModelWithMapping<DOMAIN>({
   name: '',
-  environment: DOMAIN_ENVIRONMENT.PROD
+  target: '',
+  production: false
 })
 @CLASSNAME('DOMAIN')
-export class DOMAIN extends META.BASE_ENTITY<DOMAIN> {
+export class DOMAIN extends META.BASE_ENTITY<DOMAIN> implements IDOMAIN {
   fromRaw(obj: DOMAIN): DOMAIN {
     throw new Error("Method not implemented.");
   }
@@ -42,16 +50,12 @@ export class DOMAIN extends META.BASE_ENTITY<DOMAIN> {
   @PrimaryGeneratedColumn()
   id: number;
 
-  get path() {
-    if (this.environment === DOMAIN_ENVIRONMENT.PROD) {
-      return this.name;
-    }
-    return `${EnumValues.getNameFromValue(DOMAIN_ENVIRONMENT, this.environment)}.${this.name}`;
-  }
 
   @Column({ nullable: true }) name: string;
 
-  @Column({ default: DOMAIN_ENVIRONMENT.PROD }) environment: DOMAIN_ENVIRONMENT;
+  @Column({ nullable: true }) target: string;
+
+  @Column({ nullable: true }) production: boolean;
 
 
 }
