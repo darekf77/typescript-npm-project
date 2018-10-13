@@ -199,6 +199,13 @@ export abstract class Project {
     return this.type === 'workspace';
   }
 
+  get allowedEnvironments() {
+    if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
+      return this.packageJson.data.tnp.allowedEnv.concat('local')
+    }
+    return config.allowedEnvironments.concat('local');
+  }
+
   /**
    * Standalone projects link: npm libs
    */

@@ -159,7 +159,10 @@ export interface IPackageJSON {
     type: LibType;
     isCoreProject: boolean;
     basedOn: string,
+    basedOnAbsolutePath1: string, // TODO QUICK_FIX
+    basedOnAbsolutePath2: string, // TODO QUICK_FIX
     resources?: string[];
+    allowedEnv?: EnvironmentName[]
     // requiredLibs?: string[];
   };
 }

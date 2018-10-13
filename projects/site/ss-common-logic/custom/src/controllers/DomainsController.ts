@@ -4,15 +4,12 @@ import { DOMAIN } from '../entities/DOMAIN';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
-import { RebirdHttpsDomains } from '../helpers/rebird-https-domains';
+
 
 
 @ENDPOINT()
 @CLASSNAME('DomainsController')
 export class DomainsController extends META.BASE_CONTROLLER<DOMAIN> {
-
-  private static rebird: RebirdHttpsDomains;
-
 
 
 

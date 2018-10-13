@@ -112,12 +112,35 @@ export class PackageJSON {
 
   get pathToBaseline(): string {
     if (this.data && this.data.tnp &&
-      _.isString(this.data.tnp.basedOn)) {
-      const p = path.join(this.location, this.data.tnp.basedOn);
+      (
+        _.isString(this.data.tnp.basedOn) ||
+        _.isString(this.data.tnp.basedOnAbsolutePath1) ||
+        _.isString(this.data.tnp.basedOnAbsolutePath1)
+      )
+    ) {
+
+      let p = path.join(this.location, this.data.tnp.basedOn);
       if (fs.existsSync(p)) {
         return p;
       }
-      error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})`)
+
+      // TODO quick fix
+      p = this.data.tnp.basedOnAbsolutePath1;
+      if (fs.existsSync(p)) {
+        return p;
+      }
+
+      p = this.data.tnp.basedOnAbsolutePath2;
+      if (fs.existsSync(p)) {
+        return p;
+      }
+
+
+      error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})
+
+      path desn't exist: ${p} 
+
+      `)
     }
   }
 

@@ -4,7 +4,9 @@
       "README.md"
     ],
     "type": "workspace",
-    "basedOn": "../baseline"
+    "basedOn": "../baseline",
+    "allowedEnv": ["online"],
+    "basedOnAbsolutePath1": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline"
   },
   "name": "site",
   "version": "0.0.0",

@@ -90,7 +90,7 @@ export class DashboardComponent implements OnInit {
     log.i('data', data.body.json);
     return data.body.json.map(b => {
       return {
-        name: b.path,
+        name: b.name,
         href: `/dashboard/domains/domain/${b.id}`,
         id: b.id
       };
