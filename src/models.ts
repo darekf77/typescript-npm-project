@@ -143,6 +143,14 @@ export interface EnvConfig {
   currentProjectName?: string;
   packageJSON?: IPackageJSON;
 
+  cloud?: {
+    ports: {
+      update: number;
+      letsencrypt: number;
+      port90: number;
+    }
+  }
+
 }
 
 

@@ -36,6 +36,10 @@ export abstract class Project {
     //#endregion
   }
 
+  public get backupName() {
+    return `____${this.name}`
+  }
+
   public readonly location: string;
 
   //#region @backend

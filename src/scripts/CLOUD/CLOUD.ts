@@ -1,14 +1,39 @@
 
 //#region @backend
 import * as path from 'path';
-import { run } from '../process';
-import { Project, ProjectFrom } from '../project';
-import { rebuildTnp } from './UPDATE';
+import { run } from '../../process';
+import { Project, ProjectFrom } from '../../project';
+import { rebuildTnp } from '../UPDATE';
+import { $CLOUD_SAFE_REBUILD_START } from './CLOUD-safe-rebuild';
+import { paramsFrom } from '../../helpers';
+
 
 
 
 export default {
 
+  // $CLOUD_TEST1: () => {
+  //   function test() {
+  //     console.log(`test pid: ${process.pid}, ppid: ${process.ppid}`)
+  //     setTimeout(() => {
+  //       test()
+  //     }, 2000)
+  //   }
+
+  //   test();
+  // },
+
+  // $CLOUD_TEST: () => {
+  //   run(`tnp cloud:test1 &`).sync();
+  //   process.exit(0)
+  // },
+
+  $CLOUD_SAFE_REBUILD_START,
+
+  $CLOUD_UPDATE: () => {
+    run(`tnp ${paramsFrom($CLOUD_SAFE_REBUILD_START.name)} &`).sync();
+    process.exit(0)
+  },
 
   $CLOUD_RESTART: (args) => {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
@@ -40,10 +65,7 @@ export default {
   },
 
 
-  $CLOUD_RESTART_DOMAINS: () => {
-
-  }
-
 
 }
 //#endregion
+
