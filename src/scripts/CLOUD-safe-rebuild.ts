@@ -34,7 +34,8 @@ const status = {
     'restoring and building backup - start' |
     'restoring and building backup - error' |
     'restoring and building backup - complete' |
-    'restored application running in progress ',
+    'restored application running in progress ' |
+    'complete - starting cloud',
   operationErrors: [] as string[]
 }
 
@@ -68,7 +69,7 @@ function backupCloud(project: Project) {
     run(`cpr ${project.name} ${project.backupName}`, { cwd }).sync()
     status.operation = 'creating backup - complete';
   } catch (error) {
-    run(`rimraf ${project.backupName}`, { cwd }).sync()
+    // run(`rimraf ${project.backupName}`, { cwd }).sync()
     status.operation = 'creating backup - error';
     status.operationErrors.push(JSON.stringify(error));
   }
@@ -100,6 +101,7 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   child = (_.isString(child) ? child.trim() : child)
 
   let project = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+  const workspace = project;
 
   project.clear()
   project.run(`tnp init --env=online`).sync()
@@ -126,16 +128,21 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   }
 
   backupCloud(project);
+  process.exit(0)
   if (project.env.config.name !== 'local') {
 
     project.git.resetHard()
     project.git.updateOrigin()
 
-    let p = project.run(`tnp build`).async()
+    let p = project.run(`tnp build`, { output: false, biggerBuffer: true }).async()
     p.stdout.on('data', chunk => {
       PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
         status.progress = progress;
       })
+      if (status.progress.status === 'complete') {
+        status.operation = 'complete - starting cloud';
+        workspace.run(`tnp start &`, { output: false }).sync()
+      }
     })
 
     p.stdout.on('error', (err) => {
