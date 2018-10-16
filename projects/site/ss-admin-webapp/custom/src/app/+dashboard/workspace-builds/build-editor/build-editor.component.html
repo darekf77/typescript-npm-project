@@ -1,8 +1,10 @@
 <mat-card>
 
+  <p *ngIf="model && model.isSelf">
+    <app-self-update [(model)]="model"></app-self-update>
+  </p>
 
-
-  <app-form-wrapper-material *ngIf="id"
+  <app-form-wrapper-material *ngIf="id && model && !model.isSelf"
                              [model]="model"
                              [fields]="fields"
                              [crud]="buildController"
@@ -13,7 +15,7 @@
 </mat-card>
 <br>
 <!-- <h4 *ngIf="model" > {{model.project | json}}  </h4> -->
-<mat-card>
+<mat-card *ngIf="model && !model.isSelf">
   <mat-tab-group>
     <mat-tab label="Build">
       <br>
@@ -33,8 +35,12 @@
             <span *ngIf="node.data.name !== 'name'">{{ node.data.name }}</span>
             <strong *ngIf="node.data.name !== 'name'">
               <!-- {{ nodeValue(node.data.value) }} -->
-              <input  *ngIf="node.data.isSimple" type="{{ node.data.type === 'boolean' ? 'checkbox': 'text' }}"
-                     [(ngModel)]="node.data.value" [(checked)]="node.data.value" [disabled]="true"  [style.width.px]="200" >
+              <input *ngIf="node.data.isSimple"
+                     type="{{ node.data.type === 'boolean' ? 'checkbox': 'text' }}"
+                     [(ngModel)]="node.data.value"
+                     [(checked)]="node.data.value"
+                     [disabled]="true"
+                     [style.width.px]="200">
             </strong>
             <!-- <button (click)="go($event)">Custom Action</button> -->
           </ng-template>
@@ -46,7 +52,7 @@
 
 </mat-card>
 <br>
-<mat-card>
+<mat-card *ngIf="model && !model.isSelf">
   <mat-card-subtitle>Serve</mat-card-subtitle>
   <app-serving-process [model]="model"></app-serving-process>
 </mat-card>

@@ -27,6 +27,7 @@ const status = {
   child: undefined as string,
   operation: 'starting' as 'starting' |
     'error - wrong project' |
+    'error - environment should be "online"' |
     'creating backup - start' |
     'creating backup - error' |
     'creating backup - complete' |
@@ -109,6 +110,11 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
     project = project.children.find(p => p.name === child)
   }
 
+  // if (project.env.config.name === 'local') {
+  //   status.operation = 'error - environment should be "online"'
+  //   process.stdin.resume()
+  // }
+
 
   if (!project) {
     status.operation = 'error - wrong project'
@@ -117,28 +123,34 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   }
 
   backupCloud(project);
-  project.git.resetHard()
-  project.git.updateOrigin()
+  if (project.env.config.name !== 'local') {
 
+    project.git.resetHard()
+    project.git.updateOrigin()
 
-  let p = project.run(`tnp build`).async()
-  p.stdout.on('data', chunk => {
-    PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
-      status.progress = progress;
+    let p = project.run(`tnp build`).async()
+    p.stdout.on('data', chunk => {
+      PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
+        status.progress = progress;
+      })
     })
-  })
 
-  p.stdout.on('error', (err) => {
-    status.progress.status = 'error';
-    status.progress.info = JSON.stringify(err);
-    resotreBuildAndRunCloud(project);
-  })
+    p.stdout.on('error', (err) => {
+      status.progress.status = 'error';
+      status.progress.info = JSON.stringify(err);
+      resotreBuildAndRunCloud(project);
+    })
 
-  p.stdout.once('end', () => {
-    setTimeout(() => { /// TODO is this good thing ?
-      p.removeAllListeners()
-    }, 1000)
-  })
+    p.stdout.once('end', () => {
+      setTimeout(() => { /// TODO is this good thing ?
+        p.removeAllListeners()
+      }, 1000)
+    })
+
+  }
+
+
+
 }
 
 
