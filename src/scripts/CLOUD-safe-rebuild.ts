@@ -128,7 +128,7 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   }
 
   backupCloud(project);
-  process.exit(0)
+  process.stdin.resume()
   if (project.env.config.name !== 'local') {
 
     project.git.resetHard()
