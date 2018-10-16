@@ -6,7 +6,7 @@ import * as path from 'path';
 
 
 
-export function rebuildTnp(e) {
+export function rebuildTnp() {
   const p = Project.Tnp;
   const backupFolderDist = 'tmp-dist-current';
   p.run(`rimraf ${backupFolderDist}`).sync();
