@@ -97,7 +97,7 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   status.operationErrors = [];
 
   let { child }: { child: string; } = require('minimist')(args.split(' '));
-  child = child.trim()
+  child = (_.isString(child) ? child.trim() : child)
 
   let project = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
 
