@@ -60,10 +60,12 @@ function expressApp(port: number) {
 }
 
 
-function backupCloud(project: Project) {
+function backupCloud(project: Project, workspace: Project) {
   status.operation = 'creating backup - start';
 
-  const cwd = path.resolve(path.join(project.location, '..'));
+  const cwd = path.resolve(path.join(project.location,
+    (project === workspace) ? '..': '../..'
+  ));
   try {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
     run(`cpr ${project.name} ${project.backupName} -f node_modules`, { cwd }).sync()
@@ -127,7 +129,7 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
     process.stdin.resume()
   }
 
-  backupCloud(project);
+  backupCloud(project, workspace);
 
   if (project.env.config.name !== 'local') {
 
