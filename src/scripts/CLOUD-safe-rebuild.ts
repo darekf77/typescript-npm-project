@@ -64,8 +64,9 @@ function backupCloud(project: Project, workspace: Project) {
   status.operation = 'creating backup - start';
 
   const cwd = path.resolve(path.join(project.location,
-    (project === workspace) ? '..': '../..'
+    (project === workspace) ? '..' : '../..'
   ));
+  console.log('cwd', cwd)
   try {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
     run(`cpr ${project.name} ${project.backupName} -f node_modules`, { cwd }).sync()
