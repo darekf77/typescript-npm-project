@@ -37,7 +37,7 @@ export abstract class Project {
   }
 
   public get backupName() {
-    return `____${this.name}`
+    return `tmp-${this.name}`
   }
 
   public readonly location: string;
@@ -360,6 +360,9 @@ export abstract class Project {
     return {
       updateOrigin() {
         pullCurrentBranch(self.location);
+      },
+      resetHard() {
+        self.run(`git reset --hard`).sync()
       }
     }
   }

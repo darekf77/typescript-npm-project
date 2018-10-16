@@ -25,7 +25,8 @@ import { err } from '../../project/environment-config-helpers';
 const status = {
   progress: new PROGRESS_BAR_DATA(),
   child: undefined as string,
-  operation: undefined as 'starting' |
+  operation: 'starting' as 'starting' |
+    'error - wrong project' |
     'creating backup - start' |
     'creating backup - error' |
     'creating backup - complete' |
@@ -33,7 +34,7 @@ const status = {
     'restoring and building backup - error' |
     'restoring and building backup - complete' |
     'restored application running in progress ',
-  operationError: undefined as string
+  operationErrors: [] as string[]
 }
 
 
@@ -59,7 +60,7 @@ function expressApp(port: number) {
 
 function backupCloud(project: Project) {
   status.operation = 'creating backup - start';
-  status.operationError = undefined;
+
   const cwd = path.resolve(path.join(project.location, '..'));
   try {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
@@ -68,49 +69,58 @@ function backupCloud(project: Project) {
   } catch (error) {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
     status.operation = 'creating backup - error';
-    status.operationError = JSON.stringify(error);
+    status.operationErrors.push(JSON.stringify(error));
   }
 }
 
 function resotreBuildAndRunCloud(project: Project) {
   status.operation = 'restoring and building backup - start'
-  status.operationError = undefined;
+
   const cwd = path.resolve(path.join(project.location, '..'));
   try {
+    run(`rimraf ${project.name}`, { cwd }).sync()
     run(`cpr ${project.backupName} ${project.name}`, { cwd }).sync()
     run(`rimraf ${project.backupName}`, { cwd }).sync()
-    run(``)
     status.operation = 'restoring and building backup - complete'
   } catch (error) {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
     status.operation = 'restoring and building backup - error'
-    status.operationError = JSON.stringify(error);
+    status.operationErrors.push(JSON.stringify(error));
   }
 }
 
 export function $CLOUD_SAFE_REBUILD_START(args = '') {
 
+  status.progress = new PROGRESS_BAR_DATA();
+  status.operation = 'starting';
+  status.operationErrors = [];
 
   let { child }: { child: string; } = require('minimist')(args.split(' '));
   child = child.trim()
+
   let project = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
 
   const port = project.env.config.cloud.ports.update;
   killProcessByPort(port);
   expressApp(port);
-  backupCloud(project);
+
 
   if (_.isString(child)) {
     project = project.children.find(p => p.name === child)
   }
 
+
   if (!project) {
-    status.progress.status = 'error'
-    status.progress.info = `Bad child name ${child} to build project`;
+    status.operation = 'error - wrong project'
+    status.operationErrors.push(`Bad child name ${child} to build project`);
     process.stdin.resume()
   }
 
-  project.git.updateOrigin();
+  backupCloud(project);
+  project.git.resetHard()
+  project.git.updateOrigin()
+
+
   let p = project.run(`tnp build`).async()
   p.stdout.on('data', chunk => {
     PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
@@ -118,12 +128,17 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
     })
   })
 
-  p.stdout.on('error', () => {
+  p.stdout.on('error', (err) => {
+    status.progress.status = 'error';
+    status.progress.info = JSON.stringify(err);
     resotreBuildAndRunCloud(project);
-    proje
   })
 
-
+  p.stdout.once('end', () => {
+    setTimeout(() => { /// TODO is this good thing ?
+      p.removeAllListeners()
+    }, 1000)
+  })
 }
 
 
