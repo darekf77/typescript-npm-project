@@ -66,7 +66,7 @@ function backupCloud(project: Project) {
   const cwd = path.resolve(path.join(project.location, '..'));
   try {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
-    run(`cpr ${project.name} ${project.backupName}`, { cwd }).sync()
+    run(`cpr ${project.name} ${project.backupName} -f node_modules`, { cwd }).sync()
     status.operation = 'creating backup - complete';
   } catch (error) {
     // run(`rimraf ${project.backupName}`, { cwd }).sync()
@@ -128,7 +128,7 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   }
 
   backupCloud(project);
-  process.stdin.resume()
+
   if (project.env.config.name !== 'local') {
 
     project.git.resetHard()
