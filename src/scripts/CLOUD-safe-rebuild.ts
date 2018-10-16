@@ -12,11 +12,11 @@ import * as cookieParser from 'cookie-parser';
 import * as methodOverride from 'method-override';
 import * as fileUpload from 'express-fileupload';
 
-import { ProjectFrom, Project } from '../../project';
-import { killProcessByPort, run } from '../../process';
-import { PROGRESS_BAR_DATA } from '../../progress-output';
+import { ProjectFrom, Project } from '../project';
+import { killProcessByPort, run } from '../process';
+import { PROGRESS_BAR_DATA } from '../progress-output';
 import { statSync } from 'fs-extra';
-import { err } from '../../project/environment-config-helpers';
+import { err } from '../project/environment-config-helpers';
 
 
 

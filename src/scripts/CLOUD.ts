@@ -1,11 +1,11 @@
 
 //#region @backend
 import * as path from 'path';
-import { run } from '../../process';
-import { Project, ProjectFrom } from '../../project';
-import { rebuildTnp } from '../UPDATE';
+import { run } from '../process';
+import { Project, ProjectFrom } from '../project';
+import { rebuildTnp } from './UPDATE';
 import { $CLOUD_SAFE_REBUILD_START } from './CLOUD-safe-rebuild';
-import { paramsFrom } from '../../helpers';
+import { paramsFrom } from '../helpers';
 
 
 
