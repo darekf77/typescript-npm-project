@@ -103,8 +103,8 @@ export function $CLOUD_SAFE_REBUILD_START(args = '') {
   let project = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
   const workspace = project;
 
-  project.clear()
-  project.run(`tnp init --env=online`).sync()
+  // project.clear()
+  // project.run(`tnp init --env=online`).sync()
 
   const port = project.env.config.cloud.ports.update;
   killProcessByPort(port);
