@@ -30,8 +30,8 @@ export default {
 
   $CLOUD_SAFE_REBUILD_START,
 
-  $CLOUD_UPDATE: () => {
-    run(`tnp ${paramsFrom($CLOUD_SAFE_REBUILD_START.name)} &`).sync();
+  $CLOUD_UPDATE: (args) => {
+    run(`tnp ${paramsFrom($CLOUD_SAFE_REBUILD_START.name)} ${args} &`).sync();
     process.exit(0)
   },
 

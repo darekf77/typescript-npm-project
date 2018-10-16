@@ -146,8 +146,6 @@ export interface EnvConfig {
   cloud?: {
     ports: {
       update: number;
-      letsencrypt: number;
-      port90: number;
     }
   }
 

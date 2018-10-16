@@ -24,7 +24,8 @@ export function rebuildTnp() {
       info(`Tnp self update success`);
     }
   } catch (e) {
-
+    error(`Tnp self update not successfull build
+    errors ${e}`);
   }
 }
 

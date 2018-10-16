@@ -5,7 +5,9 @@
     ],
     "type": "workspace",
     "basedOn": "../baseline",
-    "allowedEnv": ["online"],
+    "allowedEnv": [
+      "online"
+    ],
     "basedOnAbsolutePath1": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline"
   },
   "name": "site",
@@ -51,6 +53,7 @@
     "@types/passport-http-bearer": "^1.0.30",
     "@types/password-hash": "^1.2.19",
     "@types/q": "^1.0.3",
+    "@types/request": "^2.47.1",
     "@types/sleep": "0.0.7",
     "@types/validator": "^6.2.2",
     "angular-tree-component": "^7.2.1",
