@@ -23,10 +23,11 @@ Helpers.checkEnvironment({
     { name: 'cpr' },
     { name: 'renamer' },
     { name: 'nodemon' },
+    { name: 'http-server' },
     { name: 'increase-memory-limit' },
     { name: 'bower' },
     { name: 'fkill', installName:'fkill-cli' }
-  ] as any,
+  ],
   programs: [
   //   {
   //     name: 'code',

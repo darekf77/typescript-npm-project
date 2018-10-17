@@ -2,8 +2,11 @@
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as child from 'child_process';
+import axios from 'axios';
+
+
 // local
-import { PROGRESS_BAR_DATA, ProjectFrom } from "tnp-bundle";
+import { PROGRESS_BAR_DATA, ProjectFrom, Project } from "tnp-bundle";
 import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
 import { EntityRepository, META } from "morphi";
 import { TNP_PROJECT } from "../entities/TNP_PROJECT";
@@ -143,6 +146,26 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
       childProcess.removeAllListeners();
     })
 
+  }
+
+  public get selfupdate() {
+    const self = this;
+    return {
+      async start(child?: string) {
+        run('tnp update').sync();
+        if (child) {
+          run(`tnp cloud:update --child=${child}`).sync();
+        } else {
+          run('tnp cloud:update').sync();
+        }
+
+      },
+      async status() {
+        let address = `http://localhost:${ENV.cloud.ports.update}/status`;
+        let res = await axios.get(address)
+        return res.data
+      },
+    }
   }
 
 

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { LibType, EnvironmentName } from './models';
 
-// export const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
+const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
 // let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
 // if (_.isString(env)) {
@@ -16,6 +16,7 @@ import { LibType, EnvironmentName } from './models';
 
 export const config = {
   tnp: 'tnp',
+  allowedEnvironments,
   folder: {
     bundle: 'bundle',
     bower: 'bower',

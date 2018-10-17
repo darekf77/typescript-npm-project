@@ -64,7 +64,7 @@
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
             "--copyto /Users/darekf/projects/npm/tsc-npm-project/projects/site/backup/repositories/1-tsc-npm-project/projects/baseline",
-            "# --copyto  /Users/darekf/projects/npm/tsc-npm-project"
+            "--copyto  /Users/darekf/projects/npm/tsc-npm-project"
           ]
         }
       ]
@@ -133,7 +133,7 @@
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
             "--copyto  /home/dariusz/projects/npm/tsc-npm-project/projects/site/backup/repositories/1-tsc-npm-project/projects/baseline",
-            "# --copyto  /home/dariusz/projects/npm/tsc-npm-project"
+            "--copyto  /home/dariusz/projects/npm/tsc-npm-project"
           ]
         }
       ]

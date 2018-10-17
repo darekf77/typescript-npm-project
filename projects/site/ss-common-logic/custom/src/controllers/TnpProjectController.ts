@@ -4,7 +4,7 @@ import {
 } from 'baseline/ss-common-logic/src/controllers/CategoryController';
 import {
   GET, PUT, POST, PathParam, Response, QueryParam,
-  ENDPOINT, CLASSNAME, BaseCRUDEntity, META
+  ENDPOINT, CLASSNAME, BaseCRUDEntity, META, DELETE
 } from 'morphi';
 
 //#region @backend
@@ -13,6 +13,7 @@ import * as fse from 'fs-extra';
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
+import { PROGRESS_BAR_DATA } from 'tnp-bundle';
 
 
 @ENDPOINT()
@@ -143,6 +144,30 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
     //#endregion
   }
 
+  @POST('/selfupdate/:child')
+  selfupdateStart(@PathParam('child') child?: string): Response<void> {
+    //#region @backendFunc
+    return async () => {
+      await this.db.TNP_PROJECT.selfupdate.start(child)
+    }
+    //#endregion
+  }
 
+  @GET('/selfupdate')
+  selfupdateStatus(): Response<SelfUpdate> {
+    //#region @backendFunc
+    return async () => {
+      let res = await this.db.TNP_PROJECT.selfupdate.status()
+      return res as any;
+    }
+    //#endregion
+  }
 
+}
+
+export interface SelfUpdate {
+  progress: PROGRESS_BAR_DATA;
+  child: string;
+  operation: string;
+  operationErrors: string[];
 }

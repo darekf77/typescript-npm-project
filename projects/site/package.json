@@ -4,7 +4,11 @@
       "README.md"
     ],
     "type": "workspace",
-    "basedOn": "../baseline"
+    "basedOn": "../baseline",
+    "allowedEnv": [
+      "online"
+    ],
+    "basedOnAbsolutePath1": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline"
   },
   "name": "site",
   "version": "0.0.0",
@@ -49,6 +53,7 @@
     "@types/passport-http-bearer": "^1.0.30",
     "@types/password-hash": "^1.2.19",
     "@types/q": "^1.0.3",
+    "@types/request": "^2.47.1",
     "@types/sleep": "0.0.7",
     "@types/validator": "^6.2.2",
     "angular-tree-component": "^7.2.1",
@@ -69,7 +74,7 @@
     "lodash": "4.17.4",
     "material-design-icons": "3.0.1",
     "moment": "^2.22.2",
-    "morphi": "1.0.59",
+    "morphi": "1.0.61",
     "ng2-file-upload": "^1.3.0",
     "ng2-logger": "^2.0.35",
     "ng2-rest": "9.1.12",

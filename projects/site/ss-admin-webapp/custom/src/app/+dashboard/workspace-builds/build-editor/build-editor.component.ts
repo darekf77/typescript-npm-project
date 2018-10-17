@@ -60,9 +60,23 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
 
   constructor(
     public route: ActivatedRoute,
+    private router: Router,
     public buildController: BuildController,
     public projectController: TnpProjectController
   ) {
+
+    
+    // router.events.subscribe(event => {
+    //   if (event instanceof NavigationEnd) {
+    //     this.router.navigated = false;
+    //     window.scrollTo(0, 0);
+    //   }
+    // });
+
+    /// QUICK FIX FOR REFRESH MODEL
+    router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
 
   }
 
@@ -206,7 +220,7 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
   private async getEnvNames() {
     const data = await this.buildController.getEnvironmentNames(this.model.id).received;
     // log.i('environment names', data.body.json)
-    this.environments = data.body.json.filter(e => !['local', 'online'].includes(e))
+    this.environments = data.body.json.filter(e => !['local'].includes(e))
     this.fields.find(({ key }) => key === 'environmentName').templateOptions.options = this.options;
   }
 

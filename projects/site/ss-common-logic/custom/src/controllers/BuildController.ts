@@ -42,21 +42,39 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     }
   }
 
-  private async createFirstBuildFromCurrentTnpProject() {
+
+  private async createSelfBuild() {
+    const tnpLocation = path.resolve(path.join(__dirname, '../../../../../'));
+
+    const selfBuild = await this.db.BUILD.save(this.db.BUILD.create({
+      gitFolder: '/projects/site',
+      gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
+      staticFolder: tnpLocation,
+      isSelf: true
+    }))
+
+    selfBuild.init(true)
+    // await this.db.BUILD.changeEnvironmentBy(b1, 'online');
+    await this.saveProject(selfBuild)
+    await this.db.BUILD.update(selfBuild.id, selfBuild);
+
+  }
+
+  private async createBuildFromBaseline() {
 
     const tnpLocation = path.resolve(path.join(__dirname, '../../../../../'));
 
-    const b1 = await this.db.BUILD.save(this.db.BUILD.create({
+    const baselineBuild = await this.db.BUILD.save(this.db.BUILD.create({
       gitFolder: '/projects/baseline',
       gitRemote: 'https://github.com/darekf77/tsc-npm-project.git',
       staticFolder: tnpLocation
     }))
 
 
-    b1.init()
-    await this.db.BUILD.changeEnvironmentBy(b1, 'dev');
-    await this.saveProject(b1)
-    await this.db.BUILD.update(b1.id, b1);
+    baselineBuild.init()
+    await this.db.BUILD.changeEnvironmentBy(baselineBuild, 'dev');
+    await this.saveProject(baselineBuild)
+    await this.db.BUILD.update(baselineBuild.id, baselineBuild);
 
 
     // const b2 = await this.db.BUILD.save(this.db.BUILD.create({
@@ -75,7 +93,8 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
     this.db.BUILD.recreateFolders()
-    await this.createFirstBuildFromCurrentTnpProject()
+    await this.createSelfBuild()
+    await this.createBuildFromBaseline()
 
 
   }

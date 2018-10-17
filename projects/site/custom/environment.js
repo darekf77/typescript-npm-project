@@ -12,6 +12,11 @@ config.workspace.projects.forEach(p => {
 config.pathes.backup.repositories = path.join(__dirname, 'backup', 'repositories');
 config.pathes.backup.builds = path.join(__dirname, 'backup', 'builds');
 
+config.cloud = {
+  ports: {
+    update: 9999
+  }
+}
 
 module.exports = exports = { config };
 

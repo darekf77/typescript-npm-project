@@ -10,7 +10,6 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
-import { DOMAIN_ENVIRONMENT } from './DOMAIN';
 
 //#endregion
 import {
@@ -55,9 +54,9 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   }
 
-  init() {
+  init(selfBuild = false) {
     if (_.isString(this.staticFolder) && this.staticFolder !== '') {
-      this.reinitFrom.folder()
+      this.reinitFrom.folder(selfBuild)
     } else {
       this.reinitFrom.repository()
     }
@@ -71,7 +70,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   private get reinitFrom() {
     const self = this;
     return {
-      folder() {
+      folder(selfBuild = false) {
 
         if (ENV.name !== 'local') {
           pullCurrentBranch(self.staticFolder);
@@ -80,22 +79,36 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
         const toCopy = path.join(self.staticFolder, self.gitFolder);
         const dest = self.localPath.repositoryFolder;
 
-        const options: fse.CopyOptionsSync = {
-          overwrite: true,
-          recursive: true,
-          filter: (src) => {
-            return !/.*node_modules.*/g.test(src) &&
-              !/.*tmp.*/g.test(src) &&
-              !/\.vscode.*/g.test(src) &&
-              !/.*dist.*/g.test(src) &&
-              !fs.lstatSync(src).isSymbolicLink();
+        if (selfBuild) {
+
+          const slefRepoLink = path.join(ENV.pathes.backup.repositories, self.nameFromIdAndRemote);
+          if (fse.existsSync(slefRepoLink)) {
+            fse.removeSync(slefRepoLink)
           }
-        };
 
-        fse.copySync(toCopy, dest, options);
+          HelpersLinks.createLink(slefRepoLink, self.staticFolder);
 
-        run(`tnp claer`, { cwd: dest });
+        } else {
+          const options: fse.CopyOptionsSync = {
+            overwrite: true,
+            recursive: true,
+            filter: (src) => {
+              return !/.*node_modules.*/g.test(src) &&
+                !/.*tmp.*/g.test(src) &&
+                !/\.vscode.*/g.test(src) &&
+                !/.*dist.*/g.test(src) &&
+                !fs.lstatSync(src).isSymbolicLink();
+            }
+          };
+
+          fse.copySync(toCopy, dest, options);
+          run(`tnp claer`, { cwd: dest });
+
+
+        }
         self.linkRepoToBuild()
+
+
       },
 
       repository() {
@@ -147,7 +160,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   }
 
   get name() {
-    return (this.gitFolder !== '/') ? _.startCase(this.gitFolder) : _.startCase(this.nameFromRemote);
+    return this.isSelf ? 'AUTOBUILD' : ((this.gitFolder !== '/') ? _.startCase(this.gitFolder) : _.startCase(this.nameFromRemote));
   }
 
 
@@ -169,6 +182,11 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
   @Column({ nullable: true, default: '/' }) gitFolder: string;
 
   @Column({ nullable: true, default: 'friendlyName' }) friendlyName: string;
+
+  @Column({
+    type: 'boolean',
+    default: false
+  }) isSelf: boolean = false;
 
 
 

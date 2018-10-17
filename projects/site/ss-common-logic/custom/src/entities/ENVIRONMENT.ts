@@ -10,6 +10,7 @@ import { TNP_PROJECT } from "./TNP_PROJECT";
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
+import { ProjectFrom } from 'tnp-bundle';
 //#endregion
 
 export interface IENVIRONMENT {
@@ -82,6 +83,8 @@ export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvCon
       return;
     }
 
+    const allowedEnv = ProjectFrom(project.location).allowedEnvironments;
+
     const patter = `${project.location}/${config.file.environment}.*`;
     let names = glob
       .sync(patter)
@@ -91,7 +94,8 @@ export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvCon
         .replace(`${config.file.environment}.`, '')
         .replace(/\.?js$/, '')
       )
-      .map(f => f.trim() === '' ? 'local' : f);
+      .map(f => f.trim() === '' ? 'local' : f)
+      .filter(f => allowedEnv.includes(f as any))
 
     return names as any;
     //#endregion

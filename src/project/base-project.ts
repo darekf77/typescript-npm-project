@@ -36,6 +36,10 @@ export abstract class Project {
     //#endregion
   }
 
+  public get backupName() {
+    return `tmp-${this.name}`
+  }
+
   public readonly location: string;
 
   //#region @backend
@@ -199,6 +203,13 @@ export abstract class Project {
     return this.type === 'workspace';
   }
 
+  get allowedEnvironments() {
+    if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
+      return this.packageJson.data.tnp.allowedEnv.concat('local')
+    }
+    return config.allowedEnvironments.concat('local');
+  }
+
   /**
    * Standalone projects link: npm libs
    */
@@ -349,6 +360,9 @@ export abstract class Project {
     return {
       updateOrigin() {
         pullCurrentBranch(self.location);
+      },
+      resetHard() {
+        self.run(`git reset --hard`).sync()
       }
     }
   }
