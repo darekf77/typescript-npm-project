@@ -40,7 +40,8 @@ const vscode = {
       "nemesv.copy-file-name",
       "momoko8443.library-version",
       "cg-cnu.vscode-path-tools",
-      "jack89ita.copy-filename"
+      "jack89ita.copy-filename",
+      "stepanog.angular1-inline"
     ]
   },
   settings: {
