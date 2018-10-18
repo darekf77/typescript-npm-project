@@ -20,7 +20,6 @@ Helpers.checkEnvironment({
     { name: 'npm-run', version: '4.1.2' },
     { name: 'rimraf' },
     { name: 'mkdirp' },
-    { name: 'cpr' },
     { name: 'renamer' },
     { name: 'nodemon' },
     { name: 'http-server' },
@@ -37,7 +36,6 @@ Helpers.checkEnvironment({
 });
 
 const localLibs = [
-  'cpr',
   'eslint',
   'mkdirp',
   'gulp',

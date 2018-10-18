@@ -14,8 +14,8 @@ export function rebuildTnp() {
   p.run(`git pull origin master`).sync();
 
   try {
-    p.run(`cpr dist ${backupFolderDist}`).sync()
-    p.run(`(tnp build:dist && rimraf ${backupFolderDist}) || (rimraf dist && cpr ${backupFolderDist} dist  && echo "Something went wrong with rebuild of tnp") `, { output: true }).sync()
+    p.run(`cp -R dist ${backupFolderDist}`).sync()
+    p.run(`(tnp build:dist && rimraf ${backupFolderDist}) || (rimraf dist && cp -R ${backupFolderDist} dist  && echo "Something went wrong with rebuild of tnp") `, { output: true }).sync()
     const backupDist = path.join(p.location, backupFolderDist);
     if (fs.existsSync(backupDist)) {
       p.run(`rimraf ${backupFolderDist}`);

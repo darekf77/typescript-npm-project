@@ -69,10 +69,9 @@ function backupCloud(project: Project, workspace: Project) {
   console.log('cwd', cwd)
   try {
     run(`rimraf ${project.backupName}`, { cwd }).sync()
-    run(`cpr ${project.name} ${project.backupName} -f node_modules`, { cwd }).sync()
+    run(`cp -R ${project.name} ${project.backupName}`, { cwd }).sync()
     status.operation = 'creating backup - complete';
   } catch (error) {
-    // run(`rimraf ${project.backupName}`, { cwd }).sync()
     status.operation = 'creating backup - error';
     status.operationErrors.push(JSON.stringify(error));
   }
@@ -84,11 +83,9 @@ function resotreBuildAndRunCloud(project: Project) {
   const cwd = path.resolve(path.join(project.location, '..'));
   try {
     run(`rimraf ${project.name}`, { cwd }).sync()
-    run(`cpr ${project.backupName} ${project.name}`, { cwd }).sync()
-    run(`rimraf ${project.backupName}`, { cwd }).sync()
+    run(`cp -R ${project.backupName} ${project.name}`, { cwd }).sync()
     status.operation = 'restoring and building backup - complete'
   } catch (error) {
-    run(`rimraf ${project.backupName}`, { cwd }).sync()
     status.operation = 'restoring and building backup - error'
     status.operationErrors.push(JSON.stringify(error));
   }

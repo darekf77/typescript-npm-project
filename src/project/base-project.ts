@@ -456,7 +456,7 @@ export abstract class Project {
       }
     };
     fse.copySync(this.location, destinationPath, options);
-    console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));
+    console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully...`));
     const project = ProjectFrom(destinationPath);
     console.log(chalk.green('Done.'));
     return project;
