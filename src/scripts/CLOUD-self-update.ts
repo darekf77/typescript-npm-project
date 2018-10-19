@@ -148,7 +148,12 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
     }
   })
 
-  // p.stderr.on('data', err => {
+  // p.stderr.on('data', err => { // WEBPACK DATA HERE
+  //   err = err.toString();
+  //   if(err.length < 200) {
+
+  //   }
+
   //   status.operationErrors.push(`stderr data:
   //   ${err.toString()}
   //   `)
