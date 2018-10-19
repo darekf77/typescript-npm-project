@@ -78,6 +78,7 @@ export interface RunOptions {
    */
   output?: boolean;
 
+  silence?: boolean;
 
 
   // detached?: boolean;

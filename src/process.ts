@@ -132,17 +132,17 @@ function checkProcess(dirPath: string, command: string) {
 const bigMaxBuffer = 2024 * 500;
 
 function runSyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer } = options;
+  const { output, cwd, biggerBuffer, silence } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
-  const stdio = output ? [0, 1, 2] : 'ignore';
+  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
   checkProcess(cwd, command);
   return child.execSync(command, { stdio, cwd, maxBuffer })
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer } = options;
+  const { output, cwd, biggerBuffer, silence } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
-  const stdio = output ? [0, 1, 2] : 'ignore';
+  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
   checkProcess(cwd, command);
   return log(child.exec(command, { cwd, maxBuffer }), output, stdio);
 }
