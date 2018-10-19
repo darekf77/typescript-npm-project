@@ -74,8 +74,9 @@ function backupCloud(project: Project, workspace: Project) {
   ));
   console.log('cwd', cwd)
   try {
-    run(`rimraf ${project.backupName}`, { cwd }).sync()
-    run(`cp -R ${project.name} ${project.backupName}`, { cwd }).sync()
+    if (!fse.existsSync(path.join(cwd, project.backupName))) {
+      run(`cp -R ${project.name} ${project.backupName}`, { cwd }).sync()
+    }
     status.operation = 'creating backup - complete';
   } catch (error) {
     status.operation = 'creating backup - error';

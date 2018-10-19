@@ -69,10 +69,10 @@ export class AngularProject extends Project {
       if (this.isEjectedProject) {
         baseHref = `--env.${baseHref}`
         const aot = (prod ? 'aot.' : '');
-        this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref} &> /dev/null`, { biggerBuffer: true }).sync()
+        this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, { biggerBuffer: true }).sync()
       } else {
         baseHref = `--${baseHref}`
-        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref} &> /dev/null`, { biggerBuffer: true }).sync()
+        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`, { biggerBuffer: true }).sync()
       }
     }
 

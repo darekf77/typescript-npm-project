@@ -35,6 +35,10 @@ export default {
     process.exit(0)
   },
 
+  $CLOUD_BACKUP(args) {
+    CloudHelpers.createBackup(args);
+    process.exit(0)
+  },
 
   $CLOUD_CLEAR_ALL: (args) => {
     const cloudProject = CloudHelpers.cloudProject();
