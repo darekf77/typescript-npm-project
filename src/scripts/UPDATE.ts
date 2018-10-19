@@ -41,6 +41,7 @@ export default {
     p.run(`git reset --hard`).sync();
     p.run(`git pull origin master`).sync();
     p.run(`tsc`).sync();
+    process.exit(0)
   }
 
 }
