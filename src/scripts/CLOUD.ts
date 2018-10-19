@@ -15,7 +15,7 @@ export default {
 
   $CLOUD_INSTALL,
   $CLOUD_SELF_UPDATE,
-
+  $CLOUD_UPDATE: $CLOUD_SELF_UPDATE,
 
   $CLOUD_RESTART: (args) => {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
