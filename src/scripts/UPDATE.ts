@@ -34,6 +34,13 @@ export default {
   $UPDATE: (args) => {
     rebuildTnp();
     process.exit(0)
+  },
+  $UPDATE_QUICK: () => {
+    const p = Project.Tnp;
+    p.run(`clear`).sync();
+    p.run(`git reset --hard`).sync();
+    p.run(`git pull origin master`).sync();
+    p.run(`tsc`).sync();
   }
 
 }
