@@ -7,6 +7,7 @@ import { rebuildTnp } from './UPDATE';
 import { paramsFrom } from '../helpers';
 import { $CLOUD_INSTALL } from './CLOUD-install';
 import { $CLOUD_SELF_REBUILD_AND_RUN } from './CLOUD-self-update';
+import { CloudHelpers } from './CLOUD-helpers';
 
 
 
@@ -28,14 +29,14 @@ export default {
   },
 
   $CLOUD_RESTART: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp start </dev/null &>/dev/null &`).sync();
     process.exit(0)
   },
 
 
   $CLOUD_REBUILD: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear`).sync();
     cloudProject.run(`tnp init --env=online`).sync();
     cloudProject.run(`tnp build`).sync();
@@ -44,20 +45,20 @@ export default {
 
 
   $CLOUD_CLEAR_ALL: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear:all ${args}`).sync();
     process.exit(0)
   },
 
 
   $CLOUD_CLEAR: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear ${args}`).sync();
     process.exit(0)
   },
 
   $CLOUD_MONITOR() {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     function display() {
       run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp`).sync()
       setTimeout(() => {

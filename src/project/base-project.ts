@@ -195,6 +195,10 @@ export abstract class Project {
     return this.name === 'tnp';
   }
 
+  get isCloud() {
+    return this.name === 'site' && this.type === 'workspace'; // TODO temporary solution
+  }
+
   get isWorkspaceChildProject() {
     return this.parent && this.parent.type === 'workspace';
   }

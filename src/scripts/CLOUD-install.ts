@@ -2,15 +2,14 @@
 import * as path from 'path';
 
 import { ProjectFrom, Project } from '../project';
+import { CloudHelpers } from './CLOUD-helpers';
 
 
 
 export function $CLOUD_INSTALL(args) {
 
-  let cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-  cloudProject.run(`tnp clear`).sync();
-  cloudProject.run(`tnp init --env=online`).sync();
-  cloudProject.run(`tnp build`).sync();
-  cloudProject.run(`nohup tnp start &`).sync();
+  CloudHelpers.reinit()
+  CloudHelpers.cloudBuild()
+  CloudHelpers.cloudStartNoOutput()
 }
 //#endregion

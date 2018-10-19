@@ -18,6 +18,7 @@ import { PROGRESS_BAR_DATA } from '../progress-output';
 import { statSync } from 'fs-extra';
 import { err } from '../project/environment-config-helpers';
 import { paramsFrom } from '../helpers';
+import { CloudHelpers } from './CLOUD-helpers';
 
 
 
@@ -35,7 +36,7 @@ const status = {
     'creating backup - complete' |
     'restoring and building backup - start' |
     'restoring and building backup - error' |
-    'restoring and building backup - complete' |
+    'restoring and building backup - complete (starting cloud as deamon)' |
     'restored application running in progress ' |
     'complete - starting cloud',
   operationErrors: [] as string[]
@@ -85,24 +86,26 @@ function resotreBuildAndRunCloud(project: Project) {
   const cwd = path.resolve(path.join(project.location, '..'));
   try {
     run(`rimraf ${project.name}`, { cwd }).sync()
-    run(`cp -R ${project.backupName} ${project.name}`, { cwd }).sync()
-    status.operation = 'restoring and building backup - complete'
+    run(`mv ${project.backupName} ${project.name}`, { cwd }).sync()
+    CloudHelpers.cloudStartNoOutput()
+    status.operation = 'restoring and building backup - complete (starting cloud as deamon)'
   } catch (error) {
     status.operation = 'restoring and building backup - error'
     status.operationErrors.push(JSON.stringify(error));
   }
 }
 
-export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
-
+function setStatusDefault() {
   status.progress = new PROGRESS_BAR_DATA();
   status.operation = 'starting';
   status.operationErrors = [];
+}
 
+function resolveProject(args) {
   let { child }: { child: string; } = require('minimist')(args.split(' '));
   child = (_.isString(child) ? child.trim() : child)
 
-  let project = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+  let project = CloudHelpers.cloudProject();
   const workspace = project;
 
   // project.clear()
@@ -117,51 +120,59 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
     project = project.children.find(p => p.name === child)
   }
 
-  // if (project.env.config.name === 'local') {
-  //   status.operation = 'error - environment should be "online"'
-  //   process.stdin.resume()
-  // }
-
-
   if (!project) {
     status.operation = 'error - wrong project'
     status.operationErrors.push(`Bad child name ${child} to build project`);
     process.stdin.resume()
   }
+  return { project, workspace };
+}
+
+function selfUpdate(project: Project, restoreFnOnError: () => void) {
+
+  project.git.resetHard()
+  project.git.updateOrigin()
+
+  let p = project.run(`tnp build`, { output: false, biggerBuffer: true }).async()
+
+  p.stdout.on('data', chunk => {
+    PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
+      status.progress = progress;
+    })
+    if (status.progress.status === 'complete') {
+      status.operation = 'complete - starting cloud';
+      CloudHelpers.cloudStartNoOutput()
+    }
+  })
+
+  p.stdout.on('error', (err) => {
+    status.progress.status = 'error';
+    status.progress.info = JSON.stringify(err);
+    restoreFnOnError()
+  })
+
+  p.stdout.once('end', () => {
+    console.log('PROCESS ENDED')
+    // setTimeout(() => { /// TODO is this good thing ?
+    //   p.removeAllListeners()
+    // }, 1000)
+  })
+
+}
+
+export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
+
+  setStatusDefault()
+
+  const { project, workspace } = resolveProject(args);
 
   backupCloud(project, workspace);
 
   if (project.env.config.name !== 'local') {
-
-    project.git.resetHard()
-    project.git.updateOrigin()
-
-    let p = project.run(`tnp build`, { output: false, biggerBuffer: true }).async()
-    p.stdout.on('data', chunk => {
-      PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
-        status.progress = progress;
-      })
-      if (status.progress.status === 'complete') {
-        status.operation = 'complete - starting cloud';
-        workspace.run(`nohup tnp start &`, { output: false }).sync()
-      }
-    })
-
-    p.stdout.on('error', (err) => {
-      status.progress.status = 'error';
-      status.progress.info = JSON.stringify(err);
+    selfUpdate(project, () => {
       resotreBuildAndRunCloud(project);
-    })
-
-    p.stdout.once('end', () => {
-      setTimeout(() => { /// TODO is this good thing ?
-        p.removeAllListeners()
-      }, 1000)
-    })
-
+    });
   }
-
-
 
 }
 
