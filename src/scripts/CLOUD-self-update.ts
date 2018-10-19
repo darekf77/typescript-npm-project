@@ -146,7 +146,7 @@ function safeRebuild(args = '') {
       })
       if (status.progress.status === 'complete') {
         status.operation = 'complete - starting cloud';
-        workspace.run(`tnp start &`, { output: false }).sync()
+        workspace.run(`nohup tnp start &`, { output: false }).sync()
       }
     })
 
