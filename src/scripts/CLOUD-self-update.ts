@@ -148,7 +148,26 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
     }
   })
 
+  p.stderr.on('data', err => {
+    status.operationErrors.push(`stderr data:
+    ${err.toString()}
+    `)
+  })
+
+  p.stderr.on('error', err => {
+    status.operationErrors.push(`stderr error:
+
+    ${JSON.stringify(err)}
+
+    `)
+  })
+
   p.stdout.on('error', (err) => {
+    status.operationErrors.push(`stdout error:
+
+    ${JSON.stringify(err)}
+
+    `)
     status.progress.status = 'error';
     status.progress.info = JSON.stringify(err);
     restoreFnOnError()
