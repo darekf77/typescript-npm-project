@@ -1,5 +1,8 @@
 import * as path from 'path';
 import { Project, ProjectFrom } from '../project';
+import { run } from '../process';
+import { $CLOUD_SELF_REBUILD_AND_RUN } from './CLOUD-self-update';
+import { paramsFrom } from '../helpers';
 
 
 export namespace CloudHelpers {
@@ -23,6 +26,10 @@ export namespace CloudHelpers {
 
   export function cloudStartNoOutput() {
     cloudProject().run(`nohup tnp start &`).sync();
+  }
+
+  export function safeRebuildAndRun(args) {
+    run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`, { biggerBuffer: true }).sync();
   }
 
 

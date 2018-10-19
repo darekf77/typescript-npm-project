@@ -19,12 +19,12 @@ export default {
   $CLOUD_SELF_REBUILD_AND_RUN,
 
   $CLOUD_SELF_UPDATE(args) {
-    run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`).sync();
+    CloudHelpers.safeRebuildAndRun(args);
     process.exit(0)
   },
 
   $CLOUD_UPDATE(args) {
-    run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`).sync();
+    CloudHelpers.safeRebuildAndRun(args);
     process.exit(0)
   },
 
@@ -36,10 +36,8 @@ export default {
 
 
   $CLOUD_BUILD: (args) => {
-    const cloudProject = CloudHelpers.cloudProject();
-    cloudProject.run(`tnp clear`).sync();
-    cloudProject.run(`tnp init --env=online`).sync();
-    cloudProject.run(`tnp build`).sync();
+    CloudHelpers.reinit()
+    CloudHelpers.cloudBuild()
     process.exit(0)
   },
 
