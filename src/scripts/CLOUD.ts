@@ -35,7 +35,7 @@ export default {
   },
 
 
-  $CLOUD_REBUILD: (args) => {
+  $CLOUD_BUILD: (args) => {
     const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear`).sync();
     cloudProject.run(`tnp init --env=online`).sync();
