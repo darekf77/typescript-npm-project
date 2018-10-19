@@ -34,6 +34,7 @@ const status = {
     'creating backup - start' |
     'creating backup - error' |
     'creating backup - complete' |
+    'build process ended' |
     'restoring and building backup - start' |
     'restoring and building backup - error' |
     'restoring and building backup - complete (starting cloud as deamon)' |
@@ -152,7 +153,8 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
   })
 
   p.stdout.once('end', () => {
-    console.log('PROCESS ENDED')
+
+    status.operation = 'build process ended';
     // setTimeout(() => { /// TODO is this good thing ?
     //   p.removeAllListeners()
     // }, 1000)
