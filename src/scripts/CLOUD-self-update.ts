@@ -136,7 +136,7 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
   project.git.resetHard()
   project.git.updateOrigin()
 
-  let p = project.run(`tnp build`, { output: false, biggerBuffer: true }).async()
+  let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
   p.stdout.on('data', chunk => {
     PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
@@ -155,7 +155,7 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
   })
 
   p.stdout.once('end', () => {
-
+    console.log('BUILD PROCESS ENDED')
     status.operation = 'build process ended';
     // setTimeout(() => { /// TODO is this good thing ?
     //   p.removeAllListeners()
