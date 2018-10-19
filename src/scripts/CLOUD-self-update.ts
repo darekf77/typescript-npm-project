@@ -160,6 +160,10 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
   //   `)
   // })
 
+  p.stderr.on('end', () => {
+    status.operationErrors.push(`stderr end`)
+  })
+
   p.stderr.on('error', err => {
     status.operationErrors.push(`stderr error:
 
