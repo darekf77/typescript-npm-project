@@ -1,3 +1,4 @@
+//#region @backend
 import * as path from 'path';
 
 import { ProjectFrom, Project } from '../project';
@@ -12,3 +13,4 @@ export function $CLOUD_INSTALL(args) {
   cloudProject.run(`tnp build`).sync();
   cloudProject.run(`nohup tnp start &`).sync();
 }
+//#endregion
