@@ -21,7 +21,7 @@ export namespace CloudHelpers {
   }
 
   export function cloudBuildNoOutput() {
-    cloudProject().run(`nohup tnp build`, { biggerBuffer: true }).sync();
+    cloudProject().run(`tnp build`, { biggerBuffer: true }).sync();
   }
 
   export function cloudStartNoOutput() {
