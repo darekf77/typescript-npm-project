@@ -60,7 +60,12 @@ export default {
   $CLOUD_MONITOR() {
     const cloudProject = CloudHelpers.cloudProject();
     function display() {
-      run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp`).sync()
+      try {
+        run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp`).sync()
+      } catch (error) {
+        console.log('Not able to get server info');
+      }
+
       setTimeout(() => {
         display()
       }, 1000)
