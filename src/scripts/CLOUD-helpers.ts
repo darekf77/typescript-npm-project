@@ -29,7 +29,10 @@ export namespace CloudHelpers {
   }
 
   export function cloudStartNoOutput() {
-    cloudProject().run(`nohup tnp start &`).sync();
+    cloudProject().run(`tnp start &`, {
+      output: false,
+      silence: true
+    }).sync();
   }
 
   export function safeRebuildAndRun(args) {
