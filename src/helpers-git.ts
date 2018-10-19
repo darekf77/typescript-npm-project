@@ -3,6 +3,19 @@ import * as child from 'child_process';
 import { info, error } from './messages';
 import { basename } from 'path';
 
+export function countCommits(directoryPath) {
+  try {
+    const cwd = directoryPath;
+    let currentLocalBranch = child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()
+    let value = child.execSync(`git rev-list --count ${currentLocalBranch}`, { cwd });
+    return Number(value);
+  } catch (e) {
+    console.log(e)
+    error(`Cannot counts commits in branch in: ${directoryPath}`)
+  }
+
+}
+
 export function pullCurrentBranch(directoryPath) {
   info(`Pulling git changes in "${directoryPath}" `)
   try {

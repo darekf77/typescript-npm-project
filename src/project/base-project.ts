@@ -23,7 +23,7 @@ import { FilesRecreator } from './files-builder';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 
-import { pullCurrentBranch } from '../helpers-git';
+import { pullCurrentBranch, countCommits } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 //#endregion
@@ -367,6 +367,10 @@ export abstract class Project {
       },
       resetHard() {
         self.run(`git reset --hard`).sync()
+      },
+
+      countComits() {
+        return countCommits(self.location);
       }
     }
   }
