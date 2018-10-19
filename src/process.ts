@@ -103,18 +103,20 @@ export function clearConsole() {
 // })
 
 
-export function log(proc: child.ChildProcess, output = true) {
+export function log(proc: child.ChildProcess, output = true, stdio) {
   // processes.push(proc);
 
-  if (output) {
-    proc.stdout.on('data', (data) => {
-      console.log(data.toString());
-    })
+  proc.stdio = stdio;
 
-    proc.stderr.on('data', (data) => {
-      console.log(data.toString());
-    })
-  }
+  // if (output) {
+  //   proc.stdout.on('data', (data) => {
+  //     console.log(data.toString());
+  //   })
+
+  //   proc.stderr.on('data', (data) => {
+  //     console.log(data.toString());
+  //   })
+  // }
 
   return proc;
 }
@@ -132,18 +134,17 @@ const bigMaxBuffer = 2024 * 500;
 function runSyncIn(command: string, options?: RunOptions) {
   const { output, cwd, biggerBuffer } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
+  const stdio = output ? [0, 1, 2] : 'ignore';
   checkProcess(cwd, command);
-  if (output) {
-    return child.execSync(command, { stdio: [0, 1, 2], cwd, maxBuffer })
-  }
-  return child.execSync(command, { cwd, maxBuffer })
+  return child.execSync(command, { stdio, cwd, maxBuffer })
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
   const { output, cwd, biggerBuffer } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
+  const stdio = output ? [0, 1, 2] : 'ignore';
   checkProcess(cwd, command);
-  return log(child.exec(command, { cwd, maxBuffer }), output);
+  return log(child.exec(command, { cwd, maxBuffer }), output, stdio);
 }
 
 function prepareWatchCommand(cmd) {

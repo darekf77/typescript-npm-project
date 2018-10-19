@@ -32,6 +32,5 @@ module.exports = merge(common, {
         }
       }
     })
-  ],
-  stats: 'errors-only'
+  ]
 });
