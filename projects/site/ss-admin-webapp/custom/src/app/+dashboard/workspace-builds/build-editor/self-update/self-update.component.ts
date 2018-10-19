@@ -32,28 +32,40 @@ export class SelfUpdateComponent implements OnInit {
   async autoUpdate(project: TNP_PROJECT, child?: string) {
     if (_.isString(child)) {
       log.i(`Self build of child "${child}" for project `, project)
-      await this.projectController.selfupdateStart(child).received;
+      try {
+        await this.projectController.selfupdateStart(child).received;
+      } catch (e) {
+        log.er(e)
+      }
     } else {
       log.i('self build ', project)
-      await this.projectController.selfupdateStart().received;
-      await this.updateStatus()
+      try {
+        await this.projectController.selfupdateStart().received;
+        await this.updateStatus()
+      } catch (e) {
+        log.er(e)
+      }
     }
   }
 
   async updateStatus() {
 
-    const data = await this.projectController.selfupdateStatus().received;
-    const { child, operation, operationErrors, progress } = data.body.json;
-    this.child = child;
-    this.operation = operation;
-    this.operationErros = operationErrors;
-    this.progress = progress;
-
-    if (progress && progress.status === 'inprogress') {
+    try {
+      const data = await this.projectController.selfupdateStatus().received;
+      const { child, operation, operationErrors, progress } = data.body.json;
+      this.child = child;
+      this.operation = operation;
+      this.operationErros = operationErrors;
+      this.progress = progress;
+    } catch (error) {
+      log.er(error)
+    }
+    if (this.progress && this.progress.status === 'inprogress') {
       setTimeout(async () => {
         await this.updateStatus()
       }, 1000)
     }
+
   }
 
   constructor(
