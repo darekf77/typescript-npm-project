@@ -56,7 +56,7 @@ export default {
     process.exit(0)
   },
 
-  $CLOUD_RESPONSE_MONITOR() {
+  $CLOUD_MONITOR() {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
     function display() {
       run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp`).sync()
