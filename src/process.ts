@@ -39,7 +39,7 @@ export function killProcess(byPid: number) {
 
 export function killProcessByPort(port: number) {
   try {
-    run(`fkill -f :${port} &> /dev/null`, { output: false }).sync()
+    run(`nohup fkill -f :${port} &> /dev/null`, { output: false }).sync()
     info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
     warn(`No process to kill  on port: ${port}... `)
@@ -120,26 +120,30 @@ export function log(proc: child.ChildProcess, output = true) {
 }
 
 function checkProcess(dirPath: string, command: string) {
-  if (!fs.existsSync(dirPath)) error(`Path doesn't exist: ${dirPath}`);
+  if (!fs.existsSync(dirPath)) error(`
+  Path for process cwd doesn't exist: ${dirPath}
+  command: ${command}
+  `);
   if (!command) error(`Bad command: ${command}`);
 }
 
+const bigMaxBuffer = 2024 * 500;
+
 function runSyncIn(command: string, options?: RunOptions) {
-  const { output, cwd } = options;
+  const { output, cwd, biggerBuffer } = options;
+  const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   checkProcess(cwd, command);
   if (output) {
-    return child.execSync(command, { stdio: [0, 1, 2], cwd })
+    return child.execSync(command, { stdio: [0, 1, 2], cwd, maxBuffer })
   }
-  return child.execSync(command, { cwd })
+  return child.execSync(command, { cwd, maxBuffer })
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
   const { output, cwd, biggerBuffer } = options;
+  const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   checkProcess(cwd, command);
-  if (biggerBuffer) {
-    return log(child.exec(command, { cwd, maxBuffer: 2024 * 500 }), output);
-  }
-  return log(child.exec(command, { cwd }), output);
+  return log(child.exec(command, { cwd, maxBuffer }), output);
 }
 
 function prepareWatchCommand(cmd) {
