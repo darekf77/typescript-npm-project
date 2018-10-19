@@ -28,12 +28,6 @@ export default {
     process.exit(0)
   },
 
-  $CLOUD_RESTART: (args) => {
-    const cloudProject = CloudHelpers.cloudProject();
-    cloudProject.run(`tnp start </dev/null &>/dev/null &`).sync();
-    process.exit(0)
-  },
-
 
   $CLOUD_BUILD: (args) => {
     CloudHelpers.reinit()

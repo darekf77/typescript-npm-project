@@ -79,18 +79,6 @@ export interface RunOptions {
   output?: boolean;
 
 
-// 27
-// down vote TODO implement this
-// You can redirect stdout to /dev/null.
-
-// yum install nano > /dev/null
-
-// Or you can redirect both stdout and stderr,
-
-// yum install nano &> /dev/null.
-
-// But if the program has a quiet option, that's even better.
-
 
   // detached?: boolean;
   cwd?: string;
