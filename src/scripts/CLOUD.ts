@@ -61,7 +61,7 @@ export default {
     const cloudProject = CloudHelpers.cloudProject();
     function display() {
       try {
-        run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp`).sync()
+        run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp --json_opt=canonical,pretty`).sync()
       } catch (error) {
         console.log('Not able to get server info');
       }
