@@ -108,15 +108,24 @@ export function log(proc: child.ChildProcess, output = true, stdio) {
 
   proc.stdio = stdio;
 
-  // if (output) {
-  //   proc.stdout.on('data', (data) => {
-  //     console.log(data.toString());
-  //   })
+  if (output) {
+    proc.stdout.on('data', (data) => {
+      console.log(data.toString());
+    })
 
-  //   proc.stderr.on('data', (data) => {
-  //     console.log(data.toString());
-  //   })
-  // }
+    proc.stdout.on('error', (data) => {
+      console.log(data);
+    })
+
+    proc.stderr.on('data', (data) => {
+      console.log(data.toString());
+    })
+
+    proc.stderr.on('error', (data) => {
+      console.log(data);
+    })
+
+  }
 
   return proc;
 }
