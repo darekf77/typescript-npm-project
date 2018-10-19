@@ -39,10 +39,10 @@ export function killProcess(byPid: number) {
 
 export function killProcessByPort(port: number) {
   try {
-    run(`fkill -f :${port}`, { output: false }).sync()
+    run(`nohup fkill -f :${port} &> /dev/null`, { output: false }).sync()
     info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
-    warn(`Cannot kill process on port: ${port}... `)
+    warn(`No process to kill  on port: ${port}... `)
   }
 
 

@@ -148,11 +148,11 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
     }
   })
 
-  p.stderr.on('data', err => {
-    status.operationErrors.push(`stderr data:
-    ${err.toString()}
-    `)
-  })
+  // p.stderr.on('data', err => {
+  //   status.operationErrors.push(`stderr data:
+  //   ${err.toString()}
+  //   `)
+  // })
 
   p.stderr.on('error', err => {
     status.operationErrors.push(`stderr error:
