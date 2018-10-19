@@ -1,11 +1,11 @@
 <div *ngIf="model && model.project">
 
 
-  <button [disabled]="inProgress"> Self update whole project <strong>{{model.project.name}}</strong> </button>
+  <button [disabled]="inProgress" (click)="autoUpdate(model.project)" > Self update whole project <strong>{{model.project.name}}</strong> </button>
 
   <ul *ngIf="model.project.children">
     <li *ngFor="let project of model.project.children">
-      <button [disabled]="inProgress"> Self child project <strong>{{project.name}}</strong> </button>
+      <button [disabled]="inProgress" (click)="autoUpdate(model.project, project.name )" > Self child project <strong>{{project.name}}</strong> </button>
     </li>
   </ul>
 

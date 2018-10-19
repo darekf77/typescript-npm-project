@@ -1,9 +1,12 @@
+import * as _ from 'lodash';
+
 import { Component, OnInit, Input } from '@angular/core';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
 import { Log, Level } from 'ng2-logger/browser';
 import { PROGRESS_BAR_DATA } from 'tnp-bundle/browser';
+import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 const log = Log.create('self build components')
 
 
@@ -20,16 +23,43 @@ export class SelfUpdateComponent implements OnInit {
 
   progress: PROGRESS_BAR_DATA;
   operation: string;
+  child: string;
   operationErros: string[] = [];
 
 
   @Input() model: BUILD;
 
-  autorebuild(project: TNP_PROJECT) {
-    log.i('self build ', project)
+  async autoUpdate(project: TNP_PROJECT, child?: string) {
+    if (_.isString(child)) {
+      log.i(`Self build of child "${child}" for project `, project)
+      await this.projectController.selfupdateStart(child).received;
+    } else {
+      log.i('self build ', project)
+      await this.projectController.selfupdateStart().received;
+      await this.updateStatus()
+    }
   }
 
-  constructor() { }
+  async updateStatus() {
+
+    const data = await this.projectController.selfupdateStatus().received;
+    const { child, operation, operationErrors, progress } = data.body.json;
+    this.child = child;
+    this.operation = operation;
+    this.operationErros = operationErrors;
+    this.progress = progress;
+
+    if (progress && progress.status === 'inprogress') {
+      setTimeout(async () => {
+        await this.updateStatus()
+      }, 1000)
+    }
+  }
+
+  constructor(
+    public projectController: TnpProjectController
+
+  ) { }
 
   ngOnInit() {
   }
