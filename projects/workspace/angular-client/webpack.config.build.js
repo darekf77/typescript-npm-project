@@ -33,7 +33,5 @@ module.exports = merge(common, {
       }
     })
   ],
-  stats: {
-    modules: false,
-  }
+  stats: 'errors-only'
 });
