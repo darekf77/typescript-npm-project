@@ -4,36 +4,18 @@ import * as path from 'path';
 import { run } from '../process';
 import { Project, ProjectFrom } from '../project';
 import { rebuildTnp } from './UPDATE';
-import { $CLOUD_SAFE_REBUILD_START } from './CLOUD-safe-rebuild';
 import { paramsFrom } from '../helpers';
+import { $CLOUD_INSTALL } from './CLOUD-install';
+import { $CLOUD_SELF_UPDATE } from './CLOUD-self-update';
 
 
 
 
 export default {
 
-  // $CLOUD_TEST1: () => {
-  //   function test() {
-  //     console.log(`test pid: ${process.pid}, ppid: ${process.ppid}`)
-  //     setTimeout(() => {
-  //       test()
-  //     }, 2000)
-  //   }
+  $CLOUD_INSTALL,
+  $CLOUD_SELF_UPDATE,
 
-  //   test();
-  // },
-
-  // $CLOUD_TEST: () => {
-  //   run(`tnp cloud:test1 &`).sync();
-  //   process.exit(0)
-  // },
-
-  $CLOUD_SAFE_REBUILD_START,
-
-  $CLOUD_UPDATE: (args) => {
-    run(`tnp ${paramsFrom($CLOUD_SAFE_REBUILD_START.name)} ${args} &`).sync();
-    process.exit(0)
-  },
 
   $CLOUD_RESTART: (args) => {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));

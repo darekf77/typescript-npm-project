@@ -17,8 +17,13 @@ import { killProcessByPort, run } from '../process';
 import { PROGRESS_BAR_DATA } from '../progress-output';
 import { statSync } from 'fs-extra';
 import { err } from '../project/environment-config-helpers';
+import { paramsFrom } from '../helpers';
 
 
+export function $CLOUD_SELF_UPDATE(args) {
+  run(`tnp ${paramsFrom(safeRebuild.name)} ${args} &`).sync();
+  process.exit(0)
+}
 
 
 
@@ -91,7 +96,7 @@ function resotreBuildAndRunCloud(project: Project) {
   }
 }
 
-export function $CLOUD_SAFE_REBUILD_START(args = '') {
+function safeRebuild(args = '') {
 
   status.progress = new PROGRESS_BAR_DATA();
   status.operation = 'starting';
