@@ -189,7 +189,7 @@ export function run(command: string,
   console.log(`Command: "${command}" , options "${_.isObject(options) ? JSON.stringify(options) : options}"`)
   if (!options) options = {};
   if (options.output === undefined) options.output = true;
-  if (options.biggerBuffer === undefined) options.biggerBuffer = true;
+  if (options.biggerBuffer === undefined) options.biggerBuffer = false;
   if (options.cwd === undefined) options.cwd = process.cwd()
   return {
     sync() {
