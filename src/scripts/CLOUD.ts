@@ -6,7 +6,8 @@ import { Project, ProjectFrom } from '../project';
 import { rebuildTnp } from './UPDATE';
 import { paramsFrom } from '../helpers';
 import { $CLOUD_INSTALL } from './CLOUD-install';
-import { $CLOUD_SELF_UPDATE } from './CLOUD-self-update';
+import { $CLOUD_SELF_REBUILD_AND_RUN } from './CLOUD-self-update';
+
 
 
 
@@ -14,8 +15,17 @@ import { $CLOUD_SELF_UPDATE } from './CLOUD-self-update';
 export default {
 
   $CLOUD_INSTALL,
-  $CLOUD_SELF_UPDATE,
-  $CLOUD_UPDATE: $CLOUD_SELF_UPDATE,
+  $CLOUD_SELF_REBUILD_AND_RUN,
+
+  $CLOUD_SELF_UPDATE(args) {
+    run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`).sync();
+    process.exit(0)
+  },
+
+  $CLOUD_UPDATE(args) {
+    run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`).sync();
+    process.exit(0)
+  },
 
   $CLOUD_RESTART: (args) => {
     const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));

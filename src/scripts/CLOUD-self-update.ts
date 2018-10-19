@@ -20,10 +20,7 @@ import { err } from '../project/environment-config-helpers';
 import { paramsFrom } from '../helpers';
 
 
-export function $CLOUD_SELF_UPDATE(args) {
-  run(`tnp ${paramsFrom(safeRebuild.name)} ${args} &`).sync();
-  process.exit(0)
-}
+
 
 
 
@@ -96,7 +93,7 @@ function resotreBuildAndRunCloud(project: Project) {
   }
 }
 
-function safeRebuild(args = '') {
+export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
 
   status.progress = new PROGRESS_BAR_DATA();
   status.operation = 'starting';
