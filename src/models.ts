@@ -153,6 +153,12 @@ export interface EnvConfig {
     }
   }
 
+  build?: {
+    number?: number;
+    hash?: string;
+    date?: Date;
+  }
+
 }
 
 

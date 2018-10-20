@@ -5,7 +5,7 @@ export default {
 
   $TOP_NODE() {
     const processes = []
-    run(`top -c -p $(pgrep -d',' -f node)`).async()
+    // run(`top -c -p $(pgrep -d',' -f node)`).async()
   }
 
 }

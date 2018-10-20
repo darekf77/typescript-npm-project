@@ -23,7 +23,7 @@ import { FilesRecreator } from './files-builder';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 
-import { pullCurrentBranch, countCommits } from '../helpers-git';
+import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 //#endregion
@@ -371,6 +371,14 @@ export abstract class Project {
 
       countComits() {
         return countCommits(self.location);
+      },
+
+      lastCommitDate() {
+        return lastCommitDate(self.location)
+      },
+
+      lastCommitHash() {
+        return lastCommitHash(self.location)
       }
     }
   }
