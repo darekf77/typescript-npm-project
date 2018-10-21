@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
+  import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // third part

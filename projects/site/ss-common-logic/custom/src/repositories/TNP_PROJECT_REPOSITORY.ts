@@ -160,10 +160,35 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
         }
 
       },
-      async status() {
+      async status(waitForAnswer = false, maxWait = 120) {
         let address = `http://localhost:${ENV.cloud.ports.update}/status`;
-        let res = await axios.get(address)
-        return res.data
+
+        return new Promise((reject, resolve) => {
+          let countSec = 0;
+          async function getStatus() {
+            if (countSec === maxWait) {
+              reject(`Selft update wait max exceeded`)
+            } else {
+              try {
+                let res = await axios.get(address)
+                resolve(res.data)
+              } catch (error) {
+                if (!waitForAnswer) {
+                  reject(error)
+                } else {
+                  console.log(`Trying to wait (${++countSec}) for slef update status on address: ${address}`);
+                  setTimeout(async () => {
+                    await getStatus();
+                  }, 1000)
+                }
+              }
+            }
+
+          }
+
+
+        })
+
       },
     }
   }

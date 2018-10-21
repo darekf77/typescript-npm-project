@@ -154,10 +154,10 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
   }
 
   @GET('/selfupdate')
-  selfupdateStatus(): Response<SelfUpdate> {
+  selfupdateStatus(@QueryParam('waitForAnswer') waitForAnswer: boolean = false): Response<SelfUpdate> {
     //#region @backendFunc
     return async () => {
-      let res = await this.db.TNP_PROJECT.selfupdate.status()
+      let res = awa adas it this.db.TNP_PROJECT.selfupdate.status(waitForAnswer)
       return res as any;
     }
     //#endregion

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Log, Level } from 'ng2-logger/browser';
-import { DeclareVarStmt } from '@angular/compiler';
+
 
 declare const ENV;
 

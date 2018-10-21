@@ -41,14 +41,14 @@ export class SelfUpdateComponent implements OnInit {
       log.i('self build ', project)
       try {
         await this.projectController.selfupdateStart().received;
-        await this.updateStatus()
+        await this.updateStatus(true)
       } catch (e) {
         log.er(e)
       }
     }
   }
 
-  async updateStatus() {
+  async updateStatus(waitForAwser = false) {
 
     try {
       const data = await this.projectController.selfupdateStatus().received;
