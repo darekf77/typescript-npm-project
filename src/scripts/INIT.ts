@@ -3,6 +3,7 @@ import { Project } from "../project";
 import { run } from '../process';
 import { error } from '../messages';
 import chalk from 'chalk';
+import { install } from './INSTALL';
 
 async function initialize(
   pArgs?: string,
@@ -12,6 +13,12 @@ async function initialize(
     project.parent.tnpHelper.install()
   } else if (project.isWorkspace) {
     project.tnpHelper.install()
+  }
+
+  if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
+    install('', project.parent, false);
+  } else if (!project.node_modules.exist()) {
+    install('', project, false);
   }
 
   if (project.parent) {
