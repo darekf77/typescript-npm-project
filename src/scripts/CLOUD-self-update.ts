@@ -141,7 +141,7 @@ function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent 
   }
 
   project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
-  process.exit(0)
+  // process.exit(0)
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
   p.stdout.on('data', chunk => {
