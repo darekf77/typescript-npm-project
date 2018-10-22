@@ -113,6 +113,9 @@ function resolveProject(args) {
   let project = CloudHelpers.cloudProject();
   const workspace = project;
 
+  const environment = project.env.config.name;
+
+  project.run(`rimraf ${config.file.tnpEnvironment_json} && tnp init --env=${environment}`).sync() // QUICK_FIX trigger init again
   // project.clear()
   // project.run(`tnp init --env=online`).sync()
 
@@ -140,7 +143,7 @@ function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent 
     project.git.updateOrigin()
   }
 
-  project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
+
   // process.exit(0)
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
