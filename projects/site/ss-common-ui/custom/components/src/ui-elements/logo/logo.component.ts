@@ -18,5 +18,7 @@ export class LogoComponent implements OnInit {
     ENV = ENV;
     constructor() { }
 
-    ngOnInit() { }
+    ngOnInit() {
+      console.log('ENV in cmp',ENV)
+    }
 }
