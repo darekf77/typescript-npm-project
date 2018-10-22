@@ -161,7 +161,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
       },
       async status(waitForAnswer = false, maxWait = 120) {
         let address = `http://localhost:${ENV.cloud.ports.update}/status`;
-        console.log(`Ping to this server for selfupdate status ${address}`)
+        console.log(`Ping to this server for selfupdate status ${address}, waitForAnswer: ${waitForAnswer}`)
         return new Promise((resolve, reject) => {
           let countSec = 0;
 
@@ -180,6 +180,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
                 let res = await axios.get(address)
                 const data = res.data as SelfUpdate;
                 if (waitForAnswer && data.progress.status !== 'inprogress') {
+                  console.log('Bad status for waiting, trying again', data.progress)
                   tryAgainGetStatus()
                 } else {
                   resolve(data)
