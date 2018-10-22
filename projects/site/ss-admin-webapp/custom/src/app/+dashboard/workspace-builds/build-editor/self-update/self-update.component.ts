@@ -27,6 +27,10 @@ export class SelfUpdateComponent implements OnInit {
   child: string;
   operationErros: string[] = [];
 
+  get project(): TNP_PROJECT {
+    return this.model && this.model.project;
+  }
+
 
   @Input() model: BUILD;
 
