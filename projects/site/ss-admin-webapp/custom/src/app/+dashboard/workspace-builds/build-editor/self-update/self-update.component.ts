@@ -64,6 +64,7 @@ export class SelfUpdateComponent implements OnInit {
       this.operation = operation;
       this.operationErros = operationErrors;
       progress = _.merge(new PROGRESS_BAR_DATA(), progress);
+      log.d('new progress', progress)
       this.progress = progress;
       log.d('new data', data.body.json)
     } catch (error) {
@@ -96,7 +97,7 @@ export class SelfUpdateComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    await this.updateStatus(false, true);
+    // await this.updateStatus(false, true);
   }
 
 }
