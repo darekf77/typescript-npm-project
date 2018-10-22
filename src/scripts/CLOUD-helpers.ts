@@ -36,6 +36,10 @@ export namespace CloudHelpers {
     }).sync();
   }
 
+  export function cloudStart() {
+    cloudProject().run(`tnp start`).sync();
+  }
+
   export function safeRebuildAndRun(args) {
     run(`tnp ${paramsFrom($CLOUD_SELF_REBUILD_AND_RUN.name)} ${args} &`, { biggerBuffer: true }).sync();
   }

@@ -28,6 +28,15 @@ export default {
     process.exit(0)
   },
 
+  $CLOUD_START_SILENT() {
+    CloudHelpers.cloudStartNoOutput()
+    process.exit(0)
+  },
+
+  $CLOUD_START() {
+    CloudHelpers.cloudStart()
+    process.exit(0)
+  },
 
   $CLOUD_BUILD: (args) => {
     CloudHelpers.reinit()
