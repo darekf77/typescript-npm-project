@@ -99,7 +99,8 @@ export class ProjectWorkspace extends Project {
 
     console.log('Projects to build:')
     projectsInOrder.forEach((project, i) => {
-      console.log(`${i + 1}. ${project.name}`)
+      const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
+      console.log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
     })
     console.log('===================')
 
