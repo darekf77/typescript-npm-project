@@ -165,6 +165,13 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
         return new Promise((resolve, reject) => {
           let countSec = 0;
 
+          function tryAgainGetStatus() {
+            console.log(`Trying to wait (${++countSec}) for slef update status on address: ${address}`);
+            setTimeout(async () => {
+              await getStatus();
+            }, 1000)
+          }
+
           async function getStatus() {
             if (countSec === maxWait) {
               reject(`Selft update wait max exceeded`)
@@ -173,15 +180,16 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
                 let res = await axios.get(address)
                 const data = res.data as SelfUpdate;
                 data.progress = _.merge(new PROGRESS_BAR_DATA(), data.progress);
-                resolve(data)
+                if (waitForAnswer && data.progress.status === 'complete') {
+                  tryAgainGetStatus()
+                } else {
+                  resolve(data)
+                }
               } catch (error) {
                 if (!waitForAnswer) {
                   reject(error)
                 } else {
-                  console.log(`Trying to wait (${++countSec}) for slef update status on address: ${address}`);
-                  setTimeout(async () => {
-                    await getStatus();
-                  }, 1000)
+                  tryAgainGetStatus()
                 }
               }
             }

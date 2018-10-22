@@ -52,7 +52,7 @@ export class SelfUpdateComponent implements OnInit {
 
   async updateStatus(waitForAwser = false) {
 
-    if(waitForAwser) {
+    if (waitForAwser) {
       log.d('Wait for first update status')
     }
 
@@ -64,13 +64,15 @@ export class SelfUpdateComponent implements OnInit {
       this.operation = operation;
       this.operationErros = operationErrors;
       this.progress = progress;
-      log.d('new data',data.body.json)
+      log.d('new data', data.body.json)
     } catch (error) {
       log.er(error)
     }
     this.operationInProgress = false;
 
-    if (this.progress && this.progress.status === 'inprogress') {
+    if (this.progress &&
+      ((this.progress.status === 'inprogress') || (this.progress.status === 'notstarted'))
+    ) {
       setTimeout(async () => {
         await this.updateStatus()
       }, 1000)
