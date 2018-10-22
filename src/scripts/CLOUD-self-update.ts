@@ -132,7 +132,7 @@ function resolveProject(args) {
   return { project, workspace };
 }
 
-function selfUpdate(project: Project, restoreFnOnError: () => void) {
+function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent = false) {
 
   if (project.env.config.name !== 'local') {
     project.git.resetHard()
@@ -147,7 +147,11 @@ function selfUpdate(project: Project, restoreFnOnError: () => void) {
     })
     if (status.progress.status === 'complete') {
       status.operation = 'complete - starting cloud';
-      CloudHelpers.cloudStartNoOutput()
+      if (startSilent) {
+        CloudHelpers.cloudStartNoOutput()
+      } else {
+        CloudHelpers.cloudStart()
+      }
     }
   })
 
@@ -203,10 +207,11 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
 
   backupCloud(project, workspace);
 
+  let { verbose }: { verbose: boolean; } = require('minimist')(args.split(' '));
 
   selfUpdate(project, () => {
     resotreBuildAndRunCloud(project);
-  });
+  }, !verbose);
 
 
 }

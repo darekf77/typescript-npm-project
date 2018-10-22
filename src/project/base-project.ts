@@ -496,9 +496,9 @@ export abstract class Project {
       // console.log('dirname', __dirname)
       return {
         install(installFromRecreate = false) {
-          console.log('install tnp from recreate', installFromRecreate)
-          console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
-          // console.trace(`** ERR Project.Tnp not available yet`)
+          // console.log('install tnp from recreate', installFromRecreate)
+          // console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
+          console.trace(`** ERR Project.Tnp not available yet`)
         }
 
       } // TODO QUCIK FIX for tnp installd in node_modules
@@ -521,7 +521,7 @@ export abstract class Project {
     const self = this;
     return {
       install(installFromRecreate = false) { // install
-        console.log('install tnp from recreate', installFromRecreate)
+        // console.log('install tnp from recreate', installFromRecreate)
         let project: Project;
         if (self.parent && self.parent.type === 'workspace') {
           project = self.parent;

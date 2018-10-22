@@ -179,8 +179,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
               try {
                 let res = await axios.get(address)
                 const data = res.data as SelfUpdate;
-                data.progress = _.merge(new PROGRESS_BAR_DATA(), data.progress);
-                if (waitForAnswer && data.progress.status === 'complete') {
+                if (waitForAnswer && data.progress.status !== 'inprogress') {
                   tryAgainGetStatus()
                 } else {
                   resolve(data)

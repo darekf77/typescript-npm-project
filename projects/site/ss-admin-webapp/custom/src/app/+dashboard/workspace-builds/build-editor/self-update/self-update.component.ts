@@ -59,10 +59,11 @@ export class SelfUpdateComponent implements OnInit {
     this.operationInProgress = true;
     try {
       const data = await this.projectController.selfupdateStatus().received;
-      const { child, operation, operationErrors, progress } = data.body.json;
+      let { child, operation, operationErrors, progress } = data.body.json;
       this.child = child;
       this.operation = operation;
       this.operationErros = operationErrors;
+      progress = _.merge(new PROGRESS_BAR_DATA(), progress);
       this.progress = progress;
       log.d('new data', data.body.json)
     } catch (error) {
