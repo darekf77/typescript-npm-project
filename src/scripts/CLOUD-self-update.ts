@@ -111,6 +111,12 @@ function resolveProject(args) {
   child = (_.isString(child) ? child.trim() : child)
 
   let project = CloudHelpers.cloudProject();
+
+  if (project.env.config.name !== 'local') {
+    project.git.resetHard()
+    project.git.updateOrigin()
+  }
+
   const workspace = project;
 
   project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
@@ -136,12 +142,6 @@ function resolveProject(args) {
 }
 
 function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent = false) {
-
-  if (project.env.config.name !== 'local') {
-    project.git.resetHard()
-    project.git.updateOrigin()
-  }
-
 
   // process.exit(0)
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
