@@ -2,21 +2,29 @@
 
 
 
-
-
-  <button [disabled]="inProgress" (click)="autoUpdate(model.project)" > Self update whole project <strong>{{model.project.name}}</strong> </button>
+  <button [disabled]="operationInProgress || (progress && progress.status === 'inprogress')"
+          (click)="autoUpdate(model.project)"> Self update whole project <strong>{{model.project.name}}</strong>
+  </button>
 
   <ul *ngIf="model.project.children">
     <li *ngFor="let project of model.project.children">
-      <button [disabled]="inProgress" (click)="autoUpdate(model.project, project.name )" > Self child project <strong>{{project.name}}</strong> </button>
+      <button [disabled]="operationInProgress || (progress && progress.status === 'inprogress')"
+              (click)="autoUpdate(model.project, project.name )"> Self child project <strong>{{project.name}}</strong>
+      </button>
     </li>
   </ul>
 
   <hr>
   <h5>{{operation}}</h5>
-
-  <mat-progress-bar *ngIf="!progress && operationInProgress" mode="indeterminate"></mat-progress-bar>
-
+  <br>
+  <h6>
+    <span> Build progress: </span>
+    <span *ngIf="progress"
+          [innerHTML]="progress.info"></span>
+    <span *ngIf="!progress"> waiting... </span>
+  </h6>
+  <mat-progress-bar *ngIf="!progress && operationInProgress"
+                    mode="indeterminate"></mat-progress-bar>
   <mat-progress-bar *ngIf="progress"
                     mode="determinate"
                     value="{{ progress.value }}"> </mat-progress-bar>
