@@ -21,6 +21,7 @@ import { statSync } from 'fs-extra';
 import { err } from '../project/environment-config-helpers';
 import { paramsFrom } from '../helpers';
 import { CloudHelpers } from './CLOUD-helpers';
+import config from '../config';
 
 
 
@@ -206,6 +207,8 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
   const { project, workspace } = resolveProject(args);
 
   backupCloud(project, workspace);
+
+  workspace.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
 
   let { verbose }: { verbose: boolean; } = require('minimist')(args.split(' '));
 
