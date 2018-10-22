@@ -1,6 +1,9 @@
 <div *ngIf="model && model.project">
 
 
+
+
+
   <button [disabled]="inProgress" (click)="autoUpdate(model.project)" > Self update whole project <strong>{{model.project.name}}</strong> </button>
 
   <ul *ngIf="model.project.children">
@@ -11,6 +14,8 @@
 
   <hr>
   <h5>{{operation}}</h5>
+
+  <mat-progress-bar *ngIf="operationInProgress" mode="indeterminate"></mat-progress-bar>
 
   <mat-progress-bar *ngIf="progress"
                     mode="determinate"

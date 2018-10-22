@@ -151,20 +151,20 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
   public get selfupdate() {
     const self = this;
     return {
-      async start(child?: string) {
-        run('tnp update').sync();
+      async begin(child?: string) {
         if (child) {
           run(`tnp cloud:update --child=${child}`).sync();
         } else {
           run('tnp cloud:update').sync();
         }
-
+        console.log('Selft update begin...')
       },
       async status(waitForAnswer = false, maxWait = 120) {
         let address = `http://localhost:${ENV.cloud.ports.update}/status`;
-
-        return new Promise((reject, resolve) => {
+        console.log(`Ping to this server for selfupdate status ${address}`)
+        return new Promise((resolve, reject) => {
           let countSec = 0;
+
           async function getStatus() {
             if (countSec === maxWait) {
               reject(`Selft update wait max exceeded`)
@@ -185,8 +185,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
             }
 
           }
-
-
+          getStatus()
         })
 
       },

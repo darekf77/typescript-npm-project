@@ -144,16 +144,16 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
     //#endregion
   }
 
-  @POST('/selfupdate/:child')
-  selfupdateStart(@PathParam('child') child?: string): Response<void> {
+  @POST('/selfupdate')
+  selfupdateStart(@QueryParam('child') child?: string): Response<void> {
     //#region @backendFunc
     return async () => {
-      await this.db.TNP_PROJECT.selfupdate.start(child)
+      await this.db.TNP_PROJECT.selfupdate.begin(child)
     }
     //#endregion
   }
 
-  @GET('/selfupdateworkspace')
+  @GET('/selfupdate')
   selfupdateStatus(@QueryParam('waitForAnswer') waitForAnswer: boolean = false): Response<SelfUpdate> {
     //#region @backendFunc
     return async () => {

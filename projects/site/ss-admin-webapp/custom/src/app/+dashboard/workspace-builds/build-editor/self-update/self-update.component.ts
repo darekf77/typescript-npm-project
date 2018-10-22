@@ -21,6 +21,7 @@ export class SelfUpdateComponent implements OnInit {
     return (this.progress && this.progress.status === 'inprogress')
   }
 
+  operationInProgress: boolean = false;
   progress: PROGRESS_BAR_DATA;
   operation: string;
   child: string;
@@ -41,6 +42,7 @@ export class SelfUpdateComponent implements OnInit {
       log.i('self build ', project)
       try {
         await this.projectController.selfupdateStart().received;
+        log.i('Now try to get status')
         await this.updateStatus(true)
       } catch (e) {
         log.er(e)
@@ -50,6 +52,11 @@ export class SelfUpdateComponent implements OnInit {
 
   async updateStatus(waitForAwser = false) {
 
+    if(waitForAwser) {
+      log.d('Wait for first update status')
+    }
+
+    this.operationInProgress = true;
     try {
       const data = await this.projectController.selfupdateStatus().received;
       const { child, operation, operationErrors, progress } = data.body.json;
@@ -60,6 +67,8 @@ export class SelfUpdateComponent implements OnInit {
     } catch (error) {
       log.er(error)
     }
+    this.operationInProgress = false;
+
     if (this.progress && this.progress.status === 'inprogress') {
       setTimeout(async () => {
         await this.updateStatus()

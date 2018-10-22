@@ -134,8 +134,10 @@ function resolveProject(args) {
 
 function selfUpdate(project: Project, restoreFnOnError: () => void) {
 
-  project.git.resetHard()
-  project.git.updateOrigin()
+  if (project.env.config.name !== 'local') {
+    project.git.resetHard()
+    project.git.updateOrigin()
+  }
 
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
@@ -201,11 +203,11 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
 
   backupCloud(project, workspace);
 
-  if (project.env.config.name !== 'local') {
-    selfUpdate(project, () => {
-      resotreBuildAndRunCloud(project);
-    });
-  }
+
+  selfUpdate(project, () => {
+    resotreBuildAndRunCloud(project);
+  });
+
 
 }
 
