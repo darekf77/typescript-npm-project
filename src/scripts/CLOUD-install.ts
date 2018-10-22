@@ -11,5 +11,6 @@ export function $CLOUD_INSTALL(args) {
   CloudHelpers.reinit()
   CloudHelpers.cloudBuild()
   CloudHelpers.cloudStartNoOutput()
+  process.exit(0)
 }
 //#endregion
