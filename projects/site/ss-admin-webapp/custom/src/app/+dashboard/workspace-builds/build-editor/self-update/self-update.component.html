@@ -15,7 +15,7 @@
   <hr>
   <h5>{{operation}}</h5>
 
-  <mat-progress-bar *ngIf="operationInProgress" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="!progress && operationInProgress" mode="indeterminate"></mat-progress-bar>
 
   <mat-progress-bar *ngIf="progress"
                     mode="determinate"

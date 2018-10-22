@@ -14,6 +14,7 @@ import * as fse from 'fs-extra';
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 import { PROGRESS_BAR_DATA } from 'tnp-bundle';
+import { SelfUpdate } from '../entities/TNP_PROJECT';
 
 
 @ENDPOINT()
@@ -165,9 +166,3 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
 
 }
 
-export interface SelfUpdate {
-  progress: PROGRESS_BAR_DATA;
-  child: string;
-  operation: string;
-  operationErrors: string[];
-}

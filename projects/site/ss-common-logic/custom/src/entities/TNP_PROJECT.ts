@@ -14,6 +14,14 @@ import { run } from "tnp-bundle";
 import { ProjectFrom, RunOptions } from "tnp-bundle";
 //#endregion
 
+
+export interface SelfUpdate {
+  progress: PROGRESS_BAR_DATA;
+  child: string;
+  operation: string;
+  operationErrors: string[];
+}
+
 export interface ITNP_PROJECT {
   name: string;
 

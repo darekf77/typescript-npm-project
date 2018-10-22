@@ -64,6 +64,7 @@ export class SelfUpdateComponent implements OnInit {
       this.operation = operation;
       this.operationErros = operationErrors;
       this.progress = progress;
+      log.d('new data',data.body.json)
     } catch (error) {
       log.er(error)
     }

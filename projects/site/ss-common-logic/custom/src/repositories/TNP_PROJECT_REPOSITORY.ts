@@ -9,7 +9,7 @@ import axios from 'axios';
 import { PROGRESS_BAR_DATA, ProjectFrom, Project } from "tnp-bundle";
 import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
 import { EntityRepository, META } from "morphi";
-import { TNP_PROJECT } from "../entities/TNP_PROJECT";
+import { TNP_PROJECT, SelfUpdate } from "../entities/TNP_PROJECT";
 
 export interface TNP_PROJECT_ALIASES {
   project: string;
@@ -171,7 +171,9 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
             } else {
               try {
                 let res = await axios.get(address)
-                resolve(res.data)
+                const data = res.data as SelfUpdate;
+                data.progress = _.merge(new PROGRESS_BAR_DATA(), data.progress);
+                resolve(data)
               } catch (error) {
                 if (!waitForAnswer) {
                   reject(error)
@@ -254,4 +256,6 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
   }
 
 }
+
+
 //#endregion
