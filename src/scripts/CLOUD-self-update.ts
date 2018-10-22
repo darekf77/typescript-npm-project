@@ -210,7 +210,9 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
 
   workspace.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
 
-  let { verbose }: { verbose: boolean; } = require('minimist')(args.split(' '));
+  let { verbose = false }: { verbose: boolean; } = require('minimist')(args.split(' '));
+
+  console.log('VERBOSE SELF UPDATE', verbose)
 
   selfUpdate(project, () => {
     resotreBuildAndRunCloud(project);
