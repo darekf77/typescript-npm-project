@@ -140,6 +140,8 @@ function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent 
     project.git.updateOrigin()
   }
 
+  project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
+  process.exit(0)
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
   p.stdout.on('data', chunk => {
@@ -207,8 +209,6 @@ export function $CLOUD_SELF_REBUILD_AND_RUN(args = '') {
   const { project, workspace } = resolveProject(args);
 
   backupCloud(project, workspace);
-
-  workspace.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
 
   let { verbose = false }: { verbose: boolean; } = require('minimist')(args.split(' '));
 
