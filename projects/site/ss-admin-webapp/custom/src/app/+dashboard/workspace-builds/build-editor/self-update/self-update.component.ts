@@ -50,7 +50,7 @@ export class SelfUpdateComponent implements OnInit {
     }
   }
 
-  async updateStatus(waitForAwser = false) {
+  async updateStatus(waitForAwser = false, once = false) {
 
     if (waitForAwser) {
       log.d('Wait for first update status')
@@ -71,14 +71,23 @@ export class SelfUpdateComponent implements OnInit {
     }
     this.operationInProgress = false;
 
-    if (this.progress &&
-      ((this.progress.status === 'inprogress') || (this.progress.status === 'notstarted'))
-    ) {
-      setTimeout(async () => {
-        await this.updateStatus()
-      }, 1000)
+
+
+    if (!once) {
+      if (!(this.progress && this.progress.status === 'complete')) {
+        this.getUpdateAgain()
+      }
     }
 
+    if (once && this.progress && this.progress.status === 'inprogress') {
+      this.getUpdateAgain()
+    }
+  }
+
+  getUpdateAgain() {
+    setTimeout(async () => {
+      await this.updateStatus()
+    }, 1000)
   }
 
   constructor(
@@ -86,7 +95,8 @@ export class SelfUpdateComponent implements OnInit {
 
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.updateStatus(false, true);
   }
 
 }
