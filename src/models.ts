@@ -116,6 +116,7 @@ export interface EnvConfigProject {
   //#region @backend
   port: number; // override tnp type port
   $db?: ConnectionOptions;
+  ommitAppBuild?: boolean;
   isWatchBuild?: boolean; // tnp generated
   //#endregion
 }

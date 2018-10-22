@@ -21,7 +21,9 @@ export class ProjectWorkspace extends Project {
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {
-        return !!workspace.env.config.workspace.projects.find(c => c.name === child.name);
+        return !!workspace.env.config.workspace.projects.find(c => {
+          return c.name === child.name && !c.ommitAppBuild;
+        });
       })
       .forEach(child => {
         child.start(args)
@@ -105,9 +107,15 @@ export class ProjectWorkspace extends Project {
       return config.allowedTypes.libs.includes(project.type);
     })
 
-    const projectsApps: Project[] = projectsInOrder.filter(project => {
-      return config.allowedTypes.app.includes(project.type);
-    })
+    const projectsApps: Project[] = projectsInOrder
+      .filter(project => {
+        return config.allowedTypes.app.includes(project.type);
+      })
+      .filter(project => {
+        const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
+        return !envProject.ommitAppBuild
+      })
+
 
     projectsLibs.forEach((project, i) => {
       console.log(`COMPILATIONL lib for: ${project.name}`)
