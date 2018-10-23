@@ -94,7 +94,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
     this.db.BUILD.recreateFolders()
     await this.createSelfBuild()
-    // await this.createBuildFromBaseline()
+    await this.createBuildFromBaseline()
 
 
   }
