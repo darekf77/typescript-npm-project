@@ -36,7 +36,7 @@ const status = {
     'error - environment should be "online"' |
     'creating backup - start' |
     'creating backup - error' |
-    'creating backup - complete' |
+    'creating backup - complete.. in progress of building' |
     'build process ended' |
     'restoring and building backup - start' |
     'restoring and building backup - error' |
@@ -75,10 +75,15 @@ function backupCloud(project: Project, workspace: Project) {
   ));
   console.log('cwd', cwd)
   try {
-    if (!fse.existsSync(path.join(cwd, project.backupName))) {
+    if (project.env.config.name !== 'local') {
+      if (!fse.existsSync(path.join(cwd, project.backupName))) {
+        run(`cp -R ${project.name} ${project.backupName}`, { cwd }).sync()
+      }
+    } else {
+      run(`rimraf ${project.backupName}`, { cwd }).sync()
       run(`cp -R ${project.name} ${project.backupName}`, { cwd }).sync()
     }
-    status.operation = 'creating backup - complete';
+    status.operation = 'creating backup - complete.. in progress of building';
   } catch (error) {
     status.operation = 'creating backup - error';
     status.operationErrors.push(JSON.stringify(error));
@@ -110,6 +115,8 @@ function resolveProject(args) {
   let { child }: { child: string; } = require('minimist')(args.split(' '));
   child = (_.isString(child) ? child.trim() : child)
 
+  console.log(`Build child: ${child} ?`)
+
   let project = CloudHelpers.cloudProject();
 
   if (project.env.config.name !== 'local') {
@@ -119,8 +126,10 @@ function resolveProject(args) {
 
   const workspace = project;
 
-  project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
-  project.run(`tnp init --env=${config.default.cloud.environment.name}`).sync()
+  if (project.env.config.name !== 'local') {
+    project.run(`rimraf ${config.file.tnpEnvironment_json}`).sync() // QUICK_FIX trigger init again
+    project.run(`tnp init --env=${config.default.cloud.environment.name}`).sync()
+  }
   // project.clear()
   // project.run(`tnp init --env=online`).sync()
 
@@ -141,7 +150,42 @@ function resolveProject(args) {
   return { project, workspace };
 }
 
+function fakeUpdateForLocalEnv(project: Project, restoreFnOnError: () => void, startSilent = false) {
+
+  function incereaseProgress() {
+    if (status.progress.value + 10 === 100) {
+      status.progress.value = 100;
+      status.progress.info = 'Everything was build... done !'
+      status.progress.status = 'complete';
+      status.operation = 'build process ended';
+      return;
+    }
+    if ((status.progress.value / 10) % 3 === 0) {
+      status.operationErrors.push(`random test error ${status.progress.value}`);
+    }
+
+
+    status.progress.status = 'inprogress'
+    status.progress.value += 10;
+    status.progress.info = `In progress of building project test${status.progress.value + 1000}`
+
+    console.log('Fake progress increase', status.progress)
+
+    setTimeout(() => {
+      incereaseProgress();
+    }, 4000)
+  }
+
+  incereaseProgress()
+
+}
+
 function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent = false) {
+
+  if (project.env.config.name === 'local') {
+    fakeUpdateForLocalEnv(project, restoreFnOnError, startSilent);
+    return
+  }
 
   // process.exit(0)
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()

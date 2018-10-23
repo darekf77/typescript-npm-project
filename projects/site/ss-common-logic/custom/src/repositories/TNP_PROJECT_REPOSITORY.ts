@@ -152,10 +152,11 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
     const self = this;
     return {
       async begin(child?: string) {
+        const verbose = (ENV.name === 'local' ? '--verbose': '');
         if (child) {
-          run(`tnp cloud:update --child=${child}`).sync();
+          run(`tnp cloud:update --child=${child} ${verbose}`).sync();
         } else {
-          run('tnp cloud:update').sync();
+          run(`tnp cloud:update ${verbose}`).sync();
         }
         console.log('Selft update begin...')
       },
@@ -179,6 +180,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
               try {
                 let res = await axios.get(address)
                 const data = res.data as SelfUpdate;
+                console.log('data from self update server ', data)
                 if (waitForAnswer && data.progress.status !== 'inprogress') {
                   console.log('Bad status for waiting, trying again', data.progress)
                   tryAgainGetStatus()

@@ -35,26 +35,39 @@ export class SelfUpdateComponent implements OnInit {
   @Input() model: BUILD;
 
   async autoUpdate(project: TNP_PROJECT, child?: string) {
-    if (_.isString(child)) {
+
+    const childNameOK = _.isString(child);
+    if (childNameOK) {
       log.i(`Self build of child "${child}" for project `, project)
-      try {
-        await this.projectController.selfupdateStart(child).received;
-      } catch (e) {
-        log.er(e)
-      }
     } else {
-      log.i('self build ', project)
-      try {
-        await this.projectController.selfupdateStart().received;
-        log.i('Now try to get status')
-        await this.updateStatus(true)
-      } catch (e) {
-        log.er(e)
-      }
+      log.i('Self build project', project)
     }
+
+    try {
+      await this.projectController.selfupdateStart(childNameOK ? child : undefined).received;
+      log.i('Now try to get status')
+      await this.updateStatus(true)
+    } catch (e) {
+      log.er(e)
+    }
+
   }
 
-  async updateStatus(waitForAwser = false, once = false) {
+  countDownMax = 5000;
+  countDown = this.countDownMax;
+  reloadCountDown() {
+    if (this.countDown <= 0) {
+      window.location.reload();
+      return;
+    }
+
+    this.countDown -= 100;
+    setTimeout(() => {
+      this.reloadCountDown();
+    }, 100)
+  }
+
+  async updateStatus(waitForAwser = false, firstCheck = false) {
 
     if (waitForAwser) {
       log.d('Wait for first update status')
@@ -62,7 +75,7 @@ export class SelfUpdateComponent implements OnInit {
 
     this.operationInProgress = true;
     try {
-      const data = await this.projectController.selfupdateStatus().received;
+      const data = await this.projectController.selfupdateStatus(waitForAwser).received;
       let { child, operation, operationErrors, progress } = data.body.json;
       this.child = child;
       this.operation = operation;
@@ -76,17 +89,14 @@ export class SelfUpdateComponent implements OnInit {
     }
     this.operationInProgress = false;
 
-
-
-    if (!once) {
-      if (!(this.progress && this.progress.status === 'complete')) {
-        this.getUpdateAgain()
+    if (this.progress && this.progress.status === 'complete') {
+      if (!firstCheck) {
+        this.reloadCountDown();
       }
-    }
-
-    if (once && this.progress && this.progress.status === 'inprogress') {
+    } else {
       this.getUpdateAgain()
     }
+
   }
 
   getUpdateAgain() {
@@ -101,7 +111,13 @@ export class SelfUpdateComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    // await this.updateStatus(false, true);
+    this.operationInProgress = true;
+    try {
+      await this.updateStatus(false, true);
+    } catch (error) {
+
+    }
+    this.operationInProgress = false;
   }
 
 }
