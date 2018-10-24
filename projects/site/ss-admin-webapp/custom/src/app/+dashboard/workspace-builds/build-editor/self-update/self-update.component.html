@@ -29,9 +29,9 @@
           [innerHTML]="progress.info"></span>
     <span *ngIf="!progress && operationInProgress"> waiting... </span>
   </h6>
-  <mat-progress-bar *ngIf="!progress && operationInProgress"
+  <mat-progress-bar *ngIf="(!progress && operationInProgress) || waitForAwser"
                     mode="indeterminate"></mat-progress-bar>
-  <mat-progress-bar *ngIf="progress"
+  <mat-progress-bar *ngIf="progress && !waitForAwser"
                     mode="determinate"
                     value="{{ progress.value }}"> </mat-progress-bar>
 

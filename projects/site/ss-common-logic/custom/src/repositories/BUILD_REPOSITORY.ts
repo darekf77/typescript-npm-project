@@ -43,7 +43,7 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     return build;
   }
 
-  async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName = 'dev') {
+  async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName) {
     let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
     if (build.pidChangeEnvProces) {
       throw 'changing environment process alredy in progress'

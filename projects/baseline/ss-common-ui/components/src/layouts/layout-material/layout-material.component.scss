@@ -77,4 +77,10 @@ $left-panel-size: 250px !default;
     overflow: hidden;
   }
 
+  .admin-left-menu-item {
+    button.active {
+      background: rgba(0,0,0,0.2);
+    }
+  }
+
 }

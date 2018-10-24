@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
@@ -15,7 +15,7 @@ const log = Log.create('self build components')
   templateUrl: './self-update.component.html',
   styleUrls: ['./self-update.component.scss']
 })
-export class SelfUpdateComponent implements OnInit {
+export class SelfUpdateComponent implements OnInit, OnDestroy {
 
   get inProgress() {
     return (this.progress && this.progress.status === 'inprogress')
@@ -67,9 +67,15 @@ export class SelfUpdateComponent implements OnInit {
     }, 100)
   }
 
+  waitForAwser = false;
   async updateStatus(waitForAwser = false, firstCheck = false) {
+    waitForAwser = waitForAwser;
+    if (!this.applicationIsLive) {
+      return;
+    }
 
     if (waitForAwser) {
+      this.countDown = this.countDownMax;
       log.d('Wait for first update status')
     }
 
@@ -87,18 +93,30 @@ export class SelfUpdateComponent implements OnInit {
     } catch (error) {
       log.er(error)
     }
-    this.operationInProgress = false;
 
-    if (this.progress && this.progress.status === 'complete') {
-      if (!firstCheck) {
-        this.reloadCountDown();
+
+    if (firstCheck) {
+
+      if (this.progress && this.progress.status === 'inprogress') {
+        this.getUpdateAgain()
+      } else {
+        this.operationInProgress = false;
       }
+
     } else {
-      this.getUpdateAgain()
+
+      if (this.progress && this.progress.status === 'complete') {
+        this.operationInProgress = false;
+        this.reloadCountDown();
+      } else {
+        this.getUpdateAgain()
+      }
     }
+
 
   }
 
+  applicationIsLive = false;
   getUpdateAgain() {
     setTimeout(async () => {
       await this.updateStatus()
@@ -111,6 +129,7 @@ export class SelfUpdateComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.applicationIsLive = true;
     this.operationInProgress = true;
     try {
       await this.updateStatus(false, true);
@@ -118,6 +137,10 @@ export class SelfUpdateComponent implements OnInit {
 
     }
     this.operationInProgress = false;
+  }
+
+  async ngOnDestroy() {
+    this.applicationIsLive = false;
   }
 
 }

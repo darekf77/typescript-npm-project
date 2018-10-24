@@ -27,7 +27,8 @@ const log = Log.create('layout material', Level.__NOTHING);
 export interface MenuItem {
   name: string;
   href?: string;
-  action?: (any) => void;
+  action?: (any?) => void;
+  isActive?: (any?) => boolean;
   leftMenu?: LeftMenuGroupItem[];
 }
 
@@ -144,6 +145,17 @@ export class LayoutMaterialComponent implements AfterViewInit, OnInit, AfterCont
       width: 0
     }
   };
+
+  isActive(item: MenuItem) {
+    let res = false;
+    if (_.isString(item.href)) {
+      res = this.router.isActive(item.href, true);
+    }
+    if (_.isFunction(item.isActive)) {
+      res = item.isActive()
+    }
+    return res;
+  }
 
   open(item: MenuItem) {
     if (item.href) {
