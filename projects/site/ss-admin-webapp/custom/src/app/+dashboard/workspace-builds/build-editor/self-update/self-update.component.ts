@@ -76,6 +76,7 @@ export class SelfUpdateComponent implements OnInit, OnDestroy {
 
     if (waitForAwser) {
       this.countDown = this.countDownMax;
+      this.progress = undefined;
       log.d('Wait for first update status')
     }
 
