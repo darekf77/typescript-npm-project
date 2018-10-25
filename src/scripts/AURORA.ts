@@ -290,6 +290,7 @@ class ProjectAurora {
 
   pullCurrentBranch() {
     console.log(`Pulling from git project ${this.name}`)
+    this.run('git checkout HEAD').sync()
     pullCurrentBranch(this.location);
   }
 
@@ -324,11 +325,11 @@ class ProjectAurora {
       if (fse.existsSync(vendorSubPorject)) {
         tryRemoveDir(vendorSubPorject)
       }
-      
+
       // fse.mkdirpSync(vendorSubPorject)
       // console.log(vendorSubPorject)
       // console.log(this.location)
-      
+
       this.run(`cd ${vendor} && rimraf ${path.basename(this.location)} ${this.name}`).sync()
       this.run(`tnp ln ${this.location} ${vendor} && cd ${vendor} && tnp mv ${path.basename(this.location)} ${this.name}`).sync()
     }
