@@ -4,66 +4,79 @@ import * as path from 'path';
 import { run } from '../process';
 import { Project, ProjectFrom } from '../project';
 import { rebuildTnp } from './UPDATE';
-import { $CLOUD_SAFE_REBUILD_START } from './CLOUD-safe-rebuild';
 import { paramsFrom } from '../helpers';
+import { $CLOUD_INSTALL } from './CLOUD-install';
+import { $CLOUD_SELF_REBUILD_AND_RUN } from './CLOUD-self-update';
+import { CloudHelpers } from './CLOUD-helpers';
+
 
 
 
 
 export default {
 
-  // $CLOUD_TEST1: () => {
-  //   function test() {
-  //     console.log(`test pid: ${process.pid}, ppid: ${process.ppid}`)
-  //     setTimeout(() => {
-  //       test()
-  //     }, 2000)
-  //   }
+  $CLOUD_INSTALL,
+  $CLOUD_SELF_REBUILD_AND_RUN,
 
-  //   test();
-  // },
-
-  // $CLOUD_TEST: () => {
-  //   run(`tnp cloud:test1 &`).sync();
-  //   process.exit(0)
-  // },
-
-  $CLOUD_SAFE_REBUILD_START,
-
-  $CLOUD_UPDATE: (args) => {
-    run(`tnp ${paramsFrom($CLOUD_SAFE_REBUILD_START.name)} ${args} &`).sync();
+  $CLOUD_SELF_UPDATE(args) {
+    CloudHelpers.safeRebuildAndRun(args);
     process.exit(0)
   },
 
-  $CLOUD_RESTART: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp start </dev/null &>/dev/null &`).sync();
+  $CLOUD_UPDATE(args) {
+    CloudHelpers.safeRebuildAndRun(args);
     process.exit(0)
   },
 
-
-  $CLOUD_REBUILD: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
-    cloudProject.run(`tnp clear`).sync();
-    cloudProject.run(`tnp init --env=online`).sync();
-    cloudProject.run(`tnp build`).sync();
+  $CLOUD_START_SILENT() {
+    CloudHelpers.cloudStartNoOutput()
     process.exit(0)
   },
 
+  $CLOUD_START() {
+    CloudHelpers.cloudStart()
+    process.exit(0)
+  },
+
+  $CLOUD_BUILD: (args) => {
+    CloudHelpers.reinit()
+    CloudHelpers.cloudBuild()
+    process.exit(0)
+  },
+
+  $CLOUD_BACKUP(args) {
+    CloudHelpers.createBackup(args);
+    process.exit(0)
+  },
 
   $CLOUD_CLEAR_ALL: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear:all ${args}`).sync();
     process.exit(0)
   },
 
 
   $CLOUD_CLEAR: (args) => {
-    const cloudProject = ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    const cloudProject = CloudHelpers.cloudProject();
     cloudProject.run(`tnp clear ${args}`).sync();
     process.exit(0)
   },
 
+  $CLOUD_MONITOR() {
+    const cloudProject = CloudHelpers.cloudProject();
+    function display() {
+      try {
+        run(`clear && curl http://localhost:${cloudProject.env.config.cloud.ports.update}/status | json_pp --json_opt=canonical,pretty`).sync()
+      } catch (error) {
+        console.log('Not able to get server info');
+      }
+
+      setTimeout(() => {
+        display()
+      }, 1000)
+    }
+    display()
+  }
 
 
 }

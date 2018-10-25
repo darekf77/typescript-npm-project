@@ -124,7 +124,7 @@ export class BaselineSiteJoin {
         self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
           let globPath = path.join(self.pathToBaselineThroughtNodeModules, customizableFileOrFolder)
           if (!fs.existsSync(globPath)) {
-            error(`Custombizable forder of file doesn't exist: ${globPath}
+            error(`Custombizable folder of file doesn't exist: ${globPath}
 
             Please add: ${path.basename(globPath)} to your baseline.
 

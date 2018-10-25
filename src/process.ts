@@ -39,10 +39,10 @@ export function killProcess(byPid: number) {
 
 export function killProcessByPort(port: number) {
   try {
-    run(`fkill -f :${port}`, { output: false }).sync()
+    run(`fkill -f :${port} &> /dev/null`, { output: false }).sync()
     info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
-    warn(`Cannot kill process on port: ${port}... `)
+    warn(`No process to kill  on port: ${port}... `)
   }
 
 
@@ -103,43 +103,57 @@ export function clearConsole() {
 // })
 
 
-export function log(proc: child.ChildProcess, output = true) {
+export function log(proc: child.ChildProcess, output = true, stdio) {
   // processes.push(proc);
+
+  proc.stdio = stdio;
 
   if (output) {
     proc.stdout.on('data', (data) => {
       console.log(data.toString());
     })
 
+    proc.stdout.on('error', (data) => {
+      console.log(data);
+    })
+
     proc.stderr.on('data', (data) => {
       console.log(data.toString());
     })
+
+    proc.stderr.on('error', (data) => {
+      console.log(data);
+    })
+
   }
 
   return proc;
 }
 
 function checkProcess(dirPath: string, command: string) {
-  if (!fs.existsSync(dirPath)) error(`Path doesn't exist: ${dirPath}`);
+  if (!fs.existsSync(dirPath)) error(`
+  Path for process cwd doesn't exist: ${dirPath}
+  command: ${command}
+  `);
   if (!command) error(`Bad command: ${command}`);
 }
 
+const bigMaxBuffer = 2024 * 500;
+
 function runSyncIn(command: string, options?: RunOptions) {
-  const { output, cwd } = options;
+  const { output, cwd, biggerBuffer, silence } = options;
+  const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
+  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
   checkProcess(cwd, command);
-  if (output) {
-    return child.execSync(command, { stdio: [0, 1, 2], cwd })
-  }
-  return child.execSync(command, { cwd })
+  return child.execSync(command, { stdio, cwd, maxBuffer })
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer } = options;
+  const { output, cwd, biggerBuffer, silence } = options;
+  const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
+  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
   checkProcess(cwd, command);
-  if (biggerBuffer) {
-    return log(child.exec(command, { cwd, maxBuffer: 2024 * 500 }), output);
-  }
-  return log(child.exec(command, { cwd }), output);
+  return log(child.exec(command, { cwd, maxBuffer }), output, stdio);
 }
 
 function prepareWatchCommand(cmd) {
@@ -172,7 +186,7 @@ export const watcher = {
 
 export function run(command: string,
   options?: RunOptions) {
-  // console.log(` for command: ${command} options`, options)
+  console.log(`Command: "${command}" , options "${_.isObject(options) ? JSON.stringify(options) : options}"`)
   if (!options) options = {};
   if (options.output === undefined) options.output = true;
   if (options.biggerBuffer === undefined) options.biggerBuffer = false;

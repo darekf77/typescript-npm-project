@@ -191,7 +191,6 @@ export abstract class BaseProjectLib extends Project {
       if (fs.lstatSync(file).isDirectory()) {
         // console.log('IS DIRECTORY', file)
         // console.log('IS DIRECTORY DEST', dest)
-        // this.run(`tnp cpr ${file}/ ${dest}/`).sync()
         const options: fse.CopyOptionsSync = {
           overwrite: true,
           recursive: true,

@@ -3,6 +3,45 @@ import * as child from 'child_process';
 import { info, error } from './messages';
 import { basename } from 'path';
 
+export function lastCommitHash(directoryPath): string {
+  try {
+    const cwd = directoryPath;
+    let hash = child.execSync(`git log -1 --format="%H"`, { cwd }).toString().trim()
+    return hash;
+  } catch (e) {
+    console.log(e)
+    error(`Cannot counts commits in branch in: ${directoryPath}`)
+  }
+
+}
+
+
+export function lastCommitDate(directoryPath): Date {
+  try {
+    const cwd = directoryPath;
+    let unixTimestamp = child.execSync(`git log -1 --pretty=format:%ct`, { cwd }).toString().trim()
+    return new Date(Number(unixTimestamp)*1000)
+  } catch (e) {
+    console.log(e)
+    error(`Cannot counts commits in branch in: ${directoryPath}`)
+  }
+
+}
+
+
+export function countCommits(directoryPath) {
+  try {
+    const cwd = directoryPath;
+    let currentLocalBranch = child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()
+    let value = child.execSync(`git rev-list --count ${currentLocalBranch}`, { cwd }).toString().trim()
+    return Number(value);
+  } catch (e) {
+    console.log(e)
+    error(`Cannot counts commits in branch in: ${directoryPath}`)
+  }
+
+}
+
 export function pullCurrentBranch(directoryPath) {
   info(`Pulling git changes in "${directoryPath}" `)
   try {

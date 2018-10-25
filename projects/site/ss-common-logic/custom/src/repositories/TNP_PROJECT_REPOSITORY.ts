@@ -9,7 +9,7 @@ import axios from 'axios';
 import { PROGRESS_BAR_DATA, ProjectFrom, Project } from "tnp-bundle";
 import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
 import { EntityRepository, META } from "morphi";
-import { TNP_PROJECT } from "../entities/TNP_PROJECT";
+import { TNP_PROJECT, SelfUpdate } from "../entities/TNP_PROJECT";
 
 export interface TNP_PROJECT_ALIASES {
   project: string;
@@ -151,19 +151,55 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
   public get selfupdate() {
     const self = this;
     return {
-      async start(child?: string) {
-        run('tnp update').sync();
+      async begin(child?: string) {
+        const verbose = (ENV.name === 'local' ? '--verbose': '');
         if (child) {
-          run(`tnp cloud:update --child=${child}`).sync();
+          run(`tnp cloud:update --child=${child} ${verbose}`).sync();
         } else {
-          run('tnp cloud:update').sync();
+          run(`tnp cloud:update ${verbose}`).sync();
         }
-
+        console.log('Selft update begin...')
       },
-      async status() {
+      async status(waitForAnswer = false, maxWait = 120) {
         let address = `http://localhost:${ENV.cloud.ports.update}/status`;
-        let res = await axios.get(address)
-        return res.data
+        console.log(`Ping to this server for selfupdate status ${address}, waitForAnswer: ${waitForAnswer}`)
+        return new Promise((resolve, reject) => {
+          let countSec = 0;
+
+          function tryAgainGetStatus() {
+            console.log(`Trying to wait (${++countSec}) for slef update status on address: ${address}`);
+            setTimeout(async () => {
+              await getStatus();
+            }, 1000)
+          }
+
+          async function getStatus() {
+            if (countSec === maxWait) {
+              reject(`Selft update wait max exceeded`)
+            } else {
+              try {
+                let res = await axios.get(address)
+                const data = res.data as SelfUpdate;
+                console.log('data from self update server ', data)
+                if (waitForAnswer && data.progress.status !== 'inprogress') {
+                  console.log('Bad status for waiting, trying again', data.progress)
+                  tryAgainGetStatus()
+                } else {
+                  resolve(data)
+                }
+              } catch (error) {
+                if (!waitForAnswer) {
+                  reject(error)
+                } else {
+                  tryAgainGetStatus()
+                }
+              }
+            }
+
+          }
+          getStatus()
+        })
+
       },
     }
   }
@@ -230,4 +266,6 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
   }
 
 }
+
+
 //#endregion

@@ -72,7 +72,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
     baselineBuild.init()
-    await this.db.BUILD.changeEnvironmentBy(baselineBuild, 'dev');
+    // await this.db.BUILD.changeEnvironmentBy(baselineBuild, 'dev');
     await this.saveProject(baselineBuild)
     await this.db.BUILD.update(baselineBuild.id, baselineBuild);
 
@@ -112,9 +112,10 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
         try {
           env = entities.ENVIRONMENT.from(build.project);
         } catch (error) {
-          console.log(`Trying get evironment by id ${id}`)
-          sleep.sleep(1);
-          tryToGenEnvironment();
+          env = undefined;
+          // console.log(`Trying get evironment by id ${id}`)
+          // sleep.sleep(1);
+          // tryToGenEnvironment();
         }
       }
       tryToGenEnvironment()

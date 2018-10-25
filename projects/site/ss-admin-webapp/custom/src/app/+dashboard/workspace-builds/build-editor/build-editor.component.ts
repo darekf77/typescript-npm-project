@@ -65,7 +65,7 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
     public projectController: TnpProjectController
   ) {
 
-    
+
     // router.events.subscribe(event => {
     //   if (event instanceof NavigationEnd) {
     //     this.router.navigated = false;
@@ -182,8 +182,8 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     let data = await this.buildController.getBy(this.id, this.modelDataConfigBuild).received
     this.model = data.body.json;
+    log.i('MODEL', this.model)
 
-    // log.i('REFRESHE and ACTIVATE for sockets model', this.model)
     this.model.realtimeEntity.subscribe(async () => {
       data = await this.buildController.getBy(this.id, this.modelDataConfigBuild).received
       log.i('REALTIME ACTION BUILD', data)
@@ -201,20 +201,25 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
     const data = await this.buildController.getEnvironment(this.model.id).received;
     // log.i('environment', data.body.json)
     let body = data.body.json;
-    body.packageJSON = undefined;
-    const n = this.objectToNode(body).children;
+    if (_.isObject(body)) {
+      body.packageJSON = undefined;
+      const n = this.objectToNode(body).children;
 
 
-    this.nodes = n;
-    this.environmentConfig = body;
-    if (this.model && this.model.project && this.model.project.children
-      && body.workspace && body.workspace.projects
-    ) {
-      this.model.project.children.forEach(c => {
-        let s = body.workspace.projects.find(p => p.name === c.name);
-        _.merge(c, s);
-      })
+      this.nodes = n;
+      this.environmentConfig = body;
+      if (this.model && this.model.project && this.model.project.children
+        && body.workspace && body.workspace.projects
+      ) {
+        this.model.project.children.forEach(c => {
+          let s = body.workspace.projects.find(p => p.name === c.name);
+          _.merge(c, s);
+        })
+      }
+    } else {
+      log.er('tmp-environment.json is not generated')
     }
+
   }
 
   private async getEnvNames() {

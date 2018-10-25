@@ -23,7 +23,7 @@ import { FilesRecreator } from './files-builder';
 import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 
-import { pullCurrentBranch } from '../helpers-git';
+import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 //#endregion
@@ -195,6 +195,10 @@ export abstract class Project {
     return this.name === 'tnp';
   }
 
+  get isCloud() {
+    return this.name === 'site' && this.type === 'workspace'; // TODO temporary solution
+  }
+
   get isWorkspaceChildProject() {
     return this.parent && this.parent.type === 'workspace';
   }
@@ -363,6 +367,18 @@ export abstract class Project {
       },
       resetHard() {
         self.run(`git reset --hard`).sync()
+      },
+
+      countComits() {
+        return countCommits(self.location);
+      },
+
+      lastCommitDate() {
+        return lastCommitDate(self.location)
+      },
+
+      lastCommitHash() {
+        return lastCommitHash(self.location)
       }
     }
   }
@@ -456,7 +472,7 @@ export abstract class Project {
       }
     };
     fse.copySync(this.location, destinationPath, options);
-    console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully, installing npm...`));
+    console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully...`));
     const project = ProjectFrom(destinationPath);
     console.log(chalk.green('Done.'));
     return project;
@@ -480,9 +496,9 @@ export abstract class Project {
       // console.log('dirname', __dirname)
       return {
         install(installFromRecreate = false) {
-          console.log('install tnp from recreate', installFromRecreate)
-          console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
-          // console.trace(`** ERR Project.Tnp not available yet`)
+          // console.log('install tnp from recreate', installFromRecreate)
+          // console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
+          console.trace(`** ERR Project.Tnp not available yet`)
         }
 
       } // TODO QUCIK FIX for tnp installd in node_modules
@@ -505,7 +521,7 @@ export abstract class Project {
     const self = this;
     return {
       install(installFromRecreate = false) { // install
-        console.log('install tnp from recreate', installFromRecreate)
+        // console.log('install tnp from recreate', installFromRecreate)
         let project: Project;
         if (self.parent && self.parent.type === 'workspace') {
           project = self.parent;

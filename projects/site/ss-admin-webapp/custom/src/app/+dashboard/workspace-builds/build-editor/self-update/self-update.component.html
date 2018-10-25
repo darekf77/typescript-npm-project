@@ -1,18 +1,37 @@
 <div *ngIf="model && model.project">
 
-
-  <button [disabled]="inProgress"> Self update whole project <strong>{{model.project.name}}</strong> </button>
-
-  <ul *ngIf="model.project.children">
+  <button mat-raised-button
+          [disabled]="operationInProgress || (progress && progress.status === 'inprogress')"
+          (click)="autoUpdate(model.project)"> Cloud update whole project
+  </button>
+  <br>
+  <br>
+  or partial update childs:
+  <br>
+  <ul *ngIf="model.project.children"
+      class="cloud-childs">
     <li *ngFor="let project of model.project.children">
-      <button [disabled]="inProgress"> Self child project <strong>{{project.name}}</strong> </button>
+      <button mat-raised-button
+              [disabled]="operationInProgress || (progress && progress.status === 'inprogress')"
+              (click)="autoUpdate(model.project, project.name )"> - {{project.name}}
+      </button>
+
     </li>
   </ul>
 
-  <hr>
-  <h5>{{operation}}</h5>
-
-  <mat-progress-bar *ngIf="progress"
+  <!-- {{waitForAwser}} -->
+  <hr *ngIf="progress || operationInProgress">
+  <h5 *ngIf="!(waitForAwser && !progress)">{{operation}}</h5>
+  <br>
+  <h6 *ngIf="!waitForAwser && (progress || operationInProgress)">
+    <span> Build progress: </span>
+    <span *ngIf="progress"
+          [innerHTML]="progress.info"></span>
+    <span *ngIf="!progress && operationInProgress"> waiting... </span>
+  </h6>
+  <mat-progress-bar *ngIf="(waitForAwser || operationInProgress) && !progress"
+                    mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="!(waitForAwser || operationInProgress) && progress"
                     mode="determinate"
                     value="{{ progress.value }}"> </mat-progress-bar>
 
@@ -21,5 +40,7 @@
       style="color:red;">
     {{error}}
   </h5>
+
+  <h3 *ngIf="countDown < countDownMax && countDown > 0"> Self reload of browser in {{countDown}} ms </h3>
 
 </div>

@@ -22,3 +22,4 @@
 /src/typings.d.ts
 /tsconfig.json
 /tsconfig.browser.json
+/projects/tmp*

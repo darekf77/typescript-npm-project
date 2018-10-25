@@ -77,6 +77,10 @@ export interface RunOptions {
    * Show process output
    */
   output?: boolean;
+
+  silence?: boolean;
+
+
   // detached?: boolean;
   cwd?: string;
 
@@ -112,6 +116,7 @@ export interface EnvConfigProject {
   //#region @backend
   port: number; // override tnp type port
   $db?: ConnectionOptions;
+  ommitAppBuild?: boolean;
   isWatchBuild?: boolean; // tnp generated
   //#endregion
 }
@@ -147,6 +152,12 @@ export interface EnvConfig {
     ports: {
       update: number;
     }
+  }
+
+  build?: {
+    number?: number;
+    hash?: string;
+    date?: Date;
   }
 
 }

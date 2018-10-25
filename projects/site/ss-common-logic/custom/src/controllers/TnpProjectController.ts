@@ -14,6 +14,7 @@ import * as fse from 'fs-extra';
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 import { PROGRESS_BAR_DATA } from 'tnp-bundle';
+import { SelfUpdate } from '../entities/TNP_PROJECT';
 
 
 @ENDPOINT()
@@ -144,20 +145,20 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
     //#endregion
   }
 
-  @POST('/selfupdate/:child')
-  selfupdateStart(@PathParam('child') child?: string): Response<void> {
+  @POST('/selfupdate')
+  selfupdateStart(@QueryParam('child') child?: string): Response<void> {
     //#region @backendFunc
     return async () => {
-      await this.db.TNP_PROJECT.selfupdate.start(child)
+      await this.db.TNP_PROJECT.selfupdate.begin(child)
     }
     //#endregion
   }
 
   @GET('/selfupdate')
-  selfupdateStatus(): Response<SelfUpdate> {
+  selfupdateStatus(@QueryParam('waitForAnswer') waitForAnswer: boolean = false): Response<SelfUpdate> {
     //#region @backendFunc
     return async () => {
-      let res = await this.db.TNP_PROJECT.selfupdate.status()
+      let res = await this.db.TNP_PROJECT.selfupdate.status(waitForAnswer)
       return res as any;
     }
     //#endregion
@@ -165,9 +166,3 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
 
 }
 
-export interface SelfUpdate {
-  progress: PROGRESS_BAR_DATA;
-  child: string;
-  operation: string;
-  operationErrors: string[];
-}

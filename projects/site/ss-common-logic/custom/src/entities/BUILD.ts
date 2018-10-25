@@ -174,7 +174,7 @@ export class BUILD extends META.BASE_ENTITY<BUILD> {
 
   @Column() gitRemote: string;
 
-  @Column({ default: config.names.env.dev }) environmentName: string;
+  @Column({ nullable: true }) environmentName: string;
 
   @Column({ nullable: true }) staticFolder: string;
   @Column({ nullable: true }) pidChangeEnvProces: number;

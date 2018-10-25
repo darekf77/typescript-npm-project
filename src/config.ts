@@ -41,6 +41,13 @@ export const config = {
     tnpEnvironment_json: 'tmp-environment.json',
     environment: 'environment'
   },
+  default: {
+    cloud: {
+      environment: {
+        name: 'online' as EnvironmentName
+      }
+    }
+  },
   names: {
     env: {
       prod: 'prod',

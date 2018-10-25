@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
+  import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // third part
@@ -8,12 +8,9 @@ const log = Log.create('building process')
 import { Global } from 'morphi/browser'
 // local
 import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 import { MatDialog, MatCheckboxChange } from '@angular/material';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
-
-
 
 @Component({
   selector: 'app-building-process',

@@ -1,6 +1,7 @@
 //#region @backend
 import * as path from 'path';
 import * as fs from 'fs';
+import * as child from 'child_process';
 // third part
 import { Project } from "./base-project";
 import { error } from "../messages";
@@ -69,10 +70,43 @@ export class AngularProject extends Project {
       if (this.isEjectedProject) {
         baseHref = `--env.${baseHref}`
         const aot = (prod ? 'aot.' : '');
-        this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, { biggerBuffer: true }).sync()
+        // const stats = [
+        //   "--display-chunks false",
+        //   "--display-optimization-bailout false",
+        //   "--display-provided-exports false",
+        //   "--display-used-exports false",
+        //   "--display-depth false",
+        //   "--display-reasons false",
+        //   "--display-cached-assets false",
+        //   "--display-cached false",
+        //   "--display-origins false",
+        //   "--display-entrypoints false",
+        //   "--display-max-modules false",
+        //   "--display-modules false",
+        //   "--display-exclude true",
+        //   "--verbose  false",
+        //   "--progress false",
+        //   "--hide-modules true",
+        //   "--display none"
+        // ]
+        this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
+          {
+            output: false,
+            silence: true,
+            biggerBuffer: true
+          }).sync()
+        // child.execSync(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, {
+        //   stdio: 'ignore'
+        // })
+
       } else {
         baseHref = `--${baseHref}`
-        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`, { biggerBuffer: true }).sync()
+        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`,
+          {
+            output: false,
+            silence: true,
+            biggerBuffer: true
+          }).sync()
       }
     }
 

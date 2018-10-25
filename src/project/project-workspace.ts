@@ -21,7 +21,9 @@ export class ProjectWorkspace extends Project {
     const workspace: Project = this as any;
     workspace.children
       .filter(child => {
-        return !!workspace.env.config.workspace.projects.find(c => c.name === child.name);
+        return !!workspace.env.config.workspace.projects.find(c => {
+          return c.name === child.name && !c.ommitAppBuild;
+        });
       })
       .forEach(child => {
         child.start(args)
@@ -97,7 +99,8 @@ export class ProjectWorkspace extends Project {
 
     console.log('Projects to build:')
     projectsInOrder.forEach((project, i) => {
-      console.log(`${i + 1}. ${project.name}`)
+      const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
+      console.log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
     })
     console.log('===================')
 
@@ -105,9 +108,15 @@ export class ProjectWorkspace extends Project {
       return config.allowedTypes.libs.includes(project.type);
     })
 
-    const projectsApps: Project[] = projectsInOrder.filter(project => {
-      return config.allowedTypes.app.includes(project.type);
-    })
+    const projectsApps: Project[] = projectsInOrder
+      .filter(project => {
+        return config.allowedTypes.app.includes(project.type);
+      })
+      .filter(project => {
+        const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
+        return !envProject.ommitAppBuild
+      })
+
 
     projectsLibs.forEach((project, i) => {
       console.log(`COMPILATIONL lib for: ${project.name}`)
@@ -126,14 +135,14 @@ export class ProjectWorkspace extends Project {
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })
-      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`).sync()
+      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`, { biggerBuffer: true }).sync()
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' });
     })
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' });
-      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`).sync()
+      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`, { biggerBuffer: true }).sync()
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' });
     })
 

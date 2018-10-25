@@ -7,7 +7,6 @@ import { BuildOptions, BuildDir, LibType } from "../../models";
 import { error } from "../../messages";
 import { config } from '../../config';
 import { handleArguments } from './handle-arguments.fn';
-import { install } from '../INSTALL';
 import { init } from '../INIT';
 
 
@@ -44,13 +43,6 @@ export async function build(opt: BuildOptions, allowedLibs: LibType[], project: 
     } else {
       error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
     }
-  }
-
-  // console.log(`Prepare node modules: ${this.name}`)
-  if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
-    install('', project.parent, false);
-  } else if (!project.node_modules.exist()) {
-    install('', project, false);
   }
 
   if (watch) {

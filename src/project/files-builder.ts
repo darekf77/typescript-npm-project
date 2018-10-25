@@ -111,6 +111,7 @@ export class FilesRecreator {
           self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
         ).concat(self.assetsToIgnore)
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
+          .concat(self.project.isTnp ? ['projects/tmp*'] : [])
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)
