@@ -12,6 +12,9 @@ import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpPro
 import { MatDialog, MatCheckboxChange } from '@angular/material';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 
+
+
+
 @Component({
   selector: 'app-building-process',
   templateUrl: './building-process.component.html',
@@ -27,10 +30,14 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
   ) { }
 
 
-
   fields = [
-
-
+    {
+      type: 'formly-build-tnp-process',
+      templateOptions: {
+        label: 'adasdasd'
+      },
+      key: 'asdasdaa'
+    },
     {
 
       type: 'iconbutton',

@@ -12,6 +12,8 @@ import { MatTooltipModule } from '@angular/material/tooltip'
 import { BuildingProcessComponent } from './building-process.component';
 import { FormWrapperMaterialModule } from 'ss-common-ui/module';
 import { LogPrcessModule } from '../log-prcess/log-prcess.module';
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyBuildTnpProcessComponent } from '../formly-build-tnp-process/formly-build-tnp-process.component';
 
 
 const materialModules = [
@@ -24,14 +26,26 @@ const materialModules = [
   MatTooltipModule
 ]
 
+const additionalFormlyCmps = [
+  FormlyBuildTnpProcessComponent
+]
+
 @NgModule({
   imports: [
     CommonModule,
     FormWrapperMaterialModule,
     LogPrcessModule,
-    ...materialModules
+    ...materialModules,
+    FormlyModule.forChild({
+      types: [
+        FormlyBuildTnpProcessComponent.type
+      ]
+    })
   ],
   exports: [BuildingProcessComponent],
-  declarations: [BuildingProcessComponent]
+  declarations: [
+    BuildingProcessComponent,
+    ...additionalFormlyCmps
+  ]
 })
 export class BuildingProcessModule { }

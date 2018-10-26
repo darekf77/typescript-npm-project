@@ -107,12 +107,12 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
     //#region @backendFunc
     return async () => {
       const build = await this.db.BUILD.getById(id);
-      let env;
+      let env = {} as any;
       function tryToGenEnvironment() {
         try {
           env = entities.ENVIRONMENT.from(build.project);
         } catch (error) {
-          env = undefined;
+          env = {} as any;
           // console.log(`Trying get evironment by id ${id}`)
           // sleep.sleep(1);
           // tryToGenEnvironment();
