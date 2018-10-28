@@ -26,7 +26,15 @@ import { MatRadioChange } from '@angular/material';
 
 @Component({
   selector: 'app-build-editor',
-  templateUrl: './build-editor.component.html',
+  // templateUrl: './build-editor.component.html',
+  template: `
+  <mat-card>
+  <app-form-wrapper-material *ngIf="model"
+                             [model]="model"
+                             [fields]="fields">
+  </app-form-wrapper-material>
+  </mat-card>
+  `,
   styleUrls: ['./build-editor.component.scss']
 })
 export class BuildEditorComponent implements OnInit, OnDestroy {

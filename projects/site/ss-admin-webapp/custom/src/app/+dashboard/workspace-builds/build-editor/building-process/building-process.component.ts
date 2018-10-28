@@ -1,4 +1,4 @@
-  import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, NgZone, AfterViewInit } from '@angular/core';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // third part
@@ -11,6 +11,7 @@ import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
 import { MatDialog, MatCheckboxChange } from '@angular/material';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+import { FormlyBuildTnpProcessComponent } from '../formly-build-tnp-process/formly-build-tnp-process.component';
 
 
 
@@ -32,7 +33,7 @@ export class BuildingProcessComponent implements OnInit, AfterViewInit {
 
   fields = [
     {
-      type: 'formly-build-tnp-process',
+      type: FormlyBuildTnpProcessComponent.typeName,
       templateOptions: {
         label: 'adasdasd'
       },

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FieldType, ConfigOption } from '@ngx-formly/core';
 import { TypeOption } from '@ngx-formly/core/src/services/formly.config';
+import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
 
 
 @Component({
@@ -10,14 +11,18 @@ import { TypeOption } from '@ngx-formly/core/src/services/formly.config';
 })
 export class FormlyBuildTnpProcessComponent extends FieldType implements OnInit {
 
+  public static readonly typeName =  'formly-build-tnp-process';
   public static get type(): TypeOption {
     return {
       component: FormlyBuildTnpProcessComponent,
-      name: 'formly-build-tnp-process',
+      name: this.typeName
 
     }
   }
 
+
+
+  model: BUILD;
 
   ngOnInit() {
   }
