@@ -4,7 +4,7 @@ baselineMenuLeft.push(
   {
     group: 'Custom Site Components'
   }, {
-    name: 'buildtnpprocess',
+    name: 'Build Tnp-Project Process',
     href: '/previewcomponents/buildtnpprocess',
   });
 
