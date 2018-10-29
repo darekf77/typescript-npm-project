@@ -101,59 +101,6 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
   //#endregion
 
 
-  @GET('/environment/:id')
-
-  getEnvironment(@PathParam('id') id: number): Response<entities.ENVIRONMENT> {
-    //#region @backendFunc
-    return async () => {
-      const build = await this.db.BUILD.getById(id);
-      let env = {} as any;
-      function tryToGenEnvironment() {
-        try {
-          env = entities.ENVIRONMENT.from(build.project);
-        } catch (error) {
-          env = {} as any;
-          // console.log(`Trying get evironment by id ${id}`)
-          // sleep.sleep(1);
-          // tryToGenEnvironment();
-        }
-      }
-      tryToGenEnvironment()
-      return env;
-    }
-    //#endregion
-  }
-
-  @PUT('/change/build/:id/env/:envname')
-  changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName): Response<BUILD> {
-    //#region @backendFunc
-    return async () => {
-      await this.db.BUILD.changeEnvironmentBy(id, envname);
-      return await this.db.BUILD.getById(id);
-    }
-    //#endregion
-  }
-
-
-  @GET('/environment/names/:id')
-  getEnvironmentNames(@PathParam('id') id: number): Response<EnvironmentName[]> {
-    //#region @backendFunc
-    return async () => {
-      const build = await this.db.BUILD.getById(id);
-      let names = []
-      function tryAssignNames() {
-        try {
-          names = entities.ENVIRONMENT.namesFrom(build.project);
-        } catch (error) {
-          console.log('Trying get evironment names..')
-          sleep.sleep(1);
-          tryAssignNames();
-        }
-      }
-      tryAssignNames()
-      return names;
-    }
-    //#endregion
-  }
+ 
 
 }

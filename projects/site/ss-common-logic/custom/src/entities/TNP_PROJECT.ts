@@ -111,9 +111,9 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
 
 
 
-  @Column()
-  type?: LibType;
+  @Column('varchar', { nullable: true }) type?: LibType;
 
+  @Column({ nullable: true }) environmentName: string;
   @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
 
   @Column('simple-array') environments?: EnvironmentName[] = [];
@@ -137,9 +137,11 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
     return (_.isNumber(this.pidServeProces));
   }
 
+
   @Column({ nullable: true }) port: number;
   @Column({ nullable: true }) pidBuildProces: number;
   @Column({ nullable: true }) pidClearProces: number;
+  @Column({ nullable: true }) pidChangeEnvProces: number;
   @Column({ nullable: true }) pidServeProces: number;
 
   get info() {

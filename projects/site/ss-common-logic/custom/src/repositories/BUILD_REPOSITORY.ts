@@ -28,40 +28,6 @@ export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES>
     }
   }
 
-  async getById(id: number) {
-    const config = new ModelDataConfig({
-      joins: ['project', 'project.children']
-    });
-    const build = await this.findOne({
-      where: { id },
-      join: config && config.db && config.db.join
-    });
-
-    if (!build) {
-      throw `Cannot find build with id ${id}`
-    }
-    return build;
-  }
-
-  async changeEnvironmentBy(idOrBuild: number | BUILD, @PathParam('envname') envname: EnvironmentName) {
-    let build = _.isNumber(idOrBuild) ? await this.getById(idOrBuild) : idOrBuild;
-    if (build.pidChangeEnvProces) {
-      throw 'changing environment process alredy in progress'
-    }
-    console.log(`start changeing environment to ${envname}`)
-    const p = build.project.run(`tnp clear --onlyWorkspace && tnp init --env ${envname}`, {
-      output: false
-    }).async();
-    p.once('exit', async () => {
-      build = await this.getById(build.id)
-      build.pidChangeEnvProces = undefined;
-      build.environmentName = envname;
-      console.log(`end changeing environment to ${envname}`)
-      await this.updateRealtime(build.id, build)
-    })
-    build.pidChangeEnvProces = p.pid;
-    await this.update(build.id, build)
-  }
 
 
 }

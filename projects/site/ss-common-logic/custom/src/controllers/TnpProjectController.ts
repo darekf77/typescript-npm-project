@@ -9,12 +9,13 @@ import {
 
 //#region @backend
 import * as fse from 'fs-extra';
+import * as sleep from 'sleep';
 //#endregion
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
-import { PROGRESS_BAR_DATA } from 'tnp-bundle';
-import { SelfUpdate } from '../entities/TNP_PROJECT';
+import { PROGRESS_BAR_DATA, EnvironmentName } from 'tnp-bundle';
+import { SelfUpdate, TNP_PROJECT } from '../entities/TNP_PROJECT';
 
 
 @ENDPOINT()
@@ -160,6 +161,62 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
     return async () => {
       let res = await this.db.TNP_PROJECT.selfupdate.status(waitForAnswer)
       return res as any;
+    }
+    //#endregion
+  }
+
+
+  @GET('/environment/:id')
+
+  getEnvironment(@PathParam('id') id: number): Response<entities.ENVIRONMENT> {
+    //#region @backendFunc
+    return async () => {
+      const project = await this.db.TNP_PROJECT.getById(id)
+      let env = {} as any;
+      function tryToGenEnvironment() {
+        try {
+          env = entities.ENVIRONMENT.from(project);
+        } catch (error) {
+          env = {} as any;
+          // console.log(`Trying get evironment by id ${id}`)
+          // sleep.sleep(1);
+          // tryToGenEnvironment();
+        }
+      }
+      tryToGenEnvironment()
+      return env;
+    }
+    //#endregion
+  }
+
+  @PUT('/change/build/:id/env/:envname')
+  changeEnvironment(@PathParam('id') id: number, @PathParam('envname') envname: EnvironmentName): Response<TNP_PROJECT> {
+    //#region @backendFunc
+    return async () => {
+      await this.db.TNP_PROJECT.changeEnvironmentBy(id, envname);
+      return await this.db.TNP_PROJECT.getById(id);
+    }
+    //#endregion
+  }
+
+
+  @GET('/environment/names/:id')
+  getEnvironmentNames(@PathParam('id') id: number): Response<EnvironmentName[]> {
+    //#region @backendFunc
+    return async () => {
+      const project = await this.db.TNP_PROJECT.getById(id);
+      let names = []
+      function tryAssignNames() {
+        try {
+          names = entities.ENVIRONMENT.namesFrom(project);
+        } catch (error) {
+          console.log('Trying get evironment names..')
+          sleep.sleep(1);
+          tryAssignNames();
+        }
+      }
+      tryAssignNames()
+      return names;
     }
     //#endregion
   }

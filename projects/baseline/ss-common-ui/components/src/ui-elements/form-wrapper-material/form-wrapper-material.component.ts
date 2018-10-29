@@ -47,6 +47,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   @Input() crud: BaseCRUD<any>;
 
   @Input() form = new FormGroup({});
+  @Input() formGroup: FormGroup;
   @Input() model = {};
   @Input() showButtons = true;
   @Input() options: FormlyFormOptions = {};
@@ -115,7 +116,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     this.resolveFields();
 
     this.formly.options = this.options;
-    this.formly.form = this.form;
+    this.formly.form = this.formGroup ? this.formGroup : this.form;
     this.setModel(this.model);
 
 

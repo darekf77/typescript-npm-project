@@ -8,7 +8,7 @@ import axios from 'axios';
 // local
 import { PROGRESS_BAR_DATA, ProjectFrom, Project } from "tnp-bundle";
 import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
-import { EntityRepository, META } from "morphi";
+import { EntityRepository, META, ModelDataConfig } from "morphi";
 import { TNP_PROJECT, SelfUpdate } from "../entities/TNP_PROJECT";
 
 export interface TNP_PROJECT_ALIASES {
@@ -20,14 +20,24 @@ export interface TNP_PROJECT_ALIASES {
 export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TNP_PROJECT_ALIASES> {
   globalAliases: (keyof TNP_PROJECT_ALIASES)[] = ['project', 'projects']
 
+
   async getById(id: number) {
-    const project = await this.findOne(id);
+
+    const config = new ModelDataConfig({
+      joins: ['children']
+    });
+    const project = await this.findOne({
+      where: { id },
+      join: config && config.db && config.db.join
+    });
 
     if (!project) {
       throw `Cannot find project with id ${id}`
     }
+
     return project;
   }
+
 
 
   get start() {
@@ -152,7 +162,7 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
     const self = this;
     return {
       async begin(child?: string) {
-        const verbose = (ENV.name === 'local' ? '--verbose': '');
+        const verbose = (ENV.name === 'local' ? '--verbose' : '');
         if (child) {
           run(`tnp cloud:update --child=${child} ${verbose}`).sync();
         } else {
@@ -263,6 +273,26 @@ export class TNP_PROJECT_REPOSITORY extends META.BASE_REPOSITORY<TNP_PROJECT, TN
 
     await this.updateRealtime(project.id, project)
     // console.log('clear pid should populate realitime ', project)
+  }
+
+  async changeEnvironmentBy(idOrProjectName: number | TNP_PROJECT, envname: EnvironmentName) {
+    let project = _.isNumber(idOrProjectName) ? await this.getById(idOrProjectName) : idOrProjectName;
+    if (project.pidChangeEnvProces) {
+      throw 'changing environment process alredy in progress'
+    }
+    console.log(`start changeing environment to ${envname}`)
+    const p = project.run(`tnp clear --onlyWorkspace && tnp init --env ${envname}`, {
+      output: false
+    }).async();
+    p.once('exit', async () => {
+      project = await this.getById(project.id)
+      project.pidChangeEnvProces = undefined;
+      project.environmentName = envname;
+      console.log(`end changeing environment to ${envname}`)
+      await this.updateRealtime(project.id, project)
+    })
+    project.pidChangeEnvProces = p.pid;
+    await this.update(project.id, project)
   }
 
 }
