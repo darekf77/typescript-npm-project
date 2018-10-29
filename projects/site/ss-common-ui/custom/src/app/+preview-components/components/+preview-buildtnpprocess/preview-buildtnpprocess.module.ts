@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';
 import { RouterModule } from '@angular/router';
+import { BuildTnpProcessModule } from 'components';
 
 const angularModules = [
   CommonModule,
@@ -11,7 +12,8 @@ const angularModules = [
 
 @NgModule({
   imports: [
-    ...angularModules
+    ...angularModules,
+    BuildTnpProcessModule
   ],
   exports: [
     PreviewBuildtnpprocessComponent

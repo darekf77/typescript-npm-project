@@ -1,0 +1,48 @@
+<mat-accordion *ngIf="model">
+  <mat-expansion-panel [expanded]="expanded">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{model.name}}
+      </mat-panel-title>
+      <mat-panel-description>
+        Type your name and age
+        <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-horizontal-stepper [linear]="true"
+                            #stepper="matHorizontalStepper">
+      <mat-step *ngIf="model.isWorkspace">
+        <ng-template matStepLabel>ENVIRONMENT</ng-template>
+
+        <!-- <mat-radio-group>
+          <mat-radio-button value="{{env}}"
+                            *ngFor="let env of model.environments">{{env | uppercase }}</mat-radio-button>
+        </mat-radio-group> -->
+
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>BUILD</ng-template>
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>TEST</ng-template>
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>SERVE</ng-template>
+      </mat-step>
+    </mat-horizontal-stepper>
+
+    <mat-card *ngIf="model.children && model.children.length > 0">
+
+
+      <app-tnp-project *ngFor="let item of model.children"
+                       [model]="item"
+                       [isChild]="true"></app-tnp-project>
+
+    </mat-card>
+
+
+  </mat-expansion-panel>
+
+</mat-accordion>

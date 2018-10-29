@@ -12,6 +12,7 @@ import { copyFile, uniqArray, compilationWrapper, crossPlatofrmPath } from '../h
 import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
+import { run } from '../process';
 
 const REGEXS = {
 
@@ -19,10 +20,27 @@ const REGEXS = {
    *   "baseline/ss-common-logic/src/db-mocks";
    *                            |<--------->|
    */
-  baselinePart: `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+  baselinePart: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
 
 }
 
+function getRegexSourceString(s) {
+  return s
+    .replace(/\//g, '\\/')
+    .replace(/\-/g, '\\-')
+    .replace(/\+/g, '\\+')
+    .replace(/\./g, '\\.')
+    .replace(/\_/g, '\\_')
+}
+
+const debugPathes = [
+  // '/src/app/+preview-components/preview-components.component.ts',
+  // '/src/controllers.ts',
+]
+
+const debugMerge = [
+  // "/src/app/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts"
+]
 
 
 interface JoinFilesOptions {
@@ -48,7 +66,7 @@ export class BaselineSiteJoin {
         return `${BaselineSiteJoin.prefix}${baseFileName}`
       },
       removeRootFolder(filePath: string) {
-        const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\.)*)`
+        const pathPart = `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
         return filePath.replace(new RegExp(`^${pathPart}`, 'g'), '')
       },
       removeExtension(filePath: string) {
@@ -145,16 +163,19 @@ export class BaselineSiteJoin {
     }
   }
 
-  private copyJoin(source: string, dest: string, relativeBaselineCustomPath: string) {
-    // console.log(`Extname from ${source}: ${path.extname(source)}`)
+  private copyJoin(source: string, dest: string, relativeBaselineCustomPath: string, debugModel = false) {
+    if (debugModel) console.log(`SOURCE: ${source} ,extname: ${path.extname(source)}`)
+    if (debugModel) console.log(`DEST: ${dest} ,extname: ${path.extname(dest)}`)
 
     const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
     const replaceFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
-    // console.log(`Replace fn for ${source} = ${!!replaceFn}`)
+    if (debugModel) console.log(`Replace fn for ${source} = ${!!replaceFn}`)
+
     copyFile(
       source,
       dest,
-      replaceFn
+      replaceFn,
+      debugModel
     )
   }
   private fastCopy(source: string, dest: string) {
@@ -184,6 +205,9 @@ export class BaselineSiteJoin {
 
   private replace(input: string, relativeBaselineCustomPath: string) {
     const self = this;
+    const debuggin = (debugPathes.includes(relativeBaselineCustomPath));
+    if (debuggin) console.log(`relativeBaselineCustomPath: ${relativeBaselineCustomPath}`)
+
     return {
       normalizePathes() { // TODO
 
@@ -199,11 +223,7 @@ export class BaselineSiteJoin {
             if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
               let toReplace = self.getPrefixedBasename(baselineFilePathNoExit);
 
-              baselineFilePathNoExit = baselineFilePathNoExit
-                .replace('/', '\/')
-                .replace('-', '\-')
-                .replace('.', '\.')
-                .replace('_', '\_')
+              baselineFilePathNoExit = getRegexSourceString(baselineFilePathNoExit);
               baselineFilePathNoExit = `\.${BaselineSiteJoin.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
               const dirPath = path.dirname(f);
               toReplace = BaselineSiteJoin.PathHelper.removeRootFolder(crossPlatofrmPath(path.join(dirPath, toReplace)))
@@ -215,54 +235,105 @@ export class BaselineSiteJoin {
         });
         return input;
       },
+
+      /**
+       * Replace imports/export
+       * Scope: current files baseline path in current generated file
+       * Example: 
+       *  File: exmpale.ts
+       *   Code change:
+       *     From  : `import {..} from 'baseline/exapmle.ts`
+       *     To    : `import {..} from './__exapmle.ts`
+       * 
+       * Notes:
+       *  Problem1 : If import `import {..} from 'baseline/exapmle.ts` is included in different files
+       * than example.ts it is not going to be excluded
+       */
       currentFilePath() {
+
+
+
         const baselineFilePathNoExit = BaselineSiteJoin.PathHelper.removeExtension(relativeBaselineCustomPath);
+        if (debuggin) console.log(`baselineFilePathNoExit: ${baselineFilePathNoExit}`)
 
+        const toReplaceImportPath =
+          getRegexSourceString(
+            crossPlatofrmPath(
+              `${path.join(self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
+                baselineFilePathNoExit)}`
+            )
+          )
 
-        const toReplaceImportPath = crossPlatofrmPath(`${path.join(
-          self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
-          baselineFilePathNoExit)}`);
         const replacement = `./${self.getPrefixedBasename(baselineFilePathNoExit)}`;
 
-        const res = input.replace(new RegExp(`(\"|\')${toReplaceImportPath}(\"|\')`, 'g'), `'${replacement}'`);
+        // if (debuggin) console.log(`toReplaceImportPath: ${toReplaceImportPath}`)
+        if (debuggin) console.log(`replacement: ${replacement}`)
 
-        return res;
+        const replaceRegex = new RegExp(`(\"|\')${toReplaceImportPath}(\"|\')`, 'g')
+
+        if (debuggin) {
+          console.log(`replaceRegex: ${replaceRegex.source}`)
+        }
+
+        input = input.replace(replaceRegex, `'${replacement}'`);
+        if (debuggin) console.log(`
+        result input:
+        ${input}
+
+        
+        `)
+
+        return input;
       },
+
+
+      /**
+       * Same thing like in currentFilePath() but:
+       *  - handle situation like in Problem1;
+       *  - handle situation when in your custom files you are referening to custom files
+       */
       baselinePath() {
-        // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
+
+
+        const debuggin = (debugPathes.includes(relativeBaselineCustomPath));
+
+        if (debuggin) console.log(`
+        
+        relativeBaselineCustomPath:${relativeBaselineCustomPath}
+        
+        
+        `)
         const levelBack = relativeBaselineCustomPath.split('/').length - 3;
         const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
-        // console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
-        const pathToBaselineNodeModulesRelative = self.pathToBaselineNodeModulesRelative
-          .replace('/', '\/')
-          .replace('-', '\-')
-          .replace('.', '\.')
-          .replace('_', '\_')
+        if (debuggin) console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
+        const pathToBaselineNodeModulesRelative = getRegexSourceString(self.pathToBaselineNodeModulesRelative)
         const pathPart = REGEXS.baselinePart;
-        // console.log('pathPart', pathPart)
+        if (debuggin) console.log('pathPart', pathPart)
         const baselineRegex = `${pathToBaselineNodeModulesRelative}${pathPart}*`
-        // console.log(`\nbaselineRegex: ${baselineRegex}`)
+        if (debuggin) console.log(`\nbaselineRegex: ${baselineRegex}`)
         let patterns = input.match(new RegExp(baselineRegex, 'g'))
-        // if (relativeBaselineCustomPath === "/src/index.ts") {
-        //     // console.log('input', input)
-        //     console.log(patterns)
-        //     //     console.log(`patterns\n`, patterns.map(d => `\t${d}`).join('\n'))
-        // }
+
+
+        if (debuggin) console.log(`patterns\n`, _.isArray(patterns) && patterns.map(d => `\t${d}`).join('\n'))
+
 
         if (Array.isArray(patterns) && patterns.length >= 1) {
-          patterns.forEach(p => {
-            let patternWithoutBaselinePart = p
+          patterns.forEach(pathToReplaceInInput => {
+
+            if (debuggin) console.log(`PATTERN IN INPUT ${pathToReplaceInInput}`)
+
+            let patternWithoutBaselinePart = pathToReplaceInInput
               .replace(self.pathToBaselineNodeModulesRelative, '')
-            // console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
+            if (debuggin) console.log(`PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
+            if (debuggin) console.log(`pathPart = ${pathPart}`)
+
             patternWithoutBaselinePart = patternWithoutBaselinePart
               .replace(new RegExp(`^${pathPart}`, 'g'), '')
-            // console.log('patternWithoutBaselinePart rep', patternWithoutBaselinePart)
 
-            //  console.log('patternWithoutBaselinePart', patternWithoutBaselinePart)
-            // console.log('p', p)
+            if (debuggin) console.log('PATTERN WITHOUT BASELINE no path part', patternWithoutBaselinePart)
             const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`
-            // console.log('toReplace', toReplace)
-            input = input.replace(p, `.${toReplace}`.replace('...', '..'))
+            if (debuggin) console.log(`toReplace:${toReplace}`)
+            input = input.replace(pathToReplaceInInput, `.${toReplace}`.replace('...', '..'))
           })
         }
         return input;
@@ -272,15 +343,22 @@ export class BaselineSiteJoin {
   }
 
 
-  private merge(relativeBaselineCustomPath: string, verbose = true) {
-    // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
-    if (verbose) {
+
+  private merge(relativeBaselineCustomPath: string) {
+
+    const isDebugMode = debugMerge.includes(relativeBaselineCustomPath)
+    if (isDebugMode) {
+      console.log(_.times(5, () => '\n').join())
       console.log(chalk.blue(`Baseline/Site modyfication detected...`))
       console.log(`File: ${relativeBaselineCustomPath}`)
     }
     // compilationWrapper(() => {
     const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
     const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
+    if (isDebugMode) {
+      console.log('baselineAbsoluteLocation', baselineAbsoluteLocation)
+      console.log('baselineFileInCustomPath', baselineFileInCustomPath)
+    }
 
     const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath)
     let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
@@ -298,7 +376,8 @@ export class BaselineSiteJoin {
       this.copyJoin(
         baselineFileInCustomPath,
         joinFilePath,
-        relativeBaselineCustomPath
+        relativeBaselineCustomPath,
+        isDebugMode
       )
 
     } else {
@@ -312,7 +391,7 @@ export class BaselineSiteJoin {
         this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
       }
     }
-    if (verbose) {
+    if (isDebugMode) {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
   }
@@ -325,7 +404,7 @@ export class BaselineSiteJoin {
 
         compilationWrapper(() => {
           uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
-            .forEach(relativeFile => self.merge(relativeFile, false))
+            .forEach(relativeFile => self.merge(relativeFile))
         }, `Site join of all files for site project: ${self.project.name}`)
       },
       get watch() {

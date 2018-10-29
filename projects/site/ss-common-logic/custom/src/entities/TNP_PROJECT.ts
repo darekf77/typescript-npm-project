@@ -5,7 +5,7 @@ import {
 import BUILD from "./BUILD";
 import * as _ from 'lodash';
 
-import { PROGRESS_BAR_DATA, Project, EnvConfigProject, LibType } from "tnp-bundle";
+import { PROGRESS_BAR_DATA, Project, EnvConfigProject, LibType, EnvironmentName } from "tnp-bundle";
 import { CLASSNAME, FormlyForm } from "morphi";
 
 //#region @backend
@@ -47,7 +47,8 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
   host?: string;
   hostSocket?: string;
   externalHost?: string;
-  type?: LibType;
+
+
   fromRaw(obj: ITNP_PROJECT): TNP_PROJECT {
     return _.merge(new TNP_PROJECT(), obj);
   }
@@ -56,6 +57,8 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
     return _.merge(new TNP_PROJECT(), {
       name: data.name,
       location: data.location,
+      isWorkspace: data.isWorkspace,
+      type: data.type
     });
   }
 
@@ -98,10 +101,22 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
   @Column()
   location: string;
 
+  @Column({
+    type: 'boolean',
+    default: false
+  }) isWorkspace?: boolean = false;
+
   @Column()
   name: string;
 
+
+
+  @Column()
+  type?: LibType;
+
   @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
+
+  @Column('simple-array') environments?: EnvironmentName[] = [];
 
 
   @TreeChildren()

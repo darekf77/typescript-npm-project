@@ -1,3 +1,4 @@
+import { LibType} from "../models";
 //#region @backend
 
 import * as fs from 'fs';
@@ -11,7 +12,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
 import { PackageJSON } from "./package-json";
-import { LibType, BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
+import {  BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher, killProcessByPort, run } from "../process";
@@ -39,6 +40,12 @@ export abstract class Project {
   public get backupName() {
     return `tmp-${this.name}`
   }
+
+  get isWorkspace() {
+    return this.type === 'workspace';
+  }
+
+  readonly type: LibType;
 
   public readonly location: string;
 
@@ -90,7 +97,7 @@ export abstract class Project {
     }
   }
 
-  readonly type: LibType;
+  
   readonly packageJson: PackageJSON;
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
@@ -203,9 +210,7 @@ export abstract class Project {
     return this.parent && this.parent.type === 'workspace';
   }
 
-  get isWorkspace() {
-    return this.type === 'workspace';
-  }
+  
 
   get allowedEnvironments() {
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {

@@ -95,7 +95,7 @@ export function fixWebpackEnv(env: Object) {
 }
 
 export function copyFile(sousrce: string, destination: string,
-  transformTextFn?: (input: string) => string) {
+  transformTextFn?: (input: string) => string, debugMode = false) {
 
   try {
     if (!fs.existsSync(sousrce)) {
@@ -107,7 +107,7 @@ export function copyFile(sousrce: string, destination: string,
       return;
     }
     const destDirPath = path.dirname(destination);
-    // console.log('destDirPath', destDirPath)
+    if (debugMode) console.log('destDirPath', destDirPath)
     if (!fs.existsSync(destDirPath)) {
       run(`mkdirp ${destDirPath}`).sync()
     }
@@ -115,6 +115,16 @@ export function copyFile(sousrce: string, destination: string,
     let sourceData = fs.readFileSync(sousrce).toString();
     if (transformTextFn) {
       sourceData = transformTextFn(sourceData);
+    }
+    if (debugMode) {
+      console.log(`
+      
+      
+      Write to: ${destination} file:
+      ============================================================================================
+      ${sourceData}
+      ============================================================================================
+      `)
     }
 
     // process.exit(0)
