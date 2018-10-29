@@ -138,7 +138,7 @@ export class PackageJSON {
 
       error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})
 
-      path desn't exist: ${p} 
+      path desn't exist: ${p}
 
       `)
     }
@@ -159,13 +159,23 @@ export class PackageJSON {
   // }
 
   get isCoreProject() {
-    if (this.data.tnp && this.data.tnp.isCoreProject) {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.isCoreProject)) {
       if (_.isBoolean(this.data.tnp.isCoreProject)) {
         return this.data.tnp.isCoreProject;
       }
       error(`Bad value in package.json, tnp.isCoreProject should be boolean.`, true);
       error(`Location of package.json: ${this.location}`)
+    }
+    return false;
+  }
 
+  get isGenerated() {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGenerated)) {
+      if (_.isBoolean(this.data.tnp.isGenerated)) {
+        return this.data.tnp.isGenerated;
+      }
+      error(`Bad value in package.json, tnp.isGenerated should be boolean.`, true);
+      error(`Location of package.json: ${this.location}`)
     }
     return false;
   }

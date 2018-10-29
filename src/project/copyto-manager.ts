@@ -7,10 +7,11 @@ import * as path from 'path';
 import chalk from 'chalk';
 // import * as watch from 'watch'
 import { watch } from 'chokidar'
+import * as rimraf from 'rimraf';
 
 import config from "../config";
 import { Project } from './base-project';
-import { FileEvent, BuildOptions } from '../models';
+import { FileEvent, BuildOptions, IPackageJSON } from '../models';
 import { info, warn } from '../messages';
 
 export class CopyToManager {
@@ -31,6 +32,35 @@ export class CopyToManager {
     } else {
       this.copyToProjectsOnFinish()
     }
+  }
+
+  public generateCopyIn(destinationLocation) {
+    const sourceLocation = this.project.location;
+    const packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
+      encoding: 'utf8'
+    });
+    packageJson.tnp.isGenerated = true;
+
+    if (fs.existsSync(destinationLocation)) {
+      // console.log(`Removed tnp - helper from ${ dest } `)
+      rimraf.sync(destinationLocation)
+    }
+    fse.mkdirpSync(destinationLocation);
+
+    fse.copySync(`${sourceLocation}/`, destinationLocation, {
+      filter: (src: string, dest: string) => {
+        return !src.endsWith('/dist/bin') &&
+          !src.endsWith('/bin') &&
+          !/.*node_modules.*/g.test(src) &&
+          !/.*tmp\-.*/g.test(src) &&
+          !/.*dist\-.*/g.test(src) &&
+          !/.*bundle\-.*/g.test(src);
+      }
+    });
+    fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
+      spaces: 2,
+      encoding: 'utf8'
+    });
   }
 
   public copyToProjectNodeModules(destination: Project) {

@@ -1,4 +1,4 @@
-import { LibType} from "../models";
+import { LibType } from "../models";
 //#region @backend
 
 import * as fs from 'fs';
@@ -12,7 +12,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
 import { PackageJSON } from "./package-json";
-import {  BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
+import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher, killProcessByPort, run } from "../process";
@@ -97,7 +97,7 @@ export abstract class Project {
     }
   }
 
-  
+
   readonly packageJson: PackageJSON;
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
@@ -198,6 +198,10 @@ export abstract class Project {
     return this.packageJson.isCoreProject;
   }
 
+  get isGenerated() {
+    return this.packageJson.isGenerated;
+  }
+
   get isTnp() {
     return this.name === 'tnp';
   }
@@ -210,7 +214,7 @@ export abstract class Project {
     return this.parent && this.parent.type === 'workspace';
   }
 
-  
+
 
   get allowedEnvironments() {
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
@@ -328,6 +332,21 @@ export abstract class Project {
 
   protected buildOptions?: BuildOptions;
   async build(buildOptions?: BuildOptions) {
+
+    const { watch, outDir } = buildOptions;
+
+    if (!watch && !this.isGenerated && this.isWorkspaceChildProject) {
+      const generateCopyLocation = path.join(this.parent.location, outDir, this.name);
+      const generateCopyLocationWorkspace = path.join(this.parent.location, outDir);
+      if (!ProjectFrom(generateCopyLocation)) {
+        this.parent.copytToManager.generateCopyIn(generateCopyLocationWorkspace);
+      }
+
+      this.copytToManager.generateCopyIn(generateCopyLocation);
+      const generatedProject = ProjectFrom(generateCopyLocation)
+      await generatedProject.build(buildOptions)
+      return
+    }
 
     this.buildOptions = buildOptions;
 
