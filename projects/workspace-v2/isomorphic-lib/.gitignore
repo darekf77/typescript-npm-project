@@ -1,0 +1,13 @@
+node_modules
+tmp*
+dist*
+bundle*
+browser
+backup
+module
+www
+Thumbs.db
+.DS_Store
+npm-debug.log*
+.sass-cache
+.sourcemaps
