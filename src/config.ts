@@ -62,8 +62,7 @@ export const config = {
       'angular-client',
       'angular-lib',
       'ionic-client',
-      'docker',
-      'workspace'
+      'docker'
     ] as LibType[],
     libs: [
       'angular-lib',

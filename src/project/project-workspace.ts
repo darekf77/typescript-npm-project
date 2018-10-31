@@ -97,7 +97,7 @@ export class ProjectWorkspace extends Project {
 
     PROGRESS_BAR_DATA.log({ value: 0, info: `Process started`, status: 'inprogress' })
 
-    console.log('Projects to build:')
+    console.log(`Projects to build in  ${this.labels.extendedBoldName} :`)
     projectsInOrder.forEach((project, i) => {
       const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
       console.log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
@@ -133,14 +133,14 @@ export class ProjectWorkspace extends Project {
 
 
     projectsLibs.forEach((project, i) => {
-      info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type}`);
+      info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })
       project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`, { biggerBuffer: true }).sync()
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' });
     })
 
     projectsApps.forEach((project) => {
-      info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type}`);
+      info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' });
       project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`, { biggerBuffer: true }).sync()
       PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' });

@@ -198,6 +198,18 @@ export abstract class Project {
     return this.packageJson.isCoreProject;
   }
 
+  get labels() {
+    const self = this;
+    return {
+      get generated() {
+        return self.isGenerated ? '(generated)' : ''
+      },
+      get extendedBoldName() {
+        return chalk.bold(`${self.labels.generated} ${self.parent ? (self.parent.name + '/') : ''}${self.name}`);
+      }
+    }
+  }
+
   get isGenerated() {
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
       (this.isWorkspace && this.packageJson.isGenerated)

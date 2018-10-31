@@ -70,7 +70,7 @@ async function initialize(
       const projectName = project.parent ? `${project.parent.name}/${project.name}` : project.name
 
       console.log(`Config alredy ${chalk.bold('init')}ed tnp.
-${chalk.green('Environment for')} ${chalk.green(chalk.bold(projectName))}: ${chalk.bold(project.env.config.name)}`)
+${chalk.green('Environment for')} ${project.isGenerated ? chalk.bold('(generated)') : ''} ${chalk.green(chalk.bold(projectName))}: ${chalk.bold(project.env.config.name)}`)
     }
 
   }

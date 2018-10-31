@@ -94,22 +94,25 @@ export default {
   },
 
   // aliases
-  $BUILD: (args) => {
+  $BUILD: async (args) => {
+
     if (config.allowedTypes.libs.includes(Project.Current.type)) {
-      buildLib(false, false, 'dist', args)
+      await buildLib(false, false, 'dist', args)
     }
     if (config.allowedTypes.app.includes(Project.Current.type)) {
-      buildApp(false, false, 'dist', args)
+      await buildApp(false, false, 'dist', args)
     }
+    process.exit(0)
   },
 
-  $BUILD_PROD: (args) => {
+  $BUILD_PROD: async (args) => {
     if (config.allowedTypes.libs.includes(Project.Current.type)) {
-      buildLib(true, false, 'dist', args)
+      await buildLib(true, false, 'dist', args)
     }
     if (config.allowedTypes.app.includes(Project.Current.type)) {
-      buildApp(true, false, 'dist', args)
+      await buildApp(true, false, 'dist', args)
     }
+    process.exit(0)
   },
 
   $BUILDWATCH: (args) => {
