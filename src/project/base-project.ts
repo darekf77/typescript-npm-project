@@ -199,7 +199,8 @@ export abstract class Project {
   }
 
   get isGenerated() {
-    return this.packageJson.isGenerated;
+    return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
+      (this.isWorkspace || this.packageJson.isGenerated)
   }
 
   get isTnp() {
@@ -235,6 +236,20 @@ export abstract class Project {
    * @param port
    */
   async start(args?: string) {
+
+    if (this.isWorkspace && !this.isGenerated) {
+      const genLocationWOrkspace = path.join(this.location, config.folder.dist, this.name);
+      const genWorkspace = ProjectFrom(genLocationWOrkspace)
+      if (!genWorkspace) {
+        error(`No  ${'dist'}ributon folder. Please run: ${chalk.bold('tnp build')} in this workspace.
+Generated workspace should be here: ${genLocationWOrkspace}
+        `)
+      }
+      await genWorkspace.start(args);
+      return;
+    }
+
+
     await this.env.init(args, true)
     console.log(`Killing proces on port ${this.getDefaultPort()}`);
     killProcessByPort(this.getDefaultPort())
@@ -332,21 +347,6 @@ export abstract class Project {
 
   protected buildOptions?: BuildOptions;
   async build(buildOptions?: BuildOptions) {
-
-    const { watch, outDir } = buildOptions;
-
-    if (!watch && !this.isGenerated && this.isWorkspaceChildProject) {
-      const generateCopyLocation = path.join(this.parent.location, outDir, this.name);
-      const generateCopyLocationWorkspace = path.join(this.parent.location, outDir);
-      if (!ProjectFrom(generateCopyLocation)) {
-        this.parent.copytToManager.generateCopyIn(generateCopyLocationWorkspace);
-      }
-
-      this.copytToManager.generateCopyIn(generateCopyLocation);
-      const generatedProject = ProjectFrom(generateCopyLocation)
-      await generatedProject.build(buildOptions)
-      return
-    }
 
     this.buildOptions = buildOptions;
 

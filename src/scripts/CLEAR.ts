@@ -1,16 +1,40 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as path from 'path';
 import { LibType, BuildDir } from '../models';
 
-import { Project } from '../project';
+import { Project, ProjectFrom } from '../project';
 import { clearConsole } from '../process';
+import config from '../config';
+
+
+function clearGenerated(project: Project, all, recrusive, outDir: string) {
+  if (project.isWorkspace) {
+    const genWorkspace = ProjectFrom(path.join(project.location, outDir, project.name))
+    if (genWorkspace) {
+      genWorkspace.clear(all, recrusive);
+    }
+  } else if (project.isWorkspaceChildProject) {
+    const genWorkspaceChild = ProjectFrom(path.join(project.parent.location, outDir, project.parent.name, project.name))
+    if (genWorkspaceChild) {
+      genWorkspaceChild.clear(all, recrusive)
+    }
+  }
+
+}
 
 export function clear(args, all = false) {
-  let { recrusive } = require('minimist')(args.split(' '));
+  let { recrusive = false, generated = false } = require('minimist')(args.split(' '));
   // console.log('onlyWorkspace', onlyWorkspace)
 
   clearConsole()
-  Project.Current.clear(all, recrusive)
+  const project = Project.Current
+  project.clear(all, recrusive)
+  if (generated) {
+    clearGenerated(project, all, recrusive, config.folder.dist)
+    clearGenerated(project, all, recrusive, config.folder.bundle)
+  }
+
   process.exit(0)
 }
 

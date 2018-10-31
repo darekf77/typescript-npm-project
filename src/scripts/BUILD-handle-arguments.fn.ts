@@ -1,13 +1,13 @@
 //#region @backend
 import * as _ from 'lodash';
-import { clearConsole } from "../../process";
-import { Project } from '../../project';
-import { BuildDir, EnvironmentName } from "../../models";
-import { info, error } from "../../messages";
+import { clearConsole } from "../process";
+import { Project } from '../project';
+import { BuildDir, EnvironmentName } from "../models";
+import { info, error } from "../messages";
 import * as path from 'path';
 import { BuildArgs } from './build-args.model';
-import { crossPlatofrmPath, nearestProjectTo } from '../../helpers';
-import { config } from '../../config';
+import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
+import { config } from '../config';
 
 
 

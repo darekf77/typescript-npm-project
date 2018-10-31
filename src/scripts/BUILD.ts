@@ -1,13 +1,15 @@
 //#region @backend
 import * as _ from 'lodash';
 import chalk from "chalk";
+
 // local
-import { Project } from '../../project';
-import { BuildOptions, BuildDir, LibType } from "../../models";
-import { error } from "../../messages";
-import { config } from '../../config';
-import { handleArguments } from './handle-arguments.fn';
-import { init } from '../INIT';
+import { Project, ProjectFrom } from '../project';
+import { BuildOptions, BuildDir, LibType } from "../models";
+import { error } from "../messages";
+import { config } from '../config';
+import { handleArguments } from './BUILD-handle-arguments.fn';
+import { init } from './INIT';
+import { resolveProjectIfGenerated } from './BUILD-static';
 
 
 
@@ -33,9 +35,10 @@ export async function buildApp(prod = false, watch = false, outDir: BuildDir = '
 }
 
 
-export async function build(opt: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current, exit = true) {
 
-  const { watch, appBuild, args } = opt;
+export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current, exit = true) {
+
+  const { watch, appBuild, args } = buildOptions;
 
   if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
     if (appBuild) {
@@ -51,12 +54,12 @@ export async function build(opt: BuildOptions, allowedLibs: LibType[], project: 
     await init(args).project(project);
   }
 
-  await project.build(opt);
+  project = await resolveProjectIfGenerated(project, buildOptions, args)
+
+  await project.build(buildOptions);
   if (exit && !watch) {
     process.exit(0)
   }
-
-
 
 }
 
@@ -87,7 +90,7 @@ export default {
   $BUILD_APP_WATCH_PROD: (args) => buildApp(false, true, 'dist', args),
 
   $START_APP: async (args) => {
-   await Project.Current.start(args)
+    await Project.Current.start(args)
   },
 
   // aliases

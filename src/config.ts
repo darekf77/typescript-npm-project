@@ -68,7 +68,8 @@ export const config = {
     libs: [
       'angular-lib',
       'isomorphic-lib',
-      'server-lib'
+      'server-lib',
+      'workspace'
     ] as LibType[]
   },
   libsTypes: [

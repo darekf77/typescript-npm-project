@@ -35,32 +35,48 @@ export class CopyToManager {
   }
 
   public generateCopyIn(destinationLocation) {
+
     const sourceLocation = this.project.location;
-    const packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
-      encoding: 'utf8'
-    });
-    packageJson.tnp.isGenerated = true;
-
-    if (fs.existsSync(destinationLocation)) {
-      // console.log(`Removed tnp - helper from ${ dest } `)
-      rimraf.sync(destinationLocation)
+    if (this.project.isWorkspace) {
+      var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
+        encoding: 'utf8'
+      });
+      packageJson.tnp.isGenerated = true;
     }
-    fse.mkdirpSync(destinationLocation);
 
-    fse.copySync(`${sourceLocation}/`, destinationLocation, {
+
+    if (!fs.existsSync(destinationLocation)) {
+      fse.mkdirpSync(destinationLocation);
+    }
+
+    const tempLocation = `/tmp/${_.camelCase(destinationLocation)}`;
+    if (fs.existsSync(tempLocation)) {
+      rimraf.sync(tempLocation)
+    }
+    fse.mkdirpSync(tempLocation);
+
+    fse.copySync(`${sourceLocation}/`, tempLocation, {
       filter: (src: string, dest: string) => {
-        return !src.endsWith('/dist/bin') &&
-          !src.endsWith('/bin') &&
-          !/.*node_modules.*/g.test(src) &&
+        // return
+        // !src.endsWith('/dist/bin') &&
+        //   !src.endsWith('/bin') &&
+        return !/.*node_modules.*/g.test(src) &&
           !/.*tmp\-.*/g.test(src) &&
           !/.*dist\-.*/g.test(src) &&
+          !/.*\.vscode\-.*/g.test(src) &&
           !/.*bundle\-.*/g.test(src);
       }
     });
-    fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
-      spaces: 2,
-      encoding: 'utf8'
-    });
+
+    fse.moveSync(`${tempLocation}/`, destinationLocation);
+
+    if (this.project.isWorkspace) {
+      fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
+        spaces: 2,
+        encoding: 'utf8'
+      });
+    }
+
   }
 
   public copyToProjectNodeModules(destination: Project) {

@@ -9,7 +9,7 @@ import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
 
-import build from './scripts/BUILD/index';
+import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
 
 
