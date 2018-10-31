@@ -144,7 +144,9 @@ export class BaselineSiteJoin {
           if (!fs.existsSync(globPath)) {
             error(`Custombizable folder of file doesn't exist: ${globPath}
 
-            Please add: ${path.basename(globPath)} to your baseline.
+            Please add: ${path.basename(globPath)} to your baseline
+ 
+            or maybe forget ${chalk.bold('tnp install')} or ${chalk.bold('tnp link')} ?
 
             `)
           }

@@ -33,6 +33,11 @@ export class NodeModules {
         info(`Installing npm packages in ${this.project.name}... `);
         this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
       }
+      console.log('Flattering packages....')
+      if(this.project.isGenerated) {
+        this.project.run(`npm dedupe`).sync()
+      }
+      
     }
   }
   installPackage(packagePath) {
