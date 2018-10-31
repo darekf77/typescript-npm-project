@@ -89,10 +89,11 @@ export class AngularProject extends Project {
         //   "--hide-modules true",
         //   "--display none"
         // ]
+        
         this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
           {
-            output: false,
-            silence: true,
+            output: (this.env.config.name === 'local'),
+            silence: (this.env.config.name !== 'local'),
             biggerBuffer: true
           }).sync()
         // child.execSync(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, {

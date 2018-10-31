@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import * as _ from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
@@ -26,8 +27,8 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
           options: [],
           change: async (field, change: MatRadioChange) => {
             // log.i('environment changed to: ', change.value)
-            const data = await this.buildController.changeEnvironment(this.model.id, change.value).received;
-            this.model.pidChangeEnvProces = data.body.json.project.pidChangeEnvProces;
+            // const data = await this.buildController.changeEnvironment(this.model.id, change.value).received;
+            // this.model.pidChangeEnvProces = data.body.json.project.pidChangeEnvProces;
           }
         },
         expressionProperties: {

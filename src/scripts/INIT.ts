@@ -60,7 +60,6 @@ async function initialize(
     }
   }
 
-  // console.log(`Prepare environment for: ${this.name}`)
   if (!project.isStandaloneProject) {
 
     const initFromScratch = (!project.env.config || (project.isWorkspaceChildProject && !project.parent.env.config));
@@ -68,8 +67,10 @@ async function initialize(
     await project.env.init(pArgs, !initFromScratch);
 
     if (!initFromScratch) {
+      const projectName = project.parent ? `${project.parent.name}/${project.name}` : project.name
+
       console.log(`Config alredy ${chalk.bold('init')}ed tnp.
-${chalk.green('Environment for')} ${chalk.green(chalk.bold(project.name))}: ${chalk.bold(project.env.config.name)}`)
+${chalk.green('Environment for')} ${chalk.green(chalk.bold(projectName))}: ${chalk.bold(project.env.config.name)}`)
     }
 
   }

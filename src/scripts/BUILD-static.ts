@@ -5,6 +5,7 @@ import { BuildOptions } from '../models';
 import { ProjectFrom, Project } from '../project';
 import { init } from './INIT';
 import { clearConsole, run } from '../process';
+import * as rimraf from 'rimraf';
 
 
 
@@ -16,12 +17,27 @@ async function regenerateProject(project: Project, buildOptions: BuildOptions, a
     path.join(project.location, outDir, project.name) :
     path.join(project.parent.location, outDir, project.parent.name, project.name);
 
+  if (project.isWorkspace && project.isSite) {
+    const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
+    project.baseline.copytToManager.generateCopyIn(genLocationBaseline);
+  }
+
   let genProject = ProjectFrom(genLocation);
-  if (!genProject) {
+  if (project.isWorkspace) {
+    if (!genProject) {
+      project.copytToManager.generateCopyIn(genLocation);
+    }
+  } else if (project.isWorkspaceChildProject) {
+    rimraf.sync(genLocation);
     project.copytToManager.generateCopyIn(genLocation);
   }
+
   genProject = ProjectFrom(genLocation);
+  // genProject.clear()
+
   await init(args).project(genProject);
+
+
   return genProject;
 }
 

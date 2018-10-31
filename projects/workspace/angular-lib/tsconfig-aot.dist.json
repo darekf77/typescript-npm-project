@@ -14,14 +14,14 @@
     "stripInternal": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "rootDir": "./tmp/src-inlined-dist",
+    "rootDir": "./tmp/inlined-dist/src",
     "lib": [
       "es2016",
       "dom"
     ]
   },
   "files": [
-    "./tmp/src-inlined-dist/index.ts"
+    "./tmp/inlined-dist/src/index.ts"
   ],
   "exclude": [
     "node_modules",

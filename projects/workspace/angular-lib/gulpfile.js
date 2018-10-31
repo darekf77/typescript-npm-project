@@ -11,7 +11,7 @@ const exec = require('child_process').exec;
 const INLINE_TEMPLATES_DIST = {
   SRC: './components/src/**/*.ts',
   SRC_ASSETS: './components/src/**/*.png',
-  DIST: './tmp/src-inlined-dist',
+  DIST: './tmp/inlined-dist/src',
   CONFIG: {
     base: '/components/src',
     target: 'es6',
@@ -21,7 +21,7 @@ const INLINE_TEMPLATES_DIST = {
 };
 
 const INLINE_TEMPLATES_BUNDLE = _.cloneDeep(INLINE_TEMPLATES_DIST)
-INLINE_TEMPLATES_BUNDLE.DIST = './tmp/src-inlined-bundle'
+INLINE_TEMPLATES_BUNDLE.DIST = './tmp/inlined-bundle/src'
 
 /**
  * Inline external HTML and SCSS templates into Angular component files.

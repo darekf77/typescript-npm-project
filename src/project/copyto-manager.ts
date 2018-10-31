@@ -68,14 +68,18 @@ export class CopyToManager {
       }
     });
 
-    fse.moveSync(`${tempLocation}/`, destinationLocation);
+    fse.copySync(`${tempLocation}/`, destinationLocation, {
+      overwrite: true,
+      recursive: true
+    });
+    rimraf.sync(tempLocation)
 
     if (this.project.isWorkspace) {
       fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
         spaces: 2,
         encoding: 'utf8'
       });
-      fse.writeFileSync(path.join(destinationLocation, 'info.txt'), `
+      fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
         This workspace is generated.
       `)
     }

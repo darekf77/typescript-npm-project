@@ -186,7 +186,7 @@ export const watcher = {
 
 export function run(command: string,
   options?: RunOptions) {
-  console.log(`Command: "${command}" , options "${_.isObject(options) ? JSON.stringify(options) : options}"`)
+  // console.log(`Command: "${command}" , options "${_.isObject(options) ? JSON.stringify(options) : options}"`)
   if (!options) options = {};
   if (options.output === undefined) options.output = true;
   if (options.biggerBuffer === undefined) options.biggerBuffer = false;

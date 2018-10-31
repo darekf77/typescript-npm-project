@@ -109,16 +109,16 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
           // required: true,
           options: [],
           change: async (field, change: MatRadioChange) => {
-            log.i('environment changed to: ', change.value)
-            const data = await this.buildController.changeEnvironment(this.model.id, change.value).received
-            this.model.pidChangeEnvProces = data.body.json.pidChangeEnvProces;
+            // log.i('environment changed to: ', change.value)
+            // const data = await this.buildController.changeEnvironment(this.model.id, change.value).received
+            // this.model.pidChangeEnvProces = data.body.json.pidChangeEnvProces;
           }
         },
-        expressionProperties: {
-          'templateOptions.disabled': () => {
-            return !this.model || _.isNumber(this.model.pidChangeEnvProces)
-          }
-        }
+        // expressionProperties: {
+        //   'templateOptions.disabled': () => {
+        //     return !this.model || _.isNumber(this.model.pidChangeEnvProces)
+        //   }
+        // }
       },
     ] as FormlyFieldConfig[];
 
@@ -206,35 +206,35 @@ export class BuildEditorComponent implements OnInit, OnDestroy {
   }
 
   private async getEnv() {
-    const data = await this.buildController.getEnvironment(this.model.id).received;
-    // log.i('environment', data.body.json)
-    let body = data.body.json;
-    if (_.isObject(body)) {
-      body.packageJSON = undefined;
-      const n = this.objectToNode(body).children;
+    // const data = await this.buildController.getEnvironment(this.model.id).received;
+    // // log.i('environment', data.body.json)
+    // let body = data.body.json;
+    // if (_.isObject(body)) {
+    //   body.packageJSON = undefined;
+    //   const n = this.objectToNode(body).children;
 
 
-      this.nodes = n;
-      this.environmentConfig = body;
-      if (this.model && this.model.project && this.model.project.children
-        && body.workspace && body.workspace.projects
-      ) {
-        this.model.project.children.forEach(c => {
-          let s = body.workspace.projects.find(p => p.name === c.name);
-          _.merge(c, s);
-        })
-      }
-    } else {
-      log.er('tmp-environment.json is not generated')
-    }
+    //   this.nodes = n;
+    //   this.environmentConfig = body;
+    //   if (this.model && this.model.project && this.model.project.children
+    //     && body.workspace && body.workspace.projects
+    //   ) {
+    //     this.model.project.children.forEach(c => {
+    //       let s = body.workspace.projects.find(p => p.name === c.name);
+    //       _.merge(c, s);
+    //     })
+    //   }
+    // } else {
+    //   log.er('tmp-environment.json is not generated')
+    // }
 
   }
 
   private async getEnvNames() {
-    const data = await this.buildController.getEnvironmentNames(this.model.id).received;
-    // log.i('environment names', data.body.json)
-    this.environments = data.body.json.filter(e => !['local'].includes(e))
-    this.fields.find(({ key }) => key === 'environmentName').templateOptions.options = this.options;
+    // const data = await this.buildController.getEnvironmentNames(this.model.id).received;
+    // // log.i('environment names', data.body.json)
+    // this.environments = data.body.json.filter(e => !['local'].includes(e))
+    // this.fields.find(({ key }) => key === 'environmentName').templateOptions.options = this.options;
   }
 
   ngOnDestroy(): void {
