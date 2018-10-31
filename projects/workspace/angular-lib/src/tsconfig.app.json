@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "angularCompilerOptions": {
     "paths": {
-      "components": [ "../components/src/public_api.ts" ]
+      "components": [ "../components/public_api.ts" ]
     }
   },
   "compilerOptions": {
@@ -11,7 +11,7 @@
     "baseUrl": "",
     "types": [],
     "paths": {
-      "components": [ "../components/src/public_api.ts" ]
+      "components": [ "../components/public_api.ts" ]
     }
   },
   "exclude": [

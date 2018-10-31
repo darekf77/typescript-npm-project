@@ -9,11 +9,11 @@ const exec = require('child_process').exec;
  * @see  https://github.com/ludohenin/gulp-inline-ng2-template
  */
 const INLINE_TEMPLATES_DIST = {
-  SRC: './components/src/**/*.ts',
-  SRC_ASSETS: './components/src/**/*.png',
+  SRC: './components/**/*.ts',
+  SRC_ASSETS: './components/**/*.png',
   DIST: './tmp/inlined-dist/src',
   CONFIG: {
-    base: '/components/src',
+    base: '/components',
     target: 'es6',
     useRelativePaths: true,
     styleProcessor: compileSass
@@ -50,11 +50,11 @@ gulp.task('copy-assets-bundle', () => {
 });
 
 gulp.task('inline-templates-dist-watch', function () {
-  gulp.watch('./components/src/**/*.*', ['inline-templates-dist']);
+  gulp.watch('./components/**/*.*', ['inline-templates-dist']);
 });
 
 gulp.task('inline-templates-bundle-watch', function () {
-  gulp.watch('./components/src/**/*.*', ['inline-templates-bundle']);
+  gulp.watch('./components/**/*.*', ['inline-templates-bundle']);
 });
 
 /**
