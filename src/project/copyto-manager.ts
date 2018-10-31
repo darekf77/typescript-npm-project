@@ -57,14 +57,15 @@ export class CopyToManager {
 
     fse.copySync(`${sourceLocation}/`, tempLocation, {
       filter: (src: string, dest: string) => {
+        // console.log('src', src)
         // return
         // !src.endsWith('/dist/bin') &&
         //   !src.endsWith('/bin') &&
         return !/.*node_modules.*/g.test(src) &&
           !/.*tmp\-.*/g.test(src) &&
-          !/.*dist\-.*/g.test(src) &&
-          !/.*\.vscode\-.*/g.test(src) &&
-          !/.*bundle\-.*/g.test(src);
+          !/.*dist.*/g.test(src) &&
+          !/.*\.vscode.*/g.test(src) &&
+          !/.*bundle.*/g.test(src);
       }
     });
 
