@@ -75,6 +75,9 @@ export class CopyToManager {
         spaces: 2,
         encoding: 'utf8'
       });
+      fse.writeFileSync(path.join(destinationLocation, 'info.txt'), `
+        This workspace is generated.
+      `)
     }
 
   }

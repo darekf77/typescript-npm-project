@@ -200,7 +200,7 @@ export abstract class Project {
 
   get isGenerated() {
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
-      (this.isWorkspace || this.packageJson.isGenerated)
+      (this.isWorkspace && this.packageJson.isGenerated)
   }
 
   get isTnp() {
@@ -238,6 +238,7 @@ export abstract class Project {
   async start(args?: string) {
 
     if (this.isWorkspace && !this.isGenerated) {
+
       const genLocationWOrkspace = path.join(this.location, config.folder.dist, this.name);
       const genWorkspace = ProjectFrom(genLocationWOrkspace)
       if (!genWorkspace) {
@@ -245,7 +246,8 @@ export abstract class Project {
 Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }
-      await genWorkspace.start(args);
+
+      genWorkspace.run(`tnp start ${args}`).sync()
       return;
     }
 

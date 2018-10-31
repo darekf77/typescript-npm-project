@@ -29,10 +29,11 @@ export function clear(args, all = false) {
 
   clearConsole()
   const project = Project.Current
-  project.clear(all, recrusive)
   if (generated) {
     clearGenerated(project, all, recrusive, config.folder.dist)
-    clearGenerated(project, all, recrusive, config.folder.bundle)
+    // clearGenerated(project, all, recrusive, config.folder.bundle)
+  } else {
+    project.clear(all, recrusive)
   }
 
   process.exit(0)

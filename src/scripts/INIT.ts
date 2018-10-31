@@ -69,7 +69,7 @@ async function initialize(
 
     if (!initFromScratch) {
       console.log(`Config alredy ${chalk.bold('init')}ed tnp.
-${chalk.green('Environment')}: ${chalk.bold(project.env.config.name)}`)
+${chalk.green('Environment for')} ${chalk.green(chalk.bold(project.name))}: ${chalk.bold(project.env.config.name)}`)
     }
 
   }

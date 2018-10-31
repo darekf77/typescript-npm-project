@@ -6,6 +6,7 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
+- should be ONLY ONE VERION of (NG2-REST, MORPHI and other...)
 - id, shoud be with undefined (TODO temp soluition)
 - class properties: arrays and object can't have defult propty
  - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
