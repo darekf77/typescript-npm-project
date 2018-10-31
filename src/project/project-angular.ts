@@ -104,8 +104,8 @@ export class AngularProject extends Project {
         baseHref = `--${baseHref}`
         this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`,
           {
-            output: false,
-            silence: true,
+            output: (this.env.config.name === 'local'),
+            silence: (this.env.config.name !== 'local'),
             biggerBuffer: true
           }).sync()
       }
