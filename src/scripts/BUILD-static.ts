@@ -28,7 +28,7 @@ async function regenerateProject(project: Project, buildOptions: BuildOptions, a
 export async function resolveProjectIfGenerated(project: Project, buildOptions: BuildOptions, args: string): Promise<Project> {
   const { watch } = buildOptions;
 
-  if (!watch && !project.isGenerated) {
+  if (!watch && !project.isGenerated && !project.isStandaloneProject) {
 
     // run('clear').sync()
     // console.log('REGENERATING PROJECT!')

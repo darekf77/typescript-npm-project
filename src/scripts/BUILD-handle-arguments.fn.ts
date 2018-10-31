@@ -5,7 +5,7 @@ import { Project } from '../project';
 import { BuildDir, EnvironmentName } from "../models";
 import { info, error } from "../messages";
 import * as path from 'path';
-import { BuildArgs } from './build-args.model';
+import { BuildArgs } from './BUILD-args.model';
 import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
 import { config } from '../config';
 
