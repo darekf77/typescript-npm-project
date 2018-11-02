@@ -228,8 +228,8 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
 }
 
 
-let m = new TNP_PROJECT()
-let d = new TnpProjectController(undefined);
+// let m = new TNP_PROJECT()
+// let d = new TnpProjectController(undefined);
 
-let ext = d.browser.extended(m)
-ext.getEnvironmentNames()
+// let ext = d.browser.extended(m)
+// ext.getEnvironmentNames()

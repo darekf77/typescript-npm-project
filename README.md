@@ -6,7 +6,9 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
-- should be ONLY ONE VERION of (NG2-REST, MORPHI and other...)
+- issue with angular loadChildren: './components/+preview-buildtnpprocess/preview-buildtnpprocess.module#PreviewBuildTnpProcesssModule'
+     => just change name to wrong... reload... change to  normal and it will be ok !
+- should be ONLY ONE VERION of (NG2-REST, MORPHI, RXJS and other...)
 - id, shoud be with undefined (TODO temp soluition)
 - class properties: arrays and object can't have defult propty
  - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
