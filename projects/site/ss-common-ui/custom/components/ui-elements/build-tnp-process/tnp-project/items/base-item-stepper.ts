@@ -26,4 +26,5 @@ export class BaseItemStepperProcessBuildComponent implements OnInit {
         public matDialog: MatDialog) { }
 
     ngOnInit() { }
+
 }

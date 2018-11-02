@@ -36,6 +36,17 @@ export class TnpProjectComponent implements OnInit {
     }
   }
 
+  ngClass(index: number) {
+    if (this.model.isWorkspace) {
+      return {
+        'bold': (this.selectedIndex === index)
+      };
+    }
+    return {
+      'bold': (this.selectedIndex === index - 1)
+    };
+  }
+
   selectionChange(e: StepperSelectionEvent) {
     this.selectedIndex = e.selectedIndex;
   }

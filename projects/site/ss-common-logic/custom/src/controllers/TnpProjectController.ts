@@ -16,11 +16,15 @@ import * as entities from '../entities';
 import * as controllers from '../controllers';
 import { PROGRESS_BAR_DATA, EnvironmentName } from 'tnp-bundle';
 import { SelfUpdate, TNP_PROJECT } from '../entities/TNP_PROJECT';
+import { Subject } from 'rxjs/Subject';
+
+
 
 
 @ENDPOINT()
 @CLASSNAME('TnpProjectController')
 export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJECT> {
+
 
   @BaseCRUDEntity(entities.TNP_PROJECT) public entity: entities.TNP_PROJECT;
 
@@ -223,3 +227,9 @@ export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJ
 
 }
 
+
+let m = new TNP_PROJECT()
+let d = new TnpProjectController(undefined);
+
+let ext = d.browser.extended(m)
+ext.getEnvironmentNames()
