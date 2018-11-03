@@ -259,7 +259,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }
 
-      genWorkspace.run(`tnp start ${args}`).sync()
+      genWorkspace.run(`tnp start ${args}`).async()
       return;
     }
 
