@@ -5,26 +5,14 @@ import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.compo
 import { routes } from './preview-buildtnpprocess.routes';
 import { RouterModule } from '@angular/router';
 import { BuildTnpProcessModule } from 'components';
-
-
-import { NgxsModule, Select, Selector } from '@ngxs/store'
-import { Action, State, StateContext } from '@ngxs/store'
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin'
-import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin'
-import { TNP_PROJECT_STATE } from './ngxs-test';
-
-
+import { BuildService } from 'ss-common-logic/browser/services/BuildService';
+import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
 
 
 const angularModules = [
   CommonModule,
   FormsModule,
-  RouterModule.forChild(routes),
-  NgxsModule.forRoot([
-    TNP_PROJECT_STATE
-  ]),
-  NgxsReduxDevtoolsPluginModule.forRoot(),
-  NgxsLoggerPluginModule.forRoot()
+  RouterModule.forChild(routes)
 ];
 
 @NgModule({
@@ -35,6 +23,10 @@ const angularModules = [
   exports: [
     PreviewBuildtnpprocessComponent
   ],
-  declarations: [PreviewBuildtnpprocessComponent]
+  declarations: [PreviewBuildtnpprocessComponent],
+  providers: [
+    BuildController,
+    BuildService
+  ]
 })
 export class PreviewBuildTnpProcesssModule { }

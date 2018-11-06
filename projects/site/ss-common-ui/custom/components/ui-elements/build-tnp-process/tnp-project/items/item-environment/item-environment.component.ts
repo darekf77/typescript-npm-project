@@ -20,29 +20,29 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
   async ngOnInit() {
 
     const envField = {
-      key: 'environmentName',
-      type: 'radio',
-      templateOptions: {
-        // label: 'Radio',
-        placeholder: 'Environment',
-        // description: 'Description',
-        required: true,
-        options: [],
-        change: async (field, change: MatRadioChange) => {
-          log.i('environment changed to: ', change.value);
-          const data = await this.projectController.changeEnvironment(this.model.id, change.value).received;
-          this.model.pidChangeEnvProces = data.body.json.pidChangeEnvProces;
-        }
-      },
-      expressionProperties: {
-        'templateOptions.disabled': () => {
-          return !this.model || _.isNumber(this.model.pidChangeEnvProces);
-        }
-      }
+      // key: 'environmentName',
+      // type: 'radio',
+      // templateOptions: {
+      //   // label: 'Radio',
+      //   placeholder: 'Environment',
+      //   // description: 'Description',
+      //   required: true,
+      //   options: [],
+      //   change: async (field, change: MatRadioChange) => {
+      //     log.i('environment changed to: ', change.value);
+      //     const data = await this.projectController.changeEnvironment(this.model.id, change.value).received;
+      //     this.model.pidChangeEnvProces = data.body.json.pidChangeEnvProces;
+      //   }
+      // },
+      // expressionProperties: {
+      //   'templateOptions.disabled': () => {
+      //     return !this.model || _.isNumber(this.model.pidChangeEnvProces);
+      //   }
+      // }
     };
 
     this.fields = [
-      envField
+      // envField
     ];
 
     // const options = await this.projectController.b getEnvironmentNames();

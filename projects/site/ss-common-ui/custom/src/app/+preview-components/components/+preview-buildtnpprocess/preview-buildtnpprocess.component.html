@@ -1,18 +1,8 @@
-<div>
-  heloo ngxs
+<div *ngIf="model$ | async; else loader; let model">
 
-  <input [(ngModel)]="model"
-         type="text"
-         (keyup.enter)="add()">
-
-
-  <ul *ngIf="projects$ | async; else loader; let projects">
-    <li *ngFor="let p of projects"> {{p.name}} </li>
-  </ul>
-
-  <!-- <app-build-tnp-process [model]="model" ></app-build-tnp-process> -->
+  <app-build-tnp-process [model]="model"></app-build-tnp-process>
 </div>
 
-<ng-template #loader >
-  ...loadin
+<ng-template #loader>
+  ..loading model
 </ng-template>

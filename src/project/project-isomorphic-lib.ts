@@ -113,6 +113,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       }
     }
 
+    console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
     new IsomoprhicBuild({
       watch,
       foldersPathes: {
@@ -123,9 +124,10 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       },
       build: {
         generateDeclarations: !this.isWorkspaceChildProject, /// TODO QUICK_FIX
-        otherIsomorphicLibs: isomorphicNames
+        otherIsomorphicLibs: isomorphicNames,
+        environmentFileName: config.file.tnpEnvironment_json
       }
-    }).init(this.location)
+    } as any).init(this.location)
 
     this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
   }

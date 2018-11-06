@@ -25,7 +25,10 @@ Helpers.checkEnvironment({
     { name: 'http-server' },
     { name: 'increase-memory-limit' },
     { name: 'bower' },
-    { name: 'fkill', installName:'fkill-cli' }
+    { name: 'fkill', installName:'fkill-cli' },
+    { name: 'mocha' },
+    // { name: 'chai' },
+    { name: 'ts-node' }
   ],
   programs: [
   //   {

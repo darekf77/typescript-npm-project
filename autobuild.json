@@ -2,6 +2,7 @@
   "dariuszs-mbp-2.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
   "Dariuszs-MBP-2": "Dariuszs-MacBook-Pro-2.local",
   "Dariuszs-MacBook-Pro-3.local": "Dariuszs-MacBook-Pro-2.local",
+  "dariuszs-mbp-3.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
   "Dariuszs-MacBook-Pro-2.local": {
     "darekf": {
       "autoreleases": [
@@ -65,7 +66,7 @@
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/site",
             "--copyto  /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
             "--copyto /Users/darekf/projects/npm/tsc-npm-project/projects/site/backup/repositories/1-tsc-npm-project/projects/baseline",
-            "--copyto  /Users/darekf/projects/npm/tsc-npm-project"
+            "--copyto /Users/darekf/projects/npm/tsc-npm-project"
           ]
         }
       ]
