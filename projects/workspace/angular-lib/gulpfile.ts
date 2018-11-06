@@ -4,9 +4,10 @@ const sass = require('node-sass');
 const gutil = require('gulp-util');
 const through = require('through2');
 const inlineTemplates = require('gulp-inline-ng2-template');
-console.log('inlineTemplates', inlineTemplates)
 const exec = require('child_process').exec;
 import * as fs from 'fs';
+import * as path from 'path';
+import { ProjectFrom, config } from 'tnp-bundle'
 
 /**
  * Inline templates configuration.
@@ -27,15 +28,37 @@ const INLINE_TEMPLATES_DIST = {
 const INLINE_TEMPLATES_BUNDLE = _.cloneDeep(INLINE_TEMPLATES_DIST)
 INLINE_TEMPLATES_BUNDLE.DIST = './tmp/inlined-bundle/src'
 
-// gulp.task('isomorphic-pathes-dist', () => {
-//   return gulp.src(INLINE_TEMPLATES_DIST.SRC_ASSETS)
-//     .pipe(function (ss) {
-//       console.log('ss')
-//     })
-// })
+interface IsomorphicOptions {
+  currentProjectName?: string;
+  isWorkspaceChildProject: boolean;
+  localIsomorphicLibsNames: string[];
+}
+
+function getIsomorphiOptions(): IsomorphicOptions {
+  const project = ProjectFrom(process.cwd());
+  if (project.isWorkspaceChildProject) {
+
+    const workspace = project.parent;
+    const localIsomorphicLibsNames = workspace.children
+      .filter(c => c.type === 'isomorphic-lib')
+      .map(c => c.name)
+    return {
+      currentProjectName: project.name,
+      isWorkspaceChildProject: true,
+      localIsomorphicLibsNames
+    }
+
+  }
+  return {
+    isWorkspaceChildProject: false,
+    localIsomorphicLibsNames: []
+  }
+}
 
 
-function replaceIsomprhicModules(options?) {
+function replaceIsomprhicModules(options: IsomorphicOptions) {
+  const { isWorkspaceChildProject, localIsomorphicLibsNames, currentProjectName } = options;
+  console.log('localIsomorphicLibsNames', localIsomorphicLibsNames)
   return through.obj(function (file: File, enc, cb) {
     if (file.isNull()) {
       return cb(null, file);
@@ -45,8 +68,27 @@ function replaceIsomprhicModules(options?) {
       return cb(new gutil.PluginError(replaceIsomprhicModules.name.toUpperCase(), 'Streaming not supported'));
     }
 
-    console.log('file', file.path)
-    process.nextTick(cb);
+    if (isWorkspaceChildProject) {
+      let fileContent = file.contents.toString()
+      localIsomorphicLibsNames.forEach(libname => {
+        const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
+        // console.log('regex source', regex.source)
+        // console.log('replace Here ', fileContent)
+        fileContent = fileContent.replace(regex, `${libname}/tmp-for-${currentProjectName}-${config.folder.browser}/`)
+      })                // import { ... } from 'ss-common-logic/tmp-for-ss-common-ui-module'
+
+      // console.log('write file here ', file.path)
+      fs.writeFile(file.path, fileContent, {
+        encoding: 'utf8'
+      }, (err) => {
+        if (err) {
+          return cb(new gutil.PluginError(replaceIsomprhicModules.name.toUpperCase(), `Error during save of ${file.path}`));
+        }
+        process.nextTick(cb);
+      })
+    } else {
+      process.nextTick(cb);
+    }
   });
 };
 
@@ -60,7 +102,7 @@ gulp.task('inline-templates-dist', ['copy-assets-dist'], () => {
   return gulp.src(INLINE_TEMPLATES_DIST.SRC)
     .pipe(inlineTemplates(INLINE_TEMPLATES_DIST.CONFIG))
     .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST))
-    .pipe(replaceIsomprhicModules())
+    .pipe(replaceIsomprhicModules(getIsomorphiOptions()))
 });
 
 gulp.task('copy-assets-dist', () => {
@@ -109,7 +151,6 @@ function compileSass(path, ext, file, callback) {
 
 
 //#region file interface
-
 
 export interface File {
   /**
@@ -407,4 +448,4 @@ interface SymbolicFile extends NullFile {
   isSymbolic(): true;
 }
 
-//#region
+//#endregion

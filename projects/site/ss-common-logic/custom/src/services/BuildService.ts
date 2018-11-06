@@ -18,7 +18,7 @@ export class BuildService {
   private async refreshModel(id: number, config: ModelDataConfig) {
 
 
-    //#region @ENV.name === 'prod'
+    //#region @cutExpression ENV.currentProjectName === 'ss-common-ui'
     if (ENV.currentProjectName === 'ss-common-ui') {
       return mockBuild()
     }
@@ -43,7 +43,7 @@ export class BuildService {
 }
 
 
-//#region @ENV.currentProjectName === 'ss-common-ui'
+//#region @cutExpression ENV.currentProjectName === 'ss-common-ui'
 function mockBuild() {
   const build = new BUILD();
 

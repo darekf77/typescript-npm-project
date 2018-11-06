@@ -6,10 +6,11 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
 // third part
-import { IsomoprhicBuild } from "morphi";
+
 import { BaseProjectLib } from "./base-project-lib";
 import { HelpersLinks } from '../helpers-links';
 import { config } from '../config';
+import { IsomoprhicBuildExtended } from '../build/isomorphic';
 
 
 
@@ -113,8 +114,8 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       }
     }
 
-    console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
-    new IsomoprhicBuild({
+    // console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
+    new IsomoprhicBuildExtended({
       watch,
       foldersPathes: {
         dist: outDir as any

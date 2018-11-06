@@ -33,7 +33,7 @@ export class ProjectAngularLib extends BaseProjectLib {
 
   projectSpecyficFiles() {
     return super.projectSpecyficFiles().concat([
-      'gulpfile.js',
+      'gulpfile.ts',
       'ng-package.json',
       'tsconfig-aot.bundle.json',
       'tsconfig-aot.dist.json',

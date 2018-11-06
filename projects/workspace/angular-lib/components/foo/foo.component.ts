@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 
+// import {  } from 'isomorphic-lib/module/asd/asdasd/bbb'
+// import {  } from 'isomorphic-lib/module/dupa/asd'
+
 @Component({
   selector: 'my-foo',
   templateUrl: 'foo.components.html',
@@ -9,4 +12,4 @@ export class FooComponent {
 }
 
 
- 
+
