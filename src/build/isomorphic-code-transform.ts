@@ -1,10 +1,16 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import { CodeTransform } from 'morphi/build-tool/isomorphic/code-transform';
+import { EnvConfig } from '../models';
+import { nearestProjectTo } from '../helpers';
+import { Project } from '../project';
+import config from '../config';
 
 export class CodeTransformExtended extends CodeTransform {
 
-
+  public static ENV: EnvConfig;
   private findReplacements(stringContent: string, pattern, fun, ) {
 
     const replacements = [];
@@ -13,7 +19,7 @@ export class CodeTransformExtended extends CodeTransform {
       const value = line.substr(line.search(pattern) + pattern.length).trim();
       // console.log('value: ' + value)
       if (fun(value.replace(/(\'|\")/g, ''))) {
-        // console.log('MATCH!: ' + value)
+        console.log('MATCH!: ' + value)
         replacements.push(`${pattern}${value}\n`);
       }
     })
@@ -40,21 +46,99 @@ export class CodeTransformExtended extends CodeTransform {
     return this.replaceRegionsWith(stringContent, replacementPatterns);
   }
 
-  // replaceRegionsForIsomorphicLib() {
-  //   const isWithEnv = _.isObject(CodeTransform.ENV);
 
-  //   this.rawContent = this.replaceRegionsWith(this.rawContent, [
+  protected rawContents: { [projectLibName: string]: string } = {};
+  replaceRegionsForIsomorphicLibWithEnvironment(ENV, projectLibName?: string) {
+    const isWithEnv = _.isObject(ENV);
 
-  //     ["@backendFunc", `return undefined;`],
-  //     "@backend",
+    if (_.isString(projectLibName)) {
 
-  //     ["@cutExpression ", function (e, expression) {
-  //       return isWithEnv && eval(`(function(ENV){ ${expression} })(e)`);
-  //     }]
+      this.rawContents[projectLibName] = this.replaceRegionsWith(this.rawContent, [
 
-  //   ], '')
-  //   return this;
-  // }
+        ["@backendFunc", `return undefined;`],
+        "@backend",
+
+        ["@cutExpression ", function (expression) {
+          return isWithEnv && eval(`(function(ENV){ ${expression} })(e)`);
+        }]
+
+      ], '')
+
+    }
+
+    this.rawContent = this.replaceRegionsWith(this.rawContent, [
+
+      ["@backendFunc", `return undefined;`],
+      "@backend",
+
+      ["@cutExpression ", function (expression) {
+        return isWithEnv && eval(`(function(ENV){ ${expression} })(e)`);
+      }]
+
+    ], '')
+    return this;
+  }
+
+  project: Project;
+
+  envForSpecyficEnvironment(angularLibProjectName) {
+    const res: EnvConfig = _.cloneDeep(CodeTransformExtended.ENV);
+    res.name = angularLibProjectName;
+    return res;
+  }
+
+  replaceRegionsForIsomorphicLib() {
+
+    this.rawContents = {};
+
+    if (!this.project) {
+      this.project = nearestProjectTo(this.filePath);
+    }
+
+    if (this.project && this.project.isWorkspaceChildProject) {
+      const angularLibs = this.project
+        .parent
+        .children
+        .filter(c => c.type === 'angular-lib')
+        .map(c => c.name)
+        .forEach(projectLibName => {
+          this.replaceRegionsForIsomorphicLibWithEnvironment(this.envForSpecyficEnvironment(projectLibName), projectLibName)
+        })
+    }
+
+    const e = CodeTransformExtended.ENV;
+    return this.replaceRegionsForIsomorphicLibWithEnvironment(CodeTransformExtended.ENV);
+  }
+
+  saveOrDelete() {
+    // console.log('saving ismoprhic file', this.filePath)
+    if (this.isEmpty) {
+      const deletePath = this.filePath;
+      // console.log(`Delete empty: ${deletePath}`)
+      fse.unlinkSync(deletePath)
+
+      Object.keys(this.rawContents).forEach(projectLibName => {
+        const p = this.filePath.replace(new RegExp(`/${this.project.name}/${config.folder.dist}/`),
+          `/${this.project.name}/tmp-src-for-${projectLibName}-${config.folder.browser}/`)
+        fse.unlinkSync(p)
+
+      })
+    } else {
+      // console.log(`Not empty: ${this.filePath}`)
+      fs.writeFileSync(this.filePath, this.rawContent, 'utf8');
+
+      Object.keys(this.rawContents).forEach(projectLibName => {
+        const p = this.filePath.replace(new RegExp(`/${this.project.name}/${config.folder.dist}/`),
+          `/${this.project.name}/tmp-src-for-${projectLibName}-${config.folder.browser}/`)
+        fs.writeFileSync(p, this.rawContents[projectLibName], 'utf8');
+
+      })
+
+    }
+
+
+
+  }
 
 }
 

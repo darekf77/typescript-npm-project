@@ -55,5 +55,6 @@
     "https://avatars1.githubusercontent.com/u/36506552?s=400&u=380c1c398a14720b9f140f8e526b1e052c9e9699&v=4"
   ],
   "favorites.sortDirection": "ASC",
-  "favorites.groupsFirst": true
+  "favorites.groupsFirst": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

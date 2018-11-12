@@ -16,17 +16,19 @@ export class IsomoprhicBuildExtended extends IsomoprhicBuild {
 
   init(processCWD) {
 
-    // if (_.isString(this.BUILD.environmentFileName)) {
-    //   const envConfigPath = path.join(processCWD, this.BUILD.environmentFileName);
-    //   if (fs.existsSync(envConfigPath)) {
-    //     try {
-    //       this.CodeTransform.ENV = fse.readJsonSync(envConfigPath, { encoding: 'utf8' })
-    //       // console.log(`Project with environment file: ${this.BUILD.environmentFileName}`,this.CodeTransform.ENV)
-    //     } catch (error) {
-    //       console.warn(`Wrong environment file in ${envConfigPath}`)
-    //     }
-    //   }
-    // }
+    if (_.isString(this.BUILD.environmentFileName)) {
+      const envConfigPath = path.join(processCWD, this.BUILD.environmentFileName);
+      if (fs.existsSync(envConfigPath)) {
+        try {
+          CodeTransformExtended.ENV = fse.readJsonSync(envConfigPath, { encoding: 'utf8' })
+          // console.log(`Project with environment file: ${this.BUILD.environmentFileName}`,this.CodeTransform.ENV)
+        } catch (error) {
+          console.warn(`Wrong environment file in ${envConfigPath}`)
+        }
+      }
+    }
+
+
     super.init(processCWD)
   }
 
