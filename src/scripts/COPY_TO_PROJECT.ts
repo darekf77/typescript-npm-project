@@ -4,15 +4,24 @@ import { Project, BaseProjectLib, ProjectFrom } from '../project';
 import { error, info } from '../messages';
 import chalk from 'chalk';
 
-function copyto(args: string) {
+function copy(destLocaiton) {
+
   const currentLib = (Project.Current as BaseProjectLib);
-  const destLocaiton = _.first(args.split(' ').filter(a => a.trim() !== ''));
   const destination = ProjectFrom(destLocaiton);
   if (!destination) {
     error(`Incorect project in: ${destLocaiton}`)
   }
   currentLib.copytToManager.copyToProjectNodeModules(destination);
-  info(`Current project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
+  info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
+}
+
+function copyto(args: string) {
+
+  const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
+
+  destLocaitons.forEach(c => copy(c));
+
+
   process.exit(0)
 }
 

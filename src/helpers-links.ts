@@ -6,7 +6,7 @@ import * as os from "os";
 
 import { error} from "./messages";
 import { run } from "./process";
-import { Helpers } from "morphi";
+import { HelpersBackend } from "morphi";
 
 export namespace HelpersLinks {
 
@@ -41,7 +41,7 @@ export namespace HelpersLinks {
 
     export function createLink(target, link) {
         // console.log('Create link!')
-        return run(Helpers.createLink(target, link)).sync()
+        return run(HelpersBackend.createLink(target, link)).sync()
     }
 
 }

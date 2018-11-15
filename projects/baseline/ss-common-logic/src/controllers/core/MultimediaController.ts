@@ -20,7 +20,7 @@ import * as bcrypt from 'bcrypt';
 import * as graph from 'fbgraph';
 import * as path from 'path';
 import { UploadedFile } from "express-fileupload";
-import { getRecrusiveFilesFrom } from 'morphi';
+import { HelpersBackend } from 'morphi';
 //#endregion
 
 
@@ -96,7 +96,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
   private discover(folderName, type: MultimediaType) {
     const res: MULTIMEDIA[] = []
-    const files: string[] = getRecrusiveFilesFrom(folderName);
+    const files: string[] = HelpersBackend.getRecrusiveFilesFrom(folderName);
     files.forEach(name => {
       let m = this.db.MULTIMEDIA.create({
         name,

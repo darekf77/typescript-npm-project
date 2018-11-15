@@ -279,7 +279,7 @@ export class FilesRecreator {
   private controllersTemplateSingleton(srcPath, controllerRelativePath) {
     let controller = path.basename(controllerRelativePath);
     return `
-    ${controller}: getSingleton<${controller}>(${controller}),`
+    ${controller}: Helpers.getSingleton<${controller}>(${controller}),`
   }
 
   private generateEntityTs() {
@@ -390,7 +390,7 @@ export class FilesRecreator {
 
       //#${'region'} @backend
 
-      import { getSingleton } from "morphi";
+      import { Helpers } from "morphi";
       import * as _ from 'lodash'
 
       export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {

@@ -10,7 +10,7 @@ import { ClassHelper, getWebpackEnv } from "../helpers";
 import { BaseProjectLib } from "./base-project-lib";
 import { HelpersLinks } from '../helpers-links';
 import { config } from '../config';
-import { IsomoprhicBuildExtended } from '../build/isomorphic';
+import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 
 
 
@@ -115,21 +115,12 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
 
     // console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
-    new IsomoprhicBuildExtended({
-      watch,
-      foldersPathes: {
-        dist: outDir as any
-      },
-      toolsPathes: {
-        tsc: 'npm-run tsc'
-      },
-      build: {
-        generateDeclarations: !this.isWorkspaceChildProject, /// TODO QUICK_FIX
-        otherIsomorphicLibs: isomorphicNames,
-        environmentFileName: config.file.tnpEnvironment_json
-      }
-    } as any).init(this.location)
 
+    if(watch) {
+      new IncrementalBuildProcessExtended(this, this.buildOptions).startAndWatch('isomorphic compilation (watch mode)')
+    } else {
+      new IncrementalBuildProcessExtended(this, this.buildOptions).start('isomorphic compilation')
+    }
     this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
   }
 

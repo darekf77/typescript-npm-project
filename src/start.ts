@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
 import { run as runCommand } from "./process";
-import { Helpers } from "morphi";
+import { HelpersBackend } from "morphi";
 import { match } from './helpers';
 import { isString } from 'util';
 import chalk from 'chalk';
@@ -13,7 +13,7 @@ import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
 
 
-Helpers.checkEnvironment({
+HelpersBackend.checkEnvironment({
   npm: [
     { name: 'watch', version: '1.0.2' },
     { name: 'check-node-version' },
