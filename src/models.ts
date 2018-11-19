@@ -34,6 +34,7 @@ export interface IBuildOptions {
   outDir: BuildDir;
   watch?: boolean;
   args?: string;
+  compileOnce?: boolean;
   appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
@@ -46,10 +47,13 @@ export class BuildOptions implements IBuildOptions {
   outDir: BuildDir;
   watch?: boolean;
   args?: string;
+  genOnlyClientCode?: boolean;
   appBuild?: boolean;
   baseHref?: string;
+  compileOnce?: boolean;
   onlyWatchNoBuild?: boolean;
   copyto?: Project[];
+  forClient?: Project[];
   additionalIsomorphicLibs?: string[];
 
   public static fromRaw(options: IBuildOptions): BuildOptions {

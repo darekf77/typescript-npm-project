@@ -15,10 +15,10 @@ import { resolveProjectIfGenerated } from './BUILD-static';
 
 export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
 
-  const { copyto, onlyWatchNoBuild } = handleArguments(args, outDir, watch);
+  const { copyto, onlyWatchNoBuild, forClient, genOnlyClientCode, compileOnce } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
-    prod, watch, outDir, copyto, onlyWatchNoBuild, args
+    prod, watch, outDir, forClient, copyto, onlyWatchNoBuild, args, genOnlyClientCode, compileOnce
   };
   await build(options, config.allowedTypes.libs)
 }

@@ -1,4 +1,6 @@
 //#region @backend
+import * as _ from 'lodash';
+
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut';
 import { EnvConfig } from '../models';
@@ -29,23 +31,40 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     cwd: string) {
 
     super(sourceOut, outFolder, location, cwd)
+
+    this.initCodeCut.call(this, ENV);
   }
 
-  codeCuttFn(cutIftrue = true, e: EnvConfig) {
-    return function (expression: string) {
-      const res = eval(`(function(ENV){ return (${expression.trim()}); })(e)`);
+  codeCuttFn(cutIftrue: boolean) {
+    return function (expression: string, e: EnvConfig) {
+      const exp = `(function(ENV){
+        // console.log(typeof ENV)
+        return ${expression.trim()}
+      })(e)`;
+      // console.log(exp)
+      const res = eval(exp);
       return cutIftrue ? res : !res;
     }
   }
 
+  customEnv: EnvConfig;
   initCodeCut() {
+
+    const env = arguments[0];
+    if(!_.isObject(env)) {
+      return;
+    }
+    this.customEnv = _.merge(env, { currentProjectName: this.module });
+    // console.log('customEnv', this.customEnv)
+
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {
       replacements: [
         ["@backendFunc", `return undefined;`],
         "@backend",
-        // ["@cutRegionIfTrue", this.codeCuttFn(true, this.ENV)],
-        // ["@cutRegionIfFalse", this.codeCuttFn(false, this.ENV)]
-      ]
+        ["@cutRegionIfTrue", this.codeCuttFn(true)],
+        ["@cutRegionIfFalse", this.codeCuttFn(false)]
+      ],
+      env: this.customEnv
     })
   }
 

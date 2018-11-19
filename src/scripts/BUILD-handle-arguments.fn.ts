@@ -8,7 +8,8 @@ import * as path from 'path';
 import { BuildArgs } from './BUILD-args.model';
 import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
 import { config } from '../config';
-
+import { ProjectFrom } from '../index';
+import chalk from 'chalk';
 
 
 export function handleArguments(args: string, outDir: BuildDir, watch: boolean) {
@@ -32,6 +33,25 @@ export function handleArguments(args: string, outDir: BuildDir, watch: boolean) 
 
   // console.log('argsObj', argsObj)
   // process.exit(0)
+  let forClient: Project[] = [];
+
+  if (argsObj.forClient) {
+    if (_.isString(argsObj.forClient)) {
+      argsObj.forClient = [argsObj.forClient]
+    }
+    if (Project.Current.isWorkspaceChildProject) {
+      forClient = argsObj.forClient.map(projectParentChildName => {
+        const proj = Project.Current.parent.children.find(c => c.name === projectParentChildName)
+        if (!proj) {
+          error(`${chalk.bold('--forClient argument')} : Cannot find module ${chalk.bold(projectParentChildName)}`);
+        }
+        info(`Build only for client ${chalk.bold(projectParentChildName)}`)
+        return proj;
+      })
+    }
+
+  }
+
   let copyto: Project[] = []
   if (argsObj.copyto) {
     if (_.isString(argsObj.copyto)) {
@@ -67,8 +87,11 @@ tnp build:${outDir}${watch ? ':watch' : ''} --copyto "<windows path here>"`)
     onlyWatchNoBuild = true;
   }
 
+  let genOnlyClientCode = !!argsObj.genOnlyClientCode;
+  let compileOnce = !!argsObj.compileOnce;
+
   return {
-    copyto, onlyWatchNoBuild  //, baseHref
+    copyto, onlyWatchNoBuild, forClient, genOnlyClientCode, compileOnce  //, baseHref
   }
 }
 //#endregion
