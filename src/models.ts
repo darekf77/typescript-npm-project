@@ -47,13 +47,27 @@ export class BuildOptions implements IBuildOptions {
   outDir: BuildDir;
   watch?: boolean;
   args?: string;
+
+  /**
+   * Do not generate backend code
+   */
   genOnlyClientCode?: boolean;
   appBuild?: boolean;
   baseHref?: string;
+
+  /**
+   * In watch mode compile once and exit
+   */
   compileOnce?: boolean;
   onlyWatchNoBuild?: boolean;
   copyto?: Project[];
+
+  /**
+   * For isomorphic-lib
+   * Specyify build targets as workspace childs projects names
+   */
   forClient?: Project[];
+
   additionalIsomorphicLibs?: string[];
 
   public static fromRaw(options: IBuildOptions): BuildOptions {
