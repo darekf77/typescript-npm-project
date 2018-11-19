@@ -84,6 +84,7 @@ export class FilesRecreator {
           'dist*',
           'bundle*',
           'browser',
+          'browser*',
           'backup',
           'module',
           'www'

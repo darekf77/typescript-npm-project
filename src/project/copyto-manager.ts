@@ -129,7 +129,7 @@ export class CopyToManager {
               config.folder.node_modules,
               this.project.isTnp ? config.file.tnpBundle : this.project.name,
               specificFile));
-            // console.log(`Copy file !: ${monitoredSpecificFile} to ${projectOudFileDest} `)
+            console.log(`Copy file !: ${monitoredSpecificFile} to ${projectOudFileDest} `)
             fse.copySync(monitoredSpecificFile, projectOudFileDest);
 
           } else {
