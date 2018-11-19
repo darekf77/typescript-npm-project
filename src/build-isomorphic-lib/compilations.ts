@@ -1,4 +1,4 @@
-
+//#region @backend
 import { BroswerCompilation, OutFolder } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut';
 import { EnvConfig } from '../models';
@@ -38,3 +38,4 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
 
 }
+//#endregion

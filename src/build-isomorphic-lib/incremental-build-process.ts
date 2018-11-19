@@ -1,4 +1,4 @@
-
+//#region @backend
 import * as path from 'path';
 import { BroswerForModuleCompilation } from './compilations';
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
@@ -24,7 +24,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         const cwd = project.location;
 
         // this.resolveModulesLocations
-        //     .forEach(moduleName => {                
+        //     .forEach(moduleName => {
         //         let browserOutFolder = `${config.folder.browser}-for-${moduleName}`
         //         if (outFolder === 'bundle') {
         //             browserOutFolder = path.join(outFolder, browserOutFolder);
@@ -46,3 +46,4 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
 }
 
+//#endregion
