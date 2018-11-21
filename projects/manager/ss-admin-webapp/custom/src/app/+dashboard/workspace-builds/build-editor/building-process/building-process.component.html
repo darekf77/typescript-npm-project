@@ -1,0 +1,69 @@
+<app-form-wrapper-material [showButtons]="false"
+                           [fields]="fields"
+                           [model]="model">
+</app-form-wrapper-material>
+<!-- <h2 *ngIf="progress" >{{progress | json}}</h2> -->
+<h6>
+  <span> Build progress: </span>
+  <span [innerHTML]="info"></span>
+</h6>
+<mat-progress-bar *ngIf="progress"
+                  mode="determinate"
+                  value="{{ progress.value }}"> </mat-progress-bar>
+
+<!-- (opened)="panelOpenState = true"
+                  (closed)="panelOpenState = false" -->
+
+
+<br>
+
+<mat-accordion *ngIf="project">
+
+  <mat-expansion-panel *ngFor="let p of project.children"
+                       [disabled]="project.pidClearProces ||
+                        project.pidBuildProces">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{p.name}}
+      </mat-panel-title>
+      <mat-panel-description>
+        {{ p.buildInProgress ? 'REBUILDING IN PROGRESS:': '' }} {{p.baseUrl}}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <div class="accordion-wrap">
+      <span> Link to project:
+        <a *ngIf="project.serveInProgress"
+           target="_blank"
+           [href]="p.host">{{p.host}}</a>
+        <a href="javascript:void(0)"
+           *ngIf="!project.serveInProgress"
+           [class.a-disabled]="!project.progress || project.progress.value < 100"
+           matTooltip="Please run server first">{{p.host}}</a>
+      </span>
+      <br>
+      <br>
+
+      <a href="javascript:void(0)"
+         (click)="rebuild(p)"
+         [class.a-disabled]="!project.progress || project.progress.value < 100
+         || childresProjectsBuildsOrClearInProgress(project)"
+         *ngIf="!p.buildInProgress">
+        Rebuild project
+      </a>
+      <a (click)="stopRebuild(p)"
+         *ngIf="p.buildInProgress">
+        Stop rebuilding...
+      </a>
+      <span [innerHTML]="p.info"></span>
+    </div>
+
+
+  </mat-expansion-panel>
+</mat-accordion>
+
+
+<app-log-prcess *ngIf="isShowingBuildLogs"
+                [type]="'build'"
+                (hide)="isShowingBuildLogs = false"
+                [model]="model"></app-log-prcess>

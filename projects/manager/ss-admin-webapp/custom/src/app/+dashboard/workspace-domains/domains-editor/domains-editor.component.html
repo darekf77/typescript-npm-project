@@ -1,0 +1,11 @@
+<p>
+  <app-form-wrapper-material *ngIf="id"
+                             [(model)]="model"
+                             [fields]="fields"
+                             [crud]="domainsController"
+                             [exclude]="['id']"
+                             [modelDataConfig]="modelDataConfig"
+                             (complete)="complete()">
+  </app-form-wrapper-material>
+
+</p>

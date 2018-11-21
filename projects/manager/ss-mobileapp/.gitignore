@@ -1,0 +1,16 @@
+node_modules
+tmp*
+dist*
+bundle*
+browser
+module
+www
+Thumbs.db
+.DS_Store
+npm-debug.log*
+.sass-cache
+.sourcemaps
+src
+tslint.json
+.editorconfig
+tsconfig.json

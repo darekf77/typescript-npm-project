@@ -1,0 +1,71 @@
+<!-- {{selectedIndex}} -->
+<mat-accordion *ngIf="model">
+  <mat-expansion-panel [expanded]="expanded"
+                       (opened)="opened.next(model.name)"
+                       (closed)="closed.next(model.name)">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{model.name}}
+      </mat-panel-title>
+      <mat-panel-description>
+        Type your name and age
+
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-horizontal-stepper [linear]="true"
+                            (selectionChange)="selectionChange($event)"
+                            #stepper="matHorizontalStepper">
+      <mat-step *ngIf="model.isWorkspace"
+                [stepControl]="environmentFormGroup">
+
+        <ng-template matStepLabel><span [ngClass]="ngClass(0)">ENVIRONMENT</span></ng-template>
+        <app-item-environment [model]="model"
+                              [formGroup]="environmentFormGroup"></app-item-environment>
+
+      </mat-step>
+      <mat-step [stepControl]="buildFormGroup">
+        <ng-template matStepLabel> <span [ngClass]="ngClass(1)">BUILD</span></ng-template>
+        <app-item-build [model]="model"
+                        [formGroup]="buildFormGroup"></app-item-build>
+        <!-- <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar> -->
+
+      </mat-step>
+      <mat-step [stepControl]="testFormGroup">
+        <ng-template matStepLabel><span [ngClass]="ngClass(2)">TEST</span></ng-template>
+        <app-item-test [model]="model"
+                       [formGroup]="testFormGroup"></app-item-test>
+        <!-- <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar> -->
+      </mat-step>
+      <mat-step [stepControl]="serveFormGroup">
+        <ng-template matStepLabel><span [ngClass]="ngClass(3)">SERVE</span></ng-template>
+        <app-item-serve [model]="model"
+                        [formGroup]="serveFormGroup"></app-item-serve>
+        <!-- 
+        <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar> -->
+
+      </mat-step>
+    </mat-horizontal-stepper>
+
+    <a href="javascript:void(0)"
+       *ngIf="model.children && model.children.length > 0"
+       (click)="showChildren=!showChildren">Toogle children of {{model.name}} </a>
+
+    <mat-card *ngIf="showChildren">
+
+      <app-tnp-project *ngFor="let item of model.children"
+                       [model]="item"
+                       (opened)="expandedChild = $event"
+                       (closed)="closeChild($event)"
+                       [expanded]="item.name === expandedChild"
+                       [isChild]="true"></app-tnp-project>
+
+    </mat-card>
+
+
+  </mat-expansion-panel>
+
+</mat-accordion>

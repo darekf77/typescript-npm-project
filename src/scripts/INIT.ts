@@ -4,6 +4,8 @@ import { run } from '../process';
 import { error } from '../messages';
 import chalk from 'chalk';
 import { install } from './INSTALL';
+import { RecrusiveBaseline } from './INIT-recrusive-functions';
+
 
 async function initialize(
   pArgs?: string,
@@ -29,35 +31,11 @@ async function initialize(
 
   if (project.isSite) {
 
-    if (project.isWorkspaceChildProject) {
-      project.parent.baseline.tnpHelper.install()
-    } else if (project.isWorkspace) {
-      project.baseline.tnpHelper.install()
-    }
-
-    if (project.baseline && project.baseline.isWorkspaceChildProject) {
-      project.baseline.parent.recreate.init()
-    }
+    await RecrusiveBaseline.installTnpHelpersForBaselines(project.baseline);
+    await RecrusiveBaseline.recreateFilesBaselinesWorkspaces(project);
     project.baseline.recreate.init();
 
-    if (watch) {
-      // console.log("HERE !!")
-
-      project.join.init().watch()
-
-      if (project.isWorkspaceChildProject
-        // QUICK_FIX for webpack fails
-        // when parent is angular project
-        && project.type === 'isomorphic-lib'
-      ) {
-        project.parent.join.init().watch()
-      }
-    } else {
-      project.join.init()
-      if (project.isWorkspaceChildProject) {
-        project.parent.join.init()
-      }
-    }
+    await RecrusiveBaseline.joinSiteWithParentBaselines(project, watch);
   }
 
   if (!project.isStandaloneProject) {
