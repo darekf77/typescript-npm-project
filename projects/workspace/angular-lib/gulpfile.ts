@@ -102,7 +102,7 @@ gulp.task('inline-templates-dist', ['copy-assets-dist'], () => {
   return gulp.src(INLINE_TEMPLATES_DIST.SRC)
     .pipe(inlineTemplates(INLINE_TEMPLATES_DIST.CONFIG))
     .pipe(gulp.dest(INLINE_TEMPLATES_DIST.DIST))
-    .pipe(replaceIsomprhicModules(getIsomorphiOptions()))
+    // .pipe(replaceIsomprhicModules(getIsomorphiOptions()))
 });
 
 gulp.task('copy-assets-dist', () => {

@@ -18,7 +18,7 @@ export class BuildService {
   private async refreshModel(id: number, config: ModelDataConfig) {
 
 
-    //#region @cutExpression ENV.currentProjectName === 'ss-common-ui'
+    //#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
     if (ENV.currentProjectName === 'ss-common-ui') {
       return mockBuild()
     }

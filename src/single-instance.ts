@@ -1,3 +1,4 @@
+//#region @backend
 import * as lockfile from 'lockfile';
 import * as fse from 'fs-extra';
 import * as fs from 'fs';
@@ -45,3 +46,4 @@ function waitToUnlockFile() {
     return;
   }
 }
+//#endregion

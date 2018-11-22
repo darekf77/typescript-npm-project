@@ -11,7 +11,7 @@ export namespace RecrusiveBaseline {
 
 
     if (!project || !project.isSite) {
-      console.log(`(info joining) ${chalk.bold(project.name)} is not a site project`)
+      // console.log(`(info joining) ${chalk.bold(project.name)} is not a site project`)
 
       for (let index = 0; index < projectsToRecreate.length; index++) {
         const p = projectsToRecreate[index];
@@ -38,7 +38,7 @@ export namespace RecrusiveBaseline {
   export async function recreateFilesBaselinesWorkspaces(project: Project, projectsToRecreate: Project[] = []) {
 
     if (!project || !project.isSite) {
-      console.log(`(info recreating) ${chalk.bold(project.name)} is not a site project`)
+      // console.log(`(info recreating) ${chalk.bold(project.name)} is not a site project`)
 
       for (let index = 0; index < projectsToRecreate.length; index++) {
         const p = projectsToRecreate[index];

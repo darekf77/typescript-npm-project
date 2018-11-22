@@ -60,7 +60,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     this.debug('TestService.ts')
     this.customEnv = options.env;
-    return super.replaceRegionsForIsomorphicLib(options as any);
+    return super.replaceRegionsForIsomorphicLib(_.clone(options) as any);
   }
 
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '') {
@@ -74,7 +74,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       if (_.isFunction(funOrString)) {
         const rep = this.findReplacements(stringContent, pattern, funOrString);
         // this.isDebuggingFile && console.log('replacements', replacements)
-        return this.replaceRegionsWith(rep.stringContent, replacementPatterns.concat(rep.replacements));
+        return this.replaceRegionsWith(rep.stringContent, rep.replacements.concat(replacementPatterns));
       } else {
         replacement = funOrString as any;
       }
