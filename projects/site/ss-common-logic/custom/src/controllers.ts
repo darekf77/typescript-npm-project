@@ -25,17 +25,17 @@ TnpProjectController
 
 //#region @backend
 
-import { getSingleton } from "morphi";
+import { Helpers } from "morphi";
 import * as _ from 'lodash'
 
 export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
 return _.merge(controllersBaseline.controllers(), {
 
-BuildController: getSingleton<BuildController>(BuildController),
+BuildController: Helpers.getSingleton<BuildController>(BuildController),
 
-DomainsController: getSingleton<DomainsController>(DomainsController),
+DomainsController: Helpers.getSingleton<DomainsController>(DomainsController),
 
-TnpProjectController: getSingleton<TnpProjectController>(TnpProjectController),
+TnpProjectController: Helpers.getSingleton<TnpProjectController>(TnpProjectController),
 }  );
 }
 //#endregion

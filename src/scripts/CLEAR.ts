@@ -9,6 +9,7 @@ import config from '../config';
 
 
 function clearGenerated(project: Project, all, recrusive, outDir: string) {
+  console.log(`Cleaning generated workspace in for ${project.location}`)
   if (project.isWorkspace) {
     const genWorkspace = ProjectFrom(path.join(project.location, outDir, project.name))
     if (genWorkspace) {
@@ -24,8 +25,15 @@ function clearGenerated(project: Project, all, recrusive, outDir: string) {
 }
 
 export function clear(args, all = false) {
-  let { recrusive = false, generated = false } = require('minimist')(args.split(' '));
-  // console.log('onlyWorkspace', onlyWorkspace)
+  let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
+
+  recrusive = (recrusive || r);
+  generated = (generated || g);
+
+  // console.log('r', r)
+  // console.log('recrusive', recrusive)
+  // console.log('g', g)
+  // console.log('generated', generated)
 
   clearConsole()
   const project = Project.Current

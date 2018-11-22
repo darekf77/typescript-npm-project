@@ -51,10 +51,10 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   initCodeCut() {
 
     const env = arguments[0];
-    if(!_.isObject(env)) {
+    if (!_.isObject(env)) {
       return;
     }
-    this.customEnv = _.merge(env, { currentProjectName: this.module });
+    this.customEnv = _.merge(_.cloneDeep(env), { currentProjectName: this.module });
     // console.log('customEnv', this.customEnv)
 
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {

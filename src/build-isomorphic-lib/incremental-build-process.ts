@@ -12,11 +12,11 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
   private get resolveModulesLocations(): string[] {
     if (this.project.isWorkspaceChildProject) {
 
-      if (_.isArray(this.buildOptions.forClient)) {
+      if (_.isArray(this.buildOptions.forClient) && this.buildOptions.forClient.length > 0) {
         return this.buildOptions.forClient.map(c => c.name)
       }
 
-      const res = this.project.parent.children
+      return this.project.parent.children
         .filter(c => config.allowedTypes.app.includes(c.type))
         .map(c => c.name)
     }
@@ -40,6 +40,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     this.compileOnce = buildOptions.compileOnce;
 
     // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
+    // console.log('this.resolveModulesLocations', this.resolveModulesLocations)
 
     this.resolveModulesLocations
       .forEach(moduleName => {

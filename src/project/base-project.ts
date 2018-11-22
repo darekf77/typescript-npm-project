@@ -224,7 +224,7 @@ export abstract class Project {
   }
 
   get isWorkspaceChildProject() {
-    return this.parent && this.parent.type === 'workspace';
+    return !!this.parent && this.parent.type === 'workspace';
   }
 
 
