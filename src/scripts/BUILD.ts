@@ -5,7 +5,7 @@ import chalk from "chalk";
 // local
 import { Project, ProjectFrom } from '../project';
 import { BuildOptions, BuildDir, LibType } from "../models";
-import { error } from "../messages";
+import { error, info } from "../messages";
 import { config } from '../config';
 import { handleArguments } from './BUILD-handle-arguments.fn';
 import { init } from './INIT';
@@ -49,6 +49,8 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
     }
   }
 
+  await project.checker.check(buildOptions);
+
   if (watch) {
     await init(args).watch.project(project)
   } else {
@@ -57,33 +59,13 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)
 
-  await checkActiveProcessInProjectLocation(project, buildOptions);
+  
 
   await project.build(buildOptions);
   if (exit && !watch) {
     process.exit(0)
   }
 
-}
-
-async function checkActiveProcessInProjectLocation(project: Project, buildOptions: BuildOptions) {
-  const instance = await project.checker.check(buildOptions);
-  if (_.isNumber(instance.pid)) {
-    await questionYesNo(`There is active build instance of project in this location:
-
-${project.location}
-
-on pid: ${instance.pid}
-
-Do you wanna kill it ?`
-
-      , () => {
-        instance.kill()
-      }, () => {
-        console.log(`Exiting process, busy location: ${instance.location}`)
-        process.exit(0)
-      });
-  }
 }
 
 function buildWatch(args) {

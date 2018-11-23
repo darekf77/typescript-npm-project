@@ -1,42 +1,31 @@
 [
   {
     "location": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline/ss-common-logic",
-    "pid": null,
+    "pid": 13543,
     "buildOptions": {
       "prod": false,
       "watch": true,
       "outDir": "dist",
-      "forClient": [],
-      "copyto": [],
       "onlyWatchNoBuild": false,
-      "args": "",
-      "genOnlyClientCode": false,
+      "args": "--genOnlyClientCode --forClient ss-common-ui",
+      "genOnlyClientCode": true,
       "compileOnce": false
     }
   },
   {
     "location": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline/ss-common-ui",
-    "pid": 10917,
-    "buildOptions": {
-      "prod": false,
-      "watch": true,
-      "outDir": "dist",
-      "appBuild": true,
-      "onlyWatchNoBuild": false,
-      "args": "/home/dariusz/.nvm/versions/node/v9.4.0/bin/node /home/dariusz/.nvm/versions/node/v9.4.0/bin/tnp"
-    }
+    "pid": null,
+    "buildOptions": null
   },
   {
     "location": "/home/dariusz/projects/npm/tsc-npm-project",
-    "pid": 12030,
+    "pid": 13829,
     "buildOptions": {
       "prod": false,
       "watch": true,
       "outDir": "dist",
-      "forClient": [],
-      "copyto": [],
       "onlyWatchNoBuild": false,
-      "args": "",
+      "args": "--copyto /home/dariusz/projects/npm/tsc-npm-project/projects/baseline --copyto /home/dariusz/projects/npm/tsc-npm-project/projects/site --copyto /home/dariusz/projects/npm/tsc-npm-project/projects/workspace --copyto /home/dariusz/projects/npm/tsc-npm-project/projects/site/backup/repositories/1-tsc-npm-project/projects/baseline",
       "genOnlyClientCode": false,
       "compileOnce": false
     }

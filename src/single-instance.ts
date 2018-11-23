@@ -10,8 +10,10 @@ import * as  psList from 'ps-list';
 import { Project } from './project/base-project';
 import { config } from './config';
 import { ProjectFrom } from './index';
+import { questionYesNo, killProcess } from './process';
 import { run } from './process';
 import { BuildOptions } from './models';
+import { info } from './messages';
 
 export interface PsListInfo {
   pid: number;
@@ -38,14 +40,33 @@ export class ProjectsChecker {
   }
 
   private save() {
+
+
     // console.log('instances to save', this.instances.map(f => f.project.name))
-    fse.writeJSONSync(this.jsonWithProjectsPath, this.instances, {
-      encoding: 'utf8',
-      spaces: 2
-    })
+    fse.writeJSONSync(this.jsonWithProjectsPath, this.instances.map(ins => {
+      if (ins.buildOptions) {
+        ins.buildOptions = _.mergeWith({}, _.omit(ins.buildOptions, ['copyto', 'forClient']))
+      }
+
+      return ins;
+    }), {
+        encoding: 'utf8',
+        spaces: 2
+      })
   }
 
+  private async update() {
+    const ps: PsListInfo[] = await psList();
+    // console.log('ps', ps)
 
+    this.instances.forEach(ins => {
+      const ii = ps.find(processInfo => processInfo.pid == ins.pid)
+      if (!ii) {
+        ins.pid = null;
+        ins.buildOptions = null;
+      }
+    })
+  }
 
 
   check(buildOptions: BuildOptions): Promise<ProjectInstance> {
@@ -64,20 +85,57 @@ export class ProjectsChecker {
         this.lock()
         this.load()
 
+        await this.update()
+
         let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
-        if (!projectInstance) {
+        if (projectInstance) {
+
+          if (_.isNumber(projectInstance.pid)) {
+            await this.action(projectInstance, () => {
+              // replace process with current
+              const pidToKill = projectInstance.pid;
+              projectInstance.pid = process.pid;
+              projectInstance.buildOptions = buildOptions;
+              this.save()
+              killProcess(pidToKill)
+            });
+          } else {
+            projectInstance.pid = pid;
+            projectInstance.buildOptions = buildOptions;
+            this.save()
+          }
+        } else {
           projectInstance = new ProjectInstance(projecBuild.location, pid);
+          projectInstance.buildOptions = buildOptions;
           this.instances.push(projectInstance)
+          this.save()
         }
-        projectInstance.buildOptions = buildOptions;
 
-        await projectInstance.update()
-
-        this.save()
         resolve(projectInstance)
       })
     })
 
+  }
+
+  private async action(instance: ProjectInstance, cbKill: () => void) {
+    if (this.project.env.config.name === 'local') {
+      await questionYesNo(`There is active build instance of project in this location:
+
+      ${this.project.location}
+      
+      on pid: ${instance.pid}
+      
+      Do you wanna kill it ?`
+
+        , () => {
+          cbKill()
+        }, () => {
+          console.log(`Exiting process, busy location: ${instance.location}`)
+          process.exit(0)
+        });
+    } else {
+      cbKill()
+    }
   }
 
   lock(): boolean {
@@ -112,19 +170,16 @@ export class ProjectInstance {
 
   }
 
-  async update() {
-    const ps: PsListInfo[] = await psList();
-    console.log('ps', ps)
-    let info = ps.find(p => p.pid == this.pid);
-    console.log('Info from system: ', info)
-    if (!info) {
-      this.pid = null;
-    }
-    return info;
-  }
+
 
   kill() {
-    run(`kill -g ${this.pid}`).sync()
+    info(`Killing instance of project "${this.project.name}" build instance on pid: ${this.pid}`)
+    try {
+      run(`kill -9 ${this.pid}`).sync()
+    } catch (error) {
+      console.info('Not successfull process killing...')
+    }
+
   }
   get project() {
     return ProjectFrom(this.location);

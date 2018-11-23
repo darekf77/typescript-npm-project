@@ -24,3 +24,4 @@
 /tsconfig.json
 /tsconfig.browser.json
 /projects/tmp*
+/bin/projects.json
