@@ -27,6 +27,7 @@ import { ProxyRouter } from './proxy-router';
 import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
+import { SourceModifier } from './source-modifier';
 //#endregion
 
 export abstract class Project {
@@ -102,6 +103,7 @@ export abstract class Project {
   readonly node_modules: NodeModules;
   readonly recreate: FilesRecreator;
   readonly join: BaselineSiteJoin;
+  readonly sourceModifier: SourceModifier;
   env: EnvironmentConfig;
   readonly proxyRouter: ProxyRouter;
   readonly copytToManager: CopyToManager;
@@ -299,6 +301,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
       this.node_modules = new NodeModules(this);
       this.type = this.packageJson.type;
       this.recreate = new FilesRecreator(this);
+      this.sourceModifier = new SourceModifier(this, this.recreate);
       if (!this.isStandaloneProject) {
         this.join = new BaselineSiteJoin(this);
       }
