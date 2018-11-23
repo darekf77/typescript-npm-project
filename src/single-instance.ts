@@ -96,7 +96,7 @@ export class ProjectsChecker {
               const pidToKill = projectInstance.pid;
               projectInstance.pid = process.pid;
               projectInstance.buildOptions = buildOptions;
-              this.save()
+              console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
               killProcess(pidToKill)
             });
           } else {
@@ -118,12 +118,15 @@ export class ProjectsChecker {
   }
 
   private async action(instance: ProjectInstance, cbKill: () => void) {
-    if (this.project.env.config.name === 'local') {
+    if (this.project.isStandaloneProject || this.project.env.config.name === 'local') {
       await questionYesNo(`There is active build instance of project in this location:
 
       ${this.project.location}
       
       on pid: ${instance.pid}
+
+      with build options: 
+      ${JSON.stringify(_.omit(instance.buildOptions, ['copyto', 'forClient']))}
       
       Do you wanna kill it ?`
 
