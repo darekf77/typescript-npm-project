@@ -1,0 +1,44 @@
+[
+  {
+    "location": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline/ss-common-logic",
+    "pid": null,
+    "buildOptions": {
+      "prod": false,
+      "watch": true,
+      "outDir": "dist",
+      "forClient": [],
+      "copyto": [],
+      "onlyWatchNoBuild": false,
+      "args": "",
+      "genOnlyClientCode": false,
+      "compileOnce": false
+    }
+  },
+  {
+    "location": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline/ss-common-ui",
+    "pid": 10917,
+    "buildOptions": {
+      "prod": false,
+      "watch": true,
+      "outDir": "dist",
+      "appBuild": true,
+      "onlyWatchNoBuild": false,
+      "args": "/home/dariusz/.nvm/versions/node/v9.4.0/bin/node /home/dariusz/.nvm/versions/node/v9.4.0/bin/tnp"
+    }
+  },
+  {
+    "location": "/home/dariusz/projects/npm/tsc-npm-project",
+    "pid": 12030,
+    "buildOptions": {
+      "prod": false,
+      "watch": true,
+      "outDir": "dist",
+      "forClient": [],
+      "copyto": [],
+      "onlyWatchNoBuild": false,
+      "args": "",
+      "genOnlyClientCode": false,
+      "compileOnce": false
+    }
+  }
+]
