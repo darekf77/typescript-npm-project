@@ -28,6 +28,7 @@ import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from 
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
+import { ProjectsChecker } from '../single-instance';
 //#endregion
 
 export abstract class Project {
@@ -104,6 +105,7 @@ export abstract class Project {
   readonly recreate: FilesRecreator;
   readonly join: BaselineSiteJoin;
   readonly sourceModifier: SourceModifier;
+  readonly checker: ProjectsChecker;
   env: EnvironmentConfig;
   readonly proxyRouter: ProxyRouter;
   readonly copytToManager: CopyToManager;
@@ -297,6 +299,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
       // console.log('PROJECT FROM', location)
 
+
       this.packageJson = PackageJSON.from(location);
       this.node_modules = new NodeModules(this);
       this.type = this.packageJson.type;
@@ -305,6 +308,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
       if (!this.isStandaloneProject) {
         this.join = new BaselineSiteJoin(this);
       }
+      this.checker = new ProjectsChecker(this);
 
       Project.projects.push(this);
 
