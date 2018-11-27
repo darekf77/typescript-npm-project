@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/TNP_PROJECT';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { MatRadioChange } from '@angular/material/radio';
 

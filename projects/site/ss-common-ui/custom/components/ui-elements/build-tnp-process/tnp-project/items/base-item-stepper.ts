@@ -1,8 +1,8 @@
 
 import { Component, OnInit, Input } from '@angular/core';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/TNP_PROJECT';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/TnpProjectController';
+import { BuildController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/BuildController';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material';

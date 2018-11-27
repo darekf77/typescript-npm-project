@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
+import { BUILD } from 'ss-common-logic/browser-for-ss-common-ui/entities/BUILD';
 
 @Component({
   selector: 'app-build-tnp-process',

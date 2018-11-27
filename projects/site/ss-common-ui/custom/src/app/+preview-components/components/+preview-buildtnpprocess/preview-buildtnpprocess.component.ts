@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
-import { BuildService } from 'ss-common-logic/browser/services/BuildService';
+import { BUILD } from 'ss-common-logic/browser-for-ss-common-ui/entities/BUILD';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/TNP_PROJECT';
+import { BuildService } from 'ss-common-logic/browser-for-ss-common-ui/services/BuildService';
 import { Observable } from 'rxjs';
 
 @Component({
