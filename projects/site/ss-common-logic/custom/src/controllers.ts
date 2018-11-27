@@ -14,12 +14,16 @@ export { BuildController } from './controllers/BuildController';
 import { DomainsController } from './controllers/DomainsController';
 export { DomainsController } from './controllers/DomainsController';
 
+import { SystemController } from './controllers/SystemController';
+export { SystemController } from './controllers/SystemController';
+
 import { TnpProjectController } from './controllers/TnpProjectController';
 export { TnpProjectController } from './controllers/TnpProjectController';
 
 export const Controllers:META.BASE_CONTROLLER<any>[] = [
 BuildController,
 DomainsController,
+SystemController,
 TnpProjectController
 ].concat(BaselineControllers as any) as any;
 
@@ -34,6 +38,8 @@ return _.merge(controllersBaseline.controllers(), {
 BuildController: Helpers.getSingleton<BuildController>(BuildController),
 
 DomainsController: Helpers.getSingleton<DomainsController>(DomainsController),
+
+SystemController: Helpers.getSingleton<SystemController>(SystemController),
 
 TnpProjectController: Helpers.getSingleton<TnpProjectController>(TnpProjectController),
 }  );
