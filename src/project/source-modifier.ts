@@ -1,10 +1,15 @@
 //#region @backend
 import * as fs from 'fs';
+import * as fse from 'fs-extra';
+import * as path from 'path';
+import * as glob from 'glob';
 
 import { Project } from './base-project';
 import { FilesRecreator } from './files-builder';
 import config from '../config';
 import { ProjectFrom } from './index';
+import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import { IncrementalCompilation } from 'morphi/build';
 
 export interface IsomorphicOptions {
   currentProjectName?: string;
@@ -13,14 +18,31 @@ export interface IsomorphicOptions {
 }
 
 
-export class SourceModifier {
+export class SourceModifier extends IncrementalCompilation {
+
+  private options: IsomorphicOptions;
+  protected syncAction(): void {
+    this.options = this.isomorphiOptions;
+    this.project.customizableFilesAndFolders.forEach(f => {
+      const pathSrc = path.join(this.project.location, f);
+      if (fse.lstatSync(pathSrc).isDirectory()) {
+        glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
+          this.cb({ path: p, contents: fs.readFileSync(p, { encoding: 'utf8' }) }, this.options);
+        })
+      }
+    })
+  }
+
+  protected preAsyncAction(): void {
+    // throw new Error("Method not implemented.");
+  }
+  protected asyncAction(filePath: string) {
+    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+  }
 
 
   constructor(private project: Project, filesRecreator: FilesRecreator) {
-
-  }
-
-  run() {
+    super(`(src|components)/**/*.ts`, '', project.location);
 
   }
 
@@ -57,7 +79,7 @@ export class SourceModifier {
         const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
         // console.log('regex source', regex.source)
         // console.log('replace Here ', fileContent)
-        fileContent = fileContent.replace(regex, `${libname}/tmp-for-${currentProjectName}-${config.folder.browser}/`)
+        fileContent = fileContent.replace(regex, `${libname}/${IncrementalBuildProcessExtended.getBrowserVerPath(currentProjectName)}/`)
       })                // import { ... } from 'ss-common-logic/tmp-for-ss-common-ui-module'
 
       // console.log('write file here ', file.path)

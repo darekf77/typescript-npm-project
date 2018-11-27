@@ -7,11 +7,11 @@ import {
   TableWrapperModule
 } from 'components';
 
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
-import { ExamplesPaginationController } from 'ss-common-logic/browser/controllers/ExamplesPaginationController';
-import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser/entities/EXAMPLE_PAGINATION';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
+import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesPaginationController';
+import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE_PAGINATION';
 import { init, AngularProviders } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
+import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 

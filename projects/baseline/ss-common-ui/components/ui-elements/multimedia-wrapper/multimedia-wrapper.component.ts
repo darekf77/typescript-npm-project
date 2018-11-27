@@ -7,8 +7,8 @@ import { BaseCRUD, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia wrapper');
 // local
-import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
-import { MultimediaType, MULTIMEDIA } from 'ss-common-logic/browser/entities/core/MULTIMEDIA';
+import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/MultimediaController';
+import { MultimediaType, MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/MULTIMEDIA';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 export type DialogAction = 'select' | 'upload';

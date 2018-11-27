@@ -6,7 +6,7 @@ import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
-import { CATEGORY } from 'ss-common-logic/browser/entities';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-common-ui/entities';
 
 const log = Log.create('List wrapper', Level.__NOTHING);
 

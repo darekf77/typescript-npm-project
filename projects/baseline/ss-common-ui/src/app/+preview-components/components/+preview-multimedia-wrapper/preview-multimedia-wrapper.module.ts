@@ -13,9 +13,9 @@ import { init, AngularProviders } from 'morphi/browser';
 // local
 import { PreviewMultimediaWrapperComponent } from './preview-multimedia-wrapper.component';
 import { routes } from './preview-multimedia-wrapper.routes';
-import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
-import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { MULTIMEDIA } from 'ss-common-logic/browser/entities';
+import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/MultimediaController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/AuthController';
+import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/entities';
 import { MultimediaWrapperModule, MultimediaWrapperComponent } from 'components';
 
 

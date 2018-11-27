@@ -3,9 +3,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Log, Logger } from 'ng2-logger/browser';
 const log = Log.create('dialog part');
 // local
-import { DialogType, DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
-import { ConfigController, APP_LANGUAGE } from 'ss-common-logic/browser/controllers/ConfigController';
-import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
+import { DialogType, DIALOG } from 'ss-common-logic/browser-for-ss-common-ui/entities/DIALOG';
+import { ConfigController, APP_LANGUAGE } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ConfigController';
+import { DialogsController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/DialogsController';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
 

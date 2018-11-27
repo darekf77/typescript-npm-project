@@ -1,11 +1,11 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
 import * as _ from 'lodash';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
 import { getFormlyFrom } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
+import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
 
 const log = Log.create('preview-multimedia-wrapper');
 

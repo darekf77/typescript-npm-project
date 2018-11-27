@@ -7,7 +7,9 @@ import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('formly progressbar')
 
-import { ProgressBarStatus, ProgressBarType, PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
+import { ProgressBarStatus, ProgressBarType, PROGRESS_BAR_DATA } from 'ss-common-logic/browser-for-ss-common-ui/entities/PROGRESS_BAR_DATA';
+
+console.log('test')
 
 @Component({
   selector: 'app-formly-progressbar',

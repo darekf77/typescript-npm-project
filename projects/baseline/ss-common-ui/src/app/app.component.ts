@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-
+console.log('Stuning')
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

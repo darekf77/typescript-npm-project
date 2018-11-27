@@ -364,12 +364,22 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
   }
 
-
+  private modifySourceBeforCompilation() {
+    if (config.allowedTypes.app.includes(this.type)) {
+      if (this.buildOptions.watch) {
+        this.sourceModifier.initAndWatch()
+      } else {
+        this.sourceModifier.init()
+      }
+    }
+  }
 
   protected buildOptions?: BuildOptions;
   async build(buildOptions?: BuildOptions) {
 
     this.buildOptions = buildOptions;
+
+    this.modifySourceBeforCompilation();
 
     let baseHref: string;
     // console.log('AM HERE')

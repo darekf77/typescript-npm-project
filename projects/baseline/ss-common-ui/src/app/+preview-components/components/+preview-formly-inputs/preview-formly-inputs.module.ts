@@ -10,9 +10,9 @@ import {
   ListWrapperModule
 } from 'components';
 // third part
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
 import { init, AngularProviders } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
+import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
