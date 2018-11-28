@@ -454,6 +454,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }) // link/unlink takes care of node_modules
       .join(' ')
     // console.log(`rimraf ${gitginoredfiles}`)
+    this.checker.killAndClear()
     this.run(`rimraf ${gitginoredfiles}`).sync();
     if (recrusive) {
       if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
