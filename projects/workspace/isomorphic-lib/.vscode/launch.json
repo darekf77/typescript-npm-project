@@ -12,6 +12,7 @@
       "type": "node",
       "request": "launch",
       "remoteRoot": "${workspaceRoot}",
+      "localRoot":  "${workspaceRoot}",
       "name": "Nodemon server",
       "runtimeExecutable": "nodemon",
       "program": "${workspaceFolder}/run.js",

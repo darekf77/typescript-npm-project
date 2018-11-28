@@ -5,8 +5,8 @@ import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.compo
 import { routes } from './preview-buildtnpprocess.routes';
 import { RouterModule } from '@angular/router';
 import { BuildTnpProcessModule } from 'components';
-import { BuildService } from 'ss-common-logic/browser/services/BuildService';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
+import { BuildService } from 'ss-common-logic/browser-for-ss-common-ui/services/BuildService';
+import { BuildController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/BuildController';
 
 
 const angularModules = [

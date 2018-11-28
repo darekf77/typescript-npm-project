@@ -23,7 +23,10 @@ export class SourceModifier extends IncrementalCompilation {
   private options: IsomorphicOptions;
   protected syncAction(): void {
     this.options = this.isomorphiOptions;
-    this.project.customizableFilesAndFolders.forEach(f => {
+
+    const files = this.project.customizableFilesAndFolders.concat(this.project.isSite ? [config.folder.custom] : [])
+
+    files.forEach(f => {
       const pathSrc = path.join(this.project.location, f);
       if (fse.lstatSync(pathSrc).isDirectory()) {
         glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
