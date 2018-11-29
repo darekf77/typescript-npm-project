@@ -28,7 +28,8 @@ HelpersBackend.checkEnvironment({
     { name: 'fkill', installName:'fkill-cli' },
     { name: 'mocha' },
     // { name: 'chai' },
-    { name: 'ts-node' }
+    { name: 'ts-node' },
+    { name: 'stmux' }
   ],
   programs: [
   //   {

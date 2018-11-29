@@ -16,7 +16,7 @@ import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, I
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { run as __run, watcher as __watcher, killProcessByPort, run } from "../process";
-import { copyFile, getMostRecentFilesNames } from "../helpers";
+import { copyFile, getMostRecentFilesNames, tryRemoveDir, tryCopyFrom } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
@@ -650,6 +650,8 @@ function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
 
 const notNeededReinstallationTnp = {};
 
+
+
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
   if (project.isTnp) {
     return
@@ -673,15 +675,17 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
 
     if (fs.existsSync(destCompiledJs)) {
       // console.log(`Removed tnp - helper from ${ dest } `)
-      rimraf.sync(destCompiledJs)
+      tryRemoveDir(destCompiledJs)
     }
-    fse.copySync(`${pathTnpCompiledJS}/`, destCompiledJs, {
+    
+    tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
       filter: (src: string, dest: string) => {
         return !src.endsWith('/dist/bin') &&
           !src.endsWith('/bin') &&
           !/.*node_modules.*/g.test(src);
       }
     });
+    
     fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
       encoding: 'utf8',
       spaces: 2

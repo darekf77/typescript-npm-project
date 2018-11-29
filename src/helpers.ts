@@ -237,6 +237,19 @@ export class ClassHelper {
   }
 }
 
+export function tryCopyFrom(source, destination, options = {}) {
+  // console.log(`Trying to copy from hahah: ${source} to ${destination}`)
+  try {
+    fse.copySync(source, destination, _.merge({
+      overwrite: true,
+      recursive: true
+    }, options))
+  } catch (e) {
+    console.log(e)
+    sleep(1);
+    tryCopyFrom(source, destination, options)
+  }
+}
 
 export function tryRemoveDir(dirpath) {
   try {

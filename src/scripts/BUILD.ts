@@ -59,7 +59,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)
 
-  
+
 
   await project.build(buildOptions);
   if (exit && !watch) {
@@ -68,12 +68,27 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
 }
 
-function buildWatch(args) {
-  if (config.allowedTypes.libs.includes(Project.Current.type)) {
-    buildLib(false, true, 'dist', args)
+export class SystemTerminal {
+  public static run(command: string, cwd = process.cwd()) {
+    return run(`cd ${cwd} && gnome-terminal -e "${command}"`).sync()
   }
-  if (config.allowedTypes.app.includes(Project.Current.type)) {
-    buildApp(false, true, 'dist', args)
+}
+
+async function buildWatch(args) {
+
+  const isLegitLib = config.allowedTypes.libs.includes(Project.Current.type);
+  const isLegitApp = config.allowedTypes.app.includes(Project.Current.type);
+
+  if (isLegitLib && isLegitApp) {
+    SystemTerminal.run(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`)
+    return
+  }
+
+  if (isLegitLib) {
+    await buildLib(false, true, 'dist', args)
+  }
+  if (isLegitApp) {
+    await buildApp(false, true, 'dist', args)
   }
 }
 

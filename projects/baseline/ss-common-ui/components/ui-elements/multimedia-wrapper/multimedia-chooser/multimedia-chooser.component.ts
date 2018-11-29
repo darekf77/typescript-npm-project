@@ -8,7 +8,7 @@ const log = Log.create('multimedia chooser');
 import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/MultimediaController';
 import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/MULTIMEDIA';
 
-
+console.log('heehheh');
 
 
 @Component({
@@ -39,7 +39,7 @@ export class MultimediaChooserComponent implements OnInit, OnDestroy {
   }
 
   async initData() {
-    const data = await this.multimediaController.getAll(this.modelDataConfig).received;
+    const data = await this.multimediaController.getAll(this.modelDataConfig as any).received;
     this.rows = data.body.json;
     log.i('multimedia', this.rows);
   }

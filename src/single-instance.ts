@@ -18,11 +18,6 @@ import { info } from './messages';
 import { init } from './scripts/INIT';
 
 
-notif.notify({
-  message: 'Hello'
-})
-
-
 export interface PsListInfo {
   pid: number;
   ppid: number;
@@ -92,7 +87,7 @@ export class ProjectsChecker {
 
   }
 
-  check(buildOptions: BuildOptions): Promise<ProjectInstance> {
+  async check(buildOptions: BuildOptions) {
 
     return new Promise(async (resolve) => {
 
@@ -103,7 +98,7 @@ export class ProjectsChecker {
 
 
         let projecBuild: Project = this.project;
-        let pid: number = process.pid;
+        let processPid: number = process.pid;
 
         this.lock()
         this.load()
@@ -113,51 +108,39 @@ export class ProjectsChecker {
         let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
         if (projectInstance) {
 
-          await this.action(projectInstance, buildOptions.appBuild, () => {
-            const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
-            if (buildOptions.appBuild) {
-              projectInstance.build.app.pid = process.pid;
-              projectInstance.build.app.buildOptions = buildOptions;
-            } else {
-              projectInstance.build.lib.pid = process.pid;
-              projectInstance.build.lib.buildOptions = buildOptions;
-            }
+          const pidApp = projectInstance.build.app.pid;
+          const pidLib = projectInstance.build.lib.pid;
+
+          if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
+            await this.action(projectInstance, buildOptions.appBuild, () => {
+              const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
+              if (buildOptions.appBuild) {
+                projectInstance.build.app.pid = process.pid;
+                projectInstance.build.app.buildOptions = buildOptions;
+              } else {
+                projectInstance.build.lib.pid = process.pid;
+                projectInstance.build.lib.buildOptions = buildOptions;
+              }
 
 
-            console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
-            killProcess(pidToKill)
-          })
-
-          // if (_.isNumber(projectInstance.pidAppBuild)) {
-
-          //   // await this.action(projectInstance, () => {
-          //   //   // replace process with current
-          //   //   const pidToKill = projectInstance.pid;
-          //   //   projectInstance.pid = process.pid;
-          //   //   projectInstance.buildOptions = buildOptions;
-          //   //   console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
-          //   //   killProcess(pidToKill)
-          //   // });
-          // } else {
-          //   projectInstance.pid = pid;
-          //   projectInstance.buildOptions = buildOptions;
-          //   this.save()
-          // }
+              console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
+              killProcess(pidToKill)
+            })
+          }
         } else {
           projectInstance = new ProjectInstance(projecBuild.location);
           if (buildOptions.appBuild) {
             projectInstance.build.app.buildOptions = buildOptions;
-            projectInstance.build.app.pid = pid;
+            projectInstance.build.app.pid = processPid;
           } else {
             projectInstance.build.lib.buildOptions = buildOptions;
-            projectInstance.build.lib.pid = pid;
+            projectInstance.build.lib.pid = processPid;
           }
 
           this.instances.push(projectInstance)
-          this.save()
         }
-
-        resolve(projectInstance)
+        this.save()
+        resolve()
       })
     })
 
@@ -181,13 +164,13 @@ export class ProjectsChecker {
         info = `
         app build on pid: ${pidApp}
         with build options:
-        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.app.buildOptions, ['copyto', 'forClient']))}
+        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.app.buildOptions, ['copyto', 'forClient']), null, 4)}
         `
       } else {
         info = `
         lib build on pid: ${pidLib}
         with build options:
-        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.lib.buildOptions, ['copyto', 'forClient']))}
+        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.lib.buildOptions, ['copyto', 'forClient']), null, 4)}
         `
       }
 
