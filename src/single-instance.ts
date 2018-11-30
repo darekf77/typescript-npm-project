@@ -45,22 +45,27 @@ export class ProjectsChecker {
   private save(isAppBuild = true) {
 
     // console.log('instances to save', this.instances.map(f => f.project.name))
-    fse.writeJSONSync(this.jsonWithProjectsPath, this.instances.map(ins => {
+    const instancesToSave = this.instances.map(ins => {
       const buildOptions = (isAppBuild ? ins.build.app.buildOptions : ins.build.lib.buildOptions)
-      if (buildOptions) {
-        const newBuildOptions = _.mergeWith({}, _.omit(buildOptions, ['copyto', 'forClient']))
-        if (isAppBuild) {
-          ins.build.app.buildOptions = newBuildOptions;
-        } else {
-          ins.build.lib.buildOptions = newBuildOptions;
-        }
+
+      const newBuildOptions = _.cloneDeep(_.mergeWith({}, _.omit(buildOptions, ['copyto', 'forClient'])));
+      if (isAppBuild) {
+        ins.build.app.buildOptions = newBuildOptions;
+      } else {
+        ins.build.lib.buildOptions = newBuildOptions;
       }
 
       return ins;
-    }), {
-        encoding: 'utf8',
-        spaces: 2
-      })
+    });
+
+    // console.log(instancesToSave)
+    // process.exit(0)
+
+
+    fse.writeJSONSync(this.jsonWithProjectsPath, instancesToSave, {
+      encoding: 'utf8',
+      spaces: 2
+    })
   }
 
   private async update(isAppBuild: boolean) {
@@ -116,10 +121,10 @@ export class ProjectsChecker {
               const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
               if (buildOptions.appBuild) {
                 projectInstance.build.app.pid = process.pid;
-                projectInstance.build.app.buildOptions = buildOptions;
+                projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
               } else {
                 projectInstance.build.lib.pid = process.pid;
-                projectInstance.build.lib.buildOptions = buildOptions;
+                projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
               }
 
 
@@ -130,10 +135,10 @@ export class ProjectsChecker {
         } else {
           projectInstance = new ProjectInstance(projecBuild.location);
           if (buildOptions.appBuild) {
-            projectInstance.build.app.buildOptions = buildOptions;
+            projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
             projectInstance.build.app.pid = processPid;
           } else {
-            projectInstance.build.lib.buildOptions = buildOptions;
+            projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
             projectInstance.build.lib.pid = processPid;
           }
 
