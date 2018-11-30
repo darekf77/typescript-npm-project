@@ -77,7 +77,7 @@ async function buildWatch(args) {
   const isLegitApp = config.allowedTypes.app.includes(Project.Current.type);
 
   if (isLegitLib && isLegitApp) {
-    SystemTerminal.run(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`)
+    SystemTerminal.runInNewInstance(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`)
     return
   }
 

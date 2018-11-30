@@ -462,16 +462,17 @@ export class FilesRecreator {
       const libAssetsPath = path.join(
         project.location,
         config.folder.components,
-        config.folder.src,
         config.folder.assets,
         project.name
       );
+      // console.log('libAssetsPath',libAssetsPath)
 
       const previewAssetsPathProjectRelative = path.join(
         config.folder.src,
         config.folder.assets,
         project.name
       );
+      // console.log('previewAssetsPathProjectRelative',previewAssetsPathProjectRelative)
 
       const previewAssetsPath = path.join(
         project.location,
@@ -494,7 +495,6 @@ export class FilesRecreator {
         const libAssetsPath = path.join(
           child.location,
           config.folder.components,
-          config.folder.src,
           config.folder.assets,
           child.name
         );

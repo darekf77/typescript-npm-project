@@ -2,7 +2,7 @@
 
 import { run } from './process';
 export class SystemTerminal {
-  public static run(command: string, cwd = process.cwd()) {
+  public static runInNewInstance(command: string, cwd = process.cwd()) {
     if (process.platform === 'darwin') {
 
       return run(`osascript <<END
