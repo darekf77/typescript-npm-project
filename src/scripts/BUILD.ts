@@ -11,6 +11,7 @@ import { handleArguments } from './BUILD-handle-arguments.fn';
 import { init } from './INIT';
 import { resolveProjectIfGenerated } from './BUILD-static';
 import { questionYesNo, run } from '../process';
+import { SystemTerminal } from '../system-terminal';
 
 
 
@@ -68,11 +69,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
 }
 
-export class SystemTerminal {
-  public static run(command: string, cwd = process.cwd()) {
-    return run(`cd ${cwd} && gnome-terminal -e "${command}"`).sync()
-  }
-}
+
 
 async function buildWatch(args) {
 
