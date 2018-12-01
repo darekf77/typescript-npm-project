@@ -6,6 +6,8 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 import * as notif from 'node-notifier';
+import * as jsonStrinigySafe from 'json-stringify-safe';
+
 
 
 import { Project } from './project/base-project';
@@ -39,6 +41,12 @@ export class ProjectsChecker {
 
     let json = fse.readJsonSync(this.jsonWithProjectsPath) as any[];
     json = json.map(f => _.merge(new ProjectInstance(), f))
+    json = json.map(f => {
+      const ins = f as ProjectInstance;
+      ins.build.app.buildOptions = _.merge(new BuildOptions(), ins.build.app.buildOptions)
+      ins.build.lib.buildOptions = _.merge(new BuildOptions(), ins.build.lib.buildOptions)
+      return ins;
+    })
     this.instances = json;
   }
 
@@ -46,22 +54,29 @@ export class ProjectsChecker {
 
     // console.log('instances to save', this.instances.map(f => f.project.name))
     const instancesToSave = this.instances.map(ins => {
-      const buildOptions = (isAppBuild ? ins.build.app.buildOptions : ins.build.lib.buildOptions)
 
-      const newBuildOptions = _.cloneDeep(_.mergeWith({}, _.omit(buildOptions, ['copyto', 'forClient'])));
-      if (isAppBuild) {
-        ins.build.app.buildOptions = newBuildOptions;
-      } else {
-        ins.build.lib.buildOptions = newBuildOptions;
-      }
-
-      return ins;
+      let copy = {} as ProjectInstance;
+      _.merge(copy, {
+        location: ins.location,
+        build: {
+          app: {
+            buildOptions: _.merge({}, _.omit(ins.build.app.buildOptions,
+              BuildOptions.PropsToOmmitWhenStringify)),
+            pid: ins.build.app.pid
+          },
+          lib: {
+            buildOptions: _.merge({}, _.omit(ins.build.lib.buildOptions,
+              BuildOptions.PropsToOmmitWhenStringify)),
+            pid: ins.build.lib.pid
+          }
+        }
+      } as ProjectInstance)
+      return copy;
     });
 
-    // console.log(instancesToSave)
-    // process.exit(0)
-
-
+    // // console.log(instancesToSave)
+    // console.log(jsonStrinigySafe(instancesToSave))
+    // // process.exit(0)
     fse.writeJSONSync(this.jsonWithProjectsPath, instancesToSave, {
       encoding: 'utf8',
       spaces: 2
@@ -169,13 +184,13 @@ export class ProjectsChecker {
         info = `
         app build on pid: ${pidApp}
         with build options:
-        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.app.buildOptions, ['copyto', 'forClient']), null, 4)}
+        ${alreadyWorkingInstance.build.app.buildOptions.toString()}
         `
       } else {
         info = `
         lib build on pid: ${pidLib}
         with build options:
-        ${JSON.stringify(_.omit(alreadyWorkingInstance.build.lib.buildOptions, ['copyto', 'forClient']), null, 4)}
+        ${alreadyWorkingInstance.build.lib.buildOptions.toString()}
         `
       }
 

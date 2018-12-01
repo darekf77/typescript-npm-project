@@ -43,6 +43,8 @@ export interface IBuildOptions {
 }
 
 export class BuildOptions implements IBuildOptions {
+
+  public static PropsToOmmitWhenStringify = ['copyto', 'forClient'];
   prod: boolean;
   outDir: BuildDir;
   watch?: boolean;
@@ -69,6 +71,10 @@ export class BuildOptions implements IBuildOptions {
   forClient?: Project[];
 
   additionalIsomorphicLibs?: string[];
+
+  public toString = () => {
+    return JSON.stringify(_.mergeWith({}, _.omit(this, BuildOptions.PropsToOmmitWhenStringify)),null, 4);
+  };
 
   public static fromRaw(options: IBuildOptions): BuildOptions {
     return _.merge(new BuildOptions(), options);
