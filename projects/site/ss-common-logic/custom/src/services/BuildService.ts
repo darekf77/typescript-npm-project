@@ -6,7 +6,6 @@ import { TNP_PROJECT } from "../entities/TNP_PROJECT";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import 'rxjs/add/observable/fromPromise';
-
 @Injectable()
 export class BuildService {
 
@@ -34,7 +33,7 @@ export class BuildService {
     const self = this;
     return {
       byId(id: number, config: ModelDataConfig) {
-        return Observable.fromPromise(self.refreshModel(id, config))
+        return from(self.refreshModel(id, config))
       }
     }
   }
@@ -42,8 +41,13 @@ export class BuildService {
 
 }
 
+export function from( promise:Promise<any> ) {
+  const su
+  return Observable.create()
+}
 
-//#region @cutExpression ENV.currentProjectName === 'ss-common-ui'
+
+//#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
 function mockBuild() {
   const build = new BUILD();
 
