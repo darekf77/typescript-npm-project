@@ -15,10 +15,10 @@ import { ModelDataConfig } from 'morphi/browser';
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // local
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+import { BUILD } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/BUILD';
+import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/TNP_PROJECT';
 import { EnvironmentName } from 'tnp-bundle';
 import { EnvConfig } from 'tnp-bundle/browser';
 import { MatRadioChange } from '@angular/material';

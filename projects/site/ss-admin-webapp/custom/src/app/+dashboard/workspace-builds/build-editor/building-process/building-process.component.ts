@@ -7,10 +7,10 @@ import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('building process')
 import { Global } from 'morphi/browser'
 // local
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
+import { BUILD } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/BUILD';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
 import { MatDialog, MatCheckboxChange } from '@angular/material';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/TNP_PROJECT';
 import { FormlyBuildTnpProcessComponent } from '../formly-build-tnp-process/formly-build-tnp-process.component';
 
 

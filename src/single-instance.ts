@@ -188,7 +188,7 @@ export class ProjectsChecker {
           const pidApp = projectInstance.build.app.pid;
           const pidLib = projectInstance.build.lib.pid;
 
-          console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
+          // console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
 
           if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
             await this.action(projectInstance, buildOptions.appBuild, () => {

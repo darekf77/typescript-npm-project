@@ -6,9 +6,9 @@ import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('building process')
 // local
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
+import { BUILD } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/BUILD';
+import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
 
 
 @Component({

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DomainsController } from 'ss-common-logic/browser/controllers/DomainsController';
+import { DomainsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DomainsController';
 
 @Component({
   selector: 'app-workspace-domains',

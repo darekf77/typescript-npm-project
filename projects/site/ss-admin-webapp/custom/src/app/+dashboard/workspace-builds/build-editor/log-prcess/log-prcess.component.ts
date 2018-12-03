@@ -1,15 +1,15 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, ViewChild, TemplateRef, AfterContentInit } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { BuildController } from 'ss-common-logic/browser/controllers/BuildController';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
+import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs/Subscription';
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
+import { BUILD } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/BUILD';
 
 import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger/browser';
-import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser/entities/PROGRESS_BAR_DATA';
+import { PROGRESS_BAR_DATA } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/PROGRESS_BAR_DATA';
 const log = Log.create('log progress')
 
 @Component({

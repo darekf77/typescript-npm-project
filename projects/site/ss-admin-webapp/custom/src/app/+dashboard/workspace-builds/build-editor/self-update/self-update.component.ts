@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { BUILD } from 'ss-common-logic/browser/entities/BUILD';
-import { TNP_PROJECT } from 'ss-common-logic/browser/entities/TNP_PROJECT';
+import { BUILD } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/BUILD';
+import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/TNP_PROJECT';
 
 import { Log, Level } from 'ng2-logger/browser';
 import { PROGRESS_BAR_DATA } from 'tnp-bundle/browser';
-import { TnpProjectController } from 'ss-common-logic/browser/controllers/TnpProjectController';
+import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
 const log = Log.create('self build components')
 
 

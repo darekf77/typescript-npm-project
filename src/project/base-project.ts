@@ -672,7 +672,7 @@ const notNeededReinstallationTnp = {};
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
 
   if (project.checker.areActiveProjectsInWorkspace()) {
-    console.log(`Active projects in workspace on pids ${project.checker.foundedActivePids(true)},
+    console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(true).toString()} ,
     -  quit installing ${chalk.bold('tnp-bundle')}`)
     return
   }
