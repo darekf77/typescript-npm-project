@@ -106,13 +106,14 @@ export class FilesRecreator {
                 return `!${path.join(config.folder.custom, f)}`
               }))
           ) : []
-        )).concat( // common files for all project
+          )).concat( // common files for all project
           self.project.isCoreProject ? [] : self.commonFilesForAllProjects
-        ).concat( // core files of projects types
+          ).concat( // core files of projects types
           self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
-        ).concat(self.assetsToIgnore)
+          )
+          .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
-          .concat(self.project.isTnp ? ['projects/tmp*','bin/projects.json'] : [])
+          .concat(self.project.isTnp ? ['projects/tmp*', 'bin/projects.json'] : [])
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)

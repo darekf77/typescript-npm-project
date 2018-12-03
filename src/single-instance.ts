@@ -112,25 +112,54 @@ export class ProjectsChecker {
   }
 
 
-  private checkIfActive(workspace: Project) {
+  private checkIfActiveProjectInWorkspace(workspace: Project) {
     // console.log('this.instances', this.instances.map(i => i.location))
     const workspaceInstance = this.instances.find(f => f.location === workspace.location)
 
-    if (workspaceInstance.isActive) {
+    if (workspaceInstance.isActive && !workspaceInstance.isCurrentProcess) { // TODO imposible ?
+      // console.log(`Active workspace ${workspace.name}`)
       return true;
     }
-    return workspace.children.filter(c => {
-      const childInstance = this.instances.find(f => f.location === c.location)
-      return childInstance.isActive;
-    }).length > 0;
+
+    return workspace.children
+      .filter(c => {
+        const childInstance = this.instances.find(f => f.location === c.location)
+        if (childInstance.isActive && !childInstance.isCurrentProcess) {
+          // console.log(`Active workspace ${workspace.location} child ${c.name}`)
+        }
+        return childInstance.isActive && !childInstance.isCurrentProcess;
+      }).length > 0;
   }
 
+  foundedActivePids(onlyForThisWorkspace = false) {
+    const project = onlyForThisWorkspace ? this.project : undefined;
+    const pids = [];
+    if (project) {
+      const projectIns = this.instances.find(i => i.location === project.location)
+      if (_.isNumber(projectIns.build.app.pid)) {
+        pids.push(projectIns.build.app.pid)
+      }
+      if (_.isNumber(projectIns.build.lib.pid)) {
+        pids.push(projectIns.build.lib.pid)
+      }
+    } else {
+      this.instances.forEach(i => {
+        if (_.isNumber(i.build.app.pid)) {
+          pids.push(i.build.app.pid)
+        }
+        if (_.isNumber(i.build.lib.pid)) {
+          pids.push(i.build.lib.pid)
+        }
+      })
+    }
+    return pids;
+  }
   areActiveProjectsInWorkspace() {
 
     if (this.project.isWorkspace) {
-      return this.checkIfActive(this.project);
+      return this.checkIfActiveProjectInWorkspace(this.project);
     } else if (this.project.isWorkspaceChildProject) {
-      return this.checkIfActive(this.project.parent);
+      return this.checkIfActiveProjectInWorkspace(this.project.parent);
     }
     return false;
   }
@@ -178,7 +207,7 @@ export class ProjectsChecker {
             })
           } else {
             // update process
-            if(buildOptions.appBuild) {
+            if (buildOptions.appBuild) {
               projectInstance.build.app.pid = process.pid;
               projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
             } else {
@@ -312,6 +341,11 @@ export class ProjectInstance {
 
   get isActive() {
     return _.isNumber(this.build.app.pid) || _.isNumber(this.build.lib.pid);
+  }
+
+  get isCurrentProcess() {
+    return (_.isNumber(this.build.app.pid) && this.build.app.pid === process.pid) ||
+      (_.isNumber(this.build.lib.pid) && this.build.lib.pid === process.pid)
   }
 
   kill() {
