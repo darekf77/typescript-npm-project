@@ -12,12 +12,8 @@
           "args": [
             "--bumbVersionIn /Users/darekf/projects/npm/ng2-rest/preview/client",
             "--bumbVersionIn /Users/darekf/projects/npm/ng2-rest/preview/server",
-            "--bumbVersionIn /Users/darekf/projects/npm/morphi",
             "--bumbVersionIn /Users/darekf/projects/npm/morphi/examples",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/site",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project"
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace"
           ]
         },
         {
@@ -25,10 +21,7 @@
           "command": "tnp release",
           "args": [
             "--bumbVersionIn /Users/darekf/projects/npm/morphi/examples",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/baseline",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/site",
-            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project"
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace"
           ]
         }
       ],
@@ -81,12 +74,8 @@
           "args": [
             "--bumbVersionIn /home/dariusz/projects/npm/ng2-rest/preview/client",
             "--bumbVersionIn /home/dariusz/projects/npm/ng2-rest/preview/server",
-            "--bumbVersionIn /home/dariusz/projects/npm/morphi",
             "--bumbVersionIn /home/dariusz/projects/npm/morphi/examples",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/site",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project"
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace"
           ]
         },
         {
@@ -94,10 +83,7 @@
           "command": "tnp release",
           "args": [
             "--bumbVersionIn /home/dariusz/projects/npm/morphi/examples",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/baseline",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/site",
-            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project"
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace"
           ]
         }
       ],

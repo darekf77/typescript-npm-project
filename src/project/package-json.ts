@@ -172,6 +172,7 @@ export class PackageJSON {
   }
 
   saveForInstall(saveForInstall = true) {
+    this.coreRecreate()
     this.reload()
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       this.recreateForWorkspace(saveForInstall)
@@ -191,6 +192,9 @@ export class PackageJSON {
       }
       return obj[pkgName];
     });
+    coreProject.packageJson.save()
+    coreProject.packageJson.reload()
+    coreProject.packageJson.saveForInstall(false)
   }
 
   dedupe() {
