@@ -49,7 +49,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     this.resolveModulesLocations
       .forEach(moduleName => {
-        let browserOutFolder =  IncrementalBuildProcessExtended.getBrowserVerPath(moduleName);
+        let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath(moduleName);
         if (outFolder === 'bundle') {
           browserOutFolder = path.join(outFolder, browserOutFolder);
         }
@@ -60,7 +60,8 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
             `tmp-src-${outFolder}-${browserOutFolder}`,
             browserOutFolder as any,
             location,
-            cwd)
+            cwd,
+            outFolder)
         )
       })
 

@@ -5,7 +5,8 @@ import { ModelDataConfig } from "morphi";
 import { TNP_PROJECT } from "../entities/TNP_PROJECT";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
-import 'rxjs/add/observable/fromPromise';
+
+
 @Injectable()
 export class BuildService {
 
@@ -41,9 +42,12 @@ export class BuildService {
 
 }
 
-export function from( promise:Promise<any> ) {
-  const su
-  return Observable.create()
+export function from(promise: Promise<any>) {
+
+  return Observable.create((observer) => {
+    promise.then(d => observer.next(d))
+      .catch(er => observer.error(er))
+  })
 }
 
 

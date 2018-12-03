@@ -28,9 +28,10 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     sourceOut: string,
     outFolder: OutFolder,
     location: string,
-    cwd: string) {
+    cwd: string,
+    backendOut: string) {
 
-    super(sourceOut, outFolder, location, cwd)
+    super(sourceOut, outFolder, location, cwd, backendOut)
 
     this.initCodeCut.call(this, ENV);
   }
