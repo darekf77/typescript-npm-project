@@ -311,7 +311,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
       // console.log('PROJECT FROM', location)
 
 
-      this.packageJson = PackageJSON.from(location);
+      this.packageJson = PackageJSON.fromProject(this);
       this.node_modules = new NodeModules(this);
       this.type = this.packageJson.type;
       this.recreate = new FilesRecreator(this);
@@ -590,6 +590,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     pathTnpPackageJSONData.main = undefined;
     pathTnpPackageJSONData.preferGlobal = undefined;
     pathTnpPackageJSONData.dependencies = undefined;
+    pathTnpPackageJSONData.devDependencies = undefined;
 
 
     const self = this;

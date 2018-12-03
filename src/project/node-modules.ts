@@ -37,11 +37,11 @@ export class NodeModules {
       if(this.project.isGenerated && this.project.isWorkspace) {
         this.project.run(`npm dedupe`).sync()
       }
-      
+
     }
   }
   installPackage(packagePath) {
-    this.project.packageJson.installPackage(packagePath, '--save');
+    this.project.packageJson.installPackage(packagePath);
   }
   get localChildrensWithRequiredLibs() {
     const self = this;

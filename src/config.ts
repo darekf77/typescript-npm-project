@@ -39,7 +39,8 @@ export const config = {
     package_json: 'package.json',
     tnpBundle: 'tnp-bundle',
     tnpEnvironment_json: 'tmp-environment.json',
-    environment: 'environment'
+    environment: 'environment',
+    bin: 'bin'
   },
   default: {
     cloud: {

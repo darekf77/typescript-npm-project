@@ -73,7 +73,7 @@ export class BuildOptions implements IBuildOptions {
   additionalIsomorphicLibs?: string[];
 
   public toString = () => {
-    return JSON.stringify(_.mergeWith({}, _.omit(this, BuildOptions.PropsToOmmitWhenStringify)),null, 4);
+    return JSON.stringify(_.mergeWith({}, _.omit(this, BuildOptions.PropsToOmmitWhenStringify)), null, 4);
   };
 
   public static fromRaw(options: IBuildOptions): BuildOptions {
@@ -186,6 +186,7 @@ export interface EnvConfig {
 
 }
 
+export type DependenciesFromPackageJsonStyle = { [name: string]: string; }
 
 export interface IPackageJSON {
   name: string;
@@ -194,17 +195,31 @@ export interface IPackageJSON {
   main?: string;
   preferGlobal?: boolean;
 
-  dependencies?: { [name: string]: string; };
-  devDependencies?: { [name: string]: string; };
+  dependencies?: DependenciesFromPackageJsonStyle;
+  devDependencies?: DependenciesFromPackageJsonStyle;
   tnp: {
     type: LibType;
     isCoreProject: boolean;
+    core: {
+      dependencies: {
+        dedupe: string[];
+        common: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
+
+        // libtype of workspace project
+        onlyFor: { [libType: string]: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle }; }
+      }
+    }
     basedOn: string,
     basedOnAbsolutePath1: string, // TODO QUICK_FIX
     basedOnAbsolutePath2: string, // TODO QUICK_FIX
     resources?: string[];
     allowedEnv?: EnvironmentName[];
     isGenerated?: boolean;
+    overrided: {
+      dedupe?: string[];
+      ignoreWhenStartWith?: string[];
+      dependencies?: DependenciesFromPackageJsonStyle;
+    }
     // requiredLibs?: string[];
   };
 }

@@ -32,7 +32,7 @@ export * from './project-server-lib';
 export * from './project-workspace';
 
 function typeFrom(location: string): LibType {
-  const packageJson = PackageJSON.from(location);
+  const packageJson = PackageJSON.fromLocation(location);
   let type = packageJson.type;
   return type;
 }
@@ -52,7 +52,7 @@ export function ProjectFrom(location: string, warnings = false): Project {
     warnings && console.warn(`ProjectFrom: Cannot find project in location: ${location}`)
     return;
   }
-  if (!PackageJSON.from(location)) {
+  if (!PackageJSON.fromLocation(location)) {
     warnings && console.warn(`ProjectFrom: Cannot find package.json in location: ${location}`)
     return
   };

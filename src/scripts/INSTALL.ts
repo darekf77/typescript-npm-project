@@ -7,9 +7,9 @@ import { error } from "../messages";
 import { unlink } from "./UNLINK";
 
 
-export function install(a: string, project = Project.Current, unlinkChilds = true) {
+export function install(a: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true) {
   const args = a.split(' ').filter(a => !!a);
-
+  project.packageJson.saveForInstall(true)
   if (args.length === 0) { // NPM INSTALL
     if (project.type === 'workspace') {
       console.log('** npm install in workspace')
@@ -39,7 +39,8 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       }
     }
 
-  } if (args.length >= 1) { // NPM INSTALL <package name>
+  }
+  if (args.length >= 1) { // NPM INSTALL <package name>
 
     const npmPackagesToAdd = args
       .map(p => p.trim())
@@ -86,6 +87,11 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       })
     }
   }
+  if (cleanAndDedupe) {
+    project.packageJson.saveForInstall(false)
+    project.packageJson.dedupe()
+  }
+
 }
 
 export default {

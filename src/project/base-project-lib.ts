@@ -79,7 +79,7 @@ export abstract class BaseProjectLib extends Project {
       }
 
       bumbVersionIn.forEach(p => {
-        const packageJson = PackageJSON.from(p, true);
+        const packageJson = PackageJSON.fromLocation(p);
         if (packageJson && packageJson.data) {
           let versionBumped = false;
           if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
@@ -141,7 +141,7 @@ export abstract class BaseProjectLib extends Project {
       this.run(`tnp clear`).sync();
 
       if (!this.node_modules.exist()) {
-        install('', this, false);
+        install('', this, false, false);
       }
 
       this.recreate.init();
@@ -149,6 +149,7 @@ export abstract class BaseProjectLib extends Project {
         prod, outDir: config.folder.bundle as 'bundle'
       })
       this.bundleResources()
+      this.packageJson.saveForInstall(false)
     }, () => process.exit(0))
     await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
       let successPublis = false;

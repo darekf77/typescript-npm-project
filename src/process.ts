@@ -192,7 +192,7 @@ export function run(command: string,
   if (options.biggerBuffer === undefined) options.biggerBuffer = false;
   if (options.cwd === undefined) options.cwd = process.cwd()
   return {
-    sync() {
+    sync(): Buffer {
       if (_.isNumber(options.tryAgainWhenFailAfter) && options.tryAgainWhenFailAfter > 0) {
         try {
           const proc = runSyncIn(command, options);
@@ -200,7 +200,7 @@ export function run(command: string,
         } catch (error) {
           console.log(`Trying again command: ${command}`)
           sleep.msleep(options.tryAgainWhenFailAfter)
-          return run(command, options).sync();
+          return run(command, options).sync()
         }
       }
       return runSyncIn(command, options);
