@@ -95,9 +95,7 @@
     "tslib": "1.8.1",
     "typeorm": "^0.2.7",
     "validator": "^9.2.0",
-    "zone.js": "0.8.20"
-  },
-  "devDependencies": {
+    "zone.js": "0.8.20",
     "@ionic/app-scripts": "^3.1.8",
     "@types/chai": "^4.1.2",
     "@types/jasmine": "~2.8.0",
