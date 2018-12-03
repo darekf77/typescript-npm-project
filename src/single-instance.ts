@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as  psList from 'ps-list';
-import * as notif from 'node-notifier';
+// import * as notif from 'node-notifier';
 import * as jsonStrinigySafe from 'json-stringify-safe';
 
 
@@ -36,7 +36,11 @@ export class ProjectsChecker {
 
   }
 
-  private instances: ProjectInstance[] = [];
+  private static instances: ProjectInstance[] = [];
+
+  private get instances() {
+    return ProjectsChecker.instances;
+  }
   private load() {
 
     let json = fse.readJsonSync(this.jsonWithProjectsPath) as any[];
@@ -47,7 +51,7 @@ export class ProjectsChecker {
       ins.build.lib.buildOptions = _.merge(new BuildOptions(), ins.build.lib.buildOptions)
       return ins;
     })
-    this.instances = json;
+    ProjectsChecker.instances = json;
   }
 
   private save(isAppBuild = true) {
@@ -83,19 +87,19 @@ export class ProjectsChecker {
     })
   }
 
-  private async update(isAppBuild: boolean) {
+  private async update() {
     const ps: PsListInfo[] = await psList();
     // console.log('ps', ps)
 
     this.instances.forEach(ins => {
-      const instancLib = ps.find(processInfo => processInfo.pid == ins.build.lib.pid)
-      if (!instancLib) {
+      const psInfoLib = ps.find(processInfo => processInfo.pid == ins.build.lib.pid)
+      if (!psInfoLib) {
         ins.build.lib.pid = undefined;
         ins.build.lib.buildOptions = undefined;
       }
 
-      const instancApp = ps.find(processInfo => processInfo.pid == ins.build.app.pid)
-      if (!instancApp) {
+      const psInfoApp = ps.find(processInfo => processInfo.pid == ins.build.app.pid)
+      if (!psInfoApp) {
         ins.build.app.pid = undefined;
         ins.build.app.buildOptions = undefined;
       }
@@ -105,6 +109,30 @@ export class ProjectsChecker {
 
   killAndClear() { // MAKE IT ASYNC
 
+  }
+
+
+  private checkIfActive(workspace: Project) {
+    // console.log('this.instances', this.instances.map(i => i.location))
+    const workspaceInstance = this.instances.find(f => f.location === workspace.location)
+
+    if (workspaceInstance.isActive) {
+      return true;
+    }
+    return workspace.children.filter(c => {
+      const childInstance = this.instances.find(f => f.location === c.location)
+      return childInstance.isActive;
+    }).length > 0;
+  }
+
+  areActiveProjectsInWorkspace() {
+
+    if (this.project.isWorkspace) {
+      return this.checkIfActive(this.project);
+    } else if (this.project.isWorkspaceChildProject) {
+      return this.checkIfActive(this.project.parent);
+    }
+    return false;
   }
 
   async check(buildOptions: BuildOptions) {
@@ -123,13 +151,15 @@ export class ProjectsChecker {
         this.lock()
         this.load()
 
-        await this.update(buildOptions.appBuild);
+        await this.update();
 
         let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
         if (projectInstance) {
 
           const pidApp = projectInstance.build.app.pid;
           const pidLib = projectInstance.build.lib.pid;
+
+          console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
 
           if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
             await this.action(projectInstance, buildOptions.appBuild, () => {
@@ -146,7 +176,17 @@ export class ProjectsChecker {
               console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
               killProcess(pidToKill)
             })
+          } else {
+            // update process
+            if(buildOptions.appBuild) {
+              projectInstance.build.app.pid = process.pid;
+              projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+            } else {
+              projectInstance.build.lib.pid = process.pid;
+              projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+            }
           }
+
         } else {
           projectInstance = new ProjectInstance(projecBuild.location);
           if (buildOptions.appBuild) {
@@ -159,11 +199,32 @@ export class ProjectsChecker {
 
           this.instances.push(projectInstance)
         }
+        this.automaticlyAddWorkspaceInstance(this.project)
         this.save()
+        console.log('** check system/pids end')
         resolve()
       })
     })
 
+  }
+
+  private automaticlyAddWorkspaceInstance(project: Project) {
+    const workspace = project.parent;
+    if (project.isWorkspaceChildProject) {
+      const workspaceInstance = this.instances.find(p => p.location === workspace.location)
+      if (!workspaceInstance) {
+        this.instances.push(new ProjectInstance(workspace.location));
+        // console.log(`Worksapce auto add from ${workspace.location}`)
+      } else {
+        // console.log(`Worksapce already added ${workspace.location}`)
+      }
+      workspace.children.forEach(c => {
+        const childInstance = this.instances.find(p => p.location === c.location)
+        if (!childInstance) {
+          this.instances.push(new ProjectInstance(c.location));
+        }
+      })
+    }
   }
 
   private async isLocalEnv(): Promise<boolean> {
@@ -214,7 +275,7 @@ export class ProjectsChecker {
   lock(): boolean {
 
     if (!fs.existsSync(this.jsonWithProjectsPath)) {
-      this.instances = [];
+      ProjectsChecker.instances = [];
       fse.writeJsonSync(this.jsonWithProjectsPath, []);
       return;
     }
@@ -249,7 +310,9 @@ export class ProjectInstance {
     public readonly location?: string) {
   }
 
-
+  get isActive() {
+    return _.isNumber(this.build.app.pid) || _.isNumber(this.build.lib.pid);
+  }
 
   kill() {
     const pidLib = this.build.lib.pid

@@ -20,6 +20,7 @@ Helper project for my typescript npm libraries.
 import { DIALOG } from '../entities'; // ERROR 
 import { DIALOG } from '../entities/DIALOG'; // OK
 // entites is folder and file at the same time, maybe that ?
+- DO NOT put watcher on 'src' - it will make webpack build neverend
 
 ## Create, build, publish:
 - isomorphic typescript library

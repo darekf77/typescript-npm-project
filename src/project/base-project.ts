@@ -58,6 +58,17 @@ export abstract class Project {
   }
   abstract buildSteps(buildOptions?: BuildOptions);
 
+  quickFixMissingLibs(missingLibsNames: string[] = []) {
+    missingLibsNames.forEach(missingLibName => {
+      const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
+      if (!fse.existsSync(pathInProjectNodeModules)) {
+        fse.mkdirpSync(pathInProjectNodeModules);
+        const indexjsLocation = path.join(pathInProjectNodeModules, 'index.js')
+        fse.writeFileSync(indexjsLocation, ` export default { } `, 'utf8');
+      }
+    })
+  }
+
   routerTargetHttp() {
     return `http://localhost:${this.getDefaultPort()}`;
   }
@@ -366,16 +377,22 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   private modifySourceBeforCompilation() {
     if (config.allowedTypes.app.includes(this.type)) {
-      if (this.buildOptions.watch) {
-        this.sourceModifier.initAndWatch()
-      } else {
-        this.sourceModifier.init()
-      }
+      this.sourceModifier.init()
+      // if (this.buildOptions.watch) {
+      //   this.sourceModifier.initAndWatch()
+      // } else {
+      //   this.sourceModifier.init()
+      // }
     }
   }
 
   protected buildOptions?: BuildOptions;
   async build(buildOptions?: BuildOptions) {
+
+    if (this.isWorkspaceChildProject) {
+      this.quickFixMissingLibs(['react-native-sqlite-storage'])
+    }
+
 
     this.buildOptions = buildOptions;
 
@@ -653,6 +670,12 @@ const notNeededReinstallationTnp = {};
 
 
 function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
+
+  if (project.checker.areActiveProjectsInWorkspace()) {
+    console.log(`Active projects in workspace, quit installing ${chalk.bold('tnp-bundle')}`)
+    return
+  }
+
   if (project.isTnp) {
     return
   }
@@ -677,7 +700,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       // console.log(`Removed tnp - helper from ${ dest } `)
       tryRemoveDir(destCompiledJs)
     }
-    
+
     tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
       filter: (src: string, dest: string) => {
         return !src.endsWith('/dist/bin') &&
@@ -685,7 +708,7 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
           !/.*node_modules.*/g.test(src);
       }
     });
-    
+
     fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
       encoding: 'utf8',
       spaces: 2

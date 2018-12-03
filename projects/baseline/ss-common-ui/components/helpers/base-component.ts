@@ -1,6 +1,7 @@
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy, Component } from '@angular/core';
 
+
 @Component({
   selector: 'app-base-component-meta'
 })
