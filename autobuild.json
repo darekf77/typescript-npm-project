@@ -7,6 +7,16 @@
     "darekf": {
       "autoreleases": [
         {
+          "cwd": "/Users/darekf/projects/npm/ng2-logger",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /Users/darekf/projects/npm/ng2-logger/preview/client",
+            "--bumbVersionIn /Users/darekf/projects/npm/ng2-logger/preview/server",
+            "--bumbVersionIn /Users/darekf/projects/npm/morphi/examples",
+            "--bumbVersionIn /Users/darekf/projects/npm/tsc-npm-project/projects/workspace"
+          ]
+        },
+        {
           "cwd": "/Users/darekf/projects/npm/ng2-rest",
           "command": "tnp release",
           "args": [
@@ -68,6 +78,16 @@
   "dariusz-ubuntu": {
     "dariusz": {
       "autoreleases": [
+        {
+          "cwd": "/Users/darekf/projects/npm/ng2-logger",
+          "command": "tnp release",
+          "args": [
+            "--bumbVersionIn /home/dariusz/projects/npm/ng2-logger/preview/client",
+            "--bumbVersionIn /home/dariusz/projects/npm/ng2-logger/preview/server",
+            "--bumbVersionIn /home/dariusz/projects/npm/morphi/examples",
+            "--bumbVersionIn /home/dariusz/projects/npm/tsc-npm-project/projects/workspace"
+          ]
+        },
         {
           "cwd": "/home/dariusz/projects/npm/ng2-rest",
           "command": "tnp release",

@@ -128,21 +128,80 @@ export class PackageJSON {
       }
     })
 
-    project.packageJson.data.devDependencies = undefined;
+
     this.cleanBeforeSave(project, newDeps);
 
-    if (saveForInstall) {
-      project.packageJson.data.dependencies = sortKeys(newDeps)
-      project.packageJson.save()
+    if (project.isStandaloneProject) {
+
+      if (saveForInstall) {
+
+        project.packageJson.data.devDependencies = sortKeys(this.filterDevDepOnly(_.cloneDeep(newDeps)))
+        project.packageJson.data.dependencies = sortKeys(this.filterDepOnly(_.cloneDeep(newDeps)))
+        project.packageJson.save()
+      } else {
+        project.packageJson.data.devDependencies = undefined;
+        project.packageJson.data.dependencies = undefined;
+        project.packageJson.save()
+      }
+
     } else {
-      project.packageJson.data.dependencies = undefined;
-      project.packageJson.save()
+      project.packageJson.data.devDependencies = undefined;
+      if (saveForInstall) {
+        project.packageJson.data.dependencies = sortKeys(newDeps)
+        project.packageJson.save()
+      } else {
+        project.packageJson.data.dependencies = undefined;
+        project.packageJson.save()
+      }
     }
 
+
+  }
+
+
+  filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
+    const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    // console.log('d1evDeps', devDeps)
+    Object.keys(deps).forEach(name => {
+      if (!devDeps.includes(name)) {
+        deps[name] = undefined;
+      }
+    })
+    return deps;
+  }
+
+  filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
+    const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    // console.log('d2evDeps', devDeps)
+    Object.keys(deps).forEach(name => {
+      if (devDeps.includes(name)) {
+        deps[name] = undefined;
+      }
+    })
+    return deps;
   }
 
   cleanBeforeSave(project: Project, deps: DependenciesFromPackageJsonStyle) {
     deps[project.name] = undefined;
+
+    if (project.packageJson.data.tnp &&
+      project.packageJson.data.tnp.overrided &&
+      _.isArray(project.packageJson.data.tnp.overrided.includeOnly)) {
+
+      let onlyAllowed = project.packageJson.data.tnp.overrided.includeOnly;
+
+      onlyAllowed = onlyAllowed.concat(Project.by('workspace')
+        .packageJson.data.tnp.core.dependencies.always);
+
+      Object.keys(deps).forEach(depName => {
+        if (!onlyAllowed.includes(depName)) {
+          deps[depName] = undefined;
+        }
+      });
+
+      return
+    }
+
 
     if (project.packageJson.data.tnp &&
       project.packageJson.data.tnp.overrided &&
@@ -171,8 +230,11 @@ export class PackageJSON {
     this.modifyWrapper(newDeps, this.project, saveForInstall, allDeps);
   }
 
-  saveForInstall(saveForInstall = true) {
-    this.coreRecreate()
+  saveForInstall(saveForInstall = true, coreRecreate = true) {
+    console.log(`save for install in ${this.project.name} ! ` )
+    if (coreRecreate) {
+      this.coreRecreate()
+    }
     this.reload()
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       this.recreateForWorkspace(saveForInstall)
@@ -194,7 +256,7 @@ export class PackageJSON {
     });
     coreProject.packageJson.save()
     coreProject.packageJson.reload()
-    coreProject.packageJson.saveForInstall(false)
+    coreProject.packageJson.saveForInstall(false, false)
   }
 
   dedupe() {

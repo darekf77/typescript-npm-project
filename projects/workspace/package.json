@@ -12,16 +12,34 @@
           "morphi",
           "rxjs"
         ],
+        "always": [
+          "@types/node",
+          "tslib",
+          "reflect-metadata",
+          "typescript",
+          "ts-node"
+        ],
+        "asDevDependencies": [
+          "@types/node",
+          "tslib",
+          "reflect-metadata",
+          "webpack",
+          "typescript",
+          "ts-node"
+        ],
         "common": {
           "@types/node": "9.3.0",
           "@types/q": "^1.0.3",
           "q": "^1.5.1",
-          "morphi": "1.0.69",
+          "morphi": "1.0.70",
           "gulp": "^3.9.1",
           "dateformat": "^3.0.3",
-          "ng2-logger": "^2.0.35",
-          "ng2-rest": "9.1.13",
+          "ng2-logger": "2.0.38",
+          "ng2-rest": "9.1.14",
+          "@types/diff": "^3.2.2",
+          "randomcolor": "^0.5.3",
           "json": {
+            "json-stringify-safe": "^5.0.1",
             "circular-json": "^0.5.1",
             "json5": "^0.5.1",
             "@types/json5": "0.0.29",
@@ -167,7 +185,6 @@
             }
           },
           "isomorphic-lib": {
-
             "@types/vinyl": "^2.0.2",
             "operating-system": {
               "chalk": "^2.3.2",

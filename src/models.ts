@@ -202,6 +202,8 @@ export interface IPackageJSON {
     isCoreProject: boolean;
     core: {
       dependencies: {
+        always?: string[];
+        asDevDependencies?: string[];
         dedupe: string[];
         common: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
 
@@ -218,6 +220,7 @@ export interface IPackageJSON {
     overrided: {
       dedupe?: string[];
       ignoreWhenStartWith?: string[];
+      includeOnly?: string[];
       dependencies?: DependenciesFromPackageJsonStyle;
     }
     // requiredLibs?: string[];

@@ -23,9 +23,9 @@ export class NodeModules {
     const linkCommand = `tnp ln ${localNodeModules} ${target.location}`;
     this.project.run(linkCommand).sync();
   }
-  installPackages() {
+  installPackages(force = false) {
     const yarnLock = path.join(this.project.location, 'yarn.lock');
-    if (!this.exist()) {
+    if (force || !this.exist()) {
       if (fs.existsSync(yarnLock)) {
         info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
         this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
@@ -38,6 +38,8 @@ export class NodeModules {
         this.project.run(`npm dedupe`).sync()
       }
 
+    } else {
+      console.log('node_modules exists')
     }
   }
   installPackage(packagePath) {

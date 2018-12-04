@@ -15,6 +15,7 @@ import config from "../config";
 import { compilationWrapper } from '../helpers';
 import { PackageJSON } from './package-json';
 import { install } from '../scripts/INSTALL';
+import { ProjectFrom } from '../index';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -80,6 +81,21 @@ export abstract class BaseProjectLib extends Project {
 
       bumbVersionIn.forEach(p => {
         const packageJson = PackageJSON.fromLocation(p);
+        if (packageJson.data.tnp && packageJson.data.tnp.type) {
+          const project = ProjectFrom(p);
+          if (project.isWorkspace && project.isCoreProject) {
+            if (!project.packageJson.data.dependencies) {
+              project.packageJson.data.dependencies = {};
+            }
+            project.packageJson.data.dependencies[this.name] = newVersion;
+            project.packageJson.save()
+            project.packageJson.coreRecreate();
+            info(`Version of current project "${this.name}" bumped in ${project.name} (with recreate) `)
+            count++;
+          }
+          return
+        }
+
         if (packageJson && packageJson.data) {
           let versionBumped = false;
           if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
@@ -101,8 +117,24 @@ export abstract class BaseProjectLib extends Project {
     return count;
   }
 
+  private commit(newVer) {
+    try {
+      this.run(`git add --all . `).sync()
+    } catch (error) {
+      warn(`Failed to git add --all .`);
+    }
+
+    try {
+      this.run(`git commit -m "new version ${newVer}"`).sync()
+    } catch (error) {
+      warn(`Failed to git commit -m "new vers...`);
+    }
+  }
+
   public async release(c?: ReleaseOptions) {
+
     this.checkIfLogginInToNpm()
+
     const { prod = false, bumbVersionIn = [] } = c;
     // clearConsole()
     this.checkIfReadyForNpm()
@@ -119,17 +151,7 @@ export abstract class BaseProjectLib extends Project {
     await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
 
       this.bumpVersionInOtherProjects(bumbVersionIn, newVersion, true)
-      try {
-        this.run(`git add --all . `).sync()
-      } catch (error) {
-        warn(`Failed to git add --all .`);
-      }
-
-      try {
-        this.run(`git commit -m "new version ${newVersion}"`).sync()
-      } catch (error) {
-        warn(`Failed to git commit -m "new vers...`);
-      }
+      this.commit(newVersion);
 
       try {
         this.run(`npm version patch`).sync()
@@ -150,6 +172,7 @@ export abstract class BaseProjectLib extends Project {
       })
       this.bundleResources()
       this.packageJson.saveForInstall(false)
+      this.commit(newVersion);
     }, () => process.exit(0))
     await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
       let successPublis = false;

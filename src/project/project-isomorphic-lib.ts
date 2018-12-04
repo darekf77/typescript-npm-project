@@ -22,13 +22,17 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
   }
 
   projectSpecyficFiles(): string[] {
-    return super.projectSpecyficFiles().concat([
-      '.vscode/launch.json',
-      'run.js',
-      "src/typings.d.ts",
-      "tsconfig.json",
-      "tsconfig.browser.json"
-    ]);
+    return super.projectSpecyficFiles()
+      .concat([
+        '.vscode/launch.json',
+
+        "tsconfig.json",
+        "tsconfig.browser.json"
+      ]).concat(
+      !this.isStandaloneProject ? [
+        'run.js',
+        "src/typings.d.ts",
+      ] : []);
   }
 
   projectSpecyficIgnoredFiles() {
@@ -116,7 +120,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
     // console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
 
-    if(watch) {
+    if (watch) {
       new IncrementalBuildProcessExtended(this, this.buildOptions).startAndWatch('isomorphic compilation (watch mode)')
     } else {
       new IncrementalBuildProcessExtended(this, this.buildOptions).start('isomorphic compilation')

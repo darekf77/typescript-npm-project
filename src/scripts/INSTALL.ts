@@ -18,7 +18,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       }
       project.node_modules.installPackages()
       link(project)
-    } else if (project.parent && project.parent.type === 'workspace') {
+    } else if (project.isWorkspaceChildProject) {
       console.log('** npm install in child of workspace')
       const parent = project.parent;
       if (unlinkChilds) {
@@ -28,7 +28,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       link(parent)
     } else {
       console.log('** npm install in separated project')
-      project.node_modules.installPackages()
+      project.node_modules.installPackages(true)
     }
 
     if (process.platform === 'darwin') {
