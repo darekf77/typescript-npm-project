@@ -7,4 +7,4 @@ export class ResizableInputDirective {
 
 
 }
-
+console.log('test super!')

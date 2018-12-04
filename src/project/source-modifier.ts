@@ -15,6 +15,7 @@ export interface IsomorphicOptions {
   currentProjectName?: string;
   isWorkspaceChildProject: boolean;
   localIsomorphicLibsNames: string[];
+  angularClients?: string[];
 }
 
 

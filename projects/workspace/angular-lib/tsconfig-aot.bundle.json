@@ -29,7 +29,7 @@
     "src",
     "e2e",
     "bundle",
-    "module",
+    "module*",
     "components"
   ],
   "angularCompilerOptions": {
