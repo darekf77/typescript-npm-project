@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, NavigationEnd } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
-import {CategoryController} from 'ss-common-logic/browser/controllers/CategoryController';
-import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import {CategoryController} from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
 import { Log, Level } from "ng2-logger/browser";
 import { isNumber } from "lodash";
 import { Router } from "@angular/router";

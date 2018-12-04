@@ -7,7 +7,7 @@ import { error } from "../messages";
 import { unlink } from "./UNLINK";
 
 
-export function install(a: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true) {
+export function install(a: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
   const args = a.split(' ').filter(a => !!a);
   project.packageJson.saveForInstall(true)
   if (args.length === 0) { // NPM INSTALL
@@ -16,7 +16,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       if (unlinkChilds) {
         unlink(project)
       }
-      project.node_modules.installPackages()
+      project.node_modules.installPackages(force)
       link(project)
     } else if (project.isWorkspaceChildProject) {
       console.log('** npm install in child of workspace')
@@ -24,7 +24,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       if (unlinkChilds) {
         unlink(parent)
       }
-      parent.node_modules.installPackages()
+      parent.node_modules.installPackages(force)
       link(parent)
     } else {
       console.log('** npm install in separated project')
@@ -96,7 +96,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
 
 export default {
   $INSTALL: (args) => {
-    install(args);
+    install(args, undefined, undefined, undefined, true);
     process.exit(0);
   },
   $I: (args) => {

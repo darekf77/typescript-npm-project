@@ -16,6 +16,7 @@ import { LibType } from '../models';
 import config from '../config';
 import { run } from '../process';
 import { error } from '../messages';
+import { UnknowNpmProject } from './project-unknow-npm';
 //#endregion
 export * from './base-project';
 
@@ -69,6 +70,7 @@ export function ProjectFrom(location: string, warnings = false): Project {
   if (type === 'server-lib') resultProject = new ProjectServerLib(location);
   if (type === 'angular-cli') resultProject = new ProjectAngularCliClient(location);
   if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
+  if (type === 'unknow-npm-project') resultProject = new UnknowNpmProject(location);
   // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
   //     : ('NO PROJECT FROM LOCATION ' + location))
 

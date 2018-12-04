@@ -3,9 +3,9 @@ import { Component, OnInit, HostListener } from '@angular/core';
 // third part
 import { Log, Level } from "ng2-logger";
 // local
-import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
-import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { CategoryController } from "ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController";
+import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu } from 'ss-common-ui/module';

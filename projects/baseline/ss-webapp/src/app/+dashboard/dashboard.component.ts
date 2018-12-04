@@ -6,14 +6,14 @@ import { ModelDataConfig } from 'morphi/browser'
 import { Log, Level } from "ng2-logger/browser";
 import * as _ from 'lodash';
 // local
-import { CategoryController } from "ss-common-logic/browser/controllers/CategoryController";
-import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
+import { CategoryController } from "ss-common-logic/browser-for-ss-webapp/controllers/CategoryController";
+import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/controllers/core/AuthController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/entities/CATEGORY';
 import { Subscription } from 'rxjs/Subscription';
 
 import { stringifyToQueryParams } from 'ss-common-ui/module';
-import {GroupsController} from 'ss-common-logic/browser/controllers/GroupsController';
-import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
+import {GroupsController} from 'ss-common-logic/browser-for-ss-webapp/controllers/GroupsController';
+import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/entities/GROUP';
 
 const log = Log.create('Dashboard')
 

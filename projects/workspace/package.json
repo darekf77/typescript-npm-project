@@ -10,7 +10,8 @@
         "dedupe": [
           "ng2-rest",
           "morphi",
-          "rxjs"
+          "rxjs",
+          "@ngtools"
         ],
         "always": [
           "@types/node",

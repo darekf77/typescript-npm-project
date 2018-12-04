@@ -528,6 +528,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
         return (notAllowed.filter(p => p.test(folderNam)).length === 0);
       })
 
+    if (this.isTnp) {
+      subdirectories = subdirectories.concat(getDirectories(path.join(this.location, config.folder.projects))
+        .filter(f => {
+          const folderNam = path.basename(f);
+          return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+        }))
+    }
+
     return subdirectories
       .map(dir => {
         // console.log('child:', dir)

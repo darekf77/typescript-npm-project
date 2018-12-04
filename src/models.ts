@@ -11,7 +11,15 @@ export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencie
 
 export type Package = { name: string; version: string; };
 
-export type LibType = "angular-lib" | "isomorphic-lib" | 'angular-client' | "ionic-client" | 'server-lib' | 'workspace' | 'angular-cli' | 'docker';
+export type LibType = "angular-lib"
+  | "isomorphic-lib"
+  | 'angular-client'
+  | "ionic-client"
+  | 'server-lib'
+  | 'workspace'
+  | 'angular-cli'
+  | 'docker'
+  | 'unknow-npm-project'
 
 export type RecreateFile = { where: string; from: string };
 
@@ -194,6 +202,8 @@ export interface IPackageJSON {
   bin?: any;
   main?: string;
   preferGlobal?: boolean;
+  engines?: { node: string; npm: string; }
+  license?: string;
 
   dependencies?: DependenciesFromPackageJsonStyle;
   devDependencies?: DependenciesFromPackageJsonStyle;

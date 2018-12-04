@@ -18,24 +18,24 @@ const loadingBar = [
 
 // my modules
 // import { MyLibModule } from 'angular-lib';
-import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
-import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
-import { ExamplesController } from 'ss-common-logic/browser/controllers/ExamplesController';
-import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
-import { DialogsController } from 'ss-common-logic/browser/controllers/DialogsController';
-import { ConfigController } from 'ss-common-logic/browser/controllers/ConfigController';
-import { MultimediaController } from 'ss-common-logic/browser/controllers/core/MultimediaController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
+import { CategoryController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/ExamplesController';
+import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/GroupsController';
+import { DialogsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DialogsController';
+import { ConfigController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/ConfigController';
+import { MultimediaController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/MultimediaController';
 
 // entities
-import { USER } from 'ss-common-logic/browser/entities/core/USER';
-import { EMAIL } from 'ss-common-logic/browser/entities/core/EMAIL';
-import { EMAIL_TYPE } from 'ss-common-logic/browser/entities/core/EMAIL_TYPE';
-import { SESSION } from 'ss-common-logic/browser/entities/core/SESSION';
-import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
-import { DIALOG } from 'ss-common-logic/browser/entities/DIALOG';
-import { GROUP } from 'ss-common-logic/browser/entities/GROUP';
-import { EXAMPLE } from 'ss-common-logic/browser/entities/EXAMPLE';
-import { CONFIG } from 'ss-common-logic/browser/entities/CONFIG';
+import { USER } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/core/USER';
+import { EMAIL } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/core/EMAIL';
+import { EMAIL_TYPE } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/core/EMAIL_TYPE';
+import { SESSION } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/core/SESSION';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
+import { DIALOG } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/DIALOG';
+import { GROUP } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/GROUP';
+import { EXAMPLE } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/EXAMPLE';
+import { CONFIG } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CONFIG';
 // local
 
 import { routes } from "./app.routes";

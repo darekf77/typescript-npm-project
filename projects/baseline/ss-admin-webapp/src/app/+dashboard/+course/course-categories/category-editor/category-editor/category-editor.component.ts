@@ -13,9 +13,9 @@ import { Subscription } from 'rxjs/Subscription';
 import { ModelDataConfig } from 'morphi/browser';
 // local
 
-import { CATEGORY } from 'ss-common-logic/browser/entities/CATEGORY';
-import { CategoryController } from 'ss-common-logic/browser/controllers/CategoryController';
-import { GroupsController } from 'ss-common-logic/browser/controllers/GroupsController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
+import { CategoryController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController';
+import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/GroupsController';
 
 @Component({
   selector: 'app-category-editor',

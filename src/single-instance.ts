@@ -3,6 +3,7 @@ import * as lockfile from 'lockfile';
 import * as fse from 'fs-extra';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as glob from 'glob';
 import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 // import * as notif from 'node-notifier';
@@ -301,11 +302,50 @@ export class ProjectsChecker {
     }
   }
 
+
+  private discoverFrom(project: Project) {
+    if (!project) {
+      return
+    }
+    // console.log(`Discovered: ${project.name}`)
+    this.instances.push(new ProjectInstance(project.location));
+    if (_.isArray(project.children)) {
+      project.children.forEach(c => this.discoverFrom(c))
+    }
+    this.discoverFrom(project.preview)
+  }
+
+
+  discoverExistedProjects() {
+
+    // this.discoverFrom(Project.Tnp);
+    const npmProjects = path.resolve(path.join(Project.Tnp.location, '..'))
+    fse.readdirSync(npmProjects)
+      .map(name => path.join(npmProjects, name))
+      .map(location => {
+        // console.log(location)
+        return ProjectFrom(location)
+      })
+      .filter(f => !!f)
+      .filter(f => {
+        // console.log(`Type for ${f.name} === ${f.type}`)
+        return f.type !== 'unknow-npm-project'
+      })
+      .forEach(project => {
+        // console.log(project.name)
+        this.discoverFrom(project)
+      })
+  }
+
   lock(): boolean {
+
+
+
 
     if (!fs.existsSync(this.jsonWithProjectsPath)) {
       ProjectsChecker.instances = [];
-      fse.writeJsonSync(this.jsonWithProjectsPath, []);
+      this.discoverExistedProjects();
+      this.save()
       return;
     }
 

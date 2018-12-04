@@ -33,6 +33,8 @@ export const config = {
     assets: 'assets',
     entities: 'entities',
     controllers: 'controllers',
+    projects: 'projects',
+    workspace: 'workspace'
 
   },
   file: {

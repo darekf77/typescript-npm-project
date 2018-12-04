@@ -3,7 +3,8 @@ import { init, AngularProviders } from 'morphi/browser';
 import { AppComponent } from './app.component';
 
 import { moprhi, modules } from './app.imports';
-import { AuthController } from 'ss-common-logic/browser/controllers/core/AuthController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
+import { MultimediaController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/MultimediaController';
 
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
@@ -22,7 +23,8 @@ init({
   imports: modules.import.angular,
   providers: [
     AngularProviders,
-    AuthController
+    AuthController,
+    MultimediaController
   ],
   bootstrap: [AppComponent]
 })

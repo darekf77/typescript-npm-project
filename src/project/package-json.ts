@@ -131,16 +131,23 @@ export class PackageJSON {
 
     this.cleanBeforeSave(project, newDeps);
 
+    const engines = Project.by('workspace').packageJson.data.engines;
+    const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
+
     if (project.isStandaloneProject) {
 
       if (saveForInstall) {
 
         project.packageJson.data.devDependencies = sortKeys(this.filterDevDepOnly(_.cloneDeep(newDeps)))
         project.packageJson.data.dependencies = sortKeys(this.filterDepOnly(_.cloneDeep(newDeps)))
+        project.packageJson.data.engines = engines;
+        project.packageJson.data.license = license;
         project.packageJson.save()
       } else {
         project.packageJson.data.devDependencies = undefined;
         project.packageJson.data.dependencies = undefined;
+        project.packageJson.data.engines = undefined
+        project.packageJson.data.license = undefined;
         project.packageJson.save()
       }
 
@@ -148,9 +155,17 @@ export class PackageJSON {
       project.packageJson.data.devDependencies = undefined;
       if (saveForInstall) {
         project.packageJson.data.dependencies = sortKeys(newDeps)
+        if (!project.isCoreProject) {
+          project.packageJson.data.engines = engines;
+          project.packageJson.data.license = license;
+        }
         project.packageJson.save()
       } else {
         project.packageJson.data.dependencies = undefined;
+        if (!project.isCoreProject) {
+          project.packageJson.data.engines = undefined;
+          project.packageJson.data.license = undefined;
+        }
         project.packageJson.save()
       }
     }
@@ -231,7 +246,7 @@ export class PackageJSON {
   }
 
   saveForInstall(saveForInstall = true, coreRecreate = true) {
-    console.log(`save for install in ${this.project.name} ! ` )
+    console.log(`save for install in ${this.project.name} ! `)
     if (coreRecreate) {
       this.coreRecreate()
     }
@@ -319,7 +334,7 @@ export class PackageJSON {
       const file = fs.readFileSync(path.join(this.location, config.file.package_json), 'utf8').toString();
       const json = JSON.parse(file);
       if (!json.tnp) {
-        error(`Unrecognized project type from package.json in location: ${location}`);
+        warn(`Unrecognized project type from package.json in location: ${location}`, false);
       }
       this.data = json;
     } catch (e) {
@@ -358,7 +373,7 @@ export class PackageJSON {
       const file = fs.readFileSync(filePath, 'utf8').toString();
       const json = JSON.parse(file);
       if (!json.tnp && !isTnpProject) {
-        error(`Unrecognized project type ${filePath}, from location: ${location}`);
+        warn(`Unrecognized project type from location: ${location}`, false);
       }
       return new PackageJSON({ data: json, location, project });
     } catch (err) {
@@ -387,10 +402,15 @@ export class PackageJSON {
 
   get type(): LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
+    if (_.isString(res)) {
+      return res;
+    }
     if (!res && fs.existsSync(path.join(this.location, 'angular-cli.json'))) {
       return 'angular-cli';
     }
-    return res;
+    if (this.data && this.data.name) {
+      return 'unknow-npm-project';
+    }
   }
 
   get name() {
