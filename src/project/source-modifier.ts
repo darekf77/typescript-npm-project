@@ -10,12 +10,14 @@ import config from '../config';
 import { ProjectFrom } from './index';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
+import { AnglarLibModuleDivider } from '../build-isomorphic-lib/angular-lib-module-build';
 
 export interface IsomorphicOptions {
   currentProjectName?: string;
   isWorkspaceChildProject: boolean;
   localIsomorphicLibsNames: string[];
   angularClients?: string[];
+  angularLibs?: string[];
 }
 
 
@@ -56,37 +58,57 @@ export class SourceModifier extends IncrementalCompilation {
     if (project.isWorkspaceChildProject) {
 
       const workspace = project.parent;
+
       const localIsomorphicLibsNames = workspace.children
         .filter(c => c.type === 'isomorphic-lib')
         .map(c => c.name)
+
+      const angularLibs = workspace.children
+        .filter(c => c.type === 'angular-lib')
+        .map(c => c.name)
+
+
       return {
         currentProjectName: project.name,
         isWorkspaceChildProject: true,
-        localIsomorphicLibsNames
+        localIsomorphicLibsNames,
+        angularLibs
       }
 
     }
     return {
       isWorkspaceChildProject: false,
-      localIsomorphicLibsNames: []
+      localIsomorphicLibsNames: [],
+      angularLibs: []
     }
   }
 
 
 
   cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
-    const { isWorkspaceChildProject, localIsomorphicLibsNames, currentProjectName } = options;
+    const {
+      isWorkspaceChildProject,
+      localIsomorphicLibsNames,
+      currentProjectName,
+      angularLibs
+    } = options;
 
     if (isWorkspaceChildProject) {
       let fileContent = file.contents.toString()
+
       localIsomorphicLibsNames.forEach(libname => {
         const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
-        // console.log('regex source', regex.source)
-        // console.log('replace Here ', fileContent)
         fileContent = fileContent.replace(regex, `${libname}/${IncrementalBuildProcessExtended.getBrowserVerPath(currentProjectName)}/`)
-      })                // import { ... } from 'ss-common-logic/tmp-for-ss-common-ui-module'
+      })
 
-      // console.log('write file here ', file.path)
+
+      angularLibs.forEach(angularLibName => {
+        const regex = new RegExp(`${angularLibName}\\/${config.folder.module}\\/`, 'g')
+        fileContent = fileContent.replace(regex,
+          `${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}/`)
+      })
+
+
       fs.writeFileSync(file.path, fileContent, {
         encoding: 'utf8'
       });
