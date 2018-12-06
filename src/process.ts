@@ -110,7 +110,7 @@ export function log(proc: child.ChildProcess, output = true, stdio) {
 
   if (output) {
     proc.stdout.on('data', (data) => {
-      console.log(data.toString());
+      process.stdout.write(data)
     })
 
     proc.stdout.on('error', (data) => {
@@ -118,7 +118,7 @@ export function log(proc: child.ChildProcess, output = true, stdio) {
     })
 
     proc.stderr.on('data', (data) => {
-      console.log(data.toString());
+      process.stderr.write(data)
     })
 
     proc.stderr.on('error', (data) => {
@@ -140,10 +140,26 @@ function checkProcess(dirPath: string, command: string) {
 
 const bigMaxBuffer = 2024 * 500;
 
+function getStdio(options?: RunOptions) {
+  const {
+    output, cwd, biggerBuffer, silence,
+    // pipeToParentProcerss = false,
+    // inheritFromParentProcerss = false
+   } = options;
+  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
+  // if (pipeToParentProcerss) {
+  //   stdio = ['pipe', 'pipe', 'pipe'] as any;
+  // }
+  // if (inheritFromParentProcerss) {
+  //   stdio = ['inherit', 'inherit', 'inherit'] as any;
+  // }
+  return stdio;
+}
+
 function runSyncIn(command: string, options?: RunOptions) {
   const { output, cwd, biggerBuffer, silence } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
-  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
+  let stdio = getStdio(options)
   checkProcess(cwd, command);
   return child.execSync(command, { stdio, cwd, maxBuffer })
 }
@@ -151,7 +167,7 @@ function runSyncIn(command: string, options?: RunOptions) {
 function runAsyncIn(command: string, options?: RunOptions) {
   const { output, cwd, biggerBuffer, silence } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
-  let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
+  let stdio = getStdio(options)
   checkProcess(cwd, command);
   return log(child.exec(command, { cwd, maxBuffer }), output, stdio);
 }
