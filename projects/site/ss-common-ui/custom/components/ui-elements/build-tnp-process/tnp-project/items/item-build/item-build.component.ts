@@ -24,7 +24,7 @@ export class ItemBuildComponent extends BaseItemStepperProcessBuildComponent imp
           icon: 'play_arrow',
           // label: 'Start',
           action: async () => {
-            await this.projectController.startBuildById(this.model.id).received;
+            // await this.projectController.startBuildById(this.model.id).received;
             // log.i('build process started!');
           }
         },
@@ -43,7 +43,7 @@ export class ItemBuildComponent extends BaseItemStepperProcessBuildComponent imp
         templateOptions: {
           icon: 'stop',
           action: async () => {
-            await this.projectController.stopBuildById(this.model.id).received;
+            // await this.projectController.stopBuildById(this.model.id).received;
             // log.i('build process stopped!')
           }
         },
