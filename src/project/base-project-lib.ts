@@ -165,7 +165,7 @@ export abstract class BaseProjectLib extends Project {
       if (!this.node_modules.exist()) {
         install('', this, false, false);
       }
-
+      this.packageJson.saveForInstall(true)
       this.recreate.init();
       await this.build({
         prod, outDir: config.folder.bundle as 'bundle'

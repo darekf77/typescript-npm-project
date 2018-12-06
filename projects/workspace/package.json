@@ -9,6 +9,7 @@
       "dependencies": {
         "dedupe": [
           "ng2-rest",
+          "ng2-logger",
           "morphi",
           "rxjs",
           "@ngtools"
@@ -18,7 +19,9 @@
           "tslib",
           "reflect-metadata",
           "typescript",
-          "ts-node"
+          "ts-node",
+          "tslint",
+          "enum-values"
         ],
         "asDevDependencies": [
           "@types/node",
@@ -26,17 +29,19 @@
           "reflect-metadata",
           "webpack",
           "typescript",
-          "ts-node"
+          "ts-node",
+          "gulp",
+          "tslint"
         ],
         "common": {
           "@types/node": "9.3.0",
           "@types/q": "^1.0.3",
           "q": "^1.5.1",
-          "morphi": "1.0.70",
+          "morphi": "1.0.77",
           "gulp": "^3.9.1",
           "dateformat": "^3.0.3",
-          "ng2-logger": "2.0.38",
-          "ng2-rest": "9.1.14",
+          "ng2-logger": "2.0.43",
+          "ng2-rest": "9.1.17",
           "@types/diff": "^3.2.2",
           "randomcolor": "^0.5.3",
           "json": {

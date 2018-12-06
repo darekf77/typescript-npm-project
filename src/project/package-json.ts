@@ -137,13 +137,14 @@ export class PackageJSON {
     if (project.isStandaloneProject) {
 
       if (saveForInstall) {
-
+        info('save for install - standalone project')
         project.packageJson.data.devDependencies = sortKeys(this.filterDevDepOnly(_.cloneDeep(newDeps)))
         project.packageJson.data.dependencies = sortKeys(this.filterDepOnly(_.cloneDeep(newDeps)))
         project.packageJson.data.engines = engines;
         project.packageJson.data.license = license;
         project.packageJson.save()
       } else {
+        info('save for clean version - standalone project')
         project.packageJson.data.devDependencies = undefined;
         project.packageJson.data.dependencies = undefined;
         project.packageJson.data.engines = undefined
@@ -154,6 +155,7 @@ export class PackageJSON {
     } else {
       project.packageJson.data.devDependencies = undefined;
       if (saveForInstall) {
+        info('save for install - workspace project')
         project.packageJson.data.dependencies = sortKeys(newDeps)
         if (!project.isCoreProject) {
           project.packageJson.data.engines = engines;
@@ -161,6 +163,7 @@ export class PackageJSON {
         }
         project.packageJson.save()
       } else {
+        info('save for clean version - workspace project')
         project.packageJson.data.dependencies = undefined;
         if (!project.isCoreProject) {
           project.packageJson.data.engines = undefined;
