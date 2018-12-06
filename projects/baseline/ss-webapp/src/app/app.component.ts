@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/controllers/core/AuthController';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { stringifyToQueryParams } from 'ss-common-ui/module';
+import { stringifyToQueryParams } from 'ss-common-ui/module-for-ss-webapp';
 
 @Component({
   selector: 'app-root',

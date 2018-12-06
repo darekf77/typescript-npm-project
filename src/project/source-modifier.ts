@@ -84,6 +84,19 @@ export class SourceModifier extends IncrementalCompilation {
   }
 
 
+  private replaceWhenWholeModule(angularLibName: string, fileContent: string) {
+    const tofind = `(\'|\")${angularLibName}/${config.folder.module}(\'|\")`
+    const regex = new RegExp(tofind, 'g')
+    const replacement = `'${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}'`;
+    return fileContent.replace(regex, replacement)
+  }
+
+  private replaceWhenReferingInsideModule(angularLibName: string, fileContent: string) {
+    const tofind = `${angularLibName}/${config.folder.module}/`
+    const regex = new RegExp(tofind, 'g')
+    const replacement = `${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}/`;
+    return fileContent.replace(regex, replacement)
+  }
 
   cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
     const {
@@ -103,11 +116,11 @@ export class SourceModifier extends IncrementalCompilation {
 
 
       angularLibs.forEach(angularLibName => {
-        const regex = new RegExp(`${angularLibName}\\/${config.folder.module}\\/`, 'g')
-        fileContent = fileContent.replace(regex,
-          `${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}/`)
+        // TODO same should be for isomorphic lib ?
+        fileContent = this.replaceWhenWholeModule(angularLibName, fileContent)
+        fileContent = this.replaceWhenReferingInsideModule(angularLibName, fileContent)
       })
-
+      // process.exit(0)
 
       fs.writeFileSync(file.path, fileContent, {
         encoding: 'utf8'

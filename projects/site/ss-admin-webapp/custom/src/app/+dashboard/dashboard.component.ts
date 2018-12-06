@@ -10,7 +10,7 @@ import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/con
 
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import { Menu, MenuItem } from 'ss-common-ui/module';
+import { Menu, MenuItem } from 'ss-common-ui/module-for-ss-admin-webapp';
 import { DomainsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DomainsController';
 import { Global } from 'morphi/browser';
 

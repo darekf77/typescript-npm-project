@@ -8,7 +8,7 @@ import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/cont
 import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import { Menu } from 'ss-common-ui/module';
+import { Menu } from 'ss-common-ui/module-for-ss-admin-webapp';
 
 const log = Log.create('Dashboard')
 

@@ -9,7 +9,7 @@ import {
   TableWrapperModule,
   FormWrapperMaterialModule,
   DialogsConversationEditorModule
-} from 'ss-common-ui/module';
+} from 'ss-common-ui/module-for-ss-admin-webapp';
 
 
 const angularModules = [

@@ -15,7 +15,7 @@ import { MatInputModule } from "@angular/material/input";
 
 // third part
 import { StaticColumnsModule } from "static-columns";
-import { LogoModule } from 'ss-common-ui/module';
+import { LogoModule } from 'ss-common-ui/module-for-ss-admin-webapp';
 
 
 @NgModule({

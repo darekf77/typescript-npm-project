@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatTooltipModule } from '@angular/material/tooltip'
 // local
 import { BuildingProcessComponent } from './building-process.component';
-import { FormWrapperMaterialModule } from 'ss-common-ui/module';
+import { FormWrapperMaterialModule } from 'ss-common-ui/module-for-ss-admin-webapp';
 import { LogPrcessModule } from '../log-prcess/log-prcess.module';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyBuildTnpProcessComponent } from '../formly-build-tnp-process/formly-build-tnp-process.component';

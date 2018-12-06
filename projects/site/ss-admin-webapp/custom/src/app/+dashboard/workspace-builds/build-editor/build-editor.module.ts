@@ -7,7 +7,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatRadioModule } from '@angular/material/radio'
 import { MatTabsModule } from '@angular/material/tabs'
 // thirdpart
-import { FormWrapperMaterialModule, DialogWrapperModule } from 'ss-common-ui/module';
+import { FormWrapperMaterialModule, DialogWrapperModule } from 'ss-common-ui/module-for-ss-admin-webapp';
 import { TreeModule } from 'angular-tree-component';
 // local
 import { BuildEditorComponent } from './build-editor.component';

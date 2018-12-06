@@ -13,7 +13,7 @@ import { routes } from "./dashboard.routes";
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
-import { LayoutMaterialModule } from 'ss-common-ui/module';
+import { LayoutMaterialModule } from 'ss-common-ui/module-for-ss-admin-webapp';
 // third part
 import { McBreadcrumbsModule } from 'ngx-breadcrumbs';
 

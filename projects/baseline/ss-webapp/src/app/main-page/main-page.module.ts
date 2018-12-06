@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import {
   SliderVerticalModule,
   CommonUIModule
-} from "ss-common-ui/module";
+} from 'ss-common-ui/module-for-ss-webapp';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';

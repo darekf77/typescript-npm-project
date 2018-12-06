@@ -11,7 +11,7 @@ import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/controller
 import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/entities/CATEGORY';
 import { Subscription } from 'rxjs/Subscription';
 
-import { stringifyToQueryParams } from 'ss-common-ui/module';
+import { stringifyToQueryParams } from 'ss-common-ui/module-for-ss-webapp';
 import {GroupsController} from 'ss-common-logic/browser-for-ss-webapp/controllers/GroupsController';
 import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/entities/GROUP';
 
