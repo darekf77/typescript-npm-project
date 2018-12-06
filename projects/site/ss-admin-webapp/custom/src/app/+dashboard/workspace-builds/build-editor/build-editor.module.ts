@@ -12,14 +12,8 @@ import { TreeModule } from 'angular-tree-component';
 // local
 import { BuildEditorComponent } from './build-editor.component';
 import { routes } from './build-editor.routes';
-import { BuildingProcessModule } from './building-process/building-process.module';
-import { ServingProcessModule } from './serving-process/serving-process.module';
-import { SelfUpdateModule } from './self-update/self-update.module';
-
 const localModules = [
-  BuildingProcessModule,
-  ServingProcessModule,
-  SelfUpdateModule
+
 ]
 
 const materialModules = [

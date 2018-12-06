@@ -75,7 +75,7 @@ export class FilesRecreator {
           '.npmignore',
           '.npmrc',
           '.babelrc'
-        ])
+        ]).map( f => f.startsWith('/') ? f.slice(1): f )
       },
       get gitignore() {
         const gitignoreFiles = [ // for sure ingored
@@ -200,7 +200,7 @@ export class FilesRecreator {
               self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
                 settings["files.exclude"][f] = true
               })
-              return settings;
+              return settings
             });
           }
         }

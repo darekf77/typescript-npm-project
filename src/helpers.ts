@@ -98,6 +98,10 @@ export function copyFile(sousrce: string, destination: string,
   transformTextFn?: (input: string) => string, debugMode = false) {
 
   try {
+    if (fse.lstatSync(sousrce).isDirectory()) {
+      warn(`Trying to copy directory as file: ${sousrce}`, true)
+      return
+    }
     if (!fs.existsSync(sousrce)) {
       warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
       return;
@@ -109,7 +113,7 @@ export function copyFile(sousrce: string, destination: string,
     const destDirPath = path.dirname(destination);
     if (debugMode) console.log('destDirPath', destDirPath)
     if (!fs.existsSync(destDirPath)) {
-      run(`mkdirp ${destDirPath}`).sync()
+      fse.mkdirpSync(destDirPath);
     }
 
     let sourceData = fs.readFileSync(sousrce).toString();
@@ -118,8 +122,8 @@ export function copyFile(sousrce: string, destination: string,
     }
     if (debugMode) {
       console.log(`
-      
-      
+
+
       Write to: ${destination} file:
       ============================================================================================
       ${sourceData}

@@ -12,6 +12,12 @@ export default {
     process.exit(0)
   },
 
+
+  $DEDUPE() {
+    Project.Current.packageJson.dedupe()
+    process.exit(0)
+  },
+
   $DEPS_DEDUPE(args: string) {
     Project.Current.packageJson.dedupe()
     process.exit(0)
