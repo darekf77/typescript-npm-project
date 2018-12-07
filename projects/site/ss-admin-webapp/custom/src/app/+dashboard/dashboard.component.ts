@@ -75,6 +75,7 @@ export class DashboardComponent implements OnInit {
 
   async getBuilds() {
     const data = await this.buildController.getAll().received;
+    debugger
     log.i('data', data.body.json);
     return data.body.json.map(b => {
       return {

@@ -1,6 +1,6 @@
 import {
-  ENDPOINT, CLASSNAME, BaseCRUDEntity, META,
-  POST, PathParam, QueryParam, GET, Response, PUT, ModelDataConfig
+  ENDPOINT, CLASSNAME, BaseCRUDEntity, META, SYMBOL,
+  POST, PathParam, QueryParam, GET, Response, PUT, ModelDataConfig, Any
 } from 'morphi';
 import { BUILD } from '../entities/BUILD';
 import * as _ from 'lodash';
@@ -34,6 +34,20 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
 
   }
+
+
+  @GET(`/${SYMBOL.CRUD_TABLE_MODEL}`)
+  getAll(config?: ModelDataConfig) {
+    console.log('here')
+    return async () => {
+      const build = new BUILD();
+      return [{
+        build
+      }] as any;
+    }
+  }
+
+
   //#endregion
 
 

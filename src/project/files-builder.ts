@@ -75,7 +75,13 @@ export class FilesRecreator {
           '.npmignore',
           '.npmrc',
           '.babelrc'
-        ]).map( f => f.startsWith('/') ? f.slice(1): f )
+        ]).map(f => f.startsWith('/') ? f.slice(1) : f)
+          .filter(f => {
+            if (self.project.isSite && f === 'src') {
+              return false
+            }
+            return true;
+          })
       },
       get gitignore() {
         const gitignoreFiles = [ // for sure ingored
