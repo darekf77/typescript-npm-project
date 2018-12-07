@@ -1,7 +1,8 @@
 //#region @backend
 import * as child from 'child_process';
-import { info, error } from './messages';
+import { info, error, warn } from './messages';
 import { basename } from 'path';
+import { questionYesNo } from './process';
 
 export function lastCommitHash(directoryPath): string {
   try {
@@ -20,7 +21,7 @@ export function lastCommitDate(directoryPath): Date {
   try {
     const cwd = directoryPath;
     let unixTimestamp = child.execSync(`git log -1 --pretty=format:%ct`, { cwd }).toString().trim()
-    return new Date(Number(unixTimestamp)*1000)
+    return new Date(Number(unixTimestamp) * 1000)
   } catch (e) {
     console.log(e)
     error(`Cannot counts commits in branch in: ${directoryPath}`)
@@ -42,7 +43,7 @@ export function countCommits(directoryPath) {
 
 }
 
-export function pullCurrentBranch(directoryPath) {
+export async function pullCurrentBranch(directoryPath, askToRetry = false) {
   info(`Pulling git changes in "${directoryPath}" `)
   try {
     const cwd = directoryPath;
@@ -50,8 +51,16 @@ export function pullCurrentBranch(directoryPath) {
     child.execSync(`git pull origin ${currentLocalBranch}`, { cwd });
     info(`Branch "${currentLocalBranch}" updated successfully in ${basename(directoryPath)}`)
   } catch (e) {
-    console.log(e)
-    error(`Cannot update current branch in: ${directoryPath}`)
+    // console.log(e)
+    error(`Cannot update current branch in: ${directoryPath}`, askToRetry, true)
+    if (askToRetry) {
+      await questionYesNo(`Do you wanna try again ?`, async () => {
+        await pullCurrentBranch(directoryPath, askToRetry)
+      }, () => {
+        process.exit(0)
+      })
+    }
+
   }
 
 }

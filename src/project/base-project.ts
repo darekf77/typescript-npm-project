@@ -435,8 +435,8 @@ Generated workspace should be here: ${genLocationWOrkspace}
   public get git() {
     const self = this;
     return {
-      updateOrigin() {
-        pullCurrentBranch(self.location);
+      async updateOrigin(askToRetry = false) {
+        await pullCurrentBranch(self.location, askToRetry);
       },
       resetHard() {
         self.run(`git reset --hard`).sync()

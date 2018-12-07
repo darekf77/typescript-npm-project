@@ -147,14 +147,14 @@ export class AutoActions {
     return build;
   }
 
-  build(watch = false) {
+  async build(watch = false) {
     const build = this.getBuild();
     if (!build) {
       error(`Not build for current project "${this.project.name}"   `)
     } else {
       clearConsole();
       if (!this.project.isTnp) {
-        this.project.git.updateOrigin();
+        await this.project.git.updateOrigin(true);
       }
       this.project.run(`${watch ? build.commandWatch : build.command} ${(_.isArray(build.args) ? build.args
         .filter(a => !a.trim().startsWith('#'))
@@ -164,10 +164,10 @@ export class AutoActions {
 
 }
 
-export function autobuild(project: Project, watch = false, exit = true) {
+export async function autobuild(project: Project, watch = false, exit = true) {
 
   const autobuild = new AutoActions(project);
-  autobuild.build(watch)
+  await autobuild.build(watch)
   if (exit) {
     process.exit(0)
   }
@@ -176,14 +176,14 @@ export function autobuild(project: Project, watch = false, exit = true) {
 
 
 export default {
-  $AUTOBUILD: (args: string) => {
-    autobuild(Project.Current, !!args.split(' ').find(a => a == 'watch'))
+  $AUTOBUILD: async (args: string) => {
+    await autobuild(Project.Current, !!args.split(' ').find(a => a == 'watch'))
   },
-  $AUTOBUILD_WATCH: () => {
-    autobuild(Project.Current, true)
+  $AUTOBUILD_WATCH: async () => {
+    await autobuild(Project.Current, true)
   },
-  $AUTOBUILDWATCH: () => {
-    autobuild(Project.Current, true)
+  $AUTOBUILDWATCH: async () => {
+    await autobuild(Project.Current, true)
   }
 
 }
