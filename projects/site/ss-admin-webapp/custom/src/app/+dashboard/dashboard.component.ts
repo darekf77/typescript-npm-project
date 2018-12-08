@@ -12,9 +12,9 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module-for-ss-admin-webapp';
 import { DomainsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DomainsController';
-import { Global } from 'morphi/browser';
+import { Global, CLASSNAME } from 'morphi/browser';
 
-const log = Log.create('Dashboard', Level.__NOTHING);
+const log = Log.create('Dashboard');
 
 @Component({
   selector: 'app-dashboard-component',
@@ -75,8 +75,8 @@ export class DashboardComponent implements OnInit {
 
   async getBuilds() {
     const data = await this.buildController.getAll().received;
-    debugger
-    log.i('data', data.body.json);
+
+    log.i('builds', data.body.json);
     return data.body.json.map(b => {
       return {
         name: b.name,
@@ -86,21 +86,21 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  async getDomains() {
-    const data = await this.domainsController.getAll().received;
-    log.i('data', data.body.json);
-    return data.body.json.map(b => {
-      return {
-        name: b.name,
-        href: `/dashboard/domains/domain/${b.id}`,
-        id: b.id
-      };
-    });
-  }
+  // async getDomains() {
+  //   const data = await this.domainsController.getAll().received;
+  //   log.i('data', data.body.json);
+  //   return data.body.json.map(b => {
+  //     return {
+  //       name: b.name,
+  //       href: `/dashboard/domains/domain/${b.id}`,
+  //       id: b.id
+  //     };
+  //   });
+  // }
 
   async ngOnInit() {
 
-
+    // log.i(CLASSNAME.prototype.classes)
 
     const builds = _.first(this.menu.top.items).leftMenu[0];
     builds.action = () => {

@@ -13,6 +13,7 @@ import config from "../config";
 import { Project } from './base-project';
 import { FileEvent, BuildOptions, IPackageJSON } from '../models';
 import { info, warn } from '../messages';
+import { tryRemoveDir } from '../index';
 
 export class CopyToManager {
 
@@ -87,12 +88,9 @@ export class CopyToManager {
 
   }
 
+  private static firstRemovedDir = {};
   public copyToProjectNodeModules(destination: Project) {
 
-    if (this.project.isTnp) {
-      destination.tnpHelper.install();
-      return;
-    }
 
     const monitoredOutDir: string = path.join(this.project.location,
       config.folder.dist)
@@ -100,7 +98,17 @@ export class CopyToManager {
     const projectOudDirDest = path.join(destination.location,
       config.folder.node_modules,
       this.project.name);
-    fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
+
+    if (!CopyToManager.firstRemovedDir[projectOudDirDest]) {
+      CopyToManager.firstRemovedDir[projectOudDirDest] = true;
+      tryRemoveDir(projectOudDirDest, true)
+    }
+
+    if (this.project.isTnp) {
+      destination.tnpHelper.install();
+    } else {
+      fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
+    }
   }
 
   private __firstTimeWatchCopyTOFiles = [];
@@ -142,15 +150,13 @@ export class CopyToManager {
         this.buildOptions.copyto.forEach(p => {
 
           if (p && p.location) {
-            if (this.project.isTnp) {
-              p.tnpHelper.install(true);
-            } else {
-              const projectOudDirDest = path.join(p.location,
-                config.folder.node_modules,
-                this.project.isTnp ? config.file.tnpBundle : this.project.name
-              );
-              fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
-            }
+
+            const projectOudDirDest = path.join(p.location,
+              config.folder.node_modules,
+              this.project.isTnp ? config.file.tnpBundle : this.project.name
+            );
+            fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
+
           } else {
             warn(`Invalid project: ${p}`)
           }

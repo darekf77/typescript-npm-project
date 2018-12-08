@@ -102,9 +102,8 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
   buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
     const isomorphicNames = this.getIsomorphcLibNames(this.isWorkspaceChildProject)
 
-    if (!this.isTnp) {
-      this.copyWhenExist('bin', outDir, true) // TODO make this for each library
-    }
+
+    this.copyWhenExist('bin', outDir, true) // TODO make this for each library
     this.copyWhenExist('package.json', outDir, true)
     this.copyWhenExist('.npmrc', outDir, true)
     this.copyWhenExist('.npmignore', outDir, true)

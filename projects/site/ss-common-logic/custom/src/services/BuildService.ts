@@ -1,6 +1,6 @@
 import { BuildController } from "../controllers/BuildController";
 import { Subject } from "rxjs/Subject";
-import BUILD from "../entities/BUILD";
+import { BUILD } from "../entities/BUILD";
 import { ModelDataConfig } from "morphi";
 import { TNP_PROJECT } from "../entities/TNP_PROJECT";
 import { Injectable } from "@angular/core";

@@ -16,7 +16,6 @@
     "npm-debug.log*": true,
     ".sass-cache": true,
     ".sourcemaps": true,
-    "src": true,
     "__src": true,
     "!custom/src": true,
     "tslint.json": true,

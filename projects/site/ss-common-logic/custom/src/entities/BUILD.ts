@@ -30,155 +30,44 @@ export interface IBUILD {
 //#endregion
 @FormlyForm<BUILD>()
 @DefaultModelWithMapping<BUILD>({
-  gitFolder: '/',
-  gitRemote: '',
-  friendlyName: 'fiiendly name',
+  gitRemote: ''
 }, {
     progress: PROGRESS_BAR_DATA
   })
 @CLASSNAME('BUILD')
-export class BUILD extends META.BASE_ENTITY<BUILD> {
-
-
-  //#region @backend
-  get nameFromIdAndRemote() {
-    return `${this.id}-${this.nameFromRemote}`;
-  }
-
-  get localPath() {
-
-    return {
-      repositoryFolder: path.join(ENV.pathes.backup.repositories, this.nameFromIdAndRemote, this.gitFolder),
-      buildFolder: path.join(ENV.pathes.backup.builds, this.nameFromIdAndRemote)
-    }
-
-  }
-
-  init(selfBuild = false) {
-    if (_.isString(this.staticFolder) && this.staticFolder !== '') {
-      this.reinitFrom.folder(selfBuild)
-    } else {
-      this.reinitFrom.repository()
-    }
-    const location = this.localPath.buildFolder;
-
-    const project = TNP_PROJECT.from(location);
-    this.project = project;
-  }
-
-
-  private get reinitFrom() {
-    const self = this;
-    return {
-      folder(selfBuild = false) {
-
-        if (ENV.name !== 'local') {
-          pullCurrentBranch(self.staticFolder);
-        }
-
-        const toCopy = path.join(self.staticFolder, self.gitFolder);
-        const dest = self.localPath.repositoryFolder;
-
-        if (selfBuild) {
-
-          const slefRepoLink = path.join(ENV.pathes.backup.repositories, self.nameFromIdAndRemote);
-          if (fse.existsSync(slefRepoLink)) {
-            fse.removeSync(slefRepoLink)
-          }
-
-          HelpersLinks.createLink(slefRepoLink, self.staticFolder);
-
-        } else {
-          const options: fse.CopyOptionsSync = {
-            overwrite: true,
-            recursive: true,
-            filter: (src) => {
-              return !/.*node_modules.*/g.test(src) &&
-                !/.*tmp.*/g.test(src) &&
-                !/\.vscode.*/g.test(src) &&
-                !/.*dist.*/g.test(src) &&
-                !fs.lstatSync(src).isSymbolicLink();
-            }
-          };
-
-          fse.copySync(toCopy, dest, options);
-          run(`tnp claer`, { cwd: dest });
-
-
-        }
-        self.linkRepoToBuild()
-
-
-      },
-
-      repository() {
-        const p = path.join(ENV.pathes.repositories, self.nameFromIdAndRemote);
-        if (fse.existsSync(p)) {
-          pullCurrentBranch(this.localPath.repositoryFolder);
-        } else {
-          run(`git clone ${self.gitRemote} ${self.nameFromIdAndRemote}`, { cwd: ENV.pathes.repositories })
-        }
-        self.linkRepoToBuild()
-      }
-
-
-    }
-
-
-  }
-
-  private linkRepoToBuild() {
-    if (fse.existsSync(this.localPath.buildFolder)) {
-      fse.removeSync(this.localPath.buildFolder)
-    }
-
-    HelpersLinks.createLink(this.localPath.buildFolder, this.localPath.repositoryFolder);
-  }
-
-
-  //#endregion
-
-
+export class BUILD implements IBUILD {
 
   @PrimaryGeneratedColumn()
   id: number;
 
-  fromRaw(obj: BUILD): BUILD {
-    return _.merge(new BUILD(), obj);
+  path: string;
+  get name(): string {
+    if (this.customName) {
+      return this.customName;
+    }
+    if (this.isSelf) {
+      return 'AUTOBUILD'
+    }
+    if (this.gitRemote) {
+      const nameFromRemote = _.first(this.gitRemote.match(/([a-z-])+\.git/g)).replace('.git', '');
+      if (this.gitFolder) {
+        return `${nameFromRemote}/${this.gitFolder}`
+      }
+      return nameFromRemote;
+    }
+    if (this.path) {
+      const maxPathLength = 100;
+      if (this.path.length > maxPathLength) {
+        return this.path.substr(this.path.length - maxPathLength)
+      }
+      return this.path;
+    }
+    console.warn(`entity [BUILD] Cannot resolve project name`)
+    return '';
   }
-
-
-  get name() {
-    return this.isSelf ? 'AUTOBUILD' : ((this.gitFolder !== '/') ? _.startCase(this.gitFolder) : _.startCase(this.nameFromRemote));
-  }
-
-
-  get nameFromRemote() {
-    return _.first(this.gitRemote.match(/([a-z-])+\.git/g)).replace('.git', '');
-  }
-
-  @OneToOne(type => TNP_PROJECT)
-  @JoinColumn()
   project: TNP_PROJECT;
-
-  @Column() gitRemote: string;
-
-
-  @Column({ nullable: true }) staticFolder: string;
-  
-
-  @Column({ nullable: true, default: '/' }) gitFolder: string;
-
-  @Column({ nullable: true, default: 'friendlyName' }) friendlyName: string;
-
-  @Column({
-    type: 'boolean',
-    default: false
-  }) isSelf: boolean = false;
-
-
-
+  gitRemote: string;
+  gitFolder: string;
+  customName: string;
+  isSelf: boolean = false;
 }
-
-
-export default BUILD;

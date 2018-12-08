@@ -35,21 +35,20 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   }
 
+  //#endregion
 
-  @GET(`/${SYMBOL.CRUD_TABLE_MODEL}`)
-  getAll(config?: ModelDataConfig) {
+  @GET()
+  getAll() {
+    //#region @backendFunc
     console.log('here')
     return async () => {
       const build = new BUILD();
-      return [{
+      return [
         build
-      }] as any;
+      ] as any;
     }
+    //#endregion
   }
-
-
-  //#endregion
-
 
 
 

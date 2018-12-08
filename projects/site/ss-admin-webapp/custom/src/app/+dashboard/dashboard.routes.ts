@@ -16,10 +16,10 @@ export const routes: Routes = [
         path: 'builds',
         loadChildren: './workspace-builds/workspace-builds.module#WorkspaceBuildsModule'
       },
-      {
-        path: 'domains',
-        loadChildren: './workspace-domains/workspace-domains.module#WorkspaceDomainsModule'
-      }
+      // {
+      //   path: 'domains',
+      //   loadChildren: './workspace-domains/workspace-domains.module#WorkspaceDomainsModule'
+      // }
     ]
   }
 ];

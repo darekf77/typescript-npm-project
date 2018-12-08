@@ -255,13 +255,17 @@ export function tryCopyFrom(source, destination, options = {}) {
   }
 }
 
-export function tryRemoveDir(dirpath) {
+export function tryRemoveDir(dirpath: string, contentOnly = false) {
   try {
-    rimraf.sync(dirpath)
+    if (contentOnly) {
+      rimraf.sync(`${dirpath}/*`)
+    } else {
+      rimraf.sync(dirpath)
+    }
   } catch (e) {
     console.log(`Trying to remove directory: ${dirpath}`)
     sleep(1);
-    tryRemoveDir(dirpath);
+    tryRemoveDir(dirpath, contentOnly);
   }
 }
 
