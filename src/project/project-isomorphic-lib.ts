@@ -124,7 +124,6 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     } else {
       new IncrementalBuildProcessExtended(this, this.buildOptions).start('isomorphic compilation')
     }
-    this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
   }
 
 }

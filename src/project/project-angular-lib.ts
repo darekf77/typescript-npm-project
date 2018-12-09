@@ -65,7 +65,6 @@ export class ProjectAngularLib extends BaseProjectLib {
         }
       }, `angular-lib (project ${this.name})`)
     }
-    this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
     return this;
   }
 
@@ -91,10 +90,7 @@ export class ProjectAngularLib extends BaseProjectLib {
           this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }
-      this.copytToManager.initCopyingOnBuildFinish(this.buildOptions);
     }
-
-
 
   }
 

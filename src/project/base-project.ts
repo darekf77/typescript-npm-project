@@ -430,6 +430,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     // }
 
     this.buildSteps(buildOptions);
+    this.copytToManager.initCopyingOnBuildFinish(buildOptions);
   }
 
   public get git() {

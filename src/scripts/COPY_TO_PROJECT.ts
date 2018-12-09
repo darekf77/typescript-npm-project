@@ -11,7 +11,7 @@ function copy(destLocaiton) {
   if (!destination) {
     error(`Incorect project in: ${destLocaiton}`)
   }
-  currentLib.copytToManager.copyToProjectNodeModules(destination);
+  currentLib.copytToManager.copyBuildedDistributionTo(destination);
   info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
 

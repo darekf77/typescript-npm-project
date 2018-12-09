@@ -13,7 +13,8 @@ import config from "../config";
 import { Project } from './base-project';
 import { FileEvent, BuildOptions, IPackageJSON } from '../models';
 import { info, warn } from '../messages';
-import { tryRemoveDir } from '../index';
+import { tryRemoveDir, tryCopyFrom } from '../index';
+import { copyFile } from '../helpers';
 
 export class CopyToManager {
 
@@ -25,17 +26,17 @@ export class CopyToManager {
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
     if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-      // info(`No need to copying on build finsh`)
+      info(`No need to copying on build finsh... `)
       return;
     }
     if (watch) {
-      this.watchOutDir()
+      this.watchAndCopyToProjectOnFinish()
     } else {
       this.copyToProjectsOnFinish()
     }
   }
 
-  public generateCopyIn(destinationLocation) {
+  public generateSourceCopyIn(destinationLocation: string) {
 
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
@@ -88,85 +89,60 @@ export class CopyToManager {
 
   }
 
-  private static firstRemovedDir = {};
-  public copyToProjectNodeModules(destination: Project) {
 
+  public copyBuildedDistributionTo(destination: Project, options?: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }) {
+    const { specyficFileRelativePath = undefined, outDir = 'dist' } = options;
 
-    const monitoredOutDir: string = path.join(this.project.location,
-      config.folder.dist)
-
-    const projectOudDirDest = path.join(destination.location,
-      config.folder.node_modules,
-      this.project.name);
-
-    if (!CopyToManager.firstRemovedDir[projectOudDirDest]) {
-      CopyToManager.firstRemovedDir[projectOudDirDest] = true;
-      tryRemoveDir(projectOudDirDest, true)
+    if (!specyficFileRelativePath && (!destination || !destination.location)) {
+      warn(`Invalid project: ${destination.name}`)
+      return
     }
 
-    if (this.project.isTnp) {
-      destination.tnpHelper.install();
+    const namePackageName = this.project.isTnp ? config.file.tnpBundle : this.project.name;
+
+    if (specyficFileRelativePath) {
+      const sourceFile = path.normalize(path.join(this.project.location,
+        outDir, specyficFileRelativePath));
+
+      const destinationFile = path.normalize(path.join(destination.location,
+        config.folder.node_modules,
+        namePackageName,
+        specyficFileRelativePath));
+
+      copyFile(sourceFile, destinationFile)
     } else {
-      fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
+      const monitoredOutDir: string = path.join(this.project.location, outDir)
+
+      const projectOudDirDest = path.join(destination.location,
+        config.folder.node_modules,
+        namePackageName
+      );
+
+      tryRemoveDir(projectOudDirDest, true)
+      tryCopyFrom(monitoredOutDir, projectOudDirDest)
     }
+
   }
 
-  private __firstTimeWatchCopyTOFiles = [];
-  private copyToProjectsOnFinish(event?: FileEvent, specificFile?: string) {
+  // private __firstTimeWatchCopyTOFiles = [];
+  private copyToProjectsOnFinish(event?: FileEvent, specyficFileRelativePath?: string) {
 
     // prevent first unnecesary copy after watch
-    if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
-      this.__firstTimeWatchCopyTOFiles.push(specificFile)
-      return;
-    }
+    // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
+    //   this.__firstTimeWatchCopyTOFiles.push(specificFile)
+    //   return;
+    // }
 
-    const monitoredOutDir: string = this.buildOptions.outDir;
+    const outDir = this.buildOptions.outDir;
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      // console.log(`copyto ${monitoredOutDir}`, this.buildOptions.copyto )
-
-
-      if (event && specificFile) {
-        // console.log(`Event: ${event} Copy SPECIFI FILE: ${specificFile}`)
-        const monitoredSpecificFile = path.normalize(path.join(this.project.location,
-          this.buildOptions.outDir, specificFile));
-
-        this.buildOptions.copyto.forEach(p => {
-          if (p && p.location) {
-
-            const projectOudFileDest = path.normalize(path.join(p.location,
-              config.folder.node_modules,
-              this.project.isTnp ? config.file.tnpBundle : this.project.name,
-              specificFile));
-            // console.log(`Copy file !: ${monitoredSpecificFile} to ${projectOudFileDest} `)
-            fse.copySync(monitoredSpecificFile, projectOudFileDest);
-
-          } else {
-            warn(`Invalid project: ${p}`)
-          }
-
-        })
-
-      } else {
-        this.buildOptions.copyto.forEach(p => {
-
-          if (p && p.location) {
-
-            const projectOudDirDest = path.join(p.location,
-              config.folder.node_modules,
-              this.project.isTnp ? config.file.tnpBundle : this.project.name
-            );
-            fse.copySync(monitoredOutDir, projectOudDirDest, { overwrite: true });
-
-          } else {
-            warn(`Invalid project: ${p}`)
-          }
-
-        })
-      }
+      this.buildOptions.copyto.forEach(p => {
+        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir })
+      })
     }
+
   }
 
-  private watchOutDir() {
+  private watchAndCopyToProjectOnFinish() {
     const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
 
     // console.log('watching   folder for as copy source !! ', monitorDir)
@@ -194,30 +170,10 @@ export class CopyToManager {
         this.copyToProjectsOnFinish('removed', f as any);
       })
 
-      // console.log(`Monitoring directory: ${monitorDir} `)
-      // watch.watchTree(monitorDir, (f, curr, prev) => {
-
-      //     if (_.isString(f)) {
-      //         f = f.replace(monitorDir, '') as any
-      //         // console.log(f)
-      //     }
-
-      //     // process.exit(0)
-      //     if (typeof f == "object" && prev === null && curr === null) {
-      //         // Finished walking the tree
-      //     } else if (prev === null) {
-      //         this.copyToProjectsOnFinish('created', f as any);
-      //     } else if (curr.nlink === 0) {
-      //         this.copyToProjectsOnFinish('removed', f as any);
-      //     } else {
-      //         this.copyToProjectsOnFinish('changed', f as any);
-      //         // f was changed
-      //     }
-      // })
     } else {
       console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir}`);
       setTimeout(() => {
-        this.watchOutDir();
+        this.watchAndCopyToProjectOnFinish();
       }, 1000)
     }
   }

@@ -19,17 +19,17 @@ async function regenerateProject(project: Project, buildOptions: BuildOptions, a
 
   if (project.isWorkspace && project.isSite) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    project.baseline.copytToManager.generateCopyIn(genLocationBaseline);
+    project.baseline.copytToManager.generateSourceCopyIn(genLocationBaseline);
   }
 
   let genProject = ProjectFrom(genLocation);
   if (project.isWorkspace) {
     if (!genProject) {
-      project.copytToManager.generateCopyIn(genLocation);
+      project.copytToManager.generateSourceCopyIn(genLocation);
     }
   } else if (project.isWorkspaceChildProject) {
     rimraf.sync(genLocation);
-    project.copytToManager.generateCopyIn(genLocation);
+    project.copytToManager.generateSourceCopyIn(genLocation);
   }
 
   genProject = ProjectFrom(genLocation);
