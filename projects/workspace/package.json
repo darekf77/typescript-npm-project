@@ -40,8 +40,8 @@
           "morphi": "1.0.78",
           "gulp": "^3.9.1",
           "dateformat": "^3.0.3",
-          "ng2-logger": "2.0.43",
-          "ng2-rest": "9.1.17",
+          "ng2-logger": "2.0.44",
+          "ng2-rest": "9.1.18",
           "@types/diff": "^3.2.2",
           "randomcolor": "^0.5.3",
           "json": {

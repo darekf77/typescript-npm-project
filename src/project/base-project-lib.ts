@@ -15,7 +15,7 @@ import config from "../config";
 import { compilationWrapper } from '../helpers';
 import { PackageJSON } from './package-json';
 import { install } from '../scripts/INSTALL';
-import { ProjectFrom } from '../index';
+import { ProjectFrom, tryCopyFrom } from '../index';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -170,6 +170,7 @@ export abstract class BaseProjectLib extends Project {
       await this.build({
         prod, outDir: config.folder.bundle as 'bundle'
       })
+      this.createClientVersionAsCopyOfBrowser()
       this.bundleResources()
       this.packageJson.saveForInstall(false)
       this.commit(newVersion);
@@ -200,6 +201,13 @@ export abstract class BaseProjectLib extends Project {
     console.log(`Git branch: ${branchName}`)
     this.run(`git push origin ${branchName}`, { output: false }).sync()
     info('Pushing to git repository done.')
+  }
+
+  private createClientVersionAsCopyOfBrowser() {
+    const bundleFolder = path.join(this.location, config.folder.bundle);
+    const browser = path.join(bundleFolder, config.folder.browser)
+    const client = path.join(bundleFolder, config.folder.client)
+    tryCopyFrom(browser, client);
   }
 
   public bundleResources() {

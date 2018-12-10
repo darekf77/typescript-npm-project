@@ -13,6 +13,7 @@ import { Project } from './base-project';
 import { HelpersLinks } from '../helpers-links';
 import { walkObject } from '../helpers';
 import { config as schemaConfig } from '../environment-config';
+import { terminalLine } from '../process';
 
 
 
@@ -20,15 +21,34 @@ export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
 
-export function err(workspaceConfig: EnvConfig) {
-  error(`Please follow worksapce schema:\n${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
-  \n
-  \n your config\n : ${JSON.stringify(workspaceConfig, null, 4)}
-      `)
+export function err(workspaceConfig: EnvConfig, fileContent?: string) {
+
+  let configString = fileContent ? fileContent : `
+  ...
+${chalk.bold(JSON.stringify(workspaceConfig, null, 4))}
+  ...
+  `
+
+  error(`Please follow worksapce environment config schema:\n
+${terminalLine()}
+  let { config } = require('tnp-bundle/environment-config')
+
+  config = ${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
+
+  module.exports = exports = { config };
+${terminalLine()}
+
+Your config:
+${terminalLine()}
+${configString}
+${terminalLine()}
+`)
 }
 
-export function validateWorkspaceConfig(workspaceConfig: EnvConfig) {
-
+export function validateWorkspaceConfig(workspaceConfig: EnvConfig, filePath: string) {
+  if (!_.isObject(workspaceConfig)) {
+    err(undefined, fse.readFileSync(filePath, 'utf8'));
+  }
   if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig);
   if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig)
   workspaceConfig.workspace.projects.forEach(p => {
@@ -167,11 +187,11 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 
 
 
-export const existedConfigs = {} as { [workspacePath in string]: EnvConfig; }
+export const existedConfigs = {} as {[workspacePath in string]: EnvConfig; }
 
 
 export function workspaceConfigBy(workspace: Project, environment: EnvironmentName): EnvConfig {
-  let config: EnvConfig;
+  let configWorkspaceEnv: EnvConfig;
 
   const alreadyExistProject = (workspace && workspace.isWorkspace) ? existedConfigs[workspace.location] : null;
 
@@ -183,19 +203,20 @@ export function workspaceConfigBy(workspace: Project, environment: EnvironmentNa
   }
 
   if (_.isObject(alreadyExistProject) && alreadyExistProject !== null) {
-    config = alreadyExistProject;
+    configWorkspaceEnv = alreadyExistProject;
     // console.log('Already exist workspaceconfig ', EnvironmentConfig.woksapaceConfigs)
   } else {
     const envSurfix = (environment === 'local') ? '' : `.${environment}`;
-    let pathToProjectEnvironment = path.join(workspace.location, `environment${envSurfix}`);
-
+    var pathToProjectEnvironment = path.join(workspace.location, `${config.file.environment}${envSurfix}`);
+    console.log('pathToProjectEnvironment:', pathToProjectEnvironment)
     if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
       error(`Workspace ${workspace.location}
         ...without environment${envSurfix}.js config.`);
     }
 
     // try {
-    config = require(pathToProjectEnvironment).config as any;
+    configWorkspaceEnv = require(pathToProjectEnvironment).config as any;
+    // console.log('configWorkspaceEnv', configWorkspaceEnv)
     // } catch (error) {
     //   if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
     //     console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
@@ -205,11 +226,11 @@ export function workspaceConfigBy(workspace: Project, environment: EnvironmentNa
     // }
 
   }
-  validateWorkspaceConfig(config);
-  existedConfigs[workspace.location] = config;
+  validateWorkspaceConfig(configWorkspaceEnv, `${pathToProjectEnvironment}.js`);
+  existedConfigs[workspace.location] = configWorkspaceEnv;
 
 
-  return config;
+  return configWorkspaceEnv;
 }
 
 

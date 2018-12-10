@@ -80,11 +80,13 @@ export function init(args: string,
 
 export default {
   $INIT: async (args) => {
+    await Project.Current.checker.check();
     await init(args).project()
     process.exit(0)
   },
 
   $INIT_WATCH: async (args) => {
+    await Project.Current.checker.check();
     await init(args).watch.project()
   },
 

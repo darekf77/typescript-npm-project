@@ -32,6 +32,9 @@ export async function questionYesNo(message: string,
   }
 }
 
+export function terminalLine() {
+  return _.times(process.stdout.columns, () => '-').join('')
+}
 
 export function killProcess(byPid: number) {
   run(`kill -9 ${byPid}`).sync()
@@ -145,7 +148,7 @@ function getStdio(options?: RunOptions) {
     output, cwd, biggerBuffer, silence,
     // pipeToParentProcerss = false,
     // inheritFromParentProcerss = false
-   } = options;
+  } = options;
   let stdio = output ? [0, 1, 2] : ((_.isBoolean(silence) && silence) ? 'ignore' : undefined);
   // if (pipeToParentProcerss) {
   //   stdio = ['pipe', 'pipe', 'pipe'] as any;

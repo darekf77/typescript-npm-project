@@ -1,5 +1,7 @@
 
-const config = {
+let { config } = require('tnp-bundle/environment-config')
+
+config = {
 
   workspace: {
     workspace: {
@@ -36,6 +38,6 @@ const config = {
 
 }
 
-module.exports = exports = config;
+module.exports = exports = { config };
 
 

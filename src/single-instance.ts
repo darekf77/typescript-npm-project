@@ -165,7 +165,7 @@ export class ProjectsChecker {
     return false;
   }
 
-  async check(buildOptions: BuildOptions) {
+  async check(buildOptions?: BuildOptions) {
 
     return new Promise(async (resolve) => {
 
@@ -183,17 +183,33 @@ export class ProjectsChecker {
 
         await this.update();
 
-        let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
-        if (projectInstance) {
+        if (buildOptions) {
+          resolve()
+          let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
+          if (projectInstance) {
 
-          const pidApp = projectInstance.build.app.pid;
-          const pidLib = projectInstance.build.lib.pid;
+            const pidApp = projectInstance.build.app.pid;
+            const pidLib = projectInstance.build.lib.pid;
 
-          // console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
+            // console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
 
-          if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
-            await this.action(projectInstance, buildOptions.appBuild, () => {
-              const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
+            if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
+              await this.action(projectInstance, buildOptions.appBuild, () => {
+                const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
+                if (buildOptions.appBuild) {
+                  projectInstance.build.app.pid = process.pid;
+                  projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+                } else {
+                  projectInstance.build.lib.pid = process.pid;
+                  projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+                }
+
+
+                console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
+                killProcess(pidToKill)
+              })
+            } else {
+              // update process
               if (buildOptions.appBuild) {
                 projectInstance.build.app.pid = process.pid;
                 projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
@@ -201,37 +217,24 @@ export class ProjectsChecker {
                 projectInstance.build.lib.pid = process.pid;
                 projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
               }
-
-
-              console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
-              killProcess(pidToKill)
-            })
-          } else {
-            // update process
-            if (buildOptions.appBuild) {
-              projectInstance.build.app.pid = process.pid;
-              projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
-            } else {
-              projectInstance.build.lib.pid = process.pid;
-              projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
             }
-          }
 
-        } else {
-          projectInstance = new ProjectInstance(projecBuild.location);
-          if (buildOptions.appBuild) {
-            projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
-            projectInstance.build.app.pid = processPid;
           } else {
-            projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
-            projectInstance.build.lib.pid = processPid;
-          }
+            projectInstance = new ProjectInstance(projecBuild.location);
+            if (buildOptions.appBuild) {
+              projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+              projectInstance.build.app.pid = processPid;
+            } else {
+              projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+              projectInstance.build.lib.pid = processPid;
+            }
 
-          this.instances.push(projectInstance)
+            this.instances.push(projectInstance)
+          }
+          this.automaticlyAddWorkspaceInstance(this.project)
+          this.save()
+          console.log('** check system/pids end')
         }
-        this.automaticlyAddWorkspaceInstance(this.project)
-        this.save()
-        console.log('** check system/pids end')
         resolve()
       })
     })

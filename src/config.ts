@@ -34,7 +34,8 @@ export const config = {
     entities: 'entities',
     controllers: 'controllers',
     projects: 'projects',
-    workspace: 'workspace'
+    workspace: 'workspace',
+    client: 'client'
 
   },
   file: {
