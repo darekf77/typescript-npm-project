@@ -14,6 +14,8 @@ const log = Log.create('preview-form-wrapper');
 })
 export class PreviewFormWrapperComponent implements OnInit {
 
+
+
   entity = EXAMPLE;
   model: EXAMPLE = {
     // id: 23,
@@ -33,12 +35,12 @@ export class PreviewFormWrapperComponent implements OnInit {
   } as any;
 
   fields = [
-    {
-      key: 'href',
-      templateOptions: {
-        required: true
-      },
-    },
+    // {
+    //   key: 'href',
+    //   templateOptions: {
+    //     required: true
+    //   },
+    // },
     {
       key: 'selectwrappertest',
       type: 'selectwrapper',
@@ -51,13 +53,14 @@ export class PreviewFormWrapperComponent implements OnInit {
   ];
 
   constructor(public exampleService: ExamplesController) {
-
+    log.i('exampleService', exampleService);
   }
 
 
   async ngOnInit() {
-    const models = await this.exampleService.getAll().received.observable.take(1).toPromise();
-    this.model = models[0];
+    const models =  await this.exampleService.getAll().received;
+    log.i('models', models);
+    this.model = models.body.json[0];
   }
 
 }

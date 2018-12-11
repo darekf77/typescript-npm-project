@@ -65,10 +65,9 @@ export class FormWrapperMaterialComponent implements OnInit {
     console.error(`
 
     Please use:
-    @FormlyForm()
-    @DefaultModelWithMapping(...)
+    @Morphi.Entity(...)
 
-    decorators for entity "${this.entity && _.trim(this.entity.name)}"
+    decorator for entity "${this.entity && _.trim(this.entity.name)}"
 
     `);
   }
@@ -108,6 +107,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   }
 
   async ngOnInit() {
+    console.log('model', this.model);
     log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
@@ -125,6 +125,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     }
 
     this.createOrder();
+    log.i('result formly', this.formly);
   }
 
   createOrder() {
