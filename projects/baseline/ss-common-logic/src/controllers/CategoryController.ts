@@ -97,12 +97,6 @@ export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY
   //#endregion
 
 
-  // @GET(`/${SYMBOL.}`)
-  // updateById() {
-
-  // }
-
-
   @Morphi.Http.GET('/allCategories')
   allCategoriesWithAllData(): Morphi.Response<entities.CATEGORY[]> {
     //#region @backendFunc

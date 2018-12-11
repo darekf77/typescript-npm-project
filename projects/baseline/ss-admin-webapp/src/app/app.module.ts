@@ -21,7 +21,7 @@ Morphi.init({
   ],
   imports: modules.import.angular,
   providers: [
-    AngularProviders,
+    Morphi.Providers,
     AuthController,
     MultimediaController
   ],

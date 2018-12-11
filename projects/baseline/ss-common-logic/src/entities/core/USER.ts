@@ -25,19 +25,19 @@ export class USER extends Morphi.Base.Entity<USER, IUSER> implements IUSER {
   //#region @backend
   @Morphi.Orm.Column.Generated()
   //#endregion
-  id: number = undefined
+  id: number
 
-  session: SESSION = undefined
-
-  //#region @backend
-  @Morphi.Orm.Column.Custom()
-  //#endregion
-  username: string = undefined
+  session: SESSION
 
   //#region @backend
   @Morphi.Orm.Column.Custom()
   //#endregion
-  password: string = undefined
+  username: string
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  password: string
 
   //#region @backend
   @Morphi.Orm.Column.Custom({ nullable: true })
@@ -47,17 +47,17 @@ export class USER extends Morphi.Base.Entity<USER, IUSER> implements IUSER {
   //#region @backend
   @Morphi.Orm.Column.Custom({ nullable: true })
   //#endregion
-  firstname: string = undefined
+  firstname: string
 
   //#region @backend
   @Morphi.Orm.Column.Custom({ nullable: true })
   //#endregion
-  lastname: string = undefined
+  lastname: string
 
   //#region @backend
   @Morphi.Orm.Column.Custom({ nullable: true })
   //#endregion
-  email?: string = undefined
+  email?: string
 
   //#region @backend
   @Morphi.Orm.Relation.OneToMany(() => EMAIL, email => email.user, {

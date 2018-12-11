@@ -45,12 +45,13 @@ export class CATEGORY extends Morphi.Base.Entity<CATEGORY, ICATEGORY> {
   //#region @backend
   @Morphi.Orm.Column.Generated()
   //#endregion
-  id: number = undefined;
+  id: number;
 
   //#region @backend
   @Morphi.Orm.Column.Custom()
   //#endregion
-  name: string = undefined;
+  name: string;
+  supra: string = ''
 
   //#region @backend
   @Morphi.Orm.Column.Custom({
@@ -58,7 +59,7 @@ export class CATEGORY extends Morphi.Base.Entity<CATEGORY, ICATEGORY> {
     nullable: true
   })
   //#endregion
-  isPremium: boolean = false;
+  isPremium: boolean;
 
   get path() {
     return _.kebabCase(this.name);

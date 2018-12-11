@@ -9,7 +9,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component');
+const log = Log.create('form warpper material component', Level.__NOTHING);
 
 @Component({
   selector: 'app-form-wrapper-material',
@@ -91,7 +91,7 @@ export class FormWrapperMaterialComponent implements OnInit {
         });
         fields = fields
           .concat(this.fields.filter(field => !keys.includes(field.key)));
-        log.i('field affer contact', fields);
+        // log.i('field affer contact', fields);
       }
 
     }
@@ -100,10 +100,10 @@ export class FormWrapperMaterialComponent implements OnInit {
     }
 
     fields = fields.filter(({ key }) => !(key && this.exclude.includes(key)));
-    log.i('fields filter', fields);
+    // log.i('fields filter', fields);
 
     this.formly.fields = fields;
-    log.i('FORMLY FIELDS', this.formly.fields);
+    // log.i('FORMLY FIELDS', this.formly.fields);
   }
 
   async ngOnInit() {
@@ -136,7 +136,7 @@ export class FormWrapperMaterialComponent implements OnInit {
     if (_.isString(this.fieldsOrder)) {
       this.fieldsOrder = this.fieldsOrder.split(',');
     }
-    log.i('create order!', this.fieldsOrder);
+    // log.i('create order!', this.fieldsOrder);
     const fieldsNewOrder = [];
 
     if (this.fieldsOrder.length > 0) {
@@ -147,7 +147,7 @@ export class FormWrapperMaterialComponent implements OnInit {
         }
       });
       this.formly.fields = fieldsNewOrder.concat(this.formly.fields.filter(f => !fieldsNewOrder.includes(f)));
-      log.i('new Order', this.formly.fields.map(f => f.key).join(','));
+      // log.i('new Order', this.formly.fields.map(f => f.key).join(','));
     }
   }
 
