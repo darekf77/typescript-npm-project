@@ -1,6 +1,7 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { USER } from '../../entities/core/USER';
+import { tableNameFrom } from 'morphi/framework';
 
 export interface USER_ALIASES {
 
@@ -8,8 +9,8 @@ export interface USER_ALIASES {
 
 }
 
-@EntityRepository(USER)
-export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER, USER_ALIASES> {
+@Morphi.Repository()
+export class USER_REPOSITORY extends Morphi.Base.Repository<USER, USER_ALIASES> {
 
 
   globalAliases: (keyof USER_ALIASES)[] = ['user']
@@ -18,9 +19,9 @@ export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER, USER_ALIASES> {
   byUsername(username: string) {
 
     return this
-      .createQueryBuilder(META.tableNameFrom(USER))
-      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${META.tableNameFrom(USER)}.username = :username`)
+      .createQueryBuilder(tableNameFrom(USER))
+      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${tableNameFrom(USER)}.username = :username`)
       .setParameter('username', username)
       .getOne()
 
@@ -29,9 +30,9 @@ export class USER_REPOSITORY extends META.BASE_REPOSITORY<USER, USER_ALIASES> {
   byId(id: number) {
 
     return this
-      .createQueryBuilder(META.tableNameFrom(USER))
-      .innerJoinAndSelect(`${META.tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${META.tableNameFrom(USER)}.id = :id`)
+      .createQueryBuilder(tableNameFrom(USER))
+      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
+      .where(`${tableNameFrom(USER)}.id = :id`)
       .setParameter('id', id)
       .getOne()
 

@@ -15,7 +15,8 @@ import { Project } from "./base-project";
 import { ProjectFrom } from "./index";
 import chalk from "chalk";
 import { config } from '../config';
-import { HelpersBackend } from 'morphi';
+import { Helpers } from 'morphi';
+import { tryRemoveDir } from '../helpers';
 
 const sortKeys = function (obj) {
   if (_.isArray(obj)) {
@@ -130,6 +131,7 @@ export class PackageJSON {
 
 
     this.cleanBeforeSave(project, newDeps);
+    // this.inlcudeDevDevs(project)
 
     const engines = Project.by('workspace').packageJson.data.engines;
     const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
@@ -179,25 +181,37 @@ export class PackageJSON {
 
   filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    let onlyAsDevAllowed = this.project.packageJson.data.tnp.overrided.includeAsDev || [];
+    let allDeps = this.getDepsBy();
+
     // console.log('d1evDeps', devDeps)
     Object.keys(deps).forEach(name => {
       if (!devDeps.includes(name)) {
         deps[name] = undefined;
       }
     })
+
+    Object.keys(allDeps).forEach(name => {
+      if (onlyAsDevAllowed.includes(name) || onlyAsDevAllowed.filter(d => (new RegExp(d)).test(name)).length > 0) {
+        deps[name] = allDeps[name]
+      }
+    })
+
     return deps;
   }
 
   filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    let onlyAsDevAllowed = this.project.packageJson.data.tnp.overrided.includeAsDev || [];
     // console.log('d2evDeps', devDeps)
     Object.keys(deps).forEach(name => {
-      if (devDeps.includes(name)) {
+      if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) || onlyAsDevAllowed.filter(f => (new RegExp(f)).test(name)).length > 0) {
         deps[name] = undefined;
       }
     })
     return deps;
   }
+
 
   cleanBeforeSave(project: Project, deps: DependenciesFromPackageJsonStyle) {
     deps[project.name] = undefined;
@@ -297,7 +311,7 @@ export class PackageJSON {
       // console.log(duplicates)
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(this.location, duplicateRelativePath)
-        HelpersBackend.tryRemoveDir(p)
+        tryRemoveDir(p)
         info(`Duplicate of ${f} removed from ${p}`)
       })
     })

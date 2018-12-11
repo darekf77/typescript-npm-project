@@ -10,4 +10,5 @@ export * from './helpers-links';
 export * from './helpers-git';
 export * from './helpers-isomorphic';
 export * from './process';
+export * from './build-isomorphic-lib';
 //#endregion

@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { CONFIG } from '../entities/CONFIG';
 
 export interface CONFIG_ALIASES {
@@ -9,8 +9,8 @@ export interface CONFIG_ALIASES {
 
 }
 
-@EntityRepository(CONFIG)
-export class CONFIG_REPOSITORY extends META.BASE_REPOSITORY<CONFIG, CONFIG_ALIASES> {
+@Morphi.Repository()
+export class CONFIG_REPOSITORY extends Morphi.Base.Repository<CONFIG, CONFIG_ALIASES> {
 
 
   globalAliases: (keyof CONFIG_ALIASES)[] = ['config', 'configs'];

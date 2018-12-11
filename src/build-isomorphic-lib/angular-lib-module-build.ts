@@ -11,7 +11,8 @@ import { ProjectFrom } from '../project/index';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
 import { IsomorphicOptions } from '../project/source-modifier';
-import { HelpersBackend } from 'morphi';
+import { Helpers } from 'morphi';
+import { tryRemoveDir } from '../helpers';
 
 
 
@@ -27,7 +28,7 @@ export class AnglarLibModuleDivider extends IncrementalCompilation {
     this.options.angularClients.forEach(angularClientName => {
       const divideModulePath = path.join(this.project.location, AnglarLibModuleDivider.nameFor(angularClientName))
       if (fse.existsSync(divideModulePath)) {
-        HelpersBackend.tryRemoveDir(divideModulePath)
+        tryRemoveDir(divideModulePath)
       }
       fse.mkdirSync(divideModulePath);
     })

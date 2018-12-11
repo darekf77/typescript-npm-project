@@ -1,6 +1,6 @@
 //#region @backend
 import { MULTIMEDIA } from '../../entities/core/MULTIMEDIA';
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 
 export interface MULTIMEDIA_ALIASES {
 
@@ -11,8 +11,8 @@ export interface MULTIMEDIA_ALIASES {
 }
 
 
-@EntityRepository(MULTIMEDIA)
-export class MULTIMEDIA_REPOSITORY extends META.BASE_REPOSITORY<MULTIMEDIA, MULTIMEDIA_ALIASES> {
+@Morphi.Repository()
+export class MULTIMEDIA_REPOSITORY extends Morphi.Base.Repository<MULTIMEDIA, MULTIMEDIA_ALIASES> {
 
 
   globalAliases: (keyof MULTIMEDIA_ALIASES)[] = ['audio', 'video', 'picture']

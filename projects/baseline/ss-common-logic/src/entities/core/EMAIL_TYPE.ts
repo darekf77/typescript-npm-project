@@ -1,10 +1,5 @@
-import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
-import { Column } from "typeorm/decorator/columns/Column";
-import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
-import { Entity } from "typeorm/decorator/entity/Entity";
+import { Morphi } from 'morphi';
 import { EMAIL } from "./EMAIL";
-import { META } from 'morphi';
-import { CLASSNAME } from 'morphi';
 
 
 
@@ -17,26 +12,31 @@ export interface IEMAIL_TYPE {
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(EMAIL_TYPE))
-//#endregion
-@CLASSNAME('EMAIL_TYPE')
-export class EMAIL_TYPE extends META.BASE_ENTITY<EMAIL_TYPE> implements IEMAIL_TYPE {
+@Morphi.Entity({
+  className: 'EMAIL_TYPE'
+})
+export class EMAIL_TYPE extends Morphi.Base.Entity<EMAIL_TYPE> implements IEMAIL_TYPE {
 
   fromRaw(obj: Object): EMAIL_TYPE {
     throw new Error("Method not implemented.");
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column({ length: 50, unique: true })
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ length: 50, unique: true })
+  //#endregion
   name: EMAIL_TYPE_NAME = undefined
 
-
-  @ManyToMany(() => EMAIL, email => email.types, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToMany(() => EMAIL, email => email.types, {
     cascade: false
   })
+  //#endregion
   emails: EMAIL[];
 }
 

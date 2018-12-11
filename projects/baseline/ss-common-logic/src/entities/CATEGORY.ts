@@ -1,11 +1,6 @@
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { ManyToMany } from 'typeorm/decorator/relations/ManyToMany';
-import { Entity, JoinTable, OneToMany, EntityRepository, JoinColumn, ManyToOne } from 'typeorm';
-import { META } from 'morphi';
-import { kebabCase } from 'lodash';
+import { Morphi } from 'morphi';
+import * as _ from 'lodash';
 import { GROUP, IGROUP } from './GROUP';
-import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
 
 
@@ -16,20 +11,23 @@ export interface ICATEGORY {
   groups: IGROUP[];
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(CATEGORY))
-//#endregion
-@FormlyForm<CATEGORY>(undefined, ['path', 'groups', 'id'])
-@DefaultModelWithMapping<CATEGORY>({
-  isPremium: false,
-  name: '',
-  // groups: []
-}, {
+
+@Morphi.Entity<CATEGORY>({
+  className: 'CATEGORY',
+  formly: {
+    exclude: ['path', 'groups', 'id']
+  },
+  defaultModelValues: {
+    isPremium: false,
+    name: '',
+    // groups: []
+  },
+  mapping: {
     groups: 'GROUP',
     picture: 'MULTIMEDIA'
-  })
-@CLASSNAME('CATEGORY')
-export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
+  }
+})
+export class CATEGORY extends Morphi.Base.Entity<CATEGORY, ICATEGORY> {
 
   fromRaw(obj: ICATEGORY): CATEGORY {
     let category = new CATEGORY();
@@ -44,29 +42,40 @@ export class CATEGORY extends META.BASE_ENTITY<CATEGORY, ICATEGORY> {
     return category;
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined;
 
-  @Column() name: string = undefined;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  name: string = undefined;
 
-  @Column({
+  //#region @backend
+  @Morphi.Orm.Column.Custom({
     type: 'boolean',
     nullable: true
-  }) isPremium: boolean = false;
+  })
+  //#endregion
+  isPremium: boolean = false;
 
   get path() {
-    return kebabCase(this.name);
+    return _.kebabCase(this.name);
   }
 
-  @OneToMany(type => GROUP, group => group.category, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(type => GROUP, group => group.category, {
     cascade: false
   })
+  //#endregion
   groups: GROUP[];
 
-
-  @ManyToOne(type => MULTIMEDIA, m => m.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
+  //#endregion
   picture?: MULTIMEDIA;
 
 }

@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { GROUP } from '../entities/GROUP';
 
 export interface GROUP_ALIASES {
@@ -10,8 +10,8 @@ export interface GROUP_ALIASES {
 }
 
 
-@EntityRepository(GROUP)
-export class GROUP_REPOSITORY extends META.BASE_REPOSITORY<GROUP, GROUP_ALIASES> {
+@Morphi.Repository()
+export class GROUP_REPOSITORY extends Morphi.Base.Repository<GROUP, GROUP_ALIASES> {
 
 
   globalAliases: (keyof GROUP_ALIASES)[] = ['group', 'groups'];

@@ -1,11 +1,6 @@
-import { OneToMany } from "typeorm/decorator/relations/OneToMany";
-import { Column } from "typeorm/decorator/columns/Column";
-import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
-import { Entity } from "typeorm/decorator/entity/Entity";
+import { Morphi } from 'morphi';
 import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
-import { META } from 'morphi';
-import { CLASSNAME } from 'morphi';
 
 
 
@@ -19,33 +14,58 @@ export interface IUSER {
   city?: string;
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(USER))
-//#endregion
-@CLASSNAME('USER')
-export class USER extends META.BASE_ENTITY<USER, IUSER> implements IUSER {
+@Morphi.Entity({
+  className: 'USER'
+})
+export class USER extends Morphi.Base.Entity<USER, IUSER> implements IUSER {
 
 
   fromRaw(obj: IUSER): USER {
     throw new Error("Method not implemented.");
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
   session: SESSION = undefined
 
-  @Column() username: string = undefined
-  @Column() password: string = undefined
-  @Column({ nullable: true }) whereCreated: 'baseline' | 'site' = 'baseline';
-  @Column({ nullable: true }) firstname: string = undefined
-  @Column({ nullable: true }) lastname: string = undefined
-  @Column({ nullable: true }) email?: string = undefined
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  username: string = undefined
 
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  password: string = undefined
 
-  @OneToMany(() => EMAIL, email => email.user, {
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  whereCreated: 'baseline' | 'site' = 'baseline';
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  firstname: string = undefined
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  lastname: string = undefined
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  email?: string = undefined
+
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(() => EMAIL, email => email.user, {
     cascade: false
   })
+  //#endregion
   emails: EMAIL[];
 
 }

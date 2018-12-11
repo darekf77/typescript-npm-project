@@ -25,12 +25,12 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     return super.projectSpecyficFiles()
       .concat([
         '.vscode/launch.json',
-
         "tsconfig.json",
-        "tsconfig.browser.json"
+        "tsconfig.browser.json",
+        "webpack.config.js",
+        'run.js'
       ]).concat(
       !this.isStandaloneProject ? [
-        'run.js',
         "src/typings.d.ts",
       ] : []);
   }
@@ -68,9 +68,21 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
   }
 
   buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
     if (!onlyWatchNoBuild) {
-      this.buildLib(outDir, prod, watch);
+      if (appBuild) {
+        let webpackEnvParams = `env.outFolder=${outDir}`;
+        webpackEnvParams = webpackEnvParams + (watch ? 'env.watch=true' : '');
+        const client = _.first(forClient);
+        console.log('forClients',forClient)
+        if (client) {
+          webpackEnvParams = `${webpackEnvParams} env.moduleName=${client.name} env.port=${client.getDefaultPort()}`
+        }
+        this.run(`npm-run webpack-dev-server ${webpackEnvParams}`).sync()
+      } else {
+        this.buildLib(outDir, prod, watch);
+      }
+
     }
     return;
   }

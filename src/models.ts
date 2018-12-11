@@ -231,6 +231,7 @@ export interface IPackageJSON {
       dedupe?: string[];
       ignoreWhenStartWith?: string[];
       includeOnly?: string[];
+      includeAsDev?: string[];
       dependencies?: DependenciesFromPackageJsonStyle;
     }
     // requiredLibs?: string[];

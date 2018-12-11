@@ -1,9 +1,5 @@
-import { META } from 'morphi';
+import { Morphi } from 'morphi';
 import * as _ from 'lodash';
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { Entity, EntityRepository } from 'typeorm';
-import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
 
 
 
@@ -13,16 +9,15 @@ export interface ICONFIG {
   value: any;
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(CONFIG))
-//#endregion
-@FormlyForm()
-@DefaultModelWithMapping<CONFIG>({
-  key: '',
-  value: ''
+
+@Morphi.Entity<CONFIG>({
+  className: 'CONFIG',
+  defaultModelValues: {
+    key: '',
+    value: ''
+  }
 })
-@CLASSNAME('CONFIG')
-export class CONFIG extends META.BASE_ENTITY<CONFIG, ICONFIG> implements ICONFIG {
+export class CONFIG extends Morphi.Base.Entity<CONFIG, ICONFIG> implements ICONFIG {
 
   fromRaw(obj: ICONFIG): CONFIG {
     const config = new CONFIG();
@@ -30,11 +25,20 @@ export class CONFIG extends META.BASE_ENTITY<CONFIG, ICONFIG> implements ICONFIG
     return config;
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column({ unique: true }) key: string;
-  @Column({ nullable: true }) value: string;
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ unique: true })
+  //#endregion
+  key: string;
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  value: string;
 
 
 }

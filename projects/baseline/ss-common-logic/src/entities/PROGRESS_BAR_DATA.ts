@@ -1,4 +1,4 @@
-import { Entity, META, CLASSNAME, PrimaryGeneratedColumn } from 'morphi';
+import { Morphi } from 'morphi';
 import { IPROGRESS_BAR_DATA, ProgressBarStatus, PROGRESS_BAR_DATA as TNP_PROGRESS_BAR_DATA, } from 'tnp-bundle';
 import _ from 'lodash';
 
@@ -6,18 +6,20 @@ export { IPROGRESS_BAR_DATA, PROGRESS_BAR_DATA as TNP_PROGRESS_BAR_DATA, Progres
 
 
 
-//#region @backend
-@Entity(META.tableNameFrom(PROGRESS_BAR_DATA))
-//#endregion
-@CLASSNAME('PROGRESS_BAR_DATA')
-export class PROGRESS_BAR_DATA extends META.BASE_ENTITY<PROGRESS_BAR_DATA, IPROGRESS_BAR_DATA> implements IPROGRESS_BAR_DATA {
-  
+
+@Morphi.Entity({
+  className: 'PROGRESS_BAR_DATA'
+})
+export class PROGRESS_BAR_DATA extends Morphi.Base.Entity<PROGRESS_BAR_DATA, IPROGRESS_BAR_DATA> implements IPROGRESS_BAR_DATA {
+
   value: number;
   status: ProgressBarStatus;
   info: string;
 
+  //#region @backend
 
-  @PrimaryGeneratedColumn()
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number;
 
 

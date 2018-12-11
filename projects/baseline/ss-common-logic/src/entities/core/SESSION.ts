@@ -1,14 +1,7 @@
 
-import { OneToOne } from "typeorm/decorator/relations/OneToOne";
-import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
-import { Column } from "typeorm/decorator/columns/Column";
-import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
-import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
-import { Entity } from "typeorm/decorator/entity/Entity";
-import { Resource } from "ng2-rest";
+import { Morphi } from 'morphi';
+import { Resource } from 'ng2-rest';
 import { USER } from './USER';
-import { META } from 'morphi';
-import { CLASSNAME } from 'morphi';
 
 //#region @backend
 import { generate } from "password-hash";
@@ -54,11 +47,11 @@ export interface ISESSION {
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(SESSION))
-//#endregion
-@CLASSNAME('SESSION')
-export class SESSION extends META.BASE_ENTITY<SESSION> implements ISESSION {
+
+@Morphi.Entity({
+  className: 'SESSION'
+})
+export class SESSION extends Morphi.Base.Entity<SESSION> implements ISESSION {
 
   fromRaw(obj: Object): SESSION {
     throw new Error("Method not implemented.");
@@ -72,33 +65,45 @@ export class SESSION extends META.BASE_ENTITY<SESSION> implements ISESSION {
     return Math.round((this.expiredDate.getTime() - now.getTime()) / 1000);
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column({ length: 100 })
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ length: 100 })
+  //#endregion
   token: string = undefined
 
   token_type = 'bearer';
 
-  @Column({
+  //#region @backend
+  @Morphi.Orm.Column.Custom({
     length: 50,
     nullable: true
   })
+  //#endregion
   ip: string = undefined
 
-  @CreateDateColumn()
+  //#region @backend
+  @Morphi.Orm.Column.CreateDate()
+  //#endregion
   createdDate: Date = undefined
 
-  @Column({
+  //#region @backend
+  @Morphi.Orm.Column.Custom({
     nullable: false
   })
+  //#endregion
   expiredDate: Date = undefined
 
-
-  @OneToOne(() => USER, user => user.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToOne(() => USER, user => user.id, {
     nullable: true
   })
-  @JoinColumn()
+  @Morphi.Orm.Join.Column()
+  //#endregion
   user: USER;
 
   //#region @backend

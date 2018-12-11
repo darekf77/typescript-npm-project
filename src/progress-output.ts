@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { META, CLASSNAME } from 'morphi';
+import { CLASSNAME } from 'ng2-rest';
 import * as _ from 'lodash';
 
 export type ProgressBarStatus = 'notstarted' | 'inprogress' | 'complete' | 'error';

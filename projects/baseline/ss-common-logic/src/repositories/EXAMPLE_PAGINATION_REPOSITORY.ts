@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { EXAMPLE_PAGINATION } from '../entities/EXAMPLE_PAGINATION';
 
 export interface EXAMPLE_PAGINATION_ALIASES {
@@ -9,9 +9,9 @@ export interface EXAMPLE_PAGINATION_ALIASES {
 
 }
 
-@EntityRepository(EXAMPLE_PAGINATION)
+@Morphi.Repository()
 export class EXAMPLE_PAGINATION_REPOSITORY
-  extends META.BASE_REPOSITORY<EXAMPLE_PAGINATION, EXAMPLE_PAGINATION_ALIASES> {
+  extends Morphi.Base.Repository<EXAMPLE_PAGINATION, EXAMPLE_PAGINATION_ALIASES> {
 
 
   globalAliases: (keyof EXAMPLE_PAGINATION_ALIASES)[] = ['example', 'examples'];

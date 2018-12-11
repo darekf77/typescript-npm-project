@@ -1,7 +1,4 @@
-import {
-  ENDPOINT, OrmConnection, Connection, BaseCRUDEntity,
-  GET, PathParam, Response, CLASSNAME, isBrowser, META
-} from 'morphi';
+import { Morphi } from 'morphi';
 import * as _ from 'lodash';
 import { Log, Level } from "ng2-logger";
 const log = Log.create('ExamplesController')
@@ -11,14 +8,15 @@ import * as controllers from '../controllers';
 
 
 
-@ENDPOINT()
-@CLASSNAME('ExamplesPaginationController')
-export class ExamplesPaginationController extends META.BASE_CONTROLLER<entities.EXAMPLE_PAGINATION> {
+@Morphi.Controller({
+  className: 'ExamplesPaginationController'
+})
+export class ExamplesPaginationController extends Morphi.Base.Controller<entities.EXAMPLE_PAGINATION> {
 
-  @BaseCRUDEntity(entities.EXAMPLE_PAGINATION) public entity: entities.EXAMPLE_PAGINATION;
+  @Morphi.Base.InjectCRUDEntity(entities.EXAMPLE_PAGINATION) public entity: entities.EXAMPLE_PAGINATION;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

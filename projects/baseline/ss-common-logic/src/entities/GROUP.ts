@@ -1,14 +1,7 @@
-import { META } from 'morphi';
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
-import { CATEGORY } from './CATEGORY';
-import { Entity, OneToMany } from 'typeorm';
+import { Morphi } from 'morphi';
 import { DIALOG, IDIALOG } from './DIALOG';
-import { CLASSNAME, DefaultModelWithMapping, FormlyForm } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
-
-
+import { CATEGORY } from './CATEGORY';
 
 export interface IGROUP {
   id?: number;
@@ -17,17 +10,20 @@ export interface IGROUP {
   picture?: MULTIMEDIA;
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(GROUP))
-//#endregion
-@FormlyForm<GROUP>(undefined, ['id'])
-@DefaultModelWithMapping<GROUP>({
-  title: ''
-}, {
+
+@Morphi.Entity<GROUP>({
+  className: 'GROUP',
+  formly: {
+    exclude: ['id']
+  },
+  defaultModelValues: {
+    title: ''
+  },
+  mapping: {
     picture: 'MULTIMEDIA'
-  })
-@CLASSNAME('GROUP')
-export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
+  }
+})
+export class GROUP extends Morphi.Base.Entity<GROUP, IGROUP> implements IGROUP {
 
 
   fromRaw(obj: IGROUP): GROUP {
@@ -43,31 +39,44 @@ export class GROUP extends META.BASE_ENTITY<GROUP, IGROUP> implements IGROUP {
     return group;
   }
 
-
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column()
+  //#region @backend
+
+  @Morphi.Orm.Column.Custom()
+  //#endregion
   title: string = undefined
 
-  @Column()
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
   amazing: string = ' asdmasdas'
 
 
-  @ManyToOne(() => CATEGORY, cat => cat.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(() => CATEGORY, cat => cat.id, {
     cascade: false
   })
+  //#endregion
   category: CATEGORY;
 
 
-  @OneToMany(() => DIALOG, dial => dial.group, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(() => DIALOG, dial => dial.group, {
     cascade: false
   })
+  //#endregion
   dialogs: DIALOG[];
 
-  @ManyToOne(() => MULTIMEDIA, m => m.id, {
+
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(() => MULTIMEDIA, m => m.id, {
     cascade: false
   })
+  //#endregion
   picture?: MULTIMEDIA;
 
 }

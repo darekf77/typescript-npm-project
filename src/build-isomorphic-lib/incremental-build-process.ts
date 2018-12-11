@@ -1,11 +1,15 @@
 //#region @backend
 import * as path from 'path';
 import * as _ from 'lodash';
+import * as fse from 'fs-extra';
+import chalk from 'chalk';
+
 import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
 import config from '../config';
 import { Project } from '../project';
 import { BuildOptions, LibType } from '../models';
+import { warn } from '../messages';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
@@ -43,6 +47,20 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     }
 
     this.compileOnce = buildOptions.compileOnce;
+
+    if (project.isStandaloneProject && !buildOptions.watch) {
+      const browser = _.first(this.browserCompilations)
+      browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
+        if (f !== 'app.ts') {
+          return true;
+        }
+        const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
+        warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
+        fse.writeFileSync(absolutePathToFile, '')
+        return false;
+      })
+      // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
+    }
 
     // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
     // console.log('this.resolveModulesLocations', this.resolveModulesLocations)

@@ -1,11 +1,5 @@
-import { Entity, EntityRepository, OneToOne, OneToMany, ManyToOne } from 'typeorm';
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
-import { META } from 'morphi';
+import { Morphi } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
-
-
 
 
 export interface IEXAMPLE {
@@ -13,25 +7,30 @@ export interface IEXAMPLE {
   test: string;
 }
 
-@DefaultModelWithMapping<AnotherJSON>(
-  {
+@Morphi.Entity({
+  className: 'AnotherJSON',
+  defaultModelValues: {
     isGood: true,
     speed: 33
-  })
+  }
+})
 export class AnotherJSON {
   isGood: Boolean;
   speed: Number;
 }
 
-@DefaultModelWithMapping<TestJSON>(
-  {
+
+@Morphi.Entity<TestJSON>({
+  className: 'TestJSON',
+  defaultModelValues: {
     name: 'test',
     age: 23,
     isAwesome: true
   },
-  {
+  mapping: {
     test: AnotherJSON
-  })
+  }
+})
 export class TestJSON {
   name: string;
   age: number;
@@ -40,24 +39,26 @@ export class TestJSON {
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(EXAMPLE))
-//#endregion
-@FormlyForm((fields) => {
 
-  return fields;
-})
-@DefaultModelWithMapping<EXAMPLE>({
-  'isAmazing': true,
-  'href': '< http://defaulthref >',
-  'name': '< default name >',
-  'age': 23,
-  'birthDate': new Date('01-02-2000')
-}, {
+@Morphi.Entity({
+  className: 'EXAMPLE',
+  formly: {
+    transformFn: (fields) => {
+      return fields;
+    }
+  },
+  defaultModelValues: {
+    'isAmazing': true,
+    'href': '< http://defaulthref >',
+    'name': '< default name >',
+    'age': 23,
+    'birthDate': new Date('01-02-2000')
+  },
+  mapping: {
     testjson: 'TestJSON'
-  })
-@CLASSNAME('EXAMPLE')
-export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXAMPLE {
+  }
+})
+export class EXAMPLE extends Morphi.Base.Entity<EXAMPLE, IEXAMPLE> implements IEXAMPLE {
 
   fromRaw(obj: IEXAMPLE): EXAMPLE {
     let ex = new EXAMPLE();
@@ -66,29 +67,60 @@ export class EXAMPLE extends META.BASE_ENTITY<EXAMPLE, IEXAMPLE> implements IEXA
   }
 
 
-
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column('simple-json') testjson = new TestJSON();
+  //#region @backend
+  @Morphi.Orm.Column.Custom('simple-json')
+  //#endregion
 
-  @Column() test: string = undefined;
-  @Column() href: string;
-  @Column() name: string;
+  testjson = new TestJSON();
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  test: string = undefined;
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  href: string;
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  name: string;
 
 
-  @ManyToOne(type => MULTIMEDIA, multimedia => multimedia.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => MULTIMEDIA, multimedia => multimedia.id, {
     nullable: true,
     cascade: false
   })
+  //#endregion
   multimediaExample?: MULTIMEDIA;
 
-  @Column() age: number;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  age: number;
 
-  @Column() birthDate: Date;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  birthDate: Date;
 
 
-  @Column('boolean') isAmazing;
+  //#region @backend
+  @Morphi.Orm.Column.Custom('boolean')
+  //#endregion
+  isAmazing: boolean;
 
-  @Column() otherData: string = 'asdasdasd';
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  otherData: string = 'asdasdasd';
 }

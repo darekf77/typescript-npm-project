@@ -1,8 +1,9 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { USER } from '../../entities/core/USER';
 import { SESSION } from '../../entities/core/SESSION';
 import { SESSION_CONFIG } from '../../entities/core/SESSION';
+import { tableNameFrom } from 'morphi/framework';
 
 export interface SESSION_ALIASES {
 
@@ -11,8 +12,8 @@ export interface SESSION_ALIASES {
 }
 
 
-@EntityRepository(SESSION)
-export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_ALIASES> {
+@Morphi.Repository()
+export class SESSION_REPOSITORY extends Morphi.Base.Repository<SESSION, SESSION_ALIASES> {
 
 
   globalAliases: (keyof SESSION_ALIASES)[] = ['sesssion'];
@@ -27,10 +28,10 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_AL
       ip = '::1'
     }
 
-    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
-      .where(`${META.tableNameFrom(SESSION)}.user = :id`)
-      .andWhere(`${META.tableNameFrom(SESSION)}.ip = :ip`)
+    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
+      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
+      .where(`${tableNameFrom(SESSION)}.user = :id`)
+      .andWhere(`${tableNameFrom(SESSION)}.ip = :ip`)
       .setParameters({
         id: user.id,
         ip
@@ -45,9 +46,9 @@ export class SESSION_REPOSITORY extends META.BASE_REPOSITORY<SESSION, SESSION_AL
 
   async getByToken(token: string) {
 
-    const Session = await this.createQueryBuilder(META.tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${META.tableNameFrom(SESSION)}.user`, META.tableNameFrom(USER))
-      .where(`${META.tableNameFrom(SESSION)}.token = :token`)
+    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
+      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
+      .where(`${tableNameFrom(SESSION)}.token = :token`)
       .setParameter('token', token)
       .getOne();
     if (Session) {

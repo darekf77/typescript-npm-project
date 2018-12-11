@@ -1,14 +1,7 @@
-import {
-  ENDPOINT, OrmConnection, Connection,
-  BaseCRUDEntity,
-  GET, META,
-  PathParam,
-  Response, CLASSNAME, POST, BodyParam
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 
 //#region @backend
-import { authenticate } from 'passport';
 import * as fs from 'fs';
 import * as path from 'path';
 //#endregion
@@ -18,25 +11,27 @@ import * as entities from '../entities';
 import * as controllers from '../controllers';
 
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'CategoryController',
+  //#region @backend
   auth: (method) => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('CategoryController')
-export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> {
+export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY> {
 
-  @BaseCRUDEntity(entities.CATEGORY) public entity: entities.CATEGORY;
+  @Morphi.Base.InjectCRUDEntity(entities.CATEGORY) public entity: entities.CATEGORY;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
+    // @ts-ignore
     return entities.entities(this.connection as any);
   }
 
+  // @ts-ignore
   get ctrl() {
     return controllers.controllers()
   }
@@ -107,8 +102,8 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
   // }
 
 
-  @GET('/allCategories')
-  allCategoriesWithAllData(): Response<entities.CATEGORY[]> {
+  @Morphi.Http.GET('/allCategories')
+  allCategoriesWithAllData(): Morphi.Response<entities.CATEGORY[]> {
     //#region @backendFunc
     const self = this;
     return async () => {
@@ -127,8 +122,8 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
   }
 
 
-  @GET('/categories')
-  allCategories(): Response<entities.CATEGORY[]> {
+  @Morphi.Http.GET('/categories')
+  allCategories(): Morphi.Response<entities.CATEGORY[]> {
     //#region @backendFunc
     const self = this;
     return async () => {
@@ -138,8 +133,8 @@ export class CategoryController extends META.BASE_CONTROLLER<entities.CATEGORY> 
     //#endregion
   }
 
-  @GET('/categories/:id')
-  categoryBy(@PathParam('id') id: number): Response<entities.CATEGORY> {
+  @Morphi.Http.GET('/categories/:id')
+  categoryBy(@Morphi.Http.Param.Path('id') id: number): Morphi.Response<entities.CATEGORY> {
     //#region @backendFunc
     const self = this;
     return async () => {

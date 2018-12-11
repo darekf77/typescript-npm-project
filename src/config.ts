@@ -65,6 +65,7 @@ export const config = {
       'angular-cli',
       'angular-client',
       'angular-lib',
+      'isomorphic-lib',
       'ionic-client',
       'docker'
     ] as LibType[],

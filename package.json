@@ -51,6 +51,7 @@
   },
   "preferGlobal": true,
   "dependencies": {
-    "enum-values": "^1.2.1"
+    "enum-values": "^1.2.1",
+    "morphi": "^1.0.78"
   }
 }

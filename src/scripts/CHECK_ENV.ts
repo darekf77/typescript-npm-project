@@ -1,14 +1,14 @@
 //#region @backend
-import { HelpersBackend } from "morphi";
+import { Helpers } from "morphi";
 
 
 export default {
     $CHECK_ENV: (args) => {
-        HelpersBackend.checkEnvironment()
+        Helpers.checkEnvironment()
         process.exit(0)
     },
     $CHECK_ENVIRONMENT: (args) => {
-        HelpersBackend.checkEnvironment()
+        Helpers.checkEnvironment()
         process.exit(0)
     },
 };

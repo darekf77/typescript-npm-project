@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { EMAIL_TYPE } from '../../entities/core/EMAIL_TYPE';
 import { EMAIL_TYPE_NAME } from '../../entities/core/EMAIL_TYPE';
 
@@ -13,8 +13,8 @@ export interface EMAIL_TYPE_ALIASES {
 
 
 
-@EntityRepository(EMAIL_TYPE)
-export class EMAIL_TYPE_REPOSITORY extends META.BASE_REPOSITORY<EMAIL_TYPE, EMAIL_TYPE_ALIASES> {
+@Morphi.Repository()
+export class EMAIL_TYPE_REPOSITORY extends Morphi.Base.Repository<EMAIL_TYPE, EMAIL_TYPE_ALIASES> {
 
 
   globalAliases: (keyof EMAIL_TYPE_ALIASES)[] = ['type', 'types']

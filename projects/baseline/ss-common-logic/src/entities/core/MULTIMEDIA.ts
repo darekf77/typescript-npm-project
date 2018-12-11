@@ -1,10 +1,4 @@
-import { META } from 'morphi';
-import { OneToMany } from "typeorm/decorator/relations/OneToMany";
-import { Column } from "typeorm/decorator/columns/Column";
-import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
-import { Entity } from "typeorm/decorator/entity/Entity";
-import { CreateDateColumn } from "typeorm/decorator/columns/CreateDateColumn";
-import { CLASSNAME, isNode, DefaultModelWithMapping } from 'morphi';
+import { Morphi } from 'morphi';
 import { CATEGORY } from '../CATEGORY';
 import { GROUP } from '../GROUP';
 import { DIALOG } from '../DIALOG';
@@ -24,46 +18,61 @@ export interface IMULTIMEDIA {
   createdDate: Date;
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(MULTIMEDIA))
-//#endregion
-@DefaultModelWithMapping<MULTIMEDIA>({
-  name: ''
+
+@Morphi.Entity({
+  className: 'MULTIMEDIA',
+  defaultModelValues: {
+    name: ''
+  }
 })
-@CLASSNAME('MULTIMEDIA')
-export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {
+export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {
 
+  //#region @backend
 
-  @PrimaryGeneratedColumn()
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined;
 
-  @CreateDateColumn()
+  //#region @backend
+
+  @Morphi.Orm.Column.CreateDate()
+  //#endregion
   createdDate: Date = undefined
 
-  @Column('varchar', { length: 200, nullable: true })
+  //#region @backend
+
+  @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
+  //#endregion
   name: string = null
 
 
-  @Column('varchar', { length: 20 })
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { length: 20 })
+  //#endregion
   type: MultimediaType;
 
 
-  @OneToMany(() => CATEGORY, cat => cat.picture, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(() => CATEGORY, cat => cat.picture, {
     cascade: false
   })
+  //#endregion
   catetories: CATEGORY[];
 
 
-  @OneToMany(() => GROUP, group => group.picture, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(() => GROUP, group => group.picture, {
     cascade: false
   })
+  //#endregion
   groups: GROUP[];
 
 
-
-  @OneToMany(() => DIALOG, dialog => dialog.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.OneToMany(() => DIALOG, dialog => dialog.id, {
     cascade: false
   })
+  //#endregion
   dialogs: DIALOG[];
 
 
@@ -78,7 +87,7 @@ export class MULTIMEDIA extends META.BASE_ENTITY<MULTIMEDIA, IMULTIMEDIA> implem
 
   get path() {
     //#region @backend
-    if (isNode) {
+    if (Morphi.IsNode) {
       if (!this.type) {
         throw Error(`Bad multimedia type for id ${this.id}`)
       }

@@ -1,11 +1,4 @@
-import { META } from 'morphi';
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { Entity, EntityRepository, Connection } from 'typeorm';
-import {
-  CLASSNAME, FormlyForm, DefaultModelWithMapping,
-  ENDPOINT, BaseCRUDEntity, OrmConnection
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 
 
@@ -17,22 +10,22 @@ export interface IEXAMPLE_PAGINATION {
 }
 
 
+@Morphi.Entity<EXAMPLE_PAGINATION>({
+  className: 'EXAMPLE_PAGINATION',
+  formly: {
+    transformFn: (fields) => {
 
-//#region @backend
-@Entity(META.tableNameFrom(EXAMPLE_PAGINATION))
-//#endregion
-@FormlyForm((fields) => {
-
-  return fields;
+      return fields;
+    }
+  },
+  defaultModelValues: {
+    'isAmazing': true,
+    'name': '< default name >',
+    'age': 23
+  }
 })
-@DefaultModelWithMapping<EXAMPLE_PAGINATION>({
-  'isAmazing': true,
-  'name': '< default name >',
-  'age': 23
-})
-@CLASSNAME('EXAMPLE_PAGINATION')
 export class EXAMPLE_PAGINATION
-  extends META.BASE_ENTITY<EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION>
+  extends Morphi.Base.Entity<EXAMPLE_PAGINATION, IEXAMPLE_PAGINATION>
   implements IEXAMPLE_PAGINATION {
 
   fromRaw(obj: IEXAMPLE_PAGINATION): EXAMPLE_PAGINATION {
@@ -41,16 +34,34 @@ export class EXAMPLE_PAGINATION
     return ex;
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column() name: string;
-  @Column() test: string;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  name: string;
 
-  @Column() age: number;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  test: string;
 
-  @Column() price: number = 23
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  age: number;
 
-  @Column('boolean') isAmazing: boolean;
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
+  price: number = 23
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom('boolean')
+  //#endregion
+  isAmazing: boolean;
 
 }

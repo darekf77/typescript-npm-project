@@ -1,9 +1,5 @@
 
-import {
-  ENDPOINT, GET, POST, PUT, DELETE, isNode, Connection,
-  PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-  Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity, CLASSNAME
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 //#region @backend
 import { authenticate, use } from 'passport';
@@ -30,9 +26,6 @@ import { Subject } from "rxjs/Subject";
 export { Subject } from "rxjs/Subject";
 
 const log = Log.create('AuthController', Level.__NOTHING);
-
-
-import { META } from 'morphi';
 
 
 import { SESSION } from "../../entities/core/SESSION";
@@ -69,31 +62,33 @@ export interface IFacebook {
 }
 
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'AuthController',
+  //#region @backend
   auth: (method) => {
-    //#region @backendFunc
+
     if (method === AuthController.prototype.login) {
       return;
     }
     if (method === AuthController.prototype.checkExist) {
       return;
     }
-    return authenticate('bearer', { session: false });
-    //#endregion
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('AuthController')
-export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
+export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
 
-  @BaseCRUDEntity(entities.SESSION) entity: entities.SESSION;
+  @Morphi.Base.InjectCRUDEntity(entities.SESSION) entity: entities.SESSION;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);
   }
 
+  // @ts-ignore
   get ctrl() {
     return controllers.controllers()
   }
@@ -101,7 +96,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
 
   constructor() {
     super();
-    isBrowser && this.browser.init()
+    Morphi.IsBrowser && this.browser.init()
   }
 
   private _subIsLggedIn = new Subject<boolean>();
@@ -112,7 +107,7 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     const self = this;
     return {
       async init(checkSession = true) {
-        if (isNode) {
+        if (Morphi.IsNode) {
           return;
         }
         const session = entities.SESSION.localStorage.fromLocalStorage()
@@ -173,8 +168,8 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
   }
 
 
-  @GET('/')
-  info(): Response<entities.USER> {
+  @Morphi.Http.GET('/')
+  info(): Morphi.Response<entities.USER> {
     //#region @backendFunc
     const self = this;
     return async (req, res) => {
@@ -188,13 +183,13 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
         return User;
       }
 
-      throw Errors.entityNotFound(entities.USER);
+      throw Morphi.Orm.Errors.entityNotFound(entities.USER);
     };
     //#endregion
   }
 
-  @GET('/check/exist/:username_or_email')
-  checkExist(@PathParam('username_or_email') param: string): Response<Boolean> {
+  @Morphi.Http.GET('/check/exist/:username_or_email')
+  checkExist(@Morphi.Http.Param.Path('username_or_email') param: string): Morphi.Response<Boolean> {
     //#region @backendFunc
     const self = this;
     return async (req, res) => {
@@ -222,8 +217,8 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  @POST('/logout')
-  logout(): Response<boolean> {
+  @Morphi.Http.POST('/logout')
+  logout(): Morphi.Response<boolean> {
 
     //#region @backendFunc
     const self = this;
@@ -249,8 +244,8 @@ export class AuthController extends META.BASE_CONTROLLER<entities.SESSION> {
     //#endregion
   }
 
-  @POST('/login')
-  login(@BodyParam() body: IHelloJS & entities.IUSER): Response<entities.SESSION> {
+  @Morphi.Http.POST('/login')
+  login(@Morphi.Http.Param.Body() body: IHelloJS & entities.IUSER): Morphi.Response<entities.SESSION> {
     //#region @backendFunc
     const self = this;
     return async (req) => {

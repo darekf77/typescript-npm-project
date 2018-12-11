@@ -1,7 +1,4 @@
-import {
-  ENDPOINT, OrmConnection, Connection, BaseCRUDEntity,
-  GET, META, Response, CLASSNAME, isBrowser
-} from 'morphi';
+import { Morphi } from 'morphi';
 import { Log, Level } from "ng2-logger";
 const log = Log.create('ExamplesController')
 
@@ -12,21 +9,22 @@ import * as controllers from '../controllers';
 
 
 
-@ENDPOINT()
-@CLASSNAME('ExamplesController')
-export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
+@Morphi.Controller({
+  className: 'ExamplesController'
+})
+export class ExamplesController extends Morphi.Base.Controller<entities.EXAMPLE> {
 
   constructor() {
     super();
-    if (isBrowser) {
+    if (Morphi.IsBrowser) {
       log.i('ExamplesController, constructor', this)
     }
   }
 
-  @BaseCRUDEntity(entities.EXAMPLE) public entity: entities.EXAMPLE;
+  @Morphi.Base.InjectCRUDEntity(entities.EXAMPLE) public entity: entities.EXAMPLE;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);
@@ -57,8 +55,8 @@ export class ExamplesController extends META.BASE_CONTROLLER<entities.EXAMPLE> {
   //#endregion
 
 
-  @GET('/dupa')
-  info2(): Response<any> {
+  @Morphi.Http.GET('/dupa')
+  info2(): Morphi.Response<any> {
     //#region @backendFunc
     return {
       send: {

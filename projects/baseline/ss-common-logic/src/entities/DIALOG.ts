@@ -1,16 +1,7 @@
-import { META } from 'morphi';
-import { PrimaryGeneratedColumn } from 'typeorm/decorator/columns/PrimaryGeneratedColumn';
-import { Column } from 'typeorm/decorator/columns/Column';
-import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
-import { CATEGORY } from './CATEGORY';
-import { JoinColumn } from 'typeorm/decorator/relations/JoinColumn';
-import { Entity, EntityRepository, ManyToMany } from 'typeorm';
-import { CategoryController } from '../controllers';
-import { GROUP } from './GROUP';
-import { CLASSNAME, FormlyForm, DefaultModelWithMapping } from 'morphi';
+import { Morphi } from 'morphi';
 import { EnumValues } from 'enum-values';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
-
+import { GROUP } from './GROUP';
 
 
 export enum DialogType {
@@ -32,20 +23,20 @@ export interface IDIALOG {
 
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(DIALOG))
-//#endregion
-@FormlyForm()
-@DefaultModelWithMapping<DIALOG>({
-  type: DialogType.HINT,
-  lang_en: '',
-  lang_fr: '',
-  lang_pl: ''
-}, {
+
+@Morphi.Entity<DIALOG>({
+  className: 'DIALOG',
+  defaultModelValues: {
+    type: DialogType.HINT,
+    lang_en: '',
+    lang_fr: '',
+    lang_pl: ''
+  },
+  mapping: {
     group: 'GROUP'
-  })
-@CLASSNAME('DIALOG')
-export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG {
+  }
+})
+export class DIALOG extends Morphi.Base.Entity<DIALOG, IDIALOG> implements IDIALOG {
 
   fromRaw(obj: IDIALOG): DIALOG {
     let dialog = new DIALOG();
@@ -56,37 +47,64 @@ export class DIALOG extends META.BASE_ENTITY<DIALOG, IDIALOG> implements IDIALOG
     return dialog;
   }
 
-  @PrimaryGeneratedColumn()
+
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number = undefined
 
-  @Column({ default: DialogType.HINT }) type: DialogType;
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ default: DialogType.HINT })
+  //#endregion
+  type: DialogType;
 
   get typeString() {
     return EnumValues.getNameFromValue(DialogType, this.type)
   }
 
-  @Column({ nullable: true }) lang_pl?: string = undefined
-  @Column({ nullable: true }) lang_en?: string = undefined
-  @Column({ nullable: true }) lang_fr?: string = undefined
 
-  @ManyToOne(type => GROUP, group => group.id, {
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  lang_pl?: string = undefined
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  lang_en?: string = undefined
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  lang_fr?: string = undefined
+
+
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => GROUP, group => group.id, {
     cascade: false
   })
+  //#endregion
   group: GROUP;
 
-  @ManyToOne(type => MULTIMEDIA, m => m.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
+  //#endregion
   audio_pl?: MULTIMEDIA;
 
-  @ManyToOne(type => MULTIMEDIA, m => m.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
+  //#endregion
   audio_en?: MULTIMEDIA;
 
-  @ManyToOne(type => MULTIMEDIA, m => m.id, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToOne(type => MULTIMEDIA, m => m.id, {
     cascade: false
   })
+  //#endregion
   audio_fr?: MULTIMEDIA;
 
 

@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { CATEGORY } from '../entities/CATEGORY';
 
 export interface CATEGORY_ALIASES {
@@ -10,8 +10,8 @@ export interface CATEGORY_ALIASES {
 }
 
 
-@EntityRepository(CATEGORY)
-export class CATEGORY_REPOSITORY extends META.BASE_REPOSITORY<CATEGORY, CATEGORY_ALIASES> {
+@Morphi.Repository()
+export class CATEGORY_REPOSITORY extends Morphi.Base.Repository<CATEGORY, CATEGORY_ALIASES> {
 
 
   globalAliases: (keyof CATEGORY_ALIASES)[] = ['category', 'categories']

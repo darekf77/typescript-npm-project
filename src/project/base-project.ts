@@ -377,12 +377,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   private modifySourceBeforCompilation() {
     if (config.allowedTypes.app.includes(this.type)) {
-      this.sourceModifier.init()
-      // if (this.buildOptions.watch) {
-      //   this.sourceModifier.initAndWatch()
-      // } else {
-      //   this.sourceModifier.init()
-      // }
+      if (!this.isStandaloneProject) {
+        this.sourceModifier.init(`client source modifier`)
+        // if (this.buildOptions.watch) {
+        //   this.sourceModifier.initAndWatch()
+        // } else {
+        //   this.sourceModifier.init()
+        // }
+      }
     }
   }
 

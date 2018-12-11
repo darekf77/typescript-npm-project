@@ -1,8 +1,4 @@
-import {
-  ENDPOINT, OrmConnection, Connection,
-  BaseCRUDEntity,
-  CLASSNAME, META
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 
 //#region @backend
@@ -15,20 +11,20 @@ import * as controllers from '../controllers';
 
 
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'GroupsController',
+  //#region @backend
   auth: () => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('GroupsController')
-export class GroupsController extends META.BASE_CONTROLLER<entities.GROUP> {
+export class GroupsController extends Morphi.Base.Controller<entities.GROUP> {
 
-  @BaseCRUDEntity(entities.GROUP) public entity: entities.GROUP;
+  @Morphi.Base.InjectCRUDEntity(entities.GROUP) public entity: entities.GROUP;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

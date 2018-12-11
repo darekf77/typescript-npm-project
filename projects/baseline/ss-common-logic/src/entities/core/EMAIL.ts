@@ -1,32 +1,17 @@
 
-import { ManyToMany } from "typeorm/decorator/relations/ManyToMany";
-import { ManyToOne } from "typeorm/decorator/relations/ManyToOne";
-import { JoinTable } from "typeorm/decorator/relations/JoinTable";
-import { JoinColumn } from "typeorm/decorator/relations/JoinColumn";
-import { Column } from "typeorm/decorator/columns/Column";
-import { PrimaryGeneratedColumn } from "typeorm/decorator/columns/PrimaryGeneratedColumn";
+import { Morphi } from 'morphi';
 import { USER } from "./USER";
 import { EMAIL_TYPE } from './EMAIL_TYPE';
-import { META } from 'morphi';
-import { CLASSNAME } from 'morphi';
-
-
-//#region @backend
-import { Entity } from "typeorm/decorator/entity/Entity";
-
-//#endregion
-
 
 export interface IEMAIL {
 
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(EMAIL))
-//#endregion
-@CLASSNAME('EMAIL')
-export class EMAIL extends META.BASE_ENTITY<EMAIL> implements IEMAIL {
+@Morphi.Entity({
+  className: 'EMAIL'
+})
+export class EMAIL extends Morphi.Base.Entity<EMAIL> implements IEMAIL {
 
   fromRaw(obj: Object): EMAIL {
     throw new Error("Method not implemented.");
@@ -37,24 +22,32 @@ export class EMAIL extends META.BASE_ENTITY<EMAIL> implements IEMAIL {
     this.address = address;
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   public id: number = undefined
 
-  @Column('varchar', { length: 100, unique: true })
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { length: 100, unique: true })
+  //#endregion
   address: string = undefined
 
 
-  @ManyToMany(() => EMAIL_TYPE, type => type.emails, {
+  //#region @backend
+  @Morphi.Orm.Relation.ManyToMany(() => EMAIL_TYPE, type => type.emails, {
     cascade: false
   })
-  @JoinTable()
+  @Morphi.Orm.Join.Table()
+  //#endregion
   types: EMAIL_TYPE[];
 
+  //#region @backend
 
-  @ManyToOne(() => USER, user => user.id, {
+  @Morphi.Orm.Relation.ManyToOne(() => USER, user => user.id, {
     cascade: false
   })
-  @JoinColumn()
+  @Morphi.Orm.Join.Column()
+  //#endregion
   user: USER;
 
 }

@@ -1,63 +1,41 @@
 
-import {
-  ENDPOINT, GET, POST, PUT, DELETE, isNode, Connection,
-  PathParam, QueryParam, CookieParam, HeaderParam, BodyParam,
-  Response, OrmConnection, Errors, isBrowser, BaseCRUDEntity,
-  CLASSNAME
-} from 'morphi';
-import { get } from "lodash";
+import { Morphi } from 'morphi';
+import * as _ from 'lodash';
 
-//#region @backend
-import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import { authenticate, use } from 'passport';
-import { Strategy, IStrategyOptions } from 'passport-http-bearer';
-import { isEmail, isLowercase, isLength } from 'validator';
-import * as q from 'q';
-import { Handler } from 'express';
 export { Handler } from 'express';
-import * as bcrypt from 'bcrypt';
-import * as graph from 'fbgraph';
-import * as path from 'path';
 import { UploadedFile } from "express-fileupload";
-import { HelpersBackend } from 'morphi';
+import { Helpers } from 'morphi';
 //#endregion
 
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
-
-import * as _ from 'lodash';
-
-import { META } from 'morphi';
-
-
 import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 
 
-@ENDPOINT({
-  auth: (method) => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
+@Morphi.Controller({
+  className: 'MultimediaController',
+  //#region @backend
+  auth: () => {
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('MultimediaController')
-export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMEDIA> {
+export class MultimediaController extends Morphi.Base.Controller<entities.MULTIMEDIA> {
 
-  @BaseCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
+  @Morphi.Base.InjectCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
 
   constructor() {
     super()
     entities.MULTIMEDIA.recreateFolder()
   }
 
-  @POST('/upload')
-  upload(): Response<boolean> {
+  @Morphi.Http.POST('/upload')
+  upload(): Morphi.Response<boolean> {
     //#region @backendFunc
-    return async (req, res) => {
-      const file: UploadedFile = get(req, 'files.file');
+    return async (req) => {
+      const file: UploadedFile = _.get(req, 'files.file');
 
 
       if (!file) {
@@ -68,7 +46,6 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
         m.name = file.name;
         m.type = 'picture';
         m = await this.db.MULTIMEDIA.save(m)
-        const p = m.path;
         await file.mv(m.path, undefined) as any;
         console.log('uploaded file', file)
       }
@@ -80,13 +57,15 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
 
   //#region @backend
-  @OrmConnection connection: Connection;
 
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
+    // @ts-ignore
     return entities.entities(this.connection as any);
   }
 
+  // @ts-ignore
   get ctrl() {
     return controllers.controllers()
   }
@@ -96,7 +75,7 @@ export class MultimediaController extends META.BASE_CONTROLLER<entities.MULTIMED
 
   private discover(folderName, type: MultimediaType) {
     const res: MULTIMEDIA[] = []
-    const files: string[] = HelpersBackend.getRecrusiveFilesFrom(folderName);
+    const files: string[] = Helpers.getRecrusiveFilesFrom(folderName);
     files.forEach(name => {
       let m = this.db.MULTIMEDIA.create({
         name,

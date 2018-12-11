@@ -1,6 +1,8 @@
+
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { EMAIL } from '../../entities/core/EMAIL';
+import { tableNameFrom } from 'morphi/framework';
 
 export interface EMAIL_ALIASES {
 
@@ -9,8 +11,9 @@ export interface EMAIL_ALIASES {
 
 }
 
-@EntityRepository(EMAIL)
-export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL, EMAIL_ALIASES> {
+
+@Morphi.Repository()
+export class EMAIL_REPOSITORY extends Morphi.Base.Repository<EMAIL, EMAIL_ALIASES> {
 
 
   globalAliases: (keyof EMAIL_ALIASES)[] = ['email', 'emails']
@@ -30,9 +33,9 @@ export class EMAIL_REPOSITORY extends META.BASE_REPOSITORY<EMAIL, EMAIL_ALIASES>
   async findBy(address: string) {
 
     return await this
-      .createQueryBuilder(META.tableNameFrom(EMAIL))
-      .innerJoinAndSelect(`${META.tableNameFrom(EMAIL)}.user`, 'user')
-      .where(`${META.tableNameFrom(EMAIL)}.address = :email`)
+      .createQueryBuilder(tableNameFrom(EMAIL))
+      .innerJoinAndSelect(`${tableNameFrom(EMAIL)}.user`, 'user')
+      .where(`${tableNameFrom(EMAIL)}.address = :email`)
       .setParameter('email', address)
       .getOne();
 

@@ -9,30 +9,11 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
+const _ = require('lodash')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin');
 
-/**
- * Envs
- */
-const ENV = process.env.NODE_ENV;
-const IS_PROD = ENV === 'production';
-
-/**
- * Directories
- */
-const srcDirRelative = './tmp-src-dist-browser';
-const distDirRelative = './dist-browser';
-
-const srcDir = path.join(__dirname, srcDirRelative);
-const distDir = path.join(__dirname, distDirRelative);
-
-/**
- * Plugins
- */
-const definePlugin = new webpack.DefinePlugin({
-  'process.env.NODE_ENV': JSON.stringify(ENV)
-});
 
 const noEmitOnErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
 
@@ -43,78 +24,99 @@ const htmlWebpackPlugin = new HtmlWebpackPlugin({
 
 const uglifyWebpackPlugin = new UglifyWebpackPlugin();
 
-const prodPlugins = IS_PROD
-  ? [ uglifyWebpackPlugin ]
-  : [];
 
 /**
  * Export config
  */
-module.exports = {
-  devtool: IS_PROD ? 'source-map' : 'eval-source-map',
-  entry: `${srcDirRelative}/index.ts`,
-  output: {
-    path: distDir,
-    filename: '[name].[hash:5].js'
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js']
-  },
-  module: {
-    rules: [
-      // {
-      //   enforce: 'pre',
-      //   test: /\.tsx?$/,
-      //   loader: 'tslint-loader',
-      //   include: srcDir,
-      //   exclude: /node_modules/,
-      //   options: {
-      //     configFile: './tslint.json',
-      //     failOnHint: true
-      //   }
-      // },
-      {
-        test: /\.tsx?$/,
-        include: srcDir,
-        exclude: /node_modules/,
-        use: [
-          {
-            /**
-             * 2. Transpile ES6 + dynamic imports into ES5
-             *    (smaller bundle sizes than ts-loader alone)
-             */
-            loader: 'babel-loader',
-            options: {
-              presets: [ 'es2015' ],
-              plugins: [ 'babel-plugin-syntax-dynamic-import' ]
-            }
-          },
-          {
-            /**
-             * 1. Transpile TypeScript into ES6 + dynamic imports
-             */
-            loader: 'ts-loader',
-            options: {
-              // compilerOptions: {
+module.exports = (env) => {
+  env = env || {};
+  const { watch = false, outFolder = 'dist', moduleName = undefined, port = 9000 } = env;
+  console.log('env', env)
+  const browserOutFolder = `browser-for-${moduleName}`;
+  const srcDirRelative = _.isString(moduleName) ? `tmp-src-${outFolder}-${browserOutFolder}` : `./tmp-src-${outFolder}-browser`;
+  const distDirRelative = _.isString(moduleName) ? browserOutFolder : `./${outFolder}-browser`;
+  const ENV = moduleName ? fs.readFileSync('tmp-environment.json', 'utf8') : {}
+
+  const srcDir = path.join(__dirname, srcDirRelative);
+  const distDir = path.join(__dirname, distDirRelative);
+
+  /**
+ * Plugins
+ */
+  const definePlugin = new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify(ENV)
+  });
+
+
+  return {
+    devtool: !watch ? 'source-map' : 'eval-source-map',
+    entry: `${srcDirRelative}/app.ts`,
+    output: {
+      path: distDir,
+      filename: '[name].[hash:5].js'
+    },
+    resolve: {
+      extensions: ['.ts', '.tsx', '.js']
+    },
+    module: {
+      rules: [
+        // {
+        //   enforce: 'pre',
+        //   test: /\.tsx?$/,
+        //   loader: 'tslint-loader',
+        //   include: srcDir,
+        //   exclude: /node_modules/,
+        //   options: {
+        //     configFile: './tslint.json',
+        //     failOnHint: true
+        //   }
+        // },
+        {
+          test: /\.tsx?$/,
+          include: srcDir,
+          exclude: /node_modules/,
+          use: [
+            {
+              /**
+               * 2. Transpile ES6 + dynamic imports into ES5
+               *    (smaller bundle sizes than ts-loader alone)
+               */
+              loader: 'babel-loader',
+              options: {
+                presets: ['es2015'],
+                plugins: ['babel-plugin-syntax-dynamic-import']
+              }
+            },
+            {
+              /**
+               * 1. Transpile TypeScript into ES6 + dynamic imports
+               */
+              loader: 'ts-loader',
+              options: {
+                // compilerOptions: {
                 // module: 'esnext' , // allows bundle splitting via dynamic imports!,
-              // },
-              configFile: "tmp-src-dist-browser/tsconfig.json"
+                // },
+                configFile: "tmp-src-dist-browser/tsconfig.json"
+              }
             }
-          }
-        ]
-      }
-    ]
-  },
-  plugins: [
-    definePlugin,
-    noEmitOnErrorsPlugin,
-    htmlWebpackPlugin,
-    ...prodPlugins
-  ],
-  devServer: {
-    contentBase: srcDir,
-    compress: true,
-    port: 9000
-  }
-};
+          ]
+        }
+      ]
+    },
+    plugins: [
+      definePlugin,
+      noEmitOnErrorsPlugin,
+      htmlWebpackPlugin,
+      ...(!watch
+        ? [uglifyWebpackPlugin]
+        : [])
+    ],
+    devServer: {
+      contentBase: srcDir,
+      compress: true,
+      port
+    }
+  };
+}
+
 

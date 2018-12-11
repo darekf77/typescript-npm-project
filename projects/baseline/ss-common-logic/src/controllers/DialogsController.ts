@@ -1,9 +1,4 @@
-import {
-  ENDPOINT, OrmConnection, Connection,
-  BaseCRUDEntity,
-  META,
-  CLASSNAME
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 //#region @backend
 import { authenticate } from 'passport';
@@ -14,20 +9,20 @@ import * as entities from '../entities';
 import * as controllers from '../controllers';
 
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'DialogsController',
+  //#region @backend
   auth: () => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('DialogsController')
-export class DialogsController extends META.BASE_CONTROLLER<entities.DIALOG> {
+export class DialogsController extends Morphi.Base.Controller<entities.DIALOG> {
 
-  @BaseCRUDEntity(entities.DIALOG) public entity: entities.DIALOG;
+  @Morphi.Base.InjectCRUDEntity(entities.DIALOG) public entity: entities.DIALOG;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

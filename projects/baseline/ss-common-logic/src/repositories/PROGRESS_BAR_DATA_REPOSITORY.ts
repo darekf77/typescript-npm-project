@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { PROGRESS_BAR_DATA } from '../entities/PROGRESS_BAR_DATA';
 
 export interface PROGRESS_BAR_DATA_ALIASES {
@@ -10,8 +10,8 @@ export interface PROGRESS_BAR_DATA_ALIASES {
 }
 
 
-@EntityRepository(PROGRESS_BAR_DATA)
-export class PROGRESS_BAR_DATA_REPOSITORY extends META.BASE_REPOSITORY<PROGRESS_BAR_DATA, PROGRESS_BAR_DATA_ALIASES> {
+@Morphi.Repository()
+export class PROGRESS_BAR_DATA_REPOSITORY extends Morphi.Base.Repository<PROGRESS_BAR_DATA, PROGRESS_BAR_DATA_ALIASES> {
 
 
   globalAliases: (keyof PROGRESS_BAR_DATA_ALIASES)[] = ['progress', 'progresses'];

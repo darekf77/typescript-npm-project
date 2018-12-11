@@ -1,16 +1,7 @@
-import {
-  ENDPOINT, OrmConnection, Connection,
-  BaseCRUDEntity, META,
-  CLASSNAME, isBrowser
-} from 'morphi';
+import { Morphi } from 'morphi';
 import { Log } from 'ng2-logger';
 
 const log = Log.create('CondigController')
-
-//#region @backend
-import { authenticate } from 'passport';
-//#endregion
-
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
@@ -31,20 +22,20 @@ const APP_CONFIG: ConfigValues = Object.freeze<ConfigValues>({
   course_target_language: 'fr'
 })
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'ConfigController',
+  //#region @backend
   auth: () => {
-    //#region @backendFunc
-    return authenticate('bearer', { session: false });
-    //#endregion
+    return Morphi.Auth('bearer', { session: false });
   }
+  //#endregion
 })
-@CLASSNAME('ConfigController')
-export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
+export class ConfigController extends Morphi.Base.Controller<entities.CONFIG> {
 
-  @BaseCRUDEntity(entities.CONFIG) public entity: entities.CONFIG;
+  @Morphi.Base.InjectCRUDEntity(entities.CONFIG) public entity: entities.CONFIG;
 
   //#region @backend
-  @OrmConnection connection: Connection;
+  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);
@@ -70,7 +61,7 @@ export class ConfigController extends META.BASE_CONTROLLER<entities.CONFIG> {
   //#endregion
 
   private async refresh() {
-    if (isBrowser) {
+    if (Morphi.IsBrowser) {
       const config = await this.getAll().received;
       config.body.json.forEach(({ key, value }) => {
         ConfigController.cachedValues[key] = value;
