@@ -6,8 +6,9 @@ const log = Log.create('CondigController')
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
-
-
+//#region @backend
+import { authenticate } from 'passport'
+//#endregion
 
 export type APP_LANGUAGE = 'pl' | 'en' | 'fr';
 
@@ -26,7 +27,7 @@ const APP_CONFIG: ConfigValues = Object.freeze<ConfigValues>({
   className: 'ConfigController',
   //#region @backend
   auth: () => {
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })

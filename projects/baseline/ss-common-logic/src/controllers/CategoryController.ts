@@ -4,6 +4,7 @@ import { Morphi } from 'morphi';
 //#region @backend
 import * as fs from 'fs';
 import * as path from 'path';
+import { authenticate } from 'passport'
 //#endregion
 
 
@@ -15,7 +16,7 @@ import * as controllers from '../controllers';
   className: 'CategoryController',
   //#region @backend
   auth: (method) => {
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })
@@ -27,11 +28,10 @@ export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY
   @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
-    // @ts-ignore
     return entities.entities(this.connection as any);
   }
 
-  // @ts-ignore
+
   get ctrl() {
     return controllers.controllers()
   }
@@ -39,7 +39,8 @@ export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY
 
   async initExampleDbData() {
 
-    const pathDatabaseJSON = path.join(__dirname, '../../database.json')
+    const pathDatabaseJSON = path.resolve(path.join(__dirname, '../../database.json'))
+    // console.log('pathDatabaseJSON', pathDatabaseJSON)
 
     let json: {
       categories: entities.ICATEGORY[]
@@ -47,7 +48,7 @@ export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY
 
     try {
       json = JSON.parse(fs.readFileSync(pathDatabaseJSON, 'utf8').toString())
-
+      // console.log('database.json', json)
       const categories: entities.CATEGORY[] = json.categories.map(c => {
         let category = new entities.CATEGORY()
         return category.fromRaw(c);
@@ -90,7 +91,7 @@ export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY
       console.log(e);
       process.exit(0)
     }
-    console.log('json', json)
+    // console.log('json', json)
 
   }
   //#endregion

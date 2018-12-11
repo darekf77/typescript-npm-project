@@ -7,10 +7,12 @@ import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { BaseCRUD, describeClassProperites } from 'morphi/browser';
+
+import { Morphi } from 'morphi/browser';
 
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
+import { describeClassProperites } from 'ng2-rest/browser';
 
 
 const log = Log.create('select wrapper');
@@ -30,7 +32,7 @@ export class SelectWrapperComponent extends FieldType implements OnInit, AfterVi
 
   isLoading = false;
 
-  @Input() crud: BaseCRUD<any>;
+  @Input() crud: Morphi.CRUD.Base<any>;
 
   @Input() selectOptions: CRUDSelectWrapperOption[] = [];
 

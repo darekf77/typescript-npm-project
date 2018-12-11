@@ -1,10 +1,6 @@
 import { Morphi } from 'morphi';
 import { EMAIL } from "./EMAIL";
 
-
-
-
-
 export type EMAIL_TYPE_NAME = 'normal_auth' | 'facebook' | 'google_plus' | 'twitter';
 
 export interface IEMAIL_TYPE {

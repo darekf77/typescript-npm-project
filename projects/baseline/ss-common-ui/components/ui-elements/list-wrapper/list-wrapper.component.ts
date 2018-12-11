@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { BaseCRUD, describeClassProperites, ModelDataConfig, SYMBOL } from 'morphi/browser';
+import { Morphi , ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-common-ui/entities';
+import { describeClassProperites } from 'ng2-rest/browser';
 
 const log = Log.create('List wrapper', Level.__NOTHING);
 
@@ -30,7 +30,7 @@ export class ListWrapperComponent implements OnInit {
 
   }
 
-  @Input() arrayDataConfig = new ModelDataConfig();
+  @Input() arrayDataConfig = new Morphi.CRUD.ModelDataConfig();
 
   @ViewChild('create') templateCreate: TemplateRef<any>;
 
@@ -38,7 +38,7 @@ export class ListWrapperComponent implements OnInit {
 
   isLoading = false;
 
-  @Input() crud: BaseCRUD<any>;
+  @Input() crud: Morphi.CRUD.Base<any>;
 
   @Input() links: CRUDListWrapperLink[] = [
 
@@ -116,7 +116,7 @@ export class ListWrapperComponent implements OnInit {
     try {
       log.i('this.arrayDataConfig', this.arrayDataConfig);
       const rows = await this.crud.getAll(this.arrayDataConfig).received;
-      const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
+      const totalElements = Number(rows.headers.get(Morphi.SYMBOL.X_TOTAL_COUNT));
       this.isLoading = false;
       if (!isNaN(totalElements)) {
         this.arrayDataConfig.set.pagination.totalElement(totalElements);

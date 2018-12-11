@@ -17,7 +17,7 @@ const angularModules = [
   CommonModule,
   FormsModule,
   HttpClientModule
-]
+];
 
 const materialModules = [
   MatIconModule,

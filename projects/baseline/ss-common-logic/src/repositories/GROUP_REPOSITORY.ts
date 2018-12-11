@@ -10,7 +10,7 @@ export interface GROUP_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(GROUP)
 export class GROUP_REPOSITORY extends Morphi.Base.Repository<GROUP, GROUP_ALIASES> {
 
 

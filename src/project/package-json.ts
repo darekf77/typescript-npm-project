@@ -102,6 +102,8 @@ export class PackageJSON {
       project.packageJson.data.tnp.overrided.dependencies) ?
       project.packageJson.data.tnp.overrided.dependencies : {}
 
+    // console.log('toOverride',toOverride)
+
     _.merge(newDeps, toOverride);
     Object.keys(newDeps).forEach(key => {
       if (_.isNull(newDeps[key])) {
@@ -130,7 +132,7 @@ export class PackageJSON {
     })
 
 
-    this.cleanBeforeSave(project, newDeps);
+    this.cleanBeforeSave(project, newDeps, toOverride);
     // this.inlcudeDevDevs(project)
 
     const engines = Project.by('workspace').packageJson.data.engines;
@@ -213,7 +215,9 @@ export class PackageJSON {
   }
 
 
-  cleanBeforeSave(project: Project, deps: DependenciesFromPackageJsonStyle) {
+  cleanBeforeSave(project: Project, deps: DependenciesFromPackageJsonStyle, overrided: DependenciesFromPackageJsonStyle) {
+    // console.log('overrided', overrided)
+
     deps[project.name] = undefined;
 
     if (project.packageJson.data.tnp &&
@@ -237,11 +241,12 @@ export class PackageJSON {
 
     if (project.packageJson.data.tnp &&
       project.packageJson.data.tnp.overrided &&
-      _.isArray(project.packageJson.data.tnp.overrided.ignoreWhenStartWith)) {
-      const patterns = project.packageJson.data.tnp.overrided.ignoreWhenStartWith;
+      _.isArray(project.packageJson.data.tnp.overrided.ignoreDepsPattern)) {
+      const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
       patterns.forEach(p => {
         Object.keys(deps).forEach(depName => {
-          if (depName.startsWith(p)) {
+          // console.log(`check patter: ${p} agains ${depName}`)
+          if ((new RegExp(p)).test(depName) && !overrided[depName]) {
             deps[depName] = undefined;
           }
         })

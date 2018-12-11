@@ -10,7 +10,7 @@ export interface CATEGORY_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(CATEGORY)
 export class CATEGORY_REPOSITORY extends Morphi.Base.Repository<CATEGORY, CATEGORY_ALIASES> {
 
 

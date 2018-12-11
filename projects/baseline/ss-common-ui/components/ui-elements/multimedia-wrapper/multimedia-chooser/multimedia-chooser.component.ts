@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 // third part
 import { Subscription } from 'rxjs/Subscription';
-import { describeClassProperites, ModelDataConfig } from 'morphi/browser';
+import { Morphi } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia chooser');
 // local
@@ -26,7 +26,7 @@ export class MultimediaChooserComponent implements OnInit, OnDestroy {
   @Input() selected: MULTIMEDIA[] = [];
   @Output() selectedRow = new EventEmitter<MULTIMEDIA | MULTIMEDIA[]>();
 
-  @Input() modelDataConfig: ModelDataConfig;
+  @Input() modelDataConfig: Morphi.CRUD.ModelDataConfig;
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   @ViewChild('hdrTpl') hdrTpl: TemplateRef<any>;
 

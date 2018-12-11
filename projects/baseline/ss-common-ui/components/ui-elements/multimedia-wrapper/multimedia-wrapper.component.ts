@@ -3,7 +3,7 @@ import { Component, OnInit, Input, TemplateRef, ViewChild } from '@angular/core'
 import { FieldType } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { BaseCRUD, ModelDataConfig } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia wrapper');
 // local
@@ -24,7 +24,7 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
   currentAction: DialogAction = 'select';
   selectionType: 'single' | 'multi' = 'single';
   dialogRef: MatDialogRef<any>;
-  modelDataConfig = new ModelDataConfig();
+  modelDataConfig = new Morphi.CRUD.ModelDataConfig();
   @ViewChild('dialog') private dialog: TemplateRef<any>;
 
 

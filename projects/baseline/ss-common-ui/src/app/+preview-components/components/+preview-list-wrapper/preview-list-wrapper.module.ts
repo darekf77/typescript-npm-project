@@ -11,7 +11,7 @@ import {
 } from 'components';
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
-import { init, AngularProviders } from 'morphi/browser';
+import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
 
 
@@ -21,12 +21,11 @@ const materialModules = [
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
-init({
+Morphi.init({
   host,
   controllers: [ExamplesController],
   entities: [EXAMPLE]
 })
-  .angularProviders();
 
 @NgModule({
   imports: [
@@ -37,7 +36,7 @@ init({
   ],
   declarations: [PreviewListWrapperComponent],
   providers: [
-    AngularProviders
+    Morphi.Providers
   ]
 })
 export class PreviewListWrapperModule { }

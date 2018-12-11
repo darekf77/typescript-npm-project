@@ -13,7 +13,7 @@ import * as controllers from '../controllers';
   className: 'DialogsController',
   //#region @backend
   auth: () => {
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })

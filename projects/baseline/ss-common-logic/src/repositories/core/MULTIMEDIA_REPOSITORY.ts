@@ -11,7 +11,7 @@ export interface MULTIMEDIA_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(MULTIMEDIA)
 export class MULTIMEDIA_REPOSITORY extends Morphi.Base.Repository<MULTIMEDIA, MULTIMEDIA_ALIASES> {
 
 

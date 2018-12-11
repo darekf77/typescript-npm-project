@@ -13,7 +13,7 @@ import {
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
-import { AngularProviders } from 'morphi/browser';
+import { Morphi } from 'morphi/browser';
 
 const angularModules = [
   CommonModule,
@@ -44,7 +44,7 @@ const formlyModules = [
   ],
   declarations: [PreviewDialogFieldComponent],
   providers: [
-    AngularProviders
+    Morphi.Providers
   ]
 })
 export class PreviewSelectWrapperModule { }

@@ -3,8 +3,6 @@ import { SESSION } from "./SESSION";
 import { EMAIL } from "./EMAIL";
 
 
-
-
 export interface IUSER {
   email?: string;
   username: string;

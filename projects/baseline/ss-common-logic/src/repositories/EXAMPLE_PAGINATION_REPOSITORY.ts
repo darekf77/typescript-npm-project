@@ -9,7 +9,7 @@ export interface EXAMPLE_PAGINATION_ALIASES {
 
 }
 
-@Morphi.Repository()
+@Morphi.Repository(EXAMPLE_PAGINATION)
 export class EXAMPLE_PAGINATION_REPOSITORY
   extends Morphi.Base.Repository<EXAMPLE_PAGINATION, EXAMPLE_PAGINATION_ALIASES> {
 

@@ -7,7 +7,7 @@ export interface IEXAMPLE {
   test: string;
 }
 
-@Morphi.Entity({
+@Morphi.Entity<AnotherJSON>({
   className: 'AnotherJSON',
   defaultModelValues: {
     isGood: true,

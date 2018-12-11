@@ -3,7 +3,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Log, Logger } from 'ng2-logger/browser';
 const log = Log.create('dialog-conversations-editor');
 
-import {DialogsController} from 'ss-common-logic/browser-for-ss-common-ui/controllers/DialogsController';
+import { DialogsController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/DialogsController';
 import { DIALOG, DialogType } from 'ss-common-logic/browser-for-ss-common-ui/entities/DIALOG';
 import { ConfigController, APP_LANGUAGE } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ConfigController';
 

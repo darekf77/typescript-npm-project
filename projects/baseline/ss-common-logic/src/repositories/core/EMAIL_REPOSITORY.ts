@@ -12,7 +12,7 @@ export interface EMAIL_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(EMAIL)
 export class EMAIL_REPOSITORY extends Morphi.Base.Repository<EMAIL, EMAIL_ALIASES> {
 
 

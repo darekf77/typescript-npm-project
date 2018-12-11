@@ -5,8 +5,10 @@ import * as _ from 'lodash';
 export { Handler } from 'express';
 import { UploadedFile } from "express-fileupload";
 import { Helpers } from 'morphi';
-//#endregion
 
+//#region @backend
+import { authenticate } from 'passport'
+//#endregion
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
@@ -18,7 +20,7 @@ import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
   className: 'MultimediaController',
   //#region @backend
   auth: () => {
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })

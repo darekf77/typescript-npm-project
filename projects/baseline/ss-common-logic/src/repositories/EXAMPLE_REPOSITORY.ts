@@ -10,7 +10,7 @@ export interface EXAMPLE_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(EXAMPLE)
 export class EXAMPLE_REPOSITORY extends Morphi.Base.Repository<EXAMPLE, EXAMPLE_ALIASES> {
 
 

@@ -12,7 +12,7 @@ export interface SESSION_ALIASES {
 }
 
 
-@Morphi.Repository()
+@Morphi.Repository(SESSION)
 export class SESSION_REPOSITORY extends Morphi.Base.Repository<SESSION, SESSION_ALIASES> {
 
 

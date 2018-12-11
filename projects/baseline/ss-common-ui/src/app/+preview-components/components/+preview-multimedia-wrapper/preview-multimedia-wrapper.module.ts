@@ -9,7 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 // third part
-import { init, AngularProviders } from 'morphi/browser';
+import { Morphi } from 'morphi/browser';
 // local
 import { PreviewMultimediaWrapperComponent } from './preview-multimedia-wrapper.component';
 import { routes } from './preview-multimedia-wrapper.routes';
@@ -48,12 +48,11 @@ const otherModules = [
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
-init({
+Morphi.init({
   host,
   controllers: [MultimediaController, AuthController],
   entities: [MULTIMEDIA]
-})
-  .angularProviders();
+});
 
 @NgModule({
   imports: [
@@ -64,7 +63,7 @@ init({
   ],
   declarations: [PreviewMultimediaWrapperComponent],
   providers: [
-    AngularProviders
+    Morphi.Providers
   ]
 })
 export class PreviewMultimediaWrapperModule { }

@@ -7,10 +7,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { BaseCRUD, describeClassProperites, ModelDataConfig } from 'morphi/browser';
-import { getFormlyFrom } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component', Level.__NOTHING);
+const log = Log.create('form warpper material component');
 
 @Component({
   selector: 'app-form-wrapper-material',
@@ -19,7 +18,7 @@ const log = Log.create('form warpper material component', Level.__NOTHING);
 })
 export class FormWrapperMaterialComponent implements OnInit {
 
-  @Input() modelDataConfig = new ModelDataConfig();
+  @Input() modelDataConfig = new Morphi.CRUD.ModelDataConfig();
   @ViewChild('templateDelete') templateDelete: TemplateRef<any>;
 
   constructor(
@@ -44,7 +43,7 @@ export class FormWrapperMaterialComponent implements OnInit {
 
   @Input() mode: 'update' | 'create' = 'update';
 
-  @Input() crud: BaseCRUD<any>;
+  @Input() crud: Morphi.CRUD.Base<any>;
 
   @Input() form = new FormGroup({});
   @Input() formGroup: FormGroup;
@@ -75,7 +74,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   }
 
   resolveFields() {
-    let fields = getFormlyFrom(this.entity);
+    let fields = Morphi.CRUD.getFormlyFrom(this.entity);
     log.i(`fields from entity : ${this.entity && this.entity.name}`, fields);
 
     if (_.isFunction(this.entity) && !fields) {

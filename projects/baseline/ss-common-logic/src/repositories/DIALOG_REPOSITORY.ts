@@ -9,7 +9,7 @@ export interface DIALOG_ALIASES {
 
 }
 
-@Morphi.Repository()
+@Morphi.Repository(DIALOG)
 export class DIALOG_REPOSITORY extends Morphi.Base.Repository<DIALOG, DIALOG_ALIASES> {
 
 

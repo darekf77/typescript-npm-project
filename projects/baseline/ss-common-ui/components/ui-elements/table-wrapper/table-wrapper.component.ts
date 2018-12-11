@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { BaseCRUD, describeClassProperites, ModelDataConfig, SYMBOL } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi/browser';
 
 import { Log, Level } from 'ng2-logger/browser';
+import { describeClassProperites } from 'ng2-rest/browser';
 import { Router } from '@angular/router';
 
 const log = Log.create('Table wrapper');
@@ -15,12 +16,12 @@ const log = Log.create('Table wrapper');
 })
 export class TableWrapperComponent implements OnInit {
 
-  @Input() arrayDataConfig = new ModelDataConfig();
+  @Input() arrayDataConfig = new Morphi.CRUD.ModelDataConfig();
 
   @Input() rowHref: string;
 
   @Input() allowedColumns: string[] = [];
-  @Input() crud: BaseCRUD<any>;
+  @Input() crud: Morphi.CRUD.Base<any>;
 
   public messages = {
     emptyMessage: undefined,
@@ -77,11 +78,11 @@ export class TableWrapperComponent implements OnInit {
   }
   async retriveData() {
     const rows = await this.crud.getAll(this.arrayDataConfig).received.observable.take(1).toPromise();
-    const totalElements = Number(rows.headers.get(SYMBOL.X_TOTAL_COUNT));
+    const totalElements = Number(rows.headers.get(Morphi.SYMBOL.X_TOTAL_COUNT));
     if (!isNaN(totalElements)) {
       this.arrayDataConfig.set.pagination.totalElement(totalElements);
     }
-    log.i(SYMBOL.X_TOTAL_COUNT, rows.headers.get(SYMBOL.X_TOTAL_COUNT));
+    log.i(Morphi.SYMBOL.X_TOTAL_COUNT, rows.headers.get(Morphi.SYMBOL.X_TOTAL_COUNT));
     log.i('rows', rows.body.json);
     this.rows = rows.body.json;
   }

@@ -73,7 +73,7 @@ export interface IFacebook {
     if (method === AuthController.prototype.checkExist) {
       return;
     }
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })

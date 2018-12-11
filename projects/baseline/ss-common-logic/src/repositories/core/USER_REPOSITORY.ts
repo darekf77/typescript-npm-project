@@ -9,7 +9,7 @@ export interface USER_ALIASES {
 
 }
 
-@Morphi.Repository()
+@Morphi.Repository(USER)
 export class USER_REPOSITORY extends Morphi.Base.Repository<USER, USER_ALIASES> {
 
 

@@ -10,17 +10,16 @@ import {
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
 import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesPaginationController';
 import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE_PAGINATION';
-import { init, AngularProviders } from 'morphi/browser';
+import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
-init({
+Morphi.init({
   host,
   controllers: [ExamplesController, ExamplesPaginationController],
   entities: [EXAMPLE, EXAMPLE_PAGINATION]
-})
-  .angularProviders();
+});
 
 @NgModule({
   imports: [
@@ -30,7 +29,7 @@ init({
   ],
   declarations: [PreviewTableWrapperComponent],
   providers: [
-    AngularProviders
+    Morphi.Providers
   ]
 })
 export class PreviewTableWrapperModule { }

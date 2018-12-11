@@ -15,7 +15,7 @@ import * as controllers from '../controllers';
   className: 'GroupsController',
   //#region @backend
   auth: () => {
-    return Morphi.Auth('bearer', { session: false });
+    return authenticate('bearer', { session: false });
   }
   //#endregion
 })

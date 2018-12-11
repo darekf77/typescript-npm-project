@@ -229,7 +229,7 @@ export interface IPackageJSON {
     isGenerated?: boolean;
     overrided: {
       dedupe?: string[];
-      ignoreWhenStartWith?: string[];
+      ignoreDepsPattern?: string[];
       includeOnly?: string[];
       includeAsDev?: string[];
       dependencies?: DependenciesFromPackageJsonStyle;

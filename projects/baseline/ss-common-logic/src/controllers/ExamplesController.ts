@@ -7,8 +7,6 @@ import * as entities from '../entities';
 import * as controllers from '../controllers';
 
 
-
-
 @Morphi.Controller({
   className: 'ExamplesController'
 })

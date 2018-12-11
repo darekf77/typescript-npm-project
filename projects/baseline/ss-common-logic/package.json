@@ -9,5 +9,8 @@
         "resources": [
             "README.md"
         ]
+    },
+    "dependencies": {
+        "typeorm": "^0.2.7"
     }
 }

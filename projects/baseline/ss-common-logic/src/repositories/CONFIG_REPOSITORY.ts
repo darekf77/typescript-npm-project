@@ -9,7 +9,7 @@ export interface CONFIG_ALIASES {
 
 }
 
-@Morphi.Repository()
+@Morphi.Repository(CONFIG)
 export class CONFIG_REPOSITORY extends Morphi.Base.Repository<CONFIG, CONFIG_ALIASES> {
 
 
