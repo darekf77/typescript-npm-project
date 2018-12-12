@@ -132,7 +132,22 @@ export abstract class Project {
     return current;
   }
   static get Tnp() {
-    return ProjectFrom(path.join(__dirname, '..', '..'));
+    const filenameapth = 'tnp-system-path.txt';
+    let tnp = ProjectFrom(path.join(__dirname, '..', '..'));
+    if (tnp) {
+      const currentPathInSystem = path.join(tnp.location, 'tnp-system-path.txt');
+      if (!fse.existsSync(currentPathInSystem)) {
+        fse.writeFileSync(currentPathInSystem, tnp.location, 'utf8')
+      }
+    } else {
+      const savedTnpPath = path.join(__dirname, '..', filenameapth);
+      const tnpBundleTnpPath = fse.readFileSync(savedTnpPath).toString().trim()
+      if (!fse.existsSync(tnpBundleTnpPath)) {
+        error(`Please build you ${chalk.bold('tnp-npm-project')} first... `)
+      }
+      tnp = ProjectFrom(tnpBundleTnpPath)
+    }
+    return tnp;
   }
 
   protected __defaultPort: number;
@@ -726,6 +741,13 @@ function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackag
       encoding: 'utf8',
       spaces: 2
     })
+
+    const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
+    const destTnpPath = path.join(project.location, config.folder.node_modules,
+      config.file.tnpBundle, config.file.tnp_system_path_txt)
+
+    fse.copyFileSync(sourceTnpPath, destTnpPath);
+
     let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
     // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
 

@@ -307,7 +307,7 @@ export class PackageJSON {
         .map(l => l.replace(/\/\//g, '/'))
         .filter(l => !!l)
         .filter(l => !l.startsWith(`${config.folder.node_modules}/${f}`))
-        .filter(l => !l.startsWith(`${config.folder.node_modules}/.${config.file.bin}`))
+        .filter(l => !l.startsWith(`${config.folder.node_modules}/${config.folder._bin}`))
         .filter(l => path.basename(path.dirname(l)) === config.folder.node_modules)
       // const duplicates = glob.sync(`/**/${f}`, {
       //   cwd: path.join(this.location, config.folder.node_modules),

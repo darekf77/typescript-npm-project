@@ -1,13 +1,11 @@
 //#region @backend
-import { Morphi } from "morphi";
-import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
+import * as path from 'path';
 import * as _ from 'lodash';
-import { run, HelpersLinks, killProcess, pullCurrentBranch, EnvironmentName } from 'tnp-bundle';
-import * as child from 'child_process';
-import { PROGRESS_BAR_DATA, ProjectFrom } from "tnp-bundle";
-import { TNP_PROJECT } from "../entities/TNP_PROJECT";
-
+import { Morphi } from "morphi";
+//local
+import { BUILD } from "./../entities/BUILD";
+import { config, Project, ProjectInstance } from 'tnp-bundle';
 export interface BUILD_ALIASES {
   builds: string;
   build: string;
@@ -17,18 +15,15 @@ export interface BUILD_ALIASES {
 export class BUILD_REPOSITORY extends Morphi.Base.Repository<BUILD, BUILD_ALIASES> {
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
 
-  recreateFolders() {
 
-    if (!fse.existsSync(ENV.pathes.backup.repositories)) {
-      fse.mkdirpSync(ENV.pathes.backup.repositories)
-    }
 
-    if (!fse.existsSync(ENV.pathes.backup.builds)) {
-      fse.mkdirpSync(ENV.pathes.backup.builds)
-    }
+  async getBuilds() {
+    console.log('Project',Project)
+    const tnpProjectPath = path.join(Project.Tnp.location, config.folder.bin, config.file.projects_json)
+    const readjson: any[] = fse.readJSONSync(tnpProjectPath)
+    console.log('readjson',readjson)
+    return readjson.map(d => _.merge(new ProjectInstance, d))
   }
-
-
 
 }
 

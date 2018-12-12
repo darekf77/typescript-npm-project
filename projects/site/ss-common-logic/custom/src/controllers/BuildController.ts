@@ -29,21 +29,29 @@ export class BuildController extends Morphi.Base.Controller<BUILD> {
 
 
   async initExampleDbData() {
-
+    let builds = this.db.BUILD.getBuilds()
+    console.log('builds', builds)
 
   }
 
   //#endregion
 
   @Morphi.Http.GET()
-  getAll() {
+  heelooeoe(): Morphi.Response<any> {
+    //#region @backendFunc
+    return { send: 'uhuhu' }
+    //#endregion
+  }
+
+  @Morphi.Http.GET()
+  getAll(): Morphi.Response<any> {
     //#region @backendFunc
     console.log('here')
+
     return async () => {
-      const build = new BUILD();
-      return [
-        build
-      ] as any;
+      let builds = this.db.BUILD.getBuilds()
+      // const build = new BUILD();
+      return builds;
     }
     //#endregion
   }

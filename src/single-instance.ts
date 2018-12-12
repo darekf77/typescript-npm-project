@@ -171,7 +171,7 @@ export class ProjectsChecker {
 
 
 
-      this.jsonWithProjectsPath = path.join(Project.Tnp.location, 'bin/projects.json');
+      this.jsonWithProjectsPath = path.join(Project.Tnp.location, `bin/${config.file.projects_json}`);
       setTimeout(async () => {
 
 

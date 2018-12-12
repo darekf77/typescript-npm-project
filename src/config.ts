@@ -35,15 +35,17 @@ export const config = {
     controllers: 'controllers',
     projects: 'projects',
     workspace: 'workspace',
-    client: 'client'
-
+    client: 'client',
+    bin: 'bin',
+    _bin: '.bin'
   },
   file: {
     package_json: 'package.json',
+    projects_json: 'projects.json',
     tnpBundle: 'tnp-bundle',
     tnpEnvironment_json: 'tmp-environment.json',
     environment: 'environment',
-    bin: 'bin'
+    tnp_system_path_txt: 'tnp-system-path.txt'
   },
   default: {
     cloud: {

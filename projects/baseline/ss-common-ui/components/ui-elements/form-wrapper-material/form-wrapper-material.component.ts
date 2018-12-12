@@ -107,8 +107,8 @@ export class FormWrapperMaterialComponent implements OnInit {
   }
 
   async ngOnInit() {
-    console.log('model', this.model);
-    log.i(`CRUD`, this.crud);
+    // console.log('model', this.model);
+    // log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
