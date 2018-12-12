@@ -76,7 +76,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
     const groupid = Number(this.route.snapshot.paramMap.get('groupid'))
     log.i(`categotryId: ${categotryId}, groupid: ${groupid}`)
     // this.modelDataConfigGroup.set.where(`group.id = ${groupid}`);
-    const data = await this.groupCRUD.getBy(groupid, this.modelDataConfigGroup).received;
+    const data = await this.groupCRUD.getBy(groupid, this.modelDataConfigGroup as any).received;
     this.group = data.body.json;
     this.group.dialogs = await this.getDialgs(groupid);
     log.i('this.model', this.group)
@@ -86,7 +86,7 @@ export class DialogsGroupsEditorComponent implements OnInit {
   async getDialgs(groupid) {
 
     this.modelDataConfigDialogs.set.where(`group.id = ${groupid}`)
-    const data = await this.dialogsController.getAll(this.modelDataConfigDialogs).received;
+    const data = await this.dialogsController.getAll(this.modelDataConfigDialogs  as any).received;
     return data.body.json;
   }
 

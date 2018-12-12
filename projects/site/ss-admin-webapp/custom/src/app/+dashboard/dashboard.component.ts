@@ -12,10 +12,10 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module-for-ss-admin-webapp';
 import { DomainsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DomainsController';
-import { Global, CLASSNAME } from 'morphi/browser';
 
 const log = Log.create('Dashboard');
 
+console.log('asd')
 @Component({
   selector: 'app-dashboard-component',
   templateUrl: 'dashboard.component.html',
@@ -31,8 +31,6 @@ export class DashboardComponent implements OnInit {
     public ngZone: NgZone,
     private router: Router) {
 
-    Global.vars.ngZone = ngZone;
-    Global.vars.ApplicationRef = ref;
   }
 
 
