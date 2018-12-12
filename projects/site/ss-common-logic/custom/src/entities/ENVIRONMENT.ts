@@ -1,9 +1,8 @@
-import { Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn } from "morphi";
 import * as _ from 'lodash';
 import {
   EnvironmentName, config, EnvConfig, EnvConfigProject, IPackageJSON
 } from "tnp-bundle";
-import { CLASSNAME, FormlyForm } from "morphi";
+import { Morphi } from "morphi";
 import { TNP_PROJECT } from "./TNP_PROJECT";
 
 //#region @backend
@@ -17,18 +16,18 @@ export interface IENVIRONMENT {
 
 }
 
+@Morphi.Entity({
+  className: 'ENVIRONMENT'
+})
+export class ENVIRONMENT extends Morphi.Base.Entity<ENVIRONMENT> implements EnvConfig {
 
-//#region @backend
-@Entity(META.tableNameFrom(ENVIRONMENT))
-//#endregion
-@FormlyForm<ENVIRONMENT>()
-@DefaultModelWithMapping<ENVIRONMENT>({
 
-}, {
 
-  })
-@CLASSNAME('ENVIRONMENT')
-export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvConfig {
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
+  id: number;
+
   pathes?: any;
   isCoreProject?: boolean;
   isSiteProject?: boolean;
@@ -101,9 +100,6 @@ export class ENVIRONMENT extends META.BASE_ENTITY<ENVIRONMENT> implements EnvCon
     //#endregion
   }
 
-
-  @PrimaryGeneratedColumn()
-  id: number;
 
 
 }

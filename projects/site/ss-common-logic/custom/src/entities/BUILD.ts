@@ -1,20 +1,6 @@
 import * as _ from 'lodash';
-import { Entity, Column, PrimaryGeneratedColumn, EntityRepository, OneToOne, JoinColumn } from "typeorm";
-import { FormlyForm, DefaultModelWithMapping, CLASSNAME, Global, META } from 'morphi';
-import { config } from 'tnp-bundle';
+import {  Morphi } from 'morphi';
 
-//#region @backend
-import * as path from 'path';
-import * as rimraf from 'rimraf';
-import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import * as child from 'child_process';
-import { run, HelpersLinks, killProcess, pullCurrentBranch } from 'tnp-bundle';
-
-//#endregion
-import {
-  PROGRESS_BAR_DATA
-} from 'baseline/ss-common-logic/src/entities/PROGRESS_BAR_DATA';
 import { TNP_PROJECT } from './TNP_PROJECT';
 
 
@@ -25,19 +11,22 @@ export interface IBUILD {
 
 }
 
-//#region @backend
-@Entity(META.tableNameFrom(BUILD))
-//#endregion
-@FormlyForm<BUILD>()
-@DefaultModelWithMapping<BUILD>({
-  gitRemote: ''
-}, {
-    progress: PROGRESS_BAR_DATA
-  })
-@CLASSNAME('BUILD')
+
+
+@Morphi.Entity<BUILD>({
+  className: 'BUILD',
+  defaultModelValues: {
+    gitRemote: ''
+  },
+  mapping: {
+    progress: 'PROGRESS_BAR_DATA'
+  }
+})
 export class BUILD implements IBUILD {
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number;
 
   path: string;

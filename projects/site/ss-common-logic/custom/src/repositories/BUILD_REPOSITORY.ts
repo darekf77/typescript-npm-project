@@ -1,5 +1,5 @@
 //#region @backend
-import { EntityRepository, META, ModelDataConfig, PathParam } from "morphi";
+import { Morphi } from "morphi";
 import { BUILD } from "./../entities/BUILD";
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
@@ -13,8 +13,8 @@ export interface BUILD_ALIASES {
   build: string;
 }
 
-@EntityRepository(BUILD)
-export class BUILD_REPOSITORY extends META.BASE_REPOSITORY<BUILD, BUILD_ALIASES> {
+@Morphi.Repository(BUILD)
+export class BUILD_REPOSITORY extends Morphi.Base.Repository<BUILD, BUILD_ALIASES> {
   globalAliases: (keyof BUILD_ALIASES)[] = ['build', 'builds']
 
   recreateFolders() {

@@ -1,7 +1,4 @@
-import {
-  ENDPOINT, CLASSNAME, BaseCRUDEntity, META, SYMBOL,
-  POST, PathParam, QueryParam, GET, Response, PUT, ModelDataConfig, Any
-} from 'morphi';
+import { Morphi } from 'morphi';
 import { BUILD } from '../entities/BUILD';
 import * as _ from 'lodash';
 import { EnvironmentName } from 'tnp-bundle'
@@ -14,11 +11,12 @@ import * as sleep from 'sleep';
 import * as entities from '../entities';
 import * as controllers from '../controllers';
 
-@ENDPOINT()
-@CLASSNAME('BuildController')
-export class BuildController extends META.BASE_CONTROLLER<BUILD> {
+@Morphi.Controller({
+  className: 'BuildController'
+})
+export class BuildController extends Morphi.Base.Controller<BUILD> {
 
-  @BaseCRUDEntity(entities.BUILD) public entity: entities.BUILD;
+  @Morphi.Base.InjectCRUDEntity(entities.BUILD) public entity: entities.BUILD;
   //#region @backend
 
   get db() {
@@ -37,7 +35,7 @@ export class BuildController extends META.BASE_CONTROLLER<BUILD> {
 
   //#endregion
 
-  @GET()
+  @Morphi.Http.GET()
   getAll() {
     //#region @backendFunc
     console.log('here')

@@ -1,5 +1,5 @@
 
-import { ENDPOINT, CLASSNAME, BaseCRUDEntity, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { DOMAIN } from '../entities/DOMAIN';
 
 import * as entities from '../entities';
@@ -7,13 +7,14 @@ import * as controllers from '../controllers';
 
 
 
-@ENDPOINT()
-@CLASSNAME('DomainsController')
-export class DomainsController extends META.BASE_CONTROLLER<DOMAIN> {
+@Morphi.Controller({
+  className: 'DomainsController'
+})
+export class DomainsController extends Morphi.Base.Controller<DOMAIN> {
 
 
 
-  @BaseCRUDEntity(entities.DOMAIN) public entity: entities.DOMAIN;
+  @Morphi.Base.InjectCRUDEntity(entities.DOMAIN) public entity: entities.DOMAIN;
   //#region @backend
 
   get db() {

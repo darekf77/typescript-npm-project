@@ -1,12 +1,8 @@
-import {
-  Entity, META, DefaultModelWithMapping, PrimaryGeneratedColumn,
-  Column, TreeChildren, TreeParent, Tree
-} from "morphi";
-import BUILD from "./BUILD";
+import { BUILD } from "./BUILD";
 import * as _ from 'lodash';
 
 import { PROGRESS_BAR_DATA, Project, EnvConfigProject, LibType, EnvironmentName } from "tnp-bundle";
-import { CLASSNAME, FormlyForm } from "morphi";
+import { Morphi } from "morphi";
 
 //#region @backend
 import * as path from 'path';
@@ -31,18 +27,14 @@ export interface ITNP_PROJECT {
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(TNP_PROJECT))
-@Tree("closure-table")
-//#endregion
-@FormlyForm<TNP_PROJECT>()
-@DefaultModelWithMapping<TNP_PROJECT>({
-
-}, {
+@Morphi.Entity<TNP_PROJECT>({
+  className: 'TNP_PROJECT',
+  tree: 'closure-table',
+  mapping: {
     progress: PROGRESS_BAR_DATA
-  })
-@CLASSNAME('TNP_PROJECT')
-export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvConfigProject {
+  }
+})
+export class TNP_PROJECT extends Morphi.Base.Entity<TNP_PROJECT> implements EnvConfigProject {
   baseUrl: string;
   host?: string;
   hostSocket?: string;
@@ -95,34 +87,57 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
 
   //#endregion
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number;
 
-  @Column()
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
   location: string;
 
-  @Column({
+  //#region @backend
+  @Morphi.Orm.Column.Custom({
     type: 'boolean',
     default: false
-  }) isWorkspace?: boolean = false;
+  })
+  //#endregion
+  isWorkspace?: boolean = false;
 
-  @Column()
+  //#region @backend
+  @Morphi.Orm.Column.Custom()
+  //#endregion
   name: string;
 
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { nullable: true })
+  //#endregion
+  type?: LibType;
 
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  environmentName: string;
 
-  @Column('varchar', { nullable: true }) type?: LibType;
+  //#region @backend
+  @Morphi.Orm.Column.Custom('simple-json', { nullable: true })
+  //#endregion
+  progress: PROGRESS_BAR_DATA;
 
-  @Column({ nullable: true }) environmentName: string;
-  @Column('simple-json', { nullable: true }) progress: PROGRESS_BAR_DATA;
+  //#region @backend
+  @Morphi.Orm.Column.Custom('simple-array')
+  //#endregion
+  environments?: EnvironmentName[] = [];
 
-  @Column('simple-array') environments?: EnvironmentName[] = [];
-
-
-  @TreeChildren()
+  //#region @backend
+  @Morphi.Orm.Tree.Children()
+  //#endregion
   children: TNP_PROJECT[];
 
-  @TreeParent()
+  //#region @backend
+  @Morphi.Orm.Tree.Parent()
+  //#endregion
   parent: TNP_PROJECT;
 
   get buildInProgress() {
@@ -137,12 +152,33 @@ export class TNP_PROJECT extends META.BASE_ENTITY<TNP_PROJECT> implements EnvCon
     return (_.isNumber(this.pidServeProces));
   }
 
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  port: number;
 
-  @Column({ nullable: true }) port: number;
-  @Column({ nullable: true }) pidBuildProces: number;
-  @Column({ nullable: true }) pidClearProces: number;
-  @Column({ nullable: true }) pidChangeEnvProces: number;
-  @Column({ nullable: true }) pidServeProces: number;
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  pidBuildProces: number;
+
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  pidClearProces: number;
+
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  pidChangeEnvProces: number;
+
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  pidServeProces: number;
 
   get info() {
     return this.progress && this.progress.html;

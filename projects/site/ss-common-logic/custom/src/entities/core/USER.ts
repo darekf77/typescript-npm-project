@@ -1,6 +1,6 @@
 
 import { Column, Entity } from "typeorm";
-import { CLASSNAME, EntityRepository, META } from "morphi";
+import { Morphi } from "morphi";
 
 import {
   USER as BASELINE_USER
@@ -8,12 +8,15 @@ import {
 
 export * from "baseline/ss-common-logic/src/entities/core/USER";
 
-//#region @backend
-@Entity(META.tableNameFrom(USER))
-//#endregion
-@CLASSNAME('USER')
+
+@Morphi.Entity({
+  className: 'USER'
+})
 export class USER extends BASELINE_USER {
 
-  @Column({ nullable: true }) whereCreated: 'baseline' | 'site' = 'site';
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  whereCreated: 'baseline' | 'site' = 'site';
 
 }

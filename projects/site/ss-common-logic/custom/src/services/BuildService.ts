@@ -6,8 +6,9 @@ import { TNP_PROJECT } from "../entities/TNP_PROJECT";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 
+import { Morphi } from 'morphi'
 
-@Injectable()
+@Morphi.Service()
 export class BuildService {
 
   constructor(

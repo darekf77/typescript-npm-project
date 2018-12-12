@@ -1,11 +1,7 @@
 import {
-  CategoryController as BaselineCategoryController,
-
+  CategoryController as BaselineCategoryController
 } from 'baseline/ss-common-logic/src/controllers/CategoryController';
-import {
-  GET, PUT, POST, PathParam, Response, QueryParam,
-  ENDPOINT, CLASSNAME, BaseCRUDEntity, META, DELETE
-} from 'morphi';
+import { Morphi } from 'morphi';
 
 //#region @backend
 import * as fse from 'fs-extra';
@@ -19,14 +15,12 @@ import { SelfUpdate, TNP_PROJECT } from '../entities/TNP_PROJECT';
 import { Subject } from 'rxjs/Subject';
 
 
+@Morphi.Controller({
+  className: 'TnpProjectController'
+})
+export class TnpProjectController extends Morphi.Base.Controller<entities.TNP_PROJECT> {
 
-
-@ENDPOINT()
-@CLASSNAME('TnpProjectController')
-export class TnpProjectController extends META.BASE_CONTROLLER<entities.TNP_PROJECT> {
-
-
-  @BaseCRUDEntity(entities.TNP_PROJECT) public entity: entities.TNP_PROJECT;
+  @Morphi.Base.InjectCRUDEntity(entities.TNP_PROJECT) public entity: entities.TNP_PROJECT;
 
 
   //#region @backend

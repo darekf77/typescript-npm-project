@@ -1,17 +1,7 @@
 import * as _ from 'lodash';
 import { Entity, Column, PrimaryGeneratedColumn, EntityRepository } from "typeorm";
-import { FormlyForm, DefaultModelWithMapping, CLASSNAME, META } from 'morphi';
+import { Morphi } from 'morphi';
 import { EnumValues } from 'enum-values';
-
-//#region @backend
-import * as path from 'path';
-import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import { run, HelpersLinks, killProcess } from 'tnp-bundle';
-
-//#endregion
-
-
 
 
 export interface IDOMAIN {
@@ -32,30 +22,38 @@ export interface IDOMAIN {
 }
 
 
-//#region @backend
-@Entity(META.tableNameFrom(DOMAIN))
-//#endregion
-@FormlyForm<DOMAIN>()
-@DefaultModelWithMapping<DOMAIN>({
-  name: '',
-  target: '',
-  production: false
+@Morphi.Entity({
+  className: 'DOMAIN',
+  defaultModelValues: {
+    name: '',
+    target: '',
+    production: false
+  }
 })
-@CLASSNAME('DOMAIN')
-export class DOMAIN extends META.BASE_ENTITY<DOMAIN> implements IDOMAIN {
+export class DOMAIN extends Morphi.Base.Entity<DOMAIN> implements IDOMAIN {
   fromRaw(obj: DOMAIN): DOMAIN {
     throw new Error("Method not implemented.");
   }
 
-  @PrimaryGeneratedColumn()
+  //#region @backend
+  @Morphi.Orm.Column.Generated()
+  //#endregion
   id: number;
 
+//#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  name: string;
 
-  @Column({ nullable: true }) name: string;
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  target: string;
 
-  @Column({ nullable: true }) target: string;
-
-  @Column({ nullable: true }) production: boolean;
+  //#region @backend
+  @Morphi.Orm.Column.Custom({ nullable: true })
+  //#endregion
+  production: boolean;
 
 
 }

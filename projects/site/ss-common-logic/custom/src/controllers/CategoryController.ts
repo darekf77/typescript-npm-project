@@ -1,11 +1,11 @@
 import {
-  CategoryController as BaselineCategoryController,
-
+  CategoryController as BaselineCategoryController
 } from 'baseline/ss-common-logic/src/controllers/CategoryController';
-import { ENDPOINT, CLASSNAME } from 'morphi';
+import { Morphi } from 'morphi';
 
-@ENDPOINT()
-@CLASSNAME('CategoryController')
+@Morphi.Controller({
+  className: 'CategoryController'
+})
 export class CategoryController extends BaselineCategoryController {
 
   //#region @backend

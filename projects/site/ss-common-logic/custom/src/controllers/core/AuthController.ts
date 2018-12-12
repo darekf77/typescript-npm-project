@@ -6,7 +6,7 @@ import {
   //#endregion
   IFacebook, IHelloJS
 } from 'baseline/ss-common-logic/src/controllers/core/AuthController';
-import { ENDPOINT, CLASSNAME } from 'morphi';
+import { Morphi } from 'morphi';
 
 export {
   //#region @backend
@@ -21,9 +21,10 @@ import { authenticate, use } from 'passport';
 //#endregion
 
 
-@ENDPOINT({
+@Morphi.Controller({
+  className: 'AuthController',
+  //#region @backend
   auth: (method) => {
-    //#region @backendFunc
     if (method === AuthController.prototype.login) {
       return;
     }
@@ -31,10 +32,9 @@ import { authenticate, use } from 'passport';
       return;
     }
     return authenticate('bearer', { session: false });
-    //#endregion
   }
+  //#endregion
 })
-@CLASSNAME('AuthController')
 export class AuthController extends BaselineAuthController {
   // constructor() {
   //   super()
