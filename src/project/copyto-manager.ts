@@ -23,6 +23,7 @@ export class CopyToManager {
   private buildOptions: BuildOptions;
 
   public initCopyingOnBuildFinish(buildOptions: BuildOptions) {
+    // console.log("INIT BUILD FINSH")
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
     if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
@@ -30,6 +31,7 @@ export class CopyToManager {
       return;
     }
     if (watch) {
+      this.copyToProjectsOnFinish()
       this.watchAndCopyToProjectOnFinish()
     } else {
       this.copyToProjectsOnFinish()
@@ -111,22 +113,30 @@ export class CopyToManager {
 
       copyFile(sourceFile, destinationFile)
     } else {
-      const monitoredOutDir: string = path.join(this.project.location, outDir)
-
       const projectOudDirDest = path.join(destination.location,
         config.folder.node_modules,
         namePackageName
       );
 
       tryRemoveDir(projectOudDirDest, true)
-      tryCopyFrom(monitoredOutDir, projectOudDirDest)
+
+      if (this.project.isTnp) {
+        // console.info('[copyto] TNP INTSTALL')
+        destination.tnpHelper.install()
+      }
+      else {
+        // console.info('[copyto] NORMAL INTSTALL')
+        const monitoredOutDir: string = path.join(this.project.location, outDir)
+
+        tryCopyFrom(monitoredOutDir, projectOudDirDest)
+      }
     }
 
   }
 
   // private __firstTimeWatchCopyTOFiles = [];
   private copyToProjectsOnFinish(event?: FileEvent, specyficFileRelativePath?: string) {
-
+    // console.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
     // prevent first unnecesary copy after watch
     // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
     //   this.__firstTimeWatchCopyTOFiles.push(specificFile)
@@ -136,6 +146,7 @@ export class CopyToManager {
     const outDir = this.buildOptions.outDir;
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       this.buildOptions.copyto.forEach(p => {
+        // console.log(`Copy to ${p.name}`)
         this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir })
       })
     }
