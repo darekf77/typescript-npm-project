@@ -72,7 +72,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         let webpackEnvParams = `env.outFolder=${outDir}`;
-        webpackEnvParams = webpackEnvParams + (watch ? 'env.watch=true' : '');
+        webpackEnvParams = webpackEnvParams + (watch ? ' env.watch=true' : '');
         const client = _.first(forClient);
         console.log('forClients',forClient)
         if (client) {
