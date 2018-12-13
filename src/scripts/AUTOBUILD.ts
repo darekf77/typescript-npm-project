@@ -9,6 +9,8 @@ import { error, info } from '../messages';
 import { clearConsole } from '../process';
 import { walkObject } from '../helpers';
 import chalk from 'chalk';
+import * as JSON5 from 'json5';
+import { config as globalConfig } from '../config';
 
 // function popertyKey(key: string) {
 
@@ -33,64 +35,25 @@ export interface AutoActionsUser {
   autoreleases?: ProjectForAutoRelease[];
 }
 
-export interface AutoActionsConfigComputer {
-  [userName: string]: AutoActionsUser;
-}
-
-export interface JSONAutoActionsConfig {
-  [computerNames: string]: AutoActionsConfigComputer | string;
-}
-
 export class AutoActions {
 
 
-  readonly config: JSONAutoActionsConfig;
-
+  readonly config: AutoActionsUser;
 
 
   constructor(private project: Project) {
 
-    const autobuildjsonfilePath = path.join(Project.Tnp.location, 'autobuild.json');
-    this.config = fse.readJsonSync(autobuildjsonfilePath, {
-      encoding: 'utf8'
-    });
-    this.validateConfig()
+    const autobuildjsonfilePath = path.join(Project.Tnp.location, globalConfig.file.autob_actions_js);
+    this.config = require(`${autobuildjsonfilePath}`);
+    // console.log(this.config)
+    process.exit(0)
     this.trimConfigPropsValues();
   }
 
-  private validateConfig() {
-    let hostname = this.hostname;
-    const username = os.userInfo().username.toLowerCase();
-    if (!this.config) {
-      error('Bad autobuild.json config!')
-    }
-    if (!this.config[hostname]) {
-      error(`Hostname: "${hostname}" not found in autobuild.json config!`)
-    }
-    if (!this.config[hostname][username]) {
-      error(`Username: "${username}" not found in autobuild.json config!`)
-    }
-  }
-
-  get hostname() {
-    let hostname = os.hostname();
-    let orgHostname = hostname;
-    if (_.isString(this.config[hostname])) {
-      hostname = this.config[hostname] as string;
-      if (!this.config[hostname]) {
-        error(`Bad hostname alisas: "${orgHostname}":"${hostname}": `)
-      }
-    }
-    return hostname;
-  }
 
   release() {
-    console.log('config', this.config)
-    const hostname = this.hostname;
-    const username = os.userInfo().username.toLowerCase();
-    console.log('hostname', hostname)
-    console.log('username', username)
-    const autoreleases: ProjectForAutoRelease[] = this.config[hostname][username].autoreleases;
+
+    const autoreleases: ProjectForAutoRelease[] = this.config.autoreleases;
     if (!_.isArray(autoreleases)) {
       error(`No autoreleases in autobuild.json.`)
     }
@@ -124,21 +87,15 @@ export class AutoActions {
   }
 
   private getBuild() {
-    // console.log('config', this.config)
-    const hostname = this.hostname;
-    const username = os.userInfo().username.toLowerCase();
 
 
-
-    const build: ProjectForAutoBuild = this.config[hostname][username].builds
+    const build: ProjectForAutoBuild = this.config.builds
       .find(b => {
         const p = ProjectFrom(b.cwd);
 
         if (!p) {
-          console.log('hostname', hostname)
-          console.log('username', username)
           console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
-          error(`Please fix your autobuild.json`);
+          error(`Please fix your autobuild.js`);
         }
         return path.resolve(p.location) === path.resolve(this.project.location)
       });

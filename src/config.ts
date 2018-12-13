@@ -40,6 +40,7 @@ export const config = {
     _bin: '.bin'
   },
   file: {
+    autob_actions_js: 'auto-actions.js',
     package_json: 'package.json',
     projects_json: 'projects.json',
     tnpBundle: 'tnp-bundle',
