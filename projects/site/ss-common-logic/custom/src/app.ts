@@ -7,4 +7,4 @@ export default function () {
 
 //#endregion
 
-console.log('heeloo')
+console.log('heeloo thats amazinfg', ENV)

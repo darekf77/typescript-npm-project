@@ -25,7 +25,7 @@ Morphi.init({
   host,
   controllers: [ExamplesController],
   entities: [EXAMPLE]
-})
+});
 
 @NgModule({
   imports: [

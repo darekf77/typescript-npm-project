@@ -2,6 +2,7 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
+import chalk from 'chalk';
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
@@ -11,6 +12,7 @@ import { BaseProjectLib } from "./base-project-lib";
 import { HelpersLinks } from '../helpers-links';
 import { config } from '../config';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import { error } from '../messages';
 
 
 
@@ -71,14 +73,30 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        let webpackEnvParams = `env.outFolder=${outDir}`;
-        webpackEnvParams = webpackEnvParams + (watch ? ' env.watch=true' : '');
-        const client = _.first(forClient);
-        console.log('forClients',forClient)
-        if (client) {
-          webpackEnvParams = `${webpackEnvParams} env.moduleName=${client.name} env.port=${client.getDefaultPort()}`
+        let webpackEnvParams = `--env.outFolder=${outDir}`;
+        webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+        // console.log('forClients', forClient)
+        if (!this.isStandaloneProject && forClient.length === 0) {
+          const clientsExamples = this.parent.children
+            .filter(c => config.allowedTypes.app.includes(c.type))
+            .map(c => chalk.bold('--forClient ' + c.name) + '  or')
+          error(`Please define client parameter for app simulation:
+${clientsExamples.length > 0 ? clientsExamples.join('\n') : chalk.bold('--forClient my-example-client')}
+          Please choose only one ${chalk.bold('--forClient')} parameter.
+          `
+            , false, true)
         }
-        this.run(`npm-run webpack-dev-server ${webpackEnvParams}`).sync()
+        const client = _.first(forClient);
+
+        if (client) {
+          webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${client.getDefaultPort()}`
+        }
+
+        const command = `npm-run webpack-dev-server ${webpackEnvParams}`
+        // console.log(command)
+        // process.exit(0)
+        this.run(command).sync()
+
       } else {
         this.buildLib(outDir, prod, watch);
       }

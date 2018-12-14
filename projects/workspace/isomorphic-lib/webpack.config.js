@@ -9,11 +9,13 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const fse = require('fs-extra');
 const fs = require('fs');
 const _ = require('lodash')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin');
-
+const { fixWebpackEnv } = require('tnp-bundle')
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 
 const noEmitOnErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
 
@@ -25,27 +27,26 @@ const htmlWebpackPlugin = new HtmlWebpackPlugin({
 const uglifyWebpackPlugin = new UglifyWebpackPlugin();
 
 
+
+
 /**
  * Export config
  */
 module.exports = (env) => {
   env = env || {};
+  fixWebpackEnv(env)
   const { watch = false, outFolder = 'dist', moduleName = undefined, port = 9000 } = env;
-  console.log('env', env)
+  // console.log('env', env)
   const browserOutFolder = `browser-for-${moduleName}`;
-  const srcDirRelative = _.isString(moduleName) ? `tmp-src-${outFolder}-${browserOutFolder}` : `./tmp-src-${outFolder}-browser`;
-  const distDirRelative = _.isString(moduleName) ? browserOutFolder : `./${outFolder}-browser`;
-  const ENV = moduleName ? fs.readFileSync('tmp-environment.json', 'utf8') : {}
+  const srcDirRelative = _.isString(moduleName) ? `./tmp-src-${outFolder}-${browserOutFolder}` : `./tmp-src-${outFolder}-browser`;
+  const distDirRelative = _.isString(moduleName) ? `./${browserOutFolder}` : `./${outFolder}-browser`;
 
   const srcDir = path.join(__dirname, srcDirRelative);
   const distDir = path.join(__dirname, distDirRelative);
 
-  /**
- * Plugins
- */
-  const definePlugin = new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(ENV)
-  });
+  let ENV = moduleName ? fse.readJSONSync('./tmp-environment.json', {
+    'encoding': 'utf8'
+  }) : {}
 
 
   return {
@@ -104,7 +105,9 @@ module.exports = (env) => {
       ]
     },
     plugins: [
-      definePlugin,
+      new DefinePlugin({
+        "ENV": JSON.stringify(ENV)
+      }),
       noEmitOnErrorsPlugin,
       htmlWebpackPlugin,
       ...(!watch

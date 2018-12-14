@@ -113,28 +113,37 @@ export class ProjectsChecker {
   }
 
 
-  private checkIfActiveProjectInWorkspace(workspace: Project) {
+  private checkIfReadyForTnpInstall(workspace: Project) {
     // console.log('this.instances', this.instances.map(i => i.location))
     const workspaceInstance = this.instances.find(f => f.location === workspace.location)
 
-    if (workspaceInstance.isActive && !workspaceInstance.isCurrentProcess) { // TODO imposible ?
-      // console.log(`Active workspace ${workspace.name}`)
-      return true;
+    const isWorkspaceNotReadyForTnpInstall = workspaceInstance.isNotReadForTnpInstall
+    if (isWorkspaceNotReadyForTnpInstall) { // TODO imposible ?
+      // console.log('workspace is  ready ? ', isWorkspaceNotReadyForTnpInstall)
+      return false;
     }
 
-    return workspace.children
+    const childrenReadyForTnpInstall = workspace.children
       .filter(c => {
         const childInstance = this.instances.find(f => f.location === c.location)
-        if (childInstance.isActive && !childInstance.isCurrentProcess) {
-          // console.log(`Active workspace ${workspace.location} child ${c.name}`)
+        if (childInstance.isNotReadForTnpInstall) {
+          // console.log('child not ready: ', childInstance.location)
+          // console.log('app build', childInstance.build.app)
+          // console.log('lib build', childInstance.build.lib)
+          // console.log('process pid', process.pid)
         }
-        return childInstance.isActive && !childInstance.isCurrentProcess;
-      }).length > 0;
+        return childInstance.isNotReadForTnpInstall
+      }).length === 0;
+    // console.log('children are ready ? ', childrenReadyForTnpInstall)
+
+    // process.exit(0)
+    return childrenReadyForTnpInstall;
   }
 
   foundedActivePids(onlyForThisWorkspace = false) {
     const project = onlyForThisWorkspace ? this.project : undefined;
     const pids = [];
+
     if (project) {
       const projectIns = this.instances.find(i => i.location === project.location)
       if (_.isNumber(projectIns.build.app.pid)) {
@@ -153,14 +162,15 @@ export class ProjectsChecker {
         }
       })
     }
+
     return pids;
   }
-  areActiveProjectsInWorkspace() {
+  isReadyForTnpInstall() {
 
     if (this.project.isWorkspace) {
-      return this.checkIfActiveProjectInWorkspace(this.project);
+      return this.checkIfReadyForTnpInstall(this.project);
     } else if (this.project.isWorkspaceChildProject) {
-      return this.checkIfActiveProjectInWorkspace(this.project.parent);
+      return this.checkIfReadyForTnpInstall(this.project.parent);
     }
     return false;
   }
@@ -288,18 +298,20 @@ export class ProjectsChecker {
         `
       }
 
-      await questionYesNo(`There is active build instance of project in this location:
+      cbKill()
 
-      ${this.project.location}
-      ${info}
-      Do you wanna kill it ?`
+      // await questionYesNo(`There is active build instance of project in this location:
 
-        , () => {
-          cbKill()
-        }, () => {
-          console.log(`Exiting process, busy location: ${alreadyWorkingInstance.location}`)
-          process.exit(0)
-        });
+      // ${this.project.location}
+      // ${info}
+      // Do you wanna kill it ?`
+
+      //   , () => {
+      //     cbKill()
+      //   }, () => {
+      //     console.log(`Exiting process, busy location: ${alreadyWorkingInstance.location}`)
+      //     process.exit(0)
+      //   });
     } else {
       cbKill()
     }
@@ -382,14 +394,35 @@ export class ProjectInstance {
     public readonly location?: string) {
   }
 
+  get isNotReadForTnpInstall() {
+    return (this.isActive.appBuild && !this.isCurrentProcess.appBuild)
+      || (this.isActive.libBuild && !this.isCurrentProcess.libBuild)
+  }
+
   get isActive() {
-    return _.isNumber(this.build.app.pid) || _.isNumber(this.build.lib.pid);
+    const self = this;
+    return {
+      get appBuild() {
+        return _.isNumber(self.build.app.pid)
+      },
+      get libBuild() {
+        return _.isNumber(self.build.lib.pid)
+      }
+    }
   }
 
   get isCurrentProcess() {
-    return (_.isNumber(this.build.app.pid) && this.build.app.pid === process.pid) ||
-      (_.isNumber(this.build.lib.pid) && this.build.lib.pid === process.pid)
+    const self = this;
+    return {
+      get appBuild() {
+        return (_.isNumber(self.build.app.pid) && (self.build.app.pid === process.pid))
+      },
+      get libBuild() {
+        return (_.isNumber(self.build.lib.pid) && (self.build.lib.pid === process.pid))
+      }
+    }
   }
+
 
   kill() {
     const pidLib = this.build.lib.pid

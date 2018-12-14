@@ -10,7 +10,8 @@
     ],
     "overrided": {
       "dependencies": {
-        "@types/jasmine": null
+        "@types/jasmine": null,
+        "@types/jasminewd2": null
       }
     },
     "basedOnAbsolutePath1": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline"
