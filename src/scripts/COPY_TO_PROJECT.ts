@@ -32,6 +32,9 @@ export default {
   },
   $copy_to_project: (args) => {
     copyto(args)
+  },
+  $copyto: (args) => {
+    copyto(args)
   }
 }
 //#endregion

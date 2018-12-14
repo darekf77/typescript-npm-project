@@ -11,11 +11,11 @@ async function initialize(
   pArgs?: string,
   project = Project.Current, watch = false) {
 
-  if (project.isWorkspaceChildProject) {
-    project.parent.tnpHelper.install()
-  } else if (project.isWorkspace) {
-    project.tnpHelper.install()
-  }
+  // if (project.isWorkspaceChildProject) {
+  //   project.parent.tnpHelper.install()
+  // } else if (project.isWorkspace) {
+  project.tnpHelper.install()
+  // }
 
   if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
     install('', project.parent, false);

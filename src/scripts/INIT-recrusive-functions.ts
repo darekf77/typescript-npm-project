@@ -62,11 +62,11 @@ export namespace RecrusiveBaseline {
   export async function installTnpHelpersForBaselines(project: Project) {
 
     if (project.isSite) {
-      if (project.isWorkspaceChildProject) {
-        project.parent.baseline.tnpHelper.install()
-      } else if (project.isWorkspace) {
-        project.baseline.tnpHelper.install()
-      }
+      // if (project.isWorkspaceChildProject) {
+      //   project.parent.baseline.tnpHelper.install()
+      // } else if (project.isWorkspace) {
+      project.baseline.tnpHelper.install()
+      // }
     }
 
     if (project.isSite) {

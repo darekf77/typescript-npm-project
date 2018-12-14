@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from "os";
 import * as sleep from 'sleep';
-
+import * as inquirer from 'inquirer';
 
 import { error, info, warn } from "./messages";
 import { RunOptions, WatchOptions } from "./models";
@@ -15,6 +15,31 @@ import { paramsFrom } from './index';
 const prompts = require('prompts');
 export async function questionYesNo(message: string,
   callbackTrue: () => any, callbackFalse?: () => any) {
+
+  // const response: { value: boolean } = await inquirer
+  //   .prompt([
+  //     {
+  //       type: 'confirm',
+  //       name: 'value',
+  //       message,
+  //       // choices: this.parent.children
+  //       //   .filter(c => config.allowedTypes.app.includes(c.type))
+  //       //   .filter(c => c.name !== this.name)
+  //       //   .map(c => c.name),
+  //       // filter: function (val) {
+  //       //   return val.toLowerCase();
+  //       // }
+  //     }
+  //   ]) as any;
+
+  // if (response.value) {
+  //   callbackTrue()
+  // } else {
+  //   if (_.isFunction(callbackFalse)) {
+  //     callbackFalse()
+  //   }
+  // }
+
   const response = await prompts({
     type: 'toggle',
     name: 'value',

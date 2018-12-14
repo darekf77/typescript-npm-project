@@ -3,6 +3,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as inquirer from 'inquirer';
+
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv } from "../helpers";
@@ -13,6 +15,7 @@ import { HelpersLinks } from '../helpers-links';
 import { config } from '../config';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { error } from '../messages';
+import { ProjectFrom } from '.';
 
 
 
@@ -32,9 +35,9 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         "webpack.config.js",
         'run.js'
       ]).concat(
-      !this.isStandaloneProject ? [
-        "src/typings.d.ts",
-      ] : []);
+        !this.isStandaloneProject ? [
+          "src/typings.d.ts",
+        ] : []);
   }
 
   projectSpecyficIgnoredFiles() {
@@ -69,24 +72,44 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     return result;
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         let webpackEnvParams = `--env.outFolder=${outDir}`;
         webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
         // console.log('forClients', forClient)
+        let client = _.first(forClient);
         if (!this.isStandaloneProject && forClient.length === 0) {
-          const clientsExamples = this.parent.children
-            .filter(c => config.allowedTypes.app.includes(c.type))
-            .map(c => chalk.bold('--forClient ' + c.name) + '  or')
-          error(`Please define client parameter for app simulation:
-${clientsExamples.length > 0 ? clientsExamples.join('\n') : chalk.bold('--forClient my-example-client')}
-          Please choose only one ${chalk.bold('--forClient')} parameter.
-          `
-            , false, true)
+
+          const answer: { project: string } = await inquirer
+            .prompt([
+              {
+                type: 'list',
+                name: 'project',
+                message: 'Which project do you wanna simulate ?',
+                choices: this.parent.children
+                  .filter(c => config.allowedTypes.app.includes(c.type))
+                  .filter(c => c.name !== this.name)
+                  .map(c => c.name),
+                filter: function (val) {
+                  return val.toLowerCase();
+                }
+              }
+            ]) as any;
+          // console.log('ANSWER', answer)
+          client = ProjectFrom(path.join(this.location, '..', answer.project))
+          //           const clientsExamples = this.parent.children
+          //             .filter(c => config.allowedTypes.app.includes(c.type))
+          //             .map(c => chalk.bold('--forClient ' + c.name) + '  or')
+          //           error(`Please define client parameter for app simulation:
+          // ${clientsExamples.length > 0 ? clientsExamples.join('\n') : chalk.bold('--forClient my-example-client')}
+          //           Please choose only one ${chalk.bold('--forClient')} parameter.
+          //           `
+          //             , false, true)
         }
-        const client = _.first(forClient);
+
+        // console.log('CLIENT NAME', client.name)
 
         if (client) {
           webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${client.getDefaultPort()}`

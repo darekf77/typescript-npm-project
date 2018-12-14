@@ -29,6 +29,7 @@ module.exports = exports = function (base) {
       "command": "tnp build:dist",
       "commandWatch": "tnp build:dist:watch",
       "args": [
+        `--copyto ${base}tsc-npm-project`,
         `--copyto ${base}tsc-npm-project/projects/baseline`,
         `--copyto ${base}tsc-npm-project/projects/site`,
         `--copyto ${base}tsc-npm-project/projects/workspace`,

@@ -56,7 +56,7 @@ export abstract class Project {
   public projectSpecyficIgnoredFiles() {
     return [];
   }
-  abstract buildSteps(buildOptions?: BuildOptions);
+  abstract async buildSteps(buildOptions?: BuildOptions);
 
   quickFixMissingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {
@@ -446,7 +446,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     //   }
     // }
 
-    this.buildSteps(buildOptions);
+    await this.buildSteps(buildOptions);
     this.copytToManager.initCopyingOnBuildFinish(buildOptions);
   }
 
@@ -623,6 +623,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     return {
       install(installFromRecreate = false) { // install
         // console.log('install tnp from recreate', installFromRecreate)
+        const client = self;
         let project: Project;
         if (self.parent && self.parent.type === 'workspace') {
           project = self.parent;
@@ -632,7 +633,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
         if (process.platform === 'win32') {
           try {
-            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
+            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData, client)
           } catch (e) {
             console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
             console.log(e)
@@ -640,7 +641,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
             self.tnpHelper.install()
           }
         } else {
-          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
+          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData, client)
         }
       }
     }
@@ -696,10 +697,14 @@ const notNeededReinstallationTnp = {};
 
 
 
-function reinstallTnp(project: Project, pathTnpCompiledJS: string, pathTnpPackageJSONData: IPackageJSON) {
+function reinstallTnp(project: Project,
+  pathTnpCompiledJS: string,
+  pathTnpPackageJSONData: IPackageJSON,
+  client: Project) {
 
   if (!project.checker.isReadyForTnpInstall()) {
-    console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(true).toString()} ,
+    console.log('Current process pid: ' + process.pid)
+    console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(client).toString()} ,
     -  quit installing ${chalk.bold('tnp-bundle')}`)
     return
   }

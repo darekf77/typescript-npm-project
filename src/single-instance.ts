@@ -140,24 +140,25 @@ export class ProjectsChecker {
     return childrenReadyForTnpInstall;
   }
 
-  foundedActivePids(onlyForThisWorkspace = false) {
-    const project = onlyForThisWorkspace ? this.project : undefined;
+  foundedActivePids(project?: Project) {
+    // const project = onlyForThisWorkspace ? this.project : undefined;
     const pids = [];
 
     if (project) {
       const projectIns = this.instances.find(i => i.location === project.location)
-      if (_.isNumber(projectIns.build.app.pid)) {
+      // console.log('INSRTANCEEE', projectIns)
+      if (projectIns.isActive.appBuild) {
         pids.push(projectIns.build.app.pid)
       }
-      if (_.isNumber(projectIns.build.lib.pid)) {
+      if (projectIns.isActive.libBuild) {
         pids.push(projectIns.build.lib.pid)
       }
     } else {
       this.instances.forEach(i => {
-        if (_.isNumber(i.build.app.pid)) {
+        if (i.isActive.appBuild) {
           pids.push(i.build.app.pid)
         }
-        if (_.isNumber(i.build.lib.pid)) {
+        if (i.isActive.libBuild) {
           pids.push(i.build.lib.pid)
         }
       })
@@ -194,7 +195,7 @@ export class ProjectsChecker {
         await this.update();
 
         if (buildOptions) {
-          resolve()
+
           let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
           if (projectInstance) {
 
@@ -298,20 +299,20 @@ export class ProjectsChecker {
         `
       }
 
-      cbKill()
+      // cbKill()
 
-      // await questionYesNo(`There is active build instance of project in this location:
+      await questionYesNo(`There is active build instance of project in this location:
 
-      // ${this.project.location}
-      // ${info}
-      // Do you wanna kill it ?`
+      ${this.project.location}
+      ${info}
+      Do you wanna kill it ?`
 
-      //   , () => {
-      //     cbKill()
-      //   }, () => {
-      //     console.log(`Exiting process, busy location: ${alreadyWorkingInstance.location}`)
-      //     process.exit(0)
-      //   });
+        , () => {
+          cbKill()
+        }, () => {
+          console.log(`Exiting process, busy location: ${alreadyWorkingInstance.location}`)
+          process.exit(0)
+        });
     } else {
       cbKill()
     }

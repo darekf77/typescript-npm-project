@@ -46,7 +46,7 @@ export class AutoActions {
     const autobuildjsonfilePath = path.join(Project.Tnp.location, globalConfig.file.autob_actions_js);
     this.config = require(`${autobuildjsonfilePath}`);
     // console.log(this.config)
-    process.exit(0)
+    // process.exit(0)
     this.trimConfigPropsValues();
   }
 
@@ -106,6 +106,7 @@ export class AutoActions {
 
   async build(watch = false) {
     const build = this.getBuild();
+    // console.log('build',build)
     if (!build) {
       error(`Not build for current project "${this.project.name}"   `)
     } else {
@@ -140,6 +141,7 @@ export default {
     await autobuild(Project.Current, true)
   },
   $AUTOBUILDWATCH: async () => {
+    // console.log('AUTOBUILD!')
     await autobuild(Project.Current, true)
   }
 
