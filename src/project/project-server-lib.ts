@@ -21,7 +21,7 @@ export class ProjectServerLib extends BaseProjectLib {
     this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
 
 

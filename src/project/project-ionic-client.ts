@@ -18,7 +18,7 @@ export class ProjectIonicClient extends Project {
     ];
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir } = buildOptions;
     if (watch) {
       this.run(`tnp npm-run ionic serve --no-open -p ${this.getDefaultPort()}`).async()

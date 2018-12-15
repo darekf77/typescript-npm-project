@@ -15,7 +15,7 @@ export class ProjectDocker extends Project {
         ];
     }
 
-    buildSteps(buildOptions?: BuildOptions) {
+    async buildSteps(buildOptions?: BuildOptions) {
         const { prod, watch, outDir } = buildOptions;
 
     }

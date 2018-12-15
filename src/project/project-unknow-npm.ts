@@ -16,7 +16,7 @@ export class UnknowNpmProject extends Project {
   projectSpecyficFiles(): string[] {
     return []
   }
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     throw new Error("Method not implemented.");
   }
   protected startOnCommand(args: string): string {

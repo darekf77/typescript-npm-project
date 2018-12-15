@@ -89,7 +89,7 @@ export class AngularProject extends Project {
         //   "--hide-modules true",
         //   "--display none"
         // ]
-        
+
         this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
           {
             output: (this.env.config.name === 'local'),
@@ -113,7 +113,7 @@ export class AngularProject extends Project {
 
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     this.buildOptions = buildOptions;
     const { prod, watch, outDir, appBuild, args } = buildOptions;
     let baseHref = buildOptions.baseHref;

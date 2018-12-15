@@ -1,4 +1,6 @@
-import { LibType } from "../models";
+import { Morphi } from 'morphi';
+
+import { LibType, EnvironmentName } from "../models";
 //#region @backend
 
 import * as fs from 'fs';
@@ -21,7 +23,6 @@ import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
 import { FilesRecreator } from './files-builder';
 
-import { EnvironmentConfig } from './environment-config';
 import { ProxyRouter } from './proxy-router';
 
 import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from '../helpers-git';
@@ -29,13 +30,63 @@ import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
 import { ProjectsChecker } from '../single-instance';
+import { reinstallTnp } from './tnp-bundle';
+import { isNode } from 'ng2-logger';
 //#endregion
 
-export abstract class Project {
+import { EnvironmentConfig } from './environment-config';
 
+export interface IProject {
+  isSite: boolean;
+  isCoreProject: boolean;
+  isGenerated: boolean;
+  isWorkspaceChildProject: boolean;
+  isWorkspace: boolean;
+  isStandaloneProject: boolean;
+  isTnp: boolean;
+  isCloud: boolean;
+  name: string;
+  defaultPort?: number;
+  version: string;
+  getDefaultPort(): number;
+  customizableFilesAndFolders: string[];
+  type: LibType;
+  backupName: string;
+  location: string;
+  resources: string[];
+  env: EnvironmentConfig;
+  allowedEnvironments: EnvironmentName[];
+  children: Project[];
+  parent: Project;
+  preview: Project;
+  requiredLibs: Project[];
+  baseline: Project;
+}
+
+@Morphi.Entity({
+  className: 'Project'
+})
+export class Project implements IProject {
+  static projects: Project[] = [];
+
+  public static defaultPortByType(type: LibType): number {
+
+    if (type === 'workspace') return 5000;
+    if (type === 'angular-cli') return 4200;
+    if (type === 'angular-client') return 4300;
+    if (type === 'angular-lib') return 4250;
+    if (type === 'ionic-client') return 8080;
+    if (type === 'docker') return 5000;
+    if (type === 'isomorphic-lib') return 4000;
+    if (type === 'server-lib') return 4050;
+  }
+
+  readonly browser: IProject;
   public get name(): string {
     //#region @backendFunc
-    return this.packageJson.name;
+    if (isNode) {
+      return this.packageJson.name;
+    }
     //#endregion
   }
 
@@ -51,13 +102,29 @@ export abstract class Project {
 
   public readonly location: string;
 
+
   //#region @backend
-  abstract projectSpecyficFiles(): string[];
+  projectSpecyficFiles(): string[] {
+    // should be abstract
+    return []
+  }
+  //#endregion
+
+
+  //#region @backend
   public projectSpecyficIgnoredFiles() {
     return [];
   }
-  abstract async buildSteps(buildOptions?: BuildOptions);
+  //#endregion
 
+
+  //#region @backend
+  async buildSteps(buildOptions?: BuildOptions) {
+    // should be abstract
+  }
+  //#endregion
+
+  //#region @backend
   quickFixMissingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
@@ -68,20 +135,35 @@ export abstract class Project {
       }
     })
   }
+  //#endregion
 
+  //#region @backend
   routerTargetHttp() {
     return `http://localhost:${this.getDefaultPort()}`;
   }
+  //#endregion
 
 
   readonly requiredLibs: Project[] = []; // TODO FIX THIS
+
   get parent(): Project {
+    if (Morphi.IsBrowser) {
+      return this.browser.parent;
+    }
+    //#region @backend
     return ProjectFrom(path.join(this.location, '..'));
+    //#endregion
   }
   get preview(): Project {
+    if (Morphi.IsBrowser) {
+      return this.browser.preview;
+    }
+    //#region @backend
     return ProjectFrom(path.join(this.location, 'preview'));
+    //#endregion
   }
 
+  //#region @backend
   /**
    * Check if project is based on baseline ( in package json workspace )
    * (method works from any level)
@@ -93,6 +175,7 @@ export abstract class Project {
       return this.parent && !!this.parent.packageJson.pathToBaseline;
     }
   }
+  //#endregion
 
   /**
    * DONT USE WHEN IS NOT TO RESOLVE BASELINE PROJECT
@@ -102,27 +185,54 @@ export abstract class Project {
    * For child site worksapce is baseline worksapce child
    */
   get baseline(): Project {
-
+    if (Morphi.IsBrowser) {
+      return this.browser.baseline;
+    }
+    //#region @backend
     if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && ProjectFrom(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
       return this.parent && this.parent.baseline && ProjectFrom(path.join(this.parent.baseline.location, this.name));
     }
+    //#endregion
   }
 
-
+  //#region @backend
   readonly packageJson: PackageJSON;
+  //#endregion
+
+  //#region @backend
   readonly node_modules: NodeModules;
+  //#endregion
+
+  //#region @backend
   readonly recreate: FilesRecreator;
+  //#endregion
+
+  //#region @backend
   readonly join: BaselineSiteJoin;
+  //#endregion
+
+  //#region @backend
   readonly sourceModifier: SourceModifier;
+  //#endregion
+
+  //#region @backend
   readonly checker: ProjectsChecker;
+  //#endregion
+
   env: EnvironmentConfig;
+
+  //#region @backend
   readonly proxyRouter: ProxyRouter;
+  //#endregion
+
+  //#region @backend
   readonly copytToManager: CopyToManager;
+  //#endregion
 
-  static projects: Project[] = [];
 
+  //#region @backend
   static get Current() {
     const current = ProjectFrom(process.cwd())
     if (!current) {
@@ -131,6 +241,9 @@ export abstract class Project {
     // console.log('CURRENT', current.location)
     return current;
   }
+  //#endregion
+
+  //#region @backend
   static get Tnp() {
     const filenameapth = 'tnp-system-path.txt';
     let tnp = ProjectFrom(path.join(__dirname, '..', '..'));
@@ -149,18 +262,32 @@ export abstract class Project {
     }
     return tnp;
   }
+  //#endregion
 
+  //#region @backend
   protected __defaultPort: number;
+  //#endregion
 
+  //#region @backend
   public setDefaultPort(port: number) {
     this.__defaultPort = port;
   }
+  //#endregion
+
 
   public getDefaultPort() {
+    if (Morphi.IsBrowser) {
+      return this.browser.defaultPort;
+    }
+    //#region @backend
     return this.__defaultPort;
+    //#endregion
   }
 
+
+  //#region @backend
   public get isBuildedLib() {
+
     if (this.type === 'angular-lib') {
       return fse.existsSync(path.join(this.location, config.folder.module)) &&
         fse.existsSync(path.join(this.location, config.folder.dist));
@@ -170,29 +297,26 @@ export abstract class Project {
         fse.existsSync(path.join(this.location, config.folder.dist));
     }
   }
+  //#endregion
 
+
+  //#region @backend
   public setDefaultPortByType() {
     this.setDefaultPort(Project.defaultPortByType(this.type))
   }
-
-  public static defaultPortByType(type: LibType): number {
-
-    if (type === 'workspace') return 5000;
-    if (type === 'angular-cli') return 4200;
-    if (type === 'angular-client') return 4300;
-    if (type === 'angular-lib') return 4250;
-    if (type === 'ionic-client') return 8080;
-    if (type === 'docker') return 5000;
-    if (type === 'isomorphic-lib') return 4000;
-    if (type === 'server-lib') return 4050;
-  }
-
+  //#endregion
 
 
   get version() {
+    if (Morphi.IsBrowser) {
+      return this.browser.version;
+    }
+    //#region @backend
     return this.packageJson.version;
+    //#endregion
   }
 
+  //#region @backend
   get versionPatchedPlusOne() {
     const ver = this.version.split('.');
     if (ver.length > 0) {
@@ -200,12 +324,22 @@ export abstract class Project {
     }
     return ver.join('.')
   }
+  //#endregion
 
   get resources(): string[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.resources;
+    }
+    //#region @backend
     return this.packageJson.resources;
+    //#endregion
   }
 
   get isSite() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isSite;
+    }
+    //#region @backend
     const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
     let basedOn = '';
     if (this.isWorkspace) {
@@ -219,13 +353,19 @@ export abstract class Project {
     const res = (basedOn && basedOn !== '');
     // console.log(`Project "${this.location}" is site: ${res}`)
     return res;
+    //#endregion
   }
 
   /**
    * Core project with basic tested functionality
    */
   get isCoreProject() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isCoreProject;
+    }
+    //#region @backend
     return this.packageJson.isCoreProject;
+    //#endregion
   }
 
   get labels() {
@@ -234,45 +374,76 @@ export abstract class Project {
       get generated() {
         return self.isGenerated ? '(generated)' : ''
       },
+      //#region @backend
       get extendedBoldName() {
         return chalk.bold(`${self.labels.generated} ${self.parent ? (self.parent.name + '/') : ''}${self.name}`);
       }
+      //#endregion
     }
   }
 
   get isGenerated() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isGenerated;
+    }
+    //#region @backend
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
       (this.isWorkspace && this.packageJson.isGenerated)
+    //#endregion
   }
 
   get isTnp() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isTnp;
+    }
+    //#region @backend
     return this.name === 'tnp';
+    //#endregion
   }
 
   get isCloud() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isCloud;
+    }
+    //#region @backend
     return this.name === 'site' && this.type === 'workspace'; // TODO temporary solution
+    //#endregion
   }
 
   get isWorkspaceChildProject() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isWorkspaceChildProject;
+    }
+    //#region @backend
     return !!this.parent && this.parent.type === 'workspace';
+    //#endregion
   }
 
-
-
   get allowedEnvironments() {
+    if (Morphi.IsBrowser) {
+      return this.browser.allowedEnvironments;
+    }
+    //#region @backend
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
       return this.packageJson.data.tnp.allowedEnv.concat('local')
     }
     return config.allowedEnvironments.concat('local');
+    //#endregion
   }
 
   /**
    * Standalone projects link: npm libs
    */
   get isStandaloneProject() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isStandaloneProject;
+    }
+    //#region @backend
     return !this.isWorkspaceChildProject && !this.isWorkspace;
+    //#endregion
   }
 
+  //#region @backend
   /**
    * Start server on top of static build
    * @param port
@@ -306,18 +477,27 @@ Generated workspace should be here: ${genLocationWOrkspace}
       // })
     }
   }
+  //#endregion
 
-  protected abstract startOnCommand(args: string): string;
+  //#region @backend
+  protected startOnCommand(args: string): string {
+    // should be abstract
+    return undefined;
+  }
+  //#endregion
 
+  //#region @backend
   requiredDependencies(): Package[] {
     return [
       { name: "node-sass", version: "^4.7.2" },
       { name: "typescript", version: "2.6.2" }
     ]
   }
+  //#endregion
 
 
 
+  //#region @backend
   constructor(location: string) {
     this.location = location;
 
@@ -353,9 +533,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
       error(`Invalid project location: ${location}`);
     }
   }
+  //#endregion
 
 
   get customizableFilesAndFolders() {
+    if (Morphi.IsBrowser) {
+      return this.browser.customizableFilesAndFolders;
+    }
+    //#region @backend
     if (this.type === 'workspace') return [
       // 'environment.d.ts',
       'environment.js',
@@ -367,15 +552,19 @@ Generated workspace should be here: ${genLocationWOrkspace}
     const files: string[] = ['src']
     if (this.type === 'angular-lib') files.push('components');
     return files;
+    //#endregion
   }
 
 
+  //#region @backend
   run(command: string, options?: RunOptions) {
     if (!options) options = {}
     if (!options.cwd) options.cwd = this.location;
     return __run(command, options);
   }
+  //#endregion
 
+  //#region @backend
   protected get watcher() {
     const self = this;
     return {
@@ -389,7 +578,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }
     }
   }
+  //#endregion
 
+  //#region @backend
   private modifySourceBeforCompilation() {
     if (config.allowedTypes.app.includes(this.type)) {
       if (!this.isStandaloneProject) {
@@ -402,8 +593,13 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }
     }
   }
+  //#endregion
 
+  //#region @backend
   protected buildOptions?: BuildOptions;
+  //#endregion
+
+  //#region @backend
   async build(buildOptions?: BuildOptions) {
 
     if (this.isWorkspaceChildProject) {
@@ -449,7 +645,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
     await this.buildSteps(buildOptions);
     this.copytToManager.initCopyingOnBuildFinish(buildOptions);
   }
+  //#endregion
 
+  //#region @backend
   public get git() {
     const self = this;
     return {
@@ -473,7 +671,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }
     }
   }
+  //#endregion
 
+  //#region @backend
   public clear(includeNodeModules = false, recrusive = false) {
     console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
 
@@ -501,7 +701,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
   }
+  //#endregion
 
+  //#region @backend
   public static by(libraryType: LibType): Project {
     // console.log('by libraryType ' + libraryType)
     let projectPath;
@@ -523,10 +725,13 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
     return ProjectFrom(projectPath);
   }
-
+  //#endregion
 
   get children(): Project[] {
-
+    if (Morphi.IsBrowser) {
+      return this.browser.children;
+    }
+    //#region @backend
     // console.log('from ' + this.location)
 
     const notAllowed: RegExp[] = [
@@ -560,8 +765,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
         return ProjectFrom(dir);
       })
       .filter(c => !!c)
+    //#endregion
   }
 
+  //#region @backend
   cloneTo(destinationPath: string): Project {
     const options: fse.CopyOptionsSync = {
       overwrite: true,
@@ -577,7 +784,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
     console.log(chalk.green('Done.'));
     return project;
   }
+  //#endregion
 
+  //#region @backend
   public checkIfReadyForNpm() {
     // console.log('TYPEEEEE', this.type)
     const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
@@ -586,9 +795,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
     return true;
   }
+  //#endregion
 
+  //#region @backend
   reinstallCounter = 1;
+  //#endregion
 
+
+  //#region @backend
   public get tnpHelper() {
 
     if (!Project.Tnp) {
@@ -645,121 +859,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
         }
       }
     }
-    //#endregion
+
   }
+  //#endregion
 
 
-  //#region @backend
 
-  // TODO solve problem with ngc watch mode high cpu
-  // get ownNpmPackage() {
-  //     const self = this;
-  //     return {
-  //         linkTo(project: Project) {
-  //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             // project.run(`rimraf ${targetLocation}`).sync();
-  //             Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
-  //         },
-  //         unlinkFrom(project: Project) {
-  //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             project.run(`rimraf ${targetLocation}`).sync();
-  //         }
-  //     };
-  // }
-
-};
-
-function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
-  const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
-
-  return getMostRecentFilesNames(tnpDistCompiled)
-    .map(f => f.replace(tnpDistCompiled, ''))
-    .filter(f => {
-      const fileInDest = path.join(destination, f)
-      const fileInTnp = path.join(tnpDistCompiled, f);
-
-      if (!fs.existsSync(fileInDest)) {
-        // console.log(`File ${fileInDest} doesn't exist`)
-        return true;
-      }
-
-      const res = fs.readFileSync(fileInTnp).toString().trim() !== fs.readFileSync(fileInDest).toString().trim()
-      // console.log(`
-      //   compare: "${fileInDest}" ${fs.readFileSync(fileInDest).toString().length}
-      //   with : "${fileInTnp}" ${fs.readFileSync(fileInTnp).toString().length}
-      //   result: ${res}
-      // `)
-      return res;
-    }).length === 0;
 }
-
-const notNeededReinstallationTnp = {};
-
-
-
-function reinstallTnp(project: Project,
-  pathTnpCompiledJS: string,
-  pathTnpPackageJSONData: IPackageJSON,
-  client: Project) {
-
-  if (!project.checker.isReadyForTnpInstall()) {
-    console.log('Current process pid: ' + process.pid)
-    console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(client).toString()} ,
-    -  quit installing ${chalk.bold('tnp-bundle')}`)
-    return
-  }
-
-  if (project.isTnp) {
-    return
-  }
-
-  if (notNeededReinstallationTnp[project.location]) {
-    return;
-  }
-  if (project.isWorkspaceChildProject || project.type === 'workspace') {
-
-
-    const destCompiledJs = path.join(project.location, config.folder.node_modules, config.file.tnpBundle)
-
-    if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
-      notNeededReinstallationTnp[project.location] = true;
-      // console.log(`Reinstallation of "tnp" not needed in ${project.name} `);
-      return;
-    }
-
-    const destPackageJSON = path.join(project.location, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
-
-    if (fs.existsSync(destCompiledJs)) {
-      // console.log(`Removed tnp - helper from ${ dest } `)
-      tryRemoveDir(destCompiledJs)
-    }
-
-    tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
-      filter: (src: string, dest: string) => {
-        return !src.endsWith('/dist/bin') &&
-          !src.endsWith('/bin') &&
-          !/.*node_modules.*/g.test(src);
-      }
-    });
-
-    fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
-      encoding: 'utf8',
-      spaces: 2
-    })
-
-    const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
-    const destTnpPath = path.join(project.location, config.folder.node_modules,
-      config.file.tnpBundle, config.file.tnp_system_path_txt)
-
-    fse.copyFileSync(sourceTnpPath, destTnpPath);
-
-    let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
-    // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
-
-    notNeededReinstallationTnp[project.location] = true;
-    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} `)
-  } else {
-    // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
-  }
-}
-//#endregion

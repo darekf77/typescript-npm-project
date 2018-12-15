@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { Project } from './base-project';
-import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
+
 import { walkObject } from '../helpers';
 import { error, warn } from '../messages';
 import chalk from 'chalk';
@@ -15,13 +15,22 @@ import { ProxyRouter } from './proxy-router';
 import {
   validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
 } from './environment-config-helpers';
+//#endregion
+import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
+import { isBrowser } from 'ng2-logger';
 
+//#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
+//#endregion
+
+export interface IEnvironmentConfig {
+  readonly config: EnvConfig
+}
 
 export class EnvironmentConfig {
 
-
-
+  browser: IEnvironmentConfig;
+  //#region @backend
   constructor(private project: Project) { }
 
   /**
@@ -130,7 +139,7 @@ export class EnvironmentConfig {
     })
 
 
-    
+
     config.build = {
       number: this.project.git.countComits(),
       date: this.project.git.lastCommitDate(),
@@ -139,6 +148,7 @@ export class EnvironmentConfig {
 
     saveConfigWorkspca(this.project, config)
   }
+  //#endregion
 
   private static configs: { [location: string]: EnvConfig } = {};
 
@@ -146,7 +156,10 @@ export class EnvironmentConfig {
    * Can be accesed only after env.prepare()
    */
   public get config(): EnvConfig {
-
+    if (isBrowser) {
+      return this.browser.config;
+    }
+    //#region @backend
     const configPath = path.resolve(path.join(this.project.location, tmpEnvironmentFileName));
     if (EnvironmentConfig.configs[configPath]) {
       return EnvironmentConfig.configs[configPath];
@@ -158,6 +171,7 @@ export class EnvironmentConfig {
     } else {
       warn(`confg doesnt exist: ${configPath}`)
     }
+    //#endregion
 
   }
 
@@ -168,7 +182,3 @@ export class EnvironmentConfig {
 
 }
 
-
-
-
-//#endregion

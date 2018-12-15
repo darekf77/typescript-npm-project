@@ -72,14 +72,14 @@ export class ProjectAngularLib extends BaseProjectLib {
     return `divide module compilation of ${chalk.bold(this.name)}`
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, appBuild, onlyWatchNoBuild } = buildOptions;
 
 
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        this.angular.buildSteps(buildOptions);
+        await this.angular.buildSteps(buildOptions);
       } else {
         if (watch) {
           this.buildLib(outDir, prod, false);

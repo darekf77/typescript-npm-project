@@ -34,7 +34,7 @@ export class ProjectWorkspace extends Project {
     return ['environment.d.ts'];
   }
 
-  buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions) {
     PROGRESS_BAR_DATA.log({ info: 'Process started', status: 'inprogress', value: 0 })
     const { prod, watch, outDir, args } = buildOptions;
 
