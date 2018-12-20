@@ -16,12 +16,10 @@ import { Subject } from 'rxjs/Subject';
 
 
 @Morphi.Controller({
-  className: 'TnpProjectController'
+  className: 'TnpProjectController',
+  entity: entities.TNP_PROJECT
 })
 export class TnpProjectController extends Morphi.Base.Controller<entities.TNP_PROJECT> {
-
-  @Morphi.Base.InjectCRUDEntity(entities.TNP_PROJECT) public entity: entities.TNP_PROJECT;
-
 
   //#region @backend
 

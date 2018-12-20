@@ -23,6 +23,9 @@ export { ENVIRONMENT, IENVIRONMENT } from './entities/ENVIRONMENT';
 import { PROJECT, IPROJECT } from './entities/PROJECT';
 export { PROJECT, IPROJECT } from './entities/PROJECT';
 
+import { SYSTEM_INFO, ISYSTEM_INFO } from './entities/SYSTEM_INFO';
+export { SYSTEM_INFO, ISYSTEM_INFO } from './entities/SYSTEM_INFO';
+
 import { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
 export { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
 
@@ -31,6 +34,7 @@ BUILD,
 DOMAIN,
 ENVIRONMENT,
 PROJECT,
+SYSTEM_INFO,
 TNP_PROJECT
 ].concat(BaselineEntities as any) as any;
 
@@ -42,6 +46,7 @@ export {   BUILD_REPOSITORY } from './repositories/BUILD_REPOSITORY';
 
 import {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 export {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
+
 
 
 
@@ -62,6 +67,8 @@ DOMAIN: repositoryFrom<DOMAIN , DOMAIN_REPOSITORY>(connection, DOMAIN , DOMAIN_R
 ENVIRONMENT: repositoryFrom<ENVIRONMENT>(connection, ENVIRONMENT),
 
 PROJECT: repositoryFrom<PROJECT>(connection, PROJECT),
+
+SYSTEM_INFO: repositoryFrom<SYSTEM_INFO>(connection, SYSTEM_INFO),
 
 TNP_PROJECT: repositoryFrom<TNP_PROJECT , TNP_PROJECT_REPOSITORY>(connection, TNP_PROJECT , TNP_PROJECT_REPOSITORY),
 }  );

@@ -9,4 +9,4 @@ export default function () {
 //#endregion
 
 
-console.log('heeloo thats amazinfg', ENV)
+// console.log('heeloo thats amazinfg', ENV)

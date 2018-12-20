@@ -63,8 +63,11 @@ export interface IProject {
   baseline: Project;
 }
 
-@Morphi.Entity({
-  className: 'Project'
+@Morphi.Entity<Project>({
+  className: 'Project',
+  mapping: {
+
+  }
 })
 export class Project implements IProject {
   static projects: Project[] = [];

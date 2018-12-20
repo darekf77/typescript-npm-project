@@ -16,10 +16,12 @@ import { SelfUpdate, TNP_PROJECT } from '../entities/TNP_PROJECT';
 import { Subject } from 'rxjs/Subject';
 
 
+
 @Morphi.Controller({
-  className: 'SystemController'
+  className: 'SystemController',
+  entity: entities.SYSTEM_INFO
 })
-export class SystemController extends Morphi.Base.Controller<any> {
+export class SystemController extends Morphi.Base.Controller<entities.SYSTEM_INFO> {
 
 
   @Morphi.Http.GET('/test')

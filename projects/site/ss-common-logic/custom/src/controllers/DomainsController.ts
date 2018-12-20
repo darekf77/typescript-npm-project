@@ -1,6 +1,6 @@
 
 import { Morphi } from 'morphi';
-import { DOMAIN } from '../entities/DOMAIN';
+
 
 import * as entities from '../entities';
 import * as controllers from '../controllers';
@@ -8,13 +8,12 @@ import * as controllers from '../controllers';
 
 
 @Morphi.Controller({
-  className: 'DomainsController'
+  className: 'DomainsController',
+  entity: entities.DOMAIN
 })
-export class DomainsController extends Morphi.Base.Controller<DOMAIN> {
+export class DomainsController extends Morphi.Base.Controller<entities.DOMAIN> {
 
 
-
-  @Morphi.Base.InjectCRUDEntity(entities.DOMAIN) public entity: entities.DOMAIN;
   //#region @backend
 
   get db() {
@@ -27,8 +26,6 @@ export class DomainsController extends Morphi.Base.Controller<DOMAIN> {
 
   async initExampleDbData() {
     // console.log('Don not init this! OK ')
-
-
 
   }
 

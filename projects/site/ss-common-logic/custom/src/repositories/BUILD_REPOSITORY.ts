@@ -18,11 +18,11 @@ export class BUILD_REPOSITORY extends Morphi.Base.Repository<BUILD, BUILD_ALIASE
 
 
   async getBuilds() {
-    console.log('Project',Project)
+    console.log('Project', Project)
     const tnpProjectPath = path.join(Project.Tnp.location, config.folder.bin, config.file.projects_json)
     const readjson: any[] = fse.readJSONSync(tnpProjectPath)
-    console.log('readjson',readjson)
-    return readjson.map(d => _.merge(new ProjectInstance, d))
+    // console.log('readjson', readjson)
+    return readjson.map(d => (_.merge(new ProjectInstance, d) as ProjectInstance).project)
   }
 
 }

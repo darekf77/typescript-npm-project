@@ -12,11 +12,11 @@ import * as entities from '../entities';
 import * as controllers from '../controllers';
 
 @Morphi.Controller({
-  className: 'BuildController'
+  className: 'BuildController',
+  entity: entities.BUILD
 })
-export class BuildController extends Morphi.Base.Controller<BUILD> {
+export class BuildController extends Morphi.Base.Controller<entities.BUILD> {
 
-  @Morphi.Base.InjectCRUDEntity(entities.BUILD) public entity: entities.BUILD;
   //#region @backend
 
   get db() {
@@ -29,8 +29,8 @@ export class BuildController extends Morphi.Base.Controller<BUILD> {
 
 
   async initExampleDbData() {
-    let builds = await this.db.BUILD.getBuilds()
-    console.log('builds', builds)
+    // let builds = await this.db.BUILD.getBuilds()
+    // console.log('builds', builds)
 
   }
 
@@ -49,9 +49,9 @@ export class BuildController extends Morphi.Base.Controller<BUILD> {
     console.log('here')
 
     return async () => {
-      let builds = this.db.BUILD.getBuilds()
-      // const build = new BUILD();
-      return builds;
+      let builds = await this.db.BUILD.getBuilds()
+      // console.log('builds', builds)
+      return [_.first(builds)] ; //   builds;
     }
     //#endregion
   }

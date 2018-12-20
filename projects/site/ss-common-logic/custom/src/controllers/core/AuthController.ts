@@ -20,9 +20,11 @@ export {
 import { authenticate, use } from 'passport';
 //#endregion
 
+import { SESSION } from 'baseline/ss-common-logic/src/entities/core/SESSION';
 
 @Morphi.Controller({
   className: 'AuthController',
+  entity: SESSION, // TODO it is not working as expected , NOT NECESSARY ???
   //#region @backend
   auth: (method) => {
     if (method === AuthController.prototype.login) {

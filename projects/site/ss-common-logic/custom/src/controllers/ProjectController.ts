@@ -13,16 +13,13 @@ import * as controllers from '../controllers';
 import { PROGRESS_BAR_DATA, EnvironmentName } from 'tnp-bundle';
 import { SelfUpdate, TNP_PROJECT } from '../entities/TNP_PROJECT';
 import { Subject } from 'rxjs/Subject';
-import { PROJECT } from '../entities';
 
 
 @Morphi.Controller({
-  className: 'ProjectController'
+  className: 'ProjectController',
+  entity: entities.PROJECT
 })
-export class ProjectController extends Morphi.Base.Controller<PROJECT> {
-
-  @Morphi.Base.InjectCRUDEntity(entities.PROJECT) public entity: entities.PROJECT;
-
+export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> {
 
   //#region @backend
 
