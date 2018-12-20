@@ -25,6 +25,7 @@ const APP_CONFIG: ConfigValues = Object.freeze<ConfigValues>({
 
 @Morphi.Controller({
   className: 'ConfigController',
+  entity: entities.CONFIG,
   //#region @backend
   auth: () => {
     return authenticate('bearer', { session: false });
@@ -33,10 +34,8 @@ const APP_CONFIG: ConfigValues = Object.freeze<ConfigValues>({
 })
 export class ConfigController extends Morphi.Base.Controller<entities.CONFIG> {
 
-  @Morphi.Base.InjectCRUDEntity(entities.CONFIG) public entity: entities.CONFIG;
 
   //#region @backend
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

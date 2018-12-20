@@ -14,6 +14,7 @@ import * as controllers from '../controllers';
 
 @Morphi.Controller({
   className: 'CategoryController',
+  entity: entities.CATEGORY,
   //#region @backend
   auth: (method) => {
     return authenticate('bearer', { session: false });
@@ -22,10 +23,7 @@ import * as controllers from '../controllers';
 })
 export class CategoryController extends Morphi.Base.Controller<entities.CATEGORY> {
 
-  @Morphi.Base.InjectCRUDEntity(entities.CATEGORY) public entity: entities.CATEGORY;
-
   //#region @backend
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

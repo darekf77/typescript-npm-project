@@ -8,7 +8,8 @@ import * as controllers from '../controllers';
 
 
 @Morphi.Controller({
-  className: 'ExamplesController'
+  className: 'ExamplesController',
+  entity: entities.EXAMPLE
 })
 export class ExamplesController extends Morphi.Base.Controller<entities.EXAMPLE> {
 
@@ -19,10 +20,8 @@ export class ExamplesController extends Morphi.Base.Controller<entities.EXAMPLE>
     }
   }
 
-  @Morphi.Base.InjectCRUDEntity(entities.EXAMPLE) public entity: entities.EXAMPLE;
 
   //#region @backend
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

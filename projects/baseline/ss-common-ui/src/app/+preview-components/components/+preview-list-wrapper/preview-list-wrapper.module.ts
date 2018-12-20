@@ -21,6 +21,7 @@ const materialModules = [
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
+console.log('INITM MORPHI MODULE');
 Morphi.init({
   host,
   controllers: [ExamplesController],

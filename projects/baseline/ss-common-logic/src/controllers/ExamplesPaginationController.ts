@@ -9,14 +9,13 @@ import * as controllers from '../controllers';
 
 
 @Morphi.Controller({
-  className: 'ExamplesPaginationController'
+  className: 'ExamplesPaginationController',
+  entity: entities.EXAMPLE_PAGINATION
 })
 export class ExamplesPaginationController extends Morphi.Base.Controller<entities.EXAMPLE_PAGINATION> {
 
-  @Morphi.Base.InjectCRUDEntity(entities.EXAMPLE_PAGINATION) public entity: entities.EXAMPLE_PAGINATION;
 
   //#region @backend
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

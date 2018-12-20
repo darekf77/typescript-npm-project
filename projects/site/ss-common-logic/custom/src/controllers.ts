@@ -14,6 +14,9 @@ export { BuildController } from './controllers/BuildController';
 import { DomainsController } from './controllers/DomainsController';
 export { DomainsController } from './controllers/DomainsController';
 
+import { ProjectController } from './controllers/ProjectController';
+export { ProjectController } from './controllers/ProjectController';
+
 import { SystemController } from './controllers/SystemController';
 export { SystemController } from './controllers/SystemController';
 
@@ -23,6 +26,7 @@ export { TnpProjectController } from './controllers/TnpProjectController';
 export const Controllers: Morphi.Base.Controller<any>[] = [
 BuildController,
 DomainsController,
+ProjectController,
 SystemController,
 TnpProjectController
 ].concat(BaselineControllers as any) as any;
@@ -38,6 +42,8 @@ return _.merge(controllersBaseline.controllers(), {
 BuildController: Helpers.getSingleton<BuildController>(BuildController),
 
 DomainsController: Helpers.getSingleton<DomainsController>(DomainsController),
+
+ProjectController: Helpers.getSingleton<ProjectController>(ProjectController),
 
 SystemController: Helpers.getSingleton<SystemController>(SystemController),
 

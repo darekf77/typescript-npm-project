@@ -29,7 +29,7 @@ export class BuildController extends Morphi.Base.Controller<BUILD> {
 
 
   async initExampleDbData() {
-    let builds = this.db.BUILD.getBuilds()
+    let builds = await this.db.BUILD.getBuilds()
     console.log('builds', builds)
 
   }

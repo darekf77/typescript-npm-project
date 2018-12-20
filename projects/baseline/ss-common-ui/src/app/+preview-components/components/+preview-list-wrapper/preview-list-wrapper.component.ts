@@ -15,6 +15,7 @@ export class PreviewListWrapperComponent implements OnInit {
 
 
   ngOnInit() {
+    console.log('LIST WRAPPER ON ININT');
     setTimeout(async () => {
       // await this.exampleService.info().received.observable.take(1).toPromise();
       await this.exampleService.info2().received.observable.take(1).toPromise();

@@ -64,6 +64,7 @@ export interface IFacebook {
 
 @Morphi.Controller({
   className: 'AuthController',
+  entity: SESSION,
   //#region @backend
   auth: (method) => {
 
@@ -79,10 +80,9 @@ export interface IFacebook {
 })
 export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
 
-  @Morphi.Base.InjectCRUDEntity(entities.SESSION) entity: entities.SESSION;
+
 
   //#region @backend
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     return entities.entities(this.connection as any);

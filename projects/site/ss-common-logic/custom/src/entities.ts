@@ -20,6 +20,9 @@ export { DOMAIN, IDOMAIN } from './entities/DOMAIN';
 import { ENVIRONMENT, IENVIRONMENT } from './entities/ENVIRONMENT';
 export { ENVIRONMENT, IENVIRONMENT } from './entities/ENVIRONMENT';
 
+import { PROJECT, IPROJECT } from './entities/PROJECT';
+export { PROJECT, IPROJECT } from './entities/PROJECT';
+
 import { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
 export { TNP_PROJECT, ITNP_PROJECT } from './entities/TNP_PROJECT';
 
@@ -27,6 +30,7 @@ export const Entities: Morphi.Base.Entity<any>[] = [
 BUILD,
 DOMAIN,
 ENVIRONMENT,
+PROJECT,
 TNP_PROJECT
 ].concat(BaselineEntities as any) as any;
 
@@ -38,6 +42,7 @@ export {   BUILD_REPOSITORY } from './repositories/BUILD_REPOSITORY';
 
 import {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
 export {   DOMAIN_REPOSITORY } from './repositories/DOMAIN_REPOSITORY';
+
 
 
 import {   TNP_PROJECT_REPOSITORY } from './repositories/TNP_PROJECT_REPOSITORY';
@@ -55,6 +60,8 @@ BUILD: repositoryFrom<BUILD , BUILD_REPOSITORY>(connection, BUILD , BUILD_REPOSI
 DOMAIN: repositoryFrom<DOMAIN , DOMAIN_REPOSITORY>(connection, DOMAIN , DOMAIN_REPOSITORY),
 
 ENVIRONMENT: repositoryFrom<ENVIRONMENT>(connection, ENVIRONMENT),
+
+PROJECT: repositoryFrom<PROJECT>(connection, PROJECT),
 
 TNP_PROJECT: repositoryFrom<TNP_PROJECT , TNP_PROJECT_REPOSITORY>(connection, TNP_PROJECT , TNP_PROJECT_REPOSITORY),
 }  );

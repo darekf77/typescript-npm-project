@@ -18,6 +18,7 @@ import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
 
 @Morphi.Controller({
   className: 'MultimediaController',
+  entity: entities.MULTIMEDIA,
   //#region @backend
   auth: () => {
     return authenticate('bearer', { session: false });
@@ -25,8 +26,6 @@ import { MULTIMEDIA, MultimediaType } from '../../entities/core/MULTIMEDIA';
   //#endregion
 })
 export class MultimediaController extends Morphi.Base.Controller<entities.MULTIMEDIA> {
-
-  @Morphi.Base.InjectCRUDEntity(entities.MULTIMEDIA) entity: entities.MULTIMEDIA;
 
   constructor() {
     super()
@@ -59,8 +58,6 @@ export class MultimediaController extends Morphi.Base.Controller<entities.MULTIM
 
 
   //#region @backend
-
-  @Morphi.Orm.InjectConnection connection: Morphi.Orm.Connection;
 
   get db() {
     // @ts-ignore
