@@ -100,6 +100,9 @@ export class Project implements IProject {
 
   readonly type: LibType;
 
+  //#region @backend
+  @Morphi.Orm.Column.Primary({ type: 'varchar', length: 400 })
+  //#endregion
   public readonly location: string;
 
 
@@ -499,38 +502,42 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   constructor(location: string) {
-    this.location = location;
-
-    if (fs.existsSync(location)) {
-
-      // console.log('PROJECT FROM', location)
+    if (!_.isUndefined(location)) {
 
 
-      this.packageJson = PackageJSON.fromProject(this);
-      this.node_modules = new NodeModules(this);
-      this.type = this.packageJson.type;
-      this.recreate = new FilesRecreator(this);
-      this.sourceModifier = new SourceModifier(this, this.recreate);
-      if (!this.isStandaloneProject) {
-        this.join = new BaselineSiteJoin(this);
+      this.location = location;
+
+      if (fs.existsSync(location)) {
+
+        // console.log('PROJECT FROM', location)
+
+
+        this.packageJson = PackageJSON.fromProject(this);
+        this.node_modules = new NodeModules(this);
+        this.type = this.packageJson.type;
+        this.recreate = new FilesRecreator(this);
+        this.sourceModifier = new SourceModifier(this, this.recreate);
+        if (!this.isStandaloneProject) {
+          this.join = new BaselineSiteJoin(this);
+        }
+        this.checker = new ProjectsChecker(this);
+
+        Project.projects.push(this);
+
+        // this.requiredLibs = this.packageJson.requiredProjects;
+
+
+        this.__defaultPort = Project.defaultPortByType(this.type);
+        // console.log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
+        if (!this.isStandaloneProject) {
+          this.env = new EnvironmentConfig(this);
+          this.proxyRouter = new ProxyRouter(this);
+        }
+        this.copytToManager = new CopyToManager(this);
+
+      } else {
+        warn(`Invalid project location: ${location}`);
       }
-      this.checker = new ProjectsChecker(this);
-
-      Project.projects.push(this);
-
-      // this.requiredLibs = this.packageJson.requiredProjects;
-
-
-      this.__defaultPort = Project.defaultPortByType(this.type);
-      // console.log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
-      if (!this.isStandaloneProject) {
-        this.env = new EnvironmentConfig(this);
-        this.proxyRouter = new ProxyRouter(this);
-      }
-      this.copytToManager = new CopyToManager(this);
-
-    } else {
-      error(`Invalid project location: ${location}`);
     }
   }
   //#endregion

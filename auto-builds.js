@@ -21,7 +21,21 @@ module.exports = exports = function (base) {
         `--copyto ${base}tsc-npm-project/projects/baseline`,
         `--copyto ${base}tsc-npm-project/projects/site`,
         `--copyto ${base}tsc-npm-project/projects/workspace`,
-        `--copyto ${base}morphi/examples`
+        `--copyto ${base}morphi/examples`,
+        `--copyto ${base}morphi/super-simple-morphi-example`
+      ]
+    },
+    {
+      "cwd": `${base}ng2-logger`,
+      "command": "tnp build:dist",
+      "commandWatch": "tnp build:dist:watch",
+      "args": [
+        `--copyto ${base}morphi`,
+        `--copyto ${base}tsc-npm-project/projects/baseline`,
+        `--copyto ${base}tsc-npm-project/projects/site`,
+        `--copyto ${base}tsc-npm-project/projects/workspace`,
+        `--copyto ${base}morphi/examples`,
+        `--copyto ${base}morphi/super-simple-morphi-example`
       ]
     },
     {
@@ -33,7 +47,8 @@ module.exports = exports = function (base) {
         `--copyto ${base}tsc-npm-project/projects/baseline`,
         `--copyto ${base}tsc-npm-project/projects/site`,
         `--copyto ${base}tsc-npm-project/projects/workspace`,
-        `--copyto ${base}morphi/examples`
+        `--copyto ${base}morphi/examples`,
+        `--copyto ${base}morphi/super-simple-morphi-example`
       ]
     }
   ]

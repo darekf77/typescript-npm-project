@@ -65,7 +65,7 @@ export function reinstallTnp(project: Project,
   if (!project.checker.isReadyForTnpInstall()) {
     console.log('Current process pid: ' + process.pid)
     console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(client).toString()} ,
-    -  quit installing ${chalk.bold('tnp-bundle')}`)
+    -  quit installing ${chalk.bold('tnp-bundle')} inside ${project.location}`)
     return
   }
 
