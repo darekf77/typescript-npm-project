@@ -25,6 +25,17 @@ BUILDS are only projects :
  - worksapces (that contains with childen | with childen previews)
  - standalone (that contains with childen previews)
 
+## Tests
+- isomorphic-lib 
+  + unit-tests in mocha in nodejs
+- angular-lib
+  + unit test in karma browser
+  + e2e for components
+- (angular|ionic|electron)-client
+  + e2e cucumber tests
+
+
+
 ## Create, build, publish:
 - isomorphic typescript library
 - angular library

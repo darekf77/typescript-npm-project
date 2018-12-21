@@ -35,6 +35,7 @@ import { isNode } from 'ng2-logger';
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
+import { TestRunner } from './test-runner';
 
 export interface IProject {
   isSite: boolean;
@@ -149,6 +150,9 @@ export class Project implements IProject {
   }
   //#endregion
 
+  //#region @backend
+  tests: TestRunner;
+  //#endregion
 
   readonly requiredLibs: Project[] = []; // TODO FIX THIS
 
@@ -524,6 +528,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
           this.join = new BaselineSiteJoin(this);
         }
         this.checker = new ProjectsChecker(this);
+        this.tests = new TestRunner(this);
 
         Project.projects.push(this);
 

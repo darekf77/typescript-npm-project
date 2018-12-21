@@ -34,6 +34,7 @@ module.exports = exports = function (base) {
         `--copyto ${base}tsc-npm-project/projects/baseline`,
         `--copyto ${base}tsc-npm-project/projects/site`,
         `--copyto ${base}tsc-npm-project/projects/workspace`,
+        `--copyto ${base}ng2-rest`,
         `--copyto ${base}morphi/examples`,
         `--copyto ${base}morphi/super-simple-morphi-example`
       ]

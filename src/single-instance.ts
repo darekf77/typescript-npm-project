@@ -147,12 +147,15 @@ export class ProjectsChecker {
     if (project) {
       const projectIns = this.instances.find(i => i.location === project.location)
       // console.log('INSRTANCEEE', projectIns)
-      if (projectIns.isActive.appBuild) {
-        pids.push(projectIns.build.app.pid)
+      if (projectIns) { // QUICK_FIX test init
+        if (projectIns.isActive.appBuild) {
+          pids.push(projectIns.build.app.pid)
+        }
+        if (projectIns.isActive.libBuild) {
+          pids.push(projectIns.build.lib.pid)
+        }
       }
-      if (projectIns.isActive.libBuild) {
-        pids.push(projectIns.build.lib.pid)
-      }
+
     } else {
       this.instances.forEach(i => {
         if (i.isActive.appBuild) {
