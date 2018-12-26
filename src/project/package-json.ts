@@ -508,6 +508,17 @@ export class PackageJSON {
     return false;
   }
 
+  get isCommandLineToolOnly() {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.isCommandLineToolOnly)) {
+      if (_.isBoolean(this.data.tnp.isCommandLineToolOnly)) {
+        return this.data.tnp.isCommandLineToolOnly;
+      }
+      error(`Bad value in package.json, tnp.isCommandLineToolOnly should be boolean.`, true);
+      error(`Location of package.json: ${this.location}`)
+    }
+    return false;
+  }
+
   get isGenerated() {
     if (this.data.tnp && !_.isUndefined(this.data.tnp.isGenerated)) {
       if (_.isBoolean(this.data.tnp.isGenerated)) {

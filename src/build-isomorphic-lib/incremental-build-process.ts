@@ -48,41 +48,47 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     this.compileOnce = buildOptions.compileOnce;
 
-    if (project.isStandaloneProject && !buildOptions.watch) {
-      const browser = _.first(this.browserCompilations)
-      browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
-        if (f !== 'app.ts') {
-          return true;
-        }
-        const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
-        warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
-        fse.writeFileSync(absolutePathToFile, '')
-        return false;
-      })
-      // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
+    if (buildOptions.onlyBackend) {
+
+      this.browserCompilations = [];
+
+    } else {
+
+      if (project.isStandaloneProject && !buildOptions.watch) {
+        const browser = _.first(this.browserCompilations)
+        browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
+          if (f !== 'app.ts') {
+            return true;
+          }
+          const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
+          warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
+          fse.writeFileSync(absolutePathToFile, '')
+          return false;
+        })
+        // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
+      }
+
+      // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
+      // console.log('this.resolveModulesLocations', this.resolveModulesLocations)
+
+      this.resolveModulesLocations
+        .forEach(moduleName => {
+          let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath(moduleName);
+          if (outFolder === 'bundle') {
+            browserOutFolder = path.join(outFolder, browserOutFolder);
+          }
+
+          this.browserCompilations.push(
+            new BroswerForModuleCompilation(moduleName,
+              this.project.env.config,
+              `tmp-src-${outFolder}-${browserOutFolder}`,
+              browserOutFolder as any,
+              location,
+              cwd,
+              outFolder)
+          )
+        })
     }
-
-    // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
-    // console.log('this.resolveModulesLocations', this.resolveModulesLocations)
-
-    this.resolveModulesLocations
-      .forEach(moduleName => {
-        let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath(moduleName);
-        if (outFolder === 'bundle') {
-          browserOutFolder = path.join(outFolder, browserOutFolder);
-        }
-
-        this.browserCompilations.push(
-          new BroswerForModuleCompilation(moduleName,
-            this.project.env.config,
-            `tmp-src-${outFolder}-${browserOutFolder}`,
-            browserOutFolder as any,
-            location,
-            cwd,
-            outFolder)
-        )
-      })
-
   }
 
 

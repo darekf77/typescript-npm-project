@@ -17,7 +17,7 @@ export class ProjectServerLib extends BaseProjectLib {
     ]);
   }
 
-  buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
+  async buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
     this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
   }
 
@@ -26,7 +26,7 @@ export class ProjectServerLib extends BaseProjectLib {
 
 
     if (!onlyWatchNoBuild) {
-      this.buildLib(outDir, prod, watch);
+      await this.buildLib(outDir, prod, watch);
     }
   }
 }

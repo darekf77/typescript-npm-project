@@ -17,7 +17,7 @@ import {
 } from './environment-config-helpers';
 //#endregion
 import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
-import { isBrowser } from 'ng2-logger';
+import { Helpers } from 'ng2-logger';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
@@ -156,7 +156,7 @@ export class EnvironmentConfig {
    * Can be accesed only after env.prepare()
    */
   public get config(): EnvConfig {
-    if (isBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.config;
     }
     //#region @backend

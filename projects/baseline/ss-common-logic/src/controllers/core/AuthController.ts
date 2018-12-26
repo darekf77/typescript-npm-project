@@ -16,8 +16,6 @@ import * as path from 'path';
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
-import { Resource, HttpResponse, HttpResponseError } from "ng2-rest";
-export { HttpResponse } from "ng2-rest";
 import { Log, Level } from 'ng2-logger';
 import { Observable, Subscribable } from "rxjs/Observable";
 
@@ -143,7 +141,7 @@ export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
             log.i('info', info)
             self._subIsLggedIn.next(true)
           } catch (error) {
-            const err: HttpResponseError = error;
+            const err: Morphi.Http.Resopnse.Error = error;
             log.er(error)
             if (err.statusCode === 401) {
               self.browser.logout(session);

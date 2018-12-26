@@ -8,11 +8,12 @@ import * as watch from 'watch'
 // local
 import { Project } from "./base-project";
 import { LibType, RecreateFile, FileEvent } from "../models";
-import { copyFile, uniqArray, compilationWrapper, crossPlatofrmPath } from '../helpers';
+import { copyFile, uniqArray, crossPlatofrmPath } from '../helpers';
 import config from '../config';
 import { error } from '../messages';
 import chalk from 'chalk';
 import { run } from '../process';
+import { Helpers } from 'morphi/helpers';
 
 const REGEXS = {
 
@@ -86,7 +87,7 @@ export class BaselineSiteJoin {
     }
   }
 
-  init() {
+  async init() {
     // remove customizable
     // console.log(this.project.customizableFilesAndFolders);
     // process.exit(0)
@@ -94,7 +95,7 @@ export class BaselineSiteJoin {
       this.project.run(`rimraf ${customizable}`).sync()
     });
     // rejoin baseline/site files
-    this.join.allBaselineSiteFiles()
+    await this.join.allBaselineSiteFiles()
     return this;
   }
 
@@ -145,7 +146,7 @@ export class BaselineSiteJoin {
             error(`Custombizable folder of file doesn't exist: ${globPath}
 
             Please add: ${path.basename(globPath)} to your baseline
- 
+
             or maybe forget ${chalk.bold('tnp install')} or ${chalk.bold('tnp link')} ?
 
             `)
@@ -241,12 +242,12 @@ export class BaselineSiteJoin {
       /**
        * Replace imports/export
        * Scope: current files baseline path in current generated file
-       * Example: 
+       * Example:
        *  File: exmpale.ts
        *   Code change:
        *     From  : `import {..} from 'baseline/exapmle.ts`
        *     To    : `import {..} from './__exapmle.ts`
-       * 
+       *
        * Notes:
        *  Problem1 : If import `import {..} from 'baseline/exapmle.ts` is included in different files
        * than example.ts it is not going to be excluded
@@ -282,7 +283,7 @@ export class BaselineSiteJoin {
         result input:
         ${input}
 
-        
+
         `)
 
         return input;
@@ -300,10 +301,10 @@ export class BaselineSiteJoin {
         const debuggin = (debugPathes.includes(relativeBaselineCustomPath));
 
         if (debuggin) console.log(`
-        
+
         relativeBaselineCustomPath:${relativeBaselineCustomPath}
-        
-        
+
+
         `)
         const levelBack = relativeBaselineCustomPath.split('/').length - 3;
         const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
@@ -354,7 +355,7 @@ export class BaselineSiteJoin {
       console.log(chalk.blue(`Baseline/Site modyfication detected...`))
       console.log(`File: ${relativeBaselineCustomPath}`)
     }
-    // compilationWrapper(() => {
+
     const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
     const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
     if (isDebugMode) {
@@ -401,10 +402,10 @@ export class BaselineSiteJoin {
   private get join() {
     const self = this;
     return {
-      allBaselineSiteFiles() {
+      async allBaselineSiteFiles() {
         self.__checkBaselineSiteStructure()
 
-        compilationWrapper(() => {
+        await Helpers.compilationWrapper(() => {
           uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
             .forEach(relativeFile => self.merge(relativeFile))
         }, `Site join of all files for site project: ${self.project.name}`)

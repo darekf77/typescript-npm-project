@@ -7,6 +7,7 @@ import { error } from "../messages";
 import config from "../config";
 import { Project } from './base-project';
 import { AnglarLibModuleDivider } from '../build-isomorphic-lib/angular-lib-module-build';
+import { Helpers } from 'morphi/helpers';
 export class ProjectAngularLib extends BaseProjectLib {
 
   private angular: AngularProject;
@@ -44,7 +45,7 @@ export class ProjectAngularLib extends BaseProjectLib {
     ]).concat(this.angular.projectSpecyficFiles());
   }
 
-  buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean) {
+  async buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean) {
     if (watch) {
       this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
@@ -56,7 +57,7 @@ export class ProjectAngularLib extends BaseProjectLib {
       }, 3000)
 
     } else {
-      this.compilationWrapper(() => {
+      await Helpers.compilationWrapper(() => {
         this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
         this.run(`npm-run gulp inline-templates-${outDir}`, { output: true }).sync()
         this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
@@ -82,11 +83,11 @@ export class ProjectAngularLib extends BaseProjectLib {
         await this.angular.buildSteps(buildOptions);
       } else {
         if (watch) {
-          this.buildLib(outDir, prod, false);
+          await this.buildLib(outDir, prod, false);
           this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
-          this.buildLib(outDir, prod, true)
+          await this.buildLib(outDir, prod, true)
         } else {
-          this.buildLib(outDir, prod, watch)
+          await this.buildLib(outDir, prod, watch)
           this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }

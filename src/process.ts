@@ -12,6 +12,7 @@ import { error, info, warn } from "./messages";
 import { RunOptions, WatchOptions } from "./models";
 import config from './config';
 import { paramsFrom } from './index';
+import { runSyncOrAsync } from './helpers';
 const prompts = require('prompts');
 export async function questionYesNo(message: string,
   callbackTrue: () => any, callbackFalse?: () => any) {
@@ -40,6 +41,7 @@ export async function questionYesNo(message: string,
   //   }
   // }
 
+
   const response = await prompts({
     type: 'toggle',
     name: 'value',
@@ -48,13 +50,13 @@ export async function questionYesNo(message: string,
     active: 'yes',
     inactive: 'no'
   });
+
   if (response.value) {
-    callbackTrue()
+    await runSyncOrAsync(callbackTrue)
   } else {
-    if (_.isFunction(callbackFalse)) {
-      callbackFalse()
-    }
+    await runSyncOrAsync(callbackFalse)
   }
+
 }
 
 export function terminalLine() {

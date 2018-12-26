@@ -43,6 +43,15 @@ export function countCommits(directoryPath) {
 
 }
 
+export function currentBranchName(cwd) {
+  try {
+    const branchName =  child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()
+    return branchName;
+  } catch (e) {
+    error(e);
+  }
+}
+
 export async function pullCurrentBranch(directoryPath, askToRetry = false) {
   info(`Pulling git changes in "${directoryPath}" `)
   try {

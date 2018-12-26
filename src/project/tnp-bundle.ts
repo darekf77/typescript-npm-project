@@ -11,21 +11,21 @@ import { IPackageJSON } from '../models';
 
 
 
-  // TODO solve problem with ngc watch mode high cpu
-  // get ownNpmPackage() {
-  //     const self = this;
-  //     return {
-  //         linkTo(project: Project) {
-  //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             // project.run(`rimraf ${targetLocation}`).sync();
-  //             Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
-  //         },
-  //         unlinkFrom(project: Project) {
-  //             const targetLocation = path.join(project.location, 'node_modules', self.name)
-  //             project.run(`rimraf ${targetLocation}`).sync();
-  //         }
-  //     };
-  // }
+// TODO solve problem with ngc watch mode high cpu
+// get ownNpmPackage() {
+//     const self = this;
+//     return {
+//         linkTo(project: Project) {
+//             const targetLocation = path.join(project.location, 'node_modules', self.name)
+//             // project.run(`rimraf ${targetLocation}`).sync();
+//             Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
+//         },
+//         unlinkFrom(project: Project) {
+//             const targetLocation = path.join(project.location, 'node_modules', self.name)
+//             project.run(`rimraf ${targetLocation}`).sync();
+//         }
+//     };
+// }
 
 
 
@@ -61,6 +61,10 @@ export function reinstallTnp(project: Project,
   pathTnpCompiledJS: string,
   pathTnpPackageJSONData: IPackageJSON,
   client: Project) {
+
+  if (project.isStandaloneProject) {
+    return;
+  }
 
   if (!project.checker.isReadyForTnpInstall()) {
     console.log('Current process pid: ' + process.pid)

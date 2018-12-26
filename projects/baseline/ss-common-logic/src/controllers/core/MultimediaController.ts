@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 
 export { Handler } from 'express';
 import { UploadedFile } from "express-fileupload";
-import { Helpers } from 'morphi';
+import { Helpers } from 'morphi/helpers';
 
 //#region @backend
 import { authenticate } from 'passport'

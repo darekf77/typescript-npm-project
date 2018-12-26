@@ -102,6 +102,7 @@ export class CopyToManager {
 
     const namePackageName = this.project.isTnp ? config.file.tnpBundle : this.project.name;
 
+
     if (specyficFileRelativePath) {
       const sourceFile = path.normalize(path.join(this.project.location,
         outDir, specyficFileRelativePath));

@@ -9,7 +9,6 @@ import { run } from "./process";
 import { sleep } from 'sleep';
 import { ProjectFrom } from './index';
 import { Project } from './index';
-import * as dateformat from "dateformat";
 import { BuildOptions } from './models';
 import { error, warn } from "./messages";
 //#endregion
@@ -137,41 +136,6 @@ export function copyFile(sousrce: string, destination: string,
   } catch (e) {
     error(`Error while copying file: ${sousrce} to ${destination}`, true)
     // console.log(e)
-  }
-
-}
-
-
-export function compilationWrapper(fn: () => void, taskName: string = 'Task', executionType: 'Compilation' | 'Code execution' = 'Compilation') {
-  function date() {
-    return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
-  }
-  if (!fn || !_.isFunction(fn)) {
-    error(`${executionType} wrapper: "${fs}" is not a function.`)
-  }
-
-  if (isAsyncFunction(fn)) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
-        await fn()
-        console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
-        resolve()
-      } catch (error) {
-        console.log(chalk.red(error));
-        console.log(`${date()} ${executionType} of ${taskName} ERROR`)
-        reject(error)
-      }
-    })
-  } else {
-    try {
-      console.log(chalk.gray(`${date()} ${executionType} of "${chalk.bold(taskName)}" started...`))
-      fn()
-      console.log(chalk.green(`${date()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
-    } catch (error) {
-      console.log(chalk.red(error));
-      console.log(`${date()} ${executionType} of ${taskName} ERROR`)
-    }
   }
 
 }
@@ -392,10 +356,19 @@ export function uniqArray(array: any[]) {
   });
 }
 
-export function isAsyncFunction(fn) {
-  return _.isFunction(fn) && fn.constructor.name === 'AsyncFunction';
-}
+const AsyncFunction = (async () => { }).constructor;
+// const GeneratorFunction = (function* () { }).constructor as any;
 
+export async function runSyncOrAsync(fn: Function) {
+  let wasPromise = false;
+  let promisOrValue = fn()
+  if (promisOrValue instanceof Promise) {
+    wasPromise = true;
+    promisOrValue = Promise.resolve(promisOrValue)
+  }
+  // console.log('was promis ', wasPromise)
+  return promisOrValue;
+}
 
 export function ReorganizeArray<T>(arr: T[]) {
   return {

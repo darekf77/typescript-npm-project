@@ -7,7 +7,7 @@ import * as inquirer from 'inquirer';
 
 import { Project } from "./base-project";
 import { BuildOptions } from "../models";
-import { ClassHelper, getWebpackEnv } from "../helpers";
+import { ClassHelper, getWebpackEnv, tryCopyFrom } from "../helpers";
 // third part
 
 import { BaseProjectLib } from "./base-project-lib";
@@ -16,6 +16,7 @@ import { config } from '../config';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { error } from '../messages';
 import { ProjectFrom } from '.';
+import { copyFile } from '../helpers';
 
 
 
@@ -121,23 +122,30 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         this.run(command).sync()
 
       } else {
-        this.buildLib(outDir, prod, watch);
+        await this.buildLib(outDir, prod, watch);
       }
 
     }
     return;
   }
 
-  private copyWhenExist(source: string, outDir: string, folder = false) {
+  private copyWhenExist(source: string, outDir: string) {
     const basename = source;
     source = path.join(this.location, source);
     outDir = path.join(this.location, outDir, basename);
+    // console.log(`Copy from ${source} to ${outDir}`)
     if (fse.existsSync(source)) {
-      if (folder) {
-        fse.copySync(source, outDir, { overwrite: true, recursive: true })
+      if (fse.lstatSync(source).isDirectory()) {
+        // console.log('copy folder')
+        tryCopyFrom(source, outDir)
+        // fse.copySync(source, outDir, { overwrite: true, recursive: true })
       } else {
-        fse.copyFileSync(source, outDir);
+        // console.log('copy copyfile')
+        // fse.copyFileSync(source, outDir);
+        copyFile(source, outDir)
       }
+    } else {
+      // console.log('not exist', source)
     }
   }
   private linkWhenExist(source: string, outLInk: string) {
@@ -152,15 +160,15 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
   }
 
-  buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
+  async buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
     const isomorphicNames = this.getIsomorphcLibNames(this.isWorkspaceChildProject)
 
-
-    this.copyWhenExist('bin', outDir, true) // TODO make this for each library
-    this.copyWhenExist('package.json', outDir, true)
-    this.copyWhenExist('.npmrc', outDir, true)
-    this.copyWhenExist('.npmignore', outDir, true)
-    this.copyWhenExist('.gitignore', outDir, true)
+    // console.log('Build fucking this', this.buildOptions)
+    this.copyWhenExist('bin', outDir) // TODO make this for each library
+    this.copyWhenExist('package.json', outDir)
+    this.copyWhenExist('.npmrc', outDir)
+    this.copyWhenExist('.npmignore', outDir)
+    this.copyWhenExist('.gitignore', outDir)
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
       if (this.isTnp) {
@@ -173,9 +181,9 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     // console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
 
     if (watch) {
-      new IncrementalBuildProcessExtended(this, this.buildOptions).startAndWatch('isomorphic compilation (watch mode)')
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
     } else {
-      new IncrementalBuildProcessExtended(this, this.buildOptions).start('isomorphic compilation')
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation')
     }
   }
 

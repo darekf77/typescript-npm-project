@@ -12,7 +12,7 @@ import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
 import { questionYesNo, clearConsole } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { compilationWrapper } from '../helpers';
+import { Helpers } from 'morphi/helpers';
 import { PackageJSON } from './package-json';
 import { install } from '../scripts/INSTALL';
 import { ProjectFrom, tryCopyFrom } from '../index';
@@ -35,21 +35,21 @@ export abstract class BaseProjectLib extends Project {
   }
 
 
-  abstract buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
+  abstract async buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
 
   // abstract get isBuildedForOther();
 
 
-  public async publish() {
-    this.checkIfReadyForNpm()
-    await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
-      this.run('npm publish', {
-        cwd: path.join(this.location, config.folder.bundle),
-        output: true
-      }).sync()
-      this.pushToGitRepo()
-    })
-  }
+  // public async publish() {
+  //   this.checkIfReadyForNpm()
+  //   await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
+  //     this.run('npm publish', {
+  //       cwd: path.join(this.location, config.folder.bundle),
+  //       output: true
+  //     }).sync()
+  //     this.pushToGitRepo()
+  //   })
+  // }
 
   checkIfLogginInToNpm() {
     try {
@@ -170,12 +170,17 @@ export abstract class BaseProjectLib extends Project {
       await this.build({
         prod, outDir: config.folder.bundle as 'bundle'
       })
-      this.createClientVersionAsCopyOfBrowser()
+      if (!this.isCommandLineToolOnly) {
+        this.createClientVersionAsCopyOfBrowser()
+      }
+
       this.bundleResources()
       this.packageJson.saveForInstall(false)
       this.commit(newVersion);
     }, () => process.exit(0))
-    await questionYesNo(`Publish on npm version: ${newVersion} ?`, () => {
+
+
+    await questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;
       try {
         this.run('npm publish', {
@@ -193,6 +198,7 @@ export abstract class BaseProjectLib extends Project {
     }, () => {
       removeTagAndCommit()
     })
+
   }
 
   pushToGitRepo() {
@@ -238,12 +244,6 @@ export abstract class BaseProjectLib extends Project {
       }
     })
     info(`Resources copied to release folder: ${config.folder.bundle}`)
-  }
-
-
-
-  protected compilationWrapper(fn: () => void, taskName: string = 'Task', executionType?: string) {
-    return compilationWrapper(fn, taskName, executionType as any);
   }
 
 

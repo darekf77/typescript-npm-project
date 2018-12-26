@@ -25,13 +25,13 @@ import { FilesRecreator } from './files-builder';
 
 import { ProxyRouter } from './proxy-router';
 
-import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash } from '../helpers-git';
+import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName } from '../helpers-git';
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
 import { ProjectsChecker } from '../single-instance';
 import { reinstallTnp } from './tnp-bundle';
-import { isNode } from 'ng2-logger';
+
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
@@ -40,6 +40,7 @@ import { TestRunner } from './test-runner';
 export interface IProject {
   isSite: boolean;
   isCoreProject: boolean;
+  isCommandLineToolOnly: boolean;
   isGenerated: boolean;
   isWorkspaceChildProject: boolean;
   isWorkspace: boolean;
@@ -88,9 +89,7 @@ export class Project implements IProject {
   readonly browser: IProject;
   public get name(): string {
     //#region @backendFunc
-    if (isNode) {
-      return this.packageJson.name;
-    }
+    return this.packageJson.name;
     //#endregion
   }
 
@@ -378,6 +377,15 @@ export class Project implements IProject {
     //#endregion
   }
 
+  get isCommandLineToolOnly() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isCommandLineToolOnly;
+    }
+    //#region @backend
+    return this.packageJson.isCommandLineToolOnly;
+    //#endregion
+  }
+
   get labels() {
     const self = this;
     return {
@@ -621,6 +629,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
       this.quickFixMissingLibs(['react-native-sqlite-storage'])
     }
 
+    if (this.isCommandLineToolOnly) {
+      buildOptions.onlyBackend = true;
+    }
+
 
     this.buildOptions = buildOptions;
 
@@ -668,6 +680,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
     return {
       async updateOrigin(askToRetry = false) {
         await pullCurrentBranch(self.location, askToRetry);
+      },
+      pushCurrentBranch() {
+        self.run(`git push origin ${currentBranchName(self.location)}`).sync()
       },
       resetHard() {
         self.run(`git reset --hard`).sync()

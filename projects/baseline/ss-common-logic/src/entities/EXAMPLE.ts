@@ -40,7 +40,7 @@ export class TestJSON {
 
 
 
-@Morphi.Entity({
+@Morphi.Entity<EXAMPLE>({
   className: 'EXAMPLE',
   formly: {
     transformFn: (fields) => {
@@ -55,7 +55,8 @@ export class TestJSON {
     'birthDate': new Date('01-02-2000')
   },
   mapping: {
-    testjson: 'TestJSON'
+    testjson: 'TestJSON',
+
   }
 })
 export class EXAMPLE extends Morphi.Base.Entity<EXAMPLE, IEXAMPLE> implements IEXAMPLE {

@@ -43,6 +43,7 @@ export interface IBuildOptions {
   watch?: boolean;
   args?: string;
   compileOnce?: boolean;
+  onlyBackend?: boolean;
   appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
@@ -64,6 +65,11 @@ export class BuildOptions implements IBuildOptions {
   genOnlyClientCode?: boolean;
   appBuild?: boolean;
   baseHref?: string;
+
+  /**
+   * Generate only backend, without browser version
+   */
+  onlyBackend?: boolean;
 
   /**
    * In watch mode compile once and exit
@@ -210,6 +216,7 @@ export interface IPackageJSON {
   tnp: {
     type: LibType;
     isCoreProject: boolean;
+    isCommandLineToolOnly?: boolean;
     core: {
       dependencies: {
         always?: string[];
