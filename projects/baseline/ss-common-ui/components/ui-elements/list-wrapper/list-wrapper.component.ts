@@ -6,7 +6,7 @@ import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
-import { describeClassProperites } from 'ng2-rest/browser';
+import { Helpers } from 'morphi/browser/helpers';
 
 const log = Log.create('List wrapper', Level.__NOTHING);
 
@@ -93,7 +93,7 @@ export class ListWrapperComponent implements OnInit {
       this.icon = 'lock';
     }
 
-    const columns = describeClassProperites(this.crud.entity)
+    const columns = Helpers.Class.describeProperites(this.crud.entity)
       .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
       .map(prop => {
         return { prop };
@@ -112,7 +112,7 @@ export class ListWrapperComponent implements OnInit {
 
   async retriveData() {
     this.isLoading = true;
-    log.i('this.crud.entity', describeClassProperites(this.crud.entity));
+    log.i('this.crud.entity', Helpers.Class.describeProperites(this.crud.entity));
     try {
       log.i('this.arrayDataConfig', this.arrayDataConfig);
       const rows = await this.crud.getAll(this.arrayDataConfig).received;

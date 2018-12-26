@@ -19,7 +19,7 @@ export interface IBUILD {
     gitRemote: ''
   },
   mapping: {
-    progress: 'PROGRESS_BAR_DATA'
+    // progress: 'PROGRESS_BAR_DATA'
   }
 })
 export class BUILD implements IBUILD {

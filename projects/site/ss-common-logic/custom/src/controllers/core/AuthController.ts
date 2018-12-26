@@ -1,17 +1,11 @@
 import {
-  AuthController as BaselineAuthController,
-  //#region @backend
-  Handler,
-  HttpResponse,
-  //#endregion
-  IFacebook, IHelloJS
+  AuthController as BaselineAuthController
 } from 'baseline/ss-common-logic/src/controllers/core/AuthController';
 import { Morphi } from 'morphi';
 
 export {
   //#region @backend
   Handler,
-  HttpResponse,
   //#endregion
   IFacebook, IHelloJS
 } from 'baseline/ss-common-logic/src/controllers/core/AuthController';

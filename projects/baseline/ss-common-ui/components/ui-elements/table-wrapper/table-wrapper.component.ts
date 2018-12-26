@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi/browser';
 
 import { Log, Level } from 'ng2-logger/browser';
-import { describeClassProperites } from 'ng2-rest/browser';
+import { Helpers } from 'morphi/browser/helpers';
 import { Router } from '@angular/router';
 
 const log = Log.create('Table wrapper');
@@ -60,10 +60,10 @@ export class TableWrapperComponent implements OnInit {
   async ngOnInit() {
     this.arrayDataConfig.set.pagination.rowDisplayed(5);
     log.i('arrayDataConfig', this.arrayDataConfig);
-    log.i('this.crud.entity', describeClassProperites(this.crud.entity));
+    log.i('this.crud.entity', Helpers.Class.describeProperites(this.crud.entity));
 
     try {
-      const columns = describeClassProperites(this.crud.entity)
+      const columns = Helpers.Class.describeProperites(this.crud.entity)
         .filter(prop => this.allowedColumns.length > 0 ? this.allowedColumns.includes(prop) : true)
         .map(prop => {
           return { prop };

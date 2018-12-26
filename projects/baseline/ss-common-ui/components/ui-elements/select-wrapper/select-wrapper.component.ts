@@ -12,7 +12,7 @@ import { Morphi } from 'morphi/browser';
 
 import { Log, Level } from 'ng2-logger/browser';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
-import { describeClassProperites } from 'ng2-rest/browser';
+import { Helpers } from 'morphi/browser/helpers';
 
 
 const log = Log.create('select wrapper');
@@ -58,7 +58,7 @@ export class SelectWrapperComponent extends FieldType implements OnInit, AfterVi
 
     if (_.isFunction(this.crud)) {
       this.isLoading = true;
-      log.i('this.crud.entity', describeClassProperites(this.crud.entity));
+      log.i('this.crud.entity', Helpers.Class.describeProperites(this.crud.entity));
       try {
         const rows = await this.crud.getAll().received.observable.take(1).toPromise();
         this.initOptions(rows.body.json);

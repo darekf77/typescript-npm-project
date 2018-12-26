@@ -604,10 +604,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
   //#endregion
 
   //#region @backend
-  private modifySourceBeforCompilation() {
+  private async modifySourceBeforCompilation() {
     if (config.allowedTypes.app.includes(this.type)) {
       if (!this.isStandaloneProject) {
-        this.sourceModifier.init(`client source modifier`)
+        await this.sourceModifier.init(`client source modifier`)
         // if (this.buildOptions.watch) {
         //   this.sourceModifier.initAndWatch()
         // } else {
@@ -636,7 +636,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     this.buildOptions = buildOptions;
 
-    this.modifySourceBeforCompilation();
+    await this.modifySourceBeforCompilation();
 
     let baseHref: string;
     // console.log('AM HERE')
