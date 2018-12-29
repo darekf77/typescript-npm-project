@@ -32,8 +32,10 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     backendOut: string) {
 
     super(sourceOut, outFolder, location, cwd, backendOut)
+    if (ENV) {
+      this.initCodeCut.call(this, ENV);
+    }
 
-    this.initCodeCut.call(this, ENV);
   }
 
   codeCuttFn(cutIftrue: boolean) {

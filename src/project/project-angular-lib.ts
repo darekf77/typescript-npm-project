@@ -1,5 +1,6 @@
 //#region @backend
 import chalk from 'chalk';
+import * as _ from 'lodash';
 import { BaseProjectLib } from "./base-project-lib";
 import { AngularProject } from "./project-angular";
 import { BuildOptions, BuildDir } from "../models";
@@ -15,9 +16,12 @@ export class ProjectAngularLib extends BaseProjectLib {
 
   constructor(public location: string) {
     super(location);
-    this.angular = new AngularProject(location);
-    this.moduleDivider = new AnglarLibModuleDivider(this);
-    this.angular.env = this.env; // TODO QUICK_FIX
+    if (_.isString(location)) {
+      this.angular = new AngularProject(location);
+      this.moduleDivider = new AnglarLibModuleDivider(this);
+      this.angular.env = this.env; // TODO QUICK_FIX
+    }
+
   }
 
   public setDefaultPort(port: number) {

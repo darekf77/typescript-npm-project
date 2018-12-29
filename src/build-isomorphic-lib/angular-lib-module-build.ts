@@ -55,7 +55,7 @@ export class AnglarLibModuleDivider extends IncrementalCompilation {
 
 
   constructor(private project: Project) {
-    super(`${config.folder.dist}/**/*.js`, '', project.location);
+    super(`${config.folder.dist}/**/*.js`, '', project && project.location);
 
   }
 

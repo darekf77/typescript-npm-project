@@ -339,16 +339,19 @@ export class PackageJSON {
   }
 
   constructor(options: { data: Object, location?: string; project?: Project; }) {
-    if (options.project && !options.location) {
-      options.location = options.project.location;
-    }
-    _.merge(this, options);
-
-    this.data = _.merge({
-      tnp: {
-        resources: []
+    if (_.isObject(options)) {
+      if (options.project && !options.location) {
+        options.location = options.project.location;
       }
-    } as IPackageJSON, options.data as any);
+      _.merge(this, options);
+
+      this.data = _.merge({
+        tnp: {
+          resources: []
+        }
+      } as IPackageJSON, options.data as any);
+    }
+
   }
 
   private reload() {

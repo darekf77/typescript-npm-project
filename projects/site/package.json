@@ -11,7 +11,9 @@
     "overrided": {
       "dependencies": {
         "@types/jasmine": null,
-        "@types/jasminewd2": null
+        "@types/jasminewd2": null,
+        "flatted": "^2.0.0",
+        "ts-sinon": null
       }
     },
     "basedOnAbsolutePath1": "/home/dariusz/projects/npm/tsc-npm-project/projects/baseline"

@@ -48,7 +48,7 @@ export class SourceModifier extends IncrementalCompilation {
 
 
   constructor(private project: Project, filesRecreator: FilesRecreator) {
-    super(`(src|components)/**/*.ts`, '', project.location);
+    super(`(src|components)/**/*.ts`, '', project && project.location);
 
   }
 

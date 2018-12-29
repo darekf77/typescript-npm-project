@@ -141,6 +141,9 @@ export class ProjectsChecker {
   }
 
   foundedActivePids(project?: Project) {
+    if(!project) {
+      project = this.project
+    }
     // const project = onlyForThisWorkspace ? this.project : undefined;
     const pids = [];
 

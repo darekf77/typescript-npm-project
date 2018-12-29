@@ -34,7 +34,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
   constructor(private project: Project, private buildOptions: BuildOptions) {
 
-    super(buildOptions.outDir, config.folder.src, project.location);
+    super(buildOptions ? buildOptions.outDir : undefined, config && config.folder.src, project && project.location);
 
     const outFolder = buildOptions.outDir;
     const location = config.folder.src;

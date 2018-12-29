@@ -11,6 +11,7 @@ import { BuildService } from 'ss-common-logic/browser-for-ss-common-ui/services/
 // logic
 import { BuildController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/BuildController';
 import { BUILD } from 'ss-common-logic/browser-for-ss-common-ui/entities/BUILD';
+import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/PROJECT';
 
 
 const angularModules = [
@@ -24,7 +25,7 @@ const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic
 Morphi.init({
   host,
   controllers: [BuildController],
-  entities: [BUILD]
+  entities: [BUILD, PROJECT]
 });
 
 @NgModule({

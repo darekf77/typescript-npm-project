@@ -87,7 +87,25 @@ export class BaselineSiteJoin {
     }
   }
 
+  joinNotAllowed = false;
   async init() {
+    if (this.joinNotAllowed) {
+      return this;
+    }
+
+    const pids = this.project.checker.foundedActivePids().filter(p => p !== process.pid);
+    if (pids.length > 0) {
+      console.log(`Found active baseline/site join on pids: ${pids.toString()}
+      current pid: ${process.pid}, ppid ${process.ppid}`)
+      this.joinNotAllowed = true;
+      if (this.project.isWorkspaceChildProject) {
+        this.project.parent.join.joinNotAllowed = true;
+      }
+      return this;
+    } else {
+      console.log('OK to baseline/site join')
+    }
+
     // remove customizable
     // console.log(this.project.customizableFilesAndFolders);
     // process.exit(0)
@@ -399,6 +417,8 @@ export class BaselineSiteJoin {
     }
   }
 
+
+
   private get join() {
     const self = this;
     return {
@@ -424,6 +444,9 @@ export class BaselineSiteJoin {
   }
 
   watch() {
+    if (this.joinNotAllowed) {
+      return
+    }
     this.monitor((absolutePath, event, isCustomFolder) => {
       // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
       absolutePath = crossPlatofrmPath(absolutePath)
