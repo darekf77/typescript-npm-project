@@ -35,7 +35,7 @@ export abstract class BaseProjectLib extends Project {
   }
 
 
-  abstract async buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean);
+  abstract async buildLib(outDir: BuildDir, forClient: Project[], prod?: boolean, watch?: boolean);
 
   // abstract get isBuildedForOther();
 

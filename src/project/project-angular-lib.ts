@@ -49,7 +49,7 @@ export class ProjectAngularLib extends BaseProjectLib {
     ]).concat(this.angular.projectSpecyficFiles());
   }
 
-  async buildLib(outDir: BuildDir, prod?: boolean, watch?: boolean) {
+  async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
     if (watch) {
       this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
@@ -78,7 +78,7 @@ export class ProjectAngularLib extends BaseProjectLib {
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, appBuild, onlyWatchNoBuild } = buildOptions;
+    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient } = buildOptions;
 
 
 
@@ -87,11 +87,11 @@ export class ProjectAngularLib extends BaseProjectLib {
         await this.angular.buildSteps(buildOptions);
       } else {
         if (watch) {
-          await this.buildLib(outDir, prod, false);
+          await this.buildLib(outDir, forClient, prod, false);
           this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
-          await this.buildLib(outDir, prod, true)
+          await this.buildLib(outDir, forClient, prod, true)
         } else {
-          await this.buildLib(outDir, prod, watch)
+          await this.buildLib(outDir, forClient, prod, watch)
           this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }

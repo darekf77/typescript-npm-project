@@ -17,16 +17,16 @@ export class ProjectServerLib extends BaseProjectLib {
     ]);
   }
 
-  async buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
+  async buildLib(outDir: "dist" | "bundle", forClient: Project[] = [], prod = false, watch = false) {
     this.run(`npm-run tsc ${watch ? '-w' : ''} --outDir ${outDir}`).sync()
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, onlyWatchNoBuild } = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, forClient } = buildOptions;
 
 
     if (!onlyWatchNoBuild) {
-      await this.buildLib(outDir, prod, watch);
+      await this.buildLib(outDir, forClient, prod, watch);
     }
   }
 }

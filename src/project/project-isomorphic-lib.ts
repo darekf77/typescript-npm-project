@@ -122,11 +122,40 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         this.run(command).sync()
 
       } else {
-        await this.buildLib(outDir, prod, watch);
+        if (!this.isStandaloneProject && forClient.length === 0) {
+
+
+
+          while (buildOptions.forClient.length === 0) {
+            console.info('Please select at lease one client..')
+            await this.selectClients(buildOptions)
+          }
+
+        }
+
+        await this.buildLib(outDir, forClient, prod, watch);
       }
 
     }
     return;
+  }
+
+  private async selectClients(buildOptions:BuildOptions) {
+    const { projects = [] }: { projects: string[] } = await inquirer
+      .prompt([
+        {
+          type: 'checkbox',
+          name: 'projects',
+          message: 'Select target projects to build library: ',
+          choices: this.parent.children
+            .filter(c => config.allowedTypes.app.includes(c.type))
+            .filter(c => c.name !== this.name)
+            .map(c => {
+              return { value: c.name, name: c.name }
+            })
+        }
+      ]) as any;
+    buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
   }
 
   private copyWhenExist(source: string, outDir: string) {
@@ -160,7 +189,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     }
   }
 
-  async buildLib(outDir: "dist" | "bundle", prod = false, watch = false) {
+  async buildLib(outDir: "dist" | "bundle", forClient: Project[] = [], prod = false, watch = false) {
     const isomorphicNames = this.getIsomorphcLibNames(this.isWorkspaceChildProject)
 
     // console.log('Build fucking this', this.buildOptions)
