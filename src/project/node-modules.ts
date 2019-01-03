@@ -6,9 +6,24 @@ import * as fse from 'fs-extra';
 import { Project } from "./base-project";
 import { error, info } from "../messages";
 import { HelpersLinks } from '../helpers-links';
+import { ProjectFrom } from './index';
+import config from '../config';
 export class NodeModules {
 
   constructor(private project: Project) { }
+
+  copy(packageName: string, options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }) {
+    const self = this;
+    return {
+      to(destination: Project) {
+        const p = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
+        p.copytToManager.generateSourceCopyIn(destination.location, false)
+        p.dependencies.forEach(dep => {
+          dep.copytToManager.generateSourceCopyIn(destination.location, false)
+        })
+      }
+    }
+  }
 
 
   linkToProject(target: Project, force = false) {
@@ -34,7 +49,7 @@ export class NodeModules {
         this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
       }
       console.log('Flattering packages....')
-      if(this.project.isGenerated && this.project.isWorkspace) {
+      if (this.project.isGenerated && this.project.isWorkspace) {
         this.project.run(`npm dedupe`).sync()
       }
 

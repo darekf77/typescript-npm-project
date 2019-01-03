@@ -42,7 +42,7 @@ export class BuildController extends Morphi.Base.Controller<entities.BUILD> {
     return async (req, res) => {
       const p = { dupa: 'pussy', aa: {} };
       p.aa = p;
-      console.log('teraz ok aa')
+      // console.log('teraz ok aa')
 
       return p;
     }
@@ -52,7 +52,7 @@ export class BuildController extends Morphi.Base.Controller<entities.BUILD> {
   @Morphi.Http.GET()
   getAll(): Morphi.Response<any> {
     //#region @backendFunc
-    console.log('here')
+    // console.log('here')
 
     return async () => {
       let builds = await this.db.BUILD.getBuilds()
@@ -64,7 +64,7 @@ export class BuildController extends Morphi.Base.Controller<entities.BUILD> {
       //   a
       // }
 
-      return builds;
+      return builds.slice(0, 4);
     }
     //#endregion
   }

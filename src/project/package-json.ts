@@ -183,7 +183,7 @@ export class PackageJSON {
 
   filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
-    let onlyAsDevAllowed = this.project.packageJson.data.tnp.overrided.includeAsDev || [];
+    let onlyAsDevAllowed = (this.project.packageJson.data.tnp && this.project.packageJson.data.tnp.overrided && this.project.packageJson.data.tnp.overrided.includeAsDev) || [];
     let allDeps = this.getDepsBy();
 
     // console.log('d1evDeps', devDeps)
@@ -204,7 +204,10 @@ export class PackageJSON {
 
   filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
-    let onlyAsDevAllowed = this.project.packageJson.data.tnp.overrided.includeAsDev || [];
+    let onlyAsDevAllowed = (this.project.packageJson.data.tnp
+      && this.project.packageJson.data.tnp.overrided
+      && this.project.packageJson.data.tnp.overrided.includeAsDev) || [];
+
     // console.log('d2evDeps', devDeps)
     Object.keys(deps).forEach(name => {
       if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) || onlyAsDevAllowed.filter(f => (new RegExp(f)).test(name)).length > 0) {

@@ -59,6 +59,7 @@ export interface IProject {
   env: EnvironmentConfig;
   allowedEnvironments: EnvironmentName[];
   children: Project[];
+  dependencies: Project[];
   parent: Project;
   preview: Project;
   requiredLibs: Project[];
@@ -69,7 +70,14 @@ export interface IProject {
   className: 'Project',
   mapping: {
 
+  },
+  //#region @backend
+  browserTransformFn: (entity) => {
+    entity.browser.children = entity.children;
+    entity.browser.isWorkspace = entity.isWorkspace
+    return entity;
   }
+  //#endregion
 })
 export class Project implements IProject {
   static projects: Project[] = [];
@@ -86,7 +94,7 @@ export class Project implements IProject {
     if (type === 'server-lib') return 4050;
   }
 
-  readonly browser: IProject;
+  readonly browser: IProject = {} as any;
   public get name(): string {
     //#region @backendFunc
     return this.packageJson.name;
@@ -327,6 +335,10 @@ export class Project implements IProject {
 
   //#region @backend
   get versionPatchedPlusOne() {
+    if (!this.version) {
+      error(`Please define ${chalk.bold('version')} property in your package.json`, true,true)
+      error(path.join(this.location, config.file.package_json),false,true)
+    }
     const ver = this.version.split('.');
     if (ver.length > 0) {
       ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
@@ -756,6 +768,26 @@ Generated workspace should be here: ${genLocationWOrkspace}
     return ProjectFrom(projectPath);
   }
   //#endregion
+
+  get dependencies(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.dependencies;
+    }
+    //#region @backend
+    if (this.type === 'unknow-npm-project' && this.packageJson.data && this.packageJson.data.dependencies) {
+      return Object.keys(this.packageJson.data.dependencies).map(packageName => {
+        const p = path.join(this.location, config.folder.node_modules, packageName);
+        if (fse.existsSync(p)) {
+          const project = ProjectFrom(p);
+          return project;
+        } else {
+          error(`Dependency "${packageName}" doen't exist in ${path.join(this.location, config.folder.node_modules)}`)
+        }
+      })
+    }
+    return [];
+    //#endregion
+  }
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {

@@ -3,8 +3,9 @@ import { run } from "../process";
 import { Project } from '../project';
 import { link } from "./LINK";
 import { checkValidNpmPackageName } from "../helpers";
-import { error } from "../messages";
+import { error, info } from "../messages";
 import { unlink } from "./UNLINK";
+import chalk from 'chalk';
 
 
 export function install(a: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
@@ -12,14 +13,14 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
   project.packageJson.saveForInstall(true)
   if (args.length === 0) { // NPM INSTALL
     if (project.type === 'workspace') {
-      console.log('** npm install in workspace')
+      info(`npm install in ${chalk.bold('workspace')} project`)
       if (unlinkChilds) {
         unlink(project)
       }
       project.node_modules.installPackages(force)
       link(project)
     } else if (project.isWorkspaceChildProject) {
-      console.log('** npm install in child of workspace')
+      info(`npm install in ${chalk.bold('workspace child')} project`)
       const parent = project.parent;
       if (unlinkChilds) {
         unlink(parent)
@@ -27,7 +28,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       parent.node_modules.installPackages(force)
       link(parent)
     } else {
-      console.log('** npm install in separated project')
+      info(`npm install in ${chalk.bold('stanalone')} project`)
       project.node_modules.installPackages(true)
     }
 
@@ -39,8 +40,7 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
       }
     }
 
-  }
-  if (args.length >= 1) { // NPM INSTALL <package name>
+  } else if (args.length >= 1) { // NPM INSTALL <package name>
 
     const npmPackagesToAdd = args
       .map(p => p.trim())

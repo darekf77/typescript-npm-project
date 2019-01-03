@@ -11,7 +11,7 @@ import { ProjectFrom } from './index';
 import { ProxyRouter } from './proxy-router';
 import { Project } from './base-project';
 import { HelpersLinks } from '../helpers-links';
-import { walkObject } from '../helpers';
+import { walk } from 'lodash-walk-object';
 import { config as schemaConfig } from '../environment-config';
 import { terminalLine } from '../process';
 
@@ -140,11 +140,11 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
 
 function frontendCuttedVersion(workspaceConfig: EnvConfig) {
   const c = _.cloneDeep(workspaceConfig);
-  walkObject(c, (lodashPath, isPrefixed) => {
-    if (isPrefixed) {
-      _.set(c, lodashPath, null)
-    }
-  })
+  // walk.Object(c, (lodashPath, isPrefixed) => { // TODO CUT PREFIXED!!!!
+  //   if (isPrefixed) {
+  //     _.set(c, lodashPath, null)
+  //   }
+  // })
   return c;
 }
 
@@ -187,7 +187,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 
 
 
-export const existedConfigs = {} as {[workspacePath in string]: EnvConfig; }
+export const existedConfigs = {} as { [workspacePath in string]: EnvConfig; }
 
 
 export function workspaceConfigBy(workspace: Project, environment: EnvironmentName): EnvConfig {

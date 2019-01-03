@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import { Project, ProjectFrom } from "../project";
 import { error, info } from '../messages';
 import { clearConsole } from '../process';
-import { walkObject } from '../helpers';
 import chalk from 'chalk';
 import * as JSON5 from 'json5';
 import { config as globalConfig } from '../config';

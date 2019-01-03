@@ -20,25 +20,6 @@ import * as _ from 'lodash'
 import { config } from './config';
 
 
-export function walkObject(obj: Object, callBackFn: (lodashPath: string, isPrefixed: boolean) => void, lodashPath = '') {
-  lodashPath = (lodashPath === '') ? `` : `${lodashPath}.`;
-  Object.keys(obj).forEach(key => {
-    const contactedPath = `${lodashPath}${key}`
-    callBackFn(contactedPath, key.startsWith('$'))
-    const v = obj[key];
-    const isObject = _.isObject(v)
-    const isArray = _.isArray(v)
-    if (isObject) {
-      walkObject(v, callBackFn, contactedPath)
-    } else if (isArray) {
-      (v as Array<any>).forEach((elem, i) => {
-        walkObject(elem, callBackFn, `${lodashPath}${key}[${i}]`)
-      })
-    }
-  })
-}
-
-
 //#region @backend
 export function crossPlatofrmPath(p: string) {
   if (process.platform === 'win32') {

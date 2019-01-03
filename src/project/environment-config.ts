@@ -6,7 +6,6 @@ import * as _ from 'lodash';
 
 import { Project } from './base-project';
 
-import { walkObject } from '../helpers';
 import { error, warn } from '../messages';
 import chalk from 'chalk';
 import { ProjectFrom } from './index';

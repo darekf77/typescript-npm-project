@@ -26,8 +26,6 @@ export class PreviewBuildtnpprocessComponent implements OnInit {
   model$: Observable<BUILD>;
 
   async ngOnInit() {
-
-
     const builds = await this.buildController.getAll().received;
     log.i('builds', builds.body.json);
 

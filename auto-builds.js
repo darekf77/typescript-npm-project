@@ -17,7 +17,7 @@ module.exports = exports = function (base) {
   var whereNg2RestNeeded = [
     `--copyto ${base}ng2-rest/preview/server`,
     `--copyto ${base}ng2-rest/preview/client`,
-    `--copyto ${base}morphi`
+    `--copyto ${base}morphi`,
   ].concat(whereMorphiNeeded)
 
 
@@ -25,6 +25,18 @@ module.exports = exports = function (base) {
     `--copyto ${base}ng2-rest`
   ].concat(whereNg2RestNeeded)
 
+
+  var whereWalkObjectNeeded = [
+    `--copyto ${base}ng2-rest`,
+    `--copyto ${base}json10`
+  ].concat(whereNg2RestNeeded)
+
+  var whereTypescripClassHelperNeeded = [
+  ].concat(whereWalkObjectNeeded)
+
+  var wherejson10Needed = [
+    `--copyto ${base}ng2-rest`
+  ].concat(whereNg2RestNeeded)
 
   return [
     {
@@ -50,6 +62,25 @@ module.exports = exports = function (base) {
       "command": "tnp build:dist",
       "commandWatch": "tnp build:dist:watch",
       "args": whereNg2LoggerNeeded
+    },
+    {
+      "cwd": `${base}json10`,
+      "command": "tnp build:dist",
+      "commandWatch": "tnp build:dist:watch",
+      "args": wherejson10Needed
+    },
+    {
+      "cwd": `${base}lodash-walk-object`,
+      "command": "tnp build:dist",
+      "commandWatch": "tnp build:dist:watch",
+      "args": whereWalkObjectNeeded
+    },
+
+    {
+      "cwd": `${base}typescript-class-helpers`,
+      "command": "tnp build:dist",
+      "commandWatch": "tnp build:dist:watch",
+      "args": whereTypescripClassHelperNeeded
     }
 
   ]

@@ -38,7 +38,7 @@ export class CopyToManager {
     }
   }
 
-  public generateSourceCopyIn(destinationLocation: string) {
+  public generateSourceCopyIn(destinationLocation: string, override = true) {
 
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
@@ -49,7 +49,10 @@ export class CopyToManager {
     }
 
 
-    if (!fs.existsSync(destinationLocation)) {
+    if (fs.existsSync(destinationLocation) && override) {
+      warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
+      return;
+    } else {
       fse.mkdirpSync(destinationLocation);
     }
 
@@ -88,7 +91,7 @@ export class CopyToManager {
         This workspace is generated.
       `)
     }
-
+    info(`Source of project "${this.project.name}" generated in ${destinationLocation}`)
   }
 
 
