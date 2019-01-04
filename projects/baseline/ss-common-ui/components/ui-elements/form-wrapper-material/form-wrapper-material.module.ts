@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatProgressBarModule  } from '@angular/material/progress-bar'
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
@@ -15,6 +15,8 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
+import { RepeatTypeComponent } from 'morphi/browser/crud/formly-repeat-component';
+import { FormlyHorizontalWrapper } from 'morphi/browser/crud/formly-group-wrapper-component';
 
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
@@ -60,11 +62,13 @@ const formlyModules = [
       { name: 'button', component: ButtonWithActionComponent },
       { name: 'switch', component: FormlySwitchComponent },
       { name: 'iconbutton', component: IconButtonWithActionComponent },
-      { name: 'infoprogressbar', component: FormlyProgressbardComponent }
+      { name: 'infoprogressbar', component: FormlyProgressbardComponent },
+      { name: 'repeat', component: RepeatTypeComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },
     ],
+    wrappers: [{ name: 'groupwrap', component: FormlyHorizontalWrapper }],
   }),
   FormlyMatToggleModule,
   FormlyMatDatepickerModule,
@@ -79,7 +83,9 @@ const customComponetns = [
   ButtonWithActionComponent,
   FormlySwitchComponent,
   IconButtonWithActionComponent,
-  FormlyProgressbardComponent
+  FormlyProgressbardComponent,
+  RepeatTypeComponent,
+  FormlyHorizontalWrapper
 ];
 
 @NgModule({
