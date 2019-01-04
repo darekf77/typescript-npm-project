@@ -8,8 +8,11 @@ export interface IEMAIL_TYPE {
 }
 
 
-@Morphi.Entity({
-  className: 'EMAIL_TYPE'
+@Morphi.Entity<EMAIL_TYPE>({
+  className: 'EMAIL_TYPE',
+  mapping: {
+    emails: ['EMAIL']
+  }
 })
 export class EMAIL_TYPE extends Morphi.Base.Entity<EMAIL_TYPE> implements IEMAIL_TYPE {
 

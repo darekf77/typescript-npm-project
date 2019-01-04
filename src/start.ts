@@ -11,7 +11,9 @@ import { Project } from './project';
 
 import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
+import config from './config';
 
+process.env[config.message.tnp_bundle_mode] = 'false'
 
 Helpers.checkEnvironment({
   npm: [
@@ -25,17 +27,17 @@ Helpers.checkEnvironment({
     { name: 'http-server' },
     { name: 'increase-memory-limit' },
     { name: 'bower' },
-    { name: 'fkill', installName:'fkill-cli' },
+    { name: 'fkill', installName: 'fkill-cli' },
     { name: 'mocha' },
     // { name: 'chai' },
     { name: 'ts-node' },
     { name: 'stmux' }
   ],
   programs: [
-  //   {
-  //     name: 'code',
-  //     website: 'https://code.visualstudio.com/'
-  //   }
+    //   {
+    //     name: 'code',
+    //     website: 'https://code.visualstudio.com/'
+    //   }
   ]
 });
 

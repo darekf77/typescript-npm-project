@@ -48,8 +48,13 @@ export interface ISESSION {
 
 
 
-@Morphi.Entity({
-  className: 'SESSION'
+@Morphi.Entity<SESSION>({
+  className: 'SESSION',
+  mapping: {
+    createdDate: 'Date',
+    expiredDate: 'Date',
+    user: 'USER'
+  }
 })
 export class SESSION extends Morphi.Base.Entity<SESSION> implements ISESSION {
 

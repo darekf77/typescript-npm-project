@@ -108,7 +108,7 @@ export class BaselineSiteJoin {
 
     // remove customizable
     // console.log(this.project.customizableFilesAndFolders);
-    // process.exit(0)
+
     this.project.customizableFilesAndFolders.forEach(customizable => {
       this.project.run(`rimraf ${customizable}`).sync()
     });
@@ -122,7 +122,7 @@ export class BaselineSiteJoin {
     // console.log('baselineFiles', baselineFiles)
     const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
     // console.log('baselineReplacePath', baselineReplacePath)
-    // process.exit(0)
+
     baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
 
     return baselineFiles;
@@ -133,7 +133,7 @@ export class BaselineSiteJoin {
     // console.log('customFiles', customFiles)
     const customReplacePath = crossPlatofrmPath(path.join(this.project.location, config.folder.custom));
     // console.log('customReplacePath', customReplacePath)
-    // process.exit(0)
+
     customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
 
     return customFiles;

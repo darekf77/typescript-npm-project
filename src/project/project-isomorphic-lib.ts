@@ -60,7 +60,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
 
     // console.log(result)
-    // process.exit(0)
+
     return result;
   }
 
@@ -69,7 +69,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     result = result.concat(this.additionalRequiredIsomorphcLibs);
 
     // console.log('result', result)
-    // process.exit(0)
+
     return result;
   }
 
@@ -118,7 +118,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
         const command = `npm-run webpack-dev-server ${webpackEnvParams}`
         // console.log(command)
-        // process.exit(0)
+
         this.run(command).sync()
 
       } else {

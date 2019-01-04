@@ -14,7 +14,6 @@ export interface IEXAMPLE_PAGINATION {
   className: 'EXAMPLE_PAGINATION',
   formly: {
     transformFn: (fields) => {
-
       return fields;
     }
   },

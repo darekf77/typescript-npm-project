@@ -60,7 +60,7 @@ export function ProjectFrom(location: string, warnings = false): Project {
   const type = typeFrom(location);
   // console.log('type', type)
   // console.log('location', location)
-  // process.exit(1)
+
   let resultProject: Project;
   if (type === 'isomorphic-lib') resultProject = new ProjectIsomorphicLib(location);
   if (type === 'angular-lib') resultProject = new ProjectAngularLib(location);

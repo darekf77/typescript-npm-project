@@ -55,6 +55,9 @@ export const config = {
       }
     }
   },
+  message: {
+    tnp_bundle_mode: 'tnp-bundle-mode'
+  },
   names: {
     env: {
       prod: 'prod',

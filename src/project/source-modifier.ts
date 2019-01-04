@@ -120,7 +120,7 @@ export class SourceModifier extends IncrementalCompilation {
         fileContent = this.replaceWhenWholeModule(angularLibName, fileContent)
         fileContent = this.replaceWhenReferingInsideModule(angularLibName, fileContent)
       })
-      // process.exit(0)
+
 
       fs.writeFileSync(file.path, fileContent, {
         encoding: 'utf8'

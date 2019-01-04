@@ -73,8 +73,10 @@ export interface IProject {
   },
   //#region @backend
   browserTransformFn: (entity) => {
+    console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
     entity.browser.isWorkspace = entity.isWorkspace
+    entity.browser.isCloud = true;
     return entity;
   }
   //#endregion
@@ -107,6 +109,22 @@ export class Project implements IProject {
 
   get isWorkspace() {
     return this.type === 'workspace';
+  }
+
+  public static get isBundleMode() {
+    if (Morphi.IsBrowser) {
+      return true;
+    }
+    //#region @backend
+    if (process.env[config.message.tnp_bundle_mode] === 'false') {
+      return false;
+    }
+    return true;
+    //#endregion
+  }
+
+  get isBundleMode() {
+    return Project.isBundleMode;
   }
 
   readonly type: LibType;
@@ -165,7 +183,7 @@ export class Project implements IProject {
 
   get parent(): Project {
     if (Morphi.IsBrowser) {
-      return this.browser.parent;
+      return this.browser && this.browser.parent;
     }
     //#region @backend
     return ProjectFrom(path.join(this.location, '..'));
@@ -173,7 +191,7 @@ export class Project implements IProject {
   }
   get preview(): Project {
     if (Morphi.IsBrowser) {
-      return this.browser.preview;
+      return this.browser && this.browser.preview;
     }
     //#region @backend
     return ProjectFrom(path.join(this.location, 'preview'));
@@ -203,7 +221,7 @@ export class Project implements IProject {
    */
   get baseline(): Project {
     if (Morphi.IsBrowser) {
-      return this.browser.baseline;
+      return this.browser && this.browser.baseline;
     }
     //#region @backend
     if (this.isWorkspace) {
@@ -251,6 +269,7 @@ export class Project implements IProject {
 
   //#region @backend
   static get Current() {
+
     const current = ProjectFrom(process.cwd())
     if (!current) {
       error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`)
@@ -262,6 +281,7 @@ export class Project implements IProject {
 
   //#region @backend
   static get Tnp() {
+
     const filenameapth = 'tnp-system-path.txt';
     let tnp = ProjectFrom(path.join(__dirname, '..', '..'));
     if (tnp) {
@@ -294,7 +314,7 @@ export class Project implements IProject {
 
   public getDefaultPort() {
     if (Morphi.IsBrowser) {
-      return this.browser.defaultPort;
+      return this.browser && this.browser.defaultPort;
     }
     //#region @backend
     return this.__defaultPort;
@@ -326,7 +346,7 @@ export class Project implements IProject {
 
   get version() {
     if (Morphi.IsBrowser) {
-      return this.browser.version;
+      return this.browser && this.browser.version;
     }
     //#region @backend
     return this.packageJson.version;
@@ -335,9 +355,10 @@ export class Project implements IProject {
 
   //#region @backend
   get versionPatchedPlusOne() {
+
     if (!this.version) {
-      error(`Please define ${chalk.bold('version')} property in your package.json`, true,true)
-      error(path.join(this.location, config.file.package_json),false,true)
+      error(`Please define ${chalk.bold('version')} property in your package.json`, true, true)
+      error(path.join(this.location, config.file.package_json), false, true)
     }
     const ver = this.version.split('.');
     if (ver.length > 0) {
@@ -349,7 +370,7 @@ export class Project implements IProject {
 
   get resources(): string[] {
     if (Morphi.IsBrowser) {
-      return this.browser.resources;
+      return this.browser && this.browser.resources;
     }
     //#region @backend
     return this.packageJson.resources;
@@ -358,7 +379,7 @@ export class Project implements IProject {
 
   get isSite() {
     if (Morphi.IsBrowser) {
-      return this.browser.isSite;
+      return this.browser && this.browser.isSite;
     }
     //#region @backend
     const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
@@ -382,7 +403,7 @@ export class Project implements IProject {
    */
   get isCoreProject() {
     if (Morphi.IsBrowser) {
-      return this.browser.isCoreProject;
+      return this.browser && this.browser.isCoreProject;
     }
     //#region @backend
     return this.packageJson.isCoreProject;
@@ -391,7 +412,7 @@ export class Project implements IProject {
 
   get isCommandLineToolOnly() {
     if (Morphi.IsBrowser) {
-      return this.browser.isCommandLineToolOnly;
+      return this.browser && this.browser.isCommandLineToolOnly;
     }
     //#region @backend
     return this.packageJson.isCommandLineToolOnly;
@@ -414,7 +435,7 @@ export class Project implements IProject {
 
   get isGenerated() {
     if (Morphi.IsBrowser) {
-      return this.browser.isGenerated;
+      return this.browser && this.browser.isGenerated;
     }
     //#region @backend
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
@@ -424,7 +445,7 @@ export class Project implements IProject {
 
   get isTnp() {
     if (Morphi.IsBrowser) {
-      return this.browser.isTnp;
+      return this.browser && this.browser.isTnp;
     }
     //#region @backend
     return this.name === 'tnp';
@@ -433,7 +454,7 @@ export class Project implements IProject {
 
   get isCloud() {
     if (Morphi.IsBrowser) {
-      return this.browser.isCloud;
+      return this.browser && this.browser.isCloud;
     }
     //#region @backend
     return this.name === 'site' && this.type === 'workspace'; // TODO temporary solution
@@ -442,7 +463,7 @@ export class Project implements IProject {
 
   get isWorkspaceChildProject() {
     if (Morphi.IsBrowser) {
-      return this.browser.isWorkspaceChildProject;
+      return this.browser && this.browser.isWorkspaceChildProject;
     }
     //#region @backend
     return !!this.parent && this.parent.type === 'workspace';
@@ -451,7 +472,7 @@ export class Project implements IProject {
 
   get allowedEnvironments() {
     if (Morphi.IsBrowser) {
-      return this.browser.allowedEnvironments;
+      return this.browser && this.browser.allowedEnvironments;
     }
     //#region @backend
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
@@ -466,7 +487,7 @@ export class Project implements IProject {
    */
   get isStandaloneProject() {
     if (Morphi.IsBrowser) {
-      return this.browser.isStandaloneProject;
+      return this.browser && this.browser.isStandaloneProject;
     }
     //#region @backend
     return !this.isWorkspaceChildProject && !this.isWorkspace;
@@ -573,7 +594,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   get customizableFilesAndFolders() {
     if (Morphi.IsBrowser) {
-      return this.browser.customizableFilesAndFolders;
+      return this.browser && this.browser.customizableFilesAndFolders;
     }
     //#region @backend
     if (this.type === 'workspace') return [
@@ -747,6 +768,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   public static by(libraryType: LibType): Project {
+
     // console.log('by libraryType ' + libraryType)
     let projectPath;
     if (libraryType === 'workspace') {
@@ -771,7 +793,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   get dependencies(): Project[] {
     if (Morphi.IsBrowser) {
-      return this.browser.dependencies;
+      return this.browser && this.browser.dependencies;
     }
     //#region @backend
     if (this.type === 'unknow-npm-project' && this.packageJson.data && this.packageJson.data.dependencies) {
@@ -791,7 +813,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {
-      return this.browser.children;
+      return this.browser && this.browser.children;
     }
     //#region @backend
     // console.log('from ' + this.location)
@@ -850,6 +872,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   public checkIfReadyForNpm() {
+
     // console.log('TYPEEEEE', this.type)
     const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
     if (!libs.includes(this.type)) {

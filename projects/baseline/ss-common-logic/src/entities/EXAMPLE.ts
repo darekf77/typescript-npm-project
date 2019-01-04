@@ -48,15 +48,16 @@ export class TestJSON {
     }
   },
   defaultModelValues: {
-    'isAmazing': true,
-    'href': '< http://defaulthref >',
-    'name': '< default name >',
-    'age': 23,
-    'birthDate': new Date('01-02-2000')
+    isAmazing: true,
+    href: '< http://defaulthref >',
+    name: '< default name >',
+    age: 23,
+    birthDate: new Date('01-02-2000')
   },
   mapping: {
     testjson: 'TestJSON',
-
+    multimediaExample: 'MULTIMEDIA',
+    birthDate: 'Date'
   }
 })
 export class EXAMPLE extends Morphi.Base.Entity<EXAMPLE, IEXAMPLE> implements IEXAMPLE {

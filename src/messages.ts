@@ -1,5 +1,7 @@
 //#region @backend
 import chalk from 'chalk';
+import config from './config';
+
 export function error(details: any, noExit = false, noTrace = false) {
   // Error.stackTraceLimit = Infinity;
   if (typeof details === 'object') {
@@ -26,9 +28,10 @@ export function error(details: any, noExit = false, noTrace = false) {
     }
 
   }
-
-  if (!noExit) {
-    process.exit(1);
+  if (process.env[config.message.tnp_bundle_mode] === 'false') {
+    if (!noExit) {
+      process.exit(1);
+    }
   }
 }
 

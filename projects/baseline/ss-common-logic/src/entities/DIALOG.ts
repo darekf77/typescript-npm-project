@@ -33,7 +33,10 @@ export interface IDIALOG {
     lang_pl: ''
   },
   mapping: {
-    group: 'GROUP'
+    group: 'GROUP',
+    audio_en: 'MULTIMEDIA',
+    audio_fr: 'MULTIMEDIA',
+    audio_pl: 'MULTIMEDIA'
   }
 })
 export class DIALOG extends Morphi.Base.Entity<DIALOG, IDIALOG> implements IDIALOG {

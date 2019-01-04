@@ -20,6 +20,8 @@ export interface IGROUP {
     title: ''
   },
   mapping: {
+    category: 'CATEGORY',
+    dialogs: ['DIALOG'],
     picture: 'MULTIMEDIA'
   }
 })

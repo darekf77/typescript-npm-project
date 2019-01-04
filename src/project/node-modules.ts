@@ -66,7 +66,7 @@ export class NodeModules {
       .concat(self.project.children)
       .concat(self.project.baseline ? [self.project.baseline] : [])
     // console.log(symlinks.map(c => c.name))
-    // process.exit(0)
+
     symlinks.forEach(c => {
       if (path.basename(c.location) != c.name) {
         error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)

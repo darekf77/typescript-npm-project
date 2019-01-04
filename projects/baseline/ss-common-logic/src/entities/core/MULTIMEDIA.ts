@@ -19,10 +19,16 @@ export interface IMULTIMEDIA {
 }
 
 
-@Morphi.Entity({
+@Morphi.Entity<MULTIMEDIA>({
   className: 'MULTIMEDIA',
   defaultModelValues: {
     name: ''
+  },
+  mapping: {
+    catetories: ['CATEGORY'],
+    dialogs: ['DIALOG'],
+    groups: ['GROUP'],
+    createdDate: 'Date'
   }
 })
 export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {

@@ -177,7 +177,13 @@ export abstract class BaseProjectLib extends Project {
       this.bundleResources()
       this.packageJson.saveForInstall(false)
       this.commit(newVersion);
-    }, () => process.exit(0))
+    }, () => {
+      if (this.isBundleMode) {
+        return
+      } else {
+        process.exit(0)
+      }
+    })
 
 
     await questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
@@ -217,6 +223,7 @@ export abstract class BaseProjectLib extends Project {
   }
 
   public bundleResources() {
+
     this.checkIfReadyForNpm()
     const bundleFolder = path.join(this.location, config.folder.bundle);
     if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);

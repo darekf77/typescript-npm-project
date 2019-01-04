@@ -27,6 +27,14 @@ module.exports = exports = function (base) {
         `--bumbVersionIn ${base}morphi/examples`,
         `--bumbVersionIn ${base}tsc-npm-project/projects/workspace`
       ]
+    },
+    {
+      "cwd": `${base}lodash-walk-object`,
+      "command": "tnp release",
+      "args": [
+        `--bumbVersionIn ${base}morphi/examples`,
+        `--bumbVersionIn ${base}tsc-npm-project/projects/workspace`
+      ]
     }
   ]
   //#endregion

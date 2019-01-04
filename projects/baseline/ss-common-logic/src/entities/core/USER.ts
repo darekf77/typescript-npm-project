@@ -12,8 +12,12 @@ export interface IUSER {
   city?: string;
 }
 
-@Morphi.Entity({
-  className: 'USER'
+@Morphi.Entity<USER>({
+  className: 'USER',
+  mapping: {
+    session: 'SESSION',
+    emails: 'EMAIL'
+  }
 })
 export class USER extends Morphi.Base.Entity<USER, IUSER> implements IUSER {
 

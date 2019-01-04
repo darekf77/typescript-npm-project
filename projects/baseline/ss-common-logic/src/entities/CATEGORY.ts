@@ -23,7 +23,7 @@ export interface ICATEGORY {
     // groups: []
   },
   mapping: {
-    groups: 'GROUP',
+    groups: ['GROUP'],
     picture: 'MULTIMEDIA'
   }
 })
