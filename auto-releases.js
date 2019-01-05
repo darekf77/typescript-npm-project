@@ -35,6 +35,14 @@ module.exports = exports = function (base) {
         `--bumbVersionIn ${base}morphi/examples`,
         `--bumbVersionIn ${base}tsc-npm-project/projects/workspace`
       ]
+    },
+    {
+      "cwd": `${base}json10`,
+      "command": "tnp release",
+      "args": [
+        `--bumbVersionIn ${base}morphi/examples`,
+        `--bumbVersionIn ${base}tsc-npm-project/projects/workspace`
+      ]
     }
   ]
   //#endregion
