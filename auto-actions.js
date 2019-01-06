@@ -4,6 +4,7 @@ const chalk = require('chalk').default;
 const pathes = {
   "Dariuszs-MacBook-Pro-3.local": "/Users/darekf/projects/npm/",
   "dariuszs-mbp-3.gtk.gtech.com": "/Users/darekf/projects/npm/",
+  "darek-All-Series":"/home/darek/projects/npm/",
   // "dariuszs-mbp-2.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
   // "Dariuszs-MBP-2": "Dariuszs-MacBook-Pro-2.local",
   // "Dariuszs-MacBook-Pro-3.local": "Dariuszs-MacBook-Pro-2.local",

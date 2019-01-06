@@ -116,32 +116,36 @@ export class ProjectsChecker {
   private checkIfReadyForTnpInstall(workspace: Project) {
     // console.log('this.instances', this.instances.map(i => i.location))
     const workspaceInstance = this.instances.find(f => f.location === workspace.location)
+    if (workspaceInstance) {
+      const isWorkspaceNotReadyForTnpInstall = workspaceInstance.isNotReadForTnpInstall
+      if (isWorkspaceNotReadyForTnpInstall) { // TODO imposible ?
+        // console.log('workspace is  ready ? ', isWorkspaceNotReadyForTnpInstall)
+        return false;
+      }
 
-    const isWorkspaceNotReadyForTnpInstall = workspaceInstance.isNotReadForTnpInstall
-    if (isWorkspaceNotReadyForTnpInstall) { // TODO imposible ?
-      // console.log('workspace is  ready ? ', isWorkspaceNotReadyForTnpInstall)
-      return false;
+      const childrenReadyForTnpInstall = workspace.children
+        .filter(c => {
+          const childInstance = this.instances.find(f => f.location === c.location)
+          if (childInstance.isNotReadForTnpInstall) {
+            // console.log('child not ready: ', childInstance.location)
+            // console.log('app build', childInstance.build.app)
+            // console.log('lib build', childInstance.build.lib)
+            // console.log('process pid', process.pid)
+          }
+          return childInstance.isNotReadForTnpInstall
+        }).length === 0;
+      // console.log('children are ready ? ', childrenReadyForTnpInstall)
+
+      // process.exit(0)
+      return childrenReadyForTnpInstall;
     }
-
-    const childrenReadyForTnpInstall = workspace.children
-      .filter(c => {
-        const childInstance = this.instances.find(f => f.location === c.location)
-        if (childInstance.isNotReadForTnpInstall) {
-          // console.log('child not ready: ', childInstance.location)
-          // console.log('app build', childInstance.build.app)
-          // console.log('lib build', childInstance.build.lib)
-          // console.log('process pid', process.pid)
-        }
-        return childInstance.isNotReadForTnpInstall
-      }).length === 0;
-    // console.log('children are ready ? ', childrenReadyForTnpInstall)
-
-    // process.exit(0)
-    return childrenReadyForTnpInstall;
+    console.log(`Cannot find instance of workspace`, workspace)
+    console.log('Instances', this.instances)
+    return true;
   }
 
   foundedActivePids(project?: Project) {
-    if(!project) {
+    if (!project) {
       project = this.project
     }
     // const project = onlyForThisWorkspace ? this.project : undefined;

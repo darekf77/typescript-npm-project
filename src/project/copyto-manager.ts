@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
 import chalk from 'chalk';
-// import * as watch from 'watch'
 import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
