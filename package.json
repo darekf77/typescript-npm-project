@@ -47,6 +47,9 @@
   },
   "name": "tnp",
   "version": "0.0.3",
+  "scripts": {
+    "postinstall": "pwd > tnp-system-path.txt"
+  },
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp"

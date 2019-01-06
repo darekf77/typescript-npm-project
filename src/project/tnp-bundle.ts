@@ -62,6 +62,10 @@ export function reinstallTnp(project: Project,
   pathTnpPackageJSONData: IPackageJSON,
   client: Project) {
 
+  if (_.isUndefined(notNeededReinstallationTnp[project.location])) {
+    notNeededReinstallationTnp[project.location] = 0;
+  }
+
   if (project.isStandaloneProject) {
     return;
   }
@@ -77,7 +81,8 @@ export function reinstallTnp(project: Project,
     return
   }
 
-  if (notNeededReinstallationTnp[project.location]) {
+  if (notNeededReinstallationTnp[project.location] > 2) {
+    console.log('[TNP helper] reinstall not needed')
     return;
   }
   if (project.isWorkspaceChildProject || project.type === 'workspace') {
@@ -85,11 +90,6 @@ export function reinstallTnp(project: Project,
 
     const destCompiledJs = path.join(project.location, config.folder.node_modules, config.file.tnpBundle)
 
-    if (process.platform === 'win32' && checkIfFileTnpFilesUpToDateInDest(destCompiledJs)) {
-      notNeededReinstallationTnp[project.location] = true;
-      // console.log(`Reinstallation of "tnp" not needed in ${project.name} `);
-      return;
-    }
 
     const destPackageJSON = path.join(project.location, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
@@ -120,8 +120,13 @@ export function reinstallTnp(project: Project,
     let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
     // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
 
-    notNeededReinstallationTnp[project.location] = true;
-    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} `)
+    if (_.isUndefined(notNeededReinstallationTnp[project.location])) {
+      notNeededReinstallationTnp[project.location] = 1;
+    } else {
+      ++notNeededReinstallationTnp[project.location];
+    }
+
+    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , installs counter:${notNeededReinstallationTnp[project.location]} `)
   } else {
     // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }

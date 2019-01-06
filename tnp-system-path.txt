@@ -1,1 +1,1 @@
-/Users/darekf/projects/npm/tsc-npm-project
+/home/darek/projects/npm/tsc-npm-project

@@ -894,7 +894,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
       // console.log(Project.Current.location)
       // console.log('dirname', __dirname)
       return {
-        install(installFromRecreate = false) {
+        install() {
           // console.log('install tnp from recreate', installFromRecreate)
           // console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
           console.trace(`** ERR Project.Tnp not available yet`)
@@ -920,7 +920,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     const self = this;
     return {
-      install(installFromRecreate = false) { // install
+      install() { // install
         // console.log('install tnp from recreate', installFromRecreate)
         const client = self;
         let project: Project;
