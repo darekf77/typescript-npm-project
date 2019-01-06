@@ -69,7 +69,7 @@ export interface IProject {
 @Morphi.Entity<Project>({
   className: 'Project',
   mapping: {
-
+    children: ['Project']
   },
   //#region @backend
   browserTransformFn: (entity) => {

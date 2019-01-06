@@ -1,4 +1,5 @@
 /node_modules
+/tnp-system-path.txt
 /tmp*
 /dist*
 /bundle*
@@ -26,4 +27,3 @@
 /run.js
 /projects/tmp*
 /bin/projects.json
-/tnp-system-path.txt
