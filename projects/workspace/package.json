@@ -46,7 +46,7 @@
           "gulp": "^3.9.1",
           "dateformat": "^3.0.3",
           "ng2-logger": "2.0.46",
-          "ng2-rest": "9.2.8",
+          "ng2-rest": "9.2.10",
           "@types/diff": "^3.2.2",
           "randomcolor": "^0.5.3",
           "ts-loader": "^2.3.1",
