@@ -838,12 +838,18 @@ Generated workspace should be here: ${genLocationWOrkspace}
     //#region @backend
     if (this.type === 'unknow-npm-project' && this.packageJson.data && this.packageJson.data.dependencies) {
       return Object.keys(this.packageJson.data.dependencies).map(packageName => {
-        const p = path.join(this.location, config.folder.node_modules, packageName);
+        let p = path.resolve(path.join(this.location, '..', packageName))
         if (fse.existsSync(p)) {
           const project = ProjectFrom(p);
           return project;
         } else {
-          error(`Dependency "${packageName}" doen't exist in ${path.join(this.location, config.folder.node_modules)}`)
+          p = path.join(this.location, config.folder.node_modules, packageName);
+          if (fse.existsSync(p)) {
+            const project = ProjectFrom(p);
+            return project;
+          }
+
+          error(`Dependency "${packageName}" doen't exist in ${p}`)
         }
       })
     }

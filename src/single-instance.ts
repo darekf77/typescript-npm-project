@@ -139,8 +139,8 @@ export class ProjectsChecker {
       // process.exit(0)
       return childrenReadyForTnpInstall;
     }
-    console.log(`Cannot find instance of workspace`, workspace)
-    console.log('Instances', this.instances)
+    console.log(`Cannot find instance of workspace "${workspace.name}" in ${workspace.location}`)
+    // console.log('Instances', this.instances)
     return true;
   }
 

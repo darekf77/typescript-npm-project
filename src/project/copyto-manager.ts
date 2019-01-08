@@ -61,19 +61,25 @@ export class CopyToManager {
     }
     fse.mkdirpSync(tempLocation);
 
-    fse.copySync(`${sourceLocation}/`, tempLocation, {
-      filter: (src: string, dest: string) => {
-        // console.log('src', src)
-        // return
-        // !src.endsWith('/dist/bin') &&
-        //   !src.endsWith('/bin') &&
-        return !/.*node_modules.*/g.test(src) &&
-          !/.*tmp\-.*/g.test(src) &&
-          !/.*dist.*/g.test(src) &&
-          !/.*\.vscode.*/g.test(src) &&
-          !/.*bundle.*/g.test(src);
-      }
-    });
+    if (this.project.type === 'unknow-npm-project') {
+      fse.copySync(`${sourceLocation}/`, tempLocation);
+    } else {
+      fse.copySync(`${sourceLocation}/`, tempLocation, {
+        filter: (src: string, dest: string) => {
+          // console.log('src', src)
+          // return
+          // !src.endsWith('/dist/bin') &&
+          //   !src.endsWith('/bin') &&
+          return !/.*node_modules.*/g.test(src) &&
+            !/.*tmp\-.*/g.test(src) &&
+            !/.*dist.*/g.test(src) &&
+            !/.*\.vscode.*/g.test(src) &&
+            !/.*bundle.*/g.test(src);
+        }
+      });
+    }
+
+
 
     fse.copySync(`${tempLocation}/`, destinationLocation, {
       overwrite: true,

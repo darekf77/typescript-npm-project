@@ -39,10 +39,37 @@ function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
   }
 }
 
+function copyFromTemplateWorkspaceIfPossible(packageName: string, destination: Project) {
+
+  const templateWorkspace = Project.by('workspace');
+  if(templateWorkspace === destination) {
+    console.log('worksapce installation...')
+    return false;
+  }
+
+  if (templateWorkspace.node_modules.contains(packageName)) {
+    templateWorkspace.node_modules.copy(packageName).to(destination)
+    return true;
+  }
+  return false;
+}
+
+function copyPackageFromTemplate(project: Project, npmPackagesToAdd: string[]) {
+  return (npmPackagesToAdd
+    .filter(packageName => !copyFromTemplateWorkspaceIfPossible(packageName, project))
+    .length === 0)
+}
 
 function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAdd: string[]) {
+
   if (project.type === 'workspace') {  // workspace project: npm i <package name>
     console.log('** npm install <package> in workspace')
+
+    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
+      info(`All pacakges copied from workspace template`)
+      return;
+    }
+
     if (unlinkChilds) {
       unlink(project)
     }
@@ -55,6 +82,12 @@ function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAd
     link(project)
   } else if (project.parent && project.parent.type === 'workspace') {
     console.log('** npm install <package> in child of workspace')
+
+    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
+      info(`All pacakges copied from workspace template`)
+      return;
+    }
+
     if (unlinkChilds) {
       unlink(project.parent)
     }

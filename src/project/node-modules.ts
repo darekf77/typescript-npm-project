@@ -17,9 +17,10 @@ export class NodeModules {
     return {
       to(destination: Project) {
         const p = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
-        p.copytToManager.generateSourceCopyIn(destination.location, false)
+        const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
+        p.copytToManager.generateSourceCopyIn(path.join(nodeModeulesPath, p.name), false)
         p.dependencies.forEach(dep => {
-          dep.copytToManager.generateSourceCopyIn(destination.location, false)
+          dep.copytToManager.generateSourceCopyIn(path.join(nodeModeulesPath, dep.name), false)
         })
       }
     }
@@ -59,6 +60,10 @@ export class NodeModules {
   }
   installPackage(packagePath) {
     this.project.packageJson.installPackage(packagePath);
+  }
+
+  contains(packageName: string) {
+    return fs.existsSync(path.join(this.project.location, config.folder.node_modules, packageName))
   }
   get localChildrensWithRequiredLibs() {
     const self = this;
