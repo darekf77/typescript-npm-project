@@ -71,17 +71,21 @@ export interface IProject {
 @Morphi.Entity<Project>({
   className: 'Project',
   mapping: {
-    children: ['Project'],
-    parent: 'Project',
-    preview: 'Project',
-    baseline: 'Project'
+
+  },
+  additionalMapping: {
+    'browser.children': ['Project'],
+    'browser.parent': 'Project',
+    'browser.baseline': 'Project',
+    'browser.preview': 'Project'
   },
   //#region @backend
   browserTransformFn: (entity) => {
-    console.log('I AM TRANSFORMING ENTITY!!!')
+    // console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
+
     return entity;
   }
   //#endregion

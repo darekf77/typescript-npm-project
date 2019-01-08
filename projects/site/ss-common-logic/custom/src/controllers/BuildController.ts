@@ -63,9 +63,9 @@ export class BuildController extends Morphi.Base.Controller<entities.BUILD> {
       // a['b'] = {
       //   a
       // }
-      const build  = builds.find(d => d.type === 'workspace');
-      console.log('IS TNP BUNDLE MODE ?', build.isBundleMode)
-      return [build];
+      // const build  = builds.find(d => d.type === 'workspace');
+      // console.log('IS TNP BUNDLE MODE ?', build.isBundleMode)
+      return builds;
     }
     //#endregion
   }
