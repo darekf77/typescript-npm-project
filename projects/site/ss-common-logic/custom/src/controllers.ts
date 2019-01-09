@@ -8,27 +8,11 @@ export * from 'baseline/ss-common-logic/src/controllers';
 
 
 
-import { BuildController } from './controllers/BuildController';
-export { BuildController } from './controllers/BuildController';
-
-import { DomainsController } from './controllers/DomainsController';
-export { DomainsController } from './controllers/DomainsController';
-
 import { ProjectController } from './controllers/ProjectController';
 export { ProjectController } from './controllers/ProjectController';
 
-import { SystemController } from './controllers/SystemController';
-export { SystemController } from './controllers/SystemController';
-
-import { TnpProjectController } from './controllers/TnpProjectController';
-export { TnpProjectController } from './controllers/TnpProjectController';
-
 export const Controllers: Morphi.Base.Controller<any>[] = [
-BuildController,
-DomainsController,
-ProjectController,
-SystemController,
-TnpProjectController
+ProjectController
 ].concat(BaselineControllers as any) as any;
 
 //#region @backend
@@ -39,15 +23,7 @@ import * as _ from 'lodash'
 export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
 return _.merge(controllersBaseline.controllers(), {
 
-BuildController: Helpers.getSingleton<BuildController>(BuildController),
-
-DomainsController: Helpers.getSingleton<DomainsController>(DomainsController),
-
 ProjectController: Helpers.getSingleton<ProjectController>(ProjectController),
-
-SystemController: Helpers.getSingleton<SystemController>(SystemController),
-
-TnpProjectController: Helpers.getSingleton<TnpProjectController>(TnpProjectController),
 }  );
 }
 //#endregion

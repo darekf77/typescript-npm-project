@@ -9,24 +9,22 @@ export default function () {
 //#endregion
 
 import { Morphi } from 'morphi';
-import { BuildController } from './controllers/BuildController';
-import { BUILD } from './entities/BUILD';
 
 async function start() {
-  const project = ENV.workspace.projects.find(p => p.name === ENV.currentProjectName)
+  // const project = ENV.workspace.projects.find(p => p.name === ENV.currentProjectName)
 
-  Morphi.init({
-    host: project.host,
-    controllers: [BuildController],
-    entities: [BUILD]
-  })
+  // Morphi.init({
+  //   host: project.host,
+  //   controllers: [BuildController],
+  //   entities: [BUILD]
+  // })
 
-  const buildCtr = new BuildController()
-  const builds = (await buildCtr.heelooeoe().received).body.json
+  // const buildCtr = new BuildController()
+  // const builds = (await buildCtr.heelooeoe().received).body.json
 
-  console.log(builds)
+  // console.log(builds)
 
-  console.log('heeloo thats amazinfg', ENV)
+  // console.log('heeloo thats amazinfg', ENV)
 }
 
 if (Morphi.IsBrowser) {
