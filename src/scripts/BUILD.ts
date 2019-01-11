@@ -15,25 +15,25 @@ import { SystemTerminal } from '../system-terminal';
 
 
 
-export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string) {
+export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string, overrideOptions: BuildOptions = {} as any) {
 
   const { copyto, onlyWatchNoBuild, forClient, genOnlyClientCode, compileOnce } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, forClient, copyto, onlyWatchNoBuild, args, genOnlyClientCode, compileOnce
   };
-  await build(options, config.allowedTypes.libs)
+  await build(_.merge(options, overrideOptions), config.allowedTypes.libs)
 }
 
 
-export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string) {
+export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, overrideOptions: BuildOptions = {} as any) {
 
   const { onlyWatchNoBuild, forClient } = handleArguments(args, outDir, watch);
 
   const options: BuildOptions = {
     prod, watch, outDir, appBuild: true, forClient, onlyWatchNoBuild, args
   };
-  await build(options, config.allowedTypes.app);
+  await build(_.merge(options, overrideOptions), config.allowedTypes.app);
 }
 
 

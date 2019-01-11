@@ -36,6 +36,7 @@ import { reinstallTnp } from './tnp-bundle';
 
 import { EnvironmentConfig } from './environment-config';
 import { TestRunner } from './test-runner';
+import { FrameworkFilesGenerator } from './framework-files-generator';
 
 export interface IProject {
   isSite: boolean;
@@ -288,6 +289,8 @@ export class Project implements IProject {
   //#region @backend
   readonly sourceModifier: SourceModifier;
   //#endregion
+
+  readonly frameworkFileGenerator: FrameworkFilesGenerator;
 
   //#region @backend
   readonly checker: ProjectsChecker;
@@ -605,6 +608,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
         this.type = this.packageJson.type;
         this.recreate = new FilesRecreator(this);
         this.sourceModifier = new SourceModifier(this, this.recreate);
+        this.frameworkFileGenerator = new FrameworkFilesGenerator(this)
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
         }
@@ -680,12 +684,19 @@ Generated workspace should be here: ${genLocationWOrkspace}
   private async modifySourceBeforCompilation() {
     if (config.allowedTypes.app.includes(this.type)) {
       if (!this.isStandaloneProject) {
-        await this.sourceModifier.init(`client source modifier`)
+        await this.sourceModifier.init(`Client source modules pathes modifier`)
         // if (this.buildOptions.watch) {
         //   this.sourceModifier.initAndWatch()
         // } else {
         //   this.sourceModifier.init()
         // }
+
+        const generatorName = 'Files generator: entites.ts, controllers.ts';
+        if (this.buildOptions.watch) {
+          this.frameworkFileGenerator.initAndWatch(generatorName)
+        } else {
+          this.frameworkFileGenerator.init(generatorName)
+        }
       }
     }
   }

@@ -12,6 +12,7 @@ import { Project } from './project';
 import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
 import config from './config';
+import { ConsoleUi } from './console-ui';
 
 process.env[config.message.tnp_bundle_mode] = 'false'
 
@@ -132,12 +133,18 @@ export async function start(argsv: string[]) {
       const p = Project.Current;
 
       if (p) {
-        console.log(`Default action for project ${p.name}`)
-        if (p.isWorkspaceChildProject) {
-          build.$BUILD_WATCH(argsv.join(' '));
-        } else if (p.isStandaloneProject) {
-          autobuild(Project.Current, true, false)
+        const ui = new ConsoleUi(p);
+        try {
+          await ui.init()
+        } catch (error) {
+          process.exit(0)
         }
+        // console.log(`Default action for project ${p.name}`)
+        // if (p.isWorkspaceChildProject) {
+        //   build.$BUILD_WATCH(argsv.join(' '));
+        // } else if (p.isStandaloneProject) {
+        //   autobuild(Project.Current, true, false)
+        // }
         process.stdin.resume();
       } else {
         console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
