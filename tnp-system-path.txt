@@ -1,1 +1,0 @@
-/home/darek/projects/npm/tsc-npm-project

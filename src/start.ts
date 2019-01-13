@@ -74,6 +74,9 @@ export async function start(argsv: string[]) {
   let recognized = false;
   if (Array.isArray(argsv) && argsv.length >= 3) {
     const localLib = argsv[2];
+    if (localLib === "i") {
+      argsv[2] = 'install'
+    }
     if (!helpAlias.includes(localLib) && localLibs.includes(localLib)) {
       recognized = true;
       const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
