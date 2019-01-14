@@ -51,6 +51,8 @@ export interface IBuildOptions {
   additionalIsomorphicLibs?: string[];
 }
 
+export type BuildData = { project: Project, buildOptions: BuildOptions, pid: number };
+
 export class BuildOptions implements IBuildOptions {
 
   public static PropsToOmmitWhenStringify = ['copyto', 'forClient'];

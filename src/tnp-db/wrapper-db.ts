@@ -14,7 +14,7 @@ import { DomainInstance } from './domain-instance';
 import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { PsListInfo } from './ps-info';
-import { BuildOptions } from '../models';
+import { BuildOptions, BuildData } from '../models';
 
 const ENTITIES = Object.freeze({
   PROJECTS: 'projects',
@@ -25,20 +25,38 @@ const ENTITIES = Object.freeze({
 
 export class TnpDB {
 
-  private static _instace: TnpDB;
+  private static _instance: TnpDB;
 
-  public static async Instance(reinit = false) {
-    if (!this._instace) {
+  private static _firstTimeInit = true;
+  public static async Instance(forceReinit = false, buildData?: BuildData) {
+
+    if (!this._instance) {
       const location = path.join(Project.Tnp.location, `bin/db.json`);
-      this._instace = new TnpDB(location)
-      await this._instace.init(reinit || !fse.existsSync(location))
+      this._instance = new TnpDB(location)
+      if (buildData) {
+        const { project, buildOptions, pid } = buildData;
+        await this._instance.init(forceReinit || !fse.existsSync(location), project, buildOptions, pid)
+      } else {
+        await this._instance.init(forceReinit || !fse.existsSync(location))
+      }
+
     }
-    return this._instace;
+    if (this._firstTimeInit) {
+      console.log('[wrapper-db] exist listener inited')
+
+      process.on('exit', l => {
+        console.log('[wrapper-db] EXIT ACTION EXECUTED')
+        let builds = this._instance.getAll.builds;
+        builds = builds.filter(b => b.pid === process.pid);
+        this._instance.set.builds(builds);
+      })
+    }
+    return this._instance;
   }
 
   private _adapter;
   private db;
-  private async init(recreate = false) {
+  private async init(recreate = false, projectForBuild?: Project, buildOptions?: BuildOptions, buildPid?: number) {
     if (recreate) {
       fse.writeFileSync(this.location, '')
     }
@@ -47,8 +65,12 @@ export class TnpDB {
     if (recreate) {
       this.db.defaults({ projects: [], domains: [], ports: [], builds: [] })
         .write()
-      this.addExistedProjects()
-      await this.addExistedBuilds();
+      this.add.existedProjects()
+      console.log('[wrapper-db] Existed projects added')
+      if (_.isObject(buildOptions) && _.isObject(projectForBuild) && _.isNumber(buildPid)) {
+        this.add.buildIfNotExist(projectForBuild, buildOptions, buildPid);
+        console.log('[wrapper-db] Current project added')
+      }
     }
   }
 
@@ -94,9 +116,6 @@ export class TnpDB {
   }
 
 
-
-
-
   private discoverFrom(project: Project) {
     if (!project) {
       return
@@ -109,54 +128,76 @@ export class TnpDB {
     this.discoverFrom(project.preview)
   }
 
-  async addExistedBuilds() {
-    const ps: PsListInfo[] = await psList();
-    console.log('ps list', ps)
-    this.db.set(ENTITIES.BUILDS, ps);
+  private prepareToSave(build: BuildInstance) {
+    const { buildOptions, pid, project, location } = build;
+    return _.cloneDeep({
+      buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
+      pid,
+      location: _.isString(location) ? location : project.location
+    }) as BuildInstance;
   }
 
-  addExistedProjects() {
-
-    // this.discoverFrom(Project.Tnp);
-    const npmProjects = path.resolve(path.join(Project.Tnp.location, '..'))
-    fse.readdirSync(npmProjects)
-      .map(name => path.join(npmProjects, name))
-      .map(location => {
-        // console.log(location)
-        return ProjectFrom(location)
-      })
-      .filter(f => !!f)
-      .filter(f => {
-        // console.log(`Type for ${f.name} === ${f.type}`)
-        return f.type !== 'unknow-npm-project'
-      })
-      .forEach(project => {
-        // console.log(project.name)
-        this.discoverFrom(project)
-      })
-  }
-
-  public addProjectIfNotExist(project: Project) {
-    if (!this.getAll.projects.includes(project)) {
-      this.discoverFrom(project);
+  get set() {
+    const self = this;
+    return {
+      builds(builds: BuildInstance[]) {
+        const json = builds.map(c => self.prepareToSave(c));
+        self.db.set(ENTITIES.BUILDS, json);
+      }
     }
   }
 
-  public addBuildIfNotExist(project: Project, buildOptions: BuildOptions, pid: number) {
-    if (!this.getAll.builds.find(b => {
-      return (
-        (b.project === project) &&
-        (b.buildOptions.watch === buildOptions.watch) &&
-        (b.pid == pid)
-      )
-    })) {
-      this.db.get(ENTITIES.BUILDS).push({
-        buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
-        pid,
-        location: project.location
-      } as BuildInstance).write()
+  get add() {
+    const self = this;
+
+    return {
+
+      existedProjects() {
+
+        // this.discoverFrom(Project.Tnp);
+        const npmProjects = path.resolve(path.join(Project.Tnp.location, '..'))
+        fse.readdirSync(npmProjects)
+          .map(name => path.join(npmProjects, name))
+          .map(location => {
+            // console.log(location)
+            return ProjectFrom(location)
+          })
+          .filter(f => !!f)
+          .filter(f => {
+            // console.log(`Type for ${f.name} === ${f.type}`)
+            return f.type !== 'unknow-npm-project'
+          })
+          .forEach(project => {
+            // console.log(project.name)
+            self.discoverFrom(project)
+          })
+      },
+
+      projectIfNotExist(project: Project) {
+        if (!self.getAll.projects.includes(project)) {
+          self.discoverFrom(project);
+        }
+      },
+
+      buildIfNotExist(project: Project, buildOptions: BuildOptions, pid: number) {
+        if (!self.getAll.builds.find(b => {
+          return (
+            (b.project === project) &&
+            (b.buildOptions.watch === buildOptions.watch) &&
+            (b.pid == pid)
+          )
+        })) {
+          self.db.get(ENTITIES.BUILDS).push(self.prepareToSave({
+            buildOptions,
+            pid,
+            project
+          })).write()
+        }
+      }
     }
   }
+
+
 
   constructor(public location: string) {
 

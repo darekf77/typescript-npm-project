@@ -28,7 +28,8 @@ export class PortInstance {
       }).length > 0;
     }
 
-    if (_.isObject(this.id) && _.isObject(anotherId)) {
+    if (_.isObject(this.id) && !_.isArray(this.id) &&
+      _.isObject(anotherId) && !_.isArray(anotherId)) {
       const idRange = this.id as Range;
       const anotherIdRange = anotherId as Range;
       return idRange.contains(anotherIdRange);
@@ -47,16 +48,16 @@ export class PortInstance {
       return this.id.includes(anotherId)
     }
 
-    if (_.isArray(this.id) && _.isObject(anotherId)) {
+    if (_.isArray(this.id) && _.isObject(anotherId) && !_.isArray(anotherId)) {
       return this.id.filter(num => (anotherId as Range).contains(num))
         .length === this.id.length;
     }
 
-    if (_.isObject(this.id) && _.isNumber(anotherId)) {
+    if (_.isObject(this.id) && !_.isArray(this.id) && _.isNumber(anotherId)) {
       return (this.id as Range).contains(anotherId)
     }
 
-    if (_.isObject(this.id) && _.isArray(anotherId)) {
+    if (_.isObject(this.id) && !_.isArray(this.id) && _.isArray(anotherId)) {
       return (anotherId as number[]).filter(num => (this.id as Range).contains(num))
         .length === (anotherId as number[]).length;
     }

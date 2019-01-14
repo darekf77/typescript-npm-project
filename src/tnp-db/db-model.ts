@@ -3,7 +3,7 @@ import { DomainInstance } from './domain-instance';
 import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { Project } from '../project/base-project';
-import { BuildOptions } from '../models';
+import { BuildOptions, BuildData } from '../models';
 import { TnpDB } from './wrapper-db';
 
 
@@ -21,9 +21,9 @@ export class TnpDBModel {
 
 
   private static _instace: TnpDBModel;
-  public static async Instance(reinit = false) {
+  public static async Instance(buildData?: BuildData) {
     if (!this._instace) {
-      this._instace = new TnpDBModel(await TnpDB.Instance(reinit))
+      this._instace = new TnpDBModel(await TnpDB.Instance(false, buildData))
     }
     return this._instace;
   }
@@ -50,8 +50,8 @@ export class TnpDBModel {
       get at() {
         return {
           async BUILD(buildOptions: BuildOptions, pid: number) {
-            self.db.addProjectIfNotExist(currentProject);
-            self.db.addBuildIfNotExist(currentProject, buildOptions, pid)
+            self.db.add.projectIfNotExist(currentProject);
+            self.db.add.buildIfNotExist(currentProject, buildOptions, pid)
           },
           async INIT() {
 

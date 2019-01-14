@@ -51,7 +51,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
     }
   }
 
-  await (await TnpDBModel.Instance()).init(project).at.BUILD(buildOptions, process.pid)
+  await (await TnpDBModel.Instance({ project, buildOptions, pid: process.pid })).init(project).at.BUILD(buildOptions, process.pid)
   await project.checker.check(buildOptions);
 
   if (watch) {
