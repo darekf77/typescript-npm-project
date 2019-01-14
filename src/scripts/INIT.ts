@@ -5,6 +5,7 @@ import { error } from '../messages';
 import chalk from 'chalk';
 import { install } from './INSTALL';
 import { RecrusiveBaseline } from './INIT-recrusive-functions';
+import { TnpDBModel } from '../tnp-db';
 
 
 async function initialize(
@@ -81,6 +82,7 @@ export function init(args: string,
 export default {
   $INIT: async (args) => {
     await Project.Current.checker.check();
+    await (await TnpDBModel.Instance()).init().at.BUILD;
     await init(args).project()
     process.exit(0)
   },

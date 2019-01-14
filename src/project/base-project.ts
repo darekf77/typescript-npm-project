@@ -31,12 +31,12 @@ import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
 import { ProjectsChecker } from '../single-instance';
 import { reinstallTnp } from './tnp-bundle';
-
+import { FrameworkFilesGenerator } from './framework-files-generator';
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
 import { TestRunner } from './test-runner';
-import { FrameworkFilesGenerator } from './framework-files-generator';
+
 
 export interface IProject {
   isSite: boolean;
@@ -290,7 +290,9 @@ export class Project implements IProject {
   readonly sourceModifier: SourceModifier;
   //#endregion
 
+  //#region @backend
   readonly frameworkFileGenerator: FrameworkFilesGenerator;
+  //#endregion
 
   //#region @backend
   readonly checker: ProjectsChecker;

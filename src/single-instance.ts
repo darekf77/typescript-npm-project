@@ -19,6 +19,7 @@ import { run } from './process';
 import { BuildOptions } from './models';
 import { info } from './messages';
 import { init } from './scripts/INIT';
+import { IBuildInstance } from './tnp-db/build-instance';
 
 
 export interface PsListInfo {
@@ -388,16 +389,12 @@ export class ProjectsChecker {
 
 }
 
-export type BuildData = {
-  buildOptions: BuildOptions;
-  pid: number;
-};
 
 export class ProjectInstance {
 
   public build: {
-    app: BuildData;
-    lib: BuildData;
+    app: IBuildInstance;
+    lib: IBuildInstance;
   } = { app: {}, lib: {} } as any
 
 

@@ -140,8 +140,8 @@ export interface WatchOptions {
   wait?: number;
 }
 
-
 import { ConnectionOptions } from "typeorm";
+
 
 export interface EnvConfigProject {
   baseUrl: string;
@@ -244,3 +244,8 @@ export interface IPackageJSON {
     // requiredLibs?: string[];
   };
 }
+
+
+
+
+

@@ -6,6 +6,7 @@ import { LibType, BuildDir } from '../models';
 import { Project, ProjectFrom } from '../project';
 import { clearConsole } from '../process';
 import config from '../config';
+import { TnpDBModel } from '../tnp-db';
 
 
 function clearGenerated(project: Project, all, recrusive, outDir: string) {
@@ -24,11 +25,13 @@ function clearGenerated(project: Project, all, recrusive, outDir: string) {
 
 }
 
-export function clear(args, all = false) {
+export async function clear(args, all = false) {
   let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
 
   recrusive = (recrusive || r);
   generated = (generated || g);
+  const project = Project.Current
+  await (await TnpDBModel.Instance()).init(project).at.BUILD;
 
   // console.log('r', r)
   // console.log('recrusive', recrusive)
@@ -36,7 +39,7 @@ export function clear(args, all = false) {
   // console.log('generated', generated)
 
   clearConsole()
-  const project = Project.Current
+
   if (generated) {
     clearGenerated(project, all, recrusive, config.folder.dist)
     // clearGenerated(project, all, recrusive, config.folder.bundle)
@@ -48,9 +51,9 @@ export function clear(args, all = false) {
 }
 
 export default {
-  $CLEAN: (args) => clear(args),
-  $CLEAR: (args) => clear(args),
-  $CLEAN_ALL: (args) => clear(args, true),
-  $CLEAR_ALL: (args) => clear(args, true)
+  $CLEAN: async (args) => { await clear(args) },
+  $CLEAR: async (args) => { await clear(args) },
+  $CLEAN_ALL: async (args) => { await clear(args, true) },
+  $CLEAR_ALL: async (args) => { await clear(args, true) }
 }
 //#endregion
