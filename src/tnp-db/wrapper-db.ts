@@ -82,7 +82,11 @@ export class TnpDB {
       get builds() {
         const res = (self.db.get(ENTITIES.BUILDS).value() as any[])
         if (_.isArray(res)) {
-          return res.map(v => _.merge(new BuildInstance(), v))
+          return res.map(v => {
+            const ins: BuildInstance = _.merge(new BuildInstance(), v)
+            ins.buildOptions = _.merge(new BuildOptions(), ins.buildOptions)
+            return ins;
+          })
         }
         return [];
       }
@@ -147,7 +151,7 @@ export class TnpDB {
       )
     })) {
       this.db.get(ENTITIES.BUILDS).push({
-        buildOptions,
+        buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
         pid,
         location: project.location
       } as BuildInstance).write()

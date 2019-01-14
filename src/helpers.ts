@@ -389,3 +389,32 @@ export function checkValidNpmPackageName(pkg) {
 }
 
 
+export class Range {
+
+  static from(from: number) {
+    // const self = this;
+    return {
+      to(to: number) {
+        return new Range(from, to);
+      }
+    }
+  }
+
+  constructor(
+    public from: number,
+    public to: number) {
+    if (_.isNative(from) || _.isNative(to)) {
+      throw `This Range type is only for positive numbers`
+    }
+  }
+
+  contains(anotherRangeOrNumber: Range | number) {
+    if (_.isNumber(anotherRangeOrNumber)) {
+      return anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to;
+    }
+    anotherRangeOrNumber = anotherRangeOrNumber as Range;
+
+    return (anotherRangeOrNumber.from >= this.from && anotherRangeOrNumber.to <= this.to);
+  }
+
+}
