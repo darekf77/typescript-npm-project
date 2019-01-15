@@ -5,13 +5,20 @@ import { Project } from '../project/base-project';
 import { SystemService } from './system-service';
 import { Range } from '../helpers'
 import { ProjectFrom } from '../project';
+import { TnpDB } from './wrapper-db';
 
 
 
 export class PortsSet {
 
   private ports: PortInstance[];
-  constructor(ports: PortInstance[], private saveCallback: (ports: PortInstance[]) => void) {
+  private saveCallback: (ports: PortInstance[]) => void;
+  constructor(ports: PortInstance[], saveCallback?: (ports: PortInstance[]) => void) {
+    if (_.isFunction(saveCallback)) {
+      this.saveCallback = saveCallback;
+    } else {
+      this.saveCallback = () => { }
+    }
     this.ports = _.cloneDeep(ports).map(c => _.merge(new PortInstance(), c));
   }
 
@@ -24,7 +31,7 @@ export class PortsSet {
   }
 
   private makeSmaller(allInstacesSingle: PortInstance[]) {
-    this.ports = []
+    const ports: PortInstance[] = []
 
     let currentProjectLocationOrSystemService: Project | SystemService = undefined;
     let curretnPortIns: PortInstance;
@@ -33,22 +40,58 @@ export class PortsSet {
       if (!_.isEqual(ins.reservedFor, currentProjectLocationOrSystemService)) {
         currentProjectLocationOrSystemService = ins.reservedFor;
         curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService)
-        this.ports.push(curretnPortIns)
+        ports.push(curretnPortIns)
       } else {
         if (!curretnPortIns) {
           curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService)
-          this.ports.push(curretnPortIns)
+          ports.push(curretnPortIns)
         } else {
           const anotherInsAdded = curretnPortIns.addIdIfPossible(ins.id);
 
           if (!anotherInsAdded) {
             curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService);
-            this.ports.push(curretnPortIns)
+            ports.push(curretnPortIns)
           }
         }
       }
 
     })
+    return ports;
+  }
+
+  public static get count() {
+    return {
+      freePorts(ports: PortInstance[]) {
+        let sum = 0;
+        ports.forEach(ins => {
+          if (ins.isFree) {
+            sum += ins.size;
+          }
+        })
+        return sum;
+      },
+      allPorts(ports: PortInstance[]) {
+        let sum = 0;
+        ports.forEach(ins => {
+          sum += ins.size;
+        })
+        return sum;
+      }
+    }
+
+  }
+
+  get numOfFreePortsAvailable() {
+    return PortsSet.count.freePorts(this.ports);
+  }
+
+  get numOfTakenPortsAvailable() {
+    return this.numOfAllPortsAvailable - this.numOfFreePortsAvailable;
+  }
+
+
+  get numOfAllPortsAvailable() {
+    return PortsSet.count.allPorts(this.ports);
   }
 
   checkIfFreePortAmountEnouth(projectLocationOrSystemService: Project | SystemService, howManyPorts: number, ports: PortInstance[]) {
@@ -62,7 +105,7 @@ export class PortsSet {
         sum += ins.size;
       }
     })
-    return sum >= howManyPorts;
+    return PortsSet.count.freePorts(ports) >= howManyPorts;
   }
 
   private generateAllInstaces(ports: PortInstance[]) {
@@ -93,20 +136,32 @@ export class PortsSet {
   private _reserveFreePortsFor(projectLocationOrSystemService: Project | SystemService, howManyPorts: number = 1, ports: PortInstance[],
     allInstaces?: PortInstance[]): boolean {
 
+    let saveInstancesToDb = false;
+
     if (!this.checkIfFreePortAmountEnouth(projectLocationOrSystemService, howManyPorts, ports)) {
       return false;
     }
 
-    if (projectLocationOrSystemService && _.isString((projectLocationOrSystemService as Project).location) && howManyPorts > 1) {
+    const isProject = (projectLocationOrSystemService && _.isString((projectLocationOrSystemService as Project).location));
+
+    if (isProject && howManyPorts > 1) {
       throw `One project can only have on port`
     }
 
-    let saveInstancesToDb = true;
+    if (isProject) {
+      var project = (projectLocationOrSystemService as Project);
+      if (project.isWorkspace || project.isStandaloneProject) {
+        saveInstancesToDb = true;
+      }
+    }
+
+
+
     if (_.isUndefined(allInstaces)) {
-      saveInstancesToDb = false;
       allInstaces = this.generateAllInstaces(ports);
     }
 
+    // console.log('allInstaces', TnpDB.prepareToSave.ports(allInstaces))
     let countReserved = 0;
     allInstaces.some((ins) => {
       if (countReserved < howManyPorts) {
@@ -119,18 +174,24 @@ export class PortsSet {
       return true;
     })
 
+    // console.log('allInstaces', TnpDB.prepareToSave.ports(allInstaces))
 
-    if (_.isString(projectLocationOrSystemService) && ProjectFrom(projectLocationOrSystemService).children.length > 0) {
-      const childrenSuccessReserverPorts = ProjectFrom(projectLocationOrSystemService).children.filter(child => {
+    if (isProject && project.children.length > 0) {
+      const childrenSuccessReserverPorts = project.children.filter(child => {
         return this._reserveFreePortsFor(child, undefined, ports, allInstaces)
-      }).length === ProjectFrom(projectLocationOrSystemService).children.length;
+      }).length === project.children.length;
       if (!childrenSuccessReserverPorts) {
         return false;
       }
     }
 
     if (saveInstancesToDb) {
-      this.makeSmaller(allInstaces);
+
+      // console.log('allInstaces', TnpDB.prepareToSave.ports(allInstaces))
+      const ports = this.makeSmaller(allInstaces);
+      // console.log('ports', TnpDB.prepareToSave.ports(ports))
+
+      this.ports = ports;
       this.saveCallback(this.ports)
     }
     return true;
@@ -151,7 +212,7 @@ export class PortsSet {
   }
 
   remove(port: PortInstance) {
-    this.ports = this.ports.filter(f => f.isEqual(port));
+    this.ports = this.ports.filter(f => !f.isEqual(port));
     this.saveCallback(this.ports)
   }
 

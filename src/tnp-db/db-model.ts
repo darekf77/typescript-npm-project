@@ -64,8 +64,8 @@ export class TnpDBModel {
           forPorject(project: Project) {
             return self.db.portsSet.reserveFreePortsFor(project)
           },
-          forSystemServices(reserveFor: Project | SystemService, size = 1) {
-            return self.db.portsSet.reserveFreePortsFor(reserveFor, size)
+          forSystemServices(reserveFor: SystemService, size = 1) {
+            return self.db.portsSet.reserveFreePortsFor(reserveFor as SystemService, size)
           }
         }
       }

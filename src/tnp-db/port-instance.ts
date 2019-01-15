@@ -47,12 +47,18 @@ export class PortInstance {
   }
 
   get size() {
+    if (_.isUndefined(this.id)) {
+      console.log(this)
+      throw `Undefined id for instace above`
+    }
+
     if (_.isNumber(this.id)) {
       return 1;
     }
     if (_.isArray(this.id)) {
       return this.id.length;
     }
+    // console.log('THIS ID',this.id)
     return (this.id as Range).length;
   }
 
