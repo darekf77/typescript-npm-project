@@ -6,29 +6,6 @@ import { Range } from '../helpers';
 
 export type PortIdType = number | number[] | Range;
 
-export class PortsSet {
-
-  private ports: PortInstance[];
-  constructor(ports: PortInstance[], private saveCallback: (ports: PortInstance[]) => void) {
-    this.ports = _.cloneDeep(ports).map(c => _.merge(new PortInstance(), c));
-  }
-
-
-  private join(instace1: PortInstance, instace2: PortInstance) {
-
-  }
-
-  firstFreeAndSave(howManyPorts = 1): PortInstance[] {
-
-    return []
-  }
-
-
-  addAndSave(port: PortInstance): PortInstance[] {
-    return []
-  }
-
-}
 
 export class PortInstance {
 
@@ -36,12 +13,41 @@ export class PortInstance {
     public id?: PortIdType,
     public reservedFor?: Project | SystemService) {
 
+    if (_.isArray(id)) {
+      this.id = _.sortBy(id);
+    }
   }
 
   get isFree() {
     return !this.reservedFor;
   }
 
+  get size() {
+    if (_.isNumber(this.id)) {
+      return 1;
+    }
+    if (_.isArray(this.id)) {
+      return this.id.length;
+    }
+    return (this.id as Range).length;
+  }
+
+  isEqual(port: PortInstance) {
+    if (!port) {
+      return false;
+    }
+    return _.isEqual(this.id, port.id);
+  }
+
+  get sortIndex() {
+    if (_.isNumber(this.id)) {
+      return this.id;
+    }
+    if (_.isArray(this.id)) {
+      return _.first(this.id);
+    }
+    return (this.id as Range).from;
+  }
 
 
   /**

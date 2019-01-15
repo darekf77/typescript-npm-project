@@ -10,11 +10,12 @@ import { Project } from '../project/base-project';
 import { ProjectFrom } from '../project';
 import { map } from 'rxjs/operator/map';
 import { DomainInstance } from './domain-instance';
-import { PortInstance, PortsSet } from './port-instance';
+import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { PsListInfo } from './ps-info';
 import { BuildOptions, BuildData } from '../models';
 import { ENTITIES } from './entities';
+import { PortsSet } from './ports-set';
 
 
 export class TnpDB {

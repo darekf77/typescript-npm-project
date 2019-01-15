@@ -408,6 +408,18 @@ export class Range {
     }
   }
 
+  get length() {
+    return this.to - this.from;
+  }
+
+  get array() {
+    const arr = [];
+    for (let index = this.from; index <= this.to; index++) {
+      arr.push(index);
+    }
+    return arr;
+  }
+
   contains(anotherRangeOrNumber: Range | number) {
     if (_.isNumber(anotherRangeOrNumber)) {
       return anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to;

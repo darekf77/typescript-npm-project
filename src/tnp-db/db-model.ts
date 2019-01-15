@@ -61,10 +61,10 @@ export class TnpDBModel {
       get getFree() {
         return {
           one() {
-            return _.first(self.db.portsSet.firstFreeAndSave(1))
+            return _.first(self.db.portsSet.getFree(1))
           },
           array(size = 10) {
-            return self.db.portsSet.firstFreeAndSave(size)
+            return self.db.portsSet.getFree(size)
           }
         }
       }
