@@ -7,21 +7,15 @@ import { LowdbSync } from 'lowdb';
 import * as path from 'path';
 import * as FileSync from 'lowdb/adapters/FileSync'
 import { Project } from '../project/base-project';
-import { ITnpDBModel } from './db-model';
 import { ProjectFrom } from '../project';
 import { map } from 'rxjs/operator/map';
 import { DomainInstance } from './domain-instance';
-import { PortInstance } from './port-instance';
+import { PortInstance, PortsSet } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { PsListInfo } from './ps-info';
 import { BuildOptions, BuildData } from '../models';
+import { ENTITIES } from './entities';
 
-const ENTITIES = Object.freeze({
-  PROJECTS: 'projects',
-  DOMAINS: 'domains',
-  PORTS: 'ports',
-  BUILDS: 'builds'
-})
 
 export class TnpDB {
 
@@ -74,7 +68,7 @@ export class TnpDB {
     }
   }
 
-  get getAll(): ITnpDBModel {
+  get getAll() {
     const self = this;
     return {
       get projects() {
@@ -91,14 +85,6 @@ export class TnpDB {
           return res.map(v => _.merge(new DomainInstance(), v))
         }
         return []
-      },
-
-      get ports() {
-        const res = (self.db.get(ENTITIES.PORTS).value() as any[])
-        if (_.isArray(res)) {
-          return res.map(v => _.merge(new PortInstance(), v))
-        }
-        return [];
       },
 
       get builds() {
@@ -143,6 +129,9 @@ export class TnpDB {
       builds(builds: BuildInstance[]) {
         const json = builds.map(c => self.prepareToSave(c));
         self.db.set(ENTITIES.BUILDS, json);
+      },
+      ports(ports: PortInstance[]) {
+        self.db.set(ENTITIES.PORTS, ports);
       }
     }
   }
@@ -151,7 +140,6 @@ export class TnpDB {
     const self = this;
 
     return {
-
       existedProjects() {
 
         // this.discoverFrom(Project.Tnp);
@@ -197,6 +185,19 @@ export class TnpDB {
     }
   }
 
+  get portsSet() {
+
+    let res = (this.db.get(ENTITIES.PORTS).value() as any[])
+    if (_.isArray(res)) {
+      res = res.map(v => _.merge(new PortInstance(), v))
+    } else {
+      res = []
+    }
+
+    return new PortsSet(res, (ports) => {
+      this.set.ports(ports);
+    });
+  }
 
 
   constructor(public location: string) {

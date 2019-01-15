@@ -6,11 +6,50 @@ import { Range } from '../helpers';
 
 export type PortIdType = number | number[] | Range;
 
+export class PortsSet {
+
+  private ports: PortInstance[];
+  constructor(ports: PortInstance[], private saveCallback: (ports: PortInstance[]) => void) {
+    this.ports = _.cloneDeep(ports).map(c => _.merge(new PortInstance(), c));
+  }
+
+
+  private join(instace1: PortInstance, instace2: PortInstance) {
+
+  }
+
+  firstFreeAndSave(howManyPorts = 1): PortInstance[] {
+
+    return []
+  }
+
+
+  addAndSave(port: PortInstance): PortInstance[] {
+    return []
+  }
+
+}
+
 export class PortInstance {
 
   constructor(
     public id?: PortIdType,
     public reservedFor?: Project | SystemService) {
+
+  }
+
+  get isFree() {
+    return !this.reservedFor;
+  }
+
+
+
+  /**
+   * [1] => 1
+   * [1,2,3,4,5] => 0..5
+   * [1..1] => 1
+   */
+  refactor() {
 
   }
 

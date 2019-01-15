@@ -2,20 +2,11 @@
 import { DomainInstance } from './domain-instance';
 import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
+import * as _ from 'lodash';
 import { Project } from '../project/base-project';
 import { BuildOptions, BuildData } from '../models';
 import { TnpDB } from './wrapper-db';
 
-
-
-export interface ITnpDBModel {
-
-  projects: Project[];
-  builds: BuildInstance[];
-  ports: PortInstance[];
-  domains: DomainInstance[];
-
-}
 
 export class TnpDBModel {
 
@@ -65,14 +56,15 @@ export class TnpDBModel {
   }
 
   get ports() {
+    const self = this;
     return {
       get getFree() {
         return {
           one() {
-            return Math.round(Math.random() * 10);
+            return _.first(self.db.portsSet.firstFreeAndSave(1))
           },
           array(size = 10) {
-            return []
+            return self.db.portsSet.firstFreeAndSave(size)
           }
         }
       }

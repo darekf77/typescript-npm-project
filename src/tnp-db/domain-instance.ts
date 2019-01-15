@@ -3,17 +3,17 @@ import { Project } from '../project/base-project';
 
 
 export class IDomainInstance {
-  domain: string;
-  isHttps: boolean;
-  projectLocation: string;
+  address: string;
+  sockets: boolean;
+  secure: boolean;
+  production: boolean;
 }
 
 
-export class DomainInstance {
-  domain: string;
-  isHttps: boolean;
-  get reservedFor(): Project {
-    return undefined;
-  }
+export class DomainInstance implements IDomainInstance {
+  address: string;
+  sockets: boolean;
+  secure: boolean;
+  production: boolean;
 }
 //#endregion
