@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { Project } from '../project/base-project';
 import { SystemService } from './system-service';
 import { Range } from '../helpers'
+import { ProjectFrom } from '../project';
 
 
 
@@ -14,41 +15,129 @@ export class PortsSet {
     this.ports = _.cloneDeep(ports).map(c => _.merge(new PortInstance(), c));
   }
 
+  public get _ports() {
+    return _.cloneDeep(this.ports).map(c => _.merge(new PortInstance(), c));
+  }
+
   private reorder() {
     this.ports = _.sortBy(this.ports, (o: PortInstance) => o.sortIndex)
   }
 
-  getFree(howManyPorts = 1): PortInstance[] {
-    const freeInstances: PortInstance[] = [];
-    let allInstaces: PortInstance[] = [];
-    this.ports.forEach((ins) => {
-      const { isFree, id, includes, size, reservedFor } = ins;
-      if (size === 1) {
-        allInstaces.push(ins);
+  private makeSmaller(allInstacesSingle: PortInstance[]) {
+    this.ports = []
+
+    let currentProjectLocationOrSystemService: Project | SystemService = undefined;
+    let curretnPortIns: PortInstance;
+    allInstacesSingle.forEach(ins => {
+
+      if (!_.isEqual(ins.reservedFor, currentProjectLocationOrSystemService)) {
+        currentProjectLocationOrSystemService = ins.reservedFor;
+        curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService)
+        this.ports.push(curretnPortIns)
       } else {
-        if (_.isArray(id)) {
-          id.forEach(idelem => {
-            allInstaces.push(new PortInstance(idelem, reservedFor))
-          })
+        if (!curretnPortIns) {
+          curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService)
+          this.ports.push(curretnPortIns)
         } else {
-          const rangeID = id as Range;
-          allInstaces = allInstaces.concat(rangeID.array.map(idelem => {
-            return new PortInstance(idelem, reservedFor)
-          }));
-        }
-      }
-    });
+          const anotherInsAdded = curretnPortIns.addIdIfPossible(ins.id);
 
-    this.ports.forEach(({ isFree, id, includes, size }) => {
-      if (freeInstances.length < howManyPorts) {
-        if (isFree) {
-
+          if (!anotherInsAdded) {
+            curretnPortIns = new PortInstance(ins.id, currentProjectLocationOrSystemService);
+            this.ports.push(curretnPortIns)
+          }
         }
       }
 
     })
+  }
 
-    return []
+  checkIfFreePortAmountEnouth(projectLocationOrSystemService: Project | SystemService, howManyPorts: number, ports: PortInstance[]) {
+    if (_.isUndefined(howManyPorts) && _.isString(projectLocationOrSystemService)) {
+      const project = ProjectFrom(projectLocationOrSystemService);
+      howManyPorts = 1 + (project.isWorkspace ? project.children.length : 0)
+    }
+    let sum = 0;
+    ports.forEach(ins => {
+      if (ins.isFree) {
+        sum += ins.size;
+      }
+    })
+    return sum >= howManyPorts;
+  }
+
+  private generateAllInstaces(ports: PortInstance[]) {
+    let allInstaces: PortInstance[] = [];
+    ports.forEach((ins) => {
+      if (ins.size === 1) {
+        allInstaces.push(ins);
+      } else {
+        if (_.isArray(ins.id)) {
+          ins.id.forEach(idelem => {
+            allInstaces.push(new PortInstance(idelem, ins.reservedFor))
+          })
+        } else {
+          const rangeID = ins.id as Range;
+          allInstaces = allInstaces.concat(rangeID.array.map(idelem => {
+            return new PortInstance(idelem, ins.reservedFor)
+          }));
+        }
+      }
+    });
+    return allInstaces;
+  }
+
+  reserveFreePortsFor(projectLocationOrSystemService: Project | SystemService, howManyPorts: number = 1) {
+    return this._reserveFreePortsFor(projectLocationOrSystemService, howManyPorts, this.ports);
+  }
+
+  private _reserveFreePortsFor(projectLocationOrSystemService: Project | SystemService, howManyPorts: number = 1, ports: PortInstance[],
+    allInstaces?: PortInstance[]): boolean {
+
+    if (!this.checkIfFreePortAmountEnouth(projectLocationOrSystemService, howManyPorts, ports)) {
+      return false;
+    }
+
+    if (projectLocationOrSystemService && _.isString((projectLocationOrSystemService as Project).location) && howManyPorts > 1) {
+      throw `One project can only have on port`
+    }
+
+    let saveInstancesToDb = true;
+    if (_.isUndefined(allInstaces)) {
+      saveInstancesToDb = false;
+      allInstaces = this.generateAllInstaces(ports);
+    }
+
+    let countReserved = 0;
+    allInstaces.some((ins) => {
+      if (countReserved < howManyPorts) {
+        if (ins.isFree) {
+          ins.reservedFor = projectLocationOrSystemService;
+          countReserved++;
+        }
+        return false;
+      }
+      return true;
+    })
+
+
+    if (_.isString(projectLocationOrSystemService) && ProjectFrom(projectLocationOrSystemService).children.length > 0) {
+      const childrenSuccessReserverPorts = ProjectFrom(projectLocationOrSystemService).children.filter(child => {
+        return this._reserveFreePortsFor(child, undefined, ports, allInstaces)
+      }).length === ProjectFrom(projectLocationOrSystemService).children.length;
+      if (!childrenSuccessReserverPorts) {
+        return false;
+      }
+    }
+
+    if (saveInstancesToDb) {
+      this.makeSmaller(allInstaces);
+      this.saveCallback(this.ports)
+    }
+    return true;
+  }
+
+  getReserverFor(projectLocationOrSevice: string | SystemService): PortInstance[] {
+    return this.ports.filter(f => _.isEqual(f.reservedFor, projectLocationOrSevice));
   }
 
   update(port: PortInstance): boolean {

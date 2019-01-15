@@ -1,7 +1,12 @@
 
 //#region @backend
 export class SystemService {
-  name: string;
-  description: string;
+
+  constructor(
+  public name: string,
+  public description?: string
+  ) {
+
+  }
 }
 //#endregion

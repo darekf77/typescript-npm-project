@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { Project } from '../project/base-project';
 import { BuildOptions, BuildData } from '../models';
 import { TnpDB } from './wrapper-db';
+import { SystemService } from './system-service';
 
 
 export class TnpDBModel {
@@ -58,13 +59,13 @@ export class TnpDBModel {
   get ports() {
     const self = this;
     return {
-      get getFree() {
+      get reserve() {
         return {
-          one() {
-            return _.first(self.db.portsSet.getFree(1))
+          forPorject(project: Project) {
+            return self.db.portsSet.reserveFreePortsFor(project)
           },
-          array(size = 10) {
-            return self.db.portsSet.getFree(size)
+          forSystemServices(reserveFor: Project | SystemService, size = 1) {
+            return self.db.portsSet.reserveFreePortsFor(reserveFor, size)
           }
         }
       }

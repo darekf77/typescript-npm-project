@@ -18,6 +18,30 @@ export class PortInstance {
     }
   }
 
+  addIdIfPossible(id: PortIdType): boolean {
+    if (_.isNumber(this.id) && _.isNumber(id)) {
+      this.id = [this.id, id];
+      return true;
+    }
+    if (_.isArray(this.id) && _.isNumber(id)) {
+      if (!this.id.includes(id)) {
+        this.id.push(id);
+        this.makeSmaller()
+        return true;
+      }
+    }
+    if (_.isObject(this.id) && _.isNumber(id)) {
+      const idRange = this.id as Range;
+      if (idRange.to + 1 === id) {
+        idRange.to = id;
+        return true;
+      }
+    }
+
+
+    return false;
+  }
+
   get isFree() {
     return !this.reservedFor;
   }
@@ -52,11 +76,27 @@ export class PortInstance {
 
   /**
    * [1] => 1
-   * [1,2,3,4,5] => 0..5
-   * [1..1] => 1
+   * [1,2,3,4,5] => Range(0 to 5)
+   * Range(1 to 1) => 1
    */
-  refactor() {
-
+  makeSmaller() {
+    if (_.isArray(this.id)) {
+      if (this.id.length === 0) {
+        this.id = _.first(this.id);
+        return;
+      }
+      if (_.first(this.id) + (this.id.length - 1) === _.last(this.id)) {
+        this.id = Range.from(_.first(this.id)).to(_.last(this.id))
+        return
+      }
+    }
+    if (_.isObject(this.id)) {
+      const rangeId = this.id as Range;
+      if (rangeId.from === rangeId.to) {
+        this.id = rangeId.from;
+        return;
+      }
+    }
   }
 
   includes(anotherInstance: PortInstance) {

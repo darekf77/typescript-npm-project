@@ -115,24 +115,47 @@ export class TnpDB {
     this.discoverFrom(project.preview)
   }
 
-  private prepareToSave(build: BuildInstance) {
-    const { buildOptions, pid, project, location } = build;
-    return _.cloneDeep({
-      buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
-      pid,
-      location: _.isString(location) ? location : project.location
-    }) as BuildInstance;
+  public static get prepareToSave() {
+    return {
+      ports(ports: PortInstance[]) {
+        return ports.map(p => {
+          return TnpDB.prepareToSave.port(p)
+        });
+      },
+      builds(builds: BuildInstance[]) {
+        return builds.map(p => {
+          return TnpDB.prepareToSave.build(p)
+        });
+      },
+      build(build: BuildInstance) {
+        const { buildOptions, pid, project, location } = build;
+        return _.cloneDeep({
+          buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
+          pid,
+          location: _.isString(location) ? location : project.location
+        }) as BuildInstance;
+      },
+      port(port: PortInstance) {
+        return _.cloneDeep({
+          id: port.id,
+          reservedFor: !!port.reservedFor && _.isString((port.reservedFor as Project).location) ?
+            (port.reservedFor as Project).location : port.reservedFor
+        } as PortInstance);
+      }
+    }
   }
+
 
   get set() {
     const self = this;
     return {
       builds(builds: BuildInstance[]) {
-        const json = builds.map(c => self.prepareToSave(c));
+        const json = builds.map(c => TnpDB.prepareToSave.build(c));
         self.db.set(ENTITIES.BUILDS, json);
       },
       ports(ports: PortInstance[]) {
-        self.db.set(ENTITIES.PORTS, ports);
+        const json = ports.map(c => TnpDB.prepareToSave.port(c));
+        self.db.set(ENTITIES.PORTS, json);
       }
     }
   }
@@ -176,7 +199,7 @@ export class TnpDB {
             (b.pid == pid)
           )
         })) {
-          self.db.get(ENTITIES.BUILDS).push(self.prepareToSave({
+          self.db.get(ENTITIES.BUILDS).push(TnpDB.prepareToSave.build({
             buildOptions,
             pid,
             project
@@ -190,7 +213,13 @@ export class TnpDB {
 
     let res = (this.db.get(ENTITIES.PORTS).value() as any[])
     if (_.isArray(res)) {
-      res = res.map(v => _.merge(new PortInstance(), v))
+      res = res.map(v => {
+        const r = _.merge(new PortInstance(), v) as PortInstance;
+        if (_.isString(r.reservedFor)) {
+          r.reservedFor = ProjectFrom(r.reservedFor)
+        }
+        return r;
+      })
     } else {
       res = []
     }
