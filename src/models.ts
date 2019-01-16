@@ -17,6 +17,7 @@ export type LibType = "angular-lib"
   | "ionic-client"
   | 'server-lib'
   | 'workspace'
+  | 'container'
   | 'angular-cli'
   | 'docker'
   | 'unknow-npm-project'

@@ -17,6 +17,7 @@ import config from '../config';
 import { run } from '../process';
 import { error } from '../messages';
 import { UnknowNpmProject } from './project-unknow-npm';
+import { ProjectContainer } from './project-container';
 //#endregion
 export * from './base-project';
 
@@ -31,6 +32,7 @@ export * from './project-ionic-client';
 export * from './project-isomorphic-lib';
 export * from './project-server-lib';
 export * from './project-workspace';
+export * from './project-container';
 
 function typeFrom(location: string): LibType {
   const packageJson = PackageJSON.fromLocation(location);
@@ -71,6 +73,7 @@ export function ProjectFrom(location: string, warnings = false): Project {
   if (type === 'angular-cli') resultProject = new ProjectAngularCliClient(location);
   if (type === 'ionic-client') resultProject = new ProjectIonicClient(location);
   if (type === 'unknow-npm-project') resultProject = new UnknowNpmProject(location);
+  if (type === 'container') resultProject = new ProjectContainer(location);
   // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
   //     : ('NO PROJECT FROM LOCATION ' + location))
 

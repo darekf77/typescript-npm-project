@@ -1,0 +1,10 @@
+{
+  "tnp": {
+    "resources": [
+      "README.md"
+    ],
+    "type": "container"
+  },
+  "name": "baseline",
+  "version": "0.0.0"
+}

@@ -35,6 +35,7 @@ export const config = {
     controllers: 'controllers',
     projects: 'projects',
     workspace: 'workspace',
+    container: 'container',
     client: 'client',
     bin: 'bin',
     _bin: '.bin'
@@ -73,7 +74,8 @@ export const config = {
       'angular-lib',
       'isomorphic-lib',
       'ionic-client',
-      'docker'
+      'docker',
+      'container'
     ] as LibType[],
     libs: [
       'angular-lib',

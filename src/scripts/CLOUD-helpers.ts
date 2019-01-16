@@ -13,7 +13,7 @@ import { error } from '../messages';
 export namespace CloudHelpers {
 
   export function cloudProject() {
-    return ProjectFrom(path.join(Project.Tnp.location, 'projects/site'));
+    return ProjectFrom(path.join(Project.Tnp.location, 'projects/container/site'));
   }
 
   export function cloudBuild() {

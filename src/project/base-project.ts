@@ -47,6 +47,8 @@ export interface IProject {
   isWorkspaceChildProject: boolean;
   isBasedOnOtherProject: boolean;
   isWorkspace: boolean;
+  isContainer: boolean;
+  isContainerChild: boolean;
   isStandaloneProject: boolean;
   isTnp: boolean;
   isCloud: boolean;
@@ -131,6 +133,24 @@ export class Project implements IProject {
     }
     //#region @backend
     return this.type === 'workspace';
+    //#endregion
+  }
+
+  get isContainer() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isContainer;
+    }
+    //#region @backend
+    return this.type === 'container';
+    //#endregion
+  }
+
+  get isContainerChild() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isContainerChild;
+    }
+    //#region @backend
+    return !!this.parent && this.parent.type === 'container';
     //#endregion
   }
 
@@ -817,17 +837,17 @@ Generated workspace should be here: ${genLocationWOrkspace}
     // console.log('by libraryType ' + libraryType)
     let projectPath;
     if (libraryType === 'workspace') {
-      let p = ProjectFrom(path.join(__dirname, `../../projects/workspace`));
+      let p = ProjectFrom(path.join(__dirname, `../../projects/container/workspace`));
       if (!p) {
-        p = ProjectFrom(path.join(__dirname, `../projects/workspace`));
+        p = ProjectFrom(path.join(__dirname, `../projects/container/workspace`));
       }
       return p;
     }
-    projectPath = path.join(__dirname, `../../projects/workspace/${libraryType}`);
+    projectPath = path.join(__dirname, `../../projects/container/workspace/${libraryType}`);
     if (fse.existsSync(projectPath)) {
       return ProjectFrom(projectPath);
     }
-    projectPath = path.join(__dirname, `../projects/workspace/${libraryType}`);
+    projectPath = path.join(__dirname, `../projects/container/workspace/${libraryType}`);
     if (!fs.existsSync(projectPath)) {
       error(`Bad library type: ${libraryType}`, true)
       return undefined;
