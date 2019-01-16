@@ -64,6 +64,7 @@ export class TnpDB {
       this.db.defaults({ projects: [], domains: [], ports: [], builds: [] })
         .write()
       this.add.existedProjects()
+      this.add.existedDomains()
 
 
       const defaultPorts: PortInstance[] = [
@@ -74,7 +75,7 @@ export class TnpDB {
 
       ]
       this.set.ports(defaultPorts);
-      console.log('[wrapper-db] Existed projects added')
+      // console.log('[wrapper-db] Existed projects added')
       if (_.isObject(buildOptions) && _.isObject(projectForBuild) && _.isNumber(buildPid)) {
         this.add.buildIfNotExist(projectForBuild, buildOptions, buildPid);
         console.log('[wrapper-db] Current project added')
@@ -96,7 +97,13 @@ export class TnpDB {
       get domains() {
         const res = (self.db.get(ENTITIES.DOMAINS).value() as any[])
         if (_.isArray(res)) {
-          return res.map(v => _.merge(new DomainInstance(), v))
+          return res.map(v => {
+            const d: DomainInstance = _.merge(new DomainInstance(), v);
+            d.declaredIn = d.declaredIn.map(d => {
+              return { environment: d.environment, project: ProjectFrom(d.project as any) }
+            })
+            return d;
+          })
         }
         return []
       },
@@ -154,6 +161,18 @@ export class TnpDB {
           reservedFor: !!port.reservedFor && _.isString((port.reservedFor as Project).location) ?
             (port.reservedFor as Project).location : port.reservedFor
         } as PortInstance);
+      },
+      domain(domain: DomainInstance) {
+        const { activeFor, address, secure, production, declaredIn, sockets } = domain;
+        return _.cloneDeep({
+          declaredIn: declaredIn.map(d => {
+            return { environment: d.environment, project: d.project.location }
+          }) as any,
+          address,
+          production,
+          secure,
+          sockets
+        } as DomainInstance);
       }
     }
   }
@@ -168,35 +187,70 @@ export class TnpDB {
       },
       ports(ports: PortInstance[]) {
         const json = ports.map(c => TnpDB.prepareToSave.port(c));
-        console.log('ports to save', ports)
+        // console.log('ports to save', ports)
         self.db.set(ENTITIES.PORTS, json).write()
+      },
+      domains(domains: DomainInstance[]) {
+        const json = domains.map(c => TnpDB.prepareToSave.domain(c));
+        // console.log('ports to save', ports)
+        self.db.set(ENTITIES.DOMAINS, json).write()
       }
     }
+  }
+
+  private discoverProjectsInLocation(location: string) {
+    // this.discoverFrom(Project.Tnp);
+    fse.readdirSync(location)
+      .map(name => path.join(location, name))
+      .map(location => {
+        // console.log(location)
+        return ProjectFrom(location)
+      })
+      .filter(f => !!f)
+      .filter(f => {
+        // console.log(`Type for ${f.name} === ${f.type}`)
+        return f.type !== 'unknow-npm-project'
+      })
+      .forEach(project => {
+        // console.log(project.name)
+        this.discoverFrom(project)
+      })
   }
 
   get add() {
     const self = this;
 
     return {
-      existedProjects() {
 
-        // this.discoverFrom(Project.Tnp);
-        const npmProjects = path.resolve(path.join(Project.Tnp.location, '..'))
-        fse.readdirSync(npmProjects)
-          .map(name => path.join(npmProjects, name))
-          .map(location => {
-            // console.log(location)
-            return ProjectFrom(location)
-          })
-          .filter(f => !!f)
-          .filter(f => {
-            // console.log(`Type for ${f.name} === ${f.type}`)
-            return f.type !== 'unknow-npm-project'
-          })
-          .forEach(project => {
-            // console.log(project.name)
-            self.discoverFrom(project)
-          })
+      existedProjects() {
+        self.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
+        self.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
+      },
+
+      existedDomains() {
+        const domains: DomainInstance[] = [];
+        self.getAll.projects.forEach(project => {
+          if (!project.isWorkspaceChildProject && project.env &&
+            project.env.config && project.env.config.domain) {
+
+            // console.log(`Domain detected: ${p.env.config.domain}, env:${p.env.config.name} `)
+            const address = project.env.config.domain;
+            const environment = project.env.config.name;
+            const existed = domains.find(d => d.address === address);
+            if (existed) {
+              existed.declaredIn.push({ project, environment })
+            } else {
+              const domain = new DomainInstance()
+              domain.address = address;
+              domain.declaredIn = [{ project, environment }]
+              domains.push(domain)
+            }
+
+          }
+        })
+
+        self.set.domains(domains);
+
       },
 
       projectIfNotExist(project: Project) {

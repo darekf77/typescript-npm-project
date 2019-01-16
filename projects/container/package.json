@@ -5,6 +5,6 @@
     ],
     "type": "container"
   },
-  "name": "baseline",
+  "name": "container",
   "version": "0.0.0"
 }
