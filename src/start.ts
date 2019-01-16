@@ -13,6 +13,9 @@ import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
 import config from './config';
 import { ConsoleUi } from './console-ui';
+import { TnpDBModel } from './tnp-db/db-model';
+import { $LAST } from './scripts/DB';
+import { info } from './messages';
 
 process.env[config.message.tnp_bundle_mode] = 'false'
 
@@ -70,6 +73,19 @@ const helpAlias = [
 
 
 export async function start(argsv: string[]) {
+
+  const db = await TnpDBModel.Instance();
+  // console.log(argsv)
+  if (
+    (argsv.length === 2 && argsv[1].endsWith('/bin/tnp')) ||
+    (argsv.length === 3 && argsv[1].endsWith('/bin/tnp')
+      && argsv[2] === _.kebabCase(_.lowerCase($LAST.name))
+    )
+  ) {
+    info(`Replaying last command`);
+  } else {
+    db.init().at.ANY_COMMAND(process.cwd(), argsv);
+  }
 
   let recognized = false;
   if (Array.isArray(argsv) && argsv.length >= 3) {
@@ -136,7 +152,8 @@ export async function start(argsv: string[]) {
       const p = Project.Current;
 
       if (p) {
-        const ui = new ConsoleUi(p);
+
+        const ui = new ConsoleUi(p, db);
         try {
           await ui.init()
         } catch (error) {

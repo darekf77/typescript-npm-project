@@ -188,78 +188,79 @@ export class ProjectsChecker {
   }
 
   async check(buildOptions?: BuildOptions) {
+    return;
 
-    return new Promise(async (resolve) => {
-
-
-
-      this.jsonWithProjectsPath = path.join(Project.Tnp.location, `bin/${config.file.projects_json}`);
-      setTimeout(async () => {
+    // return new Promise(async (resolve) => {
 
 
-        let projecBuild: Project = this.project;
-        let processPid: number = process.pid;
 
-        this.lock()
-        this.load()
-
-        await this.update();
-
-        if (buildOptions) {
-
-          let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
-          if (projectInstance) {
-
-            const pidApp = projectInstance.build.app.pid;
-            const pidLib = projectInstance.build.lib.pid;
-
-            // console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
-
-            if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
-              await this.action(projectInstance, buildOptions.appBuild, () => {
-                const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
-                if (buildOptions.appBuild) {
-                  projectInstance.build.app.pid = process.pid;
-                  projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
-                } else {
-                  projectInstance.build.lib.pid = process.pid;
-                  projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
-                }
+    //   this.jsonWithProjectsPath = path.join(Project.Tnp.location, `bin/${config.file.projects_json}`);
+    //   setTimeout(async () => {
 
 
-                console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
-                killProcess(pidToKill)
-              })
-            } else {
-              // update process
-              if (buildOptions.appBuild) {
-                projectInstance.build.app.pid = process.pid;
-                projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
-              } else {
-                projectInstance.build.lib.pid = process.pid;
-                projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
-              }
-            }
+    //     let projecBuild: Project = this.project;
+    //     let processPid: number = process.pid;
 
-          } else {
-            projectInstance = new ProjectInstance(projecBuild.location);
-            if (buildOptions.appBuild) {
-              projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
-              projectInstance.build.app.pid = processPid;
-            } else {
-              projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
-              projectInstance.build.lib.pid = processPid;
-            }
+    //     this.lock()
+    //     this.load()
 
-            this.instances.push(projectInstance)
-          }
-          this.automaticlyAddWorkspaceInstance(this.project)
-          this.save()
-          console.log('** check system/pids end')
-        }
-        resolve()
-      })
-    })
+    //     await this.update();
+
+    //     if (buildOptions) {
+
+    //       let projectInstance = this.instances.find(p => p.project.location === projecBuild.location)
+    //       if (projectInstance) {
+
+    //         const pidApp = projectInstance.build.app.pid;
+    //         const pidLib = projectInstance.build.lib.pid;
+
+    //         // console.log(`Found instance of ${this.project.name}, builds: app(${pidApp}) , lib(${pidLib})`)
+
+    //         if ((_.isNumber(pidApp) && buildOptions.appBuild) || (_.isNumber(pidLib) && !buildOptions.appBuild)) {
+    //           await this.action(projectInstance, buildOptions.appBuild, () => {
+    //             const pidToKill = buildOptions.appBuild ? projectInstance.build.app.pid : projectInstance.build.lib.pid
+    //             if (buildOptions.appBuild) {
+    //               projectInstance.build.app.pid = process.pid;
+    //               projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+    //             } else {
+    //               projectInstance.build.lib.pid = process.pid;
+    //               projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+    //             }
+
+
+    //             console.log(`Kill build process on pid ${pidToKill} for ${projectInstance.project.name}`)
+    //             killProcess(pidToKill)
+    //           })
+    //         } else {
+    //           // update process
+    //           if (buildOptions.appBuild) {
+    //             projectInstance.build.app.pid = process.pid;
+    //             projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+    //           } else {
+    //             projectInstance.build.lib.pid = process.pid;
+    //             projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+    //           }
+    //         }
+
+    //       } else {
+    //         projectInstance = new ProjectInstance(projecBuild.location);
+    //         if (buildOptions.appBuild) {
+    //           projectInstance.build.app.buildOptions = _.cloneDeep(buildOptions);
+    //           projectInstance.build.app.pid = processPid;
+    //         } else {
+    //           projectInstance.build.lib.buildOptions = _.cloneDeep(buildOptions);
+    //           projectInstance.build.lib.pid = processPid;
+    //         }
+
+    //         this.instances.push(projectInstance)
+    //       }
+    //       this.automaticlyAddWorkspaceInstance(this.project)
+    //       this.save()
+    //       console.log('** check system/pids end')
+    //     }
+    //     resolve()
+    //   })
+    // })
 
   }
 

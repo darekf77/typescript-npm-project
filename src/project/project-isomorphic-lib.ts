@@ -17,6 +17,8 @@ import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/increme
 import { error } from '../messages';
 import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
+import { TnpDBModel } from '../tnp-db';
+import { CommandInstance } from '../tnp-db/command-instance';
 
 
 
@@ -140,7 +142,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     return;
   }
 
-  private async selectClients(buildOptions:BuildOptions) {
+  private async selectClients(buildOptions: BuildOptions) {
     const { projects = [] }: { projects: string[] } = await inquirer
       .prompt([
         {
@@ -156,6 +158,15 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         }
       ]) as any;
     buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
+
+    const db = await TnpDBModel.Instance()
+    const cmd = db.get.lastCommandFrom(this.location);
+    db.update.command(CommandInstance.from(this.location)
+      .command(cmd.command + ' ' + buildOptions.forClient.map(c => {
+        return `--forClient ${c.name}`
+      }).join(' ')
+      ))
+
   }
 
   private copyWhenExist(source: string, outDir: string) {

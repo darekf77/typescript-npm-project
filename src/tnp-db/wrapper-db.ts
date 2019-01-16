@@ -18,6 +18,9 @@ import { Range } from '../helpers';
 import { ENTITIES } from './entities';
 import { PortsSet } from './ports-set';
 import { SystemService } from './system-service';
+import { CommandInstance } from './command-instance';
+import { start } from '../start';
+import { error } from '../messages';
 
 
 export class TnpDB {
@@ -61,7 +64,7 @@ export class TnpDB {
     this.db = low(this._adapter)
     if (recreate) {
       console.log('[wrapper-db]recreate values')
-      this.db.defaults({ projects: [], domains: [], ports: [], builds: [] })
+      this.db.defaults({ projects: [], domains: [], ports: [], builds: [], commands: [] })
         .write()
       this.add.existedProjects()
       this.add.existedDomains()
@@ -86,6 +89,18 @@ export class TnpDB {
   get getAll() {
     const self = this;
     return {
+      get commands(): CommandInstance[] {
+        const res = (self.db.get(ENTITIES.COMMANDS).value() as CommandInstance[])
+        if (_.isArray(res)) {
+          return res.map(cmd => {
+            const c = new CommandInstance();
+            c.command = cmd.command;
+            c.location = cmd.location;
+            return c;
+          })
+        };
+        return [];
+      },
       get projects() {
         const res = (self.db.get(ENTITIES.PROJECTS).value() as string[])
         if (_.isArray(res)) {
@@ -137,16 +152,6 @@ export class TnpDB {
 
   public static get prepareToSave() {
     return {
-      ports(ports: PortInstance[]) {
-        return ports.map(p => {
-          return TnpDB.prepareToSave.port(p)
-        });
-      },
-      builds(builds: BuildInstance[]) {
-        return builds.map(p => {
-          return TnpDB.prepareToSave.build(p)
-        });
-      },
       build(build: BuildInstance) {
         const { buildOptions, pid, project, location } = build;
         return _.cloneDeep({
@@ -161,6 +166,12 @@ export class TnpDB {
           reservedFor: !!port.reservedFor && _.isString((port.reservedFor as Project).location) ?
             (port.reservedFor as Project).location : port.reservedFor
         } as PortInstance);
+      },
+      command(cmd: CommandInstance) {
+        const { command, location } = cmd;
+        return _.cloneDeep({
+          command, location
+        } as CommandInstance);
       },
       domain(domain: DomainInstance) {
         const { activeFor, address, secure, production, declaredIn, sockets } = domain;
@@ -181,6 +192,10 @@ export class TnpDB {
   get set() {
     const self = this;
     return {
+      commands(commands: CommandInstance[]) {
+        const json = commands.map(c => TnpDB.prepareToSave.command(c));
+        self.db.set(ENTITIES.COMMANDS, json).write()
+      },
       builds(builds: BuildInstance[]) {
         const json = builds.map(c => TnpDB.prepareToSave.build(c));
         self.db.set(ENTITIES.BUILDS, json).write()
@@ -295,6 +310,51 @@ export class TnpDB {
     return new PortsSet(res, (ports) => {
       this.set.ports(ports);
     });
+  }
+
+  get commandsSet() {
+    const self = this;
+    const commands = this.getAll.commands;
+    return {
+      setCommand(location: string, command: string) {
+        const cmd = commands.find(c => c.location === location);
+        if (cmd) {
+          cmd.command = command;
+        } else {
+          const c = new CommandInstance();
+          c.location = location;
+          c.command = command;
+          commands.push(c)
+        }
+        self.set.commands(commands)
+      },
+      lastCommandFrom(location: string): CommandInstance {
+        const cmd = commands.find(c => c.location === location)
+        return cmd;
+      },
+
+      update(cmd: CommandInstance) {
+        const c = commands.find(c => c.location === cmd.location)
+        c.command = cmd.command;
+        self.set.commands(commands)
+      },
+
+      async runCommand(cmd: CommandInstance) {
+        if (cmd) {
+          await start(cmd.command.split(' '));
+        } else {
+          error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+        }
+      },
+      async runLastCommandIn(location: string) {
+        const cmd = commands.find(c => c.location === location)
+        if (cmd) {
+          await start(cmd.command.split(' '));
+        } else {
+          error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+        }
+      }
+    }
   }
 
 

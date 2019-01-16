@@ -7,6 +7,7 @@ import { Project } from '../project/base-project';
 import { BuildOptions, BuildData } from '../models';
 import { TnpDB } from './wrapper-db';
 import { SystemService } from './system-service';
+import { CommandInstance } from './command-instance';
 
 
 export class TnpDBModel {
@@ -24,16 +25,32 @@ export class TnpDBModel {
 
   }
 
-
-  get projects() {
-    return this.db.getAll.projects;
+  get get() {
+    const self = this;
+    return {
+      lastCommandFrom(location: string): CommandInstance {
+        return self.db.commandsSet.lastCommandFrom(location);
+      }
+    }
   }
 
-  get builds() {
-    return this.db.getAll.builds;
+  get update() {
+    const self = this;
+    return {
+      command(cmd: CommandInstance) {
+        self.db.commandsSet.update(cmd);
+      }
+    }
   }
 
-
+  get start() {
+    const self = this;
+    return {
+      async lastCommand(cmd: CommandInstance) {
+        await self.db.commandsSet.runCommand(cmd);
+      }
+    }
+  }
 
 
   init(currentProject: Project = Project.Current) {
@@ -50,6 +67,9 @@ export class TnpDBModel {
           },
           async CLEAN() {
 
+          },
+          async ANY_COMMAND(location: string, args: string[]) {
+            self.db.commandsSet.setCommand(location, args.join(' '))
           }
         }
       }
@@ -74,6 +94,7 @@ export class TnpDBModel {
 
 
   get checkIf() {
+    const self = this;
     return {
       get allowed() {
         return {

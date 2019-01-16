@@ -7,6 +7,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib } from './scripts/BUILD';
+import { TnpDBModel } from './tnp-db';
+import { CommandInstance } from './tnp-db/command-instance';
 
 enum CHOICE {
   LAST_USED_COMMAND = 'Last used command',
@@ -25,13 +27,16 @@ enum CHOICE {
 export class ConsoleUi {
 
   private readonly lastCommandFileName = 'last-command.txt'
-  constructor(public project: Project) {
+  constructor(public project: Project, private db: TnpDBModel) {
 
   }
 
+  lastCmd: CommandInstance;
   get lastCommandAvailable(): Boolean {
-    return fse.existsSync(path.join(this.project.location, this.lastCommandFileName))
+    this.lastCmd = this.db.get.lastCommandFrom(this.project.location)
+    return !!this.lastCmd;
   }
+
 
 
   async init() {
@@ -44,7 +49,7 @@ export class ConsoleUi {
         .getNamesAndValues(CHOICE)
         .filter(({ name, value }) => {
           if (!this.lastCommandAvailable) {
-            if(value === CHOICE.LAST_USED_COMMAND) {
+            if (value === CHOICE.LAST_USED_COMMAND) {
               return false
             }
           }
@@ -52,12 +57,16 @@ export class ConsoleUi {
         })
     }) as any;
 
+
+
     if (res.command === CHOICE.BUILD_DIST_WATCH) {
 
       await buildLib(false, true, 'dist', '')
     }
     else if (res.command === CHOICE.BUILD_DIST) {
       await buildLib(false, false, 'dist', '')
+    } else if (res.command === CHOICE.LAST_USED_COMMAND) {
+      await this.db.start.lastCommand(this.lastCmd);
     }
   }
 
