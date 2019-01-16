@@ -14,8 +14,10 @@ import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { PsListInfo } from './ps-info';
 import { BuildOptions, BuildData } from '../models';
+import { Range } from '../helpers';
 import { ENTITIES } from './entities';
 import { PortsSet } from './ports-set';
+import { SystemService } from './system-service';
 
 
 export class TnpDB {
@@ -36,16 +38,16 @@ export class TnpDB {
       }
 
     }
-    if (this._firstTimeInit) {
-      console.log('[wrapper-db] exist listener inited')
+    // if (this._firstTimeInit) {
+    //   console.log('[wrapper-db] exist listener inited')
 
-      process.on('exit', l => {
-        console.log('[wrapper-db] EXIT ACTION EXECUTED')
-        let builds = this._instance.getAll.builds;
-        builds = builds.filter(b => b.pid === process.pid);
-        this._instance.set.builds(builds);
-      })
-    }
+    //   process.on('exit', l => {
+    //     console.log('[wrapper-db] EXIT ACTION EXECUTED')
+    //     let builds = this._instance.getAll.builds;
+    //     builds = builds.filter(b => b.pid === process.pid);
+    //     this._instance.set.builds(builds);
+    //   })
+    // }
     return this._instance;
   }
 
@@ -58,9 +60,20 @@ export class TnpDB {
     this._adapter = new FileSync(this.location)
     this.db = low(this._adapter)
     if (recreate) {
+      console.log('[wrapper-db]recreate values')
       this.db.defaults({ projects: [], domains: [], ports: [], builds: [] })
         .write()
       this.add.existedProjects()
+
+
+      const defaultPorts: PortInstance[] = [
+
+
+        new PortInstance([80, 443], new SystemService('http(s) related')),
+        new PortInstance(Range.from(4000).to(6000))
+
+      ]
+      this.set.ports(defaultPorts);
       console.log('[wrapper-db] Existed projects added')
       if (_.isObject(buildOptions) && _.isObject(projectForBuild) && _.isNumber(buildPid)) {
         this.add.buildIfNotExist(projectForBuild, buildOptions, buildPid);
@@ -151,11 +164,12 @@ export class TnpDB {
     return {
       builds(builds: BuildInstance[]) {
         const json = builds.map(c => TnpDB.prepareToSave.build(c));
-        self.db.set(ENTITIES.BUILDS, json);
+        self.db.set(ENTITIES.BUILDS, json).write()
       },
       ports(ports: PortInstance[]) {
         const json = ports.map(c => TnpDB.prepareToSave.port(c));
-        self.db.set(ENTITIES.PORTS, json);
+        console.log('ports to save', ports)
+        self.db.set(ENTITIES.PORTS, json).write()
       }
     }
   }

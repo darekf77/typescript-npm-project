@@ -27,3 +27,4 @@
 /run.js
 /projects/tmp*
 /bin/projects.json
+/bin/db.json
