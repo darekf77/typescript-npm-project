@@ -17,7 +17,7 @@ import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/increme
 import { error } from '../messages';
 import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
-import { TnpDBModel } from '../tnp-db';
+import { TnpDB } from '../tnp-db';
 import { CommandInstance } from '../tnp-db/command-instance';
 
 
@@ -159,9 +159,9 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
       ]) as any;
     buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
 
-    const db = await TnpDBModel.Instance()
-    const cmd = db.get.lastCommandFrom(this.location);
-    db.update.command(CommandInstance.from(this.location)
+    const db = await TnpDB.Instance;
+    const cmd = db.commands.lastCommandFrom(this.location);
+    db.commands.update(CommandInstance.from(this.location)
       .command(cmd.command + ' ' + buildOptions.forClient.map(c => {
         return `--forClient ${c.name}`
       }).join(' ')

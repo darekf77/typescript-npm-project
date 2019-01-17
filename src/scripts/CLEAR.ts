@@ -6,7 +6,7 @@ import { LibType, BuildDir } from '../models';
 import { Project, ProjectFrom } from '../project';
 import { clearConsole } from '../process';
 import config from '../config';
-import { TnpDBModel } from '../tnp-db';
+import { TnpDB } from '../tnp-db';
 
 
 function clearGenerated(project: Project, all, recrusive, outDir: string) {
@@ -31,7 +31,7 @@ export async function clear(args, all = false) {
   recrusive = (recrusive || r);
   generated = (generated || g);
   const project = Project.Current
-  await (await TnpDBModel.Instance()).init(project).at.BUILD;
+  await (await TnpDB.Instance).notify.when.CLEAN(project);
 
   // console.log('r', r)
   // console.log('recrusive', recrusive)

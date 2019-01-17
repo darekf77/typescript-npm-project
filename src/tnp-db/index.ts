@@ -1,3 +1,3 @@
 //#region @backend
-export * from './db-model';
+export * from './wrapper-db';
 //#endregion

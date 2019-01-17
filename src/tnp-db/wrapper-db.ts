@@ -21,6 +21,7 @@ import { SystemService } from './system-service';
 import { CommandInstance } from './command-instance';
 import { start } from '../start';
 import { error } from '../messages';
+import { getWorkingDirOfProcess } from '../process';
 
 
 export class TnpDB {
@@ -28,35 +29,29 @@ export class TnpDB {
   private static _instance: TnpDB;
 
   private static _firstTimeInit = true;
-  public static async Instance(forceReinit = false, buildData?: BuildData) {
 
+  private static async instance() {
     if (!this._instance) {
       const location = path.join(Project.Tnp.location, `bin/db.json`);
       this._instance = new TnpDB(location)
-      if (buildData) {
-        const { project, buildOptions, pid } = buildData;
-        await this._instance.init(forceReinit || !fse.existsSync(location), project, buildOptions, pid)
-      } else {
-        await this._instance.init(forceReinit || !fse.existsSync(location))
-      }
-
+      await this._instance.init(!fse.existsSync(location))
     }
-    // if (this._firstTimeInit) {
-    //   console.log('[wrapper-db] exist listener inited')
+    return this._instance;
+  }
+  public static get Instance() {
+    return this.instance()
+  }
 
-    //   process.on('exit', l => {
-    //     console.log('[wrapper-db] EXIT ACTION EXECUTED')
-    //     let builds = this._instance.getAll.builds;
-    //     builds = builds.filter(b => b.pid === process.pid);
-    //     this._instance.set.builds(builds);
-    //   })
-    // }
+  public static get InstanceSync() {
+    if (!this._instance) {
+      error(`Please use (await TnpDB.Instance) here`);
+    }
     return this._instance;
   }
 
   private _adapter;
   private db;
-  private async init(recreate = false, projectForBuild?: Project, buildOptions?: BuildOptions, buildPid?: number) {
+  public async init(recreate = true) {
     if (recreate) {
       fse.writeFileSync(this.location, '')
     }
@@ -68,6 +63,7 @@ export class TnpDB {
         .write()
       this.add.existedProjects()
       this.add.existedDomains()
+      await this.add.existedBuilds();
 
 
       const defaultPorts: PortInstance[] = [
@@ -78,15 +74,10 @@ export class TnpDB {
 
       ]
       this.set.ports(defaultPorts);
-      // console.log('[wrapper-db] Existed projects added')
-      if (_.isObject(buildOptions) && _.isObject(projectForBuild) && _.isNumber(buildPid)) {
-        this.add.buildIfNotExist(projectForBuild, buildOptions, buildPid);
-        console.log('[wrapper-db] Current project added')
-      }
     }
   }
 
-  get getAll() {
+  private get getAll() {
     const self = this;
     return {
       get commands(): CommandInstance[] {
@@ -153,10 +144,11 @@ export class TnpDB {
   public static get prepareToSave() {
     return {
       build(build: BuildInstance) {
-        const { buildOptions, pid, project, location } = build;
+        const { pid, project, location, buildOptions, cmd } = build;
         return _.cloneDeep({
           buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
           pid,
+          cmd,
           location: _.isString(location) ? location : project.location
         }) as BuildInstance;
       },
@@ -189,7 +181,7 @@ export class TnpDB {
   }
 
 
-  get set() {
+  private get set() {
     const self = this;
     return {
       commands(commands: CommandInstance[]) {
@@ -232,10 +224,32 @@ export class TnpDB {
       })
   }
 
-  get add() {
+
+
+  private get add() {
     const self = this;
 
     return {
+
+      async existedBuilds() {
+        const ps: PsListInfo[] = await psList();
+        // console.log(ps.filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0));
+        const builds = ps
+          .filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0)
+          .map(p => {
+            const location = getWorkingDirOfProcess(p.pid);
+            const project = ProjectFrom(location)
+            if (project) {
+              const b = new BuildInstance()
+              b.location = getWorkingDirOfProcess(p.pid);
+              b.pid = p.pid;
+              b.cmd = p.cmd;
+              return b;
+            }
+          })
+          .filter(p => !!p)
+        self.set.builds(builds);
+      },
 
       existedProjects() {
         self.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
@@ -282,17 +296,15 @@ export class TnpDB {
             (b.pid == pid)
           )
         })) {
-          self.db.get(ENTITIES.BUILDS).push(TnpDB.prepareToSave.build({
-            buildOptions,
-            pid,
-            project
-          })).write()
+          const b = new BuildInstance({ buildOptions, pid, location: project.location })
+
+          self.db.get(ENTITIES.BUILDS).push(TnpDB.prepareToSave.build(b)).write()
         }
       }
     }
   }
 
-  get portsSet() {
+  get ports() {
 
     let res = (this.db.get(ENTITIES.PORTS).value() as any[])
     if (_.isArray(res)) {
@@ -312,7 +324,25 @@ export class TnpDB {
     });
   }
 
-  get commandsSet() {
+  get projects() {
+    const self = this;
+    return {
+      discoverExistedProjects() {
+        self.add.existedProjects()
+        console.log(self.getAll.projects)
+      }
+    }
+  }
+
+  get builds() {
+    return {
+      killForClearOf(project: Project) {
+
+      }
+    }
+  }
+
+  get commands() {
     const self = this;
     const commands = this.getAll.commands;
     return {
@@ -358,12 +388,58 @@ export class TnpDB {
   }
 
 
-  constructor(public location: string) {
+  constructor(private location: string) {
 
 
 
   }
 
 
+  get notify() {
+    const self = this;
+    return {
+      get when() {
+        return {
+          async BUILD(currentProject: Project, buildOptions: BuildOptions, pid: number) {
+            self.add.projectIfNotExist(currentProject);
+            self.add.buildIfNotExist(currentProject, buildOptions, pid)
+          },
+          async INIT(currentProject: Project) {
+            self.add.projectIfNotExist(currentProject);
+          },
+          async CLEAN(currentProject: Project) {
+            self.add.projectIfNotExist(currentProject);
+          },
+          async ANY_COMMAND(location: string, args: string[]) {
+            self.commands.setCommand(location, args.join(' '))
+          }
+        }
+      }
+    }
+  }
+
+
+  get checkIf() {
+    const self = this;
+    return {
+      get allowed() {
+        return {
+          toRunBuild(project: Project, options: BuildOptions) {
+
+          },
+          toInstallTnp(project: Project) {
+            return true;
+          },
+          toWatchWorkspace(workspaceChild: Project) {
+            return true;
+          }
+
+        }
+      }
+    }
+  }
 }
+
+
+
 //#endregion

@@ -8,6 +8,7 @@ import { config } from '../config';
 import { getMostRecentFilesNames, tryCopyFrom, tryRemoveDir } from "../helpers";
 import { Project } from './base-project';
 import { IPackageJSON } from '../models';
+import { TnpDB } from '../tnp-db';
 
 
 
@@ -69,11 +70,11 @@ export function reinstallTnp(project: Project,
   if (project.isStandaloneProject) {
     return;
   }
+  const db = TnpDB.InstanceSync;
 
-  if (!project.checker.isReadyForTnpInstall()) {
+  if (!db.checkIf.allowed.toInstallTnp(project)) {
     console.log('Current process pid: ' + process.pid)
-    console.log(`Active projects in workspace on pids: ${project.checker.foundedActivePids(client).toString()} ,
-    -  quit installing ${chalk.bold('tnp-bundle')} inside ${project.location}`)
+    console.log(`Quiting install tnp-bundle in ${project.location}`)
     return
   }
 

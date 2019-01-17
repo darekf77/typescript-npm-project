@@ -12,7 +12,7 @@ import { init } from './INIT';
 import { resolveProjectIfGenerated } from './BUILD-static';
 import { questionYesNo, run } from '../process';
 import { SystemTerminal } from '../system-terminal';
-import { TnpDBModel } from '../tnp-db';
+import { TnpDB } from '../tnp-db';
 
 
 
@@ -51,8 +51,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
     }
   }
 
-  await (await TnpDBModel.Instance({ project, buildOptions, pid: process.pid })).init(project).at.BUILD(buildOptions, process.pid)
-  await project.checker.check(buildOptions);
+  await (await TnpDB.Instance).notify.when.BUILD(project, buildOptions, process.pid)
 
   if (watch) {
     await init(args).watch.project(project)

@@ -7,9 +7,10 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib } from './scripts/BUILD';
-import { TnpDBModel } from './tnp-db';
 import { CommandInstance } from './tnp-db/command-instance';
 import { clearConsole } from './process';
+import { TnpDB } from './tnp-db/wrapper-db';
+import { runSyncOrAsync } from './helpers';
 
 enum CHOICE {
   LAST_USED_COMMAND = 'Last used command',
@@ -28,20 +29,22 @@ enum CHOICE {
 export class ConsoleUi {
 
   private readonly lastCommandFileName = 'last-command.txt'
-  constructor(public project: Project, private db: TnpDBModel) {
+  constructor(public project: Project, private db: TnpDB) {
 
   }
 
   lastCmd: CommandInstance;
   get lastCommandAvailable(): Boolean {
-    this.lastCmd = this.db.get.lastCommandFrom(this.project.location)
+    this.lastCmd = this.db.commands.lastCommandFrom(this.project.location)
+    // this.db.commandsSet.
     return !!this.lastCmd;
   }
 
 
 
-  async init() {
-    clearConsole()
+  async init(functions: Function[]) {
+    // clearConsole()
+    // console.log(functions.map(f => f.name))
     let res: { command: CHOICE } = await prompt({
       type: 'autocomplete',
       name: 'command',
@@ -56,9 +59,14 @@ export class ConsoleUi {
           }
           return true;
         })
+        .concat(functions.map(f => {
+          let name = f.name;
+          if (name.startsWith('$')) {
+            name = name.slice(1)
+          }
+          return { name, value: f.name } as any;
+        }))
     }) as any;
-
-
 
     if (res.command === CHOICE.BUILD_DIST_WATCH) {
 
@@ -67,7 +75,12 @@ export class ConsoleUi {
     else if (res.command === CHOICE.BUILD_DIST) {
       await buildLib(false, false, 'dist', '')
     } else if (res.command === CHOICE.LAST_USED_COMMAND) {
-      await this.db.start.lastCommand(this.lastCmd);
+      await this.db.commands.runCommand(this.lastCmd);
+    } else {
+      const fn = functions.find(f => f.name === res.command);
+      if (fn) {
+        await runSyncOrAsync(fn)
+      }
     }
   }
 

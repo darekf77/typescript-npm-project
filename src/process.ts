@@ -59,6 +59,15 @@ export async function questionYesNo(message: string,
 
 }
 
+export function getWorkingDirOfProcess(PID: number) {
+  try {
+    const cwd = child.execSync(`lsof -p ${PID} | awk '$4=="cwd" {print $9}'`).toString().trim()
+    return cwd;
+  } catch (e) {
+    error(e);
+  }
+}
+
 export function terminalLine() {
   return _.times(process.stdout.columns, () => '-').join('')
 }

@@ -13,9 +13,9 @@ import build from './scripts/BUILD';
 import { autobuild } from './scripts/AUTOBUILD';
 import config from './config';
 import { ConsoleUi } from './console-ui';
-import { TnpDBModel } from './tnp-db/db-model';
 import { $LAST } from './scripts/DB';
 import { info } from './messages';
+import { TnpDB } from './tnp-db/wrapper-db';
 
 process.env[config.message.tnp_bundle_mode] = 'false'
 
@@ -74,7 +74,7 @@ const helpAlias = [
 
 export async function start(argsv: string[]) {
 
-  const db = await TnpDBModel.Instance();
+  const db = await TnpDB.Instance;
   // console.log(argsv)
   if (
     (argsv.length === 2 && argsv[1].endsWith('/bin/tnp')) ||
@@ -84,7 +84,7 @@ export async function start(argsv: string[]) {
   ) {
     // info(`Replaying last command`);
   } else {
-    db.init().at.ANY_COMMAND(process.cwd(), argsv);
+    db.notify.when.ANY_COMMAND(process.cwd(), argsv);
   }
 
   let recognized = false;
@@ -113,7 +113,7 @@ export async function start(argsv: string[]) {
   const files = [helpFile]
     .concat(glob.sync(path.join(__dirname, '/scripts/**/*.js')).filter(f => f != helpFile))
 
-
+  const functions: Function[] = []
 
   files.forEach(function (file) {
     let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
@@ -124,6 +124,7 @@ export async function start(argsv: string[]) {
         }
         if (!isString(v)) {
           const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
+          functions.push(vFn)
           if (_.isFunction(vFn)) {
             const check = match(k, argsv);
             if (check.isMatch) {
@@ -155,7 +156,7 @@ export async function start(argsv: string[]) {
 
         const ui = new ConsoleUi(p, db);
         try {
-          await ui.init()
+          await ui.init(functions)
         } catch (error) {
           process.exit(0)
         }

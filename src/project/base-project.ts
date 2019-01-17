@@ -29,13 +29,13 @@ import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, curren
 import { CopyToManager } from './copyto-manager';
 import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
-import { ProjectsChecker } from '../single-instance';
 import { reinstallTnp } from './tnp-bundle';
 import { FrameworkFilesGenerator } from './framework-files-generator';
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
 import { TestRunner } from './test-runner';
+import { TnpDB } from '../tnp-db';
 
 
 export interface IProject {
@@ -314,9 +314,6 @@ export class Project implements IProject {
   readonly frameworkFileGenerator: FrameworkFilesGenerator;
   //#endregion
 
-  //#region @backend
-  readonly checker: ProjectsChecker;
-  //#endregion
 
   env: EnvironmentConfig;
 
@@ -634,7 +631,6 @@ Generated workspace should be here: ${genLocationWOrkspace}
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
         }
-        this.checker = new ProjectsChecker(this);
         this.tests = new TestRunner(this);
 
         Project.projects.push(this);
@@ -818,7 +814,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }) // link/unlink takes care of node_modules
       .join(' ')
     // console.log(`rimraf ${gitginoredfiles}`)
-    this.checker.killAndClear()
+
+    const db = TnpDB.InstanceSync;
+    db.builds.killForClearOf(this)
     this.run(`rimraf ${gitginoredfiles}`).sync();
     if (recrusive) {
       if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {

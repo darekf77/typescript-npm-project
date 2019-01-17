@@ -5,7 +5,6 @@ export * from './models';
 export * from './progress-output';
 export * from './project';
 //#region @backend
-export * from './single-instance';
 export * from './helpers-links';
 export * from './helpers-git';
 export * from './helpers-isomorphic';

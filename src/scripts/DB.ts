@@ -1,19 +1,18 @@
 //#region @backend
-import { TnpDBModel } from '../tnp-db';
 import { TnpDB } from '../tnp-db/wrapper-db';
 
 export async function $LAST(args: string) {
-  const db = await TnpDBModel.Instance();
-  await db.start.lastCommand(db.get.lastCommandFrom(process.cwd()));
+  const db = await TnpDB.Instance;
+  await db.commands.runCommand(db.commands.lastCommandFrom(process.cwd()));
   process.exit(0)
 }
 
 export default {
   $DB: async (args: string) => {
+    const db = await TnpDB.Instance;
     if (args.trim() === 'reinit') {
-      await TnpDB.Instance(true)
+      await db.init()
     }
-    const db = await TnpDBModel.Instance();
     process.exit(0)
   },
   $LAST

@@ -14,6 +14,7 @@ import { error } from '../messages';
 import chalk from 'chalk';
 import { run } from '../process';
 import { Helpers } from 'morphi/helpers';
+import { TnpDB } from '../tnp-db';
 
 const REGEXS = {
 
@@ -93,8 +94,11 @@ export class BaselineSiteJoin {
       return this;
     }
 
-    const pids = this.project.checker.foundedActivePids().filter(p => p !== process.pid);
-    if (pids.length > 0) {
+    const db = await TnpDB.Instance;
+    if(db.checkIf.allowed.toWatchWorkspace(this.project)) {
+      console.log('OK to baseline/site join')
+    } else {
+      const pids = []
       console.log(`Found active baseline/site join on pids: ${pids.toString()}
       current pid: ${process.pid}, ppid ${process.ppid}`)
       this.joinNotAllowed = true;
@@ -102,8 +106,6 @@ export class BaselineSiteJoin {
         this.project.parent.join.joinNotAllowed = true;
       }
       return this;
-    } else {
-      console.log('OK to baseline/site join')
     }
 
     // remove customizable
