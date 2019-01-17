@@ -9,6 +9,7 @@ import { EnumValues } from 'enum-values'
 import { buildLib } from './scripts/BUILD';
 import { TnpDBModel } from './tnp-db';
 import { CommandInstance } from './tnp-db/command-instance';
+import { clearConsole } from './process';
 
 enum CHOICE {
   LAST_USED_COMMAND = 'Last used command',
@@ -40,7 +41,7 @@ export class ConsoleUi {
 
 
   async init() {
-
+    clearConsole()
     let res: { command: CHOICE } = await prompt({
       type: 'autocomplete',
       name: 'command',

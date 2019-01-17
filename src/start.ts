@@ -82,7 +82,7 @@ export async function start(argsv: string[]) {
       && argsv[2] === _.kebabCase(_.lowerCase($LAST.name))
     )
   ) {
-    info(`Replaying last command`);
+    // info(`Replaying last command`);
   } else {
     db.init().at.ANY_COMMAND(process.cwd(), argsv);
   }
