@@ -82,14 +82,15 @@ export function init(args: string,
 export default {
   $INIT: async (args) => {
     const project = Project.Current;
-    await project.checker.check();
+    const db = await TnpDB.Instance;
     await (await TnpDB.Instance).notify.when.INIT(project)
     await init(args).project()
     process.exit(0)
   },
 
   $INIT_WATCH: async (args) => {
-    await Project.Current.checker.check();
+    const project = Project.Current;
+    await (await TnpDB.Instance).notify.when.INIT(project)
     await init(args).watch.project()
   },
 

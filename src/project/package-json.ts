@@ -373,6 +373,10 @@ export class PackageJSON {
   }
 
   installPackage(packageName?: string) {
+    if (!_.isString(packageName) || packageName.trim() === '') {
+      console.trace('Invalida package name', packageName)
+      return
+    }
     const type: InstalationType = '--save';
     // console.log('packageName', packageName)
     // console.log(this.location)

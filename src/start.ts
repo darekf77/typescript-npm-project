@@ -157,7 +157,8 @@ export async function start(argsv: string[]) {
         const ui = new ConsoleUi(p, db);
         try {
           await ui.init(functions)
-        } catch (error) {
+        } catch (e) {
+          // console.log(e)
           process.exit(0)
         }
         // console.log(`Default action for project ${p.name}`)

@@ -7,13 +7,18 @@ export async function $LAST(args: string) {
   process.exit(0)
 }
 
+const $DB = async (args: string) => {
+  const db = await TnpDB.Instance;
+  if (args.trim() === 'reinit') {
+    await db.init()
+  }
+  process.exit(0)
+}
+
 export default {
-  $DB: async (args: string) => {
-    const db = await TnpDB.Instance;
-    if (args.trim() === 'reinit') {
-      await db.init()
-    }
-    process.exit(0)
+  $DB,
+  $DB_REINTI() {
+    return $DB('reinit')
   },
   $LAST
 }
