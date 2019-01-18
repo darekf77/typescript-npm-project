@@ -64,7 +64,7 @@ export class ConsoleUi {
       })
       .map(({ value, name }) => {
         choisesSet[value] = name;
-        return name;
+        return value;
       })
       .concat(functions.map(f => {
         let name = f.name;
