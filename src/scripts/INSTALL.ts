@@ -42,7 +42,7 @@ function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
 function copyFromTemplateWorkspaceIfPossible(packageName: string, destination: Project) {
 
   const templateWorkspace = Project.by('workspace');
-  if(templateWorkspace === destination) {
+  if (templateWorkspace === destination) {
     console.log('worksapce installation...')
     return false;
   }
@@ -114,6 +114,9 @@ function resolvePacakgesFromArgs(args: string[]) {
   return args
     .map(p => p.trim())
     .filter(p => {
+      if (['--save', '--save-dev'].includes(p)) {
+        return false;
+      }
       const res = checkValidNpmPackageName(p)
       if (!res) {
         error(`Invalid package to install: ${p}`, true)
