@@ -127,6 +127,20 @@ export class Project implements IProject {
     //#endregion
   }
 
+  //#region @backend
+  get hasNpmOrganization() {
+    // console.log('path.dirname(this.location)', path.dirname(this.location))
+    return path.basename(path.dirname(this.location)).startsWith('@');
+  }
+
+  get npmOrganization() {
+    if (!this.hasNpmOrganization) {
+      return;
+    }
+    return path.basename(path.dirname(this.location))
+  }
+  //#endregion
+
   get isWorkspace() {
     if (Morphi.IsBrowser) {
       return this.browser.isWorkspace;

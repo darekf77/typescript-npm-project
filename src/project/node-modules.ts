@@ -18,9 +18,20 @@ export class NodeModules {
       to(destination: Project) {
         const p = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
-        p.copytToManager.generateSourceCopyIn(path.join(nodeModeulesPath, p.name), false)
+
+        // console.log('hAS ORGANIZAION',p.hasNpmOrganization)
+        // console.log('ORGANIZAION',p.npmOrganization)
+
+        const pDestPath = p.hasNpmOrganization ?
+          path.join(nodeModeulesPath, p.npmOrganization, p.name) :
+          path.join(nodeModeulesPath, p.name)
+        p.copytToManager.generateSourceCopyIn(pDestPath, false)
+
         p.dependencies.forEach(dep => {
-          dep.copytToManager.generateSourceCopyIn(path.join(nodeModeulesPath, dep.name), false)
+          const depDestPath = dep.hasNpmOrganization ?
+            path.join(nodeModeulesPath, dep.npmOrganization, dep.name) :
+            path.join(nodeModeulesPath, dep.name)
+          dep.copytToManager.generateSourceCopyIn(depDestPath, false)
         })
       }
     }

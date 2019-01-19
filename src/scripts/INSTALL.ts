@@ -80,7 +80,7 @@ function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAd
       project.node_modules.installPackage(npmPackageName)
     })
     link(project)
-  } else if (project.parent && project.parent.type === 'workspace') {
+  } else if (project.isWorkspaceChildProject) {
     console.log('** npm install <package> in child of workspace')
 
     if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
@@ -103,6 +103,12 @@ function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAd
     if (!project.node_modules.exist()) {
       project.node_modules.installPackages()
     }
+
+    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
+      info(`All pacakges copied from workspace template`)
+      return;
+    }
+
     npmPackagesToAdd.forEach(npmPackageName => {  // Other normal porojects
       project.node_modules.installPackage(npmPackageName)
     })
