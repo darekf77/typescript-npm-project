@@ -26,12 +26,15 @@ function clearGenerated(project: Project, all, recrusive, outDir: string) {
 }
 
 export async function clear(args, all = false) {
+
   let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
 
   recrusive = (recrusive || r);
   generated = (generated || g);
   const project = Project.Current
-  await (await TnpDB.Instance).notify.when.CLEAN(project);
+  const db = await TnpDB.Instance;
+  await (db).notify.when.CLEAN(project);
+  db.commands.setCommand(project.location, 'tnp clear')
 
   // console.log('r', r)
   // console.log('recrusive', recrusive)

@@ -70,6 +70,8 @@ export function init(args: string,
       return init(args, { watch: true })
     },
     async project(p: Project = Project.Current) {
+      const db = await TnpDB.Instance;
+      await (await TnpDB.Instance).notify.when.INIT(p)
       await initialize(args, p, watch)
     }
   }
@@ -81,17 +83,8 @@ export function init(args: string,
 
 export default {
   $INIT: async (args) => {
-    const project = Project.Current;
-    const db = await TnpDB.Instance;
-    await (await TnpDB.Instance).notify.when.INIT(project)
     await init(args).project()
     process.exit(0)
-  },
-
-  $INIT_WATCH: async (args) => {
-    const project = Project.Current;
-    await (await TnpDB.Instance).notify.when.INIT(project)
-    await init(args).watch.project()
   },
 
   $VSCODE: () => {

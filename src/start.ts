@@ -82,7 +82,7 @@ export async function start(argsv: string[]) {
       && argsv[2] === _.kebabCase(_.lowerCase($LAST.name))
     )
   ) {
-    // info(`Replaying last command`);
+    // info(`DO NOTHIGN`);
   } else {
     db.notify.when.ANY_COMMAND(process.cwd(), argsv);
   }
@@ -161,13 +161,6 @@ export async function start(argsv: string[]) {
           // console.log(e)
           process.exit(0)
         }
-        // console.log(`Default action for project ${p.name}`)
-        // if (p.isWorkspaceChildProject) {
-        //   build.$BUILD_WATCH(argsv.join(' '));
-        // } else if (p.isStandaloneProject) {
-        //   autobuild(Project.Current, true, false)
-        // }
-        process.stdin.resume();
       } else {
         console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
         process.exit(0);
