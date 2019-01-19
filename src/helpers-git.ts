@@ -2,7 +2,7 @@
 import * as child from 'child_process';
 import { info, error, warn } from './messages';
 import { basename } from 'path';
-import { questionYesNo } from './process';
+import { questionYesNo, run } from './process';
 
 export function lastCommitHash(directoryPath): string {
   try {
@@ -45,11 +45,27 @@ export function countCommits(directoryPath) {
 
 export function currentBranchName(cwd) {
   try {
-    const branchName =  child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()
+    const branchName = child.execSync(`git branch | sed -n '/\* /s///p'`, { cwd }).toString().trim()
     return branchName;
   } catch (e) {
     error(e);
   }
+}
+
+export function commitWhatIs(customMessage = 'changes') {
+
+  try {
+    run(`git add --all . `).sync()
+  } catch (error) {
+    warn(`Failed to git add --all .`);
+  }
+
+  try {
+    run(`git commit -m "${customMessage}"`).sync()
+  } catch (error) {
+    warn(`Failed to git commit -m "${customMessage}"`);
+  }
+
 }
 
 export async function pullCurrentBranch(directoryPath, askToRetry = false) {

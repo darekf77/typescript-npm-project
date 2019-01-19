@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { Project, BaseProjectLib, ProjectFrom } from '../project';
 import { error, info } from '../messages';
 import chalk from 'chalk';
+import { commitWhatIs } from '../helpers-git';
 
 export default {
 
@@ -38,6 +39,7 @@ export default {
       info(`Showing deps for standalone project`)
       Project.Current.packageJson.saveForInstall(true)
     }
+    commitWhatIs(`show package.json dependencies`)
     process.exit(0)
   },
 
