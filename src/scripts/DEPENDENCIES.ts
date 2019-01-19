@@ -33,6 +33,14 @@ export default {
     process.exit(0)
   },
 
+  DEPS_SHOW_IF_STANDALONE(args: string) {
+    if (Project.Current.isStandaloneProject) {
+      info(`Showing deps for standalone project`)
+      Project.Current.packageJson.saveForInstall(true)
+    }
+    process.exit(0)
+  },
+
 
   $DEPS_CLEAN(args: string) {
     Project.Current.packageJson.saveForInstall(false)

@@ -2,7 +2,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "echo 'asdasd'",
-      "pre-push": "echo 'asdasd'"
+      "pre-push": "tnp deps:show:if:standalone"
     }
   },
   "tnp": {
