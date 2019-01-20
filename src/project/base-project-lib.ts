@@ -7,10 +7,9 @@ import * as path from 'path';
 // local
 import { Project } from "./base-project";
 import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
-import { questionYesNo, clearConsole } from "../process";
+import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { Helpers } from 'morphi/helpers';
 import { PackageJSON } from './package-json';
 import { install } from '../scripts/INSTALL';
 import { ProjectFrom, tryCopyFrom } from '../index';
@@ -134,7 +133,7 @@ export abstract class BaseProjectLib extends Project {
     this.checkIfLogginInToNpm()
 
     const { prod = false, bumbVersionIn = [] } = c;
-    // clearConsole()
+
     this.checkIfReadyForNpm()
     const newVersion = Project.Current.versionPatchedPlusOne;
     const self = this;

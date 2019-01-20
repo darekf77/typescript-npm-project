@@ -82,7 +82,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         let webpackEnvParams = `--env.outFolder=${outDir}`;
         webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
         // console.log('forClients', forClient)
-        let client = _.first(forClient);
+        let client = _.first(forClient as Project[]);
         if (!this.isStandaloneProject && forClient.length === 0) {
 
           const answer: { project: string } = await inquirer
@@ -135,7 +135,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
 
         }
 
-        await this.buildLib(outDir, forClient, prod, watch);
+        await this.buildLib(outDir, forClient as Project[], prod, watch);
       }
 
     }

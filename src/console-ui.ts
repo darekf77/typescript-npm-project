@@ -7,9 +7,8 @@ import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib, buildApp } from './scripts/BUILD';
 import { CommandInstance } from './tnp-db/command-instance';
-import { clearConsole, killProcessByPort } from './process';
+import {  killProcessByPort } from './process';
 import { TnpDB } from './tnp-db/wrapper-db';
-import { runSyncOrAsync, paramsFrom } from './helpers';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
 import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
@@ -20,6 +19,7 @@ inquirer.registerPrompt('autocomplete', inquirerAutocomplete)
 class Choice {
   constructor(
     public name: string,
+    // public key: string,
     public value: string
   ) {
 
@@ -54,6 +54,7 @@ export class ConsoleUi {
   lastCmd: CommandInstance;
   get lastCommandAvailable(): Boolean {
     this.lastCmd = this.db.commands.lastCommandFrom(this.project.location)
+    // console.log('this.lastCmd',this.lastCmd)
     // this.db.commandsSet.
     return !!this.lastCmd;
   }
@@ -61,9 +62,12 @@ export class ConsoleUi {
 
 
   async init(functions: Function[]) {
-    // clearConsole()
 
-
+    // const choices = [
+    //   { value: 'valuies', name: 'dupa' },
+    //   { value: 'valuies2', name: 'dupa2' },
+    //   { value: 'valuies3', name: 'dupa3' }
+    // ]
     const choices = Object.keys(CHOICE)
       .map(key => {
         return { name: key, value: CHOICE[key] }
@@ -80,14 +84,16 @@ export class ConsoleUi {
         return true;
       })
       .map((s) => {
-
-        if (s.value === CHOICE.LAST_USED_COMMAND) {
+        const { value, name } = s;
+        if (value === CHOICE.LAST_USED_COMMAND) {
           s.name = `${s.name}: ${this.lastCmd.shortCMD}`
-          CHOICE.LAST_USED_COMMAND = s.name;
         }
-
         return new Choice(s.name, s.value as any);
       })
+
+
+
+
       // .concat(functions
       //   // .filter( f => !!f.name  )
       //   .map(f => {
@@ -117,7 +123,7 @@ export class ConsoleUi {
         var fuzzyResult = fuzzy.filter(input, choices.map(f => f.name));
         resolve(
           fuzzyResult.map(function (el) {
-            return el.original;
+            return { name: el.original, value: choices.find(c => c.name === el.original).value };
           })
         );
       });
@@ -133,7 +139,9 @@ export class ConsoleUi {
       choices
     } as any) as any;
 
-    switch (CHOICE[res.command]) {
+    // console.log('res', res)
+
+    switch (res.command) {
 
       case CHOICE.INIT:
         this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
@@ -162,7 +170,9 @@ export class ConsoleUi {
         break;
 
       case CHOICE.LAST_USED_COMMAND:
-        await this.db.commands.runCommand(this.lastCmd);
+        await this.db.commands.runCommand(!!this.lastCmd ?
+          this.lastCmd : new CommandInstance(undefined, this.project.location)
+        );
         break;
 
       case CHOICE.CLEAR:
@@ -183,16 +193,16 @@ export class ConsoleUi {
         process.exit(0)
         break;
 
-      default:
-        const fn = functions.find(f => f.name === res.command);
-        if (_.isFunction(fn)) {
-          this.db.commands.setCommand(process.cwd(), `tnp ${paramsFrom(fn.name)}`)
-          await runSyncOrAsync(fn)
-        } else {
-          throw `Command not implemented: ${res.command}`
-        }
+      // default:
+      //   const fn = functions.find(f => f.name === res.command);
+      //   if (_.isFunction(fn)) {
+      //     this.db.commands.setCommand(process.cwd(), `tnp ${paramsFrom(fn.name)}`)
+      //     await runSyncOrAsync(fn)
+      //   } else {
+      //     throw `Command not implemented: ${res.command}`
+      //   }
 
-        break;
+      //   break;
     }
 
   }

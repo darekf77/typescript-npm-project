@@ -17,7 +17,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     if (this.project.isWorkspaceChildProject) {
 
       if (_.isArray(this.buildOptions.forClient) && this.buildOptions.forClient.length > 0) {
-        return this.buildOptions.forClient.map(c => c.name)
+        return (this.buildOptions.forClient as Project[]).map(c => c.name)
       }
 
       return this.project.parent.children

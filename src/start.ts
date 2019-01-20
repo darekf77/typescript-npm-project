@@ -9,12 +9,9 @@ import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
 
-import build from './scripts/BUILD';
-import { autobuild } from './scripts/AUTOBUILD';
 import config from './config';
 import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
-import { info } from './messages';
 import { TnpDB } from './tnp-db/wrapper-db';
 
 process.env[config.message.tnp_bundle_mode] = 'false'
@@ -28,6 +25,7 @@ Helpers.checkEnvironment({
     { name: 'mkdirp' },
     { name: 'renamer' },
     { name: 'nodemon' },
+    { name: 'madge' },
     { name: 'http-server' },
     { name: 'increase-memory-limit' },
     { name: 'bower' },

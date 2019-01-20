@@ -15,7 +15,7 @@ import { paramsFrom } from './index';
 import { runSyncOrAsync } from './helpers';
 const prompts = require('prompts');
 export async function questionYesNo(message: string,
-  callbackTrue: () => any, callbackFalse?: () => any) {
+  callbackTrue?: () => any, callbackFalse?: () => any) {
 
   // const response: { value: boolean } = await inquirer
   //   .prompt([
@@ -52,11 +52,11 @@ export async function questionYesNo(message: string,
   });
 
   if (response.value) {
-    await runSyncOrAsync(callbackTrue)
+    await   runSyncOrAsync(callbackTrue)
   } else {
     await runSyncOrAsync(callbackFalse)
   }
-
+  return response.value;
 }
 
 export function getWorkingDirOfProcess(PID: number) {
@@ -101,6 +101,9 @@ export function killProcessByPort(port: number) {
 }
 
 export function clearConsole() {
+  console.log('\x1Bc');
+
+  // process.stdout.write('\033c\033[3J');
   // try {
   //   if (process.platform === 'win32') {
   //     run('cls').sync()

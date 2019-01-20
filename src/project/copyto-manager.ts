@@ -154,7 +154,7 @@ export class CopyToManager {
 
     const outDir = this.buildOptions.outDir;
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      this.buildOptions.copyto.forEach(p => {
+      (this.buildOptions.copyto as Project[]).forEach(p => {
         // console.log(`Copy to ${p.name}`)
         this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir })
       })

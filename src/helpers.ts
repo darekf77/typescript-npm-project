@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as rimraf from "rimraf";
-import { run } from "./process";
 import { sleep } from 'sleep';
 import { ProjectFrom } from './index';
 import { Project } from './index';
@@ -341,6 +340,9 @@ const AsyncFunction = (async () => { }).constructor;
 // const GeneratorFunction = (function* () { }).constructor as any;
 
 export async function runSyncOrAsync(fn: Function) {
+  if (_.isUndefined(fn)) {
+    return;
+  }
   let wasPromise = false;
   let promisOrValue = fn()
   if (promisOrValue instanceof Promise) {

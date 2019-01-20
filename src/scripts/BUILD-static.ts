@@ -4,7 +4,6 @@ import * as sleep from 'sleep';
 import { BuildOptions } from '../models';
 import { ProjectFrom, Project } from '../project';
 import { init } from './INIT';
-import { clearConsole, run } from '../process';
 import * as rimraf from 'rimraf';
 
 

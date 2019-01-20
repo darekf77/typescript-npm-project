@@ -2,8 +2,12 @@ import { Project } from '../project';
 import * as _ from 'lodash';
 
 export class CommandInstance {
-  command: string;
-  location: string;
+  constructor(
+  public command?: string,
+  public location?: string
+  ) {
+
+  }
 
   get shortCMD() {
     if (!this.command) {

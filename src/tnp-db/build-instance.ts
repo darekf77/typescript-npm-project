@@ -1,18 +1,18 @@
 //#region @backend
+import * as _ from 'lodash';
 import { BuildOptions } from '../models';
 import { ProjectFrom } from '../project';
-import { Project } from '../project';
-import { handleArguments } from '../scripts/BUILD-handle-arguments.fn';
-
+import { Project } from '../project/base-project'
 
 export type IBuildInstance = {
-  buildOptions: BuildOptions;
+  buildOptions?: BuildOptions;
   cmd?: string;
   pid: number;
   location?: string;
 };
 
 export class BuildInstance implements IBuildInstance {
+
 
   constructor(data?: IBuildInstance) {
     if (!data) {
@@ -23,21 +23,37 @@ export class BuildInstance implements IBuildInstance {
     this.pid = pid;
     this.cmd = cmd;
     this.location = location;
-    if (!!this.buildOptions && !this.cmd) {
-      // TODO
+
+    if (!this.cmd && !this.buildOptions) {
+      // console.log('create empty IBuildInstance ')
+    } else {
+      if (!this.cmd) {
+        this.cmd = BuildOptions.exportToCMD(this.buildOptions);
+      }
+
+      if (!this.buildOptions) {
+        this.buildOptions = BuildOptions.from(this.cmd)
+      }
     }
 
-    if (!this.buildOptions && !!this.cmd) {
-      // TODO
-      // this.buildOptions = handleArguments()
-    }
+
   }
+
+  get isTnpProjectBuild() {
+    return (_.isString(this.cmd) && this.cmd.trim() !== '' && _.isObject(this.buildOptions))
+  }
+
 
   buildOptions: BuildOptions;
   cmd?: string;
 
-  public recreate() {
-
+  isEqual(anotherInstace: BuildInstance) {
+    if (!anotherInstace) {
+      return false;
+    }
+    return (this.pid == anotherInstace.pid ||
+      (this.location === anotherInstace.location &&
+        this.buildOptions.watch && anotherInstace.buildOptions.watch))
   }
 
   pid: number;

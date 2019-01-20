@@ -7,7 +7,6 @@ import { Project, ProjectFrom } from '../project';
 import { BuildOptions, BuildDir, LibType } from "../models";
 import { error, info } from "../messages";
 import { config } from '../config';
-import { handleArguments } from './BUILD-handle-arguments.fn';
 import { init } from './INIT';
 import { resolveProjectIfGenerated } from './BUILD-static';
 import { questionYesNo, run } from '../process';
@@ -17,29 +16,21 @@ import { TnpDB } from '../tnp-db';
 
 
 export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string, overrideOptions: BuildOptions = {} as any) {
-
-  const { copyto, onlyWatchNoBuild, forClient, genOnlyClientCode, compileOnce } = handleArguments(args, outDir, watch);
-
-  const options: BuildOptions = {
-    prod, watch, outDir, forClient, copyto, onlyWatchNoBuild, args, genOnlyClientCode, compileOnce
-  };
-  await build(_.merge(options, overrideOptions), config.allowedTypes.libs)
+  const project: Project = Project.Current;
+  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, args });
+  await build(_.merge(options, overrideOptions), config.allowedTypes.libs, project)
 }
 
 
 export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, overrideOptions: BuildOptions = {} as any) {
-
-  const { onlyWatchNoBuild, forClient } = handleArguments(args, outDir, watch);
-
-  const options: BuildOptions = {
-    prod, watch, outDir, appBuild: true, forClient, onlyWatchNoBuild, args
-  };
-  await build(_.merge(options, overrideOptions), config.allowedTypes.app);
+  const project: Project = Project.Current;
+  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, args });
+  await build(_.merge(options, overrideOptions), config.allowedTypes.app, project);
 }
 
 
 
-export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project = Project.Current, exit = true) {
+export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project, exit = true) {
 
   const { watch, appBuild, args } = buildOptions;
 
@@ -51,7 +42,6 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
     }
   }
 
-  await (await TnpDB.Instance).notify.when.BUILD(project, buildOptions, process.pid)
 
   if (watch) {
     await init(args).watch.project(project)
@@ -61,6 +51,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)
 
+  await (await TnpDB.Instance).notify.when.BUILD(project, buildOptions, process.pid)
 
 
   await project.build(buildOptions);

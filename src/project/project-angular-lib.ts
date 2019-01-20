@@ -87,11 +87,11 @@ export class ProjectAngularLib extends BaseProjectLib {
         await this.angular.buildSteps(buildOptions);
       } else {
         if (watch) {
-          await this.buildLib(outDir, forClient, prod, false);
+          await this.buildLib(outDir, forClient as Project[], prod, false);
           this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
-          await this.buildLib(outDir, forClient, prod, true)
+          await this.buildLib(outDir, forClient as Project[], prod, true)
         } else {
-          await this.buildLib(outDir, forClient, prod, watch)
+          await this.buildLib(outDir, forClient as Project[], prod, watch)
           this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }

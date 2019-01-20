@@ -20,8 +20,10 @@ import { PortsSet } from './ports-set';
 import { SystemService } from './system-service';
 import { CommandInstance } from './command-instance';
 import { start } from '../start';
-import { error } from '../messages';
-import { getWorkingDirOfProcess } from '../process';
+import { error, warn } from '../messages';
+import { getWorkingDirOfProcess, killProcess, questionYesNo } from '../process';
+import { prompt } from 'enquirer'
+import * as inquirer from 'inquirer';
 
 
 export class TnpDB {
@@ -61,9 +63,9 @@ export class TnpDB {
       console.log('[wrapper-db]recreate values')
       this.db.defaults({ projects: [], domains: [], ports: [], builds: [], commands: [] })
         .write()
-      this.add.existedProjects()
-      this.add.existedDomains()
-      await this.add.existedBuilds();
+      this.updateAndAdd.existedProjects()
+      this.updateAndAdd.existedDomains()
+      await this.updateAndAdd.existedBuilds();
 
 
       const defaultPorts: PortInstance[] = [
@@ -226,7 +228,7 @@ export class TnpDB {
 
 
 
-  private get add() {
+  private get updateAndAdd() {
     const self = this;
 
     return {
@@ -240,14 +242,18 @@ export class TnpDB {
             const location = getWorkingDirOfProcess(p.pid);
             const project = ProjectFrom(location)
             if (project) {
-              const b = new BuildInstance()
-              b.location = getWorkingDirOfProcess(p.pid);
-              b.pid = p.pid;
-              b.cmd = p.cmd;
+              const b = new BuildInstance({
+                location: getWorkingDirOfProcess(p.pid),
+                pid: p.pid,
+                cmd: p.cmd
+              });
+              // console.log('result build instance', b)
               return b;
             }
           })
-          .filter(p => !!p)
+          .filter(b => !!b)
+          .filter(b => b.isTnpProjectBuild)
+
         self.set.builds(builds);
       },
 
@@ -288,19 +294,15 @@ export class TnpDB {
         }
       },
 
-      buildIfNotExist(project: Project, buildOptions: BuildOptions, pid: number) {
-        if (!self.getAll.builds.find(b => {
-          return (
-            (b.project === project) &&
-            (b.buildOptions.watch === buildOptions.watch) &&
-            (b.pid == pid)
-          )
-        })) {
-          const b = new BuildInstance({ buildOptions, pid, location: project.location })
-
-          self.db.get(ENTITIES.BUILDS).push(TnpDB.prepareToSave.build(b)).write()
+      buildIfNotExistOrReturnExisted(project: Project, buildOptions: BuildOptions, pid: number): BuildInstance {
+        const currentB = new BuildInstance({ buildOptions, pid, location: project.location })
+        const existed = self.getAll.builds.find(b => b.isEqual(currentB))
+        if (_.isObject(existed)) {
+          return existed;
         }
+        self.db.get(ENTITIES.BUILDS).push(TnpDB.prepareToSave.build(currentB)).write()
       }
+
     }
   }
 
@@ -328,16 +330,18 @@ export class TnpDB {
     const self = this;
     return {
       discoverExistedProjects() {
-        self.add.existedProjects()
+        self.updateAndAdd.existedProjects()
         console.log(self.getAll.projects)
       }
     }
   }
 
   get builds() {
+    const self = this;
     return {
-      killForClearOf(project: Project) {
-
+      remove(build: BuildInstance) {
+        const builds = self.getAll.builds.filter(b => b.isEqual(build));
+        self.set.builds(builds);
       }
     }
   }
@@ -370,7 +374,7 @@ export class TnpDB {
       },
 
       async runCommand(cmd: CommandInstance) {
-        if (cmd) {
+        if (cmd && _.isString(cmd.command) && cmd.command.trim() !== '') {
           await start(cmd.command.split(' '));
         } else {
           error(`Last command for location: ${cmd.location} doen't exists`, false, true);
@@ -401,14 +405,43 @@ export class TnpDB {
       get when() {
         return {
           async BUILD(currentProject: Project, buildOptions: BuildOptions, pid: number) {
-            self.add.projectIfNotExist(currentProject);
-            self.add.buildIfNotExist(currentProject, buildOptions, pid)
+            self.updateAndAdd.projectIfNotExist(currentProject);
+            while (true) {
+              const existed = self.updateAndAdd.buildIfNotExistOrReturnExisted(currentProject, buildOptions, pid);
+
+
+
+              if (existed) {
+
+                const kill = () => {
+                  killProcess(existed.pid)
+                  self.builds.remove(existed)
+                }
+
+                if (!existed.buildOptions.watch) {
+                  warn('automatic kill of active build instance in static build mode')
+                  kill()
+                  continue;
+                } else {
+                  const confirm = await questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
+                  build options: ${existed.buildOptions.toString()}`)
+                  if (confirm) {
+                    kill();
+                    continue;
+                  } else {
+                    process.exit(0)
+                  }
+                }
+              }
+              break;
+            }
+
           },
           async INIT(currentProject: Project) {
-            self.add.projectIfNotExist(currentProject);
+            self.updateAndAdd.projectIfNotExist(currentProject);
           },
           async CLEAN(currentProject: Project) {
-            self.add.projectIfNotExist(currentProject);
+            self.updateAndAdd.projectIfNotExist(currentProject);
           },
           async ANY_COMMAND(location: string, args: string[]) {
             self.commands.setCommand(location, args.join(' '))

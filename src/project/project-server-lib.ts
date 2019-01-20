@@ -26,7 +26,7 @@ export class ProjectServerLib extends BaseProjectLib {
 
 
     if (!onlyWatchNoBuild) {
-      await this.buildLib(outDir, forClient, prod, watch);
+      await this.buildLib(outDir, forClient  as Project[], prod, watch);
     }
   }
 }

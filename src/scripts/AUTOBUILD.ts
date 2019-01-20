@@ -6,7 +6,6 @@ import * as _ from 'lodash';
 
 import { Project, ProjectFrom } from "../project";
 import { error, info } from '../messages';
-import { clearConsole } from '../process';
 import chalk from 'chalk';
 import * as JSON5 from 'json5';
 import { config as globalConfig } from '../config';
@@ -109,7 +108,6 @@ export class AutoActions {
     if (!build) {
       error(`Not build for current project "${this.project.name}"   `)
     } else {
-      clearConsole();
       if (!this.project.isTnp) {
         await this.project.git.updateOrigin(true);
       }
