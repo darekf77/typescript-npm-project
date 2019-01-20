@@ -340,7 +340,8 @@ export class TnpDB {
     const self = this;
     return {
       remove(build: BuildInstance) {
-        const builds = self.getAll.builds.filter(b => b.isEqual(build));
+        const builds = self.getAll.builds.filter(b => !b.isEqual(build));
+        // console.log('after rem', builds)
         self.set.builds(builds);
       }
     }
@@ -414,7 +415,10 @@ export class TnpDB {
               if (existed) {
 
                 const kill = () => {
-                  killProcess(existed.pid)
+                  try {
+                    killProcess(existed.pid)
+                  } catch (error) {
+                  }
                   self.builds.remove(existed)
                 }
 

@@ -830,7 +830,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     // console.log(`rimraf ${gitginoredfiles}`)
 
     const db = TnpDB.InstanceSync;
-    db.builds.killForClearOf(this)
+    // db.builds.killForClearOf(this)
     this.run(`rimraf ${gitginoredfiles}`).sync();
     if (recrusive) {
       if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
