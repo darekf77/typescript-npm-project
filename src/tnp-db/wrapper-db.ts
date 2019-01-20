@@ -13,7 +13,7 @@ import { DomainInstance } from './domain-instance';
 import { PortInstance } from './port-instance';
 import { BuildInstance } from './build-instance';
 import { PsListInfo } from './ps-info';
-import { BuildOptions, BuildData } from '../models';
+import { BuildOptions, BuildData, EnvironmentName } from '../models';
 import { Range } from '../helpers';
 import { ENTITIES } from './entities';
 import { PortsSet } from './ports-set';
@@ -226,7 +226,26 @@ export class TnpDB {
       })
   }
 
+  private addDomain(address: string, environment: EnvironmentName,
+    domains: DomainInstance[], project: Project) {
 
+    if (!_.isString(address) || address.trim() === '') {
+      return
+    }
+
+    const existed = domains.find(d => d.address === address);
+    if (existed) {
+      if (existed.declaredIn.filter(d => d.environment === environment
+        && d.project === d.project).length === 0) {
+        existed.declaredIn.push({ project, environment })
+      }
+    } else {
+      const domain = new DomainInstance()
+      domain.address = address;
+      domain.declaredIn = [{ project, environment }]
+      domains.push(domain)
+    }
+  }
 
   private get updateAndAdd() {
     const self = this;
@@ -271,17 +290,16 @@ export class TnpDB {
             // console.log(`Domain detected: ${p.env.config.domain}, env:${p.env.config.name} `)
             const address = project.env.config.domain;
             const environment = project.env.config.name;
-            const existed = domains.find(d => d.address === address);
-            if (existed) {
-              existed.declaredIn.push({ project, environment })
-            } else {
-              const domain = new DomainInstance()
-              domain.address = address;
-              domain.declaredIn = [{ project, environment }]
-              domains.push(domain)
-            }
-
+            self.addDomain(address, environment, domains, project);
           }
+
+          if (project && project.env) {
+            project.env.configsFromJs.forEach(c => {
+              self.addDomain(c.domain, c.name, domains, project);
+            })
+          }
+
+
         })
 
         self.set.domains(domains);

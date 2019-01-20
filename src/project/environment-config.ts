@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
+import * as glob from 'glob';
 
 import { Project } from './base-project';
 
@@ -17,6 +18,7 @@ import {
 //#endregion
 import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
 import { Helpers } from 'ng2-logger';
+import config from '../config';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
@@ -150,6 +152,32 @@ export class EnvironmentConfig {
   //#endregion
 
   private static configs: { [location: string]: EnvConfig } = {};
+
+  public get configsFromJs(): EnvConfig[] { // TODO something if weird here
+    //#region @backendFunc
+    const p = this.project.isWorkspaceChildProject ? this.project.parent : this.project;
+    const locations = glob.sync(`${p.location}/*${config.file.environment}.*js`);
+    const configs = locations.map(l => {
+      let c: EnvConfig;
+      try {
+        const jsFileName = l.replace(/\.js$/, '');
+        // console.log('jsFileName', jsFileName)
+        c = require(jsFileName).config
+        if (path.basename(jsFileName).split('.').length === 2) {
+          c.name = path.basename(jsFileName).split('.')[1] as any;
+        } else {
+          c.name  = 'local';
+        }
+
+        // console.log('cdddd', c.domain)
+      } catch (error) {
+
+      }
+      return _.cloneDeep(c);
+    }).filter(c => !!c);
+    return configs;
+    //#endregion
+  }
 
   /**
    * Can be accesed only after env.prepare()
