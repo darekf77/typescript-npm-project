@@ -17,14 +17,14 @@ import { TnpDB } from '../tnp-db';
 
 export async function buildLib(prod = false, watch = false, outDir: BuildDir, args: string, overrideOptions: BuildOptions = {} as any) {
   const project: Project = Project.Current;
-  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, args });
+  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, appBuild: false, args });
   await build(_.merge(options, overrideOptions), config.allowedTypes.libs, project)
 }
 
 
 export async function buildApp(prod = false, watch = false, outDir: BuildDir = 'dist', args: string, overrideOptions: BuildOptions = {} as any) {
   const project: Project = Project.Current;
-  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, args });
+  const options: BuildOptions = BuildOptions.from(process.argv.join(' '), project, { outDir, watch, prod, appBuild: true, args });
   await build(_.merge(options, overrideOptions), config.allowedTypes.app, project);
 }
 

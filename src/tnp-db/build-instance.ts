@@ -53,7 +53,10 @@ export class BuildInstance implements IBuildInstance {
     }
     return (this.pid == anotherInstace.pid ||
       (this.location === anotherInstace.location &&
-        this.buildOptions.watch && anotherInstace.buildOptions.watch))
+        this.buildOptions.watch === anotherInstace.buildOptions.watch &&
+        this.buildOptions.appBuild === anotherInstace.buildOptions.appBuild &&
+        this.buildOptions.outDir === anotherInstace.buildOptions.outDir
+      ))
   }
 
   pid: number;

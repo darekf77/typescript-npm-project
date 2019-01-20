@@ -406,13 +406,14 @@ export class TnpDB {
       get when() {
         return {
           async BUILD(currentProject: Project, buildOptions: BuildOptions, pid: number) {
+            // console.log('current build options', buildOptions)
             self.updateAndAdd.projectIfNotExist(currentProject);
             while (true) {
               const existed = self.updateAndAdd.buildIfNotExistOrReturnExisted(currentProject, buildOptions, pid);
 
 
 
-              if (existed) {
+              if (existed && existed.pid !== process.pid) {
 
                 const kill = () => {
                   try {

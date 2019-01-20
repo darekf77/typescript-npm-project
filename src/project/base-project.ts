@@ -31,11 +31,12 @@ import { build } from '../scripts/BUILD';
 import { SourceModifier } from './source-modifier';
 import { reinstallTnp } from './tnp-bundle';
 import { FrameworkFilesGenerator } from './framework-files-generator';
+import { TnpDB } from '../tnp-db';
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
 import { TestRunner } from './test-runner';
-import { TnpDB } from '../tnp-db';
+
 
 
 export interface IProject {

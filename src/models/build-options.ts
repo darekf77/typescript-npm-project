@@ -3,14 +3,13 @@ import * as _ from 'lodash';
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
+import { error, info } from '../messages';
+import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
 //#endregion
 
 import { Project } from '../project/base-project';
 import { BuildDir } from './build-dir';
-import { error, info } from '../messages';
-import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
 import { config } from '../config';
-import { OutFolder } from 'morphi/build';
 
 export interface IBuildOptions {
   prod: boolean;
@@ -108,7 +107,8 @@ export class BuildOptions implements IBuildOptions {
     return { prod, watch, outDir, appBuild }
   }
 
-  public static from(cmd: string, projectCurrent?: Project, mainOptions?: { watch: boolean; prod: boolean, outDir: OutFolder, args: string }): BuildOptions {
+  public static from(cmd: string, projectCurrent?: Project,
+    mainOptions?: { watch: boolean; prod: boolean, outDir: BuildDir, appBuild: boolean, args: string }): BuildOptions {
 
     const split = cmd.split(' ');
     const optionsToMerge = !!mainOptions ? mainOptions : this.getMainOptions(split);

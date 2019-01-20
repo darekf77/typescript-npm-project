@@ -144,28 +144,28 @@ export class ConsoleUi {
     switch (res.command) {
 
       case CHOICE.INIT:
-        this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
+        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
         await init('')
         process.exit(0)
         break;
 
       case CHOICE.BUILD_APP_WATCH:
-        this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
+        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildApp(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST_WATCH:
-        this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
+        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildLib(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_APP:
-        this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
+        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildApp(false, false, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST:
-        this.db.commands.setCommand(process.cwd(), `tnp ${CHOICE[res.command]}`)
+        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildLib(false, false, 'dist', '')
         break;
 
