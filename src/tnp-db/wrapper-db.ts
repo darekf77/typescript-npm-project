@@ -484,10 +484,34 @@ export class TnpDB {
 
           },
           toInstallTnp(project: Project) {
-            return true;
+            let allowed = true;
+            const p = project.isWorkspaceChildProject ? project.parent : project;
+            if (p.isWorkspace) {
+              const builds = self.getAll.builds;
+              builds.some(b => {
+                if (p.children.filter(c => c.location === b.project.location)) {
+                  allowed = false;
+                  return true;
+                }
+                return false;
+              })
+            }
+            return allowed;
           },
           toWatchWorkspace(workspaceChild: Project) {
-            return true;
+            let allowed = true;
+            const p = workspaceChild.isWorkspaceChildProject ? workspaceChild.parent : workspaceChild;
+            if (p.isWorkspace) {
+              const builds = self.getAll.builds;
+              builds.find(b => {
+                if (p.children.filter(c => c.location === b.project.location)) {
+                  allowed = false;
+                  return true;
+                }
+                return false;
+              })
+            }
+            return allowed;
           }
 
         }
