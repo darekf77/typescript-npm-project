@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import { Worker } from 'webworker-threads';
+// import { Worker } from 'webworker-threads';
 
 
 import * as express from "express";
