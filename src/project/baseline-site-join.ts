@@ -99,6 +99,7 @@ export class BaselineSiteJoin {
       console.log('OK to baseline/site join')
     } else {
       const pids = []
+      console.log(`Current process pid: ${process.pid}`)
       console.log(`Found active baseline/site join on pids: ${pids.toString()}
       current pid: ${process.pid}, ppid ${process.ppid}`)
       this.joinNotAllowed = true;

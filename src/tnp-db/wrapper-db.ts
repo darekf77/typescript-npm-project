@@ -446,6 +446,7 @@ export class TnpDB {
                   kill()
                   continue;
                 } else {
+                  console.log(`Current process pid: ${process.pid}`)
                   const confirm = await questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
                   build options: ${existed.buildOptions.toString()}`)
                   if (confirm) {
