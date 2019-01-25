@@ -86,7 +86,7 @@ export class ConsoleUi {
       .map((s) => {
         const { value, name } = s;
         if (value === CHOICE.LAST_USED_COMMAND) {
-          s.name = `${s.name}: ${this.lastCmd.shortCMD}`
+          s.name = `${s.name}: ${this.lastCmd.shortCommandForLastCommand}`
         }
         return new Choice(s.name, s.value as any);
       })

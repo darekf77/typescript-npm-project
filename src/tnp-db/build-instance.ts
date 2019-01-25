@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { BuildOptions } from '../models';
 import { ProjectFrom } from '../project';
 import { Project } from '../project/base-project'
+import { CommandInstance } from './command-instance';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;
@@ -21,7 +22,7 @@ export class BuildInstance implements IBuildInstance {
     const { buildOptions, pid, location, cmd } = data;
     this.buildOptions = buildOptions;
     this.pid = pid;
-    this.cmd = cmd;
+    this.cmd = CommandInstance.fixedCommand(cmd);
     this.location = location;
 
     if (!this.cmd && !this.buildOptions) {
@@ -36,11 +37,14 @@ export class BuildInstance implements IBuildInstance {
       }
     }
 
-
   }
 
   get isTnpProjectBuild() {
-    return (_.isString(this.cmd) && this.cmd.trim() !== '' && _.isObject(this.buildOptions))
+    let res = (_.isString(this.cmd) && this.cmd.trim() !== '' && _.isObject(this.buildOptions))
+    // if (!res) {
+      // console.log('it is not a build', this.cmd)
+    // }
+    return res;
   }
 
 

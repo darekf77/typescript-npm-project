@@ -3,13 +3,29 @@ import * as _ from 'lodash';
 
 export class CommandInstance {
   constructor(
-  public command?: string,
-  public location?: string
+    public command?: string,
+    public location?: string
   ) {
-
+    this.command = CommandInstance.fixedCommand(command)
   }
 
-  get shortCMD() {
+  public static fixedCommand(command: string) {
+    // console.log(`command to fix: ${command}`)
+    if (!command) {
+      return command
+    }
+    const args = command.split(' ');
+    const i = args.findIndex(arg => arg.endsWith(`/bin/tnp`))
+    if (i === -1) {
+      return command;
+    }
+    // console.log('founded index', i)
+    let res = `tnp ${args.slice(i + 1, args.length).join(' ')}`
+    // console.log('res', res)
+    return res;
+  }
+
+  get shortCommandForLastCommand() {
     if (!this.command) {
       return ''
     }
@@ -31,9 +47,7 @@ export class CommandInstance {
   public static from(location: string) {
     return {
       command(command: string) {
-        const c = new CommandInstance();
-        c.location = location;
-        c.command = command;
+        const c = new CommandInstance(command, location)
         return c;
       }
     }

@@ -68,7 +68,8 @@ export class BuildOptions implements IBuildOptions {
 
   //#region @backend
   private static getMainOptions(args: string[]) {
-    const ind = args.findIndex((p, i) => p.endsWith('/tnp') && !!args[i + 1] && args[i + 1].startsWith('build'))
+    const ind = args.findIndex((p, i) => (p.endsWith('/tnp') || p === 'tnp')
+      && !!args[i + 1] && args[i + 1].startsWith('build'))
     let prod = false, watch = false, outDir = 'dist', appBuild = false;
     if (ind >= 0) {
       const cmd = _.kebabCase(args[ind + 1]).split('-').slice(1)

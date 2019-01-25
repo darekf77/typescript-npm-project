@@ -86,9 +86,7 @@ export class TnpDB {
         const res = (self.db.get(ENTITIES.COMMANDS).value() as CommandInstance[])
         if (_.isArray(res)) {
           return res.map(cmd => {
-            const c = new CommandInstance();
-            c.command = cmd.command;
-            c.location = cmd.location;
+            const c = new CommandInstance(cmd.command, cmd.location);
             return c;
           })
         };
@@ -374,9 +372,7 @@ export class TnpDB {
         if (cmd) {
           cmd.command = command;
         } else {
-          const c = new CommandInstance();
-          c.location = location;
-          c.command = command;
+          const c = new CommandInstance(command, location);
           commands.push(c)
         }
         self.set.commands(commands)
