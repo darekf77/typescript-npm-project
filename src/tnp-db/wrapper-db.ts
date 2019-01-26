@@ -24,14 +24,13 @@ import { error, warn } from '../messages';
 import { getWorkingDirOfProcess, killProcess, questionYesNo } from '../process';
 import { prompt } from 'enquirer'
 import * as inquirer from 'inquirer';
+import { DBTransaction } from './db-lock';
 
 
 export class TnpDB {
 
+  //#region instance
   private static _instance: TnpDB;
-
-  private static _firstTimeInit = true;
-
   private static async instance() {
     if (!this._instance) {
       const location = path.join(Project.Tnp.location, `bin/db.json`);
@@ -53,6 +52,10 @@ export class TnpDB {
 
   private _adapter;
   private db;
+  private transaction = new DBTransaction();
+  //#endregion
+
+
   public async init(recreate = true) {
     if (recreate) {
       fse.writeFileSync(this.location, '')
@@ -61,21 +64,22 @@ export class TnpDB {
     this.db = low(this._adapter)
     if (recreate) {
       console.log('[wrapper-db]recreate values')
-      this.db.defaults({ projects: [], domains: [], ports: [], builds: [], commands: [] })
-        .write()
-      this.updateAndAdd.existedProjects()
-      this.updateAndAdd.existedDomains()
-      await this.updateAndAdd.existedBuilds();
+      await this.transaction.start(async () => {
+        this.db.defaults({ projects: [], domains: [], ports: [], builds: [], commands: [] })
+          .write()
+        this.update.existedProjects()
+        this.update.existedDomains()
+        await this.update.existedBuilds();
 
+        const defaultPorts: PortInstance[] = [
 
-      const defaultPorts: PortInstance[] = [
+          new PortInstance([80, 443], new SystemService('http(s) related')),
+          new PortInstance(Range.from(4000).to(6000))
 
+        ]
+        this.set.ports(defaultPorts);
+      })
 
-        new PortInstance([80, 443], new SystemService('http(s) related')),
-        new PortInstance(Range.from(4000).to(6000))
-
-      ]
-      this.set.ports(defaultPorts);
     }
   }
 
@@ -130,6 +134,7 @@ export class TnpDB {
 
 
   private discoverFrom(project: Project) {
+
     if (!project) {
       return
     }
@@ -141,7 +146,7 @@ export class TnpDB {
     this.discoverFrom(project.preview)
   }
 
-  public static get prepareToSave() {
+  private static get prepareToSave() {
     return {
       build(build: BuildInstance) {
         const { pid, project, location, buildOptions, cmd } = build;
@@ -245,7 +250,7 @@ export class TnpDB {
     }
   }
 
-  private get updateAndAdd() {
+  private get update() {
     const self = this;
 
     return {
@@ -281,6 +286,7 @@ export class TnpDB {
 
       existedDomains() {
         const domains: DomainInstance[] = [];
+
         self.getAll.projects.forEach(project => {
           if (!project.isWorkspaceChildProject && project.env &&
             project.env.config && project.env.config.domain) {
@@ -301,10 +307,10 @@ export class TnpDB {
         })
 
         self.set.domains(domains);
-
       },
 
       projectIfNotExist(project: Project) {
+
         if (!self.getAll.projects.includes(project)) {
           self.discoverFrom(project);
         }
@@ -322,7 +328,7 @@ export class TnpDB {
     }
   }
 
-  get ports() {
+  public get ports() {
 
     let res = (this.db.get(ENTITIES.PORTS).value() as any[])
     if (_.isArray(res)) {
@@ -342,17 +348,17 @@ export class TnpDB {
     });
   }
 
-  get projects() {
+  public get projects() {
     const self = this;
     return {
       discoverExistedProjects() {
-        self.updateAndAdd.existedProjects()
+        self.update.existedProjects()
         console.log(self.getAll.projects)
       }
     }
   }
 
-  get builds() {
+  public get builds() {
     const self = this;
     return {
       remove(build: BuildInstance) {
@@ -363,67 +369,74 @@ export class TnpDB {
     }
   }
 
-  get commands() {
+  public get commands() {
     const self = this;
     const commands = this.getAll.commands;
     return {
-      setCommand(location: string, command: string) {
-        const cmd = commands.find(c => c.location === location);
-        if (cmd) {
-          cmd.command = command;
-        } else {
-          const c = new CommandInstance(command, location);
-          commands.push(c)
-        }
-        self.set.commands(commands)
+      async setCommand(location: string, command: string) {
+        await self.transaction.start(() => {
+          const cmd = commands.find(c => c.location === location);
+          if (cmd) {
+            cmd.command = command;
+          } else {
+            const c = new CommandInstance(command, location);
+            commands.push(c)
+          }
+          self.set.commands(commands)
+        })
+
       },
       lastCommandFrom(location: string): CommandInstance {
         const cmd = commands.find(c => c.location === location)
         return cmd;
       },
 
-      update(cmd: CommandInstance) {
-        const c = commands.find(c => c.location === cmd.location)
-        c.command = cmd.command;
-        self.set.commands(commands)
+      async update(cmd: CommandInstance) {
+        await self.transaction.start(() => {
+          const c = commands.find(c => c.location === cmd.location)
+          c.command = cmd.command;
+          self.set.commands(commands)
+        })
       },
 
       async runCommand(cmd: CommandInstance) {
-        if (cmd && _.isString(cmd.command) && cmd.command.trim() !== '') {
-          await start(cmd.command.split(' '));
-        } else {
-          error(`Last command for location: ${cmd.location} doen't exists`, false, true);
-        }
+        await self.transaction.start(async () => {
+          if (cmd && _.isString(cmd.command) && cmd.command.trim() !== '') {
+            await start(cmd.command.split(' '));
+          } else {
+            error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+          }
+        });
+
       },
       async runLastCommandIn(location: string) {
-        const cmd = commands.find(c => c.location === location)
-        if (cmd) {
-          await start(cmd.command.split(' '));
-        } else {
-          error(`Last command for location: ${cmd.location} doen't exists`, false, true);
-        }
+        await self.transaction.start(async () => {
+          const cmd = commands.find(c => c.location === location)
+          if (cmd) {
+            await start(cmd.command.split(' '));
+          } else {
+            error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+          }
+        });
       }
     }
   }
 
 
   constructor(private location: string) {
-
-
-
   }
 
 
-  get notify() {
+  public get notify() {
     const self = this;
     return {
       get when() {
         return {
           async BUILD(currentProject: Project, buildOptions: BuildOptions, pid: number) {
             // console.log('current build options', buildOptions)
-            self.updateAndAdd.projectIfNotExist(currentProject);
+            self.update.projectIfNotExist(currentProject);
             while (true) {
-              const existed = self.updateAndAdd.buildIfNotExistOrReturnExisted(currentProject, buildOptions, pid);
+              const existed = self.update.buildIfNotExistOrReturnExisted(currentProject, buildOptions, pid);
 
 
 
@@ -458,13 +471,13 @@ export class TnpDB {
 
           },
           async INIT(currentProject: Project) {
-            self.updateAndAdd.projectIfNotExist(currentProject);
+            self.update.projectIfNotExist(currentProject);
           },
           async CLEAN(currentProject: Project) {
-            self.updateAndAdd.projectIfNotExist(currentProject);
+            self.update.projectIfNotExist(currentProject);
           },
           async ANY_COMMAND(location: string, args: string[]) {
-            self.commands.setCommand(location, args.join(' '))
+            await self.commands.setCommand(location, args.join(' '))
           }
         }
       }
@@ -472,7 +485,7 @@ export class TnpDB {
   }
 
 
-  get checkIf() {
+  public get checkIf() {
     const self = this;
     return {
       get allowed() {

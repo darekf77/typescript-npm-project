@@ -162,7 +162,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     const db = await TnpDB.Instance;
     const cmd = db.commands.lastCommandFrom(this.location);
     console.log('last command', cmd)
-    db.commands.update(CommandInstance.from(this.location)
+    await db.commands.update(CommandInstance.from(this.location)
       .command(cmd.command + ' ' + buildOptions.forClient.map(c => {
         return `--forClient ${c.name}`
       }).join(' ')
