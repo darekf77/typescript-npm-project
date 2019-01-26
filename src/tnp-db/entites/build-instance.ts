@@ -1,9 +1,10 @@
 //#region @backend
 import * as _ from 'lodash';
-import { BuildOptions } from '../models';
-import { ProjectFrom } from '../project';
-import { Project } from '../project/base-project'
+import { BuildOptions } from '../../models';
+import { ProjectFrom } from '../../project';
+import { Project } from '../../project/base-project'
 import { CommandInstance } from './command-instance';
+import { DBBaseEntity } from './base-entity';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;
@@ -12,10 +13,11 @@ export type IBuildInstance = {
   location?: string;
 };
 
-export class BuildInstance implements IBuildInstance {
+export class BuildInstance extends DBBaseEntity<BuildInstance> implements IBuildInstance {
 
 
   constructor(data?: IBuildInstance) {
+    super()
     if (!data) {
       data = {} as any;
     }
@@ -42,7 +44,7 @@ export class BuildInstance implements IBuildInstance {
   get isTnpProjectBuild() {
     let res = (_.isString(this.cmd) && this.cmd.trim() !== '' && _.isObject(this.buildOptions))
     // if (!res) {
-      // console.log('it is not a build', this.cmd)
+    // console.log('it is not a build', this.cmd)
     // }
     return res;
   }

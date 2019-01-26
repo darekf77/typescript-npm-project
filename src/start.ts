@@ -82,7 +82,7 @@ export async function start(argsv: string[]) {
   ) {
     // info(`DO NOTHIGN`);
   } else {
-    db.notify.when.ANY_COMMAND(process.cwd(), argsv);
+    db.transaction.setCommand(argsv.join(' '), process.cwd());
   }
 
   let recognized = false;

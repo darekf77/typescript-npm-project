@@ -18,7 +18,7 @@ import { error } from '../messages';
 import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
 import { TnpDB } from '../tnp-db';
-import { CommandInstance } from '../tnp-db/command-instance';
+import { CommandInstance } from '../tnp-db/entites/command-instance';
 
 
 
@@ -160,13 +160,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
 
     const db = await TnpDB.Instance;
-    const cmd = db.commands.lastCommandFrom(this.location);
-    console.log('last command', cmd)
-    await db.commands.update(CommandInstance.from(this.location)
-      .command(cmd.command + ' ' + buildOptions.forClient.map(c => {
-        return `--forClient ${c.name}`
-      }).join(' ')
-      ))
+    db.transaction.updateCommandBuildOptions(this.location, buildOptions);
 
   }
 

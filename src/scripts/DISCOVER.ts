@@ -7,7 +7,7 @@ import { TnpDB } from '../tnp-db';
 export default {
   $DISCOVER: async (args) => {
     const db = await TnpDB.Instance
-    db.projects.discoverExistedProjects()
+    db.transaction.__projectsCtrl.addExisted()
     process.exit(0)
   }
 }

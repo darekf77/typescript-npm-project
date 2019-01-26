@@ -51,7 +51,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)
 
-  await (await TnpDB.Instance).notify.when.BUILD(project, buildOptions, process.pid)
+  await (await TnpDB.Instance).transaction.build(project, buildOptions, process.pid)
 
 
   await project.build(buildOptions);

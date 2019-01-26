@@ -1,11 +1,11 @@
 //#region @backend
 import { TnpDB } from '../tnp-db/wrapper-db';
-import { CommandInstance } from '../tnp-db/command-instance';
+import { CommandInstance } from '../tnp-db/entites';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
-  const last = db.commands.lastCommandFrom(process.cwd());
-  await db.commands.runCommand(!!last ? last : new CommandInstance(undefined, process.cwd()));
+  const last = db.lastCommandFrom(process.cwd());
+  await db.transaction.runCommand(!!last ? last : new CommandInstance(undefined, process.cwd()));
   // process.exit(0)
 }
 
@@ -14,9 +14,9 @@ const $DB = async (args: string) => {
 
   if (args.trim() === 'reinit') {
     await db.init()
-    db.commands.setCommand(process.cwd(), 'tnp db reinit')
+    db.transaction.setCommand(process.cwd(), 'tnp db reinit')
   } else {
-    db.commands.setCommand(process.cwd(), 'tnp db')
+    db.transaction.setCommand(process.cwd(), 'tnp db')
   }
 
   process.exit(0)

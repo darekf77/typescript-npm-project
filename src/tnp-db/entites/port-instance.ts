@@ -1,18 +1,19 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Project } from '../project/base-project';
-import { SystemService } from './system-service';
-import { Range } from '../helpers';
+import { Project } from '../../project/base-project';
+import { SystemService } from '../../models/system-service';
+import { Range } from '../../helpers';
+import { DBBaseEntity } from './base-entity';
 
 export type PortIdType = number | number[] | Range;
 
 
-export class PortInstance {
+export class PortInstance extends DBBaseEntity<PortInstance> {
 
   constructor(
     public id?: PortIdType,
     public reservedFor?: Project | SystemService) {
-
+    super()
     if (_.isArray(id)) {
       this.id = _.sortBy(id);
     }

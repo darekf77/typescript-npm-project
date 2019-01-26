@@ -71,7 +71,7 @@ export function init(args: string,
     },
     async project(p: Project = Project.Current) {
       const db = await TnpDB.Instance;
-      await (await TnpDB.Instance).notify.when.INIT(p)
+      await (await TnpDB.Instance).transaction.addProjectIfNotExist(p)
       await initialize(args, p, watch)
     }
   }

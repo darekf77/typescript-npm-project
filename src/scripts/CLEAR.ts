@@ -33,8 +33,8 @@ export async function clear(args, all = false) {
   generated = (generated || g);
   const project = Project.Current
   const db = await TnpDB.Instance;
-  await (db).notify.when.CLEAN(project);
-  db.commands.setCommand(project.location, 'tnp clear')
+  await (db).transaction.addProjectIfNotExist(project);
+  db.transaction.setCommand(project.location, 'tnp clear')
 
   // console.log('r', r)
   // console.log('recrusive', recrusive)

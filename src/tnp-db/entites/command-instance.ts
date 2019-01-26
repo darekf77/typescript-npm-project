@@ -1,11 +1,17 @@
-import { Project } from '../project';
 import * as _ from 'lodash';
+import { DBBaseEntity } from './base-entity';
 
-export class CommandInstance {
+export class CommandInstance extends DBBaseEntity<CommandInstance> {
+  isEqual(anotherInstace: CommandInstance): boolean {
+    return ((this.location === anotherInstace.location) &&
+      (this.command.trim() === anotherInstace.command.trim()))
+  }
+
   constructor(
     public command?: string,
     public location?: string
   ) {
+    super()
     this.command = CommandInstance.fixedCommand(command)
   }
 

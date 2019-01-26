@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib, buildApp } from './scripts/BUILD';
-import { CommandInstance } from './tnp-db/command-instance';
+import { CommandInstance } from './tnp-db/entites';
 import {  killProcessByPort } from './process';
 import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
@@ -53,7 +53,7 @@ export class ConsoleUi {
 
   lastCmd: CommandInstance;
   get lastCommandAvailable(): Boolean {
-    this.lastCmd = this.db.commands.lastCommandFrom(this.project.location)
+    this.lastCmd = this.db.lastCommandFrom(this.project.location)
     // console.log('this.lastCmd',this.lastCmd)
     // this.db.commandsSet.
     return !!this.lastCmd;
@@ -144,33 +144,34 @@ export class ConsoleUi {
     switch (res.command) {
 
       case CHOICE.INIT:
-        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
+        this
+        this.db.transaction.setCommand(process.cwd(), `tnp ${res.command}`)
         await init('')
         process.exit(0)
         break;
 
       case CHOICE.BUILD_APP_WATCH:
-        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
+        this.db.transaction.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildApp(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST_WATCH:
-        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
+        this.db.transaction.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildLib(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_APP:
-        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
+        this.db.transaction.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildApp(false, false, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST:
-        this.db.commands.setCommand(process.cwd(), `tnp ${res.command}`)
+        this.db.transaction.setCommand(process.cwd(), `tnp ${res.command}`)
         await buildLib(false, false, 'dist', '')
         break;
 
       case CHOICE.LAST_USED_COMMAND:
-        await this.db.commands.runCommand(!!this.lastCmd ?
+        await this.db.transaction.runCommand(!!this.lastCmd ?
           this.lastCmd : new CommandInstance(undefined, this.project.location)
         );
         break;
