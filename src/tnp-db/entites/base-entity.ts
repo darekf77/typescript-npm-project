@@ -1,16 +1,18 @@
+//#region @backend
 import * as _ from 'lodash'
 import { CLASS } from 'typescript-class-helpers'
 
-export abstract class DBBaseEntity<T> {
+export abstract class DBBaseEntity<T=any> {
   abstract isEqual(anotherInstace: DBBaseEntity<any>): boolean;
 
 
   entityName() {
-    return DBBaseEntity.entityFromClassName(CLASS.getNameFromObject(this) as string)
+    return DBBaseEntity.entityNameFromClassName(CLASS.getNameFromObject(this) as string)
   }
 
-  public static entityFromClassName(className: string) {
-    return _.lowerCase((CLASS.getNameFromObject(this) as string).replace('Instance', 's'))
+  public static entityNameFromClassName(className: string) {
+    return _.lowerCase(className.replace('Instance', 's'))
   }
 
 }
+//#endregion

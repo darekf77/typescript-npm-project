@@ -1,12 +1,16 @@
+//#region @backend
 import * as _ from 'lodash';
+
 import { CLASS } from 'typescript-class-helpers'
 
 import { BuildOptions } from '../models/build-options';
 import { Project } from '../project/base-project';
 import { DBBaseEntity } from './entites/base-entity';
-import { BuildInstance, PortInstance, DomainInstance, EntityNames as EntityName, CommandInstance } from './entites';
+import {
+  BuildInstance, PortInstance, DomainInstance,
+  EntityNames, CommandInstance, ProjectInstance
+} from './entites';
 import { ProjectFrom } from '../project';
-
 
 
 export class DbCrud {
@@ -16,34 +20,36 @@ export class DbCrud {
 
   }
 
-  clearDBandReinit() {
-    this.db.defaults({ projects: [], domains: [], ports: [], builds: [], commands: [] })
+  clearDBandReinit(defaultValues: Object) {
+    this.db.defaults(defaultValues)
       .write()
   }
 
-  getALL<T extends DBBaseEntity<any>>(classFN: Function): DBBaseEntity<T>[] {
-    const entityName: EntityName = this.getEntityNameByClassFN(classFN);
+  getAll<T extends DBBaseEntity>(classFN: Function): T[] {
+    const entityName: EntityNames = this.getEntityNameByClassFN(classFN);
+    // console.log('entity name from object', entityName)
     const res = (this.db.get(entityName).value() as T[])
+    // console.log('res', res)
     if (_.isArray(res) && res.length > 0) {
-      return res.map(v => this.afterRetrive(v, entityName));
+      return res.map(v => this.afterRetrive(v, entityName)).filter(f => !!f) as any;
     }
     return [];
   }
 
-  addIfNotExist<T extends DBBaseEntity<any>>(entity: DBBaseEntity<T>): boolean {
-    const indexFounded = this.getALL(CLASS.getFromObject(entity))
-      .findIndex(f => f.isEqual(entity))
+  addIfNotExist(entity: DBBaseEntity): boolean {
+    // console.log(`[addIfNotExist] add if not exist entity: ${CLASS.getNameFromObject(entity)}`)
+    const all = this.getAll(CLASS.getFromObject(entity))
+    const indexFounded = all.findIndex(f => f.isEqual(entity))
     if (indexFounded === -1) {
-      return false;
+      all.push(entity)
+      this.setBulk(all);
+      return true;
     }
-    const all = this.getALL(CLASS.getFromObject(entity))
-    all.push(entity)
-    this.setBulk(all);
-    return true;
+    return false;
   }
 
-  remove<T extends DBBaseEntity<any>>(entity: DBBaseEntity<T>): boolean {
-    const all = this.getALL(CLASS.getFromObject(entity))
+  remove(entity: DBBaseEntity): boolean {
+    const all = this.getAll(CLASS.getFromObject(entity))
     const filtered = all.filter(f => !f.isEqual(entity))
     if (filtered.length === all.length) {
       return false;
@@ -52,33 +58,24 @@ export class DbCrud {
     return true;
   }
 
-  update<T extends DBBaseEntity<any>>(entity: DBBaseEntity<T>): boolean {
-    const all = this.getALL(CLASS.getFromObject(entity))
+  set(entity: DBBaseEntity) {
+    const all = this.getAll(CLASS.getFromObject(entity))
     const existed = all.find(f => f.isEqual(entity))
-    if (!existed) {
-      return false;
-    }
-    _.merge(existed, entity)
-    this.setBulk(all);
-    return true;
-  }
-
-  set<T extends DBBaseEntity<any>>(entity: DBBaseEntity<T>) {
-    const all = this.getALL(CLASS.getFromObject(entity))
-    const existed = all.find(f => f.isEqual(entity))
-    if (!existed) {
+    if (existed) {
+      _.merge(existed, entity)
+    } else {
       all.push(entity)
-      this.setBulk(all);
     }
-    this.update(entity)
+    this.setBulk(all);
   }
 
-  setBulk<T extends DBBaseEntity<any>>(entites: DBBaseEntity<T>[]): boolean {
+  setBulk(entites: DBBaseEntity[]): boolean {
     if (!_.isArray(entites) || entites.length === 0) {
       return false;
     }
     const entityName = this.getEntityNameByClassName(CLASS.getNameFromObject(_.first(entites)))
     const json = entites.map(c => this.preprareEntity(c));
+    // console.log(`[setBulk] set json for entity ${entityName}`, json)
     this.db.set(entityName, json).write()
     return true;
   }
@@ -87,11 +84,11 @@ export class DbCrud {
     return this.getEntityNameByClassName(CLASS.getName(classFN))
   }
 
-  private getEntityNameByClassName(className: string): EntityName {
-    return className === 'Project' ? 'projects' : DBBaseEntity.entityFromClassName(className) as EntityName;
+  private getEntityNameByClassName(className: string): EntityNames {
+    return className === 'Project' ? 'projects' : DBBaseEntity.entityNameFromClassName(className) as EntityNames;
   }
 
-  private afterRetrive<T=any>(value: any, entityName: EntityName): DBBaseEntity<T> {
+  private afterRetrive<T=any>(value: any, entityName: EntityNames): DBBaseEntity {
     if (entityName === 'builds') {
       const v = value as BuildInstance;
       const ins: BuildInstance = _.merge(new BuildInstance(), v)
@@ -121,20 +118,33 @@ export class DbCrud {
     }
     if (entityName === 'projects') {
       const location = value;
-      return ProjectFrom(location) as any;
+      return ProjectInstance.from(location)
     }
+    return value;
   }
 
-  private preprareEntity<T extends DBBaseEntity<any> = any>(entity: DBBaseEntity<T>) {
+  private preprareEntity<T extends DBBaseEntity = any>(entity: DBBaseEntity) {
+    // console.log(`prerpare entity, typeof ${typeof entity}`, entity)
+    // console.log('typeof BuildInstance', typeof BuildInstance)
+
+    [BuildInstance, PortInstance, CommandInstance, DomainInstance, ProjectInstance]
+      .find(f => {
+        if(!f) {
+          throw `Undefined instance of class. Propobly circural dependency`
+        }
+        return false;
+      })
+
     if (entity instanceof BuildInstance) {
       const { pid, project, location, buildOptions, cmd } = entity as BuildInstance;
       return _.cloneDeep({
         buildOptions: _.merge({}, _.omit(buildOptions, BuildOptions.PropsToOmmitWhenStringify)),
         pid,
         cmd,
-        location: _.isString(location) ? location : project.location
+        location: _.isString(location) ? location : (!!project && project.location)
       }) as BuildInstance;
     }
+    // console.log('typeof PortInstance', typeof PortInstance)
     if (entity instanceof PortInstance) {
       const port = entity as PortInstance;
       return _.cloneDeep({
@@ -143,6 +153,7 @@ export class DbCrud {
           (port.reservedFor as Project).location : port.reservedFor
       } as PortInstance);
     }
+    // console.log('typeof CommandInstance', typeof CommandInstance)
     if (entity instanceof CommandInstance) {
       const cmd = entity as CommandInstance;
       const { command, location } = cmd;
@@ -150,6 +161,7 @@ export class DbCrud {
         command, location
       } as CommandInstance);
     }
+    // console.log('typeof DomainInstance', typeof DomainInstance)
     if (entity instanceof DomainInstance) {
       const domain = entity as DomainInstance;
       const { activeFor, address, declaredIn } = domain;
@@ -163,16 +175,9 @@ export class DbCrud {
         // sockets
       } as DomainInstance);
     }
-
+    return entity;
   }
 
 }
 
-
-
-export class DBAccess {
-
-
-
-
-}
+//#endregion

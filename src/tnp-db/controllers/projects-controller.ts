@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
@@ -5,6 +6,7 @@ import { Project } from '../../project/base-project';
 import { ProjectFrom } from '../../project';
 import { DbCrud } from '../db-crud';
 import { BaseController } from './base-controlller';
+import { ProjectInstance } from '../entites';
 
 export class ProjectsController extends BaseController {
 
@@ -13,17 +15,17 @@ export class ProjectsController extends BaseController {
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
   }
 
-  addIfNotExists(project: Project): boolean {
+  addIfNotExists(projectInstance: ProjectInstance): boolean {
 
-    if (!project) {
+    if (!projectInstance) {
       return
     }
 
-    if (this.crud.addIfNotExist<any>(project as any)) {
-      if (_.isArray(project.children)) {
-        project.children.forEach(c => this.addIfNotExists(c))
+    if (this.crud.addIfNotExist(projectInstance)) {
+      if (_.isArray(projectInstance.project.children)) {
+        projectInstance.project.children.forEach(c => this.addIfNotExists(ProjectInstance.from(c)))
       }
-      this.addIfNotExists(project.preview)
+      this.addIfNotExists(ProjectInstance.from(projectInstance.project.preview))
     }
   }
 
@@ -42,8 +44,9 @@ export class ProjectsController extends BaseController {
       })
       .forEach(project => {
         // console.log(project.name)
-        this.addIfNotExists(project)
+        this.addIfNotExists(ProjectInstance.from(project))
       })
   }
 
 }
+//#endregion

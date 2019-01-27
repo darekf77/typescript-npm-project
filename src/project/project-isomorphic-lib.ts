@@ -160,7 +160,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
     buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
 
     const db = await TnpDB.Instance;
-    db.transaction.updateCommandBuildOptions(this.location, buildOptions);
+    await db.transaction.updateCommandBuildOptions(this.location, buildOptions);
 
   }
 

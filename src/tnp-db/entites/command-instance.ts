@@ -1,7 +1,8 @@
+//#region @backend
 import * as _ from 'lodash';
 import { DBBaseEntity } from './base-entity';
 
-export class CommandInstance extends DBBaseEntity<CommandInstance> {
+export class CommandInstance extends DBBaseEntity {
   isEqual(anotherInstace: CommandInstance): boolean {
     return ((this.location === anotherInstace.location) &&
       (this.command.trim() === anotherInstace.command.trim()))
@@ -60,3 +61,4 @@ export class CommandInstance extends DBBaseEntity<CommandInstance> {
   }
 
 }
+//#endregion

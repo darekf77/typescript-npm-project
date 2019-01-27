@@ -13,7 +13,7 @@ export type IBuildInstance = {
   location?: string;
 };
 
-export class BuildInstance extends DBBaseEntity<BuildInstance> implements IBuildInstance {
+export class BuildInstance extends DBBaseEntity implements IBuildInstance {
 
 
   constructor(data?: IBuildInstance) {

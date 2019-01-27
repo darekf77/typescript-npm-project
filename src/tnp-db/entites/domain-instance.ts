@@ -13,15 +13,21 @@ export class IDomainInstance {
 }
 
 
-export class DomainInstance extends DBBaseEntity<DomainInstance> implements IDomainInstance {
+export class DomainInstance extends DBBaseEntity implements IDomainInstance {
   isEqual(anotherInstace: DomainInstance): boolean {
     return this.address === anotherInstace.address;
   }
+  constructor(
+    public address: string = ''
+    // sockets: boolean = true;
+    // secure: boolean = false;
+    // production: boolean = false;
 
-  address: string;
-  // sockets: boolean = true;
-  // secure: boolean = false;
-  // production: boolean = false;
+  ) {
+    super()
+  }
+
+
   declaredIn: {
     project: Project;
     environment: EnvironmentName

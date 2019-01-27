@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 
 import { BaseController } from './base-controlller';
@@ -11,7 +12,7 @@ export class DomainsController extends BaseController {
   async addExisted() {
     const domains: DomainInstance[] = [];
 
-    this.crud.getALL<any>(Project).forEach((p) => {
+    this.crud.getAll<any>(Project).forEach((p) => {
       const project: Project = p as any;
       if (!project.isWorkspaceChildProject && project.env &&
         project.env.config && project.env.config.domain) {
@@ -56,3 +57,4 @@ export class DomainsController extends BaseController {
   }
 
 }
+//#endregion

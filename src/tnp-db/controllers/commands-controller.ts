@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import { start } from '../../start';
 import { error, warn } from '../../messages';
@@ -13,7 +14,7 @@ export class CommandsController extends BaseController {
   }
 
   lastCommandFrom(location: string): CommandInstance {
-    const commands = this.crud.getALL<CommandInstance>(CommandInstance) as CommandInstance[];
+    const commands = this.crud.getAll<CommandInstance>(CommandInstance) as CommandInstance[];
     const cmd = commands.find(c => c.location === location)
     return cmd;
   }
@@ -28,7 +29,7 @@ export class CommandsController extends BaseController {
 
   }
   async runLastCommandIn(location: string) {
-    const commands = this.crud.getALL<CommandInstance>(CommandInstance) as CommandInstance[];
+    const commands = this.crud.getAll<CommandInstance>(CommandInstance) as CommandInstance[];
     const cmd = commands.find(c => c.location === location)
     if (cmd) {
       await start(cmd.command.split(' '));
@@ -44,7 +45,7 @@ export class CommandsController extends BaseController {
         return `--forClient ${c.name}`
       }).join(' ');
       cmd.command = cmd.command + ' ' + clients;
-      this.crud.update(cmd)
+      this.crud.set(cmd)
     } else {
       warn(`Cannot update unexisted last commadn in location: ${location}`)
     }
@@ -52,3 +53,4 @@ export class CommandsController extends BaseController {
 
 
 }
+//#endregion

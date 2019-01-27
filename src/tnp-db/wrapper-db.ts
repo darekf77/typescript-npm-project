@@ -11,12 +11,12 @@ import { BuildOptions } from '../models';
 import { error, warn } from '../messages';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
-import { BuildInstance } from './entites';
+import { BuildInstance, CommandInstance } from './entites';
 
 
 export class TnpDB {
 
-  //#region instance
+
   private static _instance: TnpDB;
   private static async instance() {
     if (!this._instance) {
@@ -41,7 +41,6 @@ export class TnpDB {
   private db;
   private crud: DbCrud;
   public transaction: DBTransaction;
-  //#endregion
 
 
   public async init(recreate = true) {
@@ -78,7 +77,7 @@ export class TnpDB {
             let allowed = true;
             const p = project.isWorkspaceChildProject ? project.parent : project;
             if (p.isWorkspace) {
-              const builds = self.crud.getALL(BuildInstance) as BuildInstance[];
+              const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
               builds.some(b => {
                 if (p.children.filter(c => c.location === b.project.location)) {
                   allowed = false;
@@ -93,7 +92,7 @@ export class TnpDB {
             let allowed = true;
             const p = workspaceChild.isWorkspaceChildProject ? workspaceChild.parent : workspaceChild;
             if (p.isWorkspace) {
-              const builds = self.crud.getALL(BuildInstance) as BuildInstance[];
+              const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
               builds.find(b => {
                 if (p.children.filter(c => c.location === b.project.location)) {
                   allowed = false;

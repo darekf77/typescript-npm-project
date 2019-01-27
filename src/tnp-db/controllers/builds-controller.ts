@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 
@@ -42,7 +43,7 @@ export class BuildsController extends BaseController {
 
   getExistedForOptions(project: Project, buildOptions: BuildOptions, pid: number): BuildInstance {
     const currentB = new BuildInstance({ buildOptions, pid, location: project.location })
-    const all = this.crud.getALL<BuildInstance>(BuildInstance) as BuildInstance[]
+    const all = this.crud.getAll<BuildInstance>(BuildInstance) as BuildInstance[]
     const existed = all.find(b => b.isEqual(currentB))
     if (_.isObject(existed)) {
       return existed;
@@ -51,3 +52,4 @@ export class BuildsController extends BaseController {
 
 
 }
+//#endregion

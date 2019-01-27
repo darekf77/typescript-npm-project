@@ -43,7 +43,8 @@ function typeFrom(location: string): LibType {
 export function ProjectFrom(location: string, warnings = false): Project {
 
   if (!_.isString(location)) {
-    error(`ProjectFrom: Value is not a string: ${location}`)
+    return
+    // error(`ProjectFrom: Value is not a string: ${location}`)
   }
 
   location = path.resolve(location);

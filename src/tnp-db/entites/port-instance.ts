@@ -8,7 +8,7 @@ import { DBBaseEntity } from './base-entity';
 export type PortIdType = number | number[] | Range;
 
 
-export class PortInstance extends DBBaseEntity<PortInstance> {
+export class PortInstance extends DBBaseEntity {
 
   constructor(
     public id?: PortIdType,

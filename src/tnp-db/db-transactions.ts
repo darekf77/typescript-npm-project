@@ -1,3 +1,4 @@
+//#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
@@ -18,7 +19,8 @@ import { BuildOptions } from '../models/build-options';
 import { BuildInstance } from './entites/build-instance';
 import { warn } from '../messages';
 import { killProcess, questionYesNo } from '../process';
-import { CommandInstance } from './entites';
+import { CommandInstance, ProjectInstance } from './entites';
+import { PortsSet } from './controllers/ports-set';
 
 
 
@@ -36,14 +38,26 @@ export class DBTransaction {
     this.__domainsCtrl = new DomainsController(crud);
     this.__buildsCtrl = new BuildsController(crud);
     this.__portsCtrl = new PortsController(crud);
+    this.__commandsCtrl == new CommandsController(crud)
 
     this.controllers = this.controllers.concat([
       this.__projectsCtrl,
       this.__domainsCtrl,
       this.__buildsCtrl,
-      this.__portsCtrl
+      this.__portsCtrl,
+      this.__commandsCtrl
     ])
   }
+
+
+  public get portsManager() {
+    return new Promise<PortsSet>(async (resolve, reject) => {
+      await this.start(() => {
+        resolve(this.__portsCtrl.manager)
+      })
+    })
+  }
+
 
   public async setCommand(command: string, location: string) {
     await this.start(() => {
@@ -58,13 +72,15 @@ export class DBTransaction {
     })
   }
 
-  updateCommandBuildOptions(location: string, buildOptions: BuildOptions) {
-    this.__commandsCtrl.updateCommandBuildOptions(location, buildOptions);
+  async updateCommandBuildOptions(location: string, buildOptions: BuildOptions) {
+    await this.start(async () => {
+      this.__commandsCtrl.updateCommandBuildOptions(location, buildOptions);
+    })
   }
 
   public async reinitDB() {
     await this.start(async () => {
-      this.crud.clearDBandReinit()
+      this.crud.clearDBandReinit({ projects: [], domains: [], ports: [], builds: [], commands: [] })
       for (let index = 0; index < this.controllers.length; index++) {
         const ctrl = this.controllers[index];
         await ctrl.addExisted()
@@ -73,13 +89,13 @@ export class DBTransaction {
   }
 
   public addProjectIfNotExist(project: Project) {
-    this.__projectsCtrl.addIfNotExists(project);
+    this.__projectsCtrl.addIfNotExists(ProjectInstance.from(project));
   }
 
   public async build(currentProject: Project, buildOptions: BuildOptions, pid: number) {
     // console.log('current build options', buildOptions)
     this.start(async () => {
-      this.__projectsCtrl.addIfNotExists(currentProject)
+      this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
       while (true) {
 
         const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
@@ -128,7 +144,5 @@ export class DBTransaction {
   }
 
 
-
-
-
 }
+//#endregion

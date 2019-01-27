@@ -1,10 +1,10 @@
 //#region @backend
-import { PortInstance } from '../tnp-db/entites/port-instance';
 import * as _ from 'lodash';
-import { Project } from '../project/base-project';
-import { SystemService } from './system-service';
-import { Range } from '../helpers'
-import { ProjectFrom } from '../project';
+
+import { Range } from '../../helpers';
+import { PortInstance } from '../entites';
+import { ProjectFrom, Project } from '../../project';
+import { SystemService } from '../../models/system-service';
 
 
 
