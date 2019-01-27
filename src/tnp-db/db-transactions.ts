@@ -38,7 +38,7 @@ export class DBTransaction {
     this.__domainsCtrl = new DomainsController(crud);
     this.__buildsCtrl = new BuildsController(crud);
     this.__portsCtrl = new PortsController(crud);
-    this.__commandsCtrl == new CommandsController(crud)
+    this.__commandsCtrl = new CommandsController(crud)
 
     this.controllers = this.controllers.concat([
       this.__projectsCtrl,

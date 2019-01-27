@@ -74,7 +74,7 @@ export class DbCrud {
       return false;
     }
     const entityName = this.getEntityNameByClassName(CLASS.getNameFromObject(_.first(entites)))
-    const json = entites.map(c => this.preprareEntity(c));
+    const json = entites.map(c => this.preprareEntityForSave(c));
     // console.log(`[setBulk] set json for entity ${entityName}`, json)
     this.db.set(entityName, json).write()
     return true;
@@ -117,19 +117,18 @@ export class DbCrud {
       return r as any;
     }
     if (entityName === 'projects') {
-      const location = value;
-      return ProjectInstance.from(location)
+      return new ProjectInstance(value);
     }
     return value;
   }
 
-  private preprareEntity<T extends DBBaseEntity = any>(entity: DBBaseEntity) {
+  private preprareEntityForSave(entity: DBBaseEntity) {
     // console.log(`prerpare entity, typeof ${typeof entity}`, entity)
     // console.log('typeof BuildInstance', typeof BuildInstance)
 
     [BuildInstance, PortInstance, CommandInstance, DomainInstance, ProjectInstance]
       .find(f => {
-        if(!f) {
+        if (!f) {
           throw `Undefined instance of class. Propobly circural dependency`
         }
         return false;
@@ -144,7 +143,7 @@ export class DbCrud {
         location: _.isString(location) ? location : (!!project && project.location)
       }) as BuildInstance;
     }
-    // console.log('typeof PortInstance', typeof PortInstance)
+
     if (entity instanceof PortInstance) {
       const port = entity as PortInstance;
       return _.cloneDeep({
@@ -153,7 +152,7 @@ export class DbCrud {
           (port.reservedFor as Project).location : port.reservedFor
       } as PortInstance);
     }
-    // console.log('typeof CommandInstance', typeof CommandInstance)
+
     if (entity instanceof CommandInstance) {
       const cmd = entity as CommandInstance;
       const { command, location } = cmd;
@@ -161,7 +160,7 @@ export class DbCrud {
         command, location
       } as CommandInstance);
     }
-    // console.log('typeof DomainInstance', typeof DomainInstance)
+
     if (entity instanceof DomainInstance) {
       const domain = entity as DomainInstance;
       const { activeFor, address, declaredIn } = domain;
@@ -175,6 +174,11 @@ export class DbCrud {
         // sockets
       } as DomainInstance);
     }
+
+    if (entity instanceof ProjectInstance) {
+      return entity.locationOfProject;
+    }
+
     return entity;
   }
 
