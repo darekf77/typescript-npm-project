@@ -56,6 +56,10 @@ export class TnpDB {
     }
   }
 
+  public async runCommand(cmd: CommandInstance) {
+    await this.transaction.__commandsCtrl.runCommand(cmd)
+
+  }
 
   constructor(private location: string) {
   }
@@ -75,17 +79,17 @@ export class TnpDB {
           },
           toInstallTnp(project: Project) {
             let allowed = true;
-            const p = project.isWorkspaceChildProject ? project.parent : project;
-            if (p.isWorkspace) {
-              const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
-              builds.some(b => {
-                if (p.children.filter(c => c.location === b.project.location)) {
-                  allowed = false;
-                  return true;
-                }
-                return false;
-              })
-            }
+            // const p = project.isWorkspaceChildProject ? project.parent : project;
+            // if (p.isWorkspace) {
+            //   const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
+            //   builds.some(b => {
+            //     if (p.children.filter(c => c.location === b.project.location)) {
+            //       allowed = false;
+            //       return true;
+            //     }
+            //     return false;
+            //   })
+            // }
             return allowed;
           },
           toWatchWorkspace(workspaceChild: Project) {

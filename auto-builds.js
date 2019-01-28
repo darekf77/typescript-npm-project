@@ -1,9 +1,9 @@
 module.exports = exports = function (base) {
 
   var whereTnpBundleNeeded = [
-    `--copyto ${base}tsc-npm-project/projects/baseline`,
-    `--copyto ${base}tsc-npm-project/projects/site`,
-    `--copyto ${base}tsc-npm-project/projects/workspace`,
+    `--copyto ${base}tsc-npm-project/projects/container/baseline`,
+    `--copyto ${base}tsc-npm-project/projects/container/site`,
+    `--copyto ${base}tsc-npm-project/projects/container/workspace`,
     `--copyto ${base}morphi/examples`
   ]
 

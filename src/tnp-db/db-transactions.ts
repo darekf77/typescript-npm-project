@@ -24,6 +24,7 @@ import { killProcess, questionYesNo } from '../process';
 import { CommandInstance, ProjectInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
+import chalk from 'chalk';
 
 
 
@@ -55,7 +56,7 @@ export class DBTransaction {
 
   public get portsManager() {
     return new Promise<PortsSet>(async (resolve, reject) => {
-      await this.start(() => {
+      await this.start(`Resolve ports manager`, () => {
         resolve(this.__portsCtrl.manager)
       })
     })
@@ -68,26 +69,20 @@ export class DBTransaction {
       error(`Cannot set command - location doesn't exists: ${location}`)
       return
     }
-    await this.start(() => {
+    await this.start(`set command: ${command} in location: ${location}`, () => {
       const c = new CommandInstance(command, location);
       this.crud.set(c)
     })
   }
 
-  public async runCommand(cmd: CommandInstance) {
-    await this.start(async () => {
-      await this.__commandsCtrl.runCommand(cmd)
-    })
-  }
-
   async updateCommandBuildOptions(location: string, buildOptions: BuildOptions) {
-    await this.start(async () => {
+    await this.start('update command build options', async () => {
       this.__commandsCtrl.updateCommandBuildOptions(location, buildOptions);
     })
   }
 
   public async reinitDB() {
-    await this.start(async () => {
+    await this.start(`Reinit db`, async () => {
       this.crud.clearDBandReinit({ projects: [], domains: [], ports: [], builds: [], commands: [] })
       await this.__projectsCtrl.addExisted()
       await this.__domainsCtrl.addExisted()
@@ -103,7 +98,7 @@ export class DBTransaction {
 
   public async build(currentProject: Project, buildOptions: BuildOptions, pid: number) {
     // console.log('current build options', buildOptions)
-    this.start(async () => {
+    this.start(`at project build`, async () => {
       this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
       while (true) {
 
@@ -146,11 +141,13 @@ export class DBTransaction {
 
 
 
-  private async start(callback: () => void,
+  private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
 
-    console.log('Transaction started')
+    let debug = false;
 
+    debug && console.log(`Transaction started for pid: ${process.pid}, name: ${chalk.bold(name)}`)
+    let rewriteFile = true;
     const transactionFilePath = path.join(__dirname, '..', '..', 'tmp-transaction-pid.txt');
 
     if (fse.existsSync(transactionFilePath)) {
@@ -159,16 +156,16 @@ export class DBTransaction {
       } catch (e) { }
 
       if (previousFileStatus === 'none' && _.isString(pidString) && pidString.trim() === '') {
-        console.log(`Waiting shortly if other process is goint to write something to file`)
+        debug && console.log(`Waiting shortly if other process is goint to write something to file  - current pid: ${process.pid} `)
         sleep.msleep(500);
-        await this.start(callback, 'empty')
+        await this.start(name, callback, 'empty')
         return;
       }
       if ((previousFileStatus === 'none' || previousFileStatus === 'empty') &&
         _.isString(pidString) && pidString.startsWith('[') && !pidString.endsWith(']')) {
-        console.log(`Waiting for other process to finish wiring pid`)
+          debug && console.log(`Waiting for other process to finish wiring pid - current pid: ${process.pid}`)
         sleep.msleep(500);
-        await this.start(callback, 'written-started')
+        await this.start(name, callback, 'written-started')
         return;
       }
       if (_.isString(pidString) && pidString.startsWith('[') && pidString.endsWith(']')) {
@@ -176,23 +173,30 @@ export class DBTransaction {
       }
       if (!isNaN(pidInFile) && pidInFile > 0) {
 
-        if (process.ppid === pidInFile) {
-          warn(`Child process will override transaction`)
-        }
-        let ps: PsListInfo[] = await psList()
-        if (ps.filter(p => p.pid == pidInFile).length >= 1) {
+        if (process.ppid === pidInFile || process.pid === pidInFile) {
+          rewriteFile = false;
+        } else {
+          let ps: PsListInfo[] = await psList()
+          if (ps.filter(p => p.pid == pidInFile).length >= 1) {
 
-          console.log(`Waiting for transaction on pid ${pidInFile} to end`)
-          sleep.msleep(500);
-          await this.start(callback)
-          return;
+            debug && console.log(`Waiting for transaction on pid ${pidInFile} to end - current pid: ${process.pid}`)
+            sleep.msleep(500);
+            await this.start(name, callback)
+            return;
+          }
         }
       }
     }
-    fse.writeFileSync(transactionFilePath, `[${process.pid}]`);
+    if (rewriteFile) {
+      fse.writeFileSync(transactionFilePath, `[${process.pid}]`);
+    }
+
     await runSyncOrAsync(callback)
-    fse.removeSync(transactionFilePath);
-    console.log('Transaction ended')
+    if (rewriteFile) {
+      fse.removeSync(transactionFilePath);
+    }
+    debug && console.log(`Transaction ${!rewriteFile ? `(inside transaction with pid: ${process.ppid})`
+      : ''} ended for pid: ${process.pid}, name: ${chalk.bold(name)}`)
   }
 
 

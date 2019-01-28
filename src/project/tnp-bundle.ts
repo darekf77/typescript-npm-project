@@ -72,11 +72,11 @@ export function reinstallTnp(project: Project,
   }
   const db = TnpDB.InstanceSync;
 
-  if (!db.checkIf.allowed.toInstallTnp(project)) {
-    console.log('Current process pid: ' + process.pid)
-    console.log(`Quiting install tnp-bundle in ${project.location}`)
-    return
-  }
+  // if (!db.checkIf.allowed.toInstallTnp(project)) {
+  //   console.log('Current process pid: ' + process.pid)
+  //   console.log(`Quiting install tnp-bundle in ${project.location}`)
+  //   return
+  // }
 
   if (project.isTnp) {
     return

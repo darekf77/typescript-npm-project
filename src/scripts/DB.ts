@@ -5,7 +5,7 @@ import { CommandInstance } from '../tnp-db/entites';
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
   const last = db.lastCommandFrom(process.cwd());
-  await db.transaction.runCommand(!!last ? last : new CommandInstance(undefined, process.cwd()));
+  await db.runCommand(!!last ? last : new CommandInstance(undefined, process.cwd()));
   // process.exit(0)
 }
 

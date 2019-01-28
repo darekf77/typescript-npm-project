@@ -171,7 +171,7 @@ export class ConsoleUi {
         break;
 
       case CHOICE.LAST_USED_COMMAND:
-        await this.db.transaction.runCommand(!!this.lastCmd ?
+        await this.db.runCommand(!!this.lastCmd ?
           this.lastCmd : new CommandInstance(undefined, this.project.location)
         );
         break;
