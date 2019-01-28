@@ -17,7 +17,7 @@ import {
 import { Project } from '../project';
 import { BuildOptions } from '../models/build-options';
 import { BuildInstance } from './entites/build-instance';
-import { warn } from '../messages';
+import { warn, error } from '../messages';
 import { killProcess, questionYesNo } from '../process';
 import { CommandInstance, ProjectInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
@@ -59,7 +59,12 @@ export class DBTransaction {
   }
 
 
-  public async setCommand(command: string, location: string) {
+  public async setCommand(command: string) {
+    let location: string = process.cwd();
+    if (!fse.existsSync(location)) {
+      error(`Cannot set command - location doesn't exists: ${location}`)
+      return
+    }
     await this.start(() => {
       const c = new CommandInstance(command, location);
       this.crud.set(c)
@@ -137,8 +142,24 @@ export class DBTransaction {
 
 
 
-  private async start(callback: () => void) {
-    console.log('Transaction started')
+  private async start(callback: () => void,
+    // transactionState: 'file-create' | 'file-and-active-pid' | 'file-and-inactive-pid'
+    ) {
+    // console.log('Transaction started')
+    // let transactionAllowed = true;
+    // const transactionFilePath = path.join(__dirname, '..', '..', 'tmp-transaction-pid.txt');
+    // if (fse.existsSync(transactionFilePath)) {
+    //   transactionAllowed = false;
+    //   try {
+    //     var pid = Number(fse.readFileSync(transactionFilePath, 'utf8').toString())
+    //     if (!isNaN(pid)) {
+    //       setTimeout()
+    //     }
+    //   } catch (error) {
+
+    //   }
+    // }
+
     await runSyncOrAsync(callback)
     console.log('Transaction ended')
   }

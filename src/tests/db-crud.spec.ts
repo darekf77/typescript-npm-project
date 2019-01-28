@@ -154,6 +154,22 @@ describe('Db crud', () => {
 
     expect(crud.getAll(ProjectInstance).length).to.be.eq(1)
 
+    crud.addIfNotExist(new ProjectInstance('/asdasd'))
+
+    expect(crud.getAll(ProjectInstance).length).to.be.eq(2)
+
+    crud.remove(new ProjectInstance())
+
+    expect(crud.getAll(ProjectInstance).length).to.be.eq(1)
+
+    crud.set(new ProjectInstance('/asdasdaaaa'))
+
+    expect(crud.getAll(ProjectInstance).length).to.be.eq(2)
+
+    crud.setBulk([new ProjectInstance(),new ProjectInstance('/asd'), new ProjectInstance('/aa')])
+
+    expect(crud.getAll(ProjectInstance).length).to.be.eq(3)
+
   });
 
 

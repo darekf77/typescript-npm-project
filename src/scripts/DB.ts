@@ -14,9 +14,9 @@ const $DB = async (args: string) => {
 
   if (args.trim() === 'reinit') {
     await db.init()
-    db.transaction.setCommand(process.cwd(), 'tnp db reinit')
+    db.transaction.setCommand('tnp db reinit')
   } else {
-    db.transaction.setCommand(process.cwd(), 'tnp db')
+    db.transaction.setCommand('tnp db')
   }
 
   process.exit(0)
