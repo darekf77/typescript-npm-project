@@ -2,6 +2,8 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as  psList from 'ps-list';
+import * as sleep from 'sleep';
 
 import { runSyncOrAsync } from '../helpers';
 
@@ -21,6 +23,7 @@ import { warn, error } from '../messages';
 import { killProcess, questionYesNo } from '../process';
 import { CommandInstance, ProjectInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
+import { PsListInfo } from '../models/ps-info';
 
 
 
@@ -143,24 +146,46 @@ export class DBTransaction {
 
 
   private async start(callback: () => void,
-    // transactionState: 'file-create' | 'file-and-active-pid' | 'file-and-inactive-pid'
-    ) {
-    // console.log('Transaction started')
-    // let transactionAllowed = true;
-    // const transactionFilePath = path.join(__dirname, '..', '..', 'tmp-transaction-pid.txt');
-    // if (fse.existsSync(transactionFilePath)) {
-    //   transactionAllowed = false;
-    //   try {
-    //     var pid = Number(fse.readFileSync(transactionFilePath, 'utf8').toString())
-    //     if (!isNaN(pid)) {
-    //       setTimeout()
-    //     }
-    //   } catch (error) {
+    previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
 
-    //   }
-    // }
+    console.log('Transaction started')
 
+    const transactionFilePath = path.join(__dirname, '..', '..', 'tmp-transaction-pid.txt');
+
+    if (fse.existsSync(transactionFilePath)) {
+      try {
+        var pidString = fse.readFileSync(transactionFilePath, 'utf8').toString();
+      } catch (e) { }
+
+      if (previousFileStatus === 'none' && _.isString(pidString) && pidString.trim() === '') {
+        console.log(`Waiting shortly if other process is goint to write something to file`)
+        sleep.msleep(500);
+        await this.start(callback, 'empty')
+        return;
+      }
+      if ((previousFileStatus === 'none' || previousFileStatus === 'empty') &&
+        _.isString(pidString) && pidString.startsWith('[') && !pidString.endsWith(']')) {
+        console.log(`Waiting for other process to finish wiring pid`)
+        sleep.msleep(500);
+        await this.start(callback, 'written-started')
+        return;
+      }
+      if (_.isString(pidString) && pidString.startsWith('[') && pidString.endsWith(']')) {
+        var pidInFile = Number(pidString.replace(/^\[/, '').replace(/\]$/, ''))
+      }
+      if (!isNaN(pidInFile) && pidInFile > 0) {
+        let ps: PsListInfo[] = await psList()
+        if (ps.filter(p => p.pid == pidInFile).length >= 1) {
+          console.log(`Waiting for transaction on pid ${pidInFile} to end`)
+          sleep.msleep(500);
+          await this.start(callback)
+          return;
+        }
+      }
+    }
+    fse.writeFileSync(transactionFilePath, `[${process.pid}]`);
     await runSyncOrAsync(callback)
+    fse.removeSync(transactionFilePath);
     console.log('Transaction ended')
   }
 
