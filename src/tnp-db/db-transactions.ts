@@ -89,10 +89,11 @@ export class DBTransaction {
   public async reinitDB() {
     await this.start(async () => {
       this.crud.clearDBandReinit({ projects: [], domains: [], ports: [], builds: [], commands: [] })
-      for (let index = 0; index < this.controllers.length; index++) {
-        const ctrl = this.controllers[index];
-        await ctrl.addExisted()
-      }
+      await this.__projectsCtrl.addExisted()
+      await this.__domainsCtrl.addExisted()
+      await this.__commandsCtrl.addExisted()
+      await this.__portsCtrl.addExisted()
+      await this.__buildsCtrl.addExisted()
     })
   }
 

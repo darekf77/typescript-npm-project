@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 
 import { BaseController } from './base-controlller';
-import { DomainInstance } from '../entites';
+import { DomainInstance, ProjectInstance } from '../entites';
 import { Project } from '../../project';
 import { EnvironmentName } from '../../models/environment-name';
 
@@ -12,8 +12,8 @@ export class DomainsController extends BaseController {
   async addExisted() {
     const domains: DomainInstance[] = [];
 
-    this.crud.getAll<any>(Project).forEach((p) => {
-      const project: Project = p as any;
+    this.crud.getAll<ProjectInstance>(Project).forEach((p) => {
+      const project: Project = p.project;
       if (!project.isWorkspaceChildProject && project.env &&
         project.env.config && project.env.config.domain) {
 
