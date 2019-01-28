@@ -9,6 +9,11 @@ import { EnvironmentName } from '../../models/environment-name';
 
 export class DomainsController extends BaseController {
 
+  async update() {
+
+  }
+
+
   async addExisted() {
     const domains: DomainInstance[] = [];
 
@@ -32,7 +37,7 @@ export class DomainsController extends BaseController {
 
     })
 
-    this.crud.setBulk(domains);
+    this.crud.setBulk(domains, DomainInstance);
   }
 
   private addDomain(address: string, environment: EnvironmentName,

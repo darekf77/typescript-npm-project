@@ -166,7 +166,8 @@ describe('Db crud', () => {
 
     expect(crud.getAll(ProjectInstance).length).to.be.eq(2)
 
-    crud.setBulk([new ProjectInstance(),new ProjectInstance('/asd'), new ProjectInstance('/aa')])
+    crud.setBulk([new ProjectInstance(), new ProjectInstance('/asd'),
+    new ProjectInstance('/aa')], PortInstance)
 
     expect(crud.getAll(ProjectInstance).length).to.be.eq(3)
 

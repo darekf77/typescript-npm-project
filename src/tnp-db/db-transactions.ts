@@ -92,16 +92,17 @@ export class DBTransaction {
     })
   }
 
+
   public addProjectIfNotExist(project: Project) {
     this.__projectsCtrl.addIfNotExists(ProjectInstance.from(project));
   }
 
   public async build(currentProject: Project, buildOptions: BuildOptions, pid: number) {
     // console.log('current build options', buildOptions)
-    this.start(`at project build`, async () => {
+    await this.start(`at project build`, async () => {
       this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
       while (true) {
-
+        await this.__buildsCtrl.update()
         const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
 
         if (existed && existed.pid !== process.pid) {
@@ -144,7 +145,7 @@ export class DBTransaction {
   private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
 
-    let debug = false;
+    let debug = true;
 
     debug && console.log(`Transaction started for pid: ${process.pid}, name: ${chalk.bold(name)}`)
     let rewriteFile = true;

@@ -10,6 +10,11 @@ import { ProjectInstance } from '../entites';
 
 export class ProjectsController extends BaseController {
 
+  async update() {
+
+  }
+
+
   async addExisted() {
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))

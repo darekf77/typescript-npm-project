@@ -43,7 +43,8 @@ export class SourceModifier extends IncrementalCompilation {
     // throw new Error("Method not implemented.");
   }
   protected asyncAction(filePath: string) {
-    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+    console.log('SOurce modifier async !',filePath)
+    // this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
   }
 
 

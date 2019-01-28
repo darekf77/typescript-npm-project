@@ -9,5 +9,7 @@ export abstract class BaseController {
 
   abstract async addExisted() ;
 
+  abstract async update() ;
+
 }
 //#endregion

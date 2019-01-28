@@ -718,10 +718,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
     if (config.allowedTypes.app.includes(this.type)) {
       if (!this.isStandaloneProject) {
         const sourceModifireName = `Client source modules pathes modifier`;
-        await this.sourceModifier.init(sourceModifireName)
         const generatorName = 'Files generator: entites.ts, controllers.ts';
-        await this.frameworkFileGenerator.init(generatorName)
-        // TODO handle watch
+        if (this.buildOptions.watch) {
+          await this.sourceModifier.initAndWatch(sourceModifireName)
+          // await this.frameworkFileGenerator.initAndWatch(generatorName)
+        } else {
+          await this.sourceModifier.init(sourceModifireName)
+          await this.frameworkFileGenerator.init(generatorName)
+        }
       }
     }
   }

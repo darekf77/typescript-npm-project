@@ -10,7 +10,14 @@ import { BuildInstance } from '../entites/build-instance';
 import { BuildOptions } from '../../models/build-options';
 
 export class BuildsController extends BaseController {
-
+  async update() {
+    const ps: PsListInfo[] = await psList();
+    const all = this.crud.getAll<BuildInstance>(BuildInstance);
+    console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
+    const filteredBuilds = all.filter(b => ps.filter(p => p.pid == b.pid).length > 0)
+    console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
+    this.crud.setBulk(filteredBuilds, BuildInstance);
+  }
 
   async addExisted() {
     const ps: PsListInfo[] = await psList();
@@ -33,7 +40,7 @@ export class BuildsController extends BaseController {
       .filter(b => !!b)
       .filter(b => b.isTnpProjectBuild)
 
-    this.crud.setBulk(builds);
+    this.crud.setBulk(builds, BuildInstance);
   }
 
   add(project: Project, buildOptions: BuildOptions, pid: number) {

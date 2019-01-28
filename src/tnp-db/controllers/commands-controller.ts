@@ -13,6 +13,11 @@ export class CommandsController extends BaseController {
 
   }
 
+  async update() {
+
+  }
+
+
   lastCommandFrom(location: string): CommandInstance {
     const commands = this.crud.getAll<CommandInstance>(CommandInstance) as CommandInstance[];
     const cmd = commands.find(c => c.location === location)

@@ -8,9 +8,14 @@ import { PortsSet } from './ports-set';
 
 export class PortsController extends BaseController {
 
+  async update() {
+
+  }
+
+
   public get manager() {
     return new PortsSet(this.crud.getAll(PortInstance), (newPorts) => {
-      this.crud.setBulk(newPorts);
+      this.crud.setBulk(newPorts, PortInstance);
     });
   }
 
@@ -23,7 +28,7 @@ export class PortsController extends BaseController {
 
     ]
 
-    this.crud.setBulk(defaultPorts);
+    this.crud.setBulk(defaultPorts, PortInstance);
 
   }
 

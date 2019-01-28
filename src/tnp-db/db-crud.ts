@@ -11,6 +11,7 @@ import {
   EntityNames, CommandInstance, ProjectInstance
 } from './entites';
 import { ProjectFrom } from '../project';
+import { error } from '../messages';
 
 
 export class DbCrud {
@@ -37,28 +38,32 @@ export class DbCrud {
   }
 
   addIfNotExist(entity: DBBaseEntity): boolean {
+    const classFN = CLASS.getFromObject(entity)
     // console.log(`[addIfNotExist] add if not exist entity: ${CLASS.getNameFromObject(entity)}`)
     const all = this.getAll(CLASS.getFromObject(entity))
     const indexFounded = all.findIndex(f => f.isEqual(entity))
     if (indexFounded === -1) {
       all.push(entity)
-      this.setBulk(all);
+      this.setBulk(all, all.length === 0 ? classFN : undefined);
       return true;
     }
     return false;
   }
 
   remove(entity: DBBaseEntity): boolean {
+    const classFN = CLASS.getFromObject(entity)
     const all = this.getAll(CLASS.getFromObject(entity))
     const filtered = all.filter(f => !f.isEqual(entity))
     if (filtered.length === all.length) {
       return false;
     }
-    this.setBulk(filtered);
+    this.setBulk(filtered, all.length === 0 ? classFN : undefined);
     return true;
   }
 
   set(entity: DBBaseEntity) {
+    const classFN = CLASS.getFromObject(entity)
+
     const all = this.getAll(CLASS.getFromObject(entity))
     const existed = all.find(f => f.isEqual(entity))
     if (existed) {
@@ -66,14 +71,20 @@ export class DbCrud {
     } else {
       all.push(entity)
     }
-    this.setBulk(all);
+    this.setBulk(all, all.length === 0 ? classFN : undefined);
   }
 
-  setBulk(entites: DBBaseEntity[]): boolean {
-    if (!_.isArray(entites) || entites.length === 0) {
-      return false;
+  setBulk(entites: DBBaseEntity[], classFN: Function): boolean {
+    if (!_.isArray(entites)) {
+      error(`[db-crud] setBuild - this is not array of entities`)
     }
-    const entityName = this.getEntityNameByClassName(CLASS.getNameFromObject(_.first(entites)))
+    if (entites.length === 0 && !_.isFunction(classFN)) {
+      error(`Please provide class function in setBuild(entites, <class function hrere>)`)
+    }
+    const className = _.isFunction(classFN) ? CLASS.getName(classFN) :
+      CLASS.getNameFromObject(_.first(entites))
+
+    const entityName = this.getEntityNameByClassName(className)
     const json = entites.map(c => this.preprareEntityForSave(c));
     // console.log(`[setBulk] set json for entity ${entityName}`, json)
     this.db.set(entityName, json).write()

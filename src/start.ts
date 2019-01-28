@@ -111,6 +111,7 @@ export async function start(argsv: string[]) {
   const files = [helpFile]
     .concat(glob.sync(path.join(__dirname, '/scripts/**/*.js')).filter(f => f != helpFile))
 
+
   const functions: Function[] = []
 
   files.forEach(function (file) {
