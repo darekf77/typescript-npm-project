@@ -175,8 +175,13 @@ export class DBTransaction {
         var pidInFile = Number(pidString.replace(/^\[/, '').replace(/\]$/, ''))
       }
       if (!isNaN(pidInFile) && pidInFile > 0) {
+
+        if (process.ppid === pidInFile) {
+          warn(`Child process will override transaction`)
+        }
         let ps: PsListInfo[] = await psList()
         if (ps.filter(p => p.pid == pidInFile).length >= 1) {
+
           console.log(`Waiting for transaction on pid ${pidInFile} to end`)
           sleep.msleep(500);
           await this.start(callback)
