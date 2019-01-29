@@ -145,7 +145,7 @@ export class DBTransaction {
   private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
       name = '-'
-    let debug = true;
+    let debug = false;
 
     debug && console.log(`Transaction started for pid: ${process.pid}, name: ${chalk.bold(name)}`)
     let rewriteFile = true;
