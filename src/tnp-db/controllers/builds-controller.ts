@@ -13,9 +13,9 @@ export class BuildsController extends BaseController {
   async update() {
     const ps: PsListInfo[] = await psList();
     const all = this.crud.getAll<BuildInstance>(BuildInstance);
-    console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
+    // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
     const filteredBuilds = all.filter(b => ps.filter(p => p.pid == b.pid).length > 0)
-    console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
+    // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
     this.crud.setBulk(filteredBuilds, BuildInstance);
   }
 

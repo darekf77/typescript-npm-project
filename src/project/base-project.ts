@@ -721,7 +721,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
         const generatorName = 'Files generator: entites.ts, controllers.ts';
         if (this.buildOptions.watch) {
           await this.sourceModifier.initAndWatch(sourceModifireName)
-          // await this.frameworkFileGenerator.initAndWatch(generatorName)
+          await this.frameworkFileGenerator.initAndWatch(generatorName)
         } else {
           await this.sourceModifier.init(sourceModifireName)
           await this.frameworkFileGenerator.init(generatorName)
@@ -737,7 +737,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   async build(buildOptions?: BuildOptions) {
-
+    // console.log('BUILD OPTIONS', buildOptions)
     if (this.isWorkspaceChildProject) {
       this.quickFixMissingLibs(['react-native-sqlite-storage'])
     }

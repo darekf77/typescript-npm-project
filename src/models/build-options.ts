@@ -108,15 +108,23 @@ export class BuildOptions implements IBuildOptions {
     return { prod, watch, outDir, appBuild }
   }
 
-  public static from(cmd: string, projectCurrent?: Project,
+  public static from(argsString: string, projectCurrent?: Project,
     mainOptions?: { watch: boolean; prod: boolean, outDir: BuildDir, appBuild: boolean, args: string }): BuildOptions {
 
-    const split = cmd.split(' ');
+    const split = argsString.split(' ');
+    // console.log('split', split)
     const optionsToMerge = !!mainOptions ? mainOptions : this.getMainOptions(split);
+    // console.log('optionsToMerge', optionsToMerge)
     if (!optionsToMerge) {
       return;
     }
-    const argsObj: IBuildOptions = _.merge(require('minimist')(split), optionsToMerge);
+    const argsObj: IBuildOptions = require('minimist')(split)
+    // console.log('argsObj', argsObj)
+    argsObj.watch = optionsToMerge.watch;
+    argsObj.prod = optionsToMerge.prod;
+    argsObj.outDir = optionsToMerge.outDir as any;
+    argsObj.appBuild = optionsToMerge.appBuild;
+
 
     if (argsObj.forClient) {
       if (_.isString(argsObj.forClient)) {

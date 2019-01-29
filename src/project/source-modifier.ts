@@ -43,8 +43,8 @@ export class SourceModifier extends IncrementalCompilation {
     // throw new Error("Method not implemented.");
   }
   protected asyncAction(filePath: string) {
-    console.log('SOurce modifier async !',filePath)
-    // this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+    // console.log('SOurce modifier async !',filePath)
+    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
   }
 
 
@@ -109,6 +109,7 @@ export class SourceModifier extends IncrementalCompilation {
 
     if (isWorkspaceChildProject) {
       let fileContent = file.contents.toString()
+      let orgFileContent = fileContent;
 
       localIsomorphicLibsNames.forEach(libname => {
         const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
@@ -122,10 +123,12 @@ export class SourceModifier extends IncrementalCompilation {
         fileContent = this.replaceWhenReferingInsideModule(angularLibName, fileContent)
       })
 
+      if (fileContent !== orgFileContent) {
+        fs.writeFileSync(file.path, fileContent, {
+          encoding: 'utf8'
+        });
+      }
 
-      fs.writeFileSync(file.path, fileContent, {
-        encoding: 'utf8'
-      });
     }
   }
 

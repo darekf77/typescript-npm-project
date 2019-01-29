@@ -50,6 +50,10 @@ export const routes: Routes = [
         path: 'logo',
         loadChildren: './components/+preview-logo/preview-logo.module#PreviewLogoModule'
       },
+      {
+        path: 'processlogger',
+        loadChildren: './components/+preview-process-logger/preview-process-logger.module#PreviewProcessLoggerModule'
+      },
     ]
   }
 ];

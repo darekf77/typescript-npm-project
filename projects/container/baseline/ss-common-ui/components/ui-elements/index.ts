@@ -12,3 +12,5 @@ export * from './standalone-popup';
 export * from './slider-vertical-section';
 export * from './form-wrapper-material';
 export * from './dialogs-conversation-editor';
+export * from  './process-logger';
+

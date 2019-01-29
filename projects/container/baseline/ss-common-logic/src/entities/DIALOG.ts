@@ -3,7 +3,7 @@ import { EnumValues } from 'enum-values';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
 import { GROUP } from './GROUP';
 
-
+console.log('asd aa')
 export enum DialogType {
   MAN,
   WOMAN,

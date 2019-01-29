@@ -71,7 +71,7 @@ const helpAlias = [
 
 
 export async function start(argsv: string[]) {
-
+  // console.log('STARTING COOMMADN', argsv)
   const db = await TnpDB.Instance;
   // console.log(argsv)
   if (

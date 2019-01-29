@@ -44,7 +44,7 @@ export class DbCrud {
     const indexFounded = all.findIndex(f => f.isEqual(entity))
     if (indexFounded === -1) {
       all.push(entity)
-      this.setBulk(all, all.length === 0 ? classFN : undefined);
+      this.setBulk(all, classFN);
       return true;
     }
     return false;
@@ -57,7 +57,7 @@ export class DbCrud {
     if (filtered.length === all.length) {
       return false;
     }
-    this.setBulk(filtered, all.length === 0 ? classFN : undefined);
+    this.setBulk(filtered, classFN);
     return true;
   }
 
@@ -71,7 +71,7 @@ export class DbCrud {
     } else {
       all.push(entity)
     }
-    this.setBulk(all, all.length === 0 ? classFN : undefined);
+    this.setBulk(all, classFN);
   }
 
   setBulk(entites: DBBaseEntity[], classFN: Function): boolean {

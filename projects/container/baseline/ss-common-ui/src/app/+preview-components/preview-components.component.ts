@@ -22,6 +22,10 @@ export const menuLeft // : ComponentsMenuItem[]
       name: 'TableWrapper'
     },
     {
+      href: '/previewcomponents/processlogger',
+      name: 'ProcessLogger'
+    },
+    {
       group: 'Formly Fields'
     },
     {
