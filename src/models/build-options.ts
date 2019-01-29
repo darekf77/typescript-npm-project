@@ -108,7 +108,7 @@ export class BuildOptions implements IBuildOptions {
     return { prod, watch, outDir, appBuild }
   }
 
-  public static from(argsString: string, projectCurrent?: Project,
+  public static from(argsString: string, projectCurrent: Project,
     mainOptions?: { watch: boolean; prod: boolean, outDir: BuildDir, appBuild: boolean, args: string }): BuildOptions {
 
     const split = argsString.split(' ');

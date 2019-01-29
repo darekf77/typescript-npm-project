@@ -35,7 +35,8 @@ export class BuildInstance extends DBBaseEntity implements IBuildInstance {
       }
 
       if (!this.buildOptions) {
-        this.buildOptions = BuildOptions.from(this.cmd)
+        const project: Project = Project.Current;
+        this.buildOptions = BuildOptions.from(this.cmd, project)
       }
     }
 
