@@ -99,7 +99,8 @@ export class FrameworkFilesGenerator extends IncrementalCompilation {
 
 
     const entitesFilePath = path.join(cwd, 'entities.ts');
-    const currentFile = fse.readFileSync(entitesFilePath, 'utf8').toString()
+    const currentFile = fse.existsSync(entitesFilePath) ?
+      fse.readFileSync(entitesFilePath, 'utf8').toString() : ''
 
     if (currentFile !== newEntitesFile) {
       fse.writeFileSync(entitesFilePath, newEntitesFile, 'utf8')
@@ -170,7 +171,8 @@ export class FrameworkFilesGenerator extends IncrementalCompilation {
     ;
 
     const controllerFilePath = path.join(cwd, 'controllers.ts');
-    const currentFile = fse.readFileSync(controllerFilePath, 'utf8').toString()
+    const currentFile = fse.existsSync(controllerFilePath) ?
+      fse.readFileSync(controllerFilePath, 'utf8').toString() : ''
 
     if (currentFile !== newControllerFile) {
       fse.writeFileSync(controllerFilePath, newControllerFile, 'utf8')

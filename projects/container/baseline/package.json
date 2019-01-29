@@ -4,7 +4,10 @@
       "README.md"
     ],
     "type": "workspace",
-    "baseline": true
+    "baseline": true,
+    "overrided": {
+      "dependencies": {}
+    }
   },
   "name": "baseline",
   "version": "0.0.0"
