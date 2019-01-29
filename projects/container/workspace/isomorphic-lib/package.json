@@ -5,6 +5,7 @@
     "main": "index.js",
     "tnp": {
         "isCoreProject": true,
+        "useFramework": true,
         "type": "isomorphic-lib",
         "resources": [
             "README.md"

@@ -19,6 +19,7 @@ export interface IPackageJSON {
     type: LibType;
     isCoreProject: boolean;
     isCommandLineToolOnly?: boolean;
+    useFramework: boolean;
     core: {
       dependencies: {
         always?: string[];

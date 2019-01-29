@@ -53,6 +53,7 @@ export interface IProject {
   isStandaloneProject: boolean;
   isTnp: boolean;
   isCloud: boolean;
+  useFramework: boolean;
   name: string;
   defaultPort?: number;
   version: string;
@@ -430,6 +431,18 @@ export class Project implements IProject {
     //#endregion
   }
 
+  get useFramework() {
+    if (Morphi.IsBrowser) {
+      return this.browser.useFramework;
+    }
+    //#region @backend
+    if (!!this.baseline) {
+      return this.baseline.packageJson.useFramework;
+    }
+    return this.packageJson.useFramework;
+    //#endregion
+  }
+
   //#region @backend
   get versionPatchedPlusOne() {
 
@@ -720,11 +733,17 @@ Generated workspace should be here: ${genLocationWOrkspace}
         const sourceModifireName = `Client source modules pathes modifier`;
         const generatorName = 'Files generator: entites.ts, controllers.ts';
         if (this.buildOptions.watch) {
-          await this.sourceModifier.initAndWatch(sourceModifireName)
-          await this.frameworkFileGenerator.initAndWatch(generatorName)
+          if (this.type === 'isomorphic-lib' && this.useFramework) {
+            await this.frameworkFileGenerator.initAndWatch(generatorName)
+          } else {
+            await this.sourceModifier.initAndWatch(sourceModifireName)
+          }
         } else {
-          await this.sourceModifier.init(sourceModifireName)
-          await this.frameworkFileGenerator.init(generatorName)
+          if (this.type === 'isomorphic-lib' && this.useFramework) {
+            await this.frameworkFileGenerator.init(generatorName)
+          } else {
+            await this.sourceModifier.init(sourceModifireName)
+          }
         }
       }
     }

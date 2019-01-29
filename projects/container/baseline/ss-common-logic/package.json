@@ -6,6 +6,7 @@
     "tnp": {
         "type": "isomorphic-lib",
         "baseline": true,
+        "useFramework": true,
         "resources": [
             "README.md"
         ]

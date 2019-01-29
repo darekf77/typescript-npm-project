@@ -55,8 +55,8 @@ export class LoginComponent  implements OnInit {
   }
 
   model = {
-    username: 'admin',
-    password: 'admin'
+    username: '',
+    password: ''
   }
 
   login(data) {

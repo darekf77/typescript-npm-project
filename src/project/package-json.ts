@@ -541,6 +541,18 @@ export class PackageJSON {
   }
 
 
+  get useFramework() {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.useFramework)) {
+      if (_.isBoolean(this.data.tnp.useFramework)) {
+        return this.data.tnp.useFramework;
+      }
+      error(`Bad value in package.json, tnp.useFramework should be boolean.`, true);
+      error(`Location of package.json: ${this.location}`)
+    }
+    return false;
+  }
+
+
 
 }
 //#endregion
