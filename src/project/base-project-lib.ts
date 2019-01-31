@@ -78,7 +78,8 @@ export abstract class BaseProjectLib extends Project {
 
       bumbVersionIn.forEach(p => {
         const packageJson = PackageJSON.fromLocation(p);
-        if (packageJson.data.tnp && packageJson.data.tnp.type) {
+        if (!!packageJson && packageJson.data &&
+           packageJson.data.tnp && packageJson.data.tnp.type) {
           const project = ProjectFrom(p);
           if (project.isWorkspace && project.isCoreProject) {
             if (!project.packageJson.data.dependencies) {
