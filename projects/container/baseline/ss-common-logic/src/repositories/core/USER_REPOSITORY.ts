@@ -1,7 +1,7 @@
 //#region @backend
 import { Morphi } from 'morphi';
 import { USER } from '../../entities/core/USER';
-import { tableNameFrom } from 'morphi/framework';
+
 
 export interface USER_ALIASES {
 
@@ -19,9 +19,9 @@ export class USER_REPOSITORY extends Morphi.Base.Repository<USER, USER_ALIASES> 
   byUsername(username: string) {
 
     return this
-      .createQueryBuilder(tableNameFrom(USER))
-      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${tableNameFrom(USER)}.username = :username`)
+      .createQueryBuilder(Morphi.Orm.TableNameFrom(USER))
+      .innerJoinAndSelect(`${Morphi.Orm.TableNameFrom(USER)}.emails`, 'emails')
+      .where(`${Morphi.Orm.TableNameFrom(USER)}.username = :username`)
       .setParameter('username', username)
       .getOne()
 
@@ -30,9 +30,9 @@ export class USER_REPOSITORY extends Morphi.Base.Repository<USER, USER_ALIASES> 
   byId(id: number) {
 
     return this
-      .createQueryBuilder(tableNameFrom(USER))
-      .innerJoinAndSelect(`${tableNameFrom(USER)}.emails`, 'emails')
-      .where(`${tableNameFrom(USER)}.id = :id`)
+      .createQueryBuilder(Morphi.Orm.TableNameFrom(USER))
+      .innerJoinAndSelect(`${Morphi.Orm.TableNameFrom(USER)}.emails`, 'emails')
+      .where(`${Morphi.Orm.TableNameFrom(USER)}.id = :id`)
       .setParameter('id', id)
       .getOne()
 

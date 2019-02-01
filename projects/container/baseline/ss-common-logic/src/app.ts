@@ -1,24 +1,60 @@
 import "reflect-metadata";
 import { Morphi } from 'morphi'
+import { Helpers } from 'morphi/helpers'
 
 
-//#region @backend
-import { Controllers, Entities, InitDataPriority } from './index';
+//#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
+import { ProcessController } from './controllers/core/ProcessController';
+import { PROCESS } from './entities/core/PROCESS';
+//#endregion
 
-export default function () {
+import {
+  Controllers, Entities,
+  //#region @backend
+  InitDataPriority
+  //#endregion
+} from './index';
+
+
+async function start() {
   const project = ENV.workspace.projects.find(p => p.name === ENV.currentProjectName)
-  Morphi.init({
+  await Morphi.init({
+    //#region @backend
     publicAssets: [{ path: '/assets', location: ENV.pathes.backup.assets }],
     config: project.$db as any,
+    InitDataPriority,
+    //#endregion
     host: ENV.name !== 'local' ?
       `http://${ENV.ip}:${project.port}${project.baseUrl}` :
       `http://${ENV.ip}:${project.port}`
     ,
     hostSocket: `http://${ENV.ip}:${project.port}`,
     controllers: Controllers,
-    entities: Entities,
-    InitDataPriority
+    entities: Entities
   })
+
+  //#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
+  if (Morphi.IsBrowser) {
+    // let ctrlFN: ProcessController = Controllers.find(c => (c as any).name === 'ProcessController') as any;
+    // console.log('ctrlFN',ctrlFN)
+    // let pc = Helpers.getSingleton<ProcessController>(ctrlFN);
+    let pc = new ProcessController()
+    console.log('pc',pc)
+    let loveme = await pc.killmeee().received;
+    console.log('loveme', loveme.body.text)
+    let p = new PROCESS()
+
+     await p.kill()
+  }
+  //#endregion
+
 }
 
+export default start;
+
+
+//#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
+if (Morphi.IsBrowser) {
+  start()
+}
 //#endregion

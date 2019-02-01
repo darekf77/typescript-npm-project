@@ -3,7 +3,7 @@ import { Morphi } from 'morphi';
 import { USER } from '../../entities/core/USER';
 import { SESSION } from '../../entities/core/SESSION';
 import { SESSION_CONFIG } from '../../entities/core/SESSION';
-import { tableNameFrom } from 'morphi/framework';
+
 
 export interface SESSION_ALIASES {
 
@@ -28,10 +28,10 @@ export class SESSION_REPOSITORY extends Morphi.Base.Repository<SESSION, SESSION_
       ip = '::1'
     }
 
-    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
-      .where(`${tableNameFrom(SESSION)}.user = :id`)
-      .andWhere(`${tableNameFrom(SESSION)}.ip = :ip`)
+    const Session = await this.createQueryBuilder(Morphi.Orm.TableNameFrom(SESSION))
+      .innerJoinAndSelect(`${Morphi.Orm.TableNameFrom(SESSION)}.user`, Morphi.Orm.TableNameFrom(USER))
+      .where(`${Morphi.Orm.TableNameFrom(SESSION)}.user = :id`)
+      .andWhere(`${Morphi.Orm.TableNameFrom(SESSION)}.ip = :ip`)
       .setParameters({
         id: user.id,
         ip
@@ -46,9 +46,9 @@ export class SESSION_REPOSITORY extends Morphi.Base.Repository<SESSION, SESSION_
 
   async getByToken(token: string) {
 
-    const Session = await this.createQueryBuilder(tableNameFrom(SESSION))
-      .innerJoinAndSelect(`${tableNameFrom(SESSION)}.user`, tableNameFrom(USER))
-      .where(`${tableNameFrom(SESSION)}.token = :token`)
+    const Session = await this.createQueryBuilder(Morphi.Orm.TableNameFrom(SESSION))
+      .innerJoinAndSelect(`${Morphi.Orm.TableNameFrom(SESSION)}.user`, Morphi.Orm.TableNameFrom(USER))
+      .where(`${Morphi.Orm.TableNameFrom(SESSION)}.token = :token`)
       .setParameter('token', token)
       .getOne();
     if (Session) {

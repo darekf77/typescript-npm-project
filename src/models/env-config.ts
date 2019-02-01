@@ -11,8 +11,8 @@ export interface EnvConfigProject {
   name: string;  // tnp checked
   type?: LibType; // tnp checked
 
-  //#region @backend
   port: number; // override tnp type port
+  //#region @backend
   $db?: ConnectionOptions;
   ommitAppBuild?: boolean;
   isWatchBuild?: boolean; // tnp generated

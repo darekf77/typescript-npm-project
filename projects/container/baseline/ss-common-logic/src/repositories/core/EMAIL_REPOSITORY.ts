@@ -2,7 +2,7 @@
 //#region @backend
 import { Morphi } from 'morphi';
 import { EMAIL } from '../../entities/core/EMAIL';
-import { tableNameFrom } from 'morphi/framework';
+
 
 export interface EMAIL_ALIASES {
 
@@ -33,9 +33,9 @@ export class EMAIL_REPOSITORY extends Morphi.Base.Repository<EMAIL, EMAIL_ALIASE
   async findBy(address: string) {
 
     return await this
-      .createQueryBuilder(tableNameFrom(EMAIL))
-      .innerJoinAndSelect(`${tableNameFrom(EMAIL)}.user`, 'user')
-      .where(`${tableNameFrom(EMAIL)}.address = :email`)
+      .createQueryBuilder( Morphi.Orm.TableNameFrom(EMAIL))
+      .innerJoinAndSelect(`${Morphi.Orm.TableNameFrom(EMAIL)}.user`, 'user')
+      .where(`${Morphi.Orm.TableNameFrom(EMAIL)}.address = :email`)
       .setParameter('email', address)
       .getOne();
 
