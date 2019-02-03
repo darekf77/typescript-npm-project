@@ -4,8 +4,8 @@ import { Helpers } from 'morphi/helpers'
 
 
 //#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
-import { ProcessController } from './controllers/core/ProcessController';
-import { PROCESS } from './entities/core/PROCESS';
+import { ProcessController } from './controllers';
+import { PROCESS } from './entities';
 //#endregion
 
 import {
@@ -35,7 +35,7 @@ async function start() {
 
   //#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
   if (Morphi.IsBrowser) {
-    // let ctrlFN: ProcessController = Controllers.find(c => (c as any).name === 'ProcessController') as any;
+    // let ProcessControllerFN: ProcessController = Controllers.find(c => (c as any).name === 'ProcessController') as any;
     // console.log('ctrlFN',ctrlFN)
     // let pc = Helpers.getSingleton<ProcessController>(ctrlFN);
     let pc = new ProcessController()

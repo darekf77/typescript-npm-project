@@ -17,11 +17,14 @@ Helper project for my typescript npm libraries.
 - if you are changing environment setting you have to start build (or watch:build) again
 - watch for circural typescript dependencies !
 - typescipt weird path issue exist stil  :
-import { DIALOG } from '../entities'; // ERROR 
-import { DIALOG } from '../entities/DIALOG'; // OK
+  import { DIALOG } from '../entities'; // ERROR 
+  import { DIALOG } from '../entities/DIALOG'; // OK
 // entites is folder and file at the same time, maybe that ?
 - DO NOT put watcher on 'src' - it will make webpack build neverend
 - CHECK maybe you forgot "@" BEFORE DECORATOR for "Entity, Controller, Repository !!!
+- Inside isomorphic app.ts simulator use only ./controller and ./entities:
+  import { ProcessController } from './controllers'; // OK 
+  import { ProcessController } from './controllers/core/ProcessController'; // error undefined
 
 BUILDS are only projects :
  - worksapces (that contains with childen | with childen previews)

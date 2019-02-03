@@ -9,9 +9,7 @@ import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
 
-export class IProcessController {
-  killmeee: () => Morphi.Response<string>;
-}
+export interface IProcessController extends ProcessController { }
 
 
 @Morphi.Controller({

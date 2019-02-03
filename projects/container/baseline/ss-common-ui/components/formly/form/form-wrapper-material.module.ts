@@ -19,14 +19,14 @@ import { RepeatTypeComponent } from 'morphi/browser/crud/formly-repeat-component
 import { FormlyHorizontalWrapper } from 'morphi/browser/crud/formly-group-wrapper-component';
 
 // custom formly components
-import { SelectWrapperModule, SelectWrapperComponent } from '../select-wrapper';
-import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../multimedia-wrapper';
+import { SelectWrapperModule, SelectWrapperComponent } from '../select';
+import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../../entity-component/multimedia';
 
 // other
 import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
-import { EditorWrapperModule, EditorWrapperComponent } from '../editor-wrapper';
+import { EditorWrapperModule, EditorWrapperComponent } from '../editor';
 import { ButtonWithActionComponent, FormlyProgressbardComponent } from './additional-types';
 import { FormlySwitchComponent } from './additional-types/formly-switch';
 import { IconButtonWithActionComponent } from './additional-types/formly-icon-button-with-action';
