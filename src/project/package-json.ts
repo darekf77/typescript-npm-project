@@ -326,11 +326,16 @@ export class PackageJSON {
 
   }
 
-  update() {
-
+  updateHooks() {
+    if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks["pre-push"]))) {
+      this.data.husky = {
+        hooks: {
+          "pre-push": "tnp deps:show:if:standalone"
+        }
+      }
+      this.save()
+    }
   }
-
-
 
   save() {
     const filePath = path.join(this.location, config.file.package_json);

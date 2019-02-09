@@ -12,7 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // local
 import { ListWrapperComponent } from './list-wrapper.component';
-import { FormWrapperMaterialModule } from '../form-wrapper-material';
+import { FormWrapperMaterialModule } from '../../form';
 
 const materialModules = [
   MatSelectModule,

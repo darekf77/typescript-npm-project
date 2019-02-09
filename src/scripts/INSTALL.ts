@@ -30,13 +30,13 @@ function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
     project.node_modules.installPackages(true)
   }
 
-  if (process.platform === 'darwin') {
-    if (project.isWorkspace) {
-      project.run(`increase-memory-limit`).sync();
-    } else if (project.isWorkspaceChildProject) {
-      project.parent.run(`increase-memory-limit`).sync();
-    }
-  }
+  // if (process.platform === 'darwin') {
+  //   if (project.isWorkspace) {
+  //     project.run(`increase-memory-limit`).sync();
+  //   } else if (project.isWorkspaceChildProject) {
+  //     project.parent.run(`increase-memory-limit`).sync();
+  //   }
+  // }
 }
 
 function copyFromTemplateWorkspaceIfPossible(packageName: string, destination: Project) {

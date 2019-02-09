@@ -6,6 +6,11 @@ export type DependenciesFromPackageJsonStyle = { [name: string]: string; }
 
 export interface IPackageJSON {
   name: string;
+  husky?: {
+    hooks: {
+      'pre-push': string;
+    }
+  }
   version: string;
   bin?: any;
   main?: string;

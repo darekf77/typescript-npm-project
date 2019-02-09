@@ -52,7 +52,7 @@ export async function questionYesNo(message: string,
   });
 
   if (response.value) {
-    await   runSyncOrAsync(callbackTrue)
+    await runSyncOrAsync(callbackTrue)
   } else {
     await runSyncOrAsync(callbackFalse)
   }
@@ -144,27 +144,37 @@ export function clearConsole() {
 //   `);
 // })
 
+function modifyLineByLine(data: string | Buffer | Error, outputLineReplace: (outputLine: string) => string) {
+  let modifyOutput = _.isFunction(outputLineReplace);
+  if (modifyOutput && _.isString(data)) {
+    data = data.split(/\r?\n/).map(line => outputLineReplace(line)).join('\n');
+  }
+  return data as string;
+}
 
-export function log(proc: child.ChildProcess, output = true, stdio) {
+export function log(proc: child.ChildProcess, output = true, stdio,
+  outputLineReplace: (outputLine: string) => string) {
   // processes.push(proc);
 
   proc.stdio = stdio;
 
+
+
   if (output) {
     proc.stdout.on('data', (data) => {
-      process.stdout.write(data)
+      process.stdout.write(modifyLineByLine(data, outputLineReplace))
     })
 
     proc.stdout.on('error', (data) => {
-      console.log(data);
+      console.log(modifyLineByLine(data, outputLineReplace));
     })
 
     proc.stderr.on('data', (data) => {
-      process.stderr.write(data)
+      process.stderr.write(modifyLineByLine(data, outputLineReplace))
     })
 
     proc.stderr.on('error', (data) => {
-      console.log(data);
+      console.log(modifyLineByLine(data, outputLineReplace));
     })
 
   }
@@ -207,11 +217,11 @@ function runSyncIn(command: string, options?: RunOptions) {
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer, silence } = options;
+  const { output, cwd, biggerBuffer, silence, outputLineReplace } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   let stdio = getStdio(options)
   checkProcess(cwd, command);
-  return log(child.exec(command, { cwd, maxBuffer }), output, stdio);
+  return log(child.exec(command, { cwd, maxBuffer }), output, stdio, outputLineReplace);
 }
 
 function prepareWatchCommand(cmd) {

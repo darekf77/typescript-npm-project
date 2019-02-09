@@ -26,11 +26,11 @@
   "exclude": [
     "node_modules",
     "dist",
+    "bundle",
     "src",
     "e2e",
     "bundle",
-    "module*",
-    "components"
+    "module*"
   ],
   "angularCompilerOptions": {
     "genDir": "dist",

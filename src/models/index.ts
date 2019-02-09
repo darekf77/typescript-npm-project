@@ -30,6 +30,11 @@ export interface RunOptions {
 
   silence?: boolean;
 
+  /**
+   * Modify output line by line
+   */
+  outputLineReplace?: (outputLine: string) => string;
+
 
   // detached?: boolean;
   cwd?: string;

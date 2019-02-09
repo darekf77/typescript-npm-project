@@ -73,7 +73,7 @@ export class FormWrapperMaterialComponent implements OnInit {
   }
 
   resolveFields() {
-    let fields = Morphi.CRUD.getFormlyFrom(this.entity);
+    let fields = Morphi.Formly.getFrom(this.entity);
     log.i(`fields from entity : ${this.entity && this.entity.name}`, fields);
 
     if (_.isFunction(this.entity) && !fields) {

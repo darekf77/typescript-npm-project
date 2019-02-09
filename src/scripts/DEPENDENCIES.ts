@@ -53,10 +53,6 @@ export default {
     process.exit(0)
   },
 
-  $DEPS_UPDATE(args: string) {
-    Project.Current.packageJson.update();
-    process.exit(0)
-  }
 
 }
 

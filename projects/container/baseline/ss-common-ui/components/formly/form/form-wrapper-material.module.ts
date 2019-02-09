@@ -19,17 +19,25 @@ import { RepeatTypeComponent } from 'morphi/browser/crud/formly-repeat-component
 import { FormlyHorizontalWrapper } from 'morphi/browser/crud/formly-group-wrapper-component';
 
 // custom formly components
-import { SelectWrapperModule, SelectWrapperComponent } from '../select';
-import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../../entity-component/multimedia';
+import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/select';
+import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../entity-components/multimedia';
 
 // other
 import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
-import { EditorWrapperModule, EditorWrapperComponent } from '../editor';
-import { ButtonWithActionComponent, FormlyProgressbardComponent } from './additional-types';
-import { FormlySwitchComponent } from './additional-types/formly-switch';
-import { IconButtonWithActionComponent } from './additional-types/formly-icon-button-with-action';
+
+import {
+  EditorWrapperModule,
+  EditorWrapperComponent
+} from '../base-components/editor';
+import {
+  ButtonWithActionComponent,
+  FormlyProgressbardComponent,
+  FormlySwitchComponent,
+  IconButtonWithActionComponent
+} from './additional-types';
+import { Morphi } from 'morphi/browser';
 
 
 const angularModules = [
@@ -56,9 +64,7 @@ const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
     types: [
-      { name: 'selectwrapper', component: SelectWrapperComponent },
-      { name: 'multimediawrapper', component: MultimediaWrapperComponent },
-      { name: 'editorwrapper', component: EditorWrapperComponent },
+      ...Morphi.Formly.getAllRegisterdTypes(),
       { name: 'button', component: ButtonWithActionComponent },
       { name: 'switch', component: FormlySwitchComponent },
       { name: 'iconbutton', component: IconButtonWithActionComponent },

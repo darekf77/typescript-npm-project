@@ -673,6 +673,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
           this.proxyRouter = new ProxyRouter(this);
         }
         this.copytToManager = new CopyToManager(this);
+        if(this.isStandaloneProject) {
+          this.packageJson.updateHooks()
+        }
 
       } else {
         warn(`Invalid project location: ${location}`);
@@ -803,6 +806,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     await this.buildSteps(buildOptions);
     this.copytToManager.initCopyingOnBuildFinish(buildOptions);
+    if(buildOptions.compileOnce) {
+      process.exit(0)
+    }
   }
   //#endregion
 

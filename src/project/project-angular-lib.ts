@@ -50,21 +50,29 @@ export class ProjectAngularLib extends BaseProjectLib {
   }
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
+
+    const outputLineReplace = (line) => {
+      // console.log('LINE:',line)
+      return line.replace('tmp/inlined-dist/src', 'components')
+    };
+
     if (watch) {
       this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
         this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
       }
-      this.run(`npm-run gulp inline-templates-${outDir}-watch`, { output: true }).async()
+      this.run(`npm-run gulp inline-templates-${outDir}-watch`,
+        { output: false, outputLineReplace }).async()
       setTimeout(() => {
-        this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`).async()
+        this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).async()
       }, 3000)
 
     } else {
       await Helpers.compilationWrapper(() => {
         this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
-        this.run(`npm-run gulp inline-templates-${outDir}`, { output: true }).sync()
-        this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`).sync()
+        this.run(`npm-run gulp inline-templates-${outDir}`,
+          { output: false, outputLineReplace }).sync()
+        this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`,{ output: true, outputLineReplace }).sync()
         if (outDir === 'dist') {
           this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
         }
@@ -78,7 +86,7 @@ export class ProjectAngularLib extends BaseProjectLib {
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient } = buildOptions;
+    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient, compileOnce } = buildOptions;
 
 
 
@@ -89,6 +97,9 @@ export class ProjectAngularLib extends BaseProjectLib {
         if (watch) {
           await this.buildLib(outDir, forClient as Project[], prod, false);
           this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
+          if(compileOnce) {
+            return;
+          }
           await this.buildLib(outDir, forClient as Project[], prod, true)
         } else {
           await this.buildLib(outDir, forClient as Project[], prod, watch)
