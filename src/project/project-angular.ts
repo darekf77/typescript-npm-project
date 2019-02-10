@@ -8,6 +8,8 @@ import { error } from "../messages";
 import config from "../config";
 import { BuildOptions } from '../models';
 import { EnvironmentConfig } from './environment-config';
+import { killonport } from '../scripts/KILL';
+import { killProcessByPort } from '../process';
 
 /**
  * DO NOT USE environment variables in this project directly
@@ -61,6 +63,7 @@ export class AngularProject extends Project {
     if (watch) {
       const p = (port !== undefined ? `--port ${port}` : '');
       if (this.isEjectedProject) {
+        killProcessByPort(port)
         this.run(`npm-run webpack-dev-server ${p} `, { biggerBuffer: true }).async()
       } else {
         this.run(`npm-run ng serve ${p} `, { biggerBuffer: true }).async()

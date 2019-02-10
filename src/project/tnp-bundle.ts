@@ -60,11 +60,17 @@ const notNeededReinstallationTnp = {};
 
 export function reinstallTnp(project: Project,
   pathTnpCompiledJS: string,
-  pathTnpPackageJSONData: IPackageJSON,
-  client: Project) {
+  pathTnpPackageJSONData: IPackageJSON) {
 
-  if (_.isUndefined(notNeededReinstallationTnp[project.location])) {
-    notNeededReinstallationTnp[project.location] = 0;
+  const workspaceLocation = project.isWorkspace ? project.location :
+    (project.isWorkspaceChildProject ? project.parent.location : void 0);
+
+  if (!_.isString(workspaceLocation)) {
+    return
+  }
+
+  if (_.isUndefined(notNeededReinstallationTnp[workspaceLocation])) {
+    notNeededReinstallationTnp[workspaceLocation] = 0;
   }
 
   if (project.isStandaloneProject) {
@@ -72,22 +78,23 @@ export function reinstallTnp(project: Project,
   }
   const db = TnpDB.InstanceSync;
   let allowedToRemoveTnpBundleFolder = db.checkIf.allowed.removeTnpBundleFolder(project)
-  console.log('allowedToRemoveTnpBundleFolder',allowedToRemoveTnpBundleFolder)
+  // console.log('allowedToRemoveTnpBundleFolder', allowedToRemoveTnpBundleFolder)
+
   if (project.isTnp) {
     return
   }
 
-  if (notNeededReinstallationTnp[project.location] > 2) {
+  if (notNeededReinstallationTnp[workspaceLocation] > 2) {
     console.log('[TNP helper] reinstall not needed')
     return;
   }
-  if (project.isWorkspaceChildProject || project.type === 'workspace') {
+  if (!project.isStandaloneProject) {
 
 
-    const destCompiledJs = path.join(project.location, config.folder.node_modules, config.file.tnpBundle)
+    const destCompiledJs = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle)
 
 
-    const destPackageJSON = path.join(project.location, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
+    const destPackageJSON = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
     if (fs.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
       // console.log(`Removed tnp - helper from ${ dest } `)
@@ -108,7 +115,7 @@ export function reinstallTnp(project: Project,
     })
 
     const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
-    const destTnpPath = path.join(project.location, config.folder.node_modules,
+    const destTnpPath = path.join(workspaceLocation, config.folder.node_modules,
       config.file.tnpBundle, config.file.tnp_system_path_txt)
 
     fse.copyFileSync(sourceTnpPath, destTnpPath);
@@ -116,10 +123,10 @@ export function reinstallTnp(project: Project,
     let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
     // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
 
-    if (_.isUndefined(notNeededReinstallationTnp[project.location])) {
-      notNeededReinstallationTnp[project.location] = 1;
+    if (_.isUndefined(notNeededReinstallationTnp[workspaceLocation])) {
+      notNeededReinstallationTnp[workspaceLocation] = 1;
     } else {
-      ++notNeededReinstallationTnp[project.location];
+      ++notNeededReinstallationTnp[workspaceLocation];
     }
 
     console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , installs counter:${notNeededReinstallationTnp[project.location]} `)

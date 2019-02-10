@@ -5,6 +5,8 @@ import { ProjectFrom } from '../../project';
 import { Project } from '../../project/base-project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
+import { killProcess } from '../../process';
+import chalk from 'chalk';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;
@@ -64,6 +66,22 @@ export class BuildInstance extends DBBaseEntity implements IBuildInstance {
         this.buildOptions.appBuild === anotherInstace.buildOptions.appBuild &&
         this.buildOptions.outDir === anotherInstace.buildOptions.outDir
       ))
+  }
+
+  public get brief() {
+    let brief = this.buildOptions ? (
+      '(' +
+      (this.buildOptions.watch ? 'watch' : 'static') + ',' +
+      (this.buildOptions.appBuild ? 'app' : 'lib') + ',' +
+      (this.buildOptions.outDir) +
+      ')'
+    ) : ''
+    return brief + `build instace for project: ${chalk.bold(this.project.name)} on pid: ${this.pid}`;
+  }
+
+  kill() {
+    console.log(`Killing ${this.brief}`)
+    killProcess(this.pid)
   }
 
   pid: number;

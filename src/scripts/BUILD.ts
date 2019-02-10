@@ -42,6 +42,8 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
     }
   }
 
+  const transactions = (await (await TnpDB.Instance).transaction);
+  await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
 
   if (watch) {
     await init(args).watch.project(project)
@@ -51,7 +53,7 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)
 
-  await (await TnpDB.Instance).transaction.build(project, buildOptions, process.pid)
+  await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)
 
 
   await project.build(buildOptions);

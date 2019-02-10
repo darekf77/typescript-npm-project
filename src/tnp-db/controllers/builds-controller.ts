@@ -8,14 +8,20 @@ import { PsListInfo } from '../../models/ps-info';
 import { ProjectFrom, Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { BuildOptions } from '../../models/build-options';
+import { warn } from '../../messages';
 
 export class BuildsController extends BaseController {
+
+  /**
+   * Update if proceses exists (by pid)
+   */
   async update() {
     const ps: PsListInfo[] = await psList();
     const all = this.crud.getAll<BuildInstance>(BuildInstance);
     // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
     const filteredBuilds = all.filter(b => ps.filter(p => p.pid == b.pid).length > 0)
     // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
+    // process.exit(0)
     this.crud.setBulk(filteredBuilds, BuildInstance);
   }
 
@@ -41,6 +47,21 @@ export class BuildsController extends BaseController {
       .filter(b => b.isTnpProjectBuild)
 
     this.crud.setBulk(builds, BuildInstance);
+  }
+
+  async killInstancesFrom(projects: Project[]) {
+    let projectsLocations = projects.map(p => p.location);
+    (this.crud
+      .getAll<BuildInstance>(BuildInstance) as BuildInstance[])
+      .filter(b => projectsLocations.includes(b.project.location))
+      .forEach(b => {
+        try {
+          b.kill()
+        } catch (error) {
+          warn(`Not able to kill ${b.brief}`)
+        }
+      })
+
   }
 
   add(project: Project, buildOptions: BuildOptions, pid: number) {

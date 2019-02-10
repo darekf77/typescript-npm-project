@@ -1035,17 +1035,12 @@ Generated workspace should be here: ${genLocationWOrkspace}
     return {
       install() { // install
         // console.log('install tnp from recreate', installFromRecreate)
-        const client = self;
-        let project: Project;
-        if (self.parent && self.parent.type === 'workspace') {
-          project = self.parent;
-        } else {
-          project = self;
-        }
+
+        let project = self;
 
         if (process.platform === 'win32') {
           try {
-            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData, client)
+            reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
           } catch (e) {
             console.log(`Trying to reinstall tnp in ${project && project.name}... ${self.reinstallCounter++} `)
             console.log(e)
@@ -1053,7 +1048,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
             self.tnpHelper.install()
           }
         } else {
-          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData, client)
+          reinstallTnp(project, pathTnpCompiledJS, pathTnpPackageJSONData)
         }
       }
     }

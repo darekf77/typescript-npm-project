@@ -7,13 +7,14 @@ import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib, buildApp } from './scripts/BUILD';
 import { CommandInstance } from './tnp-db/entites';
-import {  killProcessByPort } from './process';
+import { killProcessByPort } from './process';
 import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
 import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
 import { init } from './scripts/INIT';
 import { clear } from './scripts/CLEAR';
+import { killAll } from './scripts/KILL';
 inquirer.registerPrompt('autocomplete', inquirerAutocomplete)
 
 class Choice {
@@ -40,6 +41,7 @@ const CHOICE = {
   START_SERVER: 'start',
   CLEAR: 'clear',
   CLEAR_RECUSIVE_WITH_NODE_MODUELS: 'clear:all --recrusive',
+  KILL_ALL_ACTIVE_BUILD_INSTANES_FROM_CURRENT_WORKSPACE: 'killall',
   KILL_ON_PORT: 'killonport',
   HELP: 'help',
 }
@@ -182,6 +184,10 @@ export class ConsoleUi {
 
       case CHOICE.CLEAR_RECUSIVE_WITH_NODE_MODUELS:
         await Project.Current.clear(true, true)
+        break;
+
+      case CHOICE.KILL_ALL_ACTIVE_BUILD_INSTANES_FROM_CURRENT_WORKSPACE:
+        killAll()
         break;
 
       case CHOICE.KILL_ON_PORT:

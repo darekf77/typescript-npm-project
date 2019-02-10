@@ -97,41 +97,55 @@ export class DBTransaction {
     this.__projectsCtrl.addIfNotExists(ProjectInstance.from(project));
   }
 
-  public async build(currentProject: Project, buildOptions: BuildOptions, pid: number) {
+  public async killInstancesFrom(projects: Project[]) {
+    await this.start(`kill instances from projets`, async () => {
+      await this.__buildsCtrl.update()
+      await this.__buildsCtrl.killInstancesFrom(projects)
+      await this.__buildsCtrl.update()
+    });
+  }
+
+  private killAndRemove(existed: BuildInstance) {
+    try {
+      killProcess(existed.pid)
+    } catch (error) {
+    }
+    this.crud.remove(existed)
+  }
+
+
+  public async updateBuildsWithCurrent(currentProject: Project,
+    buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {
     // console.log('current build options', buildOptions)
-    await this.start(`at project build`, async () => {
+    await this.start(`update builds with current`, async () => {
       this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
+
       while (true) {
         await this.__buildsCtrl.update()
+        if (onlyUpdate) {
+          break;
+        }
+
         const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
 
-        if (existed && existed.pid !== process.pid) {
-
-          const kill = () => {
-            try {
-              killProcess(existed.pid)
-            } catch (error) {
-            }
-
-            this.crud.remove(existed)
-          }
+        if (existed) {
 
           if (!existed.buildOptions.watch) {
             warn('automatic kill of active build instance in static build mode')
-            kill()
+            this.killAndRemove(existed)
             continue;
           } else {
             console.log(`Current process pid: ${process.pid}`)
             const confirm = await questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
            build options: ${existed.buildOptions.toString()}`)
             if (confirm) {
-              kill();
+              this.killAndRemove(existed)
               continue;
             } else {
               process.exit(0)
             }
           }
-        } else {
+        } else if (!existed) {
           this.__buildsCtrl.add(currentProject, buildOptions, pid);
         }
         break;
@@ -144,7 +158,7 @@ export class DBTransaction {
 
   private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
-      name = '-'
+    name = '-'
     let debug = false;
 
     debug && console.log(`Transaction started for pid: ${process.pid}, name: ${chalk.bold(name)}`)
@@ -164,7 +178,7 @@ export class DBTransaction {
       }
       if ((previousFileStatus === 'none' || previousFileStatus === 'empty') &&
         _.isString(pidString) && pidString.startsWith('[') && !pidString.endsWith(']')) {
-          debug && console.log(`Waiting for other process to finish wiring pid - current pid: ${process.pid}`)
+        debug && console.log(`Waiting for other process to finish wiring pid - current pid: ${process.pid}`)
         sleep.msleep(500);
         await this.start(name, callback, 'written-started')
         return;

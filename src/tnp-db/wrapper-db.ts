@@ -81,25 +81,18 @@ export class TnpDB {
             let allowed = true;
             const p = project.isWorkspaceChildProject ? project.parent : project;
             if (p.isWorkspace) {
-              console.log('Current pid',process.pid)
-              const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
-              console.log('builds', builds)
-              const currentProcessBuild = builds.find(c => c.pid === process.pid);
-              console.log('currentProcessBuild', currentProcessBuild)
-              if (!currentProcessBuild) {
-                error(`Cannot find current build procerss`, false, true)
-              }
-              builds.some(b => {
-                if (!b.isEqual(currentProcessBuild)) {
 
-                  let proj = p.children.find(c => c.location === b.project.location)
-                  if (!!proj) {
-                    console.log(`PROCESS WORKSPACE FOUNDED: ${proj.name},
-                     NOT ALLOWED TO REMOVE TNP BUNDLE`, b.buildOptions)
-                    allowed = false;
-                    return true;
-                  }
+              const builds = self.crud.getAll(BuildInstance) as BuildInstance[];
+
+              builds.some(b => {
+                let proj = p.children.find(c => c.location === b.project.location)
+                if (!!proj) {
+                  // console.log(`PROCESS WORKSPACE FOUNDED: ${proj.name},
+                  //    NOT ALLOWED TO REMOVE TNP BUNDLE`, b.buildOptions)
+                  allowed = false;
+                  return true;
                 }
+
                 return false;
               })
             }

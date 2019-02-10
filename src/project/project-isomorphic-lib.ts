@@ -19,6 +19,7 @@ import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
 import { TnpDB } from '../tnp-db';
 import { CommandInstance } from '../tnp-db/entites/command-instance';
+import { killProcessByPort } from '../process';
 
 
 
@@ -115,7 +116,9 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         // console.log('CLIENT NAME', client.name)
 
         if (client) {
-          webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${client.getDefaultPort()}`
+          let port = client.getDefaultPort()
+          killProcessByPort(port)
+          webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
         }
 
         const command = `npm-run webpack-dev-server ${webpackEnvParams}`

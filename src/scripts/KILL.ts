@@ -2,8 +2,10 @@
 import { info, error } from "../messages";
 import { run, killProcessByPort } from '../process';
 import * as os from 'os';
+import { TnpDB } from '../tnp-db';
+import { Project } from '../project';
 
-function killall() {
+function killallnode() {
   run(`fkill -f node`).sync()
   // if (process.platform === 'win32') {
   //   run(`taskkill /F /im node.exe`).sync();
@@ -12,7 +14,18 @@ function killall() {
   // }
 }
 
-
+export async function killAll() {
+  const db = await TnpDB.Instance;
+  let projectsToKill = [];
+  let p = Project.Current;
+  projectsToKill.push(p)
+  let workspace = p.isWorkspaceChildProject ? p.parent : void 0;
+  if (!!workspace) {
+    projectsToKill = projectsToKill.concat(workspace.children)
+  }
+  await db.transaction.killInstancesFrom(projectsToKill)
+  process.exit(0)
+}
 
 export function killonport(args, noExit = false) {
   const port = parseInt(args.trim())
@@ -30,11 +43,11 @@ export default {
   $KILLONPORT: (args: string) => {
     killonport(args);
   },
-  $KILLALL_NODE: () => {
-    killall()
+  $KILLALL: () => {
+    killAll()
   },
   $KILLALLNODE: () => {
-    killall()
+    killallnode()
   }
 
 }
