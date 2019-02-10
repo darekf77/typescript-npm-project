@@ -17,7 +17,10 @@ export interface IPROCESS {
 
 
 @Morphi.Entity<PROCESS>({
-  className: 'PROCESS'
+  className: 'PROCESS',
+  //#region @backend
+  createTable: false
+  //#endregion
 })
 export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessController> implements IPROCESS {
   get id() {
@@ -26,9 +29,10 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   pid: number;
 
-
-  public static getAll() {
-
+  public static ctrl: IProcessController;
+  public static async getAll() {
+    let data = await this.ctrl.getAll().received;
+    return data.body.json;
   }
 
 

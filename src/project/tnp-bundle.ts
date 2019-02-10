@@ -71,13 +71,8 @@ export function reinstallTnp(project: Project,
     return;
   }
   const db = TnpDB.InstanceSync;
-
-  // if (!db.checkIf.allowed.toInstallTnp(project)) {
-  //   console.log('Current process pid: ' + process.pid)
-  //   console.log(`Quiting install tnp-bundle in ${project.location}`)
-  //   return
-  // }
-
+  let allowedToRemoveTnpBundleFolder = db.checkIf.allowed.removeTnpBundleFolder(project)
+  console.log('allowedToRemoveTnpBundleFolder',allowedToRemoveTnpBundleFolder)
   if (project.isTnp) {
     return
   }
@@ -94,7 +89,7 @@ export function reinstallTnp(project: Project,
 
     const destPackageJSON = path.join(project.location, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
-    if (fs.existsSync(destCompiledJs)) {
+    if (fs.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
       // console.log(`Removed tnp - helper from ${ dest } `)
       tryRemoveDir(destCompiledJs)
     }

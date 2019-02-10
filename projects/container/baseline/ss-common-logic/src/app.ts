@@ -39,12 +39,15 @@ async function start() {
     // console.log('ctrlFN',ctrlFN)
     // let pc = Helpers.getSingleton<ProcessController>(ctrlFN);
     let pc = new ProcessController()
-    console.log('pc',pc)
+    console.log('pc', pc)
     let loveme = await pc.killmeee().received;
     console.log('loveme', loveme.body.text)
     let p = new PROCESS()
 
-     await p.kill()
+    await p.kill()
+
+    let proceses = await PROCESS.getAll()
+    console.log('proceses',proceses)
   }
   //#endregion
 
