@@ -7,6 +7,7 @@ import { authenticate } from 'passport'
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
+import { PROCESS } from '../../entities/core/PROCESS';
 
 
 export interface IProcessController extends ProcessController { }
@@ -28,6 +29,20 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#region @backendFunc
     return { send: 'super!!!!!' }
     //#endregion
+
+  }
+
+  @Morphi.Http.GET()
+  getAll(): Morphi.Response<PROCESS[]> {
+    //#region @backendFunc
+    return async (req, res) => {
+      let p = new PROCESS()
+      p.pid = 1111;
+      let p2 = new PROCESS()
+      p2.pid = 2222;
+      return [p, p2]
+    }
+    //#endregion
   }
 
 
@@ -42,12 +57,6 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
   }
 
 
-  async initExampleDbData() {
-
-    let p1 = new entities.PROCESS()
-    p1.id = 123
-    await this.db.PROCESS.save(p1)
-  }
   //#endregion
 
 }

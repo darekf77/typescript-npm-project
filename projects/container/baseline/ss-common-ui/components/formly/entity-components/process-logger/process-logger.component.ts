@@ -13,6 +13,8 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
 
+
+
   constructor() {
     super();
   }

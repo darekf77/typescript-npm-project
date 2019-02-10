@@ -10,11 +10,7 @@ import { IProcessController } from '../../controllers/core/ProcessController';
 
 
 export interface IPROCESS {
-
-  /**
-   * pid of process
-   */
-  id: number;
+  pid: number;
 }
 
 
@@ -24,14 +20,16 @@ export interface IPROCESS {
   className: 'PROCESS'
 })
 export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessController> implements IPROCESS {
+  get id() {
+    return this.pid;
+  }
+
+  pid: number;
 
 
-  //#region @backend
-  @Morphi.Orm.Column.Primary()
-  //#endregion
-  id: number;
+  public static getAll() {
 
-
+  }
 
 
   async kill() {
