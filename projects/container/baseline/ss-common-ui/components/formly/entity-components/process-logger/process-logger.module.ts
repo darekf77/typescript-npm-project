@@ -10,6 +10,7 @@ import { ButtonIconModule } from '../../base-components';
     CommonModule,
     ButtonIconModule
   ],
+  entryComponents: [ProcessLoggerComponent],
   exports: [ProcessLoggerComponent],
   declarations: [ProcessLoggerComponent]
 })

@@ -1,5 +1,6 @@
 import { Morphi } from 'morphi';
 import { MULTIMEDIA } from './core/MULTIMEDIA';
+import { PROCESS } from './core/PROCESS';
 
 
 export interface IEXAMPLE {
@@ -57,7 +58,8 @@ export class TestJSON {
   mapping: {
     testjson: 'TestJSON',
     multimediaExample: 'MULTIMEDIA',
-    birthDate: 'Date'
+    birthDate: 'Date',
+    process: 'PROCESS'
   }
 })
 export class EXAMPLE extends Morphi.Base.Entity<EXAMPLE, IEXAMPLE> implements IEXAMPLE {
@@ -67,6 +69,8 @@ export class EXAMPLE extends Morphi.Base.Entity<EXAMPLE, IEXAMPLE> implements IE
     ex.test = obj.test;
     return ex;
   }
+
+  process: PROCESS;
 
 
   //#region @backend

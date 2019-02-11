@@ -23,21 +23,26 @@ import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/
 import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../entity-components/multimedia';
 
 // other
+import { Morphi } from 'morphi/browser';
 import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';
 
+// base components
 import {
   EditorWrapperModule,
   EditorWrapperComponent
 } from '../base-components/editor';
+
+// aditional types componets
 import {
   ButtonWithActionComponent,
   FormlyProgressbardComponent,
   FormlySwitchComponent,
   IconButtonWithActionComponent
 } from './additional-types';
-import { Morphi } from 'morphi/browser';
+// import { ProcessLoggerModule } from '../entity-components/process-logger';
+
 
 
 const angularModules = [
@@ -59,6 +64,8 @@ const myFormlyModules = [
   MultimediaWrapperModule,
   EditorWrapperModule
 ];
+
+console.log('Morphi.Formly.getAllRegisterdTypes()', Morphi.Formly.getAllRegisterdTypes());
 
 const formlyModules = [
   FormlyMaterialModule,
@@ -94,12 +101,17 @@ const customComponetns = [
   FormlyHorizontalWrapper
 ];
 
+const entityModules = [
+  // ProcessLoggerModule
+];
+
 @NgModule({
   imports: [
     ...angularModules,
     ...formlyModules,
     ...myFormlyModules,
-    ...materialModules
+    ...materialModules,
+    ...entityModules
   ],
   exports: [
     ...customComponetns

@@ -32,6 +32,22 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
 
   }
 
+  @Morphi.Http.GET('/start/:pid')
+  start(@Morphi.Http.Param.Path('pid') pid: number): Morphi.Response<string> {
+    //#region @backendFunc
+    return { send: 'started!' }
+    //#endregion
+
+  }
+
+  @Morphi.Http.GET('/start/:pid')
+  stop(@Morphi.Http.Param.Path('pid') pid: number): Morphi.Response<string> {
+    //#region @backendFunc
+    return { send: 'stopped!' }
+    //#endregion
+
+  }
+
   @Morphi.Http.GET()
   getAll(): Morphi.Response<PROCESS[]> {
     //#region @backendFunc
@@ -47,10 +63,6 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
 
 
   //#region @backend
-
-  get db() {
-    return entities.entities(this.connection as any);
-  }
 
   get ctrl() {
     return controllers.controllers()

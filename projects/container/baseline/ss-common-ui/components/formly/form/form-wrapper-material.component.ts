@@ -1,5 +1,9 @@
 // angular
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, TemplateRef } from '@angular/core';
+import {
+  Component, OnInit, Input, Output, EventEmitter, ViewChild,
+  TemplateRef, ComponentFactoryResolver, ViewContainerRef,
+  AfterViewInit
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 // material
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -9,20 +13,23 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component', Level.__NOTHING);
+const log = Log.create('form warpper material component',
+  // Level.__NOTHING
+);
 
 @Component({
   selector: 'app-form-wrapper-material',
   templateUrl: './form-wrapper-material.component.html',
   styleUrls: ['./form-wrapper-material.component.scss']
 })
-export class FormWrapperMaterialComponent implements OnInit {
+export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
 
   @Input() modelDataConfig = new Morphi.CRUD.ModelDataConfig();
   @ViewChild('templateDelete') templateDelete: TemplateRef<any>;
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private resolver: ComponentFactoryResolver
   ) { }
 
   formly = {
@@ -32,7 +39,12 @@ export class FormWrapperMaterialComponent implements OnInit {
   };
 
   id_toDelete: number;
+  public get hasRegisteredCmp() {
+    return !!this.ftype;
+  }
+  public ftype: { component: Function; entity?: Function; name: string };
   @Input() id: number;
+  @ViewChild('entitycomponent', { read: ViewContainerRef }) entitycomponent: ViewContainerRef;
 
   /**
    * Exclude specyfic generated form fields
@@ -106,12 +118,37 @@ export class FormWrapperMaterialComponent implements OnInit {
     // log.i('FORMLY FIELDS', this.formly.fields);
   }
 
+
+  ngAfterViewInit() {
+    if (this.hasRegisteredCmp) {
+      setTimeout(() => {
+
+        this.entitycomponent.clear();
+        const factory = this.resolver.resolveComponentFactory(this.ftype.component as any);
+        const componentRef = this.entitycomponent.createComponent(factory);
+        (componentRef.instance as any).model = this.model;
+      });
+    }
+
+  }
+
+
   async ngOnInit() {
+
     // console.log('model', this.model);
     // log.i(`CRUD`, this.crud);
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
+
+    const types = Morphi.Formly.getAllRegisterdTypes();
+    log.i('types', types);
+    const ftype = Morphi.Formly.FindTypeForEntity(this.entity);
+    if (!!ftype) {
+      this.ftype = ftype;
+      return;
+    }
+
     this.resolveFields();
 
     this.formly.options = this.options;

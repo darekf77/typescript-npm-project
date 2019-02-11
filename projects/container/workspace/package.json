@@ -15,6 +15,9 @@
         "dedupe": [
           "ng2-rest",
           "ng2-logger",
+          "json10",
+          "lodash-walk-object",
+          "typescript-class-helpers",
           "morphi",
           "rxjs",
           "@ngtools",

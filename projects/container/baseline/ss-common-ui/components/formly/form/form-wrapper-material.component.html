@@ -14,8 +14,12 @@
   </div>
 
 </ng-template>
+<div *ngIf="ftype" >
+  <div #entitycomponent>
+  </div>
+</div>
 <!-- <h3 *ngIf="model">{{model| json}}</h3> -->
-<form *ngIf="formly.form"
+<form *ngIf="!hasRegisteredCmp && formly.form"
       (ngSubmit)="ngSubmit(model)"
       [formGroup]="formly.form">
   <formly-form [model]="model"

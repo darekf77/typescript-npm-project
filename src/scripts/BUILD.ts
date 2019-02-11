@@ -36,9 +36,9 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
 
   if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
     if (appBuild) {
-      error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
+      error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
     } else {
-      error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`)
+      error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
     }
   }
 

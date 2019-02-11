@@ -4,8 +4,9 @@ import { Component, OnInit } from '@angular/core';
 // formly
 import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities';
 
-@Morphi.Formly.RegisterComponentAsType('ProcessLoggerComponent')
+@Morphi.Formly.RegisterComponentForEntity(PROCESS)
 @Component({
   selector: 'app-process-logger',
   templateUrl: './process-logger.component.html',

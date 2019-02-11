@@ -1,6 +1,6 @@
 import { Morphi } from 'morphi';
 import { IPROGRESS_BAR_DATA, ProgressBarStatus, PROGRESS_BAR_DATA as TNP_PROGRESS_BAR_DATA, } from 'tnp-bundle';
-import _ from 'lodash';
+
 
 export { IPROGRESS_BAR_DATA, PROGRESS_BAR_DATA as TNP_PROGRESS_BAR_DATA, ProgressBarStatus, ProgressBarType } from 'tnp-bundle'
 

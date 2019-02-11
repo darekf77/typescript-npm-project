@@ -2,3 +2,14 @@
   preview process logger!
   <app-process-logger></app-process-logger>
 </p>
+
+<mat-card *ngFor="let m of model" >
+  <app-form-wrapper-material  [entity]="processController.entity"
+                             [model]="m"
+                             [fields]="fields"
+                             [exclude]="['ctrl']"
+                             >
+
+  </app-form-wrapper-material>
+
+</mat-card>

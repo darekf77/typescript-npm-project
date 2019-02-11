@@ -32,7 +32,7 @@ Morphi.init({
   host,
   controllers: [ExamplesController],
   entities: [EXAMPLE]
-})
+});
 
 @NgModule({
   imports: [
@@ -42,11 +42,7 @@ Morphi.init({
     ...angularModules,
     RouterModule.forChild(routes),
     FormlyMaterialModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' },
-      ],
-    }),
+    FormlyModule.forRoot(),
   ],
   declarations: [PreviewSelectWrapperComponent],
   providers: [
