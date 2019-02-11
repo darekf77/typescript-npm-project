@@ -10,6 +10,7 @@ import * as controllers from '../../controllers';
 import { PROCESS } from '../../entities/core/PROCESS';
 
 
+
 export interface IProcessController extends ProcessController { }
 
 
@@ -32,18 +33,22 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
 
   }
 
-  @Morphi.Http.GET('/start/:pid')
-  start(@Morphi.Http.Param.Path('pid') pid: number): Morphi.Response<string> {
+  @Morphi.Http.POST('/start')
+  start(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<void> {
     //#region @backendFunc
-    return { send: 'started!' }
+    return async () => {
+      await this.db.PROCESS.start(process);
+    }
     //#endregion
 
   }
 
-  @Morphi.Http.GET('/start/:pid')
-  stop(@Morphi.Http.Param.Path('pid') pid: number): Morphi.Response<string> {
+  @Morphi.Http.POST('/stop')
+  stop(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<void> {
     //#region @backendFunc
-    return { send: 'stopped!' }
+    return async () => {
+      await this.db.PROCESS.stop(process);
+    }
     //#endregion
 
   }
@@ -68,6 +73,10 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     return controllers.controllers()
   }
 
+  get db() {
+    // @ts-ignore
+    return entities.entities(this.connection as any);
+  }
 
   //#endregion
 

@@ -15,5 +15,15 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
 
   globalAliases: (keyof PROCESS_ALIASES)[] = ['process', 'processes']
 
+
+  start(processOrPid: PROCESS) {
+
+  }
+
+
+  stop(processOrPid: PROCESS ) {
+
+  }
+
 }
 //#endregion
