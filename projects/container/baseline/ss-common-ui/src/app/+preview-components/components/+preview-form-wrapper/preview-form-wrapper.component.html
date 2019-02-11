@@ -1,8 +1,18 @@
-<mat-card>
+<select [(ngModel)]="selectedValue"
+        (change)="changeValue()">
+  <option>ALL </option>
+  <option *ngFor="let accessKey of accessKeys"
+          [ngValue]="accessKey.value">
+    {{accessKey.name | uppercase}}
+  </option>
+</select>
+{{selectedOptions | json}}
+<mat-card *ngIf="!reload" >
 
   <app-form-wrapper-material [entity]="entity"
                              [(model)]="model"
-                             [fields]="fields">
+                             [fields]="fields"
+                             [include]="include">
 
   </app-form-wrapper-material>
 

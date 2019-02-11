@@ -47,9 +47,10 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   @ViewChild('entitycomponent', { read: ViewContainerRef }) entitycomponent: ViewContainerRef;
 
   /**
-   * Exclude specyfic generated form fields
+   * Exclude or Include specyfic generated form fields
    */
-  @Input() exclude: string[] = [];
+  @Input() exclude: string[];
+  @Input() include: string[];
 
   @Input() fieldsOrder: string[];
 
@@ -111,7 +112,15 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
       fields = this.fields;
     }
 
-    fields = fields.filter(({ key }) => !(key && this.exclude.includes(key)));
+    fields = fields.filter(({ key }) => {
+      if (_.isArray(this.exclude)) {
+        return !(key && this.exclude.includes(key));
+      }
+      if (_.isArray(this.include)) {
+        return (key && this.include.includes(key));
+      }
+      return true;
+    });
     // log.i('fields filter', fields);
 
     this.formly.fields = fields;
@@ -122,7 +131,7 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if (this.hasRegisteredCmp) {
       setTimeout(() => {
-
+        console.error('RECREATEEEEEE');
         this.entitycomponent.clear();
         const factory = this.resolver.resolveComponentFactory(this.ftype.component as any);
         const componentRef = this.entitycomponent.createComponent(factory);

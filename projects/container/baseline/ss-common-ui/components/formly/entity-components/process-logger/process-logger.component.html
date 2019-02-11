@@ -1,4 +1,5 @@
 <p>
   <app-button-icon></app-button-icon>
+  <input [ngModel]="vv" (change)="onChange($event.target.value)" >
   {{model | json}}
 </p>

@@ -129,7 +129,7 @@ export function reinstallTnp(project: Project,
       ++notNeededReinstallationTnp[workspaceLocation];
     }
 
-    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , installs counter:${notNeededReinstallationTnp[project.location]} `)
+    console.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , installs counter:${notNeededReinstallationTnp[workspaceLocation]} `)
   } else {
     // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
   }

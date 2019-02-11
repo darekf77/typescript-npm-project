@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+
 // material
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -21,6 +23,13 @@ import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/cont
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
 
 
+const angularModules = [
+  ReactiveFormsModule,
+  CommonModule,
+  FormsModule,
+  RouterModule.forChild(routes)
+];
+
 
 const materialModules = [
   MatCardModule,
@@ -39,10 +48,9 @@ Morphi.init({
 
 @NgModule({
   imports: [
-    CommonModule,
+    ...angularModules,
     ListWrapperModule,
     ...materialModules,
-    RouterModule.forChild(routes),
     ProcessLoggerModule,
     FormWrapperMaterialModule,
     FormlyModule.forChild({

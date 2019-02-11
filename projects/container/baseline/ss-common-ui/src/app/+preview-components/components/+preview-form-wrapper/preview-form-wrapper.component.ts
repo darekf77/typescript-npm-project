@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
+import { Helpers } from 'morphi/browser/helpers';
 
 const log = Log.create('preview-form-wrapper');
 
@@ -14,33 +15,11 @@ const log = Log.create('preview-form-wrapper');
 })
 export class PreviewFormWrapperComponent implements OnInit {
 
-
-
+  reload = false;
   entity = EXAMPLE;
-  model: EXAMPLE = {
-    // id: 23,
-    // test: 'asdasd',
-    // name: 'basename',
-    // age: 444,
-    // birthDate: new Date('04-02-1990'),
-    // isAmazing: true,
-    // otherData: 'othereot',
-    // href: 'http://onet.pl',
-    // testjson: {
-    //   isAwesome: false,
-    //   age: 200,
-    //   name: 'testing'
-    // },
-    // fromRaw: undefined as any
-  } as any;
-
+  model: EXAMPLE = {} as any;
+  include: string[];
   fields = [
-    // {
-    //   key: 'href',
-    //   templateOptions: {
-    //     required: true
-    //   },
-    // },
     {
       key: 'selectwrappertest',
       type: 'selectwrapper',
@@ -51,16 +30,44 @@ export class PreviewFormWrapperComponent implements OnInit {
       }
     }
   ];
+  accessKeys = [];
+  selectedValue: string;
 
   constructor(public exampleService: ExamplesController) {
     log.i('exampleService', exampleService);
+    this.accessKeys = Helpers.Class.describeProperites(EXAMPLE)
+      .map(p => {
+        return { name: p, value: p };
+      });
   }
 
 
   async ngOnInit() {
-    const models =  await this.exampleService.getAll().received;
+    const models = await this.exampleService.getAll().received;
     log.i('models', models);
     this.model = models.body.json[0];
+    this.selectedValue = window.localStorage.getItem('selectedValue');
+    this.changeValue();
+  }
+
+
+  changeValue() {
+    log.i('selected', this.selectedValue);
+    window.localStorage.setItem('selectedValue', this.selectedValue);
+    if (!this.selectedValue || this.selectedValue === 'ALL') {
+      this.include = void 0;
+    } else {
+      this.include = [this.selectedValue];
+    }
+    log.i('include', this.include);
+    this.reloadForm();
+  }
+
+  reloadForm() {
+    this.reload = true;
+    setTimeout(() => {
+      this.reload = false;
+    });
   }
 
 }
