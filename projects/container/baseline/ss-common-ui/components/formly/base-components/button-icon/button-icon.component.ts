@@ -14,7 +14,7 @@ export class ButtonIconComponent implements OnInit {
   @Output() action = new EventEmitter();
 
   onAction() {
-
+    this.action.next()
   }
 
   constructor() { }

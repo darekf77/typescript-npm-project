@@ -1,5 +1,27 @@
 <p>
-  <app-button-icon></app-button-icon>
-  <input [ngModel]="vv" (change)="onChange($event.target.value)" >
-  {{model | json}}
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Process title
+      </mat-panel-title>
+      <mat-panel-description>
+        Type your name and age
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <app-button-icon [icon]="icon"
+                     [label]="label"
+                     ></app-button-icon>
+    <app-button-icon [icon]="'info'"
+                     [label]="''"
+                     (action)="isOpen = !isOpen"
+                     ></app-button-icon>
+  </mat-expansion-panel>
+
 </p>
+<standalone-popup *ngIf="isOpen" [contentComponent]="popupContent"></standalone-popup>
+
+<ng-template #popupContent>
+
+  Hello there
+</ng-template>

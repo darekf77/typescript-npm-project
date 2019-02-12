@@ -17,14 +17,38 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
 
-  vv = 122;
+  isOpen = false;
+
+  get icon() {
+    if (!this.process || this.process.state === 'notStarted') {
+      return 'play_arrow';
+    }
+    if (this.process.state === 'running') {
+      return 'stop';
+    }
+    return 'replay';
+  }
+
+  get label() {
+    if (!this.process || this.process.state === 'notStarted') {
+      return 'start';
+    }
+    if (this.process.state === 'running') {
+      return 'stop';
+    }
+    return 'restart';
+  }
+
+  process: PROCESS;
+
   constructor() {
     super();
   }
 
+  inited = false;
   ngOnInit() {
-    log.i('this.formControl.value', this.formControl.value);
-    this.vv = this.formControl.value;
+    this.inited = true;
+    // log.i('this.formControl.value', this.formControl.value);
   }
 
   onChange(v) {
