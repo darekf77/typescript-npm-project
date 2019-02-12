@@ -16,8 +16,15 @@ const log = Log.create('process loger');
   styleUrls: ['./process-logger.component.scss']
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
-
+  public static ids = 0;
+  private num: number;
   isOpen = false;
+  inited = false;
+  process: PROCESS;
+
+  get title() {
+    return 'Process title';
+  }
 
   get icon() {
     if (!this.process || this.process.state === 'notStarted') {
@@ -39,13 +46,24 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
     return 'restart';
   }
 
-  process: PROCESS;
+  reset() {
+    this.isOpen = false;
+    setTimeout(() => {
+      this.num = ProcessLoggerComponent.ids++;
+      this.isOpen = true;
+    });
+  }
+
+  onClose() {
+    this.isOpen = false;
+  }
 
   constructor() {
     super();
+    this.num = ProcessLoggerComponent.ids++;
   }
 
-  inited = false;
+
   ngOnInit() {
     this.inited = true;
     // log.i('this.formControl.value', this.formControl.value);

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 // material
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
 // local
 import { ProcessLoggerComponent } from './process-logger.component';
 import { ButtonIconModule } from '../../base-components';
@@ -20,7 +21,8 @@ const angularModules = [
 ];
 
 const materialModules = [
-  MatExpansionModule
+  MatExpansionModule,
+  MatTabsModule
 ];
 
 const localModules = [
