@@ -12,6 +12,8 @@ export class PopupComponent implements AfterViewInit {
   @Input() public parent: PopupControler;
   @Input() public template: TemplateRef<any>;
 
+  @Input() public title: string;
+
   closePopup(): void {
     this.parent.close();
   }

@@ -1,27 +1,39 @@
 
 import * as _ from 'lodash';
 import { PopupInfo } from './popup-info';
-import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef, ElementRef } from '@angular/core';
+import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef, ElementRef, EventEmitter } from '@angular/core';
 import { PopupComponent } from '../popup-component/popup.component';
 import { HTMLElementUtil } from './html-utls';
+import { Subject } from 'rxjs/Subject';
 
 const coordinateX = 'coordinateX';
 const coordinateY = 'coordinateY';
 
 export class PopupControler {
-  private bodyHtml: HTMLElement;
+  private static ids = 0;
+  public onClose: EventEmitter<any>;
 
+  private bodyHtml: HTMLElement;
 
   modalZIndex = 10000;
   popupQueue: PopupInfo[] = [];
+  id: string;
   constructor(private viewContainerRef: ViewContainerRef,
-    private componentFactoryResolver: ComponentFactoryResolver) {
+    private componentFactoryResolver: ComponentFactoryResolver,
+    id?: string,
+    private title?: string
+  ) {
+    if (!_.isNumber(id)) {
+      this.id = `${PopupControler.ids++}inside`;
+    } else {
+      this.id = id;
+    }
 
   }
 
   reinitPos() {
-    const x = Number(localStorage.getItem(coordinateX));
-    const y = Number(localStorage.getItem(coordinateY));
+    const x = Number(localStorage.getItem(`${coordinateX}${this.id}`));
+    const y = Number(localStorage.getItem(`${coordinateY}${this.id}`));
     if (!_.isNaN(x) && !_.isNaN(y)) {
       this.moveTo(x, y);
     }
@@ -38,6 +50,7 @@ export class PopupControler {
 
     popupRef.instance.parent = this;
     popupRef.instance.template = component;
+    popupRef.instance.title = this.title;
 
     if (this.bodyHtml == null) {
       this.bodyHtml = this.getBody(popupRef.location.nativeElement);
@@ -53,9 +66,13 @@ export class PopupControler {
     return popupRef;
   }
   public close = () => {
-    if (this.popupQueue.length > 0) {
-      const popup = this.popupQueue.pop();
-      HTMLElementUtil.RemoveElement(popup.popup.location.nativeElement);
+    if (this.onClose.observers.length > 0) {
+      this.onClose.next();
+    } else {
+      if (this.popupQueue.length > 0) {
+        const popup = this.popupQueue.pop();
+        HTMLElementUtil.RemoveElement(popup.popup.location.nativeElement);
+      }
     }
 
   }
@@ -77,8 +94,8 @@ export class PopupControler {
     popup.wrapper.style.top = (y - popup.dragYOffset) + 'px';
     popup.wrapper.style.left = (x - popup.dragXOffset) + 'px';
 
-    window.localStorage.setItem(coordinateX, (x - popup.dragXOffset).toString());
-    window.localStorage.setItem(coordinateY, (y - popup.dragYOffset).toString());
+    window.localStorage.setItem(`${coordinateX}${this.id}`, (x - popup.dragXOffset).toString());
+    window.localStorage.setItem(`${coordinateY}${this.id}`, (y - popup.dragYOffset).toString());
   }
   private findPopupWrapperAndContent = (popup: HTMLElement, popupInfo: PopupInfo) => {
 

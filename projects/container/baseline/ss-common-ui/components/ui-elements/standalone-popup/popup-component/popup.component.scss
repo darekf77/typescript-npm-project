@@ -24,6 +24,9 @@
         text-align: right;
         border-bottom: solid 1px;
         background-color: #cccccc;
+        span {
+          float: left;
+        }
         label {
             font-size: 10px;
             right: 6px;
