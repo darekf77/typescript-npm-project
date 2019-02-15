@@ -45,13 +45,15 @@ export class DBTransaction {
     this.__buildsCtrl = new BuildsController(crud);
     this.__portsCtrl = new PortsController(crud);
     this.__commandsCtrl = new CommandsController(crud)
+    this.__processCtrl = new ProcessController(crud);
 
     this.controllers = this.controllers.concat([
       this.__projectsCtrl,
       this.__domainsCtrl,
       this.__buildsCtrl,
       this.__portsCtrl,
-      this.__commandsCtrl
+      this.__commandsCtrl,
+      this.__processCtrl
     ])
   }
 

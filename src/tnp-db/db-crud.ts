@@ -131,6 +131,9 @@ export class DbCrud {
     if (entityName === 'projects') {
       return new ProjectInstance(value);
     }
+    if (entityName === 'processes') {
+      return _.merge(new ProcessInstance(), value) as PortInstance;
+    }
     return value;
   }
 
@@ -185,6 +188,10 @@ export class DbCrud {
         // secure,
         // sockets
       } as DomainInstance);
+    }
+
+    if (entity instanceof ProcessInstance) {
+      return entity;
     }
 
     if (entity instanceof ProjectInstance) {

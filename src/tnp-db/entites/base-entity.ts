@@ -11,7 +11,11 @@ export abstract class DBBaseEntity<T=any> {
   }
 
   public static entityNameFromClassName(className: string) {
-    return _.lowerCase(className.replace('Instance', 's'))
+    className = className.replace('Instance', 's')
+    if (className.endsWith('sss')) { // ex. processes
+      className = className.replace('sss', 'sses')
+    }
+    return _.lowerCase(className)
   }
 
 }

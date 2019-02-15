@@ -9,6 +9,8 @@ export class ProcessInstance extends DBBaseEntity {
   }
 
   pid: number;
+  cmd: string;
+  name: string;
   meta: string;
   env: any;
 
