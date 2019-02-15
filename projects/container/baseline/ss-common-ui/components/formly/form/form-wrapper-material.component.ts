@@ -131,7 +131,6 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if (this.hasRegisteredCmp) {
       setTimeout(() => {
-        console.error('RECREATEEEEEE');
         this.entitycomponent.clear();
         const factory = this.resolver.resolveComponentFactory(this.ftype.component as any);
         const componentRef = this.entitycomponent.createComponent(factory);

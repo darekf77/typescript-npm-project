@@ -82,8 +82,10 @@ export async function start(argsv: string[]) {
   ) {
     // info(`DO NOTHIGN`);
   } else {
-    db.transaction.setCommand(argsv.join(' '));
+    await db.transaction.setCommand(argsv.join(' '));
   }
+
+  await db.transaction.updateCurrentProcess()
 
   let recognized = false;
   if (Array.isArray(argsv) && argsv.length >= 3) {

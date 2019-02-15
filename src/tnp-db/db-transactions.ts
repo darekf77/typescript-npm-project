@@ -14,7 +14,8 @@ import {
   BuildsController,
   PortsController,
   CommandsController,
-  BaseController
+  BaseController,
+  ProcessController
 } from './controllers';
 import { Project } from '../project';
 import { BuildOptions } from '../models/build-options';
@@ -35,6 +36,7 @@ export class DBTransaction {
   public readonly __buildsCtrl: BuildsController;
   public readonly __portsCtrl: PortsController;
   public readonly __commandsCtrl: CommandsController;
+  public readonly __processCtrl: ProcessController;
   private controllers: BaseController[] = []
 
   constructor(private crud: DbCrud) {
@@ -83,12 +85,20 @@ export class DBTransaction {
 
   public async reinitDB() {
     await this.start(`Reinit db`, async () => {
-      this.crud.clearDBandReinit({ projects: [], domains: [], ports: [], builds: [], commands: [] })
+      this.crud.clearDBandReinit({
+        projects: [],
+        domains: [],
+        ports: [],
+        builds: [],
+        commands: [],
+        processes: []
+      });
       await this.__projectsCtrl.addExisted()
       await this.__domainsCtrl.addExisted()
       await this.__commandsCtrl.addExisted()
       await this.__portsCtrl.addExisted()
       await this.__buildsCtrl.addExisted()
+      await this.__processCtrl.addExisted()
     })
   }
 
@@ -113,6 +123,11 @@ export class DBTransaction {
     this.crud.remove(existed)
   }
 
+  public async updateCurrentProcess() {
+    await this.start(`update current process`, async () => {
+      await this.__processCtrl.updateCurrentProcess()
+    });
+  }
 
   public async updateBuildsWithCurrent(currentProject: Project,
     buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {

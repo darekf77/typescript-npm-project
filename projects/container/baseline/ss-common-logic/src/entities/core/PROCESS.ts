@@ -19,7 +19,13 @@ export interface IPROCESS extends PROCESS {
   exitCodePath: string;
 }
 
-export type PROCESS_STATE = 'notStarted' | 'running' | 'exitedWithSuccess' | 'exitedWithError'
+export type PROCESS_STATE =
+  'notStarted' |
+  'inProgressOfStarting' |
+  'running' |
+  'inProgressOfStopping' |
+  'exitedWithSuccess' |
+  'exitedWithError'
 
 
 @Morphi.Entity<PROCESS>({

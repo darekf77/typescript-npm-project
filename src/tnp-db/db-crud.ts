@@ -8,7 +8,8 @@ import { Project } from '../project/base-project';
 import { DBBaseEntity } from './entites/base-entity';
 import {
   BuildInstance, PortInstance, DomainInstance,
-  EntityNames, CommandInstance, ProjectInstance
+  EntityNames, CommandInstance, ProjectInstance,
+  ProcessInstance
 } from './entites';
 import { ProjectFrom } from '../project';
 import { error } from '../messages';
