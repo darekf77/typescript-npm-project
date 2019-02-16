@@ -1,7 +1,7 @@
 <br>
 <p>
   preview process logger!
-  <app-process-logger></app-process-logger>
+  <app-process-logger  *ngFor="let m of model" [model]="m" ></app-process-logger>
 </p>
 
 <mat-card *ngFor="let m of model" >

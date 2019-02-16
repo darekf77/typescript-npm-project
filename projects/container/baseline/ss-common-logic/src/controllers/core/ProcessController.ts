@@ -34,41 +34,27 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
   }
 
   @Morphi.Http.POST('/start')
-  start(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<void> {
+  start(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      await this.db.PROCESS.start(process);
+      return await this.db.PROCESS.start(process);
     }
     //#endregion
 
   }
 
   @Morphi.Http.POST('/stop')
-  stop(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<void> {
+  stop(@Morphi.Http.Param.Body('process') process: PROCESS): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      await this.db.PROCESS.stop(process);
+      return await this.db.PROCESS.stop(process);
     }
     //#endregion
 
-  }
-
-  @Morphi.Http.GET()
-  getAll(): Morphi.Response<PROCESS[]> {
-    //#region @backendFunc
-    return async (req, res) => {
-      let p = new PROCESS()
-      p.pid = 1111;
-      let p2 = new PROCESS()
-      p2.pid = 2222;
-      return [p, p2]
-    }
-    //#endregion
   }
 
 
   //#region @backend
-
   get ctrl() {
     return controllers.controllers()
   }
@@ -76,6 +62,11 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
   get db() {
     // @ts-ignore
     return entities.entities(this.connection as any);
+  }
+
+  async initExampleDbData() {
+    let p = new PROCESS({ name: 'Test process i', cmd: 'echo "hello world"' })
+    await this.db.PROCESS.save(p)
   }
 
   //#endregion

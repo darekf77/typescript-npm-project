@@ -1,5 +1,5 @@
 import { Morphi } from 'morphi/browser';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 // formly
 import { FieldType } from '@ngx-formly/core';
@@ -16,18 +16,34 @@ const log = Log.create('process loger');
   styleUrls: ['./process-logger.component.scss']
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
+
   public static ids = 0;
+  @Input() public model: PROCESS;
   private num: number;
   isOpen = false;
   inited = false;
-  process: PROCESS;
+  get process() {
+    return this.model;
+  }
+
+  async action() {
+    if (this.process.state === 'running') {
+      await this.process.stop();
+    } else {
+      await this.process.start();
+    }
+  }
+
 
   get title() {
-    return 'Process title';
+    return this.process && this.process.name;
   }
 
   get icon() {
-    if (!this.process || this.process.state === 'notStarted') {
+    if (!this.process) {
+      return;
+    }
+    if (this.process.state === 'notStarted') {
       return 'play_arrow';
     }
     if (this.process.state === 'running') {

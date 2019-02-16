@@ -1,8 +1,8 @@
-<p>
+<p [attr.disabled]="!process" >
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        {{title}}
+        {{process && process.name}}
       </mat-panel-title>
       <mat-panel-description>
         Type your name and age
@@ -10,6 +10,7 @@
     </mat-expansion-panel-header>
 
     <app-button-icon [icon]="icon"
+                     (action)="action()"
                      [label]="label"></app-button-icon>
     <app-button-icon [icon]="'info'"
                      [label]="''"

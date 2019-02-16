@@ -1,20 +1,25 @@
+import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 
 
 //#region @backend
-import * as _ from 'lodash';
 import * as path from "path";
 import * as fse from "fs-extra";
+import { TnpDB } from 'tnp-bundle';
 //#endregion
 
 import { IProcessController } from '../../controllers/core/ProcessController';
 import { Project, config } from 'tnp-bundle';
-
+import { CLASS } from 'typescript-class-helpers';
+export { Models } from 'ng2-rest/models'
+import { Models } from 'ng2-rest/models'
 
 
 export interface IPROCESS extends PROCESS {
   state: PROCESS_STATE;
+  stderLog: string;
   stderLogPath: string;
+  stdoutLog: string;
   stdoutLogPath: string;
   exitCodePath: string;
 }
@@ -38,24 +43,53 @@ export type PROCESS_STATE =
     cmd: 'echo "Hello from tnp process"'
   },
   //#region @backend
-  createTable: false,
-  //#region @backend
   browserTransformFn: (entity) => {
     entity.browser.state = entity.state;
+
+    entity.browser.stderLog = entity.stderLog;
     entity.browser.stderLogPath = entity.stderLogPath;
+
+    entity.browser.stdoutLog = entity.stdoutLog;
     entity.browser.stdoutLogPath = entity.stdoutLogPath;
+
     entity.browser.exitCodePath = entity.exitCodePath;
     return entity;
   }
   //#endregion
 })
 export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessController> {
-  get id() {
-    return this.pid;
+
+  constructor(options?: { name: string; cmd: string; }) {
+    super()
+    this.name = options && options.name;
+    this.cmd = options && options.cmd;
   }
+;
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
+  //#endregion
+  name: string = undefined;
+
+
+  //#region @backend
+
+  @Morphi.Orm.Column.Generated()
+  //#endregion
+  id: number = undefined;
+
   public browser: IPROCESS = {} as any;
-  cmd: string;
-  pid: number;
+
+
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { length: 500, nullable: true })
+  //#endregion
+  cmd: string = undefined;
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom('bigint', { nullable: true })
+  //#endregion
+  pid: number = undefined;
 
 
   private _files(propertyName: string, surfix: string) {
@@ -71,10 +105,26 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     //#endregion
   }
 
+  private __readLog(propertyName: string) {
+    if (Morphi.IsBrowser) {
+      return this.browser[propertyName]
+    }
+    //#region @backend
+    const p = this[`${propertyName}Path`]
+    return fse.existsSync(p) && fse.readFileSync(p, 'utf8').toString()
+    //#endregion
+  }
+
+  get stdoutLog() {
+    return this.__readLog('stdoutLog');
+  }
   get stdoutLogPath() {
     return this._files('stdoutLogPath', 'stdout')
   }
 
+  get stderLog() {
+    return this.__readLog('stderLog');
+  }
   get stderLogPath() {
     return this._files('stderLogPath', 'stder')
   }
@@ -83,17 +133,23 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return this._files('exitCodePath', 'exitcode')
   }
 
-  start() {
-    return this.ctrl.start(this)
+  async start() {
+    let data = await this.ctrl.start(this).received;
+    _.merge(this, data.body.json);
   }
 
-  stop() {
-    return this.ctrl.stop(this)
+  async stop() {
+    let data = await this.ctrl.stop(this).received;
+    _.merge(this, data.body.json);
+  }
+
+  get context() {
+    return `${this.name ? this.name : ''}${this.id}_${CLASS.getNameFromObject(this)}`;
   }
 
   get state(): PROCESS_STATE {
     if (Morphi.IsBrowser) {
-      return this.browser.state
+      return this.browser.state;
     }
     //#region @backend
     if (_.isNumber(this.pid)) {
