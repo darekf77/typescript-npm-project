@@ -31,21 +31,19 @@ import chalk from 'chalk';
 
 export class DBTransaction {
 
-  public readonly __projectsCtrl: ProjectsController;
-  public readonly __domainsCtrl: DomainsController;
-  public readonly __buildsCtrl: BuildsController;
-  public readonly __portsCtrl: PortsController;
-  public readonly __commandsCtrl: CommandsController;
-  public readonly __processCtrl: ProcessController;
+
   private controllers: BaseController[] = []
 
-  constructor(private crud: DbCrud) {
-    this.__projectsCtrl = new ProjectsController(crud);
-    this.__domainsCtrl = new DomainsController(crud);
-    this.__buildsCtrl = new BuildsController(crud);
-    this.__portsCtrl = new PortsController(crud);
-    this.__commandsCtrl = new CommandsController(crud)
-    this.__processCtrl = new ProcessController(crud);
+  constructor(
+    private crud: DbCrud,
+    private readonly __projectsCtrl: ProjectsController,
+    private readonly __domainsCtrl: DomainsController,
+    private readonly __buildsCtrl: BuildsController,
+    private readonly __portsCtrl: PortsController,
+    private readonly __commandsCtrl: CommandsController,
+    private readonly __processCtrl: ProcessController,
+  ) {
+
 
     this.controllers = this.controllers.concat([
       this.__projectsCtrl,

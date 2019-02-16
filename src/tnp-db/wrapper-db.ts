@@ -5,7 +5,15 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as FileSync from 'lowdb/adapters/FileSync'
 
-
+import {
+  ProjectsController,
+  DomainsController,
+  BuildsController,
+  PortsController,
+  CommandsController,
+  BaseController,
+  ProcessController
+} from './controllers';
 import { Project } from '../project/base-project';
 import { BuildOptions } from '../models';
 import { error, warn } from '../messages';
@@ -15,6 +23,13 @@ import { BuildInstance, CommandInstance } from './entites';
 
 
 export class TnpDB {
+
+  private __projectsCtrl: ProjectsController;
+  private __domainsCtrl: DomainsController;
+  private __buildsCtrl: BuildsController;
+  private __portsCtrl: PortsController;
+  private __commandsCtrl: CommandsController;
+  private __processCtrl: ProcessController;
 
 
   private static _instance: TnpDB;
@@ -50,14 +65,34 @@ export class TnpDB {
     this._adapter = new FileSync(this.location)
     this.db = low(this._adapter)
     this.crud = new DbCrud(this.db);
-    this.transaction = new DBTransaction(this.crud);
+
+    this.__projectsCtrl = new ProjectsController(this.crud);
+    this.__domainsCtrl = new DomainsController(this.crud);
+    this.__buildsCtrl = new BuildsController(this.crud);
+    this.__portsCtrl = new PortsController(this.crud);
+    this.__commandsCtrl = new CommandsController(this.crud)
+    this.__processCtrl = new ProcessController(this.crud);
+
+    this.transaction = new DBTransaction(
+      this.crud,
+      this.__projectsCtrl,
+      this.__domainsCtrl,
+      this.__buildsCtrl,
+      this.__portsCtrl,
+      this.__commandsCtrl,
+      this.__processCtrl
+    );
+
+
+
+
     if (recreate) {
       await this.transaction.reinitDB()
     }
   }
 
   public async runCommand(cmd: CommandInstance) {
-    await this.transaction.__commandsCtrl.runCommand(cmd)
+    await this.__commandsCtrl.runCommand(cmd)
 
   }
 
@@ -65,7 +100,7 @@ export class TnpDB {
   }
 
   lastCommandFrom(location: string) {
-    return this.transaction.__commandsCtrl.lastCommandFrom(location)
+    return this.__commandsCtrl.lastCommandFrom(location)
   }
 
 
