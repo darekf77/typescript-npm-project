@@ -16,7 +16,7 @@ import * as fileUpload from 'express-fileupload';
 
 import { ProjectFrom, Project } from '../project';
 import { killProcessByPort, run } from '../process';
-import { PROGRESS_BAR_DATA } from '../progress-output';
+import { PROGRESS_DATA } from '../progress-output';
 import { statSync } from 'fs-extra';
 import { err } from '../project/environment-config-helpers';
 import { paramsFrom } from '../helpers';
@@ -29,7 +29,7 @@ import config from '../config';
 
 
 const status = {
-  progress: new PROGRESS_BAR_DATA(),
+  progress: new PROGRESS_DATA(),
   child: undefined as string,
   operation: 'starting' as 'starting' |
     'error - wrong project' |
@@ -106,7 +106,7 @@ function resotreBuildAndRunCloud(project: Project) {
 }
 
 function setStatusDefault() {
-  status.progress = new PROGRESS_BAR_DATA();
+  status.progress = new PROGRESS_DATA();
   status.operation = 'starting';
   status.operationErrors = [];
 }
@@ -155,8 +155,8 @@ function fakeUpdateForLocalEnv(project: Project, restoreFnOnError: () => void, s
   function incereaseProgress() {
     if (status.progress.value + 10 === 100) {
       status.progress.value = 100;
-      status.progress.info = 'Everything was build... done !'
-      status.progress.status = 'complete';
+      status.progress.msg = 'Everything was build... done !'
+
       status.operation = 'build process ended';
       return;
     }
@@ -165,9 +165,9 @@ function fakeUpdateForLocalEnv(project: Project, restoreFnOnError: () => void, s
     }
 
 
-    status.progress.status = 'inprogress'
+
     status.progress.value += 10;
-    status.progress.info = `In progress of building project test${status.progress.value + 1000}`
+    status.progress.msg = `In progress of building project test${status.progress.value + 1000}`
 
     console.log('Fake progress increase', status.progress)
 
@@ -191,17 +191,17 @@ function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent 
   let p = project.run(`tnp build`, { biggerBuffer: true }).async()
 
   p.stdout.on('data', chunk => {
-    PROGRESS_BAR_DATA.resolveFrom(chunk.toString(), progress => {
+    PROGRESS_DATA.resolveFrom(chunk.toString(), progress => {
       status.progress = progress;
     })
-    if (status.progress.status === 'complete') {
-      status.operation = 'complete - starting cloud';
-      if (startSilent) {
-        CloudHelpers.cloudStartNoOutput()
-      } else {
-        CloudHelpers.cloudStart()
-      }
-    }
+    // if (status.progress.status === 'complete') {
+    //   status.operation = 'complete - starting cloud';
+    //   if (startSilent) {
+    //     CloudHelpers.cloudStartNoOutput()
+    //   } else {
+    //     CloudHelpers.cloudStart()
+    //   }
+    // }
   })
 
   // p.stderr.on('data', err => { // WEBPACK DATA HERE
@@ -233,8 +233,8 @@ function selfUpdate(project: Project, restoreFnOnError: () => void, startSilent 
     ${JSON.stringify(err)}
 
     `)
-    status.progress.status = 'error';
-    status.progress.info = JSON.stringify(err);
+    // status.progress.status = 'error';
+    // status.progress.info = JSON.stringify(err);
     restoreFnOnError()
   })
 

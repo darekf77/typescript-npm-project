@@ -37,7 +37,6 @@ import {
 // aditional types componets
 import {
   ButtonWithActionComponent,
-  FormlyProgressbardComponent,
   FormlySwitchComponent,
   IconButtonWithActionComponent
 } from './additional-types';
@@ -75,7 +74,6 @@ const formlyModules = [
       { name: 'button', component: ButtonWithActionComponent },
       { name: 'switch', component: FormlySwitchComponent },
       { name: 'iconbutton', component: IconButtonWithActionComponent },
-      { name: 'infoprogressbar', component: FormlyProgressbardComponent },
       { name: 'repeat', component: RepeatTypeComponent }
     ],
     validationMessages: [
@@ -96,7 +94,6 @@ const customComponetns = [
   ButtonWithActionComponent,
   FormlySwitchComponent,
   IconButtonWithActionComponent,
-  FormlyProgressbardComponent,
   RepeatTypeComponent,
   FormlyHorizontalWrapper
 ];

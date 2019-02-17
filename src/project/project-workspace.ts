@@ -6,7 +6,7 @@ import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../messages';
-import { PROGRESS_BAR_DATA } from '../progress-output';
+import { PROGRESS_DATA } from '../progress-output';
 import { ProxyRouter } from './proxy-router';
 
 
@@ -35,7 +35,7 @@ export class ProjectWorkspace extends Project {
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    PROGRESS_BAR_DATA.log({ info: 'Process started', status: 'inprogress', value: 0 })
+    PROGRESS_DATA.log({ msg: 'Process started', value: 0 })
     const { prod, watch, outDir, args } = buildOptions;
 
     const projects = {
@@ -95,7 +95,7 @@ export class ProjectWorkspace extends Project {
     });
 
 
-    PROGRESS_BAR_DATA.log({ value: 0, info: `Process started`, status: 'inprogress' })
+    PROGRESS_DATA.log({ value: 0, msg: `Process started` })
 
     console.log(`Projects to build in  ${this.labels.extendedBoldName} :`)
     projectsInOrder.forEach((project, i) => {
@@ -134,19 +134,19 @@ export class ProjectWorkspace extends Project {
 
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building lib: ${project.name}`, status: 'inprogress' })
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
       project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`, { biggerBuffer: true }).sync()
-      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building lib: ${project.name}`, status: 'inprogress' });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
     })
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `In progress building app: ${project.name}`, status: 'inprogress' });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
       project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`, { biggerBuffer: true }).sync()
-      PROGRESS_BAR_DATA.log({ value: (count++ / sum) * 100, info: `Finish building app: ${project.name}`, status: 'inprogress' });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
     })
 
-    PROGRESS_BAR_DATA.log({ value: 100, info: `Process Complete`, status: 'complete' });
+    PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
 
   }
 }

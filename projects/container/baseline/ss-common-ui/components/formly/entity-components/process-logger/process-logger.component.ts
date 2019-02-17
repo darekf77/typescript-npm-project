@@ -1,5 +1,6 @@
 import { Morphi } from 'morphi/browser';
 import { Component, OnInit, Input } from '@angular/core';
+import * as _ from 'lodash';
 
 // formly
 import { FieldType } from '@ngx-formly/core';
@@ -32,6 +33,10 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
     } else {
       await this.process.start();
     }
+  }
+
+  isNumber(v) {
+    return _.isNumber(v);
   }
 
 

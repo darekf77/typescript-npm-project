@@ -5,10 +5,10 @@
         {{process && process.name}}
       </mat-panel-title>
       <mat-panel-description>
-        Type your name and age
+        {{ (process && process.progress && isNumber(process.progress.value)) ? (process.progress.value + '%'): '-'  }}
       </mat-panel-description>
     </mat-expansion-panel-header>
-
+    <code>{{process && process.cmd}}</code>
     <app-button-icon [icon]="icon"
                      (action)="action()"
                      [label]="label"></app-button-icon>

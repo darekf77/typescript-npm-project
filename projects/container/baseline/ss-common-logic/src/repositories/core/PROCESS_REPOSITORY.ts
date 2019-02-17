@@ -1,10 +1,14 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
 
-import { run, TnpDB, killProcess } from 'tnp-bundle';
+import { run, TnpDB, killProcess, Project } from 'tnp-bundle';
 import * as child from 'child_process';
 import { Morphi } from 'morphi';
+import * as  psList from 'ps-list';
+import { PsListInfo } from 'tnp-bundle'
 import { PROCESS } from '../../entities/core/PROCESS';
 import { config } from 'tnp-bundle';
 
@@ -22,45 +26,74 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   globalAliases: (keyof PROCESS_ALIASES)[] = ['process', 'processes']
 
 
-  async start(process: PROCESS): Promise<PROCESS> {
 
-    const db = await TnpDB.Instance;
+  async start(proc: PROCESS): Promise<PROCESS> {
 
+    rimraf.sync(proc.stdoutLogPath)
+    rimraf.sync(proc.stderLogPath)
+    rimraf.sync(proc.exitCodePath)
 
-    let p = run(process.cmd, {
-      biggerBuffer: true,
-      output: false
-    }).async()
-    process.pid = p.pid;
+    if (proc.isSync) {
 
-    fse.writeFileSync(process.stdoutLogPath, '');
-    fse.writeFileSync(process.stderLogPath, '');
+      try {
+        var stdout = child.execSync(proc.cmd, { cwd: proc.cwd})
+        fse.writeFileSync(proc.exitCodePath, (0).toString())
+      } catch (err) {
+        fse.writeFileSync(proc.exitCodePath, (((err && _.isNumber(err.status)) ? err.status : 1)).toString())
+        var stderr = err;
+      }
 
+      fse.writeFileSync(proc.stdoutLogPath, !stdout ? '' : stdout);
+      fse.writeFileSync(proc.stderLogPath, !stderr ? '' : stderr);
+    } else {
+      var p = run(proc.cmd, { cwd: proc.cwd, output: false }).async()
+
+      proc.pid = p.pid;
+      proc.previousPid = p.pid;
+
+      await this.update(proc.id, proc);
+      fse.writeFileSync(proc.stdoutLogPath, '');
+      fse.writeFileSync(proc.stderLogPath, '');
+      this.attach(p, proc)
+    }
+
+    return proc;
+  }
+
+  attach(p: child.ChildProcess, proc: PROCESS, resolve?: (any?) => any) {
     this.attachListeners(p, {
       msgAction: (chunk) => {
-        fse.appendFileSync(process.stdoutLogPath, chunk)
-        Morphi.Realtime.Server.TrigggerEntityChanges(process)
+        console.log('MSG:', chunk)
+        fse.appendFileSync(proc.stdoutLogPath, chunk)
+        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
       },
       errorAction: (chunk) => {
-        fse.appendFileSync(process.stderLogPath, chunk)
-        Morphi.Realtime.Server.TrigggerEntityChanges(process)
+        console.log('ERR:', chunk)
+        fse.appendFileSync(proc.stderLogPath, chunk)
+        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
       },
-      endAction: async () => {
-        Morphi.Realtime.Server.TrigggerEntityChanges(process)
+      endAction: async (exitCode) => {
+        console.log('END:')
+        proc = await this.findOne(proc.id)
+        proc.pid = void 0;
+        fse.writeFileSync(proc.exitCodePath, exitCode.toString())
+        await this.update(proc.id, proc);
+        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
+
+        if (_.isFunction(resolve)) {
+          resolve(proc)
+        }
       }
     })
-
-    return process;
   }
 
 
   async stop(process: PROCESS): Promise<PROCESS> {
     try {
       killProcess(process.pid)
-    } catch (error) {
-
-    }
+    } catch (error) { }
     process.pid = void 0;
+    await this.update(process.id, process);
     return process;
   }
 
@@ -91,8 +124,29 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
 
     childProcess.on('exit', (exit, signal) => {
       endAction(exit);
-      childProcess.removeAllListeners();
+      // childProcess.removeAllListeners();
     })
+
+  }
+
+
+  async updateActive(processOrProcesses: PROCESS | PROCESS[], activeProcesses?: PsListInfo[]) {
+    if (_.isUndefined(activeProcesses)) {
+      activeProcesses = await psList()
+    }
+
+    if (_.isArray(processOrProcesses)) {
+      for (let index = 0; index < processOrProcesses.length; index++) {
+        const p = processOrProcesses[index];
+        await this.updateActive(p, activeProcesses);
+      }
+      return;
+    }
+    let p = processOrProcesses as PROCESS;
+    if (_.isNumber(p.pid) && !activeProcesses.find(ap => ap.pid == p.pid)) {
+      p.pid = undefined;
+      await this.update(p.id, p);
+    }
 
   }
 

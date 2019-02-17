@@ -1,34 +1,25 @@
-import { Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { CLASSNAME } from 'ng2-rest';
 import * as _ from 'lodash';
+import { CLASS } from 'typescript-class-helpers';
 
-export type ProgressBarStatus = 'notstarted' | 'inprogress' | 'complete' | 'error';
-
-export type ProgressBarType = 'determinate' | 'indeterminate' | 'buffer' | 'query';
-
-
-
-export interface IPROGRESS_BAR_DATA {
+export interface IPROGRESS_DATA {
   /**
    * How man percent of
    */
   value?: number;
-  status: ProgressBarStatus;
-  info: string;
+  msg?: string;
   date?: Date;
 }
 
 
-export class PROGRESS_BAR_DATA implements IPROGRESS_BAR_DATA {
+@CLASS.NAME('PROGRESS_DATA')
+export class PROGRESS_DATA implements IPROGRESS_DATA {
 
-  public static log(log: IPROGRESS_BAR_DATA) {
-    console.log(`[[[${JSON.stringify({ value: log.value, info: log.info, status: log.status })}]]]`)
+  public static log(log: IPROGRESS_DATA) {
+    console.log(`[[[${JSON.stringify({ value: log.value, msg: log.msg, date: new Date() } as IPROGRESS_DATA)}]]]`)
   }
 
-  @PrimaryGeneratedColumn()
-  id: number;
 
-  public static resolveFrom(chunk: string, callbackOnFounded: (json: PROGRESS_BAR_DATA) => any, checkSplit = true) {
+  public static resolveFrom(chunk: string, callbackOnFounded: (json: PROGRESS_DATA) => any, checkSplit = true) {
     let progress;
 
     if (!_.isString(chunk)) {
@@ -54,7 +45,7 @@ export class PROGRESS_BAR_DATA implements IPROGRESS_BAR_DATA {
     if (!_.isUndefined(progress)) {
       try {
         const p = JSON.parse(progress);
-        const res = _.merge(new PROGRESS_BAR_DATA(), p);
+        const res = _.merge(new PROGRESS_DATA(), p);
         callbackOnFounded(res);
       } catch (error) {
         console.error(`ProgresssBarData: fail to parse "${progress}"`)
@@ -62,31 +53,9 @@ export class PROGRESS_BAR_DATA implements IPROGRESS_BAR_DATA {
     }
   }
 
-  public value: number = 0;
-  public status: ProgressBarStatus = 'notstarted';
-  public info: string = '';
+  public value: number;
+  public msg: string;
   public date: Date;
-
-
-  get html() {
-    if (this.status) {
-      if (this.status === 'error') {
-        return `<strong class="color-red" >${this.info}&nbsp;<span>${this.date}</span></strong>`
-      } else if (this.status === 'complete') {
-        return `<strong class="color-green" >${this.info}&nbsp;<span>${this.date}</span></strong>`
-      } else if (this.status === 'inprogress') {
-        return `<span class="color-blue" >${this.info}&nbsp;<span>${this.date}</span></span>`
-      }
-    }
-    return `
-        <span class="color-muted"   >  -- process not stated -- </span>
-      `
-  }
-
-
-  toString = () => {
-    return `Progress: ${this.value}  ${this.info ? (' - ' + this.info) : ''}`;
-  }
 
 
 }

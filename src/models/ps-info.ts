@@ -1,4 +1,3 @@
-//#region @backend
 export interface PsListInfo {
   pid: number;
   ppid: number;
@@ -8,4 +7,3 @@ export interface PsListInfo {
   cmd: string;
 
 }
-//#endregion

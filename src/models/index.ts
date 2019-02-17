@@ -5,6 +5,7 @@ export * from './lib-type';
 export * from './environment-name';
 export * from './env-config';
 export * from './ipackage-json';
+export * from './ps-info';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
