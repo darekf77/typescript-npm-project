@@ -1,4 +1,4 @@
-<p [attr.disabled]="!process" >
+<p [attr.disabled]="!process">
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -28,15 +28,24 @@
                   [contentComponent]="popupContent"></standalone-popup>
 
 <ng-template #popupContent>
-  <mat-tab-group style="height: 300px">
-    <mat-tab label="Info Messages"  #scrollMsg >
-      <app-process-info-message  [model]="model"(changes)="scrollToBottom()" ></app-process-info-message>
+  <mat-tab-group>
+    <mat-tab label="Info Messages">
+
+      <app-process-info-message [model]="model"
+                                [changes]="changesSubject"></app-process-info-message>
+
     </mat-tab>
-    <mat-tab label="Console Output" #scrollStdout >
-      <app-process-console-info [model]="model" ></app-process-console-info>
+    <mat-tab label="Console Output">
+      <div #scrollStdout
+           class="wrap-tabs">
+        <app-process-console-info [model]="model"></app-process-console-info>
+      </div>
     </mat-tab>
-    <mat-tab label="Console Errors" #scrollStder >
-      <app-process-console-info [model]="model" outputType='stder'  ></app-process-console-info>
+    <mat-tab label="Console Errors">
+      <div #scrollStder
+           class="wrap-tabs">
+        <app-process-console-info [model]="model"></app-process-console-info>
+      </div>
     </mat-tab>
   </mat-tab-group>
 </ng-template>

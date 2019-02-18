@@ -16,7 +16,6 @@ export class ProcessConsoleInfoComponent implements OnInit {
   @Input() public model: PROCESS;
 
 
-
   constructor() { }
 
   ngOnInit() {

@@ -92,12 +92,19 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   async stop(proc: PROCESS) {
     try {
       child.execSync(`pkill -9 -P ${proc.pid}`)
-      child.execSync(`kill -9 ${proc.pid}`)
-
-      console.log(`Process killed successfully on pid ${proc.pid}`)
-    } catch (error) {
-      console.log(`Process NOT KILLED on pid ${proc.pid}`)
+      console.log(`Process (pid: ${proc.pid}) childs killed successfully`)
+    } catch (err) {
+      console.log(err)
+      console.log(`Process (pid: ${proc.pid}) childs NOT KILLED ${proc.pid}`)
     }
+
+    try {
+      child.execSync(`kill -9 ${proc.pid}`)
+      console.log(`Process (pid: ${proc.pid}) killed successfully`)
+    } catch (error) {
+      console.log(`Process (pid: ${proc.pid}) NOT KILLED`)
+    }
+
     proc.pid = void 0;
     await this.update(proc.id, proc);
   }

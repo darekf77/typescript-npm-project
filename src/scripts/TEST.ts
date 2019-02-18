@@ -39,7 +39,7 @@ function SHOW_LOOP_MESSAGES(c = 0, maximum = Infinity, errExit = false) {
   PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 })
   setTimeout(() => {
     SHOW_LOOP_MESSAGES(++c, maximum, errExit)
-  }, 1000)
+  }, 3000)
 }
 
 export default {

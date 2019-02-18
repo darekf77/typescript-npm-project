@@ -201,15 +201,20 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return this._files('exitCodePath', 'exitcode')
   }
 
-  async start() {
+  async start(changesToModel?: () => void) {
     let data = await this.ctrl.start(this.id).received;
     _.merge(this, data.body.json);
-
+    if (_.isFunction(changesToModel)) {
+      changesToModel()
+    }
     if (!this.isSync) {
       Morphi.Realtime.Browser.SubscribeEntityChanges(this, async () => {
         console.log('entity should be updated !')
         data = await this.ctrl.getBy(this.id).received;
         _.merge(this, data.body.json);
+        if (_.isFunction(changesToModel)) {
+          changesToModel()
+        }
         const state = data.body.json.state
         if (state === 'exitedWithError' || state === 'exitedWithSuccess') {
           Morphi.Realtime.Browser.UnsubscribeEntityChanges(this);

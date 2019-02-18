@@ -8,6 +8,9 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities';
 // logger
 import { Log, Level } from 'ng2-logger/browser';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 const log = Log.create('process loger');
 
 @Morphi.Formly.RegisterComponentForEntity(PROCESS)
@@ -18,31 +21,6 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
 
-  @ViewChild('scrollStdout') private scrollStdout: ElementRef;
-  @ViewChild('scrollStder') private scrollStder: ElementRef;
-
-  @ViewChild('scrollMsg') private scrollMsg: ElementRef;
-
-
-
-  scrollToBottom(): void {
-    try {
-      if(this.scrollStdout) {
-        this.scrollStdout.nativeElement.scrollTop = this.scrollStdout.nativeElement.scrollHeight;
-      }
-
-      if(this.scrollStder) {
-        this.scrollStder.nativeElement.scrollTop = this.scrollStder.nativeElement.scrollHeight;
-      }
-
-      if(this.scrollMsg) {
-        this.scrollMsg.nativeElement.scrollTop = this.scrollMsg.nativeElement.scrollHeight;
-      }
-
-    } catch (err) { }
-  }
-
-
   @Input() public model: PROCESS;
 
   isOpen = false;
@@ -50,11 +28,15 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
     return this.model;
   }
 
+  changesSubject = new BehaviorSubject(void 0);
+  changes = this.changesSubject.asObservable()
   async action() {
     if (this.process.state === 'running') {
       await this.process.stop();
     } else {
-      await this.process.start();
+      await this.process.start(() => {
+        this.changesSubject.next(void 0)
+      });
     }
   }
 
@@ -124,7 +106,9 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
 
   pinned = false;
   ngOnInit() {
-
+    this.changes.subscribe(()=> {
+      console.log("HELLOOOO")
+    })
     this.pinned = _.isString(localStorage.getItem(this.nameForLC));
     this.isOpen = this.pinned;
     console.log(`should be piinned ${this.process && this.process.id}`, this.pinned)
