@@ -14,6 +14,13 @@ export class PopupComponent implements AfterViewInit {
 
   @Input() public title: string;
 
+  @Input() public pinned = false;
+
+  changePinned(e) {
+    console.log('pinned', e.target.checked)
+    this.parent.pin(e.target.checked)
+  }
+
   closePopup(): void {
     this.parent.close();
   }
@@ -39,7 +46,7 @@ export class PopupComponent implements AfterViewInit {
         // }
       );
 
-    }, 500);
+    });
 
   }
 

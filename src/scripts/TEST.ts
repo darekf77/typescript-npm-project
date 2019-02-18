@@ -4,6 +4,7 @@ import { getLinesFromFiles } from "../helpers";
 import { Project } from '../project';
 import { init } from './INIT';
 import { run } from '../process';
+import { PROGRESS_DATA } from '../progress-output';
 
 function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {
@@ -20,6 +21,24 @@ function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
   console.log(`counter: ${c}`)
   setTimeout(() => {
     SHOW_LOOP(++c, maximum, errExit)
+  }, 1000)
+}
+
+function SHOW_LOOP_MESSAGES(c = 0, maximum = Infinity, errExit = false) {
+  if (_.isString(c)) {
+    var { max = Infinity, err = false } = require('minimist')(c.split(' '));
+    maximum = _.isNumber(max) ? max : Infinity;
+    errExit = err;
+    // console.log('max',max)
+    // console.log('err',err)
+    c = 0
+  }
+  if (c === maximum) {
+    process.exit(errExit ? 1 : 0)
+  }
+  PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 })
+  setTimeout(() => {
+    SHOW_LOOP_MESSAGES(++c, maximum, errExit)
   }, 1000)
 }
 
@@ -53,8 +72,8 @@ export default {
     p.stdout.on('data', (chunk) => {
       console.log('prod:' + chunk)
     })
-    p.on('exit',(c)=> {
-      console.log('process exited with code: '+ c)
+    p.on('exit', (c) => {
+      console.log('process exited with code: ' + c)
       process.exit(0)
     })
   },
@@ -70,7 +89,25 @@ export default {
     }
   },
 
-  SHOW_LOOP
+
+  SHOW_LOOP: (args) => {
+    console.log('process pid', process.pid)
+    console.log('process ppid', process.ppid)
+    // process.on('SIGTERM', () => {
+    //   process.exit(0)
+    // })
+    SHOW_LOOP(args)
+  },
+
+  SHOW_LOOP_MESSAGES: (args) => {
+    console.log('process pid', process.pid)
+    console.log('process ppid', process.ppid)
+    // process.on('SIGTERM', () => {
+    //   process.exit(0)
+    // })
+    SHOW_LOOP_MESSAGES(args)
+  }
+
 
 }
 //#endregion

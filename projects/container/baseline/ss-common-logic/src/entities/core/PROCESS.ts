@@ -74,10 +74,10 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     this.name = options && options.name;
     this.cmd = options && options.cmd;
     this.cwd = options && options.cwd;
-    if(options && _.isBoolean(options.async)) {
+    if (options && _.isBoolean(options.async)) {
       this.isSync = !options.async;
     }
-    if(!this.cwd) {
+    if (!this.cwd) {
       this.cwd = process.cwd()
     }
   }
@@ -119,6 +119,12 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   pid: number = undefined;
 
 
+  // //#region @backend
+  // @Morphi.Orm.Column.Custom('bigint', { nullable: true })
+  // //#endregion
+  // ppid: number = undefined;
+
+
   //#region @backend
   @Morphi.Orm.Column.Custom('bigint', { nullable: true })
   //#endregion
@@ -127,7 +133,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   private _files(propertyName: string, surfix: string) {
     if (Morphi.IsBrowser) {
-      return this.browser[propertyName]
+      return this.browser && this.browser[propertyName]
     }
     //#region @backend
     const p = path.join(Project.Tnp.location, 'tmp-processes-logs', `${this.id}.${surfix}.txt`);
@@ -138,17 +144,16 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     //#endregion
   }
 
-  private __readLog(propertyName: 'stdoutLog' | 'stderLog' | 'exitCode'):string {
+  private __readLog(propertyName: 'stdoutLog' | 'stderLog' | 'exitCode'): string {
     if (Morphi.IsBrowser) {
-      return this.browser[propertyName] as any;
+      return this.browser && this.browser[propertyName] as any;
     }
     //#region @backend
     const p = this[`${propertyName}Path`]
     if (!fse.existsSync(p)) {
-      console.log(`path not exit`, p)
       return
     }
-    return fse.readFileSync(p, 'utf8').toString();
+    return fse.readFileSync(p, 'utf8').toString()
     //#endregion
   }
 
@@ -160,9 +165,19 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   }
 
   get allProgressData(): PROGRESS_DATA[] {
-    return []
+    return PROGRESS_DATA.resolveFrom(this.stdoutLog)
+      .concat(PROGRESS_DATA.resolveFrom(this.stderLog))
   }
 
+  get stder() {
+    let res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
+    return res;
+  }
+
+  get stdout() {
+    let res = _.isString(this.stdoutLog) ? this.stdoutLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
+    return res;
+  }
 
   get stdoutLog() {
     return this.__readLog('stdoutLog');
@@ -189,11 +204,24 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   async start() {
     let data = await this.ctrl.start(this.id).received;
     _.merge(this, data.body.json);
+
+    if (!this.isSync) {
+      Morphi.Realtime.Browser.SubscribeEntityChanges(this, async () => {
+        console.log('entity should be updated !')
+        data = await this.ctrl.getBy(this.id).received;
+        _.merge(this, data.body.json);
+        const state = data.body.json.state
+        if (state === 'exitedWithError' || state === 'exitedWithSuccess') {
+          Morphi.Realtime.Browser.UnsubscribeEntityChanges(this);
+        }
+      })
+    }
+
   }
 
   async stop() {
-    let data = await this.ctrl.stop(this.id).received;
-    _.merge(this, data.body.json);
+    await this.ctrl.stop(this.id).received;
+
   }
 
   get context() {

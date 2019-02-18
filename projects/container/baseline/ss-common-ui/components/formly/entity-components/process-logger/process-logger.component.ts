@@ -18,11 +18,9 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
 
-  public static ids = 0;
   @Input() public model: PROCESS;
-  private num: number;
+
   isOpen = false;
-  inited = false;
   get process() {
     return this.model;
   }
@@ -70,23 +68,41 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
   reset() {
     this.isOpen = false;
     setTimeout(() => {
-      this.num = ProcessLoggerComponent.ids++;
       this.isOpen = true;
     });
   }
 
   onClose() {
     this.isOpen = false;
+    localStorage.removeItem(this.nameForLC)
+  }
+
+  get nameForLC() {
+    return `pinProcess${this.process.id}`;
+  }
+
+  onPin(value: boolean) {
+    if (value) {
+      localStorage.setItem(this.nameForLC, 'true')
+    } else {
+      localStorage.removeItem(this.nameForLC)
+    }
   }
 
   constructor() {
     super();
-    this.num = ProcessLoggerComponent.ids++;
   }
 
+  get id() {
+    return !!this.process && `process${this.process && this.process.id}`
+  }
 
+  pinned = false;
   ngOnInit() {
-    this.inited = true;
+
+    this.pinned = _.isString(localStorage.getItem(this.nameForLC));
+    this.isOpen = this.pinned;
+    console.log(`should be piinned ${this.process && this.process.id}`, this.pinned)
     // log.i('this.formControl.value', this.formControl.value);
   }
 

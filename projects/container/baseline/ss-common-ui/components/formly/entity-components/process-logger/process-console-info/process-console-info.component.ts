@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
 
 @Component({
   selector: 'app-process-console-info',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ProcessConsoleInfoComponent implements OnInit {
 
+  @Input() public outputType: 'stdout' | 'stder' = 'stdout'
+  @Input() public model: PROCESS;
+
   constructor() { }
 
   ngOnInit() {
+
   }
 
 }

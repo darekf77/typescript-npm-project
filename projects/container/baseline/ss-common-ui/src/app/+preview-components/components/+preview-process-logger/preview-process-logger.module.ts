@@ -18,10 +18,10 @@ const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic
 
 Morphi.init({
   host,
+  hostSocket: ENV.name === 'local' && host,
   controllers: [ProcessController],
   entities: [PROCESS]
 });
-
 
 const angularModules = [
   CommonModule,

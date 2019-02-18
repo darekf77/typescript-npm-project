@@ -7,8 +7,11 @@ export interface IPROGRESS_DATA {
    */
   value?: number;
   msg?: string;
+  type?: PROGRESS_DATA_TYPE;
   date?: Date;
 }
+
+export type PROGRESS_DATA_TYPE = 'info' | 'error' | 'warning' | 'event';
 
 
 @CLASS.NAME('PROGRESS_DATA')
@@ -19,11 +22,13 @@ export class PROGRESS_DATA implements IPROGRESS_DATA {
   }
 
 
-  public static resolveFrom(chunk: string, callbackOnFounded: (json: PROGRESS_DATA) => any, checkSplit = true) {
-    let progress;
+  public static resolveFrom(chunk: string,
+    callbackOnFounded?: (json: PROGRESS_DATA) => any, checkSplit = true): PROGRESS_DATA[] {
 
+    let progress;
+    let res: PROGRESS_DATA[] = [];
     if (!_.isString(chunk)) {
-      return;
+      return [];
     }
     chunk = chunk.trim();
 
@@ -32,9 +37,9 @@ export class PROGRESS_DATA implements IPROGRESS_DATA {
       if (split.length > 1) {
         // console.log('split founded', split)
         split.forEach(s => {
-          this.resolveFrom(s, callbackOnFounded, false)
-        })
-        return
+          res = res.concat(this.resolveFrom(s, callbackOnFounded, false));
+        });
+        return res;
       }
     }
 
@@ -45,16 +50,24 @@ export class PROGRESS_DATA implements IPROGRESS_DATA {
     if (!_.isUndefined(progress)) {
       try {
         const p = JSON.parse(progress);
-        const res = _.merge(new PROGRESS_DATA(), p);
-        callbackOnFounded(res);
-      } catch (error) {
+        const single = _.merge(new PROGRESS_DATA(), p);
+        res = res.concat([single])
+        if (_.isFunction(callbackOnFounded)) {
+          callbackOnFounded(single);
+        }
+      } catch (err) {
+        console.log(err)
         console.error(`ProgresssBarData: fail to parse "${progress}"`)
       }
     }
+    return res;
   }
 
   public value: number;
   public msg: string;
+
+  public type: PROGRESS_DATA_TYPE = 'event'
+
   public date: Date;
 
 

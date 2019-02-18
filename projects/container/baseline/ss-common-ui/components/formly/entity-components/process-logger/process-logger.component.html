@@ -19,15 +19,24 @@
   </mat-expansion-panel>
 
 </p>
-<standalone-popup [id]="num"
+<standalone-popup [id]="id"
                   [title]="title"
+                  [pinned]="pinned"
                   (close)="onClose()"
-                  *ngIf="isOpen"
+                  (pin)="onPin($event)"
+                  *ngIf="process && isOpen"
                   [contentComponent]="popupContent"></standalone-popup>
 
 <ng-template #popupContent>
-  <mat-tab-group>
-    <mat-tab label="Info">Content 1</mat-tab>
-    <mat-tab label="Console output">Content 2</mat-tab>
+  <mat-tab-group style="height: 300px">
+    <mat-tab label="Info Messages">
+      <app-process-info-message  [model]="model" ></app-process-info-message>
+    </mat-tab>
+    <mat-tab label="Console Output">
+      <app-process-console-info [model]="model" ></app-process-console-info>
+    </mat-tab>
+    <mat-tab label="Console Errors">
+      <app-process-console-info [model]="model" outputType='stder' ></app-process-console-info>
+    </mat-tab>
   </mat-tab-group>
 </ng-template>

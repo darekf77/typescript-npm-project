@@ -21,7 +21,10 @@ export class StandalonePopupComponent implements OnInit, AfterContentInit, OnDes
   @Input() public id: string;
   @Input() public title = ''
 
+  @Input() public pinned = false;
+
   @Output() public close = new EventEmitter();
+  @Output() public pin = new EventEmitter();
 
   constructor(
     private viewContainerRef: ViewContainerRef,
@@ -34,23 +37,34 @@ export class StandalonePopupComponent implements OnInit, AfterContentInit, OnDes
     this.controller = new PopupControler(this.viewContainerRef,
       this.componentFactoryResolver,
       this.id,
-      this.title);
-    this.controller.setContentComponent(this.contentComponent);
+      this.title,
+      this.pinned);
+    if (!this.controller.setContentComponent(this.contentComponent)) {
+      return
+    }
     this.controller.reinitPos();
     this.controller.onClose = this.close;
+    this.controller.onPin = this.pin;
+    StandalonePopupComponent.existed[this.id] = this.controller;
   }
 
   ngOnInit() {
 
   }
-
+  static existed = {}
   ngAfterContentInit() {
-    setTimeout(() => {
-      this.initPopup();
-    });
+    if (StandalonePopupComponent.existed[this.id]) {
+      // this.controller = StandalonePopupComponent.existed[this.id]
+    } else {
+      setTimeout(() => {
+        this.initPopup();
+      });
+    }
+
   }
 
   ngOnDestroy() {
+    StandalonePopupComponent.existed = {}
     this.handlers.forEach(h => h.unsubscribe());
   }
 

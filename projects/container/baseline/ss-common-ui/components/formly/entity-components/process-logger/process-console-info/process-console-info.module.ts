@@ -6,6 +6,9 @@ import { ProcessConsoleInfoComponent } from './process-console-info.component';
   imports: [
     CommonModule
   ],
+  exports: [
+    ProcessConsoleInfoComponent
+  ],
   declarations: [ProcessConsoleInfoComponent]
 })
 export class ProcessConsoleInfoModule { }

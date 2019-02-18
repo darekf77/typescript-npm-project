@@ -13,6 +13,8 @@ export class PopupControler {
   private static ids = 0;
   public onClose: EventEmitter<any>;
 
+  public onPin: EventEmitter<any>;
+
   private bodyHtml: HTMLElement;
 
   modalZIndex = 10000;
@@ -21,9 +23,10 @@ export class PopupControler {
   constructor(private viewContainerRef: ViewContainerRef,
     private componentFactoryResolver: ComponentFactoryResolver,
     id?: string,
-    private title?: string
+    private title?: string,
+    private pinned = false
   ) {
-    if (!_.isNumber(id)) {
+    if (_.isUndefined(id)) {
       this.id = `${PopupControler.ids++}inside`;
     } else {
       this.id = id;
@@ -51,9 +54,15 @@ export class PopupControler {
     popupRef.instance.parent = this;
     popupRef.instance.template = component;
     popupRef.instance.title = this.title;
+    popupRef.instance.pinned = this.pinned;
 
     if (this.bodyHtml == null) {
-      this.bodyHtml = this.getBody(popupRef.location.nativeElement);
+      try {
+        this.bodyHtml = this.getBody(popupRef.location.nativeElement);
+      } catch (e) {
+        return;
+      }
+
     }
     pInfo.popup = popupRef;
     this.findPopupWrapperAndContent(pInfo.popup.location.nativeElement, pInfo);
@@ -65,10 +74,16 @@ export class PopupControler {
     this.centerPositioning(pInfo.wrapper);
     return popupRef;
   }
+
+  public pin = (value) => {
+    if (this.onClose.observers.length > 0) {
+      this.onPin.next(value)
+    }
+  }
+
   public close = () => {
     if (this.onClose.observers.length > 0) {
       this.onClose.next();
-    } else {
       if (this.popupQueue.length > 0) {
         const popup = this.popupQueue.pop();
         HTMLElementUtil.RemoveElement(popup.popup.location.nativeElement);

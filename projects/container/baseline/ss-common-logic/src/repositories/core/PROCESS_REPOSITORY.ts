@@ -36,7 +36,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
     if (proc.isSync) {
 
       try {
-        var stdout = child.execSync(proc.cmd, { cwd: proc.cwd})
+        var stdout = child.execSync(proc.cmd, { cwd: proc.cwd })
         fse.writeFileSync(proc.exitCodePath, (0).toString())
       } catch (err) {
         fse.writeFileSync(proc.exitCodePath, (((err && _.isNumber(err.status)) ? err.status : 1)).toString())
@@ -47,7 +47,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
       fse.writeFileSync(proc.stderLogPath, !stderr ? '' : stderr);
     } else {
       var p = run(proc.cmd, { cwd: proc.cwd, output: false }).async()
-
+      // console.log(`PROCESS STARTED ON PID: ${p.pid}`)
       proc.pid = p.pid;
       proc.previousPid = p.pid;
 
@@ -61,24 +61,25 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   }
 
   attach(p: child.ChildProcess, proc: PROCESS, resolve?: (any?) => any) {
+
     this.attachListeners(p, {
       msgAction: (chunk) => {
-        console.log('MSG:', chunk)
+        // console.log('MSG:', chunk)
         fse.appendFileSync(proc.stdoutLogPath, chunk)
-        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
+        Morphi.Realtime.Server.TrigggerEntityChanges(proc)
       },
       errorAction: (chunk) => {
-        console.log('ERR:', chunk)
+        // console.log('ERR:', chunk)
         fse.appendFileSync(proc.stderLogPath, chunk)
-        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
+        Morphi.Realtime.Server.TrigggerEntityChanges(proc)
       },
       endAction: async (exitCode) => {
-        console.log('END:')
+        // console.log('END:')
         proc = await this.findOne(proc.id)
         proc.pid = void 0;
-        fse.writeFileSync(proc.exitCodePath, exitCode.toString())
+        fse.writeFileSync(proc.exitCodePath, ( _.isNumber(exitCode) ? exitCode : '-111'))
         await this.update(proc.id, proc);
-        // Morphi.Realtime.Server.TrigggerEntityChanges(process)
+        Morphi.Realtime.Server.TrigggerEntityChanges(proc)
 
         if (_.isFunction(resolve)) {
           resolve(proc)
@@ -88,13 +89,17 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   }
 
 
-  async stop(process: PROCESS): Promise<PROCESS> {
+  async stop(proc: PROCESS) {
     try {
-      killProcess(process.pid)
-    } catch (error) { }
-    process.pid = void 0;
-    await this.update(process.id, process);
-    return process;
+      child.execSync(`pkill -9 -P ${proc.pid}`)
+      child.execSync(`kill -9 ${proc.pid}`)
+
+      console.log(`Process killed successfully on pid ${proc.pid}`)
+    } catch (error) {
+      console.log(`Process NOT KILLED on pid ${proc.pid}`)
+    }
+    proc.pid = void 0;
+    await this.update(proc.id, proc);
   }
 
 
