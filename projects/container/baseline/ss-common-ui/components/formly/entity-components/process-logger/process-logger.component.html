@@ -29,14 +29,14 @@
 
 <ng-template #popupContent>
   <mat-tab-group style="height: 300px">
-    <mat-tab label="Info Messages">
-      <app-process-info-message  [model]="model" ></app-process-info-message>
+    <mat-tab label="Info Messages"  #scrollMsg >
+      <app-process-info-message  [model]="model"(changes)="scrollToBottom()" ></app-process-info-message>
     </mat-tab>
-    <mat-tab label="Console Output">
+    <mat-tab label="Console Output" #scrollStdout >
       <app-process-console-info [model]="model" ></app-process-console-info>
     </mat-tab>
-    <mat-tab label="Console Errors">
-      <app-process-console-info [model]="model" outputType='stder' ></app-process-console-info>
+    <mat-tab label="Console Errors" #scrollStder >
+      <app-process-console-info [model]="model" outputType='stder'  ></app-process-console-info>
     </mat-tab>
   </mat-tab-group>
 </ng-template>

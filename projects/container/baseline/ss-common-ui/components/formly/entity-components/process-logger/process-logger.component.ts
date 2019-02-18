@@ -1,5 +1,5 @@
 import { Morphi } from 'morphi/browser';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges, SimpleChange } from '@angular/core';
 import * as _ from 'lodash';
 
 // formly
@@ -17,6 +17,31 @@ const log = Log.create('process loger');
   styleUrls: ['./process-logger.component.scss']
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit {
+
+  @ViewChild('scrollStdout') private scrollStdout: ElementRef;
+  @ViewChild('scrollStder') private scrollStder: ElementRef;
+
+  @ViewChild('scrollMsg') private scrollMsg: ElementRef;
+
+
+
+  scrollToBottom(): void {
+    try {
+      if(this.scrollStdout) {
+        this.scrollStdout.nativeElement.scrollTop = this.scrollStdout.nativeElement.scrollHeight;
+      }
+
+      if(this.scrollStder) {
+        this.scrollStder.nativeElement.scrollTop = this.scrollStder.nativeElement.scrollHeight;
+      }
+
+      if(this.scrollMsg) {
+        this.scrollMsg.nativeElement.scrollTop = this.scrollMsg.nativeElement.scrollHeight;
+      }
+
+    } catch (err) { }
+  }
+
 
   @Input() public model: PROCESS;
 
