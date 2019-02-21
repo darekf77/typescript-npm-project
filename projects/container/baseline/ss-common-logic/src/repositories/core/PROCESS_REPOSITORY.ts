@@ -89,7 +89,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   }
 
 
-  async stop(proc: PROCESS) {
+  async stop(proc: PROCESS): Promise<PROCESS> {
     try {
       child.execSync(`pkill -9 -P ${proc.pid}`)
       console.log(`Process (pid: ${proc.pid}) childs killed successfully`)
@@ -107,6 +107,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
 
     proc.pid = void 0;
     await this.update(proc.id, proc);
+    return proc;
   }
 
 

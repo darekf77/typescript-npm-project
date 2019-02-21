@@ -1,6 +1,7 @@
 :host {
     pointer-events: none;
     .popup-modal {
+        resize: vertical;
         position: fixed;
         top: 0px;
         left: 0px;

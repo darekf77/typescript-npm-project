@@ -14,6 +14,7 @@ import { Project, config } from 'tnp-bundle';
 import { CLASS } from 'typescript-class-helpers';
 export { Models } from 'ng2-rest/models'
 import { Models } from 'ng2-rest/models'
+import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 
 
 export interface IPROCESS extends PROCESS {
@@ -201,32 +202,49 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return this._files('exitCodePath', 'exitcode')
   }
 
-  async start(changesToModel?: () => void) {
+
+
+  // private static subject = {};
+  // static subscribeChangesFor(entity: { id: number; }) {
+  //   const { id } = entity;
+  //   if (PROCESS.subject[entity.id]) {
+  //     PROCESS.subject[entity.id] = new BehaviorSubject(void 0);
+
+  //     Morphi.Realtime.Browser.SubscribeEntityChanges(this, async () => {
+  //       console.log('entity should be updated !')
+  //       const data = await PROCESS.ctrl.getBy(id).received;
+
+  //       const state = data.body.json.state
+  //       if (state === 'exitedWithError' || state === 'exitedWithSuccess') {
+  //         Morphi.Realtime.Browser.UnsubscribeEntityChanges(entity);
+  //       }
+  //       ((PROCESS.subject[entity.id]) as BehaviorSubject<PROCESS>).next(data.body.json)
+  //     })
+  //   }
+  //   return PROCESS.subject[entity.id] as BehaviorSubject<PROCESS>;
+  // }
+
+  // static unsubscribeChangesFor(entity: { id: number; }) {
+  //   const subject = PROCESS.subject[entity.id] as BehaviorSubject<any>;
+  //   if (subject) {
+  //     subject.unsubscribe()
+  //   }
+  // }
+
+  // listenChanges(changesToModel?: () => void) {
+  //   console.log('UPDATE CALLED!')
+
+
+  // }
+
+  async start() {
     let data = await this.ctrl.start(this.id).received;
     _.merge(this, data.body.json);
-    if (_.isFunction(changesToModel)) {
-      changesToModel()
-    }
-    if (!this.isSync) {
-      Morphi.Realtime.Browser.SubscribeEntityChanges(this, async () => {
-        console.log('entity should be updated !')
-        data = await this.ctrl.getBy(this.id).received;
-        _.merge(this, data.body.json);
-        if (_.isFunction(changesToModel)) {
-          changesToModel()
-        }
-        const state = data.body.json.state
-        if (state === 'exitedWithError' || state === 'exitedWithSuccess') {
-          Morphi.Realtime.Browser.UnsubscribeEntityChanges(this);
-        }
-      })
-    }
-
   }
 
   async stop() {
-    await this.ctrl.stop(this.id).received;
-
+    let data = await this.ctrl.stop(this.id).received;
+    _.merge(this, data.body.json);
   }
 
   get context() {

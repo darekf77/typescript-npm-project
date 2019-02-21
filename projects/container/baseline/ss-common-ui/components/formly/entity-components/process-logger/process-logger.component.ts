@@ -1,5 +1,9 @@
 import { Morphi } from 'morphi/browser';
-import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges, SimpleChange } from '@angular/core';
+import {
+  Component, OnInit, Input, ViewChild, ElementRef,
+  OnDestroy,
+  OnChanges, SimpleChange
+} from '@angular/core';
 import * as _ from 'lodash';
 
 // formly
@@ -11,6 +15,8 @@ import { Log, Level } from 'ng2-logger/browser';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { PROCESS_STATE } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+
 const log = Log.create('process loger');
 
 @Morphi.Formly.RegisterComponentForEntity(PROCESS)
@@ -19,7 +25,7 @@ const log = Log.create('process loger');
   templateUrl: './process-logger.component.html',
   styleUrls: ['./process-logger.component.scss']
 })
-export class ProcessLoggerComponent extends FieldType implements OnInit {
+export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
 
   @Input() public model: PROCESS;
 
@@ -28,16 +34,15 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
     return this.model;
   }
 
-  changesSubject = new BehaviorSubject(void 0);
-  changes = this.changesSubject.asObservable()
+  changes = new BehaviorSubject(void 0);
   async action() {
     if (this.process.state === 'running') {
       await this.process.stop();
     } else {
-      await this.process.start(() => {
-        this.changesSubject.next(void 0)
-      });
+      await this.process.start();
+      this.subscribe()
     }
+
   }
 
   isNumber(v) {
@@ -105,16 +110,34 @@ export class ProcessLoggerComponent extends FieldType implements OnInit {
   }
 
   pinned = false;
+
+
+  subscribe() {
+    if (!this.process.isSync) {
+      this.process.subscribeRealtimeUpdates({
+        condition: (proc) => {
+          return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
+            .includes(proc.state)
+        },
+        callback: () => {
+          this.changes.next(void 0)
+        }
+      })
+    }
+  }
+
   ngOnInit() {
-    this.changes.subscribe(()=> {
-      console.log("HELLOOOO")
-    })
+    log.i("ON INIT PROCESS")
     this.pinned = _.isString(localStorage.getItem(this.nameForLC));
     this.isOpen = this.pinned;
     console.log(`should be piinned ${this.process && this.process.id}`, this.pinned)
     // log.i('this.formControl.value', this.formControl.value);
+    this.subscribe()
   }
 
+  ngOnDestroy() {
+    this.model.unsubscribeRealtimeUpdates()
+  }
   onChange(v) {
     this.formControl.setValue(v);
     console.log(this.model);

@@ -42,10 +42,10 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
   }
 
   @Morphi.Http.GET('/stop/:id')
-  stop(@Morphi.Http.Param.Path('id') id: number): Morphi.Response<void> {
+  stop(@Morphi.Http.Param.Path('id') id: number): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id));
+      return (await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id)));
     }
     //#endregion
 
