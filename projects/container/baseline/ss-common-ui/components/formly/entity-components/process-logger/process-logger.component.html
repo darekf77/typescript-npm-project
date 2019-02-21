@@ -36,19 +36,16 @@
 
     </mat-tab>
     <mat-tab label="Console Output">
-      <div #scrollStdout
-           class="wrap-tabs">
-        <app-process-console-info [model]="model"
-                                  [changes]="changes"></app-process-console-info>
-      </div>
+
+      <app-process-console-info [model]="model"
+                                [changes]="changes"></app-process-console-info>
+
     </mat-tab>
     <mat-tab label="Console Errors">
-      <div #scrollStder
-           class="wrap-tabs">
-        <app-process-console-info [model]="model"
-                                  [changes]="changes"
-                                  outputType="stder" ></app-process-console-info>
-      </div>
+      <app-process-console-info [model]="model"
+                                [changes]="changes"
+                                outputType="stder"></app-process-console-info>
+
     </mat-tab>
   </mat-tab-group>
 </ng-template>

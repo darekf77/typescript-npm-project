@@ -15,6 +15,7 @@ import { ButtonIconModule } from '../../base-components';
 import { ProcessConsoleInfoModule } from './process-console-info/process-console-info.module';
 import { StandalonePopupModule } from '../../../ui-elements/standalone-popup';
 import { ProcessInfoMessageComponent } from './process-info-message/process-info-message.component';
+import { ResizeService } from '../../../helpers/resize-service';
 
 
 
@@ -57,6 +58,7 @@ const localComponents = [
   exports: [ProcessLoggerComponent, MomentModule],
   declarations: [
     ...localComponents
-  ]
+  ],
+  providers: [ResizeService]
 })
 export class ProcessLoggerModule { }

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
-  EventEmitter, Output, OnDestroy, AfterViewInit
+  EventEmitter, Output, OnDestroy, AfterViewInit, HostBinding, HostListener, NgZone, DoCheck
 } from '@angular/core';
 
 import { Log } from 'ng2-logger';
@@ -12,15 +12,17 @@ import { PROGRESS_DATA } from 'tnp-bundle/browser';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/observable/fromEvent';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { BaseComponent } from '../../../../helpers/base-component';
+import { ResizeService } from '../../../../helpers/resize-service';
 
 
 
 @Component({
   selector: 'app-process-info-message',
   templateUrl: './process-info-message.component.html',
-  styleUrls: ['./process-info-message.component.scss']
+  styleUrls: ['./process-info-message.component.scss'],
 })
 export class ProcessInfoMessageComponent extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -30,9 +32,17 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
   messPrev: number;
   messages = [];
 
-  constructor(private elemetRef: ElementRef) {
+  constructor(private elemetRef: ElementRef, public resizeService: ResizeService) {
     super()
+
   }
+
+
+  get lsKey() {
+    return `process-info-message-model-height-${this.model.id}`
+  }
+
+  @HostBinding('style.height.px') height: number = 300;
 
   scrollDown() {
     setTimeout(() => {
@@ -44,12 +54,25 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
   ngAfterViewInit() {
     this.messages = this.model.allProgressData;
-    this.scrollDown()
+    const savedHeight = Number(localStorage.getItem(this.lsKey));
+    // console.log('from local storage height', savedHeight)
+    setTimeout(()=>{
+      if (!isNaN(savedHeight)) {
+        this.height = savedHeight;
+      }
+      this.scrollDown()
+    })
   }
 
   handlers: Subscription[] = []
 
   ngOnInit() {
+
+    this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, (elem) => {
+      let height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
+      // console.log('set new height',height)
+      localStorage.setItem(this.lsKey, height.toString())
+    });
 
     this.handlers.push(this.changes.subscribe(() => {
       // console.log('CHANGES PROCESS INFO')
@@ -61,7 +84,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe())
-
+    this.resizeService.removeResizeEventListener(this.elemetRef.nativeElement)
   }
 
 }
