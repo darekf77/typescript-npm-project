@@ -167,17 +167,30 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return _.last(this.allProgressData);
   }
 
+  _allProgressData: PROGRESS_DATA[];
   get allProgressData(): PROGRESS_DATA[] {
+
+    if (_.isArray(this._allProgressData)) {
+      return this._allProgressData;
+    }
     return PROGRESS_DATA.resolveFrom(this.stdoutLog)
       .concat(PROGRESS_DATA.resolveFrom(this.stderLog))
   }
 
+  _stder: string;
   get stder() {
+    if (_.isString(this._stder)) {
+      return this._stder;
+    }
     let res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
     return res;
   }
 
+  _stdout: string;
   get stdout() {
+    if (_.isString(this._stdout)) {
+      return this._stdout;
+    }
     let res = _.isString(this.stdoutLog) ? this.stdoutLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
     return res;
   }

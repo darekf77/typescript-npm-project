@@ -28,9 +28,6 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
 
-  config = new ModelDataConfig<PROCESS>({
-    exclude: ['stderLogPath', 'stdoutLogPath', 'allProgressData']
-  })
   @Input() public model: PROCESS;
 
   isOpen = false;

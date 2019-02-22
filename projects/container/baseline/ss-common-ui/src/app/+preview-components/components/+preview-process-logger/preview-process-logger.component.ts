@@ -6,6 +6,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // local
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
 import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/ProcessController';
+import { ModelDataConfig } from 'morphi/browser';
 
 @Component({
   selector: 'app-preprocess-logger',
@@ -16,6 +17,10 @@ export class PreviewProcessLoggerComponent implements OnInit {
 
   model: PROCESS[];
 
+  config = new ModelDataConfig({
+    exclude: ['stderLogPath', 'stdoutLogPath', 'allProgressData']
+  })
+
   fields: FormlyFieldConfig[];
 
 
@@ -23,6 +28,7 @@ export class PreviewProcessLoggerComponent implements OnInit {
 
   async ngOnInit() {
     this.model = await PROCESS.getAll();
+    this.model.forEach(m => m.modelDataConfig = this.config)
     console.log('model', this.model);
   }
 
