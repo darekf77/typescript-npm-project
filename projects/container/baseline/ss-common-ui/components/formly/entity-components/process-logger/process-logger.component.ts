@@ -1,4 +1,4 @@
-import { Morphi } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi/browser';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
   OnDestroy,
@@ -16,6 +16,7 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { PROCESS_STATE } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+import { PROGRESS_DATA } from 'tnp-bundle/browser';
 
 const log = Log.create('process loger');
 
@@ -27,6 +28,9 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
 
+  config = new ModelDataConfig<PROCESS>({
+    exclude: ['stderLogPath', 'stdoutLogPath', 'allProgressData']
+  })
   @Input() public model: PROCESS;
 
   isOpen = false;
@@ -111,16 +115,28 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
 
   pinned = false;
 
+  updateCondition(proc: PROCESS) {
+    return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
+      .includes(proc.state)
+  }
 
   subscribe() {
     if (!this.process.isSync) {
+
+      const condition = (proc) => this.updateCondition(proc);
+
       this.process.subscribeRealtimeUpdates({
-        condition: (proc) => {
-          return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
-            .includes(proc.state)
-        },
+        condition,
         callback: () => {
           this.changes.next(void 0)
+        }
+      })
+
+      this.process.subscribeRealtimeUpdates<PROGRESS_DATA[]>({
+        condition,
+        property: 'allProgressData',
+        update: () => {
+          return this.model.ctrl.progressMessages(this.process.id, this.process.allProgressData.length).received
         }
       })
     }

@@ -28,6 +28,8 @@ export interface IPROCESS extends PROCESS {
 
   exitCode: number;
   exitCodePath: string;
+
+  allProgressData: PROGRESS_DATA[];
 }
 
 export type PROCESS_STATE =

@@ -67,19 +67,22 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
         // console.log('MSG:', chunk)
         fse.appendFileSync(proc.stdoutLogPath, chunk)
         Morphi.Realtime.Server.TrigggerEntityChanges(proc)
+        Morphi.Realtime.Server.TrigggerEntityPropertyChanges<PROCESS>(proc, ['stderLog', 'stdoutLog', 'allProgressData'])
       },
       errorAction: (chunk) => {
         // console.log('ERR:', chunk)
         fse.appendFileSync(proc.stderLogPath, chunk)
         Morphi.Realtime.Server.TrigggerEntityChanges(proc)
+        Morphi.Realtime.Server.TrigggerEntityPropertyChanges<PROCESS>(proc, ['stderLog', 'stdoutLog', 'allProgressData'])
       },
       endAction: async (exitCode) => {
         // console.log('END:')
         proc = await this.findOne(proc.id)
         proc.pid = void 0;
-        fse.writeFileSync(proc.exitCodePath, ( _.isNumber(exitCode) ? exitCode : '-111'))
+        fse.writeFileSync(proc.exitCodePath, (_.isNumber(exitCode) ? exitCode : '-111'))
         await this.update(proc.id, proc);
         Morphi.Realtime.Server.TrigggerEntityChanges(proc)
+        Morphi.Realtime.Server.TrigggerEntityPropertyChanges<PROCESS>(proc, ['stderLog', 'stdoutLog', 'allProgressData'])
 
         if (_.isFunction(resolve)) {
           resolve(proc)

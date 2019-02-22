@@ -11,6 +11,7 @@ import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
 //#endregion
 
+import { PROGRESS_DATA } from 'tnp-bundle'
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 import { PROCESS } from '../../entities/core/PROCESS';
@@ -50,6 +51,20 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#endregion
 
   }
+
+  @Morphi.Http.GET('/progress/:id')
+  progressMessages(
+    @Morphi.Http.Param.Path('id') id: number,
+    @Morphi.Http.Param.Query('alreadyInFE') alreadyInFE: number = 0): Morphi.Response<PROGRESS_DATA[]> {
+
+    //#region @backendFunc
+    return async () => {
+      let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
+      return res.allProgressData.slice(alreadyInFE)
+    }
+    //#endregion
+  }
+
 
   @Morphi.Http.GET()
   getAll(@Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS[]> {
