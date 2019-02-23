@@ -120,22 +120,15 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   subscribe() {
     if (!this.process.isSync) {
 
-      const condition = (proc) => this.updateCondition(proc);
 
       this.process.subscribeRealtimeUpdates({
-        condition,
+        modelDataConfig: this.process.modelDataConfig,
+        condition: () => this.process.updateCondition,
         callback: () => {
           this.changes.next(void 0)
         }
       })
 
-      this.process.subscribeRealtimeUpdates<PROGRESS_DATA[]>({
-        condition,
-        property: 'allProgressData',
-        update: () => {
-          return this.model.ctrl.progressMessages(this.process.id, this.process.allProgressData.length).received
-        }
-      })
     }
   }
 
@@ -149,7 +142,10 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   ngOnDestroy() {
-    this.model.unsubscribeRealtimeUpdates()
+    if (this.model instanceof PROCESS) {
+      this.model.unsubscribeRealtimeUpdates()
+    }
+
   }
   onChange(v) {
     this.formControl.setValue(v);

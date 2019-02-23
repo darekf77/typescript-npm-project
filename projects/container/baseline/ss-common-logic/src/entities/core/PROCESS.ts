@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Morphi } from 'morphi';
+import { Morphi, ModelDataConfig } from 'morphi';
 
 
 //#region @backend
@@ -84,7 +84,12 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
       this.cwd = process.cwd()
     }
   }
-  ;
+
+  get updateCondition() {
+    return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
+      .includes(this.state)
+  }
+
   //#region @backend
   @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
   //#endregion
@@ -219,39 +224,6 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
 
 
-  // private static subject = {};
-  // static subscribeChangesFor(entity: { id: number; }) {
-  //   const { id } = entity;
-  //   if (PROCESS.subject[entity.id]) {
-  //     PROCESS.subject[entity.id] = new BehaviorSubject(void 0);
-
-  //     Morphi.Realtime.Browser.SubscribeEntityChanges(this, async () => {
-  //       console.log('entity should be updated !')
-  //       const data = await PROCESS.ctrl.getBy(id).received;
-
-  //       const state = data.body.json.state
-  //       if (state === 'exitedWithError' || state === 'exitedWithSuccess') {
-  //         Morphi.Realtime.Browser.UnsubscribeEntityChanges(entity);
-  //       }
-  //       ((PROCESS.subject[entity.id]) as BehaviorSubject<PROCESS>).next(data.body.json)
-  //     })
-  //   }
-  //   return PROCESS.subject[entity.id] as BehaviorSubject<PROCESS>;
-  // }
-
-  // static unsubscribeChangesFor(entity: { id: number; }) {
-  //   const subject = PROCESS.subject[entity.id] as BehaviorSubject<any>;
-  //   if (subject) {
-  //     subject.unsubscribe()
-  //   }
-  // }
-
-  // listenChanges(changesToModel?: () => void) {
-  //   console.log('UPDATE CALLED!')
-
-
-  // }
-
   async start() {
     let data = await this.ctrl.start(this.id).received;
     _.merge(this, data.body.json);
@@ -285,8 +257,8 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   }
 
   public static ctrl: IProcessController;
-  public static async getAll() {
-    let data = await this.ctrl.getAll().received;
+  public static async getAll(config?: ModelDataConfig) {
+    let data = await this.ctrl.getAll(config).received;
     // console.log('BACKENDDATA', data)
     return data.body.json;
   }

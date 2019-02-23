@@ -27,6 +27,11 @@ import { ResizeService } from '../../../../helpers/resize-service';
 export class ProcessInfoMessageComponent extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() public model: PROCESS;
+
+  get process() {
+    return this.model;
+  }
+
   @Input() public changes: BehaviorSubject<void>;
 
   messPrev: number;
@@ -79,12 +84,25 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
       this.messages = this.model.allProgressData;
       this.scrollDown()
     }))
+
+    if (!this.process.isSync) {
+
+      this.process.subscribeRealtimeUpdates({
+        condition: () => this.process.updateCondition,
+        property: '_allProgressData',
+        isBufforedProperty: true
+      });
+
+    }
   }
 
 
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe())
     this.resizeService.removeResizeEventListener(this.elemetRef.nativeElement)
+    if(this.model instanceof PROCESS) {
+      this.process.unsubscribeRealtimeUpdates('_allProgressData')
+    }
   }
 
 }

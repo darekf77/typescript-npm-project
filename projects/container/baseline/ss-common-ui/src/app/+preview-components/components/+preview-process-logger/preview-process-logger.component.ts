@@ -18,7 +18,11 @@ export class PreviewProcessLoggerComponent implements OnInit {
   model: PROCESS[];
 
   config = new ModelDataConfig({
-    exclude: ['stderLogPath', 'stdoutLogPath', 'allProgressData']
+    exclude: [
+      'stderLog', 'browser.stderLog',
+      'stdoutLog','browser.stdoutLog',
+      'allProgressData','browser.allProgressData'
+    ]
   })
 
   fields: FormlyFieldConfig[];
