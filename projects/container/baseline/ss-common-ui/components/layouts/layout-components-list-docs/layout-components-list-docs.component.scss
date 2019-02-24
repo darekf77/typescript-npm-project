@@ -1,5 +1,13 @@
 :host {
 
+  .left-panel {
+    overflow: auto;
+    resize: horizontal;
+    padding: 10px;
+    min-width: auto !important;
+    width: 300px;
+  }
+
   .example-full-width {
     width: 100%;
   };

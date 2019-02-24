@@ -20,10 +20,10 @@ export class PreviewProcessLoggerComponent implements OnInit {
   config = new ModelDataConfig({
     exclude: [
       'stderLog', 'browser.stderLog',
-      'stdoutLog','browser.stdoutLog',
-      'allProgressData','browser.allProgressData'
+      'stdoutLog', 'browser.stdoutLog',
+      'allProgressData', 'browser.allProgressData'
     ]
-  })
+  });
 
   fields: FormlyFieldConfig[];
 
@@ -32,7 +32,7 @@ export class PreviewProcessLoggerComponent implements OnInit {
 
   async ngOnInit() {
     this.model = await PROCESS.getAll();
-    this.model.forEach(m => m.modelDataConfig = this.config)
+    this.model.forEach(m => m.modelDataConfig = this.config);
     console.log('model', this.model);
   }
 

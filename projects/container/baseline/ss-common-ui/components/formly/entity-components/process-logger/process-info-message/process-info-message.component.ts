@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 
 import { Log } from 'ng2-logger';
-const log = Log.create('process infor meessages')
+const log = Log.create('process infor meessages');
 
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
 import { PROGRESS_DATA } from 'tnp-bundle/browser';
@@ -26,71 +26,71 @@ import { ResizeService } from '../../../../helpers/resize-service';
 })
 export class ProcessInfoMessageComponent extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @Input() public model: PROCESS;
-
   get process() {
     return this.model;
   }
+
+  constructor(private elemetRef: ElementRef, public resizeService: ResizeService) {
+    super();
+
+  }
+
+
+  get lsKey() {
+    return `process-info-message-model-height-${this.model.id}`;
+  }
+
+  @Input() public model: PROCESS;
 
   @Input() public changes: BehaviorSubject<void>;
 
   messPrev: number;
   messages = [];
 
-  constructor(private elemetRef: ElementRef, public resizeService: ResizeService) {
-    super()
+  @HostBinding('style.height.px') height = 300;
 
-  }
-
-
-  get lsKey() {
-    return `process-info-message-model-height-${this.model.id}`
-  }
-
-  @HostBinding('style.height.px') height: number = 300;
+  handlers: Subscription[] = [];
 
   scrollDown() {
     setTimeout(() => {
       if (this.elemetRef && this.elemetRef.nativeElement) {
         this.elemetRef.nativeElement.scrollTop = this.elemetRef.nativeElement.scrollHeight;
       }
-    }, 100)
+    }, 100);
   }
 
   ngAfterViewInit() {
     this.messages = this.model.allProgressData;
     const savedHeight = Number(localStorage.getItem(this.lsKey));
     // console.log('from local storage height', savedHeight)
-    setTimeout(()=>{
+    setTimeout(() => {
       if (!isNaN(savedHeight)) {
         this.height = savedHeight;
       }
-      this.scrollDown()
-    })
+      this.scrollDown();
+    });
   }
-
-  handlers: Subscription[] = []
 
   ngOnInit() {
 
     this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, (elem) => {
-      let height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
+      const height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
       // console.log('set new height',height)
-      localStorage.setItem(this.lsKey, height.toString())
+      localStorage.setItem(this.lsKey, height.toString());
     });
 
     this.handlers.push(this.changes.subscribe(() => {
       // console.log('CHANGES PROCESS INFO')
       this.messages = this.model.allProgressData;
-      this.scrollDown()
-    }))
+      this.scrollDown();
+    }));
 
     if (!this.process.isSync) {
 
       this.process.subscribeRealtimeUpdates({
         condition: () => this.process.updateCondition,
-        property: '_allProgressData',
-        isBufforedProperty: true
+        property: 'allProgressData',
+        bufforProperty: '_allProgressData'
       });
 
     }
@@ -98,10 +98,10 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
 
   ngOnDestroy(): void {
-    this.handlers.forEach(h => h.unsubscribe())
-    this.resizeService.removeResizeEventListener(this.elemetRef.nativeElement)
-    if(this.model instanceof PROCESS) {
-      this.process.unsubscribeRealtimeUpdates('_allProgressData')
+    this.handlers.forEach(h => h.unsubscribe());
+    this.resizeService.removeResizeEventListener(this.elemetRef.nativeElement);
+    if (this.model instanceof PROCESS) {
+      this.process.unsubscribeRealtimeUpdates('_allProgressData');
     }
   }
 

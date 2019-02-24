@@ -27,27 +27,8 @@ const log = Log.create('process loger');
   styleUrls: ['./process-logger.component.scss']
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
-
-  @Input() public model: PROCESS;
-
-  isOpen = false;
   get process() {
     return this.model;
-  }
-
-  changes = new BehaviorSubject(void 0);
-  async action() {
-    if (this.process.state === 'running') {
-      await this.process.stop();
-    } else {
-      await this.process.start();
-      this.subscribe()
-    }
-
-  }
-
-  isNumber(v) {
-    return _.isNumber(v);
   }
 
 
@@ -78,6 +59,39 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     return 'restart';
   }
 
+  get nameForLC() {
+    return `pinProcess${this.process.id}`;
+  }
+
+  constructor() {
+    super();
+  }
+
+  get id() {
+    return !!this.process && `process${this.process && this.process.id}`;
+  }
+
+  @Input() public model: PROCESS;
+
+  isOpen = false;
+
+  changes = new BehaviorSubject(void 0);
+
+  pinned = false;
+  async action() {
+    if (this.process.state === 'running') {
+      await this.process.stop();
+    } else {
+      await this.process.start();
+      this.subscribe();
+    }
+
+  }
+
+  isNumber(v) {
+    return _.isNumber(v);
+  }
+
   reset() {
     this.isOpen = false;
     setTimeout(() => {
@@ -87,63 +101,49 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
 
   onClose() {
     this.isOpen = false;
-    localStorage.removeItem(this.nameForLC)
-  }
-
-  get nameForLC() {
-    return `pinProcess${this.process.id}`;
+    localStorage.removeItem(this.nameForLC);
   }
 
   onPin(value: boolean) {
     if (value) {
-      localStorage.setItem(this.nameForLC, 'true')
+      localStorage.setItem(this.nameForLC, 'true');
     } else {
-      localStorage.removeItem(this.nameForLC)
+      localStorage.removeItem(this.nameForLC);
     }
   }
 
-  constructor() {
-    super();
-  }
-
-  get id() {
-    return !!this.process && `process${this.process && this.process.id}`
-  }
-
-  pinned = false;
-
   updateCondition(proc: PROCESS) {
     return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
-      .includes(proc.state)
+      .includes(proc.state);
   }
 
   subscribe() {
     if (!this.process.isSync) {
 
 
-      this.process.subscribeRealtimeUpdates({
-        modelDataConfig: this.process.modelDataConfig,
-        condition: () => this.process.updateCondition,
-        callback: () => {
-          this.changes.next(void 0)
-        }
-      })
+      // this.process.subscribeRealtimeUpdates({
+      //   modelDataConfig: this.process.modelDataConfig,
+      //   condition: () => this.process.updateCondition,
+      //   callback: () => {
+      //     this.changes.next(void 0)
+      //   }
+      // })
 
     }
   }
 
   ngOnInit() {
-    log.i("ON INIT PROCESS")
+    log.i('ON INIT PROCESS');
     this.pinned = _.isString(localStorage.getItem(this.nameForLC));
     this.isOpen = this.pinned;
-    console.log(`should be piinned ${this.process && this.process.id}`, this.pinned)
+    console.log(`should be piinned ${this.process && this.process.id}`, this.pinned);
     // log.i('this.formControl.value', this.formControl.value);
-    this.subscribe()
+    this.subscribe();
   }
 
   ngOnDestroy() {
     if (this.model instanceof PROCESS) {
-      this.model.unsubscribeRealtimeUpdates()
+      this.model.unsubscribeRealtimeUpdates();
     }
 
   }
