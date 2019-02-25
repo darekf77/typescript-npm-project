@@ -88,7 +88,6 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     if (!this.process.isSync) {
 
       this.process.subscribeRealtimeUpdates({
-        condition: () => this.process.updateCondition,
         property: 'allProgressData',
         bufforProperty: '_allProgressData'
       });

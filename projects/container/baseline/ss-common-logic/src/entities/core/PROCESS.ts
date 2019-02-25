@@ -231,7 +231,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   async stop() {
     let data = await this.ctrl.stop(this.id).received;
-    _.merge(this, data.body.json);
+    // _.merge(this, data.body.json);
   }
 
   get context() {
