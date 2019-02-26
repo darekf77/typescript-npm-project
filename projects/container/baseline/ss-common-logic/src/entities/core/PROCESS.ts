@@ -30,6 +30,7 @@ export interface IPROCESS extends PROCESS {
   exitCodePath: string;
 
   allProgressData: PROGRESS_DATA[];
+  progress: PROGRESS_DATA;
 }
 
 export type PROCESS_STATE =
@@ -66,6 +67,8 @@ export type PROCESS_STATE =
 
     entity.browser.exitCode = entity.exitCode;
     entity.browser.exitCodePath = entity.exitCodePath;
+
+    entity.browser.progress = entity.progress;
 
     if (entity.modelDataConfig) {
       entity.modelDataConfig.set.exclude(entity.browser)
@@ -171,10 +174,14 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     //#endregion
   }
 
+
   /**
    * Number from 0-100 or undefined
    */
   get progress(): PROGRESS_DATA {
+    if (Morphi.IsBrowser && _.isUndefined(this._allProgressData)) {
+      return this.browser && this.browser.progress;
+    }
     return _.last(this.allProgressData);
   }
 
@@ -228,8 +235,6 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return this._files('exitCodePath', 'exitcode')
   }
 
-
-
   async start() {
     this.tempState = 'inProgressOfStarting';
     let data = await this.ctrl.start(this.id, this.modelDataConfig).received;
@@ -263,7 +268,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     if (_.isNumber(this.pid)) {
       return 'running'
     }
-    if(_.isNull(this.exitCode)) {
+    if (_.isNull(this.exitCode)) {
       return 'inProgressOfStopping'
     }
     if (fse.existsSync(this.exitCodePath)) {

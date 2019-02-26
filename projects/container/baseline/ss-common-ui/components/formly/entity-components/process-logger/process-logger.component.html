@@ -10,14 +10,16 @@
       <mat-panel-title>
         {{process && process.name}}
       </mat-panel-title>
-      <mat-panel-description>
-        {{ (process && process.progress && isNumber(process.progress.value)) ? (process.progress.value + '%'): '-'  }}
+      <mat-panel-description [style.color]="color">
+        {{ progress }}
       </mat-panel-description>
     </mat-expansion-panel-header>
     <app-button-icon [icon]="icon"
+                     [color]="color"
                      (action)="action()"
                      [label]="label"></app-button-icon>
     <app-button-icon [icon]="'info'"
+                     [color]="color"
                      [label]="''"
                      (dblclick)="reset()"
                      (action)="isOpen = !isOpen"></app-button-icon>

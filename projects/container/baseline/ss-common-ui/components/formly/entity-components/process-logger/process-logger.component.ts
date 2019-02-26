@@ -38,6 +38,27 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     return this.process && this.process.name;
   }
 
+  get color() {
+    if (!this.process) {
+      return;
+    }
+    if (this.process.progress && this.process.progress.value === 100
+      || this.process.state === 'exitedWithSuccess') {
+      return 'green';
+    }
+    if (this.process.progress && this.process.progress.value === 100) {
+      return 'green';
+    }
+    if (this.process.state === 'running' ||
+      this.process.state === 'inProgressOfStarting' ||
+      this.process.state === 'inProgressOfStopping') {
+      return 'blue';
+    }
+    if (this.process.state === 'exitedWithError') {
+      return 'red';
+    }
+  }
+
   get icon() {
     if (!this.process) {
       return;
@@ -93,9 +114,21 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
       await this.process.stop();
     } else {
       await this.process.start();
-      this.subscribe();
     }
+    this.changes.next(void 0);
 
+  }
+
+  get progress() {
+    return (this.process &&
+      this.process.progress) ?
+      ((!this.process.isSync &&
+        _.isNumber(this.process.progress.value))
+        ? (this.process.progress.value + '%') :
+        this.process.progress.msg) :
+      (this.process.state === 'inProgressOfStarting' ||
+        this.process.state === 'inProgressOfStopping' ||
+        this.process.state === 'running') ? '...loading' : '';
   }
 
   isNumber(v) {

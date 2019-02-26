@@ -11,6 +11,8 @@ export class ButtonIconComponent implements OnInit {
   @Input() label = 'Button';
   @Input() disabled = false;
 
+  @Input() color: string = void 0;
+
   @Output() action = new EventEmitter();
 
   onAction() {
