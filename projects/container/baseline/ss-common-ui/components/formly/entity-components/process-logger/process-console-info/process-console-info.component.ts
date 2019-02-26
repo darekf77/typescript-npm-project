@@ -3,7 +3,7 @@ import {
   EventEmitter, Component, OnInit, Input,
   Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy
 } from '@angular/core';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';

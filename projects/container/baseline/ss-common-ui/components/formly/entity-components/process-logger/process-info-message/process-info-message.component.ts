@@ -7,7 +7,7 @@ import {
 import { Log } from 'ng2-logger';
 const log = Log.create('process infor meessages');
 
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 import { PROGRESS_DATA } from 'tnp-bundle/browser';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';

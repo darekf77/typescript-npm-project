@@ -10,8 +10,8 @@ import { Morphi } from 'morphi/browser';
 // local
 import { PreviewProcessLoggerComponent } from './preview-process-logger.component';
 import { ProcessLoggerModule, FormWrapperMaterialModule } from 'components';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
-import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/ProcessController';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
+import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;

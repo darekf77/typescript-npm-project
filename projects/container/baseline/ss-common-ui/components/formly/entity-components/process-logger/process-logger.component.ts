@@ -9,13 +9,13 @@ import * as _ from 'lodash';
 // formly
 import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 // logger
 import { Log, Level } from 'ng2-logger/browser';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import { PROCESS_STATE } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+import { PROCESS_STATE } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 import { PROGRESS_DATA } from 'tnp-bundle/browser';
 
 const log = Log.create('process loger');

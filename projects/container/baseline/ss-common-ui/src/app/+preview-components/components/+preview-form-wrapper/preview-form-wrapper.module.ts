@@ -16,11 +16,11 @@ import {
   ListWrapperModule, FormWrapperMaterialModule, ProcessLoggerModule
 } from 'components';
 // third part
-import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE';
-import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/ProcessController';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/PROCESS';
+import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
+import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 
 
 const angularModules = [

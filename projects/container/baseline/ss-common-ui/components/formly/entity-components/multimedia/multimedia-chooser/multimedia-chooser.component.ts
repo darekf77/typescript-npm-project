@@ -5,8 +5,8 @@ import { Morphi } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia chooser');
 // local
-import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/MultimediaController';
-import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/MULTIMEDIA';
+import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
+import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
 
 console.log('heehheh');
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesPaginationController';
-import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser-for-ss-common-ui/entities/EXAMPLE_PAGINATION';
+import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesPaginationController';
+
 
 @Component({
   selector: 'app-preview-table-wrapper',

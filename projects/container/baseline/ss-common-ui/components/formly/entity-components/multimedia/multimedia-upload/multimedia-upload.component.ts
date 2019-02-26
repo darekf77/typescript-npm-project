@@ -6,8 +6,8 @@ import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('multimedia-upload');
 
 import { FileUploader, FileItem } from 'ng2-file-upload';
-import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/core/AuthController';
-import { SESSION, SESSION_CONFIG } from 'ss-common-logic/browser-for-ss-common-ui/entities/core/SESSION';
+import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/apps/auth/AuthController';
+import { SESSION, SESSION_CONFIG } from 'ss-common-logic/browser-for-ss-common-ui/apps/auth/SESSION';
 const URL = 'asd'; // `${ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host}/MultimediaController/upload`;
 
 

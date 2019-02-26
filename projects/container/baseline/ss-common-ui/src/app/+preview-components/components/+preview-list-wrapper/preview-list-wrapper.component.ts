@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/ExamplesController';
+import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 
 @Component({
   selector: 'app-preview-list-wrapper',
