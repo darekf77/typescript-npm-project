@@ -33,20 +33,23 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
 
 
   @Morphi.Http.GET('/start/:id')
-  start(@Morphi.Http.Param.Path('id') id: number): Morphi.Response<PROCESS> {
+  start(@Morphi.Http.Param.Path('id') id: number, @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
       let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
+      res.modelDataConfig = config;
       return res;
     }
     //#endregion
   }
 
   @Morphi.Http.GET('/stop/:id')
-  stop(@Morphi.Http.Param.Path('id') id: number): Morphi.Response<PROCESS> {
+  stop(@Morphi.Http.Param.Path('id') id: number, @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      return (await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id)));
+      let res = await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id));
+      res.modelDataConfig = config;
+      return res;
     }
     //#endregion
 
@@ -73,8 +76,8 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
       const s = super.getAll(config)
       const processes = await Morphi.getResponseValue(s, req, res) as PROCESS[];
       await this.db.PROCESS.updateActive(processes)
+      processes.forEach(p => p.modelDataConfig = config)
       return processes;
-
     }
     //#endregion
   }
@@ -86,6 +89,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
       const s = super.getBy(id, config)
       const process = await Morphi.getResponseValue(s, req, res) as PROCESS;
       await this.db.PROCESS.updateActive(process);
+      process.modelDataConfig = config;
       return process;
     }
     //#endregion

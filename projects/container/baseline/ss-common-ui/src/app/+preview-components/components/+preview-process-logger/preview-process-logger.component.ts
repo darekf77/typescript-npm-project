@@ -31,7 +31,7 @@ export class PreviewProcessLoggerComponent implements OnInit {
   constructor(public processController: ProcessController) { }
 
   async ngOnInit() {
-    this.model = await PROCESS.getAll();
+    this.model = await PROCESS.getAll(this.config);
     this.model.forEach(m => m.modelDataConfig = this.config);
     console.log('model', this.model);
   }

@@ -120,14 +120,12 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   subscribe() {
     if (!this.process.isSync) {
 
-
-      // this.process.subscribeRealtimeUpdates({
-      //   modelDataConfig: this.process.modelDataConfig,
-      //   condition: () => this.process.updateCondition,
-      //   callback: () => {
-      //     this.changes.next(void 0)
-      //   }
-      // })
+      this.process.subscribeRealtimeUpdates({
+        modelDataConfig: this.process.modelDataConfig,
+        callback: () => {
+          this.changes.next(void 0)
+        }
+      })
 
     }
   }

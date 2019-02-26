@@ -100,7 +100,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     this.handlers.forEach(h => h.unsubscribe());
     this.resizeService.removeResizeEventListener(this.elemetRef.nativeElement);
     if (this.model instanceof PROCESS) {
-      this.process.unsubscribeRealtimeUpdates('_allProgressData');
+      this.process.unsubscribeRealtimeUpdates('allProgressData');
     }
   }
 

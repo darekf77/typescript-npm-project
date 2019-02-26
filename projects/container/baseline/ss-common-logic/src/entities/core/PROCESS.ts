@@ -66,6 +66,12 @@ export type PROCESS_STATE =
 
     entity.browser.exitCode = entity.exitCode;
     entity.browser.exitCodePath = entity.exitCodePath;
+
+    if(entity.modelDataConfig) {
+      entity.modelDataConfig.set.exclude(entity.browser)
+      entity.modelDataConfig = void 0;
+    }
+
     return entity;
   }
   //#endregion
@@ -225,13 +231,16 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
 
   async start() {
-    let data = await this.ctrl.start(this.id).received;
+    let data = await this.ctrl.start(this.id, this.modelDataConfig).received;
+    this._allProgressData = void 0;
+    this._stder = void 0;
+    this._stdout = void 0;
     _.merge(this, data.body.json);
   }
 
   async stop() {
-    let data = await this.ctrl.stop(this.id).received;
-    // _.merge(this, data.body.json);
+    let data = await this.ctrl.stop(this.id, this.modelDataConfig).received;
+    _.merge(this, data.body.json);
   }
 
   get context() {
