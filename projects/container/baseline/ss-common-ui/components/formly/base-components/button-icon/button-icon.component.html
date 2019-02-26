@@ -1,4 +1,8 @@
-<button mat-button  type="button" (click)="onAction()" [disabled]="disabled"  >
-  <mat-icon>{{icon}}</mat-icon>
-  {{label}}
+<button mat-button
+        type="button"
+        (click)="onAction()"
+        [disabled]="disabled">
+  <mat-icon *ngIf="icon !== 'waiting'">{{icon}}</mat-icon>
+  <mat-spinner *ngIf="icon === 'waiting'"></mat-spinner>
+  <span *ngIf="icon !== 'waiting'">{{label}}</span>
 </button>

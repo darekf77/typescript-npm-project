@@ -7,6 +7,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 // other
 import { MomentModule } from 'ngx-moment';
 // local
@@ -29,12 +30,13 @@ const materialModules = [
   MatExpansionModule,
   MatTabsModule,
   MatIconModule,
-  MatListModule
+  MatListModule,
+  MatProgressSpinnerModule
 ];
 
 const otherModules = [
   MomentModule
-]
+];
 
 const localModules = [
   StandalonePopupModule,
@@ -45,7 +47,7 @@ const localModules = [
 const localComponents = [
   ProcessInfoMessageComponent,
   ProcessLoggerComponent
-]
+];
 
 @NgModule({
   imports: [

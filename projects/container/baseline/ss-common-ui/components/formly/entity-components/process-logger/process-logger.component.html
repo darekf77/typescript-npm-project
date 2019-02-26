@@ -1,5 +1,11 @@
 <p [attr.disabled]="!process">
-  <mat-expansion-panel>
+  <!-- <span *ngIf="process._allProgressData">
+    {{process._allProgressData | json}}
+  </span> -->
+
+  <mat-expansion-panel [expanded]=[isExpanded]
+                       (closed)="onExpand(false)"
+                       (opened)="onExpand(true)">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{process && process.name}}
@@ -8,7 +14,6 @@
         {{ (process && process.progress && isNumber(process.progress.value)) ? (process.progress.value + '%'): '-'  }}
       </mat-panel-description>
     </mat-expansion-panel-header>
-    <code>{{process && process.cmd}}</code>
     <app-button-icon [icon]="icon"
                      (action)="action()"
                      [label]="label"></app-button-icon>
@@ -28,8 +33,12 @@
                   [contentComponent]="popupContent"></standalone-popup>
 
 <ng-template #popupContent>
+
+  <code>{{process.cmd}}</code>
+
   <mat-tab-group>
-    <mat-tab label="Info Messages">
+
+    <mat-tab label="Messages">
 
       <app-process-info-message [model]="model"
                                 [changes]="changes"></app-process-info-message>

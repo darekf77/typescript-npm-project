@@ -27,6 +27,8 @@ const log = Log.create('process loger');
   styleUrls: ['./process-logger.component.scss']
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
+
+  isExpanded = false;
   get process() {
     return this.model;
   }
@@ -39,6 +41,10 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   get icon() {
     if (!this.process) {
       return;
+    }
+    if (this.process.state === 'inProgressOfStarting' ||
+      this.process.state === 'inProgressOfStopping') {
+      return 'waiting';
     }
     if (this.process.state === 'notStarted') {
       return 'play_arrow';
@@ -61,6 +67,10 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
 
   get nameForLC() {
     return `pinProcess${this.process.id}`;
+  }
+
+  get nameForExpand() {
+    return `expandProcess${this.process.id}`;
   }
 
   constructor() {
@@ -112,6 +122,14 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     }
   }
 
+  onExpand(value: boolean) {
+    if (value) {
+      localStorage.setItem(this.nameForExpand, 'true');
+    } else {
+      localStorage.removeItem(this.nameForExpand);
+    }
+  }
+
   updateCondition(proc: PROCESS) {
     return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
       .includes(proc.state);
@@ -119,19 +137,20 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
 
   subscribe() {
     if (!this.process.isSync) {
-
+      console.log(`SUBSCRIBE ENTITY: ${this.process.id}`);
       this.process.subscribeRealtimeUpdates({
         modelDataConfig: this.process.modelDataConfig,
         callback: () => {
-          this.changes.next(void 0)
+          this.changes.next(void 0);
         }
-      })
+      });
 
     }
   }
 
   ngOnInit() {
     log.i('ON INIT PROCESS');
+    this.isExpanded = _.isString(localStorage.getItem(this.nameForExpand));
     this.pinned = _.isString(localStorage.getItem(this.nameForLC));
     this.isOpen = this.pinned;
     console.log(`should be piinned ${this.process && this.process.id}`, this.pinned);

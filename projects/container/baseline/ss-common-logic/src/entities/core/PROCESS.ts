@@ -67,7 +67,7 @@ export type PROCESS_STATE =
     entity.browser.exitCode = entity.exitCode;
     entity.browser.exitCodePath = entity.exitCodePath;
 
-    if(entity.modelDataConfig) {
+    if (entity.modelDataConfig) {
       entity.modelDataConfig.set.exclude(entity.browser)
       entity.modelDataConfig = void 0;
     }
@@ -231,29 +231,40 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
 
   async start() {
+    this.tempState = 'inProgressOfStarting';
     let data = await this.ctrl.start(this.id, this.modelDataConfig).received;
     this._allProgressData = void 0;
     this._stder = void 0;
     this._stdout = void 0;
     _.merge(this, data.body.json);
+    this.tempState = null;
   }
 
   async stop() {
+    this.tempState = 'inProgressOfStopping';
     let data = await this.ctrl.stop(this.id, this.modelDataConfig).received;
     _.merge(this, data.body.json);
+    this.tempState = null;
   }
 
   get context() {
     return `${this.name ? this.name : ''}${this.id}_${CLASS.getNameFromObject(this)}`;
   }
 
+  tempState: PROCESS_STATE = null;
   get state(): PROCESS_STATE {
+    if (!_.isNull(this.tempState)) {
+      return this.tempState;
+    }
     if (Morphi.IsBrowser) {
       return this.browser.state;
     }
     //#region @backend
     if (_.isNumber(this.pid)) {
       return 'running'
+    }
+    if(_.isNull(this.exitCode)) {
+      return 'inProgressOfStopping'
     }
     if (fse.existsSync(this.exitCodePath)) {
       let exitcode = Number(fse.readFileSync(this.exitCodePath).toString())

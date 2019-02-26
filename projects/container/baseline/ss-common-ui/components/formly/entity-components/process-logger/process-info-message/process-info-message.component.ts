@@ -83,15 +83,33 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
       // console.log('CHANGES PROCESS INFO')
       this.messages = this.model.allProgressData;
       this.scrollDown();
+      this.removeDuplicates();
     }));
 
     if (!this.process.isSync) {
-
+      console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - allProgressData `);
       this.process.subscribeRealtimeUpdates({
         property: 'allProgressData',
-        bufforProperty: '_allProgressData'
+        bufforProperty: '_allProgressData',
+        callback: () => {
+          this.changes.next(void 0);
+        }
       });
 
+    }
+
+
+  }
+
+  removeDuplicates() {
+    if (this.process && this.process._allProgressData) {
+      const unique = {};
+      this.process._allProgressData.forEach(c => {
+        unique[_.snakeCase(c.date as any)] = c;
+      });
+      this.process._allProgressData = Object
+        .keys(unique)
+        .map(k => unique[k]);
     }
   }
 

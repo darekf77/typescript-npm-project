@@ -107,7 +107,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
     } catch (error) {
       console.log(`Process (pid: ${proc.pid}) NOT KILLED`)
     }
-
+    fse.writeFileSync(proc.exitCodePath, 0)
     proc.pid = void 0;
     await this.update(proc.id, proc);
     return proc;
