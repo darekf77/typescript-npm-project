@@ -4,6 +4,7 @@ import * as  underscore from 'underscore';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as glob from 'glob';
 import * as rimraf from "rimraf";
 import { sleep } from 'sleep';
 import { ProjectFrom } from './index';
@@ -26,6 +27,32 @@ export function crossPlatofrmPath(p: string) {
   }
   return p;
 }
+
+export function getEntites(cwd: string): string[] {
+  return glob
+    .sync(`**/*.ts`, {
+      cwd: cwd
+    }).filter(p =>
+      !p.endsWith('Controller.ts') &&
+      !p.endsWith('_REPOSITORY.ts') &&
+      !p.endsWith('.REPOSITORY.ts') &&
+      !p.endsWith('Repository.ts') &&
+      !p.endsWith('Service.ts') &&
+      !p.endsWith('.d.ts') &&
+      !p.endsWith('.spec.ts') &&
+      !(['index.ts', 'app.ts','controllers.ts','entities.ts'].includes(path.basename(p)))
+    )
+}
+
+
+export function getControllers(cwd: string): string[] {
+  return glob
+    .sync(`**/*Controller.ts`, {
+      cwd: cwd
+    })
+}
+
+
 
 
 export function nearestProjectTo(location: string) {

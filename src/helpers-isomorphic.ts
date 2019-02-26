@@ -3,6 +3,7 @@ import { Project } from './project';
 import config from './config';
 import * as glob from 'glob';
 import * as path from 'path';
+import { getEntites, getControllers } from './helpers';
 
 export function getReservedClassNames(project = Project.Current) {
   // console.log('get class names from : ' + project.name)
@@ -22,21 +23,25 @@ export function getReservedClassNames(project = Project.Current) {
       .filter((p) => p.type === 'isomorphic-lib')
       .forEach(p => {
 
-        const controllers = glob.sync(`${path.join(
+        const controllers = getControllers(path.join(
           p.location,
-          config.folder.src,
-          config.folder.controllers
-        )}/**/*.ts`)
+          config.folder.src
+        ))
+
         // console.log('controllers', controllers)
         controllers.forEach(c => {
           names.push(path.basename(c, '.ts'))
         });
 
-        const entities = glob.sync(`${path.join(
+        const entities = getEntites(path.join(
           p.location,
-          config.folder.src,
-          config.folder.entities
-        )}/**/*.ts`)
+          config.folder.src
+        ))
+        // const entities = glob.sync(`${path.join(
+        //   p.location,
+        //   config.folder.src,
+        //   config.folder.entities
+        // )}/**/*.ts`)
         // console.log('entities', entities)
         entities.forEach(e => {
           names.push(path.basename(e, '.ts'))

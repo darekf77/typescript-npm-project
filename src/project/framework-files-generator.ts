@@ -9,6 +9,7 @@ import * as rimraf from 'rimraf';
 import { Project } from './base-project';
 import { config } from '../config';
 import { IncrementalCompilation } from 'morphi/build';
+import { getEntites, getControllers } from '../helpers';
 
 
 export class FrameworkFilesGenerator extends IncrementalCompilation {
@@ -38,10 +39,7 @@ export class FrameworkFilesGenerator extends IncrementalCompilation {
       : path.join(this.project.location, config.folder.src);
 
 
-    let entitesFiles = glob
-      .sync(`${config.folder.entities}/**/*.ts`, {
-        cwd: cwd
-      })
+    let entitesFiles = getEntites(cwd);
 
     if (isSite) {
       entitesFiles = entitesFiles.filter(f => {
@@ -110,10 +108,7 @@ export class FrameworkFilesGenerator extends IncrementalCompilation {
       : path.join(this.project.location, config.folder.src);
 
 
-    let controllersFiles = glob
-      .sync(`${config.folder.controllers}/**/*.ts`, {
-        cwd: cwd
-      })
+    let controllersFiles = getControllers(cwd);
 
     if (isSite) {
       controllersFiles = controllersFiles.filter(f => {

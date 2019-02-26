@@ -59,7 +59,7 @@ export class ProcessConsoleInfoComponent extends BaseComponent
     }));
 
 
-    console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - ${this.outputType} `);
+    // console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - ${this.outputType} `);
 
     this.process.subscribeRealtimeUpdates({
       property: this.outputType,

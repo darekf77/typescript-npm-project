@@ -87,7 +87,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     }));
 
 
-    console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - allProgressData `);
+    // console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - allProgressData `);
 
     this.process.subscribeRealtimeUpdates({
       property: 'allProgressData',
