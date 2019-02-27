@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/TNP_PROJECT';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 

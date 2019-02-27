@@ -17,15 +17,15 @@ export namespace RecrusiveBaseline {
         const p = projectsToRecreate[index];
 
         if (watch) {
-          (await p.join.init()).watch()
           if (p.isWorkspaceChildProject) {
             (await p.parent.join.init()).watch()
           }
+          (await p.join.init()).watch()
         } else {
-          await p.join.init()
           if (p.isWorkspaceChildProject) {
             (await p.parent.join).init()
           }
+          await p.join.init()
         }
       }
       return

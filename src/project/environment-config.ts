@@ -76,7 +76,7 @@ export class EnvironmentConfig {
 
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
 
-    const config = workspaceConfigBy(this.project, environmentName);
+    const config = await workspaceConfigBy(this.project, environmentName);
     config.name = environmentName;
 
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;

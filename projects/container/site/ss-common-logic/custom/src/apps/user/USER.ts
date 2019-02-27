@@ -4,9 +4,9 @@ import { Morphi } from "morphi";
 
 import {
   USER as BASELINE_USER
-} from "baseline/ss-common-logic/src/entities/core/USER";
+} from "baseline/ss-common-logic/src/apps/user/USER";
 
-export * from "baseline/ss-common-logic/src/entities/core/USER";
+export * from "baseline/ss-common-logic/src/apps/user/USER";
 
 
 @Morphi.Entity({

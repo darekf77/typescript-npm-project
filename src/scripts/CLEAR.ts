@@ -29,9 +29,13 @@ export async function clear(args, all = false) {
 
   let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
 
-  recrusive = (recrusive || r);
+  recrusive = (recrusive || r || all);
   generated = (generated || g);
-  const project = Project.Current
+  let project = Project.Current
+  if(all && project.isWorkspaceChildProject) {
+    project = project.parent;
+  }
+
   const db = await TnpDB.Instance;
   await (db).transaction.addProjectIfNotExist(project);
   db.transaction.setCommand('tnp clear')
@@ -56,7 +60,7 @@ export async function clear(args, all = false) {
 export default {
   $CLEAN: async (args) => { await clear(args) },
   $CLEAR: async (args) => { await clear(args) },
-  $CLEAN_ALL: async (args) => { await clear(args, true) },
-  $CLEAR_ALL: async (args) => { await clear(args, true) }
+  $CLEAN_ALL: async () => { await clear('', true) },
+  $CLEAR_ALL: async () => { await clear('', true) }
 }
 //#endregion

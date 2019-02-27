@@ -255,7 +255,7 @@ export class Project implements IProject {
       return this.browser.parent;
     }
     //#region @backend
-    return ProjectFrom(path.join(this.location, '..'));
+    return _.isString(this.location) && ProjectFrom(path.join(this.location, '..'));
     //#endregion
   }
   get preview(): Project {
@@ -263,7 +263,7 @@ export class Project implements IProject {
       return this.browser.preview;
     }
     //#region @backend
-    return ProjectFrom(path.join(this.location, 'preview'));
+    return _.isString(this.location) && ProjectFrom(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -673,7 +673,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
           this.proxyRouter = new ProxyRouter(this);
         }
         this.copytToManager = new CopyToManager(this);
-        if(this.isStandaloneProject) {
+        if (this.isStandaloneProject) {
           this.packageJson.updateHooks()
         }
 
@@ -806,7 +806,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     await this.buildSteps(buildOptions);
     this.copytToManager.initCopyingOnBuildFinish(buildOptions);
-    if(buildOptions.compileOnce) {
+    if (buildOptions.compileOnce) {
       process.exit(0)
     }
   }

@@ -16,10 +16,9 @@ import { MatRadioModule } from '@angular/material/radio';
 // local
 import { BuildTnpProcessComponent } from './build-tnp-process.component';
 import { TnpProjectComponent } from './tnp-project/tnp-project.component';
-import { FormWrapperMaterialModule } from 'baseline/ss-common-ui/components/ui-elements/form-wrapper-material';
+import { FormWrapperMaterialModule } from 'baseline/ss-common-ui/components/formly';
 import { ItemEnvironmentComponent, ItemBuildComponent, ItemServeComponent, ItemTestComponent } from './tnp-project/items';
-import { TnpProjectController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/TnpProjectController';
-import { BuildController } from 'ss-common-logic/browser-for-ss-common-ui/controllers/BuildController';
+
 
 const angularModules = [
   CommonModule,
@@ -61,6 +60,6 @@ const componentsLocal = [
   ],
   exports: [...componentsLocal],
   declarations: [...componentsLocal],
-  providers: [TnpProjectController, BuildController]
+  providers: []
 })
 export class BuildTnpProcessModule { }

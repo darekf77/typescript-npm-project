@@ -94,20 +94,23 @@ export class BaselineSiteJoin {
       return this;
     }
 
-    const db = await TnpDB.Instance;
-    if(db.checkIf.allowed.toWatchWorkspace(this.project)) {
-      console.log('OK to baseline/site join')
-    } else {
-      const pids = []
-      console.log(`Current process pid: ${process.pid}`)
-      console.log(`Found active baseline/site join on pids: ${pids.toString()}
-      current pid: ${process.pid}, ppid ${process.ppid}`)
-      this.joinNotAllowed = true;
-      if (this.project.isWorkspaceChildProject) {
-        this.project.parent.join.joinNotAllowed = true;
+    if (!this.project.isSite) {
+      const db = await TnpDB.Instance;
+      if (db.checkIf.allowed.toWatchWorkspace(this.project)) {
+        console.log('OK to baseline/site join')
+      } else {
+        const pids = []
+        console.log(`Current process pid: ${process.pid}`)
+        console.log(`Found active baseline/site join on pids: ${pids.toString()}
+        current pid: ${process.pid}, ppid ${process.ppid}`)
+        this.joinNotAllowed = true;
+        if (this.project.isWorkspaceChildProject) {
+          this.project.parent.join.joinNotAllowed = true;
+        }
+        return this;
       }
-      return this;
     }
+
 
     // remove customizable
     // console.log(this.project.customizableFilesAndFolders);

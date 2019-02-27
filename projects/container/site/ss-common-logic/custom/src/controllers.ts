@@ -8,8 +8,8 @@ export * from 'baseline/ss-common-logic/src/controllers';
 
 
 
-import { ProjectController } from './controllers/ProjectController';
-export { ProjectController } from './controllers/ProjectController';
+import { ProjectController } from './apps/project/ProjectController';
+export { ProjectController } from './apps/project/ProjectController';
 
 export const Controllers: Morphi.Base.Controller<any>[] = [
 ProjectController

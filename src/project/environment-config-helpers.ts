@@ -190,7 +190,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 export const existedConfigs = {} as { [workspacePath in string]: EnvConfig; }
 
 
-export function workspaceConfigBy(workspace: Project, environment: EnvironmentName): EnvConfig {
+export async function workspaceConfigBy(workspace: Project, environment: EnvironmentName): Promise<EnvConfig> {
   let configWorkspaceEnv: EnvConfig;
 
   const alreadyExistProject = (workspace && workspace.isWorkspace) ? existedConfigs[workspace.location] : null;
@@ -209,6 +209,24 @@ export function workspaceConfigBy(workspace: Project, environment: EnvironmentNa
     const envSurfix = (environment === 'local') ? '' : `.${environment}`;
     var pathToProjectEnvironment = path.join(workspace.location, `${config.file.environment}${envSurfix}`);
     console.log('pathToProjectEnvironment:', pathToProjectEnvironment)
+
+    if (workspace.isSite) {
+      if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
+        console.log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
+        try {
+          if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
+            console.log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
+            const w = workspace.join.joinNotAllowed
+            workspace.join.joinNotAllowed = false;
+            await workspace.join.init()
+            workspace.join.joinNotAllowed = w;
+          }
+        } catch (e) {
+          error(e)
+        }
+      }
+    }
+
     if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
       error(`Workspace ${workspace.location}
         ...without environment${envSurfix}.js config.`);

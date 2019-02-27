@@ -13,7 +13,7 @@ import { MultimediaUploadComponent } from './multimedia-upload.component';
 import { FileUploadModule } from 'ng2-file-upload';
 import { StaticColumnsModule } from 'static-columns';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import { DialogWrapperModule } from '../../../../ui-elements';
+
 
 const materialModules = [
   MatDialogModule,
@@ -25,13 +25,13 @@ const materialModules = [
   MatProgressBarModule
 ];
 
+
 @NgModule({
   imports: [
     CommonModule,
     ...materialModules,
     FileUploadModule,
     StaticColumnsModule,
-    DialogWrapperModule,
     NgxDatatableModule
   ],
   exports: [

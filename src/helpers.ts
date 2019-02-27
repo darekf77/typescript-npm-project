@@ -30,7 +30,7 @@ export function crossPlatofrmPath(p: string) {
 
 export function getEntites(cwd: string): string[] {
   return glob
-    .sync(`**/*.ts`, {
+    .sync(`${config.folder.apps}/**/*.ts`, {
       cwd: cwd
     }).filter(p =>
       !p.endsWith('Controller.ts') &&
@@ -47,7 +47,7 @@ export function getEntites(cwd: string): string[] {
 
 export function getControllers(cwd: string): string[] {
   return glob
-    .sync(`**/*Controller.ts`, {
+    .sync(`${config.folder.apps}/**/*Controller.ts`, {
       cwd: cwd
     })
 }

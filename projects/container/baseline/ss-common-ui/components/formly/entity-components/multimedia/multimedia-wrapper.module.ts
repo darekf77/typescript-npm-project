@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MultimediaChooserModule } from './multimedia-chooser/multimedia-chooser.module';
 import { MultimediaUploadModule } from './multimedia-upload/multimedia-upload.module';
 import { MultimediaWrapperComponent } from './multimedia-wrapper.component';
-import { DialogWrapperModule } from '../../../ui-elements';
+import { DialogWrapperModule } from '../../../ui-elements/dialog-wrapper';
 
 const angularModules = [
   CommonModule

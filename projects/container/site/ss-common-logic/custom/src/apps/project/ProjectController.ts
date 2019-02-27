@@ -1,8 +1,8 @@
 import { Morphi } from 'morphi';
 
 
-import * as entities from '../entities';
-import * as controllers from '../controllers';
+import * as entities from '../../entities';
+import * as controllers from '../../controllers';
 
 
 @Morphi.Controller({
@@ -22,7 +22,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
   }
 
   @Morphi.Http.GET()
-  getAll() {
+  getAll():any {
 
   }
 

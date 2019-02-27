@@ -78,7 +78,12 @@
   },
   "defaults": {
     "styleExt": "css",
-    "component": {
+    "component": {},
+    "apps": {
+      "showCircularDependencies": false
+    },
+    "build": {
+      "showCircularDependencies": false
     }
   },
   "warnings": {

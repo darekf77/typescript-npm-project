@@ -41,7 +41,9 @@ export class FilesRecreator {
   }
 
   public init(includeVscode = false) {
-
+    if(this.project.type === 'container') {
+      return;
+    }
     this.assets();
     this.commonFiles();
     this.projectSpecyficFiles();

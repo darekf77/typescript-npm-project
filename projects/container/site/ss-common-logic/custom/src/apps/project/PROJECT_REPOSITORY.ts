@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as child from 'child_process';
 import axios from 'axios';
 import { Morphi } from "morphi";
-import { PROJECT } from "../entities/PROJECT";
+import { PROJECT } from "./PROJECT";
 
 export interface TNP_PROJECT_ALIASES {
   project: string;

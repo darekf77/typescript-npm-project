@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
-import { TNP_PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/entities/TNP_PROJECT';
+
 import { EnvironmentName } from 'tnp-bundle/browser';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
@@ -23,7 +23,7 @@ export class TnpProjectComponent implements OnInit {
 
   @Input() isChild = false;
 
-  @Input() model: TNP_PROJECT;
+  @Input() model: any;
 
   environmentFormGroup: FormGroup;
   buildFormGroup: FormGroup;

@@ -1,6 +1,6 @@
 import {
   AuthController as BaselineAuthController
-} from 'baseline/ss-common-logic/src/controllers/core/AuthController';
+} from 'baseline/ss-common-logic/src/apps/auth/AuthController';
 import { Morphi } from 'morphi';
 
 export {
@@ -8,13 +8,13 @@ export {
   Handler,
   //#endregion
   IFacebook, IHelloJS
-} from 'baseline/ss-common-logic/src/controllers/core/AuthController';
+} from 'baseline/ss-common-logic/src/apps/auth/AuthController';
 
 //#region @backend
 import { authenticate, use } from 'passport';
 //#endregion
 
-import { SESSION } from 'baseline/ss-common-logic/src/entities/core/SESSION';
+import { SESSION } from 'baseline/ss-common-logic/src/apps/auth/SESSION';
 
 @Morphi.Controller({
   className: 'AuthController',
