@@ -83,7 +83,7 @@ export class ProcessConsoleInfoComponent extends BaseComponent
     const savedHeight = Number(localStorage.getItem(this.lsKey));
     // console.log('from local storage height', savedHeight)
     setTimeout(() => {
-      if (!isNaN(savedHeight)) {
+      if (!isNaN(savedHeight) && savedHeight > 0) {
         this.height = savedHeight;
       }
       this.scrollDown();

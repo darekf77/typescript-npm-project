@@ -64,7 +64,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     const savedHeight = Number(localStorage.getItem(this.lsKey));
     // console.log('from local storage height', savedHeight)
     setTimeout(() => {
-      if (!isNaN(savedHeight)) {
+      if (!isNaN(savedHeight) && savedHeight > 0) {
         this.height = savedHeight;
       }
       this.scrollDown();
@@ -106,7 +106,8 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     if (this.process && this.process._allProgressData) {
       const unique = {};
       this.process._allProgressData.forEach(c => {
-        unique[_.snakeCase(c.date as any)] = c;
+
+        unique[_.snakeCase(c.date as any)c] = c;
       });
       this.process._allProgressData = Object
         .keys(unique)
