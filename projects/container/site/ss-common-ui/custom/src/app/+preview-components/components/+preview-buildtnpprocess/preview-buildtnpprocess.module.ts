@@ -7,7 +7,8 @@ import { BuildTnpProcessModule } from 'components';
 import { Morphi } from 'morphi/browser';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';
-
+import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
 
 const angularModules = [
   CommonModule,
@@ -19,8 +20,8 @@ const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic
 
 Morphi.init({
   host,
-  controllers: [],
-  entities: []
+  controllers: [ProjectController],
+  entities: [PROJECT]
 });
 
 @NgModule({
@@ -33,7 +34,7 @@ Morphi.init({
   ],
   declarations: [PreviewBuildtnpprocessComponent],
   providers: [
-
+    ProjectController
   ]
 })
 export class PreviewBuildTnpProcesssModule { }

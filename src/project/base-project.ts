@@ -1,4 +1,4 @@
-import { Morphi } from 'morphi';
+import { Morphi, ModelDataConfig } from 'morphi';
 
 import { LibType, EnvironmentName } from "../models";
 //#region @backend
@@ -75,6 +75,7 @@ export interface IProject {
 
 @Morphi.Entity<Project>({
   className: 'Project',
+
   mapping: {
 
   },
@@ -85,6 +86,7 @@ export interface IProject {
     'browser.preview': 'Project'
   },
   //#region @backend
+   createTable: false,
   browserTransformFn: (entity) => {
     // console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
@@ -96,6 +98,8 @@ export interface IProject {
   //#endregion
 })
 export class Project implements IProject {
+  modelDataConfig?: ModelDataConfig;
+  id: number;
   static projects: Project[] = [];
 
   public static defaultPortByType(type: LibType): number {
@@ -640,6 +644,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   constructor(location?: string) {
+
     if (!_.isUndefined(location)) {
 
 

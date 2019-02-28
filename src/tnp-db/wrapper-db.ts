@@ -19,7 +19,7 @@ import { BuildOptions } from '../models';
 import { error, warn } from '../messages';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
-import { BuildInstance, CommandInstance } from './entites';
+import { BuildInstance, CommandInstance, ProjectInstance } from './entites';
 
 
 export class TnpDB {
@@ -94,6 +94,10 @@ export class TnpDB {
   public async runCommand(cmd: CommandInstance) {
     await this.__commandsCtrl.runCommand(cmd)
 
+  }
+
+  public getProject(): ProjectInstance[] {
+    return this.crud.getAll(ProjectInstance);
   }
 
   constructor(private location: string) {

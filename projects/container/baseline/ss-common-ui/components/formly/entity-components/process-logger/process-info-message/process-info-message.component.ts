@@ -106,8 +106,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     if (this.process && this.process._allProgressData) {
       const unique = {};
       this.process._allProgressData.forEach(c => {
-
-        unique[_.snakeCase(c.date as any)c] = c;
+        unique[_.snakeCase(c.date as any)] = c;
       });
       this.process._allProgressData = Object
         .keys(unique)
