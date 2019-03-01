@@ -30,29 +30,50 @@ export class ProcessController extends BaseController {
     const ps: PsListInfo[] = await psList();
     const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
     // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
-    const filteredBuilds = all.filter(b => ps.filter(p => p.pid == b.pid).length > 0)
+    const filteredBuilds = all.filter(b => {
+      if (ps.filter(p => p.pid == b.pid).length > 0) {
+        return true;
+      } else if (_.isNumber(b.relation1TO1entityId)) {
+        b.pid = void 0;
+      } else {
+        return false;
+      }
+    })
     // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
     // process.exit(0)
     this.crud.setBulk(filteredBuilds, ProcessInstance);
   }
 
+  async setProcess(process: ProcessInstance) {
+    const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
+    const existed = all.find(p => {
+      return p.isEqual(process) || (
+        p.info && process.info &&
+        p.info.className === process.info.className &&
+        p.info.entityId === entityId
+      )
+    })
+  }
+
   findProcessBy(metaInfo: ProcessMetaInfo) {
-    const { className, entityId, entityProperty, pid } = metaInfo;
+    const { className, entityId, entityProperty } = metaInfo;
     const proceses = this.crud.getAll<ProcessInstance>(ProcessInstance);
     let existed: ProcessInstance;
     if (_.isString(entityProperty)) {
       existed = proceses.find((p) => {
         return (
-          (_.isNumber(p.pid) && _.isNumber(pid) && p.pid === pid) ||
-          (p.info && p.info.className === className && p.info.entityId === entityId)
+          p.info &&
+          p.info.className === className &&
+          p.info.entityId === entityId
         )
       })
     } else {
       existed = proceses.find((p) => {
         return (
-          (_.isNumber(p.pid) && _.isNumber(pid) && p.pid === pid) ||
-          (p.info && p.info.className === className &&
-            p.info.entityId === entityId && p.info.entityProperty === entityProperty)
+          p.info &&
+          p.info.className === className &&
+          p.info.entityId === entityId &&
+          p.info.entityProperty === entityProperty
         )
       })
     }

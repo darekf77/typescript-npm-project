@@ -133,6 +133,12 @@ export class DBTransaction {
     });
   }
 
+  public async setProcess(process: ProcessInstance) {
+    await this.start(`Set process rellation`, async () => {
+
+    });
+  }
+
 
 
   public async updateBuildsWithCurrent(currentProject: Project,

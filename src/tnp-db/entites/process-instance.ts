@@ -4,7 +4,9 @@ import { DBBaseEntity } from './base-entity';
 import { CLASS } from 'typescript-class-helpers';
 
 export type ProcessMetaInfo = {
-  className: string, entityId: string, entityProperty?: string, pid: number;
+  className: string;
+  entityId: string;
+  entityProperty?: string;
 }
 
 export class ProcessInstance extends DBBaseEntity {
@@ -16,19 +18,20 @@ export class ProcessInstance extends DBBaseEntity {
   cmd: string;
   cwd: string;
   name: string;
+  relation1TO1entityId: number;
   meta: string;
   env: any;
 
   setInfo(metaInfo: ProcessMetaInfo) {
     const { className, entityId, entityProperty } = metaInfo;
     this.meta = `${className}-${_.kebabCase(entityId)}${
-      _.isString(entityProperty) ? ('-' + entityProperty) : ''
+      _.isString(entityProperty) ? ('-' + entityProperty) : '-'
       }`
   }
 
   get info(): ProcessMetaInfo {
     const [className, entityId, entityProperty] = this.meta.split('-');
-    return { className, entityId, entityProperty, pid: this.pid };
+    return { className, entityId, entityProperty };
   }
 
 }
