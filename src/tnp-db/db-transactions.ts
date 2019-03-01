@@ -22,7 +22,7 @@ import { BuildOptions } from '../models/build-options';
 import { BuildInstance } from './entites/build-instance';
 import { warn, error } from '../messages';
 import { killProcess, questionYesNo } from '../process';
-import { CommandInstance, ProjectInstance } from './entites';
+import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
 import chalk from 'chalk';
@@ -67,6 +67,9 @@ export class DBTransaction {
 
   public async setCommand(command: string) {
     let location: string = process.cwd();
+    if (_.isString(command) && !command.startsWith('tnp build')) {
+      return;
+    }
     if (!fse.existsSync(location)) {
       error(`Cannot set command - location doesn't exists: ${location}`)
       return
@@ -123,11 +126,14 @@ export class DBTransaction {
     this.crud.remove(existed)
   }
 
-  public async updateCurrentProcess() {
-    await this.start(`update current process`, async () => {
-      await this.__processCtrl.updateCurrentProcess()
+  public setProcessAndGetExisted(options: ProcessMetaInfo) {
+    return new Promise<ProcessInstance>(async (resolve) => {
+      let proc = this.__processCtrl.setProcessAndGetExisted(options);
+      resolve(proc);
     });
   }
+
+
 
   public async updateBuildsWithCurrent(currentProject: Project,
     buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {

@@ -20,14 +20,16 @@ export class PreviewBuildtnpprocessComponent implements OnInit {
 
   ) { }
 
-  models = []
+  models = [];
 
   async ngOnInit() {
 
 
 
-    this.models = await PROJECT.getAll(undefined, 2);
-    log.i('projects', this.models)
+    const projects = await PROJECT.getAll(undefined, 2);
+
+    this.models = projects.filter(p => p.name === 'container');
+    log.i('projects', this.models);
 
   }
 

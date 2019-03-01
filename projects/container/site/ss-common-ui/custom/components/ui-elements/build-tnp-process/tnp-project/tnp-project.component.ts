@@ -61,6 +61,10 @@ export class TnpProjectComponent implements OnInit {
     this.buildFormGroup = this.formBuilder.group({});
     this.testFormGroup = this.formBuilder.group({});
     this.serveFormGroup = this.formBuilder.group({});
+
+    if (this.model.type === 'container') {
+      this.showChildren = true;
+    }
   }
 
 }

@@ -3,9 +3,10 @@ import * as _ from 'lodash';
 import { DBBaseEntity } from './base-entity';
 import { CLASS } from 'typescript-class-helpers';
 
-/**
- * TODO Useless now ?
- */
+export type ProcessMetaInfo = {
+  className: string, entityId: string, entityProperty?: string, pid: number;
+}
+
 export class ProcessInstance extends DBBaseEntity {
   isEqual(anotherInstace: ProcessInstance): boolean {
     return (this.pid === anotherInstace.pid)
@@ -17,6 +18,18 @@ export class ProcessInstance extends DBBaseEntity {
   name: string;
   meta: string;
   env: any;
+
+  setInfo(metaInfo: ProcessMetaInfo) {
+    const { className, entityId, entityProperty } = metaInfo;
+    this.meta = `${className}-${_.kebabCase(entityId)}${
+      _.isString(entityProperty) ? ('-' + entityProperty) : ''
+      }`
+  }
+
+  get info(): ProcessMetaInfo {
+    const [className, entityId, entityProperty] = this.meta.split('-');
+    return { className, entityId, entityProperty, pid: this.pid };
+  }
 
 }
 //#endregion

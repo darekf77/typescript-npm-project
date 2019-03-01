@@ -17,8 +17,11 @@ import { MatRadioModule } from '@angular/material/radio';
 import { BuildTnpProcessComponent } from './build-tnp-process.component';
 import { TnpProjectComponent } from './tnp-project/tnp-project.component';
 import { FormWrapperMaterialModule } from 'baseline/ss-common-ui/components/formly';
-import { ItemEnvironmentComponent, ItemBuildComponent, ItemServeComponent, ItemTestComponent } from './tnp-project/items';
-
+import {
+  ItemEnvironmentComponent, ItemBuildComponent,
+  ItemServeComponent, ItemTestComponent
+} from './tnp-project/items';
+import { ProcessLoggerModule } from 'baseline/ss-common-ui/components/formly/entity-components/process-logger'
 
 const angularModules = [
   CommonModule,
@@ -52,11 +55,16 @@ const componentsLocal = [
   BuildTnpProcessComponent
 ];
 
+const baselineModules = [
+  ProcessLoggerModule
+]
+
 @NgModule({
   imports: [
     FormWrapperMaterialModule,
     ...angularModules,
-    ...materialModules
+    ...materialModules,
+    ...baselineModules
   ],
   exports: [...componentsLocal],
   declarations: [...componentsLocal],

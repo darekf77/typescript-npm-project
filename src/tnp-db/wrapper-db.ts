@@ -19,7 +19,7 @@ import { BuildOptions } from '../models';
 import { error, warn } from '../messages';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
-import { BuildInstance, CommandInstance, ProjectInstance } from './entites';
+import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';
 
 
 export class TnpDB {
@@ -96,8 +96,12 @@ export class TnpDB {
 
   }
 
-  public getProject(): ProjectInstance[] {
+  public getProjects(): ProjectInstance[] {
     return this.crud.getAll(ProjectInstance);
+  }
+
+  public getProceses(): ProcessInstance[] {
+    return this.crud.getAll(ProcessInstance);
   }
 
   constructor(private location: string) {
