@@ -19,7 +19,7 @@ export class ProjectInstance extends DBBaseEntity {
     return this.locationOfProject === anotherInstace.locationOfProject;
   }
 
-  hasEqualMeta info(anotherInstace: ProjectInstance) {
+  hasEqualMetainfo(anotherInstace: ProjectInstance) {
 
   }
 

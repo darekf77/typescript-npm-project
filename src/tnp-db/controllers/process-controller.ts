@@ -46,13 +46,13 @@ export class ProcessController extends BaseController {
 
   async setProcess(process: ProcessInstance) {
     const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
-    const existed = all.find(p => {
-      return p.isEqual(process) || (
-        p.info && process.info &&
-        p.info.className === process.info.className &&
-        p.info.entityId === entityId
-      )
-    })
+    // const existed = all.find(p => {
+    //   return p.isEqual(process) || (
+    //     p.info && process.info &&
+    //     p.info.className === process.info.className &&
+    //     p.info.entityId === entityId
+    //   )
+    // })
   }
 
   findProcessBy(metaInfo: ProcessMetaInfo) {
