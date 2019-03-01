@@ -14,7 +14,7 @@ import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 
-process.env[config.message.tnp_bundle_mode] = 'false'
+
 
 Helpers.checkEnvironment({
   npm: [

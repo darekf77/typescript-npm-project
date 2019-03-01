@@ -1,11 +1,10 @@
+import { Project } from "./base-project";
 //#region @backend
 import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
 
-// local
-import { Project } from "./base-project";
 import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
 import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
@@ -20,8 +19,11 @@ import { ProjectFrom, tryCopyFrom } from '../index';
  *  - isomorphic-lib
  *  - angular-lib
  */
+//#endregion
+
 export abstract class BaseProjectLib extends Project {
 
+  //#region @backend
   projectSpecyficFiles() {
     const files = [
       'index.js',
@@ -79,7 +81,7 @@ export abstract class BaseProjectLib extends Project {
       bumbVersionIn.forEach(p => {
         const packageJson = PackageJSON.fromLocation(p);
         if (!!packageJson && packageJson.data &&
-           packageJson.data.tnp && packageJson.data.tnp.type) {
+          packageJson.data.tnp && packageJson.data.tnp.type) {
           const project = ProjectFrom(p);
           if (project.isWorkspace && project.isCoreProject) {
             if (!project.packageJson.data.dependencies) {
@@ -250,7 +252,7 @@ export abstract class BaseProjectLib extends Project {
     })
     info(`Resources copied to release folder: ${config.folder.bundle}`)
   }
-
+  //#endregion
 
 }
-//#endregion
+

@@ -1,9 +1,10 @@
 import { Morphi } from 'morphi';
-
+import * as _ from 'lodash';
 
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 import { PROJECT } from './PROJECT';
+import { ProjectIsomorphicLib, Project } from 'tnp-bundle';
 //#region @backend
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
 //#endregion
@@ -14,23 +15,27 @@ export interface IProjectController extends ProjectController {
 
 @Morphi.Controller({
   className: 'ProjectController',
-  entity: entities.PROJECT
+  entity: entities.PROJECT,
+  additionalEntities: [ProjectIsomorphicLib, Project]
 })
 export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> {
 
 
-
   @Morphi.Http.GET()
-  getAll(@Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig)
+  getAll(
+    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig,
+    @Morphi.Http.Param.Query('slice') slice: number = 1)
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
       const db = await TnpDB.Instance;
-      return db.getProject().map(p => {
+      const projects = db.getProject();
+      const mapped = projects.map(p => {
         let res = p.project;
         res.modelDataConfig = config;
-        return res;
+        return res as any;
       });
+      return mapped;
     }
     //#endregion
   }
@@ -51,7 +56,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     return async () => {
       let res = ProjectFrom(decodeURIComponent(location));
       res.modelDataConfig = config;
-      return res;
+      return res as any;
     }
     //#endregion
   }

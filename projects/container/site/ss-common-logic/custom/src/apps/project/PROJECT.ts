@@ -13,8 +13,8 @@ export { IProject as IPROJECT } from 'tnp-bundle'
 export class PROJECT extends Project {
   ctrl: IProjectController;
   static ctrl: IProjectController;
-  static async getAll(config?: ModelDataConfig) {
-    const data = await this.ctrl.getAll(config).received
+  static async getAll(config?: ModelDataConfig, slice?: number) {
+    const data = await this.ctrl.getAll(config, slice).received
     return data.body.json;
   }
   static async getByLocation(location: string, config?: ModelDataConfig) {

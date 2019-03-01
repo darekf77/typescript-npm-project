@@ -14,6 +14,8 @@ var bundleExist = fs.existsSync(pathToBundletRun);
 
 var start;
 
+global['tnp-normal-mode'] = true
+
 if (bundleExist && distExist) {
   if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
     console.log('- tnp dist -> becouse is newer -')

@@ -20,16 +20,17 @@ import { UnknowNpmProject } from './project-unknow-npm';
 import { ProjectContainer } from './project-container';
 //#endregion
 export * from './base-project';
+export * from './base-project-lib';
+export * from './project-isomorphic-lib';
+export * from './package-json';
 
 //#region @backend
-export * from './base-project-lib';
 export * from './baseline-site-join';
 export * from './project-angular-client';
 export * from './project-angular-client-cli';
 export * from './project-angular-lib';
 export * from './project-docker';
 export * from './project-ionic-client';
-export * from './project-isomorphic-lib';
 export * from './project-server-lib';
 export * from './project-workspace';
 export * from './project-container';

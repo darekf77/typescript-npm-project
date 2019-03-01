@@ -28,9 +28,19 @@ const sortKeys = function (obj) {
   return obj;
 };
 
+//#endregion
+import { Morphi } from 'morphi';
 
+
+@Morphi.Entity<PackageJSON>({
+  className: 'PackageJSON',
+  //#region @backend
+  createTable: false
+  //#endregion
+})
 export class PackageJSON {
 
+  //#region @backend
   public data: IPackageJSON;
   public readonly location: string;
   public readonly project: Project;
@@ -557,7 +567,7 @@ export class PackageJSON {
     return false;
   }
 
-
+  //#endregion
 
 }
-//#endregion
+

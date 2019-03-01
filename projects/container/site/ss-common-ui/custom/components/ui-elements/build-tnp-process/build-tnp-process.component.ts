@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
 
 
 @Component({
@@ -10,7 +12,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 export class BuildTnpProcessComponent implements OnInit {
 
 
-  @Input() model: any;
+  @Input() model: PROJECT;
 
   isLinear = false;
   firstFormGroup: FormGroup;

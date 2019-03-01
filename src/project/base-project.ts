@@ -1,6 +1,7 @@
 import { Morphi, ModelDataConfig } from 'morphi';
 
 import { LibType, EnvironmentName } from "../models";
+import { PackageJSON } from "./package-json";
 //#region @backend
 
 import * as fs from 'fs';
@@ -13,7 +14,6 @@ import * as _ from 'lodash';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
-import { PackageJSON } from "./package-json";
 import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
@@ -77,7 +77,7 @@ export interface IProject {
   className: 'Project',
 
   mapping: {
-
+    packageJson: 'PackageJSON'
   },
   additionalMapping: {
     'browser.children': ['Project'],
@@ -86,10 +86,11 @@ export interface IProject {
     'browser.preview': 'Project'
   },
   //#region @backend
-   createTable: false,
+  createTable: false,
   browserTransformFn: (entity) => {
     // console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
+    entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
 
@@ -179,10 +180,7 @@ export class Project implements IProject {
       return true;
     }
     //#region @backend
-    if (process.env[config.message.tnp_bundle_mode] === 'false') {
-      return false;
-    }
-    return true;
+    return !(!!global[config.message.tnp_normal_mode])
     //#endregion
   }
 
@@ -310,9 +308,9 @@ export class Project implements IProject {
     //#endregion
   }
 
-  //#region @backend
+
   readonly packageJson: PackageJSON;
-  //#endregion
+
 
   //#region @backend
   readonly node_modules: NodeModules;
@@ -451,7 +449,12 @@ export class Project implements IProject {
   get versionPatchedPlusOne() {
 
     if (!this.version) {
-      error(`Please define ${chalk.bold('version')} property in your package.json`, true, true)
+
+      if (!global[config.message.tnp_normal_mode]) {
+        return
+      }
+
+      error(`Please define ${chalk.bold('version')} property in your package.json`, true)
       error(path.join(this.location, config.file.package_json), false, true)
     }
     const ver = this.version.split('.');

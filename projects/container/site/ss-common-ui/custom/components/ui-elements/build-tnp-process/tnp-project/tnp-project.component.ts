@@ -5,6 +5,9 @@ import { EnvironmentName } from 'tnp-bundle/browser';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
+import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+
 @Component({
   selector: 'app-tnp-project',
   templateUrl: './tnp-project.component.html',
@@ -23,7 +26,7 @@ export class TnpProjectComponent implements OnInit {
 
   @Input() isChild = false;
 
-  @Input() model: any;
+  @Input() model: PROJECT;
 
   environmentFormGroup: FormGroup;
   buildFormGroup: FormGroup;

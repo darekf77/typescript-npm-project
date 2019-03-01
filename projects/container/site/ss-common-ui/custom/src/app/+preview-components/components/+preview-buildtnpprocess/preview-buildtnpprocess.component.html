@@ -1,6 +1,5 @@
 <div *ngIf="models">
-
-  <app-build-tnp-process [model]="model"></app-build-tnp-process>
+  <app-build-tnp-process *ngFor="let model of models" [model]="model"></app-build-tnp-process>
 </div>
 
 <ng-template #loader>

@@ -5,7 +5,7 @@ import { Log } from 'ng2-logger/browser';
 
 const log = Log.create('privew build tnp ');
 import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
-
+import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
 
 @Component({
   selector: 'app-preview-buildtnpprocess',
@@ -16,16 +16,18 @@ export class PreviewBuildtnpprocessComponent implements OnInit {
 
 
   constructor(
-    // private buildService: BuildService,
+    private ProjectController: ProjectController,
 
   ) { }
 
   models = []
 
   async ngOnInit() {
-    const projecs = await PROJECT.getAll();
-    log.i('projects', projecs)
-    // this.model$ = this.buildService.$observe.byId(1, undefined);
+
+
+
+    this.models = await PROJECT.getAll(undefined, 2);
+    log.i('projects', this.models)
 
   }
 

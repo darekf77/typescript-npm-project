@@ -58,7 +58,7 @@ export const config = {
     }
   },
   message: {
-    tnp_bundle_mode: 'tnp-bundle-mode'
+    tnp_normal_mode: 'tnp-normal-mode'
   },
   names: {
     env: {

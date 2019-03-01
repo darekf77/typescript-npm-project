@@ -28,7 +28,7 @@ export function error(details: any, noExit = false, noTrace = false) {
     }
 
   }
-  if (process.env[config.message.tnp_bundle_mode] === 'false') {
+  if (global[config.message.tnp_normal_mode]) {
     if (!noExit) {
       process.exit(1);
     }
