@@ -100,6 +100,10 @@ export class TnpDB {
     return this.crud.getAll(ProjectInstance);
   }
 
+  resetProceses() {
+    this.__processCtrl.resetProcessess()
+  }
+
   public getProceses(): ProcessInstance[] {
     return this.crud.getAll(ProcessInstance);
   }

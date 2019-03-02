@@ -24,8 +24,13 @@ export class ProcessController extends BaseController {
     //     return proc;
     //   })
 
-    // this.crud.setBulk(proceses, ProcessInstance);
+    this.crud.setBulk([], ProcessInstance);
   }
+
+  resetProcessess() {
+    this.crud.setBulk([], ProcessInstance);
+  }
+
   async update() {
     // const ps: PsListInfo[] = await psList();
     // const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
@@ -44,15 +49,6 @@ export class ProcessController extends BaseController {
     // this.crud.setBulk(filteredBuilds, ProcessInstance);
   }
 
-  findProcessByRelationId(relation1TO1entityId: number) {
-    if (_.isNumber(relation1TO1entityId)) {
-      return
-    }
-    const proceses = this.crud.getAll<ProcessInstance>(ProcessInstance);
-    return proceses.find((p) => {
-      return (p.info && (p.relation1TO1entityId === relation1TO1entityId))
-    });
-  }
 
   findProcessByInfo(metaInfo: ProcessMetaInfo) {
     const { className, entityId, entityProperty } = metaInfo;
@@ -72,17 +68,6 @@ export class ProcessController extends BaseController {
   boundProcess(metaInfo: ProcessMetaInfo, relation1TO1entityId?: number): ProcessInstance {
     let existed: ProcessInstance;
     let saveToDB = true;
-    existed = this.findProcessByRelationId(relation1TO1entityId);
-    if (existed) {
-      if (existed.info.className !== metaInfo.className ||
-        existed.info.entityId !== metaInfo.entityId ||
-        existed.info.entityProperty !== metaInfo.entityProperty) {
-        this.crud.remove(existed);
-        existed = void 0;
-      } else {
-        saveToDB = false
-      }
-    }
 
     if (!existed) {
       existed = this.findProcessByInfo(metaInfo)
@@ -97,14 +82,17 @@ export class ProcessController extends BaseController {
     }
 
     existed.setInfo(metaInfo);
-    existed.relation1TO1entityId = relation1TO1entityId;
+    if(_.isNumber(relation1TO1entityId)) {
+      existed.relation1TO1entityId = relation1TO1entityId;
+    }
+
 
     // existed.cwd = metaInfo.cwd;
     // existed.cmd = metaInfo.cmd;
     // existed.pid = metaInfo.pid;
 
     if(saveToDB) {
-      this.crud.set(existed);
+      this.crud.set(existed)
     }
     return existed;
   }

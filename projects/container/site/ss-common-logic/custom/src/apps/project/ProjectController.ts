@@ -40,7 +40,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
         const p = mapped[index];
         await this.addProcessesToModel(p as any);
       }
-      return mapped;
+      return  mapped;
     }
     //#endregion
   }
@@ -74,35 +74,35 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     const db = await TnpDB.Instance;
 
 
-    this.assignProc(p, db, 'procStaticBuild', {
+    await this.assignProc(p, db, 'procStaticBuild', {
       cmd: 'tnp build:dist',
       cwd: p.location,
       async: true,
       name: `Static Build of project ${p.name}`
     })
 
-    this.assignProc(p, db, 'procWatchBuild', {
+    await this.assignProc(p, db, 'procWatchBuild', {
       cmd: 'tnp build:dist:watch',
       cwd: p.location,
       async: true,
       name: `Watch build of project ${p.name}`
     });
 
-    this.assignProc(p, db, 'procServeStatic', {
+    await this.assignProc(p, db, 'procServeStatic', {
       cmd: 'tnp start',
       cwd: p.location,
       async: true,
       name: `Server staticlyu project ${p.name}`
     })
 
-    this.assignProc(p, db, 'procInitEnv', {
+    await this.assignProc(p, db, 'procInitEnv', {
       cmd: 'tnp init --env=%s',
       cwd: p.location,
       async: false,
       name: `Init environment of project ${p.name}`
     });
 
-    this.assignProc(p, db, 'procClear', {
+    await this.assignProc(p, db, 'procClear', {
       cmd: 'tnp clear:%s',
       cwd: p.location,
       async: false,
@@ -136,26 +136,23 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
         let toSave = { metaInfo, relation1TO1entityId };
         relation1TO1entityId = proc.relation1TO1entityId;
         if (_.isNumber(relation1TO1entityId)) {
-          processInDB = await this.db.PROCESS.find({ id: relation1TO1entityId });
+          processInDB = await this.db.PROCESS.findOne({ id: relation1TO1entityId });
         }
         if (processInDB) {
           toSave = void 0;
         } else {
           processInDB = new PROCESS(processOptions);
-          processInDB = await this.db.PROCESS.save(processInDB);
+          try {
+            processInDB.savingMode = true
+            processInDB = await this.db.PROCESS.save(processInDB);
+          } catch (e) {
+            console.log(e)
+          }
+          processInDB.savingMode = false;
           relation1TO1entityId = processInDB.id;
+          toSave.relation1TO1entityId = relation1TO1entityId;
         }
         p[property as any] = processInDB;
-
-        // if (proc.cmd !== processInDB.cmd ||
-        //   proc.pid !== processInDB.pid ||
-        //   proc.cwd !== processInDB.cwd) {
-
-        //   metaInfo.pid = processInDB.pid;
-        //   metaInfo.cwd = processInDB.cwd;
-        //   metaInfo.cmd = processInDB.cmd;
-        //   return { metaInfo, relation1TO1entityId }
-        // }
         return toSave;
       }
     )
@@ -172,6 +169,9 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
 
   async initExampleDbData() {
     // console.log('Don not init this! OK ')
+    const db = await TnpDB.Instance;
+    db.resetProceses()
+    console.log('Done clearing processes')
 
   }
   //#endregion
