@@ -10,38 +10,38 @@ import { PsListInfo } from '../../models/ps-info';
 export class ProcessController extends BaseController {
 
   async addExisted() {
-    const ps: PsListInfo[] = await psList();
-    // console.log(ps.filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0));
-    const proceses = ps
-      .filter(p => {
-        return !!p.cmd.split(' ').find(p => p.endsWith(`/bin/tnp`))
-      })
-      .map(p => {
-        const proc = new ProcessInstance();
-        proc.pid = p.pid;
-        proc.cmd = p.cmd;
-        proc.name = p.name;
-        return proc;
-      })
+    // const ps: PsListInfo[] = await psList();
+    // // console.log(ps.filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0));
+    // const proceses = ps
+    //   .filter(p => {
+    //     return !!p.cmd.split(' ').find(p => p.endsWith(`/bin/tnp`))
+    //   })
+    //   .map(p => {
+    //     const proc = new ProcessInstance();
+    //     proc.pid = p.pid;
+    //     proc.cmd = p.cmd;
+    //     proc.name = p.name;
+    //     return proc;
+    //   })
 
-    this.crud.setBulk(proceses, ProcessInstance);
+    // this.crud.setBulk(proceses, ProcessInstance);
   }
   async update() {
-    const ps: PsListInfo[] = await psList();
-    const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
-    // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
-    const filteredBuilds = all.filter(b => {
-      if(_.isNumber(b.relation1TO1entityId)) {
-        return true;
-      }
-      if (ps.filter(p => p.pid == b.pid).length > 0) {
-        return true;
-      }
-      return false;
-    })
-    // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
-    // process.exit(0)
-    this.crud.setBulk(filteredBuilds, ProcessInstance);
+    // const ps: PsListInfo[] = await psList();
+    // const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
+    // // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
+    // const filteredBuilds = all.filter(b => {
+    //   if(_.isNumber(b.relation1TO1entityId)) {
+    //     return true;
+    //   }
+    //   if (ps.filter(p => p.pid == b.pid).length > 0) {
+    //     return true;
+    //   }
+    //   return false;
+    // })
+    // // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
+    // // process.exit(0)
+    // this.crud.setBulk(filteredBuilds, ProcessInstance);
   }
 
   findProcessByRelationId(relation1TO1entityId: number) {
