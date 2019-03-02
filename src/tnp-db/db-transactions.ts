@@ -27,6 +27,13 @@ import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
 import chalk from 'chalk';
 
+export type ProcessBoundAction = (
+  process: ProcessInstance
+) => Promise<{
+  metaInfo: ProcessMetaInfo,
+  relation1TO1entityId?: number
+}>
+
 
 
 export class DBTransaction {
@@ -126,16 +133,24 @@ export class DBTransaction {
     this.crud.remove(existed)
   }
 
-  public setProcessAndGetExisted(options: ProcessMetaInfo) {
-    return new Promise<ProcessInstance>(async (resolve) => {
-      let proc = this.__processCtrl.setProcessAndGetExisted(options);
-      resolve(proc);
+  async boundActions(
+    action1: ProcessBoundAction,
+    action2: ProcessBoundAction) {
+
+    await this.start(`bound process`, async () => {
+      let d = await action1(void 0);
+      let proc = await this.boundProcess(d.metaInfo, d.relation1TO1entityId);
+      d = await action2(proc);
+      if(d) {
+        await this.boundProcess(d.metaInfo, d.relation1TO1entityId);
+      }
     });
   }
 
-  public async setProcess(process: ProcessInstance) {
-    await this.start(`Set process rellation`, async () => {
-
+  private boundProcess(metaInfo: ProcessMetaInfo, relation1TO1entityId?: number): Promise<ProcessInstance> {
+    return new Promise<ProcessInstance>(async (resolve) => {
+      let proc = this.__processCtrl.boundProcess(metaInfo, relation1TO1entityId)
+      resolve(proc);
     });
   }
 

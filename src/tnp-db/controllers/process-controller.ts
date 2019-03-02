@@ -31,65 +31,80 @@ export class ProcessController extends BaseController {
     const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
     // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
     const filteredBuilds = all.filter(b => {
+      if(_.isNumber(b.relation1TO1entityId)) {
+        return true;
+      }
       if (ps.filter(p => p.pid == b.pid).length > 0) {
         return true;
-      } else if (_.isNumber(b.relation1TO1entityId)) {
-        b.pid = void 0;
-      } else {
-        return false;
       }
+      return false;
     })
     // console.log('[UPDATE BUILDS] AFTER FILTER', filteredBuilds.map(c => c.pid))
     // process.exit(0)
     this.crud.setBulk(filteredBuilds, ProcessInstance);
   }
 
-  async setProcess(process: ProcessInstance) {
-    const all = this.crud.getAll<ProcessInstance>(ProcessInstance);
-    // const existed = all.find(p => {
-    //   return p.isEqual(process) || (
-    //     p.info && process.info &&
-    //     p.info.className === process.info.className &&
-    //     p.info.entityId === entityId
-    //   )
-    // })
+  findProcessByRelationId(relation1TO1entityId: number) {
+    if (_.isNumber(relation1TO1entityId)) {
+      return
+    }
+    const proceses = this.crud.getAll<ProcessInstance>(ProcessInstance);
+    return proceses.find((p) => {
+      return (p.info && (p.relation1TO1entityId === relation1TO1entityId))
+    });
   }
 
-  findProcessBy(metaInfo: ProcessMetaInfo) {
+  findProcessByInfo(metaInfo: ProcessMetaInfo) {
     const { className, entityId, entityProperty } = metaInfo;
     const proceses = this.crud.getAll<ProcessInstance>(ProcessInstance);
     let existed: ProcessInstance;
-    if (_.isString(entityProperty)) {
-      existed = proceses.find((p) => {
-        return (
-          p.info &&
-          p.info.className === className &&
-          p.info.entityId === entityId
-        )
-      })
-    } else {
-      existed = proceses.find((p) => {
-        return (
-          p.info &&
-          p.info.className === className &&
-          p.info.entityId === entityId &&
-          p.info.entityProperty === entityProperty
-        )
-      })
-    }
+    existed = proceses.find((p) => {
+      return (
+        p.info &&
+        p.info.className === className &&
+        p.info.entityId === entityId &&
+        p.info.entityProperty === entityProperty
+      )
+    })
     return existed;
   }
 
-  setProcessAndGetExisted(metaInfo: ProcessMetaInfo): ProcessInstance {
-    let existed = this.findProcessBy(metaInfo)
+  boundProcess(metaInfo: ProcessMetaInfo, relation1TO1entityId?: number): ProcessInstance {
+    let existed: ProcessInstance;
+    let saveToDB = true;
+    existed = this.findProcessByRelationId(relation1TO1entityId);
     if (existed) {
-      existed.setInfo(metaInfo);
+      if (existed.info.className !== metaInfo.className ||
+        existed.info.entityId !== metaInfo.entityId ||
+        existed.info.entityProperty !== metaInfo.entityProperty) {
+        this.crud.remove(existed);
+        existed = void 0;
+      } else {
+        saveToDB = false
+      }
+    }
+
+    if (!existed) {
+      existed = this.findProcessByInfo(metaInfo)
+      if(existed && !_.isNumber(relation1TO1entityId)) {
+        saveToDB = false;
+      }
+    }
+
+    if (!existed) {
+      existed = new ProcessInstance()
+      saveToDB = true;
+    }
+
+    existed.setInfo(metaInfo);
+    existed.relation1TO1entityId = relation1TO1entityId;
+
+    // existed.cwd = metaInfo.cwd;
+    // existed.cmd = metaInfo.cmd;
+    // existed.pid = metaInfo.pid;
+
+    if(saveToDB) {
       this.crud.set(existed);
-    } else {
-      let proc = new ProcessInstance();
-      proc.setInfo(metaInfo);
-      this.crud.set(proc);
-      existed = proc;
     }
     return existed;
   }

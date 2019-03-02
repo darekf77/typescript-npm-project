@@ -6,7 +6,10 @@ import { CLASS } from 'typescript-class-helpers';
 export type ProcessMetaInfo = {
   className: string;
   entityId: string;
-  entityProperty?: string;
+  entityProperty: string;
+  cmd?: string;
+  cwd?: string;
+  pid?: number;
 }
 
 export class ProcessInstance extends DBBaseEntity {

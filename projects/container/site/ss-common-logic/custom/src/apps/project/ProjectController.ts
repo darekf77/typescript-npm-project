@@ -33,7 +33,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
       const projects = db.getProjects();
       const mapped = projects.map(p => {
         let res = p.project;
-        res.modelDataConfig = config;
+        res.modelDataConfig = config as any;
         return res as any;
       });
       for (let index = 0; index < mapped.length; index++) {
@@ -61,7 +61,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#region @backendFunc
     return async () => {
       let res = ProjectFrom(decodeURIComponent(location));
-      res.modelDataConfig = config;
+      res.modelDataConfig = config as any;
       await this.addProcessesToModel(res as any);
       return res as any;
     }
@@ -73,13 +73,6 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
   private async addProcessesToModel(p: PROJECT) {
     const db = await TnpDB.Instance;
 
-
-    p.procStaticBuild = new PROCESS({
-      cmd: 'tnp build:dist',
-      cwd: p.location,
-      async: true,
-      name: `Static Build of project ${p.name}`
-    })
 
     this.assignProc(p, db, 'procStaticBuild', {
       cmd: 'tnp build:dist',
@@ -118,18 +111,55 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
 
   }
 
-  private async assignProc(p: PROJECT, db: TnpDB,
-    property: (keyof PROJECT), processOptions: { name: string; cmd: string; cwd?: string; async?: boolean }) {
-    p[property as any] = new PROCESS(processOptions);
+  private async assignProc(
+    p: PROJECT, db: TnpDB,
+    property: (keyof PROJECT),
+    processOptions: { name: string; cmd: string; cwd?: string; async?: boolean }) {
 
-    const pid = (p && p[property]) ? (p[property] as PROCESS).pid : void 0;
-    let ins = await db.transaction.setProcessAndGetExisted({
+    let processInDB: PROCESS;
+    let relation1TO1entityId: number;
+
+    const metaInfo = {
       className: 'PROJECT',
       entityId: p.location,
       entityProperty: property,
-      pid
-    });
-    (p[property] as PROCESS).pid = ins.pid;
+      pid: void 0,
+      cmd: void 0,
+      cwd: void 0
+    };
+
+    await db.transaction.boundActions(
+      async () => {
+        return { metaInfo, relation1TO1entityId }
+      },
+      async (proc) => {
+        let toSave = { metaInfo, relation1TO1entityId };
+        relation1TO1entityId = proc.relation1TO1entityId;
+        if (_.isNumber(relation1TO1entityId)) {
+          processInDB = await this.db.PROCESS.find({ id: relation1TO1entityId });
+        }
+        if (processInDB) {
+          toSave = void 0;
+        } else {
+          processInDB = new PROCESS(processOptions);
+          processInDB = await this.db.PROCESS.save(processInDB);
+          relation1TO1entityId = processInDB.id;
+        }
+        p[property as any] = processInDB;
+
+        // if (proc.cmd !== processInDB.cmd ||
+        //   proc.pid !== processInDB.pid ||
+        //   proc.cwd !== processInDB.cwd) {
+
+        //   metaInfo.pid = processInDB.pid;
+        //   metaInfo.cwd = processInDB.cwd;
+        //   metaInfo.cmd = processInDB.cmd;
+        //   return { metaInfo, relation1TO1entityId }
+        // }
+        return toSave;
+      }
+    )
+
   }
 
   get db() {
