@@ -37,7 +37,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#region @backendFunc
     return async () => {
       let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
-      res.modelDataConfig = config;
+      res.modelDataConfig = config as any;
       return res;
     }
     //#endregion
@@ -48,7 +48,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#region @backendFunc
     return async () => {
       let res = await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id));
-      res.modelDataConfig = config;
+      res.modelDataConfig = config as any;
       return res;
     }
     //#endregion

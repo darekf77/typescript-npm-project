@@ -20,7 +20,7 @@ export class PROJECT extends Project {
   ctrl: IProjectController;
   static ctrl: IProjectController;
   static async getAll(config?: ModelDataConfig, slice?: number) {
-    const data = await this.ctrl.getAll(config, slice).received
+    const data = await this.ctrl.getAll(config, slice).received;
     return data.body.json;
   }
   static async getByLocation(location: string, config?: ModelDataConfig) {

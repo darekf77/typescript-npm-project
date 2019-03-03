@@ -40,7 +40,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
         const p = mapped[index];
         await this.addProcessesToModel(p as any);
       }
-      return  mapped;
+      return mapped;
     }
     //#endregion
   }
@@ -142,13 +142,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
           toSave = void 0;
         } else {
           processInDB = new PROCESS(processOptions);
-          try {
-            processInDB.savingMode = true
-            processInDB = await this.db.PROCESS.save(processInDB);
-          } catch (e) {
-            console.log(e)
-          }
-          processInDB.savingMode = false;
+          processInDB = await this.db.PROCESS.save(processInDB);
           relation1TO1entityId = processInDB.id;
           toSave.relation1TO1entityId = relation1TO1entityId;
         }
@@ -156,6 +150,9 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
         return toSave;
       }
     )
+
+
+
 
   }
 

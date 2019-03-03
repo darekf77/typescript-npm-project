@@ -44,7 +44,6 @@ export const config = {
   file: {
     autob_actions_js: 'auto-actions.js',
     package_json: 'package.json',
-    projects_json: 'projects.json',
     tnpBundle: 'tnp-bundle',
     tnpEnvironment_json: 'tmp-environment.json',
     environment: 'environment',
