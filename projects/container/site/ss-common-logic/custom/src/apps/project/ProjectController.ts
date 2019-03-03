@@ -5,7 +5,7 @@ import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 import { PROJECT } from './PROJECT';
 import { ProjectIsomorphicLib, Project } from 'tnp-bundle';
-import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
+
 //#region @backend
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
 //#endregion
@@ -29,18 +29,8 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
-      const db = await TnpDB.Instance;
-      const projects = db.getProjects();
-      const mapped = projects.map(p => {
-        let res = p.project;
-        res.modelDataConfig = config as any;
-        return res as any;
-      });
-      for (let index = 0; index < mapped.length; index++) {
-        const p = mapped[index];
-        await this.addProcessesToModel(p as any);
-      }
-      return mapped;
+      const res = await this.db.PROJECT.getAllProjects(config)
+      return res;
     }
     //#endregion
   }
@@ -60,101 +50,13 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     : Morphi.Response<PROJECT> {
     //#region @backendFunc
     return async () => {
-      let res = ProjectFrom(decodeURIComponent(location));
-      res.modelDataConfig = config as any;
-      await this.addProcessesToModel(res as any);
-      return res as any;
+      const res = await this.db.PROJECT.getByLocation(location, config)
+      return res;
     }
     //#endregion
   }
 
   //#region @backend
-
-  private async addProcessesToModel(p: PROJECT) {
-    const db = await TnpDB.Instance;
-
-
-    await this.assignProc(p, db, 'procStaticBuild', {
-      cmd: 'tnp build:dist',
-      cwd: p.location,
-      async: true,
-      name: `Static Build of project ${p.name}`
-    })
-
-    await this.assignProc(p, db, 'procWatchBuild', {
-      cmd: 'tnp build:dist:watch',
-      cwd: p.location,
-      async: true,
-      name: `Watch build of project ${p.name}`
-    });
-
-    await this.assignProc(p, db, 'procServeStatic', {
-      cmd: 'tnp start',
-      cwd: p.location,
-      async: true,
-      name: `Server staticlyu project ${p.name}`
-    })
-
-    await this.assignProc(p, db, 'procInitEnv', {
-      cmd: 'tnp init --env=%s',
-      cwd: p.location,
-      async: false,
-      name: `Init environment of project ${p.name}`
-    });
-
-    await this.assignProc(p, db, 'procClear', {
-      cmd: 'tnp clear:%s',
-      cwd: p.location,
-      async: false,
-      name: `Clear project ${p.name}`
-    });
-
-  }
-
-  private async assignProc(
-    p: PROJECT, db: TnpDB,
-    property: (keyof PROJECT),
-    processOptions: { name: string; cmd: string; cwd?: string; async?: boolean }) {
-
-    let processInDB: PROCESS;
-    let relation1TO1entityId: number;
-
-    const metaInfo = {
-      className: 'PROJECT',
-      entityId: p.location,
-      entityProperty: property,
-      pid: void 0,
-      cmd: void 0,
-      cwd: void 0
-    };
-
-    await db.transaction.boundActions(
-      async () => {
-        return { metaInfo, relation1TO1entityId }
-      },
-      async (proc) => {
-        let toSave = { metaInfo, relation1TO1entityId };
-        relation1TO1entityId = proc.relation1TO1entityId;
-        if (_.isNumber(relation1TO1entityId)) {
-          processInDB = await this.db.PROCESS.findOne({ id: relation1TO1entityId });
-        }
-        if (processInDB) {
-          toSave = void 0;
-        } else {
-          processInDB = new PROCESS(processOptions);
-          processInDB = await this.db.PROCESS.save(processInDB);
-          relation1TO1entityId = processInDB.id;
-          toSave.relation1TO1entityId = relation1TO1entityId;
-        }
-        p[property as any] = processInDB;
-        return toSave;
-      }
-    )
-
-
-
-
-  }
 
   get db() {
     return entities.entities(this.connection as any)

@@ -28,4 +28,17 @@ export class PROJECT extends Project {
     return data.body.json;
   }
 
+  //#region @backend
+  static async createProcess(process: PROCESS) {
+    let res = await this.ctrl.db.PROCESS.save(process);
+    return res;
+  }
+
+  static async getProcessByID(processId: number) {
+    let res = await this.ctrl.db.PROCESS.findOne({ id: processId });
+    return res;
+  }
+
+  //#endregion
+
 }

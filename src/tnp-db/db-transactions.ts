@@ -73,16 +73,17 @@ export class DBTransaction {
 
 
   public async setCommand(command: string) {
+    // console.log(`Set commadn: ${command}`)
     let location: string = process.cwd();
-    if (_.isString(command) && !command.startsWith('tnp build')) {
-      return;
-    }
     if (!fse.existsSync(location)) {
       error(`Cannot set command - location doesn't exists: ${location}`)
       return
     }
     await this.start(`set command: ${command} in location: ${location}`, () => {
       const c = new CommandInstance(command, location);
+      if (_.isString(c.command) && !c.command.trim().startsWith('tnp build')) {
+        return;
+      }
       this.crud.set(c)
     })
   }

@@ -26,10 +26,10 @@ export class PreviewBuildtnpprocessComponent implements OnInit {
 
 
 
-    const projects = await PROJECT.getAll(undefined, 2);
+    const projects = await PROJECT.getAll();
 
     this.models = projects.filter(p => p.name === 'container');
-    log.i('projects', this.models);
+    log.i('projects', projects);
 
   }
 
