@@ -6,7 +6,6 @@
         "chrisdias.vscode-opennewinstance",
         "eamodio.gitlens",
         "EditorConfig.EditorConfig",
-        "eg2.tslint",
         "IBM.output-colorizer",
         "johnpapa.Angular2",
         "Mikael.Angular-BeastCode",
@@ -18,7 +17,6 @@
         "kdcro101.favorites",
         "taddison.gitlazy",
         "jack89ita.copy-filename",
-        "natqe.reload",
-        "ivangabriele.vscode-git-add-and-commit"
+        "natqe.reload"
     ]
 }
