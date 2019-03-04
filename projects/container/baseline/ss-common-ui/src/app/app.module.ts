@@ -10,40 +10,53 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 // local
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-
+import { AppPreviewPopupContentService } from './app-popup-content.service';
+// third part
+import { StaticColumnsModule } from 'static-columns';
 import {
   StandalonePopupModule
 } from 'components';
 
-const modules = [
+
+const angularModules = [
+  NoopAnimationsModule,
+  BrowserModule,
+  FormsModule,
+  HttpModule,
+  RouterModule.forRoot(routes, {
+    useHash: true,
+    preloadingStrategy: PreloadAllModules,
+    enableTracing: false
+  }),
+];
+
+const modulesMaterial = [
   MatTabsModule,
   MatSidenavModule
 ];
 
-
+const otherModules = [
+  StaticColumnsModule,
+  StandalonePopupModule
+];
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
-    NoopAnimationsModule,
-    BrowserModule,
-    FormsModule,
-    HttpModule,
-    RouterModule.forRoot(routes, {
-      useHash: true,
-      preloadingStrategy: PreloadAllModules,
-      enableTracing: false
-    }),
-    StandalonePopupModule,
-    ...modules
+    ...angularModules,
+    ...modulesMaterial,
+    ...otherModules
   ],
   exports: [
-    ...modules,
+    ...otherModules,
+    ...modulesMaterial,
 
   ],
-  providers: [],
+  providers: [
+    AppPreviewPopupContentService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

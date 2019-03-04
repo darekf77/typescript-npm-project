@@ -1,17 +1,25 @@
 <standalone-popup [contentComponent]="popupContent"></standalone-popup>
 <ng-template #popupContent>
-  <ul>
-    <li>
-      <a routerLink="/previewcomponents"> Components </a>
-    </li>
-    <li>
-      <a routerLink="/preview-layout-material"> Layout Material </a>
-    </li>
-    <li>
-      <a routerLink="/layout-slider-vertical"> Layout Slider Vertical  </a>
-    </li>
-  </ul>
+  <columns-container>
+    <column [width]="150">
+      <ul>
+        <li>
+          <a routerLink="/previewcomponents"> Components </a>
+        </li>
+        <li>
+          <a routerLink="/preview-layout-material"> Layout Material </a>
+        </li>
+        <li>
+          <a routerLink="/layout-slider-vertical"> Layout Slider Vertical </a>
+        </li>
+      </ul>
+    </column>
+    <column grow>
+      <div #container ></div>
+    </column>
+
+  </columns-container>
+
 </ng-template>
 <!-- route below -->
 <router-outlet></router-outlet>
-
