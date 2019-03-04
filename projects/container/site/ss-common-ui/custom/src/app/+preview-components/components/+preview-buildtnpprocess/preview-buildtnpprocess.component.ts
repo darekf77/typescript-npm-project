@@ -6,6 +6,7 @@ import { Log } from 'ng2-logger/browser';
 const log = Log.create('privew build tnp ');
 import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
 import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+import { ModelDataConfig } from 'morphi/browser';
 
 @Component({
   selector: 'app-preview-buildtnpprocess',
@@ -14,6 +15,9 @@ import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps
 })
 export class PreviewBuildtnpprocessComponent implements OnInit {
 
+  config = new ModelDataConfig({
+    include: ['location', 'name', 'browser']
+  });
 
   constructor(
     private ProjectController: ProjectController,
@@ -26,7 +30,7 @@ export class PreviewBuildtnpprocessComponent implements OnInit {
 
 
 
-    const projects = await PROJECT.getAll();
+    const projects = await PROJECT.getAll(this.config);
 
     this.models = projects.filter(p => p.name === 'container');
     log.i('projects', projects);

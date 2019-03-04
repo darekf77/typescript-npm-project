@@ -298,6 +298,18 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return data.body.json;
   }
 
+  //#region @backend
+  static async save(process: PROCESS) {
+    let res = await this.ctrl.db.PROCESS.save(process);
+    return res;
+  }
+
+  static async getByID(processId: number) {
+    let res = await this.ctrl.db.PROCESS.findOne({ id: processId });
+    return res;
+  }
+
+  //#endregion
 
 
 }

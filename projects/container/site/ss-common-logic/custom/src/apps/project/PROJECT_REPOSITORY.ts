@@ -97,6 +97,12 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     property: (keyof PROJECT),
     processOptions: { name: string; cmd: string; cwd?: string; async?: boolean }) {
 
+    if (p.modelDataConfig && _.isArray(p.modelDataConfig.include) &&
+      p.modelDataConfig.include.length > 0 &&
+      !p.modelDataConfig.include.includes(property)) {
+      return
+    }
+
     let processInDB: PROCESS;
     let relation1TO1entityId: number;
 
@@ -117,13 +123,13 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
         let toSave = { metaInfo, relation1TO1entityId };
         relation1TO1entityId = proc.relation1TO1entityId;
         if (_.isNumber(relation1TO1entityId)) {
-          processInDB = await PROJECT.getProcessByID(relation1TO1entityId)
+          processInDB = await PROCESS.getByID(relation1TO1entityId)
         }
         if (processInDB) {
           toSave = void 0;
         } else {
           processInDB = new PROCESS(processOptions);
-          processInDB = await PROJECT.createProcess(processInDB);
+          processInDB = await PROCESS.save(processInDB);
           relation1TO1entityId = processInDB.id;
           toSave.relation1TO1entityId = relation1TO1entityId;
         }

@@ -94,6 +94,10 @@ export interface IProject {
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
 
+    if (entity.modelDataConfig && entity.modelDataConfig.include) {
+      entity.modelDataConfig.set.include(entity)
+    }
+
     return entity;
   }
   //#endregion
@@ -740,8 +744,8 @@ Generated workspace should be here: ${genLocationWOrkspace}
   //#region @backend
   private async modifySourceBeforCompilation() {
     if (this.isSite && config.allowedTypes.libs.includes(this.type)) {
-      await this.baseline.sourceModifier.init(`Initing source modifier for baseline`)
-      await this.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`)
+      await this.baseline.sourceModifier.init(`Initing source modifier for baseline`);
+      await this.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`);
     }
 
     if (config.allowedTypes.app.includes(this.type)) {
