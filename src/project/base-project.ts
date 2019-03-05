@@ -90,6 +90,7 @@ export interface IProject {
   browserTransformFn: (entity) => {
     // console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
+    entity.browser.parent = entity.parent;
     entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;

@@ -30,7 +30,7 @@ export class PreviewBuildtnpprocessComponent
 
 
   @ViewChild('menu') menu: TemplateRef<any>;
-  models = [];
+  models: PROJECT[] = [];
   selected: PROJECT;
 
 
@@ -44,10 +44,20 @@ export class PreviewBuildtnpprocessComponent
     log.i('projects', projects);
     this.models = projects;
 
+    this.distinct()
+
+  }
+
+  distinct() {
+    const all = {};
+    this.models.forEach(c => {
+      all[c.location] = c;
+    })
+    log.i('all',all)
   }
 
   ngAfterContentInit() {
-    this.popupService.setContent(this.menu);
+    this.popupService.setContent(this.menu, '/previewcomponents/buildtnpprocess');
   }
 
 }
