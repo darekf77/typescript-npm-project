@@ -4,9 +4,25 @@ import * as _ from 'lodash';
 import * as child from 'child_process';
 import axios from 'axios';
 import { Morphi, ModelDataConfig } from "morphi";
-import { PROJECT } from "./PROJECT";
+import { PROJECT, IPROJECT } from "./PROJECT";
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
+
+const propsToClearFromObject = [
+  'sourceModifier',
+  'node_modules',
+  // 'packageJson',
+  'moduleDivider',
+  'tests',
+  'recreate',
+  'copytToManager',
+  'frameworkFileGenerator',
+  'proxyRouter',
+  'join',
+  'angular',
+  'module_divider',
+  'env'
+] as (keyof PROJECT)[]
 
 export interface TNP_PROJECT_ALIASES {
   project: string;
@@ -17,6 +33,14 @@ export interface TNP_PROJECT_ALIASES {
 export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJECT_ALIASES> {
   globalAliases: (keyof TNP_PROJECT_ALIASES)[] = ['project', 'projects']
 
+  clearProject(p: PROJECT, props = propsToClearFromObject) {
+    (props).forEach(prop => {
+      _.set(p, prop, void 0)
+    })
+    // if (p.children) {
+    //   p.children.forEach(c => this.clearProject(c as PROJECT))
+    // }
+  }
 
   async getAllProjects(config?: ModelDataConfig) {
     const db = await TnpDB.Instance;
@@ -24,19 +48,25 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     const mapped = projects.map(p => {
       let res = p.project;
       res.modelDataConfig = config as any;
+      this.clearProject(res as PROJECT);
       return res as any;
-    });
+    }).slice(0, 4);
     for (let index = 0; index < mapped.length; index++) {
       const p = mapped[index];
       await this.addProcessesToModel(p as any);
     }
-    return mapped;
+    return mapped.map(c => {
+      this.clearProject(c as PROJECT, ['modelDataConfig']);
+      return c;
+    })
   }
 
   async getByLocation(location: string, config?: ModelDataConfig) {
     let res = ProjectFrom(decodeURIComponent(location));
     res.modelDataConfig = config as any;
+    this.clearProject(res as PROJECT);
     await this.addProcessesToModel(res as any);
+    this.clearProject(res as PROJECT, ['modelDataConfig']);
     return res as any;
   }
 

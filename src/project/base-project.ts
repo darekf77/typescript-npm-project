@@ -75,7 +75,8 @@ export interface IProject {
 
 @Morphi.Entity<Project>({
   className: 'Project',
-
+  classFamily: 'Project',
+  uniqueKeyProp: 'location',
   mapping: {
     packageJson: 'PackageJSON'
   },
@@ -102,7 +103,7 @@ export interface IProject {
     return entity;
   }
   //#endregion
-})
+} as any)
 export class Project implements IProject {
   modelDataConfig?: ModelDataConfig;
   id: number;
@@ -126,7 +127,7 @@ export class Project implements IProject {
       return this.browser.name;
     }
     //#region @backendFunc
-    return this.packageJson.name;
+    return this.packageJson ? this.packageJson.name: path.basename(this.location);
     //#endregion
   }
 

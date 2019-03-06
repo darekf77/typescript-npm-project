@@ -7,6 +7,7 @@ export { IProject as IPROJECT } from 'tnp-bundle'
 
 @Morphi.Entity<PROJECT>({
   className: 'PROJECT',
+  uniqueKeyProp: 'location',
   mapping: {
 
   }
