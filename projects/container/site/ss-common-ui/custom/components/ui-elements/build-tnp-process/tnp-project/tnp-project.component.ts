@@ -55,9 +55,9 @@ export class TnpProjectComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.model && this.model.isWorkspace) {
-      this.environmentFormGroup = this.formBuilder.group({});
-    }
+    // if (this.model && this.model.isWorkspace) {
+    this.environmentFormGroup = this.formBuilder.group({});
+    // }
     this.buildFormGroup = this.formBuilder.group({});
     this.testFormGroup = this.formBuilder.group({});
     this.serveFormGroup = this.formBuilder.group({});

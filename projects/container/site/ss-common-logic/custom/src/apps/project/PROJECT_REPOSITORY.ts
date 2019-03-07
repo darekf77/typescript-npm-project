@@ -50,7 +50,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
       res.modelDataConfig = config as any;
       this.clearProject(res as PROJECT);
       return res as any;
-    }).slice(0, 4);
+    })
     for (let index = 0; index < mapped.length; index++) {
       const p = mapped[index];
       await this.addProcessesToModel(p as any);
