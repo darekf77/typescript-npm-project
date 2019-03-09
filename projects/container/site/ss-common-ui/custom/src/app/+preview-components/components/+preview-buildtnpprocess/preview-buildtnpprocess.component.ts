@@ -48,6 +48,10 @@ export class PreviewBuildtnpprocessComponent
 
   }
 
+  async selectProject(project: PROJECT) {
+    // this.models[this.models.indexOf(project)] = await PROJECT.get
+  }
+
   // distinct() {
   //   const all = {};
   //   this.models.forEach(c => {

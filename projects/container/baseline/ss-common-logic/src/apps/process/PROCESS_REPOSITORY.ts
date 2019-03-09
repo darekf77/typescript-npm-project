@@ -7,8 +7,7 @@ import * as fse from 'fs-extra';
 import { run, TnpDB, killProcess, Project } from 'tnp-bundle';
 import * as child from 'child_process';
 import { Morphi } from 'morphi';
-import * as  psList from 'ps-list';
-import { PsListInfo } from 'tnp-bundle'
+import psList, { ProcessDescriptor } from 'ps-list';
 import { PROCESS } from './PROCESS';
 
 export interface PROCESS_ALIASES {
@@ -145,7 +144,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   }
 
 
-  async updateActive(processOrProcesses: PROCESS | PROCESS[], activeProcesses?: PsListInfo[]) {
+  async updateActive(processOrProcesses: PROCESS | PROCESS[], activeProcesses?: ProcessDescriptor[]) {
     if (_.isUndefined(activeProcesses)) {
       activeProcesses = await psList()
     }

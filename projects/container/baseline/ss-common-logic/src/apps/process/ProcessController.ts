@@ -5,7 +5,7 @@ import { Morphi } from 'morphi';
 import { authenticate } from 'passport'
 import * as  psList from 'ps-list';
 import * as _ from 'lodash';
-import { PsListInfo, Project } from 'tnp-bundle'
+import { Project } from 'tnp-bundle'
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';

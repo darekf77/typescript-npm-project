@@ -9,10 +9,10 @@
 
 
 <ng-template #menu>
-  <ul *ngIf="models" class="menu-popup-preview-project" >
+  <ul *ngIf="models" class="1menu-popup-preview-project" >
     <li *ngFor="let project of models">
       <a href="javascript:void(0)"
-      (click)="selected = project" >
+      (click)="selectProject(project)" >
           {{project.name}}
       </a>
     </li>
