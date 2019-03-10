@@ -15,6 +15,7 @@ import { error } from '../messages';
 
 interface VSCodeSettings {
   'files.exclude': { [files: string]: boolean; };
+  "workbench.colorTheme": "Default Light+" | "Kimbie Dark",
   "workbench.colorCustomizations": {
     "activityBar.background"?: string;
     "activityBar.foreground"?: string;
@@ -41,7 +42,7 @@ export class FilesRecreator {
   }
 
   public init(includeVscode = false) {
-    if(this.project.type === 'container') {
+    if (this.project.type === 'container') {
       return;
     }
     this.assets();
@@ -114,11 +115,11 @@ export class FilesRecreator {
                 return `!${path.join(config.folder.custom, f)}`
               }))
           ) : []
-          )).concat( // common files for all project
+        )).concat( // common files for all project
           self.project.isCoreProject ? [] : self.commonFilesForAllProjects
-          ).concat( // core files of projects types
+        ).concat( // core files of projects types
           self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
-          )
+        )
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json'] : [])
@@ -167,6 +168,18 @@ export class FilesRecreator {
     return {
       get settings() {
         return {
+          gitReset() {
+            try {
+              self.project.run('git checkout HEAD -- .vscode/settings.json').sync()
+            } catch (e) { }
+
+          },
+          changeColorTheme(white = true) {
+            self.modifyVscode((settings) => {
+              settings['workbench.colorTheme'] = white ? "Default Light+" : "Kimbie Dark";
+              return settings;
+            });
+          },
 
           colorsFromWorkspace() {
             self.modifyVscode((settings, project) => {

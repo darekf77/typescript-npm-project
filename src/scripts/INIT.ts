@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { install } from './INSTALL';
 import { RecrusiveBaseline } from './INIT-recrusive-functions';
 import { TnpDB } from '../tnp-db';
+import { sleep } from 'sleep';
 
 
 async function initialize(
@@ -84,6 +85,26 @@ export function init(args: string,
 export default {
   $INIT: async (args) => {
     await init(args).project()
+    process.exit(0)
+  },
+
+  $VSCODE_FIX: async () => {
+    const db = await TnpDB.Instance;
+    const projects = db.getProjects();
+    for (let index = 0; index < projects.length; index++) {
+      const proj = projects[index];
+      proj.project.recreate.vscode.settings.changeColorTheme(false)
+    }
+    sleep(1);
+    for (let index = 0; index < projects.length; index++) {
+      const proj = projects[index];
+      proj.project.recreate.vscode.settings.changeColorTheme()
+    }
+    sleep(1);
+    for (let index = 0; index < projects.length; index++) {
+      const proj = projects[index];
+      proj.project.recreate.vscode.settings.gitReset()
+    }
     process.exit(0)
   },
 
