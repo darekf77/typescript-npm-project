@@ -13,17 +13,24 @@ export { IProject as IPROJECT } from 'tnp-bundle'
   }
 })
 export class PROJECT extends Project {
-  procStaticBuild: PROCESS;
-  procWatchBuild: PROCESS;
-  procInitEnv: PROCESS;
-  procServeStatic: PROCESS;
-  procClear: PROCESS;
+  procStaticBuild?: PROCESS;
+  procWatchBuild?: PROCESS;
+  procInitEnv?: PROCESS;
+  procServeStatic?: PROCESS;
+  procClear?: PROCESS;
   ctrl: IProjectController;
   static ctrl: IProjectController;
-  static async getAll(config?: ModelDataConfig, slice?: number) {
-    const data = await this.ctrl.getAll(config, slice).received;
+  static async getAll(config?: ModelDataConfig) {
+    const data = await this.ctrl.getAll(config).received;
+    return data.body.json;
+    this.projects.ch
+  }
+
+  static async getAllForMenu() {
+    const data = await this.ctrl.getAllStandalone().received;
     return data.body.json;
   }
+
   static async getByLocation(location: string, config?: ModelDataConfig) {
     const data = await this.ctrl.getByLocation(location, config).received
     return data.body.json;

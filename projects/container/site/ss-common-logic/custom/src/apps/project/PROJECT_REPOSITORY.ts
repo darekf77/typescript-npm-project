@@ -7,6 +7,7 @@ import { Morphi, ModelDataConfig } from "morphi";
 import { PROJECT, IPROJECT } from "./PROJECT";
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
+import { c } from '@angular/core/src/render3';
 
 const propsToClearFromObject = [
   'sourceModifier',
@@ -42,6 +43,31 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     // }
   }
 
+  private versionForMenu(p: PROJECT) {
+
+    const children = (p.children && p.children.length) > 0 ?
+      p.children.map(c => this.versionForMenu(c as any)) : []
+
+    return _.merge(new PROJECT(), {
+      location: p.location,
+      browser: {
+        name: p.name,
+        children
+      } as Partial<PROJECT>
+    } as Partial<PROJECT>) as PROJECT;
+  }
+
+  async getAllStandalone() {
+    const db = await TnpDB.Instance;
+    const projects = db.getProjects();
+    return projects
+      .map(p => {
+        return p.project;
+      })
+      .filter(p => p.isStandaloneProject)
+      .map(p => this.versionForMenu(p as PROJECT)) as PROJECT[]
+  }
+
   async getAllProjects(config?: ModelDataConfig) {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
@@ -58,7 +84,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     return mapped.map(c => {
       this.clearProject(c as PROJECT, ['modelDataConfig']);
       return c;
-    })
+    }) as PROJECT[]
   }
 
   async getByLocation(location: string, config?: ModelDataConfig) {

@@ -8,6 +8,7 @@ import { ProjectIsomorphicLib, Project } from 'tnp-bundle';
 
 //#region @backend
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
+import { async } from 'q';
 //#endregion
 
 export interface IProjectController extends ProjectController {
@@ -24,8 +25,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
 
   @Morphi.Http.GET()
   getAll(
-    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig,
-    @Morphi.Http.Param.Query('slice') slice: number = 1)
+    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig)
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
@@ -35,11 +35,22 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#endregion
   }
 
+  @Morphi.Http.GET()
+  getAllStandalone()
+    : Morphi.Response<PROJECT[]> {
+    //#region @backendFunc
+    return async () => {
+      const menuPorojects = await this.db.PROJECT.getAllStandalone()
+      return () => menuPorojects;
+    }
+    //#endregion
+  }
+
 
   getByLocation(
     location: string,
     config?: Morphi.CRUD.ModelDataConfig) {
-    return this._getByLocation(location, config);
+    return this._getByLocation(encodeURIComponent(location), config);
   }
 
 
@@ -50,7 +61,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     : Morphi.Response<PROJECT> {
     //#region @backendFunc
     return async () => {
-      const res = await this.db.PROJECT.getByLocation(location, config)
+      const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location), config)
       return res;
     }
     //#endregion

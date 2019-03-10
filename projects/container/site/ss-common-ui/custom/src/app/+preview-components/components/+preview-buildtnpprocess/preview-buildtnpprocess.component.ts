@@ -38,7 +38,7 @@ export class PreviewBuildtnpprocessComponent
 
 
 
-    const projects = await PROJECT.getAll(this.config);
+    const projects = await PROJECT.getAllForMenu()
 
     // this.models = projects.filter(p => p.name === 'container');
     log.i('projects', projects);
@@ -49,7 +49,10 @@ export class PreviewBuildtnpprocessComponent
   }
 
   async selectProject(project: PROJECT) {
-    // this.models[this.models.indexOf(project)] = await PROJECT.get
+
+    const fullProject = await PROJECT.getByLocation(project.location);
+    this.models[this.models.indexOf(project)] = fullProject;
+    log.i('full porject', project)
   }
 
   // distinct() {
