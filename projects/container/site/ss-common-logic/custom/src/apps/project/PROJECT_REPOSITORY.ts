@@ -7,7 +7,7 @@ import { Morphi, ModelDataConfig } from "morphi";
 import { PROJECT, IPROJECT } from "./PROJECT";
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
-import { c } from '@angular/core/src/render3';
+
 
 const propsToClearFromObject = [
   'sourceModifier',
