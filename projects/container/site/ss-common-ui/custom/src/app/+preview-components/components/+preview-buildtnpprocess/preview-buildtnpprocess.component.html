@@ -8,38 +8,7 @@
 
 
 <ng-template #menu>
-  <ul *ngIf="models"
-      class="1menu-popup-preview-project">
-    <li *ngFor="let project of models">
-      <a href="javascript:void(0)"
-         (click)="selectProject(project)">
-        {{project.name}}
-      </a>
-      <ul *ngIf="project.children">
-        <li *ngFor="let child of project.children">
-          <a href="javascript:void(0)"
-             (click)="selectProject(project)">
-            {{child.name}}
-          </a>
-          <ul *ngIf="child.children">
-            <li *ngFor="let grandchild of child.children">
-              <a href="javascript:void(0)"
-                 (click)="selectProject(project)">
-                {{grandchild.name}}
-              </a>
-              <ul *ngIf="grandchild.children">
-                <li *ngFor="let grandgrandchild of grandchild.children">
-                  <a href="javascript:void(0)"
-                     (click)="selectProject(project)">
-                    {{grandgrandchild.name}}
-                  </a>
-                </li>
-              </ul>
-            </li>
 
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
+  <app-recrusive-menu [items]="models" (selected)="selectProject($event)" ></app-recrusive-menu>
+
 </ng-template>

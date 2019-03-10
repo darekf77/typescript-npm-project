@@ -96,7 +96,10 @@ export interface IProject {
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
 
-    if (entity.modelDataConfig && entity.modelDataConfig.include) {
+    if (entity.modelDataConfig &&
+      _.isArray(entity.modelDataConfig.include) &&
+      entity.modelDataConfig.include.length > 0
+    ) {
       entity.modelDataConfig.set.include(entity)
     }
 
@@ -127,7 +130,7 @@ export class Project implements IProject {
       return this.browser.name;
     }
     //#region @backendFunc
-    return this.packageJson ? this.packageJson.name: path.basename(this.location);
+    return this.packageJson ? this.packageJson.name : path.basename(this.location);
     //#endregion
   }
 

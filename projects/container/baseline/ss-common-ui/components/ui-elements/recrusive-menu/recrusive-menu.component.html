@@ -1,0 +1,8 @@
+<ul *ngIf="items"
+    class="1menu-popup-preview-project">
+  <li *ngFor="let item of items" (click)="onSelected(item)" >
+      {{item[nameProperty]}}
+    <app-recrusive-menu *ngIf="item[childrenProperty]" (selected)="onSelected($event)"
+                        [items]="item[childrenProperty]"></app-recrusive-menu>
+  </li>
+</ul>

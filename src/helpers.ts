@@ -105,7 +105,7 @@ export function copyFile(sousrce: string, destination: string,
 
   try {
     if (fse.lstatSync(sousrce).isDirectory()) {
-      warn(`Trying to copy directory as file: ${sousrce}`, true)
+      warn(`Trying to copy directory as file: ${sousrce}`, false)
       return
     }
     if (!fs.existsSync(sousrce)) {

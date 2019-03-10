@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // local
-import { BuildTnpProcessModule } from 'components';
+import { BuildTnpProcessModule, RecrusiveMenuModule } from 'components';
 import { Morphi } from 'morphi/browser';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';
@@ -16,6 +16,11 @@ const angularModules = [
   RouterModule.forChild(routes)
 ];
 
+const localModules = [
+  BuildTnpProcessModule,
+  RecrusiveMenuModule
+]
+
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
 Morphi.init({
@@ -27,7 +32,7 @@ Morphi.init({
 @NgModule({
   imports: [
     ...angularModules,
-    BuildTnpProcessModule,
+    ...localModules
   ],
   exports: [
     PreviewBuildtnpprocessComponent

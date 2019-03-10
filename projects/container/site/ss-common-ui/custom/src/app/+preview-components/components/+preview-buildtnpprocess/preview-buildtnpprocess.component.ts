@@ -19,7 +19,7 @@ export class PreviewBuildtnpprocessComponent
 
 
   config = new ModelDataConfig({
-    include: ['location', 'name', 'browser']
+    // include: ['location', 'name', 'browser']
   });
 
   constructor(
@@ -52,6 +52,7 @@ export class PreviewBuildtnpprocessComponent
 
     const fullProject = await PROJECT.getByLocation(project.location);
     this.models[this.models.indexOf(project)] = fullProject;
+    this.selected = fullProject;
     log.i('full porject', project)
   }
 

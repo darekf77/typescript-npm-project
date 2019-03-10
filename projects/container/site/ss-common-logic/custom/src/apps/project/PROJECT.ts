@@ -23,7 +23,7 @@ export class PROJECT extends Project {
   static async getAll(config?: ModelDataConfig) {
     const data = await this.ctrl.getAll(config).received;
     return data.body.json;
-    this.projects.ch
+    // this.projects.ch
   }
 
   static async getAllForMenu() {
