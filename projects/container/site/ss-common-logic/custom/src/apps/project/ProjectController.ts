@@ -8,7 +8,6 @@ import { ProjectIsomorphicLib, Project } from 'tnp-bundle';
 
 //#region @backend
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
-import { async } from 'q';
 //#endregion
 
 export interface IProjectController extends ProjectController {
