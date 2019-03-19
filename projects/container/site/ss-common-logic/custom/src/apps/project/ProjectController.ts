@@ -1,4 +1,4 @@
-import { Morphi } from 'morphi';
+import { Morphi, MDC } from 'morphi';
 import * as _ from 'lodash';
 
 import * as entities from '../../entities';
@@ -29,7 +29,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#region @backendFunc
     return async () => {
       const res = await this.db.PROJECT.getAllProjects(config)
-      return res;
+      return () => res;
     }
     //#endregion
   }
@@ -39,7 +39,8 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
-      const menuPorojects = await this.db.PROJECT.getAllStandalone()
+      const config = MDC.create({ include: ['location', 'name'] })
+      const menuPorojects = await this.db.PROJECT.getAllProjects(config)
       return () => menuPorojects;
     }
     //#endregion
@@ -61,7 +62,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#region @backendFunc
     return async () => {
       const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location), config)
-      return res;
+      return () => res;
     }
     //#endregion
   }

@@ -9,22 +9,6 @@ import { TnpDB, ProjectFrom } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 
 
-const propsToClearFromObject = [
-  'sourceModifier',
-  'node_modules',
-  // 'packageJson',
-  'moduleDivider',
-  'tests',
-  'recreate',
-  'copytToManager',
-  'frameworkFileGenerator',
-  'proxyRouter',
-  'join',
-  'angular',
-  'module_divider',
-  'env'
-] as (keyof PROJECT)[]
-
 export interface TNP_PROJECT_ALIASES {
   project: string;
   projects: string;
@@ -34,65 +18,25 @@ export interface TNP_PROJECT_ALIASES {
 export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJECT_ALIASES> {
   globalAliases: (keyof TNP_PROJECT_ALIASES)[] = ['project', 'projects']
 
-  clearProject(p: PROJECT, props = propsToClearFromObject) {
-    (props).forEach(prop => {
-      _.set(p, prop, void 0)
-    })
-    // if (p.children) {
-    //   p.children.forEach(c => this.clearProject(c as PROJECT))
-    // }
-  }
-
-  private versionForMenu(p: PROJECT) {
-
-    const children = (p.children && p.children.length) > 0 ?
-      p.children.map(c => this.versionForMenu(c as any)) : []
-
-    return _.merge(new PROJECT(), {
-      location: p.location,
-      browser: {
-        name: p.name,
-        children
-      } as Partial<PROJECT>
-    } as Partial<PROJECT>) as PROJECT;
-  }
-
-  async getAllStandalone() {
-    const db = await TnpDB.Instance;
-    const projects = db.getProjects();
-    return projects
-      .map(p => {
-        return p.project;
-      })
-      .filter(p => p.isStandaloneProject)
-      .map(p => this.versionForMenu(p as PROJECT)) as PROJECT[]
-  }
-
   async getAllProjects(config?: ModelDataConfig) {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
     const mapped = projects.map(p => {
       let res = p.project;
       res.modelDataConfig = config as any;
-      this.clearProject(res as PROJECT);
       return res as any;
     })
     for (let index = 0; index < mapped.length; index++) {
       const p = mapped[index];
       await this.addProcessesToModel(p as any);
     }
-    return mapped.map(c => {
-      this.clearProject(c as PROJECT, ['modelDataConfig']);
-      return c;
-    }) as PROJECT[]
+    return mapped as PROJECT[]
   }
 
   async getByLocation(location: string, config?: ModelDataConfig) {
     let res = ProjectFrom(decodeURIComponent(location));
     res.modelDataConfig = config as any;
-    this.clearProject(res as PROJECT);
     await this.addProcessesToModel(res as any);
-    this.clearProject(res as PROJECT, ['modelDataConfig']);
     return res as any;
   }
 
