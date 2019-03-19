@@ -49,7 +49,12 @@ export class CommandsController extends BaseController {
       const clients = (buildOptions.forClient as Project[]).map(c => {
         return `--forClient ${c.name}`
       }).join(' ');
-      cmd.command = cmd.command + ' ' + clients;
+
+      const copyto = (buildOptions.copyto as Project[]).map(c => {
+        return `--copyto ${c.location}`
+      }).join(' ');
+
+      cmd.command = cmd.command + ' ' + clients + ' ' + copyto;
       this.crud.set(cmd)
     } else {
       warn(`Cannot update unexisted last commadn in location: ${location}`)

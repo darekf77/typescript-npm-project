@@ -165,9 +165,6 @@ export class BuildOptions implements IBuildOptions {
         if (!project) {
           error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
         } else {
-          const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;
-          const what = path.normalize(`${project.location}/node_module/${projectName}`)
-          info(`After each build finish ${what} will be update.`)
           return project;
         }
 

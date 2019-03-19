@@ -17,7 +17,7 @@ import { ChildProcess } from "child_process";
 import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { run as __run, watcher as __watcher, killProcessByPort, run } from "../process";
+import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../process";
 import { copyFile, getMostRecentFilesNames, tryRemoveDir, tryCopyFrom } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./node-modules";
@@ -32,6 +32,7 @@ import { SourceModifier } from './source-modifier';
 import { reinstallTnp } from './tnp-bundle';
 import { FrameworkFilesGenerator } from './framework-files-generator';
 import { TnpDB } from '../tnp-db';
+import * as inquirer from 'inquirer';
 //#endregion
 
 import { EnvironmentConfig } from './environment-config';
@@ -748,9 +749,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
   //#region @backend
   private async modifySourceBeforCompilation() {
-    if (this.isSite && config.allowedTypes.libs.includes(this.type)) {
+    if (this.isSite) {
       await this.baseline.sourceModifier.init(`Initing source modifier for baseline`);
       await this.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`);
+      // await questionYesNo('Continue ?') // TODO fix this
     }
 
     if (config.allowedTypes.app.includes(this.type)) {
@@ -826,11 +828,65 @@ Generated workspace should be here: ${genLocationWOrkspace}
     //   }
     // }
 
+    if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
+      if (this.isStandaloneProject) {
+        await this.selectProjectToCopyTO()
+      }
+    }
+
+    if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+      (this.buildOptions.copyto as Project[]).forEach(proj => {
+        const project = proj;
+        const projectCurrent = this;
+        const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;
+        const what = path.normalize(`${project.location}/node_module/${projectName}`)
+        info(`After each build finish ${what} will be update.`)
+      });
+    }
+
+
     await this.buildSteps(buildOptions);
-    this.copytToManager.initCopyingOnBuildFinish(buildOptions);
+    await this.copytToManager.initCopyingOnBuildFinish(buildOptions);
     if (buildOptions.compileOnce) {
       process.exit(0)
     }
+  }
+  //#endregion
+
+
+  //#region @backend
+  async selectProjectToCopyTO() {
+    // clearConsole()
+    const db = await TnpDB.Instance;
+    const existedProject = db
+      .getProjects()
+      .map(p => p.project)
+      .filter(p => p.location !== this.location)
+
+    function getProjectName(p: Project) {
+      return ((p.parent && p.parent.parent) ? `${p.parent.parent.name}/` : '') +
+        (p.parent ? `${p.parent.name}/` : '') + p.name;
+    }
+
+    const { projects = [] }: { projects: string[] } = await inquirer
+      .prompt([
+        {
+          type: 'checkbox',
+          name: 'projects',
+          message: 'Select projects where to copy bundle after finish: ',
+          choices: existedProject
+            .map(c => {
+              return { value: c.location, name: getProjectName(c) }
+            })
+        }
+      ]) as any;
+
+    this.buildOptions.copyto = projects.map(p => ProjectFrom(p))
+
+    // console.log(this.buildOptions)
+    // process.exit(0)
+
+    await db.transaction.updateCommandBuildOptions(this.location, this.buildOptions);
   }
   //#endregion
 
