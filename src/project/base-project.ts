@@ -97,13 +97,6 @@ export interface IProject {
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
 
-    if (entity.modelDataConfig &&
-      _.isArray(entity.modelDataConfig.include) &&
-      entity.modelDataConfig.include.length > 0
-    ) {
-      entity.modelDataConfig.set.include(entity)
-    }
-
     return entity;
   }
   //#endregion
@@ -882,6 +875,10 @@ Generated workspace should be here: ${genLocationWOrkspace}
       ]) as any;
 
     this.buildOptions.copyto = projects.map(p => ProjectFrom(p))
+
+    if(!_.isArray(this.buildOptions.copyto)) {
+      this.buildOptions.copyto = []
+    }
 
     // console.log(this.buildOptions)
     // process.exit(0)

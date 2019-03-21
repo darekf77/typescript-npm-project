@@ -499,6 +499,9 @@ export class PackageJSON {
         return p;
       }
 
+      if (!global[config.message.tnp_normal_mode]) {
+        return
+      }
 
       error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})
 

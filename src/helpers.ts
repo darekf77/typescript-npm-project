@@ -370,10 +370,10 @@ export async function runSyncOrAsync(fn: Function) {
   if (_.isUndefined(fn)) {
     return;
   }
-  let wasPromise = false;
+  // let wasPromise = false;
   let promisOrValue = fn()
   if (promisOrValue instanceof Promise) {
-    wasPromise = true;
+    // wasPromise = true;
     promisOrValue = Promise.resolve(promisOrValue)
   }
   // console.log('was promis ', wasPromise)
