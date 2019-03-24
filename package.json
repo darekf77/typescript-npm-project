@@ -131,7 +131,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
-    "morphi": "2.0.20",
+    "morphi": "2.0.21",
     "ng2-logger": "2.0.46",
     "ng2-rest": "9.2.12",
     "node-notifier": "^5.3.0",
