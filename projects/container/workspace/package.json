@@ -74,8 +74,8 @@
           },
           "json": {
             "underscore": "^1.9.1",
-            "json10": "0.0.14",
-            "lodash-walk-object": "0.0.13",
+            "json10": "0.0.15",
+            "lodash-walk-object": "0.0.14",
             "json-stringify-safe": "^5.0.1",
             "@types/json-stringify-safe": "^5.0.0",
             "circular-json": "^0.5.1",
