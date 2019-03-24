@@ -83,9 +83,14 @@ export interface IProject {
   },
   additionalMapping: {
     'browser.children': ['Project'],
+    'browser.children.browser.childeren': ['Project'],
+    'browser.children.browser.childeren.browser.childeren': ['Project'],
     'browser.parent': 'Project',
+    'browser.parent.browser.parent': 'Project',
     'browser.baseline': 'Project',
-    'browser.preview': 'Project'
+    'browser.baseline.browser.baseline': 'Project',
+    'browser.preview': 'Project',
+    'browser.preview.browser.preview': 'Project',
   },
   //#region @backend
   createTable: false,
