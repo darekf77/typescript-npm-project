@@ -11,6 +11,20 @@ export class RecrusiveMenuComponent implements OnInit {
   @Input() selectedItem: any;
   @Input() childrenProperty = 'children';
   @Input() nameProperty = 'name';
+  @Input() filter = {
+    props: [],
+    values: [],
+    levels: []
+  }
+
+  get cfilter() {
+    return this.filter.levels.includes(this.level) ? this.filter : {
+      props: [],
+      values: []
+    }
+  }
+
+  @Input() level = 0;
 
   @Output() selected = new EventEmitter();
   onSelected(item: any) {
@@ -21,6 +35,7 @@ export class RecrusiveMenuComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.filter)
   }
 
 }

@@ -33,6 +33,12 @@ export class PreviewBuildtnpprocessComponent
   models: PROJECT[] = [];
   selected: PROJECT;
 
+  filter = {
+    props: ['isStandaloneProject'],
+    values: [true],
+    levels: [0]
+  }
+
 
   async ngOnInit() {
 

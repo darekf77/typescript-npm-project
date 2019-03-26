@@ -9,6 +9,8 @@
 
 <ng-template #menu>
 
-  <app-recrusive-menu [items]="models" (selected)="selectProject($event)" ></app-recrusive-menu>
+  <app-recrusive-menu [items]="models"
+                      [filter]="filter"
+                      (selected)="selectProject($event)"></app-recrusive-menu>
 
 </ng-template>

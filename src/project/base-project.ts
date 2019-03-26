@@ -94,13 +94,14 @@ export interface IProject {
   },
   //#region @backend
   createTable: false,
-  browserTransformFn: (entity) => {
+  browserTransformFn: (entity: Project) => {
     // console.log('I AM TRANSFORMING ENTITY!!!')
     entity.browser.children = entity.children;
     entity.browser.parent = entity.parent;
     entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
+    entity.browser.isStandaloneProject = entity.isStandaloneProject;
 
     return entity;
   }
@@ -833,6 +834,11 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
     if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+
+      const unique = {};
+      (this.buildOptions.copyto as Project[]).forEach(p => unique[p.location] = p);
+      this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
+
       (this.buildOptions.copyto as Project[]).forEach(proj => {
         const project = proj;
         const projectCurrent = this;
@@ -881,7 +887,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     this.buildOptions.copyto = projects.map(p => ProjectFrom(p))
 
-    if(!_.isArray(this.buildOptions.copyto)) {
+    if (!_.isArray(this.buildOptions.copyto)) {
       this.buildOptions.copyto = []
     }
 
