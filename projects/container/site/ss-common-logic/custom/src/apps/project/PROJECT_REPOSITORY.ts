@@ -30,14 +30,14 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
       const p = mapped[index];
       await this.addProcessesToModel(p as any);
     }
-    return mapped as PROJECT[]
+    return mapped.map(p => PROJECT.from(p));
   }
 
   async getByLocation(location: string, config?: ModelDataConfig) {
     let res = ProjectFrom(decodeURIComponent(location));
     res.modelDataConfig = config as any;
     await this.addProcessesToModel(res as any);
-    return res as any;
+    return PROJECT.from(res)
   }
 
 

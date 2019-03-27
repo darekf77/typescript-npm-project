@@ -55,11 +55,10 @@ export class PreviewBuildtnpprocessComponent
   }
 
   async selectProject(project: PROJECT) {
-
-    const fullProject = await PROJECT.getByLocation(project.location);
-    this.models[this.models.indexOf(project)] = fullProject;
-    this.selected = fullProject;
-    log.i('full porject', project)
+    log.i('project ot update', project)
+    await project.updaetAndGetProceses()
+    this.selected = project;
+    log.i('full selected', project)
   }
 
   // distinct() {
