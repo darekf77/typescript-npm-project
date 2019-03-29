@@ -29,7 +29,7 @@ export class AnotherJSON {
     isAwesome: true
   },
   mapping: {
-    test: AnotherJSON
+    test: 'AnotherJSON'
   }
 })
 export class TestJSON {

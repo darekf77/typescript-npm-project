@@ -23,7 +23,7 @@ const log = Log.create('PROJECT')
 export class PROJECT extends Project {
 
   static from(project: Project) {
-    return (new PROJECT(), project) as PROJECT;
+    return _.merge(new PROJECT(), project) as PROJECT;
   }
 
   procStaticBuild?: PROCESS;
