@@ -125,7 +125,7 @@ export class Project implements IProject {
     if (type === 'server-lib') return 4050;
   }
 
-  private readonly browser: IProject = {} as any;
+  readonly browser: IProject = {} as any;
   public get name(): string {
     if (Morphi.IsBrowser) {
       return this.browser.name;

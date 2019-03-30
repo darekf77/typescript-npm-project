@@ -4,10 +4,18 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { IProjectController } from './ProjectController';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 import { Log } from 'ng2-logger';
-export { IProject as IPROJECT } from 'tnp-bundle'
+export { IProject } from 'tnp-bundle';
+import { IProject } from 'tnp-bundle';
 
 const log = Log.create('PROJECT')
 
+export interface IPROJECT extends IProject {
+  procStaticBuild?: PROCESS;
+  procWatchBuild?: PROCESS;
+  procInitEnv?: PROCESS;
+  procServeStatic?: PROCESS;
+  procClear?: PROCESS;
+}
 
 @Morphi.Entity<PROJECT>({
   className: 'PROJECT',
@@ -15,10 +23,19 @@ const log = Log.create('PROJECT')
   mapping: {
     procClear: 'PROCESS',
     procInitEnv: 'PROCESS',
-    procServeStatic:'PROCESS',
+    procServeStatic: 'PROCESS',
     procStaticBuild: 'PROCESS',
     procWatchBuild: 'PROCESS',
+  },
+  //#region @backend
+  createTable: false,
+  browserTransformFn: (entity: PROJECT) => {
+    // entity.browser.procClear = entity.procClear;
+    entity.browser['ada'] = 'asd'
+    // console.log('Hellow from PROJECT transofrm chain')
+    return entity;
   }
+  //#endregion
 })
 export class PROJECT extends Project {
 
@@ -28,7 +45,7 @@ export class PROJECT extends Project {
   procServeStatic?: PROCESS;
   procClear?: PROCESS;
   ctrl: IProjectController;
-
+  browser: IPROJECT;
 
   async updaetAndGetProceses() {
     const data = await this.ctrl.getByLocation(this.location).received;

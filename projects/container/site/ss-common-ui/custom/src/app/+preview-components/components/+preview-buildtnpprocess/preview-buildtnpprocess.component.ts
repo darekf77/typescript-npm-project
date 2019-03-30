@@ -59,6 +59,7 @@ export class PreviewBuildtnpprocessComponent
     await project.updaetAndGetProceses()
     this.selected = project;
     log.i('full selected', project)
+    console.log(this.models)
   }
 
   // distinct() {
