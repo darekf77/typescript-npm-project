@@ -22,10 +22,6 @@ const log = Log.create('PROJECT')
 })
 export class PROJECT extends Project {
 
-  static from(project: Project) {
-    return _.merge(new PROJECT(), project) as PROJECT;
-  }
-
   procStaticBuild?: PROCESS;
   procWatchBuild?: PROCESS;
   procInitEnv?: PROCESS;

@@ -22,22 +22,22 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
     const mapped = projects.map(p => {
-      let res = p.project;
+      const res = p.project;
       res.modelDataConfig = config as any;
       return res as any;
-    })
+    });
     for (let index = 0; index < mapped.length; index++) {
       const p = mapped[index];
       await this.addProcessesToModel(p as any);
     }
-    return mapped.map(p => PROJECT.from(p));
+    return mapped;
   }
 
   async getByLocation(location: string, config?: ModelDataConfig) {
-    let res = ProjectFrom(decodeURIComponent(location));
+    const res = ProjectFrom(decodeURIComponent(location));
     res.modelDataConfig = config as any;
     await this.addProcessesToModel(res as any);
-    return PROJECT.from(res)
+    return res;
   }
 
 

@@ -12,9 +12,8 @@ export default {
     process.exit(0)
   },
 
-
-  $DEDUPE() {
-    Project.Current.packageJson.dedupe()
+  $DEDUPE(args:string) {
+    Project.Current.packageJson.dedupe(args.split(' '))
     process.exit(0)
   },
 

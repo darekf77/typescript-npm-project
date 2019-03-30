@@ -58,6 +58,7 @@ export class BuildOptions implements IBuildOptions {
   compileOnce?: boolean;
   onlyWatchNoBuild?: boolean;
   copyto?: Project[] | string[];
+  copytoAll?: boolean;
 
   /**
    * For isomorphic-lib

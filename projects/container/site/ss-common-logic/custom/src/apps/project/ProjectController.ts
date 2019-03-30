@@ -40,7 +40,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#region @backendFunc
     return async () => {
       const config = MDC.create({ include: ['location', 'name'] })
-      const menuPorojects = await this.db.PROJECT.getAllProjects(config)
+      const menuPorojects = await this.db.PROJECT.getAllProjects(config) as any;
       return () => menuPorojects;
     }
     //#endregion
@@ -61,7 +61,7 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     : Morphi.Response<PROJECT> {
     //#region @backendFunc
     return async () => {
-      const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location), config)
+      const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location), config) as PROJECT;
       return () => res;
     }
     //#endregion

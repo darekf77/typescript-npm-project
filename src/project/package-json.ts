@@ -309,8 +309,9 @@ export class PackageJSON {
     coreProject.packageJson.saveForInstall(false, false)
   }
 
-  dedupe() {
-    const packagesNames = Project.by('workspace').packageJson.data.tnp.core.dependencies.dedupe;
+  dedupe(packages?: string[]) {
+    const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
+      Project.by('workspace').packageJson.data.tnp.core.dependencies.dedupe;
     packagesNames.forEach(f => {
       console.log(`Scanning for duplicates fo ${f}....`)
 

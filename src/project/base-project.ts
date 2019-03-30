@@ -77,6 +77,7 @@ export interface IProject {
 @Morphi.Entity<Project>({
   className: 'Project',
   classFamily: 'Project',
+  classNameInBrowser: 'PROJECT',
   uniqueKeyProp: 'location',
   mapping: {
     packageJson: 'PackageJSON'
@@ -827,11 +828,17 @@ Generated workspace should be here: ${genLocationWOrkspace}
     //   }
     // }
 
-    if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-      if (this.isStandaloneProject) {
-        await this.selectProjectToCopyTO()
+    if (this.buildOptions.copytoAll) {
+      await this.selectAllProjectCopyto()
+    } else {
+      if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
+        if (this.isStandaloneProject) {
+          await this.selectProjectToCopyTO()
+        }
       }
     }
+
+
 
     if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
 
@@ -859,6 +866,17 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
 
   //#region @backend
+
+  async selectAllProjectCopyto() {
+    const db = await TnpDB.Instance;
+    const projects = db
+      .getProjects()
+      .map(p => p.project)
+      .filter(p => p.location !== this.location)
+
+    this.buildOptions.copyto = projects;
+  }
+
   async selectProjectToCopyTO() {
     // clearConsole()
     const db = await TnpDB.Instance;
