@@ -18,12 +18,11 @@ export interface TNP_PROJECT_ALIASES {
 export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJECT_ALIASES> {
   globalAliases: (keyof TNP_PROJECT_ALIASES)[] = ['project', 'projects']
 
-  async getAllProjects(config?: ModelDataConfig) {
+  async getAllProjects() {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
     const mapped = projects.map(p => {
       const res = p.project;
-      res.modelDataConfig = config as any;
       return res as any;
     });
     for (let index = 0; index < mapped.length; index++) {
@@ -33,11 +32,10 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     return mapped;
   }
 
-  async getByLocation(location: string, config?: ModelDataConfig) {
+  async getByLocation(location: string) {
     const res = ProjectFrom(decodeURIComponent(location));
-    res.modelDataConfig = config as any;
     await this.addProcessesToModel(res as any);
-    return res;
+    return res as any;
   }
 
 

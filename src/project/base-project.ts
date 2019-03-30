@@ -95,16 +95,34 @@ export interface IProject {
   },
   //#region @backend
   createTable: false,
-  browserTransformFn: (entity: Project) => {
-    // console.log('I AM TRANSFORMING ENTITY!!!')
-    entity.browser.children = entity.children;
-    entity.browser.parent = entity.parent;
+  browserTransformFn: (entity: Project, mdc: ModelDataConfig) => {
+    // console.log('I AM TRANSFORMING ENTITY!!!', mdc)
+    let exclude = [];
+    if (!!mdc && mdc.exclude.length > 0) {
+      exclude = mdc.exclude;
+    }
+    // if(exclude.length > 0) {
+    //   console.log('exclude in Project', exclude)
+    // }
+
+    if (!(exclude.length > 0 && exclude.includes('children'))) {
+      // console.log('SET CHILDREND')
+      entity.browser.children = entity.children;
+    } else {
+      entity.browser.children = void 0
+    }
+
+    if (!(exclude.length > 0 && exclude.includes('parent'))) {
+      entity.browser.parent = entity.parent;
+    } else {
+      entity.browser.parent = void 0
+    }
+
     entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace
     entity.browser.isCloud = true;
     entity.browser.isStandaloneProject = entity.isStandaloneProject;
 
-    return entity;
   }
   //#endregion
 } as any)

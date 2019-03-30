@@ -27,12 +27,17 @@ export interface IPROJECT extends IProject {
     procStaticBuild: 'PROCESS',
     procWatchBuild: 'PROCESS',
   },
+  additionalMapping: {
+    'browser.procClear': 'PROCESS',
+    'browser.procInitEnv': 'PROCESS',
+    'browser.procServeStatic': 'PROCESS',
+    'browser.procStaticBuild': 'PROCESS',
+    'browser.procWatchBuild': 'PROCESS',
+  },
   //#region @backend
   createTable: false,
   browserTransformFn: (entity: PROJECT) => {
-    // entity.browser.procClear = entity.procClear;
-    entity.browser['ada'] = 'asd'
-    // console.log('Hellow from PROJECT transofrm chain')
+
     return entity;
   }
   //#endregion
@@ -74,7 +79,7 @@ export class PROJECT extends Project {
 
 
   static async getByLocation(location: string, config?: ModelDataConfig) {
-    const data = await this.ctrl.getByLocation(location, config).received
+    const data = await this.ctrl.getByLocation(location).received
     return data.body.json;
   }
 

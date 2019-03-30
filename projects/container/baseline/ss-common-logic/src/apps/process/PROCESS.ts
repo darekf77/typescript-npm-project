@@ -31,6 +31,7 @@ export interface IPROCESS extends PROCESS {
 
   allProgressData: PROGRESS_DATA[];
   progress: PROGRESS_DATA;
+  id: number;
 }
 
 export type PROCESS_STATE =
@@ -70,10 +71,12 @@ export type PROCESS_STATE =
 
     entity.browser.progress = entity.progress;
 
-    if (entity.modelDataConfig) {
-      entity.modelDataConfig.set.exclude(entity.browser)
-      entity.modelDataConfig = void 0;
-    }
+    entity.browser.id = entity.id;
+
+    // if (entity.modelDataConfig) {
+    //   entity.modelDataConfig.set.exclude(entity.browser)
+    //   entity.modelDataConfig = void 0;
+    // }
 
     return entity;
   }
@@ -116,7 +119,14 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   @Morphi.Orm.Column.Generated()
   //#endregion
-  id: number = undefined;
+  genId: number = undefined;
+
+  get id() {
+    if (Morphi.IsBrowser) {
+      return this.browser && this.browser.id;
+    }
+    return this.genId;
+  }
 
   public browser: IPROCESS = {} as any;
 

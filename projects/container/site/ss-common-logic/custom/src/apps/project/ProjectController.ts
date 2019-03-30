@@ -24,11 +24,11 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
 
   @Morphi.Http.GET()
   getAll(
-    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig)
+    @Morphi.Http.Param.Header(Morphi.MDC_KEY) config?: Morphi.CRUD.ModelDataConfig)
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
-      const res = await this.db.PROJECT.getAllProjects(config)
+      const res = await this.db.PROJECT.getAllProjects()
       return () => res;
     }
     //#endregion
@@ -38,9 +38,9 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
   getAllStandalone()
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
-    return async () => {
-      const config = MDC.create({ include: ['location', 'name'] })
-      const menuPorojects = await this.db.PROJECT.getAllProjects(config) as any;
+    return async (req, res) => {
+      req.headers[Morphi.MDC_KEY] = MDC.create({ include: ['location', 'name'] }).toString()
+      const menuPorojects = await this.db.PROJECT.getAllProjects() as any;
       return () => menuPorojects;
     }
     //#endregion
@@ -48,8 +48,10 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
 
 
   getByLocation(
-    location: string,
-    config?: Morphi.CRUD.ModelDataConfig) {
+    location: string) {
+    const config = MDC.create({
+      exclude: ['children', 'parent']
+    });
     return this._getByLocation(encodeURIComponent(location), config);
   }
 
@@ -57,11 +59,12 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
   @Morphi.Http.GET('/location/:location')
   private _getByLocation(
     @Morphi.Http.Param.Path('location') location: string,
-    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig)
+    @Morphi.Http.Param.Header(Morphi.MDC_KEY) config?: Morphi.CRUD.ModelDataConfig)
     : Morphi.Response<PROJECT> {
     //#region @backendFunc
-    return async () => {
-      const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location), config) as PROJECT;
+    return async (req) => {
+      req.headers[Morphi.MDC_KEY] = config.toString()
+      const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location)) as PROJECT;
       return () => res;
     }
     //#endregion
