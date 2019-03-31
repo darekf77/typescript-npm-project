@@ -98,7 +98,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     if (p.modelDataConfig && _.isArray(p.modelDataConfig.include) &&
       p.modelDataConfig.include.length > 0 &&
       !p.modelDataConfig.include.includes(property)) {
-      return
+      return;
     }
 
     let processInDB: PROCESS;

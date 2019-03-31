@@ -315,7 +315,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   }
 
   static async getByID(processId: number) {
-    let res = await this.ctrl.db.PROCESS.findOne({ id: processId });
+    let res = await this.ctrl.db.PROCESS.findOne({ genId: processId });
     return res;
   }
 

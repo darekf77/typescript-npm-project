@@ -38,7 +38,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     return async () => {
       let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
       res.modelDataConfig = config as any;
-      return res;
+      return () => res;
     }
     //#endregion
   }
@@ -49,7 +49,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     return async () => {
       let res = await this.db.PROCESS.stop(await this.db.PROCESS.findOne(id));
       res.modelDataConfig = config as any;
-      return res;
+      return () => res;
     }
     //#endregion
 
@@ -63,7 +63,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#region @backendFunc
     return async () => {
       let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
-      return res.allProgressData.slice(alreadyInFE)
+      return () => res.allProgressData.slice(alreadyInFE)
     }
     //#endregion
   }
@@ -77,7 +77,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
       const processes = await Morphi.getResponseValue(s, req, res) as PROCESS[];
       await this.db.PROCESS.updateActive(processes)
       processes.forEach(p => p.modelDataConfig = config)
-      return processes;
+      return () => processes;
     }
     //#endregion
   }
@@ -90,7 +90,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
       const process = await Morphi.getResponseValue(s, req, res) as PROCESS;
       await this.db.PROCESS.updateActive(process);
       process.modelDataConfig = config;
-      return process;
+      return () => process;
     }
     //#endregion
   }

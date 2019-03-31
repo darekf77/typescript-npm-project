@@ -168,7 +168,7 @@ export abstract class BaseProjectLib extends Project {
       this.packageJson.saveForInstall(true)
       this.recreate.init();
       await this.build({
-        prod, outDir: config.folder.bundle as 'bundle', copytoAll: true
+        prod, outDir: config.folder.bundle as 'bundle'
       })
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
