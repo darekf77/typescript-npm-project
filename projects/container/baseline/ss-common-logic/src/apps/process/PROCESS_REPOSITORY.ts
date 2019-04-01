@@ -24,8 +24,18 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
   globalAliases: (keyof PROCESS_ALIASES)[] = ['process', 'processes']
 
 
-
+  starting = {};
   async start(proc: PROCESS): Promise<PROCESS> {
+
+    if (!!this.starting[proc.id]) {
+      console.log('ommiting start')
+      return proc;
+    }
+
+    this.starting[proc.id] = true;
+    setTimeout(() => {
+      this.starting[proc.id] = false;
+    }, 1000)
 
     rimraf.sync(proc.stdoutLogPath)
     rimraf.sync(proc.stderLogPath)

@@ -103,13 +103,24 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   @Input() public model: PROCESS;
+  @Input() public config: ModelDataConfig;
 
   isOpen = false;
 
   changes = new BehaviorSubject(void 0);
 
   pinned = false;
+  actionClicked = false;
   async action() {
+    // log.i('some action')
+    // if (this.actionClicked) {
+    //   log.i('ommiting click')
+    //   return
+    // }
+    // this.actionClicked = true;
+    // setTimeout(() => {
+    //   this.actionClicked = false;
+    // }, 1000)
     if (this.process.state === 'running') {
       await this.process.stop();
     } else {
@@ -172,7 +183,7 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     if (!this.process.isSync) {
       console.log(`SUBSCRIBE ENTITY: ${this.process.id}`);
       this.process.subscribeRealtimeUpdates({
-        modelDataConfig: this.process.modelDataConfig,
+        modelDataConfig: this.config,
         callback: () => {
           this.changes.next(void 0);
         }

@@ -46,7 +46,7 @@
           "@types/node": "9.3.0",
           "@types/q": "^1.0.3",
           "q": "^1.5.1",
-          "morphi": "2.0.25",
+          "morphi": "2.0.26",
           "gulp": "^3.9.1",
           "ng2-logger": "2.0.48",
           "ng2-rest": "9.2.15",
@@ -54,7 +54,7 @@
           "diff": "^3.2.0",
           "randomcolor": "^0.5.3",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": "0.0.13",
+          "typescript-class-helpers": "0.0.14",
           "date": {
             "dateformat": "^3.0.3",
             "@types/dateformat": "^1.0.1",

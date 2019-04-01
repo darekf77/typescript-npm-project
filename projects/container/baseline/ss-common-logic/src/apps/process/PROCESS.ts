@@ -71,7 +71,6 @@ export type PROCESS_STATE =
 
     entity.browser.progress = entity.progress;
 
-    entity.browser.id = entity.id;
 
     // if (entity.modelDataConfig) {
     //   entity.modelDataConfig.set.exclude(entity.browser)
@@ -119,14 +118,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   @Morphi.Orm.Column.Generated()
   //#endregion
-  genId: number = undefined;
-
-  get id() {
-    if (Morphi.IsBrowser) {
-      return this.browser && this.browser.id;
-    }
-    return this.genId;
-  }
+  id: number = undefined;
 
   public browser: IPROCESS = {} as any;
 
@@ -314,8 +306,8 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return res;
   }
 
-  static async getByID(processId: number) {
-    let res = await this.ctrl.db.PROCESS.findOne({ genId: processId });
+  static async getByID(id: number) {
+    let res = await this.ctrl.db.PROCESS.findOne({ id });
     return res;
   }
 
