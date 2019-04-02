@@ -64,6 +64,7 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   @Input() showButtons = true;
   @Input() options: FormlyFormOptions = {};
   @Input() fields: FormlyFieldConfig[] = [];
+
   private backupModel = {};
 
   @Output() submit = new EventEmitter();

@@ -26,16 +26,20 @@
   </mat-expansion-panel>
 
 </p>
-<standalone-popup [id]="id"
-                  [title]="title"
-                  [pinned]="pinned"
+<!-- <standalone-popup [id]="id"
+
+
                   (close)="onClose()"
+                  [pinned]="pinned"
                   (pin)="onPin($event)"
                   *ngIf="process && isOpen"
-                  [contentComponent]="popupContent"></standalone-popup>
+                  [contentComponent]="popupContent"></standalone-popup> -->
 
-<ng-template #popupContent>
-
+<app-moveable-popup [title]="title"
+                    (close)="onClose()"
+                    [pinned]="pinned"
+                    *ngIf="process && isOpen"
+                    (pin)="onPin($event)">
   <code>{{process.cmd}}</code>
 
   <mat-tab-group>
@@ -59,4 +63,4 @@
 
     </mat-tab>
   </mat-tab-group>
-</ng-template>
+</app-moveable-popup>

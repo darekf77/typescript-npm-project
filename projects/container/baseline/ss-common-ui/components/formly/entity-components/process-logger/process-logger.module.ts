@@ -14,9 +14,10 @@ import { MomentModule } from 'ngx-moment';
 import { ProcessLoggerComponent } from './process-logger.component';
 import { ButtonIconModule } from '../../base-components';
 import { ProcessConsoleInfoModule } from './process-console-info/process-console-info.module';
-import { StandalonePopupModule } from '../../../ui-elements/standalone-popup';
+
 import { ProcessInfoMessageComponent } from './process-info-message/process-info-message.component';
 import { ResizeService } from '../../../helpers/resize-service';
+import { MoveablePopupModule } from '../../../ui-elements/moveable-popup';
 
 
 
@@ -39,9 +40,10 @@ const otherModules = [
 ];
 
 const localModules = [
-  StandalonePopupModule,
+  // StandalonePopupModule,
+  MoveablePopupModule,
   ProcessConsoleInfoModule,
-  ButtonIconModule
+  ButtonIconModule,
 ];
 
 const localComponents = [

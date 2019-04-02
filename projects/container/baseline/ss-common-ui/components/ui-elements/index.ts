@@ -3,6 +3,7 @@ export * from './foo';
 export * from './logo';
 export * from './recrusive-menu';
 export * from './table-wrapper';
+export * from './moveable-popup';
 export * from './dialog-field';
 export * from './dialog-wrapper';
 export * from './standalone-popup';
