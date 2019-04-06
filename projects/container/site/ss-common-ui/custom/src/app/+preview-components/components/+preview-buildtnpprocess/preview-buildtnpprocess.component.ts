@@ -57,8 +57,9 @@ export class PreviewBuildtnpprocessComponent
     let { projectLocation } = this.router.routerState.snapshot.root.queryParams;
     if (_.isString(projectLocation)) {
       projectLocation = decodeURIComponent(projectLocation);
-      this.selected = projects.find(p => p.location === projectLocation);
-      log.i('set from query params', projectLocation)
+      const selected = projects.find(p => p.location === projectLocation);
+      this.selectProject(selected);
+      // log.i('set from query params', projectLocation)
     }
 
   }

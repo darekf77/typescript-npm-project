@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
 
@@ -65,7 +66,7 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
     this.selectedIndex = e.selectedIndex;
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     // if (this.model && this.model.isWorkspace) {
     this.environmentFormGroup = this.formBuilder.group({});
     // }
@@ -80,14 +81,29 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
 
     if (this.model.isWorkspace) {
       this.expanded = !!window.localStorage.getItem(this.keyForProject)
+      if (this.expanded) {
+        await this.updateModel();
+      }
     }
 
-    this.handlers.push(this.opened.subscribe(() => {
+
+
+    this.handlers.push(this.opened.subscribe(async () => {
       window.localStorage.setItem(this.keyForProject, 'true');
+      if (this.expanded) {
+        await this.updateModel();
+      }
     }));
     this.handlers.push(this.closed.subscribe(() => {
       window.localStorage.removeItem(this.keyForProject);
     }));
+  }
+
+  async updateModel() {
+    await this.model.updaetAndGetProceses()
+    // return _.debounce(async () => {
+
+    // }, 1000)
   }
 
 }
