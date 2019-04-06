@@ -35,7 +35,8 @@
                   *ngIf="process && isOpen"
                   [contentComponent]="popupContent"></standalone-popup> -->
 
-<app-moveable-popup [title]="title"
+<app-moveable-popup [id]="id"
+                    [title]="title"
                     (close)="onClose()"
                     [pinned]="pinned"
                     *ngIf="process && isOpen"

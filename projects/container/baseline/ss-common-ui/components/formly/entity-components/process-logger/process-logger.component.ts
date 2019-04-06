@@ -35,7 +35,7 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
 
 
   get title() {
-    return this.process && this.process.name;
+    return this.process && `${this.process.name} - process ID: ${this.process.id}`;
   }
 
   get color() {

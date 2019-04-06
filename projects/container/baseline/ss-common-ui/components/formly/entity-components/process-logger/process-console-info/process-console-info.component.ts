@@ -27,7 +27,7 @@ export class ProcessConsoleInfoComponent extends BaseComponent
   get process() {
     return this.model;
   }
-  @HostBinding('style.height.px') height = 300;
+  @HostBinding('style.height.px') height = 190;
 
 
 
@@ -80,14 +80,14 @@ export class ProcessConsoleInfoComponent extends BaseComponent
 
   ngAfterViewInit() {
 
-    const savedHeight = Number(localStorage.getItem(this.lsKey));
+    // const savedHeight = Number(localStorage.getItem(this.lsKey));
     // console.log('from local storage height', savedHeight)
-    setTimeout(() => {
-      if (!isNaN(savedHeight) && savedHeight > 0) {
-        this.height = savedHeight;
-      }
-      this.scrollDown();
-    });
+    // setTimeout(() => {
+    //   if (!isNaN(savedHeight) && savedHeight > 0) {
+    //     this.height = savedHeight;
+    //   }
+    //   this.scrollDown();
+    // });
   }
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe());

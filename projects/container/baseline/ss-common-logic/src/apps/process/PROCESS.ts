@@ -207,19 +207,25 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
 
   _stder: string;
   get stder() {
+    let res: string;
     if (_.isString(this._stder)) {
-      return this._stder;
+      res = this._stder;
+    } else {
+      res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
     }
-    let res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
+    // console.log(`stder: "${res}"`)
     return res;
   }
 
   _stdout: string;
   get stdout() {
+    let res: string;
     if (_.isString(this._stdout)) {
-      return this._stdout;
+      res = this._stdout;
+    } else {
+      res = _.isString(this.stdoutLog) ? this.stdoutLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
     }
-    let res = _.isString(this.stdoutLog) ? this.stdoutLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
+    // console.log(`stdout: "${res}"`)
     return res;
   }
 

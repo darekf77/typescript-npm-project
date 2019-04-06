@@ -4,9 +4,10 @@ const chalk = require('chalk').default;
 const pathes = {
   "Dariuszs-MacBook-Pro-3.local": "/Users/darekf/projects/npm/",
   "dariuszs-mbp-3.gtk.gtech.com": "/Users/darekf/projects/npm/",
-  "darek-All-Series":"/home/darek/projects/npm/",
+  "darek-All-Series": "/home/darek/projects/npm/",
   'micros-MacBook-Pro.local': "/Users/dfilipiak/projects/npm/",
   "pl-n100ix8.myigt.com": "/Users/dfilipiak/projects/npm/",
+  "micros-MBP": "/Users/dfilipiak/projects/npm/",
   // "dariuszs-mbp-2.gtk.gtech.com": "Dariuszs-MacBook-Pro-2.local",
   // "Dariuszs-MBP-2": "Dariuszs-MacBook-Pro-2.local",
   // "Dariuszs-MacBook-Pro-3.local": "Dariuszs-MacBook-Pro-2.local",

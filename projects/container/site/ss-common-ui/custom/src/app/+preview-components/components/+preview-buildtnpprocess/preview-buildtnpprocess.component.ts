@@ -8,6 +8,8 @@ import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/P
 import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
 import { ModelDataConfig } from 'morphi/browser';
 import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app-popup-content.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-preview-buildtnpprocess',
@@ -24,6 +26,8 @@ export class PreviewBuildtnpprocessComponent
 
   constructor(
     public popupService: AppPreviewPopupContentService,
+    public router: Router,
+    public activeRoute: ActivatedRoute,
     private ProjectController: ProjectController,
 
   ) { }
@@ -50,7 +54,12 @@ export class PreviewBuildtnpprocessComponent
     log.i('projects', projects);
     this.models = projects;
 
-    // this.distinct()
+    let { projectLocation } = this.router.routerState.snapshot.root.queryParams;
+    if (_.isString(projectLocation)) {
+      projectLocation = decodeURIComponent(projectLocation);
+      this.selected = projects.find(p => p.location === projectLocation);
+      log.i('set from query params', projectLocation)
+    }
 
   }
 
@@ -59,7 +68,13 @@ export class PreviewBuildtnpprocessComponent
     await project.updaetAndGetProceses()
     this.selected = project;
     log.i('full selected', project)
-    console.log(this.models)
+    this.router.navigate([], {
+      queryParams: {
+        projectLocation: encodeURIComponent(this.selected.location)
+      },
+      relativeTo: this.activeRoute
+    });
+
   }
 
   // distinct() {

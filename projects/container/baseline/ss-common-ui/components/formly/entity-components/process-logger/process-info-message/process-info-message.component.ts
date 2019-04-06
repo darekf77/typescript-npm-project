@@ -47,7 +47,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
   messPrev: number;
   messages = [];
 
-  @HostBinding('style.height.px') height = 300;
+  @HostBinding('style.height.px') height = 190;
 
   handlers: Subscription[] = [];
 
@@ -61,14 +61,14 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
   ngAfterViewInit() {
     this.messages = this.model.allProgressData;
-    const savedHeight = Number(localStorage.getItem(this.lsKey));
-    // console.log('from local storage height', savedHeight)
-    setTimeout(() => {
-      if (!isNaN(savedHeight) && savedHeight > 0) {
-        this.height = savedHeight;
-      }
-      this.scrollDown();
-    });
+    // const savedHeight = Number(localStorage.getItem(this.lsKey));
+    // // console.log('from local storage height', savedHeight)
+    // setTimeout(() => {
+    //   if (!isNaN(savedHeight) && savedHeight > 0) {
+    //     this.height = savedHeight;
+    //   }
+    //   this.scrollDown();
+    // });
   }
 
   ngOnInit() {

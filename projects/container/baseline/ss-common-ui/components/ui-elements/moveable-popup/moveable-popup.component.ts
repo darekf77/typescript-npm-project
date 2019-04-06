@@ -1,4 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, HostBinding, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component, OnInit, ViewChild, ElementRef,
+  HostBinding, Input, Output, EventEmitter
+} from '@angular/core';
+import * as _ from 'lodash';
+
+
+const coordinateX = 'coordinateX';
+const coordinateY = 'coordinateY';
 
 @Component({
   selector: 'app-moveable-popup',
@@ -9,6 +17,7 @@ export class MoveablePopupComponent implements OnInit {
 
   @ViewChild('modal') modalRef: ElementRef;
   @Input() title = 'Modal title'
+  @Input() id: string;
   @Output() pin = new EventEmitter();
   @Output() close = new EventEmitter();
   @Input() public pinned = false;
@@ -31,13 +40,19 @@ export class MoveablePopupComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    const x = Number(localStorage.getItem(`${coordinateX}${this.id}`));
+    const y = Number(localStorage.getItem(`${coordinateY}${this.id}`));
+    if (!_.isNaN(x) && !_.isNaN(y)) {
+      this.moveTo(x, y);
+    }
   }
 
   closePopup(): void {
     this.close.next()
   }
+
   mousedown(e: MouseEvent) {
-    this.StartDragAt(e.x, e.y);
+    this.dragTo(e.x, e.y);
   }
   onDragEnd(e: DragEvent) {
     console.log('drag end', e);
@@ -56,23 +71,23 @@ export class MoveablePopupComponent implements OnInit {
 
   }
 
-  popup = {
-    dragYOffset: 0,
-    dragXOffset: 0
+  offsetdrag = {
+    Y: 0,
+    X: 0
   }
-  StartDragAt(startX: number, startY: number) {
+  dragTo(startX: number, startY: number) {
 
-    this.popup.dragYOffset = startY - this.modalTop;
-    this.popup.dragXOffset = startX - this.modalLeft;
+    this.offsetdrag.Y = startY - this.modalTop;
+    this.offsetdrag.X = startX - this.modalLeft;
   }
 
   moveTo(x: number, y: number) {
 
-    this.modalTop = (y - this.popup.dragYOffset)
-    this.modalLeft = (x - this.popup.dragXOffset)
+    this.modalTop = (y - this.offsetdrag.Y)
+    this.modalLeft = (x - this.offsetdrag.X)
 
-    // window.localStorage.setItem(`${coordinateX}${this.id}`, (x - popup.dragXOffset).toString());
-    // window.localStorage.setItem(`${coordinateY}${this.id}`, (y - popup.dragYOffset).toString());
+    window.localStorage.setItem(`${coordinateX}${this.id}`, (x - this.offsetdrag.X).toString());
+    window.localStorage.setItem(`${coordinateY}${this.id}`, (y - this.offsetdrag.Y).toString());
   }
 
 }

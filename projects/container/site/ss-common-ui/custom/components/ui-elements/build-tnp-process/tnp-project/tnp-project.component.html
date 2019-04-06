@@ -14,11 +14,10 @@
     </mat-expansion-panel-header>
 
     <mat-horizontal-stepper [linear]="true"
-                            *ngIf="model && model.type !== 'container'"
+                            *ngIf="model && model.isWorkspace"
                             (selectionChange)="selectionChange($event)"
                             #stepper="matHorizontalStepper">
-      <mat-step *ngIf="model.isWorkspace"
-                [stepControl]="environmentFormGroup">
+      <mat-step [stepControl]="environmentFormGroup">
 
         <ng-template matStepLabel><span [ngClass]="ngClass(0)">ENVIRONMENT</span></ng-template>
         <app-item-environment [model]="model"
@@ -53,7 +52,7 @@
 
     <a href="javascript:void(0)"
        *ngIf="model.children && model.children.length > 0"
-       (click)="showChildren=!showChildren">Toogle children of {{model.name}} </a>
+       (click)="toogleChildren()">Toogle children of {{model.name}} </a>
 
     <mat-card *ngIf="showChildren">
 

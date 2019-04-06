@@ -7,15 +7,18 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
 import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
 import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+import { BaseComponent } from 'baseline/ss-common-ui/components/helpers/base-component';
 
 @Component({
   selector: 'app-tnp-project',
   templateUrl: './tnp-project.component.html',
   styleUrls: ['./tnp-project.component.scss']
 })
-export class TnpProjectComponent implements OnInit {
+export class TnpProjectComponent extends BaseComponent implements OnInit {
 
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder) {
+    super()
+  }
 
   expandedChild: string;
   selectedIndex = 0;
@@ -37,6 +40,14 @@ export class TnpProjectComponent implements OnInit {
     if (this.expandedChild === name) {
       this.expandedChild = '';
     }
+  }
+
+  toogleChildren() {
+    this.showChildren = !this.showChildren;
+  }
+
+  get keyForProject() {
+    return `show-children-${this.model.location}`
   }
 
   ngClass(index: number) {
@@ -62,9 +73,21 @@ export class TnpProjectComponent implements OnInit {
     this.testFormGroup = this.formBuilder.group({});
     this.serveFormGroup = this.formBuilder.group({});
 
-    if (this.model.type === 'container') {
+    if (!this.model.isWorkspace) {
       this.showChildren = true;
     }
+
+
+    if (this.model.isWorkspace) {
+      this.expanded = !!window.localStorage.getItem(this.keyForProject)
+    }
+
+    this.handlers.push(this.opened.subscribe(() => {
+      window.localStorage.setItem(this.keyForProject, 'true');
+    }));
+    this.handlers.push(this.closed.subscribe(() => {
+      window.localStorage.removeItem(this.keyForProject);
+    }));
   }
 
 }
