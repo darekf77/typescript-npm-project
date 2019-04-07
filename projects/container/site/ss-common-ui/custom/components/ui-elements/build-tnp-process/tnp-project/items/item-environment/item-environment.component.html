@@ -1,1 +1,8 @@
 <!-- <app-process-logger [model]="model"></app-process-logger> -->
+<ul>
+  <li *ngFor="let env of model.envionments" >{{env}} </li>
+</ul>
+
+<app-process-logger *ngIf="model.procInitEnv"
+                    [model]="model.procInitEnv">
+</app-process-logger>

@@ -1,11 +1,13 @@
 //#region @backend
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
+import * as glob from 'glob';
+import * as path from 'path';
 import * as child from 'child_process';
 import axios from 'axios';
 import { Morphi, ModelDataConfig } from "morphi";
 import { PROJECT, IPROJECT } from "./PROJECT";
-import { TnpDB, ProjectFrom } from 'tnp-bundle';
+import { TnpDB, ProjectFrom, EnvironmentName, config } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 
 
@@ -36,6 +38,27 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     const res = ProjectFrom(decodeURIComponent(location));
     await this.addProcessesToModel(res as any);
     return res as any;
+  }
+
+   namesFrom(project: PROJECT): EnvironmentName[] {
+    //#region @backendFunc
+    if (!project) {
+      return [];
+    }
+
+    const patter = `${project.location}/${config.file.environment}.*`;
+    let names = glob
+      .sync(patter)
+      .filter(f => f.split('.').pop() === 'js')
+      .map(f => path
+        .basename(f)
+        .replace(`${config.file.environment}.`, '')
+        .replace(/\.?js$/, '')
+      )
+      .map(f => f.trim() === '' ? 'local' : f)
+
+    return names as any;
+    //#endregion
   }
 
 

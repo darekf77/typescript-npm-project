@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Project } from 'tnp-bundle'
+import { Project, EnvironmentName } from 'tnp-bundle'
 import { Morphi, ModelDataConfig } from 'morphi';
 import { IProjectController } from './ProjectController';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
@@ -52,18 +52,7 @@ export class PROJECT extends Project {
   ctrl: IProjectController;
   browser: IPROJECT;
 
-  async updaetAndGetProceses() {
-    const data = await this.ctrl.getByLocation(this.location).received;
-    Object
-      .keys(data.body.json)
-      .forEach(key => {
-        if (key.startsWith('proc')) {
-          log.i('update proc', key)
-          this[key] = data.body.json[key];
-        }
-      });
-
-  }
+  envionments: EnvironmentName[] = [];
 
   static ctrl: IProjectController;
   static async getAll(config?: ModelDataConfig) {
@@ -82,5 +71,27 @@ export class PROJECT extends Project {
     const data = await this.ctrl.getByLocation(location).received
     return data.body.json;
   }
+
+  async updateEndGetEnvironments() {
+    try {
+      const data = await this.ctrl.getEnvironments(this.location).received;
+      this.envionments = data.body.json;
+    } catch (error) { }
+  }
+
+
+  async updaetAndGetProceses() {
+    const data = await this.ctrl.getByLocation(this.location).received;
+    Object
+      .keys(data.body.json)
+      .forEach(key => {
+        if (key.startsWith('proc')) {
+          log.i('update proc', key)
+          this[key] = data.body.json[key];
+        }
+      });
+
+  }
+
 
 }

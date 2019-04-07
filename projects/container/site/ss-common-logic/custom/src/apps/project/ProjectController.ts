@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 import { PROJECT } from './PROJECT';
-import { ProjectIsomorphicLib, Project } from 'tnp-bundle';
+import { ProjectIsomorphicLib, Project, EnvironmentName } from 'tnp-bundle';
 
 //#region @backend
 import { TnpDB, ProjectFrom } from 'tnp-bundle';
@@ -66,6 +66,23 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
       req.headers[Morphi.MDC_KEY] = config.toString()
       const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location)) as PROJECT;
       return () => res;
+    }
+    //#endregion
+  }
+
+
+  public getEnvironments(location: string) {
+    return this._getEnvironments(encodeURIComponent(location))
+  }
+
+
+  @Morphi.Http.GET('/environments/:location')
+  private _getEnvironments(@Morphi.Http.Param.Path('location') location: string)
+    : Morphi.Response<EnvironmentName[]> {
+    //#region @backendFunc
+    return async (req) => {
+      location = decodeURIComponent(location);
+      return this.db.PROJECT.namesFrom(await this.db.PROJECT.getByLocation(location))
     }
     //#endregion
   }

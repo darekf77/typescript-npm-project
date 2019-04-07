@@ -62,8 +62,11 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
     };
   }
 
-  selectionChange(e: StepperSelectionEvent) {
+  async selectionChange(e: StepperSelectionEvent) {
     this.selectedIndex = e.selectedIndex;
+    if (this.selectedIndex === 0) {
+      await this.model.updateEndGetEnvironments()
+    }
   }
 
   async ngOnInit() {
@@ -101,6 +104,7 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
 
   async updateModel() {
     await this.model.updaetAndGetProceses()
+    await this.model.updateEndGetEnvironments();
     // return _.debounce(async () => {
 
     // }, 1000)

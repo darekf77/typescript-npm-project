@@ -23,6 +23,7 @@
         <app-item-environment [model]="model"
                               [formGroup]="environmentFormGroup"></app-item-environment>
 
+
       </mat-step>
       <mat-step [stepControl]="buildFormGroup">
         <ng-template matStepLabel> <span [ngClass]="ngClass(1)">BUILD</span></ng-template>
@@ -30,18 +31,15 @@
                         [formGroup]="buildFormGroup"></app-item-build>
         <!-- <mat-progress-bar mode="determinate"
                           value="45"></mat-progress-bar> -->
-        <app-process-logger *ngIf="model.procStaticBuild"
-                            [model]="model.procStaticBuild">
-        </app-process-logger>
+
 
       </mat-step>
-      <mat-step [stepControl]="testFormGroup">
+      <!-- <mat-step [stepControl]="testFormGroup" [disabled]="true" >
         <ng-template matStepLabel><span [ngClass]="ngClass(2)">TEST</span></ng-template>
         <app-item-test [model]="model"
                        [formGroup]="testFormGroup"></app-item-test>
-        <!-- <mat-progress-bar mode="determinate"
-                          value="45"></mat-progress-bar> -->
-      </mat-step>
+
+      </mat-step> -->
       <mat-step [stepControl]="serveFormGroup">
         <ng-template matStepLabel><span [ngClass]="ngClass(3)">SERVE</span></ng-template>
         <app-item-serve [model]="model"
