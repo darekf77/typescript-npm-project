@@ -3,7 +3,8 @@
     {{process._allProgressData | json}}
   </span> -->
 
-  <mat-expansion-panel [expanded]=[isExpanded]
+  <mat-expansion-panel *ngIf="size === 'normal'"
+                       [expanded]=[isExpanded]
                        (closed)="onExpand(false)"
                        (opened)="onExpand(true)">
     <mat-expansion-panel-header>
@@ -24,6 +25,18 @@
                      (dblclick)="reset()"
                      (action)="isOpen = !isOpen"></app-button-icon>
   </mat-expansion-panel>
+
+  <span *ngIf="size === 'compact'" class="compact" >
+    <app-button-icon [icon]="icon"
+                     [color]="color"
+                     (action)="action()"
+                     [label]="label"></app-button-icon>
+    <app-button-icon [icon]="'info'"
+                     [color]="color"
+                     [label]="''"
+                     (dblclick)="reset()"
+                     (action)="isOpen = !isOpen"></app-button-icon>
+  </span>
 
 </p>
 <!-- <standalone-popup [id]="id"

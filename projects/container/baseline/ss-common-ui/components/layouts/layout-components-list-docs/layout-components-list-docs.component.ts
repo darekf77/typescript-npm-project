@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Log, Level } from 'ng2-logger/browser';
 import { numValue } from '../../helpers';
 
-const log = Log.create('layout components');
+const log = Log.create('layout components', Level.__NOTHING);
 
 const variables = {
   headerSize: '0px',

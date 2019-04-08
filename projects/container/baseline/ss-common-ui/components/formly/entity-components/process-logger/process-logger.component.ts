@@ -28,6 +28,8 @@ const log = Log.create('process loger');
 })
 export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
 
+  @Input() size: 'compact' | 'normal' = 'normal';
+
   isExpanded = false;
   get process() {
     return this.model;
