@@ -90,6 +90,7 @@ export class PROJECT extends Project {
           this[key] = data.body.json[key];
         }
       });
+    log.i('Update project', this)
 
   }
 

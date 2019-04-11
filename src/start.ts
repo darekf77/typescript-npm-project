@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
 import { run as runCommand } from "./process";
-import { Helpers } from "morphi";
+
 import { match } from './helpers';
 import { isString } from 'util';
 import chalk from 'chalk';
@@ -16,32 +16,6 @@ import { TnpDB } from './tnp-db/wrapper-db';
 
 
 
-Helpers.checkEnvironment({
-  npm: [
-    { name: 'watch', version: '1.0.2' },
-    { name: 'check-node-version' },
-    { name: 'npm-run', version: '4.1.2' },
-    { name: 'rimraf' },
-    { name: 'mkdirp' },
-    { name: 'renamer' },
-    { name: 'nodemon' },
-    { name: 'madge' },
-    { name: 'http-server' },
-    { name: 'increase-memory-limit' },
-    { name: 'bower' },
-    { name: 'fkill', installName: 'fkill-cli' },
-    { name: 'mocha' },
-    // { name: 'chai' },
-    { name: 'ts-node' },
-    { name: 'stmux' }
-  ],
-  programs: [
-    //   {
-    //     name: 'code',
-    //     website: 'https://code.visualstudio.com/'
-    //   }
-  ]
-});
 
 const localLibs = [
   'eslint',
