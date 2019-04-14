@@ -67,35 +67,40 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
 
 
     await this.assignProc(project, db, 'procStaticBuild', {
-      cmd: 'tnp build:dist',
+      // cmd: 'tnp build:dist',
+      cmd: 'tnp show:loop:messages --max 6',
       cwd: project.location,
       async: true,
       name: `Static Build of project ${project.name}`
     })
 
     await this.assignProc(project, db, 'procWatchBuild', {
-      cmd: 'tnp build:dist:watch',
+      // cmd: 'tnp build:dist:watch',
+      cmd: 'tnp show:loop:messages --max 6',
       cwd: project.location,
       async: true,
       name: `Watch build of project ${project.name}`
     });
 
     await this.assignProc(project, db, 'procServeStatic', {
-      cmd: 'tnp start',
+      cmd: 'tnp show:loop:messages --max 6',
+      // cmd: 'tnp start',
       cwd: project.location,
       async: true,
       name: `Server staticlyu project ${project.name}`
     })
 
     await this.assignProc(project, db, 'procInitEnv', {
-      cmd: 'tnp init --env=%s',
+      cmd: 'tnp show:loop:messages --max 6',
+      // cmd: 'tnp init --env=%s',
       cwd: project.location,
       async: false,
       name: `Init environment of project ${project.name}`
     });
 
     await this.assignProc(project, db, 'procClear', {
-      cmd: 'tnp clear:%s',
+      cmd: 'tnp show:loop:messages --max 6',
+      // cmd: 'tnp clear:%s',
       cwd: project.location,
       async: false,
       name: `Clear project ${project.name}`

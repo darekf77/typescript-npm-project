@@ -7,8 +7,12 @@ import { BuildTnpProcessModule, RecrusiveMenuModule } from 'components';
 import { Morphi } from 'morphi/browser';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';
+
 import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
+
 import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 
 const angularModules = [
   CommonModule,
@@ -25,8 +29,8 @@ const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic
 
 Morphi.init({
   host,
-  controllers: [ProjectController],
-  entities: [PROJECT]
+  controllers: [ProjectController, ProcessController],
+  entities: [PROJECT, PROCESS]
 });
 
 @NgModule({

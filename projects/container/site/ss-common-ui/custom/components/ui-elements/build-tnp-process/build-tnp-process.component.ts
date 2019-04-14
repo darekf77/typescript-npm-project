@@ -1,7 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
 import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+
+// import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+// import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 
 
 @Component({
@@ -18,7 +20,11 @@ export class BuildTnpProcessComponent implements OnInit {
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
 
-  constructor(private _formBuilder: FormBuilder) { }
+  constructor(
+    private _formBuilder: FormBuilder,
+    // private porjectController: ProjectController,
+    // private processController: ProcessController
+    ) { }
 
   ngOnInit() {
     this.firstFormGroup = this._formBuilder.group({

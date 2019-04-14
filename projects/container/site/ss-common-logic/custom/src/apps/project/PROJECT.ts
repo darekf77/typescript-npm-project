@@ -86,7 +86,7 @@ export class PROJECT extends Project {
       .keys(data.body.json)
       .forEach(key => {
         if (key.startsWith('proc')) {
-          log.i('update proc', key)
+          // log.i('update proc', key)
           this[key] = data.body.json[key];
         }
       });

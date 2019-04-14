@@ -21,7 +21,9 @@ import {
   ItemEnvironmentComponent, ItemBuildComponent,
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
-import { ProcessLoggerModule } from 'baseline/ss-common-ui/components/formly/entity-components/process-logger'
+import { ProcessLoggerModule } from 'baseline/ss-common-ui/components/formly/entity-components/process-logger';
+// import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
+// import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 
 const angularModules = [
   CommonModule,
