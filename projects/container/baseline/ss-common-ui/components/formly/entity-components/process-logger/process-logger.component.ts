@@ -182,7 +182,11 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   subscribe() {
-    if (!this.process.isSync) {
+    if (this.process && !this.process.isSync) {
+      if (!(this.process instanceof PROCESS)) {
+        console.error('[processLogger] Process in not instance of PROCESS')
+        return
+      }
       console.log(`SUBSCRIBE ENTITY: ${this.process.id}`);
       this.process.subscribeRealtimeUpdates({
         modelDataConfig: this.config,
