@@ -1,8 +1,0 @@
-<div *ngIf="model$ | async; else loader; let model">
-
-  <app-build-tnp-process [model]="model"></app-build-tnp-process>
-</div>
-
-<ng-template #loader>
-  ..loading model
-</ng-template>
