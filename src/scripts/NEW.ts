@@ -38,7 +38,7 @@ function newProject(type: LibType, name: string, cwd: string) {
   if (project) {
     try {
       project.cloneTo(destinationPath);
-      console.log(destinationPath)
+      // console.log(destinationPath)
       pacakgeJsonNameFix(destinationPath)
       info(`Project ${project.name} create successfully`);
     } catch (err) {

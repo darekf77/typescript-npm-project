@@ -1098,9 +1098,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
       }
     };
     fse.copySync(this.location, destinationPath, options);
-    console.log(chalk.green(`${this.type.toUpperCase()} library structure created sucessfully...`));
+    info(`${this.type.toUpperCase()} library structure created sucessfully...`);
     const project = ProjectFrom(destinationPath);
-    console.log(chalk.green('Done.'));
+    info('Done.');
     return project;
   }
   //#endregion

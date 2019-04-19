@@ -2,29 +2,38 @@
 import chalk from 'chalk';
 import config from './config';
 
+declare global {
+  namespace NodeJS {
+    interface Global {
+      muteMessages: boolean;
+    }
+  }
+}
+
+
 export function error(details: any, noExit = false, noTrace = false) {
   // Error.stackTraceLimit = Infinity;
   if (typeof details === 'object') {
     try {
       const json = JSON.stringify(details)
       if (noTrace) {
-        console.log(chalk.red(json));
+        !global.muteMessages && console.log(chalk.red(json));
       } else {
-        console.trace(chalk.red(json));
+        !global.muteMessages && console.trace(chalk.red(json));
       }
 
     } catch (error) {
       if (noTrace) {
-        console.log(details);
+        !global.muteMessages && console.log(details);
       } else {
-        console.trace(details);
+        !global.muteMessages && console.trace(details);
       }
     }
   } else {
     if (noTrace) {
-      console.log(chalk.red(details));
+      !global.muteMessages && console.log(chalk.red(details));
     } else {
-      console.trace(chalk.red(details));
+      !global.muteMessages && console.trace(chalk.red(details));
     }
 
   }
@@ -36,14 +45,15 @@ export function error(details: any, noExit = false, noTrace = false) {
 }
 
 export function info(details: string) {
-  console.log(chalk.green(details))
+  // console.log('global.muteMessages',global.muteMessages)
+  !global.muteMessages && console.log(chalk.green(details))
 }
 
 export function warn(details: string, trace = false) {
   if (trace) {
-    console.trace(chalk.yellow(details))
+    !global.muteMessages && console.trace(chalk.yellow(details))
   } else {
-    console.log(chalk.yellow(details))
+    !global.muteMessages && console.log(chalk.yellow(details))
   }
 }
 //#endregion

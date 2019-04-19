@@ -82,11 +82,19 @@ export function init(args: string,
 // init().project();
 // init().watch.project()
 
-export default {
-  $INIT: async (args) => {
-    await init(args).project()
+export async function INIT(args, exit = true) {
+  console.log('INIT')
+  await init(args).project()
+  if(exit) {
     process.exit(0)
-  },
+  }
+
+}
+
+
+export default {
+
+  INIT,
 
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;
