@@ -12,6 +12,10 @@ export class NodeModules {
 
   constructor(private project: Project) { }
 
+  installByCopyFrom(otherProject: Project) {
+
+  }
+
   copy(packageName: string, options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }) {
     const self = this;
     return {

@@ -83,7 +83,7 @@ export class PackageJSON {
   }
 
   private getDepsBy(type: LibType = undefined, updateFn?: (obj: Object, pkgName: string) => string) {
-    const core = Project.by('workspace').packageJson.data.tnp.core.dependencies;
+    const core = Project.Tnp.packageJson.data.tnp.core.dependencies;
     let newDeps = {};
     this.travelObject(core.common, newDeps, undefined, updateFn);
     if (_.isString(type)) {
@@ -145,7 +145,7 @@ export class PackageJSON {
     this.cleanBeforeSave(project, newDeps, toOverride);
     // this.inlcudeDevDevs(project)
 
-    const engines = Project.by('workspace').packageJson.data.engines;
+    const engines = Project.Tnp.packageJson.data.engines;
     const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
 
     if (project.isStandaloneProject) {
@@ -192,7 +192,7 @@ export class PackageJSON {
 
 
   filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
-    const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
     let onlyAsDevAllowed = (this.project.packageJson.data.tnp && this.project.packageJson.data.tnp.overrided && this.project.packageJson.data.tnp.overrided.includeAsDev) || [];
     let allDeps = this.getDepsBy();
 
@@ -213,7 +213,7 @@ export class PackageJSON {
   }
 
   filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
-    const devDeps = Project.by('workspace').packageJson.data.tnp.core.dependencies.asDevDependencies;
+    const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
     let onlyAsDevAllowed = (this.project.packageJson.data.tnp
       && this.project.packageJson.data.tnp.overrided
       && this.project.packageJson.data.tnp.overrided.includeAsDev) || [];
@@ -239,7 +239,7 @@ export class PackageJSON {
 
       let onlyAllowed = project.packageJson.data.tnp.overrided.includeOnly;
 
-      onlyAllowed = onlyAllowed.concat(Project.by('workspace')
+      onlyAllowed = onlyAllowed.concat(Project.Tnp
         .packageJson.data.tnp.core.dependencies.always);
 
       Object.keys(deps).forEach(depName => {
@@ -294,7 +294,7 @@ export class PackageJSON {
   }
 
   coreRecreate() {
-    const coreProject = Project.by('workspace');
+    const coreProject = Project.Tnp;
     const addedDeps = coreProject.packageJson.data.dependencies;
     const addedDevDeps = coreProject.packageJson.data.devDependencies;
     const deps = _.merge({}, addedDeps, addedDevDeps);
@@ -311,7 +311,7 @@ export class PackageJSON {
 
   dedupe(packages?: string[]) {
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
-      Project.by('workspace').packageJson.data.tnp.core.dependencies.dedupe;
+      Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;
     packagesNames.forEach(f => {
       console.log(`Scanning for duplicates fo ${f}....`)
 

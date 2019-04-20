@@ -3,7 +3,7 @@ import { Project } from "../project";
 import { run } from '../process';
 import { error } from '../messages';
 import chalk from 'chalk';
-import { install } from './INSTALL';
+import { npmInstall } from './INSTALL';
 import { RecrusiveBaseline } from './INIT-recrusive-functions';
 import { TnpDB } from '../tnp-db';
 import { sleep } from 'sleep';
@@ -20,9 +20,9 @@ async function initialize(
   project.tnpHelper.install()
 
   if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
-    install('', project.parent, false);
+    npmInstall('', project.parent, false);
   } else if (!project.node_modules.exist()) {
-    install('', project, false);
+    npmInstall('', project, false);
   }
 
   if (project.parent) {

@@ -3,7 +3,7 @@ import { Project } from "../project";
 import { run } from '../process';
 import { error } from '../messages';
 import chalk from 'chalk';
-import { install } from './INSTALL';
+import { npmInstall } from './INSTALL';
 
 export namespace RecrusiveBaseline {
 

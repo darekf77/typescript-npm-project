@@ -131,8 +131,8 @@ function resolvePacakgesFromArgs(args: string[]) {
     })
 }
 
-export function install(a: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
-  const args = a.split(' ').filter(a => !!a);
+export function npmInstall(packagesNamesSpaceSeparated: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
+  const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
   project.packageJson.saveForInstall(true)
   if (args.length === 0) { // NPM INSTALL
     installAll(project, force, unlinkChilds);
@@ -148,14 +148,17 @@ export function install(a: string, project = Project.Current, unlinkChilds = tru
 
 }
 
+export function INSTALL(args, exit = true) {
+  npmInstall(args, undefined, undefined, undefined, true);
+  if (exit) {
+    process.exit(0);
+  }
+}
 
 export default {
-  $INSTALL: (args) => {
-    install(args, undefined, undefined, undefined, true);
-    process.exit(0);
-  },
+  INSTALL,
   $I: (args) => {
-    install(args);
+    npmInstall(args);
     process.exit(0);
   }
 }

@@ -10,7 +10,7 @@ import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
 import { PackageJSON } from './package-json';
-import { install } from '../scripts/INSTALL';
+import { npmInstall } from '../scripts/INSTALL';
 import { ProjectFrom, tryCopyFrom } from '../index';
 
 /**
@@ -163,7 +163,7 @@ export abstract class BaseProjectLib extends Project {
       this.run(`tnp clear`).sync();
 
       if (!this.node_modules.exist()) {
-        install('', this, false, false);
+        npmInstall('', this, false, false);
       }
       this.packageJson.saveForInstall(true)
       this.recreate.init();
