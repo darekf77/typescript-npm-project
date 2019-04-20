@@ -27,3 +27,4 @@
 /run.js
 /projects/tmp*
 /bin/db.json
+/bin/db-for-tests.json

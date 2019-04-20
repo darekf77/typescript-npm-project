@@ -7,6 +7,7 @@ import { ProjectFrom } from '../../project';
 import { DbCrud } from '../db-crud';
 import { BaseController } from './base-controlller';
 import { ProjectInstance } from '../entites';
+import config from '../../config';
 
 export class ProjectsController extends BaseController {
 
@@ -17,7 +18,11 @@ export class ProjectsController extends BaseController {
 
   async addExisted() {
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
-    this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
+    if (global.testMode) {
+      this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, config.folder.tnp_tests_context)), true)
+    } else {
+      this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
+    }
   }
 
   addIfNotExists(projectInstance: ProjectInstance): boolean {
@@ -34,7 +39,17 @@ export class ProjectsController extends BaseController {
     }
   }
 
-  discoverProjectsInLocation(location: string) {
+  discoverProjectsInLocation(location: string, searchSubfolders = false) {
+
+    if (searchSubfolders) {
+      fse.readdirSync(location)
+        .map(name => path.join(location, name))
+        .forEach(subLocation => {
+          this.discoverProjectsInLocation(subLocation)
+        })
+      return;
+    }
+
     // this.discoverFrom(Project.Tnp);
     fse.readdirSync(location)
       .map(name => path.join(location, name))

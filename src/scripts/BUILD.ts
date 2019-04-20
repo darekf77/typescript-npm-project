@@ -7,7 +7,7 @@ import { Project, ProjectFrom } from '../project';
 import { BuildOptions, BuildDir, LibType } from "../models";
 import { error, info } from "../messages";
 import { config } from '../config';
-import { init } from './INIT';
+import { initFromArgs } from './INIT';
 import { resolveProjectIfGenerated } from './BUILD-static';
 import { questionYesNo, run } from '../process';
 import { SystemTerminal } from '../system-terminal';
@@ -46,9 +46,9 @@ export async function build(buildOptions: BuildOptions, allowedLibs: LibType[], 
   await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
 
   if (watch) {
-    await init(args).watch.project(project)
+    await initFromArgs(args).watch.project(project)
   } else {
-    await init(args).project(project);
+    await initFromArgs(args).project(project);
   }
 
   project = await resolveProjectIfGenerated(project, buildOptions, args)

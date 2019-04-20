@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 //#endregion
 import { Project } from './base-project';
+import config from '../config';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 
@@ -28,7 +29,7 @@ export class TestRunner {
     switch (this.project.type) {
       case 'isomorphic-lib':
 
-        command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
+        command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)} --timeout ${config.CONST.TEST_TIMEOUT}`
         break;
 
       default:
@@ -45,7 +46,7 @@ export class TestRunner {
     let command: string;
     switch (this.project.type) {
       case 'isomorphic-lib':
-        command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} --watch-extensions ts`
+        command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
         break;
 
       default:

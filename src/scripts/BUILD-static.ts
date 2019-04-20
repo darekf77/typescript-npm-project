@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as sleep from 'sleep';
 import { BuildOptions } from '../models';
 import { ProjectFrom, Project } from '../project';
-import { init } from './INIT';
+import { initFromArgs } from './INIT';
 import * as rimraf from 'rimraf';
 
 
@@ -34,7 +34,7 @@ async function regenerateProject(project: Project, buildOptions: BuildOptions, a
   genProject = ProjectFrom(genLocation);
   // genProject.clear()
 
-  await init(args).project(genProject);
+  await initFromArgs(args).project(genProject);
 
 
   return genProject;

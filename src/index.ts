@@ -1,3 +1,12 @@
+declare global {
+  namespace NodeJS {
+    interface Global {
+      testMode: boolean;
+    }
+  }
+}
+
+
 export * from './config';
 export * from './helpers';
 export * from './helpers-environment';

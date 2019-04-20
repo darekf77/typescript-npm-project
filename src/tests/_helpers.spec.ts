@@ -6,7 +6,8 @@ import { IPackageJSON } from '../models';
 import config from '../config';
 
 const PATHES = {
-  BASE_FOLDER_TEST: path.join(__dirname, '..', '..', 'tmp-tests-context')
+  BASE_FOLDER_TEST: path.join(__dirname, '..', '..', config.folder.tnp_tests_context),
+  TNP_DB_FOT_TESTS: path.join(__dirname, '..', '..', `bin`, config.folder.tnp_db_for_tests_json)
 }
 
 
@@ -15,12 +16,14 @@ function RemoveTestCatalogs() {
 
     rimraf.sync(PATHES.BASE_FOLDER_TEST);
     fse.mkdirpSync(PATHES.BASE_FOLDER_TEST);
+    rimraf.sync(PATHES.TNP_DB_FOT_TESTS)
 
   }
 }
 
 type FuncTest = (locationContext: string, testName: string, options?: {
   packageJSON?: (relativePath: string, callback: (packageJSON: IPackageJSON) => void) => void;
+  cwdChange: (relativePath: string, callback: () => void) => void
 }) => any
 
 
@@ -29,6 +32,7 @@ type FuncTest = (locationContext: string, testName: string, options?: {
 export class SpecWrap {
 
   static create() {
+    global.testMode = true;
     return new SpecWrap()
   }
   private testsDescribtion: string;
@@ -70,6 +74,17 @@ export class SpecWrap {
     }
   }
 
+  private cwdChange(location) {
+    return async (relativePath: string, callback) => {
+      const oldCwd = process.cwd()
+      process.chdir(path.join(location, relativePath));
+      if (_.isFunction(callback)) {
+        await this.runSyncOrAsync(callback)
+      }
+      process.chdir(oldCwd);
+    }
+  }
+
   async run(test: FuncTest) {
 
     const location = path.join(path.join(PATHES.BASE_FOLDER_TEST, this.kamelCaseTestName));
@@ -81,7 +96,8 @@ export class SpecWrap {
 
     await this.runSyncOrAsync(() => {
       return test(location, this.testName, {
-        packageJSON: this.packageJSON(location)
+        packageJSON: this.packageJSON(location),
+        cwdChange: this.cwdChange(location)
       })
     })
     global.muteMessages = false;

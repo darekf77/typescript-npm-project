@@ -13,11 +13,11 @@ async function initialize(
   pArgs?: string,
   project = Project.Current, watch = false) {
 
-  // if (project.isWorkspaceChildProject) {
-  //   project.parent.tnpHelper.install()
-  // } else if (project.isWorkspace) {
+  if (!project) {
+    console.log(`No project to init inside: ${process.cwd()}`, false, true)
+  }
+
   project.tnpHelper.install()
-  // }
 
   if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
     install('', project.parent, false);
@@ -57,7 +57,7 @@ ${chalk.green('Environment for')} ${project.isGenerated ? chalk.bold('(generated
 
 }
 
-export function init(args: string,
+export function initFromArgs(args: string,
   options?: { watch: boolean }) {
 
   if (!options) {
@@ -68,12 +68,13 @@ export function init(args: string,
 
   return {
     get watch() {
-      return init(args, { watch: true })
+      return initFromArgs(args, { watch: true })
     },
     async project(p: Project = Project.Current) {
       const db = await TnpDB.Instance;
-      await (await TnpDB.Instance).transaction.addProjectIfNotExist(p)
+      await db.transaction.addProjectIfNotExist(p)
       await initialize(args, p, watch)
+
     }
   }
 
@@ -83,9 +84,8 @@ export function init(args: string,
 // init().watch.project()
 
 export async function INIT(args, exit = true) {
-  console.log('INIT')
-  await init(args).project()
-  if(exit) {
+  await initFromArgs(args).project()
+  if (exit) {
     process.exit(0)
   }
 

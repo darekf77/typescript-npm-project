@@ -17,7 +17,7 @@ describe(wrap.describe('Tnp init'), async () => {
 
 
   await wrap.it(`should init worksapce project`,
-    async (location, testName, { packageJSON }) => {
+    async (location, testName, { packageJSON, cwdChange }) => {
       NEW(`workspace test1`, false, location);
 
       // packageJSON('test1', p => {
@@ -25,10 +25,11 @@ describe(wrap.describe('Tnp init'), async () => {
       //   p.dependencies = {}
       //   p.tnp.core = void 0;
       // })
-      console.log(process.cwd())
-      // await INIT('', false)
-
+      // console.log(process.cwd())
       it(testName, async () => {
+        await cwdChange('test1', async () => {
+          await INIT('', false)
+        })
         expect(true).to.be.true;
 
       })

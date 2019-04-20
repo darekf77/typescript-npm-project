@@ -20,6 +20,7 @@ import { error, warn } from '../messages';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
 import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';
+import config from '../config';
 
 
 export class TnpDB {
@@ -35,7 +36,11 @@ export class TnpDB {
   private static _instance: TnpDB;
   private static async instance() {
     if (!this._instance) {
-      const location = path.join(Project.Tnp.location, `bin/db.json`);
+      let dbPath = `bin/db.json`;
+      if (global.testMode) {
+        dbPath = `bin/${config.folder.tnp_db_for_tests_json}`;
+      }
+      const location = path.join(Project.Tnp.location, dbPath);
       this._instance = new TnpDB(location)
       await this._instance.init(!fse.existsSync(location))
     }

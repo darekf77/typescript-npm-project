@@ -15,6 +15,9 @@ const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
 
 export const config = {
+  CONST: {
+    TEST_TIMEOUT: 3600000
+  },
   tnp: 'tnp',
   allowedEnvironments,
   folder: {
@@ -39,7 +42,9 @@ export const config = {
     container: 'container',
     client: 'client',
     bin: 'bin',
-    _bin: '.bin'
+    _bin: '.bin',
+    tnp_tests_context: 'tmp-tests-context',
+    tnp_db_for_tests_json: 'db-for-tests.json'
   },
   file: {
     autob_actions_js: 'auto-actions.js',

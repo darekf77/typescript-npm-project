@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { getLinesFromFiles } from "../helpers";
 import { Project } from '../project';
-import { init } from './INIT';
+import { initFromArgs } from './INIT';
 import { run } from '../process';
 import { PROGRESS_DATA } from '../progress-output';
 
@@ -45,13 +45,13 @@ function SHOW_LOOP_MESSAGES(c = 0, maximum = Infinity, errExit = false) {
 export default {
 
   $TEST_WATCH: async (args: string) => {
-    await init(args).watch.project(Project.Current)
+    await initFromArgs(args).watch.project(Project.Current)
     await Project.Current.tests.startAndWatch(args.trim().split(' '))
     process.exit(0)
   },
 
   $TEST: async (args: string) => {
-    await init(args).project(Project.Current)
+    await initFromArgs(args).project(Project.Current)
     Project.Current.tests.start(args.trim().split(' '))
     process.exit(0)
   },
