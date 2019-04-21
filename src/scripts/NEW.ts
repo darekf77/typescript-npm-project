@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import config from "../config";
-import { LibType } from '../models';
+import { LibType, IPackageJSON } from '../models';
 import { run } from "../process";
 import { Project } from "../project";
 import { info, error } from "../messages";
@@ -24,10 +24,16 @@ function goodExamples() {
   error(chalk.red(`Please use example above.`));
 }
 
-function pacakgeJsonNameFix(locationDest) {
+function pacakgeJsonNameFix(locationDest, type: LibType) {
   const pkgJSONpath = path.join(locationDest, config.file.package_json);
-  const json = fse.readJSONSync(pkgJSONpath)
+  const json: IPackageJSON = fse.readJSONSync(pkgJSONpath)
   json.name = _.kebabCase(path.basename(locationDest));
+
+  json.tnp.isCoreProject = false;
+  if ((['isomorphic-lib', 'angular-lib'] as LibType[])) {
+    json.tnp.useFramework = false;
+  }
+
   fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
 }
 
@@ -39,7 +45,7 @@ function newProject(type: LibType, name: string, cwd: string) {
     try {
       project.cloneTo(destinationPath);
       // console.log(destinationPath)
-      pacakgeJsonNameFix(destinationPath)
+      pacakgeJsonNameFix(destinationPath, type)
       info(`Project ${project.name} create successfully`);
     } catch (err) {
       error(err);

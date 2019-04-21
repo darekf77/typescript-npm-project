@@ -27,9 +27,11 @@ describe(wrap.describe('Tnp install'), async () => {
       })
       // console.log(process.cwd())
 
+      fse.mkdirpSync(path.join(location, 'test1', 'node_modules', '.bin'))
+
       it(testName, async () => {
         await cwdChange('test1', async () => {
-          INSTALL('', false)
+          INSTALL('lodash', false)
         })
         expect(true).to.be.true;
 
