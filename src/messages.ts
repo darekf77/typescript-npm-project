@@ -49,6 +49,11 @@ export function info(details: string) {
   !global.muteMessages && console.log(chalk.green(details))
 }
 
+export function log(details: string) {
+  // console.log('global.muteMessages',global.muteMessages)
+  !global.muteMessages && console.log(chalk.gray(details))
+}
+
 export function warn(details: string, trace = false) {
   if (trace) {
     !global.muteMessages && console.trace(chalk.yellow(details))

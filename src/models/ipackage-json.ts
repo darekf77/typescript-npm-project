@@ -1,6 +1,12 @@
 import { LibType } from './lib-type';
 import { EnvironmentName } from './environment-name';
 
+export type NpmDependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
+  | 'bundleDependencies' | 'bundledDependencies' | 'extensionDependencies' | '_phantomChildren';
+export const ArrNpmDependencyType: NpmDependencyType[] = [
+  'dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies', ,
+  'bundleDependencies', 'bundledDependencies', 'extensionDependencies', '_phantomChildren'
+]
 
 export type DependenciesFromPackageJsonStyle = { [name: string]: string; }
 

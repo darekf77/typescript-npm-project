@@ -1,6 +1,6 @@
 import { Morphi, ModelDataConfig } from 'morphi';
 
-import { LibType, EnvironmentName } from "../models";
+import { LibType, EnvironmentName, NpmDependencyType } from "../models";
 import { PackageJSON } from "./package-json";
 //#region @backend
 
@@ -67,7 +67,6 @@ export interface IProject {
   env: EnvironmentConfig;
   allowedEnvironments: EnvironmentName[];
   children: Project[];
-  dependencies: Project[];
   parent: Project;
   preview: Project;
   requiredLibs: Project[];
@@ -802,6 +801,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
   //#region @backend
   async build(buildOptions?: BuildOptions) {
     // console.log('BUILD OPTIONS', buildOptions)
+
     if (this.isWorkspaceChildProject) {
       this.quickFixMissingLibs(['react-native-sqlite-storage'])
     }
@@ -846,6 +846,8 @@ Generated workspace should be here: ${genLocationWOrkspace}
     //   }
     // }
 
+
+
     if (this.buildOptions.copytoAll) {
       await this.selectAllProjectCopyto()
     } else {
@@ -873,6 +875,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
       });
     }
 
+    if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
+      this.packageJson.saveForInstall(true)
+    }
 
     await this.buildSteps(buildOptions);
     await this.copytToManager.initCopyingOnBuildFinish(buildOptions);
@@ -1020,61 +1025,32 @@ Generated workspace should be here: ${genLocationWOrkspace}
   }
   //#endregion
 
-  get dependencies(): Project[] {
-    if (Morphi.IsBrowser) {
-      return this.browser.dependencies;
-    }
-    //#region @backend
-    if (this.packageJson.data && this.packageJson.data.dependencies) {
-      return Object.keys(this.packageJson.data.dependencies)
+
+  //#region @backend
+  getDeps(type: NpmDependencyType, contextFolder?: string) {
+    if (this.packageJson.data && this.packageJson.data[type]) {
+      const names = _.isArray(this.packageJson.data[type]) ? this.packageJson.data[type] : Object.keys(this.packageJson.data[type]);
+      return names
         .map(packageName => {
-          let p = path.resolve(path.join(this.location, '..', packageName))
+          // console.log(packageName)
+          // let p = path.resolve(path.join(this.location, '..', packageName))
+          // if (this.isWorkspaceChildProject && fse.existsSync(p)) {
+          //   const project = ProjectFrom(p);
+          //   return project;
+          // }
+          let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageName);
           if (fse.existsSync(p)) {
             const project = ProjectFrom(p);
             return project;
-          } else {
-            p = path.join(this.location, config.folder.node_modules, packageName);
-            if (fse.existsSync(p)) {
-              const project = ProjectFrom(p);
-              return project;
-            }
-
-            warn(`Dependency "${packageName}" doen't exist in ${p}`)
           }
+          // warn(`Dependency "${packageName}" doen't exist in ${p}`)
+
         })
         .filter(f => !!f)
     }
     return [];
-    //#endregion
   }
-
-  get devDependencies(): Project[] {
-    if (Morphi.IsBrowser) {
-      return this.browser.dependencies;
-    }
-    //#region @backend
-    if (this.packageJson.data && this.packageJson.data.devDependencies) {
-      return Object.keys(this.packageJson.data.devDependencies)
-        .map(packageName => {
-          let p = path.resolve(path.join(this.location, '..', packageName))
-          if (fse.existsSync(p)) {
-            const project = ProjectFrom(p);
-            return project;
-          } else {
-            p = path.join(this.location, config.folder.node_modules, packageName);
-            if (fse.existsSync(p)) {
-              const project = ProjectFrom(p);
-              return project;
-            }
-
-            warn(`Dependency "${packageName}" doen't exist in ${p}`)
-          }
-        })
-        .filter(f => !!f)
-    }
-    return [];
-    //#endregion
-  }
+  //#endregion
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {

@@ -37,7 +37,9 @@ export class CopyToManager {
     }
   }
 
-  public generateSourceCopyIn(destinationLocation: string, options?: { override?: boolean; filterForBundle?: boolean; showInfo?: boolean; }) {
+  public generateSourceCopyIn(destinationLocation: string,
+    options?: { override?: boolean; filterForBundle?: boolean; showInfo?: boolean; }): boolean {
+
     const { override = true, filterForBundle = true, showInfo = true } = options || {}
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
@@ -50,7 +52,7 @@ export class CopyToManager {
 
     if (fs.existsSync(destinationLocation) && !override) {
       showInfo && warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
-      return;
+      return false;
     } else {
       fse.mkdirpSync(destinationLocation);
     }
@@ -99,6 +101,7 @@ export class CopyToManager {
     }
 
     showInfo && info(`Source of project "${this.project.name}(${this.project.type})" from "${this.project.location}" generated in ${destinationLocation}`)
+    return true;
   }
 
 

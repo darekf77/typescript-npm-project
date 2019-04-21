@@ -9,7 +9,7 @@ import {
   LibType, InstalationType, BuildOptions,
   Dependencies, Package, IPackageJSON, DependenciesFromPackageJsonStyle
 } from "../models";
-import { error, info, warn } from "../messages";
+import { error, info, warn, log } from "../messages";
 import { run } from "../process";
 import { Project } from "./base-project";
 import { ProjectFrom } from "./index";
@@ -151,14 +151,14 @@ export class PackageJSON {
     if (project.isStandaloneProject) {
 
       if (saveForInstall) {
-        info('save for install - standalone project')
+        log(`[package.json] save for install - standalone project: "${this.project.name}"`)
         project.packageJson.data.devDependencies = sortKeys(this.filterDevDepOnly(_.cloneDeep(newDeps)))
         project.packageJson.data.dependencies = sortKeys(this.filterDepOnly(_.cloneDeep(newDeps)))
         project.packageJson.data.engines = engines;
         project.packageJson.data.license = license;
         project.packageJson.save()
       } else {
-        info('save for clean version - standalone project')
+        log(`[package.json] save for clean - standalone project: "${this.project.name}"`)
         project.packageJson.data.devDependencies = undefined;
         project.packageJson.data.dependencies = undefined;
         project.packageJson.data.engines = undefined
@@ -169,7 +169,7 @@ export class PackageJSON {
     } else {
       project.packageJson.data.devDependencies = undefined;
       if (saveForInstall) {
-        info('save for install - workspace project')
+        log(`[package.json] save for install - workspace project: "${this.project.name}"`)
         project.packageJson.data.dependencies = sortKeys(newDeps)
         if (!project.isCoreProject) {
           project.packageJson.data.engines = engines;
@@ -177,7 +177,7 @@ export class PackageJSON {
         }
         project.packageJson.save()
       } else {
-        info('save for clean version - workspace project')
+        log(`[package.json] save for clean - workspace project: "${this.project.name}"`)
         project.packageJson.data.dependencies = undefined;
         if (!project.isCoreProject) {
           project.packageJson.data.engines = undefined;

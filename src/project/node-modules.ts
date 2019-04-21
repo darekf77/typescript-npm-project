@@ -2,12 +2,14 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
+import * as _ from 'lodash';
 // local
 import { Project } from "./base-project";
-import { error, info } from "../messages";
+import { error, info, warn, log } from "../messages";
 import { HelpersLinks } from '../helpers-links';
 import { ProjectFrom } from './index';
 import config from '../config';
+import { ArrNpmDependencyType } from '../models/ipackage-json';
 export class NodeModules {
 
   constructor(private project: Project) { }
@@ -16,37 +18,93 @@ export class NodeModules {
 
   }
 
+  get copyBin() {
+    const self = this;
+    return {
+      to(project: Project) {
+        const source = path.join(self.project.location, config.folder.node_modules, '.bin')
+        const dest = path.join(project.location, config.folder.node_modules, '.bin')
+        if (fse.existsSync(source)) {
+          if (!fse.existsSync(dest)) {
+            fse.mkdirpSync(dest)
+          }
+          fse.copySync(source, dest, {
+            recursive: true,
+            overwrite: true
+          })
+        }
+      }
+    }
+  }
+
   copy(packageName: string,
     // options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }
   ) {
     const self = this;
     return {
       to(destination: Project) {
-        const p = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
+        let projToCopy = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
         if (!fse.existsSync(nodeModeulesPath)) {
           fse.mkdirpSync(nodeModeulesPath)
         }
-        // console.log('hAS ORGANIZAION',p.hasNpmOrganization)
-        // console.log('ORGANIZAION',p.npmOrganization)
 
-        const pDestPath = path.join(nodeModeulesPath, p.name)
-        p.copytToManager.generateSourceCopyIn(pDestPath, { override: false, filterForBundle: false, showInfo: false })
+        const pDestPath = path.join(nodeModeulesPath, projToCopy.name)
+        const addedSuccess = projToCopy.copytToManager.generateSourceCopyIn(pDestPath, { override: false, filterForBundle: false, showInfo: false })
+        if (!addedSuccess) {
+          return;
+        }
 
-        p.dependencies.forEach(dep => {
-          const depDestPath = path.join(nodeModeulesPath, dep.name)
-          dep.copytToManager.generateSourceCopyIn(depDestPath, { override: false, filterForBundle: false, showInfo: false })
-          dep.node_modules.copy()
-        })
+        log('please wait....')
+        const depsNames = self.addDependenceis(self.project, self.project.location);
 
-        p.devDependencies.forEach(dep => {
-          const depDestPath = path.join(nodeModeulesPath, dep.name)
-          dep.copytToManager.generateSourceCopyIn(depDestPath, { override: false, filterForBundle: false, showInfo: false })
+        depsNames
+          // .filter(dep => dep !== self.project.name)
+          .forEach(pkgName => {
+            const pDestPathPackage = path.join(nodeModeulesPath, pkgName)
+            projToCopy = ProjectFrom(path.join(self.project.location, config.folder.node_modules, pkgName))
+            if (projToCopy) {
+              projToCopy.copytToManager.generateSourceCopyIn(pDestPathPackage, { override: false, filterForBundle: false, showInfo: false })
+            } else {
+              warn(`This is not a npm package: '${pkgName}' inside "${self.project.location}"`)
+            }
 
-        })
+          })
 
       }
     }
+  }
+
+  private addDependenceis(project: Project, context: string, allNamesBefore: string[] = []) {
+    let newNames = []
+    if (!allNamesBefore.includes(project.name)) {
+      newNames.push(project.name)
+    }
+
+    ArrNpmDependencyType.forEach(depName => {
+      newNames = newNames.concat(project.getDeps(depName, context)
+        .filter(d => !allNamesBefore.includes(d.name))
+        .map(d => d.name))
+    })
+
+
+    let uniq = {}
+    newNames.forEach(name => uniq[name] = name)
+    newNames = Object.keys(uniq)
+
+
+    const projects = newNames
+      .map(name => ProjectFrom(path.join(context, config.folder.node_modules, name)))
+      .filter(f => !!f)
+
+    // console.log('projects', projects.length)
+    allNamesBefore = allNamesBefore.concat(newNames);
+
+    projects.forEach(dep => {
+      allNamesBefore = this.addDependenceis(dep, context, allNamesBefore)
+    })
+
+    return allNamesBefore;
   }
 
 
@@ -72,12 +130,14 @@ export class NodeModules {
         info(`Installing npm packages in ${this.project.name}... from TNP.`);
         if (this.project.isStandaloneProject) {
           Project.Tnp.packageJson.saveForInstall(true)
-          Project.Tnp.dependencies.forEach(dep => {
-            Project.Tnp.node_modules.copy(dep.name).to(this.project)
-          })
-          Project.Tnp.devDependencies.forEach(dep => {
-            Project.Tnp.node_modules.copy(dep.name).to(this.project)
-          })
+
+          ArrNpmDependencyType.forEach(depName => {
+            Project.Tnp.getDeps(depName, Project.Tnp.location).forEach(dep => {
+              Project.Tnp.node_modules.copy(dep.name).to(this.project)
+            })
+          });
+
+          Project.Tnp.node_modules.copyBin.to(this.project);
 
         } else {
           info(`Installing npm packages in ${this.project.name}... `);
@@ -85,11 +145,6 @@ export class NodeModules {
         }
 
       }
-      console.log('Flattering packages....')
-      if (this.project.isGenerated && this.project.isWorkspace) {
-        this.project.run(`npm dedupe`).sync()
-      }
-
     } else {
       console.log('node_modules exists')
     }
