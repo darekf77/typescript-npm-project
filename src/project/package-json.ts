@@ -276,7 +276,7 @@ export class PackageJSON {
 
   private recreateForStandalone(saveForInstall: boolean) {
     let allDeps = this.getDepsBy();
-    let newDeps = this.getDepsBy(this.project.type);
+    let newDeps = this.getDepsBy(this.project.isTnp ? void 0 : this.project.type);
     this.modifyWrapper(newDeps, this.project, saveForInstall, allDeps);
   }
 

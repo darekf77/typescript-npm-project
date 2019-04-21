@@ -128,7 +128,13 @@ export class NodeModules {
         this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
       } else {
         info(`Installing npm packages in ${this.project.name}... from TNP.`);
-        if (this.project.isStandaloneProject) {
+
+        if (this.project.isTnp || this.project.type === 'unknow-npm-project') {
+          this.project.packageJson.saveForInstall(true);
+          info(`Installing npm packages in ${this.project.name}... `);
+          this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
+
+        } else {
           Project.Tnp.packageJson.saveForInstall(true)
 
           ArrNpmDependencyType.forEach(depName => {
@@ -139,9 +145,6 @@ export class NodeModules {
 
           Project.Tnp.node_modules.copyBin.to(this.project);
 
-        } else {
-          info(`Installing npm packages in ${this.project.name}... `);
-          this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
         }
 
       }
