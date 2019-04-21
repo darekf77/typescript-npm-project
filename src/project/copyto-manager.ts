@@ -37,8 +37,8 @@ export class CopyToManager {
     }
   }
 
-  public generateSourceCopyIn(destinationLocation: string, override = true) {
-
+  public generateSourceCopyIn(destinationLocation: string, options?: { override?: boolean; filterForBundle?: boolean; showInfo?: boolean; }) {
+    const { override = true, filterForBundle = true, showInfo = true } = options || {}
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
@@ -48,8 +48,8 @@ export class CopyToManager {
     }
 
 
-    if (fs.existsSync(destinationLocation) && override) {
-      warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
+    if (fs.existsSync(destinationLocation) && !override) {
+      showInfo && warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
       return;
     } else {
       fse.mkdirpSync(destinationLocation);
@@ -61,9 +61,8 @@ export class CopyToManager {
     }
     fse.mkdirpSync(tempLocation);
 
-    if (this.project.type === 'unknow-npm-project') {
-      fse.copySync(`${sourceLocation}/`, tempLocation);
-    } else {
+    if (filterForBundle) {
+
       fse.copySync(`${sourceLocation}/`, tempLocation, {
         filter: (src: string, dest: string) => {
           // console.log('src', src)
@@ -77,6 +76,8 @@ export class CopyToManager {
             !/.*bundle.*/g.test(src);
         }
       });
+    } else {
+      fse.copySync(`${sourceLocation}/`, tempLocation);
     }
 
 
@@ -96,7 +97,8 @@ export class CopyToManager {
         This workspace is generated.
       `)
     }
-    info(`Source of project "${this.project.name}" generated in ${destinationLocation}`)
+
+    showInfo && info(`Source of project "${this.project.name}(${this.project.type})" from "${this.project.location}" generated in ${destinationLocation}`)
   }
 
 

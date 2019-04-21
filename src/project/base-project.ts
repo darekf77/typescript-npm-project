@@ -377,7 +377,7 @@ export class Project implements IProject {
 
     const current = ProjectFrom(process.cwd())
     if (!current) {
-      error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`)
+      error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`, false, true)
     }
     // console.log('CURRENT', current.location)
     return current;
@@ -1025,22 +1025,52 @@ Generated workspace should be here: ${genLocationWOrkspace}
       return this.browser.dependencies;
     }
     //#region @backend
-    if (this.type === 'unknow-npm-project' && this.packageJson.data && this.packageJson.data.dependencies) {
-      return Object.keys(this.packageJson.data.dependencies).map(packageName => {
-        let p = path.resolve(path.join(this.location, '..', packageName))
-        if (fse.existsSync(p)) {
-          const project = ProjectFrom(p);
-          return project;
-        } else {
-          p = path.join(this.location, config.folder.node_modules, packageName);
+    if (this.packageJson.data && this.packageJson.data.dependencies) {
+      return Object.keys(this.packageJson.data.dependencies)
+        .map(packageName => {
+          let p = path.resolve(path.join(this.location, '..', packageName))
           if (fse.existsSync(p)) {
             const project = ProjectFrom(p);
             return project;
-          }
+          } else {
+            p = path.join(this.location, config.folder.node_modules, packageName);
+            if (fse.existsSync(p)) {
+              const project = ProjectFrom(p);
+              return project;
+            }
 
-          error(`Dependency "${packageName}" doen't exist in ${p}`)
-        }
-      })
+            warn(`Dependency "${packageName}" doen't exist in ${p}`)
+          }
+        })
+        .filter(f => !!f)
+    }
+    return [];
+    //#endregion
+  }
+
+  get devDependencies(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.dependencies;
+    }
+    //#region @backend
+    if (this.packageJson.data && this.packageJson.data.devDependencies) {
+      return Object.keys(this.packageJson.data.devDependencies)
+        .map(packageName => {
+          let p = path.resolve(path.join(this.location, '..', packageName))
+          if (fse.existsSync(p)) {
+            const project = ProjectFrom(p);
+            return project;
+          } else {
+            p = path.join(this.location, config.folder.node_modules, packageName);
+            if (fse.existsSync(p)) {
+              const project = ProjectFrom(p);
+              return project;
+            }
+
+            warn(`Dependency "${packageName}" doen't exist in ${p}`)
+          }
+        })
+        .filter(f => !!f)
     }
     return [];
     //#endregion

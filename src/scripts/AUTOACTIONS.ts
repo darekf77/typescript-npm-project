@@ -128,7 +128,11 @@ export async function autobuild(project: Project, watch = false, exit = true) {
   }
 }
 
-
+function autorelease(project: Project) {
+  const autorelease = new AutoActions(project);
+  autorelease.release()
+  process.exit(0)
+}
 
 export default {
   $AUTOBUILD: async (args: string) => {
@@ -140,6 +144,9 @@ export default {
   $AUTOBUILDWATCH: async () => {
     // console.log('AUTOBUILD!')
     await autobuild(Project.Current, true)
+  },
+  $autorelease: (args) => {
+    autorelease(Project.Current)
   }
 
 }

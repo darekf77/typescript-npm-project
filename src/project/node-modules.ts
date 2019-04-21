@@ -16,27 +16,35 @@ export class NodeModules {
 
   }
 
-  copy(packageName: string, options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }) {
+  copy(packageName: string,
+    // options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }
+  ) {
     const self = this;
     return {
       to(destination: Project) {
         const p = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
-
+        if (!fse.existsSync(nodeModeulesPath)) {
+          fse.mkdirpSync(nodeModeulesPath)
+        }
         // console.log('hAS ORGANIZAION',p.hasNpmOrganization)
         // console.log('ORGANIZAION',p.npmOrganization)
 
-        const pDestPath = p.hasNpmOrganization ?
-          path.join(nodeModeulesPath, p.npmOrganization, p.name) :
-          path.join(nodeModeulesPath, p.name)
-        p.copytToManager.generateSourceCopyIn(pDestPath, false)
+        const pDestPath = path.join(nodeModeulesPath, p.name)
+        p.copytToManager.generateSourceCopyIn(pDestPath, { override: false, filterForBundle: false, showInfo: false })
 
         p.dependencies.forEach(dep => {
-          const depDestPath = dep.hasNpmOrganization ?
-            path.join(nodeModeulesPath, dep.npmOrganization, dep.name) :
-            path.join(nodeModeulesPath, dep.name)
-          dep.copytToManager.generateSourceCopyIn(depDestPath, false)
+          const depDestPath = path.join(nodeModeulesPath, dep.name)
+          dep.copytToManager.generateSourceCopyIn(depDestPath, { override: false, filterForBundle: false, showInfo: false })
+          dep.node_modules.copy()
         })
+
+        p.devDependencies.forEach(dep => {
+          const depDestPath = path.join(nodeModeulesPath, dep.name)
+          dep.copytToManager.generateSourceCopyIn(depDestPath, { override: false, filterForBundle: false, showInfo: false })
+
+        })
+
       }
     }
   }
@@ -61,8 +69,21 @@ export class NodeModules {
         info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
         this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
       } else {
-        info(`Installing npm packages in ${this.project.name}... `);
-        this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
+        info(`Installing npm packages in ${this.project.name}... from TNP.`);
+        if (this.project.isStandaloneProject) {
+          Project.Tnp.packageJson.saveForInstall(true)
+          Project.Tnp.dependencies.forEach(dep => {
+            Project.Tnp.node_modules.copy(dep.name).to(this.project)
+          })
+          Project.Tnp.devDependencies.forEach(dep => {
+            Project.Tnp.node_modules.copy(dep.name).to(this.project)
+          })
+
+        } else {
+          info(`Installing npm packages in ${this.project.name}... `);
+          this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
+        }
+
       }
       console.log('Flattering packages....')
       if (this.project.isGenerated && this.project.isWorkspace) {

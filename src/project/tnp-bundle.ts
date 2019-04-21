@@ -11,25 +11,6 @@ import { IPackageJSON } from '../models';
 import { TnpDB } from '../tnp-db';
 
 
-
-// TODO solve problem with ngc watch mode high cpu
-// get ownNpmPackage() {
-//     const self = this;
-//     return {
-//         linkTo(project: Project) {
-//             const targetLocation = path.join(project.location, 'node_modules', self.name)
-//             // project.run(`rimraf ${targetLocation}`).sync();
-//             Project.Tnp.run(`tnp ln ./ ${targetLocation}`).sync()
-//         },
-//         unlinkFrom(project: Project) {
-//             const targetLocation = path.join(project.location, 'node_modules', self.name)
-//             project.run(`rimraf ${targetLocation}`).sync();
-//         }
-//     };
-// }
-
-
-
 function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
   const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
 

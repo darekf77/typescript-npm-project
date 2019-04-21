@@ -41,7 +41,7 @@ function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
 
 function copyFromTemplateWorkspaceIfPossible(packageName: string, destination: Project) {
 
-  const templateWorkspace = Project.by('workspace');
+  const templateWorkspace = Project.Tnp;
   if (templateWorkspace === destination) {
     console.log('worksapce installation...')
     return false;

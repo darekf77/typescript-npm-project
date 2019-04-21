@@ -19,11 +19,6 @@ export default {
 
     process.exit(0)
   },
-  COPY_RESOURCES: () => {
-    Project.Current.checkIfReadyForNpm();
-    (Project.Current as BaseProjectLib).bundleResources()
 
-    process.exit(0)
-  }
 }
 //#endregion

@@ -281,7 +281,7 @@ export class PackageJSON {
   }
 
   saveForInstall(saveForInstall = true, coreRecreate = true) {
-    console.log(`save for install in ${this.project.name} ! `)
+    // console.log(`save for install in ${this.project.name} ! `)
     if (coreRecreate) {
       this.coreRecreate()
     }
@@ -401,8 +401,15 @@ export class PackageJSON {
       info(`Installing npm packge: "${packageName}" with yarn.`)
       run(`yarn add ${packageName} ${type}`, { cwd: this.location }).sync()
     } else {
-      info(`Installing npm packge: "${packageName}" with npm.`)
-      run(`npm i ${packageName} ${type}`, { cwd: this.location }).sync()
+      if (this.project.isStandaloneProject) {
+        info(`Installing npm packge: "${packageName}" from TNP.`)
+        Project.Tnp.packageJson.saveForInstall()
+        Project.Tnp.node_modules.copy(packageName).to(this.project)
+      } else {
+        info(`Installing npm packge: "${packageName}" with npm.`)
+        run(`npm i ${packageName} ${type}`, { cwd: this.location }).sync()
+      }
+
     }
   }
 

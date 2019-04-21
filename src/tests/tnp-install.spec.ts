@@ -18,18 +18,18 @@ describe(wrap.describe('Tnp install'), async () => {
 
   await wrap.it(`should install worksapce packages`,
     async (location, testName, { packageJSON, cwdChange }) => {
-      NEW(`workspace test1`, false, location);
+      NEW(`isomorphic-lib test1`, false, location);
 
-      // packageJSON('test1', p => {
-      //   p.dependencies = {}
-      //   p.dependencies = {}
-      //   p.tnp.core = void 0;
-      // })
+      packageJSON('test1', p => {
+        p.dependencies = {}
+        p.dependencies = {}
+        p.tnp.core = void 0;
+      })
       // console.log(process.cwd())
 
       it(testName, async () => {
         await cwdChange('test1', async () => {
-          INSTALL('lodash', false)
+          INSTALL('', false)
         })
         expect(true).to.be.true;
 
