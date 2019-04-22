@@ -614,7 +614,7 @@ export class Project implements IProject {
       return this.browser.isStandaloneProject;
     }
     //#region @backend
-    return (!this.isWorkspaceChildProject && !this.isWorkspace) || this.isContainer;
+    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer);
     //#endregion
   }
 

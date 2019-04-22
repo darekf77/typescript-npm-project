@@ -2,6 +2,10 @@ declare global {
   namespace NodeJS {
     interface Global {
       testMode: boolean;
+      hideWarnings: boolean;
+      hideInfos: boolean;
+      hideLog: boolean;
+
     }
   }
 }

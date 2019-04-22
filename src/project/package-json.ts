@@ -191,7 +191,7 @@ export class PackageJSON {
   }
 
 
-  filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
+  private filterDevDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
     let onlyAsDevAllowed = (this.project.packageJson.data.tnp && this.project.packageJson.data.tnp.overrided && this.project.packageJson.data.tnp.overrided.includeAsDev) || [];
     let allDeps = this.getDepsBy();
@@ -212,7 +212,7 @@ export class PackageJSON {
     return deps;
   }
 
-  filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
+  private filterDepOnly(deps: DependenciesFromPackageJsonStyle) {
     const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
     let onlyAsDevAllowed = (this.project.packageJson.data.tnp
       && this.project.packageJson.data.tnp.overrided
@@ -270,7 +270,7 @@ export class PackageJSON {
 
   private recreateForWorkspace(saveForInstall: boolean) {
     let allDeps = this.getDepsBy();
-    const workspace = this.project.isWorkspace ? this.project : (this.project.isWorkspaceChildProject ? this.project.parent : undefined)
+    const workspace = (this.project.isWorkspace || this.project.isContainer) ? this.project : (this.project.isWorkspaceChildProject ? this.project.parent : undefined)
     this.modifyWrapper(allDeps, workspace, saveForInstall, allDeps)
   }
 
@@ -286,7 +286,7 @@ export class PackageJSON {
       this.coreRecreate()
     }
     this.reload()
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject || this.project.isContainer) {
       this.recreateForWorkspace(saveForInstall)
     } else if (this.project.isStandaloneProject) {
       this.recreateForStandalone(saveForInstall)
@@ -354,7 +354,7 @@ export class PackageJSON {
       encoding: 'utf8',
       spaces: 2
     });
-    info('package.json saved')
+    // info('package.json saved')
   }
 
   constructor(options: { data: Object, location?: string; project?: Project; }) {
@@ -390,33 +390,25 @@ export class PackageJSON {
 
   installPackage(packageName?: string) {
     if (!_.isString(packageName) || packageName.trim() === '') {
-      console.trace('Invalida package name', packageName)
+      error(`Invalida package name "${packageName}"`, true, true)
       return
     }
     const type: InstalationType = '--save';
-    // console.log('packageName', packageName)
-    // console.log(this.location)
+
     const yarnLock = path.join(this.location, 'yarn.lock');
     if (fs.existsSync(yarnLock)) {
       info(`Installing npm packge: "${packageName}" with yarn.`)
       run(`yarn add ${packageName} ${type}`, { cwd: this.location }).sync()
     } else {
-      if (this.project.isStandaloneProject) {
-        info(`Installing npm packge: "${packageName}" from TNP.`)
-        Project.Tnp.packageJson.saveForInstall()
-        Project.Tnp.node_modules.copy(packageName).to(this.project)
-      } else {
-        info(`Installing npm packge: "${packageName}" with npm.`)
-        run(`npm i ${packageName} ${type}`, { cwd: this.location }).sync()
-      }
-
+      info(`Installing npm packge: "${packageName}" with npm.`)
+      run(`npm i ${packageName} ${type}`, { cwd: this.location }).sync()
     }
   }
 
   public static fromProject(project: Project) {
     return this.fromLocation(project.location, project);
   }
-  public static fromLocation(location: string, project: Project = null): PackageJSON {
+  public static fromLocation(location: string, project: Project = null, warings = true): PackageJSON {
 
     const isTnpProject = (location === path.join(__dirname, '..'));
     const filePath = path.join(location, 'package.json');

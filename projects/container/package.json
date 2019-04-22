@@ -6,10 +6,5 @@
     "type": "container"
   },
   "name": "container",
-  "version": "0.0.0",
-  "husky": {
-    "hooks": {
-      "pre-push": "tnp deps:show:if:standalone"
-    }
-  }
+  "version": "0.0.0"
 }

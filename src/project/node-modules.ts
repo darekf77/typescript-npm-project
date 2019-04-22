@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
+import chalk from 'chalk';
 // local
 import { Project } from "./base-project";
 import { error, info, warn, log } from "../messages";
@@ -13,10 +14,6 @@ import { ArrNpmDependencyType } from '../models/ipackage-json';
 export class NodeModules {
 
   constructor(private project: Project) { }
-
-  installByCopyFrom(otherProject: Project) {
-
-  }
 
   get copyBin() {
     const self = this;
@@ -56,7 +53,13 @@ export class NodeModules {
         }
 
         log('please wait....')
+        global.hideInfos = true
+        global.hideWarnings = true
+        global.hideLog = true
         const depsNames = self.addDependenceis(self.project, self.project.location);
+        global.hideInfos = false
+        global.hideWarnings = false
+        global.hideLog = false
 
         depsNames
           // .filter(dep => dep !== self.project.name)
@@ -94,7 +97,7 @@ export class NodeModules {
 
 
     const projects = newNames
-      .map(name => ProjectFrom(path.join(context, config.folder.node_modules, name)))
+      .map(name => ProjectFrom(path.join(context, config.folder.node_modules, name), false))
       .filter(f => !!f)
 
     // console.log('projects', projects.length)
@@ -120,6 +123,42 @@ export class NodeModules {
     const linkCommand = `tnp ln ${localNodeModules} ${target.location}`;
     this.project.run(linkCommand).sync();
   }
+
+  private installALlPackageFromTnp() {
+    info(`Installing npm packages in ${this.project.name}... from TNP.`);
+    this.project.packageJson.saveForInstall(true)
+    Project.Tnp.packageJson.saveForInstall(true)
+
+    ArrNpmDependencyType.forEach(depName => {
+      Project.Tnp.getDeps(depName, Project.Tnp.location).forEach(dep => {
+        Project.Tnp.node_modules.copy(dep.name).to(this.project)
+      })
+    });
+
+    Project.Tnp.node_modules.copyBin.to(this.project);
+  }
+
+  private installALlPackageFromContainer() {
+
+    const contaier = this.project.parent;
+    if (!contaier.node_modules.exist()) {
+      info(`npm install in ${chalk.bold('container')} project`)
+      contaier.packageJson.saveForInstall(true)
+      contaier.node_modules.installPackages(true)
+    }
+
+    info(`Installing npm packages in ${this.project.name}... from parent container.`);
+
+    ArrNpmDependencyType.forEach(depName => {
+      contaier.getDeps(depName, contaier.location).forEach(dep => {
+        // console.log('dep', dep)
+        contaier.node_modules.copy(dep.name).to(this.project)
+      })
+    });
+
+    contaier.node_modules.copyBin.to(this.project);
+  }
+
   installPackages(force = false) {
     const yarnLock = path.join(this.project.location, 'yarn.lock');
     if (force || !this.exist()) {
@@ -135,17 +174,11 @@ export class NodeModules {
           this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
 
         } else {
-          info(`Installing npm packages in ${this.project.name}... from TNP.`);
-          Project.Tnp.packageJson.saveForInstall(true)
-
-          ArrNpmDependencyType.forEach(depName => {
-            Project.Tnp.getDeps(depName, Project.Tnp.location).forEach(dep => {
-              Project.Tnp.node_modules.copy(dep.name).to(this.project)
-            })
-          });
-
-          Project.Tnp.node_modules.copyBin.to(this.project);
-
+          if (this.project.isContainerChild) {
+            this.installALlPackageFromContainer()
+          } else {
+            this.installALlPackageFromTnp()
+          }
         }
 
       }

@@ -46,19 +46,19 @@ export function error(details: any, noExit = false, noTrace = false) {
 
 export function info(details: string) {
   // console.log('global.muteMessages',global.muteMessages)
-  !global.muteMessages && console.log(chalk.green(details))
+  !(global.muteMessages && global.hideInfos) && console.log(chalk.green(details))
 }
 
 export function log(details: string) {
   // console.log('global.muteMessages',global.muteMessages)
-  !global.muteMessages && console.log(chalk.gray(details))
+  !(global.muteMessages && global.hideLog) && console.log(chalk.gray(details))
 }
 
 export function warn(details: string, trace = false) {
   if (trace) {
-    !global.muteMessages && console.trace(chalk.yellow(details))
+    !(global.muteMessages && global.hideWarnings) && console.trace(chalk.yellow(details))
   } else {
-    !global.muteMessages && console.log(chalk.yellow(details))
+    !(global.muteMessages && global.hideWarnings) && console.log(chalk.yellow(details))
   }
 }
 //#endregion

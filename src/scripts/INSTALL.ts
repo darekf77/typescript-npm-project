@@ -3,14 +3,17 @@ import { run } from "../process";
 import { Project } from '../project';
 import { link } from "./LINK";
 import { checkValidNpmPackageName } from "../helpers";
-import { error, info } from "../messages";
+import { error, info, log } from "../messages";
 import { unlink } from "./UNLINK";
 import chalk from 'chalk';
 
 
 
 function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
-  if (project.type === 'workspace') {
+  if (project.isContainer) {
+    info(`npm install in ${chalk.bold('container')} project`)
+    project.node_modules.installPackages(force)
+  } else if (project.isWorkspace) {
     info(`npm install in ${chalk.bold('workspace')} project`)
     if (unlinkChilds) {
       unlink(project)
@@ -62,8 +65,8 @@ function copyPackageFromTemplate(project: Project, npmPackagesToAdd: string[]) {
 
 function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAdd: string[]) {
 
-  if (project.type === 'workspace') {  // workspace project: npm i <package name>
-    console.log('** npm install <package> in workspace')
+  if (project.isWorkspace) {  // workspace project: npm i <package name>
+    log('** npm install <package> in workspace')
 
     if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
       info(`All pacakges copied from workspace template`)
@@ -81,7 +84,7 @@ function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAd
     })
     link(project)
   } else if (project.isWorkspaceChildProject) {
-    console.log('** npm install <package> in child of workspace')
+    log('** npm install <package> in child of workspace')
 
     if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
       info(`All pacakges copied from workspace template`)
@@ -99,7 +102,7 @@ function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAd
     })
     link(project.parent)
   } else {
-    console.log('** npm install <package> in separated project')
+    log('** npm install <package> in separated project')
     if (!project.node_modules.exist()) {
       project.node_modules.installPackages()
     }
