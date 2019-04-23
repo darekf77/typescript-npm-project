@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
-import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import { error, info, warn } from "../helpers";
 import config from "../config";
 import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../helpers";
@@ -37,6 +37,7 @@ import * as inquirer from 'inquirer';
 
 import { EnvironmentConfig } from './features/environment-config';
 import { TestRunner } from './features/test-runner';
+import { BuildOptions } from './features/build-options';
 
 
 

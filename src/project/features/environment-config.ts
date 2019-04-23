@@ -16,9 +16,9 @@ import {
   validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
 } from './environment-config-helpers';
 //#endregion
-import { EnvConfig, BuildOptions, EnvironmentName } from '../../models';
-import { Helpers } from 'ng2-logger';
+import { EnvConfig, EnvironmentName } from '../../models';
 import config from '../../config';
+import { Morphi } from 'morphi';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
@@ -166,7 +166,7 @@ export class EnvironmentConfig {
         if (path.basename(jsFileName).split('.').length === 2) {
           c.name = path.basename(jsFileName).split('.')[1] as any;
         } else {
-          c.name  = 'local';
+          c.name = 'local';
         }
 
         // console.log('cdddd', c.domain)
@@ -183,7 +183,7 @@ export class EnvironmentConfig {
    * Can be accesed only after env.prepare()
    */
   public get config(): EnvConfig {
-    if (Helpers.isBrowser) {
+    if (Morphi.IsBrowser) {
       return this.browser.config;
     }
     //#region @backend

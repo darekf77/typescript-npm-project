@@ -7,8 +7,8 @@ import { getWorkingDirOfProcess } from '../../helpers';
 import { PsListInfo } from '../../models/ps-info';
 import { ProjectFrom, Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
-import { BuildOptions } from '../../models/build-options';
 import { warn } from '../../helpers';
+import { BuildOptions } from '../../project/features/build-options';
 
 export class BuildsController extends BaseController {
 

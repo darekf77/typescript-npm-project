@@ -5,8 +5,8 @@ import { error, warn } from '../../helpers';
 
 import { BaseController } from './base-controlller';
 import { CommandInstance } from '../entites/command-instance';
-import { BuildOptions } from '../../models/build-options';
 import { Project } from '../../project';
+import { BuildOptions } from '../../project/features/build-options';
 
 export class CommandsController extends BaseController {
   async addExisted() {

@@ -6,7 +6,8 @@ import * as child from 'child_process';
 import { Project } from "./base-project";
 import { error } from "../helpers";
 import config from "../config";
-import { BuildOptions } from '../models';
+import { BuildOptions } from './features/build-options';
+
 
 
 /**

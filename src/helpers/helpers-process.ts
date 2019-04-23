@@ -1,17 +1,14 @@
 //#region @backend
 import * as child from 'child_process'
-import chalk from 'chalk';
 import * as _ from 'lodash';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from "os";
 import * as sleep from 'sleep';
-import * as inquirer from 'inquirer';
+import { error, info, warn } from "./helpers-messages";
 
-import { error, info, warn } from "../helpers";
 import { RunOptions, WatchOptions } from "../models";
-import config from '../config';
-import { paramsFrom } from './index';
+
+import { paramsFrom } from './helpers';
 import { runSyncOrAsync } from './helpers';
 const prompts = require('prompts');
 export async function questionYesNo(message: string,
@@ -194,7 +191,7 @@ const bigMaxBuffer = 2024 * 500;
 
 function getStdio(options?: RunOptions) {
   const {
-    output, cwd, biggerBuffer, silence,
+    output, silence,
     // pipeToParentProcerss = false,
     // inheritFromParentProcerss = false
   } = options;
@@ -209,7 +206,7 @@ function getStdio(options?: RunOptions) {
 }
 
 function runSyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer, silence } = options;
+  const { cwd, biggerBuffer } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   let stdio = getStdio(options)
   checkProcess(cwd, command);
@@ -217,7 +214,7 @@ function runSyncIn(command: string, options?: RunOptions) {
 }
 
 function runAsyncIn(command: string, options?: RunOptions) {
-  const { output, cwd, biggerBuffer, silence, outputLineReplace } = options;
+  const { output, cwd, biggerBuffer, outputLineReplace } = options;
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   let stdio = getStdio(options)
   checkProcess(cwd, command);
@@ -238,7 +235,7 @@ export const watcher = {
   },
 
   call(fn: Function | string, params: string, folderPath: string = 'src', options: WatchOptions) {
-    const { cwd = process.cwd(), wait } = options;
+    const { cwd = process.cwd() } = options;
     if (!fn) {
       error(`Bad function: ${fn} for watcher on folder: ${folderPath}, with params: ${params}`)
     }

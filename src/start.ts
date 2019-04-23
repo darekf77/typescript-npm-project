@@ -2,9 +2,7 @@
 import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand } from "./helpers";
-
-import { match } from './helpers';
+import { run as runCommand, match } from "./helpers";
 import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
@@ -45,7 +43,6 @@ const helpAlias = [
 
 
 export async function start(argsv: string[]) {
-  // console.log('STARTING COOMMADN', argsv)
   const db = await TnpDB.Instance;
   // console.log(argsv)
   if (

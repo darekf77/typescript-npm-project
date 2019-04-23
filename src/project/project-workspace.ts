@@ -2,12 +2,12 @@
 import * as _ from 'lodash';
 // local
 import { Project } from "./base-project";
-import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
 import { ProxyRouter } from './features/proxy-router';
+import { BuildOptions } from './features/build-options';
 
 
 export class ProjectWorkspace extends Project {

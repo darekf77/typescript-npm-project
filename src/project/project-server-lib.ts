@@ -1,7 +1,8 @@
 //#region @backend
 import { Project } from "./base-project";
-import { BuildOptions, InstalationType } from "../models";
+import { InstalationType } from "../models";
 import { BaseProjectLib } from "./base-project-lib";
+import { BuildOptions } from './features/build-options';
 
 export class ProjectServerLib extends BaseProjectLib {
 
@@ -26,7 +27,7 @@ export class ProjectServerLib extends BaseProjectLib {
 
 
     if (!onlyWatchNoBuild) {
-      await this.buildLib(outDir, forClient  as Project[], prod, watch);
+      await this.buildLib(outDir, forClient as Project[], prod, watch);
     }
   }
 }

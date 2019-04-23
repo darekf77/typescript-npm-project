@@ -3,7 +3,7 @@ import * as path from 'path';
 // local
 import { Project } from "./base-project";
 import config from "../config";
-import { BuildOptions } from '../models';
+import { BuildOptions } from './features/build-options';
 
 export class ProjectIonicClient extends Project {
 

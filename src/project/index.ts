@@ -84,4 +84,15 @@ export function ProjectFrom(location: string, warnings = false): Project {
 }
 
 
+export function nearestProjectTo(location: string) {
+  // console.log('nearestPorjectLocaiont', location)
+  const project = ProjectFrom(location);
+  if (project) {
+    return project;
+  }
+  location = path.join(location, '..');
+  if (!fs.existsSync(location)) return undefined;
+  return ProjectFrom(path.resolve(location));
+}
+
 //#endregion

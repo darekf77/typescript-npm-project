@@ -1,6 +1,7 @@
 //#region @backend
 import { Project } from "./base-project";
-import { BuildOptions } from "../models";
+import { BuildOptions } from './features/build-options';
+
 
 export class ProjectDocker extends Project {
 

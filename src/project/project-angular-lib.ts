@@ -3,12 +3,13 @@ import chalk from 'chalk';
 import * as _ from 'lodash';
 import { BaseProjectLib } from "./base-project-lib";
 import { AngularProject } from "./project-angular";
-import { BuildOptions, BuildDir } from "../models";
+import { BuildDir } from "../models";
 import { error } from "../helpers";
 import config from "../config";
 import { Project } from './base-project';
 import { AnglarLibModuleDivider } from './features/build-isomorphic-lib/angular-lib-module-build';
 import { Helpers } from 'morphi/helpers';
+import { BuildOptions } from './features/build-options';
 export class ProjectAngularLib extends BaseProjectLib {
 
   private angular: AngularProject;

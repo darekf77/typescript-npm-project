@@ -18,7 +18,6 @@ import {
   ProcessController
 } from './controllers';
 import { Project } from '../project';
-import { BuildOptions } from '../models/build-options';
 import { BuildInstance } from './entites/build-instance';
 import { warn, error } from '../helpers';
 import { killProcess, questionYesNo } from '../helpers';
@@ -26,6 +25,7 @@ import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } fr
 import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
 import chalk from 'chalk';
+import { BuildOptions } from '../project/features/build-options';
 
 export type ProcessBoundAction = (
   process: ProcessInstance

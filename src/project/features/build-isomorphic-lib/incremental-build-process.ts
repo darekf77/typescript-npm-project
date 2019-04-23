@@ -8,8 +8,8 @@ import { BroswerForModuleCompilation, BackendCompilationExtended } from './compi
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
 import config from '../../../config';
 import { Project } from '../../../project';
-import { BuildOptions, LibType } from '../../../models';
 import { warn } from '../../../helpers';
+import { BuildOptions } from '../build-options';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 

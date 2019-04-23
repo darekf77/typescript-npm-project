@@ -1,12 +1,12 @@
 //#region @backend
 import * as _ from 'lodash';
-import { BuildOptions } from '../../models';
 import { ProjectFrom } from '../../project';
 import { Project } from '../../project/base-project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
 import { killProcess } from '../../helpers';
 import chalk from 'chalk';
+import { BuildOptions } from '../../project/features/build-options';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;

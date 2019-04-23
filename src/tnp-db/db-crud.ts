@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 
 import { CLASS } from 'typescript-class-helpers'
 
-import { BuildOptions } from '../models/build-options';
 import { Project } from '../project/base-project';
 import { DBBaseEntity } from './entites/base-entity';
 import {
@@ -13,6 +12,7 @@ import {
 } from './entites';
 import { ProjectFrom } from '../project';
 import { error } from '../helpers';
+import { BuildOptions } from '../project/features/build-options';
 
 
 export class DbCrud {

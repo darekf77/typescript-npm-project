@@ -7,10 +7,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as rimraf from "rimraf";
 import { sleep } from 'sleep';
-import { ProjectFrom } from '../project';
-import { Project } from '../project';
-import { BuildOptions } from '../models';
-import { error, warn } from "../helpers";
+import { error, warn } from "./helpers-messages";
 //#endregion
 
 import * as _ from 'lodash'
@@ -52,19 +49,6 @@ export function getControllers(cwd: string): string[] {
     })
 }
 
-
-
-
-export function nearestProjectTo(location: string) {
-  // console.log('nearestPorjectLocaiont', location)
-  const project = ProjectFrom(location);
-  if (project) {
-    return project;
-  }
-  location = path.join(location, '..');
-  if (!fs.existsSync(location)) return undefined;
-  return ProjectFrom(path.resolve(location));
-}
 
 
 export function paramsFrom(command: string) {
@@ -168,28 +152,28 @@ export function copyFile(sousrce: string, destination: string,
 // }
 
 
-export function getWebpackEnv(params: string): BuildOptions {
+// export function getWebpackEnv(params: string): BuildOptions {
 
-  // console.log('params', params)
+//   // console.log('params', params)
 
-  const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z0-9]|\%|\\|\/|-)+`, 'g')
-  const match = params.match(regex1);
+//   const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z0-9]|\%|\\|\/|-)+`, 'g')
+//   const match = params.match(regex1);
 
-  // console.log('match', match)
+//   // console.log('match', match)
 
-  const env = {};
-  match.forEach(s => {
-    const split = s.split('=');
-    const key = split[0].replace('--env.', '')
-    const value = split[1];
-    env[key] = decodeURIComponent(value);
-    if ((env[key] as string).search(',') !== -1) {
-      env[key] = (env[key] as string).split(',')
-    }
-  })
-  fixWebpackEnv(env);
-  return env as any;
-}
+//   const env = {};
+//   match.forEach(s => {
+//     const split = s.split('=');
+//     const key = split[0].replace('--env.', '')
+//     const value = split[1];
+//     env[key] = decodeURIComponent(value);
+//     if ((env[key] as string).search(',') !== -1) {
+//       env[key] = (env[key] as string).split(',')
+//     }
+//   })
+//   fixWebpackEnv(env);
+//   return env as any;
+// }
 
 export class ClassHelper {
   static getMethodName(obj, method): string {

@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 
 import {
-  LibType, InstalationType, BuildOptions,
+  LibType, InstalationType,
   Dependencies, Package, IPackageJSON, DependenciesFromPackageJsonStyle
 } from "../../models";
 import { error, info, warn, log } from "../../helpers";
