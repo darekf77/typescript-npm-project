@@ -1,3 +1,7 @@
+//#region @backend
+import { Ora } from 'ora';
+//#endregion
+
 declare global {
   namespace NodeJS {
     interface Global {
@@ -5,6 +9,9 @@ declare global {
       hideWarnings: boolean;
       hideInfos: boolean;
       hideLog: boolean;
+      //#region @backend
+      spinner: Ora;
+      //#endregion
 
     }
   }

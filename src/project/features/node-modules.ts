@@ -80,6 +80,7 @@ export class NodeModules {
   }
 
   installPackages(force = false) {
+    global.spinner.start()
     const yarnLock = path.join(this.project.location, 'yarn.lock');
     if (force || !this.exist()) {
       if (fs.existsSync(yarnLock)) {
@@ -105,6 +106,7 @@ export class NodeModules {
     } else {
       console.log('node_modules exists')
     }
+    global.spinner.stop()
   }
 
   installPackage(packageName?: string) {
@@ -137,19 +139,20 @@ export class NodeModules {
         }
 
         const pDestPath = path.join(nodeModeulesPath, projToCopy.name)
-        const addedSuccess = projToCopy.copytToManager.generateSourceCopyIn(pDestPath, { override: false, filterForBundle: false, showInfo: false })
+        const addedSuccess = projToCopy.copytToManager.generateSourceCopyIn(pDestPath,
+          { override: false, filterForBundle: false, showInfo: false })
         if (!addedSuccess) {
           return;
         }
 
         log('please wait....')
-        global.hideInfos = true
-        global.hideWarnings = true
-        global.hideLog = true
+        global.hideInfos = true;
+        global.hideWarnings = true;
+        global.hideLog = true;
         const depsNames = self.addDependenceis(self.project, self.project.location);
-        global.hideInfos = false
-        global.hideWarnings = false
-        global.hideLog = false
+        global.hideInfos = false;
+        global.hideWarnings = false;
+        global.hideLog = false;
 
         depsNames
           // .filter(dep => dep !== self.project.name)
@@ -205,7 +208,7 @@ export class NodeModules {
   }
 
 
-  private linkToProject(target: Project, force = false) {
+  linkToProject(target: Project, force = false) {
     if (!this.exist()) {
       this.project.node_modules.installPackages();
     }

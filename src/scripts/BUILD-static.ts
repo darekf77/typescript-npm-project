@@ -1,10 +1,10 @@
 //#region @backend
 import * as path from 'path';
 import * as sleep from 'sleep';
-import { BuildOptions } from '../models';
 import { ProjectFrom, Project } from '../project';
 import { initFromArgs } from './INIT';
 import * as rimraf from 'rimraf';
+import { BuildOptions } from '../project/features/build-options';
 
 
 

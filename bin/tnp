@@ -2,6 +2,12 @@
 //#region @backend
 var fs = require('fs')
 var path = require('path')
+var ora = require('ora')
+var spinner = ora()
+global.spinner = spinner;
+if (!isNaN(process.ppid)) {
+  spinner.start()
+}
 
 var pathToDistFolder = path.join(__dirname, '../dist');
 var pathToBundleFolder = path.join(__dirname, '../bundle');
@@ -21,7 +27,7 @@ if (bundleExist && distExist) {
     console.log('- tnp dist -> becouse is newer -')
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   } else {
-    console.log('- tnp bundle -> becouse is newer -')
+    // console.log('- tnp bundle -> becouse is newer -')
     start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
   }
 } else {
@@ -29,11 +35,11 @@ if (bundleExist && distExist) {
     console.log('- tnp bundle -')
     start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
   } else {
-    console.log('- tnp dist -');
+    // console.log('- tnp dist -');
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   }
 }
 
 
-start(process.argv);
+start(process.argv, spinner);
 //#endregion

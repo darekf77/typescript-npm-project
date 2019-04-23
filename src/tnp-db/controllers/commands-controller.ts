@@ -27,7 +27,7 @@ export class CommandsController extends BaseController {
   async runCommand(cmd: CommandInstance) {
 
     if (cmd && _.isString(cmd.command) && cmd.command.trim() !== '') {
-      await start(cmd.command.split(' '));
+      await start(cmd.command.split(' '), void 0);
     } else {
       error(`Last command for location: ${cmd.location} doen't exists`, false, true);
     }
@@ -37,7 +37,7 @@ export class CommandsController extends BaseController {
     const commands = this.crud.getAll<CommandInstance>(CommandInstance) as CommandInstance[];
     const cmd = commands.find(c => c.location === location)
     if (cmd) {
-      await start(cmd.command.split(' '));
+      await start(cmd.command.split(' '), void 0);
     } else {
       error(`Last command for location: ${cmd.location} doen't exists`, false, true);
     }

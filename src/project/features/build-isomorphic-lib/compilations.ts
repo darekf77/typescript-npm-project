@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut';
 import { EnvConfig } from '../../../models';
-import { ProjectFrom } from '../../../index';
+import { ProjectFrom } from '../../index';
 
 export class BackendCompilationExtended extends BackendCompilation {
 

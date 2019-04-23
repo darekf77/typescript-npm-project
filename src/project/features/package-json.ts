@@ -1,17 +1,18 @@
 //#region @backend
-import * as _ from "lodash";
+
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from "chalk";
-
-import { Morphi } from 'morphi';
 
 import { Project } from "../base-project";
 import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle } from "../../models";
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log } from "../../helpers";
 import { config } from '../../config';
 //#endregion
+
+import * as _ from "lodash";
+import { Morphi } from 'morphi';
 
 @Morphi.Entity<PackageJSON>({
   className: 'PackageJSON',
@@ -185,8 +186,8 @@ export class PackageJSON {
   }
 
   hide(reasonToHidePackages = '') {
-    if (this.project.isContainer) {
-      log(`[packagejson] don't hide packages for container`)
+    if (this.project.isContainer || this.project.isTnp) {
+      log(`[packagejson] don't hide packages for container type or Tnp`)
       return
     }
     this.reasonToHidePackages = reasonToHidePackages;

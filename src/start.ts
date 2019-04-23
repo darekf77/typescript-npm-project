@@ -6,6 +6,7 @@ import { run as runCommand, match } from "./helpers";
 import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
+import { Ora } from 'ora';
 
 import config from './config';
 import { ConsoleUi } from './console-ui';
@@ -42,7 +43,7 @@ const helpAlias = [
 
 
 
-export async function start(argsv: string[]) {
+export async function start(argsv: string[], spinner?: Ora) {
   const db = await TnpDB.Instance;
   // console.log(argsv)
   if (
@@ -69,6 +70,7 @@ export async function start(argsv: string[]) {
       const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
       const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
       try {
+        spinner && spinner.stop()
         runCommand(commadnToRun).sync()
       } catch (error) {
         console.log(`Command ${localLib} ERROR...`);
@@ -101,6 +103,7 @@ export async function start(argsv: string[]) {
             const check = match(k, argsv);
             if (check.isMatch) {
               recognized = true;
+              spinner && spinner.stop()
               vFn.apply(null, [check.restOfArgs.join(' ')]);
               return;
             }
@@ -110,6 +113,7 @@ export async function start(argsv: string[]) {
       })
     }
   });
+  spinner && spinner.stop()
   if (recognized) {
     // console.log("RECOGNIZED !!")
     process.stdin.resume();
