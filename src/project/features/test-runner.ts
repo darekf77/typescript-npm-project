@@ -2,8 +2,8 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 //#endregion
-import { Project } from './base-project';
-import config from '../config';
+import { Project } from '../base-project';
+import config from '../../config';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 

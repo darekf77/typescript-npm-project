@@ -7,8 +7,6 @@ import { Project } from "./base-project";
 import { error } from "../messages";
 import config from "../config";
 import { BuildOptions } from '../models';
-import { EnvironmentConfig } from './environment-config';
-import { killonport } from '../scripts/KILL';
 import { killProcessByPort } from '../process';
 
 /**

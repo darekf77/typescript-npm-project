@@ -1,7 +1,7 @@
 import { Morphi, ModelDataConfig } from 'morphi';
 
 import { LibType, EnvironmentName, NpmDependencyType } from "../models";
-import { PackageJSON } from "./package-json";
+import { PackageJSON } from "./features/package-json";
 //#region @backend
 
 import * as fs from 'fs';
@@ -20,23 +20,23 @@ import config from "../config";
 import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../process";
 import { copyFile, getMostRecentFilesNames, tryRemoveDir, tryCopyFrom } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
-import { NodeModules } from "./node-modules";
-import { FilesRecreator } from './files-builder';
+import { NodeModules } from "./features/node-modules";
+import { FilesRecreator } from './features/files-builder';
 
-import { ProxyRouter } from './proxy-router';
+import { ProxyRouter } from './features/proxy-router';
 
 import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName } from '../helpers-git';
-import { CopyToManager } from './copyto-manager';
+import { CopyToManager } from './features/copyto-manager';
 import { build } from '../scripts/BUILD';
-import { SourceModifier } from './source-modifier';
-import { reinstallTnp } from './tnp-bundle';
-import { FrameworkFilesGenerator } from './framework-files-generator';
+import { SourceModifier } from './features/source-modifier';
+import { reinstallTnp } from './features/tnp-bundle';
+import { FrameworkFilesGenerator } from './features/framework-files-generator';
 import { TnpDB } from '../tnp-db';
 import * as inquirer from 'inquirer';
 //#endregion
 
-import { EnvironmentConfig } from './environment-config';
-import { TestRunner } from './test-runner';
+import { EnvironmentConfig } from './features/environment-config';
+import { TestRunner } from './features/test-runner';
 
 
 

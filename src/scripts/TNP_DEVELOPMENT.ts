@@ -1,6 +1,6 @@
 //#region @backend
 import { Project, BaseProjectLib, ProjectFrom } from "../project";
-import { BaselineSiteJoin } from "../project/baseline-site-join";
+import { BaselineSiteJoin } from "../project/features/baseline-site-join";
 import { WatchNoRace } from "../watcher-no-race";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';

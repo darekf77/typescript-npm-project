@@ -6,10 +6,10 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 
-import { Project } from './base-project';
-import { config } from '../config';
+import { Project } from '../base-project';
+import { config } from '../../config';
 import { IncrementalCompilation } from 'morphi/build';
-import { getEntites, getControllers } from '../helpers';
+import { getEntites, getControllers } from '../../helpers';
 
 
 export class FrameworkFilesGenerator extends IncrementalCompilation {

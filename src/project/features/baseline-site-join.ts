@@ -6,15 +6,15 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
 // local
-import { Project } from "./base-project";
-import { LibType, RecreateFile, FileEvent } from "../models";
-import { copyFile, uniqArray, crossPlatofrmPath } from '../helpers';
-import config from '../config';
-import { error } from '../messages';
+import { Project } from "../base-project";
+import { LibType, RecreateFile, FileEvent } from "../../models";
+import { copyFile, uniqArray, crossPlatofrmPath } from '../../helpers';
+import config from '../../config';
+import { error } from '../../messages';
 import chalk from 'chalk';
-import { run } from '../process';
+import { run } from '../../process';
 import { Helpers } from 'morphi/helpers';
-import { TnpDB } from '../tnp-db';
+import { TnpDB } from '../../tnp-db';
 
 const REGEXS = {
 

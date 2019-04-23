@@ -4,13 +4,13 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { Project } from './base-project';
+import { Project } from '../base-project';
 import { FilesRecreator } from './files-builder';
-import config from '../config';
-import { ProjectFrom } from './index';
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import config from '../../config';
+import { ProjectFrom } from '../index';
+import { IncrementalBuildProcessExtended } from '../../build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
-import { AnglarLibModuleDivider } from '../build-isomorphic-lib/angular-lib-module-build';
+import { AnglarLibModuleDivider } from '../../build-isomorphic-lib/angular-lib-module-build';
 
 export interface IsomorphicOptions {
   currentProjectName?: string;

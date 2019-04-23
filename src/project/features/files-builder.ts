@@ -6,12 +6,12 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 // local
-import { Project } from "./base-project";
-import { LibType, RecreateFile } from "../models";
-import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../helpers';
-import config from '../config';
+import { Project } from "../base-project";
+import { LibType, RecreateFile } from "../../models";
+import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../helpers';
+import config from '../../config';
 import { BaselineSiteJoin } from './baseline-site-join';
-import { error } from '../messages';
+import { error } from '../../messages';
 
 interface VSCodeSettings {
   'files.exclude': { [files: string]: boolean; };

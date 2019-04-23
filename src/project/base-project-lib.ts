@@ -9,7 +9,7 @@ import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
 import { questionYesNo } from "../process";
 import { error, info, warn } from "../messages";
 import config from "../config";
-import { PackageJSON } from './package-json';
+import { PackageJSON } from './features/package-json';
 import { npmInstall } from '../scripts/INSTALL';
 import { ProjectFrom, tryCopyFrom } from '../index';
 

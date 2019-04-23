@@ -4,16 +4,16 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 // local
-import { config } from '../config';
-import { EnvConfig, EnvironmentName, EnvConfigProject } from '../models';
-import { error, warn } from '../messages';
-import { ProjectFrom } from './index';
+import { config } from '../../config';
+import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../models';
+import { error, warn } from '../../messages';
+import { ProjectFrom } from '../index';
 import { ProxyRouter } from './proxy-router';
-import { Project } from './base-project';
-import { HelpersLinks } from '../helpers-links';
+import { Project } from '../base-project';
+import { HelpersLinks } from '../../helpers-links';
 import { walk } from 'lodash-walk-object';
-import { config as schemaConfig } from '../environment-config';
-import { terminalLine } from '../process';
+import { config as schemaConfig } from '../../environment-config';
+import { terminalLine } from '../../process';
 
 
 

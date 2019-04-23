@@ -3,14 +3,12 @@ import * as child from 'child_process';
 
 
 import * as portfinder from 'portfinder';
-import { error } from "../messages";
-import { EnvConfigProject, LibType } from "../models";
+import { error } from "../../messages";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
-import { Project } from './base-project';
+import { Project } from '../base-project';
 import chalk from 'chalk';
 import * as _ from 'lodash';
-import { killonport } from '../scripts/KILL';
 
 
 export class ProxyRouter {

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { Project } from './base-project';
-import { PackageJSON } from './package-json';
+import { PackageJSON } from './features/package-json';
 import { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { ProjectAngularLib } from './project-angular-lib';
 import { ProjectAngularClient } from './project-angular-client';
@@ -22,10 +22,10 @@ import { ProjectContainer } from './project-container';
 export * from './base-project';
 export * from './base-project-lib';
 export * from './project-isomorphic-lib';
-export * from './package-json';
+export * from './features/package-json';
 
 //#region @backend
-export * from './baseline-site-join';
+export * from './features/baseline-site-join';
 export * from './project-angular-client';
 export * from './project-angular-client-cli';
 export * from './project-angular-lib';

@@ -4,11 +4,11 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
-import { config } from '../config';
-import { getMostRecentFilesNames, tryCopyFrom, tryRemoveDir } from "../helpers";
-import { Project } from './base-project';
-import { IPackageJSON } from '../models';
-import { TnpDB } from '../tnp-db';
+import { config } from '../../config';
+import { getMostRecentFilesNames, tryCopyFrom, tryRemoveDir } from "../../helpers";
+import { Project } from '../base-project';
+import { IPackageJSON } from '../../models';
+import { TnpDB } from '../../tnp-db';
 
 
 function checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {

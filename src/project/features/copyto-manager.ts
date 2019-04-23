@@ -8,12 +8,12 @@ import chalk from 'chalk';
 import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
-import config from "../config";
-import { Project } from './base-project';
-import { FileEvent, BuildOptions, IPackageJSON } from '../models';
-import { info, warn } from '../messages';
-import { tryRemoveDir, tryCopyFrom } from '../index';
-import { copyFile } from '../helpers';
+import config from "../../config";
+import { Project } from '../base-project';
+import { FileEvent, BuildOptions, IPackageJSON } from '../../models';
+import { info, warn } from '../../messages';
+import { tryRemoveDir, tryCopyFrom } from '../../index';
+import { copyFile } from '../../helpers';
 
 export class CopyToManager {
 

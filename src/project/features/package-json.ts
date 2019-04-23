@@ -8,15 +8,15 @@ import * as glob from 'glob';
 import {
   LibType, InstalationType, BuildOptions,
   Dependencies, Package, IPackageJSON, DependenciesFromPackageJsonStyle
-} from "../models";
-import { error, info, warn, log } from "../messages";
-import { run } from "../process";
-import { Project } from "./base-project";
-import { ProjectFrom } from "./index";
+} from "../../models";
+import { error, info, warn, log } from "../../messages";
+import { run } from "../../process";
+import { Project } from "../base-project";
+import { ProjectFrom } from "../index";
 import chalk from "chalk";
-import { config } from '../config';
+import { config } from '../../config';
 import { Helpers } from 'morphi';
-import { tryRemoveDir } from '../helpers';
+import { tryRemoveDir } from '../../helpers';
 
 const sortKeys = function (obj) {
   if (_.isArray(obj)) {
@@ -428,24 +428,6 @@ export class PackageJSON {
       error(err)
     }
   }
-
-
-
-
-  // get requiredProjects(): Project[] {
-  //   const projects: Project[] = [];
-  //   if (this.data && this.data.tnp && Array.isArray(this.data.tnp.requiredLibs)) {
-  //     const dependencies = this.data.tnp.requiredLibs;
-  //     dependencies.forEach(p => {
-  //       const projectPath = path.join(this.location, p);
-  //       if (!fs.existsSync(projectPath)) {
-  //         error(`Dependency project: "${p}" doesn't exist.`)
-  //       }
-  //       projects.push(ProjectFrom(projectPath));
-  //     })
-  //   }
-  //   return projects;
-  // }
 
   get type(): LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;

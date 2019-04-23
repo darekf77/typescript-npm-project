@@ -7,7 +7,7 @@ import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../messages';
 import { PROGRESS_DATA } from '../progress-output';
-import { ProxyRouter } from './proxy-router';
+import { ProxyRouter } from './features/proxy-router';
 
 
 export class ProjectWorkspace extends Project {

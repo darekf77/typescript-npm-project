@@ -5,20 +5,20 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as glob from 'glob';
 
-import { Project } from './base-project';
+import { Project } from '../base-project';
 
-import { error, warn } from '../messages';
+import { error, warn } from '../../messages';
 import chalk from 'chalk';
-import { ProjectFrom } from './index';
-import { isValidIp } from '../helpers-environment';
+import { ProjectFrom } from '../index';
+import { isValidIp } from '../../helpers-environment';
 import { ProxyRouter } from './proxy-router';
 import {
   validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
 } from './environment-config-helpers';
 //#endregion
-import { EnvConfig, BuildOptions, EnvironmentName } from '../models';
+import { EnvConfig, BuildOptions, EnvironmentName } from '../../models';
 import { Helpers } from 'ng2-logger';
-import config from '../config';
+import config from '../../config';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];

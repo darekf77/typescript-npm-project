@@ -5,12 +5,12 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 // local
-import { Project } from "./base-project";
-import { error, info, warn, log } from "../messages";
-import { HelpersLinks } from '../helpers-links';
-import { ProjectFrom } from './index';
-import config from '../config';
-import { ArrNpmDependencyType } from '../models/ipackage-json';
+import { Project } from "../base-project";
+import { error, info, warn, log } from "../../messages";
+import { HelpersLinks } from '../../helpers-links';
+import { ProjectFrom } from '../index';
+import config from '../../config';
+import { ArrNpmDependencyType } from '../../models/ipackage-json';
 export class NodeModules {
 
   constructor(private project: Project) { }
