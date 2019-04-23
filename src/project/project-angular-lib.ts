@@ -7,7 +7,7 @@ import { BuildOptions, BuildDir } from "../models";
 import { error } from "../messages";
 import config from "../config";
 import { Project } from './base-project';
-import { AnglarLibModuleDivider } from '../build-isomorphic-lib/angular-lib-module-build';
+import { AnglarLibModuleDivider } from './features/build-isomorphic-lib/angular-lib-module-build';
 import { Helpers } from 'morphi/helpers';
 export class ProjectAngularLib extends BaseProjectLib {
 

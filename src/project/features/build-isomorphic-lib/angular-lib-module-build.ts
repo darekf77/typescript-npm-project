@@ -4,15 +4,14 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { Project } from '../project/base-project';
-import { FilesRecreator } from '../project/features/files-builder';
-import config from '../config';
-import { ProjectFrom } from '../project/index';
+import { Project } from '../../../project/base-project';
+import config from '../../../config';
+import { ProjectFrom } from '../../../project/index';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
-import { IsomorphicOptions } from '../project/features/source-modifier';
+import { IsomorphicOptions } from '../source-modifier';
 import { Helpers } from 'morphi';
-import { tryRemoveDir } from '../helpers';
+import { tryRemoveDir } from '../../../helpers';
 
 
 

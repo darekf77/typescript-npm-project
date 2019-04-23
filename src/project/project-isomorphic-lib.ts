@@ -12,7 +12,7 @@ import { ClassHelper, getWebpackEnv, tryCopyFrom } from "../helpers";
 
 import { HelpersLinks } from '../helpers-links';
 import { config } from '../config';
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import { IncrementalBuildProcessExtended } from './features/build-isomorphic-lib/incremental-build-process';
 import { error } from '../messages';
 import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';

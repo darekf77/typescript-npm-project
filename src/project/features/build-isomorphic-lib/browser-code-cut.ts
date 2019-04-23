@@ -2,8 +2,7 @@
 import * as _ from 'lodash';
 
 import { CodeCut, BrowserCodeCut } from 'morphi/build';
-import { ReplaceOptionsExtended } from './models';
-import { EnvConfig } from '../models';
+import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
 
 
 

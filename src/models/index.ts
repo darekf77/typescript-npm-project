@@ -6,6 +6,7 @@ export * from './environment-name';
 export * from './env-config';
 export * from './ipackage-json';
 export * from './ps-info';
+export * from './replace-options-extended';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 

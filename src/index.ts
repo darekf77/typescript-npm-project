@@ -23,5 +23,5 @@ export * from './tnp-db';
 export * from './helpers-git';
 export * from './helpers-isomorphic';
 export * from './process';
-export * from './build-isomorphic-lib';
+export * from './project/features/build-isomorphic-lib';
 //#endregion

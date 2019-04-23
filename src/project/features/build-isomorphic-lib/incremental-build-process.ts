@@ -6,10 +6,10 @@ import chalk from 'chalk';
 
 import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
-import config from '../config';
-import { Project } from '../project';
-import { BuildOptions, LibType } from '../models';
-import { warn } from '../messages';
+import config from '../../../config';
+import { Project } from '../../../project';
+import { BuildOptions, LibType } from '../../../models';
+import { warn } from '../../../messages';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
