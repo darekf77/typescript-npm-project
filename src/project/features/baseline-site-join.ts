@@ -10,9 +10,9 @@ import { Project } from "../base-project";
 import { LibType, RecreateFile, FileEvent } from "../../models";
 import { copyFile, uniqArray, crossPlatofrmPath } from '../../helpers';
 import config from '../../config';
-import { error } from '../../messages';
+import { error } from '../../helpers';
 import chalk from 'chalk';
-import { run } from '../../process';
+import { run } from '../../helpers';
 import { Helpers } from 'morphi/helpers';
 import { TnpDB } from '../../tnp-db';
 

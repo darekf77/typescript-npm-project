@@ -10,15 +10,15 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ClassHelper, getWebpackEnv, tryCopyFrom } from "../helpers";
 
-import { HelpersLinks } from '../helpers-links';
+import { HelpersLinks } from '../helpers';
 import { config } from '../config';
 import { IncrementalBuildProcessExtended } from './features/build-isomorphic-lib/incremental-build-process';
-import { error } from '../messages';
+import { error } from '../helpers';
 import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
 import { TnpDB } from '../tnp-db';
 import { CommandInstance } from '../tnp-db/entites/command-instance';
-import { killProcessByPort } from '../process';
+import { killProcessByPort } from '../helpers';
 //#endregion
 
 

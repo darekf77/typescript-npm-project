@@ -5,7 +5,7 @@ import { ProjectFrom } from '../../project';
 import { Project } from '../../project/base-project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
-import { killProcess } from '../../process';
+import { killProcess } from '../../helpers';
 import chalk from 'chalk';
 
 export type IBuildInstance = {

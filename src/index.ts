@@ -12,16 +12,16 @@ declare global {
 
 
 export * from './config';
-export * from './helpers';
-export * from './helpers-environment';
+export * from './helpers/helpers';
+export * from './helpers/helpers-environment';
 export * from './models';
 export * from './progress-output';
 export * from './project';
 //#region @backend
-export * from './helpers-links';
+export * from './helpers/helpers-links';
 export * from './tnp-db';
-export * from './helpers-git';
-export * from './helpers-isomorphic';
-export * from './process';
+export * from './helpers/helpers-git';
+export * from './helpers/helpers-isomorphic';
+export * from './helpers/helpers-process';
 export * from './project/features/build-isomorphic-lib';
 //#endregion

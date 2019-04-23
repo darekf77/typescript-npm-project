@@ -20,8 +20,8 @@ import {
 import { Project } from '../project';
 import { BuildOptions } from '../models/build-options';
 import { BuildInstance } from './entites/build-instance';
-import { warn, error } from '../messages';
-import { killProcess, questionYesNo } from '../process';
+import { warn, error } from '../helpers';
+import { killProcess, questionYesNo } from '../helpers';
 import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';

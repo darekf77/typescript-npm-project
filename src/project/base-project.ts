@@ -15,9 +15,9 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 // local
 import { BuildOptions, RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
-import { error, info, warn } from "../messages";
+import { error, info, warn } from "../helpers";
 import config from "../config";
-import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../process";
+import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../helpers";
 import { copyFile, getMostRecentFilesNames, tryRemoveDir, tryCopyFrom } from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./features/node-modules";
@@ -25,7 +25,7 @@ import { FilesRecreator } from './features/files-builder';
 
 import { ProxyRouter } from './features/proxy-router';
 
-import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName } from '../helpers-git';
+import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName } from '../helpers';
 import { CopyToManager } from './features/copyto-manager';
 import { build } from '../scripts/BUILD';
 import { SourceModifier } from './features/source-modifier';

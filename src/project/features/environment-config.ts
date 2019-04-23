@@ -7,10 +7,10 @@ import * as glob from 'glob';
 
 import { Project } from '../base-project';
 
-import { error, warn } from '../../messages';
+import { error, warn } from '../../helpers';
 import chalk from 'chalk';
 import { ProjectFrom } from '../index';
-import { isValidIp } from '../../helpers-environment';
+import { isValidIp } from '../../helpers';
 import { ProxyRouter } from './proxy-router';
 import {
   validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort

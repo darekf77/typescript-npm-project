@@ -12,7 +12,7 @@ import {
   ProcessInstance
 } from './entites';
 import { ProjectFrom } from '../project';
-import { error } from '../messages';
+import { error } from '../helpers';
 
 
 export class DbCrud {

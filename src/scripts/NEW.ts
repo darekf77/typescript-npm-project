@@ -7,9 +7,9 @@ import * as fse from 'fs-extra';
 
 import config from "../config";
 import { LibType, IPackageJSON } from '../models';
-import { run } from "../process";
+import { run } from "../helpers";
 import { Project } from "../project";
-import { info, error } from "../messages";
+import { info, error } from "../helpers";
 
 function getDestinationPath(projectName: string, cwd: string) {
   if (path.isAbsolute(projectName)) return projectName;

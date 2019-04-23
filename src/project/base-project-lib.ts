@@ -6,8 +6,8 @@ import * as fse from "fs-extra";
 import * as path from 'path';
 
 import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
-import { questionYesNo } from "../process";
-import { error, info, warn } from "../messages";
+import { questionYesNo } from "../helpers";
+import { error, info, warn } from "../helpers";
 import config from "../config";
 import { PackageJSON } from './features/package-json';
 import { npmInstall } from '../scripts/INSTALL';

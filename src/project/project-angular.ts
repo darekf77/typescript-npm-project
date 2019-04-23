@@ -4,10 +4,10 @@ import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
 import { Project } from "./base-project";
-import { error } from "../messages";
+import { error } from "../helpers";
 import config from "../config";
 import { BuildOptions } from '../models';
-import { killProcessByPort } from '../process';
+import { killProcessByPort } from '../helpers';
 
 /**
  * DO NOT USE environment variables in this project directly

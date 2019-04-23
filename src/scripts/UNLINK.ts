@@ -1,8 +1,8 @@
 //#region @backend
 import * as os from "os";
-import { run } from "../process";
+import { run } from "../helpers";
 import { Project } from "../project";
-import { error } from "../messages";
+import { error } from "../helpers";
 import * as _ from "lodash";
 import { LibType } from "../models";
 import { onlyLibsChildrens } from "./LINK";

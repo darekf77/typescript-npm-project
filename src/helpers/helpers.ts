@@ -7,17 +7,17 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as rimraf from "rimraf";
 import { sleep } from 'sleep';
-import { ProjectFrom } from './index';
-import { Project } from './index';
-import { BuildOptions } from './models';
-import { error, warn } from "./messages";
+import { ProjectFrom } from '../project';
+import { Project } from '../project';
+import { BuildOptions } from '../models';
+import { error, warn } from "../helpers";
 //#endregion
 
 import * as _ from 'lodash'
 
 
 
-import { config } from './config';
+import { config } from '../config';
 
 
 //#region @backend

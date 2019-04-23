@@ -3,7 +3,7 @@ import * as child from 'child_process';
 
 
 import * as portfinder from 'portfinder';
-import { error } from "../../messages";
+import { error } from "../../helpers";
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 import { Project } from '../base-project';

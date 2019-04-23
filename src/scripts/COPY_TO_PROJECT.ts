@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import { Project, BaseProjectLib, ProjectFrom } from '../project';
-import { error, info } from '../messages';
+import { error, info } from '../helpers';
 import chalk from 'chalk';
 
 function copy(destLocaiton) {

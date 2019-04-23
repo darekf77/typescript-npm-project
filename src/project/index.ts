@@ -14,8 +14,8 @@ import { ProjectAngularCliClient } from './project-angular-client-cli';
 import { ProjectIonicClient } from './project-ionic-client';
 import { LibType } from '../models';
 import config from '../config';
-import { run } from '../process';
-import { error } from '../messages';
+
+import { error } from '../helpers';
 import { UnknowNpmProject } from './project-unknow-npm';
 import { ProjectContainer } from './project-container';
 //#endregion

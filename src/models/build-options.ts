@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
-import { error, info } from '../messages';
+import { error, info } from '../helpers';
 import { crossPlatofrmPath, nearestProjectTo } from '../helpers';
 //#endregion
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import { LibType, BuildDir } from '../models';
 
 import { Project, ProjectFrom } from '../project';
-import { clearConsole } from '../process';
+import { clearConsole } from '../helpers';
 import config from '../config';
 import { TnpDB } from '../tnp-db';
 

@@ -2,9 +2,9 @@
 import * as os from "os";
 import c from '../config';
 import * as path from 'path';
-import { run } from "../process";
+import { run } from "../helpers";
 import { Project } from "../project";
-import { error } from "../messages";
+import { error } from "../helpers";
 
 function $INCLUDE(argsString: string) {
     if (!Project.Current.node_modules.exist()) {

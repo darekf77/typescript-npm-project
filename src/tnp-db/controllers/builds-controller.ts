@@ -3,12 +3,12 @@ import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
-import { getWorkingDirOfProcess } from '../../process';
+import { getWorkingDirOfProcess } from '../../helpers';
 import { PsListInfo } from '../../models/ps-info';
 import { ProjectFrom, Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { BuildOptions } from '../../models/build-options';
-import { warn } from '../../messages';
+import { warn } from '../../helpers';
 
 export class BuildsController extends BaseController {
 

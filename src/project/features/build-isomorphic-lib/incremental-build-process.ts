@@ -9,7 +9,7 @@ import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
 import config from '../../../config';
 import { Project } from '../../../project';
 import { BuildOptions, LibType } from '../../../models';
-import { warn } from '../../../messages';
+import { warn } from '../../../helpers';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 

@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import { Project, ProjectFrom } from '../project';
-import { error, info } from '../messages';
+import { error, info } from '../helpers';
 import chalk from 'chalk';
 import config from '../config';
 

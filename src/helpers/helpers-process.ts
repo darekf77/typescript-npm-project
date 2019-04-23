@@ -8,9 +8,9 @@ import * as os from "os";
 import * as sleep from 'sleep';
 import * as inquirer from 'inquirer';
 
-import { error, info, warn } from "./messages";
-import { RunOptions, WatchOptions } from "./models";
-import config from './config';
+import { error, info, warn } from "../helpers";
+import { RunOptions, WatchOptions } from "../models";
+import config from '../config';
 import { paramsFrom } from './index';
 import { runSyncOrAsync } from './helpers';
 const prompts = require('prompts');
@@ -152,7 +152,7 @@ function modifyLineByLine(data: string | Buffer | Error, outputLineReplace: (out
   return data as string;
 }
 
-export function log(proc: child.ChildProcess, output = true, stdio,
+export function logProc(proc: child.ChildProcess, output = true, stdio,
   outputLineReplace: (outputLine: string) => string) {
   // processes.push(proc);
 
@@ -221,7 +221,7 @@ function runAsyncIn(command: string, options?: RunOptions) {
   const maxBuffer = biggerBuffer ? bigMaxBuffer : undefined;
   let stdio = getStdio(options)
   checkProcess(cwd, command);
-  return log(child.exec(command, { cwd, maxBuffer }), output, stdio, outputLineReplace);
+  return logProc(child.exec(command, { cwd, maxBuffer }), output, stdio, outputLineReplace);
 }
 
 function prepareWatchCommand(cmd) {

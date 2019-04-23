@@ -1,6 +1,6 @@
 //#region @backend
 
-import { run } from './process';
+import { run } from './helpers-process';
 export class SystemTerminal {
   public static runInNewInstance(command: string, cwd = process.cwd()) {
     if (process.platform === 'darwin') {

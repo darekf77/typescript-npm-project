@@ -2,8 +2,8 @@
 //#region @backend
 import * as _ from 'lodash';
 import { Project} from '../project';
-import { error, info } from '../messages';
-import { commitWhatIs } from '../helpers-git';
+import { error, info } from '../helpers';
+import { commitWhatIs } from '../helpers';
 
 export default {
 

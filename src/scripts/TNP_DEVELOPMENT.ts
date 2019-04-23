@@ -1,14 +1,13 @@
 //#region @backend
 import { Project, BaseProjectLib, ProjectFrom } from "../project";
 import { BaselineSiteJoin } from "../project/features/baseline-site-join";
-import { WatchNoRace } from "../watcher-no-race";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';
-import { error } from '../messages';
+import { error } from '../helpers';
 import chalk from 'chalk';
 import { getMostRecentFilesNames } from '../helpers';
 import { Helpers as HelpersMorphi } from "morphi";
-import { run } from "../process";
+import { run } from "../helpers";
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
@@ -125,9 +124,6 @@ export default {
   $FILES_BASELINE: (args) => {
     console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
     process.exit(0)
-  },
-  $WATCHERS_SHOW: async (args) => {
-    await WatchNoRace.Instance.showProceses()
   },
   VERSION: () => version(),
   PATH: () => {

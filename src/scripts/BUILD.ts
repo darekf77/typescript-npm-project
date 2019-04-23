@@ -5,12 +5,11 @@ import chalk from "chalk";
 // local
 import { Project, ProjectFrom } from '../project';
 import { BuildOptions, BuildDir, LibType } from "../models";
-import { error, info } from "../messages";
+import { error, info } from "../helpers";
 import { config } from '../config';
 import { initFromArgs } from './INIT';
 import { resolveProjectIfGenerated } from './BUILD-static';
-import { questionYesNo, run } from '../process';
-import { SystemTerminal } from '../system-terminal';
+import { questionYesNo, run, SystemTerminal } from '../helpers';
 import { TnpDB } from '../tnp-db';
 
 

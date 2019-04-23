@@ -7,7 +7,7 @@ import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { buildLib, buildApp } from './scripts/BUILD';
 import { CommandInstance } from './tnp-db/entites';
-import { killProcessByPort } from './process';
+import { killProcessByPort } from './helpers';
 import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'

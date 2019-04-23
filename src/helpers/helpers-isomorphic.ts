@@ -1,6 +1,6 @@
 //#region @backend
-import { Project } from './project';
-import config from './config';
+import { Project } from '../project';
+import config from '../config';
 import * as glob from 'glob';
 import * as path from 'path';
 import { getEntites, getControllers } from './helpers';

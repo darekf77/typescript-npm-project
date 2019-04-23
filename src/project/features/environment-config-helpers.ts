@@ -6,14 +6,13 @@ import * as fse from 'fs-extra';
 // local
 import { config } from '../../config';
 import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../models';
-import { error, warn } from '../../messages';
+import { error, warn } from '../../helpers';
 import { ProjectFrom } from '../index';
 import { ProxyRouter } from './proxy-router';
 import { Project } from '../base-project';
-import { HelpersLinks } from '../../helpers-links';
 import { walk } from 'lodash-walk-object';
 import { config as schemaConfig } from '../../environment-config';
-import { terminalLine } from '../../process';
+import { terminalLine } from '../../helpers';
 
 
 

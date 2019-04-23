@@ -11,7 +11,7 @@ import * as rimraf from 'rimraf';
 import config from "../../config";
 import { Project } from '../base-project';
 import { FileEvent, BuildOptions, IPackageJSON } from '../../models';
-import { info, warn } from '../../messages';
+import { info, warn } from '../../helpers';
 import { tryRemoveDir, tryCopyFrom } from '../../index';
 import { copyFile } from '../../helpers';
 

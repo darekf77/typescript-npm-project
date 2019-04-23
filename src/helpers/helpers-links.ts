@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from "os";
 
-import { error} from "./messages";
-import { run } from "./process";
+import { error} from "../helpers";
+import { run } from "./helpers-process";
 import { Helpers } from "morphi";
 
 export namespace HelpersLinks {

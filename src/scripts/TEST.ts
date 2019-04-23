@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { getLinesFromFiles } from "../helpers";
 import { Project } from '../project';
 import { initFromArgs } from './INIT';
-import { run } from '../process';
+import { run } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
 
 function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {

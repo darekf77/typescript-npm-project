@@ -1,8 +1,8 @@
 //#region @backend
 import * as os from "os";
-import { run } from "../process";
-import { error } from "../messages";
-import { HelpersLinks } from "../helpers-links";
+import { run } from "../helpers";
+import { error } from "../helpers";
+import { HelpersLinks } from "../helpers";
 import * as path from "path";
 import * as child from "child_process";
 

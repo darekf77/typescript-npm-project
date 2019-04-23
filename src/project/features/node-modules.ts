@@ -6,8 +6,8 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 // local
 import { Project } from "../base-project";
-import { error, info, warn, log } from "../../messages";
-import { HelpersLinks } from '../../helpers-links';
+import { error, info, warn, log } from "../../helpers";
+import { HelpersLinks } from '../../helpers';
 import { ProjectFrom } from '../index';
 import config from '../../config';
 import { ArrNpmDependencyType } from '../../models/ipackage-json';

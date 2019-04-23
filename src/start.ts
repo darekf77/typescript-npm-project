@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand } from "./process";
+import { run as runCommand } from "./helpers";
 
 import { match } from './helpers';
 import { isString } from 'util';

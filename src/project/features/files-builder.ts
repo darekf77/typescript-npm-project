@@ -11,7 +11,7 @@ import { LibType, RecreateFile } from "../../models";
 import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../helpers';
 import config from '../../config';
 import { BaselineSiteJoin } from './baseline-site-join';
-import { error } from '../../messages';
+import { error } from '../../helpers';
 
 interface VSCodeSettings {
   'files.exclude': { [files: string]: boolean; };

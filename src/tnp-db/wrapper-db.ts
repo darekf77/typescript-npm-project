@@ -16,7 +16,7 @@ import {
 } from './controllers';
 import { Project } from '../project/base-project';
 import { BuildOptions } from '../models';
-import { error, warn } from '../messages';
+import { error, warn } from '../helpers';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
 import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';

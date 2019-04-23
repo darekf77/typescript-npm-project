@@ -5,8 +5,8 @@ import glob = require('glob')
 import * as path from 'path';
 import { paramsFrom, match } from '../helpers';
 import chalk from 'chalk';
-import { clearConsole } from "../process";
-import { error } from '../messages';
+import { clearConsole } from "../helpers";
+import { error } from '../helpers';
 
 const generalHelp = `
 

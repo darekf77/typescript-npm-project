@@ -1,8 +1,8 @@
 //#region @backend
 import * as child from 'child_process';
-import { info, error, warn } from './messages';
+import { info, error, warn } from '../helpers';
 import { basename } from 'path';
-import { questionYesNo, run } from './process';
+import { questionYesNo, run } from './helpers-process';
 
 export function lastCommitHash(directoryPath): string {
   try {

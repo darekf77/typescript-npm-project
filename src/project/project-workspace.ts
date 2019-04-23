@@ -5,7 +5,7 @@ import { Project } from "./base-project";
 import { BuildOptions } from "../models";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
-import { info, warn } from '../messages';
+import { info, warn } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
 import { ProxyRouter } from './features/proxy-router';
 

@@ -1,7 +1,7 @@
 //#region @backend
 import { Project } from "../project";
-import { run } from '../process';
-import { error } from '../messages';
+import { run } from '../helpers';
+import { error } from '../helpers';
 import chalk from 'chalk';
 import { npmInstall } from './INSTALL';
 import { RecrusiveBaseline } from './INIT-recrusive-functions';

@@ -9,8 +9,8 @@ import {
   LibType, InstalationType, BuildOptions,
   Dependencies, Package, IPackageJSON, DependenciesFromPackageJsonStyle
 } from "../../models";
-import { error, info, warn, log } from "../../messages";
-import { run } from "../../process";
+import { error, info, warn, log } from "../../helpers";
+import { run } from "../../helpers";
 import { Project } from "../base-project";
 import { ProjectFrom } from "../index";
 import chalk from "chalk";
