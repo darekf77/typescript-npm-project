@@ -615,7 +615,7 @@ export class Project implements IProject {
       return this.browser.isStandaloneProject;
     }
     //#region @backend
-    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer);
+    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && this.type !== 'unknow-npm-project');
     //#endregion
   }
 
@@ -877,7 +877,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
     if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
-      this.packageJson.saveForInstall(true)
+      this.packageJson.show('show before build')
     }
 
     await this.buildSteps(buildOptions);

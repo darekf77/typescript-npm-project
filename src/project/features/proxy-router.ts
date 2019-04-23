@@ -1,23 +1,16 @@
 //#region @backend
-import * as child from 'child_process';
-
-
-import * as portfinder from 'portfinder';
-import { error } from "../../helpers";
-import * as httpProxy from 'http-proxy';
-import * as http from 'http';
-import { Project } from '../base-project';
 import chalk from 'chalk';
 import * as _ from 'lodash';
+import * as portfinder from 'portfinder';
+import * as httpProxy from 'http-proxy';
+import * as http from 'http';
 
+import { error } from "../../helpers";
+import { Project } from '../base-project';
 
 export class ProxyRouter {
 
-  constructor(private project: Project) {
-
-  }
-
-
+  constructor(private project: Project) { }
   private static takenPorts = [];
 
   public static async getFreePort(from: number = 4000) {

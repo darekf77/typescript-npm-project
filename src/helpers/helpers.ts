@@ -16,6 +16,16 @@ import * as _ from 'lodash'
 
 import { config } from '../config';
 
+export const sortKeys = function (obj) {
+  if (_.isArray(obj)) {
+    return obj.map(sortKeys);
+  }
+  if (_.isObject(obj)) {
+    return _.fromPairs(_.keys(obj).sort().map(key => [key, sortKeys(obj[key])]));
+  }
+  return obj;
+};
+
 
 //#region @backend
 export function crossPlatofrmPath(p: string) {

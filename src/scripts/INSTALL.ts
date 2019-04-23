@@ -135,7 +135,7 @@ function resolvePacakgesFromArgs(args: string[]) {
 
 export function npmInstall(packagesNamesSpaceSeparated: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
   const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
-  project.packageJson.saveForInstall(true)
+  project.packageJson.show('before npm instalation')
   if (args.length === 0) { // NPM INSTALL
     installAll(project, force, unlinkChilds);
   } else if (args.length >= 1) { // NPM INSTALL <package name>
@@ -144,7 +144,7 @@ export function npmInstall(packagesNamesSpaceSeparated: string, project = Projec
   }
   project.tnpHelper.install()
   if (cleanAndDedupe) {
-    project.packageJson.saveForInstall(false)
+    project.packageJson.hide('after npm instalation')
     project.packageJson.dedupe()
   }
 

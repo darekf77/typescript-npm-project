@@ -1,9 +1,19 @@
 
 //#region @backend
 import * as _ from 'lodash';
-import { Project} from '../project';
+import { Project } from '../project';
 import { error, info } from '../helpers';
 import { commitWhatIs } from '../helpers';
+
+function DEPS_SHOW(args: string) {
+  Project.Current.packageJson.show('deps show')
+  process.exit(0)
+}
+
+function DEPS_HIDE(args: string) {
+  Project.Current.packageJson.hide('deps hide')
+  process.exit(0)
+}
 
 export default {
 
@@ -12,7 +22,7 @@ export default {
     process.exit(0)
   },
 
-  $DEDUPE(args:string) {
+  $DEDUPE(args: string) {
     Project.Current.packageJson.dedupe(args.split(' '))
     process.exit(0)
   },
@@ -22,35 +32,26 @@ export default {
     process.exit(0)
   },
 
+  DEPS_SHOW,
   $DEPS_RECREATE(args: string) {
-    Project.Current.packageJson.saveForInstall(true)
-    process.exit(0)
-  },
-
-  DEPS_SHOW(args: string) {
-    Project.Current.packageJson.saveForInstall(true)
-    process.exit(0)
+    DEPS_SHOW(args)
   },
 
   DEPS_SHOW_IF_STANDALONE(args: string) {
     if (Project.Current.isStandaloneProject) {
       info(`Showing deps for standalone project`)
-      Project.Current.packageJson.saveForInstall(true)
+      Project.Current.packageJson.show('is standalone show')
     }
     commitWhatIs(`show package.json dependencies`)
     process.exit(0)
   },
 
-
+  DEPS_HIDE,
   $DEPS_CLEAN(args: string) {
-    Project.Current.packageJson.saveForInstall(false)
-    process.exit(0)
+    DEPS_HIDE(args)
   },
 
-  $DEPS_HIDE(args: string) {
-    Project.Current.packageJson.saveForInstall(false)
-    process.exit(0)
-  },
+
 
 
 }

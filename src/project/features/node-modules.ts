@@ -4,13 +4,13 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
-// local
-import { Project } from "../base-project";
-import { error, info, warn, log } from "../../helpers";
-import { HelpersLinks } from '../../helpers';
+
 import { ProjectFrom } from '../index';
+import { Project } from "../base-project";
+import { ArrNpmDependencyType, InstalationType } from '../../models';
+import { HelpersLinks, error, info, warn, log, run } from "../../helpers";
 import config from '../../config';
-import { ArrNpmDependencyType } from '../../models/ipackage-json';
+
 export class NodeModules {
 
   constructor(private project: Project) { }
@@ -31,6 +31,96 @@ export class NodeModules {
           })
         }
       }
+    }
+  }
+
+  get localChildrensWithRequiredLibs() {
+    const self = this;
+    const symlinks: Project[] = self.project.requiredLibs
+      .concat(self.project.children)
+      .concat(self.project.baseline ? [self.project.baseline] : [])
+    // console.log(symlinks.map(c => c.name))
+
+    symlinks.forEach(c => {
+      if (path.basename(c.location) != c.name) {
+        error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
+      }
+    })
+    return {
+      removeSymlinks() {
+        symlinks.forEach(c => {
+          const symPkgPath = path.join(self.project.location, 'node_modules', c.name);
+          if (fs.existsSync(symPkgPath)) {
+            console.log(`Removing symlinks: ${c.name}`)
+            fse.unlinkSync(symPkgPath);
+          }
+        })
+      },
+      addSymlinks() {
+        symlinks.forEach(c => {
+          const destination = path.join(self.project.location, 'node_modules');
+          const command = `tnp ln ${c.location} ${destination}`;
+          console.log(`Adding symlinks: ${c.name}`)
+          self.project.run(command).sync();
+        })
+      },
+    }
+  }
+
+  get folderPath() {
+    return path.join(this.project.location, config.folder.node_modules);
+  }
+
+  exist(): boolean {
+    return fs.existsSync(path.join(this.project.location, 'node_modules', '.bin')); // TODO qucik fix for tnp-helpers
+  }
+
+  remove() {
+    fse.removeSync(this.folderPath)
+  }
+
+  installPackages(force = false) {
+    const yarnLock = path.join(this.project.location, 'yarn.lock');
+    if (force || !this.exist()) {
+      if (fs.existsSync(yarnLock)) {
+        info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
+        this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
+      } else {
+
+        if (this.project.isTnp || this.project.type === 'unknow-npm-project') {
+
+          this.project.packageJson.show('for normal npm instalation')
+          info(`Installing npm packages in ${this.project.name}... `);
+          this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
+
+        } else {
+          if (this.project.isContainerChild) {
+            this.installALlPackageFromContainer()
+          } else {
+            this.installALlPackageFromTnp()
+          }
+        }
+
+      }
+    } else {
+      console.log('node_modules exists')
+    }
+  }
+
+  installPackage(packageName?: string) {
+    if (!_.isString(packageName) || packageName.trim() === '') {
+      error(`Invalida package name "${packageName}"`, true, true)
+      return
+    }
+    const type: InstalationType = '--save';
+
+    const yarnLock = path.join(this.project.location, 'yarn.lock');
+    if (fs.existsSync(yarnLock)) {
+      info(`Installing npm packge: "${packageName}" with yarn.`)
+      run(`yarn add ${packageName} ${type}`, { cwd: this.project.location }).sync()
+    } else {
+      info(`Installing npm packge: "${packageName}" with npm.`)
+      run(`npm i ${packageName} ${type}`, { cwd: this.project.location }).sync()
     }
   }
 
@@ -78,6 +168,10 @@ export class NodeModules {
     }
   }
 
+  contains(packageName: string) {
+    return fs.existsSync(path.join(this.project.location, config.folder.node_modules, packageName))
+  }
+
   private addDependenceis(project: Project, context: string, allNamesBefore: string[] = []) {
     let newNames = []
     if (!allNamesBefore.includes(project.name)) {
@@ -111,7 +205,7 @@ export class NodeModules {
   }
 
 
-  linkToProject(target: Project, force = false) {
+  private linkToProject(target: Project, force = false) {
     if (!this.exist()) {
       this.project.node_modules.installPackages();
     }
@@ -126,8 +220,8 @@ export class NodeModules {
 
   private installALlPackageFromTnp() {
     info(`Installing npm packages in ${this.project.name}... from TNP.`);
-    this.project.packageJson.saveForInstall(true)
-    Project.Tnp.packageJson.saveForInstall(true)
+    this.project.packageJson.show('show before install fron tnp')
+    Project.Tnp.packageJson.show('show to copy from')
 
     ArrNpmDependencyType.forEach(depName => {
       Project.Tnp.getDeps(depName, Project.Tnp.location).forEach(dep => {
@@ -143,7 +237,7 @@ export class NodeModules {
     const contaier = this.project.parent;
     if (!contaier.node_modules.exist()) {
       info(`npm install in ${chalk.bold('container')} project`)
-      contaier.packageJson.saveForInstall(true)
+      contaier.packageJson.show('recreate container packages list for quick tnp install')
       contaier.node_modules.installPackages(true)
     }
 
@@ -159,84 +253,5 @@ export class NodeModules {
     contaier.node_modules.copyBin.to(this.project);
   }
 
-  installPackages(force = false) {
-    const yarnLock = path.join(this.project.location, 'yarn.lock');
-    if (force || !this.exist()) {
-      if (fs.existsSync(yarnLock)) {
-        info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
-        this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
-      } else {
-
-        if (this.project.isTnp || this.project.type === 'unknow-npm-project') {
-
-          this.project.packageJson.saveForInstall(true);
-          info(`Installing npm packages in ${this.project.name}... `);
-          this.project.run('npm i', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
-
-        } else {
-          if (this.project.isContainerChild) {
-            this.installALlPackageFromContainer()
-          } else {
-            this.installALlPackageFromTnp()
-          }
-        }
-
-      }
-    } else {
-      console.log('node_modules exists')
-    }
-  }
-  installPackage(packagePath) {
-    this.project.packageJson.installPackage(packagePath);
-  }
-
-  contains(packageName: string) {
-    return fs.existsSync(path.join(this.project.location, config.folder.node_modules, packageName))
-  }
-  get localChildrensWithRequiredLibs() {
-    const self = this;
-    const symlinks: Project[] = self.project.requiredLibs
-      .concat(self.project.children)
-      .concat(self.project.baseline ? [self.project.baseline] : [])
-    // console.log(symlinks.map(c => c.name))
-
-    symlinks.forEach(c => {
-      if (path.basename(c.location) != c.name) {
-        error(`Project "${c.location}" has different packaage.json name property than his own folder name "${path.basename(c.location)}"`)
-      }
-    })
-    return {
-      removeSymlinks() {
-        symlinks.forEach(c => {
-          const symPkgPath = path.join(self.project.location, 'node_modules', c.name);
-          if (fs.existsSync(symPkgPath)) {
-            console.log(`Removing symlinks: ${c.name}`)
-            fse.unlinkSync(symPkgPath);
-          }
-        })
-      },
-      addSymlinks() {
-        symlinks.forEach(c => {
-          const destination = path.join(self.project.location, 'node_modules');
-          const command = `tnp ln ${c.location} ${destination}`;
-          console.log(`Adding symlinks: ${c.name}`)
-          self.project.run(command).sync();
-        })
-      },
-    }
-  }
-  exist(): boolean {
-    return fs.existsSync(path.join(this.project.location, 'node_modules', '.bin')); // TODO qucik fix for tnp-helpers
-  }
-  isSymbolicLink(): boolean {
-    return HelpersLinks.isLink(this.folderPath);
-  }
-  get folderPath() {
-    return path.join(this.project.location, 'node_modules');
-  }
-  remove() {
-    // console.log('remove node_modules', this.project.location)
-    this.project.run('rimraf node_modules').sync()
-  }
 }
 //#endregion

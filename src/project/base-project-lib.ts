@@ -165,7 +165,7 @@ export abstract class BaseProjectLib extends Project {
       if (!this.node_modules.exist()) {
         npmInstall('', this, false, false);
       }
-      this.packageJson.saveForInstall(true)
+      this.packageJson.show('show for release')
       this.recreate.init();
       await this.build({
         prod, outDir: config.folder.bundle as 'bundle'
@@ -175,7 +175,7 @@ export abstract class BaseProjectLib extends Project {
       }
 
       this.bundleResources()
-      this.packageJson.saveForInstall(false)
+      this.packageJson.hide('hide after release')
       this.commit(newVersion);
     }, () => {
       if (this.isBundleMode) {
