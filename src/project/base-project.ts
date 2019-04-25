@@ -1,43 +1,42 @@
-import { Morphi, ModelDataConfig } from 'morphi';
-
-import { LibType, EnvironmentName, NpmDependencyType } from "../models";
-import { PackageJSON } from "./features/package-json";
 //#region @backend
-
+import chalk from 'chalk';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import * as sleep from 'sleep';
 import * as fse from "fs-extra";
-import chalk from 'chalk';
 import * as path from 'path';
 import * as _ from 'lodash';
+import * as inquirer from 'inquirer';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
-// local
-import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
-import { error, info, warn } from "../helpers";
+
 import config from "../config";
-import { run as __run, watcher as __watcher, killProcessByPort, run, questionYesNo } from "../helpers";
-import { copyFile, getMostRecentFilesNames, tryRemoveDir, tryCopyFrom } from "../helpers";
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
+import {
+  error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName
+} from "../helpers";
 import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./features/node-modules";
 import { FilesRecreator } from './features/files-builder';
-
+import { NpmInstall } from './features/npm-install';
 import { ProxyRouter } from './features/proxy-router';
-
-import { pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName } from '../helpers';
 import { CopyToManager } from './features/copyto-manager';
-import { build } from '../scripts/BUILD';
 import { SourceModifier } from './features/source-modifier';
 import { reinstallTnp } from './features/tnp-bundle';
 import { FrameworkFilesGenerator } from './features/framework-files-generator';
+import { build } from '../scripts/BUILD';
 import { TnpDB } from '../tnp-db';
-import * as inquirer from 'inquirer';
 //#endregion
 
+import { Morphi, ModelDataConfig } from 'morphi';
+
+import { LibType, EnvironmentName, NpmDependencyType } from "../models";
+import { PackageJSON } from "./features/package-json";
 import { EnvironmentConfig } from './features/environment-config';
 import { TestRunner } from './features/test-runner';
 import { BuildOptions } from './features/build-options';
+
 
 
 
@@ -360,6 +359,9 @@ export class Project implements IProject {
   readonly frameworkFileGenerator: FrameworkFilesGenerator;
   //#endregion
 
+  //#region @backend
+  readonly npmInstall: NpmInstall;
+  //#endregion
 
   env: EnvironmentConfig;
 
@@ -689,6 +691,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
         this.packageJson = PackageJSON.fromProject(this);
         this.node_modules = new NodeModules(this);
         this.type = this.packageJson.type;
+        this.npmInstall = new NpmInstall(this)
         this.recreate = new FilesRecreator(this);
         this.sourceModifier = new SourceModifier(this, this.recreate);
         this.frameworkFileGenerator = new FrameworkFilesGenerator(this)

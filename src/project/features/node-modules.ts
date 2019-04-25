@@ -79,10 +79,10 @@ export class NodeModules {
     fse.removeSync(this.folderPath)
   }
 
-  installPackages(force = false) {
-    global.spinner.start()
+  installPackages() {
+    // global.spinner.start()
     const yarnLock = path.join(this.project.location, 'yarn.lock');
-    if (force || !this.exist()) {
+    if (!this.exist()) {
       if (fs.existsSync(yarnLock)) {
         info(`Installing npm packages in ${this.project.name}... from yarn.lock `)
         this.project.run('yarn install', { cwd: this.project.location, output: true, biggerBuffer: true }).sync()
@@ -104,9 +104,9 @@ export class NodeModules {
 
       }
     } else {
-      console.log('node_modules exists')
+      log(`node_modules exists for '${this.project.name}'`)
     }
-    global.spinner.stop()
+    // global.spinner.stop()
   }
 
   installPackage(packageName?: string) {

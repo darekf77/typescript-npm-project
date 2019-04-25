@@ -1,157 +1,8 @@
 //#region @backend
 import { Project } from '../project';
-import { link } from "./LINK";
-import { checkValidNpmPackageName } from "../helpers";
-import { error, info, log } from "../helpers";
-import { unlink } from "./UNLINK";
-import chalk from 'chalk';
-
-
-
-function installAll(project: Project, force: boolean, unlinkChilds: boolean) {
-  if (project.isContainer) {
-    info(`npm install in ${chalk.bold('container')} project`)
-    project.node_modules.installPackages(force)
-  } else if (project.isWorkspace) {
-    info(`npm install in ${chalk.bold('workspace')} project`)
-    if (unlinkChilds) {
-      unlink(project)
-    }
-    project.node_modules.installPackages(force)
-    link(project)
-  } else if (project.isWorkspaceChildProject) {
-    info(`npm install in ${chalk.bold('workspace child')} project`)
-    const parent = project.parent;
-    if (unlinkChilds) {
-      unlink(parent)
-    }
-    parent.node_modules.installPackages(force)
-    link(parent)
-  } else {
-    info(`npm install in ${chalk.bold('stanalone')} project`)
-    project.node_modules.installPackages(true)
-  }
-
-  // if (process.platform === 'darwin') {
-  //   if (project.isWorkspace) {
-  //     project.run(`increase-memory-limit`).sync();
-  //   } else if (project.isWorkspaceChildProject) {
-  //     project.parent.run(`increase-memory-limit`).sync();
-  //   }
-  // }
-}
-
-function copyFromTemplateWorkspaceIfPossible(packageName: string, destination: Project) {
-
-  const templateWorkspace = Project.Tnp;
-  if (templateWorkspace === destination) {
-    console.log('worksapce installation...')
-    return false;
-  }
-
-  if (templateWorkspace.node_modules.contains(packageName)) {
-    templateWorkspace.node_modules.copy(packageName).to(destination)
-    return true;
-  }
-  return false;
-}
-
-function copyPackageFromTemplate(project: Project, npmPackagesToAdd: string[]) {
-  return (npmPackagesToAdd
-    .filter(packageName => !copyFromTemplateWorkspaceIfPossible(packageName, project))
-    .length === 0)
-}
-
-function installPackage(project: Project, unlinkChilds: boolean, npmPackagesToAdd: string[]) {
-
-  if (project.isWorkspace) {  // workspace project: npm i <package name>
-    log('** npm install <package> in workspace')
-
-    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
-      info(`All pacakges copied from workspace template`)
-      return;
-    }
-
-    if (unlinkChilds) {
-      unlink(project)
-    }
-    if (!project.node_modules.exist()) {
-      project.node_modules.installPackages()
-    }
-    npmPackagesToAdd.forEach(npmPackageName => {
-      project.node_modules.installPackage(npmPackageName)
-    })
-    link(project)
-  } else if (project.isWorkspaceChildProject) {
-    log('** npm install <package> in child of workspace')
-
-    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
-      info(`All pacakges copied from workspace template`)
-      return;
-    }
-
-    if (unlinkChilds) {
-      unlink(project.parent)
-    }
-    if (!project.parent.node_modules.exist()) {
-      project.parent.node_modules.installPackages()
-    }
-    npmPackagesToAdd.forEach(npmPackageName => {
-      project.parent.node_modules.installPackage(npmPackageName)
-    })
-    link(project.parent)
-  } else {
-    log('** npm install <package> in separated project')
-    if (!project.node_modules.exist()) {
-      project.node_modules.installPackages()
-    }
-
-    if (copyPackageFromTemplate(project, npmPackagesToAdd)) {
-      info(`All pacakges copied from workspace template`)
-      return;
-    }
-
-    npmPackagesToAdd.forEach(npmPackageName => {  // Other normal porojects
-      project.node_modules.installPackage(npmPackageName)
-    })
-  }
-}
-
-
-function resolvePacakgesFromArgs(args: string[]) {
-  return args
-    .map(p => p.trim())
-    .filter(p => {
-      if (['--save', '--save-dev'].includes(p)) {
-        return false;
-      }
-      const res = checkValidNpmPackageName(p)
-      if (!res) {
-        error(`Invalid package to install: ${p}`, true)
-      }
-      return res;
-    })
-}
-
-export function npmInstall(packagesNamesSpaceSeparated: string, project = Project.Current, unlinkChilds = true, cleanAndDedupe = true, force = false) {
-  const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
-  project.packageJson.show('before npm instalation')
-  if (args.length === 0) { // NPM INSTALL
-    installAll(project, force, unlinkChilds);
-  } else if (args.length >= 1) { // NPM INSTALL <package name>
-    const npmPackagesToAdd = resolvePacakgesFromArgs(args);
-    installPackage(project, unlinkChilds, npmPackagesToAdd);
-  }
-  project.tnpHelper.install()
-  if (cleanAndDedupe) {
-    project.packageJson.hide('after npm instalation')
-    project.packageJson.dedupe()
-  }
-
-}
 
 export function INSTALL(args, exit = true) {
-  npmInstall(args, undefined, undefined, undefined, true);
+  Project.Current.npmInstall.fromArgs(args);
   if (exit) {
     process.exit(0);
   }
@@ -160,7 +11,7 @@ export function INSTALL(args, exit = true) {
 export default {
   INSTALL,
   $I: (args) => {
-    npmInstall(args);
+    INSTALL(args);
     process.exit(0);
   }
 }
