@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
 // local
-import { Project } from "../base-project";
+import { Project } from "../project";
 import { LibType, RecreateFile, FileEvent } from "../../models";
 import { copyFile, uniqArray, crossPlatofrmPath } from '../../helpers';
 import config from '../../config';

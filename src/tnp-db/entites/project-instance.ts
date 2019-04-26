@@ -1,6 +1,6 @@
 //#region @backend
 import { DBBaseEntity } from './base-entity';
-import { ProjectFrom, Project } from '../../project';
+import { Project } from '../../project';
 
 export class ProjectInstance extends DBBaseEntity {
 
@@ -12,7 +12,7 @@ export class ProjectInstance extends DBBaseEntity {
   }
 
   get project() {
-    return ProjectFrom(this.locationOfProject);
+    return Project.From(this.locationOfProject);
   }
 
   isEqual(anotherInstace: ProjectInstance): boolean {

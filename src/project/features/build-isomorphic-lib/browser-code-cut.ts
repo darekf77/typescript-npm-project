@@ -5,8 +5,6 @@ import { CodeCut, BrowserCodeCut } from 'morphi/build';
 import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
 
 
-
-
 export class ExtendedCodeCut extends CodeCut {
 
   constructor(protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended) {

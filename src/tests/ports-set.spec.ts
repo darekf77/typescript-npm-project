@@ -5,7 +5,7 @@ import * as path from 'path';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
 import { Range } from '../helpers';
-import { ProjectFrom, Project } from '../project';
+import { Project } from '../project';
 import { PortInstance } from '../tnp-db/entites/port-instance';
 import { SystemService } from '../models/system-service';
 import { PortsSet } from '../tnp-db/controllers/ports-set';
@@ -17,7 +17,7 @@ import { PortsSet } from '../tnp-db/controllers/ports-set';
 describe('Ports set tests', () => {
 
 
-  const baseline = ProjectFrom(path.join(Project.Tnp.location, 'projects', 'container', 'baseline'));
+  const baseline = Project.From(path.join(Project.Tnp.location, 'projects', 'container', 'baseline'));
   const tnp = Project.Tnp;
 
 

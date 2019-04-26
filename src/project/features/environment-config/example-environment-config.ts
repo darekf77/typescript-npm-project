@@ -1,5 +1,5 @@
 //#region @backend
-import { EnvConfig } from './models';
+import { EnvConfig } from '../../../models';
 
 export const config: EnvConfig = {
   workspace: {

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import chalk from "chalk";
 
 // local
-import { Project, ProjectFrom } from '../project';
+import { Project } from '../project';
 import { BuildDir, LibType } from "../models";
 import { error, info } from "../helpers";
 import { config } from '../config';

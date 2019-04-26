@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
-import { Project, ProjectFrom } from '../project';
+import { Project } from '../project';
 import { error, info } from '../helpers';
 import chalk from 'chalk';
 import config from '../config';
@@ -15,9 +15,9 @@ function copyto(args: string) {
       packageName = packageName.replace(`${config.folder.node_modules}/`, '')
     }
     if (!path.isAbsolute(project)) {
-      project = ProjectFrom(path.join(process.cwd(), project)) as Project;
+      project = Project.From(path.join(process.cwd(), project)) as Project;
     } else {
-      project = ProjectFrom(project) as Project;
+      project = Project.From(project) as Project;
     }
 
     project.node_modules.copy(packageName).to(project);

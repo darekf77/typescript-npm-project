@@ -1,17 +1,17 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Project, BaseProjectLib, ProjectFrom } from '../project';
+import { Project, LibProject } from '../project';
 import { error, info } from '../helpers';
 import chalk from 'chalk';
 
 function copy(destLocaiton) {
 
-  const currentLib = (Project.Current as BaseProjectLib);
-  const destination = ProjectFrom(destLocaiton);
+  const currentLib = (Project.Current as LibProject);
+  const destination = Project.From(destLocaiton);
   if (!destination) {
     error(`Incorect project in: ${destLocaiton}`)
   }
-  currentLib.copytToManager.copyBuildedDistributionTo(destination);
+  currentLib.copyManager.copyBuildedDistributionTo(destination);
   info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
 

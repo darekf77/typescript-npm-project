@@ -1,24 +1,21 @@
 //#region @backend
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as glob from 'glob';
 
-import { Project } from '../base-project';
-
-import { error, warn } from '../../helpers';
-import chalk from 'chalk';
-import { ProjectFrom } from '../index';
-import { isValidIp } from '../../helpers';
-import { ProxyRouter } from './proxy-router';
+import { error, warn, isValidIp } from '../../../helpers';
 import {
-  validateWorkspaceConfig, err, overrideDefaultPortsAndWorkspaceConfig, saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy, overrideWorksapceRouterPort
+  err, overrideDefaultPortsAndWorkspaceConfig,
+  saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
+  overrideWorksapceRouterPort
 } from './environment-config-helpers';
 //#endregion
-import { EnvConfig, EnvironmentName } from '../../models';
-import config from '../../config';
+
 import { Morphi } from 'morphi';
+import config from '../../../config';
+import { EnvConfig, EnvironmentName } from '../../../models';
+import { FeatureForProject } from '../../feature-for-projects';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
@@ -28,11 +25,10 @@ export interface IEnvironmentConfig {
   readonly config: EnvConfig
 }
 
-export class EnvironmentConfig {
+export class EnvironmentConfig extends FeatureForProject {
 
   browser: IEnvironmentConfig;
   //#region @backend
-  constructor(private project: Project) { }
 
   /**
      * Avaliable for worksapce and children

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
-import { Project } from "./base-project";
+import { Project } from "./project";
 import { error } from "../helpers";
 import config from "../config";
 import { killProcessByPort } from '../helpers';

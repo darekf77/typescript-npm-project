@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { Range } from '../../helpers';
 import { PortInstance } from '../entites';
-import { ProjectFrom, Project } from '../../project';
+import { Project } from '../../project';
 import { SystemService } from '../../models/system-service';
 
 
@@ -95,7 +95,7 @@ export class PortsSet {
 
   checkIfFreePortAmountEnouth(projectLocationOrSystemService: Project | SystemService, howManyPorts: number, ports: PortInstance[]) {
     if (_.isUndefined(howManyPorts) && _.isString(projectLocationOrSystemService)) {
-      const project = ProjectFrom(projectLocationOrSystemService);
+      const project = Project.From(projectLocationOrSystemService);
       howManyPorts = 1 + (project.isWorkspace ? project.children.length : 0)
     }
     let sum = 0;

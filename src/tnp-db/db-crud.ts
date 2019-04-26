@@ -3,14 +3,13 @@ import * as _ from 'lodash';
 
 import { CLASS } from 'typescript-class-helpers'
 
-import { Project } from '../project/base-project';
+import { Project } from '../project/project';
 import { DBBaseEntity } from './entites/base-entity';
 import {
   BuildInstance, PortInstance, DomainInstance,
   EntityNames, CommandInstance, ProjectInstance,
   ProcessInstance
 } from './entites';
-import { ProjectFrom } from '../project';
 import { error } from '../helpers';
 import { BuildOptions } from '../project/features/build-options';
 
@@ -116,7 +115,7 @@ export class DbCrud {
       const v = value as DomainInstance;
       const d: DomainInstance = _.merge(new DomainInstance(), v);
       d.declaredIn = d.declaredIn.map(d => {
-        return { environment: d.environment, project: ProjectFrom(d.project as any) }
+        return { environment: d.environment, project: Project.From(d.project as any) }
       })
       return d as any;
     }
@@ -124,7 +123,7 @@ export class DbCrud {
       const v = value as PortInstance;
       const r = _.merge(new PortInstance(), v) as PortInstance;
       if (_.isString(r.reservedFor)) {
-        r.reservedFor = ProjectFrom(r.reservedFor)
+        r.reservedFor = Project.From(r.reservedFor)
       }
       return r as any;
     }

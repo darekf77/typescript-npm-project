@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from "chalk";
 
-import { Project } from "../base-project";
+import { Project } from "../project";
 import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle } from "../../models";
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log } from "../../helpers";
 import { config } from '../../config';
@@ -58,9 +58,6 @@ export class PackageJSON {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
     if (_.isString(res)) {
       return res;
-    }
-    if (!res && fs.existsSync(path.join(this.location, 'angular-cli.json'))) {
-      return 'angular-cli';
     }
     if (this.data && this.data.name) {
       return 'unknow-npm-project';

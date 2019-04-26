@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import { config } from '../../config';
 import { getMostRecentFilesNames, tryCopyFrom, tryRemoveDir } from "../../helpers";
-import { Project } from '../base-project';
+import { Project } from '../project';
 import { IPackageJSON } from '../../models';
 import { TnpDB } from '../../tnp-db';
 

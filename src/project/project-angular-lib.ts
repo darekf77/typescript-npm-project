@@ -1,16 +1,16 @@
 //#region @backend
 import chalk from 'chalk';
 import * as _ from 'lodash';
-import { BaseProjectLib } from "./base-project-lib";
+import { LibProject } from "./lib-project";
 import { AngularProject } from "./project-angular";
 import { BuildDir } from "../models";
 import { error } from "../helpers";
 import config from "../config";
-import { Project } from './base-project';
+import { Project } from './project';
 import { AnglarLibModuleDivider } from './features/build-isomorphic-lib/angular-lib-module-build';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
-export class ProjectAngularLib extends BaseProjectLib {
+export class ProjectAngularLib extends LibProject {
 
   private angular: AngularProject;
   public moduleDivider: AnglarLibModuleDivider;

@@ -1,19 +1,9 @@
-//#region @backend
-import * as fse from "fs-extra";
 import * as path from 'path';
-import * as os from 'os';
 import * as _ from 'lodash';
 
-import { Project, ProjectFrom } from "../project";
+import { Project } from "../project";
 import { error, info } from '../helpers';
-import chalk from 'chalk';
-import * as JSON5 from 'json5';
 import { config as globalConfig } from '../config';
-
-// function popertyKey(key: string) {
-
-//   return
-// }
 
 export interface ProjectForAutoBuild {
   cwd: string,
@@ -35,17 +25,12 @@ export interface AutoActionsUser {
 
 export class AutoActions {
 
-
   readonly config: AutoActionsUser;
-
 
   constructor(private project: Project) {
 
     const autobuildjsonfilePath = path.join(Project.Tnp.location, globalConfig.file.autob_actions_js);
     this.config = require(`${autobuildjsonfilePath}`);
-    // console.log(this.config)
-    // process.exit(0)
-    this.trimConfigPropsValues();
   }
 
 
@@ -74,22 +59,12 @@ export class AutoActions {
     info(`Done`);
   }
 
-  private trimConfigPropsValues() { // TODO make this works, lodash path with dot
-    // // walkObject(this.config, lodashPath => {
-    // //   const p = _.get(this.config, lodashPath);
-    // //   if (_.isString(p)) {
-    // //     console.log(`${lodashPath} v: "${chalk.bold(p)}"`)
-    // //     _.set(this.config, lodashPath, p.trim())
-    // //   }
-    // })
-  }
-
   private getBuild() {
 
 
     const build: ProjectForAutoBuild = this.config.builds
       .find(b => {
-        const p = ProjectFrom(b.cwd);
+        const p = Project.From(b.cwd);
 
         if (!p) {
           console.log(`Project in "${b.cwd}" is "${p && p.name}"`)
@@ -121,16 +96,16 @@ export class AutoActions {
 
 export async function autobuild(project: Project, watch = false, exit = true) {
 
-  const autobuild = new AutoActions(project);
-  await autobuild.build(watch)
+  const ab = new AutoActions(project);
+  await ab.build(watch)
   if (exit) {
     process.exit(0)
   }
 }
 
 function autorelease(project: Project) {
-  const autorelease = new AutoActions(project);
-  autorelease.release()
+  const ar = new AutoActions(project);
+  ar.release()
   process.exit(0)
 }
 
@@ -145,9 +120,9 @@ export default {
     // console.log('AUTOBUILD!')
     await autobuild(Project.Current, true)
   },
-  $autorelease: (args) => {
+  $autorelease: () => {
     autorelease(Project.Current)
   }
 
-}
+};
 //#endregion

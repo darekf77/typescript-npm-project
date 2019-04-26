@@ -9,16 +9,15 @@ import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
 import config from "../../config";
-import { Project } from '../base-project';
+import { Project } from '../project';
 import { FileEvent, IPackageJSON } from '../../models';
 import { info, warn } from '../../helpers';
 import { tryRemoveDir, tryCopyFrom } from '../../index';
 import { copyFile } from '../../helpers';
 import { BuildOptions } from './build-options';
+import { FeatureForProject } from '../feature-for-projects';
 
-export class CopyToManager {
-
-  constructor(private project: Project) { }
+export class CopyManager extends FeatureForProject {
 
   private buildOptions: BuildOptions;
 

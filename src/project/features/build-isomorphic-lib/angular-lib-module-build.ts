@@ -4,9 +4,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { Project } from '../../../project/base-project';
+import { Project } from '../../project';
 import config from '../../../config';
-import { ProjectFrom } from '../../../project/index';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
 import { IsomorphicOptions } from '../source-modifier';

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut';
 import { EnvConfig } from '../../../models';
-import { ProjectFrom } from '../../index';
+import { Project } from '../../project';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -12,7 +12,7 @@ export class BackendCompilationExtended extends BackendCompilation {
   compile(watch = false) {
 
     // QUICK_FIX for backend in tnp projects
-    const currentProject = ProjectFrom(this.cwd);
+    const currentProject = Project.From(this.cwd);
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
     this.tscCompilation(this.compilationFolderPath, watch, `../${this.outFolder}` as any, generatedDeclarations);
   }

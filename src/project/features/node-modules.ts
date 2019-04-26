@@ -5,15 +5,13 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 
-import { ProjectFrom } from '../index';
-import { Project } from "../base-project";
+import { Project } from "../project";
 import { ArrNpmDependencyType, InstalationType } from '../../models';
 import { HelpersLinks, error, info, warn, log, run } from "../../helpers";
 import config from '../../config';
+import { FeatureForProject } from '../feature-for-projects';
 
-export class NodeModules {
-
-  constructor(private project: Project) { }
+export class NodeModules extends FeatureForProject {
 
   get copyBin() {
     const self = this;
@@ -132,14 +130,14 @@ export class NodeModules {
     const self = this;
     return {
       to(destination: Project) {
-        let projToCopy = ProjectFrom(path.join(self.project.location, config.folder.node_modules, packageName))
+        let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
         if (!fse.existsSync(nodeModeulesPath)) {
           fse.mkdirpSync(nodeModeulesPath)
         }
 
         const pDestPath = path.join(nodeModeulesPath, projToCopy.name)
-        const addedSuccess = projToCopy.copytToManager.generateSourceCopyIn(pDestPath,
+        const addedSuccess = projToCopy.copyManager.generateSourceCopyIn(pDestPath,
           { override: false, filterForBundle: false, showInfo: false })
         if (!addedSuccess) {
           return;
@@ -158,9 +156,9 @@ export class NodeModules {
           // .filter(dep => dep !== self.project.name)
           .forEach(pkgName => {
             const pDestPathPackage = path.join(nodeModeulesPath, pkgName)
-            projToCopy = ProjectFrom(path.join(self.project.location, config.folder.node_modules, pkgName))
+            projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, pkgName))
             if (projToCopy) {
-              projToCopy.copytToManager.generateSourceCopyIn(pDestPathPackage, { override: false, filterForBundle: false, showInfo: false })
+              projToCopy.copyManager.generateSourceCopyIn(pDestPathPackage, { override: false, filterForBundle: false, showInfo: false })
             } else {
               warn(`This is not a npm package: '${pkgName}' inside "${self.project.location}"`)
             }
@@ -194,7 +192,10 @@ export class NodeModules {
 
 
     const projects = newNames
-      .map(name => ProjectFrom(path.join(context, config.folder.node_modules, name), false))
+      .map(name => {
+        // TODO hide messages
+        return Project.From(path.join(context, config.folder.node_modules, name))
+      })
       .filter(f => !!f)
 
     // console.log('projects', projects.length)
@@ -241,7 +242,7 @@ export class NodeModules {
     if (!contaier.node_modules.exist()) {
       info(`npm install in ${chalk.bold('container')} project`)
       contaier.packageJson.show('recreate container packages list for quick tnp install')
-      contaier.node_modules.installPackages(true)
+      contaier.node_modules.installPackages()
     }
 
     info(`Installing npm packages in ${this.project.name}... from parent container.`);

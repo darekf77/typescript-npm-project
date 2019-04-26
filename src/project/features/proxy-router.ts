@@ -6,11 +6,11 @@ import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
 import { error } from "../../helpers";
-import { Project } from '../base-project';
+import { Project } from '../project';
+import { FeatureForProject } from '../feature-for-projects';
 
-export class ProxyRouter {
+export class ProxyRouter extends FeatureForProject {
 
-  constructor(private project: Project) { }
   private static takenPorts = [];
 
   public static async getFreePort(from: number = 4000) {
@@ -33,7 +33,7 @@ export class ProxyRouter {
 
   private getProjectFrom(req: http.IncomingMessage): Project {
     // console.log('req', req)
-    // console.log('getProjectFrom routes', this.routes.map(r => r.baseUrl))
+    // console.log('getProject.From routes', this.routes.map(r => r.baseUrl))
     // console.log(`Request url "${req.url}"`)
     const r = this.project.env.config.workspace.projects.find(r => {
       return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
@@ -82,7 +82,7 @@ export class ProxyRouter {
     });
 
     // server.on('upgrade', (req, socket, head) => {
-    //   const p = this.getProjectFrom(req);
+    //   const p = this.getProject.From(req);
     //   console.log('resolve project from ws ', p && p.name)
 
     //   const target = p ? p.routerTargetWebSocket() : ''

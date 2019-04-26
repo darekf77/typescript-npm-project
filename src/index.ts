@@ -22,7 +22,6 @@ export * from './config';
 export * from './helpers/helpers';
 export * from './helpers/helpers-environment';
 export * from './models';
-export * from './progress-output';
 export * from './project';
 //#region @backend
 export * from './helpers/helpers-links';

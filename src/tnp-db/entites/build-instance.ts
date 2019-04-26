@@ -1,7 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { ProjectFrom } from '../../project';
-import { Project } from '../../project/base-project'
+import { Project } from '../../project/project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
 import { killProcess } from '../../helpers';
@@ -87,7 +86,7 @@ export class BuildInstance extends DBBaseEntity implements IBuildInstance {
   pid: number;
   location?: string;
   get project() {
-    return ProjectFrom(this.location);
+    return Project.From(this.location);
   }
 
 }

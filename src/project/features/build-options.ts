@@ -2,11 +2,10 @@
 import chalk from 'chalk';
 import * as path from 'path';
 import { error, info } from '../../helpers/helpers-messages';
-import { nearestProjectTo } from '../index';
 //#endregion
 
 import * as _ from 'lodash';
-import { Project } from '../base-project';
+import { Project } from '../project';
 import { IBuildOptions, BuildDir } from '../../models';
 
 export class BuildOptions implements IBuildOptions {
@@ -141,7 +140,7 @@ export class BuildOptions implements IBuildOptions {
         // console.log('raw arg', args)
 
         // console.log('path', argPath)
-        const project = nearestProjectTo(argPath);
+        const project = Project.nearestTo(argPath);
         if (!project) {
           error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
         } else {

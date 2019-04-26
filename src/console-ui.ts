@@ -1,5 +1,5 @@
 //#region @backend
-import { Project } from './project/base-project';
+import { Project } from './project/project';
 import { prompt } from 'enquirer';
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';

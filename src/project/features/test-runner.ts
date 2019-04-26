@@ -2,17 +2,16 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 //#endregion
-import { Project } from '../base-project';
+
 import config from '../../config';
+import { FeatureForProject } from '../feature-for-projects';
+import { error } from '../../helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 
 
-export class TestRunner {
+export class TestRunner extends FeatureForProject {
 
-  constructor(private project: Project) {
-
-  }
   //#region @backend
   fileCommand(files: string[]) {
     files = files.map(f => path.basename(f))
@@ -29,14 +28,15 @@ export class TestRunner {
     switch (this.project.type) {
       case 'isomorphic-lib':
 
-        command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)} --timeout ${config.CONST.TEST_TIMEOUT}`
+        command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
+          + ` --timeout ${config.CONST.TEST_TIMEOUT}`
         break;
 
       default:
         break;
     }
     if (!command) {
-      throw `Tests not impolemented for ${this.project.type}`
+      error(`Tests not impolemented for ${this.project.type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }
@@ -46,14 +46,15 @@ export class TestRunner {
     let command: string;
     switch (this.project.type) {
       case 'isomorphic-lib':
-        command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
+        command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} `
+          + ` --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
         break;
 
       default:
         break;
     }
     if (!command) {
-      throw `Tests not impolemented for ${this.project.type}`
+      error(`Tests not impolemented for ${this.project.type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }

@@ -2,7 +2,7 @@
 import { Project } from '../project';
 
 export function INSTALL(args, exit = true) {
-  Project.Current.npmInstall.fromArgs(args);
+  Project.Current.npmPackages.fromArgs(args);
   if (exit) {
     process.exit(0);
   }

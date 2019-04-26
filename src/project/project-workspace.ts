@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 // local
-import { Project } from "./base-project";
+import { Project } from "./project";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../helpers';
@@ -47,14 +47,16 @@ export class ProjectWorkspace extends Project {
       dockers: []
     };
     this.children.forEach(project => {
-      if (project.type === 'docker') projects.dockers.push(project);
-      else if (project.type === 'server-lib') projects.serverLibs.push(project);
-      else if (project.type === 'isomorphic-lib') projects.isomorphicLibs.push(project);
-      else if (project.type === 'angular-lib') projects.angularLibs.push(project);
-      else if (project.type === 'angular-client') projects.angularClients.push(project);
-      else if (project.type === 'angular-cli') projects.angularCliClients.push(project);
-    })
+      if (project.type === 'docker') {
 
+      } else if (project.type === 'isomorphic-lib') {
+        projects.isomorphicLibs.push(project);
+      } else if (project.type === 'angular-lib') {
+        projects.angularLibs.push(project);
+      } else if (project.type === 'angular-client') {
+        projects.angularClients.push(project);
+      }
+    });
 
     _.keys(projects).forEach((key) => {
       let libsProjects = (projects[key] as Project[]);

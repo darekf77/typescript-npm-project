@@ -1,4 +1,4 @@
-import { BaseProjectLib } from "./base-project-lib";
+import { LibProject } from "./lib-project";
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -6,15 +6,13 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-import { Project } from "./base-project";
+import { Project } from "./project";
 
-import { ClassHelper, tryCopyFrom, getControllers, getEntites } from "../helpers";
+import { tryCopyFrom, getControllers, getEntites } from "../helpers";
 
 import { HelpersLinks } from '../helpers';
 import { config } from '../config';
 import { IncrementalBuildProcessExtended } from './features/build-isomorphic-lib/incremental-build-process';
-import { error } from '../helpers';
-import { ProjectFrom } from '.';
 import { copyFile } from '../helpers';
 import { TnpDB } from '../tnp-db';
 import { CommandInstance } from '../tnp-db/entites/command-instance';
@@ -23,7 +21,7 @@ import { BuildOptions } from './features/build-options';
 //#endregion
 
 
-export class ProjectIsomorphicLib extends BaseProjectLib {
+export class ProjectIsomorphicLib extends LibProject {
 
   //#region @backend
   startOnCommand(args: string) {
@@ -103,7 +101,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
               }
             ]) as any;
           // console.log('ANSWER', answer)
-          client = ProjectFrom(path.join(this.location, '..', answer.project))
+          client = Project.From(path.join(this.location, '..', answer.project))
           //           const clientsExamples = this.parent.children
           //             .filter(c => config.allowedTypes.app.includes(c.type))
           //             .map(c => chalk.bold('--forClient ' + c.name) + '  or')
@@ -162,7 +160,7 @@ export class ProjectIsomorphicLib extends BaseProjectLib {
         }
       ]) as any;
 
-    buildOptions.forClient = projects.map(p => ProjectFrom(path.join(this.location, '..', p)))
+    buildOptions.forClient = projects.map(p => Project.From(path.join(this.location, '..', p)))
 
     const db = await TnpDB.Instance;
     await db.transaction.updateCommandBuildOptions(this.location, buildOptions);

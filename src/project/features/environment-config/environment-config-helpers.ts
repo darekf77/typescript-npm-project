@@ -1,18 +1,16 @@
 //#region @backend
-import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
-// local
-import { config } from '../../config';
-import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../models';
-import { error, warn } from '../../helpers';
-import { ProjectFrom } from '../index';
-import { ProxyRouter } from './proxy-router';
-import { Project } from '../base-project';
-import { walk } from 'lodash-walk-object';
-import { config as schemaConfig } from '../../environment-config';
-import { terminalLine } from '../../helpers';
+
+import { config } from '../../../config';
+import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../../models';
+import { error, warn } from '../../../helpers';
+import { ProxyRouter } from '../proxy-router';
+import { Project } from '../../project';
+import { config as schemaConfig } from './example-environment-config';
+import { terminalLine } from '../../../helpers';
 
 
 
@@ -107,7 +105,7 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
     err(workspaceConfig);
   }
 
-  const project = ProjectFrom(workspaceProjectLocation)
+  const project = Project.From(workspaceProjectLocation)
   if (project === undefined) {
     error(`Router (worksapce) port is not defined in your environment.js `);
   }
@@ -128,7 +126,7 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
 
   for (let i = 0; i < workspaceConfig.workspace.projects.length; i++) {
     const configProject = workspaceConfig.workspace.projects[i];
-    const project = ProjectFrom(path.join(workspaceProjectLocation, configProject.name))
+    const project = Project.From(path.join(workspaceProjectLocation, configProject.name))
     if (project === undefined) {
       error(`Undefined project: ${configProject.name} inside environment.js workpace.projects`);
     }
@@ -170,7 +168,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
         encoding: 'utf8',
         spaces: 2
       })
-    } else if (project.type === 'isomorphic-lib' || project.type === 'server-lib') {
+    } else if (project.type === 'isomorphic-lib') {
       fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
         encoding: 'utf8',
         spaces: 2

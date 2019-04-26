@@ -14,14 +14,12 @@ import config from "../config";
 import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from "../models";
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
-  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log
 } from "../helpers";
-import { ProjectFrom, BaseProjectLib, BaselineSiteJoin } from './index';
 import { NodeModules } from "./features/node-modules";
 import { FilesRecreator } from './features/files-builder';
-import { NpmInstall } from './features/npm-install';
 import { ProxyRouter } from './features/proxy-router';
-import { CopyToManager } from './features/copyto-manager';
+import { CopyManager } from './features/copy-manager';
 import { SourceModifier } from './features/source-modifier';
 import { reinstallTnp } from './features/tnp-bundle';
 import { FrameworkFilesGenerator } from './features/framework-files-generator';
@@ -36,42 +34,10 @@ import { PackageJSON } from "./features/package-json";
 import { EnvironmentConfig } from './features/environment-config';
 import { TestRunner } from './features/test-runner';
 import { BuildOptions } from './features/build-options';
+import { IProject } from './project.interface';
+import { NpmPackages } from './features/npm-packages';
+import { BaselineSiteJoin } from './features/baseline-site-join';
 
-
-
-
-export interface IProject {
-  isSite: boolean;
-  isCoreProject: boolean;
-  isBuildedLib: boolean;
-  isCommandLineToolOnly: boolean;
-  isGenerated: boolean;
-  isWorkspaceChildProject: boolean;
-  isBasedOnOtherProject: boolean;
-  isWorkspace: boolean;
-  isContainer: boolean;
-  isContainerChild: boolean;
-  isStandaloneProject: boolean;
-  isTnp: boolean;
-  isCloud: boolean;
-  useFramework: boolean;
-  name: string;
-  defaultPort?: number;
-  version: string;
-  _routerTargetHttp?: string;
-  customizableFilesAndFolders: string[];
-  type: LibType;
-  backupName: string;
-  location: string;
-  resources: string[];
-  env: EnvironmentConfig;
-  allowedEnvironments: EnvironmentName[];
-  children: Project[];
-  parent: Project;
-  preview: Project;
-  requiredLibs: Project[];
-  baseline: Project;
-}
 
 @Morphi.Entity<Project>({
   className: 'Project',
@@ -126,23 +92,152 @@ export interface IProject {
   //#endregion
 } as any)
 export class Project implements IProject {
+
+  public static projects: Project[] = [];
   modelDataConfig?: ModelDataConfig;
   id: number;
-  static projects: Project[] = [];
 
-  public static defaultPortByType(type: LibType): number {
-
-    if (type === 'workspace') return 5000;
-    if (type === 'angular-cli') return 4200;
-    if (type === 'angular-client') return 4300;
-    if (type === 'angular-lib') return 4250;
-    if (type === 'ionic-client') return 8080;
-    if (type === 'docker') return 5000;
-    if (type === 'isomorphic-lib') return 4000;
-    if (type === 'server-lib') return 4050;
-  }
 
   readonly browser: IProject = {} as any;
+
+  //#region @backend
+  tests: TestRunner;
+  //#endregion
+
+  readonly requiredLibs: Project[] = []; // TODO FIX THIS
+
+
+  readonly packageJson: PackageJSON;
+
+
+  //#region @backend
+  readonly node_modules: NodeModules;
+  //#endregion
+
+  //#region @backend
+  readonly recreate: FilesRecreator;
+  //#endregion
+
+  //#region @backend
+  readonly join: BaselineSiteJoin;
+  //#endregion
+
+  //#region @backend
+  readonly sourceModifier: SourceModifier;
+  //#endregion
+
+  //#region @backend
+  readonly frameworkFileGenerator: FrameworkFilesGenerator;
+  //#endregion
+
+  //#region @backend
+  readonly npmPackages: NpmPackages;
+  //#endregion
+
+  env: EnvironmentConfig;
+
+  //#region @backend
+  readonly proxyRouter: ProxyRouter;
+  //#endregion
+
+  //#region @backend
+  readonly copyManager: CopyManager;
+  //#endregion
+
+  private static typeFrom(location: string): LibType {
+    const packageJson = PackageJSON.fromLocation(location);
+    const type = packageJson.type;
+    return type;
+  }
+
+  public static From(location: string): Project {
+
+    if (!_.isString(location)) {
+      warn(`[project.from] location is not a string`)
+      return;
+    }
+    location = path.resolve(location);
+
+    const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
+    if (alreadyExist) {
+      return alreadyExist;
+    }
+    if (!fs.existsSync(location)) {
+      warn(`[project.from] Cannot find project in location: ${location}`)
+      return;
+    }
+    if (!PackageJSON.fromLocation(location)) {
+      warn(`[project.from] Cannot find package.json in location: ${location}`)
+      return;
+    };
+    const type = this.typeFrom(location);
+
+    let resultProject: Project;
+    if (type === 'isomorphic-lib') {
+      const ProjectIsomorphicLib = require('./project-isomorphic-lib');
+      resultProject = new ProjectIsomorphicLib(location);
+    }
+    if (type === 'angular-lib') {
+      const ProjectAngularLib = require('./project-angular-lib')
+      resultProject = new ProjectAngularLib(location);
+    }
+    if (type === 'angular-client') {
+      const ProjectAngularClient = require('./project-angular-client');
+      resultProject = new ProjectAngularClient(location);
+    }
+    if (type === 'workspace') {
+      const ProjectWorkspace = require('./project-workspace');
+      resultProject = new ProjectWorkspace(location);
+    }
+    if (type === 'docker') {
+      const ProjectDocker = require('./project-docker');
+      resultProject = new ProjectDocker(location);
+    }
+    if (type === 'ionic-client') {
+      const ProjectIonicClient = require('./project-ionic-client');
+      resultProject = new ProjectIonicClient(location);
+    }
+    if (type === 'unknow-npm-project') {
+      const UnknowNpmProject = require('./project-unknow-npm');
+      resultProject = new UnknowNpmProject(location);
+    }
+    if (type === 'container') {
+      const ProjectContainer = require('./project-container');
+      resultProject = new ProjectContainer(location);
+    }
+    // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
+    //     : ('NO PROJECT FROM LOCATION ' + location))
+
+    log(`Result project: ${resultProject.name}`)
+    return resultProject;
+  }
+
+  public static nearestTo(location: string) {
+    // console.log('nearestPorjectLocaiont', location)
+    const project = this.From(location);
+    if (project) {
+      return project;
+    }
+    location = path.join(location, '..');
+    if (!fs.existsSync(location)) {
+      return void 0;
+    }
+    return this.From(path.resolve(location));
+  }
+
+  public static defaultPortByType(type: LibType): number {
+    if (type === 'workspace') { return 5000; }
+    if (type === 'angular-client') { return 4300; }
+    if (type === 'angular-lib') { return 4250; }
+    if (type === 'ionic-client') { return 8080; }
+    if (type === 'docker') { return 5000; }
+    if (type === 'isomorphic-lib') { return 4000; }
+    error(`[project] Cannot resove type for: ${type}`);
+  }
+
+
+
+
   public get name(): string {
     if (Morphi.IsBrowser) {
       return this.browser.name;
@@ -272,19 +367,12 @@ export class Project implements IProject {
     //#endregion
   }
 
-
-  //#region @backend
-  tests: TestRunner;
-  //#endregion
-
-  readonly requiredLibs: Project[] = []; // TODO FIX THIS
-
   get parent(): Project {
     if (Morphi.IsBrowser) {
       return this.browser.parent;
     }
     //#region @backend
-    return _.isString(this.location) && ProjectFrom(path.join(this.location, '..'));
+    return _.isString(this.location) && Project.From(path.join(this.location, '..'));
     //#endregion
   }
   get preview(): Project {
@@ -292,7 +380,7 @@ export class Project implements IProject {
       return this.browser.preview;
     }
     //#region @backend
-    return _.isString(this.location) && ProjectFrom(path.join(this.location, 'preview'));
+    return _.isString(this.location) && Project.From(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -328,56 +416,18 @@ export class Project implements IProject {
     }
     //#region @backend
     if (this.isWorkspace) {
-      return this.packageJson.pathToBaseline && ProjectFrom(this.packageJson.pathToBaseline);
+      return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
-      return this.parent && this.parent.baseline && ProjectFrom(path.join(this.parent.baseline.location, this.name));
+      return this.parent && this.parent.baseline && Project.From(path.join(this.parent.baseline.location, this.name));
     }
     //#endregion
   }
 
 
-  readonly packageJson: PackageJSON;
-
-
-  //#region @backend
-  readonly node_modules: NodeModules;
-  //#endregion
-
-  //#region @backend
-  readonly recreate: FilesRecreator;
-  //#endregion
-
-  //#region @backend
-  readonly join: BaselineSiteJoin;
-  //#endregion
-
-  //#region @backend
-  readonly sourceModifier: SourceModifier;
-  //#endregion
-
-  //#region @backend
-  readonly frameworkFileGenerator: FrameworkFilesGenerator;
-  //#endregion
-
-  //#region @backend
-  readonly npmInstall: NpmInstall;
-  //#endregion
-
-  env: EnvironmentConfig;
-
-  //#region @backend
-  readonly proxyRouter: ProxyRouter;
-  //#endregion
-
-  //#region @backend
-  readonly copytToManager: CopyToManager;
-  //#endregion
-
-
   //#region @backend
   static get Current() {
 
-    const current = ProjectFrom(process.cwd())
+    const current = Project.From(process.cwd())
     if (!current) {
       error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`, false, true)
     }
@@ -390,7 +440,7 @@ export class Project implements IProject {
   static get Tnp() {
 
     const filenameapth = 'tnp-system-path.txt';
-    let tnp = ProjectFrom(path.join(__dirname, '..', '..'));
+    let tnp = Project.From(path.join(__dirname, '..', '..'));
     if (tnp) {
       const currentPathInSystem = path.join(tnp.location, 'tnp-system-path.txt');
       if (!fse.existsSync(currentPathInSystem)) {
@@ -402,7 +452,7 @@ export class Project implements IProject {
       if (!fse.existsSync(tnpBundleTnpPath)) {
         error(`Please build you ${chalk.bold('tnp-npm-project')} first... `)
       }
-      tnp = ProjectFrom(tnpBundleTnpPath)
+      tnp = Project.From(tnpBundleTnpPath)
     }
     return tnp;
   }
@@ -631,7 +681,7 @@ export class Project implements IProject {
     if (this.isWorkspace && !this.isGenerated) {
 
       const genLocationWOrkspace = path.join(this.location, config.folder.dist, this.name);
-      const genWorkspace = ProjectFrom(genLocationWOrkspace)
+      const genWorkspace = Project.From(genLocationWOrkspace)
       if (!genWorkspace) {
         error(`No  ${'dist'}ributon folder. Please run: ${chalk.bold('tnp build')} in this workspace.
 Generated workspace should be here: ${genLocationWOrkspace}
@@ -691,9 +741,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
         this.packageJson = PackageJSON.fromProject(this);
         this.node_modules = new NodeModules(this);
         this.type = this.packageJson.type;
-        this.npmInstall = new NpmInstall(this)
+        this.npmPackages = new NpmPackages(this)
         this.recreate = new FilesRecreator(this);
-        this.sourceModifier = new SourceModifier(this, this.recreate);
+        this.sourceModifier = new SourceModifier(this);
         this.frameworkFileGenerator = new FrameworkFilesGenerator(this)
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
@@ -711,7 +761,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
           this.env = new EnvironmentConfig(this);
           this.proxyRouter = new ProxyRouter(this);
         }
-        this.copytToManager = new CopyToManager(this);
+        this.copyManager = new CopyManager(this);
         if (this.isStandaloneProject) {
           this.packageJson.updateHooks()
         }
@@ -884,7 +934,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
     await this.buildSteps(buildOptions);
-    await this.copytToManager.initCopyingOnBuildFinish(buildOptions);
+    await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     if (buildOptions.compileOnce) {
       process.exit(0)
     }
@@ -930,7 +980,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
         }
       ]) as any;
 
-    this.buildOptions.copyto = projects.map(p => ProjectFrom(p))
+    this.buildOptions.copyto = projects.map(p => Project.From(p))
 
     if (!_.isArray(this.buildOptions.copyto)) {
       this.buildOptions.copyto = []
@@ -1010,22 +1060,22 @@ Generated workspace should be here: ${genLocationWOrkspace}
     // console.log('by libraryType ' + libraryType)
     let projectPath;
     if (libraryType === 'workspace') {
-      let p = ProjectFrom(path.join(__dirname, `../../projects/container/workspace`));
+      let p = Project.From(path.join(__dirname, `../../projects/container/workspace`));
       if (!p) {
-        p = ProjectFrom(path.join(__dirname, `../projects/container/workspace`));
+        p = Project.From(path.join(__dirname, `../projects/container/workspace`));
       }
       return p;
     }
     projectPath = path.join(__dirname, `../../projects/container/workspace/${libraryType}`);
     if (fse.existsSync(projectPath)) {
-      return ProjectFrom(projectPath);
+      return Project.From(projectPath);
     }
     projectPath = path.join(__dirname, `../projects/container/workspace/${libraryType}`);
     if (!fs.existsSync(projectPath)) {
       error(`Bad library type: ${libraryType}`, true)
       return undefined;
     }
-    return ProjectFrom(projectPath);
+    return Project.From(projectPath);
   }
   //#endregion
 
@@ -1039,12 +1089,12 @@ Generated workspace should be here: ${genLocationWOrkspace}
           // console.log(packageName)
           // let p = path.resolve(path.join(this.location, '..', packageName))
           // if (this.isWorkspaceChildProject && fse.existsSync(p)) {
-          //   const project = ProjectFrom(p);
+          //   const project = Project.From(p);
           //   return project;
           // }
           let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageName);
           if (fse.existsSync(p)) {
-            const project = ProjectFrom(p);
+            const project = Project.From(p);
             return project;
           }
           // warn(`Dependency "${packageName}" doen't exist in ${p}`)
@@ -1091,7 +1141,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     return subdirectories
       .map(dir => {
         // console.log('child:', dir)
-        return ProjectFrom(dir);
+        return Project.From(dir);
       })
       .filter(c => !!c)
     //#endregion
@@ -1109,7 +1159,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     };
     fse.copySync(this.location, destinationPath, options);
     info(`${this.type.toUpperCase()} library structure created sucessfully...`);
-    const project = ProjectFrom(destinationPath);
+    const project = Project.From(destinationPath);
     info('Done.');
     return project;
   }

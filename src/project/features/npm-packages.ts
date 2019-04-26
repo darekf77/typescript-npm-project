@@ -1,22 +1,18 @@
 //#region @backend
 import chalk from 'chalk';
 
-import { Project } from '../base-project';
+import { Project } from '../project';
 import { info, checkValidNpmPackageName, error, log } from '../../helpers';
 import { link } from '../../scripts/LINK';
 import { unlink } from '../../scripts/UNLINK';
+import { FeatureForProject } from '../feature-for-projects';
 
-export class NpmInstall {
-
-  constructor(public project: Project) {
-
-  }
-
+export class NpmPackages extends FeatureForProject {
 
   fromArgs(packagesNamesSpaceSeparated: string) {
 
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
-    if(this.project.isContainer || this.project.)
+    // if(this.project.isContainer || this.project.)
     this.project.packageJson.show('before npm instalation')
     if (args.length === 0) { // NPM INSTALL
       this.installAll();
@@ -33,6 +29,7 @@ export class NpmInstall {
 
 
   installAll() {
+    /*
     if (this.project.isContainer) {
       info(`npm install in ${chalk.bold('container')} project`)
       this.project.node_modules.installPackages(force)
@@ -45,12 +42,12 @@ export class NpmInstall {
       link(this.project)
     } else if (this.project.isWorkspaceChildProject) {
       info(`npm install in ${chalk.bold('workspace child')} project`)
-      this.project.parent.npmInstall.installAll()
+      this.project.parent.npmPackages.installAll()
     } else {
       info(`npm install in ${chalk.bold('stanalone')} project`)
       this.project.node_modules.installPackages(true)
     }
-
+    */
     // if (process.platform === 'darwin') {
     //   if (project.isWorkspace) {
     //     project.run(`increase-memory-limit`).sync();

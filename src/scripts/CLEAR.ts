@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import { LibType, BuildDir } from '../models';
 
-import { Project, ProjectFrom } from '../project';
+import { Project } from '../project';
 import { clearConsole } from '../helpers';
 import config from '../config';
 import { TnpDB } from '../tnp-db';
@@ -12,12 +12,12 @@ import { TnpDB } from '../tnp-db';
 function clearGenerated(project: Project, all, recrusive, outDir: string) {
   console.log(`Cleaning generated workspace in for ${project.location}`)
   if (project.isWorkspace) {
-    const genWorkspace = ProjectFrom(path.join(project.location, outDir, project.name))
+    const genWorkspace = Project.From(path.join(project.location, outDir, project.name))
     if (genWorkspace) {
       genWorkspace.clear(all, recrusive);
     }
   } else if (project.isWorkspaceChildProject) {
-    const genWorkspaceChild = ProjectFrom(path.join(project.parent.location, outDir, project.parent.name, project.name))
+    const genWorkspaceChild = Project.From(path.join(project.parent.location, outDir, project.parent.name, project.name))
     if (genWorkspaceChild) {
       genWorkspaceChild.clear(all, recrusive)
     }
@@ -32,7 +32,7 @@ export async function clear(args, all = false) {
   recrusive = (recrusive || r || all);
   generated = (generated || g);
   let project = Project.Current
-  if(all && project.isWorkspaceChildProject) {
+  if (all && project.isWorkspaceChildProject) {
     project = project.parent;
   }
 

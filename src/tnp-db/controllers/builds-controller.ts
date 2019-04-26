@@ -5,7 +5,7 @@ import * as  psList from 'ps-list';
 import { BaseController } from './base-controlller';
 import { getWorkingDirOfProcess } from '../../helpers';
 import { PsListInfo } from '../../models/ps-info';
-import { ProjectFrom, Project } from '../../project';
+import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { warn } from '../../helpers';
 import { BuildOptions } from '../../project/features/build-options';
@@ -32,7 +32,7 @@ export class BuildsController extends BaseController {
       .filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0)
       .map(p => {
         const location = getWorkingDirOfProcess(p.pid);
-        const project = ProjectFrom(location)
+        const project = Project.From(location)
         if (project) {
           const b = new BuildInstance({
             location: getWorkingDirOfProcess(p.pid),

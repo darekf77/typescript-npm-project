@@ -2,8 +2,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import { Project } from '../../project/base-project';
-import { ProjectFrom } from '../../project';
+import { Project } from '../../project/project';
 import { DbCrud } from '../db-crud';
 import { BaseController } from './base-controlller';
 import { ProjectInstance } from '../entites';
@@ -55,7 +54,7 @@ export class ProjectsController extends BaseController {
       .map(name => path.join(location, name))
       .map(location => {
         // console.log(location)
-        return ProjectFrom(location)
+        return Project.From(location)
       })
       .filter(f => !!f)
       .filter(f => {

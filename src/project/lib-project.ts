@@ -1,4 +1,4 @@
-import { Project } from "./base-project";
+import { Project } from "./project";
 //#region @backend
 import * as _ from 'lodash';
 import * as fs from 'fs';
@@ -10,8 +10,8 @@ import { questionYesNo } from "../helpers";
 import { error, info, warn } from "../helpers";
 import config from "../config";
 import { PackageJSON } from './features/package-json';
-import { npmInstall } from '../scripts/INSTALL';
-import { ProjectFrom, tryCopyFrom } from '../index';
+
+import {  tryCopyFrom } from '../helpers';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -21,7 +21,7 @@ import { ProjectFrom, tryCopyFrom } from '../index';
  */
 //#endregion
 
-export abstract class BaseProjectLib extends Project {
+export abstract class LibProject extends Project {
 
   //#region @backend
   projectSpecyficFiles() {
@@ -82,7 +82,7 @@ export abstract class BaseProjectLib extends Project {
         const packageJson = PackageJSON.fromLocation(p);
         if (!!packageJson && packageJson.data &&
           packageJson.data.tnp && packageJson.data.tnp.type) {
-          const project = ProjectFrom(p);
+          const project = Project.From(p);
           if (project.isWorkspace && project.isCoreProject) {
             if (!project.packageJson.data.dependencies) {
               project.packageJson.data.dependencies = {};
@@ -163,7 +163,7 @@ export abstract class BaseProjectLib extends Project {
       this.run(`tnp clear`).sync();
 
       if (!this.node_modules.exist()) {
-        npmInstall('', this, false, false);
+        this.npmPackages.installAll()
       }
       this.packageJson.show('show for release')
       this.recreate.init();

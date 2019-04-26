@@ -1,5 +1,5 @@
 //#region @backend
-import { Project, BaseProjectLib, ProjectFrom } from "../project";
+import { Project, LibProject } from "../project";
 import { BaselineSiteJoin } from "../project/features/baseline-site-join";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';
@@ -80,7 +80,7 @@ function $GIT_REMOVE_UNTRACKED() {
 export default {
   $COPY_FROM(args: string) {
     const [from, to, pkgName] = args.trim().split(' ');
-    ProjectFrom(from).node_modules.copy(pkgName).to(ProjectFrom(to))
+    Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
     process.exit()
   },
   $GIT_REMOVE_UNTRACKED,
@@ -132,7 +132,7 @@ export default {
   },
   COPY_RESOURCES: () => {
     Project.Current.checkIfReadyForNpm();
-    (Project.Current as BaseProjectLib).bundleResources()
+    (Project.Current as LibProject).bundleResources()
 
     process.exit(0)
   },

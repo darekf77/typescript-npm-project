@@ -1,7 +1,7 @@
 //#region @backend
 import * as path from 'path';
 import * as sleep from 'sleep';
-import { ProjectFrom, Project } from '../project';
+import { Project } from '../project';
 import { initFromArgs } from './INIT';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from '../project/features/build-options';
@@ -18,20 +18,20 @@ async function regenerateProject(project: Project, buildOptions: BuildOptions, a
 
   if (project.isWorkspace && project.isSite) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    project.baseline.copytToManager.generateSourceCopyIn(genLocationBaseline);
+    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline);
   }
 
-  let genProject = ProjectFrom(genLocation);
+  let genProject = Project.From(genLocation);
   if (project.isWorkspace) {
     if (!genProject) {
-      project.copytToManager.generateSourceCopyIn(genLocation);
+      project.copyManager.generateSourceCopyIn(genLocation);
     }
   } else if (project.isWorkspaceChildProject) {
     rimraf.sync(genLocation);
-    project.copytToManager.generateSourceCopyIn(genLocation);
+    project.copyManager.generateSourceCopyIn(genLocation);
   }
 
-  genProject = ProjectFrom(genLocation);
+  genProject = Project.From(genLocation);
   // genProject.clear()
 
   await initFromArgs(args).project(genProject);

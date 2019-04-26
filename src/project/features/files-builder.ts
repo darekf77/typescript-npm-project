@@ -6,12 +6,13 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 // local
-import { Project } from "../base-project";
+import { Project } from "../project";
 import { LibType, RecreateFile } from "../../models";
 import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../helpers';
 import config from '../../config';
 import { BaselineSiteJoin } from './baseline-site-join';
 import { error } from '../../helpers';
+import { FeatureForProject } from '../feature-for-projects';
 
 interface VSCodeSettings {
   'files.exclude': { [files: string]: boolean; };
@@ -35,11 +36,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 
 
-export class FilesRecreator {
-
-  constructor(private project: Project) {
-
-  }
+export class FilesRecreator extends FeatureForProject {
 
   public init(includeVscode = false) {
     if (this.project.type === 'container') {
