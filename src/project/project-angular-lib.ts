@@ -1,40 +1,40 @@
 //#region @backend
 import chalk from 'chalk';
 import * as _ from 'lodash';
-import { LibProject } from "./lib-project";
-import { AngularProject } from "./project-angular";
+import { LibProject } from "./abstract";
+import { ProjectAngularClient } from "./project-angular-client";
 import { BuildDir } from "../models";
 import { error } from "../helpers";
 import config from "../config";
-import { Project } from './project';
-import { AnglarLibModuleDivider } from './features/build-isomorphic-lib/angular-lib-module-build';
+import { Project } from './abstract';
+import { AnglarLibModuleDivider } from './features/angular-lib-module-divider';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
 export class ProjectAngularLib extends LibProject {
 
-  private angular: AngularProject;
+  private projectAngularClient: ProjectAngularClient;
   public moduleDivider: AnglarLibModuleDivider;
 
   constructor(public location: string) {
     super(location);
     if (_.isString(location)) {
-      this.angular = new AngularProject(location);
+      this.projectAngularClient = new ProjectAngularClient(location);
       this.moduleDivider = new AnglarLibModuleDivider(this);
-      this.angular.env = this.env; // TODO QUICK_FIX
+      this.projectAngularClient.env = this.env; // TODO QUICK_FIX
     }
 
   }
 
   public setDefaultPort(port: number) {
-    this.angular.setDefaultPort(port)
+    this.projectAngularClient.setDefaultPort(port)
   }
 
   public getDefaultPort() {
-    return this.angular.getDefaultPort()
+    return this.projectAngularClient.getDefaultPort()
   }
 
   protected startOnCommand(args) {
-    const command = this.angular.startOnCommand(args);
+    const command = this.projectAngularClient.startOnCommand(args);
     // console.log(`Command is running async: ${command}`)
     return command;
   }
@@ -47,7 +47,7 @@ export class ProjectAngularLib extends LibProject {
       'tsconfig-aot.bundle.json',
       'tsconfig-aot.dist.json',
       'src/tsconfig.packages.json'
-    ]).concat(this.angular.projectSpecyficFiles());
+    ]).concat(this.projectAngularClient.projectSpecyficFiles());
   }
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
@@ -93,7 +93,7 @@ export class ProjectAngularLib extends LibProject {
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        await this.angular.buildSteps(buildOptions);
+        await this.projectAngularClient.buildSteps(buildOptions);
       } else {
         if (watch) {
           await this.buildLib(outDir, forClient as Project[], prod, false);

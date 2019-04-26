@@ -5,11 +5,11 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 
-import { Project } from "../project";
+import { Project } from "../abstract";
 import { ArrNpmDependencyType, InstalationType } from '../../models';
 import { HelpersLinks, error, info, warn, log, run } from "../../helpers";
 import config from '../../config';
-import { FeatureForProject } from '../feature-for-projects';
+import { FeatureForProject } from '../abstract';
 
 export class NodeModules extends FeatureForProject {
 

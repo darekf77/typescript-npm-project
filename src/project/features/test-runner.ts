@@ -4,7 +4,7 @@ import * as path from 'path';
 //#endregion
 
 import config from '../../config';
-import { FeatureForProject } from '../feature-for-projects';
+import { FeatureForProject } from '../abstract';
 import { error } from '../../helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';

@@ -62,7 +62,7 @@ export const config = {
     }
   },
   message: {
-    tnp_normal_mode: 'tnp-normal-mode'
+    tnp_normal_mode: 'tnp_normal_mode'
   },
   names: {
     env: {
@@ -98,7 +98,56 @@ export const config = {
     'angular-client',
     'angular-cli'
   ] as LibType[],
-  // environmentName
+  // environmentName,
+  localLibs: [
+    'eslint',
+    'mkdirp',
+    'gulp',
+    'npm-run',
+    'rimraf',
+    'nodemon',
+    'release-it',
+    'tsc',
+    'watch',
+    'http-server',
+    'ts-node',
+    'sort-package-json',
+    'concurrently',
+    'sloc',
+    'morphi'
+  ],
+  helpAlias: [
+    '-h',
+    '--help',
+    '-help',
+    'help'
+  ],
+  required: {
+    npm: [
+      { name: 'watch', version: '1.0.2' },
+      { name: 'check-node-version' },
+      { name: 'npm-run', version: '4.1.2' },
+      { name: 'rimraf' },
+      { name: 'mkdirp' },
+      { name: 'renamer' },
+      { name: 'nodemon' },
+      { name: 'madge' },
+      { name: 'http-server' },
+      { name: 'increase-memory-limit' },
+      { name: 'bower' },
+      { name: 'fkill', installName: 'fkill-cli' },
+      { name: 'mocha' },
+      // { name: 'chai' },
+      { name: 'ts-node' },
+      { name: 'stmux' }
+    ],
+    programs: [
+      //   {
+      //     name: 'code',
+      //     website: 'https://code.visualstudio.com/'
+      //   }
+    ]
+  }
 }
 
 

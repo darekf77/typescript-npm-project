@@ -8,7 +8,7 @@ import { config } from '../../../config';
 import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../../models';
 import { error, warn } from '../../../helpers';
 import { ProxyRouter } from '../proxy-router';
-import { Project } from '../../project';
+import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
 import { terminalLine } from '../../../helpers';
 

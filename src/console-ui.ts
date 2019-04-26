@@ -1,5 +1,5 @@
 //#region @backend
-import { Project } from './project/project';
+import { Project } from './project';
 import { prompt } from 'enquirer';
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
@@ -12,7 +12,6 @@ import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
 import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
-import { initFromArgs } from './scripts/INIT';
 import { clear } from './scripts/CLEAR';
 import { killAll } from './scripts/KILL';
 inquirer.registerPrompt('autocomplete', inquirerAutocomplete)
@@ -146,9 +145,8 @@ export class ConsoleUi {
     switch (res.command) {
 
       case CHOICE.INIT:
-        this
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await initFromArgs('')
+        await Project.Current.init.fromArgs('');
         process.exit(0)
         break;
 

@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from "chalk";
 
-import { Project } from "../project";
+import { Project } from "../abstract";
 import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle } from "../../models";
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log } from "../../helpers";
 import { config } from '../../config';

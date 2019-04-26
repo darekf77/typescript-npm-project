@@ -1,5 +1,5 @@
 //#region @backend
-import { Project } from '../../project/project';
+import { Project } from '../../project';
 import { EnvironmentName } from '../../models';
 import { BuildInstance } from './build-instance';
 import { DBBaseEntity } from './base-entity';

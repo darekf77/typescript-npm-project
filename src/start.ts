@@ -13,36 +13,6 @@ import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 
-
-
-
-const localLibs = [
-  'eslint',
-  'mkdirp',
-  'gulp',
-  'npm-run',
-  'rimraf',
-  'nodemon',
-  'release-it',
-  'tsc',
-  'watch',
-  'http-server',
-  'ts-node',
-  'sort-package-json',
-  'concurrently',
-  'sloc',
-  'morphi'
-]
-
-const helpAlias = [
-  '-h',
-  '--help',
-  '-help',
-  'help'
-]
-
-
-
 export async function start(argsv: string[], spinner?: Ora) {
   const db = await TnpDB.Instance;
   // console.log(argsv)
@@ -65,7 +35,7 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (localLib === "i") {
       argsv[2] = 'install'
     }
-    if (!helpAlias.includes(localLib) && localLibs.includes(localLib)) {
+    if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
       recognized = true;
       const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
       const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`

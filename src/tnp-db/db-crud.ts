@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { CLASS } from 'typescript-class-helpers'
 
-import { Project } from '../project/project';
+import { Project } from '../project';
 import { DBBaseEntity } from './entites/base-entity';
 import {
   BuildInstance, PortInstance, DomainInstance,

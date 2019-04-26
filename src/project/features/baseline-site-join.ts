@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
 // local
-import { Project } from "../project";
+import { Project } from "../abstract";
 import { LibType, RecreateFile, FileEvent } from "../../models";
 import { copyFile, uniqArray, crossPlatofrmPath } from '../../helpers';
 import config from '../../config';
@@ -15,6 +15,7 @@ import chalk from 'chalk';
 import { run } from '../../helpers';
 import { Helpers } from 'morphi/helpers';
 import { TnpDB } from '../../tnp-db';
+import { FeatureForProject } from '../abstract';
 
 const REGEXS = {
 
@@ -49,18 +50,9 @@ interface JoinFilesOptions {
   baselineAbsoluteLocation: string;
 }
 
-export class BaselineSiteJoin {
+export class BaselineSiteJoin extends FeatureForProject {
   private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
   private static readonly prefix = '__';
-
-
-  constructor(private project: Project) {
-    // console.log(project)
-
-  }
-
-
-
 
   public static get PathHelper() {
     return {

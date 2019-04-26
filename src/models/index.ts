@@ -1,5 +1,5 @@
 
-export * from './build-options';
+export * from './build-options.interface';
 export * from './build-dir';
 export * from './lib-type';
 export * from './environment-name';
@@ -7,6 +7,7 @@ export * from './env-config';
 export * from './ipackage-json';
 export * from './ps-info';
 export * from './replace-options-extended';
+export * from './project.interface';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
@@ -55,4 +56,23 @@ export interface RunOptions {
 export interface WatchOptions {
   cwd: string;
   wait?: number;
+}
+
+
+export interface ProjectForAutoBuild {
+  cwd: string,
+  command: string;
+  commandWatch: string;
+  args?: string[];
+}
+
+export interface ProjectForAutoRelease {
+  cwd: string,
+  command: string;
+  args?: string[];
+}
+
+export interface AutoActionsUser {
+  builds?: ProjectForAutoBuild[];
+  autoreleases?: ProjectForAutoRelease[];
 }

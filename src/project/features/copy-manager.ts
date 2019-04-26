@@ -9,13 +9,13 @@ import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
 import config from "../../config";
-import { Project } from '../project';
+import { Project } from '../abstract';
 import { FileEvent, IPackageJSON } from '../../models';
 import { info, warn } from '../../helpers';
 import { tryRemoveDir, tryCopyFrom } from '../../index';
 import { copyFile } from '../../helpers';
 import { BuildOptions } from './build-options';
-import { FeatureForProject } from '../feature-for-projects';
+import { FeatureForProject } from '../abstract';
 
 export class CopyManager extends FeatureForProject {
 
@@ -35,6 +35,22 @@ export class CopyManager extends FeatureForProject {
     } else {
       this.copyToProjectsOnFinish()
     }
+  }
+
+  cloneTo(destinationPath: string): Project {
+    const options: fse.CopyOptionsSync = {
+      overwrite: true,
+      recursive: true,
+      errorOnExist: true,
+      filter: (src) => {
+        return !/.*node_modules.*/g.test(src);
+      }
+    };
+    fse.copySync(this.project.location, destinationPath, options);
+    info(`${this.project.type.toUpperCase()} library structure created sucessfully...`);
+    const project = Project.From(destinationPath);
+    info('Done.');
+    return project;
   }
 
   public generateSourceCopyIn(destinationLocation: string,
@@ -136,9 +152,8 @@ export class CopyManager extends FeatureForProject {
 
       if (this.project.isTnp) {
         // console.info('[copyto] TNP INTSTALL')
-        destination.tnpHelper.install()
-      }
-      else {
+        destination.tnpBundle.installAsPackage()
+      } else {
         // console.info('[copyto] NORMAL INTSTALL')
         const monitoredOutDir: string = path.join(this.project.location, outDir)
 

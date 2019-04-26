@@ -4,12 +4,11 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { Project } from '../project';
 import { FilesRecreator } from './files-builder';
 import config from '../../config';
 import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
-import { IncrementalCompilation } from 'morphi/build';
-import { AnglarLibModuleDivider } from './build-isomorphic-lib/angular-lib-module-build';
+import { AnglarLibModuleDivider } from './angular-lib-module-divider';
+import { FeatureCompilerForProject, Project } from '../abstract';
 
 export interface IsomorphicOptions {
   currentProjectName?: string;
@@ -20,7 +19,7 @@ export interface IsomorphicOptions {
 }
 
 
-export class SourceModifier extends IncrementalCompilation {
+export class SourceModifier extends FeatureCompilerForProject {
 
   private options: IsomorphicOptions;
   protected syncAction(): void {
@@ -47,8 +46,8 @@ export class SourceModifier extends IncrementalCompilation {
   }
 
 
-  constructor(private project: Project) {
-    super(`(src|components)/**/*.ts`, '', project && project.location);
+  constructor(public project: Project) {
+    super(`(src|components)/**/*.ts`, '', project && project.location, project);
 
   }
 

@@ -1,7 +1,7 @@
-import { LibType, EnvironmentName } from '../models';
-import { EnvironmentConfig } from './features/environment-config';
-import { Project } from './project';
-
+import { LibType } from './lib-type';
+import { EnvironmentConfig } from '../project/features/environment-config/environment-config';
+import { EnvironmentName } from './environment-name';
+import { Project } from '../project';
 export interface IProject {
   isSite: boolean;
   isCoreProject: boolean;

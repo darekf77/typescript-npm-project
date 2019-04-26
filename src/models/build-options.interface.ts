@@ -1,5 +1,5 @@
 
-import { Project } from '../project/project';
+import { Project } from '../project';
 import { BuildDir } from './build-dir';
 
 export interface IBuildOptions {

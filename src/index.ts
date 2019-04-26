@@ -5,6 +5,7 @@ import { Ora } from 'ora';
 declare global {
   namespace NodeJS {
     interface Global {
+      tnp_normal_mode: boolean;
       testMode: boolean;
       hideWarnings: boolean;
       hideInfos: boolean;

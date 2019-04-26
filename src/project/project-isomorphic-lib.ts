@@ -1,4 +1,4 @@
-import { LibProject } from "./lib-project";
+import { LibProject } from "./abstract";
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-import { Project } from "./project";
+import { Project } from "./abstract";
 
 import { tryCopyFrom, getControllers, getEntites } from "../helpers";
 

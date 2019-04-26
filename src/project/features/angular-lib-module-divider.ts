@@ -5,16 +5,17 @@ import * as path from 'path';
 import * as glob from 'glob';
 
 import { Project } from '../../project';
-import config from '../../../config';
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import config from '../../config';
+import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
 import { IncrementalCompilation } from 'morphi/build';
-import { IsomorphicOptions } from '../source-modifier';
+import { IsomorphicOptions } from './source-modifier';
 import { Helpers } from 'morphi';
-import { tryRemoveDir } from '../../../helpers';
+import { tryRemoveDir } from '../../helpers';
+import { FeatureCompilerForProject } from '../abstract';
 
 
 
-export class AnglarLibModuleDivider extends IncrementalCompilation {
+export class AnglarLibModuleDivider extends FeatureCompilerForProject {
 
   public static nameFor(clientName: string) {
     return `${config.folder.module}-for-${clientName}`;
@@ -52,8 +53,8 @@ export class AnglarLibModuleDivider extends IncrementalCompilation {
   }
 
 
-  constructor(private project: Project) {
-    super(`${config.folder.dist}/**/*.js`, '', project && project.location);
+  constructor(public project: Project) {
+    super(`${config.folder.dist}/**/*.js`, '', project && project.location, project);
 
   }
 

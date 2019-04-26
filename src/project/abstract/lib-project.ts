@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
 
-import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../models";
-import { questionYesNo } from "../helpers";
-import { error, info, warn } from "../helpers";
-import config from "../config";
-import { PackageJSON } from './features/package-json';
+import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../../models";
+import { questionYesNo } from "../../helpers";
+import { error, info, warn } from "../../helpers";
+import config from "../../config";
+import { PackageJSON } from '../features/package-json';
 
-import {  tryCopyFrom } from '../helpers';
+import {  tryCopyFrom } from '../../helpers';
 
 /**
  * Project ready to be build/publish as npm package.

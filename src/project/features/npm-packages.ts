@@ -1,11 +1,11 @@
 //#region @backend
 import chalk from 'chalk';
 
-import { Project } from '../project';
+import { Project } from '../abstract';
 import { info, checkValidNpmPackageName, error, log } from '../../helpers';
 import { link } from '../../scripts/LINK';
 import { unlink } from '../../scripts/UNLINK';
-import { FeatureForProject } from '../feature-for-projects';
+import { FeatureForProject } from '../abstract';
 
 export class NpmPackages extends FeatureForProject {
 
@@ -21,7 +21,7 @@ export class NpmPackages extends FeatureForProject {
       this.installPackage(npmPackagesToAdd);
     }
     if (this.project.isContainer || this.project.isWorkspace) {
-      this.project.tnpHelper.install()
+      this.project.tnpBundle.installAsPackage()
     }
     this.project.packageJson.dedupe()
 

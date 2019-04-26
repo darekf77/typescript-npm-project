@@ -6,13 +6,13 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 
-import { Project } from '../project';
+import { Project } from '../abstract';
 import { config } from '../../config';
-import { IncrementalCompilation } from 'morphi/build';
 import { getEntites, getControllers } from '../../helpers';
+import { FeatureCompilerForProject } from '../abstract';
 
 
-export class FrameworkFilesGenerator extends IncrementalCompilation {
+export class FrameworkFilesGenerator extends FeatureCompilerForProject {
   protected syncAction(): void {
     if (this.project.type === 'isomorphic-lib' && !this.project.isStandaloneProject) {
       this.generateEntityTs()
@@ -29,7 +29,7 @@ export class FrameworkFilesGenerator extends IncrementalCompilation {
   }
 
   constructor(public project: Project) {
-    super(`(src|components)/**/*.ts`, '', project && project.location);
+    super(`(src|components)/**/*.ts`, '', project && project.location, project);
   }
 
 

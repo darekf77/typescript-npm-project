@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Project } from '../../project/project'
+import { Project } from '../../project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
 import { killProcess } from '../../helpers';

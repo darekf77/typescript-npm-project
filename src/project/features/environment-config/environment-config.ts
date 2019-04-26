@@ -15,7 +15,7 @@ import {
 import { Morphi } from 'morphi';
 import config from '../../../config';
 import { EnvConfig, EnvironmentName } from '../../../models';
-import { FeatureForProject } from '../../feature-for-projects';
+import { FeatureForProject } from '../../abstract';
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];

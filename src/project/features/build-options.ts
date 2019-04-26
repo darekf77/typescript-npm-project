@@ -5,7 +5,7 @@ import { error, info } from '../../helpers/helpers-messages';
 //#endregion
 
 import * as _ from 'lodash';
-import { Project } from '../project';
+import { Project } from '../abstract';
 import { IBuildOptions, BuildDir } from '../../models';
 
 export class BuildOptions implements IBuildOptions {

@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 // local
-import { Project } from "./project";
+import { Project } from "./abstract";
 import { ReorganizeArray } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../helpers';

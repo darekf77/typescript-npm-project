@@ -1,7 +1,7 @@
-export * from './project';
-export * from './lib-project';
+
 export * from './project-isomorphic-lib';
 export * from './features/package-json';
+export * from './abstract';
 
 //#region @backend
 export * from './features/baseline-site-join';
@@ -11,3 +11,4 @@ export * from './project-docker';
 export * from './project-ionic-client';
 export * from './project-workspace';
 export * from './project-container';
+//#endregion

@@ -6,8 +6,7 @@ import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
 import { error } from "../../helpers";
-import { Project } from '../project';
-import { FeatureForProject } from '../feature-for-projects';
+import { Project, FeatureForProject } from '../abstract';
 
 export class ProxyRouter extends FeatureForProject {
 

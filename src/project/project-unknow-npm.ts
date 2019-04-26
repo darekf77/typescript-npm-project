@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
-import { Project } from "./project";
+import { Project } from "./abstract";
 import { error } from "../helpers";
 import config from "../config";
 import { BuildOptions } from './features/build-options';
@@ -13,7 +13,7 @@ import { BuildOptions } from './features/build-options';
 /**
  * DO NOT USE environment variables in this project directly
  */
-export class UnknowNpmProject extends Project {
+export class ProjectUnknowNpm extends Project {
   projectSpecyficFiles(): string[] {
     return []
   }
