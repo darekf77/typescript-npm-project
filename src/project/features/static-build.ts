@@ -5,7 +5,6 @@ import { Project, FeatureForProject } from '../abstract';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
 
-
 export class StaticBuild extends FeatureForProject {
 
   private async  regenerateProject(project: Project, buildOptions: BuildOptions, args: string) {
@@ -34,7 +33,7 @@ export class StaticBuild extends FeatureForProject {
     genProject = Project.From(genLocation);
     // genProject.clear()
 
-    await genProject.init.fromArgs(args);
+    await genProject.structure.init(args);
 
     return genProject;
   }

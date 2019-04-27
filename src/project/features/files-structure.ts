@@ -1,18 +1,21 @@
 //#region @backend
+import * as path from 'path';
 import chalk from 'chalk';
 
+import { clearConsole, log } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
 import { TnpDB } from '../../tnp-db';
+import config from '../../config';
 
-export class Initialization extends FeatureForProject {
+export class FilesStructure extends FeatureForProject {
 
 
-  public async fromArgsAndWatch(args: string) {
+  public async initAndWatch(args: string) {
 
-    return this.fromArgs(args, { watch: true })
+    return this.init(args, { watch: true })
   }
 
-  public async fromArgs(args: string,
+  public async init(args: string,
     options?: { watch: boolean }) {
 
     if (!options) {
@@ -141,6 +144,50 @@ export class Initialization extends FeatureForProject {
     if (project.isSite) {
       await this.installTnpHelpersForBaselines(project.baseline)
     }
+  }
+
+
+  private clearGenerated(project: Project, all, recrusive, outDir: string) {
+    log(`Cleaning generated workspace in for ${project.location}`)
+    if (project.isWorkspace) {
+      const genWorkspace = Project.From(path.join(project.location, outDir, project.name))
+      if (genWorkspace) {
+        genWorkspace.clear(all, recrusive);
+      }
+    } else if (project.isWorkspaceChildProject) {
+      const genWorkspaceChild = Project.From(path.join(project.parent.location, outDir, project.parent.name, project.name))
+      if (genWorkspaceChild) {
+        genWorkspaceChild.clear(all, recrusive)
+      }
+    }
+
+  }
+
+
+
+  async  clear(args, all = false) {
+
+    let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
+
+    recrusive = (recrusive || r || all);
+    generated = (generated || g);
+    let project = this.project;
+    if (all && project.isWorkspaceChildProject) {
+      project = project.parent;
+    }
+
+    const db = await TnpDB.Instance;
+    await (db).transaction.addProjectIfNotExist(project);
+    db.transaction.setCommand('tnp clear')
+
+    if (generated) {
+      this.clearGenerated(project, all, recrusive, config.folder.dist)
+      // clearGenerated(project, all, recrusive, config.folder.bundle)
+    } else {
+      project.clear(all, recrusive)
+    }
+
+    process.exit(0)
   }
 
 }

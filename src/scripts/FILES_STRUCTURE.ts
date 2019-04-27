@@ -8,7 +8,7 @@ import { sleep } from 'sleep';
 // init().watch.project()
 
 export async function INIT(args, exit = true) {
-  await Project.Current.init.fromArgs(args);
+  await Project.Current.structure.init(args);
   if (exit) {
     process.exit(0)
   }
@@ -17,8 +17,17 @@ export async function INIT(args, exit = true) {
 
 
 export default {
+  $CLEAN: async (args) => { await Project.Current.structure.clear(args) },
+  $CLEAR: async (args) => { await Project.Current.structure.clear(args) },
+  $CLEAN_ALL: async () => { await Project.Current.structure.clear('', true) },
+  $CLEAR_ALL: async () => { await Project.Current.structure.clear('', true) },
 
   INIT,
+  $REINIT: (args) => {
+    Project.Current.run(`tnp clear`).sync()
+    Project.Current.run(`tnp init`).sync()
+    process.exit(0)
+  },
 
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;

@@ -44,13 +44,13 @@ function SHOW_LOOP_MESSAGES(c = 0, maximum = Infinity, errExit = false) {
 export default {
 
   $TEST_WATCH: async (args: string) => {
-    await Project.Current.init.fromArgs(args);
+    await Project.Current.structure.init(args);
     await Project.Current.tests.startAndWatch(args.trim().split(' '))
     process.exit(0)
   },
 
   $TEST: async (args: string) => {
-    Project.Current.init.fromArgs(args);
+    Project.Current.structure.init(args);
     Project.Current.tests.start(args.trim().split(' '))
     process.exit(0)
   },

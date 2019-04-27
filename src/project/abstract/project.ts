@@ -37,7 +37,7 @@ import { BaselineSiteJoin } from '../features/baseline-site-join';
 import { BaseProject } from './base-project';
 import { TnpBundle } from '../features/tnp-bundle';
 import { StaticBuild } from '../features/static-build';
-import { Initialization } from '../features/initialization';
+import { FilesStructure } from '../features/files-structure';
 import { AutoActions } from '../features/auto-actions';
 import { BuildProcess } from '../features/build-proces';
 
@@ -305,7 +305,7 @@ export class Project extends BaseProject implements IProject {
         if (this.isStandaloneProject) {
           this.packageJson.updateHooks()
         }
-        this.init = new Initialization(this);
+        this.structure = new FilesStructure(this);
         this.buildProcess = new BuildProcess(this);
       } else {
         warn(`Invalid project location: ${location}`);

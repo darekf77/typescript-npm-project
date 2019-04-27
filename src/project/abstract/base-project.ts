@@ -38,7 +38,7 @@ import { NpmPackages } from '../features/npm-packages';
 import { BaselineSiteJoin } from '../features/baseline-site-join';
 import { Project } from './project';
 import { StaticBuild } from '../features/static-build';
-import { Initialization } from '../features/initialization';
+import { FilesStructure } from '../features/files-structure';
 import { AutoActions } from '../features/auto-actions';
 import { BuildProcess } from '../features/build-proces';
 
@@ -73,7 +73,7 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  public init: Initialization;
+  public structure: FilesStructure;
   //#endregion
 
   //#region @backend

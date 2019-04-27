@@ -5,14 +5,12 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { EnumValues } from 'enum-values'
-import { buildLib, buildApp } from './scripts/BUILD';
 import { CommandInstance } from './tnp-db/entites';
 import { killProcessByPort } from './helpers';
 import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
 import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
-import { clear } from './scripts/CLEAR';
 import { killAll } from './scripts/KILL';
 inquirer.registerPrompt('autocomplete', inquirerAutocomplete)
 
@@ -146,28 +144,28 @@ export class ConsoleUi {
 
       case CHOICE.INIT:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.init.fromArgs('');
+        await Project.Current.structure.init('');
         process.exit(0)
         break;
 
       case CHOICE.BUILD_APP_WATCH:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await buildApp(false, true, 'dist', '')
+        await Project.Current.buildProcess.startForApp(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST_WATCH:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await buildLib(false, true, 'dist', '')
+        await Project.Current.buildProcess.startForLib(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_APP:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await buildApp(false, false, 'dist', '')
+        await Project.Current.buildProcess.startForApp(false, false, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await buildLib(false, false, 'dist', '')
+        await Project.Current.buildProcess.startForLib(false, false, 'dist', '')
         break;
 
       case CHOICE.LAST_USED_COMMAND:
@@ -177,7 +175,7 @@ export class ConsoleUi {
         break;
 
       case CHOICE.CLEAR:
-        await clear('')
+        await Project.Current.structure.clear('')
         break;
 
       case CHOICE.CLEAR_RECUSIVE_WITH_NODE_MODUELS:
