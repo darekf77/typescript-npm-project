@@ -29,7 +29,7 @@ export class PackageJSON {
   }
   public static fromLocation(location: string, project: Project = null, warings = true): PackageJSON {
 
-    const isTnpProject = (location === path.join(__dirname, '..'));
+    const isTnpProject = (location === config.pathes.tnp_folder_location);
     const filePath = path.join(location, 'package.json');
     if (!fs.existsSync(filePath)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)

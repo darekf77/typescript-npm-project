@@ -10,12 +10,13 @@ import {
   saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
   overrideWorksapceRouterPort
 } from './environment-config-helpers';
+import { FeatureForProject } from '../../abstract';
 //#endregion
 
 import { Morphi } from 'morphi';
 import config from '../../../config';
 import { EnvConfig, EnvironmentName } from '../../../models';
-import { FeatureForProject } from '../../abstract';
+
 
 //#region @backend
 const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
@@ -25,7 +26,11 @@ export interface IEnvironmentConfig {
   readonly config: EnvConfig
 }
 
-export class EnvironmentConfig extends FeatureForProject {
+export class EnvironmentConfig
+  //#region @backend
+  extends FeatureForProject
+//#endregion
+{
 
   browser: IEnvironmentConfig;
   //#region @backend

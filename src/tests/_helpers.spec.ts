@@ -6,9 +6,9 @@ import { IPackageJSON } from '../models';
 import config from '../config';
 
 const PATHES = {
-  BASE_FOLDER_TEST: path.join(__dirname, '..', '..', config.folder.tnp_tests_context),
-  TNP_DB_FOT_TESTS: path.join(__dirname, '..', '..', `bin`, config.folder.tnp_db_for_tests_json)
-}
+  BASE_FOLDER_TEST: config.pathes.tnp_tests_context,
+  TNP_DB_FOT_TESTS: config.pathes.tnp_db_for_tests_json,
+};
 
 
 function RemoveTestCatalogs() {

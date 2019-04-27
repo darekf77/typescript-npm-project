@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 
-import { Project } from "../abstract";
+import { Project } from '../abstract';
 import { ArrNpmDependencyType, InstalationType } from '../../models';
 import { HelpersLinks, error, info, warn, log, run } from "../../helpers";
 import config from '../../config';

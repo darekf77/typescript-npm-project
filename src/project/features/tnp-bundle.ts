@@ -16,25 +16,12 @@ export class TnpBundle extends FeatureForProject {
 
   private notNeededReinstallationTnp = {};
 
-  //#region @backend
   private reinstallCounter = 1;
-  //#endregion
 
-
-  //#region @backend
   public installAsPackage() {
 
     if (!Project.Tnp) {
-      // console.log(Project.Current.location)
-      // console.log('dirname', __dirname)
-      return {
-        install() {
-          // console.log('install tnp from recreate', installFromRecreate)
-          // console.log('TRACE BELOW IT IS NOT ERROR... JUST TRACING...')
-          console.trace(`** ERR Project.Tnp not available yet`)
-        }
-
-      } // TODO QUCIK FIX for tnp installd in node_modules
+      console.trace(`** ERR Project.Tnp not available yet`)
     }
 
     let pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.dist);
@@ -67,7 +54,7 @@ export class TnpBundle extends FeatureForProject {
 
 
   }
-  //#endregion
+
 
   // checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
   //   const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
@@ -171,8 +158,7 @@ export class TnpBundle extends FeatureForProject {
       // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
     }
   }
-  //#endregion
+
 }
 
-
-
+ //#endregion

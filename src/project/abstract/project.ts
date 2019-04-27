@@ -1,8 +1,6 @@
 //#region @backend
 import chalk from 'chalk';
 import * as fs from 'fs';
-import * as rimraf from 'rimraf';
-
 import * as fse from "fs-extra";
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -11,7 +9,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 
 import config from '../../config';
-import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, IProject } from '../../models';
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
   pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log
@@ -21,15 +19,6 @@ import { FilesRecreator } from '../features/files-builder';
 import { ProxyRouter } from '../features/proxy-router';
 import { CopyManager } from '../features/copy-manager';
 import { SourceModifier } from '../features/source-modifier';
-import { FrameworkFilesGenerator } from '../features/framework-files-generator';
-import { TnpDB } from '../../tnp-db';
-//#endregion
-
-import { Morphi, ModelDataConfig } from 'morphi';
-
-import { LibType, EnvironmentName, NpmDependencyType } from '../../models';
-import { PackageJSON } from "../features/package-json";
-import { EnvironmentConfig } from '../features/environment-config';
 import { TestRunner } from '../features/test-runner';
 import { BuildOptions } from '../features/build-options';
 import { NpmPackages } from '../features/npm-packages';
@@ -39,6 +28,15 @@ import { StaticBuild } from '../features/static-build';
 import { FilesStructure } from '../features/files-structure';
 import { AutoActions } from '../features/auto-actions';
 import { BuildProcess } from '../features/build-proces';
+import { FrameworkFilesGenerator } from '../features/framework-files-generator';
+import { TnpDB } from '../../tnp-db';
+//#endregion
+
+import { Morphi, ModelDataConfig } from 'morphi';
+import { EnvironmentConfig } from '../features/environment-config';
+import { PackageJSON } from '../features/package-json';
+import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+
 
 
 export abstract class BaseProject {
@@ -197,7 +195,7 @@ export abstract class BaseProject {
       return this.browser.parent;
     }
     //#region @backend
-    return _.isString(this.location) &&  Project.From(path.join(this.location, '..'));
+    return _.isString(this.location) && Project.From(path.join(this.location, '..'));
     //#endregion
   }
   get preview(): Project {
@@ -934,12 +932,15 @@ export class Project extends BaseProject implements IProject {
   //#endregion
   public readonly location: string;
 
+  //#region @backend
   private static typeFrom(location: string): LibType {
     const packageJson = PackageJSON.fromLocation(location);
     const type = packageJson.type;
     return type;
   }
+  //#endregion
 
+  //#region @backend
   public static From(location: string): Project {
 
     if (!_.isString(location)) {
@@ -953,55 +954,57 @@ export class Project extends BaseProject implements IProject {
       return alreadyExist;
     }
     if (!fs.existsSync(location)) {
-      warn(`[project.from] Cannot find project in location: ${location}`)
+      // warn(`[project.from] Cannot find project in location: ${location}`)
       return;
     }
     if (!PackageJSON.fromLocation(location)) {
-      warn(`[project.from] Cannot find package.json in location: ${location}`)
+      // warn(`[project.from] Cannot find package.json in location: ${location}`)
       return;
     };
     const type = this.typeFrom(location);
 
     let resultProject: Project;
     if (type === 'isomorphic-lib') {
-      const ProjectIsomorphicLib = require('./project-isomorphic-lib');
+      const { ProjectIsomorphicLib } = require('../project-isomorphic-lib');
       resultProject = new ProjectIsomorphicLib(location);
     }
     if (type === 'angular-lib') {
-      const ProjectAngularLib = require('./project-angular-lib')
+      const { ProjectAngularLib } = require('../project-angular-lib')
       resultProject = new ProjectAngularLib(location);
     }
     if (type === 'angular-client') {
-      const ProjectAngularClient = require('./project-angular-client');
+      const { ProjectAngularClient } = require('../project-angular-client');
       resultProject = new ProjectAngularClient(location);
     }
     if (type === 'workspace') {
-      const ProjectWorkspace = require('./project-workspace');
+      const { ProjectWorkspace } = require('../project-workspace');
       resultProject = new ProjectWorkspace(location);
     }
     if (type === 'docker') {
-      const ProjectDocker = require('./project-docker');
+      const { ProjectDocker } = require('../project-docker');
       resultProject = new ProjectDocker(location);
     }
     if (type === 'ionic-client') {
-      const ProjectIonicClient = require('./project-ionic-client');
+      const { ProjectIonicClient } = require('../project-ionic-client');
       resultProject = new ProjectIonicClient(location);
     }
     if (type === 'unknow-npm-project') {
-      const UnknowNpmProject = require('./project-unknow-npm');
-      resultProject = new UnknowNpmProject(location);
+      const { ProjectUnknowNpm } = require('../project-unknow-npm');
+      resultProject = new ProjectUnknowNpm(location);
     }
     if (type === 'container') {
-      const ProjectContainer = require('./project-container');
+      const { ProjectContainer } = require('../project-container');
       resultProject = new ProjectContainer(location);
     }
     // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
-    log(`Result project: ${resultProject.name}`)
+    // log(`[project.from] Result project: ${resultProject.name}`)
     return resultProject;
   }
+  //#endregion
 
+  //#region @backend
   public static nearestTo(location: string) {
     // console.log('nearestPorjectLocaiont', location)
     const project = this.From(location);
@@ -1014,6 +1017,8 @@ export class Project extends BaseProject implements IProject {
     }
     return this.From(path.resolve(location));
   }
+  //#endregion
+
 
   public static DefaultPortByType(type: LibType): number {
     if (type === 'workspace') { return 5000; }
@@ -1022,7 +1027,10 @@ export class Project extends BaseProject implements IProject {
     if (type === 'ionic-client') { return 8080; }
     if (type === 'docker') { return 5000; }
     if (type === 'isomorphic-lib') { return 4000; }
-    error(`[project] Cannot resove type for: ${type}`);
+    if (type === 'container' || type === 'unknow-npm-project') {
+      return;
+    }
+    // error(`[project] Cannot resove type for: ${type}`);
   }
 
   public static get isBundleMode() {
@@ -1050,9 +1058,9 @@ export class Project extends BaseProject implements IProject {
   //#region @backend
   static get Tnp() {
 
-    let tnp = Project.From(config.pathes.TNP_PROJECT);
+    let tnp = Project.From(config.pathes.tnp_folder_location);
     if (tnp) {
-      const currentPathInSystem = path.join(tnp.location, config.file.tnp_system_path_txt );
+      const currentPathInSystem = path.join(tnp.location, config.file.tnp_system_path_txt);
       if (!fse.existsSync(currentPathInSystem)) {
         fse.writeFileSync(currentPathInSystem, tnp.location, 'utf8')
       }
@@ -1070,23 +1078,18 @@ export class Project extends BaseProject implements IProject {
   //#region @backend
   public static by(libraryType: LibType): Project {
 
-    // console.log('by libraryType ' + libraryType)
-    let projectPath;
     if (libraryType === 'workspace') {
-      let p = Project.From(path.join(__dirname, `../../projects/container/workspace`));
-      if (!p) {
-        p = Project.From(path.join(__dirname, `../projects/container/workspace`));
-      }
-      return p;
+      const workspaceProject = Project.From(config.pathes.projectsExamples.workspace);
+      return workspaceProject;
     }
-    projectPath = path.join(__dirname, `../../projects/container/workspace/${libraryType}`);
-    if (fse.existsSync(projectPath)) {
-      return Project.From(projectPath);
+    if (libraryType === 'container') {
+      const workspaceProject = Project.From(config.pathes.projectsExamples.container);
+      return workspaceProject;
     }
-    projectPath = path.join(__dirname, `../projects/container/workspace/${libraryType}`);
-    if (!fs.existsSync(projectPath)) {
+
+    const projectPath = path.join(config.pathes.projectsExamples.workspace, libraryType);
+    if (!fse.existsSync(projectPath)) {
       error(`Bad library type: ${libraryType}`, true)
-      return undefined;
     }
     return Project.From(projectPath);
   }

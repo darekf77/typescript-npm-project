@@ -1,7 +1,10 @@
 //#region @backend
 import chalk from 'chalk';
+//#endregion
+import { Morphi } from 'morphi';
 import config from '../config';
 
+//#region @backend
 declare global {
   namespace NodeJS {
     interface Global {
@@ -9,9 +12,13 @@ declare global {
     }
   }
 }
-
+//#endregion
 
 export function error(details: any, noExit = false, noTrace = false) {
+  if (Morphi.IsBrowser) {
+    console.error(details)
+  }
+  //#region @backend
   // Error.stackTraceLimit = Infinity;
   if (typeof details === 'object') {
     try {
@@ -42,23 +49,38 @@ export function error(details: any, noExit = false, noTrace = false) {
       process.exit(1);
     }
   }
+  //#endregion
 }
 
 export function info(details: string) {
-  // console.log('global.muteMessages',global.muteMessages)
+  if (Morphi.IsBrowser) {
+    console.info(details)
+  }
+  //#region @backend
   !(global.muteMessages && global.hideInfos) && console.log(chalk.green(details))
+  //#endregion
 }
 
 export function log(details: string) {
+  if (Morphi.IsBrowser) {
+    console.log(details)
+  }
+  //#region @backend
   // console.log('global.muteMessages',global.muteMessages)
   !(global.muteMessages && global.hideLog) && console.log(chalk.gray(details))
+  //#endregion
 }
 
 export function warn(details: string, trace = false) {
+  if (Morphi.IsBrowser) {
+    console.warn(details)
+  }
+  //#region @backend
   if (trace) {
     !(global.muteMessages && global.hideWarnings) && console.trace(chalk.yellow(details))
   } else {
     !(global.muteMessages && global.hideWarnings) && console.log(chalk.yellow(details))
   }
+  //#endregion
 }
-//#endregion
+

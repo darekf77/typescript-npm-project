@@ -37,7 +37,7 @@ export async function start(argsv: string[], spinner?: Ora) {
     }
     if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
       recognized = true;
-      const localPath = path.join(__dirname, '..', 'node_modules/.bin', localLib)
+      const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
       const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
       try {
         spinner && spinner.stop()
@@ -52,9 +52,9 @@ export async function start(argsv: string[], spinner?: Ora) {
   // await initWatcherDB();
   // process.stdin.resume();
 
-  const helpFile = glob.sync(path.join(__dirname, '/scripts/HELP.js'))[0]
+  const helpFile = glob.sync(config.pathes.scripts.HELP_js)[0]
   const files = [helpFile]
-    .concat(glob.sync(path.join(__dirname, '/scripts/**/*.js')).filter(f => f != helpFile))
+    .concat(glob.sync(config.pathes.scripts.allPattern).filter(f => f !== helpFile));
 
 
   const functions: Function[] = []

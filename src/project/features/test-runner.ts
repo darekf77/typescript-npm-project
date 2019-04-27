@@ -1,16 +1,20 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
+import { FeatureForProject } from '../abstract';
 //#endregion
 
 import config from '../../config';
-import { FeatureForProject } from '../abstract';
 import { error } from '../../helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 
 
-export class TestRunner extends FeatureForProject {
+export class TestRunner
+  //#region @backend
+  extends FeatureForProject
+//#endregion
+{
 
   //#region @backend
   fileCommand(files: string[]) {

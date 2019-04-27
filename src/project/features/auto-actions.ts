@@ -5,24 +5,24 @@ import * as _ from 'lodash';
 
 import { FeatureForProject, Project } from '../abstract';
 import { AutoActionsUser, ProjectForAutoRelease, ProjectForAutoBuild } from '../../models';
-import { config as globalConfig } from '../../config';
+import { config } from '../../config';
 import { info, error } from '../../helpers';
 
 export class AutoActions extends FeatureForProject {
 
-  readonly config: AutoActionsUser;
+  readonly configuration: AutoActionsUser;
 
   constructor(public project: Project) {
     super(project);
 
-    const autobuildjsonfilePath = path.join(Project.Tnp.location, globalConfig.file.autob_actions_js);
-    this.config = require(`${autobuildjsonfilePath}`);
+    const autobuildjsonfilePath = path.join(config.pathes.tnp_folder_location, config.file.autob_actions_js);
+    this.configuration = require(`${autobuildjsonfilePath}`);
   }
 
 
   release() {
 
-    const autoreleases: ProjectForAutoRelease[] = this.config.autoreleases;
+    const autoreleases: ProjectForAutoRelease[] = this.configuration.autoreleases;
     if (!_.isArray(autoreleases)) {
       error(`No autoreleases in autobuild.json.`)
     }
@@ -48,7 +48,7 @@ export class AutoActions extends FeatureForProject {
   private getBuild() {
 
 
-    const build: ProjectForAutoBuild = this.config.builds
+    const build: ProjectForAutoBuild = this.configuration.builds
       .find(b => {
         const p = Project.From(b.cwd);
 
@@ -79,3 +79,5 @@ export class AutoActions extends FeatureForProject {
   }
 
 }
+
+//#endregion

@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 
 import { SpecWrap } from "./_helpers.spec";
 import { NEW } from '../scripts/NEW';
-import { INIT } from '../scripts/INIT';
+import { INIT } from '../scripts/FILES_STRUCTURE';
 
 
 

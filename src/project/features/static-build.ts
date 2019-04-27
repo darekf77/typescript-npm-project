@@ -60,5 +60,7 @@ export class StaticBuild extends FeatureForProject {
     }
     return project;
   }
-  //#endregion
+
 }
+
+ //#endregion

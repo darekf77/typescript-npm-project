@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as  psList from 'ps-list';
 import * as sleep from 'sleep';
 
-import { runSyncOrAsync } from '../helpers';
+import { runSyncOrAsync, log } from '../helpers';
 
 import { DbCrud } from './db-crud';
 import {
@@ -26,6 +26,7 @@ import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
 import chalk from 'chalk';
 import { BuildOptions } from '../project/features/build-options';
+import config from '../config';
 
 export type ProcessBoundAction = (
   process: ProcessInstance
@@ -142,7 +143,7 @@ export class DBTransaction {
       let d = await action1(void 0);
       let proc = await this.boundProcess(d.metaInfo, d.relation1TO1entityId);
       d = await action2(proc);
-      if(d) {
+      if (d) {
         await this.boundProcess(d.metaInfo, d.relation1TO1entityId);
       }
     });
@@ -202,11 +203,13 @@ export class DBTransaction {
   private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
     name = '-'
-    let debug = false;
+    const debug = false;
 
-    debug && console.log(`Transaction started for pid: ${process.pid}, name: ${chalk.bold(name)}`)
+    debug && log(`Transaction started for pid: ${process.pid},`
+      + ` name: ${chalk.bold(name)}`)
+
     let rewriteFile = true;
-    const transactionFilePath = path.join(__dirname, '..', '..', 'tmp-transaction-pid.txt');
+    const transactionFilePath = config.pathes.tmp_transaction_pid_txt;
 
     if (fse.existsSync(transactionFilePath)) {
       try {

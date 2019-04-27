@@ -12,10 +12,11 @@ import { expect, use } from 'chai'
 import { Range } from '../helpers';
 import { DBBaseEntity, PortInstance, DomainInstance, BuildInstance, CommandInstance, ProjectInstance } from '../tnp-db/entites';
 import { DbCrud } from '../tnp-db/db-crud';
+import config from '../config';
 
 
 function db() {
-  let location = path.join(__dirname, '..', '..', 'tmp-db-tests.json')
+  let location = config.pathes.tmp_db_tests_json;
   if (fse.existsSync(location)) {
     fse.unlinkSync(location)
   }

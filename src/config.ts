@@ -14,57 +14,81 @@ const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'
 // environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
 
+const file = {
+  autob_actions_js: 'auto-actions.js',
+  package_json: 'package.json',
+  tnpBundle: 'tnp-bundle',
+  tnpEnvironment_json: 'tmp-environment.json',
+  environment: 'environment',
+  tnp_system_path_txt: 'tnp-system-path.txt',
+  tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
+  tmp_db_tests_json: 'tmp-db-tests.json'
+};
+
+const folder = {
+  scripts: 'scripts',
+  bundle: 'bundle',
+  bower: 'bower',
+  vendor: 'vendor',
+  dist: 'dist',
+  src: 'src',
+  tempSrc: 'tmp-src',
+  previewDistApp: 'dist-app',
+  browser: 'browser',
+  module: 'module',
+  custom: 'custom',
+  components: 'components',
+  node_modules: 'node_modules',
+  assets: 'assets',
+  apps: 'apps',
+  // entities: 'entities',
+  // controllers: 'controllers',
+  projects: 'projects',
+  workspace: 'workspace',
+  container: 'container',
+  client: 'client',
+  bin: 'bin',
+  _bin: '.bin',
+  tnp_tests_context: 'tmp-tests-context',
+  tnp_db_for_tests_json: 'db-for-tests.json'
+};
+
+function pathResolved(...partOfPath: string[]) {
+  return path.resolve(path.join(...partOfPath))
+}
+
 export const config = {
   CONST: {
     TEST_TIMEOUT: 3600000
   },
   tnp: 'tnp',
-  get pathes() {
-    return {
-      TNP_PROJECT: path.join(__dirname, '..'),
-      tnp_system_path_txt: path.join(__dirname, '..', config.file.tnp_system_path_txt),
-      projectsExamples: {
-        workspace: path.join(__dirname, `../projects/container/workspace`)
-      }
+  pathes: {
+
+    tnp_folder_location: pathResolved(__dirname, '..'),
+
+    tnp_system_path_txt: pathResolved(__dirname, '..', file.tnp_system_path_txt),
+    tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
+    tmp_db_tests_json: pathResolved(__dirname, '..', file.tmp_db_tests_json),
+
+    tnp_tests_context: pathResolved(__dirname, '..', folder.tnp_tests_context),
+    tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, folder.tnp_db_for_tests_json),
+
+    bin_in_node_modules: pathResolved(__dirname, '..', folder.node_modules, folder._bin),
+
+    scripts: {
+      HELP_js: pathResolved(__dirname, folder.scripts, 'HELP.js'),
+      allHelpFiles: path.join(__dirname, folder.scripts, '/*.js'),
+      allPattern: path.join(__dirname, `/${folder.scripts}/**/*.js`),
+    },
+
+    projectsExamples: {
+      workspace: pathResolved(__dirname, `../projects/container/workspace`),
+      container: pathResolved(__dirname, `../projects/container`)
     }
   },
   allowedEnvironments,
-  folder: {
-    bundle: 'bundle',
-    bower: 'bower',
-    vendor: 'vendor',
-    dist: 'dist',
-    src: 'src',
-    tempSrc: 'tmp-src',
-    previewDistApp: 'dist-app',
-    browser: 'browser',
-    module: 'module',
-    custom: 'custom',
-    components: 'components',
-    node_modules: 'node_modules',
-    assets: 'assets',
-    apps: 'apps',
-    // entities: 'entities',
-    // controllers: 'controllers',
-    projects: 'projects',
-    workspace: 'workspace',
-    container: 'container',
-    client: 'client',
-    bin: 'bin',
-    _bin: '.bin',
-    tnp_tests_context: 'tmp-tests-context',
-    tnp_db_for_tests_json: 'db-for-tests.json'
-  },
-  get file() {
-    return {
-      autob_actions_js: 'auto-actions.js',
-      package_json: 'package.json',
-      tnpBundle: 'tnp-bundle',
-      tnpEnvironment_json: 'tmp-environment.json',
-      environment: 'environment',
-      tnp_system_path_txt: 'tnp-system-path.txt'
-    }
-  },
+  folder,
+  file,
   default: {
     cloud: {
       environment: {
