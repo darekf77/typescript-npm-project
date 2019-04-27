@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Project } from '../../project/project';
+import { Project } from '../../project';
 import { SystemService } from '../../models/system-service';
 import { Range } from '../../helpers';
 import { DBBaseEntity } from './base-entity';

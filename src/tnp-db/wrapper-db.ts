@@ -14,7 +14,7 @@ import {
   BaseController,
   ProcessController
 } from './controllers';
-import { Project } from '../project/project';
+import { Project } from '../project';
 import { error, warn } from '../helpers';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';

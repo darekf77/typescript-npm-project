@@ -1,7 +1,7 @@
 //#region @backend
 import * as path from 'path';
 // local
-import { Project } from "./project";
+import { Project } from "./abstract";
 import config from "../config";
 import { BuildOptions } from './features/build-options';
 

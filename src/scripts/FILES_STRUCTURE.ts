@@ -23,9 +23,9 @@ export default {
   $CLEAR_ALL: async () => { await Project.Current.structure.clear('', true) },
 
   INIT,
-  $REINIT: (args) => {
-    Project.Current.run(`tnp clear`).sync()
-    Project.Current.run(`tnp init`).sync()
+  async $REINIT(args) {
+    Project.Current.structure.clear(args);
+    Project.Current.structure.init(args);
     process.exit(0)
   },
 

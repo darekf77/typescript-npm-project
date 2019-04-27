@@ -1,5 +1,5 @@
 //#region @backend
-import { Project } from "./project";
+import { Project } from "./abstract";
 import { BuildOptions } from './features/build-options';
 
 
