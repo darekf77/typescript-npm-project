@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-
+import * as path from 'path';
 
 import { LibType, EnvironmentName } from './models';
 
@@ -19,6 +19,15 @@ export const config = {
     TEST_TIMEOUT: 3600000
   },
   tnp: 'tnp',
+  get pathes() {
+    return {
+      TNP_PROJECT: path.join(__dirname, '..'),
+      tnp_system_path_txt: path.join(__dirname, '..', config.file.tnp_system_path_txt),
+      projectsExamples: {
+        workspace: path.join(__dirname, `../projects/container/workspace`)
+      }
+    }
+  },
   allowedEnvironments,
   folder: {
     bundle: 'bundle',
@@ -46,13 +55,15 @@ export const config = {
     tnp_tests_context: 'tmp-tests-context',
     tnp_db_for_tests_json: 'db-for-tests.json'
   },
-  file: {
-    autob_actions_js: 'auto-actions.js',
-    package_json: 'package.json',
-    tnpBundle: 'tnp-bundle',
-    tnpEnvironment_json: 'tmp-environment.json',
-    environment: 'environment',
-    tnp_system_path_txt: 'tnp-system-path.txt'
+  get file() {
+    return {
+      autob_actions_js: 'auto-actions.js',
+      package_json: 'package.json',
+      tnpBundle: 'tnp-bundle',
+      tnpEnvironment_json: 'tmp-environment.json',
+      environment: 'environment',
+      tnp_system_path_txt: 'tnp-system-path.txt'
+    }
   },
   default: {
     cloud: {

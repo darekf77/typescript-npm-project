@@ -178,7 +178,7 @@ export abstract class LibProject extends Project {
       this.packageJson.hide('hide after release')
       this.commit(newVersion);
     }, () => {
-      if (this.isBundleMode) {
+      if (Project.isBundleMode) {
         return
       } else {
         process.exit(0)

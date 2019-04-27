@@ -113,7 +113,7 @@ export default {
     // process.exit(0)
   },
   $isbundlemode(args) {
-    console.log('IS BUNDLE MODE? ', Project.Current.isBundleMode)
+    console.log('IS BUNDLE MODE? ', Project.isBundleMode)
     process.exit(0)
   },
   $ASSETS: () => recreate(),
