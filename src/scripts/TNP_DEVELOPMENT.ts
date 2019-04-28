@@ -1,9 +1,10 @@
 //#region @backend
+import * as _ from 'lodash';
 import { Project, LibProject } from "../project";
 import { BaselineSiteJoin } from "../project/features/baseline-site-join";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';
-import { error } from '../helpers';
+import { error, info } from '../helpers';
 import chalk from 'chalk';
 import { getMostRecentFilesNames } from '../helpers';
 import { Helpers as HelpersMorphi } from "morphi";
@@ -11,7 +12,51 @@ import { run } from "../helpers";
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
+import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
+
+function copyModuleto(args: string) {
+  let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
+  if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
+    if (packageName.startsWith(`${config.folder.node_modules}/`)) {
+      packageName = packageName.replace(`${config.folder.node_modules}/`, '')
+    }
+    if (!path.isAbsolute(project)) {
+      project = Project.From(path.join(process.cwd(), project)) as Project;
+    } else {
+      project = Project.From(project) as Project;
+    }
+
+    project.node_modules.copy(packageName).to(project);
+    info(`Copy DONE`)
+  } else {
+    error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
+  }
+  process.exit(0)
+}
+
+
+function copy(destLocaiton) {
+
+  const currentLib = (Project.Current as LibProject);
+  const destination = Project.From(destLocaiton);
+  if (!destination) {
+    error(`Incorect project in: ${destLocaiton}`)
+  }
+  currentLib.copyManager.copyBuildedDistributionTo(destination);
+  info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
+}
+
+function copyto(args: string) {
+
+  const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
+
+  destLocaitons.forEach(c => copy(c));
+
+
+  process.exit(0)
+}
+
 
 function recreate() {
   Project.Current.recreate.assets()
@@ -22,6 +67,16 @@ function recreate() {
 
 function version() {
   console.log(Project.Tnp.version);
+  process.exit(0)
+}
+
+function DEPS_SHOW(args: string) {
+  Project.Current.packageJson.show('deps show')
+  process.exit(0)
+}
+
+function DEPS_HIDE(args: string) {
+  Project.Current.packageJson.hide('deps hide')
   process.exit(0)
 }
 
@@ -144,6 +199,58 @@ export default {
     HelpersMorphi.checkEnvironment()
     process.exit(0)
   },
+
+  $DEPS_CORE() {
+    Project.Current.packageJson.coreRecreate()
+    process.exit(0)
+  },
+
+  $DEDUPE(args: string) {
+    Project.Current.packageJson.dedupe(args.split(' '))
+    process.exit(0)
+  },
+
+  $DEPS_DEDUPE(args: string) {
+    Project.Current.packageJson.dedupe()
+    process.exit(0)
+  },
+
+  DEPS_SHOW,
+  $DEPS_RECREATE(args: string) {
+    DEPS_SHOW(args)
+  },
+
+  DEPS_SHOW_IF_STANDALONE(args: string) {
+    if (Project.Current.isStandaloneProject) {
+      info(`Showing deps for standalone project`)
+      Project.Current.packageJson.show('is standalone show')
+    }
+    commitWhatIs(`show package.json dependencies`)
+    process.exit(0)
+  },
+
+  DEPS_HIDE,
+  $DEPS_CLEAN(args: string) {
+    DEPS_HIDE(args)
+  },
+
+  $copytoproject: (args) => {
+    copyto(args)
+  },
+  $copy_to_project: (args) => {
+    copyto(args)
+  },
+  $copyto: (args) => {
+    copyto(args)
+  },
+  $copymoduletoproject: (args) => {
+    copyModuleto(args)
+  },
+  $copy_module_to_project: (args) => {
+    copyModuleto(args)
+  }
+
+
 }
 
 //#endregion

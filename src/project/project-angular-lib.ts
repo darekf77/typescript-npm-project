@@ -1,10 +1,12 @@
 //#region @backend
 import chalk from 'chalk';
+import * as fse from 'fs-extra';
 import * as _ from 'lodash';
+import * as path from 'path';
 import { LibProject } from "./abstract";
 import { ProjectAngularClient } from "./project-angular-client";
 import { BuildDir } from "../models";
-import { error } from "../helpers";
+import { error, tryRemoveDir } from "../helpers";
 import config from "../config";
 import { Project } from './abstract';
 import { AnglarLibModuleDivider } from './features/angular-lib-module-divider';
@@ -60,7 +62,8 @@ export class ProjectAngularLib extends LibProject {
     if (watch) {
       this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
-        this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
+        tryRemoveDir(path.join(this.location, config.folder.module));
+        fse.symlinkSync(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
       }
       this.run(`npm-run gulp inline-templates-${outDir}-watch`,
         { output: false, outputLineReplace }).async()
@@ -73,9 +76,10 @@ export class ProjectAngularLib extends LibProject {
         this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
         this.run(`npm-run gulp inline-templates-${outDir}`,
           { output: false, outputLineReplace }).sync()
-        this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`,{ output: true, outputLineReplace }).sync()
+        this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
         if (outDir === 'dist') {
-          this.run(`rimraf ${config.folder.module} && tnp ln ${outDir} ./${config.folder.module}`).sync()
+          tryRemoveDir(path.join(this.location, config.folder.module));
+          fse.symlinkSync(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
         }
       }, `angular-lib (project ${this.name})`)
     }
@@ -98,7 +102,7 @@ export class ProjectAngularLib extends LibProject {
         if (watch) {
           await this.buildLib(outDir, forClient as Project[], prod, false);
           this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
-          if(compileOnce) {
+          if (compileOnce) {
             return;
           }
           await this.buildLib(outDir, forClient as Project[], prod, true)

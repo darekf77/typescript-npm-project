@@ -177,16 +177,15 @@ export class PackageJSON {
 
   }
 
-  show(reasonToShowPackages = '') {
+
+
+
+  show(reasonToShowPackages: string) {
     this.reasonToShowPackages = reasonToShowPackages;
-    this.saveForInstall(true)
+    this.saveForInstall(true);
   }
 
-  hide(reasonToHidePackages = '') {
-    if (this.project.isContainer || this.project.isTnp) {
-      log(`[packagejson] don't hide packages for container type or Tnp`)
-      return
-    }
+  hide(reasonToHidePackages: string) {
     this.reasonToHidePackages = reasonToHidePackages;
     this.saveForInstall(false)
   }

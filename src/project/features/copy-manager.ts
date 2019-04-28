@@ -37,22 +37,6 @@ export class CopyManager extends FeatureForProject {
     }
   }
 
-  cloneTo(destinationPath: string): Project {
-    const options: fse.CopyOptionsSync = {
-      overwrite: true,
-      recursive: true,
-      errorOnExist: true,
-      filter: (src) => {
-        return !/.*node_modules.*/g.test(src);
-      }
-    };
-    fse.copySync(this.project.location, destinationPath, options);
-    info(`${this.project.type.toUpperCase()} library structure created sucessfully...`);
-    const project = Project.From(destinationPath);
-    info('Done.');
-    return project;
-  }
-
   public generateSourceCopyIn(destinationLocation: string,
     options?: { override?: boolean; filterForBundle?: boolean; showInfo?: boolean; }): boolean {
 
@@ -121,8 +105,10 @@ export class CopyManager extends FeatureForProject {
   }
 
 
-  public copyBuildedDistributionTo(destination: Project, options?: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }) {
-    const { specyficFileRelativePath = undefined, outDir = 'dist' } = options;
+  public copyBuildedDistributionTo(destination: Project,
+    options?: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }) {
+
+    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options;
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
       warn(`Invalid project: ${destination.name}`)

@@ -43,7 +43,7 @@ function newProject(type: LibType, name: string, cwd: string) {
   const destinationPath = getDestinationPath(name, cwd);
   if (project) {
     try {
-      project.copyManager.cloneTo(destinationPath);
+      project.copyManager.generateSourceCopyIn(destinationPath);
       // console.log(destinationPath)
       pacakgeJsonNameFix(destinationPath, type)
       info(`Project ${project.name} create successfully`);

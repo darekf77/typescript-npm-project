@@ -14,7 +14,9 @@ import { FeatureForProject } from '../abstract';
 export class NodeModules extends FeatureForProject {
 
   installFrom(source: Project, triggerMsg: string) {
+    source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
     log(`copy instalation of npm packages from ${source.genericName} ${triggerMsg}`)
+    global.spinner.start()
     ArrNpmDependencyType.forEach(depName => {
       source.getDepsAsProject(depName, source.location).forEach(dep => {
         source.node_modules.copy(dep.name).to(this.project)
@@ -22,11 +24,13 @@ export class NodeModules extends FeatureForProject {
     });
 
     source.node_modules.copyBin.to(this.project);
+    global.spinner.start()
 
     this.project.getDepsAsPackage('tnp_overrided_dependencies')
       .forEach(d => {
-        this.project.npmPackages.install(d)
-      })
+        this.project.npmPackages.install(triggerMsg, d)
+      });
+
   }
 
   private get copyBin() {
@@ -65,12 +69,13 @@ export class NodeModules extends FeatureForProject {
   }
 
 
-  copy(pkg: string | Package,
-    // options = { copyDependencies: true, overrideMainModuleIfExist: false, keepDependenciesDeep: false }
-  ) {
+  copy(pkg: string | Package, options?: { override?: boolean; linkOnly?: boolean; }) {
     const self = this;
     return {
-      to(destination: Project, linkOnly = false) {
+      to(destination: Project, ) {
+
+        const { override = false, linkOnly = false } = options || {};
+
         const packageName = (_.isObject(pkg) ? (pkg as Package).name : pkg) as string;
         let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
@@ -84,7 +89,7 @@ export class NodeModules extends FeatureForProject {
           projToCopy.linkTo(pDestPath);
         } else {
           const addedSuccess = projToCopy.copyManager.generateSourceCopyIn(pDestPath,
-            { override: false, filterForBundle: false, showInfo: false })
+            { override, filterForBundle: false, showInfo: false })
           if (!addedSuccess) {
             return;
           }
@@ -110,7 +115,7 @@ export class NodeModules extends FeatureForProject {
                 projToCopy.linkTo(pDestPathPackage);
               } else {
                 projToCopy.copyManager.generateSourceCopyIn(pDestPathPackage,
-                  { override: false, filterForBundle: false, showInfo: false })
+                  { override, filterForBundle: false, showInfo: false })
               }
 
             } else {
