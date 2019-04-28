@@ -27,20 +27,25 @@ const file = {
   tmp_db_tests_json: 'tmp-db-tests.json'
 };
 
-const folder = {
-  scripts: 'scripts',
+const tempFolders = {
   bundle: 'bundle',
-  bower: 'bower',
   vendor: 'vendor',
   dist: 'dist',
-  src: 'src',
   tempSrc: 'tmp-src',
   previewDistApp: 'dist-app',
   browser: 'browser',
   module: 'module',
+  node_modules: 'node_modules',
+  client: 'client',
+  tnp_tests_context: 'tmp-tests-context',
+}
+
+const folder = {
+  scripts: 'scripts',
+  bower: 'bower',
+  src: 'src',
   custom: 'custom',
   components: 'components',
-  node_modules: 'node_modules',
   assets: 'assets',
   apps: 'apps',
   // entities: 'entities',
@@ -48,11 +53,10 @@ const folder = {
   projects: 'projects',
   workspace: 'workspace',
   container: 'container',
-  client: 'client',
   bin: 'bin',
   _bin: '.bin',
-  tnp_tests_context: 'tmp-tests-context',
-  tnp_db_for_tests_json: 'db-for-tests.json'
+  tnp_db_for_tests_json: 'db-for-tests.json',
+  ...tempFolders
 };
 
 function pathResolved(...partOfPath: string[]) {
@@ -90,6 +94,7 @@ export const config = {
   },
   allowedEnvironments,
   folder,
+  tempFolders,
   file,
   default: {
     cloud: {

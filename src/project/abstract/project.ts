@@ -131,8 +131,9 @@ export abstract class BaseProject {
     return [
       ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
       (this.isWorkspaceChildProject ? this.parent.name : ''),
+      (this.isContainerChild ? this.parent.name : ''),
       this.name
-    ].join('/').trim()
+    ].filter(f => !!f).join('/').trim()
     //#endregion
   }
 
@@ -475,7 +476,7 @@ export abstract class BaseProject {
 
     const notAllowed: RegExp[] = [
       '\.vscode', 'node\_modules',
-      ..._.values(config.folder),
+      ..._.values(config.tempFolders),
       'e2e', 'tmp.*', 'dist.*', 'tests', 'module', 'browser', 'bundle*',
       'components', '\.git', 'bin', 'custom'
     ].map(s => new RegExp(s))
@@ -500,7 +501,7 @@ export abstract class BaseProject {
 
     return subdirectories
       .map(dir => {
-        // console.log('child:', dir)
+        console.log('child:', dir)
         return Project.From(dir);
       })
       .filter(c => !!c)
@@ -535,7 +536,7 @@ export abstract class BaseProject {
 
   //#region @backend
   linkTo(destination: string) {
-    if(fse.existsSync(destination)) {
+    if (fse.existsSync(destination)) {
       tryRemoveDir(destination);
     }
     fse.symlinkSync(this.location, destination);

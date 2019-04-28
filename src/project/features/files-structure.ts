@@ -147,7 +147,8 @@ export class FilesStructure extends FeatureForProject {
   }
 
 
-  private clearGenerated(project: Project, all, recrusive, outDir: string) {
+  private clearGenerated(all, recrusive, outDir: string) {
+    const project: Project = this.project;
     log(`Cleaning generated workspace in for ${project.location}`)
     if (project.isWorkspace) {
       const genWorkspace = Project.From(path.join(project.location, outDir, project.name))
@@ -167,21 +168,47 @@ export class FilesStructure extends FeatureForProject {
 
   async  clear(args, all = false) {
 
-    let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
 
+    let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
     recrusive = (recrusive || r || all);
     generated = (generated || g);
+
+    if (all) {
+      this.project.node_modules.remove()
+    }
+
+
+
+    if (this.project.isContainer) {
+      // console.log('container childs',this.project.children.map( c => c.genericName ))
+      // process.exit(0)
+
+      if (recrusive) {
+        for (let index = 0; index < this.project.children.length; index++) {
+          const c = this.project.children[index];
+          await c.structure.clear(args, all)
+        }
+      }
+      return;
+    }
+
+    if (this.project.isWorkspace) {
+
+      return
+    }
+
+
     let project = this.project;
     if (all && project.isWorkspaceChildProject) {
       project = project.parent;
     }
 
-    const db = await TnpDB.Instance;
-    await (db).transaction.addProjectIfNotExist(project);
-    db.transaction.setCommand('tnp clear')
+    // const db = await TnpDB.Instance;
+    // await (db).transaction.addProjectIfNotExist(project);
+    // db.transaction.setCommand('tnp clear')
 
     if (generated) {
-      this.clearGenerated(project, all, recrusive, config.folder.dist)
+      this.clearGenerated(all, recrusive, config.folder.dist)
       // clearGenerated(project, all, recrusive, config.folder.bundle)
     } else {
       project.clear(all, recrusive)

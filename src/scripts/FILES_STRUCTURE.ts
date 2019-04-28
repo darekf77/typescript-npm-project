@@ -19,8 +19,8 @@ export async function INIT(args, exit = true) {
 export default {
   $CLEAN: async (args) => { await Project.Current.structure.clear(args) },
   $CLEAR: async (args) => { await Project.Current.structure.clear(args) },
-  $CLEAN_ALL: async () => { await Project.Current.structure.clear('', true) },
-  $CLEAR_ALL: async () => { await Project.Current.structure.clear('', true) },
+  $CLEAN_ALL: async (args) => { await Project.Current.structure.clear(args, true) },
+  $CLEAR_ALL: async (args) => { await Project.Current.structure.clear(args, true) },
 
   INIT,
   async $REINIT(args) {
