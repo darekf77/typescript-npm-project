@@ -51,30 +51,6 @@ export class ProjectIsomorphicLib extends LibProject {
   }
 
 
-  private get additionalRequiredIsomorphcLibs() {
-    const result: string[] = []
-
-    if (Array.isArray(this.requiredLibs)) { // TODO QUCIK_FIX not fixing this
-      this.requiredLibs.forEach(d => {
-        result.push(d.name);
-      })
-    }
-
-
-    // console.log(result)
-
-    return result;
-  }
-
-  private getIsomorphcLibNames(parentWorksapce = false) {
-    let result = [];
-    result = result.concat(this.additionalRequiredIsomorphcLibs);
-
-    // console.log('result', result)
-
-    return result;
-  }
-
   async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
     if (!onlyWatchNoBuild) {
@@ -199,7 +175,6 @@ export class ProjectIsomorphicLib extends LibProject {
   }
 
   async buildLib(outDir: "dist" | "bundle", forClient: Project[] = [], prod = false, watch = false) {
-    const isomorphicNames = this.getIsomorphcLibNames(this.isWorkspaceChildProject)
 
     // console.log('Build fucking this', this.buildOptions)
     this.copyWhenExist('bin', outDir) // TODO make this for each library

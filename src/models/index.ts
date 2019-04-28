@@ -11,11 +11,7 @@ export * from './project.interface';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
-export type InstalationType = '-g' | '--save' | '--save-dev';
 
-export type Dependencies = 'dependencies' | 'devDependencies' | 'peerDependencies';
-
-export type Package = { name: string; version: string; };
 
 export type RecreateFile = { where: string; from: string };
 

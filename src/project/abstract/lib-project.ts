@@ -162,8 +162,8 @@ export abstract class LibProject extends Project {
 
       this.run(`tnp clear`).sync();
 
-      if (!this.node_modules.exist()) {
-        this.npmPackages.installAll()
+      if (!this.node_modules.exist) {
+        this.npmPackages.installAll(`release procedure`)
       }
       this.packageJson.show('show for release')
       this.recreate.init();

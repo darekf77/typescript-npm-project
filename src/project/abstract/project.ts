@@ -9,10 +9,10 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 
 import config from '../../config';
-import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON } from '../../models';
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
-  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir
 } from '../../helpers';
 import { NodeModules } from "../features/node-modules";
 import { FilesRecreator } from '../features/files-builder';
@@ -29,6 +29,7 @@ import { FilesStructure } from '../features/files-structure';
 import { AutoActions } from '../features/auto-actions';
 import { BuildProcess } from '../features/build-proces';
 import { FrameworkFilesGenerator } from '../features/framework-files-generator';
+import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
 //#endregion
 
@@ -36,6 +37,7 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+
 
 
 
@@ -60,9 +62,6 @@ export abstract class BaseProject {
   tests: TestRunner;
   //#endregion
 
-  public requiredLibs: Project[] = []; // TODO FIX THIS
-
-
   public packageJson: PackageJSON;
 
   //#region @backend
@@ -75,6 +74,10 @@ export abstract class BaseProject {
 
   //#region @backend
   public buildProcess: BuildProcess;
+  //#endregion
+
+  //#region @backend
+  public workspaceSymlinks: WorkspaceSymlinks;
   //#endregion
 
   //#region @backend
@@ -118,6 +121,20 @@ export abstract class BaseProject {
   //#region @backend
   public autoActions: AutoActions;
   //#endregion
+
+
+  public get genericName(): string {
+    if (Morphi.IsBrowser) {
+      return this.browser.genericName;
+    }
+    //#region @backendFunc
+    return [
+      ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
+      (this.isWorkspaceChildProject ? this.parent.name : ''),
+      this.name
+    ].join('/').trim()
+    //#endregion
+  }
 
 
   public get name(): string {
@@ -516,6 +533,14 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
+  linkTo(destination: string) {
+    if(fse.existsSync(destination)) {
+      tryRemoveDir(destination);
+    }
+    fse.symlinkSync(this.location, destination);
+  }
+  //#endregion
 
 
   //#region @backend
@@ -606,32 +631,73 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
+  public getDepsAsProject(type: NpmDependencyType | TnpNpmDependencyType, contextFolder?: string): Project[] {
+    return this.getDepsAsPackage(type).map(packageObj => {
+      if (type === 'tnp_required_workspace_child') {
+        let p = path.resolve(path.join(this.location, '..', packageObj.name))
+        if (this.isWorkspaceChildProject && fse.existsSync(p)) {
+          const project = Project.From(p);
+          return project;
+        }
+      }
 
-
+      let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
+      if (fse.existsSync(p)) {
+        const project = Project.From(p);
+        return project;
+      }
+      warn(`Dependency '${packageObj}' doen't exist in ${p}`)
+    })
+      .filter(f => !!f)
+  }
+  //#endregion
 
   //#region @backend
-  public getDeps(type: NpmDependencyType, contextFolder?: string) {
-    if (this.packageJson.data && this.packageJson.data[type]) {
-      const names = _.isArray(this.packageJson.data[type]) ? this.packageJson.data[type] : Object.keys(this.packageJson.data[type]);
-      return names
-        .map(packageName => {
-          // console.log(packageName)
-          // let p = path.resolve(path.join(this.location, '..', packageName))
-          // if (this.isWorkspaceChildProject && fse.existsSync(p)) {
-          //   const project = Project.From(p);
-          //   return project;
-          // }
-          let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageName);
-          if (fse.existsSync(p)) {
-            const project = Project.From(p);
-            return project;
-          }
-          // warn(`Dependency '${packageName}' doen't exist in ${p}`)
-
-        })
-        .filter(f => !!f)
+  public getDepsAsPackage(type: NpmDependencyType | TnpNpmDependencyType): Package[] {
+    if (!this.packageJson.data) {
+      return []
     }
-    return [];
+    const isTnpOverridedDependency = (type === 'tnp_overrided_dependencies') &&
+      this.packageJson.data.tnp &&
+      this.packageJson.data.tnp.overrided &&
+      this.packageJson.data.tnp.overrided.dependencies;
+
+    const isTnpRequredWorkspaceChildren = (type === 'tnp_required_workspace_child') &&
+      this.packageJson.data.tnp &&
+      this.packageJson.data.tnp.required;
+
+    let installType: InstalationType;
+
+    let data: any;
+    if (isTnpOverridedDependency) {
+      data = this.packageJson.data.tnp.overrided.dependencies
+    } else if (isTnpRequredWorkspaceChildren) {
+      data = this.packageJson.data.tnp.required;
+    } else {
+      data = this.packageJson.data[type];
+      if (type === 'dependencies') {
+        installType = '--save'
+      } else if (type === 'devDependencies') {
+        installType = '--save-dev'
+      }
+    }
+
+    const names = _.isArray(data) ? data : _.keys(data);
+    return names
+      .map(p => {
+        if (_.isString(data[p])) {
+          return { name: p, version: data[p], installType }
+        } else {
+          if (!~p.search('@')) {
+            return { name: p, installType }
+          }
+          const isOrg = p.startsWith('@')
+          const [name, version] = (isOrg ? p.slice(1) : p).split('@')
+          return { name: isOrg ? `@${name}` : name, version, installType }
+        }
+
+      })
   }
   //#endregion
 
@@ -1111,6 +1177,7 @@ export class Project extends BaseProject implements IProject {
 
         this.packageJson = PackageJSON.fromProject(this);
         this.staticBuild = new StaticBuild(this)
+        this.workspaceSymlinks = new WorkspaceSymlinks(this);
         this.tnpBundle = new TnpBundle(this);
         this.node_modules = new NodeModules(this);
         this.type = this.packageJson.type;
@@ -1153,6 +1220,27 @@ export class Project extends BaseProject implements IProject {
   public get git() {
     const self = this;
     return {
+      resetFiles(...relativePathes: string[]) {
+        relativePathes.forEach(p => {
+          try {
+            self.run(`git checkout HEAD -- ${p}`, { cwd: self.location }).sync()
+          } catch (err) {
+            error(`[project.git] Not able to reset files: ${p} inside project ${self.name}.`
+              , true, true)
+          }
+        })
+      },
+      get isGitRepo() {
+        try {
+          var test = self.run('git rev-parse --is-inside-work-tree',
+            {
+              cwd: self.location,
+              output: false
+            }).sync();
+        } catch (e) {
+        }
+        return !!test;
+      },
       async updateOrigin(askToRetry = false) {
         await pullCurrentBranch(self.location, askToRetry);
       },

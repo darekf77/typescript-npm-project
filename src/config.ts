@@ -17,6 +17,8 @@ const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'
 const file = {
   autob_actions_js: 'auto-actions.js',
   package_json: 'package.json',
+  yarn_lock: 'yarn.lock',
+  package_lock_json: 'package-lock.json',
   tnpBundle: 'tnp-bundle',
   tnpEnvironment_json: 'tmp-environment.json',
   environment: 'environment',

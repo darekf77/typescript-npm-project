@@ -18,6 +18,7 @@ export interface IProject {
   isCloud: boolean;
   useFramework: boolean;
   name: string;
+  genericName: string;
   defaultPort?: number;
   version: string;
   _routerTargetHttp?: string;
@@ -31,6 +32,5 @@ export interface IProject {
   children: Project[];
   parent: Project;
   preview: Project;
-  requiredLibs: Project[];
   baseline: Project;
 }

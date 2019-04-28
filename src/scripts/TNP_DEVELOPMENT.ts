@@ -78,11 +78,11 @@ function $GIT_REMOVE_UNTRACKED() {
 
 
 export default {
-  $COPY_FROM(args: string) {
-    const [from, to, pkgName] = args.trim().split(' ');
-    Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
-    process.exit()
-  },
+  // $COPY_FROM(args: string) {
+  //   const [from, to, pkgName] = args.trim().split(' ');
+  //   Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
+  //   process.exit()
+  // },
   $GIT_REMOVE_UNTRACKED,
   $GIT_REMOVE_UNTRACKED_EVERYWHERE: () => {
     Project.projects.forEach(p => {

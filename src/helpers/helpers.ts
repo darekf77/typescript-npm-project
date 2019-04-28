@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as rimraf from "rimraf";
 import { sleep } from 'sleep';
-import { error, warn } from "./helpers-messages";
+import { error, warn, log } from "./helpers-messages";
 //#endregion
 
 import * as _ from 'lodash'
@@ -228,7 +228,7 @@ export function tryRemoveDir(dirpath: string, contentOnly = false) {
       rimraf.sync(dirpath)
     }
   } catch (e) {
-    console.log(`Trying to remove directory: ${dirpath}`)
+    log(`Trying to remove directory: ${dirpath}`)
     sleep(1);
     tryRemoveDir(dirpath, contentOnly);
   }

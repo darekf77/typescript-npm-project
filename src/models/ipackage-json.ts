@@ -2,11 +2,27 @@ import { LibType } from './lib-type';
 import { EnvironmentName } from './environment-name';
 
 export type NpmDependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
-  | 'bundleDependencies' | 'bundledDependencies' | 'extensionDependencies' | '_phantomChildren';
+  | 'bundleDependencies' | 'bundledDependencies' | 'extensionDependencies'
+  | '_phantomChildren';
+
+export type TnpNpmDependencyType = 'tnp_overrided_dependencies' | 'tnp_required_workspace_child';
+
 export const ArrNpmDependencyType: NpmDependencyType[] = [
   'dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies', ,
   'bundleDependencies', 'bundledDependencies', 'extensionDependencies', '_phantomChildren'
 ]
+
+export const ArrTnpNpmDependencyType: TnpNpmDependencyType[] = [
+  'tnp_overrided_dependencies', 'tnp_required_workspace_child'
+]
+
+
+
+export type InstalationType = '-g' | '--save' | '--save-dev';
+
+export const InstalationTypeArr = ['-g', '--save', '--save-dev'];
+
+export type Package = { name: string; version?: string; installType?: InstalationType; };
 
 export type DependenciesFromPackageJsonStyle = { [name: string]: string; }
 
@@ -48,6 +64,14 @@ export interface IPackageJSON {
     resources?: string[];
     allowedEnv?: EnvironmentName[];
     isGenerated?: boolean;
+    /**
+     * Usable only in workspace children
+     * Required workspace children for particular workspcae child
+     */
+    required?: string[],
+    /**
+     * Override tnp automation generation
+     */
     overrided: {
       dedupe?: string[];
       ignoreDepsPattern?: string[];

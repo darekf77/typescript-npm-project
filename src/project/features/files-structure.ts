@@ -40,10 +40,10 @@ export class FilesStructure extends FeatureForProject {
 
     project.tnpBundle.installAsPackage()
 
-    if (project.isWorkspaceChildProject && !project.parent.node_modules.exist()) {
-      project.parent.npmPackages.installAll();
-    } else if (!project.node_modules.exist()) {
-      project.npmPackages.installAll();
+    if (project.isWorkspaceChildProject && !project.parent.node_modules.exist) {
+      project.parent.npmPackages.installAll(`initialize procedure of child ${project.genericName}`);
+    } else if (!project.node_modules.exist) {
+      project.npmPackages.installAll(`initialize procedure of ${project.name}`);
     }
 
     if (project.parent) {

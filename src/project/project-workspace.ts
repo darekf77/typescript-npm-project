@@ -65,7 +65,7 @@ export class ProjectWorkspace extends Project {
         let everthingOk = true;
         libsProjects.some(p => {
           const indexProject = _.indexOf(libsProjects, p);
-          p.requiredLibs.some(pDep => {
+          p.getDepsAsProject('tnp_required_workspace_child').some(pDep => {
             const indexDependency = _.indexOf(libsProjects, pDep);
             if (indexDependency > indexProject) {
               libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
