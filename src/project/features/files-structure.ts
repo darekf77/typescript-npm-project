@@ -6,6 +6,9 @@ import { clearConsole, log } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
 import { TnpDB } from '../../tnp-db';
 import config from '../../config';
+import { OutFolder } from 'morphi/build';
+
+export type CleanType = 'all' | 'only_static_generated'
 
 export class FilesStructure extends FeatureForProject {
 
@@ -15,8 +18,7 @@ export class FilesStructure extends FeatureForProject {
     return this.init(args, { watch: true })
   }
 
-  public async init(args: string,
-    options?: { watch: boolean }) {
+  public async init(args: string, options?: { watch: boolean }) {
 
     if (!options) {
       options = { watch: false };
@@ -30,12 +32,10 @@ export class FilesStructure extends FeatureForProject {
 
   }
 
-  private async  initialize(
-    pArgs?: string,
-    project = Project.Current, watch = false) {
+  private async  initialize(pArgs?: string, project = Project.Current, watch = false) {
 
     if (!project) {
-      console.log(`No project to init inside: ${process.cwd()}`, false, true)
+      log(`No project to init inside: ${process.cwd()}`)
     }
 
     project.tnpBundle.installAsPackage()
@@ -106,7 +106,6 @@ export class FilesStructure extends FeatureForProject {
     await this.joinSiteWithParentBaselines(project.baseline, watch, projectsToRecreate);
   }
 
-
   private async  recreateFilesBaselinesWorkspaces(project: Project, projectsToRecreate: Project[] = []) {
 
     if (!project || !project.isSite) {
@@ -146,77 +145,48 @@ export class FilesStructure extends FeatureForProject {
     }
   }
 
-
-  private clearGenerated(all, recrusive, outDir: string) {
-    const project: Project = this.project;
-    log(`Cleaning generated workspace in for ${project.location}`)
-    if (project.isWorkspace) {
-      const genWorkspace = Project.From(path.join(project.location, outDir, project.name))
-      if (genWorkspace) {
-        genWorkspace.clear(all, recrusive);
-      }
-    } else if (project.isWorkspaceChildProject) {
-      const genWorkspaceChild = Project.From(path.join(project.parent.location, outDir, project.parent.name, project.name))
-      if (genWorkspaceChild) {
-        genWorkspaceChild.clear(all, recrusive)
+  private recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
+    (proj[type] as any)()
+    if (recrusive) {
+      for (let index = 0; index < proj.children.length; index++) {
+        const c = proj.children[index];
+        this.recrusiveOperation(c, recrusive, type)
       }
     }
-
   }
 
+  public async reset(options?: { recrusive: boolean; }) {
+    const { recrusive = false } = options || {};
+    this.recrusiveOperation(this.project, recrusive, 'reset')
+  }
 
+  public async clear(options?: { recrusive: boolean; }) {
+    const { recrusive = false } = options || {};
+    this.recrusiveOperation(this.project, recrusive, 'clear')
+  }
 
-  async  clear(args, all = false) {
-
-
+  private resolveArgs(args) {
     let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
-    recrusive = (recrusive || r || all);
+    recrusive = (recrusive || r);
     generated = (generated || g);
+    return { recrusive, generated }
+  }
 
-    if (all) {
-      this.project.node_modules.remove()
-    }
+  async resetFromArgs(args) {
+    const { recrusive, generated } = this.resolveArgs(args)
+    await this.reset({ recrusive })
+  }
 
-
-
-    if (this.project.isContainer) {
-      // console.log('container childs',this.project.children.map( c => c.genericName ))
-      // process.exit(0)
-
-      if (recrusive) {
-        for (let index = 0; index < this.project.children.length; index++) {
-          const c = this.project.children[index];
-          await c.structure.clear(args, all)
-        }
-      }
-      return;
-    }
-
-    if (this.project.isWorkspace) {
-
-      return
-    }
-
-
-    let project = this.project;
-    if (all && project.isWorkspaceChildProject) {
-      project = project.parent;
-    }
-
-    // const db = await TnpDB.Instance;
-    // await (db).transaction.addProjectIfNotExist(project);
-    // db.transaction.setCommand('tnp clear')
-
-    if (generated) {
-      this.clearGenerated(all, recrusive, config.folder.dist)
-      // clearGenerated(project, all, recrusive, config.folder.bundle)
-    } else {
-      project.clear(all, recrusive)
-    }
-
-    process.exit(0)
+  async  clearFromArgs(args) {
+    const { recrusive, generated } = this.resolveArgs(args)
+    await this.reset({ recrusive })
   }
 
 }
+
+
+
+
+
 
 //#endregion

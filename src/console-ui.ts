@@ -144,7 +144,7 @@ export class ConsoleUi {
 
       case CHOICE.INIT:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.structure.init('');
+        await Project.Current.filesStructure.init('');
         process.exit(0)
         break;
 
@@ -175,7 +175,7 @@ export class ConsoleUi {
         break;
 
       case CHOICE.CLEAR:
-        await Project.Current.structure.clear('')
+        await Project.Current.filesStructure.clearFromArgs('')
         break;
 
       case CHOICE.CLEAR_RECUSIVE_WITH_NODE_MODUELS:

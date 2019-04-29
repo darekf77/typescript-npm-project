@@ -33,7 +33,7 @@ export class StaticBuild extends FeatureForProject {
     genProject = Project.From(genLocation);
     // genProject.clear()
 
-    await genProject.structure.init(args);
+    await genProject.filesStructure.init(args);
 
     return genProject;
   }

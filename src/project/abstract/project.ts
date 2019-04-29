@@ -37,6 +37,8 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+import rimraf = require('rimraf');
+import { OutFolder } from 'morphi/build';
 
 
 
@@ -69,7 +71,7 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  public structure: FilesStructure;
+  public filesStructure: FilesStructure;
   //#endregion
 
   //#region @backend
@@ -262,6 +264,17 @@ export abstract class BaseProject {
       return this.parent && this.parent.baseline && Project.From(path.join(this.parent.baseline.location, this.name));
     }
     //#endregion
+  }
+
+  get StaticVersion() {
+    const outDir: OutFolder = 'dist';
+    if (this.isWorkspace) {
+      return Project.From(path.join(this.location, outDir, this.name))
+    } else if (this.isWorkspaceChildProject) {
+      return Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name))
+    }
+    warn(`There is not static version for project ${this.genericName}`)
+    return this;
   }
 
   get isBuildedLib() {
@@ -599,36 +612,32 @@ export abstract class BaseProject {
   }
   //#endregion
 
-
   //#region @backend
-  public clear(includeNodeModules = false, recrusive = false) {
-    console.log(`Cleaning ${includeNodeModules ? '(node_modules folder included)' : ''} project: ${this.name}`);
-
+  public reset() {
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
         if (f === config.folder.node_modules) {
-          return includeNodeModules;
+          return false;
         }
         if (f.startsWith(config.folder.bundle) && this.isTnp) {
           return false;
         }
         return true;
-      }) // link/unlink takes care of node_modules
-      .join(' ')
-    // console.log(`rimraf ${gitginoredfiles}`)
+      })
 
-    const db = TnpDB.InstanceSync;
-    // db.builds.killForClearOf(this)
-    this.run(`rimraf ${gitginoredfiles}`).sync();
-    if (recrusive) {
-      if (this.isWorkspace && Array.isArray(this.children) && this.children.length > 0) {
-        this.children.forEach(childProject => {
-          childProject.clear(includeNodeModules)
-        })
-      }
+    for (let index = 0; index < gitginoredfiles.length; index++) {
+      const filePath = path.join(this.location, gitginoredfiles[index]);
+      rimraf.sync(filePath);
     }
+  }
+  //#endregion
 
+  //#region @backend
+  public clear() {
+    console.log(`Cleaning '(node_modules folder included)' : ''} project: ${this.name}`);
+    this.node_modules.remove();
+    this.reset()
   }
   //#endregion
 
@@ -1207,7 +1216,7 @@ export class Project extends BaseProject implements IProject {
         if (this.isStandaloneProject) {
           this.packageJson.updateHooks()
         }
-        this.structure = new FilesStructure(this);
+        this.filesStructure = new FilesStructure(this);
         this.buildProcess = new BuildProcess(this);
       } else {
         warn(`Invalid project location: ${location}`);

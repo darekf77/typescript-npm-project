@@ -44,9 +44,9 @@ export class BuildProcess extends FeatureForProject {
     await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
 
     if (watch) {
-      await project.structure.initAndWatch(args);
+      await project.filesStructure.initAndWatch(args);
     } else {
-      await project.structure.init(args);
+      await project.filesStructure.init(args);
     }
 
     project = await project.staticBuild.resolveProjectIfGenerated(buildOptions, args)

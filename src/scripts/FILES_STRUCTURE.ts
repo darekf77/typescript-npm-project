@@ -8,7 +8,7 @@ import { sleep } from 'sleep';
 // init().watch.project()
 
 export async function INIT(args, exit = true) {
-  await Project.Current.structure.init(args);
+  await Project.Current.filesStructure.init(args);
   if (exit) {
     process.exit(0)
   }
@@ -17,15 +17,45 @@ export async function INIT(args, exit = true) {
 
 
 export default {
-  $CLEAN: async (args) => { await Project.Current.structure.clear(args) },
-  $CLEAR: async (args) => { await Project.Current.structure.clear(args) },
-  $CLEAN_ALL: async (args) => { await Project.Current.structure.clear(args, true) },
-  $CLEAR_ALL: async (args) => { await Project.Current.structure.clear(args, true) },
+  CLEAN: async (args) => {
+    await Project.Current.filesStructure.clearFromArgs(args)
+    process.exit(0)
+  },
+  CLEAR: async (args) => {
+    await Project.Current.filesStructure.clearFromArgs(args)
+    process.exit(0)
+  },
+  STATIC_CLEAN: async (args) => {
+    await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
+    process.exit(0)
+  },
+  STATIC_CLEAR: async (args) => {
+    await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
+    process.exit(0)
+  },
+
+  $CLEAN_ALL: async (args) => {
+    await Project.Current.filesStructure.clear({ recrusive: true, onlyStaticBuildProj: true })
+    process.exit(0)
+  },
+  $CLEAR_ALL: async (args) => {
+    await Project.Current.filesStructure.clear({ recrusive: true, onlyStaticBuildProj: true })
+    process.exit(0)
+  },
+  async RESET(args) {
+    await Project.Current.filesStructure.resetFromArgs(args)
+    process.exit(0)
+  },
+
+  async RESET_ALL() {
+    await Project.Current.filesStructure.reset({ recrusive: true, onlyStaticBuildProj: true })
+    process.exit(0)
+  },
 
   INIT,
   async $REINIT(args) {
-    Project.Current.structure.clear(args);
-    Project.Current.structure.init(args);
+    Project.Current.filesStructure.clearFromArgs(args);
+    Project.Current.filesStructure.init(args);
     process.exit(0)
   },
 
