@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { Project, FeatureForProject } from '../abstract';
-import { error, log } from '../../helpers';
+import { error, log, tryRemoveDir } from '../../helpers';
 import { config } from '../../config';
 
 export class WorkspaceSymlinks extends FeatureForProject {
@@ -41,6 +41,9 @@ export class WorkspaceSymlinks extends FeatureForProject {
     this.symlinks.forEach(c => {
       const destination = path.join(this.project.location, config.folder.node_modules);
       log(`Adding symlinks: ${c.genericName} to node_module ${triggeredMsg}`)
+      if (fse.existsSync(destination)) {
+        tryRemoveDir(destination)
+      }
       fse.symlinkSync(c.location, destination)
     })
     this.project.children.forEach(c => {

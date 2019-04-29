@@ -2,7 +2,7 @@
 import * as path from 'path';
 import chalk from 'chalk';
 
-import { clearConsole, log } from '../../helpers';
+import { clearConsole, log, error } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
 import { TnpDB } from '../../tnp-db';
 import config from '../../config';
@@ -14,11 +14,21 @@ export class FilesStructure extends FeatureForProject {
 
 
   public async initAndWatch(args: string) {
-
+    if (this.project.isContainer) {
+      error(`[initandwatch] cannot be done in container`)
+    }
     return this.init(args, { watch: true })
   }
 
   public async init(args: string, options?: { watch: boolean }) {
+
+    if (this.project.isContainer) {
+      for (let index = 0; index < this.project.children.length; index++) {
+        const containerChild = this.project.children[index];
+        await containerChild.filesStructure.init(args, options);
+      }
+      return;
+    }
 
     if (!options) {
       options = { watch: false };
@@ -165,20 +175,19 @@ export class FilesStructure extends FeatureForProject {
     this.recrusiveOperation(this.project, recrusive, 'clear')
   }
 
-  private resolveArgs(args) {
-    let { recrusive = false, r = false, generated = false, g = false } = require('minimist')(args.split(' '));
+  private resolveArgs(args: string) {
+    let { recrusive = false, r = false } = require('minimist')(args.split(' '));
     recrusive = (recrusive || r);
-    generated = (generated || g);
-    return { recrusive, generated }
+    return { recrusive }
   }
 
   async resetFromArgs(args) {
-    const { recrusive, generated } = this.resolveArgs(args)
+    const { recrusive } = this.resolveArgs(args)
     await this.reset({ recrusive })
   }
 
   async  clearFromArgs(args) {
-    const { recrusive, generated } = this.resolveArgs(args)
+    const { recrusive } = this.resolveArgs(args)
     await this.reset({ recrusive })
   }
 

@@ -26,6 +26,9 @@ async function buildWatch(args) {
 
 export default {
 
+  $STATIC_BUILD_DIST: [(args) => Project.Current.buildProcess.startForLib(false, false, 'dist', args),
+    `Build dist version of project library.`],
+
   $BUILD_DIST: [(args) => Project.Current.buildProcess.startForLib(false, false, 'dist', args), `Build dist version of project library.`],
   $BUILD_DIST_WATCH: (args) => Project.Current.buildProcess.startForLib(false, true, 'dist', args),
   $BUILD_DIST_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, "dist", args),

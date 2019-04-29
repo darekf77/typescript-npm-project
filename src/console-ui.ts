@@ -179,7 +179,7 @@ export class ConsoleUi {
         break;
 
       case CHOICE.CLEAR_RECUSIVE_WITH_NODE_MODUELS:
-        await Project.Current.clear(true, true)
+        // await Project.Current.
         break;
 
       case CHOICE.KILL_ALL_ACTIVE_BUILD_INSTANES_FROM_CURRENT_WORKSPACE:

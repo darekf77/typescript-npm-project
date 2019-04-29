@@ -273,8 +273,7 @@ export abstract class BaseProject {
     } else if (this.isWorkspaceChildProject) {
       return Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name))
     }
-    warn(`There is not static version for project ${this.genericName}`)
-    return this;
+    error(`There is not static version for project ${this.genericName}`, false, true)
   }
 
   get isBuildedLib() {
@@ -514,7 +513,7 @@ export abstract class BaseProject {
 
     return subdirectories
       .map(dir => {
-        console.log('child:', dir)
+        // console.log('child:', dir)
         return Project.From(dir);
       })
       .filter(c => !!c)
@@ -614,6 +613,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public reset() {
+    log(`Reseting project: ${this.genericName}`);
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
@@ -627,15 +627,21 @@ export abstract class BaseProject {
       })
 
     for (let index = 0; index < gitginoredfiles.length; index++) {
-      const filePath = path.join(this.location, gitginoredfiles[index]);
-      rimraf.sync(filePath);
+      const fileOrDirPath = path.join(this.location, gitginoredfiles[index]);
+      if (fse.existsSync(fileOrDirPath)) {
+        if (fse.lstatSync(fileOrDirPath).isDirectory()) {
+          fse.removeSync(fileOrDirPath);
+        } else {
+          fse.unlinkSync(fileOrDirPath);
+        }
+      }
     }
   }
   //#endregion
 
   //#region @backend
   public clear() {
-    console.log(`Cleaning '(node_modules folder included)' : ''} project: ${this.name}`);
+    log(`Cleaning project: ${this.genericName}`);
     this.node_modules.remove();
     this.reset()
   }
@@ -657,7 +663,7 @@ export abstract class BaseProject {
         const project = Project.From(p);
         return project;
       }
-      warn(`Dependency '${packageObj}' doen't exist in ${p}`)
+      // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
     })
       .filter(f => !!f)
   }

@@ -18,7 +18,7 @@ export class NodeModules extends FeatureForProject {
     log(`copy instalation of npm packages from ${source.genericName} ${triggerMsg}`)
     global.spinner.start()
     ArrNpmDependencyType.forEach(depName => {
-      source.getDepsAsProject(depName, source.location).forEach(dep => {
+      source.getDepsAsProject(depName).forEach(dep => {
         source.node_modules.copy(dep.name).to(this.project)
       })
     });

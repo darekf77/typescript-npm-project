@@ -39,7 +39,7 @@ export class PackageJSON {
       const file = fs.readFileSync(filePath, 'utf8').toString();
       const json = JSON.parse(file);
       if (!json.tnp && !isTnpProject) {
-        warn(`Unrecognized project type from location: ${location}`, false);
+        // warn(`Unrecognized project type from location: ${location}`, false);
       }
       return new PackageJSON({ data: json, location, project });
     } catch (err) {
@@ -507,7 +507,7 @@ export class PackageJSON {
       const file = fs.readFileSync(path.join(this.location, config.file.package_json), 'utf8').toString();
       const json = JSON.parse(file);
       if (!json.tnp) {
-        warn(`Unrecognized project type from package.json in location: ${location}`, false);
+        // warn(`Unrecognized project type from package.json in location: ${location}`, false);
       }
       this.data = json;
     } catch (e) {

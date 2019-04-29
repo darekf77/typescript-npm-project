@@ -7,15 +7,6 @@ import { sleep } from 'sleep';
 // init().project();
 // init().watch.project()
 
-export async function INIT(args, exit = true) {
-  await Project.Current.filesStructure.init(args);
-  if (exit) {
-    process.exit(0)
-  }
-
-}
-
-
 export default {
   CLEAN: async (args) => {
     await Project.Current.filesStructure.clearFromArgs(args)
@@ -34,30 +25,53 @@ export default {
     process.exit(0)
   },
 
-  $CLEAN_ALL: async (args) => {
-    await Project.Current.filesStructure.clear({ recrusive: true, onlyStaticBuildProj: true })
+  CLEAN_ALL: async (args) => {
+    await Project.Current.filesStructure.clear({ recrusive: true })
     process.exit(0)
   },
-  $CLEAR_ALL: async (args) => {
-    await Project.Current.filesStructure.clear({ recrusive: true, onlyStaticBuildProj: true })
+  CLEAR_ALL: async (args) => {
+    await Project.Current.filesStructure.clear({ recrusive: true })
     process.exit(0)
   },
+
+  STATIC_CLEAN_ALL: async (args) => {
+    await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
+    process.exit(0)
+  },
+  STATIC_CLEAR_ALL: async (args) => {
+    await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
+    process.exit(0)
+  },
+
   async RESET(args) {
     await Project.Current.filesStructure.resetFromArgs(args)
     process.exit(0)
   },
 
   async RESET_ALL() {
-    await Project.Current.filesStructure.reset({ recrusive: true, onlyStaticBuildProj: true })
+    await Project.Current.filesStructure.reset({ recrusive: true })
     process.exit(0)
   },
 
-  INIT,
-  async $REINIT(args) {
-    Project.Current.filesStructure.clearFromArgs(args);
-    Project.Current.filesStructure.init(args);
+  async STATIC_RESET(args) {
+    await Project.Current.StaticVersion.filesStructure.resetFromArgs(args)
     process.exit(0)
   },
+
+  async STATIC_RESET_ALL() {
+    await Project.Current.StaticVersion.filesStructure.reset({ recrusive: true })
+    process.exit(0)
+  },
+
+  async  INIT(args) {
+    await Project.Current.filesStructure.init(args);
+    process.exit(0)
+  },
+  async  STATIC_INIT(args) {
+    await Project.Current.StaticVersion.filesStructure.init(args);
+    process.exit(0);
+  },
+
 
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;
