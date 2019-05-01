@@ -13,6 +13,11 @@ const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online'
 // environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
 // environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
+const filesNotAllowedToClen = {
+  _gitignore: '.gitignore',
+  tslint_json: 'tslint.json',
+  _editorconfig: '.editorconfig'
+}
 
 const file = {
   autob_actions_js: 'auto-actions.js',
@@ -25,7 +30,7 @@ const file = {
   tnp_system_path_txt: 'tnp-system-path.txt',
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
   tmp_db_tests_json: 'tmp-db-tests.json',
-  _gitignore: '.gitignore'
+  ...filesNotAllowedToClen
 };
 
 const tempFolders = {
@@ -96,6 +101,7 @@ export const config = {
   allowedEnvironments,
   folder,
   tempFolders,
+  filesNotAllowedToClen: Object.keys(filesNotAllowedToClen).map(key => filesNotAllowedToClen[key]) as string[],
   file,
   default: {
     cloud: {

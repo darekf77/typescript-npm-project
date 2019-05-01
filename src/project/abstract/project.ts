@@ -620,7 +620,7 @@ export abstract class BaseProject {
         if (f === config.folder.node_modules) {
           return false;
         }
-        if (f === config.file._gitignore) {
+        if (config.filesNotAllowedToClen.includes(f)) {
           return false;
         }
         if (f.startsWith(config.folder.bundle) && this.isTnp) {
@@ -630,14 +630,9 @@ export abstract class BaseProject {
       })
 
     for (let index = 0; index < gitginoredfiles.length; index++) {
-      const fileOrDirPath = path.join(this.location, gitginoredfiles[index]);
-      if (fse.existsSync(fileOrDirPath)) {
-        if (fse.lstatSync(fileOrDirPath).isDirectory()) {
-          fse.removeSync(fileOrDirPath);
-        } else {
-          fse.unlinkSync(fileOrDirPath);
-        }
-      }
+      const fileOrDirPath = path.join(this.location, gitginoredfiles[index].trim());
+      // log(`Removing: ${fileOrDirPath}`)
+      rimraf.sync(fileOrDirPath)
     }
   }
   //#endregion
