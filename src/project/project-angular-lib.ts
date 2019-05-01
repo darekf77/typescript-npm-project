@@ -9,19 +9,16 @@ import { BuildDir } from "../models";
 import { error, tryRemoveDir } from "../helpers";
 import config from "../config";
 import { Project } from './abstract';
-import { AnglarLibModuleDivider } from './features/angular-lib-module-divider';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
 export class ProjectAngularLib extends LibProject {
 
   private projectAngularClient: ProjectAngularClient;
-  public moduleDivider: AnglarLibModuleDivider;
 
   constructor(public location: string) {
     super(location);
     if (_.isString(location)) {
       this.projectAngularClient = new ProjectAngularClient(location);
-      this.moduleDivider = new AnglarLibModuleDivider(this);
       this.projectAngularClient.env = this.env; // TODO QUICK_FIX
     }
 
@@ -101,14 +98,12 @@ export class ProjectAngularLib extends LibProject {
       } else {
         if (watch) {
           await this.buildLib(outDir, forClient as Project[], prod, false);
-          this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
           if (compileOnce) {
             return;
           }
           await this.buildLib(outDir, forClient as Project[], prod, true)
         } else {
           await this.buildLib(outDir, forClient as Project[], prod, watch)
-          this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }
     }

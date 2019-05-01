@@ -4,10 +4,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { FilesRecreator } from './files-builder';
 import config from '../../config';
 import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
-import { AnglarLibModuleDivider } from './angular-lib-module-divider';
 import { FeatureCompilerForProject, Project } from '../abstract';
 
 export interface IsomorphicOptions {
@@ -82,18 +80,22 @@ export class SourceModifier extends FeatureCompilerForProject {
     }
   }
 
+  public static nameFor(clientName: string) {
+    return `${config.folder.module}-for-${clientName}`;
+  }
+
 
   private replaceWhenWholeModule(angularLibName: string, fileContent: string) {
     const tofind = `(\'|\")${angularLibName}/${config.folder.module}(\'|\")`
     const regex = new RegExp(tofind, 'g')
-    const replacement = `'${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}'`;
+    const replacement = `'${angularLibName}/${SourceModifier.nameFor(this.project.name)}'`;
     return fileContent.replace(regex, replacement)
   }
 
   private replaceWhenReferingInsideModule(angularLibName: string, fileContent: string) {
     const tofind = `${angularLibName}/${config.folder.module}/`
     const regex = new RegExp(tofind, 'g')
-    const replacement = `${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}/`;
+    const replacement = `${angularLibName}/${SourceModifier.nameFor(this.project.name)}/`;
     return fileContent.replace(regex, replacement)
   }
 

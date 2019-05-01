@@ -15,7 +15,7 @@ import {
   pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir
 } from '../../helpers';
 import { NodeModules } from "../features/node-modules";
-import { FilesRecreator } from '../features/files-builder';
+import { FilesRecreator } from '../features/files-recreator';
 import { ProxyRouter } from '../features/proxy-router';
 import { CopyManager } from '../features/copy-manager';
 import { SourceModifier } from '../features/source-modifier';
@@ -256,6 +256,9 @@ export abstract class BaseProject {
   get baseline(): Project {
     if (Morphi.IsBrowser) {
       return this.browser.baseline;
+    }
+    if(this.isContainer) {
+      error(`Baseline for container is not supported`)
     }
     //#region @backend
     if (this.isWorkspace) {

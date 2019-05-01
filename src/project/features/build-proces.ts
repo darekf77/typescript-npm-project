@@ -44,7 +44,7 @@ export class BuildProcess extends FeatureForProject {
     await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
 
     if (watch) {
-      await project.filesStructure.initAndWatch(args);
+      await project.filesStructure.init(args,{ watch: true });
     } else {
       await project.filesStructure.init(args);
     }

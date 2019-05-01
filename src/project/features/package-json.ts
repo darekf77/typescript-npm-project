@@ -178,15 +178,13 @@ export class PackageJSON {
   }
 
 
-
-
   show(reasonToShowPackages: string) {
-    this.reasonToShowPackages = reasonToShowPackages;
+    this.reasonToShowPackages = `\n${reasonToShowPackages}`;
     this.saveForInstall(true);
   }
 
   hide(reasonToHidePackages: string) {
-    this.reasonToHidePackages = reasonToHidePackages;
+    this.reasonToHidePackages = `\n${reasonToHidePackages}`;
     this.saveForInstall(false)
   }
 

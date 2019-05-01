@@ -46,10 +46,10 @@ export class WorkspaceSymlinks extends FeatureForProject {
       }
       fse.symlinkSync(c.location, destination)
     })
-    this.project.children.forEach(c => {
-      log(`Add parent '${this.project.genericName}' node_modules to child: ${c.name} ${triggeredMsg}`)
-      this.project.node_modules.linkToProject(c)
-    })
+    // this.project.children.forEach(c => {
+    //   log(`Add parent '${this.project.genericName}' node_modules to child: ${c.name} ${triggeredMsg}`)
+    //   this.project.node_modules.linkToProject(c)
+    // })
   }
 
 

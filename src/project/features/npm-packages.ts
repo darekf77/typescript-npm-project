@@ -26,7 +26,7 @@ export class NpmPackages extends FeatureForProject {
 
   public installAll(triggeredBy: string) {
 
-    const triggeredMsg = ` [triggered by "${triggeredBy}"] `;
+    const triggeredMsg = ` \n[triggered by "${triggeredBy}"] `;
     log(`Packages instalation for ${this.project.genericName} ${triggeredMsg}`)
 
     if (this.project.node_modules.exist) {

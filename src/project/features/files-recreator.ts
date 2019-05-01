@@ -250,13 +250,6 @@ export class FilesRecreator extends FeatureForProject {
 
 
 
-
-
-
-
-
-
-
   projectSpecyficFiles() {
     const defaultProjectProptotype = Project.by(this.project.type);
     let files: RecreateFile[] = [];
