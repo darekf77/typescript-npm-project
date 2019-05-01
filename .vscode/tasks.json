@@ -5,11 +5,8 @@
     "command": "npm-run",
     "isShellCommand": true,
     "args": [
-        "tsc",
-        "-p",
-        ".",
-        "-w"
+        "tsc"
     ],
-    "showOutput": "always",
+    "showOutput": "never",
     "isBackground": false
 }

@@ -620,6 +620,9 @@ export abstract class BaseProject {
         if (f === config.folder.node_modules) {
           return false;
         }
+        if (f === config.file._gitignore) {
+          return false;
+        }
         if (f.startsWith(config.folder.bundle) && this.isTnp) {
           return false;
         }

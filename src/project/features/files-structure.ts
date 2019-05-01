@@ -156,7 +156,11 @@ export class FilesStructure extends FeatureForProject {
   }
 
   private recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
-    (proj[type] as any)()
+    if(type === 'clear') {
+      proj.clear()
+    } else if(type === 'reset') {
+      proj.reset()
+    }
     if (recrusive) {
       for (let index = 0; index < proj.children.length; index++) {
         const c = proj.children[index];
@@ -188,7 +192,7 @@ export class FilesStructure extends FeatureForProject {
 
   async  clearFromArgs(args) {
     const { recrusive } = this.resolveArgs(args)
-    await this.reset({ recrusive })
+    await this.clear({ recrusive })
   }
 
 }

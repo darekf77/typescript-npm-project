@@ -59,29 +59,40 @@ export async function start(argsv: string[], spinner?: Ora) {
 
   const functions: Function[] = []
 
-  files.forEach(function (file) {
+  files.some((file) => {
     let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {
-      _.forIn(defaultObjectFunctionsOrHelpString, (v: Function | [Function, string] | string, k) => {
-        if (recognized) {
-          return
+
+      Object.keys(defaultObjectFunctionsOrHelpString).map(key => {
+        const keyNoUnderscore = key.replace(/(\_|\$)/g, '')
+        if (!defaultObjectFunctionsOrHelpString[keyNoUnderscore]) {
+          defaultObjectFunctionsOrHelpString[keyNoUnderscore] = defaultObjectFunctionsOrHelpString[key]
         }
-        if (!isString(v)) {
-          const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
-          functions.push(vFn)
-          if (_.isFunction(vFn)) {
-            const check = match(k, argsv);
-            if (check.isMatch) {
-              recognized = true;
-              spinner && spinner.stop()
-              vFn.apply(null, [check.restOfArgs.join(' ')]);
-              return;
+      })
+
+      for (const k in defaultObjectFunctionsOrHelpString) {
+        if (defaultObjectFunctionsOrHelpString.hasOwnProperty(k)) {
+          const v = defaultObjectFunctionsOrHelpString[k];
+          if (recognized) {
+            return true;
+          }
+          if (!isString(v)) {
+            const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
+            functions.push(vFn)
+            if (_.isFunction(vFn)) {
+              const check = match(k, argsv);
+              if (check.isMatch) {
+                recognized = true;
+                spinner && spinner.stop()
+                vFn.apply(null, [check.restOfArgs.join(' ')]);
+                return true;
+              }
             }
           }
         }
-
-      })
+      }
     }
+    return false;
   });
   spinner && spinner.stop()
   if (recognized) {
