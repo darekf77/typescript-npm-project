@@ -10,18 +10,22 @@ import { info, error } from '../../helpers';
 
 export class AutoActions extends FeatureForProject {
 
-  readonly configuration: AutoActionsUser;
+  configuration: AutoActionsUser;
 
   constructor(public project: Project) {
     super(project);
 
+
+  }
+
+  private init() {
     const autobuildjsonfilePath = path.join(config.pathes.tnp_folder_location, config.file.autob_actions_js);
     this.configuration = require(`${autobuildjsonfilePath}`);
   }
 
 
   release() {
-
+    this.init()
     const autoreleases: ProjectForAutoRelease[] = this.configuration.autoreleases;
     if (!_.isArray(autoreleases)) {
       error(`No autoreleases in autobuild.json.`)
@@ -64,6 +68,7 @@ export class AutoActions extends FeatureForProject {
   }
 
   async build(watch = false) {
+    this.init()
     const build = this.getBuild();
     // console.log('build',build)
     if (!build) {

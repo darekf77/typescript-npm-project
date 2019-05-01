@@ -615,8 +615,10 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  public reset() {
-    log(`Reseting project: ${this.genericName}`);
+  public reset(showMsg = true) {
+    if(showMsg) {
+      log(`Reseting project: ${this.genericName}`);
+    }
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
@@ -644,7 +646,7 @@ export abstract class BaseProject {
   public clear() {
     log(`Cleaning project: ${this.genericName}`);
     this.node_modules.remove();
-    this.reset()
+    this.reset(false)
   }
   //#endregion
 
