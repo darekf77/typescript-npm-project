@@ -7,7 +7,7 @@ const inlineTemplates = require('gulp-inline-ng2-template');
 const exec = require('child_process').exec;
 import * as fs from 'fs';
 import * as path from 'path';
-import { ProjectFrom, config } from 'tnp-bundle'
+import { Project, config } from 'tnp-bundle'
 
 /**
  * Inline templates configuration.
@@ -35,7 +35,7 @@ interface IsomorphicOptions {
 }
 
 function getIsomorphiOptions(): IsomorphicOptions {
-  const project = ProjectFrom(process.cwd());
+  const project = Project.From(process.cwd());
   if (project.isWorkspaceChildProject) {
 
     const workspace = project.parent;

@@ -482,13 +482,8 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  get children(): Project[] {
-    if (Morphi.IsBrowser) {
-      return this.browser.children;
-    }
-    //#region @backend
-    // console.log('from ' + this.location)
-
+  //#region @backend
+  getFolders() {
     const notAllowed: RegExp[] = [
       '\.vscode', 'node\_modules',
       ..._.values(config.tempFolders),
@@ -513,13 +508,36 @@ export abstract class BaseProject {
           return (notAllowed.filter(p => p.test(folderNam)).length === 0);
         }))
     }
+    return subdirectories;
+  }
+  //#endregion
 
-    return subdirectories
+
+  //#region @backend
+  getAllChildren(options?: { unknowIncluded: boolean; }) {
+    const { unknowIncluded = false } = options || {};
+    const subdirectories = this.getFolders();
+
+    let res = subdirectories
       .map(dir => {
         // console.log('child:', dir)
         return Project.From(dir);
       })
       .filter(c => !!c)
+
+    if (!unknowIncluded) {
+      res = res.filter(c => c.type !== 'unknow-npm-project')
+    }
+    return res;
+  }
+  //#endregion
+
+  get children(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.children;
+    }
+    //#region @backend
+    return this.getAllChildren()
     //#endregion
   }
 
@@ -1147,7 +1165,12 @@ export class Project extends BaseProject implements IProject {
         fse.writeFileSync(currentPathInSystem, tnp.location, 'utf8')
       }
     } else {
-      const tnpBundleTnpPath = fse.readFileSync(config.pathes.tnp_system_path_txt).toString().trim()
+      let tnpBundleTnpPath;
+      if (global.tnp_normal_mode) {
+        tnpBundleTnpPath = fse.readFileSync(config.pathes.tnp_system_path_txt).toString().trim()
+      } else {
+        tnpBundleTnpPath = fse.readFileSync(config.pathes.tnp_system_path_txt_tnp_bundle).toString().trim()
+      }
       if (!fse.existsSync(tnpBundleTnpPath)) {
         error(`Please build you ${chalk.bold('tnp-npm-project')} first... `)
       }

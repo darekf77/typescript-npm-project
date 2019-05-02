@@ -191,6 +191,9 @@ export class PackageJSON {
   dedupe(packages?: string[]) {
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;
+    // console.log('Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;',Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe)
+    // console.log('packages to dedupe', packagesNames)
+    // process.exit(0)
     packagesNames.forEach(f => {
       log(`Scanning for duplicates fo ${f}....`)
 

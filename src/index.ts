@@ -1,13 +1,13 @@
 //#region @backend
 import { Ora } from 'ora';
-import { OutFolder } from 'morphi/build';
 //#endregion
+import { BuildDir } from './models';
 
 declare global {
   namespace NodeJS {
     interface Global {
       tnp_normal_mode: boolean;
-      tnp_out_folder: OutFolder;
+      tnp_out_folder: BuildDir;
       testMode: boolean;
       hideWarnings: boolean;
       hideInfos: boolean;
@@ -33,3 +33,4 @@ export * from './helpers/helpers-git';
 export * from './helpers/helpers-process';
 export * from './project/features/build-isomorphic-lib';
 //#endregion
+export * from './progress-output';

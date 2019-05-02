@@ -214,7 +214,7 @@ export default {
   },
 
   $DEDUPE(args: string) {
-    Project.Current.packageJson.dedupe(args.split(' '))
+    Project.Current.packageJson.dedupe(args.trim() === '' ? void 0 : args.split(' '))
     process.exit(0)
   },
 

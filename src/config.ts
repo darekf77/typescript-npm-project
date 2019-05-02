@@ -79,6 +79,8 @@ export const config = {
     tnp_folder_location: pathResolved(__dirname, '..'),
 
     tnp_system_path_txt: pathResolved(__dirname, '..', file.tnp_system_path_txt),
+    tnp_system_path_txt_tnp_bundle: pathResolved(__dirname, '..', file.tnpBundle, file.tnp_system_path_txt),
+
     tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
     tmp_db_tests_json: pathResolved(__dirname, '..', file.tmp_db_tests_json),
 

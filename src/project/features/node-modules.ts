@@ -30,7 +30,7 @@ export class NodeModules extends FeatureForProject {
       .forEach(d => {
         this.project.npmPackages.install(triggerMsg, d)
       });
-
+    this.project.packageJson.dedupe()
   }
 
   private get copyBin() {
