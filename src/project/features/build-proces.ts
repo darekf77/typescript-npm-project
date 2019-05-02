@@ -1,6 +1,8 @@
 //#region @backend
 import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as fse from 'fs-extra';
+import * as path from 'path';
 
 import { FeatureForProject, Project } from '../abstract';
 import { BuildOptions } from './build-options';
@@ -28,7 +30,15 @@ export class BuildProcess extends FeatureForProject {
     await this.build(_.merge(options, overrideOptions), config.allowedTypes.app, project);
   }
 
+  private get checkIfGeneratedTnpBundle() {
+    return Project.Current.isTnp ? true : fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser))
+  }
+
   private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project, exit = true) {
+
+    if (!this.checkIfGeneratedTnpBundle) {
+      error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
+    }
 
     const { watch, appBuild, args } = buildOptions;
 
@@ -44,7 +54,7 @@ export class BuildProcess extends FeatureForProject {
     await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
 
     if (watch) {
-      await project.filesStructure.init(args,{ watch: true });
+      await project.filesStructure.init(args, { watch: true });
     } else {
       await project.filesStructure.init(args);
     }

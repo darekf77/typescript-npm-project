@@ -5,7 +5,7 @@ import { Project, LibProject } from "../project";
 import { BaselineSiteJoin } from "../project/features/baseline-site-join";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';
-import { error, info } from '../helpers';
+import { error, info, HelpersLinks } from '../helpers';
 import chalk from 'chalk';
 import { getMostRecentFilesNames } from '../helpers';
 import { Helpers as HelpersMorphi } from "morphi";
@@ -135,7 +135,11 @@ function $GIT_REMOVE_UNTRACKED() {
 
 export default {
 
-
+  LN(args: string) {
+    let [target, link] = args.split(' ');
+    HelpersLinks.createSymLink(target, link)
+    process.exit(0)
+  },
 
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');

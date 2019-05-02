@@ -1,11 +1,13 @@
 //#region @backend
 import { Ora } from 'ora';
+import { OutFolder } from 'morphi/build';
 //#endregion
 
 declare global {
   namespace NodeJS {
     interface Global {
       tnp_normal_mode: boolean;
+      tnp_out_folder: OutFolder;
       testMode: boolean;
       hideWarnings: boolean;
       hideInfos: boolean;

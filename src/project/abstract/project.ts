@@ -5,6 +5,7 @@ import * as fse from "fs-extra";
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as inquirer from 'inquirer';
+import * as rimraf from 'rimraf';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 
@@ -37,9 +38,6 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
-import rimraf = require('rimraf');
-import { OutFolder } from 'morphi/build';
-
 
 
 
@@ -257,10 +255,10 @@ export abstract class BaseProject {
     if (Morphi.IsBrowser) {
       return this.browser.baseline;
     }
+    //#region @backend
     if (this.isContainer) {
       error(`Baseline for container is not supported`)
     }
-    //#region @backend
     if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
@@ -269,8 +267,9 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region @backend
   get StaticVersion() {
-    const outDir: OutFolder = 'dist';
+    const outDir: BuildDir = 'dist';
     if (this.isWorkspace) {
       return Project.From(path.join(this.location, outDir, this.name))
     } else if (this.isWorkspaceChildProject) {
@@ -278,6 +277,7 @@ export abstract class BaseProject {
     }
     error(`There is not static version for project ${this.genericName}`, false, true)
   }
+  //#endregion
 
   get isBuildedLib() {
     if (Morphi.IsBrowser) {
