@@ -12,7 +12,7 @@ import config from '../../config';
 import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
-  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
 } from '../../helpers';
 import { NodeModules } from "../features/node-modules";
 import { FilesRecreator } from '../features/files-recreator';
@@ -257,7 +257,7 @@ export abstract class BaseProject {
     if (Morphi.IsBrowser) {
       return this.browser.baseline;
     }
-    if(this.isContainer) {
+    if (this.isContainer) {
       error(`Baseline for container is not supported`)
     }
     //#region @backend
@@ -550,11 +550,8 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  linkTo(destination: string) {
-    if (fse.existsSync(destination)) {
-      tryRemoveDir(destination);
-    }
-    fse.symlinkSync(this.location, destination);
+  linkTo(destPackageLocation: string) {
+    HelpersLinks.createSymLink(this.location, destPackageLocation);
   }
   //#endregion
 
@@ -616,7 +613,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public reset(showMsg = true) {
-    if(showMsg) {
+    if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
     }
     const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore

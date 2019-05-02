@@ -12,12 +12,6 @@ export class AutoActions extends FeatureForProject {
 
   configuration: AutoActionsUser;
 
-  constructor(public project: Project) {
-    super(project);
-
-
-  }
-
   private init() {
     const autobuildjsonfilePath = path.join(config.pathes.tnp_folder_location, config.file.autob_actions_js);
     this.configuration = require(`${autobuildjsonfilePath}`);

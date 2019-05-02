@@ -166,11 +166,9 @@ export class ProjectIsomorphicLib extends LibProject {
     const basename = source;
     source = path.join(this.location, source);
     outLInk = path.join(this.location, outLInk, basename);
-    if (fse.existsSync(outLInk)) {
-      fse.unlinkSync(outLInk);
-    }
+
     if (fse.existsSync(source)) {
-      HelpersLinks.createLink(outLInk, source)
+      HelpersLinks.createSymLink(source, outLInk)
     }
   }
 

@@ -6,7 +6,7 @@ import * as path from 'path';
 import { LibProject } from "./abstract";
 import { ProjectAngularClient } from "./project-angular-client";
 import { BuildDir } from "../models";
-import { error, tryRemoveDir } from "../helpers";
+import { error, tryRemoveDir, HelpersLinks } from "../helpers";
 import config from "../config";
 import { Project } from './abstract';
 import { Helpers } from 'morphi/helpers';
@@ -60,7 +60,7 @@ export class ProjectAngularLib extends LibProject {
       this.run(`rimraf ${outDir}`, { tryAgainWhenFailAfter: 1000 }).sync()
       if (outDir === 'dist') {
         tryRemoveDir(path.join(this.location, config.folder.module));
-        fse.symlinkSync(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
+        HelpersLinks.createSymLink(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
       }
       this.run(`npm-run gulp inline-templates-${outDir}-watch`,
         { output: false, outputLineReplace }).async()
@@ -76,7 +76,7 @@ export class ProjectAngularLib extends LibProject {
         this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
         if (outDir === 'dist') {
           tryRemoveDir(path.join(this.location, config.folder.module));
-          fse.symlinkSync(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
+          HelpersLinks.createSymLink(path.join(this.location, outDir), path.join(this.location, outDir, config.folder.module));
         }
       }, `angular-lib (project ${this.name})`)
     }

@@ -40,14 +40,8 @@ export class NodeModules extends FeatureForProject {
         const source = path.join(self.project.location, config.folder.node_modules, '.bin')
         const dest = path.join(project.location, config.folder.node_modules, '.bin')
         if (fse.existsSync(source)) {
-          if (!fse.existsSync(dest)) {
-            fse.mkdirpSync(dest)
-          }
           if (linkOnly) {
-            if (fse.existsSync(dest)) {
-              tryRemoveDir(dest)
-            }
-            fse.symlinkSync(source, dest)
+            HelpersLinks.createSymLink(source, dest)
           } else {
             fse.copySync(source, dest, {
               recursive: true,
@@ -136,10 +130,7 @@ export class NodeModules extends FeatureForProject {
   linkToProject(target: Project) {
     const localNodeModules = path.join(this.project.location, config.folder.node_modules);
     const projectNodeModules = path.join(target.location, config.folder.node_modules);
-    if (fse.existsSync(projectNodeModules)) {
-      this.project.node_modules.remove()
-    }
-    fse.symlinkSync(localNodeModules, projectNodeModules);
+    HelpersLinks.createSymLink(localNodeModules, projectNodeModules);
   }
 
   private addDependenceis(project: Project, context: string, allNamesBefore: string[] = []) {
