@@ -97,7 +97,7 @@ export class NpmPackages extends FeatureForProject {
   }
 
   private normalInstalation(options?: { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; }) {
-    const { generatLockFiles = false, useYarn = false, pkg = void 0 } = options || {};
+    const { generatLockFiles = false, useYarn = true, pkg = void 0 } = options || {};
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
 
