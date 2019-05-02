@@ -32,8 +32,13 @@ export class NpmPackages extends FeatureForProject {
     const type = this.project.type;
     const fullInstall = (npmPackage.length === 0);
 
-    log(`Package [${npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
-      .join(',')}] instalation for ${this.project.genericName} ${triggeredMsg}`)
+    if (fullInstall) {
+      log(`Packages full installation for ${this.project.genericName}`)
+    } else {
+      log(`Package [${npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+        .join(',')}] instalation for ${this.project.genericName} ${triggeredMsg}`)
+
+    }
 
     if (!this.emptyNodeModuls) {
       const nodeModulePath = path.join(this.project.location, config.folder.node_modules);

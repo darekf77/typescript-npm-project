@@ -175,7 +175,6 @@ export abstract class LibProject extends Project {
       }
 
       this.bundleResources()
-      this.packageJson.hide('hide after release')
       this.commit(newVersion);
     }, () => {
       if (Project.isBundleMode) {
