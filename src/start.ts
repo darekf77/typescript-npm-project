@@ -35,18 +35,18 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (localLib === "i") {
       argsv[2] = 'install'
     }
-    if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
-      recognized = true;
-      const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
-      const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
-      try {
-        spinner && spinner.stop()
-        runCommand(commadnToRun).sync()
-      } catch (error) {
-        console.log(`Command ${localLib} ERROR...`);
-      }
-      process.exit(0)
-    }
+    // if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
+    //   recognized = true;
+    //   const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
+    //   const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
+    //   try {
+    //     spinner && spinner.stop()
+    //     runCommand(commadnToRun).sync()
+    //   } catch (error) {
+    //     console.log(`Command ${localLib} ERROR...`);
+    //   }
+    //   process.exit(0)
+    // }
   }
 
   // await initWatcherDB();

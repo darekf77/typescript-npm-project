@@ -254,7 +254,7 @@ export class DBTransaction {
 
     await runSyncOrAsync(callback)
     if (rewriteFile) {
-      fse.removeSync(transactionFilePath);
+      fse.unlinkSync(transactionFilePath);
     }
     debug && console.log(`Transaction ${!rewriteFile ? `(inside transaction with pid: ${process.ppid})`
       : ''} ended for pid: ${process.pid}, name: ${chalk.bold(name)}`)

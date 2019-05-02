@@ -4,10 +4,11 @@ var fs = require('fs');
 var path = require('path');
 var ora = require('ora');
 var spinner = ora();
+
 global.spinner = spinner;
-if (!isNaN(process.ppid)) {
-  spinner.start();
-}
+// if (!isNaN(process.ppid)) {
+//   spinner.start();
+// }
 
 var pathToDistFolder = path.join(__dirname, '../dist');
 var pathToBundleFolder = path.join(__dirname, '../bundle');

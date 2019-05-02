@@ -1,7 +1,7 @@
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
-import fse from 'fs-extra';
+import * as fse from 'fs-extra';
 
 import { Project } from '../abstract';
 import { info, checkValidNpmPackageName, error, log, warn } from '../../helpers';
@@ -11,76 +11,29 @@ import config from '../../config';
 
 export class NpmPackages extends FeatureForProject {
 
-  fromArgs(packagesNamesSpaceSeparated: string) {
+  async fromArgs(packagesNamesSpaceSeparated: string) {
 
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      this.installAll(`tnp install`);
+      await this.installAll(`tnp install`);
     } else {
       const packages = this.resolvePacakgesFromArgs(args);
-      this.install(`tnp install ${packages.join(',')}`, ...packages);
+      await this.install(`tnp install ${packages.join(',')}`, ...packages);
     }
   }
 
+  public async installAll(triggeredMsg: string) {
+    await this.install(triggeredMsg)
+  }
 
-  public installAll(triggeredBy: string) {
-
-    const triggeredMsg = ` \n[triggered by "${triggeredBy}"] `;
-    log(`Packages instalation for ${this.project.genericName} ${triggeredMsg}`)
-
-    if (this.project.node_modules.exist) {
-      log(`[npm-package] node_modules exisit for ${this.project.genericName}`)
-      return;
-    }
+  public async install(triggeredMsg: string, ...npmPackage: Package[]) {
 
     const type = this.project.type;
+    const fullInstall = (npmPackage.length === 0);
 
-    if (type === 'unknow-npm-project' || this.project.isTnp) {
-      if (this.emptyNodeModuls) {
-        this.normalInstalation()
-      }
-      return;
-    }
-
-    if (this.project.isWorkspaceChildProject) {
-      this.project.parent.npmPackages.installAll(`workspace child: ${this.project.name} ${triggeredMsg}`)
-      return;
-    }
-
-    if (this.project.isStandaloneProject) {
-      this.project.node_modules.installFrom(Project.Tnp, triggeredMsg)
-      this.project.packageJson.show(`standalone instalation from tnp ${triggeredMsg}`)
-      return;
-    }
-
-    if (this.project.isContainer) {
-      this.project.node_modules.installFrom(Project.Tnp, triggeredMsg);
-      this.project.children.forEach(childWorkspace => {
-        childWorkspace.node_modules.remove()
-        childWorkspace.node_modules.installFrom(this.project, `parent container ${this.project.name} ${triggeredMsg}`)
-      });
-      this.project.packageJson.show(`container instalation from tnp ${triggeredMsg}`)
-      return;
-    }
-
-    if (this.project.isWorkspace) {
-      this.project.workspaceSymlinks.remove(triggeredMsg)
-      if (this.project.isContainerChild) {
-        this.project.parent.npmPackages.installAll(`container child:  ${this.project.name} ${triggeredMsg}`)
-      } else {
-        this.project.node_modules.installFrom(Project.Tnp, triggeredMsg)
-        this.project.packageJson.show('workspace instalation from tnp')
-      }
-      this.project.workspaceSymlinks.add(triggeredMsg)
-      return;
-    }
-
-  }
-
-
-  public install(triggeredMsg: string, ...npmPackage: Package[]) {
-    log(`Package [${npmPackage.join(',')}] instalation for ${this.project.genericName} ${triggeredMsg}`)
+    log(`Package [${npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+      .join(',')}] instalation for ${this.project.genericName} ${triggeredMsg}`)
 
     if (!this.emptyNodeModuls) {
       const nodeModulePath = path.join(this.project.location, config.folder.node_modules);
@@ -89,55 +42,47 @@ export class NpmPackages extends FeatureForProject {
       }
     }
 
-    const type = this.project.type;
-    if (type === 'unknow-npm-project' || this.project.isTnp) {
-      npmPackage.forEach(pkg => {
-        this.normalInstalation({ pkg })
-      });
-      return;
-    }
-
-    if (this.project.isStandaloneProject || this.project.isContainer) {
-      Project.Tnp.packageJson.show(`${type} instalation - from tnp ${triggeredMsg}`);
-      this.project.packageJson.show(`${type} instalation - before normal install ${triggeredMsg}`)
-      npmPackage.forEach(pkg => {
-        this.normalInstalation({ pkg })
-      });
-      this.project.packageJson.show(`${type} instalation - after normal insllation to generate override ${triggeredMsg}`);
-      if (this.project.isContainer) {
-        this.project.children.forEach(workspaceContainerChild => {
-          workspaceContainerChild.packageJson.hide(`becouse it is container child: ${this.project.name} ${triggeredMsg}`)
-          npmPackage.forEach(pkg => {
-            this.project.node_modules.copy(pkg.name, { override: true }).to(workspaceContainerChild);
-          });
-          workspaceContainerChild.getDepsAsPackage('tnp_overrided_dependencies').forEach(p => {
-            warn(`${type} instalation, overrided package "${p.name}" ` +
-              `in workspace ${workspaceContainerChild.genericName} will be ingnore.`)
-          });
+    if (type === 'unknow-npm-project') {
+      if (fullInstall) {
+        this.normalInstalation()
+      } else {
+        npmPackage.forEach(pkg => {
+          this.normalInstalation({ pkg })
         });
       }
-      return;
+
     }
 
     if (this.project.isWorkspaceChildProject) {
-      this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg}`, ...npmPackage)
-      return;
+      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg}`, ...npmPackage)
     }
 
-    if (this.project.isWorkspace) {
-      if (this.project.isContainerChild) {
-        this.project.parent.npmPackages.install(`container child: ${this.project.name} ${triggeredMsg}`, ...npmPackage)
-        return;
+    if (this.project.isContainer) {
+      for (let index = 0; index < this.project.children.length; index++) {
+        const childWrokspace = this.project.children[index];
+        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg}`, ...npmPackage);
       }
-      Project.Tnp.packageJson.show(`${type} instalation - from tnp ${triggeredMsg}`);
-      this.project.packageJson.show(`${type} instalation - before normal install ${triggeredMsg}`)
-      npmPackage.forEach(pkg => {
-        this.normalInstalation({ pkg })
-      });
-      this.project.packageJson.show(`${type} instalation - after normal insllation to generate override ${triggeredMsg}`);
     }
 
+    if (this.project.isStandaloneProject || this.project.isWorkspace) {
+      this.project.packageJson.show(`${type} instalation before [${triggeredMsg}]`);
+      if (type === 'workspace') {
+        this.project.workspaceSymlinks.remove(triggeredMsg)
+      }
+      if (fullInstall) {
+        this.normalInstalation()
+      } else {
+        npmPackage.forEach(pkg => {
+          this.normalInstalation({ pkg })
+        });
+      }
+      if (type === 'workspace') {
+        this.project.workspaceSymlinks.add(triggeredMsg)
+      }
+      this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
+    }
 
+    this.project.packageJson.dedupe();
   }
 
 
@@ -167,11 +112,11 @@ export class NpmPackages extends FeatureForProject {
             this.project.git.resetFiles(config.file.yarn_lock)
           }
         } else {
-          fse.existsSync(yarnLockPath) && fse.removeSync(yarnLockPath);
+          fse.existsSync(yarnLockPath) && fse.unlinkSync(yarnLockPath);
         }
       } else {
         const packageLockPath = path.join(this.project.location, config.file.package_lock_json)
-        fse.existsSync(packageLockPath) && fse.removeSync(packageLockPath);
+        fse.existsSync(packageLockPath) && fse.unlinkSync(packageLockPath);
       }
     }
     this.project.packageJson.dedupe();

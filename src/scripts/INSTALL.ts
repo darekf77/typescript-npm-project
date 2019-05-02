@@ -1,8 +1,8 @@
 //#region @backend
 import { Project } from '../project';
 
-export function INSTALL(args, exit = true) {
-  Project.Current.npmPackages.fromArgs(args);
+export async function INSTALL(args, exit = true) {
+  await Project.Current.npmPackages.fromArgs(args);
   if (exit) {
     process.exit(0);
   }

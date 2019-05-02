@@ -16,7 +16,7 @@ import config from '../config';
 import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
 
-function copyModuleto(args: string) {
+async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
   if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
     if (packageName.startsWith(`${config.folder.node_modules}/`)) {
@@ -28,7 +28,7 @@ function copyModuleto(args: string) {
       project = Project.From(project) as Project;
     }
 
-    project.node_modules.copy(packageName).to(project);
+    await project.node_modules.copy(packageName).to(project);
     info(`Copy DONE`)
   } else {
     error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
@@ -251,11 +251,11 @@ export default {
   $copyto: (args) => {
     copyto(args)
   },
-  $copymoduletoproject: (args) => {
-    copyModuleto(args)
+  $copymoduletoproject: async (args) => {
+    await copyModuleto(args)
   },
-  $copy_module_to_project: (args) => {
-    copyModuleto(args)
+  $copy_module_to_project: async (args) => {
+    await copyModuleto(args)
   }
 
 

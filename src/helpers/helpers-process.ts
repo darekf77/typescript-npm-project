@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as os from "os";
 import * as sleep from 'sleep';
-import { error, info, warn } from "./helpers-messages";
+import { error, info, warn, log } from "./helpers-messages";
 
 import { RunOptions, WatchOptions } from "../models";
 
@@ -117,18 +117,18 @@ export function clearConsole() {
 
 
 
-// const processes: child.ChildProcess[] = [];
-// const cleanExit = function () {
-//   processes.forEach(p => {
-//     p.kill('SIGINT')
-//     p.kill('SIGTERM')
-//     console.log(`Killing child process on ${p.pid}`)
-//   })
-//   console.log(`Killing parent on ${process.pid}`)
-//   process.exit()
-// };
-// process.on('SIGINT', cleanExit); // catch ctrl-c
-// process.on('SIGTERM', cleanExit); // catch kill
+const processes: child.ChildProcess[] = [];
+const cleanExit = function () {
+  processes.forEach(p => {
+    p.kill('SIGINT')
+    p.kill('SIGTERM')
+    log(`Killing child process on ${p.pid}`)
+  })
+  log(`Killing parent on ${process.pid}`)
+  process.exit()
+};
+process.on('SIGINT', cleanExit); // catch ctrl-c
+process.on('SIGTERM', cleanExit); // catch kill
 // process.on('uncaughtException', cleanExit)
 // process.on('unhandledRejection', cleanExit)
 
@@ -151,7 +151,7 @@ function modifyLineByLine(data: string | Buffer | Error, outputLineReplace: (out
 
 export function logProc(proc: child.ChildProcess, output = true, stdio,
   outputLineReplace: (outputLine: string) => string) {
-  // processes.push(proc);
+  processes.push(proc);
 
   proc.stdio = stdio;
 

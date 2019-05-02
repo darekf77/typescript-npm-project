@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../abstract';
 import { ArrNpmDependencyType, InstalationType, Package } from '../../models';
@@ -13,60 +14,69 @@ import { FeatureForProject } from '../abstract';
 
 export class NodeModules extends FeatureForProject {
 
-  installFrom(source: Project, triggerMsg: string) {
-    source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
-    log(`[node_modules] Copy instalation of npm packages from ${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
-    global.spinner.start()
-    ArrNpmDependencyType.forEach(depName => {
-      source.getDepsAsProject(depName).forEach(dep => {
-        source.node_modules.copy(dep.name).to(this.project)
-      })
-    });
+  // async installFrom(source: Project, triggerMsg: string) {
+  //   source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
+  //   log(`[node_modules] Copy instalation of npm packages from ` +
+  //     `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
 
-    source.node_modules.copyBin.to(this.project);
-    global.spinner.start()
+  //   // global.spinner.start()
 
-    this.project.getDepsAsPackage('tnp_overrided_dependencies')
-      .forEach(d => {
-        this.project.npmPackages.install(triggerMsg, d)
-      });
-    this.project.packageJson.dedupe()
-  }
+  //   for (let index = 0; index < ArrNpmDependencyType.length; index++) {
+  //     const depName = ArrNpmDependencyType[index];
+  //     const deppp = source.getDepsAsProject(depName);
+  //     for (let index2 = 0; index2 < deppp.length; index2++) {
+  //       const dep = deppp[index2];
+  //       await source.node_modules.copy(dep.name).to(this.project)
+  //     }
 
-  private get copyBin() {
-    const self = this;
-    return {
-      to(project: Project, linkOnly = false) {
-        const source = path.join(self.project.location, config.folder.node_modules, '.bin')
-        const dest = path.join(project.location, config.folder.node_modules, '.bin')
-        if (fse.existsSync(source)) {
-          if (linkOnly) {
-            HelpersLinks.createSymLink(source, dest)
-          } else {
-            fse.copySync(source, dest, {
-              recursive: true,
-              overwrite: true
-            })
-          }
+  //   }
 
-        }
-      }
-    }
-  }
+  //   source.node_modules.copyBin.to(this.project);
+  //   // global.spinner.start()
+
+  //   const overridedDeps = this.project.getDepsAsPackage('tnp_overrided_dependencies');
+  //   for (let indexOverridedDeps = 0; indexOverridedDeps < overridedDeps.length; indexOverridedDeps++) {
+  //     const d = overridedDeps[indexOverridedDeps];
+  //     await this.project.npmPackages.install(triggerMsg, d);
+  //   }
+
+  //   this.project.packageJson.dedupe()
+  // }
+
+  // private get copyBin() {
+  //   const self = this;
+  //   return {
+  //     to(project: Project, linkOnly = false) {
+  //       const source = path.join(self.project.location, config.folder.node_modules, '.bin')
+  //       const dest = path.join(project.location, config.folder.node_modules, '.bin')
+  //       if (fse.existsSync(source)) {
+  //         if (linkOnly) {
+  //           HelpersLinks.createSymLink(source, dest)
+  //         } else {
+  //           fse.copySync(source, dest, {
+  //             recursive: true,
+  //             overwrite: true
+  //           })
+  //         }
+
+  //       }
+  //     }
+  //   }
+  // }
 
   get exist(): boolean {
     return fs.existsSync(path.join(this.project.location, config.folder.node_modules, '.bin')); // TODO qucik fix for tnp-helpers
   }
 
   remove() {
-    fse.removeSync(path.join(this.project.location, config.folder.node_modules))
+    tryRemoveDir(path.join(this.project.location, config.folder.node_modules))
   }
 
 
   copy(pkg: string | Package, options?: { override?: boolean; linkOnly?: boolean; }) {
     const self = this;
     return {
-      to(destination: Project, ) {
+      async to(destination: Project, ) {
 
         const { override = false, linkOnly = false } = options || {};
 
@@ -89,8 +99,6 @@ export class NodeModules extends FeatureForProject {
           }
         }
 
-
-        log('please wait....')
         global.hideInfos = true;
         global.hideWarnings = true;
         global.hideLog = true;
@@ -98,7 +106,7 @@ export class NodeModules extends FeatureForProject {
         global.hideInfos = false;
         global.hideWarnings = false;
         global.hideLog = false;
-
+        const prog = new TerminalProgressBar('Please wait: :current / :total', depsNames.length);
         depsNames
           // .filter(dep => dep !== self.project.name)
           .forEach(pkgName => {
@@ -115,8 +123,9 @@ export class NodeModules extends FeatureForProject {
             } else {
               warn(`This is not a npm package: '${pkgName}' inside "${self.project.location}"`)
             }
-
+            prog.tick()
           })
+        prog.terminate()
 
       }
     }
