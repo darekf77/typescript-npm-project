@@ -47,17 +47,6 @@ export class NpmPackages extends FeatureForProject {
       }
     }
 
-    if (type === 'unknow-npm-project') {
-      if (fullInstall) {
-        this.normalInstalation()
-      } else {
-        npmPackage.forEach(pkg => {
-          this.normalInstalation({ pkg })
-        });
-      }
-
-    }
-
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg}`, ...npmPackage)
     }
@@ -69,8 +58,10 @@ export class NpmPackages extends FeatureForProject {
       }
     }
 
-    if (this.project.isStandaloneProject || this.project.isWorkspace) {
-      this.project.packageJson.show(`${type} instalation before [${triggeredMsg}]`);
+    if (this.project.isStandaloneProject || this.project.isWorkspace || type === 'unknow-npm-project') {
+      if (type !== 'unknow-npm-project') {
+        this.project.packageJson.show(`${type} instalation before [${triggeredMsg}]`);
+      }
       if (type === 'workspace') {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
@@ -84,10 +75,13 @@ export class NpmPackages extends FeatureForProject {
       if (type === 'workspace') {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
-      this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
+      if (type !== 'unknow-npm-project') {
+        this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
+      }
+      this.project.packageJson.dedupe();
+      this.project.tnpBundle.installAsPackage()
     }
 
-    this.project.packageJson.dedupe();
   }
 
 
@@ -124,7 +118,6 @@ export class NpmPackages extends FeatureForProject {
         fse.existsSync(packageLockPath) && fse.unlinkSync(packageLockPath);
       }
     }
-    this.project.packageJson.dedupe();
   }
 
 

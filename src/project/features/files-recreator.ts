@@ -38,7 +38,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 export class FilesRecreator extends FeatureForProject {
 
-  public init(includeVscode = false) {
+  public async init(includeVscode = false) {
     if (this.project.type === 'container') {
       return;
     }
@@ -53,7 +53,6 @@ export class FilesRecreator extends FeatureForProject {
       this.vscode.settings.excludedFiles();
       this.vscode.settings.colorsFromWorkspace()
     }
-
   }
 
   private get commonFilesForAllProjects() {

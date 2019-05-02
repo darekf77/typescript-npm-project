@@ -749,36 +749,6 @@ export abstract class BaseProject {
 
 
   //#region @backend
-  private async modifySourceBeforCompilation() {
-    if (this.isSite) {
-      await this.baseline.sourceModifier.init(`Initing source modifier for baseline`);
-      await this.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`);
-      // await questionYesNo('Continue ?') // TODO fix this
-    }
-
-    if (config.allowedTypes.app.includes(this.type)) {
-      if (!this.isStandaloneProject) {
-        const sourceModifireName = `Client source modules pathes modifier`;
-        const generatorName = 'Files generator: entites.ts, controllers.ts';
-        if (this.buildOptions.watch) {
-          if (this.type === 'isomorphic-lib' && this.useFramework) {
-            await this.frameworkFileGenerator.initAndWatch(generatorName)
-          } else {
-            await this.sourceModifier.initAndWatch(sourceModifireName)
-          }
-        } else {
-          if (this.type === 'isomorphic-lib' && this.useFramework) {
-            await this.frameworkFileGenerator.init(generatorName)
-          } else {
-            await this.sourceModifier.init(sourceModifireName)
-          }
-        }
-      }
-    }
-  }
-  //#endregion
-
-  //#region @backend
   private async selectAllProjectCopyto() {
     const db = await TnpDB.Instance;
     const projects = db
@@ -842,8 +812,6 @@ export abstract class BaseProject {
 
 
     this.buildOptions = buildOptions;
-
-    await this.modifySourceBeforCompilation();
 
     let baseHref: string;
     // console.log('AM HERE')

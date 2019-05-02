@@ -34,17 +34,21 @@ export class FilesStructure extends FeatureForProject {
       await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
     }
 
-    if (this.project.parent) {
-      this.project.parent.recreate.init();// TODO QUICK IFX
+    if (this.project.isWorkspaceChildProject) {
+      await this.project.parent.recreate.init();// TODO QUICK IFX
     }
 
-    this.project.recreate.init();
+    await this.project.recreate.init();
+
+    if (this.project.isWorkspaceChildProject) {
+      await this.modifySourceBeforCompilation(watch)
+    }
 
     if (this.project.isSite) {
 
       await this.installTnpHelpersForBaselines(this.project.baseline);
       await this.recreateFilesBaselinesWorkspaces(this.project);
-      this.project.baseline.recreate.init();
+      await this.project.baseline.recreate.init();
 
       await this.joinSiteWithParentBaselines(this.project, watch);
     }
@@ -64,7 +68,36 @@ export class FilesStructure extends FeatureForProject {
 
     }
 
+
   }
+
+
+  //#region @backend
+  private async modifySourceBeforCompilation(watch = false) {
+    if (this.project.isSite) {
+      await this.project.baseline.sourceModifier.init(`Initing source modifier for baseline`);
+      await this.project.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`);
+      // await questionYesNo('Continue ?') // TODO fix this
+    }
+
+    const sourceModifireName = `Client source modules pathes modifier`;
+    const generatorName = 'Files generator: entites.ts, controllers.ts';
+    if (watch) {
+      if (this.project.type === 'isomorphic-lib') {
+        await this.project.frameworkFileGenerator.initAndWatch(generatorName)
+      } else {
+        await this.project.sourceModifier.initAndWatch(sourceModifireName)
+      }
+    } else {
+      if (this.project.type === 'isomorphic-lib') {
+        await this.project.frameworkFileGenerator.init(generatorName)
+      } else {
+        await this.project.sourceModifier.init(sourceModifireName)
+      }
+    }
+
+  }
+  //#endregion
 
   private async  joinSiteWithParentBaselines(project: Project, watch: boolean, projectsToRecreate: Project[] = []) {
 
@@ -100,7 +133,7 @@ export class FilesStructure extends FeatureForProject {
 
       for (let index = 0; index < projectsToRecreate.length; index++) {
         const p = projectsToRecreate[index];
-        p.recreate.init()
+        await p.recreate.init()
       }
       return;
     }

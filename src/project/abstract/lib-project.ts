@@ -166,7 +166,7 @@ export abstract class LibProject extends Project {
         await this.npmPackages.installAll(`release procedure`)
       }
       this.packageJson.show('show for release')
-      this.recreate.init();
+      await this.recreate.init();
       await this.build({
         prod, outDir: config.folder.bundle as 'bundle'
       })
