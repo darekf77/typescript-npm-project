@@ -38,21 +38,7 @@ export class TnpBundle extends FeatureForProject {
     pathTnpPackageJSONData.dependencies = undefined;
     pathTnpPackageJSONData.devDependencies = undefined;
 
-
-    if (process.platform === 'win32') {
-      try {
-        this.reinstallTnp(this.project, pathTnpCompiledJS, pathTnpPackageJSONData)
-      } catch (e) {
-        console.log(`Trying to reinstall tnp in ${this.project && this.project.name}... ${this.reinstallCounter++} `)
-        console.log(e)
-        sleep.sleep(2);
-        this.installAsPackage()
-      }
-    } else {
-      this.reinstallTnp(this.project, pathTnpCompiledJS, pathTnpPackageJSONData)
-    }
-
-
+    this.reinstallTnp(this.project, pathTnpCompiledJS, pathTnpPackageJSONData)
   }
 
 
@@ -89,7 +75,7 @@ export class TnpBundle extends FeatureForProject {
       (project.isWorkspaceChildProject ? project.parent.location : void 0);
 
     if (!_.isString(workspaceLocation)) {
-      return
+      return;
     }
 
     if (_.isUndefined(this.notNeededReinstallationTnp[workspaceLocation])) {

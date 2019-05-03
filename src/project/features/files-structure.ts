@@ -44,7 +44,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.filesStructure.init(args, _.merge(options));
+      await this.project.parent.filesStructure.init(args, options);
     }
 
     if (this.project.baseline) {

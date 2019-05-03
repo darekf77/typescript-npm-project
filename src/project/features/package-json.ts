@@ -257,6 +257,11 @@ export class PackageJSON {
 
 
   private saveForInstall(showPackagesinFile = true, coreRecreate = true) {
+
+    if (!showPackagesinFile && this.project.isTnp) {
+      showPackagesinFile = true;
+    }
+
     // log(`save for install in ${this.project.name} ! `)
     if (coreRecreate) {
       this.coreRecreate()

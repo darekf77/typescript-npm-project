@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as glob from 'glob';
 
 import { Project } from '../abstract';
 import { info, checkValidNpmPackageName, error, log, warn } from '../../helpers';
@@ -78,8 +79,12 @@ export class NpmPackages extends FeatureForProject {
       if (type !== 'unknow-npm-project') {
         this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
       }
-      this.project.packageJson.dedupe();
-      this.project.tnpBundle.installAsPackage()
+      if (type === 'workspace' && this.project.isStandaloneProject) {
+        this.project.packageJson.dedupe();
+      }
+      if (type === 'workspace') {
+        this.project.tnpBundle.installAsPackage()
+      }
     }
 
   }
@@ -90,8 +95,51 @@ export class NpmPackages extends FeatureForProject {
     return !this.project.node_modules.exist;
   }
 
+  private get nodeModulesReplacements() {
+    const npmReplacements = glob
+      .sync(`${this.project.location}/${config.folder.node_modules}-*.zip`)
+      .map(p => p.replace(this.project.location, '').slice(1));
+
+    return npmReplacements;
+  }
+
+  /**
+   * FIX for missing npm packages from npmjs.com
+   *
+   * Extract each file: node_modules-<package Name>.zip
+   * to node_modules folder before instalation.
+   * This will prevent packages deletion from npm
+   */
+  extractNodeModulesReplacements() {
+    if (!this.project.isWorkspace) {
+      return;
+    }
+    const nodeModulesPath = path.join(this.project.location, config.folder.node_modules);
+
+    if (!fse.existsSync(nodeModulesPath)) {
+      fse.mkdirpSync(nodeModulesPath)
+    }
+    this.nodeModulesReplacements.forEach(p => {
+      const name = p.replace(`${config.folder.node_modules}-`, '');
+      const moduleInNodeMdules = path.join(this.project.location, config.folder.node_modules, name);
+      if (fse.existsSync(moduleInNodeMdules)) {
+        info(`Extraction ${chalk.bold(name)} already exists in ` +
+          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`);
+      } else {
+        info(`Extraction before instalation ${chalk.bold(name)} in ` +
+          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`)
+
+        this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync()
+      }
+
+    });
+  }
+
   private normalInstalation(options?: { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; }) {
-    const { generatLockFiles = false, useYarn = true, pkg = void 0 } = options || {};
+
+    this.extractNodeModulesReplacements();
+
+    const { generatLockFiles = false, useYarn = false, pkg = void 0 } = options || {};
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
 
