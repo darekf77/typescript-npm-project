@@ -1,8 +1,9 @@
 //#region @backend
 import * as path from 'path';
+import * as _ from 'lodash';
 import chalk from 'chalk';
 
-import { clearConsole, log, error } from '../../helpers';
+import { clearConsole, log, error, info } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
 import { TnpDB } from '../../tnp-db';
 import config from '../../config';
@@ -12,73 +13,47 @@ export type CleanType = 'all' | 'only_static_generated'
 
 export class FilesStructure extends FeatureForProject {
 
-  public async init(args: string, options?: { watch: boolean }) {
-    const { watch = false } = options || {};
+  findBaselines(proj: Project, baselines: Project[] = []): Project[] {
+    if (!!proj.baseline) {
+      baselines.unshift(proj.baseline)
+    } else {
+      return baselines;
+    }
+    return this.findBaselines(proj.baseline)
+  }
+
+  public async init(args: string, options?: { watch: boolean; alreadyInitedPorjects?: Project[] }) {
+    const { watch = false, alreadyInitedPorjects = [] } = options || {};
+
+    const db = await TnpDB.Instance;
+    await db.transaction.addProjectIfNotExist(this.project)
+
+    if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
+      return;
+    }
+    info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+    alreadyInitedPorjects.push(this.project)
 
     if (this.project.isContainer) {
-      for (let index = 0; index < this.project.children.length; index++) {
-        const containerChild = this.project.children[index];
+      const containerChildren = this.project.children;
+      for (let index = 0; index < containerChildren.length; index++) {
+        const containerChild = containerChildren[index];
         await containerChild.filesStructure.init(args, options);
       }
       return;
     }
 
-    const db = await TnpDB.Instance;
-    await db.transaction.addProjectIfNotExist(this.project)
+    if (this.project.isWorkspaceChildProject) {
+      await this.project.parent.filesStructure.init(args, _.merge(options));
+    }
+
+    if (this.project.baseline) {
+      await this.project.baseline.filesStructure.init(args, options);
+    }
 
     this.project.tnpBundle.installAsPackage()
-
-    if (this.project.isWorkspaceChildProject && !this.project.parent.node_modules.exist) {
-      await this.project.parent.npmPackages.installAll(`initialize procedure of child ${this.project.genericName}`);
-    } else if (!this.project.node_modules.exist) {
-      await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
-    }
-
-    if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.recreate.init();// TODO QUICK IFX
-    }
-
+    await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
     await this.project.recreate.init();
-
-    if (this.project.isWorkspaceChildProject) {
-      await this.modifySourceBeforCompilation(watch)
-    }
-
-    if (this.project.isSite) {
-
-      await this.installTnpHelpersForBaselines(this.project.baseline);
-      await this.recreateFilesBaselinesWorkspaces(this.project);
-      await this.project.baseline.recreate.init();
-
-      await this.joinSiteWithParentBaselines(this.project, watch);
-    }
-
-    if (!this.project.isStandaloneProject) {
-
-      const initFromScratch = (!this.project.env.config || (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
-
-      await this.project.env.init(args, !initFromScratch);
-
-      if (!initFromScratch) {
-
-        log(`Config alredy ${chalk.bold('init')}ed tnp.
-  ${chalk.green('Environment for')} ${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
-          + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
-      }
-
-    }
-
-
-  }
-
-
-  //#region @backend
-  private async modifySourceBeforCompilation(watch = false) {
-    if (this.project.isSite) {
-      await this.project.baseline.sourceModifier.init(`Initing source modifier for baseline`);
-      await this.project.baseline.frameworkFileGenerator.init(`Initing baseline generated controllers/entites`);
-      // await questionYesNo('Continue ?') // TODO fix this
-    }
 
     const sourceModifireName = `Client source modules pathes modifier`;
     const generatorName = 'Files generator: entites.ts, controllers.ts';
@@ -96,74 +71,20 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-  }
-  //#endregion
+    if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
+      const initFromScratch = (!this.project.env.config ||
+        (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
+      await this.project.env.init(args, !initFromScratch);
 
-  private async  joinSiteWithParentBaselines(project: Project, watch: boolean, projectsToRecreate: Project[] = []) {
-
-
-    if (!project || !project.isSite) {
-      // console.log(`(info joining) ${chalk.bold(project.name)} is not a site project`)
-
-      for (let index = 0; index < projectsToRecreate.length; index++) {
-        const p = projectsToRecreate[index];
-
-        if (watch) {
-          if (p.isWorkspaceChildProject) {
-            (await p.parent.join.init()).watch()
-          }
-          (await p.join.init()).watch()
-        } else {
-          if (p.isWorkspaceChildProject) {
-            (await p.parent.join).init()
-          }
-          await p.join.init()
-        }
+      if (!initFromScratch) {
+        log(`Config alredy ${chalk.bold('init')}ed tnp.
+  ${chalk.green('Environment for')} ${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
+          + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
       }
-      return;
-    }
-    projectsToRecreate.unshift(project);
-    await this.joinSiteWithParentBaselines(project.baseline, watch, projectsToRecreate);
-  }
 
-  private async  recreateFilesBaselinesWorkspaces(project: Project, projectsToRecreate: Project[] = []) {
-
-    if (!project || !project.isSite) {
-      // console.log(`(info recreating) ${chalk.bold(project.name)} is not a site project`)
-
-      for (let index = 0; index < projectsToRecreate.length; index++) {
-        const p = projectsToRecreate[index];
-        await p.recreate.init()
-      }
-      return;
-    }
-
-    if (project.baseline.isWorkspaceChildProject) {
-      projectsToRecreate.unshift(project.baseline.parent);
-      await this.recreateFilesBaselinesWorkspaces(project.baseline.parent, projectsToRecreate)
-
-    } else if (project.baseline.isWorkspace) {
-      projectsToRecreate.unshift(project.baseline);
-      await this.recreateFilesBaselinesWorkspaces(project.baseline, projectsToRecreate)
-    }
-
-
-  }
-
-  private async  installTnpHelpersForBaselines(project: Project) {
-
-    if (project.isSite) {
-      // if (project.isWorkspaceChildProject) {
-      //   project.parent.baseline.tnpHelper.install()
-      // } else if (project.isWorkspace) {
-      project.baseline.tnpBundle.installAsPackage()
-      // }
-    }
-
-    if (project.isSite) {
-      await this.installTnpHelpersForBaselines(project.baseline)
     }
   }
+
 
   private recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
     if (type === 'clear') {
