@@ -15,6 +15,7 @@
   },
   "name": "site",
   "version": "0.0.0",
+  "license": "UNLICENSED",
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.3.1",
     "@angular-devkit/schematics": "^0.0.42",
@@ -228,6 +229,5 @@
     "webpack": "3.10.0",
     "webpack-dev-server": "~2.9.3",
     "zone.js": "0.8.20"
-  },
-  "license": "UNLICENSED"
+  }
 }

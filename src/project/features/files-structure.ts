@@ -56,6 +56,10 @@ export class FilesStructure extends FeatureForProject {
       for (let index = 0; index < containerChildren.length; index++) {
         const containerChild = containerChildren[index];
         await containerChild.filesStructure.init(args, options);
+        for (let indexChild = 0; indexChild < containerChild.children.length; indexChild++) {
+          const workspaceChild = containerChild.children[indexChild];
+          await workspaceChild.filesStructure.init(args, options)
+        }
       }
       return;
     }

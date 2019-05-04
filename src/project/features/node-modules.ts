@@ -64,6 +64,10 @@ export class NodeModules extends FeatureForProject {
   //   }
   // }
 
+  get folderPath() {
+    return path.join(this.project.location, config.folder.node_modules)
+  }
+
   get exist(): boolean {
     return fs.existsSync(path.join(this.project.location, config.folder.node_modules, '.bin')); // TODO qucik fix for tnp-helpers
   }

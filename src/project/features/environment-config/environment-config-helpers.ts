@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 
 import { config } from '../../../config';
 import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../../models';
-import { error, warn } from '../../../helpers';
+import { error, warn, log } from '../../../helpers';
 import { ProxyRouter } from '../proxy-router';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
@@ -101,7 +101,7 @@ async function handleProject(project: Project, configProject: EnvConfigProject, 
 export async function overrideWorksapceRouterPort(options: OverridePortType, generatePorts = true) {
   const { workspaceProjectLocation, workspaceConfig } = options;
 
-  if (!workspaceConfig.workspace || !workspaceConfig.workspace.workspace) {
+  if (!workspaceConfig || !workspaceConfig.workspace || !workspaceConfig.workspace.workspace) {
     err(workspaceConfig);
   }
 
@@ -155,7 +155,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
       encoding: 'utf8',
       spaces: 2
     })
-    console.log('config saved in worksapce', tmpEnvironmentPath)
+    log(`config saved in worksapce ${tmpEnvironmentPath}`)
 
     project.children.forEach(p => {
       saveConfigWorkspca(p, workspaceConfig);
@@ -163,19 +163,23 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 
   } else if (project.isWorkspaceChildProject) {
 
-    if (project.type === 'angular-client' || project.type === 'angular-lib') {
+    if (project.type === 'angular-client' || project.type === 'angular-lib' || project.type === 'ionic-client') {
       fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
         encoding: 'utf8',
         spaces: 2
       })
+      log(`config saved for child ${tmpEnvironmentPath}`)
     } else if (project.type === 'isomorphic-lib') {
       fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
         encoding: 'utf8',
         spaces: 2
       })
+      log(`config saved for child ${tmpEnvironmentPath}`)
+    } else {
+      log(`config not needed for child ${tmpEnvironmentPath}`)
     }
 
-    console.log('config saved in child', tmpEnvironmentPath)
+
 
   }
 }

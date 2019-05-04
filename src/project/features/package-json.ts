@@ -196,8 +196,11 @@ export class PackageJSON {
     // process.exit(0)
     packagesNames.forEach(f => {
       log(`Scanning for duplicates fo ${f}....`)
-
-      const res = run(`find ${config.folder.node_modules}/ -name ${f} `, { output: false }).sync().toString()
+      const nodeMod = path.join(this.location, config.folder.node_modules)
+      if (!fse.existsSync(nodeMod)) {
+        fse.mkdirpSync(nodeMod);
+      }
+      const res = run(`find ${config.folder.node_modules}/ -name ${f} `, { output: false, cwd: this.location }).sync().toString()
       const duplicates = res
         .split('\n')
         .map(l => l.replace(/\/\//g, '/'))

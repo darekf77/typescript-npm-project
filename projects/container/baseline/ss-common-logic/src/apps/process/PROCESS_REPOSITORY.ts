@@ -7,7 +7,8 @@ import * as fse from 'fs-extra';
 import { run, TnpDB, killProcess, Project } from 'tnp-bundle';
 import * as child from 'child_process';
 import { Morphi } from 'morphi';
-import psList, { ProcessDescriptor } from 'ps-list';
+import * as psList  from 'ps-list';
+import { ProcessDescriptor } from 'ps-list'
 import { PROCESS } from './PROCESS';
 
 export interface PROCESS_ALIASES {
