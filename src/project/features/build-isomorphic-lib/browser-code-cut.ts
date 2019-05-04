@@ -1,8 +1,12 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as path from 'path';
+import * as fse from 'fs-extra';
+import * as sass from 'node-sass';
 
 import { CodeCut, BrowserCodeCut } from 'morphi/build';
 import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
+import { error } from '../../../helpers';
 
 
 export class ExtendedCodeCut extends CodeCut {
@@ -18,6 +22,117 @@ const customReplacement = '@customReplacement';
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
+  afterRegionsReplacement(content: string) {
+    const contentFromMorphi = content;
+    let absoluteFilePath = this.absoluteFilePath.replace(/\/$/, '');
+
+    let useBackupFile = false;
+    ['html', 'css', 'scss', 'sass']
+      .map(d => `.${d}`)
+      .forEach(ext => {
+        if (!useBackupFile && absoluteFilePath.endsWith(ext)) {
+          absoluteFilePath = absoluteFilePath.replace(ext, '.ts');
+          useBackupFile = true;
+        }
+      });
+
+    const orgContentPath = `${absoluteFilePath}.orginal`;
+    if (useBackupFile) {
+      fse.writeFileSync(this.absoluteFilePath, contentFromMorphi, { encoding: 'utf8' })
+      if (fse.existsSync(orgContentPath)) {
+        const backuContent = fse.readFileSync(orgContentPath, { encoding: 'utf8' })
+        if (backuContent.trim() !== '') {
+          content = backuContent;
+        } else {
+          return content;
+        }
+      } else if (fse.existsSync(absoluteFilePath)) {
+        const orgContent = fse.readFileSync(absoluteFilePath, { encoding: 'utf8' })
+        if (orgContent.trim() !== '') {
+          fse.writeFileSync(orgContentPath, orgContent, { encoding: 'utf8' })
+          content = orgContent;
+        } else {
+          return content;
+        }
+      } else {
+        return content;
+      }
+    }
+
+    if (['module', 'component']
+      .map(c => `.${c}.ts`)
+      .filter(c => absoluteFilePath.endsWith(c)).length === 0) {
+      return content;
+    }
+
+    const dir = path.dirname(absoluteFilePath);
+    const base = path.basename(absoluteFilePath)
+      .replace(/\.(component|module)\.ts$/, '');
+
+    content = this.replaceHtmlTemplateInComponent(dir, base, content)
+    content = this.replaceCssInComponent(dir, base, content)
+    content = this.replaceSCSSInComponent(dir, base, content, 'scss', absoluteFilePath)
+    content = this.replaceSCSSInComponent(dir, base, content, 'sass', absoluteFilePath)
+
+
+    if (useBackupFile) {
+      fse.writeFileSync(absoluteFilePath, content, { encoding: 'utf8' })
+      return contentFromMorphi;
+    }
+    return content;
+  }
+
+  private replaceHtmlTemplateInComponent(dir, base, content) {
+    const htmlTemplatePath = path.join(dir, `${base}.component.html`);
+    if (fse.existsSync(htmlTemplatePath)) {
+      const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
+      // console.log(`regex: ${regex}`)
+      content = content.replace(
+        new RegExp(regex,
+          'g'),
+        'template: \`\n' + fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }) + '\n\`')
+    }
+    return content;
+  }
+
+  private replaceCssInComponent(dir, base, content) {
+    const cssFilePath = path.join(dir, `${base}.component.css`);
+    if (fse.existsSync(cssFilePath)) {
+      const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(cssFilePath)}\s*(\\'|\\")\\s*\\]`;
+      // console.log(`regex: ${regex}`)
+      content = content.replace(
+        new RegExp(regex,
+          'g'),
+        'styles: [\`\n' + fse.readFileSync(cssFilePath, { encoding: 'utf8' }) + '\n\`]')
+    }
+    return content;
+  }
+
+  private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath) {
+
+    const scssFilePath = path.join(dir, `${base}.component.${ext}`);
+    if (fse.existsSync(scssFilePath)) {
+      const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' });
+      let transformedToCss = '';
+      try {
+        const compiled = sass.renderSync({
+          data: contentScss
+        })
+        transformedToCss = compiled.css;
+      } catch (e) {
+        error(error, true, true);
+        error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
+      }
+
+      const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;
+      // console.log(`regex: ${regex}`)
+      content = content.replace(
+        new RegExp(regex,
+          'g'),
+        'styles: [\`\n' + transformedToCss + '\n\`]')
+    }
+    return content;
+  }
 
 
   private findReplacements(stringContent: string, pattern: string, fun: (jsExpressionToEval: string, env: EnvConfig) => boolean) {
