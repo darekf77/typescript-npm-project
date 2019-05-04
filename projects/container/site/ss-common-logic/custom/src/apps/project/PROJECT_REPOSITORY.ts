@@ -7,7 +7,7 @@ import * as child from 'child_process';
 import axios from 'axios';
 import { Morphi, ModelDataConfig } from "morphi";
 import { PROJECT, IPROJECT } from "./PROJECT";
-import { TnpDB, ProjectFrom, EnvironmentName, config } from 'tnp-bundle';
+import { TnpDB, Project, EnvironmentName, config } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 
 
@@ -35,7 +35,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
   }
 
   async getByLocation(location: string) {
-    const res = ProjectFrom(decodeURIComponent(location));
+    const res = Project.From(decodeURIComponent(location));
     await this.addProcessesToModel(res as any);
     return res as any;
   }

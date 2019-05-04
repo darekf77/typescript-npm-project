@@ -79,7 +79,7 @@ export class NpmPackages extends FeatureForProject {
       if (type !== 'unknow-npm-project') {
         this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
       }
-      if (type === 'workspace' && this.project.isStandaloneProject) {
+      if (type === 'workspace' || this.project.isStandaloneProject) {
         this.project.packageJson.dedupe();
       }
       if (type === 'workspace') {

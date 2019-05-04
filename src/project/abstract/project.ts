@@ -473,6 +473,12 @@ export abstract class BaseProject {
       return this.browser.customizableFilesAndFolders;
     }
     //#region @backend
+
+    const extraFolders = this.getFolders()
+      .filter(f => !this.children.map(c => c.name).includes(path.basename(f)))
+      .filter(f => !['src', 'backup'].includes(path.basename(f)))
+      .map(f => path.basename(f))
+
     if (this.type === 'workspace') return [
       // 'environment.d.ts',
       'environment.js',
@@ -480,9 +486,10 @@ export abstract class BaseProject {
       'environment.prod.js',
       'environment.stage.js',
       'environment.online.js'
-    ]
+    ].concat(!this.isSite ? extraFolders : [])
     const files: string[] = ['src']
     if (this.type === 'angular-lib') files.push('components');
+
     return files;
     //#endregion
   }
@@ -519,8 +526,14 @@ export abstract class BaseProject {
 
 
   //#region @backend
-  getAllChildren(options?: { unknowIncluded: boolean; }) {
-    const { unknowIncluded = false } = options || {};
+  getAllChildren(options?: { excludeUnknowProjects: boolean; }) {
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (_.isUndefined(options.excludeUnknowProjects)) {
+      options.excludeUnknowProjects = true;
+    }
+    const { excludeUnknowProjects } = options;
     const subdirectories = this.getFolders();
 
     let res = subdirectories
@@ -530,7 +543,7 @@ export abstract class BaseProject {
       })
       .filter(c => !!c)
 
-    if (!unknowIncluded) {
+    if (excludeUnknowProjects) {
       res = res.filter(c => c.type !== 'unknow-npm-project')
     }
     return res;

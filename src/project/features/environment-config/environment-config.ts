@@ -74,8 +74,8 @@ export class EnvironmentConfig
     }
 
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      // await this.project.parent.env.init(args, overridePortsOnly);
-      error(`[${path.basename(__filename)}] Please override parent config first`);
+      //   // await this.project.parent.env.init(args, overridePortsOnly);
+      //   error(`[${path.basename(__filename)}] Please override parent config first`);
     }
 
     if (this.project.isWorkspaceChildProject) {
@@ -203,7 +203,7 @@ export class EnvironmentConfig
       return this.browser.config;
     }
     //#region @backend
-    const configPath = path.resolve(path.join(this.project.location, tmpEnvironmentFileName));
+    let configPath = path.resolve(path.join(this.project.location, tmpEnvironmentFileName));
     if (EnvironmentConfig.configs[configPath]) {
       return EnvironmentConfig.configs[configPath];
     }
@@ -212,7 +212,15 @@ export class EnvironmentConfig
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      warn(`confg doesnt exist: ${configPath}`)
+      configPath = path.resolve(path.join(this.project.parent.location, tmpEnvironmentFileName));
+      if (fse.existsSync(configPath)) {
+        warn(`config for ${chalk.bold(this.project.genericName)} taken from parent workspace`)
+        const configParent = fse.readJsonSync(configPath) as EnvConfig;
+        return configParent;
+      } else {
+        warn(`confg for ${chalk.bold(this.project.genericName)} doesnt exist: ${configPath}`)
+      }
+
     }
     //#endregion
 

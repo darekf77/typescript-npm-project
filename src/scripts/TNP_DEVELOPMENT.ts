@@ -180,14 +180,14 @@ export default {
     process.exit(0)
   },
   $ASSETS: () => recreate(),
-  $FILES_CUSTOM: (args) => {
-    console.log(new BaselineSiteJoin(Project.Current).files.allCustomFiles)
-    process.exit(0)
-  },
-  $FILES_BASELINE: (args) => {
-    console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
-    process.exit(0)
-  },
+  // $FILES_CUSTOM: (args) => {
+  //   console.log(new BaselineSiteJoin(Project.Current).files.allCustomFiles)
+  //   process.exit(0)
+  // },
+  // $FILES_BASELINE: (args) => {
+  //   console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
+  //   process.exit(0)
+  // },
   VERSION: () => version(),
   PATH: () => {
     console.log(Project.Tnp.location);

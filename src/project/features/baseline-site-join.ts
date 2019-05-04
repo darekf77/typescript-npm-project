@@ -9,7 +9,7 @@ import * as rimraf from 'rimraf';
 // local
 import { Project } from "../abstract";
 import { LibType, RecreateFile, FileEvent } from "../../models";
-import { copyFile, uniqArray, crossPlatofrmPath } from '../../helpers';
+import { copyFile, uniqArray, crossPlatofrmPath, log } from '../../helpers';
 import config from '../../config';
 import { error } from '../../helpers';
 import chalk from 'chalk';
@@ -84,6 +84,9 @@ export class BaselineSiteJoin extends FeatureForProject {
 
   joinNotAllowed = false;
   async init() {
+    if (!this.project.baseline) {
+      return;
+    }
     if (this.joinNotAllowed) {
       return this;
     }
@@ -91,11 +94,11 @@ export class BaselineSiteJoin extends FeatureForProject {
     if (!this.project.isSite) {
       const db = await TnpDB.Instance;
       if (db.checkIf.allowed.toWatchWorkspace(this.project)) {
-        console.log('OK to baseline/site join')
+        log('OK to baseline/site join')
       } else {
         const pids = []
-        console.log(`Current process pid: ${process.pid}`)
-        console.log(`Found active baseline/site join on pids: ${pids.toString()}
+        log(`Current process pid: ${process.pid}`)
+        log(`Found active baseline/site join on pids: ${pids.toString()}
         current pid: ${process.pid}, ppid ${process.ppid}`)
         this.joinNotAllowed = true;
         if (this.project.isWorkspaceChildProject) {
@@ -118,7 +121,13 @@ export class BaselineSiteJoin extends FeatureForProject {
     return this;
   }
 
-  get relativePathesBaseline() {
+
+  async initAndWatch() {
+    await this.init();
+    await this.watch()
+  }
+
+  private get relativePathesBaseline() {
     let baselineFiles: string[] = this.files.allBaselineFiles;
     // console.log('baselineFiles', baselineFiles)
     const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
@@ -129,7 +138,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     return baselineFiles;
   }
 
-  get relativePathesCustom() {
+  private get relativePathesCustom() {
     let customFiles: string[] = this.files.allCustomFiles;
     // console.log('customFiles', customFiles)
     const customReplacePath = crossPlatofrmPath(path.join(this.project.location, config.folder.custom));
@@ -140,7 +149,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     return customFiles;
   }
 
-  get files() {
+  private get files() {
     this.__checkBaselineSiteStructure()
     const self = this;
     return {
@@ -444,7 +453,10 @@ export class BaselineSiteJoin extends FeatureForProject {
     }
   }
 
-  watch() {
+  private watch() {
+    if (!this.project.baseline) {
+      return;
+    }
     if (this.joinNotAllowed) {
       return
     }

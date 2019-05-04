@@ -67,7 +67,7 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.filesStructure.init(args, options);
     }
-    console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
+    // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
     info(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
 
     this.project.tnpBundle.installAsPackage()
@@ -77,7 +77,7 @@ export class FilesStructure extends FeatureForProject {
     await this.project.recreate.init();
 
     if (watch) {
-      await this.project.join.watch()
+      await this.project.join.initAndWatch()
     } else {
       await this.project.join.init()
     }

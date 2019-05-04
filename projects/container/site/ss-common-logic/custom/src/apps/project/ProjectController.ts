@@ -7,7 +7,7 @@ import { PROJECT } from './PROJECT';
 import { ProjectIsomorphicLib, Project, EnvironmentName } from 'tnp-bundle';
 
 //#region @backend
-import { TnpDB, ProjectFrom } from 'tnp-bundle';
+import { TnpDB } from 'tnp-bundle';
 //#endregion
 
 export interface IProjectController extends ProjectController {
