@@ -47,6 +47,10 @@ export function getEntites(cwd: string): string[] {
       !p.endsWith('Service.ts') &&
       !p.endsWith('.d.ts') &&
       !p.endsWith('.spec.ts') &&
+      !p.endsWith('.component.ts') &&
+      !p.endsWith('.module.ts') &&
+      !p.endsWith('.service.ts') &&
+      !p.endsWith('.model.ts') &&
       !(['index.ts', 'app.ts','controllers.ts','entities.ts'].includes(path.basename(p)))
     )
 }

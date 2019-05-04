@@ -38,7 +38,7 @@ if (bundleExist && distExist) {
     global.tnp_out_folder = 'bundle'
     start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
   } else {
-    // console.log('- tnp dist -');
+    console.log('- tnp dist -');
     global.tnp_out_folder = 'dist'
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 

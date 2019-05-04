@@ -80,25 +80,28 @@ export class FilesStructure extends FeatureForProject {
     }
     await this.project.recreate.init();
 
-    if (watch) {
-      await this.project.join.initAndWatch()
-    } else {
-      await this.project.join.init()
-    }
-
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
+
+      if (watch) {
+        await this.project.join.initAndWatch()
+      } else {
+        await this.project.join.init()
+      }
+
       await this.project.env.init(args);
+
+      const sourceModifireName = `Client source modules pathes modifier`;
+      const generatorName = 'Files generator: entites.ts, controllers.ts';
+      if (watch) {
+        await this.project.frameworkFileGenerator.initAndWatch(generatorName);
+        await this.project.sourceModifier.initAndWatch(sourceModifireName);
+      } else {
+        await this.project.frameworkFileGenerator.init(generatorName);
+        await this.project.sourceModifier.init(sourceModifireName);
+      }
     }
 
-    const sourceModifireName = `Client source modules pathes modifier`;
-    const generatorName = 'Files generator: entites.ts, controllers.ts';
-    if (watch) {
-      await this.project.frameworkFileGenerator.initAndWatch(generatorName);
-      await this.project.sourceModifier.initAndWatch(sourceModifireName);
-    } else {
-      await this.project.frameworkFileGenerator.init(generatorName);
-      await this.project.sourceModifier.init(sourceModifireName);
-    }
+
     info(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
