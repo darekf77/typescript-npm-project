@@ -6,6 +6,7 @@ import { ProcessTestComponent } from './process-test.component';
   imports: [
     CommonModule
   ],
-  declarations: [ProcessTestComponent]
+  declarations: [ProcessTestComponent],
+  exports: [ProcessTestComponent]
 })
 export class ProcessTestModule { }

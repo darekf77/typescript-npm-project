@@ -5,11 +5,13 @@ import { RouterModule } from '@angular/router';
 import {
   LogoModule
 } from 'components';
+import { ProcessTestModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-test/process-test.module'
 
 
 @NgModule({
   imports: [
     CommonModule,
+    ProcessTestModule,
     RouterModule.forChild([
       {
         path: '',
