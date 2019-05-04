@@ -38,6 +38,7 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+import { AnglarLibModuleDivider as ModuleDivider } from '../features/module-divider';
 
 
 
@@ -94,6 +95,10 @@ export abstract class BaseProject {
 
   //#region @backend
   public sourceModifier: SourceModifier;
+  //#endregion
+
+  //#region @backend
+  public moduleDivider: ModuleDivider;
   //#endregion
 
   //#region @backend

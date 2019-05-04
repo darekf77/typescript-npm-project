@@ -16,7 +16,7 @@ import { AnglarLibModuleDivider } from './features/module-divider';
 export class ProjectAngularLib extends LibProject {
 
   private projectAngularClient: ProjectAngularClient;
-  public moduleDivider: AnglarLibModuleDivider;
+
 
   constructor(public location: string) {
     super(location);

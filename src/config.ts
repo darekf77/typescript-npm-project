@@ -175,6 +175,7 @@ export const config = {
   ],
   required: {
     npm: [
+      { name: 'extract-zip', version: '1.6.7' },
       { name: 'watch', version: '1.0.2' },
       { name: 'check-node-version' },
       { name: 'npm-run', version: '4.1.2' },

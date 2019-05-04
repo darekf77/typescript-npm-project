@@ -9,7 +9,8 @@ import { TnpDB } from '../../tnp-db';
 import config from '../../config';
 import { OutFolder } from 'morphi/build';
 
-export type CleanType = 'all' | 'only_static_generated'
+export type CleanType = 'all' | 'only_static_generated';
+export type InitOptions = { watch: boolean; alreadyInitedPorjects?: Project[]; }
 
 export class FilesStructure extends FeatureForProject {
 
@@ -22,19 +23,35 @@ export class FilesStructure extends FeatureForProject {
     return this.findBaselines(proj.baseline)
   }
 
-  public async init(args: string, options?: { watch: boolean; alreadyInitedPorjects?: Project[] }) {
-    const { watch = false, alreadyInitedPorjects = [] } = options || {};
+  private fixOptionsArgs(options: InitOptions) {
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (_.isUndefined(options.alreadyInitedPorjects)) {
+      options.alreadyInitedPorjects = [];
+    }
+    if (_.isUndefined(options.watch)) {
+      options.watch = false;
+    }
+    return options;
+  }
+
+  public async init(args: string, options?: InitOptions) {
+    options = this.fixOptionsArgs(options);
+    const { alreadyInitedPorjects, watch } = options;
 
     const db = await TnpDB.Instance;
     await db.transaction.addProjectIfNotExist(this.project)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
+      log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
       return;
     }
-    info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+    log(`Initing project: ${chalk.bold(this.project.genericName)}`);
     alreadyInitedPorjects.push(this.project)
 
     if (this.project.isContainer) {
+
       const containerChildren = this.project.children;
       for (let index = 0; index < containerChildren.length; index++) {
         const containerChild = containerChildren[index];
@@ -43,46 +60,42 @@ export class FilesStructure extends FeatureForProject {
       return;
     }
 
-    if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.filesStructure.init(args, options);
-    }
-
     if (this.project.baseline) {
       await this.project.baseline.filesStructure.init(args, options);
     }
 
+    if (this.project.isWorkspaceChildProject) {
+      await this.project.parent.filesStructure.init(args, options);
+    }
+    console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
+    info(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
+
     this.project.tnpBundle.installAsPackage()
-    await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
+    if (!this.project.node_modules.exist) {
+      await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
+    }
     await this.project.recreate.init();
+
+    if (watch) {
+      await this.project.join.watch()
+    } else {
+      await this.project.join.init()
+    }
+
+    if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
+      await this.project.env.init(args);
+    }
 
     const sourceModifireName = `Client source modules pathes modifier`;
     const generatorName = 'Files generator: entites.ts, controllers.ts';
     if (watch) {
-      if (this.project.type === 'isomorphic-lib') {
-        await this.project.frameworkFileGenerator.initAndWatch(generatorName)
-      } else {
-        await this.project.sourceModifier.initAndWatch(sourceModifireName)
-      }
+      await this.project.frameworkFileGenerator.initAndWatch(generatorName);
+      await this.project.sourceModifier.initAndWatch(sourceModifireName);
     } else {
-      if (this.project.type === 'isomorphic-lib') {
-        await this.project.frameworkFileGenerator.init(generatorName)
-      } else {
-        await this.project.sourceModifier.init(sourceModifireName)
-      }
+      await this.project.frameworkFileGenerator.init(generatorName);
+      await this.project.sourceModifier.init(sourceModifireName);
     }
-
-    if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
-      const initFromScratch = (!this.project.env.config ||
-        (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
-      await this.project.env.init(args, !initFromScratch);
-
-      if (!initFromScratch) {
-        log(`Config alredy ${chalk.bold('init')}ed tnp.
-  ${chalk.green('Environment for')} ${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
-          + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
-      }
-
-    }
+    info(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
 

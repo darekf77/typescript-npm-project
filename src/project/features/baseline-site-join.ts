@@ -5,6 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
+import * as rimraf from 'rimraf';
 // local
 import { Project } from "../abstract";
 import { LibType, RecreateFile, FileEvent } from "../../models";
@@ -16,6 +17,7 @@ import { run } from '../../helpers';
 import { Helpers } from 'morphi/helpers';
 import { TnpDB } from '../../tnp-db';
 import { FeatureForProject } from '../abstract';
+
 
 const REGEXS = {
 
@@ -108,7 +110,8 @@ export class BaselineSiteJoin extends FeatureForProject {
     // console.log(this.project.customizableFilesAndFolders);
 
     this.project.customizableFilesAndFolders.forEach(customizable => {
-      this.project.run(`rimraf ${customizable}`).sync()
+      rimraf.sync(`${this.project.location}/${customizable}`)
+      // this.project.run(`rimraf ${customizable}`).sync()
     });
     // rejoin baseline/site files
     await this.join.allBaselineSiteFiles()

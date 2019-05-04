@@ -230,8 +230,10 @@ export class FilesRecreator extends FeatureForProject {
   customFolder() {
     if (this.project.isBasedOnOtherProject) {
       const customFolder = path.join(this.project.location, config.folder.custom)
+      const srcFolder = path.join(this.project.location, config.folder.src)
       if (!fs.existsSync(customFolder)) {
-        this.project.run(`tnp mkdirp ${config.folder.custom} ${config.folder.src}`).sync()
+        fse.mkdirpSync(customFolder);
+        fse.mkdirpSync(srcFolder);
       }
     }
   }

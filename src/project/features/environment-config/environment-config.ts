@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as glob from 'glob';
 
-import { error, warn, isValidIp } from '../../../helpers';
+import { error, warn, isValidIp, log } from '../../../helpers';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
   saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
@@ -16,6 +16,7 @@ import { FeatureForProject } from '../../abstract';
 import { Morphi } from 'morphi';
 import config from '../../../config';
 import { EnvConfig, EnvironmentName } from '../../../models';
+import chalk from 'chalk';
 
 
 //#region @backend
@@ -48,7 +49,20 @@ export class EnvironmentConfig
     return !fse.existsSync(f);
   }
 
-  public async init(args?: string, overridePortsOnly = false) {
+  public async init(args?: string, overridePortsOnly: boolean = void 0) {
+
+
+    const initFromScratch = (!this.project.env.config ||
+      (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
+
+    overridePortsOnly = !_.isUndefined(overridePortsOnly) ? overridePortsOnly : !initFromScratch;
+    if (!initFromScratch) {
+      log(`Config alredy ${chalk.bold('init')}ed tnp. ${chalk.green('Environment for')} `
+        + `${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
+        + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
+    }
+
+
     let workspaceProjectLocation: string;
 
     if (this.project.isWorkspace) {
@@ -60,7 +74,8 @@ export class EnvironmentConfig
     }
 
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      await this.project.parent.env.init(args, overridePortsOnly);
+      // await this.project.parent.env.init(args, overridePortsOnly);
+      error(`[${path.basename(__filename)}] Please override parent config first`);
     }
 
     if (this.project.isWorkspaceChildProject) {
