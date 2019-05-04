@@ -273,7 +273,7 @@ export abstract class BaseProject {
   }
 
   //#region @backend
-  get StaticVersion() {
+  get StaticVersion(): Project {
     const outDir: BuildDir = 'dist';
     if (this.isWorkspace) {
       return Project.From(path.join(this.location, outDir, this.name))

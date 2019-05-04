@@ -38,16 +38,16 @@ config = {
         },
         port: 6002
       },
-      {
-        baseUrl: '/admin',
-        name: 'ss-admin-webapp',
-        port: 6003
-      },
-      {
-        baseUrl: '/',
-        name: 'ss-webapp',
-        port: 6004
-      }
+      // {
+      //   baseUrl: '/admin',
+      //   name: 'ss-admin-webapp',
+      //   port: 6003
+      // },
+      // {
+      //   baseUrl: '/',
+      //   name: 'ss-webapp',
+      //   port: 6004
+      // }
     ]
   }
 

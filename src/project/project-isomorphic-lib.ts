@@ -8,7 +8,7 @@ import * as inquirer from 'inquirer';
 
 import { Project } from "./abstract";
 
-import { tryCopyFrom, getControllers, getEntites } from "../helpers";
+import { tryCopyFrom, getControllers, getEntites, log, info } from "../helpers";
 
 import { HelpersLinks } from '../helpers';
 import { config } from '../config';
@@ -55,6 +55,10 @@ export class ProjectIsomorphicLib extends LibProject {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
     if (!onlyWatchNoBuild) {
       if (appBuild) {
+        if (!watch) {
+          log(`App build not possible for isomorphic-lib in static build mode`)
+          return;
+        }
         let webpackEnvParams = `--env.outFolder=${outDir}`;
         webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
         // console.log('forClients', forClient)
@@ -107,7 +111,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
 
           while (buildOptions.forClient.length === 0) {
-            console.info('Please select at lease one client..')
+
             await this.selectClients(buildOptions)
           }
 
@@ -121,6 +125,13 @@ export class ProjectIsomorphicLib extends LibProject {
   }
 
   private async selectClients(buildOptions: BuildOptions) {
+    if (!this.buildOptions.watch) {
+      buildOptions.forClient = this.parent.children
+        .filter(c => config.allowedTypes.app.includes(c.type))
+        .filter(c => c.name !== this.name)
+      return;
+    }
+    info('Please select at lease one client..')
     const { projects = [] }: { projects: string[] } = await inquirer
       .prompt([
         {
