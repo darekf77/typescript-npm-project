@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 // material
 import { MatCardModule } from '@angular/material/card';
 // local
@@ -15,10 +16,13 @@ import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/app
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 // components
-import { FormWrapperMaterialModule } from 'components';
+import { FormWrapperMaterialModule, SelectWrapperModule } from 'ss-common-ui/components/formly';
 
 const angularModules = [
-  ReactiveFormsModule
+  CommonModule,
+  RouterModule.forChild(routes),
+  ReactiveFormsModule,
+  FormsModule,
 ];
 
 const materialModules = [
@@ -35,11 +39,10 @@ Morphi.init({
 
 @NgModule({
   imports: [
-    CommonModule,
-    ...materialModules,
     ...angularModules,
-    RouterModule.forChild(routes),
-    FormWrapperMaterialModule
+    ...materialModules,
+    FormWrapperMaterialModule,
+    SelectWrapperModule
   ],
   declarations: [PreviewSelectWrapperComponent],
   providers: [

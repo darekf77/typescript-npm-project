@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 
@@ -10,11 +10,9 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 })
 export class PreviewSelectWrapperComponent implements OnInit {
 
-  constructor(public exampleService: ExamplesController) {
+  constructor(public exampleService: ExamplesController, private formBuilder: FormBuilder) {
 
   }
-
-  form = new FormGroup({});
 
   model: any = {};
   options: FormlyFormOptions = {};
@@ -22,7 +20,6 @@ export class PreviewSelectWrapperComponent implements OnInit {
 
 
   ngOnInit() {
-
 
     this.fields = [
       {

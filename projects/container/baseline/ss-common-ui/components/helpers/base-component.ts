@@ -5,11 +5,9 @@ import { FieldType } from '@ngx-formly/core';
 @Component({
   selector: 'app-base-component-meta'
 })
-export class BaseComponent extends FieldType implements OnDestroy {
+export abstract class BaseComponent implements OnDestroy {
 
   @Input() model: any = {};
-  @Input() modelKey: string;
-
 
   handlers: Subscription[] = [];
 

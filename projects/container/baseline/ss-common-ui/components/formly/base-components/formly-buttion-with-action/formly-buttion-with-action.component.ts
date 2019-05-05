@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Component, OnInit } from '@angular/core';
-import { BaseComponent } from '../../../helpers';
+import { BaseFormlyComponent } from '../../../helpers';
 import { CLASS } from 'typescript-class-helpers/browser';
 
 @CLASS.NAME('FormlyButtionWithActionComponent')
@@ -9,7 +9,7 @@ import { CLASS } from 'typescript-class-helpers/browser';
   templateUrl: './formly-buttion-with-action.component.html',
   styleUrls: ['./formly-buttion-with-action.component.scss']
 })
-export class FormlyButtionWithActionComponent  extends BaseComponent {
+export class FormlyButtionWithActionComponent  extends BaseFormlyComponent {
 
 
   action() {

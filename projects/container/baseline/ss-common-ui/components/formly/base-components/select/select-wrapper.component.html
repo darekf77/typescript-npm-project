@@ -1,9 +1,7 @@
-
-<mat-form-field *ngIf="field && field.formControl" >
-  <mat-select [placeholder]="field.templateOptions.placeholder || field.templateOptions.label"
-              [aria-label]="field.templateOptions.label"
-              [required]="field.templateOptions.required"
-              [formControl]="field.formControl">
+<mat-form-field>
+  <mat-select [placeholder]="ctrl.placeholder || ctrl.label"
+              [aria-label]="ctrl.label"
+              [required]="ctrl.required">
     <mat-option *ngFor="let o of selectOptions"
                 [value]="o.value">
       {{o.label}}
