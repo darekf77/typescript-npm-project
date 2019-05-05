@@ -3,13 +3,13 @@ import {
   EventEmitter, Component, OnInit, Input,
   Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy
 } from '@angular/core';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
+import { PROCESS } from '../../PROCESS';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from '../../../../helpers/base-component';
-import { ResizeService } from '../../../../helpers/resize-service';
+import { BaseComponent } from 'ss-common-ui/module';
+import { ResizeService } from 'ss-common-ui/module';
 
 @Component({
   selector: 'app-process-console-info',

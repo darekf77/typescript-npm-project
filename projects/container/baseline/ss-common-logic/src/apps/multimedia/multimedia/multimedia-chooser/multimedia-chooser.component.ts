@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, TemplateRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 // third part
 import { Subscription } from 'rxjs/Subscription';
-import { Morphi } from 'morphi/browser';
-import { Log, Level } from 'ng2-logger/browser';
+import { Morphi } from 'morphi';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('multimedia chooser');
 // local
-import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
-import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
+import { MultimediaController } from '../../MultimediaController';
+import { MultimediaType, MULTIMEDIA } from '../../MULTIMEDIA';
 
 console.log('heehheh');
 

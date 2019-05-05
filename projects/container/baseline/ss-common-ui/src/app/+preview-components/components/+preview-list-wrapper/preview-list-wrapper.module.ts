@@ -7,8 +7,9 @@ import { MatCardModule } from '@angular/material/card';
 import { PreviewListWrapperComponent } from './preview-list-wrapper.component';
 import { routes } from './preview-list-wrapper.routes';
 import {
-  ListWrapperModule
+  ListWrapperModule,EditorWrapperModule
 } from 'components';
+
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
@@ -32,6 +33,7 @@ Morphi.init({
   imports: [
     CommonModule,
     ListWrapperModule,
+    EditorWrapperModule,
     ...materialModules,
     RouterModule.forChild(routes)
   ],

@@ -13,8 +13,13 @@ import { FormlyMaterialModule, } from '@ngx-formly/material';
 import { PreviewFormWrapperComponent } from './preview-form-wrapper.component';
 import { routes } from './preview-form-wrapper.routes';
 import {
-  ListWrapperModule, FormWrapperMaterialModule, ProcessLoggerModule
+  ListWrapperModule, FormWrapperMaterialModule
 } from 'components';
+import {
+  EditorWrapperModule
+} from 'components';
+
+import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
@@ -46,10 +51,13 @@ Morphi.init({
   entities: [EXAMPLE, PROCESS]
 });
 
+console.log('Morphi.Formly.getAllRegisterdTypes() in preview',Morphi.Formly.getAllRegisterdTypes())
+
 @NgModule({
   imports: [
     ...angularModules,
     ListWrapperModule,
+    EditorWrapperModule,
     ...materialModules,
     ProcessLoggerModule,
     FormWrapperMaterialModule,

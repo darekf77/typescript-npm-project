@@ -41,9 +41,9 @@ export namespace HelpersLinks {
   }
 
   export function createSymLink(existedFileOrFolder: string, destinationPath: string,
-    options?: { ommitWhenExistedFolderDoesntExists?: boolean }) {
+    options?: { continueWhenExistedFolderDoesntExists?: boolean }) {
 
-    const { ommitWhenExistedFolderDoesntExists = false } = options || {};
+    const { continueWhenExistedFolderDoesntExists = false } = options || {};
 
     // console.log('Create link!')
 
@@ -51,10 +51,11 @@ export namespace HelpersLinks {
     let link = destinationPath;
 
     if (!fse.existsSync(existedFileOrFolder)) {
-      if(ommitWhenExistedFolderDoesntExists) {
-        return;
+      if(continueWhenExistedFolderDoesntExists) {
+        // just continue and create link to not existed folder
+      } else {
+        error(`[helpers.createLink] target path doesn't exist: ${existedFileOrFolder}`)
       }
-      error(`[helpers.createLink] target path doesn't exist: ${existedFileOrFolder}`)
     }
 
     if (link === '.' || link === './') {

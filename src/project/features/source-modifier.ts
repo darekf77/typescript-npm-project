@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import config from '../../config';
 import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
 import { FeatureCompilerForProject, Project } from '../abstract';
-import { AnglarLibModuleDivider } from './module-divider';
+
 
 export interface IsomorphicOptions {
   currentProjectName?: string;
@@ -21,35 +21,6 @@ export interface IsomorphicOptions {
 export class SourceModifier extends FeatureCompilerForProject {
 
   private options: IsomorphicOptions;
-  protected syncAction(): void {
-    this.options = this.isomorphiOptions;
-
-    const files = this.project.customizableFilesAndFolders.concat(this.project.isSite ? [config.folder.custom] : [])
-
-    files.forEach(f => {
-      const pathSrc = path.join(this.project.location, f);
-      if (fse.lstatSync(pathSrc).isDirectory()) {
-        glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
-          this.cb({ path: p, contents: fs.readFileSync(p, { encoding: 'utf8' }) }, this.options);
-        })
-      }
-    })
-  }
-
-  protected preAsyncAction(): void {
-    // throw new Error("Method not implemented.");
-  }
-  protected asyncAction(filePath: string) {
-    // console.log('SOurce modifier async !',filePath)
-    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
-  }
-
-
-  constructor(public project: Project) {
-    super(`(src|components)/**/*.ts`, '', project && project.location, project);
-
-  }
-
 
   get isomorphiOptions(): IsomorphicOptions {
     const project = this.project;
@@ -81,21 +52,36 @@ export class SourceModifier extends FeatureCompilerForProject {
     }
   }
 
-  private replaceWhenWholeModule(angularLibName: string, fileContent: string) {
-    const tofind = `(\'|\")${angularLibName}/${config.folder.module}(\'|\")`
-    const regex = new RegExp(tofind, 'g')
-    const replacement = `'${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}'`;
-    return fileContent.replace(regex, replacement)
+
+  constructor(public project: Project) {
+    super(`(src|components)/**/*.ts`, '', project && project.location, project);
+
   }
 
-  private replaceWhenReferingInsideModule(angularLibName: string, fileContent: string) {
-    const tofind = `${angularLibName}/${config.folder.module}/`
-    const regex = new RegExp(tofind, 'g')
-    const replacement = `${angularLibName}/${AnglarLibModuleDivider.nameFor(this.project.name)}/`;
-    return fileContent.replace(regex, replacement)
+  protected syncAction(): void {
+    this.options = this.isomorphiOptions;
+
+    const files = this.project.customizableFilesAndFolders.concat(this.project.isSite ? [config.folder.custom] : [])
+
+    files.forEach(f => {
+      const pathSrc = path.join(this.project.location, f);
+      if (fse.lstatSync(pathSrc).isDirectory()) {
+        glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
+          this.cb({ path: p, contents: fs.readFileSync(p, { encoding: 'utf8' }) }, this.options);
+        })
+      }
+    })
   }
 
-  cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
+  protected preAsyncAction(): void {
+    // throw new Error("Method not implemented.");
+  }
+  protected asyncAction(filePath: string) {
+    // console.log('SOurce modifier async !',filePath)
+    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+  }
+
+  private cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
     const {
       isWorkspaceChildProject,
       localIsomorphicLibsNames,
@@ -110,13 +96,6 @@ export class SourceModifier extends FeatureCompilerForProject {
       localIsomorphicLibsNames.forEach(libname => {
         const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
         fileContent = fileContent.replace(regex, `${libname}/${IncrementalBuildProcessExtended.getBrowserVerPath(currentProjectName)}/`)
-      })
-
-
-      angularLibs.forEach(angularLibName => {
-        // TODO same should be for isomorphic lib ?
-        fileContent = this.replaceWhenWholeModule(angularLibName, fileContent)
-        fileContent = this.replaceWhenReferingInsideModule(angularLibName, fileContent)
       })
 
       if (fileContent !== orgFileContent) {

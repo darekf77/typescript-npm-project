@@ -3,12 +3,12 @@ import { Component, OnInit, Input, TemplateRef, ViewChild } from '@angular/core'
 import { FieldType } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { Morphi, ModelDataConfig } from 'morphi/browser';
-import { Log, Level } from 'ng2-logger/browser';
+import { Morphi, ModelDataConfig } from 'morphi';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('multimedia wrapper');
 // local
-import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
-import { MultimediaType, MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
+import { MultimediaController } from '../MultimediaController';
+import { MultimediaType, MULTIMEDIA } from '../MULTIMEDIA';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 export type DialogAction = 'select' | 'upload';

@@ -7,15 +7,15 @@ import {
 import { Log } from 'ng2-logger';
 const log = Log.create('process infor meessages');
 
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
-import { PROGRESS_DATA } from 'tnp-bundle/browser';
+import { PROCESS } from '../../PROCESS';
+import { PROGRESS_DATA } from 'tnp-bundle';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/fromEvent';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from '../../../../helpers/base-component';
-import { ResizeService } from '../../../../helpers/resize-service';
+import { BaseComponent } from 'ss-common-ui/module';
+import { ResizeService } from 'ss-common-ui/module';
 
 
 

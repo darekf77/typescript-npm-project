@@ -10,7 +10,7 @@ import { Morphi } from 'morphi/browser';
 
 export type OptionsButtons = 'bold' | 'italic' | 'underline';
 
-@Morphi.Formly.RegisterComponentAsType('EditorWrapperComponent')
+
 @Component({
   selector: 'app-editor-wrapper',
   templateUrl: './editor-wrapper.component.html',

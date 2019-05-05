@@ -25,15 +25,15 @@ export class PreviewEditorWrapperComponent implements OnInit {
 
 
     this.fields = [
-      {
-        key: 'editorwrappertest',
-        type: 'editorwrapper',
-        templateOptions: {
-          required: true,
-          label: 'Amazing Editor',
-          crud: this.exampleService
-        }
-      }
+      // {
+      //   key: 'editorwrappertest',
+      //   type: 'editorwrapperformly',
+      //   templateOptions: {
+      //     required: true,
+      //     label: 'Amazing Editor',
+      //     crud: this.exampleService
+      //   }
+      // }
     ];
   }
 

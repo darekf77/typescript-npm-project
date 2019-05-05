@@ -114,14 +114,16 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(scssFilePath)) {
       const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' });
       let transformedToCss = '';
-      try {
-        const compiled = sass.renderSync({
-          data: contentScss
-        })
-        transformedToCss = compiled.css;
-      } catch (e) {
-        error(error, true, true);
-        error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
+      if(contentScss.trim() !== '') {
+        try {
+          const compiled = sass.renderSync({
+            data: contentScss
+          })
+          transformedToCss = compiled.css;
+        } catch (e) {
+          // error(error, true, true);
+          error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
+        }
       }
 
       const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;

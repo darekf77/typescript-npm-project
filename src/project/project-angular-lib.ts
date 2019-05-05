@@ -11,7 +11,6 @@ import config from "../config";
 import { Project } from './abstract';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
-import { AnglarLibModuleDivider } from './features/module-divider';
 
 export class ProjectAngularLib extends LibProject {
 
@@ -22,7 +21,6 @@ export class ProjectAngularLib extends LibProject {
     super(location);
     if (_.isString(location)) {
       this.projectAngularClient = new ProjectAngularClient(location);
-      this.moduleDivider = new AnglarLibModuleDivider(this);
       this.projectAngularClient.env = this.env; // TODO QUICK_FIX
     }
 
@@ -54,11 +52,12 @@ export class ProjectAngularLib extends LibProject {
   }
 
 
-  private linkDistAsModule(outDir: BuildDir, ommitWhenExistedFolderDoesntExists = false) {
+  private linkDistAsModule(outDir: BuildDir, continueWhenExistedFolderDoesntExists = false) {
     tryRemoveDir(path.join(this.location, config.folder.module));
     const inLocationOutDir = path.join(this.location, outDir);
     const inLocationModuleDir = path.join(this.location, config.folder.module)
-    HelpersLinks.createSymLink(inLocationOutDir, inLocationModuleDir, { ommitWhenExistedFolderDoesntExists });
+    // console.log(`Create symlink from: ${inLocationOutDir} to ${inLocationModuleDir}`)
+    HelpersLinks.createSymLink(inLocationOutDir, inLocationModuleDir, { continueWhenExistedFolderDoesntExists });
   }
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
@@ -76,7 +75,7 @@ export class ProjectAngularLib extends LibProject {
       this.run(`npm-run gulp inline-templates-${outDir}-watch`,
         { output: false, outputLineReplace }).async()
       setTimeout(() => {
-        this.run(`npm-run ngc -w -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).async()
+        this.run(`npm-run tsc -w -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).async()
       }, 3000)
 
     } else {
@@ -84,7 +83,7 @@ export class ProjectAngularLib extends LibProject {
         tryRemoveDir(path.join(this.location, outDir))
         this.run(`npm-run gulp inline-templates-${outDir}`,
           { output: false, outputLineReplace }).sync()
-        this.run(`npm-run ngc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
+        this.run(`npm-run tsc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
         if (outDir === 'dist') {
           this.linkDistAsModule(outDir)
         }
@@ -108,14 +107,12 @@ export class ProjectAngularLib extends LibProject {
       } else {
         if (watch) {
           await this.buildLib(outDir, forClient as Project[], prod, false);
-          this.moduleDivider.initAndWatch(this.divideCompilationTaskName)
           if (compileOnce) {
             return;
           }
           await this.buildLib(outDir, forClient as Project[], prod, true)
         } else {
           await this.buildLib(outDir, forClient as Project[], prod, watch)
-          this.moduleDivider.init(this.divideCompilationTaskName)
         }
       }
     }

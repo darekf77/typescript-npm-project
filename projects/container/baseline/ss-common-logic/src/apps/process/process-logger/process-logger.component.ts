@@ -1,4 +1,4 @@
-import { Morphi, ModelDataConfig } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
   OnDestroy,
@@ -9,14 +9,14 @@ import * as _ from 'lodash';
 // formly
 import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
+import { PROCESS } from '../PROCESS';
 // logger
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import { PROCESS_STATE } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
-import { PROGRESS_DATA } from 'tnp-bundle/browser';
+import { PROCESS_STATE } from '../PROCESS';
+import { PROGRESS_DATA } from 'tnp-bundle';
 
 const log = Log.create('process loger');
 
@@ -189,7 +189,7 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
       }
       console.log(`SUBSCRIBE ENTITY: ${this.process.id}`);
       this.process.subscribeRealtimeUpdates({
-        modelDataConfig: this.config,
+        modelDataConfig: this.config as any,
         callback: () => {
           this.changes.next(void 0);
         }

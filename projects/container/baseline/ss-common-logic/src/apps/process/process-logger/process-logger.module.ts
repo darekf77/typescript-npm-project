@@ -12,12 +12,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MomentModule } from 'ngx-moment';
 // local
 import { ProcessLoggerComponent } from './process-logger.component';
-import { ButtonIconModule } from '../../base-components';
 import { ProcessConsoleInfoModule } from './process-console-info/process-console-info.module';
-
 import { ProcessInfoMessageComponent } from './process-info-message/process-info-message.component';
-import { ResizeService } from '../../../helpers/resize-service';
-import { MoveablePopupModule } from '../../../ui-elements/moveable-popup';
+
+import { ButtonIconModule } from 'ss-common-ui/module';
+import { ResizeService } from 'ss-common-ui/module';
+import { MoveablePopupModule } from 'ss-common-ui/module';
 
 
 

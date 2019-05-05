@@ -22,7 +22,6 @@ export interface CRUDSelectWrapperOption {
   label: string;
 }
 
-@Morphi.Formly.RegisterComponentAsType('SelectWrapperComponent')
 @Component({
   selector: 'app-select-wrapper',
   templateUrl: './select-wrapper.component.html',

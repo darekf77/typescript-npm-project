@@ -20,7 +20,7 @@ import { FormlyHorizontalWrapper } from 'morphi/browser/crud/formly-group-wrappe
 
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/select';
-import { MultimediaWrapperModule, MultimediaWrapperComponent } from '../entity-components/multimedia';
+
 
 // other
 import { Morphi } from 'morphi/browser';
@@ -60,7 +60,6 @@ const materialModules = [
 
 const myFormlyModules = [
   SelectWrapperModule,
-  MultimediaWrapperModule,
   EditorWrapperModule
 ];
 
@@ -111,6 +110,7 @@ const entityModules = [
     ...entityModules
   ],
   exports: [
+    ...myFormlyModules,
     ...customComponetns
   ],
   declarations: [

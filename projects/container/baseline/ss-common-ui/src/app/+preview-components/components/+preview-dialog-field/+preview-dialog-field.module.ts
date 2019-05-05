@@ -9,7 +9,7 @@ import { PreviewDialogFieldComponent } from './+preview-dialog-field.component';
 import { routes } from './+preview-dialog-field.routes';
 import {
   DialogFieldModule
-} from 'components';
+} from 'ss-common-logic/browser-for-ss-common-ui/apps/dialog/dialog-field';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
