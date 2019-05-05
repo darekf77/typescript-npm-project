@@ -14,7 +14,6 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 export type DialogAction = 'select' | 'upload';
 
 
-@Morphi.Formly.RegisterComponentAsType('MultimediaWrapperComponent')
 @Component({
   selector: 'app-multimedia-wrapper',
   templateUrl: './multimedia-wrapper.component.html',

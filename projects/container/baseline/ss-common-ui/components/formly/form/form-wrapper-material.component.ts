@@ -13,9 +13,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('form warpper material component',
-  Level.__NOTHING
-);
+const log = Log.create('form warpper material component');
 
 @Component({
   selector: 'app-form-wrapper-material',

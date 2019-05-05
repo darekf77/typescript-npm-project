@@ -14,16 +14,16 @@ import { NgxWigModule } from 'ngx-wig';
 
 
 const formlyModules = [
-  // FormlyMaterialModule,
-  // FormlyModule.forRoot({
-  //   types: [
-  //     { name: 'editorwrapper', component: EditorWrapperComponent }
-  //   ]
-  // }),
-  // FormlyMatToggleModule,
-  // FormlyMatDatepickerModule,
-  // MatNativeDateModule,
-  // FormlyMatSliderModule
+  FormlyMaterialModule,
+  FormlyModule.forRoot({
+    types: [
+      { name: 'editorwrapperformly', component: EditorWrapperComponent }
+    ]
+  }),
+  FormlyMatToggleModule,
+  FormlyMatDatepickerModule,
+  MatNativeDateModule,
+  FormlyMatSliderModule
 ];
 
 const otherModules = [
