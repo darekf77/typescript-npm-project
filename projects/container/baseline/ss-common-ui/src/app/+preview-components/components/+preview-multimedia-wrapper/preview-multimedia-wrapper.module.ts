@@ -16,7 +16,9 @@ import { routes } from './preview-multimedia-wrapper.routes';
 import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
 import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/apps/auth/AuthController';
 import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
-import { MultimediaWrapperModule, MultimediaWrapperComponent } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia';
+import {
+  MultimediaWrapperModule, MultimediaWrapperComponent
+} from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components';
 
 
 const angularModules = [

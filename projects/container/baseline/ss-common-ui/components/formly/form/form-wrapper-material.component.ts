@@ -85,33 +85,33 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   }
 
   resolveFields() {
-    let fields = Morphi.Formly.getFrom(this.entity);
-    log.i(`fields from entity : ${this.entity && this.entity.name}`, fields);
+    let fieldsFromEntity = _.isFunction(this.entity) ? Morphi.Formly.getFrom(this.entity) : [];
+    log.i(`fields from entity : ${this.entity && this.entity.name}`, fieldsFromEntity);
 
-    if (_.isFunction(this.entity) && !fields) {
+    if (_.isFunction(this.entity) && !fieldsFromEntity) {
       this.waringAboutDecorator();
     }
 
     if (_.isArray(this.fields)) {
       log.i('field from input', this.fields);
 
-      if (_.isArray(fields)) {
-        const keys = fields.map(c => c.key);
+      if (_.isArray(fieldsFromEntity)) {
+        const keys = fieldsFromEntity.map(c => c.key);
 
-        fields = fields.map(field => {
+        fieldsFromEntity = fieldsFromEntity.map(field => {
           return _.merge(field, this.fields.find(f => f.key === field.key));
         });
-        fields = fields
+        fieldsFromEntity = fieldsFromEntity
           .concat(this.fields.filter(field => !keys.includes(field.key)));
         // log.i('field affer contact', fields);
       }
 
     }
-    if (!_.isArray(fields)) {
-      fields = this.fields;
+    if (!_.isArray(fieldsFromEntity)) {
+      fieldsFromEntity = this.fields;
     }
 
-    fields = fields.filter(({ key }) => {
+    fieldsFromEntity = fieldsFromEntity.filter(({ key }) => {
       if (_.isArray(this.exclude)) {
         return !(key && this.exclude.includes(key));
       }
@@ -122,7 +122,7 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
     });
     // log.i('fields filter', fields);
 
-    this.formly.fields = fields;
+    this.formly.fields = fieldsFromEntity;
     // log.i('FORMLY FIELDS', this.formly.fields);
   }
 

@@ -1,10 +1,19 @@
-<mat-card>
-  <form [formGroup]="form">
-    <formly-form [model]="model"
-                 [fields]="fields"
-                 [options]="options"
-                 [form]="form">
-    </formly-form>
-  </form>
+<!-- <mat-card>
+  <mat-card-title>
+    Form Wrapper
+  </mat-card-title>
+  <app-form-wrapper-material [(model)]="model"
+                             [fields]="fields">
 
+  </app-form-wrapper-material>
+
+</mat-card> -->
+<br>
+<mat-card>
+  <mat-card-title>
+    Angular Component
+  </mat-card-title>
+  <form [formGroup]="form">
+    <app-select-wrapper [form]=[form]></app-select-wrapper>
+  </form>
 </mat-card>

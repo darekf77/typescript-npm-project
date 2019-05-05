@@ -13,10 +13,6 @@ export class BaseComponent extends FieldType implements OnDestroy {
 
   handlers: Subscription[] = [];
 
-  ngOnInit() {
-
-  }
-
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe());
     this.handlers.length = 0;

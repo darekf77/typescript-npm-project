@@ -6,20 +6,16 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as _ from 'lodash';
 import { Log, Level } from 'ng2-logger/browser';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { Morphi } from 'morphi/browser';
+import { CLASS } from 'typescript-class-helpers/browser';
 const log = Log.create('formly switch');
 
+// @Morphi.Formly.RegisterComponentAsType('FormlySwitchComponent', 'switch')
+@CLASS.NAME('FormlySwitchComponent')
 @Component({
   selector: 'app-formly-switch',
-  template: `
-     <mat-slide-toggle  [formControl]="field.formControl"  >
-        {{field.templateOptions.label}}
-     </mat-slide-toggle>
-  `,
-  styles: [`
-    :host {
-      padding-bottom: 20px;
-    }
-  `]
+  templateUrl: '/formly-switch.component.html',
+  styleUrls: ['./formly-switch.component.scss']
 })
 export class FormlySwitchComponent extends FieldType implements OnInit {
 

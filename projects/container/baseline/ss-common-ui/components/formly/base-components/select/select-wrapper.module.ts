@@ -18,6 +18,7 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
+import { CLASS } from 'typescript-class-helpers/browser';
 
 
 const angularModules = [
@@ -39,7 +40,8 @@ const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
     types: [
-      { name: 'selectwrapper', component: SelectWrapperComponent }
+      { name: 'selectwrapper', component: SelectWrapperComponent },
+      { name: CLASS.getName(SelectWrapperComponent), component: SelectWrapperComponent }
     ],
     validationMessages: [
       { name: 'required', message: 'This field is required' },

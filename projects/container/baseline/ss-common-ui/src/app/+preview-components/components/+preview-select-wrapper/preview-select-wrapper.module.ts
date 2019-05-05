@@ -7,9 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 // local
 import { PreviewSelectWrapperComponent } from './preview-select-wrapper.component';
 import { routes } from './preview-select-wrapper.routes';
-import {
-  SelectWrapperModule
-} from 'components';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
@@ -17,6 +14,8 @@ import { FormlyMaterialModule } from '@ngx-formly/material';
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
+// components
+import { FormWrapperMaterialModule } from 'components';
 
 const angularModules = [
   ReactiveFormsModule
@@ -37,12 +36,10 @@ Morphi.init({
 @NgModule({
   imports: [
     CommonModule,
-    SelectWrapperModule,
     ...materialModules,
     ...angularModules,
     RouterModule.forChild(routes),
-    FormlyMaterialModule,
-    FormlyModule.forRoot(),
+    FormWrapperMaterialModule
   ],
   declarations: [PreviewSelectWrapperComponent],
   providers: [

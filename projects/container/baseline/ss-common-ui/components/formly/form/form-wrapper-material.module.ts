@@ -36,10 +36,9 @@ import {
 
 // aditional types componets
 import {
-  ButtonWithActionComponent,
-  FormlySwitchComponent,
   IconButtonWithActionComponent
 } from './additional-types';
+import { FormlyButtionWithActionModule } from '../base-components/formly-buttion-with-action';
 // import { ProcessLoggerModule } from '../entity-components/process-logger';
 
 
@@ -60,7 +59,8 @@ const materialModules = [
 
 const myFormlyModules = [
   SelectWrapperModule,
-  EditorWrapperModule
+  EditorWrapperModule,
+  FormlyButtionWithActionModule,
 ];
 
 console.log('Morphi.Formly.getAllRegisterdTypes()', Morphi.Formly.getAllRegisterdTypes());
@@ -70,8 +70,7 @@ const formlyModules = [
   FormlyModule.forRoot({
     types: [
       ...Morphi.Formly.getAllRegisterdTypes(),
-      { name: 'button', component: ButtonWithActionComponent },
-      { name: 'switch', component: FormlySwitchComponent },
+      // { name: 'switch', component: FormlySwitchComponent },
       { name: 'iconbutton', component: IconButtonWithActionComponent },
       { name: 'repeat', component: RepeatTypeComponent }
     ],
@@ -90,8 +89,6 @@ const formlyModules = [
 
 const customComponetns = [
   FormWrapperMaterialComponent,
-  ButtonWithActionComponent,
-  FormlySwitchComponent,
   IconButtonWithActionComponent,
   RepeatTypeComponent,
   FormlyHorizontalWrapper

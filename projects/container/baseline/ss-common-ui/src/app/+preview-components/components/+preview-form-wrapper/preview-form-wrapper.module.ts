@@ -13,10 +13,8 @@ import { FormlyMaterialModule, } from '@ngx-formly/material';
 import { PreviewFormWrapperComponent } from './preview-form-wrapper.component';
 import { routes } from './preview-form-wrapper.routes';
 import {
-  ListWrapperModule, FormWrapperMaterialModule
-} from 'components';
-import {
-  EditorWrapperModule
+  ListWrapperModule, FormWrapperMaterialModule,
+  EditorWrapperModule, FormlySwitchModule
 } from 'components';
 
 import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
@@ -41,7 +39,13 @@ const materialModules = [
   MatButtonToggleModule
 ];
 
-
+const commonUiModules = [
+  ListWrapperModule,
+  FormlySwitchModule,
+  EditorWrapperModule,
+  ProcessLoggerModule,
+  FormWrapperMaterialModule,
+]
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 
@@ -51,16 +55,13 @@ Morphi.init({
   entities: [EXAMPLE, PROCESS]
 });
 
-console.log('Morphi.Formly.getAllRegisterdTypes() in preview',Morphi.Formly.getAllRegisterdTypes())
+console.log('Morphi.Formly.getAllRegisterdTypes() in preview', Morphi.Formly.getAllRegisterdTypes())
 
 @NgModule({
   imports: [
     ...angularModules,
-    ListWrapperModule,
-    EditorWrapperModule,
+    ...commonUiModules,
     ...materialModules,
-    ProcessLoggerModule,
-    FormWrapperMaterialModule,
     FormlyModule.forChild({
       types: [
         ...Morphi.Formly.getAllRegisterdTypes()
