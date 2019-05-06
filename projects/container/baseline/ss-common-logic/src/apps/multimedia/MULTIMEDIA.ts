@@ -49,7 +49,7 @@ export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> impl
 
   @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
   //#endregion
-  name: string = null
+  name: string;
 
 
   //#region @backend

@@ -28,31 +28,24 @@ export class PreviewMultimediaWrapperComponent {
     });
   }
 
+  field = {
+    key: 'amazingPicture',
+    type: 'multimediawrapper',
+    templateOptions: {
+      // openDialog: true,
+      label: 'Input',
+      placeholder: 'Placeholder',
+      description: 'Description',
+      required: true,
+    },
+  },
+
   form = new FormGroup({});
-  model: any = {};
+  model1: any = {};
+  model2: any = {};
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'amazingPicture',
-      type: 'multimediawrapper',
-      templateOptions: {
-        // openDialog: true,
-        label: 'Input',
-        placeholder: 'Placeholder',
-        description: 'Description',
-        required: true,
-      },
-    },
-    {
-      key: 'amazingPicture2',
-      type: 'multimediawrapper',
-      templateOptions: {
-        label: 'Input',
-        placeholder: 'Placeholder',
-        description: 'Description',
-        required: true,
-      },
-    },
+    this.field
   ];
 
 

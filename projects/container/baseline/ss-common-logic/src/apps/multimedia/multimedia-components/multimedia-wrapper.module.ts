@@ -10,6 +10,8 @@ import { MultimediaChooserModule } from './multimedia-chooser/multimedia-chooser
 import { MultimediaUploadModule } from './multimedia-upload/multimedia-upload.module';
 import { MultimediaWrapperComponent } from './multimedia-wrapper.component';
 import { DialogWrapperModule } from '../../dialog/dialog-wrapper';
+import { FormlyModule } from '@ngx-formly/core';
+import { CLASS } from 'typescript-class-helpers';
 
 const angularModules = [
   CommonModule
@@ -33,7 +35,19 @@ const localModules = [
   imports: [
     ...angularModules,
     ...moduleMaterial,
-    ...localModules
+    ...localModules,
+    FormlyModule.forRoot({
+      types: [
+        { name: 'multimediawrapper', component: MultimediaWrapperComponent },
+        { name: CLASS.getName(MultimediaWrapperComponent), component: MultimediaWrapperComponent },
+      ],
+      validationMessages: [
+        { name: 'required', message: 'This field is required' },
+      ],
+    }),
+  ],
+  exports: [
+    MultimediaWrapperComponent
   ],
   declarations: [MultimediaWrapperComponent]
 })

@@ -1,17 +1,25 @@
 <mat-card>
-  <h4>multimedia wrapper</h4>
+  <span *ngIf="model1">model1: {{ model1 | json}}</span>
+  <mat-card-title>
+    Form Wrapper
+  </mat-card-title>
+  <app-form-wrapper-material [(model)]="model1"
+                             [fields]="fields">
 
-  <mat-slide-toggle [checked]="mode === 'edit'"
-                    (change)="mode = (mode === 'edit' ? 'view': 'edit')">Edit mode</mat-slide-toggle>
+  </app-form-wrapper-material>
 
-  <!-- {{model | json}} -->
+</mat-card>
+<br>
 
-  <form [formGroup]="form">
-    <formly-form [model]="model"
-                 [fields]="fields"
-                 [options]="options"
-                 [form]="form">
-    </formly-form>
-  </form>
+<mat-card>
+  <mat-card-title>
+    Angular Component
+  </mat-card-title>
+  <span *ngIf="model2">model2: {{ model2 | json}}</span>
+  <br>
+  <app-multimedia-wrapper [label]="field.templateOptions.label"
+                      [(model)]="model2"
+                      [key]="field.key"
+                      [required]="field.templateOptions.required"></app-multimedia-wrapper>
 
 </mat-card>

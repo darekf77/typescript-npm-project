@@ -16,9 +16,9 @@ import { routes } from './preview-multimedia-wrapper.routes';
 import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
 import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/apps/auth/AuthController';
 import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
-import {
-  MultimediaWrapperModule, MultimediaWrapperComponent
-} from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components';
+// formly modules
+import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components';
+import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
 
 
 const angularModules = [
@@ -33,19 +33,10 @@ const materialModules = [
   MatSlideToggleModule
 ];
 
-const formlyModules = [
-  FormlyModule.forRoot({
-    types: [
-      { name: 'multimediawrapper', component: MultimediaWrapperComponent }
-    ],
-    validationMessages: [
-      { name: 'required', message: 'This field is required' },
-    ],
-  }),
-];
 
-const otherModules = [
+const formlyModules = [
   MultimediaWrapperModule,
+  FormWrapperMaterialModule,
 ];
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
@@ -60,8 +51,10 @@ Morphi.init({
   imports: [
     ...angularModules,
     ...materialModules,
-    ...formlyModules,
-    ...otherModules
+    ...formlyModules
+  ],
+  exports: [
+    ...formlyModules
   ],
   declarations: [PreviewMultimediaWrapperComponent],
   providers: [

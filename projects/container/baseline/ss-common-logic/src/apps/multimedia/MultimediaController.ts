@@ -20,9 +20,9 @@ import { MULTIMEDIA, MultimediaType } from './MULTIMEDIA';
   className: 'MultimediaController',
   entity: entities.MULTIMEDIA,
   //#region @backend
-  auth: () => {
-    return authenticate('bearer', { session: false });
-  }
+  // auth: () => {
+  //   return authenticate('bearer', { session: false });
+  // }
   //#endregion
 })
 export class MultimediaController extends Morphi.Base.Controller<entities.MULTIMEDIA> {

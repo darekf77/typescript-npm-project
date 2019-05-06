@@ -1,6 +1,4 @@
 import { Component, OnInit, Input, TemplateRef, ViewChild } from '@angular/core';
-// formly
-import { FieldType } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi';
@@ -10,17 +8,25 @@ const log = Log.create('multimedia wrapper');
 import { MultimediaController } from '../MultimediaController';
 import { MultimediaType, MULTIMEDIA } from '../MULTIMEDIA';
 import { MatDialog, MatDialogRef } from '@angular/material';
+import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/module/helpers';
+import { CLASS } from 'typescript-class-helpers';
+
+class DualComponentControllerExtended extends DualComponentController {
+
+
+}
 
 export type DialogAction = 'select' | 'upload';
 
-
+@CLASS.NAME('MultimediaWrapperComponent')
 @Component({
   selector: 'app-multimedia-wrapper',
   templateUrl: './multimedia-wrapper.component.html',
   styleUrls: ['./multimedia-wrapper.component.scss']
 })
-export class MultimediaWrapperComponent extends FieldType implements OnInit {
+export class MultimediaWrapperComponent extends BaseFormlyComponent implements OnInit {
 
+  DualComponentController = DualComponentControllerExtended;
   isReload = false;
   currentAction: DialogAction = 'select';
   selectionType: 'single' | 'multi' = 'single';
@@ -30,7 +36,7 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
 
 
   get multimedia(): MULTIMEDIA {
-    return this.formControl.value;
+    return this.ctrl.value;
   }
   selected: MULTIMEDIA[] = [];
 
@@ -67,7 +73,7 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
     if (this.dialogRef) {
       this.dialogRef.close();
     }
-    this.formControl.setValue(undefined);
+    this.ctrl.value = void 0;
   }
 
   selectMultimedia() {
@@ -75,11 +81,11 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
       this.dialogRef.close();
     }
     if (this.selectionType === 'single') {
-      this.formControl.setValue(_.first(this.selected));
+      this.ctrl.value = _.first(this.selected);
     } else {
-      this.formControl.setValue(this.selected);
+      this.ctrl.value = this.selected;
     }
-    log.i('form control value', this.formControl.value);
+    log.i('form control value', this.ctrl.value);
   }
 
   actionChange(e) {
@@ -105,6 +111,9 @@ export class MultimediaWrapperComponent extends FieldType implements OnInit {
 
   ngOnInit() {
     super.ngOnInit();
+    // if (this.ctrl.value === void 0) {
+    //   this.ctrl.value = new MULTIMEDIA()
+    // }
     if (!_.isUndefined(this.field.templateOptions.openDialog)) {
       setTimeout(() => {
         this.open();
