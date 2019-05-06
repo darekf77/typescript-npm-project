@@ -11,11 +11,11 @@ import {
 
 export class DualComponentController<T = any> {
 
-  constructor(private cmp: BaseFormlyComponent, public isFormlyMode = false) {
+  constructor(protected cmp: BaseFormlyComponent, public isFormlyMode = false) {
 
   }
 
-  private getValTemplateOptions(propertyName: string) {
+  protected getValTemplateOptions(propertyName: string) {
     if (this.isFormlyMode) {
       const res = this.cmp.field.templateOptions[propertyName]
       if (res === void 0 && this.cmp[propertyName]) {
@@ -26,7 +26,7 @@ export class DualComponentController<T = any> {
     return this.cmp[propertyName]
   }
 
-  private getValContext(propertyName: string) {
+  protected getValContext(propertyName: string) {
     if (this.isFormlyMode) {
       const res = this.cmp.field[propertyName]
       if (res === void 0 && this.cmp[propertyName]) {
@@ -93,6 +93,7 @@ export class DualComponentController<T = any> {
   set value(v) {
     if (this.isFormlyMode) {
       this.cmp.field.formControl.setValue(v);
+      this.cmp.change.next(v);
       return;
     }
     if (_.isString(this.path)) {

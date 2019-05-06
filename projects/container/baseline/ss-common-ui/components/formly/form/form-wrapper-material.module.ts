@@ -30,8 +30,7 @@ import { FormWrapperMaterialComponent } from './form-wrapper-material.component'
 
 // base components
 import {
-  EditorWrapperModule,
-  EditorWrapperComponent
+  EditorWrapperModule
 } from '../base-components/editor';
 
 // aditional types componets

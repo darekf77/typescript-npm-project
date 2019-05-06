@@ -10,6 +10,7 @@ import {
 } from '@angular/forms'
 import { Log, Level } from 'morphi/log';
 import { DualComponentController } from './dual-component-ctrl';
+import { EventEmitter } from '@angular/core';
 
 const log = Log.create('base formly component')
 
@@ -19,9 +20,9 @@ const log = Log.create('base formly component')
   template: ``
 })
 export abstract class BaseFormlyComponent<T = any> extends FieldType
-  implements OnInit, Partial<DualComponentController<T>> {
+  implements OnInit, Partial<DualComponentController<T>>, AfterViewInit {
 
-
+  DualComponentController = DualComponentController;
   ctrl: DualComponentController;
 
   @Input() disabled: boolean;
@@ -31,6 +32,24 @@ export abstract class BaseFormlyComponent<T = any> extends FieldType
   @Input() defaultValue: T;
   @Input() model: any;
   @Input() path: string;
+  @Output() change = new EventEmitter();
+
+
+  @Input() set key(value: string) {
+    if (this.ctrl && this.ctrl.isFormlyMode) {
+      return;
+    }
+    this.path = value;
+  }
+  get key(): string {
+    if (this.ctrl && this.ctrl.isFormlyMode) {
+      return this.field.key;
+    }
+    return this.path;
+  }
+
+
+
   @Input() formControl: FormControl;
   protected handlers: Subscription[] = [];
 
@@ -61,7 +80,7 @@ export abstract class BaseFormlyComponent<T = any> extends FieldType
       })
     }
 
-    this.ctrl = new DualComponentController<T>(this, isFormlyMode);
+    this.ctrl = new (this.DualComponentController as any)(this, isFormlyMode);
     log.i('this.ctrl.isFormlyMode', this.ctrl.isFormlyMode)
     // if (!this.formControl) {
     //   this.formControl = new FormControl({})
@@ -74,6 +93,7 @@ export abstract class BaseFormlyComponent<T = any> extends FieldType
     //   })
     //   //   this.formControl = new FormControl({})
     // }
+    this.change.next(this.ctrl.value);
   }
 
 }

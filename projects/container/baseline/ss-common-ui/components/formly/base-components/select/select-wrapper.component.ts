@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi/browser';
 import { Log, Level } from 'morphi/browser/log';
 import { Helpers } from 'morphi/browser/helpers';
-import { BaseFormlyComponent } from 'ss-common-ui/components/helpers';
+import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
 import { CLASS } from 'typescript-class-helpers/browser';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 

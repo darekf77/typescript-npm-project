@@ -14,9 +14,20 @@ export class PreviewEditorWrapperComponent implements OnInit {
 
   }
 
-  form = new FormGroup({});
+  model1: any = {};
+  model2: any = {};
+  field = {
+    key: 'editorwrappertest',
+    type: 'texteditor',
+    templateOptions: {
+      required: true,
+      label: 'Amazing Editor',
+      crud: this.exampleService
+    }
+  }
 
-  model: any = {};
+  buttons: any[] = ['bold']
+
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[];
 
@@ -25,15 +36,7 @@ export class PreviewEditorWrapperComponent implements OnInit {
 
 
     this.fields = [
-      {
-        key: 'editorwrappertest',
-        type: 'editorwrapperformly',
-        templateOptions: {
-          required: true,
-          label: 'Amazing Editor',
-          crud: this.exampleService
-        }
-      }
+      this.field
     ];
   }
 

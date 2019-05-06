@@ -1,6 +1,7 @@
 export * from './sass';
 export * from './base-component';
 export * from './base-formly-component';
+export * from './dual-component-ctrl';
 export * from './resize-service';
 
 export function stringifyToQueryParams(params, questionMarkAtBegin = false) {

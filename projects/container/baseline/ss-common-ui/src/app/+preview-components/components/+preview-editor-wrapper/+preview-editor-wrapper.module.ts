@@ -7,9 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 // local
 import { PreviewEditorWrapperComponent } from './+preview-editor-wrapper.component';
 import { routes } from './+preview-editor-wrapper.routes';
-import {
-  EditorWrapperModule
-} from 'components';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
@@ -17,6 +14,7 @@ import { FormlyMaterialModule } from '@ngx-formly/material';
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
+import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
 
 const angularModules = [
   ReactiveFormsModule
@@ -37,16 +35,13 @@ Morphi.init({
 @NgModule({
   imports: [
     CommonModule,
-    EditorWrapperModule,
     ...materialModules,
     ...angularModules,
     RouterModule.forChild(routes),
-    FormlyMaterialModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' },
-      ],
-    }),
+    FormWrapperMaterialModule,
+  ],
+  exports: [
+    FormWrapperMaterialModule,
   ],
   declarations: [PreviewEditorWrapperComponent],
   providers: [

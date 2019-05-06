@@ -25,18 +25,20 @@ export class PreviewSelectWrapperComponent implements OnInit {
     console.log('this.model !', this.model)
   }
 
+  field = {
+    key: 'selectwrappertest',
+    type: 'selectwrapper',
+    templateOptions: {
+      required: true,
+      label: 'Amazing Select',
+      crud: this.exampleService
+    }
+  }
+
   ngOnInit() {
 
     this.fields = [
-      {
-        key: 'selectwrappertest',
-        type: 'selectwrapper',
-        templateOptions: {
-          required: true,
-          label: 'Amazing Select',
-          crud: this.exampleService
-        }
-      }
+      this.field
     ];
   }
 

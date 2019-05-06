@@ -11,13 +11,15 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
 // other
 import { NgxWigModule } from 'ngx-wig';
+import { CLASS } from 'typescript-class-helpers/browser';
 
 
 const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
     types: [
-      { name: 'editorwrapperformly', component: EditorWrapperComponent }
+      { name: 'texteditor', component: EditorWrapperComponent },
+      { name: CLASS.getName(EditorWrapperComponent), component: EditorWrapperComponent }
     ]
   }),
   FormlyMatToggleModule,

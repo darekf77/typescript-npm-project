@@ -16,7 +16,7 @@ import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/app
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 // components
-import { FormWrapperMaterialModule, SelectWrapperModule } from 'ss-common-ui/components/formly';
+import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
 
 const angularModules = [
   CommonModule,
@@ -41,8 +41,10 @@ Morphi.init({
   imports: [
     ...angularModules,
     ...materialModules,
-    FormWrapperMaterialModule,
-    SelectWrapperModule
+    FormWrapperMaterialModule
+  ],
+  exports: [
+    FormWrapperMaterialModule
   ],
   declarations: [PreviewSelectWrapperComponent],
   providers: [
