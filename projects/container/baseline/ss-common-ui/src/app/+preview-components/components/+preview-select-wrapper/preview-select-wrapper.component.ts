@@ -15,9 +15,15 @@ export class PreviewSelectWrapperComponent implements OnInit {
   }
 
   model: any = {};
+  model1: any = {};
+  model2: any = {};
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[];
 
+  onSubmit(m) {
+    console.log('submit is working !', m)
+    console.log('this.model !', this.model)
+  }
 
   ngOnInit() {
 

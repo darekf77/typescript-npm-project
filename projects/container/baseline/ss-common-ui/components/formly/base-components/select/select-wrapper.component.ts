@@ -1,6 +1,6 @@
 // angular
 import {
-  Component, OnInit, Input, Output, AfterViewInit,
+  Component, OnInit, Input, Output, AfterViewInit, forwardRef,
 } from '@angular/core';
 import * as _ from 'lodash';
 import { Morphi } from 'morphi/browser';
@@ -8,6 +8,13 @@ import { Log, Level } from 'morphi/browser/log';
 import { Helpers } from 'morphi/browser/helpers';
 import { BaseFormlyComponent } from 'ss-common-ui/components/helpers';
 import { CLASS } from 'typescript-class-helpers/browser';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+
+export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
+  provide: NG_VALUE_ACCESSOR,
+  useExisting: forwardRef(() => SelectWrapperComponent),
+  multi: true
+};
 
 
 const log = Log.create('select wrapper');
@@ -21,7 +28,8 @@ export interface CRUDSelectWrapperOption {
 @Component({
   selector: 'app-select-wrapper',
   templateUrl: './select-wrapper.component.html',
-  styleUrls: ['./select-wrapper.component.scss']
+  styleUrls: ['./select-wrapper.component.scss'],
+  providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR]
 })
 export class SelectWrapperComponent extends BaseFormlyComponent implements OnInit, AfterViewInit {
 
@@ -42,11 +50,13 @@ export class SelectWrapperComponent extends BaseFormlyComponent implements OnIni
   @Input() valueProp = 'id';
   @Input() nameProp = 'name';
 
+
   // fields: FormlyFieldConfig[] = [];
 
   // @Input() lable: string;
 
   async ngOnInit() {
+
     super.ngOnInit()
 
     if (!this.crud && _.isFunction(_.get(this.field, 'templateOptions.crud'))) {

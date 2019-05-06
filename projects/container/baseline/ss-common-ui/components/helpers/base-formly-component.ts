@@ -13,12 +13,14 @@ import { DualComponentController } from './dual-component-ctrl';
 
 const log = Log.create('base formly component')
 
+
 @Component({
   selector: 'app-base-formly-component-meta',
   template: ``
 })
 export abstract class BaseFormlyComponent<T = any> extends FieldType
   implements OnInit, Partial<DualComponentController<T>> {
+
 
   ctrl: DualComponentController;
 
@@ -28,17 +30,38 @@ export abstract class BaseFormlyComponent<T = any> extends FieldType
   @Input() placeholder: string;
   @Input() defaultValue: T;
   @Input() model: any;
-  @Input() key: string;
+  @Input() path: string;
   @Input() formControl: FormControl;
   protected handlers: Subscription[] = [];
 
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe());
     this.handlers.length = 0;
+
   }
 
+  private __field = {
+    templateOptions: {
+
+    }
+  } as FormlyFieldConfig;
+
   ngOnInit() {
-    this.ctrl = new DualComponentController<T>(this, !!this.field);
+    // console.log('ket', this.key)
+    const isFormlyMode = !!this.field;
+    if (!isFormlyMode) {
+      const that = this;
+      Object.defineProperty(this, 'field', {
+        get: function () {
+          return that.__field;
+        },
+        set: function (v) {
+          that.__field = v;
+        }
+      })
+    }
+
+    this.ctrl = new DualComponentController<T>(this, isFormlyMode);
     log.i('this.ctrl.isFormlyMode', this.ctrl.isFormlyMode)
     // if (!this.formControl) {
     //   this.formControl = new FormControl({})

@@ -1,21 +1,25 @@
-<mat-card>
+<!-- <mat-card>
+  <span *ngIf="model1">{{ model1 | json}}</span>
   <mat-card-title>
     Form Wrapper
   </mat-card-title>
-  <app-form-wrapper-material [(model)]="model"
+  <app-form-wrapper-material [(model)]="model1"
                              [fields]="fields">
 
   </app-form-wrapper-material>
 
 </mat-card>
-<br>
-<span *ngIf="model" >{{ model | json}}</span>
+<br> -->
+
 <mat-card>
   <mat-card-title>
     Angular Component
   </mat-card-title>
-  <form>
-    <app-select-wrapper [label]="'amz from input'" [(model)]="model" [required]="true" ></app-select-wrapper>
-    <button type="submit" >submit</button>
-  </form>
+  <!-- <span *ngIf="model2">{{ model2 | json}}</span> -->
+
+  <app-select-wrapper [label]="'amz from input'"
+                      [(model)]="model2"
+                      path="asdasdas"
+                      [required]="true"></app-select-wrapper>
+
 </mat-card>

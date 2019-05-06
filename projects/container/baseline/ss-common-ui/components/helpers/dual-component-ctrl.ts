@@ -72,18 +72,22 @@ export class DualComponentController<T = any> {
     return this.getValContext('key') as string;
   }
 
+  get path() {
+    return this.getValContext('path') as string;
+  }
+
   get model(): any {
-    return this.getValContext('key') as string;
+    return this.getValContext('model') as string;
   }
 
   get value(): T {
     if (this.isFormlyMode) {
       return this.cmp.field.formControl.value;
     }
-    if (_.isString(this.key)) {
-      return this.model[this.key];
+    if (_.isString(this.path)) {
+      return _.get(this.cmp.model, this.path);
     }
-    return this.model;
+    return this.cmp.model;
   }
 
   set value(v) {
@@ -91,8 +95,8 @@ export class DualComponentController<T = any> {
       this.cmp.field.formControl.setValue(v);
       return;
     }
-    if (_.isString(this.key)) {
-      this.cmp.model[this.key];
+    if (_.isString(this.path)) {
+      _.set(this.cmp.model, this.path, v);
     } else {
       this.cmp.model = v;
     }
