@@ -25,6 +25,7 @@ Helper project for my typescript npm libraries.
 - Inside isomorphic app.ts simulator use only ./controller and ./entities:
   import { ProcessController } from './controllers'; // OK 
   import { ProcessController } from './controllers/core/ProcessController'; // error undefined
+- angular-lib 'ss-common-ui/module' is not working in src
 
 BUILDS are only projects :
  - worksapces (that contains with childen | with childen previews)

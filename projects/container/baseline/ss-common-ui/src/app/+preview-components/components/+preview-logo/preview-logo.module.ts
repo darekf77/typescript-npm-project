@@ -4,7 +4,7 @@ import { PreviewLogoComponent } from './preview-logo.component';
 import { RouterModule } from '@angular/router';
 import {
   LogoModule
-} from 'ss-common-ui/module/ui-elements/logo';
+} from 'components';
 import { ProcessTestModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-test/process-test.module'
 
 

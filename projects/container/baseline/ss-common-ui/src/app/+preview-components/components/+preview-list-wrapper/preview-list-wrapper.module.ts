@@ -8,7 +8,7 @@ import { PreviewListWrapperComponent } from './preview-list-wrapper.component';
 import { routes } from './preview-list-wrapper.routes';
 import {
   ListWrapperModule, EditorWrapperModule
-} from 'ss-common-ui/module/formly/base-components';
+} from 'components';
 
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';

@@ -16,7 +16,7 @@ import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/app
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 // components
-import { FormWrapperMaterialModule } from 'ss-common-ui/module/formly';
+import { FormWrapperMaterialModule } from 'components';
 
 const angularModules = [
   CommonModule,

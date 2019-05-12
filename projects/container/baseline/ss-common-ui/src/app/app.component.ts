@@ -5,7 +5,7 @@ import { AppPreviewPopupContentService } from './app-popup-content.service';
 
 import {
   BaseComponent
-} from 'ss-common-ui/module/helpers/base-component';
+} from 'components';
 import { Router, NavigationEnd } from '@angular/router';
 
 console.log('Stuning asdasdasd');
