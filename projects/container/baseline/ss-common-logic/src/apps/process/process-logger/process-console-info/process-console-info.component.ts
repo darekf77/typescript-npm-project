@@ -4,12 +4,9 @@ import {
   Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy
 } from '@angular/core';
 import { PROCESS } from '../../PROCESS';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from 'ss-common-ui/module';
-import { ResizeService } from 'ss-common-ui/module';
+import { BaseComponent } from 'ss-common-ui/module/helpers';
+import { ResizeService } from 'ss-common-ui/module/helpers';
 
 @Component({
   selector: 'app-process-console-info',

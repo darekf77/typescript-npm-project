@@ -5,7 +5,6 @@ import {
   AfterContentInit, ElementRef, Output, OnDestroy
 } from '@angular/core';
 import { PopupControler } from './model/popup-controller';
-import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({

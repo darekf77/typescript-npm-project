@@ -4,7 +4,6 @@ import { PopupInfo } from './popup-info';
 import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef, ElementRef, EventEmitter } from '@angular/core';
 import { PopupComponent } from '../popup-component/popup.component';
 import { HTMLElementUtil } from './html-utls';
-import { Subject } from 'rxjs/Subject';
 
 const coordinateX = 'coordinateX';
 const coordinateY = 'coordinateY';

@@ -23,7 +23,6 @@ import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/
 
 
 // other
-import { Morphi } from 'morphi/browser';
 import { NgStringPipesModule } from 'ngx-pipes';
 // local
 import { FormWrapperMaterialComponent } from './form-wrapper-material.component';

@@ -17,11 +17,9 @@ import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
 import { Log, Level } from 'ng2-logger';
-import { Observable, Subscribable } from "rxjs/Observable";
-
-export { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-export { Subject } from "rxjs/Subject";
+// export { Subject } from "rxjs/Subject";
 
 const log = Log.create('AuthController', Level.__NOTHING);
 

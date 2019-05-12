@@ -2,7 +2,6 @@
 
 import { Injectable, TemplateRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 import { Router, NavigationEnd } from '@angular/router';
 
 @Injectable()

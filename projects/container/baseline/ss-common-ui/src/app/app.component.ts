@@ -1,12 +1,11 @@
 import {
   Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ViewEncapsulation, OnInit, TemplateRef
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { AppPreviewPopupContentService } from './app-popup-content.service';
 
 import {
   BaseComponent
-} from 'ss-common-ui/module';
+} from 'ss-common-ui/module/helpers/base-component';
 import { Router, NavigationEnd } from '@angular/router';
 
 console.log('Stuning asdasdasd');

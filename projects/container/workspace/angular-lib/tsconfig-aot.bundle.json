@@ -20,8 +20,8 @@
       "dom"
     ]
   },
-  "files": [
-    "./tmp/inlined-bundle/src/index.ts"
+  "include": [
+    "./tmp/inlined-dist/src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

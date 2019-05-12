@@ -11,11 +11,7 @@ import { PROCESS } from '../PROCESS';
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/module/helpers';
 // logger
 import { Log, Level } from 'ng2-logger';
-import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { PROCESS_STATE } from '../PROCESS';
-import { PROGRESS_DATA } from 'tnp-bundle';
 
 const log = Log.create('process loger');
 

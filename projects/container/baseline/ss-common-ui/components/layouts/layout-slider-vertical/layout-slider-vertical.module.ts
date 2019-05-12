@@ -18,7 +18,7 @@ const modules = [
   StaticColumnsModule
 ];
 
-const components = [
+const localCmp = [
   SliderVertivalChildComponent,
   SliderVerticalComponent,
   GoToChildVerticalSliderDirective
@@ -26,8 +26,8 @@ const components = [
 
 @NgModule({
   imports: [modules],
-  exports: [modules, components],
-  declarations: [components],
+  exports: [modules, localCmp],
+  declarations: [localCmp],
   providers: [],
 })
 export class SliderVerticalModule { }

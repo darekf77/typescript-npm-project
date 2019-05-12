@@ -8,7 +8,7 @@ import { PreviewFormlyInputsComponent } from './preview-formly-inputs.component'
 import { routes } from './preview-formly-inputs.routes';
 import {
   ListWrapperModule
-} from 'ss-common-ui/module';
+} from 'ss-common-ui/module/formly/base-components/list';
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';

@@ -15,9 +15,9 @@ import { ProcessLoggerComponent } from './process-logger.component';
 import { ProcessConsoleInfoModule } from './process-console-info/process-console-info.module';
 import { ProcessInfoMessageComponent } from './process-info-message/process-info-message.component';
 
-import { ButtonIconModule } from 'ss-common-ui/module';
-import { ResizeService } from 'ss-common-ui/module';
-import { MoveablePopupModule } from 'ss-common-ui/module';
+import { ButtonIconModule } from 'ss-common-ui/module/formly';
+import { ResizeService } from 'ss-common-ui/module/helpers';
+import { MoveablePopupModule } from 'ss-common-ui/module/ui-elements';
 import { FormlyModule } from '@ngx-formly/core';
 import { CLASS } from 'typescript-class-helpers';
 

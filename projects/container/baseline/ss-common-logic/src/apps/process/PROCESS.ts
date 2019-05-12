@@ -12,9 +12,6 @@ import { PROGRESS_DATA } from 'tnp-bundle';
 import { IProcessController } from './ProcessController';
 import { Project, config } from 'tnp-bundle';
 import { CLASS } from 'typescript-class-helpers';
-export { Models } from 'ng2-rest/models'
-import { Models } from 'ng2-rest/models'
-import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 
 
 export interface IPROCESS extends PROCESS {
