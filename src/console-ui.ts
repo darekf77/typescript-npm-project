@@ -192,7 +192,7 @@ export class ConsoleUi {
           name: 'port',
           message: 'Please port number'
         }) as any;
-        killProcessByPort(num.port);
+        await killProcessByPort(num.port);
         process.exit(0)
         break;
 

@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 // local modules
 import {
-  BarService,
-  FooComponent,
   SliderVerticalSectionComponent
 } from './ui-elements';
 
@@ -16,7 +14,6 @@ export * from './formly';
 export * from './helpers';
 
 const CMP = [
-  FooComponent,
   SliderVerticalSectionComponent
 ];
 
@@ -38,7 +35,7 @@ export class CommonUIModule {
     return {
       ngModule: CommonUIModule,
       providers: [
-        BarService
+
       ]
     };
   }

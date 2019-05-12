@@ -15,7 +15,7 @@ import { AppPreviewPopupContentService } from './app-popup-content.service';
 import { StaticColumnsModule } from 'static-columns';
 import {
   StandalonePopupModule
-} from 'components';
+} from 'ss-common-ui/module';
 
 
 const angularModules = [

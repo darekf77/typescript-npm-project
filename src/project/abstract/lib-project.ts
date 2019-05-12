@@ -4,14 +4,15 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
+import * as  getDependents from 'npm-get-dependents';
 
 import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../../models";
-import { questionYesNo } from "../../helpers";
+import { questionYesNo, log } from "../../helpers";
 import { error, info, warn } from "../../helpers";
 import config from "../../config";
 import { PackageJSON } from '../features/package-json';
 
-import {  tryCopyFrom } from '../../helpers';
+import { tryCopyFrom } from '../../helpers';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -58,63 +59,67 @@ export abstract class LibProject extends Project {
     }
   }
 
+  private updateChildren(project: Project, newVersion, updatedProjectw: Project[] = []) {
+    if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
+      console.log(`Exition alredy ${project.genericName}`)
+      return;
+    }
+    const packageJson = project.packageJson;
+    if (packageJson && packageJson.data) {
+      if (project.type !== 'unknow-npm-project') {
+        project.packageJson.show(`For release of ${this.name  }`)
+      }
+      let versionBumped = false;
+      if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
+        versionBumped = true;
+        packageJson.data.dependencies[this.name] = newVersion;
+      }
+      if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
+        versionBumped = true;
+        packageJson.data.devDependencies[this.name] = newVersion
+      }
+      if (versionBumped) {
+        packageJson.save()
+        info(`[release - ${this.name}] Version of current project "${this.name}" bumped in ${project.genericName}`)
+      } else {
+        log(`[release - ${this.name}] ${this.name} has not a dependency of ${this.name}`)
+      }
+    } else {
+      log(`[release - ${this.name}] No package json for ${project.genericName}`)
+    }
+    updatedProjectw.push(project)
+    console.log(`[release - ${this.name}]  children of ${project.genericName}`, project.children.map(c => c.location))
+
+    project.children.forEach(p => this.updateChildren(p, newVersion, updatedProjectw));
+  }
+
   /**
    * Return how many projects has changed
    * @param bumbVersionIn
    * @param newVersion
    * @param onlyInThisProjectSubprojects
    */
-  bumpVersionInOtherProjects(bumbVersionIn: string[], newVersion, onlyInThisProjectSubprojects = false): Number {
-    let count = 0;
-    if (_.isArray(bumbVersionIn)) {
-      const currentProjectLocation = path.resolve(this.location);
-      bumbVersionIn = bumbVersionIn
-        .map(p => path.resolve(p))
-        .filter(p => p !== currentProjectLocation);
-
-      if (onlyInThisProjectSubprojects) {
-        bumbVersionIn = bumbVersionIn.filter(p => p.startsWith(currentProjectLocation));
-      } else {
-        bumbVersionIn = bumbVersionIn.filter(p => !p.startsWith(currentProjectLocation));
-      }
-
-      bumbVersionIn.forEach(p => {
-        const packageJson = PackageJSON.fromLocation(p);
-        if (!!packageJson && packageJson.data &&
-          packageJson.data.tnp && packageJson.data.tnp.type) {
-          const project = Project.From(p);
-          if (project.isWorkspace && project.isCoreProject) {
-            if (!project.packageJson.data.dependencies) {
-              project.packageJson.data.dependencies = {};
-            }
-            project.packageJson.data.dependencies[this.name] = newVersion;
-            project.packageJson.save()
-            project.packageJson.coreRecreate();
-            info(`Version of current project "${this.name}" bumped in ${project.name} (with recreate) `)
-            count++;
+  async bumpVersionInOtherProjects(newVersion, onlyInThisProjectSubprojects = false) {
+    if (onlyInThisProjectSubprojects) {
+      // console.log('UPDATE VERSION !!!!!!!!!!!!!')
+      this.updateChildren(this, newVersion);
+    } else {
+      Project.Tnp.packageJson.data.dependencies[this.name] = newVersion;
+      Project.Tnp.packageJson.save()
+      Project.Tnp.packageJson.coreRecreate();
+      await (new Promise((resolve, reject) => {
+        getDependents(this.name, function (err, packages: any[]) {
+          if (err) {
+            reject(`[lib-projecty] Can't get depended packages..`)
+          } else {
+            packages.forEach(pkg => {
+              info(`Please update "${pkg}" depended on this package...`)
+            })
+            resolve()
           }
-          return
-        }
-
-        if (packageJson && packageJson.data) {
-          let versionBumped = false;
-          if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
-            versionBumped = true;
-            packageJson.data.dependencies[this.name] = newVersion;
-          }
-          if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
-            versionBumped = true;
-            packageJson.data.devDependencies[this.name] = newVersion
-          }
-          if (versionBumped) {
-            packageJson.save()
-            info(`Version of current project "${this.name}" bumped in ${packageJson.name}`)
-            count++;
-          }
-        }
-      });
+        });
+      }));
     }
-    return count;
   }
 
   private commit(newVer) {
@@ -135,7 +140,7 @@ export abstract class LibProject extends Project {
 
     this.checkIfLogginInToNpm()
 
-    const { prod = false, bumbVersionIn = [] } = c;
+    const { prod = false } = c;
 
     this.checkIfReadyForNpm()
     const newVersion = Project.Current.versionPatchedPlusOne;
@@ -150,7 +155,7 @@ export abstract class LibProject extends Project {
 
     await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
 
-      this.bumpVersionInOtherProjects(bumbVersionIn, newVersion, true)
+      await this.bumpVersionInOtherProjects(newVersion, true)
       this.commit(newVersion);
 
       try {
@@ -197,7 +202,7 @@ export abstract class LibProject extends Project {
         removeTagAndCommit()
       }
       if (successPublis) {
-        this.bumpVersionInOtherProjects(bumbVersionIn, newVersion);
+        await this.bumpVersionInOtherProjects(newVersion);
         this.pushToGitRepo()
       }
     }, () => {

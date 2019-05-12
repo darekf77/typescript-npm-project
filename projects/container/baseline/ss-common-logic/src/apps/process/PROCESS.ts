@@ -103,11 +103,6 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return str.replace(/%s/g, () => args[i++]);
   }
 
-  get updateCondition() {
-    return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
-      .includes(this.state)
-  }
-
   //#region @backend
   @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
   //#endregion

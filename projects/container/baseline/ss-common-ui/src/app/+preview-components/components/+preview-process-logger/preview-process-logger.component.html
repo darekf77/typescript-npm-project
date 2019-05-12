@@ -1,17 +1,21 @@
-<br>
-<p>
-  preview process logger!
-  <!-- <app-process-logger  *ngFor="let m of model" [model]="m" ></app-process-logger> -->
-</p>
-
-<mat-card *ngFor="let m of model" >
-  <app-form-wrapper-material  [entity]="processController.entity"
-                             [model]="m"
-                             [fields]="fields"
-                             [modelDataConfig]="config"
-                             [exclude]="['ctrl']"
-                             >
+<!-- <mat-card *ngFor="let m of models1">
+  <span>model1: {{ m | json}}</span>
+  <mat-card-title>
+    Form Wrapper
+  </mat-card-title>
+  <app-form-wrapper-material [model]="m">
 
   </app-form-wrapper-material>
+
+</mat-card>
+<br> -->
+
+<mat-card *ngFor="let m of models2">
+  <mat-card-title>
+    Angular Component
+  </mat-card-title>
+  <span *ngIf="model2">model2: {{ m | json}}</span>
+  <br>
+  <app-process-logger [model]="m"></app-process-logger>
 
 </mat-card>

@@ -5,7 +5,7 @@ import { PreviewTableWrapperComponent } from './preview-table-wrapper.component'
 import { routes } from './preview-table-wrapper.routes';
 import {
   TableWrapperModule
-} from 'components';
+} from 'ss-common-ui/module';
 
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesPaginationController';

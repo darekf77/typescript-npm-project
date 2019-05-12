@@ -15,7 +15,9 @@ import { ModelDataConfig } from 'morphi/browser';
 })
 export class PreviewProcessLoggerComponent implements OnInit {
 
-  model: PROCESS[];
+  models1: PROCESS[];
+
+  models2: PROCESS[];
 
   config = new ModelDataConfig({
     exclude: [
@@ -28,14 +30,15 @@ export class PreviewProcessLoggerComponent implements OnInit {
     }
   });
 
-  fields: FormlyFieldConfig[];
 
 
   constructor(public processController: ProcessController) { }
 
   async ngOnInit() {
-    this.model = await PROCESS.getAll(this.config);
-    console.log('model', this.model);
+    this.models1 = await PROCESS.getAll(this.config);
+    this.models2 = await PROCESS.getAll(this.config);
+    console.log('models1', this.models1);
+    console.log('models2', this.models2);
   }
 
 }

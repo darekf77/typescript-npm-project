@@ -22,8 +22,8 @@ const log = Log.create('base formly component')
 export abstract class BaseFormlyComponent<T = any> extends FieldType
   implements OnInit, Partial<DualComponentController<T>>, AfterViewInit {
 
-  DualComponentController = DualComponentController;
-  ctrl: DualComponentController;
+  protected DualComponentController = DualComponentController;
+  public ctrl: DualComponentController;
 
   @Input() disabled: boolean;
   @Input() required: boolean;

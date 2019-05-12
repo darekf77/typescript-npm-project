@@ -38,7 +38,7 @@ export class PreviewMultimediaWrapperComponent {
       description: 'Description',
       required: true,
     },
-  },
+  }
 
   form = new FormGroup({});
   model1: any = {};

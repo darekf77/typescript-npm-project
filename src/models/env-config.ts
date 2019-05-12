@@ -6,7 +6,6 @@ import { IPackageJSON } from './ipackage-json';
 export interface EnvConfigProject {
   baseUrl: string;
   host?: string; // tnp generated
-  hostSocket?: string; // tnp generated
   externalHost?: string;
   name: string;  // tnp checked
   type?: LibType; // tnp checked

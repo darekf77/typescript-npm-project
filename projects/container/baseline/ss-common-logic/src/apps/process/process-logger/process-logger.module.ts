@@ -18,6 +18,8 @@ import { ProcessInfoMessageComponent } from './process-info-message/process-info
 import { ButtonIconModule } from 'ss-common-ui/module';
 import { ResizeService } from 'ss-common-ui/module';
 import { MoveablePopupModule } from 'ss-common-ui/module';
+import { FormlyModule } from '@ngx-formly/core';
+import { CLASS } from 'typescript-class-helpers';
 
 
 
@@ -44,6 +46,14 @@ const localModules = [
   MoveablePopupModule,
   ProcessConsoleInfoModule,
   ButtonIconModule,
+  FormlyModule.forRoot({
+    types: [
+      { name: CLASS.getName(ProcessLoggerComponent), component: ProcessLoggerComponent },
+    ],
+    validationMessages: [
+      { name: 'required', message: 'This field is required' },
+    ],
+  }),
 ];
 
 const localComponents = [

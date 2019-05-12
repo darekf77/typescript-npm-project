@@ -56,12 +56,12 @@ export class ProjectAngularClient extends Project {
     return command;
   }
 
-  buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
+  async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
     const outDirApp = 'dist-app';
     if (watch) {
       const p = (port !== undefined ? `--port ${port}` : '');
       if (this.isEjectedProject) {
-        killProcessByPort(port)
+        await killProcessByPort(port)
         this.run(`npm-run webpack-dev-server ${p} `, { biggerBuffer: true }).async()
       } else {
         this.run(`npm-run ng serve ${p} `, { biggerBuffer: true }).async()
@@ -126,7 +126,7 @@ export class ProjectAngularClient extends Project {
         baseHref = `${baseHref}/`;
         baseHref = baseHref.replace(/\/\//g, '/')
       }
-      this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref);
+      await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref);
     }
   }
 

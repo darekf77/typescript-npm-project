@@ -1,4 +1,4 @@
-import { Morphi } from 'morphi';
+import { Morphi, MDC } from 'morphi';
 import { CATEGORY } from '../category/CATEGORY';
 import { GROUP } from '../group/GROUP';
 import { DIALOG } from '../dialog/DIALOG';
@@ -32,6 +32,13 @@ export interface IMULTIMEDIA {
   }
 })
 export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> implements IMULTIMEDIA {
+
+  public static mimetype = {
+    picture: ['image/jpeg', 'image/png'],
+    audio: ['audio/mpeg', 'audio/mp3', 'audio/webm', 'audio/ogg'],
+    video: ['video/webm', 'video/ogg', 'video/mp4']
+  };
+
 
   //#region @backend
 
@@ -81,16 +88,6 @@ export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> impl
   //#endregion
   dialogs: DIALOG[];
 
-
-
-
-
-  public static mimetype = {
-    picture: ['image/jpeg', 'image/png'],
-    audio: ['audio/mpeg', 'audio/mp3', 'audio/webm', 'audio/ogg'],
-    video: ['video/webm', 'video/ogg', 'video/mp4']
-  }
-
   get path() {
     //#region @backend
     if (Morphi.IsNode) {
@@ -120,8 +117,14 @@ export class MULTIMEDIA extends Morphi.Base.Entity<MULTIMEDIA, IMULTIMEDIA> impl
     //#endregion
   }
 
+
   fromRaw(obj: IMULTIMEDIA): MULTIMEDIA {
     throw new Error("Method not implemented.");
+  }
+
+  public static async getAll(modelDataConfig: MDC) {
+    const data = await this.ctrl.getAll(modelDataConfig as any).received;
+    return data.body.json;
   }
 
 

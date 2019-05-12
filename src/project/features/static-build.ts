@@ -4,36 +4,43 @@ import * as sleep from 'sleep';
 import { Project, FeatureForProject } from '../abstract';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
+import { info, log } from '../../helpers';
+import chalk from 'chalk';
 
 export class StaticBuild extends FeatureForProject {
 
   private async  regenerateProject(project: Project, buildOptions: BuildOptions, args: string) {
+    log(`Regenerating project: ${project.genericName}`);
 
+    info(`Actual Regenerating project: ${project.genericName}`);
     const { outDir } = buildOptions;
 
-    const genLocation = project.isWorkspace ?
+    let genLocation = project.isWorkspace ?
       path.join(project.location, outDir, project.name) :
       path.join(project.parent.location, outDir, project.parent.name, project.name);
 
     if (project.isWorkspace && project.isSite) {
       const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-      project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline);
+      project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: true });
     }
 
     let genProject = Project.From(genLocation);
     if (project.isWorkspace) {
       if (!genProject) {
-        project.copyManager.generateSourceCopyIn(genLocation);
+        project.copyManager.generateSourceCopyIn(genLocation, { override: true });
       }
     } else if (project.isWorkspaceChildProject) {
-      rimraf.sync(genLocation);
-      project.copyManager.generateSourceCopyIn(genLocation);
+      project.copyManager.generateSourceCopyIn(genLocation, { override: true });
     }
 
     genProject = Project.From(genLocation);
-    // genProject.clear()
 
-    await genProject.filesStructure.init(args);
+    if (project.isWorkspace) {
+      for (let index = 0; index < project.children.length; index++) {
+        const c = project.children[index];
+        await this.regenerateProject(c, buildOptions, args)
+      }
+    }
 
     return genProject;
   }
@@ -49,13 +56,19 @@ export class StaticBuild extends FeatureForProject {
       // sleep.sleep(3);
 
       let genProject: Project;
+      genProject = await this.regenerateProject(project, buildOptions, args);
+      await genProject.filesStructure.reset({ recrusive: true })
 
-      if (project.isWorkspaceChildProject) {
-        await this.regenerateProject(project.parent, buildOptions, args);
-        genProject = await this.regenerateProject(project, buildOptions, args);
-      } else if (project.isWorkspace) {
-        genProject = await this.regenerateProject(project, buildOptions, args);
+      let { env } = require('minimist')(!args ? [] : args.split(' '));
+      if (env) {
+        info(`ENVIRONMENT: ${chalk.bold(env)}`)
+      } else {
+        args += `${args} --env=static`
+        info(`ENVIRONMENT (auto-assigned): "${chalk.bold('static')}"`)
       }
+
+      await genProject.filesStructure.init(args)
+
       return genProject;
     }
     return project;

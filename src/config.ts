@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { LibType, EnvironmentName } from './models';
 
-const allowedEnvironments: EnvironmentName[] = ['dev', 'prod', 'stage', 'online', 'test'];
+const allowedEnvironments: EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
 // let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
 // if (_.isString(env)) {

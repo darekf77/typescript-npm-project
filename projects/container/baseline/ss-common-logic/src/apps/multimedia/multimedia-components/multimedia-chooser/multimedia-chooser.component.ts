@@ -33,14 +33,8 @@ export class MultimediaChooserComponent implements OnInit, OnDestroy {
   rows = [];
   columns = [];
 
-  constructor(
-    private multimediaController: MultimediaController) {
-
-  }
-
   async initData() {
-    const data = await this.multimediaController.getAll(this.modelDataConfig as any).received;
-    this.rows = data.body.json;
+    const data = await MULTIMEDIA.getAll(this.modelDataConfig);
     log.i('multimedia', this.rows);
   }
 

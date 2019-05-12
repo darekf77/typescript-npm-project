@@ -15,9 +15,10 @@ import { routes } from './preview-form-wrapper.routes';
 import {
   ListWrapperModule, FormWrapperMaterialModule,
   EditorWrapperModule, FormlySwitchModule
-} from 'components';
+} from 'ss-common-ui/components/formly';
 
 import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
+import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components'
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
@@ -45,6 +46,7 @@ const commonUiModules = [
   EditorWrapperModule,
   ProcessLoggerModule,
   FormWrapperMaterialModule,
+  MultimediaWrapperModule,
 ]
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
@@ -55,18 +57,12 @@ Morphi.init({
   entities: [EXAMPLE, PROCESS]
 });
 
-console.log('Morphi.Formly.getAllRegisterdTypes() in preview', Morphi.Formly.getAllRegisterdTypes())
 
 @NgModule({
   imports: [
     ...angularModules,
     ...commonUiModules,
     ...materialModules,
-    FormlyModule.forChild({
-      types: [
-        ...Morphi.Formly.getAllRegisterdTypes()
-      ]
-    })
   ],
   declarations: [PreviewFormWrapperComponent],
   providers: [

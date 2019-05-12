@@ -62,13 +62,10 @@ const myFormlyModules = [
   FormlyButtionWithActionModule,
 ];
 
-console.log('Morphi.Formly.getAllRegisterdTypes()', Morphi.Formly.getAllRegisterdTypes());
-
 const formlyModules = [
   FormlyMaterialModule,
   FormlyModule.forRoot({
     types: [
-      ...Morphi.Formly.getAllRegisterdTypes(),
       // { name: 'switch', component: FormlySwitchComponent },
       { name: 'iconbutton', component: IconButtonWithActionComponent },
       { name: 'repeat', component: RepeatTypeComponent }

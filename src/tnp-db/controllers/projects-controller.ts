@@ -63,6 +63,9 @@ export class ProjectsController extends BaseController {
       })
       .forEach(project => {
         // console.log(project.name)
+        if (project.isWorkspace && !!project.StaticVersion) {
+          this.discoverProjectsInLocation(project.StaticVersion.location)
+        }
         this.addIfNotExists(ProjectInstance.from(project))
       })
   }

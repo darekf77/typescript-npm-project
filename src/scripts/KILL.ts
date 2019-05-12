@@ -27,9 +27,9 @@ export async function killAll() {
   process.exit(0)
 }
 
-export function killonport(args, noExit = false) {
+export async function killonport(args, noExit = false) {
   const port = parseInt(args.trim())
-  killProcessByPort(port);
+  await killProcessByPort(port);
   if (!noExit) {
     process.exit(0)
   }
@@ -37,11 +37,11 @@ export function killonport(args, noExit = false) {
 
 
 export default {
-  $KILL_ON_PORT: (args: string) => {
-    killonport(args);
+  $KILL_ON_PORT: async (args: string) => {
+    await killonport(args);
   },
-  $KILLONPORT: (args: string) => {
-    killonport(args);
+  $KILLONPORT: async (args: string) => {
+    await killonport(args);
   },
   $KILLALL: () => {
     killAll()

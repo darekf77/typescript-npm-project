@@ -128,8 +128,6 @@ export class EnvironmentConfig
       config.domain = config.domain.replace(/^https?:\/\//, '');
     }
 
-    config.workspace.workspace.hostSocket = `http://${config.ip}:${config.workspace.workspace.port}`;
-
     if (config.name === 'local' || !config.domain) {
       config.workspace.workspace.host =
         `http://${config.ip}:${config.workspace.workspace.port}`;
@@ -144,8 +142,6 @@ export class EnvironmentConfig
     config.packageJSON = this.project.packageJson.data;
 
     config.workspace.projects.forEach(p => {
-
-      p.hostSocket = `http://${config.ip}:${p.port}`;
 
       if (config.name === 'local') {
         p.host = `http://${config.ip}:${p.port}`;

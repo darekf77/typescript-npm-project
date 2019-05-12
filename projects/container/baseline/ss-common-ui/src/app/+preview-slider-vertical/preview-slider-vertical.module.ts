@@ -7,7 +7,7 @@ import { PreviewSliderVerticalComponent } from './preview-slider-vertical.compon
 import { routes } from './preview-slider-vertical.routes';
 import {
   SliderVerticalModule
-} from 'components';
+} from 'ss-common-ui/module';
 
 @NgModule({
   imports: [

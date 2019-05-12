@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as os from "os";
 import * as sleep from 'sleep';
+import * as fkill from 'fkill';
 import { error, info, warn, log } from "./helpers-messages";
 
 import { RunOptions, WatchOptions } from "../models";
@@ -73,9 +74,10 @@ export function killProcess(byPid: number) {
   run(`kill -9 ${byPid}`).sync()
 }
 
-export function killProcessByPort(port: number) {
+export async function killProcessByPort(port: number) {
   try {
-    run(`fkill -f :${port} &> /dev/null`, { output: false }).sync()
+    await fkill(`:${port}`);
+    // run(`fkill -f :${port} &> /dev/null`, { output: false }).sync()
     info(`Processs killed successfully on port: ${port}`)
   } catch (e) {
     warn(`No process to kill  on port: ${port}... `)

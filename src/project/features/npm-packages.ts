@@ -20,7 +20,9 @@ export class NpmPackages extends FeatureForProject {
       await this.installAll(`tnp install`);
     } else {
       const packages = this.resolvePacakgesFromArgs(args);
-      await this.install(`tnp install ${packages.join(',')}`, ...packages);
+      await this.install(`tnp install ${packages
+        .map(p => `${p.installType}${p.version ? `$@${p.version}` : ''}`)
+        .join(', ')} `, ...packages);
     }
   }
 
@@ -36,8 +38,10 @@ export class NpmPackages extends FeatureForProject {
     if (fullInstall) {
       log(`Packages full installation for ${this.project.genericName}`)
     } else {
-      log(`Package [${npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
-        .join(',')}] instalation for ${this.project.genericName} ${triggeredMsg}`)
+      log(`Package [${
+        npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+          .join(',')
+        }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
 
     }
 
@@ -49,19 +53,19 @@ export class NpmPackages extends FeatureForProject {
     }
 
     if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg}`, ...npmPackage)
+      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg} `, ...npmPackage)
     }
 
     if (this.project.isContainer) {
       for (let index = 0; index < this.project.children.length; index++) {
         const childWrokspace = this.project.children[index];
-        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg}`, ...npmPackage);
+        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg} `, ...npmPackage);
       }
     }
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || type === 'unknow-npm-project') {
       if (type !== 'unknow-npm-project') {
-        this.project.packageJson.show(`${type} instalation before [${triggeredMsg}]`);
+        this.project.packageJson.show(`${type} instalation before[${triggeredMsg}]`);
       }
       if (type === 'workspace') {
         this.project.workspaceSymlinks.remove(triggeredMsg)
@@ -77,7 +81,7 @@ export class NpmPackages extends FeatureForProject {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
       if (type !== 'unknow-npm-project') {
-        this.project.packageJson.show(`${type} instalation after [${triggeredMsg}]`);
+        this.project.packageJson.show(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
         this.project.packageJson.dedupe();
@@ -97,7 +101,7 @@ export class NpmPackages extends FeatureForProject {
 
   private get nodeModulesReplacements() {
     const npmReplacements = glob
-      .sync(`${this.project.location}/${config.folder.node_modules}-*.zip`)
+      .sync(`${this.project.location} /${config.folder.node_modules}-*.zip`)
       .map(p => p.replace(this.project.location, '').slice(1));
 
     return npmReplacements;

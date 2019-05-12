@@ -61,42 +61,33 @@ export class ProxyRouter extends FeatureForProject {
     }
   }
 
+  private getTarget(req: http.IncomingMessage): string {
+    const p = this.getProjectFrom(req);
+    return p ? p.routerTargetHttp() : void 0;
+  }
+
   private server(onServerReady: (serverPort?: number) => void) {
     const proxy = httpProxy.createProxyServer({});
 
     const server = http.createServer((req, res) => {
-      const p = this.getProjectFrom(req);
-      // console.log('Resolved project !' + p.name + ` from url: ${req.url}`)
-      if (p) {
-
-        const target = p.routerTargetHttp();
-        proxy.web(req, res, {
-          target,
-          ws: true
-        });
+      const target = this.getTarget(req);
+      if (target) {
+        proxy.web(req, res, { target });
       } else {
         res.write('not found')
         res.end();
       }
     });
 
-    // server.on('upgrade', (req, socket, head) => {
-    //   const p = this.getProject.From(req);
-    //   console.log('resolve project from ws ', p && p.name)
-
-    //   const target = p ? p.routerTargetWebSocket() : ''
-    //   proxy.ws(req, socket, head, {
-    //     target,
-    //     ws: true
-    //   });
-
-    // });
+    server.on('upgrade', (req, socket, head) => {
+      const target = this.getTarget(req)
+      proxy.ws(req, socket, head, target ? { target } : void 0);
+    });
 
     const serverPort = this.project.getDefaultPort();
 
     server.listen(serverPort, () => {
       console.log(`Proxy Router activate on ${this.project.env.config.workspace.workspace.host}`)
-
       if (_.isFunction(onServerReady)) {
         onServerReady(serverPort);
       }

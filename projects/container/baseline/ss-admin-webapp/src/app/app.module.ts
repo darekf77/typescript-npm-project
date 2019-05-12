@@ -10,7 +10,6 @@ import { MultimediaController } from 'ss-common-logic/browser-for-ss-admin-webap
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;
 Morphi.init({
   host,
-  hostSocket: ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').hostSocket,
   controllers: moprhi.controllers,
   entities: moprhi.entities
 })

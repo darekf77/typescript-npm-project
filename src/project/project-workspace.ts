@@ -39,9 +39,8 @@ export class ProjectWorkspace extends Project {
     const { prod, watch, outDir, args } = buildOptions;
 
     const projects = {
-      serverLibs: [],
-      isomorphicLibs: [],
       angularLibs: [],
+      isomorphicLibs: [],
       angularClients: [],
       angularCliClients: [],
       dockers: []
@@ -87,9 +86,8 @@ export class ProjectWorkspace extends Project {
 
 
     const projectsInOrder: Project[] = [
-      ...projects.serverLibs,
-      ...projects.isomorphicLibs,
       ...projects.angularLibs,
+      ...projects.isomorphicLibs,
       ...projects.angularClients,
       ...projects.angularCliClients
     ].filter(p => {

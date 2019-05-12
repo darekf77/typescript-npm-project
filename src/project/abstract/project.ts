@@ -27,7 +27,6 @@ import { BaselineSiteJoin } from '../features/baseline-site-join';
 import { TnpBundle } from '../features/tnp-bundle';
 import { StaticBuild } from '../features/static-build';
 import { FilesStructure } from '../features/files-structure';
-import { AutoActions } from '../features/auto-actions';
 import { BuildProcess } from '../features/build-proces';
 import { FrameworkFilesGenerator } from '../features/framework-files-generator';
 import { WorkspaceSymlinks } from '../features/workspace-symlinks';
@@ -119,20 +118,17 @@ export abstract class BaseProject {
   public staticBuild: StaticBuild;
   //#endregion
 
-  //#region @backend
-  public autoActions: AutoActions;
-  //#endregion
-
-
   public get genericName(): string {
     if (Morphi.IsBrowser) {
       return this.browser.genericName;
     }
     //#region @backendFunc
     return [
+      (this.isGenerated ? `((${chalk.bold('GENERATED')}))` : ''),
       ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
       (this.isWorkspaceChildProject ? this.parent.name : ''),
       (this.isContainerChild ? this.parent.name : ''),
+      ((this.isStandaloneProject && this.parent && this.parent.name) ? `<<${this.parent.genericName}>>` : ''),
       this.name
     ].filter(f => !!f).join('/').trim()
     //#endregion
@@ -276,7 +272,7 @@ export abstract class BaseProject {
     } else if (this.isWorkspaceChildProject) {
       return Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name))
     }
-    error(`There is not static version for project ${this.genericName}`, false, true)
+    error(`There is not static version for project ${this.genericName}`, true, true)
   }
   //#endregion
 
@@ -480,7 +476,9 @@ export abstract class BaseProject {
       'environment.js',
       'environment.dev.js',
       'environment.prod.js',
+      'environment.test.js',
       'environment.stage.js',
+      'environment.static.js',
       'environment.online.js'
     ].concat(!this.isSite ? extraFolders : [])
     const files: string[] = ['src']
@@ -648,7 +646,7 @@ export abstract class BaseProject {
     if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
     }
-    const gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
+    let gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
         if (f === config.folder.node_modules) {
@@ -662,6 +660,9 @@ export abstract class BaseProject {
         }
         return true;
       })
+    if (this.isWorkspace) {
+      gitginoredfiles = gitginoredfiles.filter(f => !f.startsWith(config.folder.dist))
+    }
 
     for (let index = 0; index < gitginoredfiles.length; index++) {
       const fileOrDirPath = path.join(this.location, gitginoredfiles[index].trim());
@@ -923,7 +924,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
     await this.env.init(args, true)
     console.log(`Killing proces on port ${this.getDefaultPort()}`);
-    killProcessByPort(this.getDefaultPort())
+    await killProcessByPort(this.getDefaultPort())
     console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     const command = this.startOnCommand(args);
     if (_.isString(command)) {
@@ -1206,7 +1207,6 @@ export class Project extends BaseProject implements IProject {
         this.recreate = new FilesRecreator(this);
         this.sourceModifier = new SourceModifier(this);
         this.frameworkFileGenerator = new FrameworkFilesGenerator(this)
-        this.autoActions = new AutoActions(this);
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
         }

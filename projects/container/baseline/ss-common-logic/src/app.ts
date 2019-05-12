@@ -17,7 +17,7 @@ import {
 
 
 async function start() {
-  const project = ENV.workspace.projects.find(p => p.name === ENV.currentProjectName)
+  const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
   await Morphi.init({
     //#region @backend
     publicAssets: [{ path: '/assets', location: ENV.pathes.backup.assets }],
@@ -28,7 +28,6 @@ async function start() {
       `http://${ENV.ip}:${project.port}${project.baseUrl}` :
       `http://${ENV.ip}:${project.port}`
     ,
-    hostSocket: `http://${ENV.ip}:${project.port}`,
     controllers: Controllers,
     entities: Entities
   })

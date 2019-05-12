@@ -1,4 +1,4 @@
-import { Morphi, ModelDataConfig } from 'morphi';
+import { Morphi, ModelDataConfig, MDC } from 'morphi';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
   OnDestroy,
@@ -7,9 +7,8 @@ import {
 import * as _ from 'lodash';
 
 // formly
-import { FieldType } from '@ngx-formly/core';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PROCESS } from '../PROCESS';
+import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/module/helpers';
 // logger
 import { Log, Level } from 'ng2-logger';
 import { Subject } from 'rxjs/Subject';
@@ -20,19 +19,28 @@ import { PROGRESS_DATA } from 'tnp-bundle';
 
 const log = Log.create('process loger');
 
+export class DualComponentControllerExtended extends DualComponentController {
+
+  get modelDataConfig(): MDC {
+    return this.getValTemplateOptions('modelDataConfig')
+  }
+
+}
+
 @Morphi.Formly.RegisterComponentForEntity(PROCESS)
 @Component({
   selector: 'app-process-logger',
   templateUrl: './process-logger.component.html',
   styleUrls: ['./process-logger.component.scss']
 })
-export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestroy {
+export class ProcessLoggerComponent extends BaseFormlyComponent implements OnInit, OnDestroy {
 
+  DualComponentController = DualComponentControllerExtended;
   @Input() size: 'compact' | 'normal' = 'normal';
 
   isExpanded = false;
   get process() {
-    return this.model;
+    return this.ctrl && this.ctrl.value;
   }
 
 
@@ -78,7 +86,7 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     return 'replay';
   }
 
-  get label() {
+  get state() {
     if (!this.process || this.process.state === 'notStarted') {
       return 'start';
     }
@@ -89,11 +97,11 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   get nameForLC() {
-    return `pinProcess${this.process.id}`;
+    return this.process && `pinProcess${this.process.id}`;
   }
 
   get nameForExpand() {
-    return `expandProcess${this.process.id}`;
+    return this.process && `expandProcess${this.process.id}`;
   }
 
   constructor() {
@@ -104,7 +112,6 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     return !!this.process && `process${this.process && this.process.id}`;
   }
 
-  @Input() public model: PROCESS;
   @Input() public config: ModelDataConfig;
 
   isOpen = false;
@@ -133,6 +140,9 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   get progress() {
+    if (!this.process) {
+      return '.... loading process'
+    }
     return (this.process &&
       this.process.progress) ?
       ((!this.process.isSync &&
@@ -176,11 +186,6 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
     }
   }
 
-  updateCondition(proc: PROCESS) {
-    return (['running', 'inProgressOfStarting', 'inProgressOfStopping'] as PROCESS_STATE[])
-      .includes(proc.state);
-  }
-
   subscribe() {
     if (this.process && !this.process.isSync) {
       if (!(this.process instanceof PROCESS)) {
@@ -199,6 +204,7 @@ export class ProcessLoggerComponent extends FieldType implements OnInit, OnDestr
   }
 
   ngOnInit() {
+    super.ngOnInit()
     log.i('ON INIT PROCESS');
     this.isExpanded = _.isString(localStorage.getItem(this.nameForExpand));
     this.pinned = _.isString(localStorage.getItem(this.nameForLC));

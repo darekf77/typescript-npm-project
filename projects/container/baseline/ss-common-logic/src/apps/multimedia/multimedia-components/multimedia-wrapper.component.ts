@@ -5,19 +5,20 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { Log, Level } from 'ng2-logger';
 const log = Log.create('multimedia wrapper');
 // local
-import { MultimediaController } from '../MultimediaController';
+
 import { MultimediaType, MULTIMEDIA } from '../MULTIMEDIA';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/module/helpers';
 import { CLASS } from 'typescript-class-helpers';
 
-class DualComponentControllerExtended extends DualComponentController {
+export class DualComponentControllerExtended extends DualComponentController {
 
 
 }
 
 export type DialogAction = 'select' | 'upload';
 
+@Morphi.Formly.RegisterComponentForEntity(MULTIMEDIA)
 @CLASS.NAME('MultimediaWrapperComponent')
 @Component({
   selector: 'app-multimedia-wrapper',
@@ -62,7 +63,6 @@ export class MultimediaWrapperComponent extends BaseFormlyComponent implements O
   }
 
   constructor(
-    public multimediaController: MultimediaController,
     private matDialog: MatDialog
 
   ) {

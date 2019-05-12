@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 // angular
 import {
   Component, OnInit, Input, Output, EventEmitter, ViewChild,
@@ -10,9 +11,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 // formly
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
-import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi/browser';
 import { Log, Level } from 'ng2-logger/browser';
+import { CLASS } from 'typescript-class-helpers/browser';
 const log = Log.create('form warpper material component');
 
 @Component({
@@ -147,13 +148,9 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
     if (!this.entity && this.crud && this.crud.entity) {
       this.entity = this.crud.entity;
     }
-
-    const types = Morphi.Formly.getAllRegisterdTypes();
-    log.i('types', types);
-    const ftype = Morphi.Formly.FindTypeForEntity(this.entity);
-    if (!!ftype) {
-      this.ftype = ftype;
-      return;
+    if (!this.entity && _.isObject(this.model)) {
+      const ob = _.isArray(this.model) ? _.first(this.model) : this.model;
+      this.entity = CLASS.getFromObject(ob)
     }
 
     this.resolveFields();

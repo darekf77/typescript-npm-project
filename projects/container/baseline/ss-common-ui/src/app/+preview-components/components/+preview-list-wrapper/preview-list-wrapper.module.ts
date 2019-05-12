@@ -8,7 +8,7 @@ import { PreviewListWrapperComponent } from './preview-list-wrapper.component';
 import { routes } from './preview-list-wrapper.routes';
 import {
   ListWrapperModule,EditorWrapperModule
-} from 'components';
+} from 'ss-common-ui/module';
 
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';

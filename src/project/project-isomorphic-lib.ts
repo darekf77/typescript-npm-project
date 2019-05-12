@@ -96,7 +96,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
         if (client) {
           let port = client.getDefaultPort()
-          killProcessByPort(port)
+          await killProcessByPort(port)
           webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
         }
 
