@@ -4,10 +4,11 @@ import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
 import { Project } from "./abstract";
-import { error } from "../helpers";
+import { error, info } from "../helpers";
 import config from "../config";
 import { killProcessByPort } from '../helpers';
 import { BuildOptions } from './features/build-options';
+import { EnvConfig, EnvironmentName } from '../models';
 
 /**
  * DO NOT USE environment variables in this project directly
@@ -103,12 +104,21 @@ export class ProjectAngularClient extends Project {
 
       } else {
         baseHref = `--${baseHref}`
-        this.run(`npm-run ng build --output-path ${config.folder.previewDistApp} ${baseHref}`,
-          {
-            output: (this.env.config.name === 'local'),
-            silence: (this.env.config.name !== 'local'),
-            biggerBuffer: true
-          }).sync()
+        if (prod) {
+          info(`BUILDING PRODUCTION`)
+        }
+        try {
+          const showOutput = (['local', 'static'] as EnvironmentName[]).includes(this.env.config.name);
+          this.run(`npm-run ng build --aot=false ${prod ? '-prod' : ''} - --output-path ${config.folder.previewDistApp} ${baseHref}`,
+            {
+              output: showOutput,
+              silence: !showOutput,
+              biggerBuffer: true
+            }).sync()
+        } catch (e) {
+          error(e, false, true);
+        }
+
       }
     }
 

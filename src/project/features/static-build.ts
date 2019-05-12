@@ -6,6 +6,7 @@ import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
 import { info, log } from '../../helpers';
 import chalk from 'chalk';
+import config from '../../config';
 
 export class StaticBuild extends FeatureForProject {
 
@@ -25,6 +26,10 @@ export class StaticBuild extends FeatureForProject {
     }
 
     let genProject = Project.From(genLocation);
+    if(genProject && genProject.isWorkspaceChildProject) {
+      genProject.reset()
+    }
+
     if (project.isWorkspace) {
       if (!genProject) {
         project.copyManager.generateSourceCopyIn(genLocation, { override: true });

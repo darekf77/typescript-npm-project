@@ -557,11 +557,18 @@ export abstract class BaseProject {
   protected quickFixMissingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
-      if (!fse.existsSync(pathInProjectNodeModules)) {
-        fse.mkdirpSync(pathInProjectNodeModules);
-        const indexjsLocation = path.join(pathInProjectNodeModules, 'index.js')
-        fse.writeFileSync(indexjsLocation, ` export default { } `, 'utf8');
+      if (fse.existsSync(pathInProjectNodeModules)) {
+        warn(`Package "${missingLibName}" will replaced with empty pacakge mock.`)
       }
+      rimraf.sync(pathInProjectNodeModules);
+      fse.mkdirpSync(pathInProjectNodeModules);
+
+      fse.writeFileSync(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `, 'utf8');
+      fse.writeFileSync(path.join(pathInProjectNodeModules, config.file.package_json), JSON.stringify({
+        name: missingLibName,
+        version: "0.0.0"
+      } as IPackageJSON), 'utf8');
+
     })
   }
   //#endregion
@@ -817,7 +824,7 @@ export abstract class BaseProject {
   async build(buildOptions?: BuildOptions) {
     // console.log('BUILD OPTIONS', buildOptions)
 
-    if (this.isWorkspaceChildProject) {
+    if (this.isWorkspaceChildProject || this.isWorkspaceChildProject) {
       this.quickFixMissingLibs(['react-native-sqlite-storage'])
     }
 
