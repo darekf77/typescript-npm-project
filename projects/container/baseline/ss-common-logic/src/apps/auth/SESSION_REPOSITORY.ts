@@ -65,7 +65,7 @@ export class SESSION_REPOSITORY extends Morphi.Base.Repository<SESSION, SESSION_
     Session.user = user;
     Session.ip = ip;
 
-    if (!ENV.workspace.build.server.production && user.username == 'postman') {
+    if (user.username == 'postman') {
       Session.createToken('postman');
     } else if (user.username == 'admin') {
       Session.createToken('admin');

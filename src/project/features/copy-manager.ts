@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
+import * as glob from 'glob';
 import chalk from 'chalk';
 import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
@@ -11,7 +12,7 @@ import * as rimraf from 'rimraf';
 import config from "../../config";
 import { Project } from '../abstract';
 import { FileEvent, IPackageJSON } from '../../models';
-import { info, warn } from '../../helpers';
+import { info, warn, log } from '../../helpers';
 import { tryRemoveDir, tryCopyFrom } from '../../index';
 import { copyFile } from '../../helpers';
 import { BuildOptions } from './build-options';
@@ -35,6 +36,16 @@ export class CopyManager extends FeatureForProject {
     } else {
       this.copyToProjectsOnFinish()
     }
+  }
+
+  genWorkspaceEnvFiles(destination: Project) {
+    const site = `${this.project.isSite ? `${config.folder.custom}/` : ''}`;
+    glob
+      .sync(`${this.project.location}/${site}${config.file.environment}*`)
+      .forEach(envFile => {
+        log(`Copying env file to static build: ${path.basename(envFile)} `)
+        tryCopyFrom(envFile, path.join(this.project.location, config.folder.dist, this.project.name, site, path.basename(envFile)))
+      })
   }
 
   public generateSourceCopyIn(destinationLocation: string,

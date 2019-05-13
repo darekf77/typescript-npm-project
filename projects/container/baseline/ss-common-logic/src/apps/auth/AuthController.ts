@@ -542,18 +542,18 @@ export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
     };
     use(new Strategy(strategy));
 
-    if (!ENV.workspace.build.server.production) {
-      await this.__createUser({
-        username: 'admin',
-        email: 'admin@admin.pl',
-        password: 'admin'
-      }, 'normal_auth', true);
-      await this.__createUser({
-        username: 'postman',
-        email: 'postman@postman.pl',
-        password: 'postman'
-      }, 'normal_auth', true);
-    }
+
+    await this.__createUser({
+      username: 'admin',
+      email: 'admin@admin.pl',
+      password: 'admin'
+    }, 'normal_auth', true);
+    await this.__createUser({
+      username: 'postman',
+      email: 'postman@postman.pl',
+      password: 'postman'
+    }, 'normal_auth', true);
+
     //#endregion
   }
 

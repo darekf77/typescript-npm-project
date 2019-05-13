@@ -4,6 +4,10 @@ import * as path from 'path';
 import { LibType, EnvironmentName } from './models';
 
 const allowedEnvironments: EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
+const allowedEnvironmentsObj = {};
+allowedEnvironments.forEach(s => {
+  allowedEnvironmentsObj[s] = s
+})
 // let { environmentName, env }: { environmentName: EnvironmentName, env: EnvironmentName } = require('minimist')(process.argv);
 
 // if (_.isString(env)) {
@@ -116,12 +120,7 @@ export const config = {
     tnp_normal_mode: 'tnp_normal_mode'
   },
   names: {
-    env: {
-      prod: 'prod',
-      dev: 'dev',
-      stage: 'stage',
-      local: 'local'
-    }
+    env: allowedEnvironmentsObj
   },
   allowedTypes: {
     app: [
@@ -191,7 +190,8 @@ export const config = {
       { name: 'mocha' },
       // { name: 'chai' },
       { name: 'ts-node' },
-      { name: 'stmux' }
+      { name: 'stmux' },
+      { name: 'webpack-bundle-analyzer' },
     ],
     programs: [
       //   {

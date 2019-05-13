@@ -1,10 +1,11 @@
 //#region @backend
 import * as path from 'path';
 import * as sleep from 'sleep';
+import * as glob from 'glob';
 import { Project, FeatureForProject } from '../abstract';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
-import { info, log } from '../../helpers';
+import { info, log, tryCopyFrom } from '../../helpers';
 import chalk from 'chalk';
 import config from '../../config';
 
@@ -26,12 +27,12 @@ export class StaticBuild extends FeatureForProject {
     }
 
     let genProject = Project.From(genLocation);
-    if(genProject && genProject.isWorkspaceChildProject) {
-      genProject.reset()
-    }
+
 
     if (project.isWorkspace) {
-      if (!genProject) {
+      if (genProject) {
+        project.copyManager.genWorkspaceEnvFiles(genProject)
+      } else {
         project.copyManager.generateSourceCopyIn(genLocation, { override: true });
       }
     } else if (project.isWorkspaceChildProject) {

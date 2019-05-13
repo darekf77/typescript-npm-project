@@ -109,7 +109,7 @@ export class ProjectAngularClient extends Project {
         }
         try {
           const showOutput = (['local', 'static'] as EnvironmentName[]).includes(this.env.config.name);
-          this.run(`npm-run ng build --aot=false ${prod ? '-prod' : ''} - --output-path ${config.folder.previewDistApp} ${baseHref}`,
+          this.run(`npm-run ng build  ${this.env.config.name === 'static' ? '--stats-json' : ''} --aot=false ${prod ? '-prod' : ''} - --output-path ${config.folder.previewDistApp} ${baseHref}`,
             {
               output: showOutput,
               silence: !showOutput,
