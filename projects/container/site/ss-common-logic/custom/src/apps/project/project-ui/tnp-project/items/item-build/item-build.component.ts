@@ -5,8 +5,7 @@ import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
 
-import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
-import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+import { PROJECT } from '../../../../PROJECT';
 
 
 @Component({

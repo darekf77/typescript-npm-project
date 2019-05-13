@@ -2,6 +2,10 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 
+
+import { PROJECT } from '../../../../PROJECT';
+
+
 @Component({
   selector: 'app-item-test',
   templateUrl: './item-test.component.html',

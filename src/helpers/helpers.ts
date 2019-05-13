@@ -36,10 +36,12 @@ export function crossPlatofrmPath(p: string) {
 }
 
 export function getEntites(cwd: string): string[] {
+  const entityRegEx = /^([A-Z]|\_|[0-9])+\.ts$/g;
   return glob
     .sync(`${config.folder.apps}/**/*.ts`, {
       cwd: cwd
     }).filter(p =>
+      entityRegEx.test(path.basename(p)) &&
       !p.endsWith('Controller.ts') &&
       !p.endsWith('_REPOSITORY.ts') &&
       !p.endsWith('.REPOSITORY.ts') &&
@@ -51,7 +53,7 @@ export function getEntites(cwd: string): string[] {
       !p.endsWith('.module.ts') &&
       !p.endsWith('.service.ts') &&
       !p.endsWith('.model.ts') &&
-      !(['index.ts', 'app.ts','controllers.ts','entities.ts'].includes(path.basename(p)))
+      !(['index.ts', 'app.ts', 'controllers.ts', 'entities.ts'].includes(path.basename(p)))
     )
 }
 

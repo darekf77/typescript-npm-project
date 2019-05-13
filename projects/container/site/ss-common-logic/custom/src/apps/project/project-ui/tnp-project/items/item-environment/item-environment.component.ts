@@ -5,8 +5,8 @@ import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { MatRadioChange } from '@angular/material/radio';
 import { EnvironmentName } from 'tnp-bundle/browser';
 
-import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
-import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+
+import { PROJECT } from '../../../../PROJECT';
 
 
 import { Log, Level } from 'ng2-logger/browser';

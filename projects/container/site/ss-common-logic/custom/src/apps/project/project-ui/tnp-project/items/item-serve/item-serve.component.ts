@@ -4,6 +4,9 @@ import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { MatRadioChange } from '@angular/material/radio';
 
 
+import { PROJECT } from '../../../../PROJECT';
+
+
 @Component({
   selector: 'app-item-serve',
   templateUrl: './item-serve.component.html',

@@ -9,7 +9,6 @@ import { MatDialog } from '@angular/material';
     selector: 'app-base-item-stepper-process-build',
     template: ''
 })
-
 export class BaseItemStepperProcessBuildComponent implements OnInit {
 
     @Input() formGroup: FormGroup = new FormGroup({});

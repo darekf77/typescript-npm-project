@@ -14,14 +14,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 // local
-import { BuildTnpProcessComponent } from './build-tnp-process.component';
+import { BuildTnpProcessComponent } from './project-ui.component';
 import { TnpProjectComponent } from './tnp-project/tnp-project.component';
 import { FormWrapperMaterialModule } from 'baseline/ss-common-ui/components/formly';
 import {
   ItemEnvironmentComponent, ItemBuildComponent,
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
-import { ProcessLoggerModule } from 'baseline/ss-common-ui/components/formly/entity-components/process-logger';
+import { ProcessLoggerModule } from 'baseline/ss-common-logic/src/apps/process/process-logger';
 // import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
 // import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 

@@ -6,8 +6,8 @@ import { EnvironmentName } from 'tnp-bundle/browser';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
-import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
-import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+import { ProjectController } from '../../ProjectController';
+import { PROJECT } from '../../PROJECT';
 import { BaseComponent } from 'baseline/ss-common-ui/components/helpers/base-component';
 
 @Component({
