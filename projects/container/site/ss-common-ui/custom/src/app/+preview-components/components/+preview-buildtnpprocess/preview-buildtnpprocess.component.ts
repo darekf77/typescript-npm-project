@@ -58,20 +58,20 @@ export class PreviewBuildtnpprocessComponent
     if (_.isString(projectLocation)) {
       projectLocation = decodeURIComponent(projectLocation);
       const selected = projects.find(p => p.location === projectLocation);
-      this.selectProject(selected);
+      if(selected) {
+        this.selected = selected;
+        await selected.updaetAndGetProceses()
+      }
       // log.i('set from query params', projectLocation)
     }
 
   }
 
   async selectProject(project: PROJECT) {
-    log.i('project ot update', project)
-    await project.updaetAndGetProceses()
-    this.selected = project;
-    log.i('full selected', project)
+    log.i('project ot update', project.name)
     this.router.navigate([], {
       queryParams: {
-        projectLocation: encodeURIComponent(this.selected.location)
+        projectLocation: encodeURIComponent(project.location)
       },
       relativeTo: this.activeRoute
     });
