@@ -188,6 +188,12 @@ export default {
   //   console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
   //   process.exit(0)
   // },
+
+  JOIN: async () => {
+    await Project.Current.join.init()
+    process.exit(0)
+  },
+
   VERSION: () => version(),
   PATH: () => {
     console.log(Project.Tnp.location);

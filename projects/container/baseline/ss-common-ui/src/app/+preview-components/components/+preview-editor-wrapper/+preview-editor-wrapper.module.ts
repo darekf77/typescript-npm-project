@@ -14,7 +14,7 @@ import { FormlyMaterialModule } from '@ngx-formly/material';
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
-import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
+import { FormWrapperMaterialModule } from 'components';
 
 const angularModules = [
   ReactiveFormsModule

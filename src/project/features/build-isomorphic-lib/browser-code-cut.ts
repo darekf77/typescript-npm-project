@@ -87,10 +87,18 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(htmlTemplatePath)) {
       const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
       // console.log(`regex: ${regex}`)
+      let replacement =  fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
+
+      if (!_.isString(replacement) || replacement.trim() === '') {
+        replacement = `
+        <!-- Put your html here -->
+        `;
+      }
+
       content = content.replace(
         new RegExp(regex,
           'g'),
-        'template: \`\n' + fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }) + '\n\`')
+        'template: \`\n' + replacement + '\n\`')
     }
     return content;
   }
@@ -100,10 +108,17 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(cssFilePath)) {
       const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(cssFilePath)}\s*(\\'|\\")\\s*\\]`;
       // console.log(`regex: ${regex}`)
+      let replacement = fse.readFileSync(cssFilePath, { encoding: 'utf8' }).toString()
+      if (!_.isString(replacement) || replacement.trim() === '') {
+        replacement = `
+        // put your styles here
+        `;
+      }
+
       content = content.replace(
         new RegExp(regex,
           'g'),
-        'styles: [\`\n' + fse.readFileSync(cssFilePath, { encoding: 'utf8' }) + '\n\`]')
+        'styles: [\`\n' + replacement + '\n\`]')
     }
     return content;
   }
@@ -112,18 +127,24 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     const scssFilePath = path.join(dir, `${base}.component.${ext}`);
     if (fse.existsSync(scssFilePath)) {
-      const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' });
-      let transformedToCss = '';
-      if(contentScss.trim() !== '') {
+      const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' }).toString()
+      let replacement = '';
+      if (contentScss.trim() !== '') {
         try {
           const compiled = sass.renderSync({
             data: contentScss
           })
-          transformedToCss = compiled.css;
+          replacement = compiled.css;
         } catch (e) {
           // error(error, true, true);
           error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
         }
+      }
+
+      if (!_.isString(replacement) || replacement.trim() === '') {
+        replacement = `
+        // put your styles here
+        `;
       }
 
       const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;
@@ -131,10 +152,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       content = content.replace(
         new RegExp(regex,
           'g'),
-        'styles: [\`\n' + transformedToCss + '\n\`]')
+        'styles: [\`\n' + replacement + '\n\`]')
     }
     return content;
   }
+
 
 
   private findReplacements(stringContent: string, pattern: string, fun: (jsExpressionToEval: string, env: EnvConfig) => boolean) {

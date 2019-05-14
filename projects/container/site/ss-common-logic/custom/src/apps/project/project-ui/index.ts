@@ -1,2 +1,2 @@
-export * from './build-tnp-process.component';
-export * from './build-tnp-process.module';
+export * from './project-ui.component';
+export * from './project-ui.module';

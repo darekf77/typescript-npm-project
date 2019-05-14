@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+// other
+import { CLASS } from 'typescript-class-helpers';
+import { FormlyModule } from '@ngx-formly/core';
 // material
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -16,14 +19,11 @@ import { MatRadioModule } from '@angular/material/radio';
 // local
 import { BuildTnpProcessComponent } from './project-ui.component';
 import { TnpProjectComponent } from './tnp-project/tnp-project.component';
-import { FormWrapperMaterialModule } from 'baseline/ss-common-ui/components/formly';
 import {
   ItemEnvironmentComponent, ItemBuildComponent,
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
 import { ProcessLoggerModule } from 'baseline/ss-common-logic/src/apps/process/process-logger';
-// import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
-// import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 
 const angularModules = [
   CommonModule,
@@ -63,7 +63,15 @@ const baselineModules = [
 
 @NgModule({
   imports: [
-    FormWrapperMaterialModule,
+    FormlyModule.forRoot({
+      types: [
+        { name: 'project', component: BuildTnpProcessComponent },
+        { name: CLASS.getName(BuildTnpProcessComponent), component: BuildTnpProcessComponent },
+      ],
+      validationMessages: [
+        { name: 'required', message: 'This field is required' },
+      ],
+    }),
     ...angularModules,
     ...materialModules,
     ...baselineModules

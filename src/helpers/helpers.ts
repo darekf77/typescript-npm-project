@@ -36,25 +36,30 @@ export function crossPlatofrmPath(p: string) {
 }
 
 export function getEntites(cwd: string): string[] {
-  const entityRegEx = /^([A-Z]|\_|[0-9])+\.ts$/g;
+  const entityRegEx = /^([A-Z]|\_|[0-9])+\.ts$/;
   return glob
     .sync(`${config.folder.apps}/**/*.ts`, {
       cwd: cwd
-    }).filter(p =>
-      entityRegEx.test(path.basename(p)) &&
-      !p.endsWith('Controller.ts') &&
-      !p.endsWith('_REPOSITORY.ts') &&
-      !p.endsWith('.REPOSITORY.ts') &&
-      !p.endsWith('Repository.ts') &&
-      !p.endsWith('Service.ts') &&
-      !p.endsWith('.d.ts') &&
-      !p.endsWith('.spec.ts') &&
-      !p.endsWith('.component.ts') &&
-      !p.endsWith('.module.ts') &&
-      !p.endsWith('.service.ts') &&
-      !p.endsWith('.model.ts') &&
-      !(['index.ts', 'app.ts', 'controllers.ts', 'entities.ts'].includes(path.basename(p)))
-    )
+    }).filter(p => {
+
+      const isMatchRegex = entityRegEx.test(path.basename(p));
+      if (!isMatchRegex) {
+        console.log(p, path.basename(p))
+      }
+      return isMatchRegex &&
+        !p.endsWith('Controller.ts') &&
+        !p.endsWith('_REPOSITORY.ts') &&
+        !p.endsWith('.REPOSITORY.ts') &&
+        !p.endsWith('Repository.ts') &&
+        !p.endsWith('Service.ts') &&
+        !p.endsWith('.d.ts') &&
+        !p.endsWith('.spec.ts') &&
+        !p.endsWith('.component.ts') &&
+        !p.endsWith('.module.ts') &&
+        !p.endsWith('.service.ts') &&
+        !p.endsWith('.model.ts') &&
+        !(['index.ts', 'app.ts', 'controllers.ts', 'entities.ts'].includes(path.basename(p)));
+    })
 }
 
 

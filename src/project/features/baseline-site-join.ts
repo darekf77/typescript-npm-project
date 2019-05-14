@@ -44,6 +44,7 @@ const debugPathes = [
 ]
 
 const debugMerge = [
+  // '/components/formly/base-components/editor/editor-wrapper.component.ts'
   // "/src/app/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts"
 ]
 
@@ -385,15 +386,15 @@ export class BaselineSiteJoin extends FeatureForProject {
     }
 
     const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
-    const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath)
+    const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath);
+    const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath);
+
+    let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
     if (isDebugMode) {
       console.log('baselineAbsoluteLocation', baselineAbsoluteLocation)
       console.log('baselineFileInCustomPath', baselineFileInCustomPath)
+      console.log('joinFilePath', joinFilePath)
     }
-
-    const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath)
-    let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
-
 
     if (fs.existsSync(baselineFileInCustomPath)) {
 
@@ -422,12 +423,73 @@ export class BaselineSiteJoin extends FeatureForProject {
         this.fastUnlink(this.getPrefixedPathInJoin(relativeBaselineCustomPath))
       }
     }
+
+    // if (debugMerge.includes(relativeBaselineCustomPath)) {
+    //   const ext = path.extname(joinFilePath)
+    //   console.log('ext',ext)
+    // }
+    if (this.project.type === 'isomorphic-lib') {
+      // this.handleUsingSelfPathesInAngularLib(joinFilePath)
+      this.handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath);
+    }
+    // }
+
+
     if (isDebugMode) {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
   }
 
 
+  /**
+   * Example:
+   *
+   * In my angular-lib, I've got file with content:
+   * import { Helpers }  from 'ss-common-ui/component/helpers';
+   *
+   * insted having log path thats sucks
+   *import { Helpers }  from '../../../../..//helpers';
+   *
+   *
+   * @param joinFilePath
+   */
+  // private handleUsingSelfPathesInAngularLib(joinFilePath: string) {
+  //   // console.log(`this project: ${this.project.location}`)
+  //   // console.log(`baseline: ${this.project.baseline.location}`)
+  //   // console.log(`joinFilePath: ${joinFilePath}`)
+  //   let orgFileCopiedToSIte = fse.readFileSync(joinFilePath, { encoding: 'utf8' });
+  //   const reg = new RegExp(`${this.project.name}\/${config.folder.components}`, 'g')
+  //   orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
+  //     `${this.project.parent.baseline.name}/${this.project.name}/${config.folder.components}`);
+  //   fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
+  // }
+
+
+  private handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath: string) {
+    // console.log(`this project: ${this.project.location}`)
+    // console.log(`baseline: ${this.project.baseline.location}`)
+    // console.log(`joinFilePath: ${joinFilePath}`)
+    let orgFileCopiedToSIte = fse.readFileSync(joinFilePath, { encoding: 'utf8' });
+
+    const moduleName = [
+      config.folder.components,
+      config.folder.module,
+      config.folder.dist,
+    ];
+
+    this.project.parent.children
+      .filter(c => c.type === 'angular-lib')
+      .map(c => c.name)
+      .forEach(angularLibName => {
+        const reg = new RegExp(`${this.project.parent.baseline.name}\/${angularLibName}\/(${moduleName.join('|')})`, 'g')
+
+        orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
+          `${angularLibName}/${config.folder.module}`);
+      });
+
+
+    fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
+  }
 
   private get join() {
     const self = this;

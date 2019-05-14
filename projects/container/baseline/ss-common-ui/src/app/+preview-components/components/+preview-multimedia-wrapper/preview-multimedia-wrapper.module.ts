@@ -18,7 +18,7 @@ import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/apps/au
 import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
 // formly modules
 import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components';
-import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
+import { FormWrapperMaterialModule } from 'components';
 
 
 const angularModules = [

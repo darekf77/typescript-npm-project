@@ -4,9 +4,8 @@ import { Observable } from 'rxjs/Observable';
 import { Log } from 'ng2-logger/browser';
 
 const log = Log.create('privew build tnp ');
-// import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/';
-export type PROJECT = any;
-declare const PROJECT: any;
+import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+
 import { ModelDataConfig } from 'morphi/browser';
 import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app-popup-content.service';
 import { Router, ActivatedRoute } from '@angular/router';

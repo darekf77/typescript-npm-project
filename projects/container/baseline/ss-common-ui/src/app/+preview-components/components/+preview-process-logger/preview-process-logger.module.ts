@@ -9,7 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { Morphi } from 'morphi/browser';
 // local
 import { PreviewProcessLoggerComponent } from './preview-process-logger.component';
-import { FormWrapperMaterialModule } from 'ss-common-ui/components/formly';
+import { FormWrapperMaterialModule } from 'components';
 import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';

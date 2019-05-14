@@ -15,7 +15,7 @@ import { routes } from './preview-form-wrapper.routes';
 import {
   ListWrapperModule, FormWrapperMaterialModule,
   EditorWrapperModule, FormlySwitchModule
-} from 'ss-common-ui/components/formly';
+} from 'components';
 
 import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
 import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components'

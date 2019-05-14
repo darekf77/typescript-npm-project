@@ -42,8 +42,6 @@ Morphi.init({
     PreviewBuildtnpprocessComponent
   ],
   declarations: [PreviewBuildtnpprocessComponent],
-  providers: [
-    ProjectController
-  ]
+  providers: []
 })
 export class PreviewBuildTnpProcesssModule { }

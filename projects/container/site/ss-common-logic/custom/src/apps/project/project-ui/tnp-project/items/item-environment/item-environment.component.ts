@@ -3,13 +3,13 @@ import * as _ from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { MatRadioChange } from '@angular/material/radio';
-import { EnvironmentName } from 'tnp-bundle/browser';
+import { EnvironmentName } from 'tnp-bundle';
 
 
 import { PROJECT } from '../../../../PROJECT';
 
 
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('item-environment.componetn');
 
 @Component({
