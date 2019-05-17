@@ -14,7 +14,7 @@ export class ProjectsController extends BaseController {
 
   }
 
-
+  private recognized: ProjectInstance[] = []
   async addExisted() {
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
     if (global.testMode) {
@@ -24,10 +24,24 @@ export class ProjectsController extends BaseController {
     }
   }
 
+
   addIfNotExists(projectInstance: ProjectInstance): boolean {
 
     if (!projectInstance) {
       return
+    }
+
+    if (this.recognized.find(p => p.project.location === projectInstance.project.location)) {
+      return
+    }
+    this.recognized.push(projectInstance);
+
+    if (projectInstance.project.isWorkspace && projectInstance.project.staticBuild) {
+      const proj = projectInstance.project.StaticVersion;
+      if(proj) {
+        console.log(`ADD STATIC ${proj.location}`)
+        this.addIfNotExists(ProjectInstance.from(proj))
+      }
     }
 
     if (this.crud.addIfNotExist(projectInstance)) {
@@ -62,10 +76,6 @@ export class ProjectsController extends BaseController {
         return f.type !== 'unknow-npm-project'
       })
       .forEach(project => {
-        // console.log(project.name)
-        if (project.isWorkspace && !!project.StaticVersion) {
-          this.discoverProjectsInLocation(project.StaticVersion.location)
-        }
         this.addIfNotExists(ProjectInstance.from(project))
       })
   }

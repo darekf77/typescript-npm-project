@@ -787,12 +787,8 @@ export abstract class BaseProject {
     const existedProject = db
       .getProjects()
       .map(p => p.project)
+      .filter(p => !p.isWorkspaceChildProject)
       .filter(p => p.location !== this.location)
-
-    function getProjectName(p: Project) {
-      return ((p.parent && p.parent.parent) ? `${p.parent.parent.name}/` : '') +
-        (p.parent ? `${p.parent.name}/` : '') + p.name;
-    }
 
     const { projects = [] }: { projects: string[] } = await inquirer
       .prompt([
@@ -802,7 +798,7 @@ export abstract class BaseProject {
           message: 'Select projects where to copy bundle after finish: ',
           choices: existedProject
             .map(c => {
-              return { value: c.location, name: getProjectName(c) }
+              return { value: c.location, name: c.genericName }
             })
         }
       ]) as any;
