@@ -186,7 +186,9 @@ export class CopyManager extends FeatureForProject {
 
     if (fs.existsSync(monitorDir)) {
       watch(monitorDir, {
-        followSymlinks: false
+        followSymlinks: false,
+        interval: process.platform === 'darwin' ? void 0 : 500,
+        binaryInterval: process.platform === 'darwin' ? void 0 : 500,
       }).on('change', (f) => {
         if (_.isString(f)) {
           f = f.replace(monitorDir, '') as any
