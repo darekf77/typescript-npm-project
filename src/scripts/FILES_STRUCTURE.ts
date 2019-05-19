@@ -3,11 +3,27 @@ import { Project } from "../project";
 import { TnpDB } from '../tnp-db';
 import { sleep } from 'sleep';
 
+export async function INIT(args: string, exit = true) {
+  await Project.Current.filesStructure.init(args);
+  if (exit) {
+    process.exit(0)
+  }
+
+}
+
+export async function STATIC_INIT(args: string, exit = true) {
+  await Project.Current.StaticVersion.filesStructure.init(args);
+  if (exit) {
+    process.exit(0)
+  }
+}
 
 // init().project();
 // init().watch.project()
 
 export default {
+  INIT,
+  STATIC_INIT,
   CLEAN: async (args) => {
     await Project.Current.filesStructure.clearFromArgs(args)
     process.exit(0)
@@ -63,14 +79,7 @@ export default {
     process.exit(0)
   },
 
-  async  INIT(args) {
-    await Project.Current.filesStructure.init(args);
-    process.exit(0)
-  },
-  async  STATIC_INIT(args) {
-    await Project.Current.StaticVersion.filesStructure.init(args);
-    process.exit(0);
-  },
+
 
 
   $VSCODE_FIX: async () => {
@@ -78,7 +87,7 @@ export default {
     const projects = db.getProjects();
     for (let index = 0; index < projects.length; index++) {
       const proj = projects[index];
-      proj.project &&  proj.project.recreate.vscode.settings.changeColorTheme(false)
+      proj.project && proj.project.recreate.vscode.settings.changeColorTheme(false)
     }
     sleep(1);
     for (let index = 0; index < projects.length; index++) {
@@ -88,7 +97,7 @@ export default {
     sleep(1);
     for (let index = 0; index < projects.length; index++) {
       const proj = projects[index];
-      proj.project &&  proj.project.recreate.vscode.settings.gitReset()
+      proj.project && proj.project.recreate.vscode.settings.gitReset()
     }
     process.exit(0)
   },

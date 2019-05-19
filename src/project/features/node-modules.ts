@@ -14,55 +14,55 @@ import { FeatureForProject } from '../abstract';
 
 export class NodeModules extends FeatureForProject {
 
-  // async installFrom(source: Project, triggerMsg: string) {
-  //   source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
-  //   log(`[node_modules] Copy instalation of npm packages from ` +
-  //     `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
+  async installFrom(source: Project, triggerMsg: string) {
+    source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
+    log(`[node_modules] Copy instalation of npm packages from ` +
+      `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
 
-  //   // global.spinner.start()
+    // global.spinner.start()
 
-  //   for (let index = 0; index < ArrNpmDependencyType.length; index++) {
-  //     const depName = ArrNpmDependencyType[index];
-  //     const deppp = source.getDepsAsProject(depName);
-  //     for (let index2 = 0; index2 < deppp.length; index2++) {
-  //       const dep = deppp[index2];
-  //       await source.node_modules.copy(dep.name).to(this.project)
-  //     }
+    for (let index = 0; index < ArrNpmDependencyType.length; index++) {
+      const depName = ArrNpmDependencyType[index];
+      const deppp = source.getDepsAsProject(depName);
+      for (let index2 = 0; index2 < deppp.length; index2++) {
+        const dep = deppp[index2];
+        await source.node_modules.copy(dep.name).to(this.project)
+      }
 
-  //   }
+    }
 
-  //   source.node_modules.copyBin.to(this.project);
-  //   // global.spinner.start()
+    source.node_modules.copyBin.to(this.project);
+    // global.spinner.start()
 
-  //   const overridedDeps = this.project.getDepsAsPackage('tnp_overrided_dependencies');
-  //   for (let indexOverridedDeps = 0; indexOverridedDeps < overridedDeps.length; indexOverridedDeps++) {
-  //     const d = overridedDeps[indexOverridedDeps];
-  //     await this.project.npmPackages.install(triggerMsg, d);
-  //   }
+    // const overridedDeps = this.project.getDepsAsPackage('tnp_overrided_dependencies');
+    // for (let indexOverridedDeps = 0; indexOverridedDeps < overridedDeps.length; indexOverridedDeps++) {
+    //   const d = overridedDeps[indexOverridedDeps];
+    //   await this.project.npmPackages.install(triggerMsg, d);
+    // }
 
-  //   this.project.packageJson.dedupe()
-  // }
+    this.project.packageJson.dedupe()
+  }
 
-  // private get copyBin() {
-  //   const self = this;
-  //   return {
-  //     to(project: Project, linkOnly = false) {
-  //       const source = path.join(self.project.location, config.folder.node_modules, '.bin')
-  //       const dest = path.join(project.location, config.folder.node_modules, '.bin')
-  //       if (fse.existsSync(source)) {
-  //         if (linkOnly) {
-  //           HelpersLinks.createSymLink(source, dest)
-  //         } else {
-  //           fse.copySync(source, dest, {
-  //             recursive: true,
-  //             overwrite: true
-  //           })
-  //         }
+  private get copyBin() {
+    const self = this;
+    return {
+      to(project: Project, linkOnly = false) {
+        const source = path.join(self.project.location, config.folder.node_modules, '.bin')
+        const dest = path.join(project.location, config.folder.node_modules, '.bin')
+        if (fse.existsSync(source)) {
+          if (linkOnly) {
+            HelpersLinks.createSymLink(source, dest)
+          } else {
+            fse.copySync(source, dest, {
+              recursive: true,
+              overwrite: true
+            })
+          }
 
-  //       }
-  //     }
-  //   }
-  // }
+        }
+      }
+    }
+  }
 
   get folderPath() {
     return path.join(this.project.location, config.folder.node_modules)

@@ -2,6 +2,7 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as fse from 'fs-extra';
 
 import { clearConsole, log, error, info } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
@@ -37,6 +38,7 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async init(args: string, options?: InitOptions) {
+    const { skipNodeModules }: { skipNodeModules: boolean } = require('minimist')(!args ? [] : args.split(' '));
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
 
@@ -76,7 +78,13 @@ export class FilesStructure extends FeatureForProject {
 
     this.project.tnpBundle.installAsPackage()
     if (!this.project.node_modules.exist) {
-      await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
+      if (skipNodeModules) {
+        if (!path.join(this.project.location, config.folder.node_modules)) {
+          fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
+        }
+      } else {
+        await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
+      }
     }
     await this.project.recreate.init();
 

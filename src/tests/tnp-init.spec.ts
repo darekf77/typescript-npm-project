@@ -28,7 +28,7 @@ describe(wrap.describe('Tnp init'), async () => {
       // console.log(process.cwd())
       it(testName, async () => {
         await cwdChange('test1', async () => {
-          await INIT('', false)
+          await INIT(' --skipNodeModules', false)
         })
         expect(true).to.be.true;
 

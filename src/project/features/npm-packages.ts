@@ -154,8 +154,18 @@ export class NpmPackages extends FeatureForProject {
     } else {
       command = `npm install ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''}`;
     }
-    this.project.run(command,
-      { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+    if (global.testMode) {
+      log(`Test mode: normal instalation`)
+      if (pkg) {
+        Project.Tnp.node_modules.copy(pkg).to(this.project);
+      } else {
+        this.project.node_modules.installFrom(Project.Tnp, `Test mode instalaltion`);
+      }
+    } else {
+      this.project.run(command,
+        { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+    }
+
     if (!generatLockFiles) {
       if (useYarn) {
         if (yarnLockExisits) {
