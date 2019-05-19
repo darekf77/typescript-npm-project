@@ -1,4 +1,4 @@
-//#region @backend
+//#region imports
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
@@ -7,17 +7,17 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
-import { Project } from "../abstract";
-import { LibType, RecreateFile, FileEvent } from "../../models";
-import { copyFile, uniqArray, crossPlatofrmPath, log } from '../../helpers';
-import config from '../../config';
-import { error } from '../../helpers';
+import { Project } from "../../abstract";
+import { LibType, RecreateFile, FileEvent } from "../../../models";
+import { copyFile, uniqArray, crossPlatofrmPath, log } from '../../../helpers';
+import config from '../../../config';
+import { error } from '../../../helpers';
 import chalk from 'chalk';
-import { run } from '../../helpers';
+import { run } from '../../../helpers';
 import { Helpers } from 'morphi/helpers';
-import { TnpDB } from '../../tnp-db';
-import { FeatureForProject } from '../abstract';
-
+import { TnpDB } from '../../../tnp-db';
+import { FeatureForProject } from '../../abstract';
+//#endregion
 
 const REGEXS = {
 
@@ -38,20 +38,16 @@ function getRegexSourceString(s) {
     .replace(/\_/g, '\\_')
 }
 
-const debugPathes = [
+const DEBUG_PATHES = [
   // '/src/app/+preview-components/preview-components.component.ts',
   // '/src/controllers.ts',
 ]
 
-const debugMerge = [
+const DEBUG_MERGE_PATHES = [
   // '/components/formly/base-components/editor/editor-wrapper.component.ts'
   // "/src/app/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts"
 ]
 
-
-interface JoinFilesOptions {
-  baselineAbsoluteLocation: string;
-}
 
 export class BaselineSiteJoin extends FeatureForProject {
   private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
@@ -237,7 +233,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
   private replace(input: string, relativeBaselineCustomPath: string) {
     const self = this;
-    const debuggin = (debugPathes.includes(relativeBaselineCustomPath));
+    const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
     if (debuggin) console.log(`relativeBaselineCustomPath: ${relativeBaselineCustomPath}`)
 
     return {
@@ -327,7 +323,7 @@ export class BaselineSiteJoin extends FeatureForProject {
       baselinePath() {
 
 
-        const debuggin = (debugPathes.includes(relativeBaselineCustomPath));
+        const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
 
         if (debuggin) console.log(`
 
@@ -378,7 +374,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
   private merge(relativeBaselineCustomPath: string) {
 
-    const isDebugMode = debugMerge.includes(relativeBaselineCustomPath)
+    const isDebugMode = DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
     if (isDebugMode) {
       console.log(_.times(5, () => '\n').join())
       console.log(chalk.blue(`Baseline/Site modyfication detected...`))
@@ -639,4 +635,3 @@ export class BaselineSiteJoin extends FeatureForProject {
   }
 
 }
-//#endregion
