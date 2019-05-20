@@ -355,10 +355,10 @@ export abstract class BaseProject {
       basedOn = this.parent.packageJson.pathToBaseline;
     }
 
-    // console.log('basedOn', basedOn)
+    console.log('[tnp] basedOn', basedOn)
 
     const res = (basedOn && basedOn !== '');
-    // console.log(`Project '${this.location}' is site: ${res}`)
+    console.log(`[tnp] Project '${this.location}' is site: ${res}`)
     return res;
     //#endregion
   }

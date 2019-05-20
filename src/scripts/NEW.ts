@@ -24,7 +24,12 @@ function goodExamples() {
   error(chalk.red(`Please use example above.`));
 }
 
-function pacakgeJsonNameFix(locationDest, type: LibType) {
+function goodExamplesNewSite() {
+  console.log(chalk.green(`Good examples: tnp:new site-project-name --basedOn baseline-workspace-project-name`));
+  error(`Please use example above.`, false, true);
+}
+
+function pacakgeJsonNameFix(locationDest, type: LibType, basedOn?: string) {
   const pkgJSONpath = path.join(locationDest, config.file.package_json);
   const json: IPackageJSON = fse.readJSONSync(pkgJSONpath)
   json.name = _.kebabCase(path.basename(locationDest));
@@ -33,11 +38,14 @@ function pacakgeJsonNameFix(locationDest, type: LibType) {
   if ((['isomorphic-lib', 'angular-lib'] as LibType[])) {
     json.tnp.useFramework = false;
   }
+  if (basedOn) {
+    json.tnp.basedOn = basedOn;
+  }
 
   fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
 }
 
-function newProject(type: LibType, name: string, cwd: string) {
+function newProject(type: LibType, name: string, cwd: string, basedOn?: string) {
 
   const project = Project.by(type);
   const destinationPath = getDestinationPath(name, cwd);
@@ -45,7 +53,7 @@ function newProject(type: LibType, name: string, cwd: string) {
     try {
       project.copyManager.generateSourceCopyIn(destinationPath);
       // console.log(destinationPath)
-      pacakgeJsonNameFix(destinationPath, type)
+      pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
       info(`Project ${project.name} create successfully`);
     } catch (err) {
       error(err);
@@ -62,15 +70,33 @@ export function NEW(args: string, exit = true, cwd = process.cwd()) {
     error(`Top few argument for ${chalk.black('init')} parameter.`, true);
     goodExamples()
   }
-  newProject(argv[0] as any, argv[1], cwd);
+  // const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
+  const type = argv[0] as any;
+  const name = argv[1]
+  newProject(type, name, cwd);
   if (exit) {
     process.exit(0)
   }
 
 }
 
+export function NEW_SITE(args: string, exit = true, cwd = process.cwd()) {
+  const argv = args.split(' ');
+  const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
+  if (!basedOn) {
+    goodExamplesNewSite()
+  }
+  if (!Project.From(basedOn)) {
+    error(`Please provide proper path to project in ${chalk.bold('--basedOn')}  parameter`);
+  }
+  newProject('workspace', argv[0] as any, cwd, basedOn);
+  if (exit) {
+    process.exit(0)
+  }
+}
 
 export default {
-  NEW
+  NEW,
+  NEW_SITE,
 }
 //#endregion

@@ -88,7 +88,7 @@ export const config = {
     tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
     tmp_db_tests_json: pathResolved(__dirname, '..', file.tmp_db_tests_json),
 
-    tnp_tests_context: pathResolved(__dirname, '..', folder.tnp_tests_context),
+    tnp_tests_context: pathResolved(`/tmp/tnp/${folder.tnp_tests_context}`),
     tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, folder.tnp_db_for_tests_json),
 
     bin_in_node_modules: pathResolved(__dirname, '..', folder.node_modules, folder._bin),

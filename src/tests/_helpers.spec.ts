@@ -4,6 +4,7 @@ import * as rimraf from 'rimraf';
 import * as path from 'path';
 import { IPackageJSON } from '../models';
 import config from '../config';
+import { tryRemoveDir } from '../helpers';
 
 const PATHES = {
   BASE_FOLDER_TEST: config.pathes.tnp_tests_context,
@@ -13,10 +14,9 @@ const PATHES = {
 
 function RemoveTestCatalogs() {
   return function (target) {
-
-    rimraf.sync(PATHES.BASE_FOLDER_TEST);
+    tryRemoveDir(PATHES.BASE_FOLDER_TEST);
     fse.mkdirpSync(PATHES.BASE_FOLDER_TEST);
-    rimraf.sync(PATHES.TNP_DB_FOT_TESTS)
+    tryRemoveDir(PATHES.TNP_DB_FOT_TESTS);
 
   }
 }

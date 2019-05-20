@@ -152,11 +152,12 @@ export class EnvironmentConfig
     })
 
 
-
-    config.build = {
-      number: this.project.git.countComits(),
-      date: this.project.git.lastCommitDate(),
-      hash: this.project.git.lastCommitHash()
+    if (this.project.git.isGitRepo) {
+      config.build = {
+        number: this.project.git.countComits(),
+        date: this.project.git.lastCommitDate(),
+        hash: this.project.git.lastCommitHash()
+      }
     }
 
     saveConfigWorkspca(this.project, config)

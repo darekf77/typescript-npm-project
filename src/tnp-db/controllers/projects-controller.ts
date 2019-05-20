@@ -18,7 +18,7 @@ export class ProjectsController extends BaseController {
   async addExisted() {
     this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '..')))
     if (global.testMode) {
-      this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, config.folder.tnp_tests_context)), true)
+      this.discoverProjectsInLocation(path.resolve(config.pathes.tnp_tests_context), true)
     } else {
       this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
     }
