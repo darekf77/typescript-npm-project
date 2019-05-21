@@ -4,7 +4,7 @@ import * as rimraf from 'rimraf';
 import * as path from 'path';
 import { IPackageJSON } from '../models';
 import config from '../config';
-import { tryRemoveDir } from '../helpers';
+import { tryRemoveDir, error } from '../helpers';
 
 const PATHES = {
   BASE_FOLDER_TEST: config.pathes.tnp_tests_context,
@@ -77,7 +77,11 @@ export class SpecWrap {
   private cwdChange(location) {
     return async (relativePath: string, callback) => {
       const oldCwd = process.cwd()
-      process.chdir(path.join(location, relativePath));
+      const newCWD = path.join(location, relativePath);
+      if (!fse.existsSync(newCWD)) {
+        error(`[cwdChange] cannot change cwd to unexisted location: ${newCWD}`)
+      }
+      process.chdir(newCWD);
       if (_.isFunction(callback)) {
         await this.runSyncOrAsync(callback)
       }

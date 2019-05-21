@@ -4,7 +4,7 @@
       "README.md"
     ],
     "type": "workspace",
-    "basedOn": "../baseline",
+    "basedOn": "./baseline",
     "allowedEnv": [
       "online"
     ],

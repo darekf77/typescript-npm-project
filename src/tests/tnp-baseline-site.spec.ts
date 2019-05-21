@@ -9,7 +9,7 @@ import { NEW, NEW_SITE } from '../scripts/NEW';
 import { INIT } from '../scripts/FILES_STRUCTURE';
 import { Project } from '../project';
 
-const BASELINE_WORKSPACE_PROJECT_NAME = 'test1'
+const BASELINE_WORKSPACE_PROJECT_NAME = 'test-1'
 const SITE_NAME = `site-for-${BASELINE_WORKSPACE_PROJECT_NAME}`;
 
 

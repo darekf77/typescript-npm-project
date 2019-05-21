@@ -7,7 +7,7 @@ import chalk from "chalk";
 
 import { Project } from "../abstract";
 import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle } from "../../models";
-import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log } from "../../helpers";
+import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from "../../helpers";
 import { config } from '../../config';
 //#endregion
 
@@ -77,6 +77,12 @@ export class PackageJSON {
     return Array.isArray(p.resources) ? p.resources : [];
   }
 
+  private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
+    const baselineInNodeModuels = path.join(this.location, config.folder.node_modules, path.basename(pathToBaseline))
+    if (!fse.existsSync(baselineInNodeModuels)) {
+      HelpersLinks.createSymLink(pathToBaseline, baselineInNodeModuels)
+    }
+  }
 
   get pathToBaseline(): string {
     if (this.data && this.data.tnp &&
@@ -87,29 +93,36 @@ export class PackageJSON {
       )
     ) {
 
-      let p = path.join(this.location, this.data.tnp.basedOn);
-      if (fs.existsSync(p)) {
-        return p;
+      let pathToBaseline = path.resolve(path.join(path.dirname(this.location), this.data.tnp.basedOn));
+      if (fse.existsSync(pathToBaseline)) {
+        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
+        return pathToBaseline;
       }
+      warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
       // TODO quick fix
-      p = this.data.tnp.basedOnAbsolutePath1;
-      if (fs.existsSync(p)) {
-        return p;
+      pathToBaseline = this.data.tnp.basedOnAbsolutePath1;
+      if (fs.existsSync(pathToBaseline)) {
+        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
+        return pathToBaseline;
       }
+      warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
-      p = this.data.tnp.basedOnAbsolutePath2;
-      if (fs.existsSync(p)) {
-        return p;
+      pathToBaseline = this.data.tnp.basedOnAbsolutePath2;
+      if (fs.existsSync(pathToBaseline)) {
+        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
+        return pathToBaseline;
       }
+      warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
-      if (!global[config.message.tnp_normal_mode]) {
-        return
+      if (!global[config.message.tnp_normal_mode] && !global.testMode) {
+        warn(`[tnp][isSite] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
+        return;
       }
-
+      console.log('DATA TNP', this.data.tnp)
       error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.location})
 
-      path desn't exist: ${p}
+      path desn't exist: ${pathToBaseline}
 
       `)
     }
