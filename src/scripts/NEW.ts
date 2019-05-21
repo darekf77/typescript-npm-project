@@ -7,7 +7,7 @@ import * as fse from 'fs-extra';
 
 import config from "../config";
 import { LibType, IPackageJSON } from '../models';
-import { run } from "../helpers";
+import { run, log } from "../helpers";
 import { Project } from "../project";
 import { info, error } from "../helpers";
 
@@ -56,7 +56,7 @@ export class ProjectFactory {
     fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
   }
 
-  private create(type: LibType, name: string, cwd: string, basedOn?: string) {
+  private start(type: LibType, name: string, cwd: string, basedOn?: string): Project {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
@@ -66,18 +66,37 @@ export class ProjectFactory {
 
     const project = Project.by(type);
     const destinationPath = this.getDestinationPath(name, cwd);
-    if (project) {
-      try {
-        project.copyManager.generateSourceCopyIn(destinationPath);
-        // console.log(destinationPath)
-        this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
-        info(`Project ${project.name} create successfully`);
-      } catch (err) {
-        error(err);
-      }
+    if (fse.pathExistsSync(destinationPath)) {
+      info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
     } else {
-      this.errorMsgCreateProject()
+      if (project) {
+        try {
+          project.copyManager.generateSourceCopyIn(destinationPath, {
+            ommitSourceCode: global.testMode
+          });
+          // console.log(destinationPath)
+          this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
+          info(`Project ${project.name} create successfully`);
+        } catch (err) {
+          error(err);
+        }
+      } else {
+        this.errorMsgCreateProject()
+      }
     }
+    if (type === 'workspace') {
+
+      const w = Project.From(destinationPath);
+      if (basedOn) {
+        w.baseline.children.forEach(c => {
+          log(`Basleine Child project "${c.genericName}"`);
+        })
+      }
+      w.children.forEach(c => {
+        log(`Child project "${c.genericName}"`);
+      });
+    }
+    return Project.From(destinationPath);
   }
 
 
@@ -90,7 +109,7 @@ export class ProjectFactory {
     // const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
     const type = argv[0] as any;
     const name = argv[1]
-    this.create(type, name, cwd);
+    this.start(type, name, cwd);
     if (exit) {
       process.exit(0)
     }
@@ -106,7 +125,7 @@ export class ProjectFactory {
     if (!Project.From(basedOn)) {
       error(`Please provide proper path to project in ${chalk.bold('--basedOn')}  parameter`);
     }
-    this.create('workspace', argv[0] as any, cwd, basedOn);
+    this.start('workspace', argv[0] as any, cwd, basedOn);
     if (exit) {
       process.exit(0)
     }

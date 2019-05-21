@@ -8,7 +8,7 @@ import * as rimraf from 'rimraf';
 
 import { Project } from '../abstract';
 import { config } from '../../config';
-import { getEntites, getControllers } from '../../helpers';
+import { getEntites, getControllers, log } from '../../helpers';
 import { FeatureCompilerForProject } from '../abstract';
 
 
@@ -38,6 +38,10 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
     const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
       : path.join(this.project.location, config.folder.src);
 
+    if (!fse.existsSync(cwd)) {
+      log(`Entites not geenrated, folder doesnt exists: ${cwd}`);
+      return;
+    }
 
     let entitesFiles = getEntites(cwd);
 
@@ -107,6 +111,10 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
     const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
       : path.join(this.project.location, config.folder.src);
 
+    if (!fse.existsSync(cwd)) {
+      log(`Controllers not geenrated, folder doesnt exists: ${cwd}`);
+      return;
+    }
 
     let controllersFiles = getControllers(cwd);
 

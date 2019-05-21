@@ -210,14 +210,14 @@ export async function workspaceConfigBy(workspace: Project, environment: Environ
   } else {
     const envSurfix = (environment === 'local') ? '' : `.${environment}`;
     var pathToProjectEnvironment = path.join(workspace.location, `${config.file.environment}${envSurfix}`);
-    console.log('pathToProjectEnvironment:', pathToProjectEnvironment)
+    log('pathToProjectEnvironment:' + pathToProjectEnvironment)
 
     if (workspace.isSite) {
       if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
-        console.log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
+        log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
         try {
           if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
-            console.log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
+            log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
             const w = workspace.join.joinNotAllowed
             workspace.join.joinNotAllowed = false;
             await workspace.join.init()

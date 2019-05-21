@@ -496,7 +496,7 @@ export class BaselineSiteJoin extends FeatureForProject {
         await Helpers.compilationWrapper(() => {
           uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
             .forEach(relativeFile => self.merge(relativeFile))
-        }, `Site join of all files for site project: ${self.project.name}`)
+        }, `(${chalk.bold(self.project.genericName)}) Site join of all files`)
       },
       get watch() {
         return {

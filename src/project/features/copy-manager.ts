@@ -49,9 +49,23 @@ export class CopyManager extends FeatureForProject {
   }
 
   public generateSourceCopyIn(destinationLocation: string,
-    options?: { override?: boolean; filterForBundle?: boolean; showInfo?: boolean; }): boolean {
+    options?: {
+      override?: boolean;
+      filterForBundle?: boolean;
+      showInfo?: boolean;
+      ommitSourceCode: boolean;
+    }): boolean {
 
-    const { override = true, filterForBundle = true, showInfo = true } = options || {}
+    const { override = true, filterForBundle = true, showInfo = true, ommitSourceCode = false } = options || {}
+    if (_.isUndefined(filterForBundle)) {
+      options.filterForBundle = true;
+    }
+    if (_.isUndefined(override)) {
+      options.override = true;
+    }
+    if (_.isUndefined(showInfo)) {
+      options.showInfo = true;
+    }
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
@@ -76,17 +90,35 @@ export class CopyManager extends FeatureForProject {
 
     if (filterForBundle) {
 
+      let regexes: RegExp[] = [
+        /.*node_modules.*/g,
+        /.*tmp\-.*/g,
+        /.*dist.*/g,
+        /.*\.vscode.*/g,
+        /.*bundle.*/g,
+      ];
+
+      if (ommitSourceCode) {
+        regexes = regexes.concat([
+          /.*src.*/g,
+          /.*components.*/g,
+        ]);
+      }
+
       fse.copySync(`${sourceLocation}/`, tempLocation, {
+
         filter: (src: string, dest: string) => {
           // console.log('src', src)
           // return
           // !src.endsWith('/dist/bin') &&
           //   !src.endsWith('/bin') &&
-          return !/.*node_modules.*/g.test(src) &&
-            !/.*tmp\-.*/g.test(src) &&
-            !/.*dist.*/g.test(src) &&
-            !/.*\.vscode.*/g.test(src) &&
-            !/.*bundle.*/g.test(src);
+
+          return _.isUndefined(regexes.find(regex => regex.test(src)));
+          // return !/.*node_modules.*/g.test(src) &&
+          //   !/.*tmp\-.*/g.test(src) &&
+          //   !/.*dist.*/g.test(src) &&
+          //   !/.*\.vscode.*/g.test(src) &&
+          //   !/.*bundle.*/g.test(src);
         }
       });
     } else {

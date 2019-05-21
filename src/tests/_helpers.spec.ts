@@ -14,9 +14,11 @@ const PATHES = {
 
 function RemoveTestCatalogs() {
   return function (target) {
-    tryRemoveDir(PATHES.BASE_FOLDER_TEST);
-    fse.mkdirpSync(PATHES.BASE_FOLDER_TEST);
-    tryRemoveDir(PATHES.TNP_DB_FOT_TESTS);
+    // tryRemoveDir(PATHES.BASE_FOLDER_TEST);
+    if (!fse.existsSync(PATHES.BASE_FOLDER_TEST)) {
+      fse.mkdirpSync(PATHES.BASE_FOLDER_TEST);
+    }
+    // tryRemoveDir(PATHES.TNP_DB_FOT_TESTS);
 
   }
 }
@@ -26,24 +28,36 @@ type FuncTest = (locationContext: string, testName: string, options?: {
   cwdChange: (relativePath: string, callback: () => void) => void
 }) => any
 
+type ItOptions = {
+  removeTestFolder: boolean;
+}
 
 
 @RemoveTestCatalogs()
 export class SpecWrap {
 
+  private testsDescribtion: string;
+  private kamelCaseTestName: string;
+  private testName: string;
+  private options?: ItOptions
+
   static create() {
     global.testMode = true;
     return new SpecWrap()
   }
-  private testsDescribtion: string;
+
   describe(testsDescribtion: string): string {
     this.testsDescribtion = testsDescribtion;
     return testsDescribtion;
   }
 
-  private kamelCaseTestName: string;
-  private testName: string;
-  async it(testName: string, callback: FuncTest) {
+
+  async it(testName: string, callback: FuncTest, options?: ItOptions) {
+    options = options || {} as any;
+    if (_.isUndefined(options.removeTestFolder)) {
+      options.removeTestFolder = true;
+    }
+    this.options = options;
     // await SpecHelper.wrapper_it(, callback);
     this.testName = testName;
     this.kamelCaseTestName = (`${_.kebabCase(this.testsDescribtion)}---${_.kebabCase(testName)}`)
@@ -92,8 +106,14 @@ export class SpecWrap {
   async run(test: FuncTest) {
 
     const location = path.join(path.join(PATHES.BASE_FOLDER_TEST, this.kamelCaseTestName));
-    rimraf.sync(location);
-    fse.mkdirpSync(location);
+
+    if (this.options.removeTestFolder) {
+      rimraf.sync(location);
+    }
+    if (!fse.existsSync(location)) {
+      fse.mkdirpSync(location);
+    }
+
     global.muteMessages = true;
     const oldCwd = process.cwd()
     process.chdir(location);

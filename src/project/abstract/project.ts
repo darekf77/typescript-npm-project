@@ -319,7 +319,7 @@ export abstract class BaseProject {
     if (!this.version) {
 
       if (!global[config.message.tnp_normal_mode]) {
-        return
+        return;
       }
 
       error(`Please define ${chalk.bold('version')} property in your package.json`, true)
@@ -347,7 +347,6 @@ export abstract class BaseProject {
       return this.browser.isSite;
     }
     //#region @backend
-    const customExist = fs.existsSync(path.join(this.location, config.folder.custom));
     let basedOn = '';
     if (this.isWorkspace) {
       basedOn = this.packageJson.pathToBaseline;
@@ -355,10 +354,10 @@ export abstract class BaseProject {
       basedOn = this.parent.packageJson.pathToBaseline;
     }
 
-    console.log('[tnp] basedOn', basedOn)
+    // log('[tnp] basedOn' + basedOn)
 
     const res = (basedOn && basedOn !== '');
-    console.log(`[tnp] Project '${this.location}' is site: ${res}`)
+    // log(`[tnp] Project '${this.location}' is site: ${res}`)
     return res;
     //#endregion
   }
@@ -649,6 +648,60 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
+  public quickFixMissingSourceFolders() { /// TODO make it more generic
+    if (this.isWorkspace ||
+      this.isWorkspaceChildProject ||
+      this.isStandaloneProject) {
+
+      log(`FIXING SOURCES FOR "${this.genericName}"`)
+      const srcFolder = path.join(this.location, config.folder.src);
+      if (!fse.existsSync(srcFolder)) {
+        log('SRC folder recreated')
+        fse.mkdirpSync(srcFolder);
+      }
+      const componentsFolder = path.join(this.location, config.folder.components);
+      if (this.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
+        log('COMPONENTS folder recreated');
+        fse.mkdirpSync(componentsFolder);
+      }
+
+      const customFolder = path.join(this.location, config.folder.custom);
+      if (this.isSite && !fse.existsSync(customFolder)) {
+        log('CUSTOM folder recreated');
+        fse.mkdirpSync(customFolder);
+      }
+
+      const nodeModulesFolder = path.join(this.location, config.folder.node_modules);
+      if (this.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
+        log('NODE_MODULES folder recreated');
+        fse.mkdirpSync(nodeModulesFolder)
+      }
+      if (this.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
+        const paretnFolderOfNodeModules = path.join(this.parent.location, config.folder.node_modules);
+        if (!fse.existsSync(paretnFolderOfNodeModules)) {
+          log('NODE_MODULES (parent) folder recreated');
+          fse.mkdirpSync(paretnFolderOfNodeModules)
+        }
+        log('NODE_MODULES folder link to child recreated');
+        HelpersLinks.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
+      }
+
+      if (this.isSite) {
+        if (this.isWorkspace) {
+          const baselineFolderInNodeModule = path.join(this.location, config.folder.node_modules, this.baseline.name);
+          if (!fse.existsSync(baselineFolderInNodeModule)) {
+            log('BASELINE folder in NODE_MODUELS recreated');
+            HelpersLinks.createSymLink(this.baseline.location, baselineFolderInNodeModule);
+          }
+        }
+      }
+
+
+    }
+  }
+  //#endregion
+
+  //#region @backend
   public reset(showMsg = true) {
     if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
@@ -676,6 +729,7 @@ export abstract class BaseProject {
       // log(`Removing: ${fileOrDirPath}`)
       rimraf.sync(fileOrDirPath)
     }
+    this.quickFixMissingSourceFolders()
   }
   //#endregion
 
@@ -1201,6 +1255,7 @@ export class Project extends BaseProject implements IProject {
 
 
         this.packageJson = PackageJSON.fromProject(this);
+        this.quickFixMissingSourceFolders()
         this.staticBuild = new StaticBuild(this)
         this.workspaceSymlinks = new WorkspaceSymlinks(this);
         this.tnpBundle = new TnpBundle(this);
@@ -1209,7 +1264,7 @@ export class Project extends BaseProject implements IProject {
         this.npmPackages = new NpmPackages(this)
         this.recreate = new FilesRecreator(this);
         this.sourceModifier = new SourceModifier(this);
-        this.frameworkFileGenerator = new FrameworkFilesGenerator(this)
+        this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
         }

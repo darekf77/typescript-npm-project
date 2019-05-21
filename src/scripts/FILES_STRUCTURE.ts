@@ -11,6 +11,26 @@ export async function INIT(args: string, exit = true) {
 
 }
 
+// export async function INIT_ALL(args: string, exit = true) {
+
+//   await Project.Current.filesStructure.init(args);
+//   if (Project.Current.isWorkspace || Project.Current.isContainer) {
+//     for (let index1 = 0; index1 < Project.Current.children.length; index1++) {
+//       const child1 = Project.Current.children[index1];
+//       await child1.filesStructure.init(args);
+//       for (let index2 = 0; index2 < child1.children.length; index2++) {
+//         const child2 = child1.children[index2];
+//         await child2.filesStructure.init(args);
+//       }
+//     }
+//   }
+
+//   if (exit) {
+//     process.exit(0)
+//   }
+
+// }
+
 export async function STATIC_INIT(args: string, exit = true) {
   await Project.Current.StaticVersion.filesStructure.init(args);
   if (exit) {
@@ -18,69 +38,90 @@ export async function STATIC_INIT(args: string, exit = true) {
   }
 }
 
+export async function CLEAN(args: string, exit = true) {
+  await Project.Current.filesStructure.clearFromArgs(args)
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export const CLEAR = CLEAN;
+
+export async function STATIC_CLEAN(args: string, exit = true) {
+  await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export const STATIC_CLEAR = STATIC_CLEAN;
+
+export async function CLEAN_ALL(args: string, exit = true) {
+  await Project.Current.filesStructure.clear({ recrusive: true })
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export const CLEAR_ALL = CLEAN_ALL;
+
+export async function STATIC_CLEAN_ALL(args: string, exit = true) {
+  await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export const STATIC_CLEAR_ALL = STATIC_CLEAN_ALL;
+
+export async function RESET(args: string, exit = true) {
+  await Project.Current.filesStructure.resetFromArgs(args)
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export async function RESET_ALL(args: string, exit = true) {
+  await Project.Current.filesStructure.reset({ recrusive: true })
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export async function STATIC_RESET(args: string, exit = true) {
+  await Project.Current.StaticVersion.filesStructure.resetFromArgs(args)
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export async function STATIC_RESET_ALL(args: string, exit = true) {
+  await Project.Current.StaticVersion.filesStructure.reset({ recrusive: true })
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+
+
 // init().project();
 // init().watch.project()
 
 export default {
   INIT,
   STATIC_INIT,
-  CLEAN: async (args) => {
-    await Project.Current.filesStructure.clearFromArgs(args)
-    process.exit(0)
-  },
-  CLEAR: async (args) => {
-    await Project.Current.filesStructure.clearFromArgs(args)
-    process.exit(0)
-  },
-  STATIC_CLEAN: async (args) => {
-    await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
-    process.exit(0)
-  },
-  STATIC_CLEAR: async (args) => {
-    await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
-    process.exit(0)
-  },
-
-  CLEAN_ALL: async (args) => {
-    await Project.Current.filesStructure.clear({ recrusive: true })
-    process.exit(0)
-  },
-  CLEAR_ALL: async (args) => {
-    await Project.Current.filesStructure.clear({ recrusive: true })
-    process.exit(0)
-  },
-
-  STATIC_CLEAN_ALL: async (args) => {
-    await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
-    process.exit(0)
-  },
-  STATIC_CLEAR_ALL: async (args) => {
-    await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
-    process.exit(0)
-  },
-
-  async RESET(args) {
-    await Project.Current.filesStructure.resetFromArgs(args)
-    process.exit(0)
-  },
-
-  async RESET_ALL() {
-    await Project.Current.filesStructure.reset({ recrusive: true })
-    process.exit(0)
-  },
-
-  async STATIC_RESET(args) {
-    await Project.Current.StaticVersion.filesStructure.resetFromArgs(args)
-    process.exit(0)
-  },
-
-  async STATIC_RESET_ALL() {
-    await Project.Current.StaticVersion.filesStructure.reset({ recrusive: true })
-    process.exit(0)
-  },
-
-
-
+  CLEAN,
+  CLEAR,
+  STATIC_CLEAN,
+  STATIC_CLEAR,
+  CLEAN_ALL,
+  CLEAR_ALL,
+  STATIC_CLEAN_ALL,
+  STATIC_CLEAR_ALL,
+  RESET,
+  RESET_ALL,
+  STATIC_RESET,
+  STATIC_RESET_ALL,
 
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;

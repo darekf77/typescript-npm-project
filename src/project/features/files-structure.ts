@@ -38,7 +38,11 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async init(args: string, options?: InitOptions) {
-    const { skipNodeModules }: { skipNodeModules: boolean } = require('minimist')(!args ? [] : args.split(' '));
+    const { skipNodeModules, recrusive }: {
+      skipNodeModules: boolean; recrusive: boolean;
+    } = require('minimist')(!args ? [] : args.split(' '));
+
+    this.project.quickFixMissingSourceFolders()
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
 
@@ -64,6 +68,13 @@ export class FilesStructure extends FeatureForProject {
         }
       }
       return;
+    }
+    if (this.project.isWorkspace && recrusive) {
+      const workspaceChildren = this.project.children;
+      for (let index = 0; index < workspaceChildren.length; index++) {
+        const workspaceChild = workspaceChildren[index];
+        await workspaceChild.filesStructure.init(args, options);
+      }
     }
 
     if (this.project.baseline) {
@@ -97,9 +108,10 @@ export class FilesStructure extends FeatureForProject {
       }
 
       await this.project.env.init(args);
+      this.project.quickFixMissingSourceFolders()
+      const sourceModifireName = `(${chalk.bold(this.project.genericName)})" Client source modules pathes modifier `;
+      const generatorName = `(${chalk.bold(this.project.genericName)}) Files generator: entites.ts, controllers.ts`;
 
-      const sourceModifireName = `Client source modules pathes modifier`;
-      const generatorName = 'Files generator: entites.ts, controllers.ts';
       if (watch) {
         await this.project.frameworkFileGenerator.initAndWatch(generatorName);
         await this.project.sourceModifier.initAndWatch(sourceModifireName);
