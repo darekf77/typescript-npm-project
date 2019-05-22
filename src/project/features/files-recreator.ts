@@ -10,7 +10,7 @@ import { Project } from "../abstract";
 import { LibType, RecreateFile } from "../../models";
 import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../helpers';
 import config from '../../config';
-import { BaselineSiteJoin } from './baseline-site-join';
+import { BaselineSiteJoin, PathHelper } from './baseline-site-join';
 import { error } from '../../helpers';
 import { FeatureForProject } from '../abstract';
 
@@ -105,7 +105,7 @@ export class FilesRecreator extends FeatureForProject {
           self.project.isSite ? (
             self.project.customizableFilesAndFolders
               .concat(self.project.customizableFilesAndFolders.map(f => {
-                return BaselineSiteJoin.PathHelper.PREFIX(f);
+                return PathHelper.PREFIX(f);
               }))
               .concat(self.project.customizableFilesAndFolders.map(f => {
                 return `!${path.join(config.folder.custom, f)}`
