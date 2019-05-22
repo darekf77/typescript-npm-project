@@ -670,7 +670,7 @@ export abstract class BaseProject {
 
       log(`FIXING SOURCES FOR "${this.genericName}"`)
       const srcFolder = path.join(this.location, config.folder.src);
-      if (!fse.existsSync(srcFolder)) {
+      if (!this.isWorkspace && !fse.existsSync(srcFolder)) {
         log('SRC folder recreated')
         fse.mkdirpSync(srcFolder);
       }
