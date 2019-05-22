@@ -495,6 +495,19 @@ export abstract class BaseProject {
   }
 
   //#region @backend
+  containsFile(filePaht: string) {
+    let fullPath = path.resolve(path.join(this.location, filePaht));
+    let res = fse.existsSync(fullPath)
+    // if (!res && process.platform === 'darwin') {
+    //   fullPath = path.join('/private', fullPath);
+    //   res = fse.existsSync(fullPath);
+    // }
+    // console.log(`res: ${res} : ${fullPath}`)
+    return res;
+  }
+  //#endregion
+
+  //#region @backend
   getFolders() {
     const notAllowed: RegExp[] = [
       '\.vscode', 'node\_modules',

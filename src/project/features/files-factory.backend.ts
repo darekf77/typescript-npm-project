@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
+import { log } from '../../helpers';
 
 
 export class FilesFactory extends FeatureForProject {
@@ -12,6 +13,7 @@ export class FilesFactory extends FeatureForProject {
 
   createFile(relativePath: string, content?: string | JSON) {
     const destPath = path.join(this.project.location, relativePath)
+    log(`CREATE FILE: ${destPath}`)
     if (_.isUndefined(content)) {
       content = '';
     }

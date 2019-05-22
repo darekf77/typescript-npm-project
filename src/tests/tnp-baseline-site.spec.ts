@@ -23,29 +23,34 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
       NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location);
       NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location)
 
-      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
-        .child('isomorphic-lib')
-        .filesFactory.createFile('src/apps/user/UserController.ts', `
+      var project = {
+        baseline: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)),
+        site: Project.From(path.join(location, SITE_NAME)),
+        baseline_isomorphi_lib: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)).child('isomorphic-lib'),
+        site_isomorphi_lib: Project.From(path.join(location, SITE_NAME)).child('isomorphic-lib'),
+      };
+
+      var testFilePath = 'src/apps/user/UserController.ts';
+      var testFilePathForSite = 'src/apps/user/__UserController.ts';
+      var testFilePathCustom = 'custom/src/apps/user/UserController.ts';
+
+      project.baseline_isomorphi_lib
+        .filesFactory.createFile(testFilePath, `
 export class UserController {
 
 }
         `);
 
-      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
-        .child('isomorphic-lib')
-        .filesFactory.createFile('src/apps/user/USER.ts', `
-export class USER {
+      project.site_isomorphi_lib
+        .filesFactory.createFile(testFilePathCustom, `
+import { UserController as Base } from '${BASELINE_WORKSPACE_PROJECT_NAME}/isomorphic-lib/${testFilePath}';
+
+export class UserController extends Base {
 
 }
         `);
 
-      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
-        .child('isomorphic-lib')
-        .filesFactory.createFile('src/apps/user/USER_REPOSITORY.ts', `
-export class USER_REPOSITORY {
-
-}
-        `);
+      console.log('FILE CREATINTOINTOINOITNOTINasdasOI')
 
       it(testName, async () => {
         // await cwdChange(BASELINE_WORKSPACE_PROJECT_NAME, async () => {
@@ -61,7 +66,15 @@ export class USER_REPOSITORY {
         const site = Project.From(sitePath)
         expect(site).to.not.be.undefined
         expect(site.isSite).to.be.true;
+
       })
+
+      it('should have test file', async () => {
+        expect(project.site_isomorphi_lib.containsFile(testFilePath)).to.be.true;
+        expect(project.site_isomorphi_lib.containsFile(testFilePathCustom)).to.be.true;
+        expect(project.site_isomorphi_lib.containsFile(testFilePathForSite)).to.be.true;
+      })
+
     }, { removeTestFolder: false })
 
 
