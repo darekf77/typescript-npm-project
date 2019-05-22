@@ -23,6 +23,30 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
       NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location);
       NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location)
 
+      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
+        .child('isomorphic-lib')
+        .filesFactory.createFile('src/apps/user/UserController.ts', `
+export class UserController {
+
+}
+        `);
+
+      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
+        .child('isomorphic-lib')
+        .filesFactory.createFile('src/apps/user/USER.ts', `
+export class USER {
+
+}
+        `);
+
+      Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME))
+        .child('isomorphic-lib')
+        .filesFactory.createFile('src/apps/user/USER_REPOSITORY.ts', `
+export class USER_REPOSITORY {
+
+}
+        `);
+
       it(testName, async () => {
         // await cwdChange(BASELINE_WORKSPACE_PROJECT_NAME, async () => {
         //   // await CLEAR_ALL('', false)

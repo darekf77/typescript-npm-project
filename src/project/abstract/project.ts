@@ -31,12 +31,14 @@ import { BuildProcess } from '../features/build-proces';
 import { FrameworkFilesGenerator } from '../features/framework-files-generator';
 import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
+import { FilesFactory } from '../features/files-factory.backend';
 //#endregion
 
 import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+
 
 
 
@@ -86,6 +88,11 @@ export abstract class BaseProject {
   //#region @backend
   public recreate: FilesRecreator;
   //#endregion
+
+  //#region @backend
+  public filesFactory: FilesFactory;
+  //#endregion
+
 
   //#region @backend
   public join: BaselineSiteJoin;
@@ -542,6 +549,14 @@ export abstract class BaseProject {
     return res;
   }
   //#endregion
+
+  child(name: string): Project {
+    const c = this.children.find(c => c.name === name);
+    if (!c) {
+      error(`Project doesnt contain child with name: ${name}`)
+    }
+    return c;
+  }
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {
@@ -1263,6 +1278,7 @@ export class Project extends BaseProject implements IProject {
         this.type = this.packageJson.type;
         this.npmPackages = new NpmPackages(this)
         this.recreate = new FilesRecreator(this);
+        this.filesFactory = new FilesFactory(this);
         this.sourceModifier = new SourceModifier(this);
         this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
         if (!this.isStandaloneProject) {
