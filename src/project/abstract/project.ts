@@ -495,6 +495,25 @@ export abstract class BaseProject {
   }
 
   //#region @backend
+  getAbsoluteFilePath(relativePath: string) {
+    return {
+      normal: path.join(this.location, relativePath),
+      custom: path.join(this.location, config.folder.custom, relativePath),
+      __prefixed: path.join(this.location, path.dirname(relativePath), `__${path.basename(relativePath)}`),
+    }
+  }
+
+  getRelativeFilePath(relativePath: string) {
+    return {
+      normal: path.join(relativePath),
+      custom: path.join(config.folder.custom, relativePath),
+      __prefixed: path.join(path.dirname(relativePath), `__${path.basename(relativePath)}`),
+    }
+  }
+
+  //#endregion
+
+  //#region @backend
   containsFile(filePaht: string) {
     let fullPath = path.resolve(path.join(this.location, filePaht));
     let res = fse.existsSync(fullPath)
@@ -563,6 +582,7 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
   child(name: string): Project {
     const c = this.children.find(c => c.name === name);
     if (!c) {
@@ -570,6 +590,9 @@ export abstract class BaseProject {
     }
     return c;
   }
+  //#endregion
+
+
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {
@@ -681,36 +704,36 @@ export abstract class BaseProject {
       this.isWorkspaceChildProject ||
       this.isStandaloneProject) {
 
-      log(`FIXING SOURCES FOR "${this.genericName}"`)
+      // log(`FIXING SOURCES FOR "${this.genericName}"`)
       const srcFolder = path.join(this.location, config.folder.src);
       if (!this.isWorkspace && !fse.existsSync(srcFolder)) {
-        log('SRC folder recreated')
+        // log('SRC folder recreated')
         fse.mkdirpSync(srcFolder);
       }
       const componentsFolder = path.join(this.location, config.folder.components);
       if (this.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
-        log('COMPONENTS folder recreated');
+        // log('COMPONENTS folder recreated');
         fse.mkdirpSync(componentsFolder);
       }
 
       const customFolder = path.join(this.location, config.folder.custom);
       if (this.isSite && !fse.existsSync(customFolder)) {
-        log('CUSTOM folder recreated');
+        // log('CUSTOM folder recreated');
         fse.mkdirpSync(customFolder);
       }
 
       const nodeModulesFolder = path.join(this.location, config.folder.node_modules);
       if (this.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
-        log('NODE_MODULES folder recreated');
+        // log('NODE_MODULES folder recreated');
         fse.mkdirpSync(nodeModulesFolder)
       }
       if (this.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
         const paretnFolderOfNodeModules = path.join(this.parent.location, config.folder.node_modules);
         if (!fse.existsSync(paretnFolderOfNodeModules)) {
-          log('NODE_MODULES (parent) folder recreated');
+          // log('NODE_MODULES (parent) folder recreated');
           fse.mkdirpSync(paretnFolderOfNodeModules)
         }
-        log('NODE_MODULES folder link to child recreated');
+        // log('NODE_MODULES folder link to child recreated');
         HelpersLinks.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
       }
 
@@ -718,7 +741,7 @@ export abstract class BaseProject {
         if (this.isWorkspace) {
           const baselineFolderInNodeModule = path.join(this.location, config.folder.node_modules, this.baseline.name);
           if (!fse.existsSync(baselineFolderInNodeModule)) {
-            log('BASELINE folder in NODE_MODUELS recreated');
+            // log('BASELINE folder in NODE_MODUELS recreated');
             HelpersLinks.createSymLink(this.baseline.location, baselineFolderInNodeModule);
           }
         }

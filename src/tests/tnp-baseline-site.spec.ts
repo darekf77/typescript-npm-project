@@ -13,6 +13,38 @@ const BASELINE_WORKSPACE_PROJECT_NAME = 'test-1'
 const SITE_NAME = `site-for-${BASELINE_WORKSPACE_PROJECT_NAME}`;
 
 
+class BaselinSiteJoinTest {
+
+  baselinChild: Project;
+  siteChild: Project;
+  constructor(
+    public baseline: Project,
+    public site: Project,
+    childProject?: string
+  ) {
+    if (childProject) {
+      this.baselinChild = baseline.child(childProject);
+      this.siteChild = site.child(childProject);
+    }
+  }
+  static create(baseline: Project, site: Project, childProject?: string) {
+    return {
+      test(childProject: string) {
+        return new BaselinSiteJoinTest(baseline, site, childProject)
+      }
+    }
+  }
+
+
+
+  scenario(contextFn: (context: BaselinSiteJoinTest) => void) {
+    contextFn(this);
+    return this;
+  }
+
+}
+
+
 const wrap = SpecWrap.create();
 describe(wrap.describe('Tnp Baseline Site'), async () => {
 
@@ -23,34 +55,48 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
       NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location);
       NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location)
 
-      var project = {
+      const project = {
         baseline: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)),
         site: Project.From(path.join(location, SITE_NAME)),
-        baseline_isomorphi_lib: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)).child('isomorphic-lib'),
-        site_isomorphi_lib: Project.From(path.join(location, SITE_NAME)).child('isomorphic-lib'),
       };
 
-      var testFilePath = 'src/apps/user/UserController.ts';
-      var testFilePathForSite = 'src/apps/user/__UserController.ts';
-      var testFilePathCustom = 'custom/src/apps/user/UserController.ts';
+      const ins = BaselinSiteJoinTest.create(project.baseline, project.site);
 
-      project.baseline_isomorphi_lib
-        .filesFactory.createFile(testFilePath, `
-export class UserController {
+      ins
+        .test('isomorphic-lib')
+        .scenario(ctx => {
+          const fileNameWithoutExt = 'TestController'
+          const fileName = `${fileNameWithoutExt}.ts`
+          const relative = `src/apps/user/${fileName}`;
+          const relativeWithoutext = `src/apps/user/${fileNameWithoutExt}`;
+          const pathFile = ctx.baselinChild.getRelativeFilePath(relative);
 
-}
-        `);
-
-      project.site_isomorphi_lib
-        .filesFactory.createFile(testFilePathCustom, `
-import { UserController as Base } from '${BASELINE_WORKSPACE_PROJECT_NAME}/isomorphic-lib/${testFilePath}';
-
-export class UserController extends Base {
+          ctx.baselinChild
+            .filesFactory.createFile(pathFile.normal, `
+export class ${fileNameWithoutExt} {
 
 }
         `);
 
-      console.log('FILE CREATINTOINTOINOITNOTINasdasOI')
+          ctx.siteChild.filesFactory.createFile(pathFile.custom, `
+import { ${fileNameWithoutExt} as Base } from '${ctx.baseline.name}/${ctx.baselinChild.name}/${relativeWithoutext}';
+
+export class ${fileNameWithoutExt} extends Base {
+
+}
+                `);
+
+          it('should have test file', async () => {
+            console.log('pathFile.normal',pathFile.normal)
+            expect(ctx.siteChild.containsFile(pathFile.normal)).to.be.true;
+
+            expect(ctx.siteChild.containsFile(pathFile.__prefixed)).to.be.true;
+            expect(ctx.siteChild.containsFile(pathFile.custom)).to.be.true;
+          })
+
+        })
+
+
 
       it(testName, async () => {
         // await cwdChange(BASELINE_WORKSPACE_PROJECT_NAME, async () => {
@@ -69,11 +115,7 @@ export class UserController extends Base {
 
       })
 
-      it('should have test file', async () => {
-        expect(project.site_isomorphi_lib.containsFile(testFilePath)).to.be.true;
-        expect(project.site_isomorphi_lib.containsFile(testFilePathCustom)).to.be.true;
-        expect(project.site_isomorphi_lib.containsFile(testFilePathForSite)).to.be.true;
-      })
+
 
     }, { removeTestFolder: false })
 

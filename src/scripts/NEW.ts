@@ -89,11 +89,11 @@ export class ProjectFactory {
       const w = Project.From(destinationPath);
       if (basedOn) {
         w.baseline.children.forEach(c => {
-          log(`Basleine Child project "${c.genericName}"`);
+          // log(`Basleine Child project "${c.genericName}"`);
         })
       }
       w.children.forEach(c => {
-        log(`Child project "${c.genericName}"`);
+        // log(`Child project "${c.genericName}"`);
       });
     }
     return Project.From(destinationPath);

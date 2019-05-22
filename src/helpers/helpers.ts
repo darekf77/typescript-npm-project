@@ -29,9 +29,6 @@ export const sortKeys = function (obj) {
 
 //#region @backend
 export function crossPlatofrmPath(p: string) {
-  if (process.platform === 'win32') {
-    return p.replace(/\\/g, '/');
-  }
   return p;
 }
 
