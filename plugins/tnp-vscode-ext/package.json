@@ -1,0 +1,58 @@
+{
+  "name": "tnp-vscode-ext",
+  "displayName": "tnp-vscode-ext",
+  "publisher": "morphi-io",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.30.0"
+  },
+  "repository": {
+    "url": "https://github.com/darekf77/tsc-npm-project.git",
+    "type": "git"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.tnpCLIcreateMorphiModel",
+        "title": "MORPHI: Create model"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "extension.tnpCLIcreateMorphiModel"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "extension.tnpCLIcreateMorphiModel",
+          "group": "Morphi CLI essentials"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "build": "vsce package",
+    "build:install": "npm run build && code --install-extension tnp-vscode-ext-0.0.1.vsix",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^3.1.4",
+    "vscode": "^1.1.25",
+    "tslint": "^5.8.0",
+    "@types/node": "^8.10.25",
+    "@types/mocha": "^2.2.42"
+  }
+}

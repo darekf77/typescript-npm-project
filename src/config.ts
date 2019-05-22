@@ -81,6 +81,7 @@ export const config = {
   pathes: {
 
     tnp_folder_location: pathResolved(__dirname, '..'),
+    tnp_vscode_ext_location: pathResolved(__dirname, '..', 'plugins', 'tnp-vscode-ext'),
 
     tnp_system_path_txt: pathResolved(__dirname, '..', file.tnp_system_path_txt),
     tnp_system_path_txt_tnp_bundle: pathResolved(__dirname, '..', file.tnpBundle, file.tnp_system_path_txt),

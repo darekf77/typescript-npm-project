@@ -7,3 +7,5 @@ export type LibType = "angular-lib"
   | 'docker'
   | 'unknow-npm-project'
 
+
+export type NewFactoryType = LibType | 'model';

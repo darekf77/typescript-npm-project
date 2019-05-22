@@ -42,7 +42,9 @@
     "projects": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#5c3735"
+    "activityBar.background": "#5c3735",
+    "statusBar.background": "#5c3735",
+    "statusBar.debuggingBackground": "#5c3735"
   },
   "editor.rulers": [
     100,

@@ -53,7 +53,7 @@ export class CopyManager extends FeatureForProject {
       override?: boolean;
       filterForBundle?: boolean;
       showInfo?: boolean;
-      ommitSourceCode: boolean;
+      ommitSourceCode?: boolean;
     }): boolean {
 
     const { override = true, filterForBundle = true, showInfo = true, ommitSourceCode = false } = options || {}

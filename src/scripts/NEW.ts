@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import config from "../config";
-import { LibType, IPackageJSON } from '../models';
+import { LibType, IPackageJSON, NewFactoryType } from '../models';
 import { run, log } from "../helpers";
 import { Project } from "../project";
 import { info, error } from "../helpers";
@@ -99,6 +99,15 @@ export class ProjectFactory {
     return Project.From(destinationPath);
   }
 
+  public createModelFromArgs(args: string, exit = true, cwd = process.cwd()) {
+    const argv = args.split(' ');
+    const name = argv[1]
+    const relativePath = argv[2]
+    Project.From(cwd).filesFactory.createModel(relativePath, name);
+    if (exit) {
+      process.exit(0)
+    }
+  }
 
   public workspaceFromArgs(args: string, exit = true, cwd = process.cwd()) {
     const argv = args.split(' ');
@@ -137,7 +146,33 @@ export class ProjectFactory {
 
 
 export function NEW(args: string, exit = true, cwd = process.cwd()) {
-  ProjectFactory.create.workspaceFromArgs(args, exit, cwd)
+  let argv = args.split(' ');
+
+  const type = argv[0] as NewFactoryType;
+
+
+  const cwdFromArgsIndex = argv.findIndex((f, i) => f === '--cwd');
+  const cwdFromArgs = (cwdFromArgsIndex !== -1) ? argv[cwdFromArgsIndex + 1] : void 0;
+  if (_.isString(cwdFromArgs)) {
+    cwd = cwdFromArgs;
+    argv = argv.filter((f, i) => {
+      if (f === '--cwd') {
+        argv[i + 1] = ''
+        return false;
+      }
+      return true;
+    })
+      .filter(f => !!f)
+    args = argv.join(' ')
+
+  }
+  // console.log(`ARGS: ${args}`)
+
+  if (type === 'model') {
+    ProjectFactory.create.createModelFromArgs(args, exit, cwd);
+  } else {
+    ProjectFactory.create.workspaceFromArgs(args, exit, cwd)
+  }
 }
 export function NEW_SITE(args: string, exit = true, cwd = process.cwd()) {
   ProjectFactory.create.workspaceSiteFromArgs(args, exit, cwd);
