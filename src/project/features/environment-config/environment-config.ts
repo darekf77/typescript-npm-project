@@ -101,8 +101,8 @@ export class EnvironmentConfig
     await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
 
     if (overridePortsOnly) {
-      console.log('Only ports overriding.. ')
-      return
+      log('Only ports overriding.. ')
+      return;
     }
 
     config.isCoreProject = this.project.isCoreProject;

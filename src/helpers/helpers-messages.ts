@@ -57,7 +57,7 @@ export function info(details: string) {
     console.info(details)
   }
   //#region @backend
-  !(global.muteMessages && global.hideInfos) && console.log(chalk.green(details))
+  (!global.muteMessages && !global.hideInfos) && console.log(chalk.green(details))
   //#endregion
 }
 
@@ -66,8 +66,9 @@ export function log(details: string) {
     console.log(details)
   }
   //#region @backend
-  // console.log('global.muteMessages',global.muteMessages)
-  !(global.muteMessages && global.hideLog) && console.log(chalk.gray(details))
+  // console.log('global.muteMessages', global.muteMessages);
+  // console.log('global.hideLog', global.hideLog);
+  (!global.muteMessages && !global.hideLog) && console.log(chalk.gray(details))
   //#endregion
 }
 
@@ -77,9 +78,9 @@ export function warn(details: string, trace = false) {
   }
   //#region @backend
   if (trace) {
-    !(global.muteMessages && global.hideWarnings) && console.trace(chalk.yellow(details))
+    (!global.muteMessages && !global.hideWarnings) && console.trace(chalk.yellow(details))
   } else {
-    !(global.muteMessages && global.hideWarnings) && console.log(chalk.yellow(details))
+    (!global.muteMessages && !global.hideWarnings) && console.log(chalk.yellow(details))
   }
   //#endregion
 }

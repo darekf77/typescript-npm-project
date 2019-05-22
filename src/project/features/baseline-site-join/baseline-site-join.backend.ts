@@ -9,7 +9,7 @@ import * as rimraf from 'rimraf';
 // local
 import { Project } from "../../abstract";
 import { LibType, RecreateFile, FileEvent } from "../../../models";
-import { copyFile, uniqArray, crossPlatofrmPath, log } from '../../../helpers';
+import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp } from '../../../helpers';
 import config from '../../../config';
 import { error } from '../../../helpers';
 import chalk from 'chalk';
@@ -493,7 +493,7 @@ export class BaselineSiteJoin extends FeatureForProject {
       async allBaselineSiteFiles() {
         self.__checkBaselineSiteStructure()
 
-        await Helpers.compilationWrapper(() => {
+        await compilationWrapperTnp(() => {
           uniqArray(self.relativePathesBaseline.concat(self.relativePathesCustom))
             .forEach(relativeFile => self.merge(relativeFile))
         }, `(${chalk.bold(self.project.genericName)}) Site join of all files`)

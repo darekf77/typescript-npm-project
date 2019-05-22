@@ -13,7 +13,7 @@ export class FilesFactory extends FeatureForProject {
 
   createFile(pathToFile: string, content?: string | JSON) {
     const destPath = path.isAbsolute(pathToFile) ? pathToFile : path.join(this.project.location, pathToFile)
-    log(`CREATE FILE: ${destPath}`)
+    // log(`CREATE FILE: ${destPath}`)
     if (_.isUndefined(content)) {
       content = '';
     }

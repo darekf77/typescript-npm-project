@@ -5,10 +5,11 @@ import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build'
 import { ExtendedCodeCut } from './browser-code-cut';
 import { EnvConfig } from '../../../models';
 import { Project } from '../../abstract';
+import { compilationWrapperTnp } from '../../../helpers';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
-
+  CompilationWrapper = compilationWrapperTnp;
   compile(watch = false) {
 
     // QUICK_FIX for backend in tnp projects
@@ -22,6 +23,7 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 
 export class BroswerForModuleCompilation extends BroswerCompilation {
+  CompilationWrapper = compilationWrapperTnp;
 
   constructor(private module: string,
     private ENV: EnvConfig,

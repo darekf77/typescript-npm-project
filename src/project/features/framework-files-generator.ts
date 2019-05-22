@@ -25,7 +25,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
   protected asyncAction(filePath: string) {
     // console.log('async action framework file gen ', filePath)
     this.syncAction()
-    // console.log('async action ended for generator')
+    // console.log('asynlog action ended for generator')
   }
 
   constructor(public project: Project) {

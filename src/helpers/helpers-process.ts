@@ -1,10 +1,12 @@
 //#region @backend
 import * as child from 'child_process'
 import * as _ from 'lodash';
+import chalk from 'chalk';
 import * as fs from 'fs';
 import * as os from "os";
 import * as sleep from 'sleep';
 import * as fkill from 'fkill';
+import * as dateformat from "dateformat";
 import { error, info, warn, log } from "./helpers-messages";
 
 import { RunOptions, WatchOptions } from "../models";
@@ -64,6 +66,27 @@ export function getWorkingDirOfProcess(PID: number) {
   } catch (e) {
     error(e);
   }
+}
+
+export async function compilationWrapperTnp(fn: () => void, taskName: string = 'Task',
+  executionType: 'Compilation' | 'Code execution' = 'Compilation') {
+  function currentDate() {
+    return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
+  }
+  if (!fn || !_.isFunction(fn)) {
+    error(`${executionType} wrapper: "${fs}" is not a function.`)
+    process.exit(1)
+  }
+
+  try {
+    log(chalk.gray(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" starte...`))
+    await runSyncOrAsync(fn)
+    log(chalk.green(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
+  } catch (error) {
+    log(chalk.red(error));
+    log(`${currentDate()} ${executionType} of ${taskName} ERROR`)
+  }
+
 }
 
 export function terminalLine() {

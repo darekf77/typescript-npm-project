@@ -114,7 +114,7 @@ export class SpecWrap {
       fse.mkdirpSync(location);
     }
 
-    global.muteMessages = true;
+
     const oldCwd = process.cwd()
     process.chdir(location);
 
@@ -124,7 +124,7 @@ export class SpecWrap {
         cwdChange: this.cwdChange(location)
       })
     })
-    global.muteMessages = false;
+
     process.chdir(oldCwd);
 
 

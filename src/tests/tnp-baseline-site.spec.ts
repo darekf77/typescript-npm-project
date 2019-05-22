@@ -38,7 +38,9 @@ class BaselinSiteJoinTest {
 
 
   scenario(contextFn: (context: BaselinSiteJoinTest) => void) {
+
     contextFn(this);
+
     return this;
   }
 
@@ -51,7 +53,7 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
 
   await wrap.it(`should create baseline/site worksapces projects`,
     async (location, testName, { packageJSON, cwdChange }) => {
-
+      global.muteMessages = true;
       NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location);
       NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location)
 
@@ -62,38 +64,11 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
 
       const ins = BaselinSiteJoinTest.create(project.baseline, project.site);
 
+
       ins
         .test('isomorphic-lib')
         .scenario(ctx => {
-          const fileNameWithoutExt = 'TestController'
-          const fileName = `${fileNameWithoutExt}.ts`
-          const relative = `src/apps/user/${fileName}`;
-          const relativeWithoutext = `src/apps/user/${fileNameWithoutExt}`;
-          const pathFile = ctx.baselinChild.getRelativeFilePath(relative);
-
-          ctx.baselinChild
-            .filesFactory.createFile(pathFile.normal, `
-export class ${fileNameWithoutExt} {
-
-}
-        `);
-
-          ctx.siteChild.filesFactory.createFile(pathFile.custom, `
-import { ${fileNameWithoutExt} as Base } from '${ctx.baseline.name}/${ctx.baselinChild.name}/${relativeWithoutext}';
-
-export class ${fileNameWithoutExt} extends Base {
-
-}
-                `);
-
-          it('should have test file', async () => {
-            console.log('pathFile.normal',pathFile.normal)
-            expect(ctx.siteChild.containsFile(pathFile.normal)).to.be.true;
-
-            expect(ctx.siteChild.containsFile(pathFile.__prefixed)).to.be.true;
-            expect(ctx.siteChild.containsFile(pathFile.custom)).to.be.true;
-          })
-
+          simpleContorllerJoin(ctx);
         })
 
 
@@ -108,7 +83,7 @@ export class ${fileNameWithoutExt} extends Base {
           await INIT(' --skipNodeModules', false)
         });
         const sitePath = path.join(location, SITE_NAME);
-        console.log('sitePath', sitePath)
+        // console.log('sitePath', sitePath)
         const site = Project.From(sitePath)
         expect(site).to.not.be.undefined
         expect(site.isSite).to.be.true;
@@ -121,3 +96,65 @@ export class ${fileNameWithoutExt} extends Base {
 
 
 })
+
+
+
+/**
+ * Simple Baseline Site Join of isomorphic-lib controller
+ */
+function simpleContorllerJoin(ctx: BaselinSiteJoinTest) {
+  const fileNameWithoutExt = _.upperFirst(_.camelCase(simpleContorllerJoin.name))
+  const fileName = `${fileNameWithoutExt}.ts`
+  const relative = `src/apps/user/${fileName}`;
+  const relativeWithoutext = `src/apps/user/${fileNameWithoutExt}`;
+  const filePathBaseline = ctx.baselinChild.path(relative);
+  const filePathSite = ctx.siteChild.path(relative);
+
+  ctx.baselinChild.filesFactory.createFile('src/helpers.ts',`
+  export class Helpers {
+
+  }
+  `)
+  ctx.baselinChild
+    .filesFactory.createFile(filePathBaseline.relative.normal, `
+import { Helpers } from '../../helpers';
+
+export class ${fileNameWithoutExt} {
+
+}
+        `);
+
+  ctx.siteChild.filesFactory.createFile(filePathBaseline.relative.custom, `
+import { ${fileNameWithoutExt} as Base } from '${ctx.baseline.name}/${ctx.baselinChild.name}/${relativeWithoutext}';
+import {
+Morphi
+} from 'morphi';
+
+export class ${fileNameWithoutExt} extends Base {
+
+}
+                `);
+
+  describe(_.startCase(simpleContorllerJoin.name), () => {
+    it('should have test file', async () => {
+      // console.log('pathFile.normal', pathFile.normal)
+      expect(ctx.siteChild.containsFile(filePathBaseline.relative.normal)).to.be.true;
+
+      expect(ctx.siteChild.containsFile(filePathBaseline.relative.__prefixed)).to.be.true;
+      expect(ctx.siteChild.containsFile(filePathBaseline.relative.custom)).to.be.true;
+    })
+
+    it('should change origin filepath to prefixed', async () => {
+      expect(!!~fse.readFileSync(filePathSite.absolute.normal).toString().trim()
+        .search(`import { ${fileNameWithoutExt} as Base } from './__${fileNameWithoutExt}';`)).to.be.true;
+    });
+
+    // it('should join new lines in import into one long import', async () => {
+    //   expect(!!~fse.readFileSync(filePathSite.absolute.normal).toString().trim()
+    //     .search(`import { Morphi } from 'morphi';`)).to.be.true;
+    // });
+
+  })
+
+
+}

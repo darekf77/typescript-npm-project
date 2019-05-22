@@ -162,7 +162,7 @@ export abstract class BaseProject {
 
   //#region @backend
   get hasNpmOrganization() {
-    // console.log('path.dirname(this.location)', path.dirname(this.location))
+    // log('path.dirname(this.location)', path.dirname(this.location))
     return path.basename(path.dirname(this.location)).startsWith('@');
   }
 
@@ -495,19 +495,27 @@ export abstract class BaseProject {
   }
 
   //#region @backend
-  getAbsoluteFilePath(relativePath: string) {
+  private _path(relativePath: string, currentProjectLocation?: string) {
+    if (_.isUndefined(currentProjectLocation)) {
+      currentProjectLocation = this.location;
+    }
     return {
-      normal: path.join(this.location, relativePath),
-      custom: path.join(this.location, config.folder.custom, relativePath),
-      __prefixed: path.join(this.location, path.dirname(relativePath), `__${path.basename(relativePath)}`),
+      normal: path.join(currentProjectLocation, relativePath),
+      custom: path.join(currentProjectLocation, config.folder.custom, relativePath),
+      __prefixed: path.join(currentProjectLocation, path.dirname(relativePath), `__${path.basename(relativePath)}`),
     }
   }
 
-  getRelativeFilePath(relativePath: string) {
+  path(relativePath: string, currentProjectLocation?: string) {
+
+    const self = this;
     return {
-      normal: path.join(relativePath),
-      custom: path.join(config.folder.custom, relativePath),
-      __prefixed: path.join(path.dirname(relativePath), `__${path.basename(relativePath)}`),
+      get relative() {
+        return self._path(relativePath, '');
+      },
+      get absolute() {
+        return self._path(relativePath);
+      }
     }
   }
 
@@ -521,7 +529,7 @@ export abstract class BaseProject {
     //   fullPath = path.join('/private', fullPath);
     //   res = fse.existsSync(fullPath);
     // }
-    // console.log(`res: ${res} : ${fullPath}`)
+    // log(`res: ${res} : ${fullPath}`)
     return res;
   }
   //#endregion
@@ -570,7 +578,7 @@ export abstract class BaseProject {
 
     let res = subdirectories
       .map(dir => {
-        // console.log('child:', dir)
+        // log('child:', dir)
         return Project.From(dir);
       })
       .filter(c => !!c)
@@ -865,7 +873,7 @@ export abstract class BaseProject {
   //#region @backend
   public checkIfReadyForNpm() {
 
-    // console.log('TYPEEEEE', this.type)
+    // log('TYPEEEEE', this.type)
     const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
     if (!libs.includes(this.type)) {
       error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`)
@@ -914,7 +922,7 @@ export abstract class BaseProject {
       this.buildOptions.copyto = []
     }
 
-    // console.log(this.buildOptions)
+    // log(this.buildOptions)
     // process.exit(0)
 
     await db.transaction.updateCommandBuildOptions(this.location, this.buildOptions);
@@ -923,7 +931,7 @@ export abstract class BaseProject {
 
   //#region @backend
   async build(buildOptions?: BuildOptions) {
-    // console.log('BUILD OPTIONS', buildOptions)
+    // log('BUILD OPTIONS', buildOptions)
 
     if (this.isWorkspaceChildProject || this.isWorkspaceChildProject) {
       this.quickFixMissingLibs(['react-native-sqlite-storage'])
@@ -937,7 +945,7 @@ export abstract class BaseProject {
     this.buildOptions = buildOptions;
 
     let baseHref: string;
-    // console.log('AM HERE')
+    // log('AM HERE')
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.isWorkspaceChildProject) {
@@ -947,7 +955,7 @@ export abstract class BaseProject {
         }).baseUrl
     }
 
-    // console.log(`basehref for current project `, baseHref)
+    // log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;
 
     // TODO do this for isomorphic lib also
@@ -1031,9 +1039,9 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
 
     await this.env.init(args, true)
-    console.log(`Killing proces on port ${this.getDefaultPort()}`);
+    log(`Killing proces on port ${this.getDefaultPort()}`);
     await killProcessByPort(this.getDefaultPort())
-    console.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
+    log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
     const command = this.startOnCommand(args);
     if (_.isString(command)) {
       const p = this.run(this.startOnCommand(args)).async()
@@ -1086,17 +1094,17 @@ Generated workspace should be here: ${genLocationWOrkspace}
   //#region @backend
   createTable: false,
   browserTransformFn: (entity: Project, mdc: ModelDataConfig) => {
-    // console.log('I AM TRANSFORMING ENTITY!!!', mdc)
+    // log('I AM TRANSFORMING ENTITY!!!', mdc)
     let exclude = [];
     if (!!mdc && mdc.exclude.length > 0) {
       exclude = mdc.exclude;
     }
     // if(exclude.length > 0) {
-    //   console.log('exclude in Project', exclude)
+    //   log('exclude in Project', exclude)
     // }
 
     if (!(exclude.length > 0 && exclude.includes('children'))) {
-      // console.log('SET CHILDREND')
+      // log('SET CHILDREND')
       entity.browser.children = entity.children;
     } else {
       entity.browser.children = void 0
@@ -1187,7 +1195,7 @@ export class Project extends BaseProject implements IProject {
       const { ProjectContainer } = require('../project-container');
       resultProject = new ProjectContainer(location);
     }
-    // console.log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
+    // log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
     // log(`[project.from] Result project: ${resultProject.name}`)
@@ -1197,7 +1205,7 @@ export class Project extends BaseProject implements IProject {
 
   //#region @backend
   public static nearestTo(location: string) {
-    // console.log('nearestPorjectLocaiont', location)
+    // log('nearestPorjectLocaiont', location)
     const project = this.From(location);
     if (project) {
       return project;
@@ -1241,7 +1249,7 @@ export class Project extends BaseProject implements IProject {
     if (!current) {
       error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`, false, true)
     }
-    // console.log('CURRENT', current.location)
+    // log('CURRENT', current.location)
     return current;
   }
   //#endregion
@@ -1302,7 +1310,7 @@ export class Project extends BaseProject implements IProject {
 
       if (fs.existsSync(location)) {
 
-        // console.log('PROJECT FROM', location)
+        // log('PROJECT FROM', location)
 
 
         this.packageJson = PackageJSON.fromProject(this);
@@ -1328,7 +1336,7 @@ export class Project extends BaseProject implements IProject {
 
 
         this.__defaultPort = Project.DefaultPortByType(this.type);
-        // console.log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
+        // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
         if (!this.isStandaloneProject) {
           this.env = new EnvironmentConfig(this);
           this.proxyRouter = new ProxyRouter(this);

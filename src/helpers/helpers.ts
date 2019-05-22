@@ -40,9 +40,9 @@ export function getEntites(cwd: string): string[] {
     }).filter(p => {
 
       const isMatchRegex = entityRegEx.test(path.basename(p));
-      if (!isMatchRegex) {
-        console.log(p, path.basename(p))
-      }
+      // if (!isMatchRegex) {
+      //   log(`Not match entity patern: ${p + path.basename(p)}`)
+      // }
       return isMatchRegex &&
         !p.endsWith('Controller.ts') &&
         !p.endsWith('_REPOSITORY.ts') &&
