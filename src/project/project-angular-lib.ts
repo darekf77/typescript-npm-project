@@ -56,8 +56,10 @@ export class ProjectAngularLib extends LibProject {
     tryRemoveDir(path.join(this.location, config.folder.module));
     const inLocationOutDir = path.join(this.location, outDir);
     const inLocationModuleDir = path.join(this.location, config.folder.module)
+    const inLocationBrowserDir = path.join(this.location, config.folder.browser)
     // console.log(`Create symlink from: ${inLocationOutDir} to ${inLocationModuleDir}`)
     HelpersLinks.createSymLink(inLocationOutDir, inLocationModuleDir, { continueWhenExistedFolderDoesntExists });
+    HelpersLinks.createSymLink(inLocationOutDir, inLocationBrowserDir, { continueWhenExistedFolderDoesntExists });
   }
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {

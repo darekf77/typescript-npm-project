@@ -9,6 +9,7 @@ import { Helpers } from 'morphi/browser/helpers';
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
 import { CLASS } from 'typescript-class-helpers/browser';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
 export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -55,6 +56,7 @@ export class SelectWrapperComponent extends BaseFormlyComponent implements OnIni
 
   // @Input() lable: string;
 
+  public field: FormlyFieldConfig;
   async ngOnInit() {
 
     super.ngOnInit()

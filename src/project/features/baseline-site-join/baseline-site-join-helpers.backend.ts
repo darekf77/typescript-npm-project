@@ -110,12 +110,16 @@ export function handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePat
   // console.log(`this project: ${this.project.location}`)
   // console.log(`baseline: ${this.project.baseline.location}`)
   // console.log(`joinFilePath: ${joinFilePath}`)
+  if (!fse.existsSync(joinFilePath)) {
+    return;
+  }
   let orgFileCopiedToSIte = fse.readFileSync(joinFilePath, { encoding: 'utf8' });
 
   const moduleName = [
     config.folder.components,
     config.folder.module,
     config.folder.dist,
+    config.folder.browser,
   ];
 
   project.parent.children
@@ -125,10 +129,15 @@ export function handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePat
       const reg = new RegExp(`${project.parent.baseline.name}\/${angularLibName}\/(${moduleName.join('|')})`, 'g')
 
       orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
-        `${angularLibName}/${config.folder.module}`);
+        `${angularLibName}/${config.folder.browser}`);
     });
 
+  if (!fse.existsSync(joinFilePath)) {
+    return;
+  }
 
   fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
+
+
 }
 

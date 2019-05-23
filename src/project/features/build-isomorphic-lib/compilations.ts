@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
-import { ExtendedCodeCut } from './browser-code-cut';
+import { ExtendedCodeCut } from './browser-code-cut.backend';
 import { EnvConfig } from '../../../models';
 import { Project } from '../../abstract';
 import { compilationWrapperTnp } from '../../../helpers';

@@ -1,4 +1,17 @@
 "use strict";
+
+console.error(`For 'angular-lib' project type please use more specific path to file:
+Good example:
+
+import { ExampleModule } from 'angular-lib/example-module';
+
+Bad example:
+
+import { ExampleModule } from 'angular-lib';
+
+`)
+
+
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }

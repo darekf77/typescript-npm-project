@@ -78,7 +78,10 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
   protected asyncAction(filePath: string) {
     // console.log('SOurce modifier async !',filePath)
-    this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+    if (fse.existsSync(filePath)) {
+      this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+    }
+
   }
 
   private cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
