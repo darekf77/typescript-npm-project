@@ -2,6 +2,7 @@
 import * as path from 'path';
 import * as sleep from 'sleep';
 import * as glob from 'glob';
+import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../abstract';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
@@ -23,7 +24,9 @@ export class StaticBuild extends FeatureForProject {
 
     if (project.isWorkspace && project.isSite) {
       const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-      project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: true });
+      project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
+      const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
+      fse.mkdirpSync(binInBasleine)
     }
 
     let genProject = Project.From(genLocation);
