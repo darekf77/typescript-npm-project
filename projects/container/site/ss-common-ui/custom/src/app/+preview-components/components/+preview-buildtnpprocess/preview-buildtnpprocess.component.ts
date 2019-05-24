@@ -10,13 +10,14 @@ import { ModelDataConfig } from 'morphi/browser';
 import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app-popup-content.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { BaseComponentForRouter } from 'baseline/ss-common-ui/components/helpers/base-component';
 
 @Component({
   selector: 'app-preview-buildtnpprocess',
   templateUrl: './preview-buildtnpprocess.component.html',
   styleUrls: ['./preview-buildtnpprocess.component.scss']
 })
-export class PreviewBuildtnpprocessComponent
+export class PreviewBuildtnpprocessComponent extends BaseComponentForRouter
   implements OnInit, AfterContentInit {
 
 
@@ -30,7 +31,10 @@ export class PreviewBuildtnpprocessComponent
     public activeRoute: ActivatedRoute,
     // private ProjectController: ProjectController,
 
-  ) { }
+  ) {
+    super(router);
+    this.reloadNgOninitOnUrlChange()
+  }
 
 
   @ViewChild('menu') menu: TemplateRef<any>;
@@ -58,7 +62,7 @@ export class PreviewBuildtnpprocessComponent
     if (_.isString(projectLocation)) {
       projectLocation = decodeURIComponent(projectLocation);
       const selected = projects.find(p => p.location === projectLocation);
-      if(selected) {
+      if (selected) {
         this.selected = selected;
         await selected.updaetAndGetProceses()
       }

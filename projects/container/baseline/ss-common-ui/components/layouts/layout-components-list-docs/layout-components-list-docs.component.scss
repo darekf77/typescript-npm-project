@@ -1,11 +1,28 @@
 :host {
 
+  .hamburger {
+    cursor: pointer;
+    .mat-icon {
+      line-height: 63px;
+      margin-left: 5px;
+    }
+  }
+
+  .folder-item-on-list {
+    margin-left: -10px;
+  }
+
   .left-panel {
     overflow: auto;
     resize: horizontal;
     padding: 10px;
     min-width: auto !important;
     width: 300px;
+
+    .left-panel-columns-container {
+      margin-top: -10px;
+      margin-bottom: -21px;
+    }
   }
 
   .example-full-width {

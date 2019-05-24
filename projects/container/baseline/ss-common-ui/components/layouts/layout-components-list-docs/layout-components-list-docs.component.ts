@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, HostListener, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger/browser';
 import { numValue } from '../../helpers';
@@ -40,6 +41,10 @@ export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit 
     }
   };
 
+  get keyLocalStorageExpandLeft() { // TODO make in more generic
+    return 'keyLocalStorageExpandLeftAngular';
+  }
+
   constructor(private router: Router) { }
 
   ngOnInit() {
@@ -52,6 +57,14 @@ export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit 
       }
       return item;
     });
+
+    const leftMenuWidht = localStorage.getItem(this.keyLocalStorageExpandLeft);
+    if (_.isString(leftMenuWidht)) {
+      const num = Number(leftMenuWidht)
+      if (!_.isNaN(num)) {
+        this.leftPanelWidth = num;
+      }
+    }
   }
 
   ngAfterViewInit() {
@@ -60,6 +73,16 @@ export class LayoutComponentsListDocsComponent implements OnInit, AfterViewInit 
     });
   }
 
+  leftPanelWidthDefault = 300;
+  leftPanelWidth = this.leftPanelWidthDefault;
+  toogleLeftPanel() {
+    if (this.leftPanelWidth === this.leftPanelWidthDefault) {
+      this.leftPanelWidth = 50;
+    } else {
+      this.leftPanelWidth = this.leftPanelWidthDefault;
+    }
+    localStorage.setItem(this.keyLocalStorageExpandLeft, this.leftPanelWidth.toString());
+  }
 
   get calculate() {
     const self = this;

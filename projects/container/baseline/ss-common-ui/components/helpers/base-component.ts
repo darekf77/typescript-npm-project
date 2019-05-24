@@ -1,5 +1,6 @@
 import { Subscription } from 'rxjs/Subscription';
-import { OnDestroy, Component, Input } from '@angular/core';
+import { OnDestroy, OnInit, Component, Input } from '@angular/core';
+import { NavigationEnd, Router } from "@angular/router";
 
 
 @Component({
@@ -16,5 +17,25 @@ export abstract class BaseComponent implements OnDestroy {
     this.handlers.length = 0;
   }
 
+
+}
+
+
+export abstract class BaseComponentForRouter extends BaseComponent {
+
+  constructor(
+    private __router: Router
+  ) {
+    super();
+  }
+
+
+  reloadNgOninitOnUrlChange() {
+    this.handlers.push(this.__router.events.subscribe(event => {
+      if (event instanceof NavigationEnd && this['ngOnInit']) {
+        this['ngOnInit']();
+      }
+    }));
+  }
 
 }

@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 // other
 import { StaticColumnsModule } from 'static-columns';
 import { NgArrayPipesModule } from 'ngx-pipes';
@@ -19,7 +20,8 @@ const materialModules = [
   MatCardModule,
   MatIconModule,
   MatListModule,
-  MatInputModule
+  MatInputModule,
+  MatTooltipModule
 ];
 
 const angularModules = [

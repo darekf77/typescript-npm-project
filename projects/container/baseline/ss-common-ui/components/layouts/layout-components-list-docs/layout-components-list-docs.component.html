@@ -1,21 +1,40 @@
 <columns-container class="container"
                    [style.height.px]="elements.content.height">
-  <column [width]="300" class="left-panel" >
-    <mat-form-field class="example-full-width">
-      <input matInput
-             [(ngModel)]="filter.list"
-             (changed)="filter.change($event)"
-             placeholder="Search for component">
-    </mat-form-field>
+  <column [width]="leftPanelWidth"
+          [style.width.px]="leftPanelWidth"
+          class="left-panel">
+
+    <columns-container class="left-panel-columns-container">
+      <column [width]="35"
+              class="hamburger"
+              (click)="toogleLeftPanel()">
+        <mat-icon>toc</mat-icon>
+      </column>
+      <column grow>
+        <mat-form-field class="example-full-width">
+          <input matInput
+                 [(ngModel)]="filter.list"
+                 (changed)="filter.change($event)"
+                 placeholder="Search for component">
+        </mat-form-field>
+      </column>
+    </columns-container>
+
     <mat-list>
       <mat-list-item *ngFor="let item of menuLeft | filterBy:['href','name','group']:filter.list"
                      routerLink="{{item.href}}"
                      [ngClass]="{'disabled' : !item.href  }"
                      [routerLinkActive]="['active']">
-        <mat-icon *ngIf="item.name" matListIcon>folder</mat-icon>
-        <h3 *ngIf="item.name" matLine> {{item.name}} </h3>
-        <hr *ngIf="item.group && !item.name" >
-        <h5 *ngIf="item.group && !item.name" matLine> {{item.group}} </h5>
+        <mat-icon *ngIf="item.name"
+                  class="folder-item-on-list"
+                  matTooltip="{{item.name ? item.name: ''}}"
+                  [matTooltipPosition]="'right'"
+                  matListIcon>folder</mat-icon>
+        <h3 *ngIf="item.name"
+            matLine> {{item.name}} </h3>
+        <hr *ngIf="item.group && !item.name">
+        <h5 *ngIf="item.group && !item.name"
+            matLine> {{item.group}} </h5>
       </mat-list-item>
     </mat-list>
 
