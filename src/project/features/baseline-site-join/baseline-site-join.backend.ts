@@ -327,10 +327,10 @@ export class BaselineSiteJoin extends FeatureForProject {
     //   const ext = path.extname(joinFilePath)
     //   console.log('ext',ext)
     // }
-    if (this.project.type === 'isomorphic-lib') {
-      // this.handleUsingSelfPathesInAngularLib(joinFilePath)
-      handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath, this.project);
-    }
+    // if (this.project.type === 'isomorphic-lib') {
+    // this.handleUsingSelfPathesInAngularLib(joinFilePath)
+    handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath, this.project);
+    // }
     // }
 
 

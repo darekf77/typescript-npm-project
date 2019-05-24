@@ -11,7 +11,7 @@ import config from '../../config';
 import { OutFolder } from 'morphi/build';
 
 export type CleanType = 'all' | 'only_static_generated';
-export type InitOptions = { watch: boolean; alreadyInitedPorjects?: Project[]; }
+export type InitOptions = { watch: boolean; alreadyInitedPorjects?: Project[]; onlyJoin?: boolean; }
 
 export class FilesStructure extends FeatureForProject {
 
@@ -38,8 +38,8 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async init(args: string, options?: InitOptions) {
-    const { skipNodeModules, recrusive }: {
-      skipNodeModules: boolean; recrusive: boolean;
+    const { skipNodeModules, recrusive, onlyJoin }: {
+      skipNodeModules: boolean; recrusive: boolean; onlyJoin?: boolean;
     } = require('minimist')(!args ? [] : args.split(' '));
 
     this.project.quickFixMissingSourceFolders()
@@ -87,17 +87,20 @@ export class FilesStructure extends FeatureForProject {
     // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
     info(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
 
-    this.project.tnpBundle.installAsPackage()
-    if (!this.project.node_modules.exist) {
-      if (skipNodeModules) {
-        if (!path.join(this.project.location, config.folder.node_modules)) {
-          fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
+    if (!onlyJoin) {
+      this.project.tnpBundle.installAsPackage()
+      if (!this.project.node_modules.exist) {
+        if (skipNodeModules) {
+          if (!path.join(this.project.location, config.folder.node_modules)) {
+            fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
+          }
+        } else {
+          await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
         }
-      } else {
-        await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
       }
+      await this.project.recreate.init();
     }
-    await this.project.recreate.init();
+
 
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
 
@@ -107,17 +110,22 @@ export class FilesStructure extends FeatureForProject {
         await this.project.join.init()
       }
 
-      await this.project.env.init(args);
+      if (!onlyJoin) {
+        await this.project.env.init(args);
+      }
+
       this.project.quickFixMissingSourceFolders()
       const sourceModifireName = `(${chalk.bold(this.project.genericName)})" Client source modules pathes modifier `;
       const generatorName = `(${chalk.bold(this.project.genericName)}) Files generator: entites.ts, controllers.ts`;
 
-      if (watch) {
-        await this.project.frameworkFileGenerator.initAndWatch(generatorName);
-        await this.project.sourceModifier.initAndWatch(sourceModifireName);
-      } else {
-        await this.project.frameworkFileGenerator.init(generatorName);
-        await this.project.sourceModifier.init(sourceModifireName);
+      if (!onlyJoin) {
+        if (watch) {
+          await this.project.frameworkFileGenerator.initAndWatch(generatorName);
+          await this.project.sourceModifier.initAndWatch(sourceModifireName);
+        } else {
+          await this.project.frameworkFileGenerator.init(generatorName);
+          await this.project.sourceModifier.init(sourceModifireName);
+        }
       }
     }
 
