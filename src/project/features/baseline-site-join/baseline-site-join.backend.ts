@@ -198,8 +198,10 @@ export class BaselineSiteJoin extends FeatureForProject {
   }
 
 
-  async initAndWatch() {
-    await this.init();
+  async initAndWatch(onlyWatch = false) {
+    if (!onlyWatch) {
+      await this.init();
+    }
 
     if (!this.project.baseline) {
       return;

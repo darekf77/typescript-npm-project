@@ -156,7 +156,36 @@ export class DBTransaction {
     });
   }
 
+  /**
+   * Fix for situation:
+   * location = example location
+   * - you alread started your "dist" build in "location"
+   * - you are starting "app" build in your "location"
+   * - file-tructure is removing (components/something)
+   *  and it will casuse error in typescript , that whould never appear
+   * after normal "first" compilation
+   */
+  public async someBuildIsActive(project: Project): Promise<boolean> {
 
+    return new Promise<boolean>(async resolve => {
+      await this.start(`opposite build is not active`, async () => {
+        // const buildOptions: BuildOptions,
+        const builds = this.crud
+          .getAll<BuildInstance>(BuildInstance)
+
+        // console.log(builds.map(b => b.project && b.project.location))
+        // console.log('project.location', project.location)
+
+        const existed = builds.find(b => {
+          return (b.project.location === project.location) ||
+            (b.project.isSite && b.project.baseline.location === project.location)
+        });
+
+        resolve(!_.isUndefined(existed));
+      });
+    })
+
+  }
 
   public async updateBuildsWithCurrent(currentProject: Project,
     buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {

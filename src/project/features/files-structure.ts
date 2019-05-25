@@ -11,7 +11,11 @@ import config from '../../config';
 import { OutFolder } from 'morphi/build';
 
 export type CleanType = 'all' | 'only_static_generated';
-export type InitOptions = { watch: boolean; alreadyInitedPorjects?: Project[]; onlyJoin?: boolean; }
+export type InitOptions = {
+  watch: boolean;
+  alreadyInitedPorjects?: Project[];
+  onlyJoin?: boolean;
+}
 
 export class FilesStructure extends FeatureForProject {
 
@@ -104,15 +108,12 @@ export class FilesStructure extends FeatureForProject {
 
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
 
-      const buildOfCurrentProject = db.getBuilds().filter(b => b.project.location === this.project.location);
-      console.log('buildOfCurrentProject', buildOfCurrentProject.map(b => b.location));
+      const someBuildIsActive = await db.transaction.someBuildIsActive(this.project)
 
       if (watch) {
+        await this.project.join.initAndWatch(someBuildIsActive)
 
-
-        await this.project.join.initAndWatch()
-
-      } else {
+      } else if (!someBuildIsActive) {
         await this.project.join.init()
       }
 
