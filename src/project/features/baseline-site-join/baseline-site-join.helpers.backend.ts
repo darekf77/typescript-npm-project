@@ -14,6 +14,12 @@ import config from '../../../config';
 
 const BaselineSiteJoinprefix = '__';
 
+export const moduleNameAngularLib = [
+  config.folder.components,
+  config.folder.module,
+  config.folder.dist,
+  config.folder.browser,
+];
 
 export function getRegexSourceString(s) {
   return s
@@ -92,89 +98,4 @@ export function fastUnlink(filePath) {
 //     `${this.project.parent.baseline.name}/${this.project.name}/${config.folder.components}`);
 //   fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
 // }
-
-const moduleName = [
-  config.folder.components,
-  config.folder.module,
-  config.folder.dist,
-  config.folder.browser,
-];
-
-/**
-   * Example:
-   *
-   * In my angular-lib, I've got file with content:
-   * import { Helpers }  from 'ss-common-ui/component/helpers';
-   *
-   * insted having log path thats sucks
-   *import { Helpers }  from '../../../../..//helpers';
-   *
-   *
-   * @param joinFilePath
-   */
-
-export function handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath: string, project: Project) {
-  if (!project.isWorkspaceChildProject) {
-    return;
-  }
-
-  // console.log(`Project: ${project.genericName}`)
-  // console.log(`File: ${joinFilePath}`)
-  // console.log(`this project: ${project.location}`)
-  // console.log(`baseline: ${project.baseline.location}`)
-  // console.log(`joinFilePath: ${joinFilePath}`)
-  // console.log('this.project.children', project.children.map(c => c.genericName))
-  if (!fse.existsSync(joinFilePath)) {
-    return;
-  }
-  let orgFileCopiedToSIte = fse.readFileSync(joinFilePath, { encoding: 'utf8' });
-
-
-
-
-  project.parent.baseline.children
-    .filter(c => c.type === 'angular-lib')
-    .map(c => c.name)
-    .forEach(angularLibName => {
-
-      orgFileCopiedToSIte = repalceWithParentBaseline(project, angularLibName, orgFileCopiedToSIte)
-      orgFileCopiedToSIte = repalceWithitself(project, angularLibName, orgFileCopiedToSIte)
-
-
-    });
-  // process.exit(0)
-
-  if (!fse.existsSync(joinFilePath)) {
-    return;
-  }
-
-  fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
-
-
-}
-
-
-function repalceWithParentBaseline(project: Project, angularLibName: string, orgFileCopiedToSIte) {
-  const regexSourece = `${project.parent.baseline.name}\/${angularLibName}\/(${moduleName.join('|')})`;
-
-  const reg = new RegExp(regexSourece, 'g')
-
-  if (reg.test(orgFileCopiedToSIte)) {
-    orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
-      `${angularLibName}/${config.folder.browser}`);
-  }
-  return orgFileCopiedToSIte;
-}
-
-function repalceWithitself(project: Project, angularLibName: string, orgFileCopiedToSIte) {
-  const regexSourece = `${angularLibName}\/(${moduleName.join('|')})`;
-
-  const reg = new RegExp(regexSourece, 'g')
-
-  if (reg.test(orgFileCopiedToSIte)) {
-    orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
-      `${angularLibName}/${config.folder.browser}`);
-  }
-  return orgFileCopiedToSIte;
-}
 

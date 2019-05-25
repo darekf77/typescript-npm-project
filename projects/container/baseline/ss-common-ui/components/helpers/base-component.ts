@@ -35,7 +35,7 @@ export abstract class BaseComponentForRouter extends BaseComponent {
       if (event instanceof NavigationEnd && this['ngOnInit']) {
         this['ngOnInit']();
       }
-    }));
+    }) as any);
   }
 
 }

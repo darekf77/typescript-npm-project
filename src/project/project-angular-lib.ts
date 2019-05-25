@@ -94,9 +94,6 @@ export class ProjectAngularLib extends LibProject {
     return this;
   }
 
-  private get divideCompilationTaskName() {
-    return `divide module compilation of ${chalk.bold(this.name)}`
-  }
 
   async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient, compileOnce } = buildOptions;

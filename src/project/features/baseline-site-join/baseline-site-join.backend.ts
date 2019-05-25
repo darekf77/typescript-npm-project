@@ -18,24 +18,11 @@ import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject } from '../../abstract';
 import {
   fastCopy, fastUnlink,
-  handleUsingBaselineAngularLibInsideSiteIsomorphicLIb,
-  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin
-} from './baseline-site-join-helpers.backend';
-import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join-debug';
+  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin, moduleNameAngularLib
+} from './baseline-site-join.helpers.backend';
+import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join.debug.backend';
+import { REGEXS } from './baseline-site-join.regexes.backend';
 //#endregion
-
-const REGEXS = {
-
-  /**
-   *   "baseline/ss-common-logic/src/db-mocks";
-   *                            |<--------->|
-   */
-  baselinePart: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
-
-}
-
-
-
 
 
 
@@ -83,7 +70,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
       : path.join(this.project.baseline.parent.name, this.project.baseline.name)
 
-    return crossPlatofrmPath(baselinePath);
+    return baselinePath;
   }
 
   private get relativePathesBaseline() {
@@ -97,10 +84,14 @@ export class BaselineSiteJoin extends FeatureForProject {
     return baselineFiles;
   }
 
+  /**
+   *
+   *
+   */
   private get relativePathesCustom() {
     let customFiles: string[] = this.files.allCustomFiles;
     // console.log('customFiles', customFiles)
-    const customReplacePath = crossPlatofrmPath(path.join(this.project.location, config.folder.custom));
+    const customReplacePath = path.join(this.project.location, config.folder.custom);
     // console.log('customReplacePath', customReplacePath)
 
     customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
@@ -323,17 +314,6 @@ export class BaselineSiteJoin extends FeatureForProject {
       }
     }
 
-    // if (debugMerge.includes(relativeBaselineCustomPath)) {
-    //   const ext = path.extname(joinFilePath)
-    //   console.log('ext',ext)
-    // }
-    // if (this.project.type === 'isomorphic-lib') {
-    // this.handleUsingSelfPathesInAngularLib(joinFilePath)
-    handleUsingBaselineAngularLibInsideSiteIsomorphicLIb(joinFilePath, this.project);
-    // }
-    // }
-
-
     if (isDebugMode) {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
@@ -357,9 +337,10 @@ export class BaselineSiteJoin extends FeatureForProject {
 
   private replacePathFn(relativeBaselineCustomPath: string) {
     return (input) => {
-      input = this.replace(input, relativeBaselineCustomPath).currentFilePath()
-      input = this.replace(input, relativeBaselineCustomPath).baselinePath()
-      input = this.replace(input, relativeBaselineCustomPath).customRelativePathes()
+      input = this.replace(input, relativeBaselineCustomPath).handlePrefixingFilesToEasyOverride();
+      input = this.replace(input, relativeBaselineCustomPath).handleReferingTOAngularLibModulesName();
+      input = this.replace(input, relativeBaselineCustomPath).handleReferingToBaselinePathes();
+      input = this.replace(input, relativeBaselineCustomPath).handleReferingToNewFilesOnlyAvailableInCustom();
       return input;
     }
   }
@@ -372,24 +353,31 @@ export class BaselineSiteJoin extends FeatureForProject {
     if (debuggin) console.log(`relativeBaselineCustomPath: ${relativeBaselineCustomPath}`)
 
     return {
-      normalizePathes() { // TODO
 
-      },
-      customRelativePathes() {
-        self.relativePathesCustom.forEach(f => {
-          if (f != relativeBaselineCustomPath) {
-            let baselineFilePathNoExit = PathHelper.removeExtension(f);
+      /**
+       * Prefixed replacement
+       *
+       * Example:
+       *
+       * Files:
+       * - site: custom/src/example/totaly-new-file.ts
+       * - site:  src/app.ts => is refereing to 'totaly-new-file.ts' which is new file only available in site/custom
+       */
+      handleReferingToNewFilesOnlyAvailableInCustom() {
+        self.relativePathesCustom.forEach(relativePthInCustom => {
+          if (relativePthInCustom !== relativeBaselineCustomPath) {
+            let baselineFilePathNoExit = PathHelper.removeExtension(relativePthInCustom);
 
-            const pathToSiteeFile = crossPlatofrmPath(path.join(self.project.location, baselineFilePathNoExit))
-            const pathToBaselineFile = crossPlatofrmPath(path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit))
+            const pathToSiteeFile = path.join(self.project.location, baselineFilePathNoExit)
+            const pathToBaselineFile = path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit)
 
             if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
               let toReplace = getPrefixedBasename(baselineFilePathNoExit);
 
               baselineFilePathNoExit = getRegexSourceString(baselineFilePathNoExit);
               baselineFilePathNoExit = `\.${PathHelper.removeRootFolder(baselineFilePathNoExit)}`
-              const dirPath = path.dirname(f);
-              toReplace = PathHelper.removeRootFolder(crossPlatofrmPath(path.join(dirPath, toReplace)))
+              const dirPath = path.dirname(relativePthInCustom);
+              toReplace = PathHelper.removeRootFolder(path.join(dirPath, toReplace))
               toReplace = `.${toReplace}`
               // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
               input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
@@ -412,7 +400,7 @@ export class BaselineSiteJoin extends FeatureForProject {
        *  Problem1 : If import `import {..} from 'baseline/exapmle.ts` is included in different files
        * than example.ts it is not going to be excluded
        */
-      currentFilePath() {
+      handlePrefixingFilesToEasyOverride() {
 
 
 
@@ -439,13 +427,61 @@ export class BaselineSiteJoin extends FeatureForProject {
         }
 
         input = input.replace(replaceRegex, `'${replacement}'`);
-        if (debuggin) console.log(`
-        result input:
-        ${input}
+        // if (debuggin) console.log(`
+        // result input:
+        // ${input}
 
 
-        `)
+        // `)
 
+        return input;
+      },
+
+      /**
+       * FIST PROBLEM:
+       * Handle situation when in site you are refering to angular-lib baseline module
+       * ex:
+       * import { Helpers } from 'angular-lib-name/(components/module/browser/dist)/helpers-path'
+       *                                                        <- will be repaled do browser ->
+       *
+       * SECOND PROBLEM:
+       * Handle situation when in site you are refering to angular-lib baseline module
+       * ex:
+       * import { Helpers } from 'baseline-name/angular-lib-name/(components/module/browser/dist)/helpers-path'
+       *                                                        <- will be repaled do browser ->
+       */
+      handleReferingTOAngularLibModulesName() {
+
+        if (self.project.isWorkspaceChildProject) {
+          const angularLibs = self.project.parent.baseline.children
+            .filter(c => c.type === 'angular-lib')
+            .map(c => c.name)
+
+          angularLibs.forEach(angularLibName => {
+            const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+            const reg = new RegExp(regexSourece, 'g')
+
+            if (reg.test(input)) {
+              // console.log('REPLEACEDD  !!!!')
+              input = input.replace(reg,
+                `${angularLibName}/${config.folder.browser}`);
+            }
+          });
+
+          angularLibs.forEach(angularLibName => {
+            const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+            const reg = new RegExp(regexSourece, 'g')
+
+            if (reg.test(input)) {
+              // console.log('REPLEACEDD  !!!!')
+              input = input.replace(reg,
+                `${angularLibName}/${config.folder.browser}`);
+            }
+          });
+
+        }
         return input;
       },
 
@@ -455,8 +491,7 @@ export class BaselineSiteJoin extends FeatureForProject {
        *  - handle situation like in Problem1;
        *  - handle situation when in your custom files you are referening to custom files
        */
-      baselinePath() {
-
+      handleReferingToBaselinePathes() {
 
         const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
 
@@ -477,14 +512,14 @@ export class BaselineSiteJoin extends FeatureForProject {
         let patterns = input.match(new RegExp(baselineRegex, 'g'))
 
 
-        if (debuggin) console.log(`patterns\n`, _.isArray(patterns) && patterns.map(d => `\t${d}`).join('\n'))
+        if (debuggin) console.log(`[baselinepath] recognized patterns\n`, _.isArray(patterns) && patterns.map(d => `\t${d}`).join('\n'))
 
 
         if (Array.isArray(patterns) && patterns.length >= 1) {
           patterns.forEach(pathToReplaceInInput => {
 
             if (debuggin) console.log(`PATTERN IN INPUT ${pathToReplaceInInput}`)
-
+            if (debuggin) console.log(`BASELINE: ${self.pathToBaselineNodeModulesRelative}`);
             let patternWithoutBaselinePart = pathToReplaceInInput
               .replace(self.pathToBaselineNodeModulesRelative, '')
             if (debuggin) console.log(`PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
