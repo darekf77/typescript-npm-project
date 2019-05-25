@@ -211,18 +211,23 @@ export class BaselineSiteJoin extends FeatureForProject {
     }
 
     const callback = (absolutePath, event, isCustomFolder) => {
-      console.log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
+      // console.log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
 
-      if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
-        // console.log(`[baselineSiteJoin] is Directory, exit`)
-        // const relative = absolutePath.replace(this.pathToCustom, '');
-        // const base = absolutePath.replace(relative, '');
-
-        // this.watchFilesAndFolders(
-        //   base,
-        //   [relative], callback)
-        return;
+      if (fse.existsSync(absolutePath)) {
+        if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
+          // console.log(`[baselineSiteJoin] is Directory, exit`)
+          const relative = absolutePath.replace(path.dirname(this.pathToCustom), '').replace(/^\//g, '');
+          const base = absolutePath.replace(relative, '').replace(/\/$/g, '');
+          // console.log(`[baselineSiteJoin] relative`, relative)
+          // console.log(`[baselineSiteJoin] base`, base)
+          this.watchFilesAndFolders(
+            base,
+            [relative], callback)
+          return;
+        }
       }
+
+
 
       if (isCustomFolder) {
         this.merge(absolutePath.replace(this.pathToCustom, ''));
@@ -244,7 +249,11 @@ export class BaselineSiteJoin extends FeatureForProject {
     filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
 
 
-    const isCustomFolder = (customizableFilesOrFolders.filter(f => f === config.folder.custom).length === 1);
+    const isCustomFolder = !_.isUndefined((customizableFilesOrFolders.find(f => {
+      // console.log('isCustomFolder', f)
+      return f.startsWith(config.folder.custom);
+    })));
+    // console.log('Finaly is custom ?', isCustomFolder)
 
     customizableFilesOrFolders.forEach(baselieFileOrFolder => {
       const fileOrFolderPath = path.join(location, baselieFileOrFolder)
