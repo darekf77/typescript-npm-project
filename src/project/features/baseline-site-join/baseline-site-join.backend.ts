@@ -209,9 +209,18 @@ export class BaselineSiteJoin extends FeatureForProject {
     if (this.joinNotAllowed) {
       return;
     }
-    this.monitor((absolutePath, event, isCustomFolder) => {
-      // console.log(`Event: ${chalk.bold(event)} for file ${absolutePath}`)
-      absolutePath = crossPlatofrmPath(absolutePath)
+
+    var callback = (absolutePath, event, isCustomFolder) => {
+      console.log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
+
+      if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
+        console.log(`[baselineSiteJoin] is Directory, exit`)
+
+        this.watchFilesAndFolders(
+          path.dirname(absolutePath),
+          [path.basename(absolutePath)], callback)
+        return
+      }
 
       if (isCustomFolder) {
         this.merge(absolutePath.replace(this.pathToCustom, ''));
@@ -219,7 +228,9 @@ export class BaselineSiteJoin extends FeatureForProject {
         this.merge(absolutePath.replace(this.pathToBaselineAbsolute, ''));
       }
 
-    })
+    }
+
+    this.monitor(callback)
   }
 
   private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
