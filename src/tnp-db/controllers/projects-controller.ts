@@ -39,7 +39,7 @@ export class ProjectsController extends BaseController {
     if (projectInstance.project.isWorkspace && projectInstance.project.staticBuild) {
       const proj = projectInstance.project.StaticVersion;
       if(proj) {
-        console.log(`ADD STATIC ${proj.location}`)
+        // console.log(`ADD STATIC ${proj.location}`)
         this.addIfNotExists(ProjectInstance.from(proj))
       }
     }

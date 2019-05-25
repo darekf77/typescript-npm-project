@@ -210,16 +210,18 @@ export class BaselineSiteJoin extends FeatureForProject {
       return;
     }
 
-    var callback = (absolutePath, event, isCustomFolder) => {
+    const callback = (absolutePath, event, isCustomFolder) => {
       console.log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
 
       if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
-        console.log(`[baselineSiteJoin] is Directory, exit`)
+        // console.log(`[baselineSiteJoin] is Directory, exit`)
+        // const relative = absolutePath.replace(this.pathToCustom, '');
+        // const base = absolutePath.replace(relative, '');
 
-        this.watchFilesAndFolders(
-          path.dirname(absolutePath),
-          [path.basename(absolutePath)], callback)
-        return
+        // this.watchFilesAndFolders(
+        //   base,
+        //   [relative], callback)
+        return;
       }
 
       if (isCustomFolder) {
