@@ -94,8 +94,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
   }
 
   private setParameters(str, ...parameters: string[]) {
-    var args = [].slice.call(arguments, 1),
-      i = 0;
+    var args = [].slice.call(arguments, 1), i = 0;
 
     return str.replace(/%s/g, () => args[i++]);
   }
