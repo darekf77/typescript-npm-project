@@ -4,7 +4,8 @@
 
 <ng-template #create>
   <mat-icon (click)="dialogRef.close()">close</mat-icon>
-  <app-form-wrapper-material *ngIf="crud && crud.entity"
+  MODAL TODO
+  <!-- <app-form-wrapper-material *ngIf="crud && crud.entity"
                              [crud]="crud"
                              [entity]="crud.entity"
                              [(model)]="model"
@@ -12,15 +13,17 @@
                              (complete)="complete($event)"
                              >
 
-  </app-form-wrapper-material>
+  </app-form-wrapper-material> -->
 
 </ng-template>
 
 <mat-spinner *ngIf="isLoading">
 </mat-spinner>
+
 <button mat-min-fab
         (click)="createDialog()">+</button>
 <mat-nav-list *ngIf="!isLoading">
+    <!-- <h1>{{ links | json }}</h1> -->
   <mat-list-item *ngFor="let link of links"
                  (click)="open(link)">
     <span matLine> {{link.href}} {{ link.name }}</span>

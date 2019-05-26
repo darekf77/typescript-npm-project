@@ -6,8 +6,9 @@ import { MatCardModule } from '@angular/material/card';
 // local
 import { PreviewListWrapperComponent } from './preview-list-wrapper.component';
 import { routes } from './preview-list-wrapper.routes';
+import { FormWrapperMaterialModule } from 'components';
 import {
-  ListWrapperModule, EditorWrapperModule
+  ListWrapperModule
 } from 'components';
 
 // third part
@@ -33,8 +34,8 @@ Morphi.init({
   imports: [
     CommonModule,
     ListWrapperModule,
-    EditorWrapperModule,
     ...materialModules,
+    FormWrapperMaterialModule,
     RouterModule.forChild(routes)
   ],
   declarations: [PreviewListWrapperComponent],

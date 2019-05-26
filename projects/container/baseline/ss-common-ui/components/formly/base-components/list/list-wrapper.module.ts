@@ -13,6 +13,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // local
 import { ListWrapperComponent } from './list-wrapper.component';
 import { FormWrapperMaterialModule } from '../../form';
+import { FormlyModule } from '@ngx-formly/core';
+import { CLASS } from 'typescript-class-helpers/browser';
 
 const materialModules = [
   MatSelectModule,
@@ -32,6 +34,15 @@ const moduleOther = [
     CommonModule,
     RouterModule,
     FormWrapperMaterialModule,
+    FormlyModule.forRoot({
+      types: [
+        { name: 'listwrapper', component: ListWrapperComponent },
+        { name: CLASS.getName(ListWrapperComponent), component: ListWrapperComponent }
+      ],
+      validationMessages: [
+        { name: 'required', message: 'This field is required' },
+      ],
+    }),
     ...moduleOther,
     ...materialModules
   ],

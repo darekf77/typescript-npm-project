@@ -25,7 +25,12 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
 
   }
 
-
+  get data() {
+    return this.model && _.isArray(this.model.envionments) &&
+      this.model.envionments.map(env => {
+        return { name: env }
+      })
+  }
 
 
 }

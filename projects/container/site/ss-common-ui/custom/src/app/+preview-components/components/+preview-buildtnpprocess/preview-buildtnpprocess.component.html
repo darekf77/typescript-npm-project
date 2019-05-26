@@ -1,15 +1,17 @@
-<div *ngIf="selected">
+<div *ngIf="selected; else loader">
   <app-project-ui [model]="selected"></app-project-ui>
 </div>
 
 <ng-template #loader>
+  <br>
   ..loading model
 </ng-template>
 
 
 <ng-template #menu>
 
-  <app-recrusive-menu [items]="models"
+  <app-recrusive-menu *ngIf="projects"
+                      [items]="projects"
                       [filter]="filter"
                       (selected)="selectProject($event)"></app-recrusive-menu>
 

@@ -8,7 +8,10 @@ import {
 } from 'components';
 import { Router, NavigationEnd } from '@angular/router';
 
-console.log('Stuning asdasdasd');
+import { Log, Level } from 'ng2-logger/browser';
+const log = Log.create('app.component')
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -34,7 +37,9 @@ export class AppComponent extends BaseComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         console.log(event)
-        if (event.url !== this.popupService.currentUrl) {
+        log.i(`[popup set content] event.url`, event.url)
+        log.i(`[popup set content] this.popupService.currentUrl`, this.popupService.currentUrl)
+        if (event.url.slice(0, 2) !== (this.popupService.currentUrl ? this.popupService.currentUrl.slice(0, 2) : void 0)) {
           this.popupService.setContent(void 0, event.url)
         }
       }

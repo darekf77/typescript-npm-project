@@ -19,12 +19,13 @@ const log = Log.create('base formly component')
   selector: 'app-base-formly-component-meta',
   template: ``
 })
-export abstract class BaseFormlyComponent<T = any> extends FieldType
+export abstract class BaseFormlyComponent<T extends DualComponentController = DualComponentController> extends FieldType
   implements OnInit, Partial<DualComponentController<T>>, AfterViewInit {
 
   protected DualComponentController = DualComponentController;
-  public ctrl: DualComponentController;
+  public ctrl: T;
 
+  @Input() mode: 'view'| 'edit' = 'edit';
   @Input() disabled: boolean;
   @Input() required: boolean;
   @Input() label: string;

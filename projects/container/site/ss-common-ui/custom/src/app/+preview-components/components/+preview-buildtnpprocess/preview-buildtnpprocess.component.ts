@@ -38,7 +38,7 @@ export class PreviewBuildtnpprocessComponent extends BaseComponentForRouter
 
 
   @ViewChild('menu') menu: TemplateRef<any>;
-  models: PROJECT[] = [];
+  projects: PROJECT[] = []
   selected: PROJECT;
 
   filter = {
@@ -50,23 +50,27 @@ export class PreviewBuildtnpprocessComponent extends BaseComponentForRouter
 
   async ngOnInit() {
 
+    log.d('[nginit] this.isCalledNgInitAfterInternalRefresh()', this.isCalledNgInitAfterInternalRefresh())
 
-
-    const projects = await PROJECT.getAllForMenu()
+    if (!this.isCalledNgInitAfterInternalRefresh()) {
+      const projects = await PROJECT.getAllForMenu();
+      log.i('[nginit] projects', projects);
+      this.projects = projects;
+    }
 
     // this.models = projects.filter(p => p.name === 'container');
-    log.i('projects', projects);
-    this.models = projects;
+
 
     let { projectLocation } = this.router.routerState.snapshot.root.queryParams;
+    log.i('[nginit] projectLocation', projectLocation)
     if (_.isString(projectLocation)) {
       projectLocation = decodeURIComponent(projectLocation);
-      const selected = projects.find(p => p.location === projectLocation);
+      const selected = this.projects.find(p => p.location === projectLocation);
       if (selected) {
         this.selected = selected;
         await selected.updaetAndGetProceses()
       }
-      // log.i('set from query params', projectLocation)
+      log.i('[nginit] this.selected', this.selected)
     }
 
   }

@@ -74,6 +74,36 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
 
   dialogRefDelete: MatDialogRef<any>;
 
+
+  async ngOnInit() {
+    log.i('[formwarpper] this.fields before anyting from input', this.fields)
+
+    // console.log('model', this.model);
+    // log.i(`CRUD`, this.crud);
+    if (!this.entity && this.crud && this.crud.entity) {
+      this.entity = this.crud.entity;
+    }
+    if (!this.entity && _.isObject(this.model)) {
+      const ob = _.isArray(this.model) ? _.first(this.model) : this.model;
+      this.entity = CLASS.getFromObject(ob)
+    }
+    log.i('[formwarpper] this.fields before resolve from input', this.fields)
+    this.resolveFields();
+
+    this.formly.options = this.options;
+    this.formly.form = this.formGroup ? this.formGroup : this.form;
+    this.setModel(this.model);
+
+
+    if ((!_.isUndefined(this.id))) {
+      const m = await this.crud.getBy(this.id, this.modelDataConfig).received;
+      this.setModel(m.body.json);
+    }
+
+    this.createOrder();
+    log.i('result formly', this.formly);
+  }
+
   waringAboutDecorator() {
     console.error(`
 
@@ -141,33 +171,6 @@ export class FormWrapperMaterialComponent implements OnInit, AfterViewInit {
   }
 
 
-  async ngOnInit() {
-
-    // console.log('model', this.model);
-    // log.i(`CRUD`, this.crud);
-    if (!this.entity && this.crud && this.crud.entity) {
-      this.entity = this.crud.entity;
-    }
-    if (!this.entity && _.isObject(this.model)) {
-      const ob = _.isArray(this.model) ? _.first(this.model) : this.model;
-      this.entity = CLASS.getFromObject(ob)
-    }
-
-    this.resolveFields();
-
-    this.formly.options = this.options;
-    this.formly.form = this.formGroup ? this.formGroup : this.form;
-    this.setModel(this.model);
-
-
-    if ((!_.isUndefined(this.id))) {
-      const m = await this.crud.getBy(this.id, this.modelDataConfig).received;
-      this.setModel(m.body.json);
-    }
-
-    this.createOrder();
-    log.i('result formly', this.formly);
-  }
 
   createOrder() {
 

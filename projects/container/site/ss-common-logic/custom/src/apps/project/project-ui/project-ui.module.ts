@@ -24,6 +24,7 @@ import {
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
 import { ProcessLoggerModule } from 'baseline/ss-common-logic/src/apps/process/process-logger';
+import { ListWrapperModule } from 'baseline/ss-common-ui/components/formly/base-components/list';
 
 const angularModules = [
   CommonModule,
@@ -54,11 +55,12 @@ const stepperItemsComponents = [
 const componentsLocal = [
   ...stepperItemsComponents,
   TnpProjectComponent,
-  BuildTnpProcessComponent
+  BuildTnpProcessComponent,
 ];
 
 const baselineModules = [
-  ProcessLoggerModule
+  ProcessLoggerModule,
+  ListWrapperModule
 ]
 
 @NgModule({

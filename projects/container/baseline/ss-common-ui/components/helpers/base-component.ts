@@ -20,6 +20,7 @@ export abstract class BaseComponent implements OnDestroy {
 
 }
 
+const isCalledNgInitAfterInternalRefresh = Symbol()
 
 export abstract class BaseComponentForRouter extends BaseComponent {
 
@@ -27,13 +28,21 @@ export abstract class BaseComponentForRouter extends BaseComponent {
     private __router: Router
   ) {
     super();
+    this[isCalledNgInitAfterInternalRefresh] = false;
   }
 
 
-  reloadNgOninitOnUrlChange() {
+  protected isCalledNgInitAfterInternalRefresh() {
+    return !!this[isCalledNgInitAfterInternalRefresh];
+  }
+  protected reloadNgOninitOnUrlChange() {
     this.handlers.push(this.__router.events.subscribe(event => {
       if (event instanceof NavigationEnd && this['ngOnInit']) {
+        this[isCalledNgInitAfterInternalRefresh] = true;
         this['ngOnInit']();
+        if (this[isCalledNgInitAfterInternalRefresh]) {
+          this[isCalledNgInitAfterInternalRefresh] = false;
+        }
       }
     }) as any);
   }
