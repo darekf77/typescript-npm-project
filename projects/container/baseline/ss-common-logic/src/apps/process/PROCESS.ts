@@ -78,7 +78,7 @@ export type PROCESS_STATE =
   }
   //#endregion
 })
-export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessController> {
+export class PROCESS<PARAMS = any> extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessController> {
 
   constructor(options?: { name: string; cmd: string; cwd?: string; async?: boolean }) {
     super()
@@ -93,11 +93,7 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     }
   }
 
-  private setParameters(str, ...parameters: string[]) {
-    var args = [].slice.call(arguments, 1), i = 0;
-
-    return str.replace(/%s/g, () => args[i++]);
-  }
+  parameters: PARAMS;
 
   //#region @backend
   @Morphi.Orm.Column.Custom('varchar', { length: 200, nullable: true })
@@ -242,11 +238,10 @@ export class PROCESS extends Morphi.Base.Entity<PROCESS, IPROCESS, IProcessContr
     return this._files('exitCodePath', 'exitcode')
   }
 
-  async start(...parameters: string[]) {
+  async start() {
     this.cmdOrg = this.cmd;
-    this.cmd = this.setParameters(this.cmd, ...parameters);
     this.tempState = 'inProgressOfStarting';
-    let data = await this.ctrl.start(this.id, this.modelDataConfig).received;
+    let data = await this.ctrl.start(this.id, this.modelDataConfig, this.parameters).received;
     this._allProgressData = void 0;
     this._stder = void 0;
     this._stdout = void 0;

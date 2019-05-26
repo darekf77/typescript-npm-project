@@ -68,7 +68,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
 
     await this.assignProc(project, db, 'procStaticBuild', {
       // cmd: 'tnp build:dist',
-      cmd: 'tnp show:loop:messages --max 6',
+      cmd: 'tnp staticbuild --env={env} ',
       cwd: project.location,
       async: true,
       name: `Static Build of project ${project.name}`

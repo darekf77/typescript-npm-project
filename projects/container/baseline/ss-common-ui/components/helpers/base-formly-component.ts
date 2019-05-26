@@ -12,7 +12,7 @@ import { Log, Level } from 'morphi/log';
 import { DualComponentController } from './dual-component-ctrl';
 import { EventEmitter } from '@angular/core';
 
-const log = Log.create('base formly component')
+const log = Log.create('base formly component', Level.__NOTHING)
 
 
 @Component({
@@ -25,7 +25,7 @@ export abstract class BaseFormlyComponent<T extends DualComponentController = Du
   protected DualComponentController = DualComponentController;
   public ctrl: T;
 
-  @Input() mode: 'view'| 'edit' = 'edit';
+  @Input() mode: 'view' | 'edit' = 'edit';
   @Input() disabled: boolean;
   @Input() required: boolean;
   @Input() label: string;

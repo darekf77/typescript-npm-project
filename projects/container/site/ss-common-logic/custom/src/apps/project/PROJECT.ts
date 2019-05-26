@@ -6,6 +6,7 @@ import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 import { Log } from 'ng2-logger';
 export { IProject } from 'tnp-bundle';
 import { IProject } from 'tnp-bundle';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const log = Log.create('PROJECT')
 
@@ -43,8 +44,20 @@ export interface IPROJECT extends IProject {
   //#endregion
 })
 export class PROJECT extends Project {
-  selectedIndex = 0;
+
+
+  set selectedIndex(v: number) {
+    this._selectedIndex = v;
+    this.selectedTabChanged.next(v)
+  }
+
+  get selectedIndex() {
+    return this._selectedIndex;
+  }
+
+  private _selectedIndex = 0;
   selectedEnv: string;
+  selectedTabChanged = new BehaviorSubject<number>(0)
   procStaticBuild?: PROCESS;
   procWatchBuild?: PROCESS;
   procInitEnv?: PROCESS;

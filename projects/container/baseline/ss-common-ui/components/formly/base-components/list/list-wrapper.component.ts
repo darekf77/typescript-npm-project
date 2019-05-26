@@ -12,7 +12,7 @@ import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/compo
 import { CLASS } from 'typescript-class-helpers/browser';
 import * as _ from 'lodash';
 
-const log = Log.create('List wrapper components');
+const log = Log.create('List wrapper components', Level.__NOTHING);
 
 export interface CRUDListWrapperLink {
   href?: string;

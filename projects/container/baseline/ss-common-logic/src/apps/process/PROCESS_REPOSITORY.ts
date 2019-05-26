@@ -7,9 +7,10 @@ import * as fse from 'fs-extra';
 import { run, TnpDB, killProcess, Project } from 'tnp-bundle';
 import * as child from 'child_process';
 import { Morphi } from 'morphi';
-import * as psList  from 'ps-list';
+import * as psList from 'ps-list';
 import { ProcessDescriptor } from 'ps-list'
 import { PROCESS } from './PROCESS';
+import { Helpers } from '../../helpers';
 
 export interface PROCESS_ALIASES {
   process: string;
@@ -42,10 +43,17 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
     rimraf.sync(proc.stderLogPath)
     rimraf.sync(proc.exitCodePath)
 
+    const COMMAND_TO_EXECUTE = proc.parameters ? Helpers
+      .interpolateString(proc.cmd)
+      .withParameters(proc.parameters)
+      : proc.cmd;
+
+    console.log(`COMMAND_TO_EXECUTE: ${COMMAND_TO_EXECUTE}`)
+
     if (proc.isSync) {
 
       try {
-        var stdout = child.execSync(proc.cmd, { cwd: proc.cwd })
+        var stdout = child.execSync(COMMAND_TO_EXECUTE, { cwd: proc.cwd })
         fse.writeFileSync(proc.exitCodePath, (0).toString())
       } catch (err) {
         fse.writeFileSync(proc.exitCodePath, (((err && _.isNumber(err.status)) ? err.status : 1)).toString())
@@ -55,7 +63,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
       fse.writeFileSync(proc.stdoutLogPath, !stdout ? '' : stdout);
       fse.writeFileSync(proc.stderLogPath, !stderr ? '' : stderr);
     } else {
-      var p = run(proc.cmd, { cwd: proc.cwd, output: false }).async()
+      var p = run(COMMAND_TO_EXECUTE, { cwd: proc.cwd, output: false }).async()
       // console.log(`PROCESS STARTED ON PID: ${p.pid}`)
       proc.pid = p.pid;
       proc.previousPid = p.pid;

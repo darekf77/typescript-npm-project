@@ -9,7 +9,7 @@ import {
 import { Router, NavigationEnd } from '@angular/router';
 
 import { Log, Level } from 'ng2-logger/browser';
-const log = Log.create('app.component')
+const log = Log.create('app.component', Level.__NOTHING)
 
 
 @Component({
@@ -36,7 +36,7 @@ export class AppComponent extends BaseComponent implements OnInit {
 
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        console.log(event)
+        // console.log(event)
         log.i(`[popup set content] event.url`, event.url)
         log.i(`[popup set content] this.popupService.currentUrl`, this.popupService.currentUrl)
         if (event.url.slice(0, 2) !== (this.popupService.currentUrl ? this.popupService.currentUrl.slice(0, 2) : void 0)) {

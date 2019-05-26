@@ -9,12 +9,14 @@ import { Project } from 'tnp-bundle'
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
+import { Helpers } from '../../helpers';
 //#endregion
 
 import { PROGRESS_DATA } from 'tnp-bundle'
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 import { PROCESS } from './PROCESS';
+
 
 
 export interface IProcessController extends ProcessController { }
@@ -33,10 +35,22 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
 
 
   @Morphi.Http.GET('/start/:id')
-  start(@Morphi.Http.Param.Path('id') id: number, @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS> {
+  start(
+    @Morphi.Http.Param.Path('id') id: number,
+    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig,
+    @Morphi.Http.Param.Query('parameters') parameters?: Object,
+  ): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      let res = await this.db.PROCESS.start(await this.db.PROCESS.findOne(id));
+      const proc = await this.db.PROCESS.findOne(id);
+      if (_.isObject(parameters) && !_.isArray(parameters)) {
+        proc.parameters = parameters;
+        console.log(`[process] Parameters are set ${parameters}`)
+      } else {
+        console.log(`[process] Parameters is not a object ${parameters}`)
+      }
+
+      let res = await this.db.PROCESS.start(proc);
       res.modelDataConfig = config as any;
       return () => res;
     }
