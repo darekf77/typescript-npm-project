@@ -67,7 +67,10 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         })
         // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
       } else if (project.isWorkspaceChildProject) {
-        this.browserCompilations = [];
+
+        if (!_.isUndefined(project.parent.children.find(c => config.appTypes.includes(c.type)))) {
+          this.browserCompilations = [];
+        }
       }
 
       // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)

@@ -140,6 +140,11 @@ export const config = {
       'workspace'
     ] as LibType[]
   },
+  appTypes: [
+    'angular-client',
+    'angular-lib',
+    'ionic-client'
+  ] as LibType[],
   libsTypes: [
     'workspace',
     'docker',
