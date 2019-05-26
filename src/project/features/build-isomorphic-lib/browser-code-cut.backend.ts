@@ -8,6 +8,7 @@ import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
 import { error } from '../../../helpers';
 
 
+
 export class ExtendedCodeCut extends CodeCut {
 
   constructor(protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended) {
@@ -20,6 +21,8 @@ export class ExtendedCodeCut extends CodeCut {
 const customReplacement = '@customReplacement';
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {
+
+  // private debugging = false;
 
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
@@ -68,11 +71,20 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const base = path.basename(absoluteFilePath)
       .replace(/\.(component|module)\.ts$/, '');
 
+    // if () {
+    //   console.log('HEHEHHEHEH', absoluteFilePath)
+    // }
+
+    // this.debugging = !!~absoluteFilePath.search('process-info-message.component')
+    // this.debugging && console.log(absoluteFilePath)
+
     content = this.replaceHtmlTemplateInComponent(dir, base, content)
     content = this.replaceCssInComponent(dir, base, content)
     content = this.replaceSCSSInComponent(dir, base, content, 'scss', absoluteFilePath)
     content = this.replaceSCSSInComponent(dir, base, content, 'sass', absoluteFilePath)
-
+    // if (this.debugging) {
+    //   process.exit(0)
+    // }
 
     if (useBackupFile) {
       fse.writeFileSync(absoluteFilePath, content, { encoding: 'utf8' })
@@ -86,7 +98,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(htmlTemplatePath)) {
       const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
       // console.log(`regex: ${regex}`)
-      let replacement =  fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
+      let replacement = fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
@@ -125,16 +137,24 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath) {
 
     const scssFilePath = path.join(dir, `${base}.component.${ext}`);
+    // this.debugging && console.log(`(${ext}) scssFilePath`, scssFilePath)
     if (fse.existsSync(scssFilePath)) {
       const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' }).toString()
+      // this.debugging && console.log(`content of file:\n${contentScss}`)
       let replacement = '';
       if (contentScss.trim() !== '') {
         try {
           const compiled = sass.renderSync({
-            data: contentScss
+            data: contentScss,
           })
           replacement = compiled.css;
+          replacement = _.isObject(replacement) ? replacement.toString() : replacement;
+          // this.debugging && console.log('compiled', compiled)
+          // this.debugging && console.log('compiled.css', compiled.css)
+          // this.debugging && console.log('typeof compiled.css', typeof compiled.css)
+          // this.debugging && console.log('compiled.css.toString', compiled.css.toString())
         } catch (e) {
+          // this.debugging && console.log('erorororor', e);
           // error(error, true, true);
           error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
         }
