@@ -33,7 +33,6 @@ const moduleOther = [
   imports: [
     CommonModule,
     RouterModule,
-    FormWrapperMaterialModule,
     FormlyModule.forRoot({
       types: [
         { name: 'listwrapper', component: ListWrapperComponent },

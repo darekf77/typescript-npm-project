@@ -43,7 +43,8 @@ export interface IPROJECT extends IProject {
   //#endregion
 })
 export class PROJECT extends Project {
-
+  selectedIndex = 0;
+  selectedEnv: string;
   procStaticBuild?: PROCESS;
   procWatchBuild?: PROCESS;
   procInitEnv?: PROCESS;

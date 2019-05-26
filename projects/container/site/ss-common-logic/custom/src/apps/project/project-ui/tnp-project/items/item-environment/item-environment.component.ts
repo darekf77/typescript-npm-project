@@ -21,15 +21,21 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
 
   entity = PROJECT;
   async ngOnInit() {
-
-
+    await this.model.updateEndGetEnvironments();
   }
 
   get data() {
-    return this.model && _.isArray(this.model.envionments) &&
-      this.model.envionments.map(env => {
-        return { name: env }
-      })
+    if (!this.model || !_.isArray(this.model.envionments)) {
+      return void 0;
+    }
+    return this.model.envionments.map(env => {
+      return {
+        name: env, action: ({name}) => {
+          this.model.selectedEnv = name;
+          this.model.selectedIndex += 1;
+        }
+      }
+    });
   }
 
 

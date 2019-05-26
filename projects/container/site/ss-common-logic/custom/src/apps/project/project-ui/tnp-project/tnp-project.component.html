@@ -20,11 +20,14 @@
 
     <mat-horizontal-stepper [linear]="true"
                             *ngIf="model && model.isWorkspace"
+                            [selectedIndex]="model.selectedIndex"
                             (selectionChange)="selectionChange($event)"
                             #stepper="matHorizontalStepper">
       <mat-step [stepControl]="environmentFormGroup">
 
-        <ng-template matStepLabel><span [ngClass]="ngClass(0)">ENVIRONMENT</span></ng-template>
+        <ng-template matStepLabel><span [ngClass]="ngClass(0)">
+            ENVIRONMENT {{model.selectedEnv ? ('('+model.selectedEnv+')'):''  }}
+          </span></ng-template>
         <app-item-environment [model]="model"
                               [formGroup]="environmentFormGroup"></app-item-environment>
 

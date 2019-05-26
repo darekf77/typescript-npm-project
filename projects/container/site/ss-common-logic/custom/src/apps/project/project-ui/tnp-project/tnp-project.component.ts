@@ -22,7 +22,7 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
   }
 
   expandedChild: string;
-  selectedIndex = 0;
+
   showChildren = false;
   @Output() opened = new EventEmitter();
   @Output() closed = new EventEmitter();
@@ -54,17 +54,17 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
   ngClass(index: number) {
     if (this.model.isWorkspace) {
       return {
-        'bold': (this.selectedIndex === index)
+        'bold': (this.model.selectedIndex === index)
       };
     }
     return {
-      'bold': (this.selectedIndex === index - 1)
+      'bold': (this.model.selectedIndex === index - 1)
     };
   }
 
   async selectionChange(e: StepperSelectionEvent) {
-    this.selectedIndex = e.selectedIndex;
-    if (this.selectedIndex === 0) {
+    this.model.selectedIndex = e.selectedIndex;
+    if (this.model.selectedIndex === 0) {
       await this.model.updateEndGetEnvironments()
     }
   }

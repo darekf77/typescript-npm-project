@@ -1,8 +1,12 @@
 <!-- <app-process-logger [model]="model"></app-process-logger> -->
-<ul>
-  <li *ngFor="let env of model.envionments" >{{env}} </li>
+<!-- <ul>
+  <li *ngFor="let env of model.envionments">{{env}} </li>
 </ul>
-<!--
-<mat-card>
-  <app-list-wrapper [data]="data" ></app-list-wrapper>
-</mat-card> -->
+{{ data | json }} -->
+
+
+<ng-template #loading>
+  ...loading environments
+</ng-template>
+<app-list-wrapper *ngIf="data; else loading"
+                  [data]="data"></app-list-wrapper>

@@ -10,12 +10,16 @@ import { Helpers } from 'morphi/browser/helpers';
 
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
 import { CLASS } from 'typescript-class-helpers/browser';
+import * as _ from 'lodash';
 
 const log = Log.create('List wrapper components');
 
 export interface CRUDListWrapperLink {
-  link: string;
+  href?: string;
+  action?: (data: CRUDListWrapperLink) => void;
   name: string;
+  id?: any;
+  data?: any;
   lock?: boolean;
 }
 
@@ -69,10 +73,10 @@ export class ListWrapperComponent
   }
   isLoading = false;
   @Input() icon = 'info';
-  @Input() links: CRUDListWrapperLink[] = [];
+
   @Input() data: CRUDListWrapperLink[] = [
-    { link: 'http://onet.pl', name: 'Onet' },
-    { link: 'http://google.pl', name: 'Google' }
+    { href: 'http://onet.pl', name: 'Onet' },
+    { href: 'http://google.pl', name: 'Google' }
   ];
   @Input() linkProp = 'href';
   @Input() linkSchema = 'example/:id';
@@ -119,14 +123,20 @@ export class ListWrapperComponent
 
     if (this.crud) {
       // await this.retriveData();
-    } else {
-      this.initLinks(this.ctrl.data);
     }
+    // else {
+    //   this.initLinks(this.ctrl.data);
+    // }
 
   }
 
   open(d: CRUDListWrapperLink) {
-    const link = d.link;
+    console.log('OPEN', d)
+    if (_.isFunction(d.action)) {
+      d.action(d);
+      return;
+    }
+    const link = d.href;
     log.i(`open link: ${link}`);
     if (link && isString(link) && link.trim() !== '') {
       this.router.navigateByUrl(link);
@@ -135,8 +145,7 @@ export class ListWrapperComponent
 
   complete(model) {
     log.i('COMPLETE')
-    this.data.push(model);
-    this.initLinks(this.data);
+    this.ctrl.data.push(model);
     if (this.dialogRef) {
       this.dialogRef.close();
     }
@@ -163,28 +172,32 @@ export class ListWrapperComponent
   //   }
   // }
 
-  initLinks(rows: any[]) {
-
-    log.d('init links this.linkSchema', this.linkSchema);
-    this.links = rows.map(row => {
+  get links(): CRUDListWrapperLink[] {
+    if (!(this.ctrl && this.ctrl.data)) {
+      return [];
+    }
+    // log.d('init links this.linkSchema', this.linkSchema);
+    const links = this.ctrl.data.map(row => {
       if (this.linkSchema) {
-        log.d('interpolated link row', row);
-        const link = interpolateParamsToUrl(row, this.linkSchema);
-        log.d('interpolated link', link);
-        log.d('row', row)
-        log.d('this.linkProp', this.linkProp)
-        log.d('this.nameProp', this.nameProp)
-        const res = { link, name: row[this.nameProp], lock: row[this.lockProp] };
-        log.d('res', res);
+        // log.d('interpolated link row', row);
+        const href = interpolateParamsToUrl(row, this.linkSchema);
+        // log.d('interpolated link', href);
+        // log.d('row', row)
+        // log.d('this.linkProp', this.linkProp)
+        // log.d('this.nameProp', this.nameProp)
+        const res = { href, name: row[this.nameProp], lock: row[this.lockProp], action: row.action };
+        // log.d('res', res);
         return res;
       }
-      log.d('row', row)
-      log.d('this.linkProp', this.linkProp)
-      log.d('this.nameProp', this.nameProp)
-      return { link: row[this.linkProp], name: row[this.nameProp] };
+      // log.d('row', row)
+      // log.d('this.linkProp', this.linkProp)
+      // log.d('this.nameProp', this.nameProp)
+      return { href: row[this.linkProp], name: row[this.nameProp], action: row.action };
     });
-    log.i('links', this.links);
+    // log.i('links', links);
+    return links;
   }
+
 
   createDialog() {
     // this.model = {};
