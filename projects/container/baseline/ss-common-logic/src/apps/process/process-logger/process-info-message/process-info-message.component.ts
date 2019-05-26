@@ -19,7 +19,7 @@ import { ResizeService } from 'ss-common-ui/module/helpers';
 @Component({
   selector: 'app-process-info-message',
   templateUrl: './process-info-message.component.html',
-  styleUrls: ['./process-info-message.component.scss'],
+  styleUrls: ['process-info-message.component.scss'],
 })
 export class ProcessInfoMessageComponent extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
 
