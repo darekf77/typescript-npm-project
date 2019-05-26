@@ -80,8 +80,8 @@ export namespace HelpersLinks {
 
 
     rimraf.sync(link);
-    log(`target ${target}`)
-    log(`link ${link}`)
+    // log(`target ${target}`)
+    // log(`link ${link}`)
     fse.symlinkSync(target, link)
   }
 

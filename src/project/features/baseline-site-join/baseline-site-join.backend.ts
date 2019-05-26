@@ -261,7 +261,7 @@ export class BaselineSiteJoin extends FeatureForProject {
         error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`)
       }
       if (fs.statSync(fileOrFolderPath).isDirectory()) {
-        console.log(`Monitoring directory: ${fileOrFolderPath} `)
+        // console.log(`Monitoring directory: ${fileOrFolderPath} `)
         watch.watchTree(fileOrFolderPath, (f, curr, prev) => {
           if (typeof f == "object" && prev === null && curr === null) {
             // Finished walking the tree
@@ -275,7 +275,7 @@ export class BaselineSiteJoin extends FeatureForProject {
           }
         })
       } else {
-        console.log(`Monitoring file: ${fileOrFolderPath} `)
+        // console.log(`Monitoring file: ${fileOrFolderPath} `)
         fs.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
           // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
           filesEventCallback(fileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', isCustomFolder)
