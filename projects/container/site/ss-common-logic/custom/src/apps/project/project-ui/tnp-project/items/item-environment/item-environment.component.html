@@ -10,3 +10,12 @@
 </ng-template>
 <app-list-wrapper *ngIf="data; else loading"
                   [data]="data"></app-list-wrapper>
+
+<form [formGroup]="formGroup">
+
+  <input [(ngModel)]="model.selectedEnv"
+         formControlName="hidden"
+         type="hidden"
+         required>
+
+</form>

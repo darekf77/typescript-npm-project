@@ -71,11 +71,19 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
 
   async ngOnInit() {
     // if (this.model && this.model.isWorkspace) {
-    this.environmentFormGroup = this.formBuilder.group({});
+    this.environmentFormGroup = this.formBuilder.group({
+      hidden: ['', Validators.required]
+    });
     // }
-    this.buildFormGroup = this.formBuilder.group({});
-    this.testFormGroup = this.formBuilder.group({});
-    this.serveFormGroup = this.formBuilder.group({});
+    this.buildFormGroup = this.formBuilder.group({
+      // hidden: ['', Validators.required]
+    });
+    this.testFormGroup = this.formBuilder.group({
+      // hidden: ['', Validators.required]
+    });
+    this.serveFormGroup = this.formBuilder.group({
+      // hidden: ['', Validators.required]
+    });
 
     if (!this.model.isWorkspace) {
       this.showChildren = true;

@@ -19,23 +19,43 @@ const log = Log.create('item-environment.componetn');
 })
 export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildComponent implements OnInit {
 
-  entity = PROJECT;
-  async ngOnInit() {
-    await this.model.updateEndGetEnvironments();
+  tabNumber() {
+    return 0;
   }
+
+  async formValueChanged() {
+    if (this.model.selectedEnv) {
+      setTimeout(() => {
+        this.model.selectedIndex += 1;
+      })
+    }
+  }
+
+  async tabSelectedAction() {
+    this.model.selectedEnv = void 0;
+    await this.model.updateEndGetEnvironments();
+    if (this.model.procStaticBuild.state !== 'notStarted') {
+      this.model.selectedIndex += 1;
+    }
+  }
+  entity = PROJECT;
 
   get data() {
     if (!this.model || !_.isArray(this.model.envionments)) {
       return void 0;
     }
-    return this.model.envionments.map(env => {
-      return {
-        name: env, action: ({name}) => {
-          this.model.selectedEnv = name;
-          this.model.selectedIndex += 1;
+    return this.model.envionments
+      .filter(env => env !== 'local')
+      .map(env => {
+        return {
+          name: env, action: ({ name }) => {
+            setTimeout(() => {
+              this.model.selectedEnv = name;
+            })
+
+          }
         }
-      }
-    });
+      })
   }
 
 

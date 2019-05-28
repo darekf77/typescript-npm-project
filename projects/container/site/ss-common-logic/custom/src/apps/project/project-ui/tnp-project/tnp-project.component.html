@@ -33,7 +33,7 @@
 
 
       </mat-step>
-      <mat-step [stepControl]="buildFormGroup">
+      <mat-step [stepControl]="buildFormGroup"  >
         <ng-template matStepLabel> <span [ngClass]="ngClass(1)">BUILD</span></ng-template>
         <app-item-build [model]="model"
                         [formGroup]="buildFormGroup"></app-item-build>

@@ -1,7 +1,7 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material';
 import { PROJECT } from '../../../PROJECT';
@@ -11,20 +11,41 @@ import { BaseComponent } from 'baseline/ss-common-ui/components/helpers';
   selector: 'app-base-item-stepper-process-build',
   template: ''
 })
-export class BaseItemStepperProcessBuildComponent extends BaseComponent implements OnInit {
+export abstract class BaseItemStepperProcessBuildComponent extends BaseComponent implements OnInit {
 
-  @Input() formGroup: FormGroup = new FormGroup({});
+  @Input() formGroup: FormGroup;
   @Input() model: PROJECT;
+
+  abstract tabNumber(): number;
+
+  abstract async tabSelectedAction(tabIndex?: number);
+
+  abstract async formValueChanged();
 
   fields: FormlyFieldConfig[];
 
+
+
   constructor(
 
-
+    private _formBuilder: FormBuilder,
     public matDialog: MatDialog) {
-      super()
+    super()
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+
+    const h = this.model.selectedTabChanged.subscribe(tabNum => {
+      if (tabNum === this.tabNumber()) {
+        this.tabSelectedAction && this.tabSelectedAction(tabNum)
+      }
+    });
+    this.handlers.push(h as any);
+
+    this.handlers.push(this.formGroup.valueChanges.subscribe(() => {
+      this.formValueChanged && this.formValueChanged();
+    }) as any)
+
+  }
 
 }

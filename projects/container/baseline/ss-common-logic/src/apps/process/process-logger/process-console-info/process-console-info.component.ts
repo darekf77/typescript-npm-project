@@ -5,8 +5,8 @@ import {
 } from '@angular/core';
 import { PROCESS } from '../../PROCESS';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from 'ss-common-ui/module/helpers';
-import { ResizeService } from 'ss-common-ui/module/helpers';
+import { BaseComponent } from 'ss-common-ui/components/helpers';
+import { ResizeService } from 'ss-common-ui/components/helpers';
 
 @Component({
   selector: 'app-process-console-info',
@@ -41,6 +41,9 @@ export class ProcessConsoleInfoComponent extends BaseComponent
     }, 100);
   }
 
+  clear(consoleContent: string) {
+    return consoleContent.replace(/(?:\r\n|\r|\n)/g, '<br>');
+  }
 
   ngOnInit() {
 

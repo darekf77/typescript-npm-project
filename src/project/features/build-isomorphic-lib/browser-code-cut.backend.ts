@@ -95,42 +95,48 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   private replaceHtmlTemplateInComponent(dir, base, content) {
     const htmlTemplatePath = path.join(dir, `${base}.component.html`);
+    let replacement = ` <!-- File ${base}.component.html  does not exist -->`
     if (fse.existsSync(htmlTemplatePath)) {
-      const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
+
       // console.log(`regex: ${regex}`)
-      let replacement = fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
+      replacement = fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
         <!-- Put your html here -->
         `;
       }
-
-      content = content.replace(
-        new RegExp(regex,
-          'g'),
-        'template: \`\n' + replacement + '\n\`')
     }
+    const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
+    content = content.replace(
+      new RegExp(regex,
+        'g'),
+      'template: \`\n' + replacement + '\n\`')
+
     return content;
   }
 
   private replaceCssInComponent(dir, base, content) {
     const cssFilePath = path.join(dir, `${base}.component.css`);
+    let replacement = `
+      /* file ${base}.component.css does not exist */
+    `;
     if (fse.existsSync(cssFilePath)) {
-      const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(cssFilePath)}\s*(\\'|\\")\\s*\\]`;
+
       // console.log(`regex: ${regex}`)
-      let replacement = fse.readFileSync(cssFilePath, { encoding: 'utf8' }).toString()
+      replacement = fse.readFileSync(cssFilePath, { encoding: 'utf8' }).toString()
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        // put your styles here
+        /* put your styles here */
         `;
       }
-
-      content = content.replace(
-        new RegExp(regex,
-          'g'),
-        'styles: [\`\n' + replacement + '\n\`]')
     }
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(cssFilePath)}\s*(\\'|\\")\\s*\\]`;
+    content = content.replace(
+      new RegExp(regex,
+        'g'),
+      'styles: [\`\n' + replacement + '\n\`]')
+
     return content;
   }
 
@@ -138,10 +144,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     const scssFilePath = path.join(dir, `${base}.component.${ext}`);
     // this.debugging && console.log(`(${ext}) scssFilePath`, scssFilePath)
+    let replacement = `
+    /* file ${base}.component.${ext} does not exist */
+  `;
     if (fse.existsSync(scssFilePath)) {
       const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' }).toString()
       // this.debugging && console.log(`content of file:\n${contentScss}`)
-      let replacement = '';
+
       if (contentScss.trim() !== '') {
         try {
           const compiled = sass.renderSync({
@@ -162,17 +171,18 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        // put your styles here
+        /* put your styles here */
         `;
       }
-
-      const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;
-      // console.log(`regex: ${regex}`)
-      content = content.replace(
-        new RegExp(regex,
-          'g'),
-        'styles: [\`\n' + replacement + '\n\`]')
     }
+
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;
+    // console.log(`regex: ${regex}`)
+    content = content.replace(
+      new RegExp(regex,
+        'g'),
+      'styles: [\`\n' + replacement + '\n\`]')
+
     return content;
   }
 

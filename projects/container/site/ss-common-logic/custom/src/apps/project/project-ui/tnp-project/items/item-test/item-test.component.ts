@@ -14,6 +14,18 @@ import { PROJECT } from '../../../../PROJECT';
 export class ItemTestComponent  extends BaseItemStepperProcessBuildComponent  implements OnInit {
 
 
+  tabSelectedAction() {
+
+  }
+
+
+  async formValueChanged() {
+
+  }
+
+  tabNumber() {
+    return void 0;
+  }
   ngOnInit() {
   }
 
