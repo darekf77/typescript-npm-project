@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
@@ -29,6 +29,7 @@ export abstract class BaseItemStepperProcessBuildComponent extends BaseComponent
   constructor(
 
     private _formBuilder: FormBuilder,
+    protected cd: ChangeDetectorRef,
     public matDialog: MatDialog) {
     super()
   }

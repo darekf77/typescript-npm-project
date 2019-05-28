@@ -13,9 +13,9 @@
 
 <form [formGroup]="formGroup">
 
-  <input [(ngModel)]="model.selectedEnv"
+  <input matInput
+         [(ngModel)]="model.selectedEnv"
          formControlName="hidden"
-         type="hidden"
          required>
 
 </form>

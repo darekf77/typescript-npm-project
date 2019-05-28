@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProcessConsoleInfoComponent } from './process-console-info.component';
+import { ResizeService } from 'ss-common-ui/module/helpers';
 
 @NgModule({
   imports: [
@@ -9,6 +10,7 @@ import { ProcessConsoleInfoComponent } from './process-console-info.component';
   exports: [
     ProcessConsoleInfoComponent
   ],
-  declarations: [ProcessConsoleInfoComponent]
+  declarations: [ProcessConsoleInfoComponent],
+  providers: [ResizeService],
 })
 export class ProcessConsoleInfoModule { }

@@ -27,8 +27,8 @@ export class ProcessConsoleInfoComponent extends BaseComponent
   @HostBinding('style.height.px') height = 190;
 
 
-
-  constructor(private elemetRef: ElementRef, public resizeService: ResizeService) {
+  public resizeService: ResizeService = new ResizeService();
+  constructor(private elemetRef: ElementRef) {
     super();
   }
 

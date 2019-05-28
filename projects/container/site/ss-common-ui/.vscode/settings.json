@@ -17,7 +17,7 @@
     "npm-debug.log*": true,
     ".sass-cache": true,
     ".sourcemaps": true,
-    "components": true,
+    // "components": true,
     "__src": true,
     "__components": true,
     "!custom/src": true,

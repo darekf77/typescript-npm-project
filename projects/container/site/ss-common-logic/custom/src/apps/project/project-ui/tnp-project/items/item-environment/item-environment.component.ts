@@ -19,6 +19,7 @@ const log = Log.create('item-environment.componetn');
 })
 export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildComponent implements OnInit {
 
+  public data = [];
   tabNumber() {
     return 0;
   }
@@ -37,21 +38,23 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
     if (this.model.procStaticBuild.state !== 'notStarted') {
       this.model.selectedIndex += 1;
     }
+    this.data = this.environments;
   }
   entity = PROJECT;
 
-  get data() {
+  get environments() {
     if (!this.model || !_.isArray(this.model.envionments)) {
-      return void 0;
+      return [];
     }
     return this.model.envionments
       .filter(env => env !== 'local')
       .map(env => {
         return {
           name: env, action: ({ name }) => {
-            setTimeout(() => {
-              this.model.selectedEnv = name;
-            })
+            // setTimeout(() => {
+            this.model.selectedEnv = name;
+            this.cd.detectChanges()
+            // })
 
           }
         }

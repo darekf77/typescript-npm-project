@@ -11,6 +11,7 @@ import { BuildDir, LibType } from '../../models';
 import { config } from '../../config';
 import { error } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
+import { PROGRESS_DATA } from '../../progress-output';
 
 
 export class BuildProcess extends FeatureForProject {
@@ -73,6 +74,10 @@ export class BuildProcess extends FeatureForProject {
     this.mergeNpmPorject()
 
     const { watch, appBuild, args } = buildOptions;
+
+    if(!watch) {
+      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` })
+    }
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
       if (appBuild) {
