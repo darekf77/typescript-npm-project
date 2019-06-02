@@ -261,9 +261,8 @@ export abstract class BaseProject {
     }
     //#region @backend
     if (this.isContainer) {
-      error(`Baseline for container is not supported`)
-    }
-    if (this.isWorkspace) {
+      error(`Baseline for container is not supported`, true, false)
+    } else if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
       return this.parent && this.parent.baseline && Project.From(path.join(this.parent.baseline.location, this.name));

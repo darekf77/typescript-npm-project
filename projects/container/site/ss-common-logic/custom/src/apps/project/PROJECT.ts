@@ -7,7 +7,7 @@ import { Log } from 'ng2-logger';
 export { IProject } from 'tnp-bundle';
 import { IProject } from 'tnp-bundle';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
+import { CLASS } from 'typescript-class-helpers';
 const log = Log.create('PROJECT')
 
 export interface IPROJECT extends IProject {
@@ -16,6 +16,7 @@ export interface IPROJECT extends IProject {
   procInitEnv?: PROCESS;
   procServeStatic?: PROCESS;
   procClear?: PROCESS;
+  selectedEnv?: string;
 }
 
 @Morphi.Entity<PROJECT>({
@@ -38,13 +39,20 @@ export interface IPROJECT extends IProject {
   //#region @backend
   createTable: false,
   browserTransformFn: (entity: PROJECT) => {
-
+    entity = PROJECT.createFrom(entity);
+    entity.browser.selectedEnv = entity.getProjectEnv()
     return entity;
   }
   //#endregion
 })
 export class PROJECT extends Project {
-
+  static createFrom(obj: any): PROJECT {
+    const classFn: Function = CLASS.getFromObject(obj);
+    if (!classFn) {
+      return obj;
+    }
+    return _.merge(new PROJECT(), obj);
+  }
 
   set selectedIndex(v: number) {
     this._selectedIndex = v;
@@ -57,6 +65,18 @@ export class PROJECT extends Project {
 
   private _selectedIndex = 0;
   selectedEnv: string;
+
+
+  getProjectEnv() {
+    if (Morphi.IsBrowser) {
+      return this.selectedEnv;
+    }
+    //#region @backend
+    return this.env && this.env.config && this.env.config.name;
+    //#endregion
+  }
+
+
   selectedTabChanged = new BehaviorSubject<number>(0)
   procStaticBuild?: PROCESS;
   procWatchBuild?: PROCESS;

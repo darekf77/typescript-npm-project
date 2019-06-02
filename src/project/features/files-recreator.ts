@@ -67,6 +67,7 @@ export class FilesRecreator extends FeatureForProject {
     const self = this;
     return {
       get vscodeSidebarFilesView() {
+        const siteFiles = ['src', 'components'];
         return self.filesIgnoredBy.gitignore.concat([
           '.gitignore',
           '.npmignore',
@@ -74,7 +75,8 @@ export class FilesRecreator extends FeatureForProject {
           '.babelrc'
         ]).map(f => f.startsWith('/') ? f.slice(1) : f)
           .filter(f => {
-            if (self.project.isSite && f === 'src') {
+            // console.log('f',siteFiles)
+            if (self.project.isSite && siteFiles.includes(f)) {
               return false
             }
             return true;
@@ -118,7 +120,7 @@ export class FilesRecreator extends FeatureForProject {
         )
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
-          .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}` ] : [])
+          .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)

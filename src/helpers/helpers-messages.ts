@@ -23,27 +23,44 @@ export function error(details: any, noExit = false, noTrace = false) {
   if (typeof details === 'object') {
     try {
       const json = JSON.stringify(details)
-      if (noTrace) {
-        !global.muteMessages && console.log(chalk.red(json));
+      if (global.tnp_normal_mode) {
+        if (noTrace) {
+          !global.muteMessages && console.log(chalk.red(json));
+        } else {
+          !global.muteMessages && console.trace(chalk.red(json));
+        }
       } else {
-        !global.muteMessages && console.trace(chalk.red(json));
+        console.log(json)
+        return;
       }
 
+
     } catch (error) {
-      if (noTrace) {
-        !global.muteMessages && console.log(details);
+      if (global.tnp_normal_mode) {
+        if (noTrace) {
+          !global.muteMessages && console.log(details);
+        } else {
+          !global.muteMessages && console.trace(details);
+        }
       } else {
-        !global.muteMessages && console.trace(details);
+        console.log(details)
+        return;
       }
     }
   } else {
-    if (noTrace) {
-      !global.muteMessages && console.log(chalk.red(details));
+    if (global.tnp_normal_mode) {
+      if (noTrace) {
+        !global.muteMessages && console.log(chalk.red(details));
+      } else {
+        !global.muteMessages && console.trace(chalk.red(details));
+      }
     } else {
-      !global.muteMessages && console.trace(chalk.red(details));
+      console.log(details)
+      return;
     }
 
   }
+
   if (global[config.message.tnp_normal_mode]) {
     if (!noExit) {
       process.exit(1);
