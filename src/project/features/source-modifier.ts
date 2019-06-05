@@ -7,6 +7,7 @@ import * as glob from 'glob';
 import config from '../../config';
 import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
 import { FeatureCompilerForProject, Project } from '../abstract';
+import { LibType } from '../../models';
 
 
 export interface IsomorphicOptions {
@@ -29,7 +30,7 @@ export class SourceModifier extends FeatureCompilerForProject {
       const workspace = project.parent;
 
       const localIsomorphicLibsNames = workspace.children
-        .filter(c => c.type === 'isomorphic-lib')
+        .filter(c => (['isomorphic-lib', 'angular-lib'] as LibType[]).includes(c.type))
         .map(c => c.name)
 
       const angularLibs = workspace.children
@@ -94,7 +95,7 @@ export class SourceModifier extends FeatureCompilerForProject {
 
     if (isWorkspaceChildProject) {
       let fileContent = file.contents.toString()
-      let orgFileContent = fileContent;
+      const orgFileContent = fileContent;
 
       localIsomorphicLibsNames.forEach(libname => {
         const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')

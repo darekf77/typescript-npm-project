@@ -22,6 +22,7 @@ import {
 } from './baseline-site-join.helpers.backend';
 import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join.debug.backend';
 import { REGEXS } from './baseline-site-join.regexes.backend';
+import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
 //#endregion
 
 
@@ -489,7 +490,7 @@ export class BaselineSiteJoin extends FeatureForProject {
             if (reg.test(input)) {
               // console.log('REPLEACEDD  !!!!')
               input = input.replace(reg,
-                `${angularLibName}/${config.folder.browser}`);
+                `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
             }
           });
 
@@ -501,7 +502,7 @@ export class BaselineSiteJoin extends FeatureForProject {
             if (reg.test(input)) {
               // console.log('REPLEACEDD  !!!!')
               input = input.replace(reg,
-                `${angularLibName}/${config.folder.browser}`);
+                `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
             }
           });
 

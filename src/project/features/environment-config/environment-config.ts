@@ -141,7 +141,7 @@ export class EnvironmentConfig
 
     config.packageJSON = this.project.packageJson.data;
     // config.frameworks = this.project.frameworks;
-    console.log(`this.project.frameworks for ${this.project.genericName}`, this.project.frameworks)
+    // console.log(`this.project.frameworks for ${this.project.genericName}`, this.project.frameworks)
     // process.exit(0)
 
     config.workspace.projects.forEach(p => {

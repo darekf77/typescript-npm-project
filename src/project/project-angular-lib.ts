@@ -57,13 +57,13 @@ export class ProjectAngularLib extends LibProject {
 
 
   private linkDistAsModule(outDir: BuildDir, continueWhenExistedFolderDoesntExists = false) {
-    tryRemoveDir(path.join(this.location, config.folder.module));
-    const inLocationOutDir = path.join(this.location, outDir);
-    const inLocationModuleDir = path.join(this.location, config.folder.module)
-    const inLocationBrowserDir = path.join(this.location, config.folder.browser)
-    // console.log(`Create symlink from: ${inLocationOutDir} to ${inLocationModuleDir}`)
-    HelpersLinks.createSymLink(inLocationOutDir, inLocationModuleDir, { continueWhenExistedFolderDoesntExists });
-    HelpersLinks.createSymLink(inLocationOutDir, inLocationBrowserDir, { continueWhenExistedFolderDoesntExists });
+    // tryRemoveDir(path.join(this.location, config.folder.module));
+    // const inLocationOutDir = path.join(this.location, outDir);
+    // const inLocationModuleDir = path.join(this.location, config.folder.module)
+    // const inLocationBrowserDir = path.join(this.location, config.folder.browser)
+    // // console.log(`Create symlink from: ${inLocationOutDir} to ${inLocationModuleDir}`)
+    // HelpersLinks.createSymLink(inLocationOutDir, inLocationModuleDir, { continueWhenExistedFolderDoesntExists });
+    // HelpersLinks.createSymLink(inLocationOutDir, inLocationBrowserDir, { continueWhenExistedFolderDoesntExists });
   }
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
@@ -95,19 +95,21 @@ export class ProjectAngularLib extends LibProject {
     //     }
     //   }, `angular-lib (project ${this.name})`)
     // }
-    if (!this.isStandaloneProject && forClient.length === 0) {
 
-      while (this.buildOptions.forClient.length === 0) {
+    if (watch) {
+      if (!this.isStandaloneProject && forClient.length === 0) {
 
-        await ProjectIsomorphicLib.selectClients(this.buildOptions, this)
+        while (this.buildOptions.forClient.length === 0) {
+
+          await ProjectIsomorphicLib.selectClients(this.buildOptions, this)
+        }
       }
 
-    }
-    if (watch) {
-
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic angular-lib compilation (watch mode)')
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions))
+        .startAndWatch('isomorphic angular-lib compilation (watch mode)')
     } else {
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic angular-lib compilation')
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions))
+        .start('isomorphic angular-lib compilation')
     }
 
     return this;
@@ -123,15 +125,7 @@ export class ProjectAngularLib extends LibProject {
       if (appBuild) {
         await this.projectAngularClient.buildSteps(buildOptions);
       } else {
-        if (watch) {
-          await this.buildLib(outDir, forClient as Project[], prod, false);
-          if (compileOnce) {
-            return;
-          }
-          await this.buildLib(outDir, forClient as Project[], prod, true)
-        } else {
-          await this.buildLib(outDir, forClient as Project[], prod, false)
-        }
+        await this.buildLib(outDir, forClient as Project[], prod, watch);
       }
     }
 

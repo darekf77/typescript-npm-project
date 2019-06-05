@@ -11,6 +11,19 @@ import { Project } from '../../../project';
 import { warn } from '../../../helpers';
 import { BuildOptions } from '../build-options';
 
+function useDefaultBrowserCompilation(project: Project) {
+  if (project.isStandaloneProject && project.type === 'isomorphic-lib') {
+    return true;
+  }
+  if (project.type === 'isomorphic-lib') {
+    return _.isUndefined(project.parent.children.find(c => {
+      return config.appTypes.includes(c.type);
+    }));
+  }
+  return false;
+}
+
+
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
   private get resolveModulesLocations(): string[] {
@@ -27,14 +40,30 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     return [];
   }
 
-  public static getBrowserVerPath(moduleName: string) {
+  public static getBrowserVerPath(moduleName?: string) {
+    if (!moduleName) {
+      return config.folder.browser;
+    }
     return `${config.folder.browser}-for-${moduleName}`;
   }
 
 
+
   constructor(private project: Project, private buildOptions: BuildOptions) {
 
-    super(buildOptions ? buildOptions.outDir : undefined, config && config.folder.src, project && project.location);
+    super(buildOptions ? buildOptions.outDir : undefined,
+      config && config.folder.src, project && project.location,
+      useDefaultBrowserCompilation(project)
+    );
+
+    // const useDefaultCompilation = useDefaultBrowserCompilation(project)
+    // if (useDefaultCompilation && project.name === 'angular-lib') {
+    //   console.log(project.parent.children.map(c => {
+    //     return { name: c.genericName, type: c.type }
+    //   }))
+    //   process.exit(0)
+    // }
+
 
     const outFolder = buildOptions.outDir;
     const location = project.type === 'isomorphic-lib' ? config.folder.src : config.folder.components;
@@ -59,7 +88,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     } else {
 
-      if (project.isStandaloneProject && !buildOptions.watch) {
+      if (project.type === 'isomorphic-lib' && project.isStandaloneProject && !buildOptions.watch) {
         const browser = _.first(this.browserCompilations)
         browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
           if (f !== 'app.ts') {
@@ -71,17 +100,28 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           return false;
         })
         // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
-      } else if (project.isWorkspaceChildProject) {
+      }
 
-        if (!_.isUndefined(project.parent.children.find(c => config.appTypes.includes(c.type)))) {
-          this.browserCompilations = [];
+
+      if (this.project.type !== 'isomorphic-lib' && project.isStandaloneProject) {
+
+        let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath();
+        if (outFolder === 'bundle') {
+          browserOutFolder = path.join(outFolder, browserOutFolder);
         }
 
+        this.browserCompilations.push(
+          new BroswerForModuleCompilation(void 0, // moduleNmae
+            this.project.env.config,
+            `tmp-src-${outFolder}`,
+            browserOutFolder as any,
+            location,
+            cwd,
+            outFolder)
+        );
+
       }
 
-      if (this.project.type !== 'isomorphic-lib') {
-        this.browserCompilations = [];
-      }
 
       // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
       // console.log('this.resolveModulesLocations', this.resolveModulesLocations)
@@ -104,7 +144,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           )
         })
 
-      console.log('this.browserCompilation', this.browserCompilations.map(c => c.location))
+      // console.log('this.browserCompilation', this.browserCompilations.map(c => c.location))
       // process.exit(0)
     }
   }
