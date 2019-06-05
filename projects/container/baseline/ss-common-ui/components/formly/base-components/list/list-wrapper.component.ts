@@ -3,10 +3,10 @@ import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Morphi, ModelDataConfig } from 'morphi';
 import { Log, Level } from 'ng2-logger';
-import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
+import { interpolateParamsToUrl } from 'ng2-rest/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
-import { Helpers } from 'morphi/browser/helpers';
+import { Helpers } from 'morphi/helpers';
 
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
 import { CLASS } from 'typescript-class-helpers';

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Morphi, ModelDataConfig } from 'morphi';
 
 import { Log, Level } from 'ng2-logger';
-import { Helpers } from 'morphi/browser/helpers';
+import { Helpers } from 'morphi/helpers';
 import { Router } from '@angular/router';
 
 const log = Log.create('Table wrapper');

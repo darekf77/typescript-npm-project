@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 import { Log, Level } from 'ng2-logger';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
-import { Helpers } from 'morphi/browser/helpers';
+import { Helpers } from 'morphi/helpers';
 
 const log = Log.create('preview-form-wrapper');
 

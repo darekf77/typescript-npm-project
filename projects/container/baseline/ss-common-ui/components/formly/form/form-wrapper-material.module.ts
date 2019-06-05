@@ -15,8 +15,8 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
-import { RepeatTypeComponent } from 'morphi/browser/crud/formly-repeat-component';
-import { FormlyHorizontalWrapper } from 'morphi/browser/crud/formly-group-wrapper-component';
+import { RepeatTypeComponent } from 'morphi/crud/formly-repeat-component';
+import { FormlyHorizontalWrapper } from 'morphi/crud/formly-group-wrapper-component';
 
 // custom formly components
 import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/select';
