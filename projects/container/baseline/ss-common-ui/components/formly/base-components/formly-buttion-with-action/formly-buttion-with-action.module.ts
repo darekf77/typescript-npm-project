@@ -1,4 +1,4 @@
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 // angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';

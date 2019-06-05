@@ -11,7 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
 // other
 import { NgxWigModule } from 'ngx-wig';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 
 
 const formlyModules = [

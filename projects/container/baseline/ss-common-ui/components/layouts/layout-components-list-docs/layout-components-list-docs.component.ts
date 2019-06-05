@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, HostListener, Input } from '@angular/
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 import { numValue } from '../../helpers';
 
 const log = Log.create('layout components', Level.__NOTHING);

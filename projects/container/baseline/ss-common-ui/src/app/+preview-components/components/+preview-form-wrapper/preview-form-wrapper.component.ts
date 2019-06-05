@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import * as _ from 'lodash';
-import { Morphi } from 'morphi/browser';
-import { Log, Level } from 'ng2-logger/browser';
+import { Morphi } from 'morphi';
+import { Log, Level } from 'ng2-logger';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 import { Helpers } from 'morphi/browser/helpers';
 

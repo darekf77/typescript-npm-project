@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Component, OnInit } from '@angular/core';
 import { BaseFormlyComponent } from '../../../helpers';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('FormlyButtionWithActionComponent')
 @Component({

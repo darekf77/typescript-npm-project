@@ -1,15 +1,15 @@
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import { times } from 'lodash';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Morphi, ModelDataConfig } from 'morphi/browser';
-import { Log, Level } from 'ng2-logger/browser';
+import { Morphi, ModelDataConfig } from 'morphi';
+import { Log, Level } from 'ng2-logger';
 import { interpolateParamsToUrl } from 'ng2-rest/browser/params';
 import { Router } from '@angular/router';
 import { isString } from 'lodash';
 import { Helpers } from 'morphi/browser/helpers';
 
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 import * as _ from 'lodash';
 
 const log = Log.create('List wrapper components', Level.__NOTHING);

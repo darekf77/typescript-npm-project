@@ -4,10 +4,10 @@ import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { Morphi } from 'morphi/browser';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { Morphi } from 'morphi';
+import { CLASS } from 'typescript-class-helpers';
 const log = Log.create('formly switch');
 
 // @Morphi.Formly.RegisterComponentAsType('FormlySwitchComponent', 'switch')

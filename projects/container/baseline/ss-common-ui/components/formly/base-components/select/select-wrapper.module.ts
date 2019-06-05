@@ -18,7 +18,7 @@ import { FormlyMatToggleModule } from '@ngx-formly/material/toggle';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyMatSliderModule } from '@ngx-formly/material/slider';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 
 
 const angularModules = [

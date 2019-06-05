@@ -4,10 +4,10 @@ import { FieldType } from '@ngx-formly/core';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
 import * as _ from 'lodash';
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('editor wrapper');
-import { Morphi } from 'morphi/browser';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { Morphi } from 'morphi';
+import { CLASS } from 'typescript-class-helpers';
 import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
 
 export class DualComponentControllerExtended extends DualComponentController {

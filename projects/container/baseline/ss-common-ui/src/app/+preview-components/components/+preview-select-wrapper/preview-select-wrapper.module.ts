@@ -13,7 +13,7 @@ import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
-import { Morphi } from 'morphi/browser';
+import { Morphi } from 'morphi';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 // components
 import { FormWrapperMaterialModule } from 'components';

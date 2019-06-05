@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { Morphi, ModelDataConfig } from 'morphi/browser';
+import { Morphi, ModelDataConfig } from 'morphi';
 
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 import { Helpers } from 'morphi/browser/helpers';
 import { Router } from '@angular/router';
 

@@ -7,7 +7,7 @@ import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule, } from '@ngx-formly/material';
 // material
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 
 const angularModules = [
   CommonModule,

@@ -6,7 +6,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // local
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
 import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
-import { ModelDataConfig } from 'morphi/browser';
+import { ModelDataConfig } from 'morphi';
 
 @Component({
   selector: 'app-preprocess-logger',

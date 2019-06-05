@@ -14,7 +14,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ListWrapperComponent } from './list-wrapper.component';
 import { FormWrapperMaterialModule } from '../../form';
 import { FormlyModule } from '@ngx-formly/core';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { CLASS } from 'typescript-class-helpers';
 
 const materialModules = [
   MatSelectModule,

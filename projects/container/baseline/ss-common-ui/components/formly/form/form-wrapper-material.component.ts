@@ -11,9 +11,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 // formly
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 // other
-import { Morphi, ModelDataConfig } from 'morphi/browser';
-import { Log, Level } from 'ng2-logger/browser';
-import { CLASS } from 'typescript-class-helpers/browser';
+import { Morphi, ModelDataConfig } from 'morphi';
+import { Log, Level } from 'ng2-logger';
+import { CLASS } from 'typescript-class-helpers';
 const log = Log.create('form warpper material component');
 
 @Component({
