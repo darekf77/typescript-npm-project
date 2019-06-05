@@ -93,6 +93,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return content;
   }
 
+  private handleTickInCode(replacement: string): string {
+    if (replacement.search('`') !== -1) {
+      console.error(`[browsercodecut] Please dont use tick \` ... `)
+      replacement = replacement.replace(/\`/g, '\\`');
+    }
+    return replacement;
+  }
+
   private replaceHtmlTemplateInComponent(dir, base, content) {
     const htmlTemplatePath = path.join(dir, `${base}.component.html`);
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
@@ -111,7 +119,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'template: \`\n' + replacement + '\n\`')
+      'template: \`\n' + this.handleTickInCode(replacement) + '\n\`')
 
     return content;
   }
@@ -135,7 +143,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'styles: [\`\n' + replacement + '\n\`]')
+      'styles: [\`\n' + this.handleTickInCode(replacement) + '\n\`]')
 
     return content;
   }
@@ -181,7 +189,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'styles: [\`\n' + replacement + '\n\`]')
+      'styles: [\`\n' + this.handleTickInCode(replacement) + '\n\`]')
 
     return content;
   }
