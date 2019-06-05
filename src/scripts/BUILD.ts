@@ -22,7 +22,8 @@ async function buildWatch(args) {
     await Project.Current.buildProcess.startForApp(false, true, 'dist', args)
   }
 }
-
+const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLib(false, true, 'dist', args);
+const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args);
 
 export default {
 
@@ -36,7 +37,12 @@ export default {
     `Build dist version of project library.`],
 
   $BUILD_DIST: [(args) => Project.Current.buildProcess.startForLib(false, false, 'dist', args), `Build dist version of project library.`],
-  $BUILD_DIST_WATCH: (args) => Project.Current.buildProcess.startForLib(false, true, 'dist', args),
+
+  BUILD_DIST_WATCH,
+  BDW: BUILD_DIST_WATCH,
+  BUILD_APP_WATCH,
+  BAW: BUILD_APP_WATCH,
+
   $BUILD_DIST_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, "dist", args),
 
   $BUILD_BUNDLE: (args) => Project.Current.buildProcess.startForLib(false, false, 'bundle', args),
@@ -46,7 +52,6 @@ export default {
   $BUILD_APP_PROD: (args) => Project.Current.buildProcess.startForApp(true, false, 'dist', args),
   $BUILD_APP: (args) => Project.Current.buildProcess.startForApp(false, false, 'dist', args),
 
-  $BUILD_APP_WATCH: (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args),
   $BUILD_APP_WATCH_PROD: (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args),
 
   $START_APP: async (args) => {
