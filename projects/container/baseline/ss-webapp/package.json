@@ -1,7 +1,10 @@
 {
   "tnp": {
     "resources": [],
-    "type": "angular-client"
+    "type": "angular-client",
+    "frameworks": [
+      "bootstrap"
+    ]
   },
   "name": "ss-webapp",
   "version": "0.0.0",

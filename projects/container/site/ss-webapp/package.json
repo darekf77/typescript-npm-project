@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "tnp": {
-    "type": "angular-client"
+    "type": "angular-client",
+    "frameworks": [
+      "bootstrap"
+    ]
   },
   "scripts": {
     "build": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.js",

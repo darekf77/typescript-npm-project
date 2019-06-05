@@ -6,7 +6,7 @@ import * as path from 'path';
 import chalk from "chalk";
 
 import { Project } from "../abstract";
-import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle } from "../../models";
+import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework } from "../../models";
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from "../../helpers";
 import { config } from '../../config';
 //#endregion
@@ -62,6 +62,16 @@ export class PackageJSON {
     if (this.data && this.data.name) {
       return 'unknow-npm-project';
     }
+  }
+
+  get frameworks(): UIFramework[] {
+    const res = this.data.tnp &&
+      _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
+    if (res.filter(f => !config.frameworks.includes(f)).length > 0) {
+      error(`[packagejson][frameworks] Unrecognized  frameworks`
+        + ` in package.json ${JSON.stringify(this.data.tnp.frameworks)}`)
+    }
+    return res;
   }
 
   get name() {

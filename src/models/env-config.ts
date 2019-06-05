@@ -18,12 +18,15 @@ export interface EnvConfigProject {
   //#endregion
 }
 
+export type UIFramework = 'bootstrap' | 'material' | 'ionic';
+
 export interface EnvConfig {
 
   pathes?: any;
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated
+  frameworks: UIFramework[];
   domain?: string;
   dynamicGenIps?: boolean;
   ip?: string | 'localhost';

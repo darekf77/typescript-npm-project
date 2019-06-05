@@ -4,7 +4,11 @@
   "license": "MIT",
   "tnp": {
     "isCoreProject": true,
-    "type": "angular-client"
+    "type": "angular-client",
+    "frameworks": [
+      "material",
+      "bootstrap"
+    ]
   },
   "scripts": {
     "build": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.js",

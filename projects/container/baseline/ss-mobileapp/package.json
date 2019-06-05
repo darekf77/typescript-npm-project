@@ -5,7 +5,10 @@
   "homepage": "http://ionicframework.com/",
   "private": true,
   "tnp": {
-    "type": "ionic-client"
+    "type": "ionic-client",
+    "frameworks": [
+      "ionic"
+    ]
   },
   "scripts": {
     "clean": "npm-run ionic-app-scripts clean",

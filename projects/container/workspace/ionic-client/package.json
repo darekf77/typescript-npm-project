@@ -6,7 +6,10 @@
   "private": true,
   "tnp": {
     "isCoreProject": true,
-    "type": "ionic-client"
+    "type": "ionic-client",
+    "frameworks": [
+      "ionic"
+    ]
   },
   "scripts": {
     "clean": "npm-run ionic-app-scripts clean",

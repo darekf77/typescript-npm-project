@@ -31,7 +31,7 @@ export class ProjectFactory {
     config.libsTypes.forEach(t => {
       console.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
     })
-    error(chalk.red(`Please use example above.`));
+    error(chalk.red(`Please use example above.`), false, true);
   }
 
   private errorMsgCreateSite() {

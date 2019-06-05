@@ -599,7 +599,14 @@ export abstract class BaseProject {
   }
   //#endregion
 
-
+  //#region @backend
+  /**
+   * available frameworks in project
+   */
+  get frameworks() {
+    return this.packageJson.frameworks;
+  }
+  //#endregion
 
   get children(): Project[] {
     if (Morphi.IsBrowser) {
@@ -948,10 +955,10 @@ export abstract class BaseProject {
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.isWorkspaceChildProject) {
-      baseHref = this.env.config &&
-        this.env.config.workspace.projects.find(p => {
-          return p.name === this.name
-        }).baseUrl
+      const proj = this.env.config && this.env.config.workspace.projects.find(p => {
+        return p.name === this.name
+      });
+      baseHref = proj ? proj.baseUrl : void 0
     }
 
     // log(`basehref for current project `, baseHref)

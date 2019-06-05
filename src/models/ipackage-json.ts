@@ -1,5 +1,6 @@
 import { LibType } from './lib-type';
 import { EnvironmentName } from './environment-name';
+import { UIFramework } from './env-config';
 
 export type NpmDependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
   | 'bundleDependencies' | 'bundledDependencies' | 'extensionDependencies'
@@ -44,6 +45,7 @@ export interface IPackageJSON {
   devDependencies?: DependenciesFromPackageJsonStyle;
   tnp: {
     type: LibType;
+    frameworks?: UIFramework[];
     isCoreProject: boolean;
     isCommandLineToolOnly?: boolean;
     useFramework: boolean;

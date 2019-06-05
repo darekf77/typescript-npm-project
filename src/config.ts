@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 
-import { LibType, EnvironmentName } from './models';
+import { LibType, EnvironmentName, UIFramework } from './models';
 
 const allowedEnvironments: EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
 const allowedEnvironmentsObj = {};
@@ -78,6 +78,7 @@ export const config = {
     TEST_TIMEOUT: 3600000
   },
   tnp: 'tnp',
+  frameworks: ['bootstrap', 'ionic', 'material'] as UIFramework[],
   pathes: {
 
     tnp_folder_location: pathResolved(__dirname, '..'),
