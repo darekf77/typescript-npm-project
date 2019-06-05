@@ -11,6 +11,8 @@ import config from "../config";
 import { Project } from './abstract';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
+import { IncrementalBuildProcessExtended } from './features/build-isomorphic-lib';
+import { ProjectIsomorphicLib } from './project-isomorphic-lib';
 
 export class ProjectAngularLib extends LibProject {
 
@@ -47,6 +49,8 @@ export class ProjectAngularLib extends LibProject {
       'ng-package.json',
       'tsconfig-aot.bundle.json',
       'tsconfig-aot.dist.json',
+      "tsconfig.isomorphic.json",
+      "tsconfig.browser.json",
       'src/tsconfig.packages.json'
     ]).concat(this.projectAngularClient.projectSpecyficFiles());
   }
@@ -64,33 +68,48 @@ export class ProjectAngularLib extends LibProject {
 
   async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
 
-    const outputLineReplace = (line) => {
-      // console.log('LINE:',line)
-      return line.replace('tmp/inlined-dist/src', 'components')
-    };
+    // const outputLineReplace = (line) => {
+    //   // console.log('LINE:',line)
+    //   return line.replace('tmp/inlined-dist/src', 'components')
+    // };
 
-    if (watch) {
-      tryRemoveDir(path.join(this.location, outDir))
-      if (outDir === 'dist') {
-        this.linkDistAsModule(outDir, true)
+    // if (watch) {
+    //   tryRemoveDir(path.join(this.location, outDir))
+    //   if (outDir === 'dist') {
+    //     this.linkDistAsModule(outDir, true)
+    //   }
+    //   this.run(`npm-run gulp inline-templates-${outDir}-watch`,
+    //     { output: false, outputLineReplace }).async()
+    //   setTimeout(() => {
+    //     this.run(`npm-run tsc -w -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).async()
+    //   }, 3000)
+
+    // } else {
+    //   await Helpers.compilationWrapper(() => {
+    //     tryRemoveDir(path.join(this.location, outDir))
+    //     this.run(`npm-run gulp inline-templates-${outDir}`,
+    //       { output: false, outputLineReplace }).sync()
+    //     this.run(`npm-run tsc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
+    //     if (outDir === 'dist') {
+    //       this.linkDistAsModule(outDir)
+    //     }
+    //   }, `angular-lib (project ${this.name})`)
+    // }
+    if (!this.isStandaloneProject && forClient.length === 0) {
+
+      while (this.buildOptions.forClient.length === 0) {
+
+        await ProjectIsomorphicLib.selectClients(this.buildOptions, this)
       }
-      this.run(`npm-run gulp inline-templates-${outDir}-watch`,
-        { output: false, outputLineReplace }).async()
-      setTimeout(() => {
-        this.run(`npm-run tsc -w -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).async()
-      }, 3000)
 
-    } else {
-      await Helpers.compilationWrapper(() => {
-        tryRemoveDir(path.join(this.location, outDir))
-        this.run(`npm-run gulp inline-templates-${outDir}`,
-          { output: false, outputLineReplace }).sync()
-        this.run(`npm-run tsc -p tsconfig-aot.${outDir}.json`, { output: true, outputLineReplace }).sync()
-        if (outDir === 'dist') {
-          this.linkDistAsModule(outDir)
-        }
-      }, `angular-lib (project ${this.name})`)
     }
+    if (watch) {
+
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic angular-lib compilation (watch mode)')
+    } else {
+      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic angular-lib compilation')
+    }
+
     return this;
   }
 
@@ -111,7 +130,7 @@ export class ProjectAngularLib extends LibProject {
           }
           await this.buildLib(outDir, forClient as Project[], prod, true)
         } else {
-          await this.buildLib(outDir, forClient as Project[], prod, watch)
+          await this.buildLib(outDir, forClient as Project[], prod, false)
         }
       }
     }

@@ -112,7 +112,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
           while (buildOptions.forClient.length === 0) {
 
-            await this.selectClients(buildOptions)
+            await ProjectIsomorphicLib.selectClients(buildOptions, this)
           }
 
         }
@@ -124,9 +124,9 @@ export class ProjectIsomorphicLib extends LibProject {
     return;
   }
 
-  private async selectClients(buildOptions: BuildOptions) {
-    if (!this.buildOptions.watch) {
-      buildOptions.forClient = this.parent.children
+  public static async selectClients(buildOptions: BuildOptions, currentProject: Project) {
+    if (!buildOptions.watch) {
+      buildOptions.forClient = currentProject.parent.children
         .filter(c => config.allowedTypes.app.includes(c.type))
         .filter(c => c.name !== this.name)
       return;
@@ -138,19 +138,19 @@ export class ProjectIsomorphicLib extends LibProject {
           type: 'checkbox',
           name: 'projects',
           message: 'Select target projects to build library: ',
-          choices: this.parent.children
+          choices: currentProject.parent.children
             .filter(c => config.allowedTypes.app.includes(c.type))
-            .filter(c => c.name !== this.name)
+            .filter(c => c.name !== currentProject.name)
             .map(c => {
               return { value: c.name, name: c.name }
             })
         }
       ]) as any;
 
-    buildOptions.forClient = projects.map(p => Project.From(path.join(this.location, '..', p)))
+    buildOptions.forClient = projects.map(p => Project.From(path.join(currentProject.location, '..', p)))
 
     const db = await TnpDB.Instance;
-    await db.transaction.updateCommandBuildOptions(this.location, buildOptions);
+    await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
 
   }
 

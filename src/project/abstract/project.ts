@@ -906,7 +906,7 @@ export abstract class BaseProject {
     const existedProject = db
       .getProjects()
       .map(p => p.project)
-      .filter(p => !p.isWorkspaceChildProject)
+      .filter(p => p && !p.isWorkspaceChildProject)
       .filter(p => p.location !== this.location)
 
     const { projects = [] }: { projects: string[] } = await inquirer

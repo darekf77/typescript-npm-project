@@ -102,7 +102,7 @@ export class TnpDB {
   }
 
   public getProjects(): ProjectInstance[] {
-    return this.crud.getAll(ProjectInstance);
+    return this.crud.getAll(ProjectInstance)
   }
 
   public getBuilds(): BuildInstance[] {

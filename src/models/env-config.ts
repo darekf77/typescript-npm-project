@@ -26,7 +26,7 @@ export interface EnvConfig {
   isCoreProject?: boolean; // tnp generated
   isSiteProject?: boolean; // tnp generated
   name?: EnvironmentName; // tnp generated
-  frameworks: UIFramework[];
+  frameworks?: UIFramework[];
   domain?: string;
   dynamicGenIps?: boolean;
   ip?: string | 'localhost';

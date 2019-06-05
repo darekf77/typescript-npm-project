@@ -37,13 +37,18 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     super(buildOptions ? buildOptions.outDir : undefined, config && config.folder.src, project && project.location);
 
     const outFolder = buildOptions.outDir;
-    const location = config.folder.src;
+    const location = project.type === 'isomorphic-lib' ? config.folder.src : config.folder.components;
     const cwd = project.location;
 
-    this.backendCompilation = new BackendCompilationExtended(outFolder, location, cwd);
+    if (project.type === 'isomorphic-lib') {
+      this.backendCompilation = new BackendCompilationExtended(outFolder, location, cwd);
+    }
+
 
     if (buildOptions.genOnlyClientCode) {
-      this.backendCompilation.isEnableCompilation = false;
+      if (this.backendCompilation) {
+        this.backendCompilation.isEnableCompilation = false;
+      }
     }
 
     this.compileOnce = buildOptions.compileOnce;
@@ -71,6 +76,11 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         if (!_.isUndefined(project.parent.children.find(c => config.appTypes.includes(c.type)))) {
           this.browserCompilations = [];
         }
+
+      }
+
+      if (this.project.type !== 'isomorphic-lib') {
+        this.browserCompilations = [];
       }
 
       // console.log(`this.project.env.config for ${project.name} is `, this.project.env.config)
@@ -93,6 +103,9 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
               outFolder)
           )
         })
+
+      console.log('this.browserCompilation', this.browserCompilations.map(c => c.location))
+      // process.exit(0)
     }
   }
 
