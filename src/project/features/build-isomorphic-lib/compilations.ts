@@ -9,6 +9,20 @@ import { compilationWrapperTnp } from '../../../helpers';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
+  // async init(...args) {
+  //   if (Project.From(this.cwd).type !== 'isomorphic-lib') {
+  //     return;
+  //   }
+  //   await super.init(...args);
+  // }
+
+  // async initAndWatch(...args) {
+  //   if (Project.From(this.cwd).type !== 'isomorphic-lib') {
+  //     return;
+  //   }
+  //   await super.initAndWatch(...args);
+  // }
+
   CompilationWrapper = compilationWrapperTnp;
   compile(watch = false) {
 
@@ -23,6 +37,15 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 
 export class BroswerForModuleCompilation extends BroswerCompilation {
+
+  get customCompilerName() {
+    const project = Project.From(this.cwd);
+    if (project && project.genericName) {
+      return `Browser Extended compilation for ${project.genericName}`;
+    }
+    return `Browser Extended compilation`
+  }
+
   CompilationWrapper = compilationWrapperTnp;
 
   constructor(private module: string,
@@ -34,6 +57,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     backendOut: string) {
 
     super(sourceOut, outFolder, location, cwd, backendOut)
+    this.compilerName = this.customCompilerName;
+
     if (ENV) {
       this.initCodeCut.call(this, ENV);
     }
