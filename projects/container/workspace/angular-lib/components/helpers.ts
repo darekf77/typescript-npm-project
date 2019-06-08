@@ -1,3 +1,6 @@
+declare global {
+  const ENV: any;
+}
 
 export namespace UIHelpers {
 

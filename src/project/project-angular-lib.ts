@@ -101,7 +101,7 @@ export class ProjectAngularLib extends LibProject {
 
         while (this.buildOptions.forClient.length === 0) {
 
-          await ProjectIsomorphicLib.selectClients(this.buildOptions, this)
+          await ProjectIsomorphicLib.selectClients(this.buildOptions, this, true)
         }
       }
 

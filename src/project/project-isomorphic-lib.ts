@@ -124,7 +124,7 @@ export class ProjectIsomorphicLib extends LibProject {
     return;
   }
 
-  public static async selectClients(buildOptions: BuildOptions, currentProject: Project) {
+  public static async selectClients(buildOptions: BuildOptions, currentProject: Project, angularLib = false) {
     if (!buildOptions.watch) {
       buildOptions.forClient = currentProject.parent.children
         .filter(c => config.allowedTypes.app.includes(c.type))
@@ -140,7 +140,12 @@ export class ProjectIsomorphicLib extends LibProject {
           message: 'Select target projects to build library: ',
           choices: currentProject.parent.children
             .filter(c => config.allowedTypes.app.includes(c.type))
-            .filter(c => c.name !== currentProject.name)
+            .filter(c => {
+              if (angularLib) {
+                return true;
+              }
+              return c.name !== currentProject.name
+            })
             .map(c => {
               return { value: c.name, name: c.name }
             })

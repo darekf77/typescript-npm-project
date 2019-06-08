@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { BaseFormlyComponent } from "./base-formly-component";
-import { CLASS } from "typescript-class-helpers/browser";
+import { CLASS } from "typescript-class-helpers";
 import {
   Component, OnInit, Input, Output, AfterViewInit,
 } from '@angular/core';
