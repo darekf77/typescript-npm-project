@@ -95,7 +95,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
         ["@cutRegionIfFalse", this.codeCuttFn(false)]
       ],
       env: this.customEnv
-    })
+    }, Project.From(this.cwd))
   }
 
 

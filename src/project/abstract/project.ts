@@ -590,9 +590,9 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  child(name: string): Project {
+  child(name: string, errors  = true): Project {
     const c = this.children.find(c => c.name === name);
-    if (!c) {
+    if (errors && !c) {
       error(`Project doesnt contain child with name: ${name}`)
     }
     return c;

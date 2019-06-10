@@ -3,17 +3,20 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as sass from 'node-sass';
 
-import { CodeCut, BrowserCodeCut } from 'morphi/build';
+import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi/build';
 import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
 import { error } from '../../../helpers';
+import { Project } from '../../abstract';
+import { IncrementalBuildProcessExtended } from './incremental-build-process';
 
 
 
 export class ExtendedCodeCut extends CodeCut {
 
-  constructor(protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended) {
+  constructor(protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended, project: Project) {
     super(cwd, filesPathes, options as any);
     this.browserCodeCut = BrowserCodeCutExtended;
+    BrowserCodeCutExtended.currentProject = project; // TODO normal inject this instead static inject
   }
 
 }
@@ -23,6 +26,15 @@ const customReplacement = '@customReplacement';
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   // private debugging = false;
+  static currentProject: Project;
+
+  get project() {
+    return BrowserCodeCutExtended.currentProject;
+  }
+
+  constructor(absoluteFilePath: string) {
+    super(absoluteFilePath)
+  }
 
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
@@ -194,8 +206,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return content;
   }
 
-
-
   private findReplacements(stringContent: string, pattern: string, fun: (jsExpressionToEval: string, env: EnvConfig) => boolean) {
 
     // this.isDebuggingFile && console.log(pattern)
@@ -226,6 +236,26 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     };
   }
 
+  replaceFromLine(pkgName: string, imp: string) {
+    console.log(`Check package: "${pkgName}"`)
+    const inlinePkg = this.getInlinePackage(pkgName)
+    console.log(inlinePkg)
+    if (inlinePkg.isIsomorphic) {
+      const replacedImp = imp.replace(inlinePkg.realName, `${inlinePkg.realName}/${this.browserString}`);
+      this.rawContent = this.rawContent.replace(imp, replacedImp);
+      return;
+    }
+    if (this.project.isWorkspaceChildProject) {
+      const child = this.project.parent.child(pkgName, false);
+      if (child) {
+        const replacedImp = imp.replace(pkgName,
+          `${pkgName}/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+        this.rawContent = this.rawContent.replace(imp, replacedImp);
+        return;
+      }
+    }
+
+  }
 
   customEnv: EnvConfig;
 

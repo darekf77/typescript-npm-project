@@ -1,3 +1,3 @@
-import { BarService } from 'angular-lib/browser-for-isomorphic-lib';
+import { BarService } from 'angular-lib';
 
 console.log('hello')
