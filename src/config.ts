@@ -80,6 +80,12 @@ const moduleNameAngularLib = [
   folder.browser,
 ];
 
+const moduleNameIsomorphicLib = [
+  folder.src,
+  folder.dist,
+  folder.browser,
+];
+
 export const config = {
   CONST: {
     TEST_TIMEOUT: 3600000
@@ -149,6 +155,7 @@ export const config = {
     ] as LibType[]
   },
   moduleNameAngularLib,
+  moduleNameIsomorphicLib,
   appTypes: [
     'angular-client',
     'angular-lib',

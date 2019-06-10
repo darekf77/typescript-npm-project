@@ -251,7 +251,12 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       const child = this.project.parent.child(pkgName, false);
       if (child) {
         const orgImp = imp;
-        if (child.type !== 'isomorphic-lib') {
+        if (child.type === 'isomorphic-lib') {
+          const sourceRegex = `${pkgName}\/(${config.moduleNameIsomorphicLib.join('|')})`;
+          // console.log(`Regex source: "${sourceRegex}"`)
+          imp = imp.replace(new RegExp(sourceRegex), pkgName);
+          // console.log(`Regex replaced: "${imp}"`)
+        } else {
           const sourceRegex = `${pkgName}\/(${config.moduleNameAngularLib.join('|')})`;
           // console.log(`Regex source: "${sourceRegex}"`)
           imp = imp.replace(new RegExp(sourceRegex), pkgName);
