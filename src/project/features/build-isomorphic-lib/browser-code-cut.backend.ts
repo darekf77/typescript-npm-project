@@ -8,6 +8,7 @@ import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
 import { error } from '../../../helpers';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from './incremental-build-process';
+import config from '../../../config';
 
 
 
@@ -237,9 +238,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
 
   replaceFromLine(pkgName: string, imp: string) {
-    console.log(`Check package: "${pkgName}"`)
+    // console.log(`Check package: "${pkgName}"`)
+    // console.log(`imp: "${imp}"`)
     const inlinePkg = this.getInlinePackage(pkgName)
-    console.log(inlinePkg)
+    // console.log(inlinePkg)
     if (inlinePkg.isIsomorphic) {
       const replacedImp = imp.replace(inlinePkg.realName, `${inlinePkg.realName}/${this.browserString}`);
       this.rawContent = this.rawContent.replace(imp, replacedImp);
@@ -248,10 +250,18 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (this.project.isWorkspaceChildProject) {
       const child = this.project.parent.child(pkgName, false);
       if (child) {
+        const orgImp = imp;
+        if (child.type !== 'isomorphic-lib') {
+          const sourceRegex = `${pkgName}\/(${config.moduleNameAngularLib.join('|')})`;
+          // console.log(`Regex source: "${sourceRegex}"`)
+          imp = imp.replace(new RegExp(sourceRegex), pkgName);
+          // console.log(`Regex replaced: "${imp}"`)
+        }
         const replacedImp = imp.replace(pkgName,
           `${pkgName}/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
-        this.rawContent = this.rawContent.replace(imp, replacedImp);
+        this.rawContent = this.rawContent.replace(orgImp, replacedImp);
         return;
+
       }
     }
 
@@ -261,7 +271,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
 
-    this.debug('TestService.ts')
+    // this.debug('TestService.ts')
     this.customEnv = options.env;
     return super.replaceRegionsForIsomorphicLib(_.clone(options) as any);
   }

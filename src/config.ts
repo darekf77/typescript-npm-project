@@ -73,6 +73,13 @@ function pathResolved(...partOfPath: string[]) {
   return path.resolve(path.join(...partOfPath))
 }
 
+const moduleNameAngularLib = [
+  folder.components,
+  folder.module,
+  folder.dist,
+  folder.browser,
+];
+
 export const config = {
   CONST: {
     TEST_TIMEOUT: 3600000
@@ -141,6 +148,7 @@ export const config = {
       'workspace'
     ] as LibType[]
   },
+  moduleNameAngularLib,
   appTypes: [
     'angular-client',
     'angular-lib',

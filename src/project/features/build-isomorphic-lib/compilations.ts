@@ -87,13 +87,15 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     this.customEnv = _.merge(_.cloneDeep(env), { currentProjectName: this.module });
     // console.log('customEnv', this.customEnv)
 
+    const environment = this.customEnv;
+
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {
       replacements: [
-        ["@backendFunc", `return undefined;`],
-        "@backend",
+        ((environment.currentProjectType === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
+        ((environment.currentProjectType === 'isomorphic-lib') && "@backend") as any,
         ["@cutRegionIfTrue", this.codeCuttFn(true)],
         ["@cutRegionIfFalse", this.codeCuttFn(false)]
-      ],
+      ].filter(f => !!f),
       env: this.customEnv
     }, Project.From(this.cwd))
   }

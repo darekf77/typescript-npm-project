@@ -14,12 +14,7 @@ import config from '../../../config';
 
 const BaselineSiteJoinprefix = '__';
 
-export const moduleNameAngularLib = [
-  config.folder.components,
-  config.folder.module,
-  config.folder.dist,
-  config.folder.browser,
-];
+export const moduleNameAngularLib = config.moduleNameAngularLib;
 
 export function getRegexSourceString(s) {
   return s
