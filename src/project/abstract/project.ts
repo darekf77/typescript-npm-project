@@ -32,12 +32,14 @@ import { FrameworkFilesGenerator } from '../features/framework-files-generator';
 import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
 import { FilesFactory } from '../features/files-factory.backend';
+import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
 //#endregion
 
 import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+
 
 
 
@@ -1013,7 +1015,7 @@ export abstract class BaseProject {
     if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
       this.packageJson.show('show before build')
     }
-
+    PackagesRecognitionExtended.fromProject(this as any).start();
     await this.buildSteps(buildOptions);
     await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     if (buildOptions.compileOnce) {

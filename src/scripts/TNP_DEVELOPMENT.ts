@@ -15,6 +15,7 @@ import * as path from 'path';
 import config from '../config';
 import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
+import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -170,6 +171,9 @@ export default {
   $MOD: () => {
     Project.Current.sourceModifier.init()
     process.exit(0)
+  },
+  UPDATE_ISOMORPHIC() {
+    PackagesRecognitionExtended.fromProject(Project.Current).start(true);
   },
   $MOD_WATCH: () => {
     Project.Current.sourceModifier.initAndWatch();

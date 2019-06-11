@@ -9,6 +9,7 @@ import { info, checkValidNpmPackageName, error, log, warn } from '../../helpers'
 import { FeatureForProject } from '../abstract';
 import { Package, InstalationTypeArr, InstalationType, LibType } from '../../models';
 import config from '../../config';
+import { PackagesRecognitionExtended } from './packages-recognition-extended';
 
 export class NpmPackages extends FeatureForProject {
 
@@ -165,6 +166,8 @@ export class NpmPackages extends FeatureForProject {
       this.project.run(command,
         { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
     }
+
+    PackagesRecognitionExtended.fromProject(this.project).start(true);
 
     if (!generatLockFiles) {
       if (useYarn) {
