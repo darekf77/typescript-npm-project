@@ -1,17 +1,43 @@
 {
+  "tnp": {
+    "resources": [
+      "README.md"
+    ],
+    "type": "angular-lib"
+  },
   "name": "ss-common-ui",
   "version": "0.0.0",
   "license": "UNLICENSED",
   "browser": {
-    "net": false,
-    "fs": false,
+    "redis": false,
+    "pg-query-stream": false,
+    "pg-native": false,
+    "pg": false,
+    "oracledb": false,
+    "mysql2": false,
+    "mysql": false,
+    "mssql": false,
+    "mongodb": false,
+    "sqlite3": false,
     "child_process": false,
-    "hiredis": false
+    "aws-sdk": false
   },
-  "tnp": {
-    "type": "angular-lib",
-    "resources": [
-      "README.md"
-    ]
-  }
+  "husky": {
+    "hooks": {
+      "pre-push": "tnp deps:show:if:standalone"
+    }
+  },
+  "isomorphicPackages": [
+    "browserify-sign",
+    "json10",
+    "lodash-walk-object",
+    "morphi",
+    "ng2-logger",
+    "ng2-rest",
+    "static-columns",
+    "timespan",
+    "tnp-bundle",
+    "typeorm",
+    "typescript-class-helpers"
+  ]
 }

@@ -241,26 +241,57 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     // console.log(`Check package: "${pkgName}"`)
     // console.log(`imp: "${imp}"`)
     const inlinePkg = this.getInlinePackage(pkgName)
-    // console.log(inlinePkg)
+
     if (inlinePkg.isIsomorphic) {
+      // console.log('inlinePkg ', inlinePkg.realName)
       const replacedImp = imp.replace(inlinePkg.realName, `${inlinePkg.realName}/${this.browserString}`);
       this.rawContent = this.rawContent.replace(imp, replacedImp);
       return;
     }
     if (this.project.isWorkspaceChildProject) {
+      // console.log(`check child: ${pkgName}`)
       const child = this.project.parent.child(pkgName, false);
       if (child) {
+        // console.log(`child founded: ${pkgName}`)
         const orgImp = imp;
+        let proceed = true;
         if (child.type === 'isomorphic-lib') {
           const sourceRegex = `${pkgName}\/(${config.moduleNameIsomorphicLib.join('|')})(?!\-)`;
-          // console.log(`Regex source: "${sourceRegex}"`)
-          imp = imp.replace(new RegExp(sourceRegex), pkgName);
-          // console.log(`Regex replaced: "${imp}"`)
+          const regex = new RegExp(sourceRegex);
+          // console.log(`[isomorphic-lib] Regex source: "${sourceRegex}"`)
+          if (regex.test(imp)) {
+            // console.log(`[isom] MATCH: ${imp}`)
+            imp = imp.replace(regex, pkgName);
+          } else {
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+            if (regexAlreadyIs.test(imp)) {
+              imp = imp.replace(regexAlreadyIs, pkgName);
+            } else {
+              proceed = false;
+            }
+            // console.log(`[isom] NOTMATCH: ${imp}`)
+          }
+          // console.log(`[isomorphic-lib] Regex replaced: "${imp}"`)
         } else {
           const sourceRegex = `${pkgName}\/(${config.moduleNameAngularLib.join('|')})(?!\-)`;
-          // console.log(`Regex source: "${sourceRegex}"`)
-          imp = imp.replace(new RegExp(sourceRegex), pkgName);
-          // console.log(`Regex replaced: "${imp}"`)
+          const regex = new RegExp(sourceRegex);
+          // console.log(`[angular-lib] Regex source: "${sourceRegex}"`)
+          if (regex.test(imp)) {
+            // console.log(`[angul] MATCH: ${imp}`)
+            imp = imp.replace(regex, pkgName);
+          } else {
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+            if (regexAlreadyIs.test(imp)) {
+              imp = imp.replace(regexAlreadyIs, pkgName);
+            } else {
+              proceed = false;
+            }
+            // console.log(`[angul] NOTMATCH: ${imp}`)
+          }
+          // console.log(`[angular-lib] Regex replaced: "${imp}"`)
+        }
+        if (proceed) {
+
         }
         const replacedImp = imp.replace(pkgName,
           `${pkgName}/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);

@@ -106,7 +106,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       }
 
 
-      if (this.project.type !== 'isomorphic-lib' && project.isStandaloneProject) {
+      if (!project.isStandaloneProject) {
 
         let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath();
         if (outFolder === 'bundle') {

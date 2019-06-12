@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, Input } from 
 
 // material
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('multimedia-upload');
 
 import { FileUploader, FileItem } from 'ng2-file-upload';

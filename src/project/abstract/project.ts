@@ -592,7 +592,7 @@ export abstract class BaseProject {
   //#endregion
 
   //#region @backend
-  child(name: string, errors  = true): Project {
+  child(name: string, errors = true): Project {
     const c = this.children.find(c => c.name === name);
     if (errors && !c) {
       error(`Project doesnt contain child with name: ${name}`)
@@ -720,16 +720,22 @@ export abstract class BaseProject {
       this.isWorkspaceChildProject ||
       this.isStandaloneProject) {
 
-      // log(`FIXING SOURCES FOR "${this.genericName}"`)
+
       const srcFolder = path.join(this.location, config.folder.src);
       if (!this.isWorkspace && !fse.existsSync(srcFolder)) {
         // log('SRC folder recreated')
         fse.mkdirpSync(srcFolder);
       }
       const componentsFolder = path.join(this.location, config.folder.components);
+      const browserStandaloneFolder = path.join(this.location, config.folder.browser);
       if (this.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
         fse.mkdirpSync(componentsFolder);
+      }
+
+      if (this.type === 'angular-lib' && this.isStandaloneProject && !fse.existsSync(browserStandaloneFolder)) {
+        // log('BROWSER folder recreated');
+        fse.symlinkSync(this.location, path.join(this.location, config.folder.browser));
       }
 
       const customFolder = path.join(this.location, config.folder.custom);
@@ -1322,12 +1328,12 @@ export class Project extends BaseProject implements IProject {
 
 
         this.packageJson = PackageJSON.fromProject(this);
+        this.type = this.packageJson.type;
         this.quickFixMissingSourceFolders()
         this.staticBuild = new StaticBuild(this)
         this.workspaceSymlinks = new WorkspaceSymlinks(this);
         this.tnpBundle = new TnpBundle(this);
         this.node_modules = new NodeModules(this);
-        this.type = this.packageJson.type;
         this.npmPackages = new NpmPackages(this)
         this.recreate = new FilesRecreator(this);
         this.filesFactory = new FilesFactory(this);

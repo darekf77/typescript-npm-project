@@ -1,6 +1,6 @@
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 // other
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('dialog - wrapper');
 
 import {

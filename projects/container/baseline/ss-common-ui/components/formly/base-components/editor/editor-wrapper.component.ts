@@ -8,7 +8,7 @@ import { Log, Level } from 'ng2-logger';
 const log = Log.create('editor wrapper');
 import { Morphi } from 'morphi';
 import { CLASS } from 'typescript-class-helpers';
-import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
+import { BaseFormlyComponent, DualComponentController } from '../../../helpers';
 
 export class DualComponentControllerExtended extends DualComponentController {
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 // other
-import { Log, Logger } from 'ng2-logger/browser';
+import { Log, Logger } from 'ng2-logger';
 const log = Log.create('dialog part');
 // local
 import { DialogType, DIALOG } from '../../DIALOG';
