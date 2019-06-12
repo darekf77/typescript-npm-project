@@ -11,6 +11,7 @@ export * from './project.interface';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
+export type CutableFileExt = 'scss' | 'css' | 'sass' | 'html' | 'ts';
 
 
 export type RecreateFile = { where: string; from: string };

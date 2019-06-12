@@ -67,6 +67,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
   codeCuttFn(cutIftrue: boolean) {
     return function (expression: string, e: EnvConfig) {
+      expression = expression.trim().replace(/\-\-\>$/, '')
       const exp = `(function(ENV){
         // console.log(typeof ENV)
         return ${expression.trim()}
@@ -93,8 +94,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       replacements: [
         ((environment.currentProjectType === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
         ((environment.currentProjectType === 'isomorphic-lib') && "@backend") as any,
-        ["@cutRegionIfTrue", this.codeCuttFn(true)],
-        ["@cutRegionIfFalse", this.codeCuttFn(false)]
+        ["@cutCodeIfTrue", this.codeCuttFn(true)],
+        ["@cutCodeIfFalse", this.codeCuttFn(false)]
       ].filter(f => !!f),
       env: this.customEnv
     }, Project.From(this.cwd))

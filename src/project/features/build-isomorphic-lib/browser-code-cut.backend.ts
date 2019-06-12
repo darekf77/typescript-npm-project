@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as sass from 'node-sass';
 
 import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi/build';
-import { EnvConfig, ReplaceOptionsExtended } from '../../../models';
+import { EnvConfig, ReplaceOptionsExtended, CutableFileExt } from '../../../models';
 import { error } from '../../../helpers';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from './incremental-build-process';
@@ -106,11 +106,17 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return content;
   }
 
-  private handleTickInCode(replacement: string): string {
+  protected handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
       console.error(`[browsercodecut] Please dont use tick \` ... `)
       replacement = replacement.replace(/\`/g, '\\`');
     }
+    return replacement;
+  }
+
+  private handleOutput(replacement: string, ext: CutableFileExt): string {
+    replacement = this.handleTickInCode(replacement);
+
     return replacement;
   }
 
@@ -132,7 +138,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'template: \`\n' + this.handleTickInCode(replacement) + '\n\`')
+      'template: \`\n' + this.handleOutput(replacement, 'html') + '\n\`')
 
     return content;
   }
@@ -156,7 +162,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'styles: [\`\n' + this.handleTickInCode(replacement) + '\n\`]')
+      'styles: [\`\n' + this.handleOutput(replacement, 'css') + '\n\`]')
 
     return content;
   }
@@ -202,7 +208,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     content = content.replace(
       new RegExp(regex,
         'g'),
-      'styles: [\`\n' + this.handleTickInCode(replacement) + '\n\`]')
+      'styles: [\`\n' + this.handleOutput(replacement, ext) + '\n\`]')
 
     return content;
   }
@@ -305,14 +311,34 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   customEnv: EnvConfig;
 
-  replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
+  // replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
 
-    // this.debug('TestService.ts')
-    this.customEnv = options.env;
-    return super.replaceRegionsForIsomorphicLib(_.clone(options) as any);
+  //   // this.debug('TestService.ts')
+  //   this.customEnv = options.env;
+  //   return super.replaceRegionsForIsomorphicLib(_.clone(options) as any);
+  // }
+
+  get allowedToReplace() {
+    return ['ts', 'html', 'css', 'sass', 'scss'] as CutableFileExt[];
   }
 
-  replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '') {
+  replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
+    this.customEnv = options.env;
+    options = _.clone(options);
+    // console.log('options.replacements', options.replacements)
+    const ext = path.extname(this.absoluteFilePath).replace('.', '') as CutableFileExt;
+    if (this.allowedToReplace.includes(ext)) {
+      this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
+    }
+    this.rawContent = this.afterRegionsReplacement(this.rawContent);
+    return this;
+  }
+
+  protected REGEX_REGION_HTML(word) {
+    return new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\<\\!\\-\\s*#?endregion ?[\\t ]*\\n?", "g")
+  }
+
+  replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '', ext: CutableFileExt = 'ts') {
 
     if (replacementPatterns.length === 0) return stringContent;
     let pattern = replacementPatterns.shift();
@@ -323,16 +349,20 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       if (_.isFunction(funOrString)) {
         const rep = this.findReplacements(stringContent, pattern, funOrString);
         // this.isDebuggingFile && console.log('replacements', replacements)
-        return this.replaceRegionsWith(rep.stringContent, rep.replacements.concat(replacementPatterns));
+        return this.replaceRegionsWith(rep.stringContent, rep.replacements.concat(replacementPatterns), '', ext);
       } else {
         replacement = funOrString as any;
       }
     }
+    if (ext === 'html') {
+      stringContent = stringContent.replace(this.REGEX_REGION_HTML(pattern), replacement);
+    } else {
+      stringContent = stringContent.replace(this.REGEX_REGION(pattern), replacement);
+    }
 
-    stringContent = stringContent.replace(this.REGEX_REGION(pattern), replacement);
     // this.isDebuggingFile && console.log(`-------------------------- ${pattern} --------------------------------`)
     // this.isDebuggingFile && console.log(stringContent)
-    return this.replaceRegionsWith(stringContent, replacementPatterns);
+    return this.replaceRegionsWith(stringContent, replacementPatterns, '', ext);
   }
 
 }
