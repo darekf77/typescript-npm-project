@@ -119,6 +119,7 @@ export class FilesStructure extends FeatureForProject {
 
       if (!onlyJoin) {
         await this.project.env.init(args);
+        this.project.filesTemplatesBuilder.rebuild()
       }
 
       this.project.quickFixMissingSourceFolders()

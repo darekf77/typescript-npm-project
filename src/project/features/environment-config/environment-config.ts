@@ -75,6 +75,7 @@ export class EnvironmentConfig
 
     if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
       await this.project.parent.env.init(args, overridePortsOnly);
+      this.project.parent.filesTemplatesBuilder.rebuild()
       // error(`[${path.basename(__filename)}] Please override parent config first`);
     }
 

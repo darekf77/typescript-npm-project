@@ -26,6 +26,9 @@ export class ProjectAngularClient extends Project {
     }
   }
 
+  filesTemplates() {
+    return ['src/tsconfig.app.json.filetemplate']
+  }
 
   projectSpecyficFiles() {
     return [
@@ -33,7 +36,7 @@ export class ProjectAngularClient extends Project {
       'src/typings.d.ts',
       'src/main.ts',
       'src/polyfills.ts',
-      'src/tsconfig.app.json',
+      'src/tsconfig.app.json.filetemplate',
       'src/tsconfig.spec.json',
       'protractor.conf.js',
       'karma.conf.js'

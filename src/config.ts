@@ -156,6 +156,9 @@ export const config = {
   },
   moduleNameAngularLib,
   moduleNameIsomorphicLib,
+  filesExtensions: {
+    filetemplate: 'filetemplate'
+  },
   appTypes: [
     'angular-client',
     'angular-lib',

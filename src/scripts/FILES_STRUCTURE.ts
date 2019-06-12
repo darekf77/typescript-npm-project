@@ -123,6 +123,11 @@ export default {
   STATIC_RESET,
   STATIC_RESET_ALL,
 
+  TEMPLATES_BUILDER() {
+    Project.Current.filesTemplatesBuilder.rebuild();
+    process.exit(0)
+  },
+
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();

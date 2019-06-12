@@ -29,16 +29,19 @@ import { StaticBuild } from '../features/static-build';
 import { FilesStructure } from '../features/files-structure';
 import { BuildProcess } from '../features/build-proces';
 import { FrameworkFilesGenerator } from '../features/framework-files-generator';
+import { FilesTemplatesBuilder } from '../features/files-templates';
 import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
 import { FilesFactory } from '../features/files-factory.backend';
 import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
+import { config as configMorphi } from 'morphi/build/config';
 //#endregion
 
 import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+
 
 
 
@@ -73,6 +76,10 @@ export abstract class BaseProject {
 
   //#region @backend
   public filesStructure: FilesStructure;
+  //#endregion
+
+  //#region @backend
+  public filesTemplatesBuilder: FilesTemplatesBuilder;
   //#endregion
 
   //#region @backend
@@ -658,6 +665,12 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
+  public filesTemplates(): string[] {
+    // should be abstract
+    return []
+  }
+  //#endregion
 
   //#region @backend
   public projectSpecyficFiles(): string[] {
@@ -713,6 +726,25 @@ export abstract class BaseProject {
     return __run(command, options);
   }
   //#endregion
+
+  //#region @backend
+  removeRecognizedIsomorphicLIbs() {
+    try {
+      const pjPath = path.join(this.location, config.file.package_json);
+      const pj: IPackageJSON = fse.readJsonSync(pjPath, {
+        encoding: 'utf8'
+      });
+      pj[configMorphi.array.isomorphicPackages] = void 0;
+      fse.writeJsonSync(pjPath, pj, {
+        encoding: 'utf8',
+        spaces: 2
+      });
+    } catch (e) {
+
+    }
+  }
+  //#endregion
+
 
   //#region @backend
   public quickFixMissingSourceFolders() { /// TODO make it more generic
@@ -779,6 +811,7 @@ export abstract class BaseProject {
     if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
     }
+    this.removeRecognizedIsomorphicLIbs();
     let gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
@@ -1053,6 +1086,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
 
 
     await this.env.init(args, true)
+    this.filesTemplatesBuilder.rebuild()
     log(`Killing proces on port ${this.getDefaultPort()}`);
     await killProcessByPort(this.getDefaultPort())
     log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
@@ -1339,6 +1373,7 @@ export class Project extends BaseProject implements IProject {
         this.filesFactory = new FilesFactory(this);
         this.sourceModifier = new SourceModifier(this);
         this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
+        this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
         if (!this.isStandaloneProject) {
           this.join = new BaselineSiteJoin(this);
         }

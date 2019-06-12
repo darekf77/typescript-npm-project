@@ -42,6 +42,9 @@ export class ProjectAngularLib extends LibProject {
     return command;
   }
 
+  filesTemplates() {
+    return this.projectAngularClient.filesTemplates();
+  }
 
   projectSpecyficFiles() {
     return super.projectSpecyficFiles().concat([
@@ -114,7 +117,6 @@ export class ProjectAngularLib extends LibProject {
 
     return this;
   }
-
 
   async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient, compileOnce } = buildOptions;

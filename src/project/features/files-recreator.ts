@@ -103,21 +103,23 @@ export class FilesRecreator extends FeatureForProject {
         ].concat([ // not sure if ignored/needed
           '.sass-cache',
           '.sourcemaps'
-        ]).concat( // for site ignore auto-generate scr
-          self.project.isSite ? (
-            self.project.customizableFilesAndFolders
-              .concat(self.project.customizableFilesAndFolders.map(f => {
-                return PathHelper.PREFIX(f);
-              }))
-              .concat(self.project.customizableFilesAndFolders.map(f => {
-                return `!${path.join(config.folder.custom, f)}`
-              }))
-          ) : []
-        )).concat( // common files for all project
-          self.project.isCoreProject ? [] : self.commonFilesForAllProjects
-        ).concat( // core files of projects types
-          self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
-        )
+        ])
+          .concat(self.project.type === 'angular-lib' ? ['src/tsconfig.app.json'] : [])
+          .concat( // for site ignore auto-generate scr
+            self.project.isSite ? (
+              self.project.customizableFilesAndFolders
+                .concat(self.project.customizableFilesAndFolders.map(f => {
+                  return PathHelper.PREFIX(f);
+                }))
+                .concat(self.project.customizableFilesAndFolders.map(f => {
+                  return `!${path.join(config.folder.custom, f)}`
+                }))
+            ) : []
+          )).concat( // common files for all project
+            self.project.isCoreProject ? [] : self.commonFilesForAllProjects
+          ).concat( // core files of projects types
+            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
+          )
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
