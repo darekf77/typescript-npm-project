@@ -21,7 +21,7 @@ import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/ap
 import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components'
 // third part
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
 import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';

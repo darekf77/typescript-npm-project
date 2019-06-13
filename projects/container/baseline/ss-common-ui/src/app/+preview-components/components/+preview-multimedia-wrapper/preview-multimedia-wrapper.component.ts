@@ -3,7 +3,7 @@ import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import * as _ from 'lodash';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
-import { Log, Level } from 'ng2-logger';
+import { Log, Level } from 'ng2-logger/browser';
 
 
 const log = Log.create('preview-multimedia-wrapper');

@@ -13,7 +13,7 @@ import {
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/browser';
 
 const angularModules = [
   CommonModule,

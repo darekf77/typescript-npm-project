@@ -10,7 +10,7 @@ import {
 import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
 import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesPaginationController';
 import { EXAMPLE_PAGINATION } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE_PAGINATION';
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/browser';
 import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;

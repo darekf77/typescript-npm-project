@@ -9,7 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 // third part
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/browser';
 // local
 import { PreviewMultimediaWrapperComponent } from './preview-multimedia-wrapper.component';
 import { routes } from './preview-multimedia-wrapper.routes';

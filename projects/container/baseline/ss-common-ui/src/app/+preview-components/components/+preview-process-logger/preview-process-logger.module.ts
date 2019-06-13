@@ -6,7 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 // material
 import { MatCardModule } from '@angular/material/card';
 // other
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/browser';
 // local
 import { PreviewProcessLoggerComponent } from './preview-process-logger.component';
 import { FormWrapperMaterialModule } from 'components';
