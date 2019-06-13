@@ -8,7 +8,7 @@ import { BroswerForModuleCompilation, BackendCompilationExtended } from './compi
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
 import config from '../../../config';
 import { Project } from '../../../project';
-import { warn } from '../../../helpers';
+import { warn, error } from '../../../helpers';
 import { BuildOptions } from '../build-options';
 
 function useDefaultBrowserCompilation(project: Project) {
@@ -136,9 +136,15 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
             browserOutFolder = path.join(outFolder, browserOutFolder);
           }
 
+          const proj = this.project.parent.child(moduleName);
+          const envConfig = proj.env.config;
+          if (!envConfig) {
+            error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
+          }
+
           this.browserCompilations.push(
             new BroswerForModuleCompilation(moduleName,
-              this.project.env.config,
+              envConfig,
               `tmp-src-${outFolder}-${browserOutFolder}`,
               browserOutFolder as any,
               location,

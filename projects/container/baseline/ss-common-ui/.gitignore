@@ -27,12 +27,12 @@
 /tsconfig-aot.dist.json
 /tsconfig.isomorphic.json
 /tsconfig.browser.json
+/src/tsconfig.app.json.filetemplate
 /src/tsconfig.packages.json
 /tsconfig.json
 /src/typings.d.ts
 /src/main.ts
 /src/polyfills.ts
-/src/tsconfig.app.json.filetemplate
 /src/tsconfig.spec.json
 /protractor.conf.js
 /karma.conf.js
