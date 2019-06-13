@@ -62,6 +62,10 @@ export const menuLeft // : ComponentsMenuItem[]
     {
       href: '/previewcomponents/logo',
       name: 'Logo'
+    },
+    {
+      href: '/previewcomponents/modal',
+      name: 'Modal'
     }
   ];
 

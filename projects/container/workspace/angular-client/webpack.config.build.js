@@ -5,12 +5,12 @@ const { AngularCompilerPlugin } = require('@ngtools/webpack');
 const ngcWebpack = require('ngc-webpack');
 const common = require('./webpack.config.common.js');
 
-const { getReservedClassNames } = require('tnp-bundle')
+// const { getReservedClassNames } = require('tnp-bundle')
 
-let reserved = getReservedClassNames()
-reserved = reserved.concat(['BaseCRUD', 'ModelDataConfig'])
+// let reserved = getReservedClassNames()
+// reserved = reserved.concat(['BaseCRUD', 'ModelDataConfig'])
 
-console.log('reserved',reserved)
+// console.log('reserved',reserved)
 
 module.exports = merge(common, {
   plugins: [
@@ -27,9 +27,9 @@ module.exports = merge(common, {
     }),
     new UglifyJSPlugin({
       uglifyOptions: {
-        mangle: {
-          reserved
-        }
+        // mangle: {
+        //   reserved
+        // }
       }
     })
   ]

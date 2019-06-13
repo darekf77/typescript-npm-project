@@ -5,7 +5,7 @@ import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build'
 import { ExtendedCodeCut } from './browser-code-cut.backend';
 import { EnvConfig } from '../../../models';
 import { Project } from '../../abstract';
-import { compilationWrapperTnp } from '../../../helpers';
+import { compilationWrapperTnp, error } from '../../../helpers';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -73,8 +73,13 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
         return ${expression.trim()}
       })(e)`;
       // console.log(exp)
-      const res = eval(exp);
-      return cutIftrue ? res : !res;
+      try {
+        const res = eval(exp);
+        return cutIftrue ? res : !res;
+      } catch (err) {
+        error(err, true, true);
+      }
+      return false;
     }
   }
 

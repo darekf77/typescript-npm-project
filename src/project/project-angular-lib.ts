@@ -54,8 +54,11 @@ export class ProjectAngularLib extends LibProject {
       'tsconfig-aot.dist.json',
       "tsconfig.isomorphic.json",
       "tsconfig.browser.json",
+      'src/tsconfig.app.json.filetemplate',
       'src/tsconfig.packages.json'
-    ]).concat(this.projectAngularClient.projectSpecyficFiles());
+    ]).concat(this.projectAngularClient.projectSpecyficFiles().filter(f => {
+      return f !== 'src/tsconfig.app.json';
+    }));
   }
 
 

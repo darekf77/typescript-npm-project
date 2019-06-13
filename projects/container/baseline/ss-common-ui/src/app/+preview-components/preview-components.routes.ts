@@ -54,6 +54,10 @@ export const routes: Routes = [
         path: 'processlogger',
         loadChildren: './components/+preview-process-logger/preview-process-logger.module#PreviewProcessLoggerModule'
       },
+      {
+        path: 'modal',
+        loadChildren: './components/+preview-modal/+preview-modal.module#PreviewModalModule'
+      },
     ]
   }
 ];

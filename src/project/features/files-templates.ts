@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import { FeatureForProject } from '../abstract';
 import { EnvConfig } from '../../models';
-import { warn } from '../../helpers';
+import { warn, error } from '../../helpers';
 import config from '../../config';
 
 export class FilesTemplatesBuilder extends FeatureForProject {
@@ -52,8 +52,12 @@ export class FilesTemplatesBuilder extends FeatureForProject {
               return ${expression.trim()}
             })(e)`;
             // console.log(exp)
-            const toReplace = eval(exp);
-            line = line.replace(pattern, toReplace);
+            try {
+              const toReplace = eval(exp);
+              line = line.replace(pattern, toReplace);
+            } catch (err) {
+              error(err, false, true);
+            }
             // console.log('toReplace', toReplace)
           });
         }

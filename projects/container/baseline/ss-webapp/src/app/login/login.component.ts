@@ -1,8 +1,8 @@
 import { Component, OnInit, TemplateRef, Input } from '@angular/core';
-import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/controllers/core/AuthController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/apps/auth/AuthController';
 
-import { Subscription } from "rxjs/Subscription";
-import { Log } from "ng2-logger";
+import { Subscription } from 'rxjs/Subscription';
+import { Log } from 'ng2-logger/browser';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
 import { ActivatedRoute } from '@angular/router';

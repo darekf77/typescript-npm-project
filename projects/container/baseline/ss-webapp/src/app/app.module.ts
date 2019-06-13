@@ -1,5 +1,5 @@
 // angular
-import { RouterModule, Route, PreloadAllModules } from "@angular/router";
+import { RouterModule, Route, PreloadAllModules } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -9,23 +9,24 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi/browser';
 // my modules
 // import { MyLibModule } from 'angular-lib';
-import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/controllers/core/AuthController';
-import { CategoryController } from 'ss-common-logic/browser-for-ss-webapp/controllers/CategoryController';
-import { DialogsController } from 'ss-common-logic/browser-for-ss-webapp/controllers/DialogsController';
-import { ConfigController } from 'ss-common-logic/browser-for-ss-webapp/controllers/ConfigController';
-import { GroupsController } from 'ss-common-logic/browser-for-ss-webapp/controllers/GroupsController';
-import { USER } from 'ss-common-logic/browser-for-ss-webapp/entities/core/USER';
-import { EMAIL } from 'ss-common-logic/browser-for-ss-webapp/entities/core/EMAIL';
-import { EMAIL_TYPE } from 'ss-common-logic/browser-for-ss-webapp/entities/core/EMAIL_TYPE';
-import { SESSION } from 'ss-common-logic/browser-for-ss-webapp/entities/core/SESSION';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/entities/CATEGORY';
-import { DIALOG } from 'ss-common-logic/browser-for-ss-webapp/entities/DIALOG';
-import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/entities/GROUP';
-import { CONFIG } from 'ss-common-logic/browser-for-ss-webapp/entities/CONFIG';
+import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/apps/auth/AuthController';
+import { CategoryController } from 'ss-common-logic/browser-for-ss-webapp/apps/category/CategoryController';
+import { DialogsController } from 'ss-common-logic/browser-for-ss-webapp/apps/dialog/DialogsController';
+import { ConfigController } from 'ss-common-logic/browser-for-ss-webapp/apps/config/ConfigController';
+import { GroupsController } from 'ss-common-logic/browser-for-ss-webapp/apps/group/GroupsController';
+import { USER } from 'ss-common-logic/browser-for-ss-webapp/apps/user/USER';
+import { EMAIL } from 'ss-common-logic/browser-for-ss-webapp/apps/email/EMAIL';
+import { EMAIL_TYPE } from 'ss-common-logic/browser-for-ss-webapp/apps/email/EMAIL_TYPE';
+import { SESSION } from 'ss-common-logic/browser-for-ss-webapp/apps/auth/SESSION';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/apps/category/CATEGORY';
+import { DIALOG } from 'ss-common-logic/browser-for-ss-webapp/apps/dialog/DIALOG';
+import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/apps/group/GROUP';
+import { CONFIG } from 'ss-common-logic/browser-for-ss-webapp/apps/config/CONFIG';
+import { ModalModule  } from 'ss-common-ui/browser-for-ss-webapp/ui-elements/modal';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import { routes } from "./app.routes";
+import { routes } from './app.routes';
 
 
 Morphi.init({
@@ -47,6 +48,7 @@ Morphi.init({
 
   ],
   imports: [
+    ModalModule,
     BrowserModule,
     FormsModule,
     HttpModule,

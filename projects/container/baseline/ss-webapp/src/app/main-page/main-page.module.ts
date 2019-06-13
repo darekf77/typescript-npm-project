@@ -4,9 +4,8 @@ import { AppMainPageComponent } from './main-page.component';
 import { FormsModule } from '@angular/forms';
 // third paret
 import {
-  SliderVerticalModule,
-  CommonUIModule
-} from 'ss-common-ui/module-for-ss-webapp';
+  SliderVerticalModule
+} from 'ss-common-ui/browser-for-ss-webapp';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';

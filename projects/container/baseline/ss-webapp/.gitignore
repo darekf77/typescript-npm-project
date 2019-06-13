@@ -21,8 +21,8 @@
 /src/typings.d.ts
 /src/main.ts
 /src/polyfills.ts
-/src/tsconfig.app.json
 /src/tsconfig.spec.json
+/src/tsconfig.app.json
 /protractor.conf.js
 /karma.conf.js
 /webpack.config.build.aot.js
