@@ -1,6 +1,7 @@
 {
   "files.exclude": {
     "node_modules": true,
+    "tnp-system-path.txt": true,
     "tmp*": true,
     "dist*": true,
     "bundle*": true,
@@ -24,7 +25,7 @@
     "src/typings.d.ts": true,
     "src/main.ts": true,
     "src/polyfills.ts": true,
-    "src/tsconfig.app.json": true,
+    "src/tsconfig.app.json.filetemplate": true,
     "src/tsconfig.spec.json": true,
     "protractor.conf.js": true,
     "karma.conf.js": true,

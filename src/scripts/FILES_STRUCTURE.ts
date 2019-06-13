@@ -148,7 +148,17 @@ export default {
     process.exit(0)
   },
 
-  $VSCODE: () => {
+  async VSCODEALL() {
+    const db = await TnpDB.Instance;
+    const projects = db.getProjects();
+    for (let index = 0; index < projects.length; index++) {
+      const proj = projects[index];
+      proj.project.recreate.vscode.settings.excludedFiles();
+      proj.project.recreate.vscode.settings.colorsFromWorkspace()
+    }
+    process.exit(0)
+  },
+  VSCODE: () => {
     Project.Current.recreate.vscode.settings.excludedFiles();
     Project.Current.recreate.vscode.settings.colorsFromWorkspace()
     process.exit(0)

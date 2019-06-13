@@ -1,31 +1,36 @@
 {
   "files.exclude": {
-    // "**/.git": true,
-    // "**/.svn": true,
-    // "**/.hg": true,
-    // "**/CVS": true,
-    // "**/.DS_Store": true,
-    // "node_modules": true,
-    // "index.*": true,
-    // "dist": true,
-    // "bundle": true,
-    // "tmp": true,
-    // "e2e": true,
-    // "tslint.json": true,
-    // ".editorconfig": true,
-    // "protractor.conf.js": true,
-    // "karma.conf.js": true,
-    // "bin": true,
-    // ".gitignore": true,
-    // ".npmignore": true,
-    // ".npmrc": true,
-    // ".tsconfig": true
+    "node_modules": true,
+    "tnp-system-path.txt": true,
+    "tmp*": true,
+    "dist*": true,
+    "bundle*": true,
+    "browser": true,
+    "browser*": true,
+    "module*": true,
+    "backup": true,
+    "module": true,
+    "www": true,
+    "Thumbs.db": true,
+    ".DS_Store": true,
+    "**/.DS_Store": true,
+    "npm-debug.log*": true,
+    ".sass-cache": true,
+    ".sourcemaps": true,
+    "src/tsconfig.app.json": true,
+    ".gitignore": true,
+    ".npmignore": true,
+    ".npmrc": true,
+    ".babelrc": true
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#d11ab3",
     "activityBar.foreground": "#313129"
   },
-  "editor.rulers": [100, 120],
+  "editor.rulers": [
+    100,
+    120
+  ],
   "html.format.wrapAttributes": "force-aligned",
   "workbench.colorTheme": "Default Light+"
 }
