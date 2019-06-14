@@ -9,20 +9,6 @@ import { compilationWrapperTnp, error } from '../../../helpers';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
-  // async init(...args) {
-  //   if (Project.From(this.cwd).type !== 'isomorphic-lib') {
-  //     return;
-  //   }
-  //   await super.init(...args);
-  // }
-
-  // async initAndWatch(...args) {
-  //   if (Project.From(this.cwd).type !== 'isomorphic-lib') {
-  //     return;
-  //   }
-  //   await super.initAndWatch(...args);
-  // }
-
   CompilationWrapper = compilationWrapperTnp;
   compile(watch = false) {
 
@@ -38,18 +24,21 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 export class BroswerForModuleCompilation extends BroswerCompilation {
 
+  private ENV: EnvConfig;
   get customCompilerName() {
-    const project = Project.From(this.cwd);
-    if (project && project.genericName) {
-      return `Browser Extended compilation for ${project.genericName}`;
+
+    if (this.ENV) {
+      return `Browser Extended compilation for ${this.ENV.currentProjectName}`;
     }
     return `Browser Extended compilation`
   }
 
   CompilationWrapper = compilationWrapperTnp;
 
-  constructor(private module: string,
-    private ENV: EnvConfig,
+  constructor(
+    private compilationProject: Project,
+    private module: string,
+    ENV: EnvConfig,
     sourceOut: string,
     outFolder: OutFolder,
     location: string,
@@ -59,9 +48,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
 
-    if (ENV) {
-      this.initCodeCut.call(this, ENV);
-    }
+    this.initCodeCut.call(this, ENV, compilationProject)
+
 
   }
 
@@ -83,27 +71,25 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     }
   }
 
-  customEnv: EnvConfig;
   initCodeCut() {
-
-    const env = arguments[0];
-    if (!_.isObject(env)) {
+    let env: EnvConfig = arguments[0]
+    const compilationProject: Project = arguments[1];
+    if (!compilationProject) {
       return;
     }
-    this.customEnv = _.merge(_.cloneDeep(env), { currentProjectName: this.module });
-    // console.log('customEnv', this.customEnv)
-
-    const environment = this.customEnv;
+    env = _.cloneDeep(env);
+    this.ENV = env;
 
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {
       replacements: [
-        ((environment.currentProjectType === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
-        ((environment.currentProjectType === 'isomorphic-lib') && "@backend") as any,
+        ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
+        ((compilationProject.type === 'isomorphic-lib') && "@backend") as any,
         ["@cutCodeIfTrue", this.codeCuttFn(true)],
         ["@cutCodeIfFalse", this.codeCuttFn(false)]
       ].filter(f => !!f),
-      env: this.customEnv
-    }, Project.From(this.cwd))
+      env
+    }, env ? Project.From(env.currentProjectLocation) : void 0,
+      compilationProject);
   }
 
 

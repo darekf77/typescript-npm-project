@@ -14,10 +14,32 @@ import config from '../../../config';
 
 export class ExtendedCodeCut extends CodeCut {
 
-  constructor(protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended, project: Project) {
+  browserCodeCut: any;
+
+  constructor(
+    protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended,
+    /**
+     * it may be not available for global, for all compilatoin
+     */
+    private project: Project,
+    private compilationProject: Project
+
+  ) {
     super(cwd, filesPathes, options as any);
     this.browserCodeCut = BrowserCodeCutExtended;
-    BrowserCodeCutExtended.currentProject = project; // TODO normal inject this instead static inject
+  }
+
+  file(absolutePathToFile) {
+
+    // console.log('options here ', options)
+    return new (this.browserCodeCut)(absolutePathToFile, this.project, this.compilationProject)
+      .flatTypescriptImportExport('import')
+      .flatTypescriptImportExport('export')
+      .replaceRegionsForIsomorphicLib(_.cloneDeep(this.options))
+      .replaceRegionsFromTsImportExport('import')
+      .replaceRegionsFromTsImportExport('export')
+      .replaceRegionsFromJSrequire()
+      .saveOrDelete();
   }
 
 }
@@ -27,14 +49,13 @@ const customReplacement = '@customReplacement';
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   // private debugging = false;
-  static currentProject: Project;
 
-  get project() {
-    return BrowserCodeCutExtended.currentProject;
+  get allowedToReplace() {
+    return ['ts', 'html', 'css', 'sass', 'scss'] as CutableFileExt[];
   }
 
-  constructor(absoluteFilePath: string) {
-    super(absoluteFilePath)
+  constructor(absoluteFilePath: string, private project?: Project, private compilationProject?: Project) {
+    super(absoluteFilePath);
   }
 
   afterRegionsReplacement(content: string) {
@@ -212,7 +233,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return content;
   }
-
   private findReplacements(stringContent: string, pattern: string, fun: (jsExpressionToEval: string, env: EnvConfig) => boolean) {
 
     // this.isDebuggingFile && console.log(pattern)
@@ -226,7 +246,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         if (indexPatternStart !== -1) {
           const value = line.substr(indexPatternStart + pattern.length).trim();
           // this.isDebuggingFile && console.log('value: ' + value)
-          if (fun(value, this.customEnv)) {
+          if (fun(value, this.project && this.project.env.config)) {
             // console.log('MATCH!: ' + value)
             const regexRep = new RegExp(`${pattern}\\s+${value}`, 'g');
             // this.isDebuggingFile && console.log(regexRep.source)
@@ -254,9 +274,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       this.rawContent = this.rawContent.replace(imp, replacedImp);
       return;
     }
-    if (this.project.isWorkspaceChildProject) {
+    if (this.compilationProject.isWorkspaceChildProject) {
       // console.log(`check child: ${pkgName}`)
-      const child = this.project.parent.child(pkgName, false);
+      const child = this.compilationProject.parent.child(pkgName, false);
       if (child) {
         // console.log(`child founded: ${pkgName}`)
         const orgImp = imp;
@@ -269,7 +289,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
             // console.log(`[isom] MATCH: ${imp}`)
             imp = imp.replace(regex, pkgName);
           } else {
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended
+              .getBrowserVerPath(this.project && this.project.name)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -286,7 +307,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
             // console.log(`[angul] MATCH: ${imp}`)
             imp = imp.replace(regex, pkgName);
           } else {
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended
+              .getBrowserVerPath(this.project && this.project.name)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -300,7 +322,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
         }
         const replacedImp = imp.replace(pkgName,
-          `${pkgName}/${IncrementalBuildProcessExtended.getBrowserVerPath(this.project.name)}`);
+          `${pkgName}/${IncrementalBuildProcessExtended
+            .getBrowserVerPath(this.project && this.project.name)}`);
         this.rawContent = this.rawContent.replace(orgImp, replacedImp);
         return;
 
@@ -309,21 +332,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   }
 
-  customEnv: EnvConfig;
-
-  // replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
-
-  //   // this.debug('TestService.ts')
-  //   this.customEnv = options.env;
-  //   return super.replaceRegionsForIsomorphicLib(_.clone(options) as any);
-  // }
-
-  get allowedToReplace() {
-    return ['ts', 'html', 'css', 'sass', 'scss'] as CutableFileExt[];
-  }
-
   replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
-    this.customEnv = options.env;
+
     options = _.clone(options);
     // console.log('options.replacements', options.replacements)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as CutableFileExt;

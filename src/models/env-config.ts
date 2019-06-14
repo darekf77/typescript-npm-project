@@ -46,6 +46,7 @@ export interface EnvConfig {
     projects: EnvConfigProject[]
   }
   currentProjectName?: string;
+  currentProjectLocation?: string;
   currentProjectType?: LibType;
   packageJSON?: IPackageJSON;
 

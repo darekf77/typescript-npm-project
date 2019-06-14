@@ -148,6 +148,7 @@ function frontendCuttedVersion(workspaceConfig: EnvConfig) {
 export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
   workspaceConfig.currentProjectType = project.type;
+  workspaceConfig.currentProjectLocation= project.location;
   workspaceConfig.frameworks = project.frameworks;
   const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 

@@ -9,6 +9,16 @@ import { Morphi } from 'morphi';
   styleUrls: ['foo.component.scss']
 })
 export class FooComponent {
+
+  constructor() {
+
+    //#region @cutCodeIfFalse ENV.currentProjectName === 'angular-lib'
+
+    console.log('ONLY IN ANGULAR-LIB')
+
+    //#endregion
+  }
+
 }
 
 

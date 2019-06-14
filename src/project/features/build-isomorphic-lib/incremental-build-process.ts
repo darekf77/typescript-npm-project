@@ -105,6 +105,8 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
       }
 
+      // console.log(this.project && this.project.name)
+      // process.exit(0)
 
       if (!project.isStandaloneProject) {
 
@@ -114,8 +116,10 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         }
 
         this.browserCompilations.push(
-          new BroswerForModuleCompilation(void 0, // moduleNmae
-            this.project.env.config,
+          new BroswerForModuleCompilation(
+            this.project,
+            void 0, // moduleNmae
+            void 0,
             `tmp-src-${outFolder}`,
             browserOutFolder as any,
             location,
@@ -143,7 +147,9 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           }
 
           this.browserCompilations.push(
-            new BroswerForModuleCompilation(moduleName,
+            new BroswerForModuleCompilation(
+              this.project,
+              moduleName,
               envConfig,
               `tmp-src-${outFolder}-${browserOutFolder}`,
               browserOutFolder as any,
