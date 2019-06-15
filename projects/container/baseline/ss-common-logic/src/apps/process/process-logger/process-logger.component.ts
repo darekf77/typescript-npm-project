@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 
 // formly
 import { PROCESS } from '../PROCESS';
-import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/browser-for-ss-common-logic/helpers';
+import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/browser/helpers';
 // logger
 import { Log, Level } from 'ng2-logger';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';

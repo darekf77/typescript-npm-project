@@ -11,7 +11,7 @@ import { DialogsConversationEditorComponent } from './dialogs-conversation-edito
 // other
 import { NgxEditorModule } from 'ngx-editor';
 import { DialogPartComponent } from './dialog-part/dialog-part.component';
-import { FormWrapperMaterialModule } from 'ss-common-ui/browser-for-ss-common-logic/formly';
+import { FormWrapperMaterialModule } from 'ss-common-ui/browser/formly';
 
 const angularModules = [
   CommonModule,

@@ -11,8 +11,8 @@ import { PROCESS } from '../../PROCESS';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/fromEvent';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from 'ss-common-ui/browser-for-ss-common-logic/helpers';
-import { ResizeService } from 'ss-common-ui/browser-for-ss-common-logic/helpers';
+import { BaseComponent } from 'ss-common-ui/browser/helpers';
+import { ResizeService } from 'ss-common-ui/browser/helpers';
 
 
 
