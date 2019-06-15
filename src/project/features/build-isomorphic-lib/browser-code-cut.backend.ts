@@ -238,13 +238,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     codeCuttFn: (jsExpressionToEval: string, env: EnvConfig, absoluteFilePath: string) => boolean,
     ext: CutableFileExt = 'ts'
   ) {
-    this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
+    // this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
     const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
     const handleHtmlString = (ext === 'html' ? ' -->' : '');
     const customReplacement = '@customReplacement';
     // this.isDebuggingFile && console.log(pattern)
 
-    this.isDebuggingFile && console.log(`[findReplacements] pattern: "${pattern}"`)
+    // this.isDebuggingFile && console.log(`[findReplacements] pattern: "${pattern}"`)
 
     const replacements = [];
     // console.log('WORD is fun')
@@ -368,13 +368,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return regex;
   }
 
-  debug(fileName: string) {
-    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-    if (this.project) {
-      this.isDebuggingFile =  true; // (path.basename(this.absoluteFilePath) === fileName);
-    }
+  // debug(fileName: string) {
+  //   // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
+  //   if (this.project) {
+  //     this.isDebuggingFile =  true; // (path.basename(this.absoluteFilePath) === fileName);
+  //   }
 
-  }
+  // }
 
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '', ext: CutableFileExt = 'ts') {
 

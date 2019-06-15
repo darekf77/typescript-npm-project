@@ -75,7 +75,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
         try {
           const res = eval(exp);
-          // console.log(`[${path.basename(absoluteFilePath)}] Eval (${expression}) => ${res}`)
+          console.log(`[${path.basename(absoluteFilePath)}] Eval (${expression}) => ${res}`)
           result = cutIftrue ? res : !res;
         } catch (err) {
           // console.log(`Expression Failed`, err)
