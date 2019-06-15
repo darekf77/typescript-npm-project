@@ -5,7 +5,7 @@ import * as sass from 'node-sass';
 
 import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi/build';
 import { EnvConfig, ReplaceOptionsExtended, CutableFileExt } from '../../../models';
-import { error } from '../../../helpers';
+import { error, escapeStringForRegEx } from '../../../helpers';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from './incremental-build-process';
 import config from '../../../config';
@@ -54,7 +54,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   constructor(absoluteFilePath: string, private project?: Project, private compilationProject?: Project) {
     super(absoluteFilePath);
-    // this.debug('foo.component.ts');
+    // this.debug('modal.service.ts');
   }
 
   afterRegionsReplacement(content: string) {
@@ -128,7 +128,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   protected handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
-      console.error(`[browsercodecut] Please dont use tick \` ... `)
+      error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
       replacement = replacement.replace(/\`/g, '\\`');
     }
     return replacement;
@@ -239,7 +239,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     ext: CutableFileExt = 'ts'
   ) {
     // this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
-    const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
+    // const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
     const handleHtmlString = (ext === 'html' ? ' -->' : '');
     const customReplacement = '@customReplacement';
     // this.isDebuggingFile && console.log(pattern)
@@ -261,7 +261,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
           if (codeCuttFn(value.replace(/\-\-\>$/, ''), this.project && this.project.env.config, this.absoluteFilePath)) {
             // this.isDebuggingFile && console.log('[findReplacements] CUT CODE ! ')
 
-            const regexRep = new RegExp(`${pattern}\\s+${value}`, 'g');
+            const regexRep = new RegExp(`${pattern}\\s+${escapeStringForRegEx(value)}`, 'g');
             // this.isDebuggingFile && console.log(`[findReplacements] value: "${regexRep.source}"`)
 
             // this.isDebuggingFile && console.log(regexRep.source)
@@ -368,13 +368,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return regex;
   }
 
-  // debug(fileName: string) {
-  //   // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-  //   if (this.project) {
-  //     this.isDebuggingFile =  true; // (path.basename(this.absoluteFilePath) === fileName);
-  //   }
+  debug(fileName: string) {
+    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
+    if (this.project) {
+      this.isDebuggingFile = true; // (path.basename(this.absoluteFilePath) === fileName);
+    }
 
-  // }
+  }
 
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '', ext: CutableFileExt = 'ts') {
 

@@ -102,6 +102,10 @@ export function fixWebpackEnv(env: Object) {
   })
 }
 
+export function escapeStringForRegEx(s: string) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 export function copyFile(sousrce: string, destination: string,
   transformTextFn?: (input: string) => string, debugMode = false) {
 

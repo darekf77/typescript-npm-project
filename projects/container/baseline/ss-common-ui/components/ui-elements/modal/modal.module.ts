@@ -6,11 +6,10 @@ import { ModalService } from './modal.service';
 
 //#region @cutCodeIfFalse ENV.frameworks.includes('material')
 import { MatDialogModule } from '@angular/material/dialog';
-//#endregion
-
 const material = [
   MatDialogModule
 ]
+//#endregion
 
 @NgModule({
   imports: [
