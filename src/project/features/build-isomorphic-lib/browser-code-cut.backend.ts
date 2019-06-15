@@ -44,8 +44,6 @@ export class ExtendedCodeCut extends CodeCut {
 
 }
 
-const customReplacement = '@customReplacement';
-
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   // private debugging = false;
@@ -56,6 +54,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   constructor(absoluteFilePath: string, private project?: Project, private compilationProject?: Project) {
     super(absoluteFilePath);
+    // this.debug('foo.component.ts');
   }
 
   afterRegionsReplacement(content: string) {
@@ -233,25 +232,43 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return content;
   }
-  private findReplacements(stringContent: string, pattern: string, fun: (jsExpressionToEval: string, env: EnvConfig) => boolean) {
-
+  private findReplacements(
+    stringContent: string,
+    pattern: string,
+    codeCuttFn: (jsExpressionToEval: string, env: EnvConfig, absoluteFilePath: string) => boolean,
+    ext: CutableFileExt = 'ts'
+  ) {
+    this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
+    const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
+    const handleHtmlString = (ext === 'html' ? ' -->' : '');
+    const customReplacement = '@customReplacement';
     // this.isDebuggingFile && console.log(pattern)
+
+    this.isDebuggingFile && console.log(`[findReplacements] pattern: "${pattern}"`)
 
     const replacements = [];
     // console.log('WORD is fun')
     stringContent = stringContent.split('\n')
       .filter(f => !!f.trim())
       .map(line => {
+        // this.isDebuggingFile && console.log(`[LINE] "${line}"`)
         const indexPatternStart = line.search(pattern);
         if (indexPatternStart !== -1) {
           const value = line.substr(indexPatternStart + pattern.length).trim();
+          // this.isDebuggingFile && console.log(`[findReplacements] value: "${value}"`)
           // this.isDebuggingFile && console.log('value: ' + value)
-          if (fun(value, this.project && this.project.env.config)) {
-            // console.log('MATCH!: ' + value)
+          // value = value.trim().replace(/\-\-\>$/, '')
+          if (codeCuttFn(value.replace(/\-\-\>$/, ''), this.project && this.project.env.config, this.absoluteFilePath)) {
+            // this.isDebuggingFile && console.log('[findReplacements] CUT CODE ! ')
+
             const regexRep = new RegExp(`${pattern}\\s+${value}`, 'g');
+            // this.isDebuggingFile && console.log(`[findReplacements] value: "${regexRep.source}"`)
+
             // this.isDebuggingFile && console.log(regexRep.source)
-            line = line.replace(regexRep, customReplacement);
+            line = line.replace(regexRep, customReplacement + handleHtmlString);
             replacements.push(customReplacement);
+          } else {
+            // this.isDebuggingFile && console.log(`[findReplacements] DO NOT CUT CODE ! `)
           }
         }
         return line;
@@ -337,6 +354,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     options = _.clone(options);
     // console.log('options.replacements', options.replacements)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as CutableFileExt;
+    // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
       this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
     }
@@ -345,23 +363,36 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
 
   protected REGEX_REGION_HTML(word) {
-    return new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\<\\!\\-\\s*#?endregion ?[\\t ]*\\n?", "g")
+    const regex = new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\<\\!\\-\\-\\s*#?endregion\\s\\-\\-\\> ?[\\t ]*\\n?", "g");
+    // this.isDebuggingFile && console.log(regex.source)
+    return regex;
+  }
+
+  debug(fileName: string) {
+    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
+    if (this.project) {
+      this.isDebuggingFile =  true; // (path.basename(this.absoluteFilePath) === fileName);
+    }
+
   }
 
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '', ext: CutableFileExt = 'ts') {
 
-    if (replacementPatterns.length === 0) return stringContent;
+    if (replacementPatterns.length === 0) {
+      return stringContent;
+    }
     let pattern = replacementPatterns.shift();
     // console.log('replacementPatterns', replacementPatterns)
     if (Array.isArray(pattern) && pattern.length === 2) {
-      const funOrString = pattern[1] as Function;
+      const cutCodeFnOrString = pattern[1] as Function;
       pattern = pattern[0] as string;
-      if (_.isFunction(funOrString)) {
-        const rep = this.findReplacements(stringContent, pattern, funOrString);
+      if (_.isFunction(cutCodeFnOrString)) {
+        const rep = this.findReplacements(stringContent, pattern, cutCodeFnOrString, ext);
         // this.isDebuggingFile && console.log('replacements', replacements)
+        // this.isDebuggingFile && console.log('replacements', rep.replacements)
         return this.replaceRegionsWith(rep.stringContent, rep.replacements.concat(replacementPatterns), '', ext);
       } else {
-        replacement = funOrString as any;
+        replacement = cutCodeFnOrString as any;
       }
     }
     if (ext === 'html') {

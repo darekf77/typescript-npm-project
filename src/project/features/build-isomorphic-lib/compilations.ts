@@ -1,5 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as path from 'path';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut.backend';
@@ -54,20 +55,36 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   codeCuttFn(cutIftrue: boolean) {
-    return function (expression: string, e: EnvConfig) {
-      expression = expression.trim().replace(/\-\-\>$/, '')
-      const exp = `(function(ENV){
-        // console.log(typeof ENV)
-        return ${expression.trim()}
-      })(e)`;
-      // console.log(exp)
-      try {
-        const res = eval(exp);
-        return cutIftrue ? res : !res;
-      } catch (err) {
-        error(err, true, true);
+    return function (expression: string, e: EnvConfig, absoluteFilePath?: string) {
+
+      let result = false;
+
+      // console.log(`------------------------`)
+      // console.log('cutIftrue', cutIftrue)
+      if (!e) {
+        // console.log(`No environment`, e)
+      } else {
+        // console.log({
+        //   currentProjectName: e.currentProjectName,
+        //   currentProjectLocation: e.currentProjectLocation
+        // } as EnvConfig);
+        const exp = `(function(ENV){
+          // console.log(typeof ENV)
+          return ${expression.trim()}
+        })(e)`;
+
+        try {
+          const res = eval(exp);
+          // console.log(`[${path.basename(absoluteFilePath)}] Eval (${expression}) => ${res}`)
+          result = cutIftrue ? res : !res;
+        } catch (err) {
+          // console.log(`Expression Failed`, err)
+          error(`[codecutFn] Eval failed `);
+          error(err, true, true);
+        }
       }
-      return false;
+      // console.log(`Finally cut code  ? ${result} for ${path.basename(absoluteFilePath)}`)
+      return result;
     }
   }
 
