@@ -60,18 +60,18 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
 
   protected syncAction(): void {
-    this.options = this.isomorphiOptions;
+    // this.options = this.isomorphiOptions;
 
-    const files = this.project.customizableFilesAndFolders.concat(this.project.isSite ? [config.folder.custom] : [])
+    // const files = this.project.customizableFilesAndFolders.concat(this.project.isSite ? [config.folder.custom] : [])
 
-    files.forEach(f => {
-      const pathSrc = path.join(this.project.location, f);
-      if (fse.lstatSync(pathSrc).isDirectory()) {
-        glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
-          this.cb({ path: p, contents: fs.readFileSync(p, { encoding: 'utf8' }) }, this.options);
-        })
-      }
-    })
+    // files.forEach(f => {
+    //   const pathSrc = path.join(this.project.location, f);
+    //   if (fse.lstatSync(pathSrc).isDirectory()) {
+    //     glob.sync(`${pathSrc}/**/*.ts`).forEach(p => {
+    //       this.cb({ path: p, contents: fs.readFileSync(p, { encoding: 'utf8' }) }, this.options);
+    //     })
+    //   }
+    // })
   }
 
   protected preAsyncAction(): void {
@@ -79,36 +79,37 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
   protected asyncAction(filePath: string) {
     // console.log('SOurce modifier async !',filePath)
-    if (fse.existsSync(filePath)) {
-      this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
-    }
+
+    // if (fse.existsSync(filePath)) {
+    //   this.cb({ path: filePath, contents: fs.readFileSync(filePath, { encoding: 'utf8' }) }, this.options);
+    // }
 
   }
 
   private cb(file: { contents: string, path: string; }, options: IsomorphicOptions) {
-    const {
-      isWorkspaceChildProject,
-      localIsomorphicLibsNames,
-      currentProjectName,
-      angularLibs
-    } = options;
+    // const {
+    //   isWorkspaceChildProject,
+    //   localIsomorphicLibsNames,
+    //   currentProjectName,
+    //   angularLibs
+    // } = options;
 
-    if (isWorkspaceChildProject) {
-      let fileContent = file.contents.toString()
-      const orgFileContent = fileContent;
+    // if (isWorkspaceChildProject) {
+    //   let fileContent = file.contents.toString()
+    //   const orgFileContent = fileContent;
 
-      localIsomorphicLibsNames.forEach(libname => {
-        const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
-        fileContent = fileContent.replace(regex, `${libname}/${IncrementalBuildProcessExtended.getBrowserVerPath(currentProjectName)}/`)
-      })
+    //   localIsomorphicLibsNames.forEach(libname => {
+    //     const regex = new RegExp(`${libname}\\/${config.folder.browser}\\/`, 'g')
+    //     fileContent = fileContent.replace(regex, `${libname}/${IncrementalBuildProcessExtended.getBrowserVerPath(currentProjectName)}/`)
+    //   })
 
-      if (fileContent !== orgFileContent) {
-        fs.writeFileSync(file.path, fileContent, {
-          encoding: 'utf8'
-        });
-      }
+    //   if (fileContent !== orgFileContent) {
+    //     fs.writeFileSync(file.path, fileContent, {
+    //       encoding: 'utf8'
+    //     });
+    //   }
 
-    }
+    // }
   }
 
 }
