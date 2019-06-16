@@ -4,10 +4,10 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import config from '../../config';
-import { IncrementalBuildProcessExtended } from './build-isomorphic-lib/incremental-build-process';
-import { FeatureCompilerForProject, Project } from '../abstract';
-import { LibType } from '../../models';
+import config from '../../../config';
+import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import { FeatureCompilerForProject, Project } from '../../abstract';
+import { LibType } from '../../../models';
 
 
 export interface IsomorphicOptions {

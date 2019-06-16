@@ -362,10 +362,10 @@ export class BaselineSiteJoin extends FeatureForProject {
 
   private replacePathFn(relativeBaselineCustomPath: string) {
     return (input) => {
-      input = this.replace(input, relativeBaselineCustomPath).handlePrefixingFilesToEasyOverride();
-      input = this.replace(input, relativeBaselineCustomPath).handleReferingTOAngularLibModulesName();
-      input = this.replace(input, relativeBaselineCustomPath).handleReferingToBaselinePathes();
-      input = this.replace(input, relativeBaselineCustomPath).handleReferingToNewFilesOnlyAvailableInCustom();
+      input = this.replace(input, relativeBaselineCustomPath)._1___handlePrefixingFilesToEasyOverride();
+      input = this.replace(input, relativeBaselineCustomPath)._2___handleReferingTOAngularLibModulesName();
+      input = this.replace(input, relativeBaselineCustomPath)._3___handleReferingToBaselinePathes();
+      input = this.replace(input, relativeBaselineCustomPath)._4___handleReferingToNewFilesOnlyAvailableInCustom();
       return input;
     }
   }
@@ -380,39 +380,6 @@ export class BaselineSiteJoin extends FeatureForProject {
     return {
 
       /**
-       * Prefixed replacement
-       *
-       * Example:
-       *
-       * Files:
-       * - site: custom/src/example/totaly-new-file.ts
-       * - site:  src/app.ts => is refereing to 'totaly-new-file.ts' which is new file only available in site/custom
-       */
-      handleReferingToNewFilesOnlyAvailableInCustom() {
-        self.relativePathesCustom.forEach(relativePthInCustom => {
-          if (relativePthInCustom !== relativeBaselineCustomPath) {
-            let baselineFilePathNoExit = PathHelper.removeExtension(relativePthInCustom);
-
-            const pathToSiteeFile = path.join(self.project.location, baselineFilePathNoExit)
-            const pathToBaselineFile = path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit)
-
-            if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
-              let toReplace = getPrefixedBasename(baselineFilePathNoExit);
-
-              baselineFilePathNoExit = getRegexSourceString(baselineFilePathNoExit);
-              baselineFilePathNoExit = `\.${PathHelper.removeRootFolder(baselineFilePathNoExit)}`
-              const dirPath = path.dirname(relativePthInCustom);
-              toReplace = PathHelper.removeRootFolder(path.join(dirPath, toReplace))
-              toReplace = `.${toReplace}`
-              // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
-              input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
-            }
-          }
-        });
-        return input;
-      },
-
-      /**
        * Replace imports/export
        * Scope: current files baseline path in current generated file
        * Example:
@@ -425,9 +392,7 @@ export class BaselineSiteJoin extends FeatureForProject {
        *  Problem1 : If import `import {..} from 'baseline/exapmle.ts` is included in different files
        * than example.ts it is not going to be excluded
        */
-      handlePrefixingFilesToEasyOverride() {
-
-
+      _1___handlePrefixingFilesToEasyOverride() {
 
         const baselineFilePathNoExit = PathHelper.removeExtension(relativeBaselineCustomPath);
         if (debuggin) console.log(`baselineFilePathNoExit: ${baselineFilePathNoExit}`)
@@ -475,7 +440,7 @@ export class BaselineSiteJoin extends FeatureForProject {
        * import { Helpers } from 'baseline-name/angular-lib-name/(components/module/browser/dist)/helpers-path'
        *                                                        <- will be repaled do browser ->
        */
-      handleReferingTOAngularLibModulesName() {
+      _2___handleReferingTOAngularLibModulesName() {
         console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
         if (self.project.isWorkspaceChildProject) {
           const startFolder: SourceFolder = _.first(relativeBaselineCustomPath.replace(/^\//, '').split('/')) as SourceFolder;
@@ -546,13 +511,12 @@ export class BaselineSiteJoin extends FeatureForProject {
         return input;
       },
 
-
       /**
        * Same thing like in currentFilePath() but:
        *  - handle situation like in Problem1;
        *  - handle situation when in your custom files you are referening to custom files
        */
-      handleReferingToBaselinePathes() {
+      _3___handleReferingToBaselinePathes() {
 
         const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
 
@@ -596,7 +560,40 @@ export class BaselineSiteJoin extends FeatureForProject {
           })
         }
         return input;
-      }
+      }.
+
+      /**
+       * Prefixed replacement
+       *
+       * Example:
+       *
+       * Files:
+       * - site: custom/src/example/totaly-new-file.ts
+       * - site:  src/app.ts => is refereing to 'totaly-new-file.ts' which is new file only available in site/custom
+       */
+      _4___handleReferingToNewFilesOnlyAvailableInCustom() {
+        self.relativePathesCustom.forEach(relativePthInCustom => {
+          if (relativePthInCustom !== relativeBaselineCustomPath) {
+            let baselineFilePathNoExit = PathHelper.removeExtension(relativePthInCustom);
+
+            const pathToSiteeFile = path.join(self.project.location, baselineFilePathNoExit)
+            const pathToBaselineFile = path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit)
+
+            if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
+              let toReplace = getPrefixedBasename(baselineFilePathNoExit);
+
+              baselineFilePathNoExit = getRegexSourceString(baselineFilePathNoExit);
+              baselineFilePathNoExit = `\.${PathHelper.removeRootFolder(baselineFilePathNoExit)}`
+              const dirPath = path.dirname(relativePthInCustom);
+              toReplace = PathHelper.removeRootFolder(path.join(dirPath, toReplace))
+              toReplace = `.${toReplace}`
+              // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
+              input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
+            }
+          }
+        });
+        return input;
+      },
     }
 
   }
