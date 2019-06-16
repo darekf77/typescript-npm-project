@@ -124,7 +124,8 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
             browserOutFolder as any,
             location,
             cwd,
-            outFolder)
+            outFolder,
+            buildOptions)
         );
 
       }
@@ -155,7 +156,8 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
               browserOutFolder as any,
               location,
               cwd,
-              outFolder)
+              outFolder,
+              buildOptions)
           )
         })
 

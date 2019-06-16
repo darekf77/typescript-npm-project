@@ -15,6 +15,7 @@
 /npm-debug.log*
 /.sass-cache
 /.sourcemaps
+/src/tsconfig.app.json
 /src
 /components
 /__src
@@ -30,13 +31,14 @@
 /ng-package.json
 /tsconfig-aot.bundle.json
 /tsconfig-aot.dist.json
+/tsconfig.isomorphic.json
+/tsconfig.browser.json
+/src/tsconfig.app.json.filetemplate
 /src/tsconfig.packages.json
 /tsconfig.json
 /src/typings.d.ts
 /src/main.ts
 /src/polyfills.ts
-/src/tsconfig.app.json
 /src/tsconfig.spec.json
 /protractor.conf.js
 /karma.conf.js
-/src/assets/ss-common-ui

@@ -7,6 +7,7 @@ import { ExtendedCodeCut } from './browser-code-cut.backend';
 import { EnvConfig } from '../../../models';
 import { Project } from '../../abstract';
 import { compilationWrapperTnp, error } from '../../../helpers';
+import { BuildOptions } from '../build-options';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -44,12 +45,14 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     outFolder: OutFolder,
     location: string,
     cwd: string,
-    backendOut: string) {
+    backendOut: string,
+    public buildOptions: BuildOptions
+  ) {
 
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
 
-    this.initCodeCut.call(this, ENV, compilationProject)
+    this.initCodeCut.call(this, ENV, compilationProject, buildOptions)
 
 
   }
@@ -91,6 +94,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   initCodeCut() {
     let env: EnvConfig = arguments[0]
     const compilationProject: Project = arguments[1];
+    const buildOptions = arguments[2];
     if (!compilationProject) {
       return;
     }
@@ -106,7 +110,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       ].filter(f => !!f),
       env
     }, env ? Project.From(env.currentProjectLocation) : void 0,
-      compilationProject);
+      compilationProject,
+      buildOptions);
   }
 
 

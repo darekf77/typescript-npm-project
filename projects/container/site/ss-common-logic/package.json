@@ -12,5 +12,18 @@
     "requiredLibs": [
       "../../workspace/isomorphic-lib"
     ]
-  }
+  },
+  "isomorphicPackages": [
+    "browserify-sign",
+    "json10",
+    "lodash-walk-object",
+    "morphi",
+    "ng2-logger",
+    "ng2-rest",
+    "static-columns",
+    "timespan",
+    "tnp-bundle",
+    "typeorm",
+    "typescript-class-helpers"
+  ]
 }

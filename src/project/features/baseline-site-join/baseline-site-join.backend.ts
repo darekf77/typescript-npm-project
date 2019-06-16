@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
-import { LibType, RecreateFile, FileEvent } from "../../../models";
+import { LibType, RecreateFile, FileEvent, SourceFolder } from "../../../models";
 import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp } from '../../../helpers';
 import config from '../../../config';
 import { error } from '../../../helpers';
@@ -476,35 +476,71 @@ export class BaselineSiteJoin extends FeatureForProject {
        *                                                        <- will be repaled do browser ->
        */
       handleReferingTOAngularLibModulesName() {
-
+        console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
         if (self.project.isWorkspaceChildProject) {
-          const angularLibs = self.project.parent.baseline.children
-            .filter(c => c.type === 'angular-lib')
-            .map(c => c.name)
+          const startFolder: SourceFolder = _.first(relativeBaselineCustomPath.replace(/^\//, '').split('/')) as SourceFolder;
 
-          angularLibs.forEach(angularLibName => {
-            const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+          if (self.project.type === 'angular-lib') {
 
-            const reg = new RegExp(regexSourece, 'g')
+            const angularLibs = self.project.parent.baseline.children
+              .filter(c => c.type === 'angular-lib')
+              .map(c => c.name)
 
-            if (reg.test(input)) {
-              // console.log('REPLEACEDD  !!!!')
-              input = input.replace(reg,
-                `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
+
+            if (startFolder === 'components') {
+              angularLibs.forEach(angularLibName => {
+                const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+                const reg = new RegExp(regexSourece, 'g')
+
+                if (reg.test(input)) {
+                  // console.log('REPLEACEDD  !!!!')
+                  input = input.replace(reg,
+                    `${angularLibName}/${config.folder.components}`);
+                }
+              });
+
+              angularLibs.forEach(angularLibName => {
+                const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+                const reg = new RegExp(regexSourece, 'g')
+
+                if (reg.test(input)) {
+                  // console.log('REPLEACEDD  !!!!')
+                  input = input.replace(reg,
+                    `${angularLibName}/${config.folder.components}`);
+                }
+              });
+            } else if (startFolder === 'src') {
+              angularLibs.forEach(angularLibName => {
+                const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+                const reg = new RegExp(regexSourece, 'g')
+
+                if (reg.test(input)) {
+                  // console.log('REPLEACEDD  !!!!')
+                  input = input.replace(reg,
+                    `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
+                }
+              });
+
+              angularLibs.forEach(angularLibName => {
+                const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
+
+                const reg = new RegExp(regexSourece, 'g')
+
+                if (reg.test(input)) {
+                  // console.log('REPLEACEDD  !!!!')
+                  input = input.replace(reg,
+                    `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
+                }
+              });
             }
-          });
 
-          angularLibs.forEach(angularLibName => {
-            const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
 
-            const reg = new RegExp(regexSourece, 'g')
+          }
 
-            if (reg.test(input)) {
-              // console.log('REPLEACEDD  !!!!')
-              input = input.replace(reg,
-                `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
-            }
-          });
+
 
         }
         return input;
