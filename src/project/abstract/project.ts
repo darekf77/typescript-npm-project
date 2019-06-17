@@ -626,6 +626,40 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  get childrenThatAreLibs(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.childrenThatAreLibs;
+    }
+    //#region @backend
+    return this.children.filter(c => {
+      return (['angular-lib', 'isomorphic-lib'] as LibType[]).includes(c.type);
+    });
+    //#endregion
+  }
+
+  get childrenThatAreClients(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.childrenThatAreClients;
+    }
+    //#region @backend
+    return this.children.filter(c => {
+      return !(['angular-lib', 'isomorphic-lib'] as LibType[]).includes(c.type);
+    });
+    //#endregion
+  }
+
+  get childrenThatAreThirdPartyInNodeModules(): Project[] {
+    if (Morphi.IsBrowser) {
+      return this.browser.childrenThatAreThirdPartyInNodeModules;
+    }
+    //#region @backend
+    return this.packageJson.isomorphicPackages.map(c => {
+      const p = path.join(this.location, config.folder.node_modules, c);
+      return Project.From(p);
+    }).filter(f => !!f);
+    //#endregion
+  }
+
   //#region @backend
   protected quickFixMissingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {

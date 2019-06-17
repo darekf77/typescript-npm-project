@@ -168,8 +168,8 @@ export default {
   PSINFO: async (a) => {
     await $PSINFO(a)
   },
-  $MOD: () => {
-    Project.Current.sourceModifier.init()
+  $MOD: async () => {
+    await Project.Current.sourceModifier.init(`Source modfier`)
     process.exit(0)
   },
   UPDATE_ISOMORPHIC() {

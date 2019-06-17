@@ -30,6 +30,9 @@ export interface IProject {
   env: EnvironmentConfig;
   allowedEnvironments: EnvironmentName[];
   children: Project[];
+  childrenThatAreLibs?: Project[];
+  childrenThatAreClients?: Project[];
+  childrenThatAreThirdPartyInNodeModules?: Project[];
   parent: Project;
   preview: Project;
   baseline: Project;

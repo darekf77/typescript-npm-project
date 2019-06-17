@@ -9,7 +9,7 @@ export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
 
-export type SourceFolder = 'src' | 'components';
+export type SourceFolder = 'src' | 'components' | 'custom';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 

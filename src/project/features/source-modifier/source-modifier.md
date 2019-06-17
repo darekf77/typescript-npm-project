@@ -1,14 +1,7 @@
 Lib types     = 'isomorphic-lib'|'angular-lib'
 Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'electron-client'
 
-# Standalone projects
-+ Prevent use of workspace projects
 
-+ Browser compilation for standalone project
-  -   (third-party-(angular-lib|isomorphic-lib)-name)
-  =>  (third-party-(angular-lib|isomorphic-lib)-name)/browser"
-
-+ Between project not allowed to use (src|components)
 
 # Baseline rules
 
@@ -31,7 +24,9 @@ Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'
 =>  (third-party-(angular-lib|isomorphic-lib)-name)/browser"
 
 
-# Site rules
+# Site rule
+
++ ONlY APPLY TO CUSTOM FOLDER:
 
 + Prevention of use baseline/builded folder:
   -   baseline/(workspace-child-(angular-lib|isomorphic-lib)-name)/(browser|browser-for-*|module|dist|bundle|)
@@ -42,6 +37,14 @@ Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'
   =>  (workspace-child-(angular-lib|isomorphic-lib)-name)/(src|components)
 
 
+# Standalone projects (not important yet)
++ Prevent use of workspace projects (tnp-bundle)
+
++ Browser compilation for standalone project
+  -   (third-party-(angular-lib|isomorphic-lib)-name)
+  =>  (third-party-(angular-lib|isomorphic-lib)-name)/browser"
+
++ Between project not allowed to use (src|components)
 
 
 # Things to check:

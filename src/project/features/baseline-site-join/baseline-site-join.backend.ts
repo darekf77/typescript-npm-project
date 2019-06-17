@@ -560,7 +560,7 @@ export class BaselineSiteJoin extends FeatureForProject {
           })
         }
         return input;
-      }.
+      },
 
       /**
        * Prefixed replacement

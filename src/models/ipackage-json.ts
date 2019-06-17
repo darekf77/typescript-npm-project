@@ -43,6 +43,7 @@ export interface IPackageJSON {
 
   dependencies?: DependenciesFromPackageJsonStyle;
   devDependencies?: DependenciesFromPackageJsonStyle;
+  isomorphicPackages?: string[];
   tnp: {
     type: LibType;
     frameworks?: UIFramework[];
