@@ -13,6 +13,8 @@ import { TsUsage } from 'morphi/build';
 import { error } from '../../../helpers';
 //#endregion
 
+const debugFiles = ['components/index.ts']
+
 export class SourceModifier extends FeatureCompilerForProject {
 
   //#region get source type lib - for libs, app - for clients
@@ -31,7 +33,10 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#endregion
 
 
+
   public static PreventNotUseOfTsSourceFolders(project: Project, relativePath: string, input?: string): string {
+    // console.log(`MOD: "${relativePath}"`)
+    const debugging = debugFiles.includes(relativePath);
     //#region init
     const saveMode = _.isUndefined(input);
     const modType = this.getModType(project, relativePath);
@@ -41,7 +46,18 @@ export class SourceModifier extends FeatureCompilerForProject {
         encoding: 'utf8'
       });
     }
+    debugging && console.log('------------')
+    // debugging && console.log(input)
+    debugging && console.log('------------')
     //#endregion
+
+    debugging && console.log('modType', modType)
+
+    // debugging && console.log('project.childrenThatAreLibs', project.parent.childrenThatAreLibs.map( c => c.name ))
+
+    // debugging && console.log('project.childrenThatAreClients', project.parent.childrenThatAreClients.map( c => c.name ))
+
+    // debugging && console.log('project.childrenThatAreThirdPartyInNodeModules', project.childrenThatAreThirdPartyInNodeModules.map( c => c.name ))
 
     if (modType === 'lib') {
 
@@ -72,22 +88,24 @@ export class SourceModifier extends FeatureCompilerForProject {
       //#region Prevent incorect use of libraries in other libraries
       (() => {
         const notallowed = [
+          ...project.parent.childrenThatAreLibs.map(c => {
+            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+          }),
+          ...project.parent.childrenThatAreClients.map(c => {
+            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+          })
+        ];
+
+        const notAllowedFor = notallowed.concat([
           config.folder.browser,
           config.folder.dist,
           config.folder.module,
           config.folder.bundle
-        ];
-
-        const notAllowedFor = notallowed.concat([
-          ...project.childrenThatAreLibs.map(c => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-          }),
-          ...project.childrenThatAreClients.map(c => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-          })
         ]);
 
-        project.childrenThatAreLibs.forEach((child) => {
+
+
+        project.parent.childrenThatAreLibs.forEach((child) => {
           const libName = child.name;
 
           const sourceFolder = child.type === 'isomorphic-lib' ? config.folder.src :
@@ -121,38 +139,40 @@ export class SourceModifier extends FeatureCompilerForProject {
        */
       //#region errors when refering to client inside lib
       (() => {
-        project.childrenThatAreClients.forEach((child) => {
-          const clientName = child.name;
+        project.parent.childrenThatAreClients
+          .filter(c => c.type !== 'isomorphic-lib')
+          .forEach((child) => {
+            const clientName = child.name;
 
-          let regexSourece = `(\\"|\\')${clientName}\/(${config.folder.src})`;
-          let matches = input.match(new RegExp(regexSourece, 'g'));
-          if (_.isArray(matches)) {
-            matches.forEach(m => {
-              error(`Please don't use client "${clientName}" inside source code of lib "${project.genericName}":
+            let regexSourece = `(\\"|\\')${clientName}\/(${config.folder.src})`;
+            let matches = input.match(new RegExp(regexSourece, 'g'));
+            if (_.isArray(matches)) {
+              matches.forEach(m => {
+                error(`Please don't use client "${clientName}" inside source code of lib "${project.genericName}":
              files: ${relativePath}
             ...
             ${m}
             ...
              `, true, true)
-            });
-          }
+              });
+            }
 
-          if (project.isSite && project.isWorkspaceChildProject) {
-            regexSourece = `(\\"|\\')${project.parent.baseline.name}\/${clientName}\/(${config.folder.src})`;
-            matches = input.match(new RegExp(regexSourece, 'g'));
-            if (_.isArray(matches)) {
-              matches.forEach(m => {
-                error(`Please don't use baseline client "${clientName}" inside source code of lib "${project.genericName}":
+            if (project.isSite && project.isWorkspaceChildProject) {
+              regexSourece = `(\\"|\\')${project.parent.baseline.name}\/${clientName}\/(${config.folder.src})`;
+              matches = input.match(new RegExp(regexSourece, 'g'));
+              if (_.isArray(matches)) {
+                matches.forEach(m => {
+                  error(`Please don't use baseline client "${clientName}" inside source code of lib "${project.genericName}":
                files: ${relativePath}
               ...
               ${m}
               ...
                `, true, true)
-              });
+                });
+              }
             }
-          }
 
-        });
+          });
       })();
       //#endregion
 
@@ -166,7 +186,7 @@ export class SourceModifier extends FeatureCompilerForProject {
       (() => {
         const notallowed = [config.folder.dist, config.folder.bundle];
 
-        project.childrenThatAreThirdPartyInNodeModules.forEach((child) => {
+        project.parent.childrenThatAreThirdPartyInNodeModules.forEach((child) => {
           const libName = child.name;
 
           const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
@@ -205,7 +225,7 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.components,
         ];
 
-        project.childrenThatAreLibs.forEach((child) => {
+        project.parent.childrenThatAreLibs.forEach((child) => {
           const libName = child.name;
 
 
@@ -259,39 +279,41 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.components,
         ];
 
-        project.childrenThatAreClients.forEach((child) => {
-          const clientName = child.name;
+        project.parent.childrenThatAreClients
+          .filter(c => c.type !== 'isomorphic-lib')
+          .forEach((child) => {
+            const clientName = child.name;
 
-          if (project.isSite && project.isWorkspaceChildProject) {
-            const regexSourece = `(\\"|\\')${project.parent.baseline.name}\/${clientName}(\/(${notallowed.join('|')}))*`;
-            const matches = input.match(new RegExp(regexSourece, 'g'));
-            if (_.isArray(matches)) {
-              matches.forEach(m => {
-                error(`Please don't use baseline client ("${project.parent.baseline.name}/${clientName}")
+            if (project.isSite && project.isWorkspaceChildProject) {
+              const regexSourece = `(\\"|\\')${project.parent.baseline.name}\/${clientName}(\/(${notallowed.join('|')}))*`;
+              const matches = input.match(new RegExp(regexSourece, 'g'));
+              if (_.isArray(matches)) {
+                matches.forEach(m => {
+                  error(`Please don't use baseline client ("${project.parent.baseline.name}/${clientName}")
               code inside source code of this client "${project.genericName}":
                files: ${relativePath}
               ...
               ${m}
               ...
                `, true, true)
-              });
+                });
+              }
             }
-          }
 
-          const regexSourece = `(\\"|\\')${clientName}(\/(${notallowed.join('|')}))*`;
-          const matches = input.match(new RegExp(regexSourece, 'g'));
-          if (_.isArray(matches)) {
-            matches.forEach(m => {
-              error(`Please don't use another client ("${clientName}") code inside source code of this client "${project.genericName}":
+            const regexSourece = `(\\"|\\')${clientName}(\/(${notallowed.join('|')}))*`;
+            const matches = input.match(new RegExp(regexSourece, 'g'));
+            if (_.isArray(matches)) {
+              matches.forEach(m => {
+                error(`Please don't use another client ("${clientName}") code inside source code of this client "${project.genericName}":
              files: ${relativePath}
             ...
             ${m}
             ...
              `, true, true)
-            });
-          }
+              });
+            }
 
-        });
+          });
       })();
       //#endregion
 
@@ -323,6 +345,7 @@ export class SourceModifier extends FeatureCompilerForProject {
   protected syncAction(): void {
     //#region SYNC ACTION
     const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
+    // console.log(files)
     files.forEach(f => {
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
     });
