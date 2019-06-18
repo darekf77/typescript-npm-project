@@ -91,6 +91,14 @@ export class FilesStructure extends FeatureForProject {
     // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
     info(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
 
+
+    if (this.project.isWorkspaceChildProject) {
+      const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);
+      if (!fse.existsSync(isInNodeMOdules)) {
+        this.project.parent.workspaceSymlinks.add(`Init of workspace child project`)
+      }
+    }
+
     if (!onlyJoin) {
       this.project.tnpBundle.installAsPackage()
       if (!this.project.node_modules.exist) {

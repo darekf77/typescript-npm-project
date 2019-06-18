@@ -23,6 +23,7 @@ import {
 import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join.debug.backend';
 import { REGEXS } from './baseline-site-join.regexes.backend';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
+import { SourceModifier } from '../source-modifier';
 //#endregion
 
 
@@ -441,72 +442,9 @@ export class BaselineSiteJoin extends FeatureForProject {
        *                                                        <- will be repaled do browser ->
        */
       _2___handleReferingTOAngularLibModulesName() {
-        console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
+        // console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
         if (self.project.isWorkspaceChildProject) {
-          const startFolder: SourceFolder = _.first(relativeBaselineCustomPath.replace(/^\//, '').split('/')) as SourceFolder;
-
-          if (self.project.type === 'angular-lib') {
-
-            const angularLibs = self.project.parent.baseline.children
-              .filter(c => c.type === 'angular-lib')
-              .map(c => c.name)
-
-
-            if (startFolder === 'components') {
-              angularLibs.forEach(angularLibName => {
-                const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
-
-                const reg = new RegExp(regexSourece, 'g')
-
-                if (reg.test(input)) {
-                  // console.log('REPLEACEDD  !!!!')
-                  input = input.replace(reg,
-                    `${angularLibName}/${config.folder.components}`);
-                }
-              });
-
-              angularLibs.forEach(angularLibName => {
-                const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
-
-                const reg = new RegExp(regexSourece, 'g')
-
-                if (reg.test(input)) {
-                  // console.log('REPLEACEDD  !!!!')
-                  input = input.replace(reg,
-                    `${angularLibName}/${config.folder.components}`);
-                }
-              });
-            } else if (startFolder === 'src') {
-              angularLibs.forEach(angularLibName => {
-                const regexSourece = `${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
-
-                const reg = new RegExp(regexSourece, 'g')
-
-                if (reg.test(input)) {
-                  // console.log('REPLEACEDD  !!!!')
-                  input = input.replace(reg,
-                    `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
-                }
-              });
-
-              angularLibs.forEach(angularLibName => {
-                const regexSourece = `${self.project.parent.baseline.name}\/${angularLibName}\/(${moduleNameAngularLib.join('|')})`;
-
-                const reg = new RegExp(regexSourece, 'g')
-
-                if (reg.test(input)) {
-                  // console.log('REPLEACEDD  !!!!')
-                  input = input.replace(reg,
-                    `${angularLibName}/${IncrementalBuildProcessExtended.getBrowserVerPath(self.project.name)}`);
-                }
-              });
-            }
-
-
-          }
-
-
-
+          input = SourceModifier.PreventNotUseOfTsSourceFolders(self.project, relativeBaselineCustomPath, input);
         }
         return input;
       },
