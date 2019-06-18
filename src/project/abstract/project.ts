@@ -632,7 +632,10 @@ export abstract class BaseProject {
     }
     //#region @backend
     return this.children.filter(c => {
-      return (['angular-lib', 'isomorphic-lib'] as LibType[]).includes(c.type);
+      return ([
+        'angular-lib',
+        'isomorphic-lib'
+      ] as LibType[]).includes(c.type);
     });
     //#endregion
   }
@@ -643,7 +646,12 @@ export abstract class BaseProject {
     }
     //#region @backend
     return this.children.filter(c => {
-      return !(['angular-lib', 'isomorphic-lib'] as LibType[]).includes(c.type);
+      return ([
+        'angular-lib',
+        'isomorphic-lib',
+        'angular-client',
+        'ionic-client',
+      ] as LibType[]).includes(c.type);
     });
     //#endregion
   }
