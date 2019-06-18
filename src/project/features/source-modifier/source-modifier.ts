@@ -79,7 +79,7 @@ export class SourceModifier extends FeatureCompilerForProject {
             (child.type === 'angular-lib' ? config.folder.components : void 0)
 
           const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
-          input = input.replace(new RegExp(regexSoureceForAlone, 'g'), `${libName}/${sourceFolder}`);
+          input = input.replace(new RegExp(regexSoureceForAlone, 'g'), `'${libName}/${sourceFolder}'`);
 
           const notAllowedFor = notallowed.concat([
             IncrementalBuildProcessExtended.getBrowserVerPath(libName)
