@@ -118,11 +118,17 @@ export class FilesStructure extends FeatureForProject {
 
       const someBuildIsActive = await db.transaction.someBuildIsActive(this.project)
 
-      if (watch) {
-        await this.project.join.initAndWatch(someBuildIsActive)
+      console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
-      } else if (!someBuildIsActive) {
+      if (watch) {
+        await this.project.join.initAndWatch(
+          someBuildIsActive
+          )
+
+      } else {
+        // if (!someBuildIsActive) { // TODO
         await this.project.join.init()
+        // }
       }
 
       if (!onlyJoin) {

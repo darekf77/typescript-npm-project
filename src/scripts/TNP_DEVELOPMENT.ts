@@ -169,6 +169,9 @@ export default {
     await $PSINFO(a)
   },
   $MOD: async () => {
+    if(Project.Current.isSite) {
+      await Project.Current.join.init();
+    }
     await Project.Current.sourceModifier.init(`Source modfier`)
     process.exit(0)
   },
