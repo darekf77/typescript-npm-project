@@ -232,27 +232,83 @@ export class SourceModifier extends FeatureCompilerForProject {
             );
           }
 
-          const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
-          input = replace(input,
-            new RegExp(regexSoureceForAlone, 'g'),
-            `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}'`
-          );
+          (() => {
+            const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
+            input = replace(input,
+              new RegExp(regexSoureceForAlone, 'g'),
+              `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}'`
+            );
+          })();
 
           if (project.isSite && project.isWorkspaceChildProject) {
-            const regexSoureceForNotAllowed = `(\\"|\\')${project.parent.baseline.name}\/${libName}\/(${notallowed.join('|')})`;
+            const regexSoureceForNotAllowed = `(\\"|\\')${project.parent.baseline.name}\/${libName}\/(${notallowed.join('|')})(?!\-)`;
             input = replace(input,
               new RegExp(regexSoureceForNotAllowed, 'g'),
               `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
             );
           }
 
-          const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(${notallowed.join('|')})`;
-          input = replace(input,
-            new RegExp(regexSoureceForNotAllowed, 'g'),
-            `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
-          );
+          (() => {
+            const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(${notallowed.join('|')})(?!\-)`;
+            input = replace(input,
+              new RegExp(regexSoureceForNotAllowed, 'g'),
+              `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
+            );
+          })();
+
+          (() => {
+            const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(?!(${notallowed.join('|')}))`;
+            input = replace(input,
+              new RegExp(regexSoureceForNotAllowed, 'g'),
+              `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}/`
+            );
+          })();
 
         });
+      })();
+      //#endregion
+
+      /**
+       * 'angular-lib-name => 'components
+       * 'angular-lib-name/ => 'components/
+       * 'angular-lib-name/(notallowedfolder)' => 'angular-lib-name/browser-for-client-name'
+       */
+      //#region handle replaceing 'components' instead library name itself in angular-lib src
+      (() => {
+        if (project.type === 'angular-lib') {
+
+          const notallowed = [
+            ...project.parent.childrenThatAreLibs.map(c => {
+              return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+            }),
+            ...project.parent.childrenThatAreClients.map(c => {
+              return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+            })
+          ];
+
+          const notAllowedFor = notallowed.concat([
+            config.folder.browser,
+            config.folder.dist,
+            config.folder.module,
+            config.folder.bundle,
+          ]);
+
+          (() => {
+            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/`;
+            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}/`);
+          })();
+
+          (() => {
+            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/(${notAllowedFor.join('|')})(\\"|\\')`;
+            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
+          })();
+
+          (() => {
+            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}(\/(${notAllowedFor.join('|')}))?`;
+            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}`);
+          })();
+
+        }
       })();
       //#endregion
 
