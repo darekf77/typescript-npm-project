@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy, OnInit, Component, Input } from '@angular/core';
-import { NavigationEnd, Router } from "@angular/router";
+import { NavigationEnd, Router } from '@angular/router';
 
 
 @Component({

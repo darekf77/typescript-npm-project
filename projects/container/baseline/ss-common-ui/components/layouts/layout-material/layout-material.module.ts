@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // third part
-import { StaticColumnsModule } from "static-columns";
+import { StaticColumnsModule } from 'static-columns';
 // local
 import { LayoutMaterialComponent } from './layout-material.component';
 import { LogoModule } from '../../ui-elements';

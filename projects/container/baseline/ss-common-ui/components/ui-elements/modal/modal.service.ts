@@ -1,8 +1,8 @@
 //#region @cutCodeIfFalse ENV.frameworks.includes('material')
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog } from '@angular/material/dialog';
 //#endregion
 
-import { TemplateRef, Injectable } from "@angular/core";
+import { TemplateRef, Injectable } from '@angular/core';
 
 import { EnvConfig } from 'tnp-bundle';
 
