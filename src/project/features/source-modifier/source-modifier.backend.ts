@@ -34,7 +34,16 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
   //#endregion
 
-
+  private static fixDoubleApostophe(input: string) {
+    const regex = /(import|export|require\(|\}\sfrom\s(\"|\')).+(\"|\')/g;
+    const matches = input.match(regex);
+    if (_.isArray(matches)) {
+      matches.forEach(m => {
+        input = input.replace(m, m.replace(/\"/g, `'`));
+      });
+    }
+    return input;
+  }
 
   public static PreventNotUseOfTsSourceFolders(project: Project, relativePath: string, input?: string): string {
     // console.log(`MOD: "${relativePath}"`)
@@ -48,6 +57,8 @@ export class SourceModifier extends FeatureCompilerForProject {
         encoding: 'utf8'
       });
     }
+    input = this.fixDoubleApostophe(input);
+
     debugging && console.log('------------')
     // debugging && console.log(input)
     debugging && console.log('------------')
@@ -342,7 +353,7 @@ export class SourceModifier extends FeatureCompilerForProject {
         ];
 
         project.parent.childrenThatAreClients
-          .filter(c => c.type !== 'isomorphic-lib')
+          .filter(c => !(['isomorphic-lib', 'angular-lib'] as LibType[]).includes(c.type))
           .forEach((child) => {
             const clientName = child.name;
 

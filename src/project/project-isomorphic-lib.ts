@@ -25,7 +25,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
   //#region @backend
   startOnCommand(args: string) {
-    const command = `node run.js ${args}`;
+    const command = `ts-node run.js ${args}`;
     return command;
   }
 
