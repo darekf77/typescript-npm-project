@@ -34,6 +34,7 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
   //#endregion
 
+  //#region fix double apostrophes in imports,export, requires
   private static fixDoubleApostophe(input: string) {
     const regex = /(import|export|require\(|\}\sfrom\s(\"|\')).+(\"|\')/g;
     const matches = input.match(regex);
@@ -44,6 +45,51 @@ export class SourceModifier extends FeatureCompilerForProject {
     }
     return input;
   }
+  //#endregion
+
+  /**
+   * 'angular-lib-name => 'components
+   * 'angular-lib-name/ => 'components/
+   * 'angular-lib-name/(notallowedfolder)' => 'angular-lib-name/browser-for-client-name'
+   */
+  //#region handle replaceing 'components' instead library name itself in angular-lib src
+  public static AngularLibComponentsInsteadItselfFix(project: Project, input: string) {
+
+    const notallowed = [
+      project.name,
+      ...project.parent.childrenThatAreLibs.map(c => {
+        return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+      }),
+      ...project.parent.childrenThatAreClients.map(c => {
+        return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
+      })
+    ];
+
+    const notAllowedFor = notallowed.concat([
+      config.folder.browser,
+      config.folder.dist,
+      config.folder.module,
+      config.folder.bundle,
+    ]);
+
+    (() => {
+      const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/`;
+      input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}/`);
+    })();
+
+    (() => {
+      const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/(${notAllowedFor.join('|')})(\\"|\\')`;
+      input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
+    })();
+
+    (() => {
+      const regexSoureceForNotAllowed = `(\\"|\\')${project.name}(\/(${notAllowedFor.join('|')}))?`;
+      input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}`);
+    })();
+
+    return input;
+  }
+  //#endregion
 
   public static PreventNotUseOfTsSourceFolders(project: Project, relativePath: string, input?: string): string {
     // console.log(`MOD: "${relativePath}"`)
@@ -291,48 +337,11 @@ export class SourceModifier extends FeatureCompilerForProject {
       //#endregion
 
       /**
-       * 'angular-lib-name => 'components
-       * 'angular-lib-name/ => 'components/
-       * 'angular-lib-name/(notallowedfolder)' => 'angular-lib-name/browser-for-client-name'
+       * In site this is done in baseline-site-join
        */
-      //#region handle replaceing 'components' instead library name itself in angular-lib src
-      (() => {
-        if (project.type === 'angular-lib') {
-
-          const notallowed = [
-            ...project.parent.childrenThatAreLibs.map(c => {
-              return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-            }),
-            ...project.parent.childrenThatAreClients.map(c => {
-              return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-            })
-          ];
-
-          const notAllowedFor = notallowed.concat([
-            config.folder.browser,
-            config.folder.dist,
-            config.folder.module,
-            config.folder.bundle,
-          ]);
-
-          (() => {
-            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/`;
-            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}/`);
-          })();
-
-          (() => {
-            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}\/(${notAllowedFor.join('|')})(\\"|\\')`;
-            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
-          })();
-
-          (() => {
-            const regexSoureceForNotAllowed = `(\\"|\\')${project.name}(\/(${notAllowedFor.join('|')}))?`;
-            input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}`);
-          })();
-
-        }
-      })();
-      //#endregion
+      if (project.type === 'angular-lib' && !project.isSite) {
+        input = this.AngularLibComponentsInsteadItselfFix(project, input);
+      }
 
       /**
        * 'baseline/client-name
