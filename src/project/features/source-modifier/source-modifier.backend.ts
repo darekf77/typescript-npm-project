@@ -203,11 +203,14 @@ export class SourceModifier extends FeatureCompilerForProject {
       //#endregion
 
       /**
-       * (SITE ONLY) 'baseline/anguliar-lib' => 'angular-lib/browser-for-client-name';
-       * 'anguliar-lib' => 'angular-lib/browser-for-client-name'
+       * (SITE ONLY) 'baseline/lib-name' => 'lib-name/browser-for-client-name';
+       * 'lib-name' => 'lib-nameb/browser-for-client-name'
        *
-       * (SITE ONLY) 'baseline/anguliar-lib/(not-allowed-folders) => 'angular-lib/browser-for-client-name
-       * 'anguliar-lib/(not-allowed-folders) => 'angular-lib/browser-for-client-name
+       * (SITE ONLY) 'baseline/lib-name/(not-allowed-folders) => 'lib-name/browser-for-client-name
+       * 'lib-name/(not-allowed-folders) => 'lib-name/browser-for-client-name
+       *
+       * (SITE ONLY) 'baseline/lib-name/ => 'lib-name/browser-for-client-name/
+       * 'lib-name/ => 'lib-name/browser-for-client-name/
        */
       //#region handle workspace libs names in clients
       (() => {
@@ -255,6 +258,14 @@ export class SourceModifier extends FeatureCompilerForProject {
               `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
             );
           })();
+
+          if (project.isSite && project.isWorkspaceChildProject) {
+            const regexSoureceForNotAllowed = `(\\"|\\')${project.parent.baseline.name}\/${libName}\/(?!(${notallowed.join('|')}))`;
+            input = replace(input,
+              new RegExp(regexSoureceForNotAllowed, 'g'),
+              `'${project.parent.baseline.name}/${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}/`
+            );
+          }
 
           (() => {
             const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(?!(${notallowed.join('|')}))`;
