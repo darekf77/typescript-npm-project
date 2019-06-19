@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProcessConsoleInfoComponent } from './process-console-info.component';
-import { ResizeService } from 'ss-common-ui/browser/helpers';
+import { ResizeService } from 'ss-common-ui/components/helpers';
 
 @NgModule({
   imports: [
