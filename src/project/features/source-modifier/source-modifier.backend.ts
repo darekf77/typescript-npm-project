@@ -13,7 +13,9 @@ import { TsUsage } from 'morphi/build';
 import { error } from '../../../helpers';
 //#endregion
 
-const debugFiles = ['components/index.ts']
+const debugFiles = [
+  // 'components/index.ts'
+];
 
 export class SourceModifier extends FeatureCompilerForProject {
 
@@ -53,11 +55,6 @@ export class SourceModifier extends FeatureCompilerForProject {
 
     debugging && console.log('modType', modType)
 
-    // debugging && console.log('project.childrenThatAreLibs', project.parent.childrenThatAreLibs.map( c => c.name ))
-
-    // debugging && console.log('project.childrenThatAreClients', project.parent.childrenThatAreClients.map( c => c.name ))
-
-    // debugging && console.log('project.childrenThatAreThirdPartyInNodeModules', project.childrenThatAreThirdPartyInNodeModules.map( c => c.name ))
 
     if (modType === 'lib') {
 
@@ -74,7 +71,7 @@ export class SourceModifier extends FeatureCompilerForProject {
         project.childrenThatAreThirdPartyInNodeModules.forEach((child) => {
           const libName = child.name;
           const regexSourece = `(\\"|\\')${libName}\/(${notallowed.join('|')})`;
-          input = input.replace(new RegExp(regexSourece, 'g'), `'${libName}`);
+          input = replace(input, new RegExp(regexSourece, 'g'), `'${libName}`);
         });
       })();
       //#endregion
@@ -103,8 +100,6 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.bundle
         ]);
 
-
-
         project.parent.childrenThatAreLibs.forEach((child) => {
           const libName = child.name;
 
@@ -113,19 +108,19 @@ export class SourceModifier extends FeatureCompilerForProject {
 
           if (project.isSite && project.isWorkspaceChildProject) {
             const regexBaselinePathIncorrenct = `(\\"|\\')${project.parent.baseline.name}\/${libName}(\\"|\\')`;
-            input = input.replace(new RegExp(regexBaselinePathIncorrenct, 'g'),
+            input = replace(input, new RegExp(regexBaselinePathIncorrenct, 'g'),
               `'${project.parent.baseline.name}/${libName}/${sourceFolder}'`);
           }
 
           const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
-          input = input.replace(new RegExp(regexSoureceForAlone, 'g'), `'${libName}/${sourceFolder}'`);
+          input = replace(input, new RegExp(regexSoureceForAlone, 'g'), `'${libName}/${sourceFolder}'`);
 
           const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(${notAllowedFor.join('|')})`;
-          input = input.replace(new RegExp(regexSoureceForNotAllowed, 'g'), `'${libName}/${sourceFolder}`);
+          input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${libName}/${sourceFolder}`);
 
           if (project.isSite && project.isWorkspaceChildProject) {
             const regexSoureceBaselineForNotAllowed = `(\\"|\\')${project.parent.baseline.name}\/${libName}\/(${notAllowedFor.join('|')})`;
-            input = input.replace(new RegExp(regexSoureceBaselineForNotAllowed, 'g'),
+            input = replace(input, new RegExp(regexSoureceBaselineForNotAllowed, 'g'),
               `'${project.parent.baseline.name}/${libName}/${sourceFolder}`);
           }
 
@@ -191,14 +186,14 @@ export class SourceModifier extends FeatureCompilerForProject {
 
           const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
 
-          input = input.replace(
+          input = replace(input,
             new RegExp(regexSoureceForAlone, 'g'),
             `'${libName}/${config.folder.browser}'`
           );
 
           const regexSourece = `(\\"|\\')${libName}\/(${notallowed.join('|')})`;
 
-          input = input.replace(
+          input = replace(input,
             new RegExp(regexSourece, 'g'),
             `'${libName}/${config.folder.browser}`
           );
@@ -231,28 +226,28 @@ export class SourceModifier extends FeatureCompilerForProject {
 
           if (project.isSite && project.isWorkspaceChildProject) {
             const regexSoureceForAlone = `(\\"|\\')${project.parent.baseline.name}\/${libName}(\\"|\\')`;
-            input = input.replace(
+            input = replace(input,
               new RegExp(regexSoureceForAlone, 'g'),
               `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}'`
             );
           }
 
           const regexSoureceForAlone = `(\\"|\\')${libName}(\\"|\\')`;
-          input = input.replace(
+          input = replace(input,
             new RegExp(regexSoureceForAlone, 'g'),
             `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}'`
           );
 
           if (project.isSite && project.isWorkspaceChildProject) {
             const regexSoureceForNotAllowed = `(\\"|\\')${project.parent.baseline.name}\/${libName}\/(${notallowed.join('|')})`;
-            input = input.replace(
+            input = replace(input,
               new RegExp(regexSoureceForNotAllowed, 'g'),
               `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
             );
           }
 
           const regexSoureceForNotAllowed = `(\\"|\\')${libName}\/(${notallowed.join('|')})`;
-          input = input.replace(
+          input = replace(input,
             new RegExp(regexSoureceForNotAllowed, 'g'),
             `'${libName}/${IncrementalBuildProcessExtended.getBrowserVerPath(project.name)}`
           );
@@ -367,6 +362,24 @@ export class SourceModifier extends FeatureCompilerForProject {
 
 }
 
+function replace(input: string, regex: RegExp, replacement: string) {
+
+  return input.split('\n').map(line => {
+    const lineTrim = line.trim()
+    if (lineTrim.startsWith('//')) {
+      return line;
+    }
+    if (
+      lineTrim.startsWith('import ') ||
+      lineTrim.startsWith('export ') ||
+      /^\}\s+from\s+(\"|\')/.test(lineTrim) ||
+      /require\((\"|\')/.test(lineTrim)
+    ) {
+      return line.replace(regex, replacement);
+    }
+    return line;
+  }).join('\n');
+}
 
 function folderPattern(project: Project) {
   return `${
