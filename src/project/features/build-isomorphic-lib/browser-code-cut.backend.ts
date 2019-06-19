@@ -162,7 +162,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         `;
       }
     }
-    const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(htmlTemplatePath)}\\s*(\\'|\\")`;
+    const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${
+      escapeStringForRegEx(path.basename(htmlTemplatePath))
+    }\\s*(\\'|\\")`;
     content = content.replace(
       new RegExp(regex,
         'g'),
@@ -186,7 +188,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         `;
       }
     }
-    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(cssFilePath)}\s*(\\'|\\")\\s*\\]`;
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
+      escapeStringForRegEx(path.basename(cssFilePath))
+    }\s*(\\'|\\")\\s*\\]`;
     content = content.replace(
       new RegExp(regex,
         'g'),
@@ -231,7 +235,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       }
     }
 
-    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${path.basename(scssFilePath)}\s*(\\'|\\")\\s*\\]`;
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
+      escapeStringForRegEx(path.basename(scssFilePath))
+      }\s*(\\'|\\")\\s*\\]`;
     // console.log(`regex: ${regex}`)
     content = content.replace(
       new RegExp(regex,

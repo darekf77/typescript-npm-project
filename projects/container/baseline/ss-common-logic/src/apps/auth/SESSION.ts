@@ -4,7 +4,7 @@ import { Resource } from 'ng2-rest';
 import { USER } from '../user/USER';
 
 //#region @backend
-import { generate } from "password-hash";
+import { generate } from 'password-hash';
 
 //#endregion
 

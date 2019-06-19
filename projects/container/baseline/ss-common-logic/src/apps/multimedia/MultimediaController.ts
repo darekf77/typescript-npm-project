@@ -3,7 +3,7 @@ import { Morphi } from 'morphi';
 import * as _ from 'lodash';
 
 export { Handler } from 'express';
-import { UploadedFile } from "express-fileupload";
+import { UploadedFile } from 'express-fileupload';
 import { Helpers } from 'morphi/helpers';
 
 //#region @backend

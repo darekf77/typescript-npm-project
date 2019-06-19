@@ -5,8 +5,8 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as child from 'child_process';
 import axios from 'axios';
-import { Morphi, ModelDataConfig } from "morphi";
-import { PROJECT, IPROJECT } from "./PROJECT";
+import { Morphi, ModelDataConfig } from 'morphi';
+import { PROJECT, IPROJECT } from './PROJECT';
 import { TnpDB, Project, EnvironmentName, config } from 'tnp-bundle';
 import { PROCESS } from 'baseline/ss-common-logic/src/apps/process/PROCESS';
 

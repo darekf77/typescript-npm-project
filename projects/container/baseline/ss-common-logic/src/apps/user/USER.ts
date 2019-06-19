@@ -1,6 +1,6 @@
 import { Morphi } from 'morphi';
-import { SESSION } from "../auth/SESSION";
-import { EMAIL } from "../email/EMAIL";
+import { SESSION } from '../auth/SESSION';
+import { EMAIL } from '../email/EMAIL';
 
 
 export interface IUSER {

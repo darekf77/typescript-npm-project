@@ -1,6 +1,6 @@
 import { Morphi } from 'morphi';
 import * as _ from 'lodash';
-import { Log, Level } from "ng2-logger";
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('ExamplesController')
 
 import * as entities from '../../entities';

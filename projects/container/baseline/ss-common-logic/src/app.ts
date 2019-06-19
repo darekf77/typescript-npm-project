@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import { Morphi } from 'morphi'
 import { Helpers } from 'morphi/helpers'
 

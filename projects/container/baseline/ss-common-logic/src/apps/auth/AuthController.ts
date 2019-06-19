@@ -17,14 +17,14 @@ import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
 import { Log, Level } from 'ng2-logger';
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
-// export { Subject } from "rxjs/Subject";
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+// export { Subject } from 'rxjs/Subject';
 
 const log = Log.create('AuthController', Level.__NOTHING);
 
 
-import { SESSION } from "./SESSION";
+import { SESSION } from './SESSION';
 import { EMAIL_TYPE_NAME } from '../email/EMAIL_TYPE';
 
 

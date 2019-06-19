@@ -1,12 +1,12 @@
 
-import { Column, Entity } from "typeorm";
-import { Morphi } from "morphi";
+import { Column, Entity } from 'typeorm';
+import { Morphi } from 'morphi';
 
 import {
   USER as BASELINE_USER
-} from "baseline/ss-common-logic/src/apps/user/USER";
+} from 'baseline/ss-common-logic/src/apps/user/USER';
 
-export * from "baseline/ss-common-logic/src/apps/user/USER";
+export * from 'baseline/ss-common-logic/src/apps/user/USER';
 
 
 @Morphi.Entity({

@@ -4,8 +4,8 @@ import { GROUP } from '../group/GROUP';
 import { DIALOG } from '../dialog/DIALOG';
 
 //#region @backend
-import * as path from "path";
-import * as fse from "fs-extra";
+import * as path from 'path';
+import * as fse from 'fs-extra';
 
 //#endregion
 

@@ -1,5 +1,5 @@
 import { Morphi } from 'morphi';
-import { Log, Level } from "ng2-logger";
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('ExamplesController')
 
 

@@ -1,6 +1,6 @@
 
 import { Morphi } from 'morphi';
-import { USER } from "../user/USER";
+import { USER } from '../user/USER';
 import { EMAIL_TYPE } from './EMAIL_TYPE';
 
 export interface IEMAIL {
