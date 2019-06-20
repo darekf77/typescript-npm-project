@@ -103,8 +103,8 @@ export class SourceModifier extends FeatureCompilerForProject {
        * 'angular-lib-itself-name/ => '
        * 'angular-lib-itself-name => '
        */
-      //#region Project inself reference in src/ of angular-lib
-      if (project.type === 'angular-lib') {
+      //#region Project inself reference in src/ of angular-lib or isomorphic-lib
+      if (project.type === 'angular-lib' || project.type === 'isomorphic-lib') {
 
         const notAllowedFor = [
           IncrementalBuildProcessExtended.getBrowserVerPath(project.name),
@@ -188,7 +188,6 @@ export class SourceModifier extends FeatureCompilerForProject {
           const libName = child.name;
           const escaped_libName = escapeStringForRegEx(libName);
 
-
           const sourceFolder = child.type === 'isomorphic-lib' ? config.folder.src :
             (child.type === 'angular-lib' ? config.folder.components : void 0)
 
@@ -232,36 +231,39 @@ export class SourceModifier extends FeatureCompilerForProject {
       (() => {
         const escaped_projectParentBaselineName = project.isSite && escapeStringForRegEx(project.parent.baseline.name);
 
+        // TODO ommit import|export|requires when checking this
+
         project.parent.childrenThatAreClients
-          .filter(c => c.type !== 'isomorphic-lib')
           .forEach((child) => {
             const clientName = child.name;
             const escaped_clientName = escapeStringForRegEx(clientName);
-
-            let regex = `(\\"|\\')${escaped_clientName}\\/(${config.folder.src})`;
-            let matches = input.match(new RegExp(regex, 'g'));
-            if (_.isArray(matches)) {
-              matches.forEach(m => {
-                error(`Please don't use client "${clientName}" inside source code of lib "${project.genericName}":
-             files: ${relativePath}
-            ...
-            ${m}
-            ...
-             `, true, true)
-              });
-            }
-
-            if (project.isSite && project.isWorkspaceChildProject) {
-              regex = `(\\"|\\')${escaped_projectParentBaselineName}\\/${escaped_clientName}\\/(${config.folder.src})`;
-              matches = input.match(new RegExp(regex, 'g'));
+            (() => {
+              const regex = `(\\"|\\')${escaped_clientName}\\/(${config.folder.src})`;
+              const matches = input.match(new RegExp(regex, 'g'));
               if (_.isArray(matches)) {
                 matches.forEach(m => {
-                  error(`Please don't use baseline client "${clientName}" inside source code of lib "${project.genericName}":
+                  warn(`Please don't use client "${clientName}" inside source code of lib "${project.genericName}":
                files: ${relativePath}
               ...
               ${m}
               ...
-               `, true, true)
+               `)
+                });
+              }
+            })()
+
+
+            if (project.isSite && project.isWorkspaceChildProject) {
+              const regex = `(\\"|\\')${escaped_projectParentBaselineName}\\/${escaped_clientName}\\/(${config.folder.src})`;
+              const matches = input.match(new RegExp(regex, 'g'));
+              if (_.isArray(matches)) {
+                matches.forEach(m => {
+                  warn(`Please don't use baseline client "${clientName}" inside source code of lib "${project.genericName}":
+               files: ${relativePath}
+              ...
+              ${m}
+              ...
+               `)
                 });
               }
             }
