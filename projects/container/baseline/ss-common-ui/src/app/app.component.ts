@@ -9,6 +9,7 @@ import {
 import { Router, NavigationEnd } from '@angular/router';
 
 import { Log, Level } from 'ng2-logger/browser';
+import { } from 'static-columns/browser';
 const log = Log.create('app.component', Level.__NOTHING)
 
 

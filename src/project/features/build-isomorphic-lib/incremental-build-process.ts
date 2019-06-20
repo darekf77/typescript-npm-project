@@ -109,24 +109,24 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       // process.exit(0)
 
       if (!project.isStandaloneProject) {
+        // TODO for now it can be disable becouse of source modifer !
+        // let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath();
+        // if (outFolder === 'bundle') {
+        //   browserOutFolder = path.join(outFolder, browserOutFolder);
+        // }
 
-        let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath();
-        if (outFolder === 'bundle') {
-          browserOutFolder = path.join(outFolder, browserOutFolder);
-        }
-
-        this.browserCompilations.push(
-          new BroswerForModuleCompilation(
-            this.project,
-            void 0, // moduleNmae
-            void 0,
-            `tmp-src-${outFolder}`,
-            browserOutFolder as any,
-            location,
-            cwd,
-            outFolder,
-            buildOptions)
-        );
+        // this.browserCompilations.push(
+        //   new BroswerForModuleCompilation(
+        //     this.project,
+        //     void 0, // moduleNmae
+        //     void 0,
+        //     `tmp-src-${outFolder}`,
+        //     browserOutFolder as any,
+        //     location,
+        //     cwd,
+        //     outFolder,
+        //     buildOptions)
+        // );
 
       }
 
