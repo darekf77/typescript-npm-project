@@ -15,6 +15,8 @@ import { NgArrayPipesModule } from 'ngx-pipes';
 // local
 import { LayoutComponentsListDocsComponent } from './layout-components-list-docs.component';
 
+import { } from 'morphi';
+
 const materialModules = [
   MatTabsModule,
   MatCardModule,

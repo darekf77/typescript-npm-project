@@ -81,14 +81,17 @@ export class SourceModifier extends FeatureCompilerForProject {
        */
       //#region (npm(isomorphic|angular)-lib-name) normal lib name in lib
       (() => {
-        const notallowed = [
+        const escaped_folders = [
           config.folder.browser,
           config.folder.dist,
+          config.folder.src,
           config.folder.bundle
-        ];
+        ].map(f => escapeStringForRegEx(f))
+
         project.childrenThatAreThirdPartyInNodeModules.forEach((child) => {
           const libName = child.name;
-          const regexSourece = `(\\"|\\')${libName}\\/(${notallowed.join('|')})`;
+          const escaped_libName = escapeStringForRegEx(libName);
+          const regexSourece = `(\\"|\\')${escaped_libName}\\/(${escaped_folders.join('|')})`;
           input = replace(input, new RegExp(regexSourece, 'g'), `'${libName}`);
         });
       })();
@@ -213,7 +216,9 @@ export class SourceModifier extends FeatureCompilerForProject {
       //#region 1. Use browser version of npm libs in client
       (() => {
         const escaped_folders = [
-          config.folder.dist, config.folder.bundle
+          config.folder.dist,
+          config.folder.src,
+          config.folder.bundle
         ].map(s => escapeStringForRegEx(s));
 
         project.parent.childrenThatAreThirdPartyInNodeModules.forEach((child) => {
@@ -448,7 +453,7 @@ export class SourceModifier extends FeatureCompilerForProject {
 
     if (fse.existsSync(filePath)) {
       this.lastChangedAsyncFile = filePath;
-      const f = filePath.replace(this.project.location, '');
+      const f = filePath.replace(this.project.location, '').replace(/^\//, '');
       log(`[sourcemodifier] File fix: ${f}`)
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f);
       setTimeout(() => {
