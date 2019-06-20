@@ -2,20 +2,20 @@
 import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // material
 
-import { MatCardModule } from "@angular/material/card";
+import { MatCardModule } from '@angular/material/card';
 // formly
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig, FormlyField } from '@ngx-formly/core';
 // other
-import { Log, Level } from "ng2-logger/browser";
+import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('category editor')
 import { Subscription } from 'rxjs/Subscription';
 import { ModelDataConfig } from 'morphi/browser';
 // local
 
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
-import { CategoryController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController';
-import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/GroupsController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CATEGORY';
+import { CategoryController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CategoryController';
+import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/group/GroupsController';
 
 @Component({
   selector: 'app-category-editor',

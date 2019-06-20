@@ -1,14 +1,14 @@
 
 import { Component, OnInit, HostListener } from '@angular/core';
 // third part
-import { Log, Level } from "ng2-logger";
+import { Log, Level } from 'ng2-logger/browser';
 // local
-import { CategoryController } from "ss-common-logic/browser-for-ss-admin-webapp/controllers/CategoryController";
-import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
+import { CategoryController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CategoryController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/auth/AuthController';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CATEGORY';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import { Menu } from 'ss-common-ui/module-for-ss-admin-webapp';
+import { Menu } from 'ss-common-ui/browser-for-ss-admin-webapp';
 
 const log = Log.create('Dashboard')
 

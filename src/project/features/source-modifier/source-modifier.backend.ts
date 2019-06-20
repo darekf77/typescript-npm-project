@@ -510,26 +510,30 @@ export class SourceModifier extends FeatureCompilerForProject {
     // throw new Error("Method not implemented.");
   }
 
-  public lastChangedAsyncFile: string;
+  public lastChangedAsyncFile: string[] = [];
   protected asyncAction(filePath: string) {
+    const that = this;
     //#region ASYNC ACTION
     // console.log('SOurce modifier async !', filePath)
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {
       return;
     }
-    if (this.lastChangedAsyncFile === filePath) {
+    if (this.lastChangedAsyncFile.includes(filePath)) {
       // console.log('dont perform action on ', filePath)
       return;
     }
 
     if (fse.existsSync(filePath)) {
-      this.lastChangedAsyncFile = filePath;
+      this.lastChangedAsyncFile.push(filePath)
       log(`[sourcemodifier] File fix: ${f}`)
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
-      setTimeout(() => {
-        this.lastChangedAsyncFile = void 0;
-      }, 1000);
+      ((filePathAA) => {
+        setTimeout(() => {
+          this.lastChangedAsyncFile = this.lastChangedAsyncFile.filter(fileAlread => fileAlread !== filePathAA);
+        }, 1000);
+      })(filePath)
+
     }
     //#endregion
   }

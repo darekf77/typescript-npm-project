@@ -4,9 +4,8 @@ import {
 
 
 import { CourseCategoriesComponent } from './course-categories.component';
-import { CourseCategoriesListComponent }
-  from './course-categories-list/course-categories-list.component';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/CATEGORY';
+import { CourseCategoriesListComponent } from './course-categories-list/course-categories-list.component';
+import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CATEGORY';
 import { CategoryResolver } from './resolver-category';
 import { GroupResolver } from './resolver-group';
 

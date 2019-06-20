@@ -4,9 +4,9 @@ import {
 } from '@angular/router';
 
 import { McBreadcrumbsResolver, IBreadcrumb } from 'ngx-breadcrumbs';
-import { GROUP } from 'ss-common-logic/browser-for-ss-admin-webapp/entities/GROUP';
-import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/GroupsController';
-import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
+import { GROUP } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/group/GROUP';
+import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/group/GroupsController';
+import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/auth/AuthController';
 
 @Injectable()
 export class GroupResolver implements Resolve<GROUP> {
