@@ -87,11 +87,6 @@ export class PackageJSON {
     return Array.isArray(p.resources) ? p.resources : [];
   }
 
-  get isomorphicPackages() {
-    const p = this.data.isomorphicPackages;
-    return Array.isArray(p) ? p : [];
-  }
-
   private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
     const baselineInNodeModuels = path.join(this.location, config.folder.node_modules, path.basename(pathToBaseline))
     if (!fse.existsSync(baselineInNodeModuels)) {

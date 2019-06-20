@@ -12,7 +12,7 @@ import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 import { AppPreviewPopupContentService } from './app-popup-content.service';
 // third part
-import { StaticColumnsModule } from 'static-columns';
+import { StaticColumnsModule } from 'static-columns/browser';
 import {
   StandalonePopupModule
 } from 'components';

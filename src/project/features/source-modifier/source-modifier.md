@@ -49,3 +49,20 @@ Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'
 
 # Things to check:
 - in backend use imported ts files outside scope
+
+
+
+----------------------------------------------------------------------------------------------------
+angular-lib             
+  + app/src    
+    - other-angular-lib-name/(folders) -> other-angular-lib-name/browser-for-angular-lib
+    - angular-lib-name-itself/(folders) -> components
+    - parentfolder/angular-lib-name-itself/(folders) -> components
+    - baseline/isomorphic-and-angular-libs-names/(folders) -> not allowed if this is not site
+
+anguliar-lib in site       
+  + custom/app/src
+    - @app/src
+    - baseline/angular-libs-names/(folders) => - baseline/angular-libs-names/components
+    - baseline/isomorphic-lib-names/(folders) => - baseline/isomorphic-libs-names/src
+----------------------------------------------------------------------------------------------------

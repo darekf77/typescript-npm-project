@@ -370,7 +370,6 @@ export class BaselineSiteJoin extends FeatureForProject {
       input = this.replace(input, relativeBaselineCustomPath)._2___handleReferingTOAngularLibModulesName();
       input = this.replace(input, relativeBaselineCustomPath)._3___handleReferingToBaselinePathes();
       input = this.replace(input, relativeBaselineCustomPath)._4___handleReferingToNewFilesOnlyAvailableInCustom();
-      input = this.replace(input, relativeBaselineCustomPath)._5___handleAngularLibComponetsInsteadItself();
       return input;
     }
   }
@@ -537,13 +536,6 @@ export class BaselineSiteJoin extends FeatureForProject {
         return input;
       },
 
-      _5___handleAngularLibComponetsInsteadItself() {
-        // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
-        if (self.project.type === 'angular-lib') {
-          input = SourceModifier.AngularLibComponentsInsteadItselfFix(self.project, input, relativeBaselineCustomPath);
-        }
-        return input;
-      }
 
     }
 

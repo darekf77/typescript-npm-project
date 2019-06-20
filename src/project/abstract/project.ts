@@ -35,6 +35,7 @@ import { TnpDB } from '../../tnp-db';
 import { FilesFactory } from '../features/files-factory.backend';
 import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
 import { config as configMorphi } from 'morphi/build/config';
+import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
 //#endregion
 
 import { Morphi, ModelDataConfig } from 'morphi';
@@ -656,12 +657,31 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region  @backend
+  get isomorphicPackages() {
+    try {
+      var p = path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES)
+      if (!fse.existsSync(p)) {
+        PackagesRecognitionExtended.fromProject(this as any).start();
+      }
+      const f = fse.readJSONSync(p, {
+        encoding: 'utf8'
+      });
+      return f[configMorphi.array.isomorphicPackages];
+      // warn(`Isomorphic package file does not exists : ${p}`);
+    } catch (e) {
+      log(e);
+      error(`Erro while reading ismorphic package file: ${p}`, true, true);
+    };
+  }
+  //#endregion
+
   get childrenThatAreThirdPartyInNodeModules(): Project[] {
     if (Morphi.IsBrowser) {
       return this.browser.childrenThatAreThirdPartyInNodeModules;
     }
     //#region @backend
-    return this.packageJson.isomorphicPackages.map(c => {
+    return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
       return Project.From(p);
     }).filter(f => !!f);
