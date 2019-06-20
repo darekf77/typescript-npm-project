@@ -324,6 +324,9 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.bundle,
           config.folder.src,
           config.folder.components,
+          ...project.parent.childrenThatAreLibs
+            .filter(c => c.name !== project.name)
+            .map(c => IncrementalBuildProcessExtended.getBrowserVerPath(c.name))
         ].map(s => escapeStringForRegEx(s));
 
         const browser_for_project = IncrementalBuildProcessExtended.getBrowserVerPath(project.name);

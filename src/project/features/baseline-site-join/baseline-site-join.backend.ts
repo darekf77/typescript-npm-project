@@ -156,11 +156,9 @@ export class BaselineSiteJoin extends FeatureForProject {
     }
 
     if (!this.project.baseline) {
-      log('NO BASELINE FOR THIS !!!!!!!!')
       return;
     }
     if (this.joinNotAllowed) {
-      log('joinNotAllowed !!!!!!!!')
       return this;
     }
 

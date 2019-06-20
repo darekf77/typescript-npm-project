@@ -11,7 +11,7 @@ const variables = {
   headerSize: '0px',
   footerSize: '0px',
 };
-
+console.log('test')
 
 export interface ComponentsMenuItem {
   name: string;

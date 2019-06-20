@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 // third part
-import { StaticColumnsModule } from 'static-columns';
+import { StaticColumnsModule } from 'static-columns/browser';
 
 
 
