@@ -676,6 +676,12 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
+  sourceFilesToIgnore() {
+    return [];
+  }
+  //#endregion
+
   get childrenThatAreThirdPartyInNodeModules(): Project[] {
     if (Morphi.IsBrowser) {
       return this.browser.childrenThatAreThirdPartyInNodeModules;

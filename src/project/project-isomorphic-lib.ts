@@ -29,6 +29,17 @@ export class ProjectIsomorphicLib extends LibProject {
     return command;
   }
 
+  sourceFilesToIgnore() {
+    let toIgnore = [
+      'src/entites.ts',
+      'src/controllers.ts',
+    ];
+    if (this.isSite) {
+      toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
+    }
+    return toIgnore;
+  }
+
   projectSpecyficFiles(): string[] {
     return super.projectSpecyficFiles()
       .concat([

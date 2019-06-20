@@ -14,8 +14,7 @@ import { StaticColumnsModule } from 'static-columns';
 import { NgArrayPipesModule } from 'ngx-pipes';
 // local
 import { LayoutComponentsListDocsComponent } from './layout-components-list-docs.component';
-
-import { } from 'morphi';
+import { } from 'ss-webapp/src/main';
 
 const materialModules = [
   MatTabsModule,
