@@ -116,19 +116,17 @@ export class FilesStructure extends FeatureForProject {
 
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
 
-      const someBuildIsActive = await db.transaction.someBuildIsActive(this.project)
+      const someBuildIsActive = await db.transaction.someBuildIsActive(this.project);
 
       // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
       if (watch) {
-        await this.project.join.initAndWatch(
-          someBuildIsActive
-          )
+        await this.project.join.initAndWatch(someBuildIsActive)
 
       } else {
-        // if (!someBuildIsActive) { // TODO
-        await this.project.join.init()
-        // }
+        if (!someBuildIsActive) { // TODO
+          await this.project.join.init();
+        }
       }
 
       if (!onlyJoin) {
@@ -143,10 +141,14 @@ export class FilesStructure extends FeatureForProject {
       if (!onlyJoin) {
         if (watch) {
           await this.project.frameworkFileGenerator.initAndWatch(generatorName);
-          await this.project.sourceModifier.initAndWatch(sourceModifireName);
+          if (!someBuildIsActive) {
+            await this.project.sourceModifier.initAndWatch(sourceModifireName);
+          }
         } else {
           await this.project.frameworkFileGenerator.init(generatorName);
-          await this.project.sourceModifier.init(sourceModifireName);
+          if (!someBuildIsActive) {
+            await this.project.sourceModifier.init(sourceModifireName);
+          }
         }
       }
     }

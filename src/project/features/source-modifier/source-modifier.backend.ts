@@ -12,6 +12,7 @@ import { LibType, SourceFolder } from '../../../models';
 import { TsUsage } from 'morphi/build';
 import { error, escapeStringForRegEx, log, warn } from '../../../helpers';
 import { replace } from './replace';
+import { take } from 'rxjs/operator/take';
 //#endregion
 
 const debugFiles = [

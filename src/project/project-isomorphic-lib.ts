@@ -58,7 +58,7 @@ export class ProjectIsomorphicLib extends LibProject {
     return [
       "src/entities.ts",
       "src/controllers.ts"
-    ]
+    ].concat(this.projectSpecyficFiles())
   }
 
 

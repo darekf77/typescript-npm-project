@@ -699,7 +699,7 @@ export abstract class BaseProject {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
-        warn(`Package "${missingLibName}" will replaced with empty pacakge mock.`)
+        warn(`Package "${missingLibName}" will replaced with empty package mock.`)
       }
       rimraf.sync(pathInProjectNodeModules);
       fse.mkdirpSync(pathInProjectNodeModules);

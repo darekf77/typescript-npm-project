@@ -61,6 +61,9 @@ export class ProjectAngularLib extends LibProject {
     }));
   }
 
+  sourceFilesToIgnore() {
+    return this.projectSpecyficFiles();
+  }
 
   private linkDistAsModule(outDir: BuildDir, continueWhenExistedFolderDoesntExists = false) {
     // tryRemoveDir(path.join(this.location, config.folder.module));
