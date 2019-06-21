@@ -124,9 +124,6 @@ export class SourceModifier extends FeatureCompilerForProject {
 
         const escaped_project_name = escapeStringForRegEx(project.name);
 
-        const w = (imp) => `[sourcemodifer] Please dont refer "${project.name}" inside itself: ${imp}
-        in file: ${relativePath}`;
-
         (() => {
           const regexSource = `(\\"|\\')${escaped_project_name}\\/(${notAllowedFor.join('|')})(\\"|\\')`;
           const regex = new RegExp(regexSource, 'g');
@@ -180,10 +177,12 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.browser,
           config.folder.dist,
           config.folder.module,
-          config.folder.bundle
+          config.folder.bundle,
+          config.folder.components,
+          config.folder.src,
         ].map(s => escapeStringForRegEx(s));
 
-        const escaped_projectParentBaselineName = project.isSite && escapeStringForRegEx(project.parent.baseline.name);
+        const escaped_project_parent_baseline_name = project.isSite && escapeStringForRegEx(project.parent.baseline.name);
 
         project.parent.childrenThatAreLibs.forEach((child) => {
           const libName = child.name;
@@ -193,10 +192,16 @@ export class SourceModifier extends FeatureCompilerForProject {
             (child.type === 'angular-lib' ? config.folder.components : void 0)
 
           if (project.isSite && project.isWorkspaceChildProject) {
-            const regexSource = `(\\"|\\')${escaped_projectParentBaselineName}\\/${escaped_libName}(\\"|\\')`;
+            const regexSource = `(\\"|\\')${escaped_project_parent_baseline_name}\\/${escaped_libName}(\\"|\\')`;
             const regex = new RegExp(regexSource, 'g');
-            // asyncCall && regex.test(input) && console.log('1')
-            input = replace(input, regex, `'${project.parent.baseline.name}/${libName}/${sourceFolder}'`);
+            if (modType === 'custom/lib') {
+              input = replace(input, regex, `'${project.parent.baseline.name}/${libName}/${sourceFolder}'`);
+            }
+            if (modType === 'lib') {
+              if (libName !== project.name) {
+                input = replace(input, regex, `'${libName}/${sourceFolder}'`);
+              }
+            }
           }
 
           (() => {
@@ -214,10 +219,16 @@ export class SourceModifier extends FeatureCompilerForProject {
           })();
 
           if (project.isSite && project.isWorkspaceChildProject) {
-            const regexSource = `(\\"|\\')${escaped_projectParentBaselineName}\\/${escaped_libName}\\/(${escaped_folders.join('|')})`;
+            const regexSource = `(\\"|\\')${escaped_project_parent_baseline_name}\\/${escaped_libName}\\/(${escaped_folders.join('|')})`;
             const regex = new RegExp(regexSource, 'g');
-            // asyncCall && regex.test(input) && console.log('4')
-            input = replace(input, regex, `'${project.parent.baseline.name}/${libName}/${sourceFolder}`);
+            if (modType === 'custom/lib') {
+              input = replace(input, regex, `'${project.parent.baseline.name}/${libName}/${sourceFolder}`);
+            }
+            if (modType === 'lib') {
+              if (libName !== project.name) {
+                input = replace(input, regex, `'${libName}/${sourceFolder}`);
+              }
+            }
           }
 
         });
