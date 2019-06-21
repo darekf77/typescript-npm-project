@@ -13,17 +13,17 @@ import { TsUsage } from 'morphi/build';
 import { error, escapeStringForRegEx, log, warn } from '../../../helpers';
 import { replace } from './replace';
 import { take } from 'rxjs/operator/take';
+import { ModType, SourceCodeType } from './source-code-type';
 //#endregion
 
 const debugFiles = [
   // 'components/index.ts',
-
 ];
 
 export class SourceModifier extends FeatureCompilerForProject {
 
   //#region get source type lib - for libs, app - for clients
-  private static getModType(project: Project, relativePath: string): 'app' | 'lib' | 'custom/app' | 'custom/lib' {
+  private static getModType(project: Project, relativePath: string): ModType {
     const startFolder: SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as SourceFolder;
     if (startFolder === 'src') {
       return project.type === 'isomorphic-lib' ? 'lib' : 'app';
@@ -51,10 +51,11 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#endregion
 
   public static PreventNotUseOfTsSourceFolders(project: Project, relativePath: string, input?: string, asyncCall = false): string {
+
+    //#region init
     relativePath = relativePath.replace(/^\//, '');
     // asyncCall && console.log(`MOD: "${relativePath}"`)
     const debugging = debugFiles.includes(relativePath);
-    //#region init
     const saveMode = _.isUndefined(input);
     const modType = this.getModType(project, relativePath);
     const filePath = path.join(project.location, relativePath);
@@ -70,10 +71,8 @@ export class SourceModifier extends FeatureCompilerForProject {
     // debugging && console.log('------------')
     //#endregion
 
-    // asyncCall && console.log('modType', modType)
-
-
     if (modType === 'lib' || modType === 'custom/lib') {
+      //#region handle lib code
 
       /**
        * FOR: every library
@@ -284,7 +283,9 @@ export class SourceModifier extends FeatureCompilerForProject {
       })();
       //#endregion
 
+      //#endregion
     } else if (modType === 'app' || modType === 'custom/app') {
+      //#region handle app code
 
       /**
        * 'npm-(isomorphic|angular)-lib-name' => 'npm-(isomorphic|angular)-lib-name/browser'
@@ -321,12 +322,7 @@ export class SourceModifier extends FeatureCompilerForProject {
       })();
       //#endregion
 
-      /**
-       * 'lib-name' => 'lib-nameb/browser-for-client-name'
-       * 'lib-name/(not-allowed-folders) => 'lib-name/browser-for-client-name
-       * 'lib-name/ => 'lib-name/browser-for-client-name/
-       */
-      //#region 2. Handle workspace libs names in clients
+      //#region 2. Handle all child project names in clients childs codes
       (() => {
         const escaped_folders = [
           config.folder.browser,
@@ -335,87 +331,87 @@ export class SourceModifier extends FeatureCompilerForProject {
           config.folder.bundle,
           config.folder.src,
           config.folder.components,
-          ...project.parent.childrenThatAreLibs
-            .filter(c => c.name !== project.name)
+        ].map(s => escapeStringForRegEx(s));
+
+        const escaped_folders_browser_for = [
+          ...project.parent.children
             .map(c => IncrementalBuildProcessExtended.getBrowserVerPath(c.name))
         ].map(s => escapeStringForRegEx(s));
 
+
         const browser_for_project = IncrementalBuildProcessExtended.getBrowserVerPath(project.name);
+        const escaped_project_parent_baseline_name = escapeStringForRegEx(project.parent.baseline.name);
 
         project.parent.childrenThatAreLibs.forEach((child) => {
           const libName = child.name;
           const escaped_libName = escapeStringForRegEx(libName);
 
-          (() => {
-            const regexSource = `(\\"|\\')${escaped_libName}(\\"|\\')`;
-            const regex = new RegExp(regexSource, 'g');
-            // regex.test(input) && console.log('app2.2')
-            input = replace(input, regex, `'${libName}/${browser_for_project}'`);
-          })();
+          if (libName === project.name) {
+            //#region EQUAL PROJECT NAME
+            const escaped_project_name = escaped_libName;
 
-          (() => {
-            const regexSource = `(\\"|\\')${escaped_libName}\\/(${escaped_folders.join('|')})(?!\\-)`;
-            const regex = new RegExp(regexSource, 'g');
-            // regex.test(input) && console.log('app2.4')
-            input = replace(input, regex, `'${libName}/${browser_for_project}`);
-          })();
+            // 1 - basleine/child-name/{}
+            (() => {
+              const folders = escaped_folders.concat(escaped_folders_browser_for);
+              const regexSoureceForNotAllowed =
+                `(\\"|\\')${escaped_project_parent_baseline_name}\\/${escaped_project_name}\\/(${notAllowedForBaseline.join('|')})(\\"|\\')`;
+              // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
+              if (project.type === 'angular-lib') {
+                input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
+              } else {
+                /// TODO
+              }
+            })();
+            (() => {
+              const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/(${notAllowedForBaseline.join('|')})(\\"|\\')`;
+              // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
+              if (project.type === 'angular-lib') {
+                input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
+              } else {
 
-          (() => {
-            const regexSource = `(\\"|\\')${escaped_libName}\\/(?!(${escaped_folders.join('|')}))`;
-            const regex = new RegExp(regexSource, 'g');
-            // regex.test(input) && console.log('app2.6')
-            input = replace(input, regex, `'${libName}/${browser_for_project}/`);
-          })();
+              }
+            })();
+
+
+            (() => {
+              const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/(${notAllowedForBaseline.join('|')})`;
+              // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
+              input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}`);
+            })();
+
+            (() => {
+              const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/`;
+              // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
+              input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}/`);
+            })();
+            //#endregion
+          } else {
+            //#region DIFFERENT THAT PROJECT NAME
+            (() => {
+              const regexSource = `(\\"|\\')${escaped_libName}(\\"|\\')`;
+              const regex = new RegExp(regexSource, 'g');
+              // regex.test(input) && console.log('app2.2')
+              input = replace(input, regex, `'${libName}/${browser_for_project}'`);
+            })();
+
+            (() => {
+              const regexSource = `(\\"|\\')${escaped_libName}\\/(${escaped_folders.join('|')})(?!\\-)`;
+              const regex = new RegExp(regexSource, 'g');
+              // regex.test(input) && console.log('app2.4')
+              input = replace(input, regex, `'${libName}/${browser_for_project}`);
+            })();
+
+            (() => {
+              const regexSource = `(\\"|\\')${escaped_libName}\\/(?!(${escaped_folders.join('|')}))`;
+              const regex = new RegExp(regexSource, 'g');
+              // regex.test(input) && console.log('app2.6')
+              input = replace(input, regex, `'${libName}/${browser_for_project}/`);
+            })();
+            //#endregion
+          }
 
         });
       })();
-      //#endregion
-
-      /**
-       * 'angular-lib-itself-name => 'components
-       * 'angular-lib-itself-name/(notallowedfolder)' => 'components'
-       * 'angular-lib-itself-name/(notallowedfolder) => 'components
-       * 3. In site this is done in baseline-site-join
-       */
-      //#region 3. Project inself reference in src/ of angular-lib
-      if (project.type === 'angular-lib') {
-
-        const notAllowedFor = [
-          IncrementalBuildProcessExtended.getBrowserVerPath(project.name),
-          ...project.parent.childrenThatAreLibs.map(c => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-          }),
-          ...project.parent.childrenThatAreClients.map(c => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(c.name)
-          }),
-          config.folder.browser,
-          config.folder.dist,
-          config.folder.module,
-          config.folder.bundle,
-        ].map(s => escapeStringForRegEx(s));
-
-        const escaped_project_name = escapeStringForRegEx(project.name);
-
-
-        (() => {
-          const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/(${notAllowedFor.join('|')})(\\"|\\')`;
-          // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
-          input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}'`);
-        })();
-
-        (() => {
-          const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/(${notAllowedFor.join('|')})`;
-          // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
-          input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}`);
-        })();
-
-        (() => {
-          const regexSoureceForNotAllowed = `(\\"|\\')${escaped_project_name}\\/`;
-          // debugging && console.log('regexSoureceForNotAllowed', regexSoureceForNotAllowed)
-          input = replace(input, new RegExp(regexSoureceForNotAllowed, 'g'), `'${config.folder.components}/`);
-        })();
-
-      }
       //#endregion
 
       /**
@@ -482,6 +478,7 @@ export class SourceModifier extends FeatureCompilerForProject {
       })();
       //#endregion
 
+      //#endregion
     }
 
     //#region save input if save mode
@@ -490,9 +487,8 @@ export class SourceModifier extends FeatureCompilerForProject {
         encoding: 'utf8'
       });
     }
-    //#endregion
-
     return input;
+    //#endregion
   }
 
   //#region folder patterns fn
@@ -507,25 +503,27 @@ export class SourceModifier extends FeatureCompilerForProject {
   }
   //#endregion
 
+  //#region SYNC ACTION
   syncAction(): void {
-    //#region SYNC ACTION
     const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
     // console.log(files)
     files.forEach(f => {
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
     });
-    //#endregion
   }
+  //#endregion
 
+  //#region PRE ASYNC ACTION
   preAsyncAction(): void {
     // throw new Error("Method not implemented.");
   }
+  //#endregion
 
+  //#region ASYNC ACTION
   public lastChangedAsyncFileS: string[] = [];
-
   asyncAction(filePath: string) {
     const that = this;
-    //#region ASYNC ACTION
+
     // console.log('SOurce modifier async !', filePath)
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {
@@ -545,10 +543,9 @@ export class SourceModifier extends FeatureCompilerForProject {
           this.lastChangedAsyncFileS = this.lastChangedAsyncFileS.filter(fileAlread => fileAlread !== filePathAA);
         }, 1000);
       })(filePath);
-
     }
-    //#endregion
   }
+  //#endregion
 
 }
 
