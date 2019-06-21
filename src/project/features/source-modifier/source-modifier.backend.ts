@@ -254,7 +254,7 @@ export class SourceModifier extends FeatureCompilerForProject {
             })()
 
 
-            if (project.isSite && project.isWorkspaceChildProject) {
+            if (project.isSite && project.isWorkspaceChildProject && child.name !== project.name) {
               const regex = `(\\"|\\')${escaped_projectParentBaselineName}\\/${escaped_clientName}\\/(${config.folder.src})`;
               const matches = input.match(new RegExp(regex, 'g'));
               if (_.isArray(matches)) {
