@@ -50,6 +50,11 @@ import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../mod
 
 export abstract class BaseProject {
 
+  handleModyfications(relativeFilePath: string) {
+
+  }
+
+
   abstract location: string;
   //#region @backend
   protected __defaultPort: number;

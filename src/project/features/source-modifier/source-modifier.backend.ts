@@ -481,6 +481,8 @@ export class SourceModifier extends FeatureCompilerForProject {
       //#endregion
     }
 
+    input = project.
+
     //#region save input if save mode
     if (saveMode) {
       fse.writeFileSync(filePath, input, {
