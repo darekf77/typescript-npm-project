@@ -13,10 +13,10 @@ export abstract class FeatureCompilerForProject extends IncrementalCompilation {
   }
 
 
-  protected abstract syncAction(filesPathes: string[]): void;
+  public abstract syncAction(filesPathes: string[]): void;
 
-  protected abstract preAsyncAction(): void;
-  protected abstract asyncAction(filePath: string);
+  public abstract preAsyncAction(): void;
+  public abstract asyncAction(filePath: string);
 
 }
 

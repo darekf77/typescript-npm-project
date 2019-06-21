@@ -122,7 +122,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
         self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
           let globPath = path.join(self.pathToBaselineThroughtNodeModules, customizableFileOrFolder)
-          if (!fs.existsSync(globPath)) {
+          if (!fse.existsSync(globPath)) {
             error(`Custombizable folder of file doesn't exist: ${globPath}
 
             Please add: ${path.basename(globPath)} to your baseline
@@ -131,7 +131,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
             `)
           }
-          if (fs.statSync(globPath).isDirectory()) {
+          if (fse.statSync(globPath).isDirectory()) {
             const globFiles = glob.sync(`${globPath}/**/*.*`);
             files = files.concat(globFiles);
           } else {
@@ -212,8 +212,10 @@ export class BaselineSiteJoin extends FeatureForProject {
       return;
     }
 
+    let toOmmitNext = []
+
     const callback = (absolutePath, event, isCustomFolder) => {
-      // console.log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
+      log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath}`)
 
       if (fse.existsSync(absolutePath)) {
         if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
@@ -230,14 +232,22 @@ export class BaselineSiteJoin extends FeatureForProject {
       }
 
 
-
       if (isCustomFolder) {
-        this.merge(absolutePath.replace(this.pathToCustom, ''));
+        // console.log('IS CUSTOM', absolutePath)
+        if (!toOmmitNext.includes(absolutePath)) {
+          toOmmitNext.push(absolutePath)
+          this.project.sourceModifier.asyncAction(absolutePath);
+          this.merge(absolutePath.replace(this.pathToCustom, ''));
+          // console.log('ommit push')
+        } else {
+          // console.log('ommit clear')
+          toOmmitNext = toOmmitNext.filter(f => f !== absolutePath);
+        }
       } else {
+        // console.log('IS NORMAL', absolutePath)
         this.merge(absolutePath.replace(this.pathToBaselineAbsolute, ''));
       }
-
-    }
+    };
 
     this.monitor(callback)
   }
@@ -257,14 +267,17 @@ export class BaselineSiteJoin extends FeatureForProject {
     })));
     // console.log('Finaly is custom ?', isCustomFolder)
 
+
     customizableFilesOrFolders.forEach(baselieFileOrFolder => {
       const fileOrFolderPath = path.join(location, baselieFileOrFolder)
-      if (!fs.existsSync(fileOrFolderPath)) {
+      if (!fse.existsSync(fileOrFolderPath)) {
         error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`)
       }
-      if (fs.statSync(fileOrFolderPath).isDirectory()) {
+      if (fse.statSync(fileOrFolderPath).isDirectory()) {
         // console.log(`Monitoring directory: ${fileOrFolderPath} `)
+
         watch.watchTree(fileOrFolderPath, (f, curr, prev) => {
+
           if (typeof f == "object" && prev === null && curr === null) {
             // Finished walking the tree
           } else if (prev === null) {
@@ -278,7 +291,7 @@ export class BaselineSiteJoin extends FeatureForProject {
         })
       } else {
         // console.log(`Monitoring file: ${fileOrFolderPath} `)
-        fs.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
+        fse.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
           // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
           filesEventCallback(fileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', isCustomFolder)
         })
@@ -312,9 +325,9 @@ export class BaselineSiteJoin extends FeatureForProject {
       console.log('joinFilePath', joinFilePath)
     }
 
-    if (fs.existsSync(baselineFileInCustomPath)) {
+    if (fse.existsSync(baselineFileInCustomPath)) {
 
-      if (fs.existsSync(baselineAbsoluteLocation)) {
+      if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'join'
         fastCopy(baselineAbsoluteLocation, getPrefixedPathInJoin(relativeBaselineCustomPath, this.project))
       } else {
@@ -329,7 +342,7 @@ export class BaselineSiteJoin extends FeatureForProject {
       )
 
     } else {
-      if (fs.existsSync(baselineAbsoluteLocation)) {
+      if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'no-in-custom'
         fastCopy(baselineAbsoluteLocation, joinFilePath);
         fastUnlink(getPrefixedPathInJoin(relativeBaselineCustomPath, this.project))

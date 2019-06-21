@@ -13,16 +13,16 @@ import { FeatureCompilerForProject } from '../abstract';
 
 
 export class FrameworkFilesGenerator extends FeatureCompilerForProject {
-  protected syncAction(): void {
+  syncAction(): void {
     if (this.project.type === 'isomorphic-lib' && !this.project.isStandaloneProject) {
       this.generateEntityTs()
       this.generateControllersTs()
     }
   }
-  protected preAsyncAction(): void {
+  preAsyncAction(): void {
     // throw new Error("Method not implemented.");
   }
-  protected asyncAction(filePath: string) {
+  asyncAction(filePath: string) {
     // console.log('async action framework file gen ', filePath)
     this.syncAction()
     // console.log('asynlog action ended for generator')

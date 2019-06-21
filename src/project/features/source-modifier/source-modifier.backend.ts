@@ -492,11 +492,11 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   //#region constructor
   constructor(public project: Project) {
-    super(folderPattern(project), '', project && project.location, project);
+    super(project.isSite ? void 0 : folderPattern(project), '', project && project.location, project);
   }
   //#endregion
 
-  protected syncAction(): void {
+  syncAction(): void {
     //#region SYNC ACTION
     const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
     // console.log(files)
@@ -506,12 +506,13 @@ export class SourceModifier extends FeatureCompilerForProject {
     //#endregion
   }
 
-  protected preAsyncAction(): void {
+  preAsyncAction(): void {
     // throw new Error("Method not implemented.");
   }
 
-  public lastChangedAsyncFile: string[] = [];
-  protected asyncAction(filePath: string) {
+  public lastChangedAsyncFileS: string[] = [];
+
+  asyncAction(filePath: string) {
     const that = this;
     //#region ASYNC ACTION
     // console.log('SOurce modifier async !', filePath)
@@ -519,20 +520,20 @@ export class SourceModifier extends FeatureCompilerForProject {
     if (this.project.sourceFilesToIgnore().includes(f)) {
       return;
     }
-    if (this.lastChangedAsyncFile.includes(filePath)) {
+    if (this.lastChangedAsyncFileS.includes(filePath)) {
       // console.log('dont perform action on ', filePath)
       return;
     }
 
     if (fse.existsSync(filePath)) {
-      this.lastChangedAsyncFile.push(filePath)
+      this.lastChangedAsyncFileS.push(filePath);
       log(`[sourcemodifier] File fix: ${f}`)
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
       ((filePathAA) => {
         setTimeout(() => {
-          this.lastChangedAsyncFile = this.lastChangedAsyncFile.filter(fileAlread => fileAlread !== filePathAA);
+          this.lastChangedAsyncFileS = this.lastChangedAsyncFileS.filter(fileAlread => fileAlread !== filePathAA);
         }, 1000);
-      })(filePath)
+      })(filePath);
 
     }
     //#endregion
