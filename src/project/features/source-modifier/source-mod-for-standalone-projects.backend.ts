@@ -4,16 +4,16 @@ import config from '../../../config';
 import { ModType } from './source-code-type';
 
 
-export abstract class SourceModForStandaloneProjects extends FeatureForProject {
+export class SourceModForStandaloneProjects extends FeatureForProject {
 
-  get foldersSources() {
+  protected get foldersSources() {
     return [
       config.folder.components,
       config.folder.src,
     ]
   };
 
-  get foldersCompiledJsDtsMap() {
+  protected get foldersCompiledJsDtsMap() {
     return [
       config.folder.dist,
       config.folder.bundle,
@@ -22,8 +22,12 @@ export abstract class SourceModForStandaloneProjects extends FeatureForProject {
     ]
   };
 
-  mod3rdPartyLibsReferces(inpput: string, modType: ModType = 'lib') {
+  protected mod3rdPartyLibsReferces(inpput: string, modType: ModType = 'lib') {
     return inpput;
+  }
+
+  process(input: string, modType: ModType = 'lib'): string {
+    return input;
   }
 
 

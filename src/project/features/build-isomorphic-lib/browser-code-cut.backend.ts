@@ -164,7 +164,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${
       escapeStringForRegEx(path.basename(htmlTemplatePath))
-    }\\s*(\\'|\\")`;
+      }\\s*(\\'|\\")`;
     content = content.replace(
       new RegExp(regex,
         'g'),
@@ -190,7 +190,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
       escapeStringForRegEx(path.basename(cssFilePath))
-    }\s*(\\'|\\")\\s*\\]`;
+      }\s*(\\'|\\")\\s*\\]`;
     content = content.replace(
       new RegExp(regex,
         'g'),
@@ -374,6 +374,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
+      this.rawContent = this.project.sourceModifier.sourceMod.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
       this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
     }
     this.rawContent = this.afterRegionsReplacement(this.rawContent);

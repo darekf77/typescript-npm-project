@@ -19,20 +19,27 @@ export type ImpReplaceOptions = {
 }
 
 function impReplace(impReplaceOptions: ImpReplaceOptions) {
-  let { input, name, urlParts,
-    partsReplacements, modType,
-    project, debugMatch, debugNotMatch } = impReplaceOptions;
+  let { input, name, urlParts, modType } = impReplaceOptions;
+  const { partsReplacements, project, debugMatch, debugNotMatch } = impReplaceOptions;
 
   name = name.replace(/\n/g, ' ')
 
   urlParts = urlParts.map(p => {
     if (_.isArray(p)) {
-      return `(${p.map(part => escapeStringForRegEx(part)).join('|')})`
+      return `(${p
+        .map(part => {
+          if (part === config.folder.browser) {
+            return `${escapeStringForRegEx(part)}(?!\\-)`;
+          }
+          return escapeStringForRegEx(part);
+        }).join('|')})`;
     }
     if (_.isString(p)) {
       return escapeStringForRegEx(p);
     }
   });
+
+  modType = modType ? modType : 'BROWSER' as any;
 
   const arr: { regexSource: string; replacement: string; description: string; }[] = [
     {
@@ -71,9 +78,17 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {
   constructor(public project: Project) {
     super(project);
-  };
+  }
 
-  mod3rdPartyLibsReferces(input: string, modType: ModType): string {
+  process(input: string, modType: ModType = 'lib') {
+    input = super.process(input, modType);
+    input = this.mod3rdPartyLibsReferces(input, modType);
+    input = this.modWorkspaceChildrenLibsBetweenItself(input, modType);
+    input = this.modSiteChildrenLibsInClient(input, modType);
+    return input;
+  }
+
+  protected mod3rdPartyLibsReferces(input: string, modType: ModType): string {
     const folderForO3rdPartLibs = [
       ...this.foldersSources,
       ...this.foldersCompiledJsDtsMap,
@@ -120,7 +135,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  modWorkspaceChildrenLibsBetweenItself(input: string, modType: ModType): string {
+  protected modWorkspaceChildrenLibsBetweenItself(input: string, modType: ModType): string {
 
     const childrenLibs = this.project.parent.childrenThatAreLibs;
 
@@ -162,8 +177,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       if (modType === 'app' || modType === 'custom/app') {
 
-        const process = (compiled: any[], preventDash: boolean) => {
-          const urlParts = preventDash ? [libName, compiled, `(?!\\-)`] : [libName, compiled];
+        const process = (compiled: any[]) => {
+          const urlParts = [libName, compiled];
 
           if (libName === this.project.name || this.project.type === 'angular-lib') {
             input = impReplace({
@@ -193,20 +208,20 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           }
         }
 
-        let tmpcompiled = [
+        let folders = [
           ...this.foldersSources,
           ...this.foldersCompiledJsDtsMap,
         ];
 
-        process(tmpcompiled, true);
+        process(folders);
 
-        tmpcompiled = this.project.parent.childrenThatAreClients
+        folders = this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
           })
 
-        process(tmpcompiled, false);
+        process(folders);
 
 
       }
@@ -215,7 +230,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  modSiteChildrenLibsInClient(input: string, modType: ModType): string {
+  protected modSiteChildrenLibsInClient(input: string, modType: ModType): string {
     if (!this.project.isSite) {
       log(`Project is not site: ${this.project.genericName}`);
     }
@@ -237,9 +252,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           sourceFolder = config.folder.src;
         }
 
-        const process = (compiled: any[], preventDash: boolean) => {
-          const urlParts = preventDash ? [baselineName, libName, compiled, `(?!\\-)`] :
-            [baselineName, libName, compiled];
+        const process = (compiled: any[]) => {
+          const urlParts = [baselineName, libName, compiled];
           input = impReplace({
             name: `
 ${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
@@ -252,20 +266,19 @@ ${baselineName}/<workspace-lib-name>/(${this.foldersSources.join('|')})`,
           });
         };
 
-        let compiled = this.foldersCompiledJsDtsMap;
-        process(compiled, true);
+        let folders = this.foldersCompiledJsDtsMap;
+        process(folders);
 
-        compiled = this.project.parent.childrenThatAreClients.map(client => {
+        folders = this.project.parent.childrenThatAreClients.map(client => {
           return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
         });
-        process(compiled, false);
+        process(folders);
 
       }
 
       if (modType === 'custom/app') {
-        const process = (compiled: any[], preventDash: boolean) => {
-          const urlParts = preventDash ? [baselineName, libName, compiled, `(?!\\-)`] :
-            [baselineName, libName, compiled];
+        const process = (compiled: any[]) => {
+          const urlParts = [baselineName, libName, compiled];
 
           const browserForCurrentClient = IncrementalBuildProcessExtended
             .getBrowserVerPath(this.project.name)
@@ -283,20 +296,20 @@ ${baselineName}/<workspace-lib-name>/${browserForCurrentClient}`,
 
         };
 
-        let tmpcompiled = [
+        let folders = [
           ...this.foldersSources,
           ...this.foldersCompiledJsDtsMap,
         ];
 
-        process(tmpcompiled, true);
+        process(folders);
 
-        tmpcompiled = this.project.parent.childrenThatAreClients
+        folders = this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
           })
 
-        process(tmpcompiled, false);
+        process(folders);
 
 
 
@@ -304,9 +317,8 @@ ${baselineName}/<workspace-lib-name>/${browserForCurrentClient}`,
 
       if (modType === 'app') {
 
-        const process = (compiled: any[], preventDash: boolean) => {
-          const urlParts = preventDash ? [baselineName, libName, compiled, `(?!\\-)`] :
-            [baselineName, libName, compiled];
+        const process = (compiled: any[]) => {
+          const urlParts = [baselineName, libName, compiled];
 
           if (libName === this.project.name || this.project.type === 'angular-lib') {
             input = impReplace({
@@ -337,20 +349,20 @@ ${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
           }
         }
 
-        let tmpcompiled = [
+        let folders = [
           ...this.foldersSources,
           ...this.foldersCompiledJsDtsMap,
         ];
 
-        process(tmpcompiled, true);
+        process(folders);
 
-        tmpcompiled = this.project.parent.childrenThatAreClients
+        folders = this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
           })
 
-        process(tmpcompiled, false);
+        process(folders);
 
       }
 
@@ -364,8 +376,19 @@ ${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
   /**
    * ONLY FOR BROWSER CODE CUT
    */
-  replaceBaslieneFromSiteBeforeBrowserCodeCut() {
+  public replaceBaslieneFromSiteBeforeBrowserCodeCut(input: string) {
     // TODO run before browser codecut/compilation
+
+    if (!this.project.isSite) {
+      log(`Project is not site: ${this.project.genericName}`);
+    }
+
+    const baselineName = this.project.parent.baseline.name;
+    const regexSource = `(\\"|\\')${escapeStringForRegEx(baselineName)}\\/`;
+    const regex = new RegExp(regexSource, 'g');
+    input = replace(input, regex, `'`);
+
+    return input;
   }
 
 }
