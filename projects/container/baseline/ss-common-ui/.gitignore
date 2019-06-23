@@ -21,7 +21,6 @@
 /index.js
 /index.d.ts
 /index.js.map
-/gulpfile.ts
 /ng-package.json
 /tsconfig-aot.bundle.json
 /tsconfig-aot.dist.json

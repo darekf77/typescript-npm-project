@@ -37,7 +37,7 @@ export class LoginComponent  implements OnInit {
     this.handlers.push(this.auth.isLoggedIn.subscribe(d => {
       log.i('data from auth observable !', d)
       this.hideModal()
-    }))
+    }) as any);
     log.i('On init login !')
     this.auth.browser.init()
   }

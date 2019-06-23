@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 // material
-import { MatCardModule } from "@angular/material/card";
+import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio'
 import { MatTabsModule } from '@angular/material/tabs'
 // thirdpart

@@ -1,7 +1,7 @@
 
 import { Component, OnInit, HostListener, NgZone, ApplicationRef } from '@angular/core';
 // third part
-import { Log, Level } from 'ng2-logger';
+import { Log, Level } from 'ng2-logger/browser';
 import * as _ from 'lodash';
 // local
 

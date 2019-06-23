@@ -70,7 +70,11 @@ export const routes: Routes = [
       {
         path: 'buildtnpprocess',
         loadChildren: './components/+preview-buildtnpprocess/preview-buildtnpprocess.module#PreviewBuildTnpProcesssModule'
-      }
+      },
+      {
+        path: 'modal',
+        loadChildren: './components/+preview-modal/+preview-modal.module#PreviewModalModule'
+      },
     ]
   }
 ];

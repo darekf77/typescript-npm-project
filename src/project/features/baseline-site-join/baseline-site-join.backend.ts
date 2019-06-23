@@ -270,32 +270,55 @@ export class BaselineSiteJoin extends FeatureForProject {
 
     customizableFilesOrFolders.forEach(baselieFileOrFolder => {
       const fileOrFolderPath = path.join(location, baselieFileOrFolder)
-      if (!fse.existsSync(fileOrFolderPath)) {
-        error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`)
-      }
-      if (fse.statSync(fileOrFolderPath).isDirectory()) {
-        // console.log(`Monitoring directory: ${fileOrFolderPath} `)
 
-        watch.watchTree(fileOrFolderPath, (f, curr, prev) => {
+      const monitor = (pfileOrFolderPath, pisCustomFolder) => {
+        if (fse.statSync(pfileOrFolderPath).isDirectory()) {
+          // console.log(`Monitoring directory: ${fileOrFolderPath} `)
 
-          if (typeof f == "object" && prev === null && curr === null) {
-            // Finished walking the tree
-          } else if (prev === null) {
-            filesEventCallback(f as any, 'created', isCustomFolder)
-          } else if (curr.nlink === 0) {
-            filesEventCallback(f as any, 'removed', isCustomFolder)
-          } else {
-            filesEventCallback(f as any, 'changed', isCustomFolder)
-            // f was changed
-          }
-        })
+          watch.watchTree(pfileOrFolderPath, (f, curr, prev) => {
+
+            if (typeof f == "object" && prev === null && curr === null) {
+              // Finished walking the tree
+            } else if (prev === null) {
+              filesEventCallback(f as any, 'created', pisCustomFolder)
+            } else if (curr.nlink === 0) {
+              filesEventCallback(f as any, 'removed', pisCustomFolder)
+            } else {
+              filesEventCallback(f as any, 'changed', pisCustomFolder)
+              // f was changed
+            }
+          })
+        } else {
+          // console.log(`Monitoring file: ${fileOrFolderPath} `)
+          fse.watch(pfileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
+            // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
+            filesEventCallback(pfileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', pisCustomFolder)
+          })
+        }
+      };
+
+      if (fse.existsSync(fileOrFolderPath)) {
+        monitor(fileOrFolderPath, isCustomFolder);
       } else {
-        // console.log(`Monitoring file: ${fileOrFolderPath} `)
-        fse.watch(fileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
-          // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
-          filesEventCallback(fileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', isCustomFolder)
-        })
+
+        const waitForFolder = (pfileOrFolderPath, pisCustomFolder, count = 0) => {
+          if (!fse.existsSync(pfileOrFolderPath)) {
+            if (count === 4) {
+              error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`, true, true)
+              return;
+            }
+            log(`[baslinesitejoin][folderwatch] (${count} time) Waiting for file/folder be available: ${pfileOrFolderPath}`)
+            setTimeout(() => {
+              waitForFolder(pfileOrFolderPath, pisCustomFolder, ++count);
+            }, 2000)
+            return;
+          }
+          monitor(pfileOrFolderPath, pisCustomFolder);
+        };
+        waitForFolder(fileOrFolderPath, isCustomFolder);
+
       }
+
 
 
     });
