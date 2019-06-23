@@ -14,8 +14,6 @@ import config from '../../../config';
 
 const BaselineSiteJoinprefix = '__';
 
-export const moduleNameAngularLib = config.moduleNameAngularLib;
-
 export function getRegexSourceString(s) {
   return s
     .replace(/\//g, '\\/')

@@ -7,10 +7,14 @@ import { ModType } from './source-code-type';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
 
+export type CheckType = 'standalone' | 'baseline' | 'site';
+
 export type ImpReplaceOptions = {
   debugMatch?: boolean;
   debugNotMatch?: boolean;
+  relativePath: string,
   project: Project,
+  method: CheckType,
   modType: ModType,
   urlParts: (string | string[])[],
   notAllowedAfterSlash?: (string | string[])[],
@@ -21,10 +25,14 @@ export type ImpReplaceOptions = {
 
 function impReplace(impReplaceOptions: ImpReplaceOptions) {
   let { input, name, urlParts, modType, notAllowedAfterSlash, debugMatch, debugNotMatch } = impReplaceOptions;
-  const { partsReplacements, project } = impReplaceOptions;
+  const { partsReplacements, project, relativePath, method } = impReplaceOptions;
 
-  // debugMatch = true;
-  // debugNotMatch = true;
+  // if (relativePath === 'custom/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
+  //   && method === 'site') {
+  //   debugMatch = true;
+  //   debugNotMatch = true;
+  // }
+
 
   name = name.replace(/\n/g, ' ')
 
@@ -80,12 +88,14 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
     input = replace(input, regex, element.replacement);
     if (isMatch) {
       debugMatch && info(`(${modType})(${project.isSite ? 'SITE - ' : ''}"${project.genericName}") (${element.description})` +
-        `MATCH: ${name}` +
-        `REGEX: ${element.regexSource}\n`);
+        `\nMATCH: ${element.regexSource}` +
+        `\nREGEX: ${element.regexSource}`) +
+        `\nFILE: ${relativePath}\n`;
     } else {
       debugNotMatch && log(`(${modType})(${project.isSite ? 'SITE - ' : ''}"${project.genericName}") (${element.description})` +
-        `DON'T MATCH: ${name}` +
-        `DON'T REGEX: ${element.regexSource}\n`)
+        `\nDON'T MATCH: ${element.regexSource}` +
+        `\nDON'T REGEX: ${element.regexSource}`) +
+        `\nFILE: ${relativePath}\n`;
     }
   }
 
@@ -99,15 +109,16 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     super(project);
   }
 
-  process(input: string, modType: ModType = 'lib') {
-    input = super.process(input, modType);
-    input = this.mod3rdPartyLibsReferces(input, modType);
-    input = this.modWorkspaceChildrenLibsBetweenItself(input, modType);
-    input = this.modSiteChildrenLibsInClient(input, modType);
+  process(input: string, modType: ModType = 'lib', relativePath: string) {
+    input = super.process(input, modType, relativePath);
+    input = this.mod3rdPartyLibsReferces(input, modType, relativePath);
+    input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
+    input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
     return input;
   }
 
-  protected mod3rdPartyLibsReferces(input: string, modType: ModType): string {
+  protected mod3rdPartyLibsReferces(input: string, modType: ModType, relativePath: string): string {
+    const method: CheckType = 'standalone';
     const folders = [
       ...this.foldersSources,
       ...this.foldersCompiledJsDtsMap,
@@ -126,6 +137,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           modType,
           urlParts: [libName, folders],
           partsReplacements: [libName],
+          relativePath,
+          method
         });
       }
 
@@ -138,6 +151,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           urlParts: [libName],
           notAllowedAfterSlash: [config.folder.browser],
           partsReplacements: [libName, config.folder.browser],
+          relativePath,
+          method
         });
 
         input = impReplace({
@@ -147,6 +162,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           modType,
           urlParts: [libName, folders],
           partsReplacements: [libName, config.folder.browser],
+          relativePath,
+          method
         });
       }
 
@@ -155,8 +172,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  protected modWorkspaceChildrenLibsBetweenItself(input: string, modType: ModType): string {
-
+  protected modWorkspaceChildrenLibsBetweenItself(input: string, modType: ModType, relativePath: string): string {
+    const method: CheckType = 'baseline';
     const childrenLibs = this.project.parent.childrenThatAreLibs;
 
     childrenLibs.forEach(child => {
@@ -181,7 +198,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
             input,
             modType,
             urlParts: [libName, compiledFolders],
-            partsReplacements: [libName, sourceFolder]
+            partsReplacements: [libName, sourceFolder],
+            relativePath,
+            method
           });
         };
 
@@ -205,7 +224,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
               input,
               modType,
               urlParts: [libName, compiled],
-              partsReplacements: [config.folder.components]
+              partsReplacements: [config.folder.components],
+              relativePath,
+              method
             });
 
           } else {
@@ -219,7 +240,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
               input,
               modType,
               urlParts: [libName, compiled],
-              partsReplacements: [libName, browserForCurrentClient]
+              partsReplacements: [libName, browserForCurrentClient],
+              relativePath,
+              method
             });
           }
         }
@@ -246,7 +269,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  protected modSiteChildrenLibsInClient(input: string, modType: ModType): string {
+  protected modSiteChildrenLibsInClient(input: string, modType: ModType, relativePath: string): string {
+    const method: CheckType = 'site';
     if (!this.project.isSite) {
       // log(`Project is not site: ${this.project.genericName}`);
       return input;
@@ -278,7 +302,9 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
             input,
             modType,
             urlParts: [baselineName, libName, compiled],
-            partsReplacements: [baselineName, libName, sourceFolder]
+            partsReplacements: [baselineName, libName, sourceFolder],
+            relativePath,
+            method
           });
         };
 
@@ -294,28 +320,37 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
 
       if (modType === 'custom/app') {
         const process = (compiled: any[]) => {
-          const browserForCurrentClient = IncrementalBuildProcessExtended
-            .getBrowserVerPath(this.project.name);
+          // const browserForCurrentClient = IncrementalBuildProcessExtended
+          //   .getBrowserVerPath(this.project.name);
+
+          let sourceFolder: string;
+          if (child.type === 'angular-lib') {
+            sourceFolder = config.folder.components;
+          }
+          if (child.type === 'isomorphic-lib') {
+            sourceFolder = config.folder.src;
+          }
 
           input = impReplace({
-            name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${browserForCurrentClient}`,
+            name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
             project: this.project,
             input,
             modType,
             urlParts: [baselineName, libName, compiled],
-            partsReplacements: [baselineName, libName, browserForCurrentClient]
+            partsReplacements: [baselineName, libName, sourceFolder],
+            relativePath,
+            method
           });
         };
 
         let folders = [
-          ...this.foldersSources,
+          // ...this.foldersSources,
           ...this.foldersCompiledJsDtsMap,
         ];
 
         process(folders);
 
         folders = this.project.parent.childrenThatAreClients
-          .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
           });
@@ -333,7 +368,9 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
               input,
               modType,
               urlParts: [baselineName, libName, compiled],
-              partsReplacements: [config.folder.components]
+              partsReplacements: [config.folder.components],
+              relativePath,
+              method
             });
 
           } else {
@@ -347,7 +384,9 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
               input,
               modType,
               urlParts: [baselineName, libName, compiled],
-              partsReplacements: [libName, browserForCurrentClient]
+              partsReplacements: [libName, browserForCurrentClient],
+              relativePath,
+              method
             });
           }
         }
@@ -360,9 +399,8 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
         process(folders);
 
         folders = this.project.parent.childrenThatAreClients
-          .filter(f => f.name !== this.project.name)
           .map(client => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
           });
 
         process(folders);

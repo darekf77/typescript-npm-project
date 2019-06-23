@@ -18,7 +18,7 @@ import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject } from '../../abstract';
 import {
   fastCopy, fastUnlink,
-  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin, moduleNameAngularLib
+  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin
 } from './baseline-site-join.helpers.backend';
 import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join.debug.backend';
 import { REGEXS } from './baseline-site-join.regexes.backend';

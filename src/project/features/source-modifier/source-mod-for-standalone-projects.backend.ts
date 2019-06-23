@@ -22,11 +22,11 @@ export class SourceModForStandaloneProjects extends FeatureForProject {
     ]
   };
 
-  protected mod3rdPartyLibsReferces(inpput: string, modType: ModType = 'lib') {
+  protected mod3rdPartyLibsReferces(inpput: string, modType: ModType, relativePath: string) {
     return inpput;
   }
 
-  process(input: string, modType: ModType = 'lib'): string {
+  process(input: string, modType: ModType, relativePath: string): string {
     return input;
   }
 

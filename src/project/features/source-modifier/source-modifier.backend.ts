@@ -66,7 +66,7 @@ export class SourceModifier extends FeatureCompilerForProject {
       });
     }
     input = this.fixDoubleApostophe(input);
-    input = project.sourceModifier.sourceMod.process(input, modType);
+    input = project.sourceModifier.sourceMod.process(input, modType, relativePath);
 
     if (saveMode) {
       fse.writeFileSync(filePath, input, {
