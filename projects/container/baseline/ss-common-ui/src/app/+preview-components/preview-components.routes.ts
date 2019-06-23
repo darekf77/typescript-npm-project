@@ -58,6 +58,10 @@ export const routes: Routes = [
         path: 'modal',
         loadChildren: './components/+preview-modal/+preview-modal.module#PreviewModalModule'
       },
+      {
+        path: 'notifications',
+        loadChildren: './components/+preview-notifications/+preview-notifications.module#PreviewNotificationsModule'
+      },
     ]
   }
 ];

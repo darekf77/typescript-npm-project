@@ -79,8 +79,8 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
         .map(f => this.repositoriesTemplateExportImport(cwd, f))
         .join('\n')}
 
-      import { Repository } from "typeorm";
-      export { Repository } from "typeorm";
+      import { Repository } from 'typeorm';
+      export { Repository } from 'typeorm';
       import * as _ from 'lodash'
 
       export function entities<ADDITIONAL={}>(connection?: Morphi.Orm.Connection, decoratorsEntities?: ADDITIONAL) {
@@ -154,7 +154,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
 
       //#${'region'} @backend
 
-      import { Helpers } from "morphi";
+      import { Helpers } from 'morphi';
       import * as _ from 'lodash'
 
       export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
