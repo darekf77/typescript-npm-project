@@ -89,7 +89,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
   }
 
   protected mod3rdPartyLibsReferces(input: string, modType: ModType): string {
-    const folderForO3rdPartLibs = [
+    const folders = [
       ...this.foldersSources,
       ...this.foldersCompiledJsDtsMap,
     ];
@@ -101,18 +101,18 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       if (modType === 'lib' || modType === 'custom/lib') {
         input = impReplace({
-          name: `<isomorphic-lib-name>/${folderForO3rdPartLibs.join('|\n')} -> <isomorphic-lib-name>`,
+          name: `${libName}/${folders.join('|\n')} -> ${libName}`,
           project: this.project,
           input,
           modType,
-          urlParts: [libName, folderForO3rdPartLibs],
+          urlParts: [libName, folders],
           partsReplacements: [libName],
         });
       }
 
       if (modType === 'app' || modType === 'custom/app') {
         input = impReplace({
-          name: `<isomorphic-lib-name> -> <isomorphic-lib-name>/browser`,
+          name: `${libName} -> ${libName}/${config.folder.browser}`,
           project: this.project,
           input,
           modType,
@@ -121,11 +121,11 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         });
 
         input = impReplace({
-          name: `<isomorphic-lib-name>/(${folderForO3rdPartLibs.join('|\n')}) -> <isomorphic-lib-name>/browser`,
+          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
           project: this.project,
           input,
           modType,
-          urlParts: [libName, folderForO3rdPartLibs],
+          urlParts: [libName, folders],
           partsReplacements: [libName, config.folder.browser],
         });
       }
@@ -146,63 +146,59 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       if (modType === 'lib' || modType === 'custom/lib') {
 
         let sourceFolder: string;
-        if (this.project.type === 'angular-lib') {
+        if (child.type === 'angular-lib') {
           sourceFolder = config.folder.components;
         }
-        if (this.project.type === 'isomorphic-lib') {
+        if (child.type === 'isomorphic-lib') {
           sourceFolder = config.folder.src;
         }
 
-        const process = (compiled: any[], preventDash: boolean) => {
-          const urlParts = preventDash ? [libName, compiled, `(?!\\-)`] : [libName, compiled];
+        const process = (compiledFolders: any[]) => {
           input = impReplace({
             name: `
-  <workspace-lib-name>/${compiled.join('|\n')} -> <isomorphic-lib-name>/(${this.foldersSources.join('|')})`,
+ ${libName}/${compiledFolders.join('|\n')} -> ${libName}/(${sourceFolder})`,
             project: this.project,
             input,
             modType,
-            urlParts: _.cloneDeep(urlParts),
+            urlParts: [libName, compiledFolders],
             partsReplacements: [libName, sourceFolder]
           });
         };
 
-        let compiled = this.foldersCompiledJsDtsMap;
-        process(compiled, true);
+        let folders = this.foldersCompiledJsDtsMap;
+        process(folders);
 
-        compiled = this.project.parent.childrenThatAreClients.map(client => {
-          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+        folders = this.project.parent.childrenThatAreClients.map(client => {
+          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
         });
-        process(compiled, false);
+        process(folders);
       }
 
       if (modType === 'app' || modType === 'custom/app') {
 
         const process = (compiled: any[]) => {
-          const urlParts = [libName, compiled];
 
           if (libName === this.project.name || this.project.type === 'angular-lib') {
             input = impReplace({
-              name: `
-  <workspace-lib-name>/${compiled.join('|\n')} -> components`,
+              name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
               project: this.project,
               input,
               modType,
-              urlParts: _.cloneDeep(urlParts),
+              urlParts: [libName, compiled],
               partsReplacements: [config.folder.components]
             });
 
           } else {
 
             const browserForCurrentClient = IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project.name)
+              .getBrowserVerPath(this.project.name);
 
             input = impReplace({
-              name: `
-  <workspace-lib-name>/${compiled.join('|\n')} -> <isomorphic-lib-name>/${browserForCurrentClient}`,
+              name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
               project: this.project,
               input,
               modType,
-              urlParts: _.cloneDeep(urlParts),
+              urlParts: [libName, compiled],
               partsReplacements: [libName, browserForCurrentClient]
             });
           }
@@ -219,7 +215,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
-          })
+          });
 
         process(folders);
 
@@ -245,23 +241,22 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       if (modType === 'lib' || modType === 'custom/lib') {
 
         let sourceFolder: string;
-        if (this.project.type === 'angular-lib') {
+        if (child.type === 'angular-lib') {
           sourceFolder = config.folder.components;
         }
-        if (this.project.type === 'isomorphic-lib') {
+        if (child.type === 'isomorphic-lib') {
           sourceFolder = config.folder.src;
         }
 
         const process = (compiled: any[]) => {
-          const urlParts = [baselineName, libName, compiled];
+
           input = impReplace({
             name: `
-${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
-${baselineName}/<workspace-lib-name>/(${this.foldersSources.join('|')})`,
+${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
             project: this.project,
             input,
             modType,
-            urlParts: _.cloneDeep(urlParts),
+            urlParts: [baselineName, libName, compiled],
             partsReplacements: [baselineName, libName, sourceFolder]
           });
         };
@@ -270,7 +265,7 @@ ${baselineName}/<workspace-lib-name>/(${this.foldersSources.join('|')})`,
         process(folders);
 
         folders = this.project.parent.childrenThatAreClients.map(client => {
-          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
         });
         process(folders);
 
@@ -278,22 +273,17 @@ ${baselineName}/<workspace-lib-name>/(${this.foldersSources.join('|')})`,
 
       if (modType === 'custom/app') {
         const process = (compiled: any[]) => {
-          const urlParts = [baselineName, libName, compiled];
-
           const browserForCurrentClient = IncrementalBuildProcessExtended
-            .getBrowserVerPath(this.project.name)
+            .getBrowserVerPath(this.project.name);
 
           input = impReplace({
-            name: `
-${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
-${baselineName}/<workspace-lib-name>/${browserForCurrentClient}`,
+            name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${browserForCurrentClient}`,
             project: this.project,
             input,
             modType,
-            urlParts: _.cloneDeep(urlParts),
+            urlParts: [baselineName, libName, compiled],
             partsReplacements: [baselineName, libName, browserForCurrentClient]
           });
-
         };
 
         let folders = [
@@ -307,43 +297,35 @@ ${baselineName}/<workspace-lib-name>/${browserForCurrentClient}`,
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
-          })
+          });
 
         process(folders);
-
-
-
       }
 
       if (modType === 'app') {
 
         const process = (compiled: any[]) => {
-          const urlParts = [baselineName, libName, compiled];
-
           if (libName === this.project.name || this.project.type === 'angular-lib') {
             input = impReplace({
-              name: `
-${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} -> components`,
+              name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${config.folder.components}`,
               project: this.project,
               input,
               modType,
-              urlParts: _.cloneDeep(urlParts),
+              urlParts: [baselineName, libName, compiled],
               partsReplacements: [config.folder.components]
             });
 
           } else {
 
             const browserForCurrentClient = IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project.name)
+              .getBrowserVerPath(this.project.name);
 
             input = impReplace({
-              name: `
-${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
-<isomorphic-lib-name>/${browserForCurrentClient}`,
+              name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${libName}/${browserForCurrentClient}`,
               project: this.project,
               input,
               modType,
-              urlParts: _.cloneDeep(urlParts),
+              urlParts: [baselineName, libName, compiled],
               partsReplacements: [libName, browserForCurrentClient]
             });
           }
@@ -360,14 +342,13 @@ ${baselineName}/<workspace-lib-name>/${compiled.join('|\n')} ->
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
-          })
+          });
 
         process(folders);
 
       }
 
-    })
-
+    });
 
     return input;
   }
