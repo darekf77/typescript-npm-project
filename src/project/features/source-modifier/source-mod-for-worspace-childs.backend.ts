@@ -245,7 +245,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
   protected modSiteChildrenLibsInClient(input: string, modType: ModType): string {
     if (!this.project.isSite) {
-      log(`Project is not site: ${this.project.genericName}`);
+      // log(`Project is not site: ${this.project.genericName}`);
       return input;
     }
 
@@ -379,7 +379,7 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
     // TODO run before browser codecut/compilation
 
     if (!this.project.isSite) {
-      log(`Project is not site: ${this.project.genericName}`);
+      // log(`Project is not site: ${this.project.genericName}`);
       return input;
     }
 
