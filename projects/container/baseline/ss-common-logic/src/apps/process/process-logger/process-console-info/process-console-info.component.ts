@@ -56,7 +56,7 @@ export class ProcessConsoleInfoComponent extends BaseComponent
     this.handlers.push(this.changes.subscribe(() => {
       // console.log('CHANGES PROCESS INFO')
       this.scrollDown();
-    }));
+    }) as any);
 
 
     // console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - ${this.outputType} `);

@@ -81,7 +81,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
       this.messages = this.model.allProgressData;
       this.scrollDown();
       this.removeDuplicates();
-    }));
+    }) as any);
 
 
     // console.log(`SUBSCRIBE PROPTERY: ${this.process.id} - allProgressData `);

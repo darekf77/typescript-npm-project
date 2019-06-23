@@ -21,8 +21,8 @@ PROJECT
 import {   PROJECT_REPOSITORY } from './apps/project/PROJECT_REPOSITORY';
 export {   PROJECT_REPOSITORY } from './apps/project/PROJECT_REPOSITORY';
 
-import { Repository } from 'typeorm';
-export { Repository } from 'typeorm';
+import { Repository } from "typeorm";
+export { Repository } from "typeorm";
 import * as _ from 'lodash'
 
 export function entities<ADDITIONAL={}>(connection?: Morphi.Orm.Connection, decoratorsEntities?: ADDITIONAL) {
