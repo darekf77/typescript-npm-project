@@ -20,8 +20,11 @@ export type ImpReplaceOptions = {
 }
 
 function impReplace(impReplaceOptions: ImpReplaceOptions) {
-  let { input, name, urlParts, modType, notAllowedAfterSlash } = impReplaceOptions;
-  const { partsReplacements, project, debugMatch, debugNotMatch } = impReplaceOptions;
+  let { input, name, urlParts, modType, notAllowedAfterSlash, debugMatch, debugNotMatch } = impReplaceOptions;
+  const { partsReplacements, project } = impReplaceOptions;
+
+  // debugMatch = true;
+  // debugNotMatch = true;
 
   name = name.replace(/\n/g, ' ')
 
