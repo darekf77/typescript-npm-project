@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { ToastrService } from 'ngx-toastr';
+import { NotificaitonModel } from './notification-model';
 
 
 @Injectable()
@@ -15,9 +16,12 @@ export class NotificationsService {
   }
 
   success(title: string, subtitle: string) {
-    return this.toast.success(title, subtitle, {
+    const t = this.toast.success(title, subtitle, {
       easing: '300',
     });
+
+    return new NotificaitonModel(t);
+
   }
 
 
