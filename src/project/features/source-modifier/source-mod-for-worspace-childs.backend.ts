@@ -16,6 +16,7 @@ export type ImpReplaceOptions = {
   project: Project,
   method: CheckType,
   modType: ModType,
+  partsReplacementsOptions?: { replaceWhole?: boolean };
   urlParts: (string | string[])[],
   notAllowedAfterSlash?: (string | string[])[],
   partsReplacements: (string | string[])[],
@@ -24,8 +25,18 @@ export type ImpReplaceOptions = {
 }
 
 function impReplace(impReplaceOptions: ImpReplaceOptions) {
-  let { input, name, urlParts, modType, notAllowedAfterSlash, debugMatch, debugNotMatch } = impReplaceOptions;
-  const { partsReplacements, project, relativePath, method } = impReplaceOptions;
+  let { input, name, urlParts, modType, notAllowedAfterSlash, partsReplacementsOptions,
+    debugMatch, debugNotMatch } = impReplaceOptions;
+  const { partsReplacements, project, relativePath, method, } = impReplaceOptions;
+
+  if (!partsReplacementsOptions) {
+    partsReplacementsOptions = {};
+  }
+  if (_.isUndefined(partsReplacementsOptions.replaceWhole)) {
+    partsReplacementsOptions.replaceWhole = false;
+  }
+  const { replaceWhole } = partsReplacementsOptions;
+
 
   // if (relativePath === 'custom/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
   //   && method === 'site') {
@@ -68,18 +79,31 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
 
   modType = modType ? modType : 'BROWSER' as any;
 
-  const arr: { regexSource: string; replacement: string; description: string; }[] = [
-    {
-      regexSource: `(\\"|\\')${urlParts.join(`\\/`)}(\\"|\\')`,
-      replacement: `'${partsReplacements.join('/')}'`,
-      description: `exactly between apostrophes`
-    },
-    {
-      regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
-      replacement: `'${partsReplacements.join('/')}/`,
-      description: `between apostrophe and slash`
-    },
-  ];
+  let arr: { regexSource: string; replacement: string; description: string; }[] = [];
+  if (replaceWhole) {
+    arr = [
+      {
+        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}.*(\\"|\\')`,
+        replacement: `'${partsReplacements.join('/')}'`,
+        description: `exactly between whole imporrt`
+      }
+    ];
+  } else {
+    arr = [
+      {
+        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}(\\"|\\')`,
+        replacement: `'${partsReplacements.join('/')}'`,
+        description: `exactly between apostrophes`
+      },
+      {
+        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
+        replacement: `'${partsReplacements.join('/')}/`,
+        description: `between apostrophe and slash`
+      },
+    ];
+  }
+
+
 
   for (let index = 0; index < arr.length; index++) {
     const element = arr[index];
@@ -361,7 +385,11 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
       if (modType === 'app') {
 
         const process = (compiled: any[]) => {
-          if (libName === this.project.name || this.project.type === 'angular-lib') {
+          if (child.type === 'angular-lib') {
+            compiled = compiled.filter(f => f !== config.folder.src);
+          };
+
+          if (libName === this.project.name || child.type === 'angular-lib') {
             input = impReplace({
               name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${config.folder.components}`,
               project: this.project,
@@ -369,6 +397,9 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
               modType,
               urlParts: [baselineName, libName, compiled],
               partsReplacements: [config.folder.components],
+              partsReplacementsOptions: {
+                replaceWhole: true
+              },
               relativePath,
               method
             });
