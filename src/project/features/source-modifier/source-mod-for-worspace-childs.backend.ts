@@ -13,13 +13,14 @@ export type ImpReplaceOptions = {
   project: Project,
   modType: ModType,
   urlParts: (string | string[])[],
+  notAllowedAfterSlash?: (string | string[])[],
   partsReplacements: (string | string[])[],
   name: string;
   input: string,
 }
 
 function impReplace(impReplaceOptions: ImpReplaceOptions) {
-  let { input, name, urlParts, modType } = impReplaceOptions;
+  let { input, name, urlParts, modType, notAllowedAfterSlash } = impReplaceOptions;
   const { partsReplacements, project, debugMatch, debugNotMatch } = impReplaceOptions;
 
   name = name.replace(/\n/g, ' ')
@@ -39,6 +40,21 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
     }
   });
 
+  if (_.isArray(notAllowedAfterSlash)) {
+    notAllowedAfterSlash = notAllowedAfterSlash.map(p => {
+      if (_.isArray(p)) {
+        return `(${p
+          .map(part => {
+            return escapeStringForRegEx(part);
+          }).join('|')})`;
+      }
+      if (_.isString(p)) {
+        return escapeStringForRegEx(p);
+      }
+    });
+  }
+
+
   modType = modType ? modType : 'BROWSER' as any;
 
   const arr: { regexSource: string; replacement: string; description: string; }[] = [
@@ -48,7 +64,7 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
       description: `exactly between apostrophes`
     },
     {
-      regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/`,
+      regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
       replacement: `'${partsReplacements.join('/')}/`,
       description: `between apostrophe and slash`
     },
@@ -117,6 +133,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
           input,
           modType,
           urlParts: [libName],
+          notAllowedAfterSlash: [config.folder.browser],
           partsReplacements: [libName, config.folder.browser],
         });
 
@@ -229,6 +246,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
   protected modSiteChildrenLibsInClient(input: string, modType: ModType): string {
     if (!this.project.isSite) {
       log(`Project is not site: ${this.project.genericName}`);
+      return input;
     }
 
     const chidren = this.project.parent.childrenThatAreLibs;
@@ -362,6 +380,7 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
 
     if (!this.project.isSite) {
       log(`Project is not site: ${this.project.genericName}`);
+      return input;
     }
 
     const baselineName = this.project.parent.baseline.name;
