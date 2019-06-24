@@ -24,6 +24,10 @@ async function buildWatch(args) {
 }
 const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLib(false, true, 'dist', args);
 const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args);
+const BUILD_DIST = async (args) => {
+  await Project.Current.buildProcess.startForLib(false, false, 'dist', `${args} --compileOnce`)
+};
+const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLib(false, false, 'bundle', `${args} --compileOnce`);
 
 export default {
 
@@ -35,8 +39,13 @@ export default {
 
   STATIC_BUILD_APP_PROD: [(args) => Project.Current.buildProcess.startForApp(true, false, 'dist', args),
     `Build dist version of project library.`],
-
-  $BUILD_DIST: [(args) => Project.Current.buildProcess.startForLib(false, false, 'dist', args), `Build dist version of project library.`],
+  BUILD_DIST,
+  async BD(args) {
+    await BUILD_DIST(args);
+  },
+  async BB(args) {
+    await BUILD_BUNDLE(args);
+  },
 
   BUILD_DIST_WATCH,
   BDW: BUILD_DIST_WATCH,
@@ -45,7 +54,7 @@ export default {
 
   $BUILD_DIST_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, "dist", args),
 
-  $BUILD_BUNDLE: (args) => Project.Current.buildProcess.startForLib(false, false, 'bundle', args),
+
   $BUILD_BUNDLE_WATCH: (args) => Project.Current.buildProcess.startForLib(false, true, 'bundle', args),
   $BUILD_BUNDLE_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, 'bundle', args),
 

@@ -103,7 +103,7 @@ export class BuildProcess extends FeatureForProject {
 
     await project.build(buildOptions);
     if (exit && !watch) {
-      process.exit(0)
+      process.exit(0);
     }
 
   }
