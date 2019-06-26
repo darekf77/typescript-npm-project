@@ -30,10 +30,7 @@ export class BuildOptions implements IBuildOptions {
    */
   onlyBackend?: boolean;
 
-  /**
-   * In watch mode compile once and exit
-   */
-  compileOnce?: boolean;
+
   onlyWatchNoBuild?: boolean;
   copyto?: Project[] | string[];
   copytoAll?: boolean;
@@ -155,13 +152,12 @@ export class BuildOptions implements IBuildOptions {
 
     argsObj.onlyWatchNoBuild = !!argsObj.onlyWatchNoBuild;
     argsObj.genOnlyClientCode = !!argsObj.genOnlyClientCode;
-    argsObj.compileOnce = !!argsObj.compileOnce;
 
     return _.merge(new BuildOptions(), argsObj) as BuildOptions;
   }
 
   public static exportToCMD(buildOptions: BuildOptions): string {
-    const { appBuild, outDir, watch, compileOnce,
+    const { appBuild, outDir, watch,
       copyto, baseHref, forClient, prod,
       genOnlyClientCode, onlyBackend, onlyWatchNoBuild
     } = buildOptions;
@@ -197,10 +193,6 @@ export class BuildOptions implements IBuildOptions {
 
     if (genOnlyClientCode) {
       args.push('--genOnlyClientCode')
-    }
-
-    if (compileOnce) {
-      args.push('--compileOnce')
     }
 
     if (onlyBackend) {

@@ -83,7 +83,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       }
     }
 
-    this.compileOnce = buildOptions.compileOnce;
+    this.compileOnce = !buildOptions.watch
 
     if (buildOptions.onlyBackend) {
 

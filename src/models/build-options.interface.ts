@@ -8,7 +8,6 @@ export interface IBuildOptions {
   noConsoleClear?: boolean;
   watch?: boolean;
   args?: string;
-  compileOnce?: boolean;
   genOnlyClientCode?: boolean;
   onlyBackend?: boolean;
   appBuild?: boolean;

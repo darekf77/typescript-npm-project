@@ -28,11 +28,11 @@ export class ProjectsController extends BaseController {
   addIfNotExists(projectInstance: ProjectInstance): boolean {
 
     if (!projectInstance) {
-      return
+      return;
     }
 
     if (this.recognized.find(p => p.project.location === projectInstance.project.location)) {
-      return
+      return;
     }
     this.recognized.push(projectInstance);
 

@@ -124,7 +124,7 @@ export class ProjectAngularLib extends LibProject {
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient, compileOnce } = buildOptions;
+    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient } = buildOptions;
 
 
 

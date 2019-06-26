@@ -75,9 +75,7 @@ export class BuildProcess extends FeatureForProject {
 
     const { watch, appBuild, args } = buildOptions;
 
-    if(!watch) {
-      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` })
-    }
+
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
       if (appBuild) {
@@ -96,7 +94,14 @@ export class BuildProcess extends FeatureForProject {
       await project.filesStructure.init(args);
     }
 
-    project = await project.staticBuild.resolveProjectIfGenerated(buildOptions, args)
+    if (project.staticAccess) {
+      console.log('staticAccessstaticAccessstaticAccessstaticAccess')
+      project = await project.staticBuild.resolveProjectIfGenerated(buildOptions, args);
+    }
+
+    if (!watch && project.isGenerated) {
+      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` })
+    }
 
     await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)
 

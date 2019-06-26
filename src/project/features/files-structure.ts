@@ -51,7 +51,7 @@ export class FilesStructure extends FeatureForProject {
     const { alreadyInitedPorjects, watch } = options;
 
     const db = await TnpDB.Instance;
-    await db.transaction.addProjectIfNotExist(this.project)
+    await db.transaction.addProjectIfNotExist(this.project);
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);

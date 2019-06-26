@@ -288,12 +288,16 @@ export abstract class BaseProject {
   //#region @backend
   get StaticVersion(): Project {
     const outDir: BuildDir = 'dist';
+    let projectToBuild: Project;
     if (this.isWorkspace) {
-      return Project.From(path.join(this.location, outDir, this.name))
+      projectToBuild = Project.From(path.join(this.location, outDir, this.name), { staticAccess: true });
     } else if (this.isWorkspaceChildProject) {
-      return Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name))
+      projectToBuild = Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name), { staticAccess: true });
     }
-    error(`There is not static version for project ${this.genericName}`, true, true)
+    // if (!projectToBuild) {
+    //   error(`There is not static version for project ${this.genericName}`)
+    // }
+    return projectToBuild;
   }
   //#endregion
 
@@ -1090,7 +1094,6 @@ export abstract class BaseProject {
     //     await build(_.merge(_.cloneDeep(buildOptions), {
     //       watch: true,
     //       appBuild: false,
-    //       compileOnce: true
     //     } as BuildOptions), undefined, c, false);
     //   }
     // }
@@ -1130,8 +1133,8 @@ export abstract class BaseProject {
     PackagesRecognitionExtended.fromProject(this as any).start();
     await this.buildSteps(buildOptions);
     await this.copyManager.initCopyingOnBuildFinish(buildOptions);
-    if (buildOptions.compileOnce) {
-      process.exit(0)
+    if (!buildOptions.watch) {
+      process.exit(0);
     }
   }
   //#endregion
@@ -1261,7 +1264,14 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static From(location: string): Project {
+  public static From(location: string, options?: { staticAccess: boolean; }): Project {
+
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (_.isUndefined(options.staticAccess)) {
+      options.staticAccess = false;
+    }
 
     if (!_.isString(location)) {
       warn(`[project.from] location is not a string`)
@@ -1271,6 +1281,7 @@ export class Project extends BaseProject implements IProject {
 
     const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
     if (alreadyExist) {
+      alreadyExist.staticAccess = options.staticAccess;
       return alreadyExist;
     }
     if (!fs.existsSync(location)) {
@@ -1320,6 +1331,7 @@ export class Project extends BaseProject implements IProject {
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
     // log(`[project.from] Result project: ${resultProject.name}`)
+    resultProject.staticAccess = options.staticAccess;
     return resultProject;
   }
   //#endregion
@@ -1361,6 +1373,21 @@ export class Project extends BaseProject implements IProject {
     return !(!!global[config.message.tnp_normal_mode])
     //#endregion
   }
+
+  private _staticAccess = false;
+  get staticAccess() {
+    const res = this._staticAccess;
+    // if (res) {
+    //   this._staticAccess = false;
+    // }
+    return res;
+  }
+
+  set staticAccess(v) {
+    this._staticAccess = v;
+  }
+
+
 
 
   //#region @backend
