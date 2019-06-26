@@ -6,7 +6,7 @@ import {
 import * as _ from 'lodash';
 
 import { Log, Level } from 'ng2-logger';
-import { numValue } from '../../helpers';
+import { numValue } from 'ss-helpers/components';
 import { Router } from '@angular/router';
 
 export interface LayoutMaterialVariables {

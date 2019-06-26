@@ -5,7 +5,10 @@
     ],
     "type": "isomorphic-lib",
     "baseline": true,
-    "useFramework": true
+    "useFramework": true,
+    "required": [
+      "ss-common-ui"
+    ]
   },
   "name": "ss-common-logic",
   "version": "0.0.0",

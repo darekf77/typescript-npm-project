@@ -555,10 +555,10 @@ export abstract class BaseProject {
   //#region @backend
   getFolders() {
     const notAllowed: RegExp[] = [
-      '\.vscode', 'node\_modules',
+      '^\.vscode$', '^node\_modules$',
       ..._.values(config.tempFolders).map(v => `^${v}$`),
-      'e2e', 'tmp.*', 'dist.*', 'tests', 'module', 'browser', 'bundle*',
-      'components', '\.git', 'bin', 'custom'
+      '^e2e$', '^tmp.*', '^dist.*', '^tests$', '^module$', '^browser', 'bundle*',
+      '^components$', '\.git', '^bin$', '^custom$'
     ].map(s => new RegExp(s))
 
     const isDirectory = source => fse.lstatSync(source).isDirectory()

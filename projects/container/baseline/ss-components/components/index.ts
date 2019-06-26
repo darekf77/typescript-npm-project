@@ -6,3 +6,8 @@ export * from './standalone-popup';
 export * from './slider-vertical-section';
 export * from './modal';
 export * from './notifications';
+export * from './editor';
+export * from './list';
+export * from './select';
+export * from './button-icon';
+export * from './formly-switch';

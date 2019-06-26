@@ -1,0 +1,30 @@
+{
+  "name": "ss-components",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "tnp": {
+    "isCoreProject": false,
+    "type": "angular-lib",
+    "resources": [
+      "README.md"
+    ],
+    "isGenerated": false,
+    "useFramework": false,
+    "required": [
+      "ss-helpers"
+    ]
+  },
+  "isomorphicPackages": [
+    "browserify-sign",
+    "json10",
+    "lodash-walk-object",
+    "morphi",
+    "ng2-logger",
+    "ng2-rest",
+    "static-columns",
+    "timespan",
+    "tnp-bundle",
+    "typeorm",
+    "typescript-class-helpers"
+  ]
+}

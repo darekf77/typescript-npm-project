@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { StaticColumnsModule } from 'static-columns';
 // local
 import { LayoutMaterialComponent } from './layout-material.component';
-import { LogoModule } from '../../ui-elements';
+import { LogoModule } from 'ss-components/components/logo';
 
 const modules = [
   CommonModule,
