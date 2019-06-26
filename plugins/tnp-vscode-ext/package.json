@@ -21,20 +21,31 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.tnpCLIcreateMorphiModel",
-        "title": "MORPHI: Create model"
+        "command": "extension.tnpCLIcreateFiredevModel",
+        "title": "FIREDEV: Create model"
+      },
+      {
+        "command": "extension.tnpCLIBuildProject",
+        "title": "FIREDEV: build project"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "extension.tnpCLIcreateMorphiModel"
+          "command": "extension.tnpCLIcreateFiredevModel"
+        },
+        {
+          "command": "extension.tnpCLIBuildProject"
         }
       ],
       "editor/title/context": [
         {
-          "command": "extension.tnpCLIcreateMorphiModel",
-          "group": "Morphi CLI essentials"
+          "command": "extension.tnpCLIcreateFiredevModel",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.tnpCLIBuildProject",
+          "group": "Firedev CLI essentials"
         }
       ]
     }

@@ -176,9 +176,18 @@ export class NodeModules extends FeatureForProject {
 
     projects.forEach(dep => {
       allNamesBefore = this.addDependenceis(dep, context, allNamesBefore)
-    })
+    });
 
     return allNamesBefore;
+  }
+
+  get fixesForNodeModulesPackages() {
+    return this.project
+      .getFolders()
+      .filter(f => {
+        return !this.project.children.map(c => c.name).includes(path.basename(f)) &&
+          !_.values(config.tempFolders).includes(path.basename(f))
+      });
   }
 
 }

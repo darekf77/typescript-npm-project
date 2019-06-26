@@ -60,7 +60,7 @@ export async function start(argsv: string[], spinner?: Ora) {
   const functions: Function[] = []
 
   files.some((file) => {
-    let defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
+    const defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {
 
       Object.keys(defaultObjectFunctionsOrHelpString).map(key => {
@@ -83,7 +83,7 @@ export async function start(argsv: string[], spinner?: Ora) {
               const check = match(k, argsv);
               if (check.isMatch) {
                 recognized = true;
-                spinner && spinner.stop()
+                // spinner && spinner.stop()
                 vFn.apply(null, [check.restOfArgs.join(' ')]);
                 return true;
               }
@@ -94,7 +94,7 @@ export async function start(argsv: string[], spinner?: Ora) {
     }
     return false;
   });
-  spinner && spinner.stop()
+  // spinner && spinner.stop()
   if (recognized) {
     // console.log("RECOGNIZED !!")
     process.stdin.resume();

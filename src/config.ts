@@ -45,6 +45,7 @@ const tempFolders = {
   previewDistApp: 'dist-app',
   browser: 'browser',
   module: 'module',
+  backup: 'backup',
   node_modules: 'node_modules',
   client: 'client',
   tnp_tests_context: 'tmp-tests-context',

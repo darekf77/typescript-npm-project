@@ -78,14 +78,20 @@ export function match(name: string, argv: string[]): { isMatch: boolean; restOfA
   let restOfArgs = argv;
 
   isMatch = !!argv.find((vv, i) => {
-    const nameInKC = paramsFrom(name);
-    const isWithoutDash = name.startsWith('$');
-    const argInKC = paramsFrom(vv);
+    const nameInKC = paramsFrom(name)
+      .replace(/\$/g, '')
+      .replace(/\-/g, '')
+      .replace(/\:/g, '')
+      .replace(/\_/g, '')
+      .toLowerCase()
+    const argInKC = paramsFrom(vv)
+      .replace(/\$/g, '')
+      .replace(/\-/g, '')
+      .replace(/\:/g, '')
+      .replace(/\_/g, '')
+      .toLowerCase()
 
-    const condition =
-      (isWithoutDash && argInKC === `${nameInKC}`)
-      || argInKC === `${nameInKC}`
-      || argInKC === `${nameInKC.substr(0, 1)}`;
+    const condition = (nameInKC === argInKC)
     if (condition) {
       restOfArgs = _.slice(argv, i + 1, argv.length);
     }

@@ -132,9 +132,15 @@ function $GIT_REMOVE_UNTRACKED() {
   process.exit(0)
 }
 
+function NPM_FIXES() {
+  console.log(Project.Current.node_modules.fixesForNodeModulesPackages)
+  process.exit(0)
+}
 
 
 export default {
+
+  npmFixes: NPM_FIXES,
 
   LN(args: string) {
     let [target, link] = args.split(' ');
@@ -169,7 +175,7 @@ export default {
     await $PSINFO(a)
   },
   $MOD: async () => {
-    if(Project.Current.isSite) {
+    if (Project.Current.isSite) {
       await Project.Current.join.init();
     }
     await Project.Current.sourceModifier.init(`Source modfier`)
