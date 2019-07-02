@@ -5,11 +5,12 @@ import { Project, LibProject } from "../project";
 import { BaselineSiteJoin } from "../project/features/baseline-site-join";
 import * as  psList from 'ps-list';
 import { PsListInfo } from '../models/ps-info';
-import { error, info, HelpersLinks, killProcess } from '../helpers';
+import { error, info, HelpersLinks, killProcess, warn } from '../helpers';
 import chalk from 'chalk';
 import { getMostRecentFilesNames } from '../helpers';
 import { Helpers as HelpersMorphi } from "morphi";
 import { run } from "../helpers";
+import * as glob from 'glob';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
@@ -18,6 +19,20 @@ import { paramsFrom } from '../helpers';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { TnpDB } from '../tnp-db';
 import { listProcesses } from './list-processes.backend';
+
+
+export function killvscode(exit = true) {
+  try {
+    run(`kill -9 $(pgrep Electron)`).sync();
+    info(`Killled`)
+  } catch (error) {
+    warn(`kill not needed`)
+  }
+  if (exit) {
+    process.exit(0)
+  }
+}
+
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -140,81 +155,76 @@ function NPM_FIXES() {
 }
 
 export async function develop(args: string, exit = true) {
-
+  console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
   const db = await TnpDB.Instance;
+  let projects = db.getProjects()
+    .map(p => p.project)
+    .filter(p => !p.isGenerated);
 
-  const projectName = _.first(args.trim().split(' '));
+  const igt = path.join(Project.Tnp.location, '../..', 'igt');
+  console.log('igt', igt)
+  projects = fse.readdirSync(igt)
+    .map(f => {
+      console.log(f);
+      return Project.From(f)
+    })
 
+  const projectsToOpen = args.trim().split(' ');
+  const projectForAction: Project[] = [];
+  const projectForWorkspaceJoin: Project[] = [];
 
-  const projects = db.getProjects().filter(p => !p.project.isGenerated);
-  let project = projects.find(p => {
-    return p.project.genericName === projectName;
-  });
-  if (!project) {
-    project = projects.find(p => {
-      return p.project.name === projectName;
+  projectsToOpen.forEach(projectName => {
+    let proj = projects.find(p => {
+      return p && p.genericName === projectName;
     });
-  }
-  if (!project) {
-    error(`Cannot find project: "${projectName}"`, false, true)
-  }
-  const projectForAction = []
-  const ins = project.project;
-  projectForAction.push(ins);
-  if (ins.children) {
-    for (let index = 0; index < ins.children.length; index++) {
-      const child = ins.children[index];
-      projectForAction.push(child);
-    }
-  }
-  if (kill) {
-
-
-    let ps: PsListInfo[] = await psList();
-    ps = ps
-      .filter(proc => {
-
-        return proc.cmd.startsWith('/Applications/Visual Studio Code.app/');
-        // const incudesInCmd = projectForAction.map(p => p.location)
-        //   .filter(p => proc.cmd.search(p) !== -1).length > 0;
-        // return incudesInCmd;
-      })
-      .filter(p => {
-        // return !!~p.cmd.search('--clientProcessId=')
-        return !!~p.cmd.search('--renderer-client-id=')
+    if (!proj) {
+      proj = projects.find(p => {
+        return p && p.name === projectName;
       });
-    console.log(ps.length)
-    // ps.forEach(p => {
-    //   console.log(p.cmd)
-    //   const first = _.first(p.cmd.match(/\-\-renderer\-client\-id\=[0-9]+/));
-    //   const num = (first && first.split('=').length === 2) ? first.split('=')[1] : void 0;
-    //   if (_.isNumber(num)) {
-    //     console.log(`Probobly pid: ${num}`)
-    //   } else {
-    //     console.log(`NOT pid: ${num}`)
-    //   }
-    // })
-    // for (let index = 0; index < ps.length; index++) {
-    //   const pppp = ps[index];
-    //   const procesesss = await listProcesses(pppp.pid, false);
-    //   console.log(`For ${pppp.pid} children:
-    //   ${procesesss.children && procesesss.children.length}
-    //   ${procesesss.cmd}
-    //   `);
-    // }
-  } else {
-    for (let index = 0; index < projectForAction.length; index++) {
-      const projectToOpen = projectForAction[index];
-      run(`code ${projectToOpen.location}`).sync();
     }
-  }
-}
+    if (!proj) {
+      error(`Cannot find project: "${projectName}"`, false, true)
+    }
 
+    if (proj.isStandaloneProject) {
+      projectForAction.push(proj);
+    } else {
+      projectForWorkspaceJoin.push(proj);
+      if (proj.children) {
+        for (let index = 0; index < proj.children.length; index++) {
+          const child = proj.children[index];
+          if (child.type === 'isomorphic-lib') {
+            projectForAction.push(child);
+          } else {
+            projectForWorkspaceJoin.push(child);
+          }
+
+        }
+      }
+    }
+
+  });
+
+  killvscode(false);
+  for (let index = 0; index < projectForAction.length; index++) {
+    const projectToOpen = projectForAction[index];
+    run(`code ${projectToOpen.location}`).sync();
+  }
+  run(`code ${projectForWorkspaceJoin.map(p => p.location).join(' ')}`).sync();
+  process.exit(0)
+}
 
 export default {
   develop,
   npmFixes: NPM_FIXES,
+  killvscode,
+  vscodekill() {
+    killvscode();
+  },
+  close() {
+    killvscode();
+  },
 
   LN(args: string) {
     let [target, link] = args.split(' ');

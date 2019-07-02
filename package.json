@@ -244,6 +244,7 @@
               "watch": "~1.0.2"
             },
             "operating-system": {
+              "robotjs": "0.5.1",
               "portfinder": "^1.0.13",
               "@types/node-notifier": "0.0.28",
               "node-notifier": "^5.3.0",
@@ -564,7 +565,8 @@
     "validator": "^9.2.0",
     "watch": "~1.0.2",
     "webpack-dev-server": "~2.9.3",
-    "zone.js": "0.8.20"
+    "zone.js": "0.8.20",
+    "robotjs": "0.5.1"
   },
   "license": "MIT",
   "isomorphicPackages": [
