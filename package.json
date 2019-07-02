@@ -540,6 +540,7 @@
     "raw-loader": "^0.5.1",
     "redbird": "^0.7.0",
     "rimraf": "^2.6.2",
+    "robotjs": "0.5.1",
     "rxjs": "5.5.6",
     "sass-loader": "^6.0.3",
     "sass-variable-loader": "^0.1.2",
@@ -565,8 +566,7 @@
     "validator": "^9.2.0",
     "watch": "~1.0.2",
     "webpack-dev-server": "~2.9.3",
-    "zone.js": "0.8.20",
-    "robotjs": "0.5.1"
+    "zone.js": "0.8.20"
   },
   "license": "MIT",
   "isomorphicPackages": [
