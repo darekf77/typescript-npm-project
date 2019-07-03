@@ -162,6 +162,12 @@ export abstract class BaseProject {
       return this.browser.name;
     }
     //#region @backendFunc
+    if (this.packageJson && this.type === 'unknow-npm-project') {
+      if (this.packageJson.name !== path.basename(this.location)
+        && path.basename(path.dirname(this.location)) === 'external') {
+          return path.basename(this.location);
+      }
+    }
     return this.packageJson ? this.packageJson.name : path.basename(this.location);
     //#endregion
   }
@@ -483,6 +489,18 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  /**
+   * Unknow npm project
+   */
+  get isUnknowNpmProject() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isUnknowNpmProject;
+    }
+    //#region @backend
+    return this.type === 'unknow-npm-project';
+    //#endregion
+  }
+
 
   get customizableFilesAndFolders() {
     if (Morphi.IsBrowser) {
@@ -702,6 +720,63 @@ export abstract class BaseProject {
     }).filter(f => !!f);
     //#endregion
   }
+
+  //#region @backend
+  private recreateCodeWorkspace() {
+    if (this.isWorkspace) {
+      const configSettings = {};
+      try {
+        const settings = fse.readJSONSync(path.join(this.location, '.vscode', 'settings.json'), {
+          encoding: 'utf8'
+        });
+        Object.keys(settings)
+          .filter(key => {
+            return key.startsWith('workbench');
+          })
+          .forEach(key => {
+            configSettings[key] = settings[key];
+          });
+      } catch (error) { }
+
+      const codeWorkspace = {
+        folders: [
+          { path: '.' },
+          ...this.children
+            .filter(c => {
+              return c.type !== 'isomorphic-lib';
+            })
+            .map(c => {
+              return { path: c.name }
+            })
+        ],
+        settings: configSettings
+      }
+      fse.writeJSONSync(path.join(this.location,
+        this.nameOfCodeWorkspace), codeWorkspace, {
+          encoding: 'utf8',
+          spaces: 2
+        });
+    }
+  }
+
+  get nameOfCodeWorkspace() {
+    return `${_.kebabCase(this.genericName)}.code-workspace`;
+  }
+
+  openInVscode() {
+    this.recreateCodeWorkspace()
+    if (this.isStandaloneProject || this.isUnknowNpmProject) {
+      this.run(`code ${this.location}`).sync()
+    } else {
+      const isomorphicServers: Project[] = this.children.filter(c => c.type === 'isomorphic-lib');
+      this.run(`code ${this.location}/${this.nameOfCodeWorkspace}`).sync();
+      isomorphicServers.forEach(s => {
+        s.run(`code ${s.location}`).sync()
+      });
+    }
+  }
+
+  //#endregion
 
   //#region @backend
   protected quickFixMissingLibs(missingLibsNames: string[] = []) {
@@ -1294,6 +1369,7 @@ export class Project extends BaseProject implements IProject {
     };
     const type = this.typeFrom(location);
 
+    // console.log(`TYpe "${type}" for ${location} `)
     let resultProject: Project;
     if (type === 'isomorphic-lib') {
       const { ProjectIsomorphicLib } = require('../project-isomorphic-lib');
@@ -1319,14 +1395,15 @@ export class Project extends BaseProject implements IProject {
       const { ProjectIonicClient } = require('../project-ionic-client');
       resultProject = new ProjectIonicClient(location);
     }
-    if (type === 'unknow-npm-project') {
-      const { ProjectUnknowNpm } = require('../project-unknow-npm');
-      resultProject = new ProjectUnknowNpm(location);
-    }
     if (type === 'container') {
       const { ProjectContainer } = require('../project-container');
       resultProject = new ProjectContainer(location);
     }
+    if (type === 'unknow-npm-project') {
+      const { ProjectUnknowNpm } = require('../project-unknow-npm');
+      resultProject = new ProjectUnknowNpm(location);
+    }
+
     // log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
 

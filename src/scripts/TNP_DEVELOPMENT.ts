@@ -20,20 +20,6 @@ import { PackagesRecognitionExtended } from '../project/features/packages-recogn
 import { TnpDB } from '../tnp-db';
 import { listProcesses } from './list-processes.backend';
 
-
-export function killvscode(exit = true) {
-  try {
-    run(`kill -9 $(pgrep Electron)`).sync();
-    info(`Killled`)
-  } catch (error) {
-    warn(`kill not needed`)
-  }
-  if (exit) {
-    process.exit(0)
-  }
-}
-
-
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
   if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
@@ -154,77 +140,10 @@ function NPM_FIXES() {
   process.exit(0)
 }
 
-export async function develop(args: string, exit = true) {
-  console.log('adasdas')
-  const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
-  const db = await TnpDB.Instance;
-  let projects = db.getProjects()
-    .map(p => p.project)
-    .filter(p => !p.isGenerated);
-
-  const igt = path.join(Project.Tnp.location, '../..', 'igt');
-  console.log('igt', igt)
-  projects = fse.readdirSync(igt)
-    .map(f => {
-      console.log(f);
-      return Project.From(f)
-    })
-
-  const projectsToOpen = args.trim().split(' ');
-  const projectForAction: Project[] = [];
-  const projectForWorkspaceJoin: Project[] = [];
-
-  projectsToOpen.forEach(projectName => {
-    let proj = projects.find(p => {
-      return p && p.genericName === projectName;
-    });
-    if (!proj) {
-      proj = projects.find(p => {
-        return p && p.name === projectName;
-      });
-    }
-    if (!proj) {
-      error(`Cannot find project: "${projectName}"`, false, true)
-    }
-
-    if (proj.isStandaloneProject) {
-      projectForAction.push(proj);
-    } else {
-      projectForWorkspaceJoin.push(proj);
-      if (proj.children) {
-        for (let index = 0; index < proj.children.length; index++) {
-          const child = proj.children[index];
-          if (child.type === 'isomorphic-lib') {
-            projectForAction.push(child);
-          } else {
-            projectForWorkspaceJoin.push(child);
-          }
-
-        }
-      }
-    }
-
-  });
-
-  killvscode(false);
-  for (let index = 0; index < projectForAction.length; index++) {
-    const projectToOpen = projectForAction[index];
-    run(`code ${projectToOpen.location}`).sync();
-  }
-  run(`code ${projectForWorkspaceJoin.map(p => p.location).join(' ')}`).sync();
-  process.exit(0)
-}
 
 export default {
-  develop,
+
   npmFixes: NPM_FIXES,
-  killvscode,
-  vscodekill() {
-    killvscode();
-  },
-  close() {
-    killvscode();
-  },
 
   LN(args: string) {
     let [target, link] = args.split(' ');

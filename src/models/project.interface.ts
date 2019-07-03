@@ -14,6 +14,7 @@ export interface IProject {
   isContainer: boolean;
   isContainerChild: boolean;
   isStandaloneProject: boolean;
+  isUnknowNpmProject: boolean;
   isTnp: boolean;
   isCloud: boolean;
   useFramework: boolean;
