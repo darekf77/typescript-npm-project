@@ -1,4 +1,7 @@
-import { Component, OnInit, Input, ViewChild, ViewContainerRef, TemplateRef, AfterViewInit } from '@angular/core';
+import {
+  Component, OnInit, Input, ViewChild,
+  ViewContainerRef, TemplateRef, AfterViewInit
+} from '@angular/core';
 import { PopupControler } from '../model/popup-controller';
 
 @Component({

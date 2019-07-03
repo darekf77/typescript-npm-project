@@ -22,7 +22,7 @@ import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/apps/category/CA
 import { DIALOG } from 'ss-common-logic/browser-for-ss-webapp/apps/dialog/DIALOG';
 import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/apps/group/GROUP';
 import { CONFIG } from 'ss-common-logic/browser-for-ss-webapp/apps/config/CONFIG';
-import { ModalModule  } from 'ss-common-ui/browser-for-ss-webapp/ui-elements/modal';
+import { ModalModule  } from 'ss-components/browser-for-ss-webapp';
 // local
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';

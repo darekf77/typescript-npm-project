@@ -36,6 +36,14 @@
     ".gitignore": true,
     ".npmignore": true,
     ".npmrc": true,
-    ".babelrc": true
+    ".babelrc": true,
+    "ss-admin-webapp": true,
+    "ss-common-logic": true,
+    "ss-common-ui": true,
+    "ss-components": true,
+    "ss-helpers": true,
+    "ss-layouts": true,
+    "ss-mobileapp": true,
+    "ss-webapp": true
   }
 }

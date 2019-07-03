@@ -5,8 +5,10 @@ import {
 } from '@angular/core';
 import { PROCESS } from '../../PROCESS';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from 'ss-common-ui/components/helpers';
-import { ResizeService } from 'ss-common-ui/components/helpers';
+import {
+  BaseFormlyComponent, DualComponentController,
+  ResizeService, BaseComponent
+} from 'ss-helpers/components';
 
 @Component({
   selector: 'app-process-console-info',

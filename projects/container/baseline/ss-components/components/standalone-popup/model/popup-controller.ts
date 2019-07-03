@@ -1,7 +1,10 @@
 
 import * as _ from 'lodash';
 import { PopupInfo } from './popup-info';
-import { ViewContainerRef, ComponentFactoryResolver, ComponentRef, TemplateRef, ElementRef, EventEmitter } from '@angular/core';
+import {
+  ViewContainerRef, ComponentFactoryResolver, ComponentRef,
+  TemplateRef, ElementRef, EventEmitter
+} from '@angular/core';
 import { PopupComponent } from '../popup-component/popup.component';
 import { HTMLElementUtil } from './html-utls';
 

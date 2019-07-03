@@ -760,7 +760,7 @@ export abstract class BaseProject {
   }
 
   get nameOfCodeWorkspace() {
-    return `${_.kebabCase(this.genericName)}.code-workspace`;
+    return `tmp.code-workspace`;
   }
 
   openInVscode() {

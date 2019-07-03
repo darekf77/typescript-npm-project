@@ -8,8 +8,7 @@ import { DialogsGroupsEditorComponent } from './dialogs-groups-editor.component'
 import {
   TableWrapperModule,
   FormWrapperMaterialModule,
-
-} from 'ss-common-ui/browser-for-ss-admin-webapp';
+} from 'ss-components/browser-for-ss-admin-webapp';
 
 import { DialogsConversationEditorModule } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/dialog/dialogs-conversation-editor';
 

@@ -19,7 +19,7 @@ import { RepeatTypeComponent } from 'morphi/crud/formly-repeat-component';
 import { FormlyHorizontalWrapper } from 'morphi/crud/formly-group-wrapper-component';
 
 // custom formly components
-import { SelectWrapperModule, SelectWrapperComponent } from '../base-components/select';
+import { SelectWrapperModule, SelectWrapperComponent } from '../select';
 
 
 // other
@@ -30,13 +30,13 @@ import { FormWrapperMaterialComponent } from './form-wrapper-material.component'
 // base components
 import {
   EditorWrapperModule
-} from '../base-components/editor';
+} from '../editor';
 
 // aditional types componets
 import {
   IconButtonWithActionComponent
 } from './additional-types';
-import { FormlyButtionWithActionModule } from '../base-components/formly-buttion-with-action';
+import { FormlyButtionWithActionModule } from '../formly-buttion-with-action';
 // import { ProcessLoggerModule } from '../entity-components/process-logger';
 
 

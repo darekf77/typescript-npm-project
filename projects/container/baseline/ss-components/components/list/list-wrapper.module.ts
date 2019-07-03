@@ -12,7 +12,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 // local
 import { ListWrapperComponent } from './list-wrapper.component';
-import { FormWrapperMaterialModule } from '../../form';
 import { FormlyModule } from '@ngx-formly/core';
 import { CLASS } from 'typescript-class-helpers';
 

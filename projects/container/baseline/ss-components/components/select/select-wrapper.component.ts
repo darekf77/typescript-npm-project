@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 import { Log, Level } from 'morphi/log';
 import { Helpers } from 'morphi/helpers';
-import { BaseFormlyComponent, DualComponentController } from '../../../helpers';
+import { BaseFormlyComponent, DualComponentController } from 'ss-helpers/components';
 import { CLASS } from 'typescript-class-helpers';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';

@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
 import {
-  Component, OnInit, Input, ViewChild, ElementRef,
-  EventEmitter, Output, OnDestroy, AfterViewInit, HostBinding, HostListener, NgZone, DoCheck
+  Component, OnInit, Input, ElementRef,
+  OnDestroy, AfterViewInit, HostBinding
 } from '@angular/core';
 
 import { Log } from 'ng2-logger';
-const log = Log.create('process infor meessages');
 
 import { PROCESS } from '../../PROCESS';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/fromEvent';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { BaseComponent } from 'ss-common-ui/components/helpers';
-import { ResizeService } from 'ss-common-ui/components/helpers';
+import {
+  BaseComponent, ResizeService
+} from 'ss-helpers/components';
 
 
 
@@ -70,7 +70,7 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
   ngOnInit() {
 
-    this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, (elem) => {
+    this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, () => {
       const height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
       // console.log('set new height',height)
       localStorage.setItem(this.lsKey, height.toString());

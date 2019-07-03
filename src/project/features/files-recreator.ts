@@ -68,12 +68,15 @@ export class FilesRecreator extends FeatureForProject {
     return {
       get vscodeSidebarFilesView() {
         const siteFiles = ['src', 'components'];
-        return self.filesIgnoredBy.gitignore.concat([
-          '.gitignore',
-          '.npmignore',
-          '.npmrc',
-          '.babelrc'
-        ]).map(f => f.startsWith('/') ? f.slice(1) : f)
+        return self.filesIgnoredBy.gitignore
+          .concat([
+            '.gitignore',
+            '.npmignore',
+            '.npmrc',
+            '.babelrc'
+          ])
+          .concat(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
+          .map(f => f.startsWith('/') ? f.slice(1) : f)
           .filter(f => {
             // console.log('f',siteFiles)
             if (self.project.isSite && siteFiles.includes(f)) {

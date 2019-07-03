@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { isString } from 'lodash';
 import { Helpers } from 'morphi/helpers';
 
-import { BaseFormlyComponent, DualComponentController } from '../../../helpers';
+import { BaseFormlyComponent, DualComponentController } from 'ss-helpers/components';
 import { CLASS } from 'typescript-class-helpers';
 import * as _ from 'lodash';
 

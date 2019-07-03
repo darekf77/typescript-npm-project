@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/apps/auth/AuthController';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { stringifyToQueryParams } from 'ss-common-ui/browser-for-ss-webapp/helpers';
-import { ModalService } from 'ss-common-ui/browser-for-ss-webapp/ui-elements/modal';
+import { stringifyToQueryParams } from 'ss-helpers/browser-for-ss-webapp';
+import { ModalService } from 'ss-components/browser-for-ss-webapp';
 
 @Component({
   selector: 'app-root',

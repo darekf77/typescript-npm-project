@@ -12,9 +12,9 @@ import { MatButtonModule } from '@angular/material/button';
 // local
 import { CategoryEditorComponent } from './category-editor/category-editor.component';
 import { CategoryEditorComponentRouter } from './category-editor-router.component';
-import { FormWrapperMaterialModule } from 'ss-common-ui/browser-for-ss-admin-webapp';
+import { FormWrapperMaterialModule } from 'ss-components/browser-for-ss-admin-webapp/form';
 // components
-import { ListWrapperModule } from 'ss-common-ui/browser-for-ss-admin-webapp';
+import { ListWrapperModule } from 'ss-components/browser-for-ss-admin-webapp';
 
 const materialModules = [
   MatListModule,

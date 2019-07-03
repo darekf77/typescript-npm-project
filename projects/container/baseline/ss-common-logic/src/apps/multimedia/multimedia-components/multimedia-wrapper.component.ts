@@ -8,7 +8,7 @@ const log = Log.create('multimedia wrapper');
 
 import { MultimediaType, MULTIMEDIA } from '../MULTIMEDIA';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { BaseFormlyComponent, DualComponentController } from 'ss-common-ui/components/helpers';
+import { BaseFormlyComponent, DualComponentController } from 'ss-helpers/components';
 import { CLASS } from 'typescript-class-helpers';
 
 export class DualComponentControllerExtended extends DualComponentController {
