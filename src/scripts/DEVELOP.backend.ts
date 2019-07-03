@@ -60,7 +60,7 @@ export async function develop(args: string, exit = true) {
         .map(f => {
           f = path.join(external, f);
           const proj = Project.From(f)
-          console.log(`external proj name: ${proj && proj.name}`);
+          // console.log(`external proj name: ${proj && proj.name}`);
           if (proj) {
             unknowNPm.push(proj)
           }
@@ -73,7 +73,12 @@ export async function develop(args: string, exit = true) {
   const projectForAction: Project[] = [];
 
   projectsToOpen.forEach(projectName => {
-    const regex = new RegExp(projectName);
+    try {
+      var regex = new RegExp(projectName);
+    } catch (err) {
+      error(`Invalid regular expresion: ${projectName}`, false, true)
+    }
+
     // console.log(`source: "${regex.source}"`)
     const projs = projects.filter(p => {
       return p && (p.genericName === projectName || regex.test(p.name))
