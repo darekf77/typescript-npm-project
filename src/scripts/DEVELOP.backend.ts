@@ -57,15 +57,15 @@ export async function develop(args: string, exit = true) {
     const external = path.join(p.location, 'external');
     if (fse.existsSync(external)) {
       projects = projects.concat(fse.readdirSync(external)
-      .map(f => {
-        f = path.join(external, f);
-        const proj = Project.From(f)
-        // console.log(`${f} proj name: ${proj && proj.name}`);
-        if (proj) {
-          unknowNPm.push(proj)
-        }
-        return proj;
-      }));
+        .map(f => {
+          f = path.join(external, f);
+          const proj = Project.From(f)
+          console.log(`external proj name: ${proj && proj.name}`);
+          if (proj) {
+            unknowNPm.push(proj)
+          }
+          return proj;
+        }));
     }
   });
 
@@ -73,21 +73,22 @@ export async function develop(args: string, exit = true) {
   const projectForAction: Project[] = [];
 
   projectsToOpen.forEach(projectName => {
-    const regex = new RegExp(escapeStringForRegEx(projectName));
+    const regex = new RegExp(projectName);
     // console.log(`source: "${regex.source}"`)
-    let proj = projects.find(p => {
-      return p && regex.test(p.genericName);
+    const projs = projects.filter(p => {
+      return p && (p.genericName === projectName || regex.test(p.name))
     });
-    if (!proj) {
-      proj = projects.find(p => {
-        return p && regex.test(p.name);
-      });
-    }
-    if (proj) {
-      projectForAction.push(proj);
+    if (projs) {
+      projs.forEach(c => projectForAction.push(c));
     } else {
       error(`Cannot find project: "${projectName}"`, true, true)
     }
+
+    // projects.forEach(p => {
+    //   console.log(`Test: ${p && p.name} with ${regex.source} ${p && regex.test(p.name)}`)
+    //   return p && regex.test(p.name);
+    // });
+
   });
 
   killvscode(false);
