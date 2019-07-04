@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 // third paret
 import {
   SliderVerticalModule
-} from 'ss-layouts/browser-for-ss-webapp';
+} from 'ss-layouts/components';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from '../login/login.component';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';

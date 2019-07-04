@@ -2,18 +2,18 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 // third part
-import { ModelDataConfig } from 'morphi/browser'
-import { Log, Level } from 'ng2-logger/browser';
+import { ModelDataConfig } from 'morphi'
+import { Log, Level } from 'ng2-logger';
 import * as _ from 'lodash';
 // local
-import { CategoryController } from 'ss-common-logic/browser-for-ss-webapp/apps/category/CategoryController';
-import { AuthController } from 'ss-common-logic/browser-for-ss-webapp/apps/auth/AuthController';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-webapp/apps/category/CATEGORY';
+import { CategoryController } from 'ss-common-logic/src/apps/category/CategoryController';
+import { AuthController } from 'ss-common-logic/src/apps/auth/AuthController';
+import { CATEGORY } from 'ss-common-logic/src/apps/category/CATEGORY';
 import { Subscription } from 'rxjs/Subscription';
 
-import { stringifyToQueryParams } from 'ss-helpers/browser-for-ss-webapp';
-import { GroupsController } from 'ss-common-logic/browser-for-ss-webapp/apps/group/GroupsController';
-import { GROUP } from 'ss-common-logic/browser-for-ss-webapp/apps/group/GROUP';
+import { stringifyToQueryParams } from 'ss-helpers/components';
+import { GroupsController } from 'ss-common-logic/src/apps/group/GroupsController';
+import { GROUP } from 'ss-common-logic/src/apps/group/GROUP';
 
 const log = Log.create('Dashboard')
 

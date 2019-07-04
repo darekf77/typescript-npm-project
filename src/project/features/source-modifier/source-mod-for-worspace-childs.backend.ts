@@ -153,7 +153,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     children.forEach(child => {
       const libName = child.name;
 
-      if (modType === 'lib' || modType === 'custom/lib') {
+      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
         input = impReplace({
           name: `${libName}/${folders.join('|\n')} -> ${libName}`,
           project: this.project,
@@ -166,30 +166,30 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         });
       }
 
-      if (modType === 'app' || modType === 'custom/app') {
-        input = impReplace({
-          name: `${libName} -> ${libName}/${config.folder.browser}`,
-          project: this.project,
-          input,
-          modType,
-          urlParts: [libName],
-          notAllowedAfterSlash: [config.folder.browser],
-          partsReplacements: [libName, config.folder.browser],
-          relativePath,
-          method
-        });
+      // if (modType === 'app' || modType === 'custom/app') {
+      //   input = impReplace({
+      //     name: `${libName} -> ${libName}/${config.folder.browser}`,
+      //     project: this.project,
+      //     input,
+      //     modType,
+      //     urlParts: [libName],
+      //     notAllowedAfterSlash: [config.folder.browser],
+      //     partsReplacements: [libName, config.folder.browser],
+      //     relativePath,
+      //     method
+      //   });
 
-        input = impReplace({
-          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
-          project: this.project,
-          input,
-          modType,
-          urlParts: [libName, folders],
-          partsReplacements: [libName, config.folder.browser],
-          relativePath,
-          method
-        });
-      }
+      //   input = impReplace({
+      //     name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
+      //     project: this.project,
+      //     input,
+      //     modType,
+      //     urlParts: [libName, folders],
+      //     partsReplacements: [libName, config.folder.browser],
+      //     relativePath,
+      //     method
+      //   });
+      // }
 
     });
 
@@ -204,7 +204,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       const libName = child.name;
 
-      if (modType === 'lib' || modType === 'custom/lib') {
+      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
 
         let sourceFolder: string;
         if (child.type === 'angular-lib') {
@@ -237,57 +237,57 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
       }
 
-      if (modType === 'app' || modType === 'custom/app') {
+      // if (modType === 'app' || modType === 'custom/app') {
 
-        const process = (compiled: any[]) => {
+      //   const process = (compiled: any[]) => {
 
-          if (libName === this.project.name || this.project.type === 'angular-lib') {
-            input = impReplace({
-              name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
-              project: this.project,
-              input,
-              modType,
-              urlParts: [libName, compiled],
-              partsReplacements: [config.folder.components],
-              relativePath,
-              method
-            });
+      //     if (libName === this.project.name || this.project.type === 'angular-lib') {
+      //       input = impReplace({
+      //         name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
+      //         project: this.project,
+      //         input,
+      //         modType,
+      //         urlParts: [libName, compiled],
+      //         partsReplacements: [config.folder.components],
+      //         relativePath,
+      //         method
+      //       });
 
-          } else {
+      //     } else {
 
-            const browserForCurrentClient = IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project.name);
+      //       const browserForCurrentClient = IncrementalBuildProcessExtended
+      //         .getBrowserVerPath(this.project.name);
 
-            input = impReplace({
-              name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
-              project: this.project,
-              input,
-              modType,
-              urlParts: [libName, compiled],
-              partsReplacements: [libName, browserForCurrentClient],
-              relativePath,
-              method
-            });
-          }
-        }
+      //       input = impReplace({
+      //         name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
+      //         project: this.project,
+      //         input,
+      //         modType,
+      //         urlParts: [libName, compiled],
+      //         partsReplacements: [libName, browserForCurrentClient],
+      //         relativePath,
+      //         method
+      //       });
+      //     }
+      //   }
 
-        let folders = [
-          ...this.foldersSources,
-          ...this.foldersCompiledJsDtsMap,
-        ];
+      //   let folders = [
+      //     ...this.foldersSources,
+      //     ...this.foldersCompiledJsDtsMap,
+      //   ];
 
-        process(folders);
+      //   process(folders);
 
-        folders = this.project.parent.childrenThatAreClients
-          .filter(f => f.name !== this.project.name)
-          .map(client => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
-          });
+      //   folders = this.project.parent.childrenThatAreClients
+      //     .filter(f => f.name !== this.project.name)
+      //     .map(client => {
+      //       return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+      //     });
 
-        process(folders);
+      //   process(folders);
 
 
-      }
+      // }
 
     });
     return input;
