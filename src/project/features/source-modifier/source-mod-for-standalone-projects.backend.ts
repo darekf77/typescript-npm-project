@@ -10,7 +10,7 @@ export class SourceModForStandaloneProjects extends FeatureForProject {
     return [
       config.folder.components,
       config.folder.src,
-    ]
+    ];
   };
 
   protected get foldersCompiledJsDtsMap() {
@@ -19,7 +19,7 @@ export class SourceModForStandaloneProjects extends FeatureForProject {
       config.folder.bundle,
       config.folder.browser,
       config.folder.module,
-    ]
+    ];
   };
 
   protected mod3rdPartyLibsReferces(inpput: string, modType: ModType, relativePath: string) {

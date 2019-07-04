@@ -3,9 +3,9 @@ import {
   HelloController, UsersController, TestController,
   ParentClass, ChildClass, ChildClass2, CRUDchild, CRUDparent,
   CRUDGenericChild, CRUDGenericParent
-} from 'isomorphic-lib/browser';
+} from 'isomorphic-lib/browser-for-angular-client';
 
-import { Log, Level } from "ng2-logger/browser";
+import { Log, Level } from 'ng2-logger/browser';
 const log = Log.create('app test')
 
 

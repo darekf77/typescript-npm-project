@@ -29,6 +29,10 @@ export class ProjectAngularClient extends Project {
   filesTemplates() {
     return [
       'src/tsconfig.app.json.filetemplate',
+      'webpack.config.build.aot.js.filetemplate',
+      'webpack.config.build.js.filetemplate',
+      'webpack.config.common.js.filetemplate',
+      'webpack.config.js.filetemplate',
       '.angular-cli.json.filetemplate'
     ];
   }
@@ -42,7 +46,9 @@ export class ProjectAngularClient extends Project {
       'src/tsconfig.spec.json',
       'src/tsconfig.app.json',
       'protractor.conf.js',
-      'karma.conf.js'
+      'karma.conf.js',
+      ...this.filesTemplates()
+        .filter(f => f !== 'src/tsconfig.app.json.filetemplate')
     ].concat(this.isEjectedProject ? [
       'webpack.config.build.aot.js',
       'webpack.config.build.js',

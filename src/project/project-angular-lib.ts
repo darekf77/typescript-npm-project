@@ -43,7 +43,9 @@ export class ProjectAngularLib extends LibProject {
   }
 
   filesTemplates() {
-    return this.projectAngularClient.filesTemplates();
+    return this.projectAngularClient
+      .filesTemplates()
+      .filter(f => f.startsWith('webpack.config.'));
   }
 
   projectSpecyficFiles() {
@@ -52,9 +54,12 @@ export class ProjectAngularLib extends LibProject {
       "tsconfig.browser.json",
       ...this.filesTemplates(),
       'src/tsconfig.packages.json'
-    ]).concat(this.projectAngularClient.projectSpecyficFiles().filter(f => {
-      return f !== 'src/tsconfig.app.json';
-    }));
+    ]).concat(this.projectAngularClient
+      .projectSpecyficFiles()
+      .filter(f => f.startsWith('webpack.config.'))
+      .filter(f => {
+        return f !== 'src/tsconfig.app.json';
+      }));
   }
 
   sourceFilesToIgnore() {

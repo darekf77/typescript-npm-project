@@ -138,6 +138,16 @@ export const config = {
   names: {
     env: allowedEnvironmentsObj
   },
+  fileExtensionsText: [
+    'js',
+    'ts',
+    'txt',
+    'json',
+    'doc',
+    'rtf',
+    'md',
+    'sh'
+  ].map(f => `.${f}`),
   allowedTypes: {
     angularClient: [
       'angular-cli',

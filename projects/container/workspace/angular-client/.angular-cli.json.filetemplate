@@ -6,7 +6,7 @@
   },
   "apps": [
     {
-      "root": "tmp-src",
+      "root": "{{{ ENV ? 'tmp-src' : 'src' }}}",
       "outDir": "dist-app",
       "assets": [
         "assets",
@@ -37,11 +37,11 @@
   },
   "lint": [
     {
-      "project": "tmp-src/tsconfig.app.json",
+      "project": "{{{ ENV ? 'tmp-src' : 'src' }}}/tsconfig.app.json",
       "exclude": "**/node_modules/**"
     },
     {
-      "project": "tmp-src/tsconfig.spec.json",
+      "project": "{{{ ENV ? 'tmp-src' : 'src' }}}/tsconfig.spec.json",
       "exclude": "**/node_modules/**"
     },
     {

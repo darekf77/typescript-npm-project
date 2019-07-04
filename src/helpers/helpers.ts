@@ -112,48 +112,56 @@ export function escapeStringForRegEx(s: string) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-export function copyFile(sousrce: string, destination: string,
+export function copyFile(sourcePath: string, destinationPath: string,
   transformTextFn?: (input: string) => string, debugMode = false) {
 
   try {
-    if (fse.lstatSync(sousrce).isDirectory()) {
-      warn(`Trying to copy directory as file: ${sousrce}`, false)
+    if (fse.lstatSync(sourcePath).isDirectory()) {
+      warn(`Trying to copy directory as file: ${sourcePath}`, false)
       return
     }
-    if (!fs.existsSync(sousrce)) {
-      warn(`[${copyFile.name}] No able to find source of ${sousrce}`);
+    if (!fs.existsSync(sourcePath)) {
+      warn(`[${copyFile.name}] No able to find source of ${sourcePath}`);
       return;
     }
-    if (sousrce === destination) {
-      warn(`Trying to copy same file ${sousrce}`);
+    if (sourcePath === destinationPath) {
+      warn(`Trying to copy same file ${sourcePath}`);
       return;
     }
-    const destDirPath = path.dirname(destination);
+    const destDirPath = path.dirname(destinationPath);
     if (debugMode) console.log('destDirPath', destDirPath)
     if (!fs.existsSync(destDirPath)) {
       fse.mkdirpSync(destDirPath);
     }
 
-    let sourceData = fs.readFileSync(sousrce).toString();
-    if (transformTextFn) {
-      sourceData = transformTextFn(sourceData);
+    // console.log('path.extname(sourcePath)', path.extname(sourcePath))
+    // console.log('config.fileExtensionsText', config.fileExtensionsText)
+    if (config.fileExtensionsText.includes(path.extname(sourcePath))) {
+
+      let sourceData = fs.readFileSync(sourcePath).toString();
+      if (transformTextFn) {
+        sourceData = transformTextFn(sourceData);
+      }
+      // if (debugMode) {
+      //   console.log(`
+
+
+      //   Write to: ${destinationPath} file:
+      //   ============================================================================================
+      //   ${sourceData}
+      //   ============================================================================================
+      //   `);
+
+      // }
+      fs.writeFileSync(destinationPath, sourceData, 'utf8')
+    } else {
+
+      fse.copyFileSync(sourcePath, destinationPath);
     }
-    if (debugMode) {
-      console.log(`
 
 
-      Write to: ${destination} file:
-      ============================================================================================
-      ${sourceData}
-      ============================================================================================
-      `)
-    }
-
-    // process.exit(0)
-    // console.log(`Copy from ${sousrce.slice(-20)} to ${destination.slice(-20)}`)
-    fs.writeFileSync(destination, sourceData, 'utf8')
   } catch (e) {
-    error(`Error while copying file: ${sousrce} to ${destination}`, true)
+    error(`Error while copying file: ${sourcePath} to ${destinationPath}`, true)
     // console.log(e)
   }
 
