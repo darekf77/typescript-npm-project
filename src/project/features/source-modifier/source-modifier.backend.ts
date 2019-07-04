@@ -12,10 +12,10 @@ import { LibType, SourceFolder } from '../../../models';
 import { TsUsage } from 'morphi/build';
 import { error, escapeStringForRegEx, log, warn } from '../../../helpers';
 import { replace } from './replace';
-import { take } from 'rxjs/operator/take';
 import { ModType, SourceCodeType } from './source-code-type';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
+import { AppSourceReplicator } from './app-source-replicator.backend';
 //#endregion
 
 const debugFiles = [
@@ -23,6 +23,21 @@ const debugFiles = [
 ];
 
 export class SourceModifier extends FeatureCompilerForProject {
+  appSourceReplicator: AppSourceReplicator;
+
+  async init(taskName?: string, callback?: any) {
+    if (config.allowedTypes.angularClient.includes(this.project.type)) {
+      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+    }
+    await super.init(taskName, callback);
+  }
+
+  async initAndWatch(taskName?: string, callback?: any) {
+    if (config.allowedTypes.angularClient.includes(this.project.type)) {
+      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`)
+    }
+    await super.initAndWatch(taskName, callback);
+  }
 
   //#region get source type lib - for libs, app - for clients
   private static getModType(project: Project, relativePath: string): ModType {
@@ -87,6 +102,7 @@ export class SourceModifier extends FeatureCompilerForProject {
   constructor(public project: Project) {
     super(project.isSite ? void 0 : folderPattern(project), '', project && project.location, project);
     this.sourceMod = new SourceModForWorkspaceChilds(project);
+    this.appSourceReplicator = new AppSourceReplicator(project);
   }
   //#endregion
 

@@ -48,12 +48,9 @@ export class ProjectAngularLib extends LibProject {
 
   projectSpecyficFiles() {
     return super.projectSpecyficFiles().concat([
-      'ng-package.json',
-      'tsconfig-aot.bundle.json',
-      'tsconfig-aot.dist.json',
       "tsconfig.isomorphic.json",
       "tsconfig.browser.json",
-      'src/tsconfig.app.json.filetemplate',
+      ...this.filesTemplates(),
       'src/tsconfig.packages.json'
     ]).concat(this.projectAngularClient.projectSpecyficFiles().filter(f => {
       return f !== 'src/tsconfig.app.json';

@@ -1,4 +1,4 @@
-import { EnvConfig } from "tnp-bundle";
+import { EnvConfig } from 'tnp-bundle/browser';
 
 declare global {
     const ENV: EnvConfig;

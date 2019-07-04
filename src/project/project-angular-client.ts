@@ -27,7 +27,10 @@ export class ProjectAngularClient extends Project {
   }
 
   filesTemplates() {
-    return ['src/tsconfig.app.json.filetemplate']
+    return [
+      'src/tsconfig.app.json.filetemplate',
+      '.angular-cli.json.filetemplate'
+    ];
   }
 
   projectSpecyficFiles() {

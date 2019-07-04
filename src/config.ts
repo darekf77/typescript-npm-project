@@ -139,6 +139,12 @@ export const config = {
     env: allowedEnvironmentsObj
   },
   allowedTypes: {
+    angularClient: [
+      'angular-cli',
+      'angular-client',
+      'angular-lib',
+      'ionic-client',
+    ] as LibType[],
     app: [
       'angular-cli',
       'angular-client',

@@ -6,7 +6,7 @@
   "apps": [
     {
       "name": "dev",
-      "root": "src",
+      "root": "tmp-src",
       "outDir": "dist-app",
       "assets": [
         "assets",
@@ -31,7 +31,7 @@
     },
     {
       "name": "packages",
-      "root": "src",
+      "root": "tmp-src",
       "outDir": "dist/app",
       "assets": [
         "assets",
@@ -62,10 +62,10 @@
   },
   "lint": [
     {
-      "project": "src/tsconfig.app.json"
+      "project": "tmp-src/tsconfig.app.json"
     },
     {
-      "project": "src/tsconfig.spec.json"
+      "project": "tmp-src/tsconfig.spec.json"
     },
     {
       "project": "e2e/tsconfig.e2e.json"
