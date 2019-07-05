@@ -42,6 +42,9 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#region get source type lib - for libs, app - for clients
   private static getModType(project: Project, relativePath: string): ModType {
     const startFolder: SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as SourceFolder;
+    if (startFolder === 'tmp-src') {
+      return 'tmp-src';
+    }
     if (startFolder === 'src') {
       return project.type === 'isomorphic-lib' ? 'lib' : 'app';
     }
@@ -155,6 +158,6 @@ export class SourceModifier extends FeatureCompilerForProject {
 
 function folderPattern(project: Project) {
   return `${
-    project.isSite ? config.folder.custom : `{${[config.folder.src, config.folder.components].join(',')}}`
+    project.isSite ? config.folder.custom : `{${[config.folder.tempSrc, config.folder.src, config.folder.components].join(',')}}`
     }/**/*.ts`
 }

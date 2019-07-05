@@ -21,12 +21,10 @@
 /index.js
 /index.d.ts
 /index.js.map
-/ng-package.json
-/tsconfig-aot.bundle.json
-/tsconfig-aot.dist.json
 /tsconfig.isomorphic.json
 /tsconfig.browser.json
 /src/tsconfig.app.json.filetemplate
+/.angular-cli.json.filetemplate
 /src/tsconfig.packages.json
 /tsconfig.json
 /src/typings.d.ts
@@ -35,3 +33,4 @@
 /src/tsconfig.spec.json
 /protractor.conf.js
 /karma.conf.js
+/.angular-cli.json.filetemplate

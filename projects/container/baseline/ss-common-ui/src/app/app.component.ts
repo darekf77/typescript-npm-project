@@ -5,11 +5,11 @@ import { AppPreviewPopupContentService } from './app-popup-content.service';
 
 import {
   BaseComponent
-} from 'components';
+} from 'ss-helpers/components';
 import { Router, NavigationEnd } from '@angular/router';
 
-import { Log, Level } from 'ng2-logger/browser';
-import { } from 'morphi/browser';
+import { Log, Level } from 'ng2-logger';
+import { } from 'morphi';
 const log = Log.create('app.component', Level.__NOTHING)
 
 

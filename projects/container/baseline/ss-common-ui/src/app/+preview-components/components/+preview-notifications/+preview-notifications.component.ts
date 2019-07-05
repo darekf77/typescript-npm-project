@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NotificationsService, ModalService } from 'components';
+import { NotificationsService, ModalService } from 'ss-components/components';
 
 
 @Component({

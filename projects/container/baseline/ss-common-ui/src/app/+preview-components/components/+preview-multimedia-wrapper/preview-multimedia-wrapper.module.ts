@@ -9,16 +9,16 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 // third part
-import { Morphi } from 'morphi/browser';
+import { Morphi } from 'morphi';
 // local
 import { PreviewMultimediaWrapperComponent } from './preview-multimedia-wrapper.component';
 import { routes } from './preview-multimedia-wrapper.routes';
-import { MultimediaController } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MultimediaController';
-import { AuthController } from 'ss-common-logic/browser-for-ss-common-ui/apps/auth/AuthController';
-import { MULTIMEDIA } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/MULTIMEDIA';
+import { MultimediaController } from 'ss-common-logic/src/apps/multimedia/MultimediaController';
+import { AuthController } from 'ss-common-logic/src/apps/auth/AuthController';
+import { MULTIMEDIA } from 'ss-common-logic/src/apps/multimedia/MULTIMEDIA';
 // formly modules
-import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components';
-import { FormWrapperMaterialModule } from 'components';
+import { MultimediaWrapperModule } from 'ss-common-logic/src/apps/multimedia/multimedia-components';
+import { FormWrapperMaterialModule } from 'ss-components/components';
 
 
 const angularModules = [

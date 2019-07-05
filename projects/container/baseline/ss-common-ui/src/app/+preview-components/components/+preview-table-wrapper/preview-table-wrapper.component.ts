@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExamplesPaginationController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesPaginationController';
+import { ExamplesPaginationController } from 'ss-common-logic/src/apps/example/ExamplesPaginationController';
 
 
 @Component({

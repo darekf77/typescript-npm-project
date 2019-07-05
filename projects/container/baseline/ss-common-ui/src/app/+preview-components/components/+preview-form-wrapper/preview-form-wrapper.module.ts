@@ -15,16 +15,16 @@ import { routes } from './preview-form-wrapper.routes';
 import {
   ListWrapperModule, FormWrapperMaterialModule,
   EditorWrapperModule, FormlySwitchModule
-} from 'components';
+} from 'ss-components/components';
 
-import { ProcessLoggerModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/process-logger'
-import { MultimediaWrapperModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/multimedia/multimedia-components'
+import { ProcessLoggerModule } from 'ss-common-logic/src/apps/process/process-logger'
+import { MultimediaWrapperModule } from 'ss-common-logic/src/apps/multimedia/multimedia-components'
 // third part
-import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
-import { Morphi } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
-import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
+import { ExamplesController } from 'ss-common-logic/src/apps/example/ExamplesController';
+import { Morphi } from 'morphi';
+import { EXAMPLE } from 'ss-common-logic/src/apps/example/EXAMPLE';
+import { ProcessController } from 'ss-common-logic/src/apps/process/ProcessController';
+import { PROCESS } from 'ss-common-logic/src/apps/process/PROCESS';
 
 
 const angularModules = [

@@ -9,11 +9,11 @@ import { PreviewDialogFieldComponent } from './+preview-dialog-field.component';
 import { routes } from './+preview-dialog-field.routes';
 import {
   DialogFieldModule
-} from 'ss-common-logic/browser-for-ss-common-ui/apps/dialog/dialog-field';
+} from 'ss-common-logic/src/apps/dialog/dialog-field';
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
-import { Morphi } from 'morphi/browser';
+import { Morphi } from 'morphi';
 
 const angularModules = [
   CommonModule,

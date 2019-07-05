@@ -7,7 +7,7 @@ import { PreviewComponents } from './preview-components.component';
 import { routes } from './preview-components.routes';
 import {
   LayoutComponentsListDocsModule
-} from 'components';
+} from 'ss-layouts/components';
 
 
 @NgModule({

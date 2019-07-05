@@ -8,7 +8,7 @@ import { PreviewLayoutMaterialComponent } from './preview-layout-material.compon
 import { routes } from './preview-layout-material.routes';
 import {
   LayoutMaterialModule
-} from 'components';
+} from 'ss-layouts/components';
 
 @NgModule({
   imports: [

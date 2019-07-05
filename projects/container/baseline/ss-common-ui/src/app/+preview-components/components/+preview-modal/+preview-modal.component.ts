@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 
-import { ModalService } from 'components';
+import { ModalService } from 'ss-components/components';
 
 @Component({
   selector: 'app-preview-modal',

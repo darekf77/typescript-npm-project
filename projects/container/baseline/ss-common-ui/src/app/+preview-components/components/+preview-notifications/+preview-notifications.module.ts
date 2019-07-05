@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PreviewNotificaitonsComponent } from './+preview-notifications.component';
 import { RouterModule } from '@angular/router';
 
-import { ModalModule, NotificationsModule } from 'components';
+import { ModalModule, NotificationsModule } from 'ss-components/components';
 
 @NgModule({
   imports: [

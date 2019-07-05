@@ -13,4 +13,4 @@ export type SourceCodeType =
   'electron-client(app) custom/src/'
   ;
 
-export type ModType = 'app' | 'lib' | 'custom/app' | 'custom/lib';
+export type ModType = 'app' | 'lib' | 'custom/app' | 'custom/lib' | 'tmp-src';

@@ -8,11 +8,11 @@ import { PreviewFormlyInputsComponent } from './preview-formly-inputs.component'
 import { routes } from './preview-formly-inputs.routes';
 import {
   ListWrapperModule
-} from 'components';
+} from 'ss-components/components';
 // third part
-import { ExamplesController } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/ExamplesController';
-import { Morphi } from 'morphi/browser';
-import { EXAMPLE } from 'ss-common-logic/browser-for-ss-common-ui/apps/example/EXAMPLE';
+import { ExamplesController } from 'ss-common-logic/src/apps/example/ExamplesController';
+import { Morphi } from 'morphi';
+import { EXAMPLE } from 'ss-common-logic/src/apps/example/EXAMPLE';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';

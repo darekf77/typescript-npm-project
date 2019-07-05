@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PreviewModalComponent } from './+preview-modal.component';
 import { RouterModule } from '@angular/router';
 
-import { ModalModule } from 'components';
+import { ModalModule } from 'ss-components/components';
 
 @NgModule({
   imports: [
