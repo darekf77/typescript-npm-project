@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
-import { Morphi } from 'morphi/browser';
+import { Morphi } from 'morphi';
 import { AppComponent } from './app.component';
 
 import { moprhi, modules } from './app.imports';
-import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/auth/AuthController';
-import { MultimediaController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/multimedia/MultimediaController';
+import { AuthController } from 'ss-common-logic/src/apps/auth/AuthController';
+import { MultimediaController } from 'ss-common-logic/src/apps/multimedia/MultimediaController';
 
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;

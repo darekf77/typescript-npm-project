@@ -14,8 +14,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 // third part
-import { StaticColumnsModule } from 'static-columns/browser';
-import { LogoModule } from 'ss-components/browser-for-ss-admin-webapp';
+import { StaticColumnsModule } from 'static-columns';
+import { LogoModule } from 'ss-components/components';
 
 
 @NgModule({

@@ -4,10 +4,10 @@ import {
 } from '@angular/router';
 
 import { McBreadcrumbsResolver, IBreadcrumb } from 'ngx-breadcrumbs';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CATEGORY';
-import {CategoryController} from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CategoryController';
-import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/auth/AuthController';
-import { SESSION } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/auth/SESSION';
+import { CATEGORY } from 'ss-common-logic/src/apps/category/CATEGORY';
+import {CategoryController} from 'ss-common-logic/src/apps/category/CategoryController';
+import { AuthController } from 'ss-common-logic/src/apps/auth/AuthController';
+import { SESSION } from 'ss-common-logic/src/apps/auth/SESSION';
 
 @Injectable()
 export class CategoryResolver implements Resolve<CATEGORY> {

@@ -1,6 +1,6 @@
 
 import { NgModule } from '@angular/core';
-import { StaticColumnsModule } from 'static-columns/browser';
+import { StaticColumnsModule } from 'static-columns';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 //
@@ -13,7 +13,7 @@ import { routes } from './dashboard.routes';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { LoginModule } from '../login/login.module';
-import { LayoutMaterialModule } from 'ss-layouts/browser-for-ss-admin-webapp';
+import { LayoutMaterialModule } from 'ss-layouts/components';
 // third part
 import { McBreadcrumbsModule } from 'ngx-breadcrumbs';
 

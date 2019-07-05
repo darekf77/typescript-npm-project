@@ -1,13 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Params, Router, NavigationEnd } from '@angular/router';
 // other
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('dialogs groups editor')
-import { ModelDataConfig } from 'morphi/browser';
+import { ModelDataConfig } from 'morphi';
 // local
-import { DialogsController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/dialog/DialogsController';
-import { GroupsController } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/group/GroupsController';
-import { GROUP } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/group/GROUP';
+import { DialogsController } from 'ss-common-logic/src/apps/dialog/DialogsController';
+import { GroupsController } from 'ss-common-logic/src/apps/group/GroupsController';
+import { GROUP } from 'ss-common-logic/src/apps/group/GROUP';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
 @Component({

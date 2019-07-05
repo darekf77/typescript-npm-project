@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CATEGORY } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CATEGORY';
-import {CategoryController} from 'ss-common-logic/browser-for-ss-admin-webapp/apps/category/CategoryController';
-import {ExamplesController} from 'ss-common-logic/browser-for-ss-admin-webapp/apps/example/ExamplesController';
+import { CATEGORY } from 'ss-common-logic/src/apps/category/CATEGORY';
+import {CategoryController} from 'ss-common-logic/src/apps/category/CategoryController';
+import {ExamplesController} from 'ss-common-logic/src/apps/example/ExamplesController';
 import { Subscription } from 'rxjs/Subscription';
-import { Log } from 'ng2-logger/browser';
+import { Log } from 'ng2-logger';
 
 const log = Log.create('coures categories list')
 

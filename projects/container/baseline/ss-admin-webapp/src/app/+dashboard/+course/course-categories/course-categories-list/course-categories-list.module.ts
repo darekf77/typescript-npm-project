@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { RouterModule } from '@angular/router';
-import { ListWrapperModule } from 'ss-components/browser-for-ss-admin-webapp';
+import { ListWrapperModule } from 'ss-components/components';
 
 const materialModules = [
   MatListModule,

@@ -8,9 +8,9 @@ import { DialogsGroupsEditorComponent } from './dialogs-groups-editor.component'
 import {
   TableWrapperModule,
   FormWrapperMaterialModule,
-} from 'ss-components/browser-for-ss-admin-webapp';
+} from 'ss-components/components';
 
-import { DialogsConversationEditorModule } from 'ss-common-logic/browser-for-ss-admin-webapp/apps/dialog/dialogs-conversation-editor';
+import { DialogsConversationEditorModule } from 'ss-common-logic/src/apps/dialog/dialogs-conversation-editor';
 
 const angularModules = [
   CommonModule
