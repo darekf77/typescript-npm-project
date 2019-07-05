@@ -23,6 +23,9 @@
 /index.js.map
 /tsconfig.isomorphic.json
 /tsconfig.browser.json
+/karma.conf.js.filetemplate
+/tsconfig.isomorphic.json.filetemplate
+/tsconfig.json.filetemplate
 /src/tsconfig.app.json.filetemplate
 /.angular-cli.json.filetemplate
 /src/tsconfig.packages.json
@@ -33,3 +36,4 @@
 /src/tsconfig.spec.json
 /protractor.conf.js
 /karma.conf.js
+/.angular-cli.json.filetemplate

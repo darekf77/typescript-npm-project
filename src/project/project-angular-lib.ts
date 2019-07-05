@@ -3,11 +3,11 @@ import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { LibProject } from "./abstract";
-import { ProjectAngularClient } from "./project-angular-client";
-import { BuildDir } from "../models";
-import { error, tryRemoveDir, HelpersLinks } from "../helpers";
-import config from "../config";
+import { LibProject } from './abstract';
+import { ProjectAngularClient } from './project-angular-client';
+import { BuildDir } from '../models';
+import { error, tryRemoveDir, HelpersLinks } from '../helpers';
+import config from '../config';
 import { Project } from './abstract';
 import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from './features/build-options';
@@ -43,15 +43,20 @@ export class ProjectAngularLib extends LibProject {
   }
 
   filesTemplates() {
-    return this.projectAngularClient
+    return [
+      'tsconfig.isomorphic.json.filetemplate',
+      'tsconfig.json.filetemplate',
+      ...this.projectAngularClient
       .filesTemplates()
-      .filter(f => !f.startsWith('webpack.config.'));
+      .filter(f => !f.startsWith('webpack.config.'))
+    ]
   }
 
   projectSpecyficFiles() {
     return super.projectSpecyficFiles().concat([
-      "tsconfig.isomorphic.json",
-      "tsconfig.browser.json",
+      'tsconfig.isomorphic.json',
+      'tsconfig.browser.json',
+      'karma.conf.js.filetemplate',
       ...this.filesTemplates(),
       'src/tsconfig.packages.json'
     ]).concat(this.projectAngularClient
