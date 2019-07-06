@@ -17,7 +17,6 @@ import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { TnpDB } from '../tnp-db';
-import { listProcesses } from './list-processes.backend';
 
 function killvscode(exit = true) {
   try {

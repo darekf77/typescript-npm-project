@@ -18,7 +18,6 @@ import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { TnpDB } from '../tnp-db';
-import { listProcesses } from './list-processes.backend';
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -143,7 +142,7 @@ function NPM_FIXES() {
 
 export default {
 
-  npmFixes: NPM_FIXES,
+  NPM_FIXES,
 
   LN(args: string) {
     let [target, link] = args.split(' ');
