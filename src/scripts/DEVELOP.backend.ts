@@ -42,16 +42,18 @@ export async function develop(args: string, exit = true) {
   const igt = path.join(Project.Tnp.location, '../..', 'igt');
   // console.log('igt', igt)
   const unknowNPm: Project[] = [];
-  projects = projects.concat(fse.readdirSync(igt)
-    .map(f => {
-      f = path.join(igt, f);
-      const proj = Project.From(f)
-      // console.log(`${f} proj name: ${proj && proj.name}`);
-      if (proj) {
-        unknowNPm.push(proj)
-      }
-      return proj;
-    }));
+  if (fse.existsSync(igt)) {
+    projects = projects.concat(fse.readdirSync(igt)
+      .map(f => {
+        f = path.join(igt, f);
+        const proj = Project.From(f)
+        // console.log(`${f} proj name: ${proj && proj.name}`);
+        if (proj) {
+          unknowNPm.push(proj)
+        }
+        return proj;
+      }));
+  }
 
   unknowNPm.forEach(p => {
     const external = path.join(p.location, 'external');
