@@ -35,7 +35,7 @@ export abstract class LibProject extends Project {
   }
 
 
-  abstract async buildLib(outDir: BuildDir, forClient: Project[], prod?: boolean, watch?: boolean);
+  abstract async buildLib();
 
   checkIfLogginInToNpm() {
     try {

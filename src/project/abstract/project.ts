@@ -1164,26 +1164,8 @@ export abstract class BaseProject {
     // log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;
 
-    // TODO do this for isomorphic lib also
-    // QUCIK_FIX for lazy programmers :P
-    // IS IS NOT WOKRING BECOUSE morphi cwd typescript bug
-    // if (this.isWorkspaceChildProject && this.type === 'angular-client') {
-    //   const requiredLibs = this.parent.children
-    //     .filter(c => (c.type === 'angular-lib') && !c.isBuildedLib)
-
-    //   for (let i = 0; i < requiredLibs.length; i++) {
-    //     const c = requiredLibs[i];
-    //     await build(_.merge(_.cloneDeep(buildOptions), {
-    //       watch: true,
-    //       appBuild: false,
-    //     } as BuildOptions), undefined, c, false);
-    //   }
-    // }
-
-
-
     if (this.buildOptions.copytoAll) {
-      await this.selectAllProjectCopyto()
+      await this.selectAllProjectCopyto();
     } else {
       if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
         if (this.isStandaloneProject) {
@@ -1191,8 +1173,6 @@ export abstract class BaseProject {
         }
       }
     }
-
-
 
     if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
 

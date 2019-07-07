@@ -35,6 +35,12 @@
     ".gitignore": true,
     ".npmignore": true,
     ".npmrc": true,
-    ".babelrc": true
+    ".babelrc": true,
+    "angular-client": true,
+    "angular-lib": true,
+    "ionic-client": true,
+    "isomorphic-lib": true,
+    "second-angular-lib": true,
+    "second-isomorphic-lib": true
   }
 }

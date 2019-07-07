@@ -48,8 +48,8 @@ export class ProjectAngularLib extends LibProject {
       'tsconfig.isomorphic.json.filetemplate',
       'tsconfig.json.filetemplate',
       ...this.projectAngularClient
-      .filesTemplates()
-      .filter(f => !f.startsWith('webpack.config.'))
+        .filesTemplates()
+        .filter(f => !f.startsWith('webpack.config.'))
     ]
   }
 
@@ -72,37 +72,33 @@ export class ProjectAngularLib extends LibProject {
     return this.projectSpecyficFiles();
   }
 
-  async buildLib(outDir: BuildDir, forClient: Project[] = [], prod?: boolean, watch?: boolean) {
+  async buildLib() {
 
-    if (watch) {
-      if (!this.isStandaloneProject && forClient.length === 0) {
-
-        while (this.buildOptions.forClient.length === 0) {
-
-          await selectClients(this.buildOptions, this, true)
-        }
+    if (!this.isStandaloneProject && this.buildOptions.forClient.length === 0) {
+      while (this.buildOptions.forClient.length === 0) {
+        await selectClients(this.buildOptions, this, true);
       }
+    }
 
+    if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .startAndWatch('isomorphic angular-lib compilation (watch mode)')
+        .startAndWatch('isomorphic angular-lib compilation (watch mode)');
     } else {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .start('isomorphic angular-lib compilation')
+        .start('isomorphic angular-lib compilation');
     }
 
     return this;
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir, appBuild, onlyWatchNoBuild, forClient } = buildOptions;
-
-
+    const { appBuild, onlyWatchNoBuild } = buildOptions;
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         await this.projectAngularClient.buildSteps(buildOptions);
       } else {
-        await this.buildLib(outDir, forClient as Project[], prod, watch);
+        await this.buildLib();
       }
     }
 

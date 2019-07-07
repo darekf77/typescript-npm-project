@@ -19,6 +19,7 @@ import { CommandInstance } from '../tnp-db/entites/command-instance';
 import { killProcessByPort } from '../helpers';
 import { BuildOptions } from './features/build-options';
 import { selectClients } from './select-clients';
+import { BuildDir } from '../models';
 //#endregion
 
 
@@ -62,6 +63,43 @@ export class ProjectIsomorphicLib extends LibProject {
     ].concat(this.projectSpecyficFiles())
   }
 
+  private async selectToSimulate(outDir: BuildDir, watch: boolean, forClient: Project[] | string[]) {
+    let webpackEnvParams = `--env.outFolder=${outDir}`;
+    webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+
+    let client = _.first(forClient as Project[]);
+    if (!this.isStandaloneProject && forClient.length === 0) {
+
+      const answer: { project: string } = await inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'project',
+            message: 'Which project do you wanna simulate ?',
+            choices: this.parent.children
+              .filter(c => config.allowedTypes.app.includes(c.type))
+              .filter(c => c.name !== this.name)
+              .map(c => c.name),
+            filter: function (val) {
+              return val.toLowerCase();
+            }
+          }
+        ]) as any;
+      // console.log('ANSWER', answer)
+      client = Project.From(path.join(this.location, '..', answer.project));
+    }
+
+    if (client) {
+      const port = client.getDefaultPort()
+      await killProcessByPort(port)
+      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
+    }
+
+    const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+    // console.log(command)
+
+    this.run(command).sync();
+  }
 
   async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
@@ -71,54 +109,10 @@ export class ProjectIsomorphicLib extends LibProject {
           log(`App build not possible for isomorphic-lib in static build mode`)
           return;
         }
-        let webpackEnvParams = `--env.outFolder=${outDir}`;
-        webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
-
-        let client = _.first(forClient as Project[]);
-        if (!this.isStandaloneProject && forClient.length === 0) {
-
-          const answer: { project: string } = await inquirer
-            .prompt([
-              {
-                type: 'list',
-                name: 'project',
-                message: 'Which project do you wanna simulate ?',
-                choices: this.parent.children
-                  .filter(c => config.allowedTypes.app.includes(c.type))
-                  .filter(c => c.name !== this.name)
-                  .map(c => c.name),
-                filter: function (val) {
-                  return val.toLowerCase();
-                }
-              }
-            ]) as any;
-          // console.log('ANSWER', answer)
-          client = Project.From(path.join(this.location, '..', answer.project));
-        }
-
-        if (client) {
-          let port = client.getDefaultPort()
-          await killProcessByPort(port)
-          webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
-        }
-
-        const command = `npm-run webpack-dev-server ${webpackEnvParams}`
-        // console.log(command)
-
-        this.run(command).sync()
-
+        await this.selectToSimulate(outDir, watch, forClient);
       } else {
-        if (!this.isStandaloneProject && forClient.length === 0) {
-
-          while (buildOptions.forClient.length === 0) {
-            await selectClients(buildOptions, this);
-          }
-
-        }
-
-        await this.buildLib(outDir, forClient as Project[], prod, watch);
+        await this.buildLib();
       }
-
     }
     return;
   }
@@ -152,8 +146,8 @@ export class ProjectIsomorphicLib extends LibProject {
     }
   }
 
-  async buildLib(outDir: 'dist' | 'bundle', forClient: Project[] = [], prod = false, watch = false) {
-
+  async buildLib() {
+    const { outDir } = this.buildOptions;
     // console.log('Build fucking this', this.buildOptions)
     this.copyWhenExist('bin', outDir) // TODO make this for each library
     this.copyWhenExist('package.json', outDir)
@@ -169,9 +163,13 @@ export class ProjectIsomorphicLib extends LibProject {
       }
     }
 
-    // console.log('config.file.tnpEnvironment_json',config.file.tnpEnvironment_json)
+    if (!this.isStandaloneProject && this.buildOptions.forClient.length === 0) {
+      while (this.buildOptions.forClient.length === 0) {
+        await selectClients(this.buildOptions, this);
+      }
+    }
 
-    if (watch) {
+    if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
     } else {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation')
