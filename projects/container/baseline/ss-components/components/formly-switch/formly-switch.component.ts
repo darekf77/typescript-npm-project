@@ -14,7 +14,7 @@ const log = Log.create('formly switch');
 @CLASS.NAME('FormlySwitchComponent')
 @Component({
   selector: 'app-formly-switch',
-  templateUrl: '/formly-switch.component.html',
+  templateUrl: './formly-switch.component.html',
   styleUrls: ['./formly-switch.component.scss']
 })
 export class FormlySwitchComponent extends FieldType implements OnInit {

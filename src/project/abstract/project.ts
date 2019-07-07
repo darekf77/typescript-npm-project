@@ -42,6 +42,7 @@ import { Morphi, ModelDataConfig } from 'morphi';
 import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
+import * as json5 from 'json5';
 
 
 
@@ -165,7 +166,7 @@ export abstract class BaseProject {
     if (this.packageJson && this.type === 'unknow-npm-project') {
       if (this.packageJson.name !== path.basename(this.location)
         && path.basename(path.dirname(this.location)) === 'external') {
-          return path.basename(this.location);
+        return path.basename(this.location);
       }
     }
     return this.packageJson ? this.packageJson.name : path.basename(this.location);
@@ -725,18 +726,24 @@ export abstract class BaseProject {
   private recreateCodeWorkspace() {
     if (this.isWorkspace) {
       const configSettings = {};
+
       try {
-        const settings = fse.readJSONSync(path.join(this.location, '.vscode', 'settings.json'), {
+        const settings = json5.parse(fse.readFileSync(path.join(this.location, '.vscode', 'settings.json'), {
           encoding: 'utf8'
-        });
+        }).toString());
+        // console.log(settings)
         Object.keys(settings)
           .filter(key => {
-            return key.startsWith('workbench');
+            const start = key.startsWith('workbench');
+            // console.log(`${key} ${start}`)
+            return start;
           })
           .forEach(key => {
             configSettings[key] = settings[key];
           });
-      } catch (error) { }
+      } catch (err) {
+        // console.log(err)
+      }
 
       const codeWorkspace = {
         folders: [
