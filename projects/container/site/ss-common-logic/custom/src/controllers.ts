@@ -17,7 +17,7 @@ ProjectController
 
 //#region @backend
 
-import { Helpers } from "morphi";
+import { Helpers } from 'morphi';
 import * as _ from 'lodash'
 
 export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {

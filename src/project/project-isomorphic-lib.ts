@@ -1,4 +1,4 @@
-import { LibProject } from "./abstract";
+import { LibProject } from './abstract';
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -6,9 +6,9 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-import { Project } from "./abstract";
+import { Project } from './abstract';
 
-import { tryCopyFrom, getControllers, getEntites, log, info } from "../helpers";
+import { tryCopyFrom, getControllers, getEntites, log, info } from '../helpers';
 
 import { HelpersLinks } from '../helpers';
 import { config } from '../config';
@@ -18,6 +18,7 @@ import { TnpDB } from '../tnp-db';
 import { CommandInstance } from '../tnp-db/entites/command-instance';
 import { killProcessByPort } from '../helpers';
 import { BuildOptions } from './features/build-options';
+import { selectClients } from './select-clients';
 //#endregion
 
 
@@ -44,20 +45,20 @@ export class ProjectIsomorphicLib extends LibProject {
     return super.projectSpecyficFiles()
       .concat([
         '.vscode/launch.json',
-        "tsconfig.json",
-        "tsconfig.browser.json",
-        "webpack.config.js",
+        'tsconfig.json',
+        'tsconfig.browser.json',
+        'webpack.config.js',
         'run.js'
       ]).concat(
         !this.isStandaloneProject ? [
-          "src/typings.d.ts",
+          'src/typings.d.ts',
         ] : []);
   }
 
   projectSpecyficIgnoredFiles() {
     return [
-      "src/entities.ts",
-      "src/controllers.ts"
+      'src/entities.ts',
+      'src/controllers.ts'
     ].concat(this.projectSpecyficFiles())
   }
 
@@ -72,7 +73,7 @@ export class ProjectIsomorphicLib extends LibProject {
         }
         let webpackEnvParams = `--env.outFolder=${outDir}`;
         webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
-        // console.log('forClients', forClient)
+
         let client = _.first(forClient as Project[]);
         if (!this.isStandaloneProject && forClient.length === 0) {
 
@@ -92,18 +93,8 @@ export class ProjectIsomorphicLib extends LibProject {
               }
             ]) as any;
           // console.log('ANSWER', answer)
-          client = Project.From(path.join(this.location, '..', answer.project))
-          //           const clientsExamples = this.parent.children
-          //             .filter(c => config.allowedTypes.app.includes(c.type))
-          //             .map(c => chalk.bold('--forClient ' + c.name) + '  or')
-          //           error(`Please define client parameter for app simulation:
-          // ${clientsExamples.length > 0 ? clientsExamples.join('\n') : chalk.bold('--forClient my-example-client')}
-          //           Please choose only one ${chalk.bold('--forClient')} parameter.
-          //           `
-          //             , false, true)
+          client = Project.From(path.join(this.location, '..', answer.project));
         }
-
-        // console.log('CLIENT NAME', client.name)
 
         if (client) {
           let port = client.getDefaultPort()
@@ -119,11 +110,8 @@ export class ProjectIsomorphicLib extends LibProject {
       } else {
         if (!this.isStandaloneProject && forClient.length === 0) {
 
-
-
           while (buildOptions.forClient.length === 0) {
-
-            await ProjectIsomorphicLib.selectClients(buildOptions, this)
+            await selectClients(buildOptions, this);
           }
 
         }
@@ -133,41 +121,6 @@ export class ProjectIsomorphicLib extends LibProject {
 
     }
     return;
-  }
-
-  public static async selectClients(buildOptions: BuildOptions, currentProject: Project, angularLib = false) {
-    if (!buildOptions.watch) {
-      buildOptions.forClient = currentProject.parent.children
-        .filter(c => config.allowedTypes.app.includes(c.type))
-        .filter(c => c.name !== this.name)
-      return;
-    }
-    info('Please select at lease one client..')
-    const { projects = [] }: { projects: string[] } = await inquirer
-      .prompt([
-        {
-          type: 'checkbox',
-          name: 'projects',
-          message: 'Select target projects to build library: ',
-          choices: currentProject.parent.children
-            .filter(c => config.allowedTypes.app.includes(c.type))
-            .filter(c => {
-              if (angularLib) {
-                return true;
-              }
-              return c.name !== currentProject.name
-            })
-            .map(c => {
-              return { value: c.name, name: c.name }
-            })
-        }
-      ]) as any;
-
-    buildOptions.forClient = projects.map(p => Project.From(path.join(currentProject.location, '..', p)))
-
-    const db = await TnpDB.Instance;
-    await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
-
   }
 
   private copyWhenExist(source: string, outDir: string) {
@@ -199,7 +152,7 @@ export class ProjectIsomorphicLib extends LibProject {
     }
   }
 
-  async buildLib(outDir: "dist" | "bundle", forClient: Project[] = [], prod = false, watch = false) {
+  async buildLib(outDir: 'dist' | 'bundle', forClient: Project[] = [], prod = false, watch = false) {
 
     // console.log('Build fucking this', this.buildOptions)
     this.copyWhenExist('bin', outDir) // TODO make this for each library

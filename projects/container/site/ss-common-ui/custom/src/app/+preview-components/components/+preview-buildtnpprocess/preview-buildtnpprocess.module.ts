@@ -4,15 +4,15 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // local
 import { RecrusiveMenuModule } from 'components';
-import { Morphi } from 'morphi/browser';
+import { Morphi } from 'morphi';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';
 
-import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
-import { ProjectController } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/ProjectController';
-import { BuildTnpProcessModule } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/project-ui';
-import { PROCESS } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/PROCESS';
-import { ProcessController } from 'ss-common-logic/browser-for-ss-common-ui/apps/process/ProcessController';
+import { PROJECT } from 'ss-common-logic/src/apps/project/PROJECT';
+import { ProjectController } from 'ss-common-logic/src/apps/project/ProjectController';
+import { BuildTnpProcessModule } from 'ss-common-logic/src/apps/project/project-ui';
+import { PROCESS } from 'ss-common-logic/src/apps/process/PROCESS';
+import { ProcessController } from 'ss-common-logic/src/apps/process/ProcessController';
 
 const angularModules = [
   CommonModule,

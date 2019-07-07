@@ -28,6 +28,11 @@
 /src/tsconfig.app.json
 /protractor.conf.js
 /karma.conf.js
+/webpack.config.build.aot.js.filetemplate
+/webpack.config.build.js.filetemplate
+/webpack.config.common.js.filetemplate
+/webpack.config.js.filetemplate
+/.angular-cli.json.filetemplate
 /webpack.config.build.aot.js
 /webpack.config.build.js
 /webpack.config.common.js

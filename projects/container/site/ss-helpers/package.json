@@ -1,0 +1,14 @@
+{
+  "name": "ss-helpers",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "tnp": {
+    "isCoreProject": false,
+    "type": "angular-lib",
+    "resources": [
+      "README.md"
+    ],
+    "isGenerated": false,
+    "useFramework": false
+  }
+}

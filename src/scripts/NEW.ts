@@ -14,8 +14,12 @@ import { info, error } from "../helpers";
 
 export class ProjectFactory {
 
-  public static get create() {
-    return new ProjectFactory()
+  private static _instance: ProjectFactory;
+  public static get Instance() {
+    if (!this._instance) {
+      this._instance = new ProjectFactory();
+    }
+    return this._instance;
   }
 
 
@@ -56,7 +60,7 @@ export class ProjectFactory {
     fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
   }
 
-  private start(type: LibType, name: string, cwd: string, basedOn?: string): Project {
+  public create(type: LibType, name: string, cwd: string, basedOn?: string): Project {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
@@ -118,7 +122,7 @@ export class ProjectFactory {
     // const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
     const type = argv[0] as any;
     const name = argv[1]
-    this.start(type, name, cwd);
+    this.create(type, name, cwd);
     if (exit) {
       process.exit(0)
     }
@@ -134,7 +138,7 @@ export class ProjectFactory {
     if (!Project.From(basedOn)) {
       error(`Please provide proper path to project in ${chalk.bold('--basedOn')}  parameter`);
     }
-    this.start('workspace', argv[0] as any, cwd, basedOn);
+    this.create('workspace', argv[0] as any, cwd, basedOn);
     if (exit) {
       process.exit(0)
     }
@@ -169,13 +173,13 @@ export function NEW(args: string, exit = true, cwd = process.cwd()) {
   // console.log(`ARGS: ${args}`)
 
   if (type === 'model') {
-    ProjectFactory.create.createModelFromArgs(args, exit, cwd);
+    ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
   } else {
-    ProjectFactory.create.workspaceFromArgs(args, exit, cwd)
+    ProjectFactory.Instance.workspaceFromArgs(args, exit, cwd)
   }
 }
 export function NEW_SITE(args: string, exit = true, cwd = process.cwd()) {
-  ProjectFactory.create.workspaceSiteFromArgs(args, exit, cwd);
+  ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd);
 }
 
 export default {

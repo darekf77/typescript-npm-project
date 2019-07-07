@@ -94,6 +94,12 @@ export class PackageJSON {
     }
   }
 
+  copyTo(project: Project) {
+    const packageJsonloCation = path.join(this.project.location, config.file.package_json);
+    const dest = path.join(project.location, config.file.package_json);
+    fse.copyFileSync(packageJsonloCation, dest);
+  }
+
   get pathToBaseline(): string {
     if (this.data && this.data.tnp &&
       (

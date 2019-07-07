@@ -8,14 +8,14 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 // other
 import * as _ from 'lodash';
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 const log = Log.create('build-editor')
 
 // formly
 import { FormlyFieldConfig } from '@ngx-formly/core';
 // local
-import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/BuildController';
-import { TnpProjectController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/TnpProjectController';
+import { BuildController } from 'ss-common-logic/src/controllers/BuildController';
+import { TnpProjectController } from 'ss-common-logic/src/controllers/TnpProjectController';
 
 
 @Component({

@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 
-import { init, replay, AngularProviders } from 'morphi/browser';
+import { init, replay, AngularProviders } from 'morphi';
 import { Controllers, Entities } from 'isomorphic-lib/browser';
 
 init('http://localhost:4000')

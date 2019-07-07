@@ -4,11 +4,12 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 
-import { clearConsole, log, error, info } from '../../helpers';
+import { clearConsole, log, error, info, tryRemoveDir } from '../../helpers';
 import { FeatureForProject, Project } from '../abstract';
 import { TnpDB } from '../../tnp-db';
 import config from '../../config';
 import { OutFolder } from 'morphi/build';
+import { ProjectFactory } from '../../scripts/NEW';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -72,6 +73,13 @@ export class FilesStructure extends FeatureForProject {
         }
       }
       return;
+    }
+    if (this.project.isWorkspace && this.project.isSite) {
+      const recreated = this.recreateSiteChildren();
+      for (let index = 0; index < recreated.length; index++) {
+        const newChild = recreated[index];
+        await newChild.filesStructure.init(args, options);
+      }
     }
     if (this.project.isWorkspace && recrusive) {
       const workspaceChildren = this.project.children;
@@ -157,6 +165,22 @@ export class FilesStructure extends FeatureForProject {
     info(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
+  recreateSiteChildren() {
+    const newChilds: Project[] = []
+    const baseline = this.project.baseline;
+    baseline.children.forEach(c => {
+      const siteChild = path.join(this.project.location, c.name);
+      if (!fse.existsSync(siteChild)) {
+        ProjectFactory.Instance.create(c.type, c.name, this.project.location);
+        const newChild = Project.From(siteChild);
+        c.packageJson.copyTo(newChild);
+        tryRemoveDir(path.join(newChild.location, config.folder.src));
+        tryRemoveDir(path.join(newChild.location, config.folder.components));
+        newChilds.push(newChild);
+      }
+    });
+    return newChilds;
+  }
 
   private recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
     if (type === 'clear') {

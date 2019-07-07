@@ -37,20 +37,6 @@ export abstract class LibProject extends Project {
 
   abstract async buildLib(outDir: BuildDir, forClient: Project[], prod?: boolean, watch?: boolean);
 
-  // abstract get isBuildedForOther();
-
-
-  // public async publish() {
-  //   this.checkIfReadyForNpm()
-  //   await questionYesNo(`Publish on npm version: ${Project.Current.version} ?`, () => {
-  //     this.run('npm publish', {
-  //       cwd: path.join(this.location, config.folder.bundle),
-  //       output: true
-  //     }).sync()
-  //     this.pushToGitRepo()
-  //   })
-  // }
-
   checkIfLogginInToNpm() {
     try {
       this.run('npm whoami').sync();

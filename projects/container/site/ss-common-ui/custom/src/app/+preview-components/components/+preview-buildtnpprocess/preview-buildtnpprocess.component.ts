@@ -1,12 +1,12 @@
 import { Component, OnInit, AfterContentInit, ViewChild, TemplateRef } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
-import { Log } from 'ng2-logger/browser';
+import { Log } from 'ng2-logger';
 
 const log = Log.create('privew build tnp ');
-import { PROJECT } from 'ss-common-logic/browser-for-ss-common-ui/apps/project/PROJECT';
+import { PROJECT } from 'ss-common-logic/src/apps/project/PROJECT';
 
-import { ModelDataConfig } from 'morphi/browser';
+import { ModelDataConfig } from 'morphi';
 import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app-popup-content.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';

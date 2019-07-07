@@ -1,17 +1,17 @@
 
 import { Component, OnInit, HostListener, NgZone, ApplicationRef } from '@angular/core';
 // third part
-import { Log, Level } from 'ng2-logger/browser';
+import { Log, Level } from 'ng2-logger';
 import * as _ from 'lodash';
 // local
 
-import { AuthController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/core/AuthController';
-import { BuildController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/BuildController';
+import { AuthController } from 'ss-common-logic/src/controllers/core/AuthController';
+import { BuildController } from 'ss-common-logic/src/controllers/BuildController';
 
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Menu, MenuItem } from 'ss-common-ui/module-for-ss-admin-webapp';
-import { DomainsController } from 'ss-common-logic/browser-for-ss-admin-webapp/controllers/DomainsController';
+import { DomainsController } from 'ss-common-logic/src/controllers/DomainsController';
 
 const log = Log.create('Dashboard');
 
