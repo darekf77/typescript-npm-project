@@ -18,8 +18,9 @@ import * as controllers from '../../controllers';
 
 import { Log, Level } from 'ng2-logger';
 import { Observable } from 'rxjs/Observable';
+export { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-// export { Subject } from 'rxjs/Subject';
+export { Subject } from 'rxjs/Subject';
 
 const log = Log.create('AuthController', Level.__NOTHING);
 
@@ -96,7 +97,7 @@ export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
   }
 
   private _subIsLggedIn = new Subject<boolean>();
-  isLoggedIn = this._subIsLggedIn.asObservable();
+  isLoggedIn = (this._subIsLggedIn.asObservable() as any) as Observable<boolean>;
 
   public get browser() {
 

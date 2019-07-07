@@ -176,6 +176,7 @@ export class FilesStructure extends FeatureForProject {
         c.packageJson.copyTo(newChild);
         tryRemoveDir(path.join(newChild.location, config.folder.src));
         tryRemoveDir(path.join(newChild.location, config.folder.components));
+        newChild.recreate.vscode.settings.colorsFromWorkspace();
         newChilds.push(newChild);
       }
     });

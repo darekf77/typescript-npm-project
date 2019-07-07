@@ -28,7 +28,7 @@ import * as _ from 'lodash'
 export function entities<ADDITIONAL={}>(connection?: Morphi.Orm.Connection, decoratorsEntities?: ADDITIONAL) {
 return _.merge(baslineEntites.entities(connection),{
 
-PROJECT: Morphi.Orm.RepositoryFrom<PROJECT , PROJECT_REPOSITORY>(connection, PROJECT , PROJECT_REPOSITORY),
+PROJECT: Morphi.Orm.RepositoryFrom<PROJECT , PROJECT_REPOSITORY>(connection as any, PROJECT , PROJECT_REPOSITORY),
 }  );
 }
 //#endregion

@@ -137,7 +137,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     input = super.process(input, modType, relativePath);
     input = this.mod3rdPartyLibsReferces(input, modType, relativePath);
     input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
-    // input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
+    input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
     return input;
   }
 
@@ -390,7 +390,7 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
             compiled = compiled.filter(f => f !== config.folder.src);
           };
 
-          if (libName === this.project.name || child.type === 'angular-lib') {
+          if (libName === this.project.name && child.type === 'angular-lib') {
             input = impReplace({
               name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${config.folder.components}`,
               project: this.project,

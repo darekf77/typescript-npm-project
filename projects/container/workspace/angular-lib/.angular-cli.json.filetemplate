@@ -77,7 +77,7 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
+    "styleExt": "scss",
     "component": {},
     "apps": {
       "showCircularDependencies": false

@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material';
 import { PROJECT } from '../../../PROJECT';
-import { BaseComponent } from 'baseline/ss-common-ui/components/helpers';
+import { BaseComponent } from 'baseline/ss-helpers/components';
 
 @Component({
   selector: 'app-base-item-stepper-process-build',

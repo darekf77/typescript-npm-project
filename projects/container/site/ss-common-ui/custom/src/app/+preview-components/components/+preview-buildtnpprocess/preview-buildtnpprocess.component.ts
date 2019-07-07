@@ -10,7 +10,7 @@ import { ModelDataConfig } from 'morphi';
 import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app-popup-content.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { BaseComponentForRouter } from 'baseline/ss-common-ui/components/helpers/base-component';
+import { BaseComponentForRouter } from 'baseline/ss-helpers/components';
 console.log('asd')
 
 @Component({

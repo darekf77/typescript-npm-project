@@ -223,7 +223,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
     let entity = path.basename(entityRelativePath).toUpperCase()
     let repoExist = this.entityRepo(srcPath, entity, entityRelativePath);
     return `
-    ${entity}: Morphi.Orm.RepositoryFrom<${entity}${repoExist}>(connection, ${entity}${repoExist}),`
+    ${entity}: Morphi.Orm.RepositoryFrom<${entity}${repoExist}>(connection as any, ${entity}${repoExist}),`
   }
 
   private controllersTemplateSingleton(srcPath, controllerRelativePath) {

@@ -10,6 +10,7 @@ export {
   IFacebook, IHelloJS
 } from 'baseline/ss-common-logic/src/apps/auth/AuthController';
 
+import { Observable } from 'rxjs/Observable';
 //#region @backend
 import { authenticate, use } from 'passport';
 //#endregion

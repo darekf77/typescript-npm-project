@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // local
-import { RecrusiveMenuModule } from 'components';
+import { RecrusiveMenuModule } from 'baseline/ss-components/components/recrusive-menu';
 import { Morphi } from 'morphi';
 import { PreviewBuildtnpprocessComponent } from './preview-buildtnpprocess.component';
 import { routes } from './preview-buildtnpprocess.routes';

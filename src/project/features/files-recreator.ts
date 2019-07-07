@@ -38,7 +38,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 export class FilesRecreator extends FeatureForProject {
 
-  public async init(includeVscode = false) {
+  public async init() {
     if (this.project.type === 'container') {
       return;
     }
@@ -49,10 +49,6 @@ export class FilesRecreator extends FeatureForProject {
     this.gitignore();
     this.npmignore();
     this.customFolder();
-    if (includeVscode) {
-      this.vscode.settings.excludedFiles();
-      this.vscode.settings.colorsFromWorkspace()
-    }
   }
 
   private get commonFilesForAllProjects() {
@@ -155,6 +151,15 @@ export class FilesRecreator extends FeatureForProject {
 
   private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
+    if (this.project.isSite) {
+      if (!fse.existsSync(pathSettingsVScode)) {
+        fse.mkdirpSync(path.dirname(pathSettingsVScode));
+        const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
+        if (fse.existsSync(settingsFromBaseline)) {
+          fse.copyFileSync(settingsFromBaseline, pathSettingsVScode);
+        }
+      }
+    }
     if (fs.existsSync(pathSettingsVScode)) {
       try {
         let settings: VSCodeSettings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))

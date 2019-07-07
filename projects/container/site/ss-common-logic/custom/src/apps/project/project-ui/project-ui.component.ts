@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Morphi } from 'morphi';
 import { PROJECT } from '../PROJECT';
-import { BaseFormlyComponent, DualComponentController } from 'baseline/ss-common-ui/components/helpers';
+import { BaseFormlyComponent, DualComponentController } from 'baseline/ss-helpers/components';
 
 export class DualComponentControllerExtended extends DualComponentController {
 

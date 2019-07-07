@@ -24,7 +24,7 @@ import {
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
 import { ProcessLoggerModule } from 'baseline/ss-common-logic/src/apps/process/process-logger';
-import { ListWrapperModule } from 'baseline/ss-common-ui/components/formly/base-components/list';
+import { ListWrapperModule } from 'baseline/ss-components/components';
 
 const angularModules = [
   CommonModule,
