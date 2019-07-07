@@ -166,7 +166,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         });
       }
 
-      if (modType === 'tmp-src') {
+      if (modType === 'tmp-src' && this.project.type !== 'isomorphic-lib') {
         input = impReplace({
           name: `${libName} -> ${libName}/${config.folder.browser}`,
           project: this.project,
@@ -308,7 +308,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       const libName = child.name;
 
-      if (modType === 'lib' || modType === 'custom/lib') {
+      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
 
         let sourceFolder: string;
         if (child.type === 'angular-lib') {
@@ -322,7 +322,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
           input = impReplace({
             name: `
-${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
+      ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
             project: this.project,
             input,
             modType,
@@ -343,48 +343,83 @@ ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}
 
       }
 
-      if (modType === 'custom/app') {
-        const process = (compiled: any[]) => {
-          // const browserForCurrentClient = IncrementalBuildProcessExtended
-          //   .getBrowserVerPath(this.project.name);
+      // if (modType === 'tmp-src') {
+      //   console.log(relativePath)
+      // }
 
-          let sourceFolder: string;
-          if (child.type === 'angular-lib') {
-            sourceFolder = config.folder.components;
-          }
-          if (child.type === 'isomorphic-lib') {
-            sourceFolder = config.folder.src;
-          }
+
+
+      // if (modType === 'custom/app') {
+      //   const process = (compiled: any[]) => {
+      //     // const browserForCurrentClient = IncrementalBuildProcessExtended
+      //     //   .getBrowserVerPath(this.project.name);
+
+      //     let sourceFolder: string;
+      //     if (child.type === 'angular-lib') {
+      //       sourceFolder = config.folder.components;
+      //     }
+      //     if (child.type === 'isomorphic-lib') {
+      //       sourceFolder = config.folder.src;
+      //     }
+
+      //     input = impReplace({
+      //       name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
+      //       project: this.project,
+      //       input,
+      //       modType,
+      //       urlParts: [baselineName, libName, compiled],
+      //       partsReplacements: [baselineName, libName, sourceFolder],
+      //       relativePath,
+      //       method
+      //     });
+      //   };
+
+      //   let folders = [
+      //     // ...this.foldersSources,
+      //     ...this.foldersCompiledJsDtsMap,
+      //   ];
+
+      //   process(folders);
+
+      //   folders = this.project.parent.childrenThatAreClients
+      //     .map(client => {
+      //       return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+      //     });
+
+      //   process(folders);
+      // }
+
+      if (modType === 'tmp-src' && this.project.type === 'isomorphic-lib') {
+        // console.log('1', relativePath)
+        let sourceFolder: string;
+        if (child.type === 'angular-lib') {
+          sourceFolder = config.folder.components;
+        }
+        if (child.type === 'isomorphic-lib') {
+          sourceFolder = config.folder.src;
+        }
+
+        const process = (compiled: any[]) => {
 
           input = impReplace({
-            name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
+            name: `
+      ${baselineName}/${libName}/${compiled.join('|\n')} -> ${libName}/${sourceFolder}`,
             project: this.project,
             input,
             modType,
             urlParts: [baselineName, libName, compiled],
-            partsReplacements: [baselineName, libName, sourceFolder],
+            partsReplacements: [libName, sourceFolder],
             relativePath,
             method
           });
         };
-
-        let folders = [
-          // ...this.foldersSources,
-          ...this.foldersCompiledJsDtsMap,
-        ];
-
-        process(folders);
-
-        folders = this.project.parent.childrenThatAreClients
-          .map(client => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
-          });
-
+        let folders = this.foldersSources;
         process(folders);
       }
 
-      if (modType === 'app') {
+      if (modType === 'tmp-src' && this.project.type !== 'isomorphic-lib') {
 
+        // console.log('2', relativePath)
         const process = (compiled: any[]) => {
           if (child.type === 'angular-lib') {
             compiled = compiled.filter(f => f !== config.folder.src);

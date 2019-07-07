@@ -154,7 +154,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
 
       //#${'region'} @backend
 
-      import { Helpers } from 'morphi';
+      import { CLASS } from 'typescript-class-helpers';
       import * as _ from 'lodash'
 
       export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
@@ -229,7 +229,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
   private controllersTemplateSingleton(srcPath, controllerRelativePath) {
     let controller = path.basename(controllerRelativePath);
     return `
-    ${controller}: Helpers.getSingleton<${controller}>(${controller}),`
+    ${controller}: CLASS.getSingleton<${controller}>(${controller}),`
   }
 
 }

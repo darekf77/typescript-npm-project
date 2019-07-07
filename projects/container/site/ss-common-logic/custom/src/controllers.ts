@@ -17,13 +17,13 @@ ProjectController
 
 //#region @backend
 
-import { Helpers } from 'morphi';
+import { CLASS } from 'typescript-class-helpers';
 import * as _ from 'lodash'
 
 export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
 return _.merge(controllersBaseline.controllers(), {
 
-ProjectController: Helpers.getSingleton<ProjectController>(ProjectController),
+ProjectController: CLASS.getSingleton<ProjectController>(ProjectController),
 }  );
 }
 //#endregion

@@ -46,14 +46,20 @@ export class ProjectIsomorphicLib extends LibProject {
     return super.projectSpecyficFiles()
       .concat([
         '.vscode/launch.json',
-        'tsconfig.json',
         'tsconfig.browser.json',
         'webpack.config.js',
-        'run.js'
+        ...this.filesTemplates(),
       ]).concat(
         !this.isStandaloneProject ? [
           'src/typings.d.ts',
         ] : []);
+  }
+
+  filesTemplates() {
+    return [
+      'tsconfig.json.filetemplate',
+      'run.js.filetemplate',
+    ];
   }
 
   projectSpecyficIgnoredFiles() {

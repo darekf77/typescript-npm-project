@@ -21,10 +21,10 @@
 /index.d.ts
 /index.js.map
 /.vscode/launch.json
-/tsconfig.json
 /tsconfig.browser.json
 /webpack.config.js
-/run.js
+/tsconfig.json.filetemplate
+/run.js.filetemplate
 /src/typings.d.ts
 /src/entities.ts
 /src/controllers.ts
@@ -32,8 +32,8 @@
 /index.d.ts
 /index.js.map
 /.vscode/launch.json
-/tsconfig.json
 /tsconfig.browser.json
 /webpack.config.js
-/run.js
+/tsconfig.json.filetemplate
+/run.js.filetemplate
 /src/typings.d.ts

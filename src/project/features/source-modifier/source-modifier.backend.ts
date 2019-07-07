@@ -25,15 +25,22 @@ const debugFiles = [
 export class SourceModifier extends FeatureCompilerForProject {
   appSourceReplicator: AppSourceReplicator;
 
+  get allowedToRunReplikator() {
+    const libs = config.allowedTypes.angularClient.concat(this.project.isSite ? ['isomorphic-lib'] : []);
+    return libs.includes(this.project.type);
+  }
+
   async init(taskName?: string, callback?: any) {
-    if (config.allowedTypes.angularClient.includes(this.project.type)) {
+    if (this.allowedToRunReplikator) {
       await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+    } else {
+      console.log(`NOT FOR ${this.project.name}`)
     }
     await super.init(taskName, callback);
   }
 
   async initAndWatch(taskName?: string, callback?: any) {
-    if (config.allowedTypes.angularClient.includes(this.project.type)) {
+    if (this.allowedToRunReplikator) {
       await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`)
     }
     await super.initAndWatch(taskName, callback);
@@ -42,7 +49,7 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#region get source type lib - for libs, app - for clients
   private static getModType(project: Project, relativePath: string): ModType {
     const startFolder: SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as SourceFolder;
-    if (startFolder === 'tmp-src') {
+    if (/^tmp\-src(?!\-)/.test(startFolder)) {
       return 'tmp-src';
     }
     if (startFolder === 'src') {
@@ -96,14 +103,14 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   //#region folder patterns fn
   private get foldersPattern() {
-    return folderPattern(this.project);
+    return getFolderPattern(this.project);
   }
   //#endregion
 
   //#region constructor
   sourceMod: SourceModForWorkspaceChilds;
   constructor(public project: Project) {
-    super(project.isSite ? void 0 : folderPattern(project), '', project && project.location, project);
+    super(getFolderPattern(project), '', project && project.location, project);
     this.sourceMod = new SourceModForWorkspaceChilds(project);
     this.appSourceReplicator = new AppSourceReplicator(project);
   }
@@ -156,8 +163,9 @@ export class SourceModifier extends FeatureCompilerForProject {
 }
 
 
-function folderPattern(project: Project) {
+function getFolderPattern(project: Project) {
   return `${
-    project.isSite ? config.folder.custom : `{${[config.folder.tempSrc, config.folder.src, config.folder.components].join(',')}}`
+    project.isSite ? `{${[config.folder.custom, config.folder.tempSrc].join(',')}}` :
+      `{${[config.folder.tempSrc, config.folder.src, config.folder.components].join(',')}}`
     }/**/*.ts`
 }

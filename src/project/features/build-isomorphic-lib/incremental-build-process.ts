@@ -68,7 +68,12 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     const cwd = project.location;
 
     if (project.type === 'isomorphic-lib') {
-      this.backendCompilation = new BackendCompilationExtended(outFolder, location, cwd);
+      if (project.isSite) {
+        this.backendCompilation = new BackendCompilationExtended(outFolder, config.folder.tempSrc, cwd);
+      } else {
+        this.backendCompilation = new BackendCompilationExtended(outFolder, location, cwd);
+      }
+
     } else {
       this.backendCompilation = void 0;
     }
