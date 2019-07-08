@@ -24,7 +24,7 @@ const sandbox = {
 
 const script = new vm.Script(`
 global["ENV"] = JSON.parse(ENV);
-var app = require('./dist/app').default;
+var app = require("./dist/app").default;
 app();
 `);
 

@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 // local
 import { Project } from "./abstract";
-import { ReorganizeArray } from "../helpers";
+import { ReorganizeArray, log } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
@@ -16,7 +16,7 @@ export class ProjectWorkspace extends Project {
   startOnCommand(args: string) {
 
     this.proxyRouter.activateServer((port) => {
-      console.log(`proxy server ready on port ${port}`)
+      log(`proxy server ready on port ${port}`)
     })
     const workspace: Project = this as any;
     workspace.children
@@ -79,7 +79,7 @@ export class ProjectWorkspace extends Project {
 
       let cout = 0
       while (!order()) {
-        console.log(`Sort(${++cout})`, libsProjects);
+        log(`Sort(${++cout}) \n ${libsProjects.map(c => c.genericName).join('\n')}\n `);
       }
     });
 
@@ -97,12 +97,12 @@ export class ProjectWorkspace extends Project {
 
     PROGRESS_DATA.log({ value: 0, msg: `Process started` })
 
-    console.log(`Projects to build in  ${this.labels.extendedBoldName} :`)
+    log(`Projects to build in  ${this.labels.extendedBoldName} :`)
     projectsInOrder.forEach((project, i) => {
       const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
-      console.log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
+      log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
     })
-    console.log('===================')
+    log('===================')
 
     const projectsLibs: Project[] = projectsInOrder.filter(project => {
       return config.allowedTypes.libs.includes(project.type);
@@ -119,13 +119,13 @@ export class ProjectWorkspace extends Project {
 
 
     projectsLibs.forEach((project, i) => {
-      console.log(`COMPILATIONL lib for: ${project.name}`)
+      log(`COMPILATIONL lib for: ${project.name}`)
     });
 
     projectsApps.forEach((project, i) => {
-      console.log(`COMPILATIONL app for: ${project.name}`)
+      log(`COMPILATIONL app for: ${project.name}`)
     });
-    console.log('===================')
+    log('===================')
 
     const sum = 2 * (projectsLibs.length + projectsApps.length);
     let count = 1;

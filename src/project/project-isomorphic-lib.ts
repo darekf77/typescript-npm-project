@@ -48,6 +48,7 @@ export class ProjectIsomorphicLib extends LibProject {
         '.vscode/launch.json',
         'tsconfig.browser.json',
         'webpack.config.js',
+        'run.js',
         ...this.filesTemplates(),
       ]).concat(
         !this.isStandaloneProject ? [
@@ -58,7 +59,6 @@ export class ProjectIsomorphicLib extends LibProject {
   filesTemplates() {
     return [
       'tsconfig.json.filetemplate',
-      'run.js.filetemplate',
     ];
   }
 
