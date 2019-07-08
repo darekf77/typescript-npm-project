@@ -65,6 +65,9 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
   private async addProcessesToModel(project: PROJECT) {
     const db = await TnpDB.Instance;
 
+    if(!project) {
+      return // TODO QUICK_FIX
+    }
 
     await this.assignProc(project, db, 'procStaticBuild', {
       // cmd: 'tnp build:dist',

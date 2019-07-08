@@ -237,11 +237,11 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
       }
 
-      if (modType === 'tmp-src') {
+      if (modType === 'tmp-src' && this.project.type === 'angular-lib') {
 
         const process = (compiled: any[]) => {
 
-          if (libName === this.project.name && this.project.type === 'angular-lib') {
+          if (libName === this.project.name) {
 
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
