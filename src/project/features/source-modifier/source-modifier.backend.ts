@@ -32,7 +32,8 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   async init(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+      // await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.syncAction([]);
     } else {
       console.log(`NOT FOR ${this.project.name}`)
     }
@@ -41,7 +42,8 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   async initAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`)
+      // await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`)
+      await this.appSourceReplicator.syncAction([]);
     }
     await super.initAndWatch(taskName, callback);
   }
@@ -150,6 +152,7 @@ export class SourceModifier extends FeatureCompilerForProject {
     if (fse.existsSync(filePath)) {
       this.lastChangedAsyncFileS.push(filePath);
       log(`[sourcemodifier] File fix: ${f}`)
+      this.appSourceReplicator.asyncAction(filePath);
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
       ((filePathAA) => {
         setTimeout(() => {

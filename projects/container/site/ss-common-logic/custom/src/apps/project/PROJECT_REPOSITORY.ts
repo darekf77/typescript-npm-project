@@ -43,6 +43,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
    namesFrom(project: PROJECT): EnvironmentName[] {
     //#region @backendFunc
     if (!project) {
+      console.log('[getByLocation] empty project!')
       return [];
     }
 

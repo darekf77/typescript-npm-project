@@ -9,6 +9,18 @@ export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
 
+export interface IObserveFile {
+  cwd: string;
+  folderName: string;
+  onlyExtensions?: string[];
+  classFn: Function;
+  asyncPriority?: number;
+  syncAction: (filesRelativePathes: string[]) => any;
+  preAsyncAction: (filesRelativePathes: string[]) => any;
+  asyncAction: (filesAbsolutePath: string[]) => any;
+}
+
+
 export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';

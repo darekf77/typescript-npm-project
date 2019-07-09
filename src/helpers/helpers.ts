@@ -386,12 +386,12 @@ export function uniqArray(array: any[]) {
 const AsyncFunction = (async () => { }).constructor;
 // const GeneratorFunction = (function* () { }).constructor as any;
 
-export async function runSyncOrAsync(fn: Function) {
+export async function runSyncOrAsync(fn: Function, args?: any[]) {
   if (_.isUndefined(fn)) {
     return;
   }
   // let wasPromise = false;
-  let promisOrValue = fn()
+  let promisOrValue = fn(args);
   if (promisOrValue instanceof Promise) {
     // wasPromise = true;
     promisOrValue = Promise.resolve(promisOrValue)
