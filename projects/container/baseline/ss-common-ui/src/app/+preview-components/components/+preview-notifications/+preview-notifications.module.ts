@@ -4,6 +4,7 @@ import { PreviewNotificaitonsComponent } from './+preview-notifications.componen
 import { RouterModule } from '@angular/router';
 
 import { ModalModule, NotificationsModule } from 'ss-components/components';
+import { ExamplesController } from 'ss-common-logic/src/apps/example/ExamplesController';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { ModalModule, NotificationsModule } from 'ss-components/components';
     NotificationsModule
   ],
   exports: [PreviewNotificaitonsComponent],
-  declarations: [PreviewNotificaitonsComponent]
+  declarations: [PreviewNotificaitonsComponent],
+  providers: [ExamplesController]
 })
 export class PreviewNotificationsModule { }

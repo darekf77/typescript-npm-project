@@ -100,6 +100,7 @@ export class BuildOptions implements IBuildOptions {
     argsObj.prod = optionsToMerge.prod;
     argsObj.outDir = optionsToMerge.outDir as any;
     argsObj.appBuild = optionsToMerge.appBuild;
+    argsObj.args = argsString;
 
 
     if (argsObj.forClient) {

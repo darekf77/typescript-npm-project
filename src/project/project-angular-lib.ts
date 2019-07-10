@@ -6,7 +6,7 @@ import * as path from 'path';
 import { LibProject } from './abstract';
 import { ProjectAngularClient } from './project-angular-client';
 import { BuildDir } from '../models';
-import { error, tryRemoveDir, HelpersLinks } from '../helpers';
+import { error, tryRemoveDir, HelpersLinks, log } from '../helpers';
 import config from '../config';
 import { Project } from './abstract';
 import { Helpers } from 'morphi/helpers';
@@ -78,6 +78,12 @@ export class ProjectAngularLib extends LibProject {
       while (this.buildOptions.forClient.length === 0) {
         await selectClients(this.buildOptions, this, true);
       }
+    }
+
+    const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
+    if (skipBuild) {
+      log(`Skip build `);
+      return;
     }
 
     if (this.buildOptions.watch) {

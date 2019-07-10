@@ -175,6 +175,11 @@ export class ProjectIsomorphicLib extends LibProject {
       }
     }
 
+    const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
+    if (skipBuild) {
+      log(`Skip build `);
+      return;
+    }
     if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
     } else {

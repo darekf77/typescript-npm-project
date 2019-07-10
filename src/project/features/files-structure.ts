@@ -121,6 +121,9 @@ export class FilesStructure extends FeatureForProject {
       await this.project.recreate.init();
     }
 
+    if (this.project.isStandaloneProject) {
+      this.project.filesTemplatesBuilder.rebuild();
+    }
 
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
 

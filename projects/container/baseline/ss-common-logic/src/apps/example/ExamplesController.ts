@@ -32,6 +32,7 @@ export class ExamplesController extends Morphi.Base.Controller<entities.EXAMPLE>
   }
 
 
+
   async initExampleDbData() {
 
     const c1 = this.db.EXAMPLE.create({
@@ -51,6 +52,12 @@ export class ExamplesController extends Morphi.Base.Controller<entities.EXAMPLE>
   }
   //#endregion
 
+  @Morphi.Http.GET('/backenderr1')
+  backendError(): Morphi.Response<any> {
+    //#region @backendFunc
+    throw 'Eroror from backend!!22 ';
+    //#endregion
+  }
 
   @Morphi.Http.GET('/dupa')
   info2(): Morphi.Response<any> {
