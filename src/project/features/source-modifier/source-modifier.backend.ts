@@ -32,18 +32,14 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   async init(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      // await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
-      await this.appSourceReplicator.syncAction([]);
-    } else {
-      console.log(`NOT FOR ${this.project.name}`)
+      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
     }
     await super.init(taskName, callback);
   }
 
   async initAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      // await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`)
-      await this.appSourceReplicator.syncAction([]);
+      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`);
     }
     await super.initAndWatch(taskName, callback);
   }
@@ -152,7 +148,6 @@ export class SourceModifier extends FeatureCompilerForProject {
     if (fse.existsSync(filePath)) {
       this.lastChangedAsyncFileS.push(filePath);
       log(`[sourcemodifier] File fix: ${f}`)
-      this.appSourceReplicator.asyncAction(filePath);
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
       ((filePathAA) => {
         setTimeout(() => {
@@ -168,7 +163,7 @@ export class SourceModifier extends FeatureCompilerForProject {
 
 function getFolderPattern(project: Project) {
   return `${
-    project.isSite ? `{${[config.folder.custom, config.folder.tempSrc].join(',')}}` :
-      `{${[config.folder.tempSrc, config.folder.src, config.folder.components].join(',')}}`
+    project.isSite ? void 0 :
+      `{${[config.folder.src, config.folder.components].join(',')}}`
     }/**/*.ts`
 }

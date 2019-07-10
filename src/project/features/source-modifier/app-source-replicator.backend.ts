@@ -8,6 +8,7 @@ import { error, escapeStringForRegEx, log, warn, copyFile, tryRemoveDir } from '
 import config from '../../../config';
 
 import { FeatureForProject, FeatureCompilerForProject, Project } from '../../abstract';
+import { SourceModifier } from './source-modifier.backend';
 
 export class AppSourceReplicator extends FeatureCompilerForProject {
 
@@ -26,11 +27,15 @@ export class AppSourceReplicator extends FeatureCompilerForProject {
         // const orgContent = fse.readFileSync(orgPath, {
         //   encoding: 'utf8'
         // });
-        const newPath = path.join(this.project.location, f.replace(/^src/, config.folder.tempSrc));
+        const relativePath = f.replace(/^src/, config.folder.tempSrc)
+        const newPath = path.join(this.project.location, relativePath);
         // fse.writeFileSync(newPath, orgContent, {
         //   encoding: 'utf8'
         // });
         copyFile(orgPath, newPath);
+        if (fse.existsSync(newPath)) {
+          SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath)
+        }
       });
     // console.log(files);
     // throw new Error("Method not implemented.");
@@ -56,9 +61,13 @@ export class AppSourceReplicator extends FeatureCompilerForProject {
     if (fse.existsSync(filePath)) {
       this.lastChangedAsyncFileS.push(filePath);
       const relative = f.replace(`${this.project.location}/`, '');
-      const newPath = path.join(this.project.location, relative.replace(/^src/, config.folder.tempSrc));
+      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+      const newPath = path.join(this.project.location, relativePath);
       copyFile(f, newPath);
-      console.log(`replikator async: ${filePath}`);
+      if (fse.existsSync(newPath)) {
+        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+      }
+      log(`[replikator async] fixed: ${relativePath}`);
 
       ((filePathAA) => {
         setTimeout(() => {
