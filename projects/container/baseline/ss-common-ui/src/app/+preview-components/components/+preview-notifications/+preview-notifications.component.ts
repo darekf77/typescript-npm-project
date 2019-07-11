@@ -19,13 +19,13 @@ export class PreviewNotificaitonsComponent extends BaseComponent implements OnIn
     private ctrl: ExamplesController
 
   ) {
-    super()
+    super();
   }
 
   ngOnInit() {
     this.handlers.push(Resource.listenErrors.subscribe(err => {
       console.log(err);
-    }))
+    }) as any)
   }
 
   show() {
@@ -40,7 +40,7 @@ export class PreviewNotificaitonsComponent extends BaseComponent implements OnIn
   }
 
   async backendErr() {
-    await this.ctrl.backendError().received
+    await this.ctrl.backendError().received;
   }
 
 }
