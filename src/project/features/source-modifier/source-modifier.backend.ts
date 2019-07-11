@@ -10,7 +10,7 @@ import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/increme
 import { FeatureCompilerForProject, Project } from '../../abstract';
 import { LibType, SourceFolder } from '../../../models';
 import { TsUsage } from 'morphi/build';
-import { error, escapeStringForRegEx, log, warn } from '../../../helpers';
+import { error, escapeStringForRegEx, log, warn, info, patchingForAsync } from '../../../helpers';
 import { replace } from './replace';
 import { ModType, SourceCodeType } from './source-code-type';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
@@ -131,30 +131,18 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#endregion
 
   //#region ASYNC ACTION
-  public lastChangedAsyncFileS: string[] = [];
   asyncAction(filePath: string) {
-    const that = this;
 
     // console.log('SOurce modifier async !', filePath)
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {
       return;
     }
-    if (this.lastChangedAsyncFileS.includes(filePath)) {
-      // console.log('dont perform action on ', filePath)
-      return;
-    }
 
-    if (fse.existsSync(filePath)) {
-      this.lastChangedAsyncFileS.push(filePath);
-      log(`[sourcemodifier] File fix: ${f}`)
+    patchingForAsync(filePath, () => {
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
-      ((filePathAA) => {
-        setTimeout(() => {
-          this.lastChangedAsyncFileS = this.lastChangedAsyncFileS.filter(fileAlread => fileAlread !== filePathAA);
-        }, 1000);
-      })(filePath);
-    }
+    }, 'source-modifier', 3);
+
   }
   //#endregion
 

@@ -8,7 +8,7 @@ import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
 import { LibType, RecreateFile, FileEvent, SourceFolder } from "../../../models";
-import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp } from '../../../helpers';
+import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp, patchingForAsync } from '../../../helpers';
 import config from '../../../config';
 import { error } from '../../../helpers';
 import chalk from 'chalk';
@@ -199,7 +199,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     return this;
   }
 
-  actionFoFile = [];
+
   async initAndWatch(onlyWatch = false) {
     if (!onlyWatch) {
       await this.init();
@@ -216,7 +216,6 @@ export class BaselineSiteJoin extends FeatureForProject {
 
     const callback = (absolutePath, event, isCustomFolder) => {
 
-
       if (fse.existsSync(absolutePath)) {
         if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
 
@@ -232,30 +231,14 @@ export class BaselineSiteJoin extends FeatureForProject {
         }
       }
 
-      console.log('actionForFile', that.actionFoFile)
-      if (that.actionFoFile.filter(o => o === absolutePath).length === 0) { // QUICK_FIX becouse next file is triggered by SM
-        that.actionFoFile.push(absolutePath);
-
+      patchingForAsync(absolutePath, () => {
         if (isCustomFolder) {
-          // console.log('IS CUSTOM', absolutePath)
           this.project.sourceModifier.asyncAction(absolutePath);
           this.merge(absolutePath.replace(this.pathToCustom, ''));
-          console.log(`FILE HERE CUSTOM !! ${absolutePath.replace(this.pathToCustom, '')}`)
         } else {
           this.merge(absolutePath.replace(this.pathToBaselineAbsolute, ''));
-          console.log(`FILE HERE NORMAL!!  ${absolutePath.replace(this.pathToBaselineAbsolute, '')}`)
         }
-// TODO LAST
-        setTimeout(() => {
-          that.actionFoFile = that.actionFoFile.filter(ab => ab !== absolutePath);
-          log(`[baselineSiteJoin] Event: ${chalk.bold(event)} for file ${absolutePath} ended!`);
-        }, 2000);
-
-      } else {
-        log(`[baselineSiteJoin] Alread action for file in progress ! ${absolutePath}`)
-        return;
-      }
-
+      }, 'baseline-site-join', 0);
 
     };
 

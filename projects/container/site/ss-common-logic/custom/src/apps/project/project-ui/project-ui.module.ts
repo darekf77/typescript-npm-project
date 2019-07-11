@@ -24,7 +24,7 @@ import {
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
 import { ProcessLoggerModule } from 'baseline/ss-common-logic/src/apps/process/process-logger';
-import { ListWrapperModule } from 'baseline/ss-components/components';
+import { ListWrapperModule } from 'baseline/ss-components/components/list';
 
 const angularModules = [
   CommonModule,

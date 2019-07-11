@@ -8,8 +8,7 @@ export interface GROUP_ALIASES {
   group: string;
 
 }
-
-
+console.log('aaaaaaaaa')
 @Morphi.Repository(GROUP)
 export class GROUP_REPOSITORY extends Morphi.Base.Repository<GROUP, GROUP_ALIASES> {
 

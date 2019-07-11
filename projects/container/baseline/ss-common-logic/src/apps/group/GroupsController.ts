@@ -9,8 +9,7 @@ import { authenticate } from 'passport';
 import * as entities from '../../entities';
 import * as controllers from '../../controllers';
 
-
-
+console.log('aaaaaaaaa')
 @Morphi.Controller({
   className: 'GroupsController',
   entity: entities.GROUP,

@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as os from "os";
+import * as path from 'path';
 import * as sleep from 'sleep';
 import * as fkill from 'fkill';
 import * as dateformat from "dateformat";
@@ -66,6 +67,47 @@ export function getWorkingDirOfProcess(PID: number) {
   } catch (e) {
     error(e);
   }
+}
+
+export function patchingForAsync(absoluteFilePath: string,
+  asynchronousCallback: (absoluteFilePath) => any, taskName: string = 'AsyncActionPath', limit = 2) {
+  const key = `pathes${_.camelCase(taskName)}`;
+  const idKey = 'asyncId';
+
+  taskName = `${taskName}(limit = ${limit})`;
+
+  if (_.isUndefined(patchingForAsync.prototype[idKey])) {
+    patchingForAsync.prototype[idKey] = 0;
+  } else {
+    ++patchingForAsync.prototype[idKey];
+  }
+  const id = `id(${patchingForAsync.prototype[idKey]})`;
+
+  if (_.isUndefined(patchingForAsync.prototype[key])) {
+    patchingForAsync.prototype[key] = []
+  }
+  const pathes = patchingForAsync.prototype[key];
+
+  if (pathes.filter(o => o === absoluteFilePath).length === 0) {
+    if (limit > 0) {
+      _.times(limit, () => {
+        pathes.push(absoluteFilePath);
+      });
+    }
+
+    // log(`[${taskName}][${path.basename(absoluteFilePath)}] EXECUTE START ${id}`);
+    asynchronousCallback(absoluteFilePath);
+    info(`[${taskName}][${path.basename(absoluteFilePath)}] EXECUTE DONE ${id}`);
+  } else {
+    const existed = pathes.find(ap => ap === absoluteFilePath);
+    if (existed) {
+      const indexExisted = pathes.indexOf(existed);
+      patchingForAsync.prototype[key] = pathes.filter((v, i) => i !== indexExisted);
+    }
+    const left = pathes.filter(ap => ap === absoluteFilePath).length;
+    // warn(`[${taskName}][${path.basename(absoluteFilePath)}] LEFT(${left}) ${id}`)
+  }
+
 }
 
 export async function compilationWrapperTnp(fn: () => void, taskName: string = 'Task',

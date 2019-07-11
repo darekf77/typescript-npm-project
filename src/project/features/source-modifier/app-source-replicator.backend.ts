@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
-import { error, escapeStringForRegEx, log, warn, copyFile, tryRemoveDir } from '../../../helpers';
+import { error, escapeStringForRegEx, log, warn, copyFile, tryRemoveDir, info, patchingForAsync } from '../../../helpers';
 
 import config from '../../../config';
 
@@ -44,37 +44,24 @@ export class AppSourceReplicator extends FeatureCompilerForProject {
     // throw new Error("Method not implemented.");
   }
 
-  public lastChangedAsyncFileS: string[] = [];
   public asyncAction(filePath: string) {
-    // throw new Error("Method not implemented.");
-    const that = this;
 
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {
       return;
     }
-    if (this.lastChangedAsyncFileS.includes(filePath)) {
-      // console.log('dont perform action on ', filePath)
-      return;
-    }
 
-    if (fse.existsSync(filePath)) {
-      this.lastChangedAsyncFileS.push(filePath);
-      const relative = f.replace(`${this.project.location}/`, '');
-      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
-      const newPath = path.join(this.project.location, relativePath);
-      copyFile(f, newPath);
-      if (fse.existsSync(newPath)) {
-        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+    patchingForAsync(filePath, () => {
+      if (fse.existsSync(filePath)) {
+        const relative = f.replace(`${this.project.location}/`, '');
+        const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+        const newPath = path.join(this.project.location, relativePath);
+        copyFile(f, newPath);
+        if (fse.existsSync(newPath)) {
+          SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+        }
       }
-      log(`[replikator async] fixed: ${relativePath}`);
-
-      ((filePathAA) => {
-        setTimeout(() => {
-          that.lastChangedAsyncFileS = that.lastChangedAsyncFileS.filter(fileAlread => fileAlread !== filePathAA);
-        }, 1000);
-      })(filePath);
-    }
+    }, 'app-source-replikator', 1);
 
 
   }
