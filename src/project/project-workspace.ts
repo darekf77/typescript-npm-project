@@ -130,21 +130,23 @@ export class ProjectWorkspace extends Project {
     const sum = 2 * (projectsLibs.length + projectsApps.length);
     let count = 1;
 
-
+    const staticPrefix = this.isGenerated ? 'static:' : '';
 
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
       PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
-      project.run(`tnp build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`, { biggerBuffer: true }).sync()
+      project.run(`tnp ${staticPrefix}build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`,
+        { biggerBuffer: true }).sync()
       PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
-    })
+    });
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
       PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
-      project.run(`tnp build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`, { biggerBuffer: true }).sync()
+      project.run(`tnp ${staticPrefix}build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`,
+        { biggerBuffer: true }).sync()
       PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
-    })
+    });
 
     PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
 

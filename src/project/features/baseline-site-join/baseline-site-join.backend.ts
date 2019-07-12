@@ -295,9 +295,14 @@ export class BaselineSiteJoin extends FeatureForProject {
       } else {
 
         const waitForFolder = (pfileOrFolderPath, pisCustomFolder, count = 0) => {
+
+          if (fse.existsSync(`/${pfileOrFolderPath}`)) {
+            pfileOrFolderPath = `/${pfileOrFolderPath}`;
+          }
+
           if (!fse.existsSync(pfileOrFolderPath)) {
             if (count === 4) {
-              error(`File ${chalk.bold(chalk.underline(fileOrFolderPath))} doesn't exist and can't be monitored.`, true, true)
+              error(`File ${chalk.bold(chalk.underline(pfileOrFolderPath))} doesn't exist and can't be monitored.`, true, true)
               return;
             }
             log(`[baslinesitejoin][folderwatch] (${count} time) Waiting for file/folder be available: ${pfileOrFolderPath}`)

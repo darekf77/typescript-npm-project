@@ -1,0 +1,6 @@
+<ng-template #tmp>
+  <h1> {{data.msg}} </h1>
+  <ul *ngIf="data.stack">
+    <li *ngFor="let msg of data.stack">{{msg}}</li>
+  </ul>
+</ng-template>

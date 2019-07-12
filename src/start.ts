@@ -14,6 +14,21 @@ import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 
 export async function start(argsv: string[], spinner?: Ora) {
+  argsv = argsv.map(arg => {
+    if (arg === 'baw') {
+      return 'build:app:watch';
+    }
+    if (arg === 'bdw') {
+      return 'build:dist:watch';
+    }
+    if (arg === 'bbw') {
+      return 'build:bundle:watch';
+    }
+    if (arg === 'bd') {
+      return 'build';
+    }
+    return arg;
+  })
   const db = await TnpDB.Instance;
   // console.log(argsv)
   if (

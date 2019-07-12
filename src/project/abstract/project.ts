@@ -296,6 +296,9 @@ export abstract class BaseProject {
   get StaticVersion(): Project {
     const outDir: BuildDir = 'dist';
     let projectToBuild: Project;
+    if (this.isGenerated) {
+      return this as any;
+    }
     if (this.isWorkspace) {
       projectToBuild = Project.From(path.join(this.location, outDir, this.name), { staticAccess: true });
     } else if (this.isWorkspaceChildProject) {
@@ -429,6 +432,9 @@ export abstract class BaseProject {
     }
   }
 
+  /**
+   * Is generated for static build
+   */
   get isGenerated() {
     if (Morphi.IsBrowser) {
       return this.browser.isGenerated;
@@ -1194,7 +1200,9 @@ export abstract class BaseProject {
     }
     PackagesRecognitionExtended.fromProject(this as any).start();
     await this.buildSteps(buildOptions);
-    await this.copyManager.initCopyingOnBuildFinish(buildOptions);
+    if(this.isStandaloneProject) {
+      await this.copyManager.initCopyingOnBuildFinish(buildOptions);
+    }
     if (!buildOptions.watch) {
       process.exit(0);
     }
@@ -1213,7 +1221,7 @@ export abstract class BaseProject {
       const genLocationWOrkspace = path.join(this.location, config.folder.dist, this.name);
       const genWorkspace = Project.From(genLocationWOrkspace)
       if (!genWorkspace) {
-        error(`No  ${'dist'}ributon folder. Please run: ${chalk.bold('tnp build')} in this workspace.
+        error(`No  ${'dist'}ributon folder. Please run: ${chalk.bold('tnp static:build')} in this workspace.
 Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }

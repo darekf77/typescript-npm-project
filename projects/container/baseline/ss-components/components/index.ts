@@ -13,3 +13,4 @@ export * from './select';
 export * from './button-icon';
 export * from './formly-switch';
 export * from './formly-buttion-with-action';
+export * from './errors-notyfications';

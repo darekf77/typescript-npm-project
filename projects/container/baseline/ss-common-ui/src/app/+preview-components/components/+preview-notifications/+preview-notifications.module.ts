@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PreviewNotificaitonsComponent } from './+preview-notifications.component';
 import { RouterModule } from '@angular/router';
 
-import { ModalModule, NotificationsModule } from 'ss-components/components';
+import { ModalModule, NotificationsModule, ErrorsNotyficationsModule } from 'ss-components/components';
 import { ExamplesController } from 'ss-common-logic/src/apps/example/ExamplesController';
 
 @NgModule({
@@ -17,7 +17,8 @@ import { ExamplesController } from 'ss-common-logic/src/apps/example/ExamplesCon
       }
     ]),
     ModalModule,
-    NotificationsModule
+    NotificationsModule,
+    ErrorsNotyficationsModule
   ],
   exports: [PreviewNotificaitonsComponent],
   declarations: [PreviewNotificaitonsComponent],
