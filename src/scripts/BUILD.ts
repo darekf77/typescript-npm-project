@@ -31,7 +31,9 @@ const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLib(false, f
 
 export default {
 
-  STATIC_BUILD: [(args) => Project.Current.StaticVersion.buildProcess.startForLib(false, false, 'dist', args),
+  STATIC_BUILD: [(args) => {
+    Project.Current.StaticVersion.buildProcess.startForLib(false, false, 'dist', args)
+  },
     `Build dist version of project library.`],
 
   STATIC_BUILD_PROD: [(args) => Project.Current.StaticVersion.buildProcess.startForLib(true, false, 'dist', args),

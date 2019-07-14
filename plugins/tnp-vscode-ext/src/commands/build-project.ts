@@ -24,7 +24,7 @@ export function buildProject(registerName: string) {
 
     window.withProgress({
       location: ProgressLocation.Notification,
-      title: `Building project "${projectName}"`,
+      title: `Building t "${projectName}"`,
       cancellable: true
     }, (progress, token) => {
       token.onCancellationRequested(() => {

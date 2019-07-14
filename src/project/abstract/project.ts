@@ -292,6 +292,20 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  /**
+   * Only for generated projects
+   */
+  get origin(): Project {
+    if(!this.isGenerated) {
+
+      return;
+    }
+  }
+
+  get distribution(): Project {
+
+  }
+
   //#region @backend
   get StaticVersion(): Project {
     const outDir: BuildDir = 'dist';
@@ -1200,7 +1214,7 @@ export abstract class BaseProject {
     }
     PackagesRecognitionExtended.fromProject(this as any).start();
     await this.buildSteps(buildOptions);
-    if(this.isStandaloneProject) {
+    if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }
     if (!buildOptions.watch) {

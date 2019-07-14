@@ -132,6 +132,8 @@ export class ProjectWorkspace extends Project {
 
     const staticPrefix = this.isGenerated ? 'static:' : '';
 
+    console.log(`BUILD OF PROJECT FROM: ${this.location} (((generated=${this.isGenerated}))`)
+
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
       PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })

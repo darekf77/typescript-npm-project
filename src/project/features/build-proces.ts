@@ -9,7 +9,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { BuildOptions } from './build-options';
 import { BuildDir, LibType } from '../../models';
 import { config } from '../../config';
-import { error } from '../../helpers';
+import { error, info } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
 import { PROGRESS_DATA } from '../../progress-output';
 
@@ -67,18 +67,40 @@ export class BuildProcess extends FeatureForProject {
 
   private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project, exit = true) {
 
+    if (project.staticAccess && !project.isGenerated) {
+      error(`This project should be generated from staticbuild command: ${project.genericName}`);
+    }
+
+    if (project.isGenerated && !project.staticAccess) {
+      error(`Please run static command for generated project: "${project.genericName}":
+examples:
+$ tnp run staticbuild
+$ tnp run staticbuild --env=prod
+$ tnp run staticbuildprod
+      `, false, true);
+    }
+
+    if (project.staticAccess && buildOptions.watch) {
+      error(`You cannot build static project in watch mode.`);
+    }
+
     if (!this.checkIfGeneratedTnpBundle) {
       error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
 
-    this.mergeNpmPorject()
-
-    const { watch, appBuild, args } = buildOptions;
+    this.mergeNpmPorject();
 
 
+    const { env } = require('minimist')(!buildOptions.args ? [] : buildOptions.args.split(' '));
+    if (env) {
+      info(`ENVIRONMENT: ${chalk.bold(env)}`)
+    } else {
+      buildOptions.args += `${buildOptions.args} --env=static`;
+      info(`ENVIRONMENT (auto-assigned): "${chalk.bold('static')}"`)
+    }
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
-      if (appBuild) {
+      if (buildOptions.appBuild) {
         error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       } else {
         error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
@@ -86,20 +108,24 @@ export class BuildProcess extends FeatureForProject {
     }
 
     const transactions = (await (await TnpDB.Instance).transaction);
-    await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true)
+    await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true);
 
-    if (watch) {
-      await project.filesStructure.init(args, { watch: true });
+    if (buildOptions.watch) {
+      await project.filesStructure.init(buildOptions.args, { watch: true });
     } else {
-      await project.filesStructure.init(args);
+      await project.filesStructure.init(buildOptions.args);
     }
+
 
     if (project.staticAccess) {
-      console.log('staticAccessstaticAccessstaticAccessstaticAccess')
-      project = await project.staticBuild.resolveProjectIfGenerated(buildOptions, args);
+      info(`STATIC BUILD!`);
+      await project.staticBuild.resolveProjectIfGenerated(buildOptions, buildOptions.args);
+
+    } else {
+      info(`NORML${buildOptions.watch ? '(WATCH)' : ''} BUILD!`);
     }
 
-    if (!watch && project.isGenerated) {
+    if (!buildOptions.watch && project.isGenerated) {
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` })
     }
 
@@ -107,7 +133,7 @@ export class BuildProcess extends FeatureForProject {
 
 
     await project.build(buildOptions);
-    if (exit && !watch) {
+    if (exit && !buildOptions.watch) {
       process.exit(0);
     }
 
