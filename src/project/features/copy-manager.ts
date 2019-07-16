@@ -31,10 +31,10 @@ export class CopyManager extends FeatureForProject {
       return;
     }
     if (watch) {
-      this.copyToProjectsOnFinish()
-      this.watchAndCopyToProjectOnFinish()
+      this.copyToProjectsOnFinish();
+      this.watchAndCopyToProjectOnFinish();
     } else {
-      this.copyToProjectsOnFinish()
+      this.copyToProjectsOnFinish();
     }
   }
 

@@ -25,7 +25,6 @@ import { BuildOptions } from '../features/build-options';
 import { NpmPackages } from '../features/npm-packages';
 import { BaselineSiteJoin } from '../features/baseline-site-join';
 import { TnpBundle } from '../features/tnp-bundle';
-import { StaticBuild } from '../features/static-build';
 import { FilesStructure } from '../features/files-structure';
 import { BuildProcess } from '../features/build-proces';
 import { FrameworkFilesGenerator } from '../features/framework-files-generator';
@@ -34,6 +33,7 @@ import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
 import { FilesFactory } from '../features/files-factory.backend';
 import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
+import { StaticBuild } from '../features/static-build';
 import { config as configMorphi } from 'morphi/build/config';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
 //#endregion
@@ -43,6 +43,7 @@ import { EnvironmentConfig } from '../features/environment-config';
 import { PackageJSON } from '../features/package-json';
 import { LibType, EnvironmentName, NpmDependencyType, IProject } from '../../models';
 import * as json5 from 'json5';
+
 
 
 
@@ -296,32 +297,63 @@ export abstract class BaseProject {
    * Only for generated projects
    */
   get origin(): Project {
-    if(!this.isGenerated) {
-
+    if (!this.isGenerated) {
+      warn(`Trying to access origin of not static project`, true);
       return;
     }
+    let project: Project;
+    if (this.isGenerated) {
+      warn(`Trying to access distribution of distribution`, true);
+      return void 0;
+    }
+    if (this.isWorkspace) {
+      const originPath = path.resolve(path.join(this.location, '..', '..'));
+      project = Project.From(originPath);
+    } else if (this.isWorkspaceChildProject) {
+      const originChildPath = path.resolve(path.join(this.location, '..', '..', this.name));
+      project = Project.From(originChildPath);
+    }
+    return project;
   }
 
+  /**
+   * generated version of workspace/worskpace-childs project
+   * ready for serving by tnp router/proxy
+   */
   get distribution(): Project {
-
-  }
-
-  //#region @backend
-  get StaticVersion(): Project {
     const outDir: BuildDir = 'dist';
     let projectToBuild: Project;
     if (this.isGenerated) {
-      return this as any;
+      warn(`Trying to access distribution of distribution`, true);
+      return;
     }
     if (this.isWorkspace) {
-      projectToBuild = Project.From(path.join(this.location, outDir, this.name), { staticAccess: true });
+      projectToBuild = Project.From(path.join(this.location, outDir, this.name));
     } else if (this.isWorkspaceChildProject) {
-      projectToBuild = Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name), { staticAccess: true });
+      projectToBuild = Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name));
+    } else if (this.isStandaloneProject) {
+      projectToBuild = Project.From(path.join(this.location, outDir));
     }
-    // if (!projectToBuild) {
-    //   error(`There is not static version for project ${this.genericName}`)
-    // }
     return projectToBuild;
+  }
+
+  //#region @backend
+  /**
+   * Same thing as distribution, but it will generate folder in
+   * case that the does not exists
+   */
+  get StaticVersion(): Project {
+    let staticVersion: Project;
+    if (this.isGenerated) {
+      staticVersion = this as any;
+    } else {
+      staticVersion = this.distribution;
+    }
+    if ((this.isWorkspace || this.isWorkspaceChildProject) && !staticVersion) {
+      this.staticBuild.regenerate();
+      staticVersion = this.distribution;
+    }
+    return staticVersion;
   }
   //#endregion
 
@@ -1348,14 +1380,7 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static From(location: string, options?: { staticAccess: boolean; }): Project {
-
-    if (_.isUndefined(options)) {
-      options = {} as any;
-    }
-    if (_.isUndefined(options.staticAccess)) {
-      options.staticAccess = false;
-    }
+  public static From(location: string): Project {
 
     if (!_.isString(location)) {
       warn(`[project.from] location is not a string`)
@@ -1365,7 +1390,6 @@ export class Project extends BaseProject implements IProject {
 
     const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
     if (alreadyExist) {
-      alreadyExist.staticAccess = options.staticAccess;
       return alreadyExist;
     }
     if (!fs.existsSync(location)) {
@@ -1417,7 +1441,6 @@ export class Project extends BaseProject implements IProject {
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
     // log(`[project.from] Result project: ${resultProject.name}`)
-    resultProject.staticAccess = options.staticAccess;
     return resultProject;
   }
   //#endregion
@@ -1459,22 +1482,6 @@ export class Project extends BaseProject implements IProject {
     return !(!!global[config.message.tnp_normal_mode])
     //#endregion
   }
-
-  private _staticAccess = false;
-  get staticAccess() {
-    const res = this._staticAccess;
-    // if (res) {
-    //   this._staticAccess = false;
-    // }
-    return res;
-  }
-
-  set staticAccess(v) {
-    this._staticAccess = v;
-  }
-
-
-
 
   //#region @backend
   static get Current() {

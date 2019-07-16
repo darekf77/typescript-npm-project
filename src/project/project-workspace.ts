@@ -85,17 +85,24 @@ export class ProjectWorkspace extends Project {
 
 
 
-    const projectsInOrder: Project[] = [
+    let projectsInOrder: Project[] = [
       ...projects.angularLibs,
       ...projects.isomorphicLibs,
-      ...projects.angularClients,
-      ...projects.angularCliClients
-    ].filter(p => {
-      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name)
+    ];
+
+    if (this.isGenerated) {
+      projectsInOrder = projectsInOrder.concat([
+        ...projects.angularClients,
+        ...projects.angularCliClients,
+      ]);
+    }
+
+    projectsInOrder = projectsInOrder.filter(p => {
+      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
     });
 
 
-    PROGRESS_DATA.log({ value: 0, msg: `Process started` })
+    this.isGenerated && PROGRESS_DATA.log({ value: 0, msg: `Process started` })
 
     log(`Projects to build in  ${this.labels.extendedBoldName} :`)
     projectsInOrder.forEach((project, i) => {
@@ -125,32 +132,32 @@ export class ProjectWorkspace extends Project {
     projectsApps.forEach((project, i) => {
       log(`COMPILATIONL app for: ${project.name}`)
     });
-    log('===================')
+    log('===================');
 
     const sum = 2 * (projectsLibs.length + projectsApps.length);
     let count = 1;
 
     const staticPrefix = this.isGenerated ? 'static:' : '';
 
-    console.log(`BUILD OF PROJECT FROM: ${this.location} (((generated=${this.isGenerated}))`)
+    this.isGenerated && log(`BUILD OF PROJECT FROM: ${this.location} (((generated=${this.isGenerated}))`)
 
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
+      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
       project.run(`tnp ${staticPrefix}build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`,
         { biggerBuffer: true }).sync()
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
+      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
     });
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
+      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
       project.run(`tnp ${staticPrefix}build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`,
         { biggerBuffer: true }).sync()
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
+      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
     });
 
-    PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
+    this.isGenerated && PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
 
   }
 }

@@ -9,49 +9,49 @@ import { BuildOptions } from './build-options';
 import { info, log, tryCopyFrom } from '../../helpers';
 import chalk from 'chalk';
 import config from '../../config';
+import { BuildDir } from '../../models';
 
 export class StaticBuild extends FeatureForProject {
 
-  private async  regenerateProject(project: Project, buildOptions: BuildOptions, args: string) {
-    log(`Regenerating project: ${project.genericName}`);
-
-    info(`Actual Regenerating project: ${project.genericName}`);
-    const { outDir } = buildOptions;
-
-    let genLocation = project.isWorkspace ?
-      path.join(project.location, outDir, project.name) :
-      path.join(project.parent.location, outDir, project.parent.name, project.name);
-
-    if (project.isWorkspace && project.isSite) {
-      const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-      project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
-      const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
-      fse.mkdirpSync(binInBasleine)
-    }
-
-    let genProject = Project.From(genLocation);
-
-
-    if (project.isWorkspace) {
-      if (genProject) {
-        project.copyManager.genWorkspaceEnvFiles(genProject)
-      } else {
-        project.copyManager.generateSourceCopyIn(genLocation, { override: true });
+  regenerate() {
+    if (this.project.isWorkspaceChildProject) {
+      if (!this.project.parent.distribution) {
+        this.project.parent.staticBuild.regenerate();
+        return;
       }
-    } else if (project.isWorkspaceChildProject) {
+    }
+    regenerateDistribution(this.project);
+    if (this.project.isWorkspace) {
+      this.project.children.forEach(c => regenerateDistribution(c));
+    }
+  }
+
+}
+
+function regenerateDistribution(project: Project): void {
+
+  info(`Actual Regenerating project: ${project.genericName}`);
+  const outDir: BuildDir = 'dist';
+
+  const genLocation = project.isWorkspace ?
+    path.join(project.location, outDir, project.name) :
+    path.join(project.parent.location, outDir, project.parent.name, project.name);
+
+  if (project.isWorkspace && project.isSite) {
+    const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
+    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
+    const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
+    fse.mkdirpSync(binInBasleine)
+  }
+
+  if (project.isWorkspace) {
+    if (project.distribution) {
+      project.copyManager.genWorkspaceEnvFiles(project.distribution);
+    } else {
       project.copyManager.generateSourceCopyIn(genLocation, { override: true });
     }
-
-    genProject = Project.From(genLocation);
-
-    if (project.isWorkspace) {
-      for (let index = 0; index < project.children.length; index++) {
-        const c = project.children[index];
-        await this.regenerateProject(c, buildOptions, args)
-      }
-    }
-
-    return genProject;
+  } else if (project.isWorkspaceChildProject) {
+    project.copyManager.generateSourceCopyIn(genLocation, { override: true });
   }
 
 }

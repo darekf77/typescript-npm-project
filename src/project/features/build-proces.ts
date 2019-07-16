@@ -7,29 +7,72 @@ import * as glob from 'glob';
 
 import { FeatureForProject, Project } from '../abstract';
 import { BuildOptions } from './build-options';
-import { BuildDir, LibType } from '../../models';
+import { BuildDir, LibType, StartForOptions } from '../../models';
 import { config } from '../../config';
-import { error, info } from '../../helpers';
+import { error, info, warn } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
 import { PROGRESS_DATA } from '../../progress-output';
+import { isUndefined } from 'util';
 
 
 export class BuildProcess extends FeatureForProject {
 
-  async  startForLib(prod = false, watch = false, outDir: BuildDir,
-    args: string, overrideOptions: BuildOptions = {} as any) {
-
-    const project: Project = Project.Current;
-    const options: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
-    await this.build(_.merge(options, overrideOptions), config.allowedTypes.libs, project)
+  private prepareOptionsLib(options: StartForOptions) {
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (isUndefined(options.outDir)) {
+      options.outDir = 'dist';
+    }
+    if (isUndefined(options.prod)) {
+      options.prod = false;
+    }
+    if (isUndefined(options.watch)) {
+      options.watch = false;
+    }
+    if (isUndefined(options.watch)) {
+      options.watch = false;
+    }
+    if (isUndefined(options.staticBuildAllowed)) {
+      options.staticBuildAllowed = false;
+    }
+    if (isUndefined(options.overrideOptions)) {
+      options.overrideOptions = {} as any;
+    }
+    if (this.project.isGenerated && !options.staticBuildAllowed) {
+      error(`Please use command:
+$ tnp static:build
+inside generated projects...
+`, false, true);
+    }
+    return options;
   }
 
+  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
+    return this.startForLib({ prod, watch, outDir, args, overrideOptions });
+  }
 
-  async  startForApp(prod = false, watch = false, outDir: BuildDir = 'dist',
-    args: string, overrideOptions: BuildOptions = {} as any) {
+  /**
+   * prod, watch, outDir, args, overrideOptions
+   */
+  async  startForLib(options: StartForOptions) {
+    options = this.prepareOptionsLib(options);
+    const { args, outDir, watch, prod, overrideOptions } = options;
     const project: Project = Project.Current;
-    const options: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });
-    await this.build(_.merge(options, overrideOptions), config.allowedTypes.app, project);
+    const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, project)
+  }
+
+  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
+    return this.startForApp({ prod, watch, outDir, args, overrideOptions });
+  }
+
+  async  startForApp(options: StartForOptions) {
+    options = this.prepareOptionsLib(options);
+    const { args, outDir, watch, prod, overrideOptions } = options;
+    const project: Project = Project.Current;
+    const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, project);
   }
 
   private mergeNpmPorject() {
@@ -67,21 +110,9 @@ export class BuildProcess extends FeatureForProject {
 
   private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project, exit = true) {
 
-    if (project.staticAccess && !project.isGenerated) {
-      error(`This project should be generated from staticbuild command: ${project.genericName}`);
-    }
-
-    if (project.isGenerated && !project.staticAccess) {
-      error(`Please run static command for generated project: "${project.genericName}":
-examples:
-$ tnp run staticbuild
-$ tnp run staticbuild --env=prod
-$ tnp run staticbuildprod
-      `, false, true);
-    }
-
-    if (project.staticAccess && buildOptions.watch) {
-      error(`You cannot build static project in watch mode.`);
+    if (project.isGenerated && buildOptions.watch) {
+      buildOptions.watch = false;
+      warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
 
     if (!this.checkIfGeneratedTnpBundle) {
@@ -116,17 +147,8 @@ $ tnp run staticbuildprod
       await project.filesStructure.init(buildOptions.args);
     }
 
-
-    if (project.staticAccess) {
-      info(`STATIC BUILD!`);
-      await project.staticBuild.resolveProjectIfGenerated(buildOptions, buildOptions.args);
-
-    } else {
-      info(`NORML${buildOptions.watch ? '(WATCH)' : ''} BUILD!`);
-    }
-
     if (!buildOptions.watch && project.isGenerated) {
-      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` })
+      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
     await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)

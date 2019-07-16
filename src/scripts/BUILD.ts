@@ -16,31 +16,38 @@ async function buildWatch(args) {
   }
 
   if (isLegitLib) {
-    await Project.Current.buildProcess.startForLib(false, true, 'dist', args);
+    await Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
   }
   if (isLegitApp) {
-    await Project.Current.buildProcess.startForApp(false, true, 'dist', args);
+    await Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
   }
 }
-const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLib(false, true, 'dist', args);
-const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args);
+const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const BUILD_DIST = async (args) => {
-  await Project.Current.buildProcess.startForLib(false, false, 'dist', args);
+  await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
-const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLib(false, false, 'bundle', args);
+const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);
 
 export default {
 
   STATIC_BUILD: [(args) => {
-    Project.Current.StaticVersion.buildProcess.startForLib(false, false, 'dist', args)
+    Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
   },
     `Build dist version of project library.`],
 
-  STATIC_BUILD_PROD: [(args) => Project.Current.StaticVersion.buildProcess.startForLib(true, false, 'dist', args),
+  STATIC_BUILD_PROD: [(args) => Project.Current.StaticVersion.buildProcess
+    .startForLib({ prod: true, args, staticBuildAllowed: true }),
     `Build dist version of project library.`],
 
-  STATIC_BUILD_APP_PROD: [(args) => Project.Current.StaticVersion.buildProcess.startForApp(true, false, 'dist', args),
-    `Build dist version of project library.`],
+  STATIC_BUILD_APP: [(args) => Project.Current.StaticVersion.buildProcess
+    .startForApp({ args, staticBuildAllowed: true }),
+    `Build dist version of project application withou.`],
+
+  STATIC_BUILD_APP_PROD: [(args) => Project.Current.StaticVersion.buildProcess
+    .startForApp({ prod: true, args, staticBuildAllowed: true }),
+    `Build dist version of project application.`],
+
   BUILD_DIST,
   async BD(args) {
     await BUILD_DIST(args);
@@ -54,16 +61,16 @@ export default {
   BUILD_APP_WATCH,
   BAW: BUILD_APP_WATCH,
 
-  $BUILD_DIST_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, 'dist', args),
+  $BUILD_DIST_PROD: (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args),
 
 
-  $BUILD_BUNDLE_WATCH: (args) => Project.Current.buildProcess.startForLib(false, true, 'bundle', args),
-  $BUILD_BUNDLE_PROD: (args) => Project.Current.buildProcess.startForLib(true, false, 'bundle', args),
+  $BUILD_BUNDLE_WATCH: (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'bundle', args),
+  $BUILD_BUNDLE_PROD: (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args),
 
-  $BUILD_APP_PROD: (args) => Project.Current.buildProcess.startForApp(true, false, 'dist', args),
-  $BUILD_APP: (args) => Project.Current.buildProcess.startForApp(false, false, 'dist', args),
+  $BUILD_APP_PROD: (args) => Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args),
+  $BUILD_APP: (args) => Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args),
 
-  $BUILD_APP_WATCH_PROD: (args) => Project.Current.buildProcess.startForApp(false, true, 'dist', args),
+  $BUILD_APP_WATCH_PROD: (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args),
 
   $START_APP: async (args) => {
     await Project.Current.start(args);
@@ -73,20 +80,20 @@ export default {
   $BUILD: async (args) => {
 
     if (config.allowedTypes.libs.includes(Project.Current.type)) {
-      await Project.Current.buildProcess.startForLib(false, false, 'dist', args);
+      await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
     }
     if (config.allowedTypes.app.includes(Project.Current.type)) {
-      await Project.Current.buildProcess.startForApp(false, false, 'dist', args);
+      await Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args);
     }
     process.exit(0);
   },
 
   $BUILD_PROD: async (args) => {
     if (config.allowedTypes.libs.includes(Project.Current.type)) {
-      await Project.Current.buildProcess.startForLib(true, false, 'dist', args);
+      await Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args);
     }
     if (config.allowedTypes.app.includes(Project.Current.type)) {
-      await Project.Current.buildProcess.startForApp(true, false, 'dist', args);
+      await Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
     }
     process.exit(0);
   },

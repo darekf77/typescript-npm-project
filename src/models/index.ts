@@ -1,3 +1,5 @@
+import { BuildDir } from './build-dir';
+import { BuildOptions } from '../project/features/build-options';
 
 export * from './build-options.interface';
 export * from './build-dir';
@@ -10,6 +12,14 @@ export * from './replace-options-extended';
 export * from './project.interface';
 
 
+export interface StartForOptions {
+  prod?: boolean;
+  watch?: boolean;
+  outDir?: BuildDir;
+  args: string;
+  staticBuildAllowed?: boolean;
+  overrideOptions?: BuildOptions;
+};
 export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
