@@ -12,38 +12,41 @@ import { config } from '../../config';
 import { error, info, warn } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
 import { PROGRESS_DATA } from '../../progress-output';
-import { isUndefined } from 'util';
 
 
 export class BuildProcess extends FeatureForProject {
 
-  private prepareOptionsLib(options: StartForOptions) {
+  public static prepareOptionsLib(options: StartForOptions, project: Project) {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
-    if (isUndefined(options.outDir)) {
+    if (_.isUndefined(options.outDir)) {
       options.outDir = 'dist';
     }
-    if (isUndefined(options.prod)) {
+    if (_.isUndefined(options.prod)) {
       options.prod = false;
     }
-    if (isUndefined(options.watch)) {
+    if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
-    if (isUndefined(options.watch)) {
+    if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
-    if (isUndefined(options.staticBuildAllowed)) {
+    if (_.isUndefined(options.staticBuildAllowed)) {
       options.staticBuildAllowed = false;
     }
-    if (isUndefined(options.overrideOptions)) {
+    if (_.isUndefined(options.overrideOptions)) {
       options.overrideOptions = {} as any;
     }
-    if (this.project.isGenerated && !options.staticBuildAllowed) {
+    if (project.isGenerated && !options.staticBuildAllowed) {
       error(`Please use command:
 $ tnp static:build
 inside generated projects...
 `, false, true);
+    }
+
+    if (!_.isString(options.args)) {
+      options.args = ''
     }
     return options;
   }
@@ -56,7 +59,7 @@ inside generated projects...
    * prod, watch, outDir, args, overrideOptions
    */
   async  startForLib(options: StartForOptions) {
-    options = this.prepareOptionsLib(options);
+    options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
     const project: Project = Project.Current;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
@@ -68,7 +71,7 @@ inside generated projects...
   }
 
   async  startForApp(options: StartForOptions) {
-    options = this.prepareOptionsLib(options);
+    options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
     const project: Project = Project.Current;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });

@@ -31,6 +31,7 @@ export type RecreateFile = { where: string; from: string };
 
 export interface ReleaseOptions {
   prod?: boolean;
+  args?: string;
   bumbVersionIn?: string[];
 }
 

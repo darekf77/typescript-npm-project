@@ -11,8 +11,8 @@ import { IBuildOptions, BuildDir } from '../../models';
 export class BuildOptions implements IBuildOptions {
 
   public static PropsToOmmitWhenStringify = ['copyto', 'forClient'];
-  prod: boolean;
-  outDir: BuildDir;
+  prod?: boolean;
+  outDir?: BuildDir;
   watch?: boolean;
   args?: string; // TODO remove ?
 

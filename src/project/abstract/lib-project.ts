@@ -13,6 +13,7 @@ import config from "../../config";
 import { PackageJSON } from '../features/package-json';
 
 import { tryCopyFrom } from '../../helpers';
+import { BuildProcess } from '../features/build-proces';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -53,7 +54,7 @@ export abstract class LibProject extends Project {
     const packageJson = project.packageJson;
     if (packageJson && packageJson.data) {
       if (project.type !== 'unknow-npm-project') {
-        project.packageJson.show(`For release of ${this.name  }`)
+        project.packageJson.show(`For release of ${this.name}`)
       }
       let versionBumped = false;
       if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
@@ -158,9 +159,9 @@ export abstract class LibProject extends Project {
       }
       this.packageJson.show('show for release')
       await this.recreate.init();
-      await this.build({
-        prod, outDir: config.folder.bundle as 'bundle'
-      })
+      await this.build(BuildProcess.prepareOptionsLib({
+        prod, outDir: config.folder.bundle as 'bundle', args: c.args
+      }, this));
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
       }
@@ -169,12 +170,13 @@ export abstract class LibProject extends Project {
       this.commit(newVersion);
     }, () => {
       if (Project.isBundleMode) {
-        return
+        warn(`Project not in bundle mode return`)
+        return;
       } else {
+        warn(`Project not in bundle mode exit`);
         process.exit(0)
       }
-    })
-
+    });
 
     await questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;

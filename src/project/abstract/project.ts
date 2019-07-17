@@ -1249,9 +1249,6 @@ export abstract class BaseProject {
     if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }
-    if (!buildOptions.watch) {
-      process.exit(0);
-    }
   }
   //#endregion
 
