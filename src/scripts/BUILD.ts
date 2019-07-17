@@ -33,10 +33,17 @@ export default {
 
   STATIC_BUILD: [(args) => {
     Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
-  },
-    `Build dist version of project library.`],
+  }, `Build dist version of project library.`],
+
+  STATIC_BUILD_DIST: [(args) => {
+    Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
+  }, `Build dist version of project library.`],
 
   STATIC_BUILD_PROD: [(args) => Project.Current.StaticVersion.buildProcess
+    .startForLib({ prod: true, args, staticBuildAllowed: true }),
+    `Build dist version of project library.`],
+
+  STATIC_BUILD_DIST_PROD: [(args) => Project.Current.StaticVersion.buildProcess
     .startForLib({ prod: true, args, staticBuildAllowed: true }),
     `Build dist version of project library.`],
 

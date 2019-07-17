@@ -102,7 +102,7 @@ export class ProjectWorkspace extends Project {
     });
 
 
-    this.isGenerated && PROGRESS_DATA.log({ value: 0, msg: `Process started` })
+    PROGRESS_DATA.log({ value: 0, msg: `Process started` })
 
     log(`Projects to build in  ${this.labels.extendedBoldName} :`)
     projectsInOrder.forEach((project, i) => {
@@ -143,21 +143,21 @@ export class ProjectWorkspace extends Project {
 
     projectsLibs.forEach((project, i) => {
       info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
       project.run(`tnp ${staticPrefix}build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`,
         { biggerBuffer: true }).sync()
-      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
     });
 
     projectsApps.forEach((project) => {
       info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
       project.run(`tnp ${staticPrefix}build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`,
         { biggerBuffer: true }).sync()
-      this.isGenerated && PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
+      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
     });
 
-    this.isGenerated && PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
+    PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
 
   }
 }

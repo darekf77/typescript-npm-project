@@ -14,6 +14,20 @@ import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 
 export async function start(argsv: string[], spinner?: Ora) {
+
+  const {
+    tnpShowProgress,
+    tnpNoColorsMode
+  }: {
+    tnpShowProgress: boolean;
+    tnpNoColorsMode: boolean;
+  } = require('minimist')(argsv);
+  global.tnpShowProgress = tnpShowProgress;
+  global.tnpNoColorsMode = tnpNoColorsMode;
+  if(global.tnpNoColorsMode) {
+    chalk.level = 0;
+  }
+
   argsv = argsv.map(arg => {
     if (arg === 'baw') {
       return 'build:app:watch';

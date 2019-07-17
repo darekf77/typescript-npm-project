@@ -61,7 +61,7 @@ inside generated projects...
   async  startForLib(options: StartForOptions) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
-    const project: Project = Project.Current;
+    const project: Project = this.project;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
     await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, project)
   }
@@ -73,7 +73,7 @@ inside generated projects...
   async  startForApp(options: StartForOptions) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
-    const project: Project = Project.Current;
+    const project: Project = this.project;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });
     await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, project);
   }
@@ -123,7 +123,6 @@ inside generated projects...
     }
 
     this.mergeNpmPorject();
-
 
     const { env } = require('minimist')(!buildOptions.args ? [] : buildOptions.args.split(' '));
     if (env) {
