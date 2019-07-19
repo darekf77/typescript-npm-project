@@ -82,56 +82,48 @@ export class CopyManager extends FeatureForProject {
       fse.mkdirpSync(destinationLocation);
     }
 
-    const tempLocation = `/tmp/${_.camelCase(destinationLocation)}`;
-    if (fs.existsSync(tempLocation)) {
-      rimraf.sync(tempLocation)
-    }
-    fse.mkdirpSync(tempLocation);
+    // const tempLocation = `/tmp/${_.camelCase(destinationLocation)}`;
+    // if (fs.existsSync(tempLocation)) {
+    //   rimraf.sync(tempLocation)
+    // }
+    // fse.mkdirpSync(tempLocation);
 
     if (filterForBundle) {
 
-      let regexes: RegExp[] = [
-        /.*node_modules.*/g,
-        /.*tmp\-.*/g,
-        /.*dist.*/g,
-        /.*\.vscode.*/g,
-        /.*bundle.*/g,
+
+      const foldersToSkip = [
+        '.vscode',
+        ..._.values(config.tempFolders),
+        ...(ommitSourceCode ? [
+          config.folder.src,
+          config.folder.components,
+          config.folder.custom,
+        ] : [])
       ];
 
-      if (ommitSourceCode) {
-        regexes = regexes.concat([
-          /.*src.*/g,
-          /.*components.*/g,
-        ]);
-      }
-
-      fse.copySync(`${sourceLocation}/`, tempLocation, {
-
+      fse.copySync(`${sourceLocation}/`, destinationLocation, {
         filter: (src: string, dest: string) => {
-          // console.log('src', src)
-          // return
-          // !src.endsWith('/dist/bin') &&
-          //   !src.endsWith('/bin') &&
-
-          return _.isUndefined(regexes.find(regex => regex.test(src)));
-          // return !/.*node_modules.*/g.test(src) &&
-          //   !/.*tmp\-.*/g.test(src) &&
-          //   !/.*dist.*/g.test(src) &&
-          //   !/.*\.vscode.*/g.test(src) &&
-          //   !/.*bundle.*/g.test(src);
+          const baseFolder = _.first(src.replace(this.project.location, '')
+            .replace(/^\//, '').split('/'));
+          const res = _.isUndefined(foldersToSkip.find(f => baseFolder.startsWith(f)));
+          // console.log(`start: ${baseFolder}
+          // => src: ${src}
+          // -> dest ${dest}
+          // = ${res}`)
+          return res;
         }
       });
     } else {
-      fse.copySync(`${sourceLocation}/`, tempLocation);
+      fse.copySync(`${sourceLocation}/`, destinationLocation);
     }
 
 
 
-    fse.copySync(`${tempLocation}/`, destinationLocation, {
-      overwrite: true,
-      recursive: true
-    });
-    rimraf.sync(tempLocation)
+    // fse.copySync(`${tempLocation}/`, destinationLocation, {
+    //   overwrite: true,
+    //   recursive: true
+    // });
+    // rimraf.sync(tempLocation)
 
     if (this.project.isWorkspace) {
       fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
@@ -143,7 +135,14 @@ export class CopyManager extends FeatureForProject {
       `)
     }
 
-    showInfo && info(`Source of project "${this.project.name}(${this.project.type})" from "${this.project.location}" generated in ${destinationLocation}`)
+    if (showInfo) {
+      let dir = path.basename(path.dirname(destinationLocation));
+      if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
+        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
+      }
+      info(`Source of project "${this.project.genericName})" generated in ${dir}/(< here >) `)
+    }
+
     return true;
   }
 

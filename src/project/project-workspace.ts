@@ -8,6 +8,7 @@ import { info, warn } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
 import { ProxyRouter } from './features/proxy-router';
 import { BuildOptions } from './features/build-options';
+import { ProjectBuild } from '../models';
 
 
 export class ProjectWorkspace extends Project {
@@ -34,131 +35,143 @@ export class ProjectWorkspace extends Project {
     return ['environment.d.ts'];
   }
 
+  private libs(targetClients: ProjectBuild[]) {
+    const existed = {};
+    const targetLibs = targetClients
+      .map(t => t.project.workspaceDependencies)
+      .reduce((a, b) => a.concat(b))
+      .map(d => {
+        if (!existed[d.name]) {
+          existed[d.name] = d;
+        }
+        return d;
+      })
+      .filter(c => {
+        if (existed[c.name]) {
+          existed[c.name] = void 0;
+          return true;
+        }
+        return false;
+      })
+      .sort((a, b) => {
+        return a.workspaceDependencies.filter(c => c === b).length;
+      });
+    // console.log('targetClients', targetClients.map(l => l.project.genericName))
+    // console.log('targetClients[0]', targetClients[0].project.workspaceDependencies.map(l => l.genericName))
+    // console.log('targetClients[1]', targetClients[1].project.workspaceDependencies.map(l => l.genericName))
+    // console.log('targetlibs', targetLibs.map(l => l.genericName))
+
+    let result: Project[] = [];
+
+    function recrusiveSearchForDependencies(lib: Project) {
+      if (_.isUndefined(result.find(r => r.name === lib.name))) {
+        result.push(lib);
+      }
+      if (lib.workspaceDependencies.length === 0) {
+        return;
+      }
+      lib.workspaceDependencies
+        .filter(f => {
+          return _.isUndefined(result.find(r => r.name === f.name))
+        })
+        .forEach(d => {
+          if (_.isUndefined(result.find(r => r.name === d.name))) {
+            result.unshift(d);
+          }
+          recrusiveSearchForDependencies(d);
+        });
+    }
+    targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
+
+    function order(): boolean {
+      let neededNextOrder = false;
+      result.some((res, index, arr) => {
+        return result.find((res2, index2, arr2) => {
+          if (res.name === res2.name) {
+            return false;
+          }
+          if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
+            result = ReorganizeArray(result).moveElement(res2).before(res);
+            neededNextOrder = true;
+            return true;
+          }
+          return false;
+        });
+      });
+      return neededNextOrder;
+    }
+
+    let count = 0;
+    let lastArr = [];
+    while (order()) {
+      // log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
+      if (_.isEqual(lastArr, result.map(c => c.name))) {
+        break;
+      }
+      lastArr = result.map(c => c.name);
+    }
+    return result.map(c => {
+      return { project: c, appBuild: false };
+    });
+  }
+
+  get projectsInOrder(): ProjectBuild[] {
+    const targetClients: ProjectBuild[] = (this.isGenerated ? this.children.filter(p => {
+      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
+    }) : this.childrenThatAreClients).map(c => {
+      return { project: c, appBuild: true };
+    });
+
+    const libs = this.libs(targetClients);
+
+    return [
+      ...libs,
+      ...targetClients
+    ];
+  }
+
   async buildSteps(buildOptions?: BuildOptions) {
     PROGRESS_DATA.log({ msg: 'Process started', value: 0 })
     const { prod, watch, outDir, args } = buildOptions;
-
-    const projects = {
-      angularLibs: [],
-      isomorphicLibs: [],
-      angularClients: [],
-      angularCliClients: [],
-      dockers: []
-    };
-    this.children.forEach(project => {
-      if (project.type === 'docker') {
-
-      } else if (project.type === 'isomorphic-lib') {
-        projects.isomorphicLibs.push(project);
-      } else if (project.type === 'angular-lib') {
-        projects.angularLibs.push(project);
-      } else if (project.type === 'angular-client') {
-        projects.angularClients.push(project);
-      }
-    });
-
-    _.keys(projects).forEach((key) => {
-      let libsProjects = (projects[key] as Project[]);
-
-      function order(): boolean {
-        let everthingOk = true;
-        libsProjects.some(p => {
-          const indexProject = _.indexOf(libsProjects, p);
-          p.getDepsAsProject('tnp_required_workspace_child').some(pDep => {
-            const indexDependency = _.indexOf(libsProjects, pDep);
-            if (indexDependency > indexProject) {
-              libsProjects = ReorganizeArray(libsProjects).moveElement(pDep).before(p);
-              everthingOk = false;
-              return !everthingOk;
-            }
-          });
-          return !everthingOk;
-        });
-        return everthingOk;
-      }
-
-      let cout = 0
-      while (!order()) {
-        log(`Sort(${++cout}) \n ${libsProjects.map(c => c.genericName).join('\n')}\n `);
-      }
-    });
-
-
-
-    let projectsInOrder: Project[] = [
-      ...projects.angularLibs,
-      ...projects.isomorphicLibs,
-    ];
-
+    const projects = this.projectsInOrder;
     if (this.isGenerated) {
-      projectsInOrder = projectsInOrder.concat([
-        ...projects.angularClients,
-        ...projects.angularCliClients,
-      ]);
+      projects.forEach(c => {
+        c.project = c.project.StaticVersion;
+      });
     }
 
-    projectsInOrder = projectsInOrder.filter(p => {
-      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
-    });
+    PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
 
-    PROGRESS_DATA.log({ value: 0, msg: `Process started` })
-
-    log(`Projects to build in  ${this.labels.extendedBoldName} :`)
-    projectsInOrder.forEach((project, i) => {
-      const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
-      log(`${i + 1}. ${project.name} ${project}  ommitAppBuild: ${envProject.ommitAppBuild}`)
-    })
-    log('===================')
-
-    const projectsLibs: Project[] = projectsInOrder.filter(project => {
-      return config.allowedTypes.libs.includes(project.type);
-    })
-
-    const projectsApps: Project[] = projectsInOrder
-      .filter(project => {
-        return config.allowedTypes.app.includes(project.type);
-      })
-      .filter(project => {
-        const envProject = this.env.config.workspace.projects.find(({ name }) => name === project.name);
-        return !envProject.ommitAppBuild
-      })
-
-
-    projectsLibs.forEach((project, i) => {
-      log(`COMPILATIONL lib for: ${project.name}`)
-    });
-
-    projectsApps.forEach((project, i) => {
-      log(`COMPILATIONL app for: ${project.name}`)
-    });
-    log('===================');
-
-    const sum = 2 * (projectsLibs.length + projectsApps.length);
     let count = 1;
+    for (let index = 0; index < projects.length; index++) {
+      const { project, appBuild } = projects[index];
+      const sum = projects.length;
+      if (appBuild) {
+        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.genericName}` });
 
-    const staticPrefix = this.isGenerated ? 'static:' : '';
+        await project.buildProcess.startForApp({
+          watch,
+          prod,
+          args: `--noConsoleClear  ${args}`,
+          staticBuildAllowed: this.isGenerated
+        }, false1);
 
-    this.isGenerated && log(`BUILD OF PROJECT FROM: ${this.location} (((generated=${this.isGenerated}))`)
+        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.genericName}` });
+      } else {
+        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.genericName}` })
 
-    projectsLibs.forEach((project, i) => {
-      info(`START OF LIB PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.name}` })
-      project.run(`tnp ${staticPrefix}build:${outDir}${watch ? ':watch' : ''}${prod ? ':prod' : ''} --noConsoleClear ${args}`,
-        { biggerBuffer: true }).sync()
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.name}` });
-    });
+        await project.buildProcess.startForLib({
+          watch,
+          prod,
+          args: `--noConsoleClear  ${args}`,
+          staticBuildAllowed: this.isGenerated
+        }, false);
 
-    projectsApps.forEach((project) => {
-      info(`START OF APP PROJECT BUILD: ${project.name}, type: ${project.type} within ${this.labels.extendedBoldName}`);
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.name}` });
-      project.run(`tnp ${staticPrefix}build:app${watch ? ':watch' : ''}${prod ? ':prod' : ''}  --noConsoleClear  ${args}`,
-        { biggerBuffer: true }).sync()
-      PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.name}` });
-    });
-
+        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.genericName}` });
+      }
+    }
     PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
-
   }
 }
 //#endregion

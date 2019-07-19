@@ -1,5 +1,6 @@
 import { BuildDir } from './build-dir';
 import { BuildOptions } from '../project/features/build-options';
+import { Project } from '../project/abstract/project';
 
 export * from './build-options.interface';
 export * from './build-dir';
@@ -11,6 +12,7 @@ export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
 
+export type ProjectBuild = { project: Project; appBuild: boolean; }
 
 export interface StartForOptions {
   prod?: boolean;

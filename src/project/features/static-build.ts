@@ -13,7 +13,15 @@ import { BuildDir } from '../../models';
 
 export class StaticBuild extends FeatureForProject {
 
+  static alerdyRegenerated = [];
   regenerate() {
+    // console.log(StaticBuild.alerdyRegenerated)
+    if (StaticBuild.alerdyRegenerated.includes(this.project.location)) {
+      log(`Already regenrated workspace ${this.project.genericName}`)
+      return;
+    } else {
+      // console.log(`NOT YET GENERATED ${this.project.genericName}`)
+    }
     if (this.project.isWorkspaceChildProject) {
       if (!this.project.parent.distribution) {
         this.project.parent.staticBuild.regenerate();
@@ -31,6 +39,7 @@ export class StaticBuild extends FeatureForProject {
 function regenerateDistribution(project: Project): void {
 
   info(`Actual Regenerating project: ${project.genericName}`);
+  StaticBuild.alerdyRegenerated.push(project.location)
   const outDir: BuildDir = 'dist';
 
   const genLocation = project.isWorkspace ?

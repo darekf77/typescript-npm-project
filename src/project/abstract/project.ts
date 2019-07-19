@@ -302,15 +302,13 @@ export abstract class BaseProject {
       return;
     }
     let project: Project;
-    if (this.isGenerated) {
-      warn(`Trying to access distribution of distribution`, true);
-      return void 0;
-    }
     if (this.isWorkspace) {
       const originPath = path.resolve(path.join(this.location, '..', '..'));
+      // console.log('originPath', originPath)
       project = Project.From(originPath);
     } else if (this.isWorkspaceChildProject) {
-      const originChildPath = path.resolve(path.join(this.location, '..', '..', this.name));
+      const originChildPath = path.resolve(path.join(this.location, '..', '..', '..', this.name));
+      // console.log('originChildPath', originChildPath)
       project = Project.From(originChildPath);
     }
     return project;
@@ -345,14 +343,13 @@ export abstract class BaseProject {
   get StaticVersion(): Project {
     let staticVersion: Project;
     if (this.isGenerated) {
+      this.origin.staticBuild.regenerate();
       staticVersion = this as any;
     } else {
-      staticVersion = this.distribution;
-    }
-    if ((this.isWorkspace || this.isWorkspaceChildProject) && !staticVersion) {
       this.staticBuild.regenerate();
       staticVersion = this.distribution;
     }
+
     return staticVersion;
   }
   //#endregion
@@ -698,6 +695,18 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  get workspaceDependencies(): Project[] {
+    if (this.isWorkspaceChildProject) {
+      return this.packageJson.workspaceDependencies.map(name => {
+        const child = this.parent.child(name);
+        if (!child) {
+          error(`Unknow child "${name}" inside ${this.packageJson.locationOfJson}`, true, true);
+        }
+        return child;
+      }).filter(f => !!f);
+    }
+    return [];
+  }
   get children(): Project[] {
     if (Morphi.IsBrowser) {
       return this.browser.children;
@@ -1286,17 +1295,6 @@ Generated workspace should be here: ${genLocationWOrkspace}
       //   console.trace('exit !!!!', ee)
       // })
     }
-  }
-  //#endregion
-
-
-
-  //#region @backend
-  public requiredDependencies(): Package[] {
-    return [
-      { name: 'node-sass', version: '^4.7.2' },
-      { name: 'typescript', version: '2.6.2' }
-    ]
   }
   //#endregion
 

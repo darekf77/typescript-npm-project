@@ -58,24 +58,24 @@ inside generated projects...
   /**
    * prod, watch, outDir, args, overrideOptions
    */
-  async  startForLib(options: StartForOptions) {
+  async  startForLib(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
     const project: Project = this.project;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, project)
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, project, exit)
   }
 
   async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
     return this.startForApp({ prod, watch, outDir, args, overrideOptions });
   }
 
-  async  startForApp(options: StartForOptions) {
+  async  startForApp(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
     const project: Project = this.project;
     const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, project);
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, project, exit);
   }
 
   private mergeNpmPorject() {
@@ -153,7 +153,10 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-    await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)
+    if (!this.project.isGenerated) {
+      await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)
+    }
+
 
 
     await project.build(buildOptions);

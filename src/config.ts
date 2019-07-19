@@ -41,6 +41,7 @@ const tempFolders = {
   bundle: 'bundle',
   vendor: 'vendor',
   dist: 'dist',
+  tmp: 'tmp',
   tempSrc: 'tmp-src',
   previewDistApp: 'dist-app',
   browser: 'browser',

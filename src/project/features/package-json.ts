@@ -43,7 +43,7 @@ export class PackageJSON {
       }
       return new PackageJSON({ data: json, location, project });
     } catch (err) {
-      error(`Error while parsing package.json in: ${filePath}`);
+      error(`Error while parsing package.json in: ${filePath}`, true, true);
       error(err)
     }
   }
@@ -85,6 +85,16 @@ export class PackageJSON {
   get resources(): string[] {
     const p = this.data.tnp;
     return Array.isArray(p.resources) ? p.resources : [];
+  }
+
+  get workspaceDependencies(): string[] {
+    const p = this.data.tnp && this.data.tnp.required;
+    // console.log(`${this.locationOfJson}`, p)
+    return Array.isArray(p) ? p : [];
+  }
+
+  get locationOfJson() {
+    return path.join(this.location, config.file.package_json);
   }
 
   private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
@@ -171,8 +181,8 @@ export class PackageJSON {
       if (_.isBoolean(this.data.tnp.isGenerated)) {
         return this.data.tnp.isGenerated;
       }
-      error(`Bad value in package.json, tnp.isGenerated should be boolean.`, true);
-      error(`Location of package.json: ${this.location}`)
+      error(`[isGenerated] Bad value in package.json, tnp.isGenerated should be boolean.`, true, true);
+      error(`[isGenerated] Location of package.json: ${this.location}`, true, true)
     }
     return false;
   }

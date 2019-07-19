@@ -4,6 +4,9 @@
     "type": "ionic-client",
     "frameworks": [
       "ionic"
+    ],
+    "required": [
+      "ss-common-logic"
     ]
   },
   "name": "ss-mobileapp",

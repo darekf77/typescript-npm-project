@@ -4,6 +4,9 @@
     "type": "angular-client",
     "frameworks": [
       "bootstrap"
+    ],
+    "required": [
+      "ss-common-logic"
     ]
   },
   "name": "ss-webapp",

@@ -5,7 +5,8 @@
     ],
     "type": "angular-lib",
     "required": [
-      "ss-layouts"
+      "ss-layouts",
+      "ss-common-logic"
     ]
   },
   "name": "ss-common-ui",

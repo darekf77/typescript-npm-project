@@ -4,6 +4,9 @@
     "type": "angular-client",
     "frameworks": [
       "material"
+    ],
+    "required": [
+      "ss-common-logic"
     ]
   },
   "name": "ss-admin-webapp",
