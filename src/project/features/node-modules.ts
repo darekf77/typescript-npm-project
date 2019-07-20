@@ -187,7 +187,9 @@ export class NodeModules extends FeatureForProject {
       .filter(f => {
         return !this.project.children.map(c => c.name).includes(path.basename(f)) &&
           !_.values(config.tempFolders).includes(path.basename(f))
-      });
+      })
+      .map(f => f.replace(this.project.location, '').replace(/^\//, ''))
+      ;
   }
 
 }

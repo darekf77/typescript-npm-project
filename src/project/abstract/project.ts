@@ -13,7 +13,7 @@ import config from '../../config';
 import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
-  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks, tryCopyFrom
 } from '../../helpers';
 import { NodeModules } from "../features/node-modules";
 import { FilesRecreator } from '../features/files-recreator';
@@ -846,8 +846,37 @@ export abstract class BaseProject {
 
   //#endregion
 
+  //#region @backedn
+  public quickFixBadNpmPackages() {
+    log(`Fixing bad npm packages - START`);
+    if (this.isGenerated && this.isWorkspace) {
+      this.origin.node_modules.fixesForNodeModulesPackages
+        .forEach(f => {
+          const source = path.join(this.origin.location, f);
+          const dest = path.join(this.location, f);
+          if (fse.existsSync(dest)) {
+            tryRemoveDir(dest);
+          }
+          tryCopyFrom(source, dest);
+        });
+    }
+    if (this.isSite && this.isWorkspace) {
+      this.baseline.node_modules.fixesForNodeModulesPackages
+        .forEach(f => {
+          const source = path.join(this.baseline.location, f);
+          const dest = path.join(this.location, f);
+          if (fse.existsSync(dest)) {
+            tryRemoveDir(dest);
+          }
+          tryCopyFrom(source, dest);
+        });
+    }
+    log(`Fixing bad npm packages - COMPLETE`);
+  }
+  //#endregion
+
   //#region @backend
-  protected quickFixMissingLibs(missingLibsNames: string[] = []) {
+  public quickFixMissingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
@@ -1199,10 +1228,6 @@ export abstract class BaseProject {
   //#region @backend
   async build(buildOptions?: BuildOptions) {
     // log('BUILD OPTIONS', buildOptions)
-
-    if (this.isWorkspaceChildProject || this.isWorkspaceChildProject) {
-      this.quickFixMissingLibs(['react-native-sqlite-storage'])
-    }
 
     if (this.isCommandLineToolOnly) {
       buildOptions.onlyBackend = true;

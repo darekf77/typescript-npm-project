@@ -48,6 +48,10 @@ export class FilesStructure extends FeatureForProject {
     } = require('minimist')(!args ? [] : args.split(' '));
 
     this.project.quickFixMissingSourceFolders()
+    if (this.project.isWorkspace) {
+      this.project.quickFixBadNpmPackages();
+      this.project.quickFixMissingLibs(['react-native-sqlite-storage'])
+    }
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
 
@@ -88,6 +92,8 @@ export class FilesStructure extends FeatureForProject {
         await workspaceChild.filesStructure.init(args, options);
       }
     }
+
+
 
     if (this.project.baseline) {
       await this.project.baseline.filesStructure.init(args, options);

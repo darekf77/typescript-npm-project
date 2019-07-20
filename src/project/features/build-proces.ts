@@ -61,9 +61,8 @@ inside generated projects...
   async  startForLib(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
-    const project: Project = this.project;
-    const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: false, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, project, exit)
+    const buildOptions: BuildOptions = BuildOptions.from(args, this.project, { outDir, watch, prod, appBuild: false, args });
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, exit)
   }
 
   async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
@@ -73,9 +72,8 @@ inside generated projects...
   async  startForApp(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     const { args, outDir, watch, prod, overrideOptions } = options;
-    const project: Project = this.project;
-    const buildOptions: BuildOptions = BuildOptions.from(args, project, { outDir, watch, prod, appBuild: true, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, project, exit);
+    const buildOptions: BuildOptions = BuildOptions.from(args, this.project, { outDir, watch, prod, appBuild: true, args });
+    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, exit);
   }
 
   private mergeNpmPorject() {
@@ -111,9 +109,9 @@ inside generated projects...
     return Project.Current.isTnp ? true : fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser))
   }
 
-  private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], project: Project, exit = true) {
+  private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], exit = true) {
 
-    if (project.isGenerated && buildOptions.watch) {
+    if (this.project.isGenerated && buildOptions.watch) {
       buildOptions.watch = false;
       warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
@@ -121,6 +119,10 @@ inside generated projects...
     if (!this.checkIfGeneratedTnpBundle) {
       error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
+
+    // if (this.project.isGenerated) {
+    //   this.project.reset();
+    // }
 
     this.mergeNpmPorject();
 
@@ -132,7 +134,7 @@ inside generated projects...
       info(`ENVIRONMENT (auto-assigned): "${chalk.bold('static')}"`)
     }
 
-    if (_.isArray(allowedLibs) && !allowedLibs.includes(project.type)) {
+    if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
       if (buildOptions.appBuild) {
         error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       } else {
@@ -141,25 +143,23 @@ inside generated projects...
     }
 
     const transactions = (await (await TnpDB.Instance).transaction);
-    await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, true);
+    await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
 
     if (buildOptions.watch) {
-      await project.filesStructure.init(buildOptions.args, { watch: true });
+      await this.project.filesStructure.init(buildOptions.args, { watch: true });
     } else {
-      await project.filesStructure.init(buildOptions.args);
+      await this.project.filesStructure.init(buildOptions.args);
     }
 
-    if (!buildOptions.watch && project.isGenerated) {
+    if (!buildOptions.watch && this.project.isGenerated && this.project.isWorkspace) {
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
     if (!this.project.isGenerated) {
-      await transactions.updateBuildsWithCurrent(project, buildOptions, process.pid, false)
+      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
 
-
-
-    await project.build(buildOptions);
+    await this.project.build(buildOptions);
     if (exit && !buildOptions.watch) {
       process.exit(0);
     }

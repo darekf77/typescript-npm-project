@@ -79,6 +79,9 @@ export class CopyManager extends FeatureForProject {
       showInfo && warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
       return false;
     } else {
+      if (fse.existsSync(destinationLocation) && override) {
+        tryRemoveDir(destinationLocation);
+      }
       fse.mkdirpSync(destinationLocation);
     }
 

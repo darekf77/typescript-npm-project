@@ -143,23 +143,23 @@ export class ProjectWorkspace extends Project {
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
 
-    let count = 1;
     for (let index = 0; index < projects.length; index++) {
       const { project, appBuild } = projects[index];
       const sum = projects.length;
+      const precentIndex = (index + 1)
       if (appBuild) {
-        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building app: ${project.genericName}` });
+        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `In progress building app: ${project.genericName}` });
 
         await project.buildProcess.startForApp({
           watch,
           prod,
           args: `--noConsoleClear  ${args}`,
           staticBuildAllowed: this.isGenerated
-        }, false1);
+        }, false);
 
-        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building app: ${project.genericName}` });
+        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `Finish building app: ${project.genericName}` });
       } else {
-        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `In progress building lib: ${project.genericName}` })
+        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `In progress building lib: ${project.genericName}` })
 
         await project.buildProcess.startForLib({
           watch,
@@ -168,7 +168,7 @@ export class ProjectWorkspace extends Project {
           staticBuildAllowed: this.isGenerated
         }, false);
 
-        PROGRESS_DATA.log({ value: (count++ / sum) * 100, msg: `Finish building lib: ${project.genericName}` });
+        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `Finish building lib: ${project.genericName}` });
       }
     }
     PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
