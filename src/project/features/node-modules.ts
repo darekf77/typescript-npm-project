@@ -69,7 +69,19 @@ export class NodeModules extends FeatureForProject {
   }
 
   get exist(): boolean {
-    return fs.existsSync(path.join(this.project.location, config.folder.node_modules, '.bin')); // TODO qucik fix for tnp-helpers
+
+    if (this.project.isWorkspace) {
+      const p = path.join(this.project.location, config.folder.node_modules, '.bin');
+      return fse.existsSync(p);
+    }
+    if (this.project.isWorkspaceChildProject) {
+      if (this.project.parent.node_modules.exist) {
+        this.project.parent.node_modules.linkToProject(this.project);
+        return true;
+      }
+    }
+    const p = path.join(this.project.location, config.folder.node_modules);
+    return fse.existsSync(p);
   }
 
   remove() {

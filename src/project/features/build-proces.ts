@@ -35,9 +35,6 @@ export class BuildProcess extends FeatureForProject {
     if (_.isUndefined(options.staticBuildAllowed)) {
       options.staticBuildAllowed = false;
     }
-    if (_.isUndefined(options.overrideOptions)) {
-      options.overrideOptions = {} as any;
-    }
     if (project.isGenerated && !options.staticBuildAllowed) {
       error(`Please use command:
 $ tnp static:build
@@ -51,8 +48,8 @@ inside generated projects...
     return options;
   }
 
-  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
-    return this.startForLib({ prod, watch, outDir, args, overrideOptions });
+  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string) {
+    return this.startForLib({ prod, watch, outDir, args });
   }
 
   /**
@@ -60,20 +57,20 @@ inside generated projects...
    */
   async  startForLib(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
-    const { args, outDir, watch, prod, overrideOptions } = options;
-    const buildOptions: BuildOptions = BuildOptions.from(args, this.project, { outDir, watch, prod, appBuild: false, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.libs, exit)
+    options.appBuild = false;
+    const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
+    await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
-  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string, overrideOptions?: BuildOptions) {
-    return this.startForApp({ prod, watch, outDir, args, overrideOptions });
+  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string) {
+    return this.startForApp({ prod, watch, outDir, args });
   }
 
   async  startForApp(options: StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
-    const { args, outDir, watch, prod, overrideOptions } = options;
-    const buildOptions: BuildOptions = BuildOptions.from(args, this.project, { outDir, watch, prod, appBuild: true, args });
-    await this.build(_.merge(buildOptions, overrideOptions), config.allowedTypes.app, exit);
+    options.appBuild = true;
+    const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
+    await this.build(buildOptions, config.allowedTypes.app, exit);
   }
 
   private mergeNpmPorject() {

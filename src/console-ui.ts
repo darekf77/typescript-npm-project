@@ -150,22 +150,22 @@ export class ConsoleUi {
 
       case CHOICE.BUILD_APP_WATCH:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.buildProcess.startForApp(false, true, 'dist', '')
+        await Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST_WATCH:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.buildProcess.startForLib(false, true, 'dist', '')
+        await Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', '')
         break;
 
       case CHOICE.BUILD_APP:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.buildProcess.startForApp(false, false, 'dist', '')
+        await Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', '')
         break;
 
       case CHOICE.BUILD_DIST:
         this.db.transaction.setCommand(`tnp ${res.command}`)
-        await Project.Current.buildProcess.startForLib(false, false, 'dist', '')
+        await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', '')
         break;
 
       case CHOICE.LAST_USED_COMMAND:

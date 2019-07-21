@@ -86,7 +86,7 @@ export class ProjectWorkspace extends Project {
     function order(): boolean {
       let neededNextOrder = false;
       result.some((res, index, arr) => {
-        return result.find((res2, index2, arr2) => {
+        return !_.isUndefined(result.find((res2, index2, arr2) => {
           if (res.name === res2.name) {
             return false;
           }
@@ -96,12 +96,11 @@ export class ProjectWorkspace extends Project {
             return true;
           }
           return false;
-        });
+        }));
       });
       return neededNextOrder;
     }
 
-    let count = 0;
     let lastArr = [];
     while (order()) {
       // log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
@@ -130,8 +129,9 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
+
   async buildSteps(buildOptions?: BuildOptions) {
-    PROGRESS_DATA.log({ msg: 'Process started', value: 0 })
+    PROGRESS_DATA.log({ msg: 'Process started', value: 0 });
     const { prod, watch, outDir, args } = buildOptions;
     const projects = this.projectsInOrder;
     if (this.isGenerated) {
@@ -146,32 +146,40 @@ export class ProjectWorkspace extends Project {
     for (let index = 0; index < projects.length; index++) {
       const { project, appBuild } = projects[index];
       const sum = projects.length;
-      const precentIndex = (index + 1)
-      if (appBuild) {
-        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `In progress building app: ${project.genericName}` });
+      const precentIndex = index;
 
+      if (appBuild) {
+        showProgress('app', project.genericName, (precentIndex / sum));
         await project.buildProcess.startForApp({
           watch,
           prod,
           args: `--noConsoleClear  ${args}`,
-          staticBuildAllowed: this.isGenerated
+          staticBuildAllowed: this.isGenerated,
+          progressCallback: (fraction) => {
+            showProgress('app', project.genericName, ((precentIndex + fraction) / sum));
+          }
         }, false);
-
-        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `Finish building app: ${project.genericName}` });
       } else {
-        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `In progress building lib: ${project.genericName}` })
-
+        showProgress('lib', project.genericName, (precentIndex / sum));
         await project.buildProcess.startForLib({
           watch,
           prod,
           args: `--noConsoleClear  ${args}`,
-          staticBuildAllowed: this.isGenerated
+          staticBuildAllowed: this.isGenerated,
+          progressCallback: (fraction) => {
+            showProgress('lib', project.genericName, ((precentIndex + fraction) / sum));
+          }
         }, false);
-
-        PROGRESS_DATA.log({ value: (precentIndex / sum) * 100, msg: `Finish building lib: ${project.genericName}` });
       }
     }
     PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
   }
 }
+
+function showProgress(type: 'app' | 'lib', name: string, precentFraction: number) {
+  PROGRESS_DATA.log({ value: (precentFraction) * 100, msg: `In progress of building ${type} "${name}"` });
+}
+
+
 //#endregion
+

@@ -15,6 +15,7 @@ export class BuildOptions implements IBuildOptions {
   outDir?: BuildDir;
   watch?: boolean;
   args?: string; // TODO remove ?
+  progressCallback?: (fractionValue: number) => any;
 
   noConsoleClear?: boolean;
 
@@ -85,7 +86,7 @@ export class BuildOptions implements IBuildOptions {
   }
 
   public static from(argsString: string, projectCurrent: Project,
-    mainOptions?: { watch: boolean; prod: boolean, outDir: BuildDir, appBuild: boolean, args: string }): BuildOptions {
+    mainOptions?: IBuildOptions): BuildOptions {
 
     const split = argsString.split(' ');
     // console.log('split', split)

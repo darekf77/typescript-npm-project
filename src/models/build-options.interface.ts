@@ -1,16 +1,12 @@
 
 import { Project } from '../project';
 import { BuildDir } from './build-dir';
+import { StartForOptions } from './start-for-options';
 
-export interface IBuildOptions {
-  prod?: boolean;
-  outDir?: BuildDir;
+export interface IBuildOptions extends StartForOptions {
   noConsoleClear?: boolean;
-  watch?: boolean;
-  args?: string;
   genOnlyClientCode?: boolean;
   onlyBackend?: boolean;
-  appBuild?: boolean;
   baseHref?: string;
   onlyWatchNoBuild?: boolean;
   forClient?: Project[] | string[];

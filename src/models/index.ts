@@ -1,5 +1,4 @@
-import { BuildDir } from './build-dir';
-import { BuildOptions } from '../project/features/build-options';
+
 import { Project } from '../project/abstract/project';
 
 export * from './build-options.interface';
@@ -11,17 +10,10 @@ export * from './ipackage-json';
 export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
+export * from './start-for-options';
 
 export type ProjectBuild = { project: Project; appBuild: boolean; }
 
-export interface StartForOptions {
-  prod?: boolean;
-  watch?: boolean;
-  outDir?: BuildDir;
-  args: string;
-  staticBuildAllowed?: boolean;
-  overrideOptions?: BuildOptions;
-};
 export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
 
 export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';

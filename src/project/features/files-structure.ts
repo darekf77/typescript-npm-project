@@ -117,7 +117,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.tnpBundle.installAsPackage()
       if (!this.project.node_modules.exist) {
         if (skipNodeModules) {
-          if (!path.join(this.project.location, config.folder.node_modules)) {
+          if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
             fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
           }
         } else {
@@ -148,26 +148,30 @@ export class FilesStructure extends FeatureForProject {
 
       if (!onlyJoin) {
         await this.project.env.init(args);
-        this.project.filesTemplatesBuilder.rebuild()
+        this.project.filesTemplatesBuilder.rebuild();
       }
 
-      this.project.quickFixMissingSourceFolders()
-      const sourceModifireName = `(${chalk.bold(this.project.genericName)})" Client source modules pathes modifier `;
-      const generatorName = `(${chalk.bold(this.project.genericName)}) Files generator: entites.ts, controllers.ts`;
+      this.project.quickFixMissingSourceFolders();
 
-      if (!onlyJoin) {
-        if (watch) {
-          await this.project.frameworkFileGenerator.initAndWatch(generatorName);
-          if (!someBuildIsActive) {
-            await this.project.sourceModifier.initAndWatch(sourceModifireName);
-          }
-        } else {
-          await this.project.frameworkFileGenerator.init(generatorName);
-          if (!someBuildIsActive) {
-            await this.project.sourceModifier.init(sourceModifireName);
+
+      if (this.project.isWorkspaceChildProject) {
+        const sourceModifireName = `(${chalk.bold(this.project.genericName)})" Client source modules pathes modifier `;
+        const generatorName = `(${chalk.bold(this.project.genericName)}) Files generator: entites.ts, controllers.ts`;
+        if (!onlyJoin) {
+          if (watch) {
+            await this.project.frameworkFileGenerator.initAndWatch(generatorName);
+            if (!someBuildIsActive) {
+              await this.project.sourceModifier.initAndWatch(sourceModifireName);
+            }
+          } else {
+            await this.project.frameworkFileGenerator.init(generatorName);
+            if (!someBuildIsActive) {
+              await this.project.sourceModifier.init(sourceModifireName);
+            }
           }
         }
       }
+
     }
 
 

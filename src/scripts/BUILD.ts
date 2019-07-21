@@ -3,7 +3,8 @@ import * as _ from 'lodash';
 
 import { Project } from '../project';
 import { config } from '../config';
-import { SystemTerminal } from '../helpers';
+import { SystemTerminal, error } from '../helpers';
+import chalk from 'chalk';
 
 async function buildWatch(args) {
 
@@ -29,31 +30,51 @@ const BUILD_DIST = async (args) => {
 };
 const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);
 
+
+const STATIC_BUILD = (args) => {
+  if (!Project.Current.isWorkspace) {
+    error(`Please use:
+${chalk.gray(`$ tnp static:build:lib`)}
+or
+${chalk.gray(`$ tnp static:build:app`)}
+
+inside workspace children.
+    `, false, true)
+  }
+  Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
+}
+
+const STATIC_BUILD_LIB = (args) => {
+  Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
+};
+
+const STATIC_BUILD_PROD = (args) => Project.Current.StaticVersion.buildProcess
+  .startForLib({ prod: true, args, staticBuildAllowed: true })
+
+const STATIC_BUILD_LIB_PROD = (args) => Project.Current.StaticVersion.buildProcess
+  .startForLib({ prod: true, args, staticBuildAllowed: true })
+
+const STATIC_BUILD_APP = (args) => Project.Current.StaticVersion.buildProcess
+  .startForApp({ args, staticBuildAllowed: true })
+
+const STATIC_BUILD_APP_PROD = (args) => Project.Current.StaticVersion.buildProcess
+  .startForApp({ prod: true, args, staticBuildAllowed: true })
+
+
 export default {
 
-  STATIC_BUILD: [(args) => {
-    Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
-  }, `Build dist version of project library.`],
-
-  STATIC_BUILD_DIST: [(args) => {
-    Project.Current.StaticVersion.buildProcess.startForLib({ args, staticBuildAllowed: true });
-  }, `Build dist version of project library.`],
-
-  STATIC_BUILD_PROD: [(args) => Project.Current.StaticVersion.buildProcess
-    .startForLib({ prod: true, args, staticBuildAllowed: true }),
-    `Build dist version of project library.`],
-
-  STATIC_BUILD_DIST_PROD: [(args) => Project.Current.StaticVersion.buildProcess
-    .startForLib({ prod: true, args, staticBuildAllowed: true }),
-    `Build dist version of project library.`],
-
-  STATIC_BUILD_APP: [(args) => Project.Current.StaticVersion.buildProcess
-    .startForApp({ args, staticBuildAllowed: true }),
-    `Build dist version of project application withou.`],
-
-  STATIC_BUILD_APP_PROD: [(args) => Project.Current.StaticVersion.buildProcess
-    .startForApp({ prod: true, args, staticBuildAllowed: true }),
-    `Build dist version of project application.`],
+  STATIC_BUILD,
+  SB: (args) => STATIC_BUILD(args),
+  STATIC_BUILD_PROD,
+  SBP: (args) => STATIC_BUILD_PROD(args),
+  STATIC_BUILD_LIB,
+  SBL: (args) => STATIC_BUILD_LIB(args),
+  STATIC_BUILD_LIB_PROD,
+  SBLP: (args) => STATIC_BUILD_LIB_PROD(args),
+  STATIC_BUILD_APP,
+  SBA: (args) => STATIC_BUILD_APP(args),
+  STATIC_BUILD_APP_PROD,
+  SBAP: (args) => STATIC_BUILD_APP_PROD(args),
 
   BUILD_DIST,
   async BD(args) {
