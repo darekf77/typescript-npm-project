@@ -1,0 +1,123 @@
+//#region @backend
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+import * as fse from 'fs-extra';
+import { FeatureForProject } from "../abstract";
+import { log, tryCopyFrom, tryRemoveDir, warn, HelpersLinks } from "../../helpers";
+import config from "../../config";
+import { IPackageJSON } from "../../models";
+
+export class QuickFixes extends FeatureForProject {
+
+  public badNpmPackages() {
+    log(`Fixing bad npm packages - START`);
+    if (this.project.isGenerated && this.project.isWorkspace) {
+      this.project.origin.node_modules.fixesForNodeModulesPackages
+        .forEach(f => {
+          const source = path.join(this.project.origin.location, f);
+          const dest = path.join(this.project.location, f);
+          if (fse.existsSync(dest)) {
+            tryRemoveDir(dest);
+          }
+          tryCopyFrom(source, dest);
+        });
+    }
+    if (this.project.isSite && this.project.isWorkspace) {
+      this.project.baseline.node_modules.fixesForNodeModulesPackages
+        .forEach(f => {
+          const source = path.join(this.project.baseline.location, f);
+          const dest = path.join(this.project.location, f);
+          if (fse.existsSync(dest)) {
+            tryRemoveDir(dest);
+          }
+          tryCopyFrom(source, dest);
+        });
+    }
+    log(`Fixing bad npm packages - COMPLETE`);
+  }
+
+  public missingLibs(missingLibsNames: string[] = []) {
+    missingLibsNames.forEach(missingLibName => {
+      const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
+      if (fse.existsSync(pathInProjectNodeModules)) {
+        warn(`Package "${missingLibName}" will replaced with empty package mock.`)
+      }
+      rimraf.sync(pathInProjectNodeModules);
+      fse.mkdirpSync(pathInProjectNodeModules);
+
+      fse.writeFileSync(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `, 'utf8');
+      fse.writeFileSync(path.join(pathInProjectNodeModules, config.file.package_json), JSON.stringify({
+        name: missingLibName,
+        version: "0.0.0"
+      } as IPackageJSON), 'utf8');
+
+    })
+  }
+
+  public missingSourceFolders() { /// TODO make it more generic
+    if (this.project.isWorkspace ||
+      this.project.isWorkspaceChildProject ||
+      this.project.isStandaloneProject) {
+
+
+      const srcFolder = path.join(this.project.location, config.folder.src);
+      if (!this.project.isWorkspace) {
+        if (!fse.existsSync(srcFolder)) {
+          fse.mkdirpSync(srcFolder);
+        }
+        // log('SRC folder recreated')
+
+      }
+      const componentsFolder = path.join(this.project.location, config.folder.components);
+      const browserStandaloneFolder = path.join(this.project.location, config.folder.browser);
+      if (this.project.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
+        // log('COMPONENTS folder recreated');
+        fse.mkdirpSync(componentsFolder);
+      }
+
+      if (this.project.type === 'angular-lib' && this.project.isStandaloneProject
+        && !fse.existsSync(browserStandaloneFolder)) {
+        // log('BROWSER folder recreated');
+        fse.symlinkSync(this.project.location, path.join(this.project.location, config.folder.browser));
+      }
+
+      const customFolder = path.join(this.project.location, config.folder.custom);
+      if (this.project.isSite && !fse.existsSync(customFolder)) {
+        // log('CUSTOM folder recreated');
+        fse.mkdirpSync(customFolder);
+      }
+
+      const nodeModulesFolder = path.join(this.project.location, config.folder.node_modules);
+      if (this.project.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
+        // log('NODE_MODULES folder recreated');
+        fse.mkdirpSync(nodeModulesFolder)
+      }
+      if (this.project.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
+        const paretnFolderOfNodeModules = path.join(this.project.parent.location, config.folder.node_modules);
+        if (!fse.existsSync(paretnFolderOfNodeModules)) {
+          // log('NODE_MODULES (parent) folder recreated');
+          fse.mkdirpSync(paretnFolderOfNodeModules)
+        }
+        // log('NODE_MODULES folder link to child recreated');
+        HelpersLinks.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
+      }
+
+      if (this.project.isSite) {
+        if (this.project.isWorkspace) {
+          const baselineFolderInNodeModule = path.join(
+            this.project.location,
+            config.folder.node_modules,
+            this.project.baseline.name
+          );
+          if (!fse.existsSync(baselineFolderInNodeModule)) {
+            // log('BASELINE folder in NODE_MODUELS recreated');
+            HelpersLinks.createSymLink(this.project.baseline.location, baselineFolderInNodeModule);
+          }
+        }
+      }
+
+    }
+  }
+
+}
+//#endregion

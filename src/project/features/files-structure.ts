@@ -47,10 +47,10 @@ export class FilesStructure extends FeatureForProject {
       skipNodeModules: boolean; recrusive: boolean; onlyJoin?: boolean;
     } = require('minimist')(!args ? [] : args.split(' '));
 
-    this.project.quickFixMissingSourceFolders()
+    this.project.quickFixes.missingSourceFolders()
     if (this.project.isWorkspace) {
-      this.project.quickFixBadNpmPackages();
-      this.project.quickFixMissingLibs(['react-native-sqlite-storage'])
+      this.project.quickFixes.badNpmPackages();
+      this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
@@ -151,7 +151,7 @@ export class FilesStructure extends FeatureForProject {
         this.project.filesTemplatesBuilder.rebuild();
       }
 
-      this.project.quickFixMissingSourceFolders();
+      this.project.quickFixes.missingSourceFolders();
 
 
       if (this.project.isWorkspaceChildProject) {

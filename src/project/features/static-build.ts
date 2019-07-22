@@ -48,7 +48,7 @@ function regenerateDistribution(project: Project): void {
 
   if (project.isWorkspace && project.isSite) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
+    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false, useTempLocation: true });
     const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
     fse.mkdirpSync(binInBasleine)
   }
@@ -57,10 +57,10 @@ function regenerateDistribution(project: Project): void {
     if (project.distribution) {
       project.copyManager.genWorkspaceEnvFiles(project.distribution);
     } else {
-      project.copyManager.generateSourceCopyIn(genLocation, { override: true });
+      project.copyManager.generateSourceCopyIn(genLocation, { override: true, useTempLocation: true });
     }
   } else if (project.isWorkspaceChildProject) {
-    project.copyManager.generateSourceCopyIn(genLocation, { override: true });
+    project.copyManager.generateSourceCopyIn(genLocation, { override: true, useTempLocation: true });
   }
 
 }

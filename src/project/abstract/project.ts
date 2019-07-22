@@ -34,6 +34,7 @@ import { TnpDB } from '../../tnp-db';
 import { FilesFactory } from '../features/files-factory.backend';
 import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
 import { StaticBuild } from '../features/static-build';
+import { QuickFixes } from '../features/quick-fixes';
 import { config as configMorphi } from 'morphi/build/config';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
 //#endregion
@@ -119,6 +120,9 @@ export abstract class BaseProject {
   public sourceModifier: SourceModifier;
   //#endregion
 
+  //#region @backend
+  public quickFixes: QuickFixes;
+  //#endregion
 
   //#region @backend
   public frameworkFileGenerator: FrameworkFilesGenerator;
@@ -852,54 +856,7 @@ export abstract class BaseProject {
 
   //#endregion
 
-  //#region @backedn
-  public quickFixBadNpmPackages() {
-    log(`Fixing bad npm packages - START`);
-    if (this.isGenerated && this.isWorkspace) {
-      this.origin.node_modules.fixesForNodeModulesPackages
-        .forEach(f => {
-          const source = path.join(this.origin.location, f);
-          const dest = path.join(this.location, f);
-          if (fse.existsSync(dest)) {
-            tryRemoveDir(dest);
-          }
-          tryCopyFrom(source, dest);
-        });
-    }
-    if (this.isSite && this.isWorkspace) {
-      this.baseline.node_modules.fixesForNodeModulesPackages
-        .forEach(f => {
-          const source = path.join(this.baseline.location, f);
-          const dest = path.join(this.location, f);
-          if (fse.existsSync(dest)) {
-            tryRemoveDir(dest);
-          }
-          tryCopyFrom(source, dest);
-        });
-    }
-    log(`Fixing bad npm packages - COMPLETE`);
-  }
-  //#endregion
 
-  //#region @backend
-  public quickFixMissingLibs(missingLibsNames: string[] = []) {
-    missingLibsNames.forEach(missingLibName => {
-      const pathInProjectNodeModules = path.join(this.location, config.folder.node_modules, missingLibName)
-      if (fse.existsSync(pathInProjectNodeModules)) {
-        warn(`Package "${missingLibName}" will replaced with empty package mock.`)
-      }
-      rimraf.sync(pathInProjectNodeModules);
-      fse.mkdirpSync(pathInProjectNodeModules);
-
-      fse.writeFileSync(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `, 'utf8');
-      fse.writeFileSync(path.join(pathInProjectNodeModules, config.file.package_json), JSON.stringify({
-        name: missingLibName,
-        version: "0.0.0"
-      } as IPackageJSON), 'utf8');
-
-    })
-  }
-  //#endregion
 
   //#region @backend
   protected startOnCommand(args: string): string {
@@ -1001,68 +958,13 @@ export abstract class BaseProject {
   //#endregion
 
 
-  //#region @backend
-  public quickFixMissingSourceFolders() { /// TODO make it more generic
-    if (this.isWorkspace ||
-      this.isWorkspaceChildProject ||
-      this.isStandaloneProject) {
-
-
-      const srcFolder = path.join(this.location, config.folder.src);
-      if (!this.isWorkspace && !fse.existsSync(srcFolder)) {
-        // log('SRC folder recreated')
-        fse.mkdirpSync(srcFolder);
-      }
-      const componentsFolder = path.join(this.location, config.folder.components);
-      const browserStandaloneFolder = path.join(this.location, config.folder.browser);
-      if (this.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
-        // log('COMPONENTS folder recreated');
-        fse.mkdirpSync(componentsFolder);
-      }
-
-      if (this.type === 'angular-lib' && this.isStandaloneProject && !fse.existsSync(browserStandaloneFolder)) {
-        // log('BROWSER folder recreated');
-        fse.symlinkSync(this.location, path.join(this.location, config.folder.browser));
-      }
-
-      const customFolder = path.join(this.location, config.folder.custom);
-      if (this.isSite && !fse.existsSync(customFolder)) {
-        // log('CUSTOM folder recreated');
-        fse.mkdirpSync(customFolder);
-      }
-
-      const nodeModulesFolder = path.join(this.location, config.folder.node_modules);
-      if (this.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
-        // log('NODE_MODULES folder recreated');
-        fse.mkdirpSync(nodeModulesFolder)
-      }
-      if (this.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
-        const paretnFolderOfNodeModules = path.join(this.parent.location, config.folder.node_modules);
-        if (!fse.existsSync(paretnFolderOfNodeModules)) {
-          // log('NODE_MODULES (parent) folder recreated');
-          fse.mkdirpSync(paretnFolderOfNodeModules)
-        }
-        // log('NODE_MODULES folder link to child recreated');
-        HelpersLinks.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
-      }
-
-      if (this.isSite) {
-        if (this.isWorkspace) {
-          const baselineFolderInNodeModule = path.join(this.location, config.folder.node_modules, this.baseline.name);
-          if (!fse.existsSync(baselineFolderInNodeModule)) {
-            // log('BASELINE folder in NODE_MODUELS recreated');
-            HelpersLinks.createSymLink(this.baseline.location, baselineFolderInNodeModule);
-          }
-        }
-      }
-
-
-    }
-  }
-  //#endregion
 
   //#region @backend
   public reset(showMsg = true) {
+    if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
+      const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
+      tryRemoveDir(siteLocationInDist);
+    }
     if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
     }
@@ -1090,7 +992,7 @@ export abstract class BaseProject {
       // log(`Removing: ${fileOrDirPath}`)
       rimraf.sync(fileOrDirPath)
     }
-    this.quickFixMissingSourceFolders()
+    this.quickFixes.missingSourceFolders()
   }
   //#endregion
 
@@ -1582,7 +1484,8 @@ export class Project extends BaseProject implements IProject {
 
         this.packageJson = PackageJSON.fromProject(this);
         this.type = this.packageJson.type;
-        this.quickFixMissingSourceFolders()
+        this.quickFixes = new QuickFixes(this)
+        this.quickFixes.missingSourceFolders()
         this.staticBuild = new StaticBuild(this)
         this.workspaceSymlinks = new WorkspaceSymlinks(this);
         this.tnpBundle = new TnpBundle(this);

@@ -54,18 +54,31 @@ export class CopyManager extends FeatureForProject {
       filterForBundle?: boolean;
       showInfo?: boolean;
       ommitSourceCode?: boolean;
+      useTempLocation?: boolean;
     }): boolean {
 
-    const { override = true, filterForBundle = true, showInfo = true, ommitSourceCode = false } = options || {}
-    if (_.isUndefined(filterForBundle)) {
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+
+    if (_.isUndefined(options.filterForBundle)) {
       options.filterForBundle = true;
     }
-    if (_.isUndefined(override)) {
+    if (_.isUndefined(options.ommitSourceCode)) {
+      options.ommitSourceCode = false;
+    }
+    if (_.isUndefined(options.override)) {
       options.override = true;
     }
-    if (_.isUndefined(showInfo)) {
+    if (_.isUndefined(options.showInfo)) {
       options.showInfo = true;
     }
+    if (_.isUndefined(options.useTempLocation)) {
+      options.useTempLocation = true;
+    }
+
+    const { override, filterForBundle, showInfo, ommitSourceCode, useTempLocation } = options;
+
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {

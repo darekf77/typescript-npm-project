@@ -110,18 +110,26 @@ export async function STATIC_RESET_ALL(args: string, exit = true) {
 export default {
   INIT,
   STATIC_INIT,
+  S_INIT: STATIC_INIT,
   CLEAN,
   CLEAR,
+  CL: CLEAN,
   STATIC_CLEAN,
   STATIC_CLEAR,
+  SCL: STATIC_CLEAN,
   CLEAN_ALL,
   CLEAR_ALL,
   STATIC_CLEAN_ALL,
   STATIC_CLEAR_ALL,
+  SCLA: STATIC_CLEAN_ALL,
   RESET,
   RESET_ALL,
+  RST: RESET,
+  RSTA: RESET_ALL,
   STATIC_RESET,
   STATIC_RESET_ALL,
+  SRST: STATIC_RESET,
+  SRSTA: STATIC_RESET_ALL,
 
   TEMPLATES_BUILDER() {
     Project.Current.filesTemplatesBuilder.rebuild();
