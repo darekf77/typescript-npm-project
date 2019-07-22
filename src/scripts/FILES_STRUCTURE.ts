@@ -32,7 +32,7 @@ export async function INIT(args: string, exit = true) {
 // }
 
 export async function STATIC_INIT(args: string, exit = true) {
-  await Project.Current.StaticVersion.filesStructure.init(args);
+  await Project.Current.StaticVersion().filesStructure.init(args);
   if (exit) {
     process.exit(0)
   }
@@ -48,7 +48,7 @@ export async function CLEAN(args: string, exit = true) {
 export const CLEAR = CLEAN;
 
 export async function STATIC_CLEAN(args: string, exit = true) {
-  await Project.Current.StaticVersion.filesStructure.clearFromArgs(args)
+  await Project.Current.StaticVersion(false).filesStructure.clearFromArgs(args)
   if (exit) {
     process.exit(0);
   }
@@ -66,7 +66,7 @@ export async function CLEAN_ALL(args: string, exit = true) {
 export const CLEAR_ALL = CLEAN_ALL;
 
 export async function STATIC_CLEAN_ALL(args: string, exit = true) {
-  await Project.Current.StaticVersion.filesStructure.clear({ recrusive: true })
+  await Project.Current.StaticVersion(false).filesStructure.clear({ recrusive: true })
   if (exit) {
     process.exit(0);
   }
@@ -89,14 +89,14 @@ export async function RESET_ALL(args: string, exit = true) {
 }
 
 export async function STATIC_RESET(args: string, exit = true) {
-  await Project.Current.StaticVersion.filesStructure.resetFromArgs(args)
+  await Project.Current.StaticVersion(false).filesStructure.resetFromArgs(args)
   if (exit) {
     process.exit(0);
   }
 }
 
 export async function STATIC_RESET_ALL(args: string, exit = true) {
-  await Project.Current.StaticVersion.filesStructure.reset({ recrusive: true })
+  await Project.Current.StaticVersion(false).filesStructure.reset({ recrusive: true })
   if (exit) {
     process.exit(0);
   }

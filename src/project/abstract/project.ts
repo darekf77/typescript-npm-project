@@ -340,13 +340,19 @@ export abstract class BaseProject {
    * Same thing as distribution, but it will generate folder in
    * case that the does not exists
    */
-  get StaticVersion(): Project {
+  StaticVersion(regenerate = true): Project {
+
     let staticVersion: Project;
     if (this.isGenerated) {
-      this.origin.staticBuild.regenerate();
+      if (regenerate) {
+        this.origin.staticBuild.regenerate();
+      }
       staticVersion = this as any;
     } else {
-      this.staticBuild.regenerate();
+
+      if (regenerate || !this.distribution) {
+        this.staticBuild.regenerate();
+      }
       staticVersion = this.distribution;
     }
 

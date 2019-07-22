@@ -123,12 +123,20 @@ inside generated projects...
 
     this.mergeNpmPorject();
 
+
+
     const { env } = require('minimist')(!buildOptions.args ? [] : buildOptions.args.split(' '));
     if (env) {
       info(`ENVIRONMENT: ${chalk.bold(env)}`)
     } else {
-      buildOptions.args += `${buildOptions.args} --env=static`;
-      info(`ENVIRONMENT (auto-assigned): "${chalk.bold('static')}"`)
+      if (this.project.isGenerated) {
+        buildOptions.args += `${buildOptions.args} --env=static`;
+        info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`)
+      } else {
+        buildOptions.args += `${buildOptions.args} --env=local`;
+        info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`)
+      }
+
     }
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
@@ -140,7 +148,9 @@ inside generated projects...
     }
 
     const transactions = (await (await TnpDB.Instance).transaction);
-    await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
+    if (!this.project.isGenerated) { // TODO REMOVE THIS
+      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
+    }
 
     if (buildOptions.watch) {
       await this.project.filesStructure.init(buildOptions.args, { watch: true });
@@ -152,10 +162,9 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-    if (!this.project.isGenerated) {
+    if (!this.project.isGenerated) { // TODO REMOVE THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
-
     await this.project.build(buildOptions);
     if (exit && !buildOptions.watch) {
       process.exit(0);

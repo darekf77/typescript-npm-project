@@ -35,14 +35,31 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (arg === 'bdw') {
       return 'build:dist:watch';
     }
+    if (arg === 'blw') {
+      return 'build:lib:watch';
+    }
     if (arg === 'bbw') {
       return 'build:bundle:watch';
     }
     if (arg === 'bd') {
-      return 'build';
+      return 'build:dist';
+    }
+    if (arg === 'bb') {
+      return 'build:bundle';
+    }
+    if (arg === 'sb') {
+      return 'static:build';
+    }
+    if (arg === 'sbl') {
+      return 'static:build:lib';
+    }
+    if (arg === 'sba') {
+      return 'static:build:app';
     }
     return arg;
-  })
+  });
+  // console.log(argsv)
+  // process.exit(0)
   const db = await TnpDB.Instance;
   // console.log(argsv)
   if (
@@ -113,6 +130,8 @@ export async function start(argsv: string[], spinner?: Ora) {
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner.stop()
+                // console.log('FNNAME',vFn.name)
+                // process.exit(0)
                 vFn.apply(null, [check.restOfArgs.join(' ')]);
                 return true;
               }

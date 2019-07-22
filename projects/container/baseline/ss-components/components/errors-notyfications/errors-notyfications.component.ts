@@ -29,7 +29,7 @@ export class ErrorsNotyficationsComponent extends BaseComponent implements After
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.notificaitonService.init(this.handlers, this.template, ((data: Ng2RestData) => {
+      this.notificaitonService.init(this.handlers as any, this.template, ((data: Ng2RestData) => {
         this.data = data;
       }));
     });

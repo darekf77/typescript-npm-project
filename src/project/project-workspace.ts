@@ -136,7 +136,7 @@ export class ProjectWorkspace extends Project {
     const projects = this.projectsInOrder;
     if (this.isGenerated) {
       projects.forEach(c => {
-        c.project = c.project.StaticVersion;
+        c.project = c.project.StaticVersion();
       });
     }
 

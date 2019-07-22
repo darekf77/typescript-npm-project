@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../abstract';
 import * as rimraf from 'rimraf';
 import { BuildOptions } from './build-options';
-import { info, log, tryCopyFrom } from '../../helpers';
+import { info, log, tryCopyFrom, error } from '../../helpers';
 import chalk from 'chalk';
 import config from '../../config';
 import { BuildDir } from '../../models';
