@@ -61,7 +61,7 @@ function regenerateDistribution(project: Project): void {
       project.copyManager.generateSourceCopyIn(genLocation);
     }
   } else if (project.isWorkspaceChildProject) {
-    project.copyManager.generateSourceCopyIn(genLocation);
+    project.copyManager.generateSourceCopyIn(genLocation, { override: false });
   }
 
 }

@@ -81,6 +81,11 @@ export class SourceModifier extends FeatureCompilerForProject {
     // asyncCall && console.log(`MOD: "${relativePath}"`)
     const debugging = debugFiles.includes(relativePath);
     const saveMode = _.isUndefined(input);
+
+    if (saveMode && !config.fileExtensionsText.includes(path.extname(relativePath))) {
+      return;
+    }
+
     const modType = this.getModType(project, relativePath);
     const filePath = path.join(project.location, relativePath);
     if (saveMode) {

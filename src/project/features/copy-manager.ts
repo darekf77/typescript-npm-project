@@ -39,6 +39,34 @@ export class CopyManager extends FeatureForProject {
     }
   }
 
+  private filterDontCopy(basePathFoldersTosSkip: string[]) {
+
+    return (src: string, dest: string) => {
+      const baseFolder = _.first(src.replace(this.project.location, '')
+        .replace(/^\//, '').split('/'));
+      if (!baseFolder || baseFolder.trim() === '') {
+        return true;
+      }
+      const isAllowed = _.isUndefined(basePathFoldersTosSkip.find(f => baseFolder.startsWith(f)));
+      return isAllowed;
+    };
+
+  }
+
+  private filterOnlyCopy(basePathFoldersOnlyToInclude: string[]) {
+
+    return (src: string, dest: string) => {
+      const baseFolder = _.first(src.replace(this.project.location, '')
+        .replace(/^\//, '').split('/'));
+      if (!baseFolder || baseFolder.trim() === '') {
+        return true;
+      }
+      const isAllowed = !_.isUndefined(basePathFoldersOnlyToInclude.find(f => baseFolder.startsWith(f)));
+      return isAllowed;
+    };
+
+  }
+
   genWorkspaceEnvFiles(destination: Project) {
     const site = `${this.project.isSite ? `${config.folder.custom}/` : ''}`;
     glob
@@ -50,7 +78,7 @@ export class CopyManager extends FeatureForProject {
   }
   lastFile: string;
   private executeCopy(sourceLocation: string, destinationLocation: string, options: GenerateProjectCopyOpt) {
-    const { useTempLocation, filterForBundle, ommitSourceCode } = options;
+    const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
     if (useTempLocation) {
       tempDestination = `/tmp/${_.camelCase(destinationLocation)}`;
@@ -66,37 +94,24 @@ export class CopyManager extends FeatureForProject {
       recursive: true,
     };
 
+    const sourceFolders = [
+      config.folder.src,
+      config.folder.components,
+      config.folder.custom,
+    ];
+
     const foldersToSkip = [
       ...(filterForBundle ? [
         '.vscode',
         ..._.values(config.tempFolders)
       ] : []),
-      ...((filterForBundle && ommitSourceCode) ? [
-        config.folder.src,
-        config.folder.components,
-        config.folder.custom,
-      ] : []),
+      ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
       ...(this.project.isWorkspace ? this.project.children.map(c => c.name) : [])
     ];
 
     // console.log(foldersToSkip)
 
-    const filter = (src: string, dest: string) => {
-      // console.log('\nsrc', src)
-      // console.log('dest', dest)
-      // console.log('this.project.location', this.project.location)
-      const baseFolder = _.first(src.replace(this.project.location, '')
-        .replace(/^\//, '').split('/'));
-      if (!baseFolder || baseFolder.trim() === '') {
-        // console.log(`true || baseFolder(${baseFolder}) => ${src}`)
-        return true;
-      }
-      const isAllowed = _.isUndefined(foldersToSkip.find(f => baseFolder.startsWith(f)));
-
-      // console.log(`${isAllowed} || baseFolder(${baseFolder}) => ${src}`)
-      // console.log('')
-      return isAllowed;
-    };
+    const filter = override ? this.filterOnlyCopy(sourceFolders) : this.filterDontCopy(foldersToSkip);
     copyOpt['filter'] = filter;
 
     fse.copySync(`${sourceLocation}/`, tempDestination, copyOpt);
@@ -150,16 +165,15 @@ export class CopyManager extends FeatureForProject {
       packageJson.tnp.isGenerated = true;
     }
 
-    if (fs.existsSync(destinationLocation) && !override) {
-      if (showInfo) {
-        warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`);
-      }
-      return false;
-    } else {
-      if (fse.existsSync(destinationLocation) && override) {
+    if (fse.existsSync(destinationLocation)) {
+      if (override) {
         tryRemoveDir(destinationLocation);
+        fse.mkdirpSync(destinationLocation);
+      } else {
+        if (showInfo) {
+          warn(`Destination for project "${this.project.name}" already exists, only: source copy`);
+        };
       }
-      fse.mkdirpSync(destinationLocation);
     }
 
     this.executeCopy(sourceLocation, destinationLocation, options);
