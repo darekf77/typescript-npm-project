@@ -13,7 +13,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     buildOptions.forClient = currentProject.parent.children
       .filter(c => config.allowedTypes.app.includes(c.type))
       .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name)))
-      .filter(c => c.name !== currentProject.name)
+      // .filter(c => c.name !== currentProject.name)
     return;
   }
   info('Please select at lease one client..')
@@ -26,12 +26,12 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
         choices: currentProject.parent.children
           .filter(c => config.allowedTypes.app.includes(c.type))
           .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name)))
-          .filter(c => {
-            if (angularLib) {
-              return true;
-            }
-            return c.name !== currentProject.name;
-          })
+          // .filter(c => {
+          //   if (angularLib) {
+          //     return true;
+          //   }
+          //   return c.name !== currentProject.name;
+          // })
           .map(c => {
             return { value: c.name, name: c.name }
           })

@@ -14,7 +14,7 @@ import { BuildDir } from '../../models';
 export class StaticBuild extends FeatureForProject {
 
   static alerdyRegenerated = [];
-  regenerate() {
+  regenerate(regenerateWorkspaceChildren = true) {
     // console.log(StaticBuild.alerdyRegenerated)
     if (StaticBuild.alerdyRegenerated.includes(this.project.location)) {
       log(`Already regenrated workspace ${this.project.genericName}`)
@@ -27,9 +27,10 @@ export class StaticBuild extends FeatureForProject {
         this.project.parent.staticBuild.regenerate();
         return;
       }
+      this.project.parent.staticBuild.regenerate(false);
     }
     regenerateDistribution(this.project);
-    if (this.project.isWorkspace) {
+    if (this.project.isWorkspace && regenerateWorkspaceChildren) {
       this.project.children.forEach(c => regenerateDistribution(c));
     }
   }
@@ -48,7 +49,7 @@ function regenerateDistribution(project: Project): void {
 
   if (project.isWorkspace && project.isSite) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false, useTempLocation: true });
+    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
     const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
     fse.mkdirpSync(binInBasleine);
   }
