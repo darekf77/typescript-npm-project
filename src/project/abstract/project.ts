@@ -344,18 +344,18 @@ export abstract class BaseProject {
    * Same thing as distribution, but it will generate folder in
    * case that the does not exists
    */
-  StaticVersion(regenerate = true): Project {
+  async StaticVersion(regenerate = true): Promise<Project> {
 
     let staticVersion: Project;
     if (this.isGenerated) {
       if (regenerate) {
-        this.origin.staticBuild.regenerate();
+        await this.origin.staticBuild.regenerate();
       }
       staticVersion = this as any;
     } else {
 
       if (regenerate || !this.distribution) {
-        this.staticBuild.regenerate();
+        await this.staticBuild.regenerate();
       }
       staticVersion = this.distribution;
     }

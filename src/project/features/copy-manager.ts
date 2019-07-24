@@ -67,14 +67,30 @@ export class CopyManager extends FeatureForProject {
 
   }
 
-  genWorkspaceEnvFiles(destination: Project) {
-    const site = `${this.project.isSite ? `${config.folder.custom}/` : ''}`;
-    glob
-      .sync(`${this.project.location}/${site}${config.file.environment}*`)
-      .forEach(envFile => {
-        log(`Copying env file to static build: ${path.basename(envFile)} `)
-        tryCopyFrom(envFile, path.join(this.project.location, config.folder.dist, this.project.name, site, path.basename(envFile)))
-      })
+  genWorkspaceEnvFilesInside(destination: Project) {
+
+    if (this.project.isSite) {
+      glob
+        .sync(`${this.project.location}/${config.folder.custom}/${config.file.environment}*`)
+        .forEach(envFile => {
+          log(`Copying env file to static build: ${path.basename(envFile)} `)
+          tryCopyFrom(envFile, path.join(destination.location, config.folder.custom, path.basename(envFile)))
+        });
+    } else {
+      glob
+        .sync(`${this.project.location}/${config.file.environment}*`)
+        .forEach(envFile => {
+          log(`Copying env file to static build: ${path.basename(envFile)} `)
+          tryCopyFrom(envFile, path.join(destination.location, path.basename(envFile)))
+        })
+      glob
+        .sync(`${this.project.location}/${config.file.tnpEnvironment_json}*`)
+        .forEach(envFile => {
+          log(`Copying env file to static build: ${path.basename(envFile)} `)
+          tryCopyFrom(envFile, path.join(destination.location, path.basename(envFile)))
+        })
+    }
+
   }
   lastFile: string;
   private executeCopy(sourceLocation: string, destinationLocation: string, options: GenerateProjectCopyOpt) {
@@ -158,11 +174,13 @@ export class CopyManager extends FeatureForProject {
     const { override, showInfo } = options;
 
     const sourceLocation = this.project.location;
-    if (this.project.isWorkspace) {
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
         encoding: 'utf8'
       });
-      packageJson.tnp.isGenerated = true;
+      if (this.project.isWorkspace) {
+        packageJson.tnp.isGenerated = true;
+      }
     }
 
     if (fse.existsSync(destinationLocation)) {
@@ -178,14 +196,16 @@ export class CopyManager extends FeatureForProject {
 
     this.executeCopy(sourceLocation, destinationLocation, options);
 
-    if (this.project.isWorkspace) {
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
         spaces: 2,
         encoding: 'utf8'
       });
+    }
+    if (this.project.isWorkspace) {
       fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
-        This workspace is generated.
-      `);
+      This workspace is generated.
+    `);
     }
 
     if (showInfo) {

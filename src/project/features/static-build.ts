@@ -14,7 +14,7 @@ import { BuildDir } from '../../models';
 export class StaticBuild extends FeatureForProject {
 
   static alerdyRegenerated = [];
-  regenerate(regenerateWorkspaceChildren = true) {
+  async regenerate(regenerateWorkspaceChildren = true) {
     // console.log(StaticBuild.alerdyRegenerated)
     if (StaticBuild.alerdyRegenerated.includes(this.project.location)) {
       log(`Already regenrated workspace ${this.project.genericName}`)
@@ -24,20 +24,23 @@ export class StaticBuild extends FeatureForProject {
     }
     if (this.project.isWorkspaceChildProject) {
       if (!this.project.parent.distribution) {
-        this.project.parent.staticBuild.regenerate();
+        await this.project.parent.staticBuild.regenerate();
         return;
       }
-      this.project.parent.staticBuild.regenerate(false);
+      await this.project.parent.staticBuild.regenerate(false);
     }
-    regenerateDistribution(this.project);
+    await regenerateDistribution(this.project);
     if (this.project.isWorkspace && regenerateWorkspaceChildren) {
-      this.project.children.forEach(c => regenerateDistribution(c));
+      for (let index = 0; index < this.project.children.length; index++) {
+        const c = this.project.children[index];
+        await regenerateDistribution(c)
+      }
     }
   }
 
 }
 
-function regenerateDistribution(project: Project): void {
+async function regenerateDistribution(project: Project) {
 
   info(`Actual Regenerating project: ${project.genericName}`);
   StaticBuild.alerdyRegenerated.push(project.location)
@@ -49,14 +52,28 @@ function regenerateDistribution(project: Project): void {
 
   if (project.isWorkspace && project.isSite) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline, { override: false });
+    project.baseline.copyManager.generateSourceCopyIn(genLocationBaseline);
+    for (let index = 0; index < project.baseline.children.length; index++) {
+      const baselineChild = project.baseline.children[index];
+      baselineChild.copyManager.generateSourceCopyIn(path.join(genLocationBaseline, baselineChild.name));
+    }
+    const generatedBaseline = Project.From(genLocationBaseline);
+    const nodeModuleBinInRealBaseline = path.join(project.baseline.location, config.folder.node_modules, config.folder._bin);
+    if (!fse.existsSync(nodeModuleBinInRealBaseline)) {
+      fse.mkdirpSync(nodeModuleBinInRealBaseline);
+    }
+    const tmpEnvironment = path.join(project.baseline.location, config.file.tnpEnvironment_json);
+    if (!fse.existsSync(tmpEnvironment)) {
+      await project.baseline.filesStructure.init(``);
+    }
+    project.baseline.copyManager.genWorkspaceEnvFilesInside(generatedBaseline);
     const binInBasleine = path.join(genLocationBaseline, config.folder.node_modules, config.folder._bin);
     fse.mkdirpSync(binInBasleine);
   }
 
   if (project.isWorkspace) {
     if (project.distribution) {
-      project.copyManager.genWorkspaceEnvFiles(project.distribution);
+      project.copyManager.genWorkspaceEnvFilesInside(project.distribution);
     } else {
       project.copyManager.generateSourceCopyIn(genLocation);
     }

@@ -137,9 +137,10 @@ export class ProjectWorkspace extends Project {
     const { prod, watch, outDir, args } = buildOptions;
     const projects = this.projectsInOrder;
     if (this.isGenerated) {
-      projects.forEach(c => {
-        c.project = c.project.StaticVersion();
-      });
+      for (let index = 0; index < projects.length; index++) {
+        const c = projects[index];
+        await  c.project.StaticVersion();
+      }
     }
     // console.log('projects', projects.map(c => c.project.genericName))
 

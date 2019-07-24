@@ -33,7 +33,7 @@ const BUILD_DIST = async (args) => {
 const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);
 
 
-const STATIC_BUILD = (args) => {
+const STATIC_BUILD = async (args) => {
   if (!Project.Current.isWorkspace) {
     error(`Please use:
 ${chalk.gray(`$ tnp static:build:lib`)}
@@ -43,23 +43,23 @@ ${chalk.gray(`$ tnp static:build:app`)}
 inside workspace children.
     `, false, true)
   }
-  Project.Current.StaticVersion().buildProcess.startForLib({ args, staticBuildAllowed: true });
+  (await Project.Current.StaticVersion()).buildProcess.startForLib({ args, staticBuildAllowed: true });
 }
 
-const STATIC_BUILD_LIB = (args) => {
-  Project.Current.StaticVersion().buildProcess.startForLib({ args, staticBuildAllowed: true });
+const STATIC_BUILD_LIB = async (args) => {
+  (await Project.Current.StaticVersion()).buildProcess.startForLib({ args, staticBuildAllowed: true });
 };
 
-const STATIC_BUILD_PROD = (args) => Project.Current.StaticVersion().buildProcess
+const STATIC_BUILD_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForLib({ prod: true, args, staticBuildAllowed: true })
 
-const STATIC_BUILD_LIB_PROD = (args) => Project.Current.StaticVersion().buildProcess
+const STATIC_BUILD_LIB_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForLib({ prod: true, args, staticBuildAllowed: true })
 
-const STATIC_BUILD_APP = (args) => Project.Current.StaticVersion().buildProcess
+const STATIC_BUILD_APP =  async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForApp({ args, staticBuildAllowed: true })
 
-const STATIC_BUILD_APP_PROD = (args) => Project.Current.StaticVersion().buildProcess
+const STATIC_BUILD_APP_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true })
 
 const $START = async (args) => {
