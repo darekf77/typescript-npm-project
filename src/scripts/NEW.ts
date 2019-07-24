@@ -76,7 +76,8 @@ export class ProjectFactory {
       if (project) {
         try {
           project.copyManager.generateSourceCopyIn(destinationPath, {
-            ommitSourceCode: global.testMode
+            ommitSourceCode: global.testMode,
+            regenerateWorkspaceChilds: true,
           });
           // console.log(destinationPath)
           this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)

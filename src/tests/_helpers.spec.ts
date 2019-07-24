@@ -5,6 +5,7 @@ import * as path from 'path';
 import { IPackageJSON } from '../models';
 import config from '../config';
 import { tryRemoveDir, error } from '../helpers';
+import '../global-typings';
 
 const PATHES = {
   BASE_FOLDER_TEST: config.pathes.tnp_tests_context,

@@ -57,7 +57,7 @@ export default {
 
 
   $READLAST: async (args) => {
-
+    // global.tnpShowProgress = true;
     const argsObj: { lines: number; file: string } = require('minimist')(args.split(' '));
     const { lines = 100, file = '' } = argsObj;
 
@@ -67,6 +67,7 @@ export default {
   },
 
   TEST_ASYNC_PROC: async (args) => {
+    global.tnpShowProgress = true;
     let p = run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
     p.stdout.on('data', (chunk) => {
       console.log('prod:' + chunk)
@@ -79,6 +80,7 @@ export default {
 
 
   TEST_SYNC_PROC: async (args) => {
+    global.tnpShowProgress = true;
     try {
       let p = run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
       process.exit(0)
@@ -90,6 +92,7 @@ export default {
 
 
   SHOW_LOOP: (args) => {
+    global.tnpShowProgress = true;
     console.log('process pid', process.pid)
     console.log('process ppid', process.ppid)
     // process.on('SIGTERM', () => {
@@ -99,6 +102,7 @@ export default {
   },
 
   SHOW_LOOP_MESSAGES: (args) => {
+    global.tnpShowProgress = true;
     console.log('process pid', process.pid)
     console.log('process ppid', process.ppid)
     // process.on('SIGTERM', () => {

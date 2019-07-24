@@ -13,7 +13,8 @@ import config from "../../config";
 import { Project } from '../abstract';
 import { FileEvent, IPackageJSON } from '../../models';
 import { info, warn, log } from '../../helpers';
-import { tryRemoveDir, tryCopyFrom } from '../../index';
+import { tryRemoveDir, tryCopyFrom } from '../../helpers';
+import { GenerateProjectCopyOpt } from '../../models/index';
 import { copyFile } from '../../helpers';
 import { BuildOptions } from './build-options';
 import { FeatureForProject } from '../abstract';
@@ -47,15 +48,74 @@ export class CopyManager extends FeatureForProject {
         tryCopyFrom(envFile, path.join(this.project.location, config.folder.dist, this.project.name, site, path.basename(envFile)))
       })
   }
+  lastFile: string;
+  private executeCopy(sourceLocation: string, destinationLocation: string, options: GenerateProjectCopyOpt) {
+    const { useTempLocation, filterForBundle, ommitSourceCode } = options;
+    let tempDestination: string;
+    if (useTempLocation) {
+      tempDestination = `/tmp/${_.camelCase(destinationLocation)}`;
+      if (fs.existsSync(tempDestination)) {
+        rimraf.sync(tempDestination)
+      }
+      fse.mkdirpSync(tempDestination);
+    } else {
+      tempDestination = destinationLocation;
+    }
+    const copyOpt = {
+      overwrite: true,
+      recursive: true,
+    };
+
+    const foldersToSkip = [
+      ...(filterForBundle ? [
+        '.vscode',
+        ..._.values(config.tempFolders)
+      ] : []),
+      ...((filterForBundle && ommitSourceCode) ? [
+        config.folder.src,
+        config.folder.components,
+        config.folder.custom,
+      ] : []),
+      ...(this.project.isWorkspace ? this.project.children.map(c => c.name) : [])
+    ];
+
+    // console.log(foldersToSkip)
+
+    const filter = (src: string, dest: string) => {
+      // console.log('\nsrc', src)
+      // console.log('dest', dest)
+      // console.log('this.project.location', this.project.location)
+      const baseFolder = _.first(src.replace(this.project.location, '')
+        .replace(/^\//, '').split('/'));
+      if (!baseFolder || baseFolder.trim() === '') {
+        // console.log(`true || baseFolder(${baseFolder}) => ${src}`)
+        return true;
+      }
+      const isAllowed = _.isUndefined(foldersToSkip.find(f => baseFolder.startsWith(f)));
+
+      // console.log(`${isAllowed} || baseFolder(${baseFolder}) => ${src}`)
+      // console.log('')
+      return isAllowed;
+    };
+    copyOpt['filter'] = filter;
+
+    fse.copySync(`${sourceLocation}/`, tempDestination, copyOpt);
+
+    if (useTempLocation) {
+      fse.copySync(`${tempDestination}/`, destinationLocation, {
+        overwrite: true,
+        recursive: true,
+      });
+      rimraf.sync(tempDestination);
+    }
+
+  }
 
   public generateSourceCopyIn(destinationLocation: string,
-    options?: {
-      override?: boolean;
-      filterForBundle?: boolean;
-      showInfo?: boolean;
-      ommitSourceCode?: boolean;
-      useTempLocation?: boolean;
-    }): boolean {
+    options?: GenerateProjectCopyOpt): boolean {
+    // if (this.project.isWorkspace) {
+    //   console.log('GENERATING WORKSPACE')
+    // }
 
     if (_.isUndefined(options)) {
       options = {} as any;
@@ -73,11 +133,14 @@ export class CopyManager extends FeatureForProject {
     if (_.isUndefined(options.showInfo)) {
       options.showInfo = true;
     }
+    if (_.isUndefined(options.regenerateWorkspaceChilds)) {
+      options.regenerateWorkspaceChilds = false;
+    }
     if (_.isUndefined(options.useTempLocation)) {
       options.useTempLocation = true;
     }
 
-    const { override, filterForBundle, showInfo, ommitSourceCode, useTempLocation } = options;
+    const { override, showInfo } = options;
 
     const sourceLocation = this.project.location;
     if (this.project.isWorkspace) {
@@ -87,9 +150,10 @@ export class CopyManager extends FeatureForProject {
       packageJson.tnp.isGenerated = true;
     }
 
-
     if (fs.existsSync(destinationLocation) && !override) {
-      showInfo && warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`)
+      if (showInfo) {
+        warn(`Destination for project "${this.project.name}" already exists in ${destinationLocation}`);
+      }
       return false;
     } else {
       if (fse.existsSync(destinationLocation) && override) {
@@ -98,48 +162,7 @@ export class CopyManager extends FeatureForProject {
       fse.mkdirpSync(destinationLocation);
     }
 
-    // const tempLocation = `/tmp/${_.camelCase(destinationLocation)}`;
-    // if (fs.existsSync(tempLocation)) {
-    //   rimraf.sync(tempLocation)
-    // }
-    // fse.mkdirpSync(tempLocation);
-
-    if (filterForBundle) {
-
-
-      const foldersToSkip = [
-        '.vscode',
-        ..._.values(config.tempFolders),
-        ...(ommitSourceCode ? [
-          config.folder.src,
-          config.folder.components,
-          config.folder.custom,
-        ] : [])
-      ];
-
-      fse.copySync(`${sourceLocation}/`, destinationLocation, {
-        filter: (src: string, dest: string) => {
-          const baseFolder = _.first(src.replace(this.project.location, '')
-            .replace(/^\//, '').split('/'));
-          const res = _.isUndefined(foldersToSkip.find(f => baseFolder.startsWith(f)));
-          // console.log(`start: ${baseFolder}
-          // => src: ${src}
-          // -> dest ${dest}
-          // = ${res}`)
-          return res;
-        }
-      });
-    } else {
-      fse.copySync(`${sourceLocation}/`, destinationLocation);
-    }
-
-
-
-    // fse.copySync(`${tempLocation}/`, destinationLocation, {
-    //   overwrite: true,
-    //   recursive: true
-    // });
-    // rimraf.sync(tempLocation)
+    this.executeCopy(sourceLocation, destinationLocation, options);
 
     if (this.project.isWorkspace) {
       fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
@@ -148,7 +171,7 @@ export class CopyManager extends FeatureForProject {
       });
       fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
         This workspace is generated.
-      `)
+      `);
     }
 
     if (showInfo) {
@@ -157,6 +180,14 @@ export class CopyManager extends FeatureForProject {
         dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
       }
       info(`Source of project "${this.project.genericName})" generated in ${dir}/(< here >) `)
+    }
+
+
+    if (options.regenerateWorkspaceChilds && this.project.isWorkspace) {
+      this.project.children.forEach(c => {
+        // console.log('GENERATING CHILD ' + c.genericName)
+        c.copyManager.generateSourceCopyIn(path.join(destinationLocation, c.name), options);
+      });
     }
 
     return true;

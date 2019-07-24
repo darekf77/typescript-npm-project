@@ -12,6 +12,15 @@ export * from './replace-options-extended';
 export * from './project.interface';
 export * from './start-for-options';
 
+export interface GenerateProjectCopyOpt {
+  override?: boolean;
+  filterForBundle?: boolean;
+  showInfo?: boolean;
+  ommitSourceCode?: boolean;
+  regenerateWorkspaceChilds?: boolean;
+  useTempLocation?: boolean;
+}
+
 export type ProjectBuild = { project: Project; appBuild: boolean; }
 
 export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
