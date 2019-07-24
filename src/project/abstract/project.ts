@@ -1187,7 +1187,9 @@ export abstract class BaseProject {
       this.packageJson.show('show before build')
     }
     PackagesRecognitionExtended.fromProject(this as any).start();
+    // console.log('before build steps')
     await this.buildSteps(buildOptions);
+    // console.log('after build steps')
     if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }

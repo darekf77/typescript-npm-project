@@ -9,7 +9,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { BuildOptions } from './build-options';
 import { BuildDir, LibType, StartForOptions } from '../../models';
 import { config } from '../../config';
-import { error, info, warn } from '../../helpers';
+import { error, info, warn, log } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
 import { PROGRESS_DATA } from '../../progress-output';
 
@@ -162,11 +162,14 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-    if (!this.project.isGenerated) { // TODO REMOVE THIS
+    if (!this.project.isGenerated && buildOptions.watch) { // TODO REMOVE THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
+    log(`Start of Building ${this.project.genericName}`);
     await this.project.build(buildOptions);
+    log(`End of Building ${this.project.genericName}`);
     if (exit && !buildOptions.watch) {
+      log('Build process exit')
       process.exit(0);
     }
 

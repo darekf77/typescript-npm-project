@@ -121,9 +121,9 @@ export async function compilationWrapperTnp(fn: () => void, taskName: string = '
   }
 
   try {
-    log(chalk.gray(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" starte...`))
+    log(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" starte...`)
     await runSyncOrAsync(fn)
-    log(chalk.green(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`))
+    log(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`)
   } catch (error) {
     log(chalk.red(error));
     log(`${currentDate()} ${executionType} of ${taskName} ERROR`)

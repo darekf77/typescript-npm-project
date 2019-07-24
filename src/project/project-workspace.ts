@@ -115,17 +115,19 @@ export class ProjectWorkspace extends Project {
   }
 
   get projectsInOrder(): ProjectBuild[] {
-    const targetClients: ProjectBuild[] = (this.isGenerated ? this.children.filter(p => {
+    const targetClients: ProjectBuild[] = (this.children.filter(p => {
       return !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
-    }) : this.childrenThatAreClients).map(c => {
+    })).map(c => {
       return { project: c, appBuild: true };
     });
+
+    // console.log('targetClients', targetClients.map(c => c.project.genericName))
 
     const libs = this.libs(targetClients);
 
     return [
       ...libs,
-      ...targetClients
+      ...(!this.buildOptions.watch ? targetClients : [])
     ];
   }
 
@@ -139,6 +141,7 @@ export class ProjectWorkspace extends Project {
         c.project = c.project.StaticVersion();
       });
     }
+    // console.log('projects', projects.map(c => c.project.genericName))
 
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
@@ -149,16 +152,20 @@ export class ProjectWorkspace extends Project {
       const precentIndex = index;
 
       if (appBuild) {
-        showProgress('app', project.genericName, (precentIndex / sum));
-        await project.buildProcess.startForApp({
-          watch,
-          prod,
-          args: `--noConsoleClear  ${args}`,
-          staticBuildAllowed: this.isGenerated,
-          progressCallback: (fraction) => {
-            showProgress('app', project.genericName, ((precentIndex + fraction) / sum));
-          }
-        }, false);
+        if (this.isGenerated) {
+          showProgress('app', project.genericName, (precentIndex / sum));
+          await project.buildProcess.startForApp({
+            watch,
+            prod,
+            args: `--noConsoleClear  ${args}`,
+            staticBuildAllowed: this.isGenerated,
+            progressCallback: (fraction) => {
+              showProgress('app', project.genericName, ((precentIndex + fraction) / sum));
+            }
+          }, false);
+        } else {
+          log(`Ommiting app build for ${this.genericName}`)
+        }
       } else {
         showProgress('lib', project.genericName, (precentIndex / sum));
         await project.buildProcess.startForLib({

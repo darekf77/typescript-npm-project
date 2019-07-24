@@ -57,7 +57,7 @@ export class EnvironmentConfig
 
     overridePortsOnly = !_.isUndefined(overridePortsOnly) ? overridePortsOnly : !initFromScratch;
     if (!initFromScratch) {
-      log(`Config alredy ${chalk.bold('init')}ed tnp. ${chalk.green('Environment for')} `
+      log(`Config alredy ${chalk.bold('init')}ed tnp. ${'Environment for'} `
         + `${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
         + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
     }
