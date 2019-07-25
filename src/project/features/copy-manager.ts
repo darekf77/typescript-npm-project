@@ -67,32 +67,15 @@ export class CopyManager extends FeatureForProject {
 
   }
 
-  genWorkspaceEnvFilesInside(destination: Project) {
+  // genSourceFilesInside(destination: Project) {
+  //   this.project.projectSourceFiles()
+  //     .forEach(f => {
+  //       const source = path.join(this.project.location, f);
+  //       log(`Copying env file to static build: ${path.basename(f)} `)
+  //       tryCopyFrom(source, path.join(destination.location, f));
+  //     });
+  // }
 
-    if (this.project.isSite) {
-      glob
-        .sync(`${this.project.location}/${config.folder.custom}/${config.file.environment}*`)
-        .forEach(envFile => {
-          log(`Copying env file to static build: ${path.basename(envFile)} `)
-          tryCopyFrom(envFile, path.join(destination.location, config.folder.custom, path.basename(envFile)))
-        });
-    } else {
-      glob
-        .sync(`${this.project.location}/${config.file.environment}*`)
-        .forEach(envFile => {
-          log(`Copying env file to static build: ${path.basename(envFile)} `)
-          tryCopyFrom(envFile, path.join(destination.location, path.basename(envFile)))
-        })
-      glob
-        .sync(`${this.project.location}/${config.file.tnpEnvironment_json}*`)
-        .forEach(envFile => {
-          log(`Copying env file to static build: ${path.basename(envFile)} `)
-          tryCopyFrom(envFile, path.join(destination.location, path.basename(envFile)))
-        })
-    }
-
-  }
-  lastFile: string;
   private executeCopy(sourceLocation: string, destinationLocation: string, options: GenerateProjectCopyOpt) {
     const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
@@ -138,6 +121,21 @@ export class CopyManager extends FeatureForProject {
         recursive: true,
       });
       rimraf.sync(tempDestination);
+    }
+
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+      // console.log(`For project: ${this.project.genericName} files:
+      // ${this.project.projectSourceFiles()}
+      // `)
+      this.project.projectSourceFiles().forEach(f => {
+        const source = path.join(this.project.location, f);
+        if (fse.existsSync(source)) {
+          log(`Copying env file to static build: ${path.basename(f)} `)
+          tryCopyFrom(source, path.join(destinationLocation, f));
+        } else {
+          warn(`[executeCopy] Doesn not exist source: ${source}`);
+        }
+      });
     }
 
   }

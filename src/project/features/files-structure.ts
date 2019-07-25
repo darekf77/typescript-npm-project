@@ -103,7 +103,7 @@ export class FilesStructure extends FeatureForProject {
       await this.project.parent.filesStructure.init(args, options);
     }
     // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
-    info(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
+    log(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
 
 
     if (this.project.isWorkspaceChildProject) {
@@ -175,7 +175,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
 
-    info(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
+    log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
   recreateSiteChildren() {

@@ -165,7 +165,11 @@ inside generated projects...
     if (!this.project.isGenerated && buildOptions.watch) { // TODO REMOVE THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
-    log(`Start of Building ${this.project.genericName}`);
+    log(`
+
+    ${chalk.bold('Start of Building')} ${this.project.genericName}
+
+    `);
     await this.project.build(buildOptions);
     log(`End of Building ${this.project.genericName}`);
     if (exit && !buildOptions.watch) {

@@ -13,7 +13,7 @@ import config from '../../config';
 import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
-  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks, tryCopyFrom
+  pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
 } from '../../helpers';
 import { NodeModules } from "../features/node-modules";
 import { FilesRecreator } from '../features/files-recreator';
@@ -881,6 +881,17 @@ export abstract class BaseProject {
   public filesTemplates(): string[] {
     // should be abstract
     return []
+  }
+  //#endregion
+
+  //#region @backend
+  public projectSourceFiles(): string[] {
+    // should be abstract
+    return [
+      ...this.filesTemplates(),
+      ...(this.filesTemplates().map(f => f.replace(`.${config.filesExtensions.filetemplate}`, ''))),
+      ...(this.projectSpecyficFiles())
+    ];
   }
   //#endregion
 

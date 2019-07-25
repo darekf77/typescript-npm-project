@@ -1,5 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as glob from 'glob';
 // local
 import { Project } from "./abstract";
 import { ReorganizeArray, log } from "../helpers";
@@ -33,6 +34,24 @@ export class ProjectWorkspace extends Project {
   }
   projectSpecyficFiles(): string[] {
     return ['environment.d.ts'];
+  }
+
+  projectSourceFiles() {
+    let environmentFiles = [];
+    if (this.isSite) {
+      environmentFiles = environmentFiles.concat(glob
+        .sync(`${config.folder.custom}/${config.file.environment}*`, { cwd: this.location }));
+    } else {
+      environmentFiles = environmentFiles.concat(glob
+        .sync(`${config.file.environment}*`, { cwd: this.location }));
+    }
+    environmentFiles = environmentFiles.concat(glob
+      .sync(`${config.file.tnpEnvironment_json}*`, { cwd: this.location }));
+
+    return [
+      ...(super.projectSourceFiles()),
+      ...environmentFiles
+    ];
   }
 
   private libs(targetClients: ProjectBuild[]) {
@@ -121,7 +140,7 @@ export class ProjectWorkspace extends Project {
       return { project: c, appBuild: true };
     });
 
-    // console.log('targetClients', targetClients.map(c => c.project.genericName))
+    console.log('targetClients', targetClients.map(c => c.project.genericName))
 
     const libs = this.libs(targetClients);
 
@@ -139,11 +158,11 @@ export class ProjectWorkspace extends Project {
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
         const c = projects[index];
-        await  c.project.StaticVersion();
+        await c.project.StaticVersion();
       }
     }
-    // console.log('projects', projects.map(c => c.project.genericName))
-
+    console.log('projects', projects.map(c => c.project.genericName))
+    process.exit(0)
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
 
