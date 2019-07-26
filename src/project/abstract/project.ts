@@ -707,6 +707,11 @@ export abstract class BaseProject {
 
   get workspaceDependencies(): Project[] {
     if (this.isWorkspaceChildProject) {
+      if (this.isSite) {
+        return this.baseline.workspaceDependencies.map(c => {
+          return this.parent.child(c.name);
+        });
+      }
       return this.packageJson.workspaceDependencies.map(name => {
         const child = this.parent.child(name);
         if (!child) {

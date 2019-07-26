@@ -72,7 +72,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
 
     await this.assignProc(project, db, 'procStaticBuild', {
       // cmd: 'tnp build:dist',
-      cmd: 'tnp staticbuild --env={env} ',
+      cmd: 'tnp staticbuild --env={env} --tnpShowProgress',
       cwd: project.location,
       async: true,
       name: `Static Build of project ${project.name}`
@@ -80,14 +80,14 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
 
     await this.assignProc(project, db, 'procWatchBuild', {
       // cmd: 'tnp build:dist:watch',
-      cmd: 'tnp show:loop:messages --max 6',
+      cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
       cwd: project.location,
       async: true,
       name: `Watch build of project ${project.name}`
     });
 
     await this.assignProc(project, db, 'procServeStatic', {
-      cmd: 'tnp show:loop:messages --max 6',
+      cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
       // cmd: 'tnp start',
       cwd: project.location,
       async: true,
@@ -95,7 +95,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     })
 
     await this.assignProc(project, db, 'procInitEnv', {
-      cmd: 'tnp show:loop:messages --max 6',
+      cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
       // cmd: 'tnp init --env=%s',
       cwd: project.location,
       async: false,
@@ -103,7 +103,7 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
     });
 
     await this.assignProc(project, db, 'procClear', {
-      cmd: 'tnp show:loop:messages --max 6',
+      cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
       // cmd: 'tnp clear:%s',
       cwd: project.location,
       async: false,

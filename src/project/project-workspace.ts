@@ -140,7 +140,7 @@ export class ProjectWorkspace extends Project {
       return { project: c, appBuild: true };
     });
 
-    console.log('targetClients', targetClients.map(c => c.project.genericName))
+    // console.log('targetClients', targetClients.map(c => c.project.genericName))
 
     const libs = this.libs(targetClients);
 
@@ -161,8 +161,8 @@ export class ProjectWorkspace extends Project {
         await c.project.StaticVersion();
       }
     }
-    console.log('projects', projects.map(c => c.project.genericName))
-    process.exit(0)
+    // console.log('projects', projects.map(c => c.project.genericName))
+    // process.exit(0)
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
 
