@@ -11,7 +11,7 @@ import { AppPreviewPopupContentService } from 'baseline/ss-common-ui/src/app/app
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { BaseComponentForRouter } from 'baseline/ss-helpers/components';
-console.log('asd')
+
 
 @Component({
   selector: 'app-preview-buildtnpprocess',
