@@ -47,7 +47,7 @@ function copy(destLocaiton) {
   if (!destination) {
     error(`Incorect project in: ${destLocaiton}`)
   }
-  currentLib.copyManager.copyBuildedDistributionTo(destination);
+  currentLib.copyManager.copyBuildedDistributionTo(destination, void 0, false);
   info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
 

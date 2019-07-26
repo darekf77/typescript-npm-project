@@ -32,7 +32,7 @@ export class CopyManager extends FeatureForProject {
       return;
     }
     if (watch) {
-      this.copyToProjectsOnFinish();
+      this.copyToProjectsOnFinish(void 0, void 0, watch);
       this.watchAndCopyToProjectOnFinish();
     } else {
       this.copyToProjectsOnFinish();
@@ -227,7 +227,7 @@ export class CopyManager extends FeatureForProject {
 
 
   public copyBuildedDistributionTo(destination: Project,
-    options?: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }) {
+    options: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }, dontRemoveDestFolder: boolean) {
 
     const { specyficFileRelativePath = void 0, outDir = 'dist' } = options;
 
@@ -255,7 +255,9 @@ export class CopyManager extends FeatureForProject {
         namePackageName
       );
 
-      tryRemoveDir(projectOudDirDest, true)
+      if (!dontRemoveDestFolder) {
+        tryRemoveDir(projectOudDirDest, true)
+      }
 
       if (this.project.isTnp) {
         // console.info('[copyto] TNP INTSTALL')
@@ -271,7 +273,7 @@ export class CopyManager extends FeatureForProject {
   }
 
   // private __firstTimeWatchCopyTOFiles = [];
-  private copyToProjectsOnFinish(event?: FileEvent, specyficFileRelativePath?: string) {
+  private copyToProjectsOnFinish(event?: FileEvent, specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
     // console.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
     // prevent first unnecesary copy after watch
     // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
@@ -283,7 +285,7 @@ export class CopyManager extends FeatureForProject {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       (this.buildOptions.copyto as Project[]).forEach(p => {
         // console.log(`Copy to ${p.name}`)
-        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir })
+        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir }, dontRemoveDestFolder)
       })
     }
 
