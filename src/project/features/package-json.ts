@@ -384,7 +384,7 @@ export class PackageJSON {
 
     // log('toOverride',toOverride)
 
-    _.merge(newDeps, toOverride);
+    _.merge(newDeps, {});
     Object.keys(newDeps).forEach(key => {
       if (_.isNull(newDeps[key])) {
         newDeps[key] = undefined;

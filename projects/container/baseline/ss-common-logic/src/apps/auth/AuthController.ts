@@ -171,10 +171,10 @@ export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
     const self = this;
     return async (req, res) => {
 
-      if (!req.user) {
+      if (!req['user']) {
         throw new Error('Not loggin in user!');
       }
-      const User = await this.db.USER.byId(req.user.id);
+      const User = await this.db.USER.byId(req['user'].id);
       if (User) {
         User.session = await this.db.SESSION.getByUser(User, req.ip);
         return User;
@@ -221,13 +221,13 @@ export class AuthController extends Morphi.Base.Controller<entities.SESSION> {
     const self = this;
     return async (req, res) => {
 
-      let User: entities.USER = req.user;
+      let User: entities.USER = req['user'];
       if (!User) {
         throw 'No user for logout';
       }
       User = await this.db.USER.byId(User.id);
       if (!User) {
-        log.w(`Cannot find user with id:${req.user} `);
+        log.w(`Cannot find user with id:${req['user']} `);
         return false;
       }
       const Session = await this.db.SESSION.getByUser(User, req.ip);

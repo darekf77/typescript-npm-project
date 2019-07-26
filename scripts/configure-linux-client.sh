@@ -12,6 +12,7 @@ cd tsc-npm-project
 npm i && tsc && npm link
 # increase number of watchers
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+# sudo sysctl fs.inotify.max_user_watches=16384 fix for https://github.com/sass/node-sass/issues/2534 no space left
 
 git config --global user.email "darekf77@gmail.com"
 git config --global user.name  "Dariusz"
