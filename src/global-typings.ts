@@ -14,8 +14,8 @@ declare global {
       hideWarnings: boolean;
       hideInfos: boolean;
       hideLog: boolean;
-      //#region @backend
       tnpShowProgress?: boolean;
+      //#region @backend
       tnpNoColorsMode?: boolean;
       spinner: Ora;
       //#endregion

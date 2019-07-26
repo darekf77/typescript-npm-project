@@ -13,6 +13,7 @@ import { ProjectController } from 'ss-common-logic/src/apps/project/ProjectContr
 import { BuildTnpProcessModule } from 'ss-common-logic/src/apps/project/project-ui';
 import { PROCESS } from 'ss-common-logic/src/apps/process/PROCESS';
 import { ProcessController } from 'ss-common-logic/src/apps/process/ProcessController';
+import { ErrorsNotyficationsModule } from 'baseline/ss-components/components/errors-notyfications/errors-notyfications.module';
 
 const angularModules = [
   CommonModule,
@@ -22,7 +23,8 @@ const angularModules = [
 
 const localModules = [
   BuildTnpProcessModule,
-  RecrusiveMenuModule
+  RecrusiveMenuModule,
+  ErrorsNotyficationsModule
 ]
 
 const host = ENV.workspace.projects.find(({ name }) => name === 'ss-common-logic').host;

@@ -11,7 +11,7 @@ export class NotificationsService {
 
   private config: Partial<IndividualConfig> = {
     closeButton: true,
-    easeTime: 1500
+    easeTime: 5500
   };
 
   constructor(

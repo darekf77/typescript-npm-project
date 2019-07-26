@@ -40,7 +40,8 @@ export interface IPROJECT extends IProject {
   createTable: false,
   browserTransformFn: (entity: PROJECT) => {
     // entity = PROJECT.createFrom(entity);
-    // entity.browser.selectedEnv = entity.getProjectEnv()
+    const project = PROJECT.createFrom(entity);
+    entity.browser.selectedEnv = project.getProjectEnv()
     return entity;
   }
   //#endregion

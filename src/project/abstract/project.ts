@@ -297,12 +297,15 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region @backend
   /**
    * Only for generated projects
    */
   get origin(): Project {
     if (!this.isGenerated) {
-      warn(`Trying to access origin of not static project`, true);
+      if (!global.tnp_normal_mode) {
+        warn(`Trying to access origin of not static project`, true);
+      }
       return;
     }
     let project: Project;
@@ -317,7 +320,9 @@ export abstract class BaseProject {
     }
     return project;
   }
+  //#endregion
 
+  //#region @backend
   /**
    * generated version of workspace/worskpace-childs project
    * ready for serving by tnp router/proxy
@@ -326,6 +331,9 @@ export abstract class BaseProject {
     const outDir: BuildDir = 'dist';
     let projectToBuild: Project;
     if (this.isGenerated) {
+      if (!global.tnp_normal_mode) {
+        return;
+      }
       warn(`Trying to access distribution of distribution`, true);
       return;
     }
@@ -338,6 +346,7 @@ export abstract class BaseProject {
     }
     return projectToBuild;
   }
+  //#endregion
 
   //#region @backend
   /**
@@ -705,6 +714,7 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
   get workspaceDependencies(): Project[] {
     if (this.isWorkspaceChildProject) {
       if (this.isSite) {
@@ -722,6 +732,8 @@ export abstract class BaseProject {
     }
     return [];
   }
+  //#endregion
+
   get children(): Project[] {
     if (Morphi.IsBrowser) {
       return this.browser.children;
@@ -776,6 +788,7 @@ export abstract class BaseProject {
     } catch (e) {
       log(e);
       error(`Erro while reading ismorphic package file: ${p}`, true, true);
+      return [];
     };
   }
   //#endregion
