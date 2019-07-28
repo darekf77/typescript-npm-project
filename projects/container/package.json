@@ -3,7 +3,8 @@
     "resources": [
       "README.md"
     ],
-    "type": "container"
+    "type": "container",
+    "isCoreProject": true
   },
   "name": "container",
   "version": "0.0.0",

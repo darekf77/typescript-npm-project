@@ -93,7 +93,9 @@ export async function pullCurrentBranch(directoryPath, askToRetry = false) {
 export function defaultRepoBranch(directoryPath) {
   try {
     const cwd = directoryPath;
-    let defaultBranch = child.execSync(`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`, { cwd }).toString().trim()
+    const defaultBranch = child
+      .execSync(`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`, { cwd })
+      .toString().trim()
     return defaultBranch;
   } catch (e) {
     console.log(e)

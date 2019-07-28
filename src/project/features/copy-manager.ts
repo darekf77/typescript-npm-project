@@ -123,7 +123,7 @@ export class CopyManager extends FeatureForProject {
       rimraf.sync(tempDestination);
     }
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+    if (this.project.isForRecreation) {
       // console.log(`For project: ${this.project.genericName} files:
       // ${this.project.projectSourceFiles()}
       // `)
@@ -162,8 +162,8 @@ export class CopyManager extends FeatureForProject {
     if (_.isUndefined(options.showInfo)) {
       options.showInfo = true;
     }
-    if (_.isUndefined(options.regenerateWorkspaceChilds)) {
-      options.regenerateWorkspaceChilds = false;
+    if (_.isUndefined(options.regenerateProjectChilds)) {
+      options.regenerateProjectChilds = false;
     }
     if (_.isUndefined(options.useTempLocation)) {
       options.useTempLocation = true;
@@ -172,7 +172,7 @@ export class CopyManager extends FeatureForProject {
     const { override, showInfo } = options;
 
     const sourceLocation = this.project.location;
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+    if (this.project.isForRecreation) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
         encoding: 'utf8'
       });
@@ -194,11 +194,15 @@ export class CopyManager extends FeatureForProject {
 
     this.executeCopy(sourceLocation, destinationLocation, options);
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      fse.writeJsonSync(path.join(destinationLocation, config.file.package_json), packageJson, {
+    if (this.project.isForRecreation) {
+      const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
+      // console.log(`packageJsonLocation: ${packageJsonLocation}`)
+      // console.log('packageJson', packageJson)
+      fse.writeJsonSync(packageJsonLocation, packageJson, {
         spaces: 2,
         encoding: 'utf8'
       });
+      // console.log(`packageJsonLocation saved: ${packageJsonLocation}`)
     }
     if (this.project.isWorkspace) {
       fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
@@ -215,8 +219,18 @@ export class CopyManager extends FeatureForProject {
     }
 
 
-    if (options.regenerateWorkspaceChilds && this.project.isWorkspace) {
-      this.project.children.forEach(c => {
+    if (options.regenerateProjectChilds && this.project.isForRecreation) {
+      let childs = this.project.children;
+
+      if (this.project.isCoreProject && this.project.isContainer) {
+        childs = this.project.children.filter(c => c.name === 'workspace');
+      }
+
+      if (this.project.isCoreProject && this.project.isWorkspace) {
+        childs = this.project.children.filter(c => config.libsTypes.includes(c.name as any));
+      }
+
+      childs.forEach(c => {
         // console.log('GENERATING CHILD ' + c.genericName)
         c.copyManager.generateSourceCopyIn(path.join(destinationLocation, c.name), options);
       });

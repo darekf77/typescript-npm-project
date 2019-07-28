@@ -69,6 +69,7 @@ export class ProjectFactory {
     name = nameKebakCase;
 
     const project = Project.by(type);
+    // console.log('PROJECt TO GENERATE', project.location)
     const destinationPath = this.getDestinationPath(name, cwd);
     if (fse.pathExistsSync(destinationPath)) {
       info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
@@ -76,8 +77,8 @@ export class ProjectFactory {
       if (project) {
         try {
           project.copyManager.generateSourceCopyIn(destinationPath, {
-            ommitSourceCode: global.testMode,
-            regenerateWorkspaceChilds: true,
+            // ommitSourceCode: global.testMode,
+            regenerateProjectChilds: true,
           });
           // console.log(destinationPath)
           this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
@@ -91,13 +92,13 @@ export class ProjectFactory {
     }
     if (type === 'workspace') {
 
-      const w = Project.From(destinationPath);
+      const workspacePrroject = Project.From(destinationPath);
       if (basedOn) {
-        w.baseline.children.forEach(c => {
+        workspacePrroject.baseline.children.forEach(c => {
           // log(`Basleine Child project "${c.genericName}"`);
-        })
+        });
       }
-      w.children.forEach(c => {
+      workspacePrroject.children.forEach(c => {
         // log(`Child project "${c.genericName}"`);
       });
     }

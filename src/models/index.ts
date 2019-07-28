@@ -17,7 +17,7 @@ export interface GenerateProjectCopyOpt {
   filterForBundle?: boolean;
   showInfo?: boolean;
   ommitSourceCode?: boolean;
-  regenerateWorkspaceChilds?: boolean;
+  regenerateProjectChilds?: boolean;
   useTempLocation?: boolean;
 }
 

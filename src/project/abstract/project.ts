@@ -201,6 +201,15 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  get isForRecreation() {
+    if (Morphi.IsBrowser) {
+      return this.browser.isForRecreation;
+    }
+    //#region @backend
+    return (this.isWorkspaceChildProject || this.isWorkspace || this.isContainer);
+    //#endregion
+  }
+
   get isWorkspace() {
     if (Morphi.IsBrowser) {
       return this.browser.isWorkspace;
@@ -834,19 +843,22 @@ export abstract class BaseProject {
         // console.log(err)
       }
 
+      const distributionFolder = path.join(this.location, config.folder.dist);
+      if (!fse.existsSync(distributionFolder)) {
+        fse.mkdirpSync(distributionFolder);
+      }
+
       const codeWorkspace = {
         folders: [
           { path: '.' },
           ...this.children
-            .filter(c => {
-              return c.type !== 'isomorphic-lib';
-            })
             .map(c => {
               return { path: c.name }
-            })
+            }),
+          { path: 'dist' }
         ],
         settings: configSettings
-      }
+      };
       fse.writeJSONSync(path.join(this.location,
         this.nameOfCodeWorkspace), codeWorkspace, {
           encoding: 'utf8',
@@ -1487,8 +1499,8 @@ export class Project extends BaseProject implements IProject {
       return workspaceProject;
     }
     if (libraryType === 'container') {
-      const workspaceProject = Project.From(config.pathes.projectsExamples.container);
-      return workspaceProject;
+      const containerProject = Project.From(config.pathes.projectsExamples.container);
+      return containerProject;
     }
 
     const projectPath = path.join(config.pathes.projectsExamples.workspace, libraryType);

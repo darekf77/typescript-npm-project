@@ -10,6 +10,7 @@ export interface IProject {
   isGenerated: boolean;
   isWorkspaceChildProject: boolean;
   isBasedOnOtherProject: boolean;
+  isForRecreation: boolean;
   isWorkspace: boolean;
   isContainer: boolean;
   isContainerChild: boolean;

@@ -17,9 +17,13 @@ declare global {
 export function error(details: any, noExit = false, noTrace = false) {
   if (Morphi.IsBrowser) {
     console.error(details)
+    return;
   }
   //#region @backend
   // Error.stackTraceLimit = Infinity;
+  if (!global.tnp_normal_mode) {
+    noTrace = true;
+  }
   if (typeof details === 'object') {
     try {
       const json = JSON.stringify(details)
@@ -71,7 +75,8 @@ export function error(details: any, noExit = false, noTrace = false) {
 
 export function info(details: string) {
   if (Morphi.IsBrowser) {
-    console.info(details)
+    console.info(details);
+    return;
   }
   //#region @backend
   (!global.muteMessages && !global.hideInfos) && console.log(chalk.green(details))
@@ -80,7 +85,8 @@ export function info(details: string) {
 
 export function log(details: string) {
   if (Morphi.IsBrowser) {
-    console.log(details)
+    console.log(details);
+    return;
   }
   //#region @backend
   // console.log('global.muteMessages', global.muteMessages);
@@ -91,9 +97,13 @@ export function log(details: string) {
 
 export function warn(details: string, trace = false) {
   if (Morphi.IsBrowser) {
-    console.warn(details)
+    console.warn(details);
+    return;
   }
   //#region @backend
+  if (!global.tnp_normal_mode) {
+    trace = false;
+  }
   if (trace) {
     (!global.muteMessages && !global.hideWarnings) && console.trace(chalk.yellow(details))
   } else {
