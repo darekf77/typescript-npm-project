@@ -46,8 +46,6 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
 
   @HostBinding('style.height.px') height = 190;
 
-  handlers: Subscription[] = [];
-
   scrollDown() {
     setTimeout(() => {
       if (this.elemetRef && this.elemetRef.nativeElement) {

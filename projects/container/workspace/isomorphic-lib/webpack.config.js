@@ -97,7 +97,7 @@ module.exports = (env) => {
                 // compilerOptions: {
                 // module: 'esnext' , // allows bundle splitting via dynamic imports!,
                 // },
-                configFile: "tmp-src-dist-browser/tsconfig.json"
+                // configFile: "tmp-src-dist-browser/tsconfig.json"
               }
             }
           ]
