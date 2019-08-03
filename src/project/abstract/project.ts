@@ -297,7 +297,9 @@ export abstract class BaseProject {
     }
     //#region @backend
     if (this.isContainer) {
-      error(`Baseline for container is not supported`, true, false)
+      if(global.tnp_normal_mode) {
+        error(`Baseline for container is not supported`, true, false)
+      }      
     } else if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
@@ -312,7 +314,8 @@ export abstract class BaseProject {
    */
   get origin(): Project {
     if (!this.isGenerated) {
-      if (!global.tnp_normal_mode) {
+      // console.log('global.tnp_normal_mode',global.tnp_normal_mode)
+      if (global.tnp_normal_mode) {
         warn(`Trying to access origin of not static project`, true);
       }
       return;

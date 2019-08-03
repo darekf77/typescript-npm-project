@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { Morphi } from 'morphi'
 
 //#region @cutRegionIfFalse ENV.currentProjectName === 'ss-common-ui'
-import { ProcessController } from './controllers';
+import { ProcessController, ExamplesController } from './controllers';
 import { PROCESS } from './entities';
 //#endregion
 
@@ -15,6 +15,7 @@ import {
 
 
 async function start() {
+  
   const project = ENV.workspace.projects.find(p => p.name === 'ss-common-logic')
   await Morphi.init({
     //#region @backend
@@ -36,6 +37,7 @@ async function start() {
     // console.log('ctrlFN',ctrlFN)
     // let pc = Helpers.getSingleton<ProcessController>(ctrlFN);
     let pc = new ProcessController()
+    let example = new ExamplesController();
     // console.log('pc', pc)
     // let loveme = await pc.killmeee().received;
     // console.log('loveme', loveme.body.text)
@@ -45,6 +47,9 @@ async function start() {
 
     let proceses = await PROCESS.getAll()
     console.log('proceses',proceses)
+
+    const backednData = await pc.example().received;
+    console.log('backednData',backednData.body.json)
   }
   //#endregion
 

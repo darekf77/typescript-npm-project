@@ -109,6 +109,18 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#endregion
   }
 
+  @Morphi.Http.GET()
+  example(): Morphi.Response<any> {
+    //#region @backendFunc
+    return ()=> {
+
+      const p = Project.From('/home/dariusz/projects/npm/tsc-npm-project');
+
+      // const d:any = { dupa: 'dupa' };
+      return (()=> p) as any;
+    }
+    //#endregion
+  }
 
   //#region @backend
   get ctrl() {
@@ -119,8 +131,6 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     // @ts-ignore
     return entities.entities(this.connection as any);
   }
-
-
 
   private removeProcesesfolder() {
     const folder = path.join(Project.Tnp.location, 'tmp-processes-logs');
