@@ -235,12 +235,12 @@ export default {
   },
 
   $DEDUPE(args: string) {
-    Project.Current.packageJson.dedupe(args.trim() === '' ? void 0 : args.split(' '))
+    Project.Current.node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
     process.exit(0)
   },
 
   $DEPS_DEDUPE(args: string) {
-    Project.Current.packageJson.dedupe()
+    Project.Current.node_modules.dedupe()
     process.exit(0)
   },
 

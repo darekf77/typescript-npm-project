@@ -40,7 +40,7 @@ export class NodeModules extends FeatureForProject {
     //   await this.project.npmPackages.install(triggerMsg, d);
     // }
 
-    this.project.packageJson.dedupe()
+    this.project.node_modules.dedupe()
   }
 
   private get copyBin() {
@@ -62,6 +62,40 @@ export class NodeModules extends FeatureForProject {
         }
       }
     }
+  }
+
+  dedupe(packages?: string[]) {
+    const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
+      Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;
+    // console.log('Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;',Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe)
+    // console.log('packages to dedupe', packagesNames)
+    // process.exit(0)
+    packagesNames.forEach(f => {
+      log(`Scanning for duplicates fo ${f}....`)
+      const nodeMod = this.folderPath;
+      if (!fse.existsSync(nodeMod)) {
+        fse.mkdirpSync(nodeMod);
+      }
+      const res = run(`find ${config.folder.node_modules}/ -name ${f} `, { output: false, cwd: this.project.location }).sync().toString()
+      const duplicates = res
+        .split('\n')
+        .map(l => l.replace(/\/\//g, '/'))
+        .filter(l => !!l)
+        .filter(l => !l.startsWith(`${config.folder.node_modules}/${f}`))
+        .filter(l => !l.startsWith(`${config.folder.node_modules}/${config.folder._bin}`))
+        .filter(l => path.basename(path.dirname(l)) === config.folder.node_modules)
+      // const duplicates = glob.sync(`/**/${f}`, {
+      //   cwd: path.join(this.location, config.folder.node_modules),
+      //   follow: false,
+      // })
+      // log(duplicates)
+      duplicates.forEach(duplicateRelativePath => {
+        const p = path.join(this.project.location, duplicateRelativePath)
+        tryRemoveDir(p)
+        info(`Duplicate of ${f} removed from ${p}`)
+      })
+    })
+
   }
 
   get folderPath() {

@@ -21,6 +21,14 @@ export interface GenerateProjectCopyOpt {
   useTempLocation?: boolean;
 }
 
+export type PackageJsonSaveOptions = {
+  recrateInPackageJson;
+  newDeps: any;
+  toOverride: any;
+  reasonToShowPackages: string;
+  reasonToHidePackages: string;
+}
+
 export type ProjectBuild = { project: Project; appBuild: boolean; }
 
 export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';

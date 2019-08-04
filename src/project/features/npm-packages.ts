@@ -85,7 +85,7 @@ export class NpmPackages extends FeatureForProject {
         this.project.packageJson.show(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
-        this.project.packageJson.dedupe();
+        this.project.node_modules.dedupe();
       }
       if (type === 'workspace') {
         this.project.tnpBundle.installAsPackage()
