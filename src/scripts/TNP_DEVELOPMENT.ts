@@ -229,11 +229,6 @@ export default {
     process.exit(0)
   },
 
-  $DEPS_CORE() {
-    Project.Current.packageJson.coreRecreate()
-    process.exit(0)
-  },
-
   $DEDUPE(args: string) {
     Project.Current.node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
     process.exit(0)

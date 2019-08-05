@@ -43,7 +43,9 @@ export class NpmPackages extends FeatureForProject {
         npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
           .join(',')
         }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
-
+      npmPackage.forEach(p => {
+        this.project.packageJson.setDependency(p);
+      });
     }
 
     if (!this.emptyNodeModuls) {
@@ -71,13 +73,14 @@ export class NpmPackages extends FeatureForProject {
       if (type === 'workspace') {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
-      if (fullInstall) {
-        this.normalInstalation()
-      } else {
-        npmPackage.forEach(pkg => {
-          this.normalInstalation({ pkg })
-        });
-      }
+
+      // if (fullInstall) {
+      //   this.normalInstalation()
+      // } else {
+      //   npmPackage.forEach(pkg => {
+      //     this.normalInstalation({ pkg });
+      //   });
+      // }
       if (type === 'workspace') {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
@@ -85,7 +88,7 @@ export class NpmPackages extends FeatureForProject {
         this.project.packageJson.show(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
-        this.project.node_modules.dedupe();
+        // this.project.node_modules.dedupe();  // TODO uncomment
       }
       if (type === 'workspace') {
         this.project.tnpBundle.installAsPackage()
@@ -142,11 +145,10 @@ export class NpmPackages extends FeatureForProject {
 
   private normalInstalation(options?: { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; }) {
 
-    this.extractNodeModulesReplacements();
-
     const { generatLockFiles = false, useYarn = false, pkg = void 0 } = options || {};
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
+
 
     let command: string;
     if (useYarn) {
@@ -166,14 +168,14 @@ export class NpmPackages extends FeatureForProject {
       this.project.run(command,
         { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
     }
-
+    this.extractNodeModulesReplacements();
     PackagesRecognitionExtended.fromProject(this.project).start(true);
 
     if (!generatLockFiles) {
       if (useYarn) {
         if (yarnLockExisits) {
           if (this.project.git.isGitRepo) {
-            this.project.git.resetFiles(config.file.yarn_lock)
+            this.project.git.resetFiles(config.file.yarn_lock);
           }
         } else {
           fse.existsSync(yarnLockPath) && fse.unlinkSync(yarnLockPath);
