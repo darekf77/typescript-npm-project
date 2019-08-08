@@ -299,7 +299,7 @@ export abstract class BaseProject {
     if (this.isContainer) {
       if(global.tnp_normal_mode) {
         error(`Baseline for container is not supported`, true, false)
-      }      
+      }
     } else if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
@@ -1073,7 +1073,7 @@ export abstract class BaseProject {
   //#region @backend
   public getDepsAsPackage(type: NpmDependencyType | TnpNpmDependencyType): Package[] {
     if (!this.packageJson.data) {
-      return []
+      return [];
     }
     const isTnpOverridedDependency = (type === 'tnp_overrided_dependencies') &&
       this.packageJson.data.tnp &&
@@ -1228,7 +1228,7 @@ export abstract class BaseProject {
     }
 
     if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
-      this.packageJson.show('show before build')
+      this.packageJson.save('show before build')
     }
     PackagesRecognitionExtended.fromProject(this as any).start();
     // console.log('before build steps')

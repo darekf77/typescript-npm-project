@@ -1,14 +1,20 @@
 {
-  "name": "ss-helpers",
-  "version": "0.0.0",
-  "license": "UNLICENSED",
   "tnp": {
-    "isCoreProject": false,
-    "type": "angular-lib",
     "resources": [
       "README.md"
     ],
+    "isCoreProject": false,
+    "type": "angular-lib",
     "isGenerated": false,
-    "useFramework": false
-  }
+    "useFramework": false,
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
+  "name": "ss-helpers",
+  "version": "0.0.0",
+  "license": "UNLICENSED"
 }

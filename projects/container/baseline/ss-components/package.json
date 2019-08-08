@@ -1,17 +1,23 @@
 {
-  "name": "ss-components",
-  "version": "0.0.0",
-  "license": "UNLICENSED",
   "tnp": {
-    "isCoreProject": false,
-    "type": "angular-lib",
     "resources": [
       "README.md"
     ],
+    "isCoreProject": false,
+    "type": "angular-lib",
     "isGenerated": false,
     "useFramework": false,
     "required": [
       "ss-helpers"
-    ]
-  }
+    ],
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
+  "name": "ss-components",
+  "version": "0.0.0",
+  "license": "UNLICENSED"
 }

@@ -3,7 +3,13 @@
     "resources": [
       "README.md"
     ],
-    "type": "workspace"
+    "type": "workspace",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
   "basedOn": "./workspace",
   "name": "workspace-site",

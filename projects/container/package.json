@@ -4,7 +4,13 @@
       "README.md"
     ],
     "type": "container",
-    "isCoreProject": true
+    "isCoreProject": true,
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
   "name": "container",
   "version": "0.0.0",

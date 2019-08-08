@@ -1,11 +1,17 @@
 {
-  "name": "ss-common-ui",
-  "version": "0.0.0",
-  "license": "UNLICENSED",
   "tnp": {
-    "type": "angular-lib",
     "resources": [
       "README.md"
-    ]
-  }
+    ],
+    "type": "angular-lib",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
+  "name": "ss-common-ui",
+  "version": "0.0.0",
+  "license": "UNLICENSED"
 }

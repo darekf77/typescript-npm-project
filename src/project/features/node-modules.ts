@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../abstract';
-import { ArrNpmDependencyType, InstalationType, Package } from '../../models';
+import { ArrNpmDependencyType, Package } from '../../models';
 import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from "../../helpers";
 import config from '../../config';
 import { FeatureForProject } from '../abstract';
@@ -15,7 +15,7 @@ import { FeatureForProject } from '../abstract';
 export class NodeModules extends FeatureForProject {
 
   async installFrom(source: Project, triggerMsg: string) {
-    source.packageJson.show(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
+    source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
     log(`[node_modules] Copy instalation of npm packages from ` +
       `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
 

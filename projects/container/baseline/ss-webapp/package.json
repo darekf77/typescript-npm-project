@@ -7,7 +7,13 @@
     ],
     "required": [
       "ss-common-logic"
-    ]
+    ],
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
   "name": "ss-webapp",
   "version": "0.0.0",

@@ -51,30 +51,34 @@ export abstract class LibProject extends Project {
       console.log(`Exition alredy ${project.genericName}`)
       return;
     }
-    const packageJson = project.packageJson;
-    if (packageJson && packageJson.data) {
-      if (project.type !== 'unknow-npm-project') {
-        project.packageJson.show(`For release of ${this.name}`)
-      }
-      let versionBumped = false;
-      if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
-        versionBumped = true;
-        packageJson.data.dependencies[this.name] = newVersion;
-      }
-      if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
-        versionBumped = true;
-        packageJson.data.devDependencies[this.name] = newVersion
-      }
-      if (versionBumped) {
-        packageJson.save()
-        info(`[release - ${this.name}] Version of current project "${this.name}" bumped in ${project.genericName}`)
-      } else {
-        log(`[release - ${this.name}] ${this.name} has not a dependency of ${this.name}`)
-      }
-    } else {
-      log(`[release - ${this.name}] No package json for ${project.genericName}`)
-    }
-    updatedProjectw.push(project)
+    project.packageJson.setDependencyAndSave({
+      name: this.name,
+      version: newVersion
+    }, `Bump versoin of library ${this.name}`);
+    // const packageJson = project.packageJson;
+    // if (packageJson && packageJson.data) {
+    //   if (project.type !== 'unknow-npm-project') {
+    //     project.packageJson.show(`For release of ${this.name}`)
+    //   }
+    //   let versionBumped = false;
+    //   if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
+    //     versionBumped = true;
+    //     packageJson.data.dependencies[this.name] = newVersion;
+    //   }
+    //   if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
+    //     versionBumped = true;
+    //     packageJson.data.devDependencies[this.name] = newVersion
+    //   }
+    //   if (versionBumped) {
+    //     packageJson.save(`Version bumped to ${} for ${this.name}  ${}`)
+    //     info(`[release - ${this.name}] Version of current project "${this.name}" bumped in ${project.genericName}`)
+    //   } else {
+    //     log(`[release - ${this.name}] ${this.name} has not a dependency of ${this.name}`)
+    //   }
+    // } else {
+    //   log(`[release - ${this.name}] No package json for ${project.genericName}`)
+    // }
+    updatedProjectw.push(project);
     console.log(`[release - ${this.name}]  children of ${project.genericName}`, project.children.map(c => c.location))
 
     project.children.forEach(p => this.updateChildren(p, newVersion, updatedProjectw));
@@ -91,9 +95,10 @@ export abstract class LibProject extends Project {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       this.updateChildren(this, newVersion);
     } else {
-      Project.Tnp.packageJson.data.dependencies[this.name] = newVersion;
-      Project.Tnp.packageJson.save()
-      Project.Tnp.packageJson.coreRecreate();
+      Project.Tnp.packageJson.setDependencyAndSave({
+        name: this.name,
+        version: newVersion,
+      }, `Bump new version "${newVersion}" of ${this.name}`);
       await (new Promise((resolve, reject) => {
         getDependents(this.name, function (err, packages: any[]) {
           if (err) {
@@ -157,7 +162,7 @@ export abstract class LibProject extends Project {
       if (!this.node_modules.exist) {
         await this.npmPackages.installAll(`release procedure`)
       }
-      this.packageJson.show('show for release')
+      this.packageJson.save('show for release')
       await this.recreate.init();
       await this.build(BuildProcess.prepareOptionsLib({
         prod, outDir: config.folder.bundle as 'bundle', args: c.args

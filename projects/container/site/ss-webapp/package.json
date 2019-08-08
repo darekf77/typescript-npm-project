@@ -1,13 +1,20 @@
 {
-  "name": "ss-webapp",
-  "version": "0.0.0",
-  "license": "MIT",
   "tnp": {
+    "resources": [],
     "type": "angular-client",
     "frameworks": [
       "bootstrap"
-    ]
+    ],
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
+  "name": "ss-webapp",
+  "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "build": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.js",
     "build:aot": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.aot.js"

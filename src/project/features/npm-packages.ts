@@ -13,7 +13,7 @@ import { PackagesRecognitionExtended } from './packages-recognition-extended';
 
 export class NpmPackages extends FeatureForProject {
 
-  async fromArgs(packagesNamesSpaceSeparated: string) {
+  async installFromArgs(packagesNamesSpaceSeparated: string) {
 
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
@@ -23,7 +23,21 @@ export class NpmPackages extends FeatureForProject {
       const packages = this.resolvePacakgesFromArgs(args);
       await this.install(`tnp install ${packages
         .map(p => `${p.installType}${p.version ? `$@${p.version}` : ''}`)
-        .join(', ')} `, ...packages);
+        .join(', ')} `, packages);
+    }
+  }
+
+  async uninstallFromArgs(packagesNamesSpaceSeparated: string) {
+
+    const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
+
+    if (args.length === 0) {
+      error(`Please specify package name: tnp uninstall exapmle-npm-package `, false, true)
+    } else {
+      const packages = this.resolvePacakgesFromArgs(args);
+      await this.install(`tnp uninstall ${packages
+        .map(p => `${p.installType}${p.version ? `$@${p.version}` : ''}`)
+        .join(', ')} `, packages, true);
     }
   }
 
@@ -31,21 +45,23 @@ export class NpmPackages extends FeatureForProject {
     await this.install(triggeredMsg)
   }
 
-  public async install(triggeredMsg: string, ...npmPackage: Package[]) {
+  public async install(triggeredMsg: string, npmPackage?: Package[], remove = false) {
 
     const type = this.project.type;
     const fullInstall = (npmPackage.length === 0);
 
-    if (fullInstall) {
-      log(`Packages full installation for ${this.project.genericName}`)
-    } else {
-      log(`Package [${
-        npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
-          .join(',')
-        }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
-      npmPackage.forEach(p => {
-        this.project.packageJson.setDependency(p);
-      });
+    if (!remove) {
+      if (fullInstall) {
+        log(`Packages full installation for ${this.project.genericName}`)
+      } else {
+        log(`Package [${
+          npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+            .join(',')
+          }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
+        npmPackage.forEach(p => {
+          this.project.packageJson.setDependencyAndSave(p, `package ${p && p.name} instalation`);
+        });
+      }
     }
 
     if (!this.emptyNodeModuls) {
@@ -56,39 +72,46 @@ export class NpmPackages extends FeatureForProject {
     }
 
     if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg} `, ...npmPackage)
+      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg} `, npmPackage, remove)
     }
 
     if (this.project.isContainer) {
       for (let index = 0; index < this.project.children.length; index++) {
         const childWrokspace = this.project.children[index];
-        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg} `, ...npmPackage);
+        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg} `, npmPackage, remove);
       }
     }
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || type === 'unknow-npm-project') {
       if (type !== 'unknow-npm-project') {
-        this.project.packageJson.show(`${type} instalation before[${triggeredMsg}]`);
+        this.project.packageJson.save(`${type} instalation before[${triggeredMsg}]`);
       }
       if (type === 'workspace') {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      // if (fullInstall) {
-      //   this.normalInstalation()
-      // } else {
-      //   npmPackage.forEach(pkg => {
-      //     this.normalInstalation({ pkg });
-      //   });
-      // }
+      if (remove) {
+        npmPackage.forEach(pkg => {
+          this.normalInstalation({ pkg, reason: triggeredMsg }, true);
+        });
+      } else {
+        if (fullInstall) {
+          this.normalInstalation()
+        } else {
+          npmPackage.forEach(pkg => {
+            this.normalInstalation({ pkg, reason: triggeredMsg });
+          });
+        }
+      }
+
       if (type === 'workspace') {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
       if (type !== 'unknow-npm-project') {
-        this.project.packageJson.show(`${type} instalation after[${triggeredMsg}]`);
+        this.project.packageJson.save(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
-        // this.project.node_modules.dedupe();  // TODO uncomment
+        this.project.node_modules.dedupe();
       }
       if (type === 'workspace') {
         this.project.tnpBundle.installAsPackage()
@@ -96,8 +119,6 @@ export class NpmPackages extends FeatureForProject {
     }
 
   }
-
-
 
   private get emptyNodeModuls() {
     return !this.project.node_modules.exist;
@@ -143,31 +164,40 @@ export class NpmPackages extends FeatureForProject {
     });
   }
 
-  private normalInstalation(options?: { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; }) {
+  private normalInstalation(options?: { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; reason: string; }, remove = false) {
 
-    const { generatLockFiles = false, useYarn = false, pkg = void 0 } = options || {};
+    const { generatLockFiles = false, useYarn = false, pkg = void 0, reason = '' } = options || {};
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
+    const install = (remove ? 'uninstall' : 'install');
 
 
     let command: string;
     if (useYarn) {
-      command = `yarn ${pkg ? 'add' : 'install'} --ignore-engines ${pkg ? pkg.name : ''} `
+      command = `yarn ${pkg ? 'add' : install} --ignore-engines ${pkg ? pkg.name : ''} `
         + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
     } else {
-      command = `npm install ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''}`;
+      command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''}`;
     }
-    if (global.testMode) {
-      log(`Test mode: normal instalation`)
-      if (pkg) {
-        Project.Tnp.node_modules.copy(pkg).to(this.project);
-      } else {
-        this.project.node_modules.installFrom(Project.Tnp, `Test mode instalaltion`);
-      }
-    } else {
+
+    if (remove) {
+      this.project.packageJson.removeDependency(pkg, reason);
       this.project.run(command,
         { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+    } else {
+      if (global.testMode) {
+        log(`Test mode: normal instalation`)
+        if (pkg) {
+          Project.Tnp.node_modules.copy(pkg).to(this.project);
+        } else {
+          this.project.node_modules.installFrom(Project.Tnp, `Test mode instalaltion`);
+        }
+      } else {
+        this.project.run(command,
+          { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+      }
     }
+
     this.extractNodeModulesReplacements();
     PackagesRecognitionExtended.fromProject(this.project).start(true);
 

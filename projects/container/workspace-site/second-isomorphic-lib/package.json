@@ -4,7 +4,13 @@
       "README.md"
     ],
     "useFramework": true,
-    "type": "isomorphic-lib"
+    "type": "isomorphic-lib",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
   "name": "second-isomorphic-lib",
   "version": "0.0.0",

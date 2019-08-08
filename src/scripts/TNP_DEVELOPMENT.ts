@@ -75,12 +75,12 @@ function version() {
 }
 
 function DEPS_SHOW(args: string) {
-  Project.Current.packageJson.show('deps show')
+  Project.Current.packageJson.save('deps show')
   process.exit(0)
 }
 
 function DEPS_HIDE(args: string) {
-  Project.Current.packageJson.hide('deps hide')
+  Project.Current.packageJson.hideDeps('deps hide')
   process.exit(0)
 }
 
@@ -247,7 +247,7 @@ export default {
   DEPS_SHOW_IF_STANDALONE(args: string) {
     if (Project.Current.isStandaloneProject) {
       info(`Showing deps for standalone project`)
-      Project.Current.packageJson.show('is standalone show')
+      Project.Current.packageJson.save('is standalone show')
     }
     commitWhatIs(`show package.json dependencies`)
     process.exit(0)

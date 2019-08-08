@@ -1,13 +1,19 @@
 {
+  "tnp": {
+    "resources": [
+      "README.md"
+    ],
+    "type": "angular-lib",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
   "name": "second-angular-lib",
   "version": "0.0.0",
   "license": "UNLICENSED",
-  "tnp": {
-    "type": "angular-lib",
-    "resources": [
-      "README.md"
-    ]
-  },
   "isomorphicPackages": [
     "browserify-sign",
     "json10",

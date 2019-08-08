@@ -5,6 +5,7 @@ import { LibType, DependenciesFromPackageJsonStyle, PackageJsonSaveOptions } fro
 import { sortKeys as sortKeysInObjAtoZ, error, log } from '../../../helpers';
 //#endregion
 
+//#region resolve and save deps for project
 export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolean,
   reasonToHidePackages: string, reasonToShowPackages: string) {
 
@@ -32,10 +33,9 @@ export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolea
     }
   });
 
-  overrideInfo(orginalDependencies, toOverrideDependencies, newDepsForProject);
-  overrideInfo(orginalDevDependencies, toOverrideDependencies, newDepsForProject, true);
+  overrideInfo({ orginalDependencies, orginalDevDependencies }, toOverrideDependencies, newDepsForProject);
 
-  saveAction(project, {
+  beforeSaveAction(project, {
     newDeps: newDepsForProject,
     toOverride: toOverrideDependencies,
     recrateInPackageJson,
@@ -44,27 +44,80 @@ export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolea
   });
 
 }
+//#endregion
 
+//#region override info
+function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: any }
+  , toOverrideDependencies, newDepsForProject) {
+  let { orginalDependencies, orginalDevDependencies } = deps;
 
-function overrideInfo(orginalDependencies, toOverrideDependencies, newDepsForProject, isDevDep = false) {
-  Object.keys(orginalDependencies).forEach(oldDepName => {
-    if (orginalDependencies[oldDepName] !== newDepsForProject[oldDepName]) {
-      let overrideMsg = '';
-      if (toOverrideDependencies && toOverrideDependencies[oldDepName]) {
-        overrideMsg = 'Overrided from ';
-      } else if (newDepsForProject[oldDepName]) {
-        overrideMsg = 'Version change for ';
-      } else {
-        overrideMsg = 'Package removed';
+  function check(orgDeps, checkinDev: boolean) {
+    Object.keys(orgDeps).forEach(oldDepName => {
+      if (orgDeps[oldDepName] !== newDepsForProject[oldDepName]) {
+        //#region variables
+        const oppositeOrgDeps = (checkinDev ? orginalDependencies : orginalDependencies);
+        let overrideMsg: string;
+        let versionFrom = orgDeps[oldDepName];
+        if (!versionFrom && oppositeOrgDeps[oldDepName]) {
+          versionFrom = oppositeOrgDeps[oldDepName];
+        }
+        const versionTo = newDepsForProject[oldDepName];
+        //#endregion
+
+        if (toOverrideDependencies && !_.isUndefined(toOverrideDependencies[oldDepName])) {
+          if (_.isNull(toOverrideDependencies[oldDepName])) {
+            if (versionFrom) {
+              overrideMsg = `Overrided/Remoed ${oldDepName}`;
+            } else {
+              overrideMsg = `Overrided without any sense ${oldDepName}`;
+            }
+          } else {
+            if (versionFrom) {
+              if (versionFrom === versionTo) {
+                overrideMsg = `Overrided not necessary "${oldDepName}@${versionFrom}"`;
+              } else {
+                overrideMsg = `Overrided "${oldDepName}" ${versionFrom}=>${versionTo}`;
+              }
+            } else {
+              overrideMsg = `Overrided/Added new packge ${oldDepName}@${versionTo}`;
+            }
+          }
+        } else {
+          if (_.isString(versionFrom) && _.isString(versionTo)) {
+            if (versionFrom !== versionFrom) {
+              overrideMsg = `Version change "${oldDepName}" ${versionFrom}=>${versionTo}`;
+            }
+          }
+          if (!versionFrom && _.isString(versionTo)) {
+            overrideMsg = `Added new package "${oldDepName}@${versionTo}"`;
+          }
+          if (_.isString(versionFrom) && !versionTo) {
+            overrideMsg = `Removed package "${oldDepName}@${versionTo}"`;
+          }
+        }
+
+        // if (toOverrideDependencies && toOverrideDependencies[oldDepName]) {
+        //   overrideMsg = 'Overrided from ';
+        // } else if (newDepsForProject[oldDepName] && versionFrom) {
+        //   overrideMsg = 'Version change for ';
+        // } else if (newDepsForProject[oldDepName] && !versionFrom) {
+        //   overrideMsg = 'Added new change for ';
+        // } else {
+        //   overrideMsg = 'Package removed';
+        // }
+        // log(`[override-info] ${checkinDev ? '[devDependency]' : '[dependency]'} | ${overrideMsg} "${oldDepName}":
+        //   "${versionFrom}"=>"${versionTo}"`);
+        overrideMsg && log(`[override-info] ${overrideMsg}`);
       }
-      log(`[override-info] ${isDevDep ? '[devDependency]' : '[dependency]'} | ${overrideMsg} "${oldDepName}":
-              "${orginalDependencies[oldDepName]}"=>"${newDepsForProject[oldDepName]}"`);
-    }
-  });
+    });
+  }
+  check(orginalDependencies, false);
+  check(orginalDevDependencies, true);
 }
+//#endregion
 
-
-function saveAction(project: Project, options: PackageJsonSaveOptions) {
+//#region save action
+function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
   const { newDeps, toOverride, recrateInPackageJson, reasonToHidePackages, reasonToShowPackages } = options;
   cleanForIncludeOnly(project, newDeps, toOverride);
 
@@ -79,14 +132,12 @@ function saveAction(project: Project, options: PackageJsonSaveOptions) {
       project.packageJson.data.dependencies = sortKeysInObjAtoZ(filterDepOnly(project, _.cloneDeep(newDeps)))
       project.packageJson.data.engines = engines;
       project.packageJson.data.license = license;
-      project.packageJson.save()
     } else {
       log(`[package.json] save for clean - standalone project: "${project.name}" , [${reasonToHidePackages}]`)
       project.packageJson.data.devDependencies = void 0;
       project.packageJson.data.dependencies = void 0;
       project.packageJson.data.engines = void 0;
       project.packageJson.data.license = void 0;
-      project.packageJson.save()
     }
 
   } else {
@@ -98,7 +149,6 @@ function saveAction(project: Project, options: PackageJsonSaveOptions) {
         project.packageJson.data.engines = engines;
         project.packageJson.data.license = license;
       }
-      project.packageJson.save()
     } else {
       log(`[package.json] save for clean - workspace project: "${project.name}" , [${reasonToHidePackages}]`)
       project.packageJson.data.dependencies = void 0;
@@ -106,17 +156,18 @@ function saveAction(project: Project, options: PackageJsonSaveOptions) {
         project.packageJson.data.engines = void 0;
         project.packageJson.data.license = void 0;
       }
-      project.packageJson.save();
     }
   }
 }
+//#endregion
 
+//#region get deps by
 export function getDepsBy(project: Project, options?: {
   updateFn?: (obj: Object, pkgName: string) => string,
   type?: LibType,
 }) {
   if (_.isUndefined(options)) {
-    options = {}
+    options = {};
   }
   const { updateFn, type } = options;
   const constantTnpDeps = {};
@@ -130,10 +181,14 @@ export function getDepsBy(project: Project, options?: {
         travelObject(core.onlyFor[libType], constantTnpDeps, undefined, updateFn);
       });
     }
+  } else {
+    // TODO HERE
   }
   return constantTnpDeps;
 }
+//#endregion
 
+//#region deps filters
 function filterDevDepOnly(project: Project, deps: DependenciesFromPackageJsonStyle) {
   const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
   const onlyAsDevAllowed = (project.packageJson.data.tnp &&
@@ -172,7 +227,9 @@ function filterDepOnly(project: Project, deps: DependenciesFromPackageJsonStyle)
   })
   return deps;
 }
+//#endregion
 
+//#region clean for include only
 function cleanForIncludeOnly(project: Project, deps: DependenciesFromPackageJsonStyle, overrided: DependenciesFromPackageJsonStyle) {
   // log('overrided', overrided)
 
@@ -210,9 +267,9 @@ function cleanForIncludeOnly(project: Project, deps: DependenciesFromPackageJson
 
   }
 }
+//#endregion
 
-
-
+//#region travel object
 function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj: Object, pkgName: string) => string) {
   Object.keys(obj).forEach(key => {
     if (key !== '@') {
@@ -235,6 +292,6 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
     } else if (!!parent) {
       travelObject(parent[key], out, parent, updateFn)
     }
-  })
+  });
 }
-
+//#endregion

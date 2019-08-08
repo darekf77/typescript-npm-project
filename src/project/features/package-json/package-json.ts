@@ -6,7 +6,6 @@ import * as path from 'path';
 import chalk from "chalk";
 
 import { Project } from "../../abstract";
-import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework } from "../../../models";
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from "../../../helpers";
 import { config } from '../../../config';
 import { PackageJsonBase } from './package-json-base.backend';
@@ -14,6 +13,7 @@ import { PackageJsonBase } from './package-json-base.backend';
 
 import * as _ from "lodash";
 import { Morphi } from 'morphi';
+import { IPackageJSON } from '../../../models/ipackage-json';
 
 
 @Morphi.Entity<PackageJSON>({
@@ -23,8 +23,8 @@ import { Morphi } from 'morphi';
   //#endregion
 })
 export class PackageJSON
-//#region @backend
-extends PackageJsonBase
+  //#region @backend
+  extends PackageJsonBase
 //#endregion
 {
 
@@ -43,17 +43,51 @@ extends PackageJsonBase
     }
     try {
       const file = fs.readFileSync(filePath, 'utf8').toString();
-      const json = JSON.parse(file);
+      const json: IPackageJSON = JSON.parse(file) as any;
       if (!json.tnp && !isTnpProject) {
         // warn(`Unrecognized project type from location: ${location}`, false);
       }
-      return new PackageJSON({ data: json, location, project });
+      var saveAtLoad = false;
+      if (json.tnp) {
+        if (!json.tnp.overrided) {
+          json.tnp.overrided = {};
+          saveAtLoad = true;
+        }
+        if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
+          json.tnp.overrided.ignoreDepsPattern = [];
+          saveAtLoad = true;
+        }
+        if (!_.isArray(json.tnp.overrided.includeAsDev)) {
+          json.tnp.overrided.includeAsDev = [];
+          saveAtLoad = true;
+        }
+        if (!_.isArray(json.tnp.overrided.includeOnly)) {
+          json.tnp.overrided.includeOnly = [];
+          saveAtLoad = true;
+        }
+        if (!json.tnp.overrided.dependencies) {
+          json.tnp.overrided.dependencies = {};
+          saveAtLoad = true;
+        }
+        if (!_.isArray(json.tnp.resources)) {
+          json.tnp.resources = [];
+          saveAtLoad = true;
+        }
+      }
+      var pkgJson = new PackageJSON({ data: json, location, project });
+
     } catch (err) {
       error(`Error while parsing package.json in: ${filePath}`, true, true);
       error(err)
+      return;
     }
+    if (saveAtLoad) {
+      log(`Saving fixed package.json structure`);
+      pkgJson.writeToDisc()
+    }
+    return pkgJson;
   }
-
+  //#endregion
 
 }
 

@@ -3,7 +3,14 @@ import { Project } from '../project';
 import { error } from '../helpers';
 
 export async function INSTALL(args, exit = true) {
-  await Project.Current.npmPackages.fromArgs(args);
+  await Project.Current.npmPackages.installFromArgs(args);
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export async function UNINSTALL(args, exit = true) {
+  await Project.Current.npmPackages.uninstallFromArgs(args);
   if (exit) {
     process.exit(0);
   }
@@ -11,6 +18,7 @@ export async function INSTALL(args, exit = true) {
 
 export default {
   INSTALL,
+  UNINSTALL,
   $I: (args) => {
     INSTALL(args);
     process.exit(0);

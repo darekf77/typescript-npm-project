@@ -2,16 +2,16 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import chalk from "chalk";
+import chalk from 'chalk';
 
-import { Project } from "../../abstract";
-import { LibType, InstalationType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package } from "../../../models";
-import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from "../../../helpers";
+import { Project } from '../../abstract';
+import { LibType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package } from '../../../models';
+import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from '../../../helpers';
 import { config } from '../../../config';
 
 
 
-import * as _ from "lodash";
+import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 import { getDepsBy, reolveAndSaveDeps } from './package-json-helpers.backend';
 
@@ -189,43 +189,44 @@ export class PackageJsonBase {
     fse.copyFileSync(packageJsonloCation, dest);
   }
 
-  public save() {
+  public writeToDisc() {
     const filePath = path.join(this.location, config.file.package_json);
     fse.writeJSONSync(filePath, this.data, {
       encoding: 'utf8',
       spaces: 2
     });
-    // info('package.json saved')
   }
 
-  public show(reasonToShowPackages: string) {
+  public save(reasonToShowPackages: string) {
     this.reasonToShowPackages = `\n${reasonToShowPackages}`;
-    this.saveForInstallation(true);
+    if (!this.project.isUnknowNpmProject && !this.project.isContainer) {
+      this.prepareForSave();
+    }
+    this.writeToDisc();
   }
 
-  public hide(reasonToHidePackages: string) {
+  public hideDeps(reasonToHidePackages: string) {
     this.reasonToHidePackages = `\n${reasonToHidePackages}`;
-    this.saveForInstallation(false)
+    this.prepareForSave(false);
   }
 
   public updateHooks() {
-    if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks["pre-push"]))) {
+    if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks['pre-push']))) {
       this.data.husky = {
         hooks: {
-          "pre-push": "tnp deps:show:if:standalone"
+          'pre-push': 'tnp deps:show:if:standalone'
         }
       }
-      this.save()
+      this.save('Update hooks');
     }
   }
 
-  private saveForInstallation(showPackagesinFile = true) {
+  private prepareForSave(showPackagesinFile = true) {
 
     if (!showPackagesinFile && this.project.isTnp) {
       showPackagesinFile = true;
     }
 
-    this.reload();
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject || this.project.isContainer) {
       this.recreateForWorkspaceOrContainer(showPackagesinFile)
     } else if (this.project.isStandaloneProject) {
@@ -247,33 +248,38 @@ export class PackageJsonBase {
 
 
   private recreateForWorkspaceOrContainer(recreateInPackageJson: boolean) {
-    const workspace = (this.project.isWorkspace || this.project.isContainer) ? this.project : (this.project.isWorkspaceChildProject ? this.project.parent : undefined)
-    reolveAndSaveDeps(workspace, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages)
+    const workspace = (this.project.isWorkspace || this.project.isContainer) ?
+      this.project : (this.project.isWorkspaceChildProject ? this.project.parent : undefined)
+    reolveAndSaveDeps(workspace, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
   private recreateForStandalone(recreateInPackageJson: boolean) {
-
     reolveAndSaveDeps(this.project, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
-  private reload() {
-    try {
-      const file = fs.readFileSync(path.join(this.location, config.file.package_json), 'utf8').toString();
-      const json = JSON.parse(file);
-      if (!json.tnp) {
-        json.tnp = {};
-      }
-      this.data = json;
-    } catch (e) {
-      error(`Error during reload package.json from ${this.location}
-        ${e}
-      `)
-    }
+  public removeDependency(p: Package, reason: string) {
+    // TODO HERE
+    // let projToUpdate: Project = this.project;
+    // getDepsBy(projToUpdate, {
+    //   updateFn: (obj, pkgName) => {
+    //     if (pkgName === p.name) {
+    //       obj[pkgName] = void 0;
+    //     }
+    //     return obj[pkgName];
+    //   }
+    // });
+    // this.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${
+    //   projToUpdate && projToUpdate.genericName
+    //   }`);
   }
 
-  public setDependency(p: Package) {
-
+  public setDependencyAndSave(p: Package, reason: string) {
+    if (!p || !p.name || !p.version) {
+      error(`Cannot set invalid dependency for project ${this.project.genericName}: ${_.toString(p)}`, false, true);
+    }
+    let projToUpdate: Project = this.project;
     if (this.project.isTnp) {
+      //#region update tnp packages
       getDepsBy(this.project, {
         updateFn: (obj, pkgName) => {
           if (pkgName === p.name) {
@@ -282,29 +288,44 @@ export class PackageJsonBase {
           return obj[pkgName];
         }
       });
-      this.save();
-    } else if (this.project.isUnknowNpmProject || this.project.isContainer) {
+      //#endregion
+    } else if (this.project.isContainer) {
       error(`Instalation not suported`, false, true);
+    } else if (this.project.isUnknowNpmProject) {
+      //#region unknow npm project
+      if (p.installType === '--save') {
+        if (!this.data.dependencies) {
+          this.data.dependencies = {};
+        }
+        this.data.dependencies[p.name] = p.version;
+      } else if (p.installType === '--save-dev') {
+        if (!this.data.devDependencies) {
+          this.data.devDependencies = {};
+        }
+        this.data.devDependencies[p.name] = p.version;
+      }
+      //#endregion
     } else {
-      let projToUpdate: Project;
+      //#region update workspace/worspaceChilds/standalone projects
+
       if (this.project.isWorkspace || this.project.isStandaloneProject) {
         projToUpdate = this.project;
       }
       if (this.project.isWorkspaceChildProject) {
         projToUpdate = this.project.parent;
       }
-      //#region check and fix path
       if (!projToUpdate.packageJson.data.tnp.overrided) {
         projToUpdate.packageJson.data.tnp.overrided = {}
       }
       if (!projToUpdate.packageJson.data.tnp.overrided.dependencies) {
         projToUpdate.packageJson.data.tnp.overrided.dependencies = {}
       }
-      //#endregion
       projToUpdate.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
-      this.save();
-      this.saveForInstallation(true)
+      //#endregion
     }
+    this.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${
+      projToUpdate && projToUpdate.genericName
+      }`);
   }
 
 }

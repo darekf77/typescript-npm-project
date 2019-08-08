@@ -4,7 +4,13 @@
       "README.md"
     ],
     "isCoreProject": true,
-    "type": "workspace"
+    "type": "workspace",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
   },
   "name": "workspace",
   "version": "0.0.0",
