@@ -69,6 +69,14 @@ export class PackageJSON
           json.tnp.overrided.dependencies = {};
           saveAtLoad = true;
         }
+        if (!json.dependencies) {
+          json.dependencies = {};
+          saveAtLoad = true;
+        }
+        if (!json.devDependencies) {
+          json.devDependencies = {};
+          saveAtLoad = true;
+        }
         if (!_.isArray(json.tnp.resources)) {
           json.tnp.resources = [];
           saveAtLoad = true;

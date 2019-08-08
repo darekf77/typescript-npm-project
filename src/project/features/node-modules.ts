@@ -93,8 +93,8 @@ export class NodeModules extends FeatureForProject {
         const p = path.join(this.project.location, duplicateRelativePath)
         tryRemoveDir(p)
         info(`Duplicate of ${f} removed from ${p}`)
-      })
-    })
+      });
+    });
 
   }
 

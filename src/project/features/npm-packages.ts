@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
+import * as _ from 'lodash';
 
 import { Project } from '../abstract';
 import { info, checkValidNpmPackageName, error, log, warn } from '../../helpers';
@@ -47,10 +48,19 @@ export class NpmPackages extends FeatureForProject {
 
   public async install(triggeredMsg: string, npmPackage?: Package[], remove = false) {
 
+    if (!_.isArray(npmPackage)) {
+      npmPackage = [];
+    }
+
     const type = this.project.type;
     const fullInstall = (npmPackage.length === 0);
 
-    if (!remove) {
+    if (remove) {
+      log(`Package [${
+        npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+          .join(',')
+        }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
+    } else {
       if (fullInstall) {
         log(`Packages full installation for ${this.project.genericName}`)
       } else {
@@ -82,9 +92,9 @@ export class NpmPackages extends FeatureForProject {
       }
     }
 
-    if (this.project.isStandaloneProject || this.project.isWorkspace || type === 'unknow-npm-project') {
-      if (type !== 'unknow-npm-project') {
-        this.project.packageJson.save(`${type} instalation before[${triggeredMsg}]`);
+    if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject) {
+      if (type !== 'unknow-npm-project' && !remove) {
+        this.project.packageJson.save(`${type} instalation before [${triggeredMsg}]`);
       }
       if (type === 'workspace') {
         this.project.workspaceSymlinks.remove(triggeredMsg)
@@ -111,7 +121,7 @@ export class NpmPackages extends FeatureForProject {
         this.project.packageJson.save(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
-        this.project.node_modules.dedupe();
+        // this.project.node_modules.dedupe(); /// TODO uncomment
       }
       if (type === 'workspace') {
         this.project.tnpBundle.installAsPackage()
@@ -180,10 +190,12 @@ export class NpmPackages extends FeatureForProject {
       command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''}`;
     }
 
+
     if (remove) {
       this.project.packageJson.removeDependency(pkg, reason);
-      this.project.run(command,
-        { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+      // TODO UNCOMMENT
+      // this.project.run(command,
+      //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
     } else {
       if (global.testMode) {
         log(`Test mode: normal instalation`)
@@ -193,8 +205,9 @@ export class NpmPackages extends FeatureForProject {
           this.project.node_modules.installFrom(Project.Tnp, `Test mode instalaltion`);
         }
       } else {
-        this.project.run(command,
-          { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+        // TODO UNCOMMENT
+        // this.project.run(command,
+        //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
       }
     }
 
