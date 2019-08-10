@@ -212,10 +212,9 @@ export class NodeModules extends FeatureForProject {
 
     const projects = newNames
       .map(name => {
-        // TODO hide messages
         return Project.From(path.join(context, config.folder.node_modules, name))
       })
-      .filter(f => !!f)
+      .filter(f => !!f);
 
     // console.log('projects', projects.length)
     allNamesBefore = allNamesBefore.concat(newNames);

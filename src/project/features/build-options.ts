@@ -14,7 +14,7 @@ export class BuildOptions implements IBuildOptions {
   prod?: boolean;
   outDir?: BuildDir;
   watch?: boolean;
-  args?: string; // TODO remove ?
+  args?: string;
   progressCallback?: (fractionValue: number) => any;
 
   noConsoleClear?: boolean;

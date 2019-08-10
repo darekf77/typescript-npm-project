@@ -292,10 +292,10 @@ export class FilesRecreator extends FeatureForProject {
     })
   }
 
-  private assetsToIgnore = []; // TODO make this better, not dependedn gitgnore on it
+  private assetsToIgnore = []; // QUICK_FIX make this better, not dependedn gitgnore on it
 
   /**
-   * TODO needs to be before gitignore recreatino ! change it
+   * QUICK_FIX needs to be before gitignore recreatino ! change it
    */
   assets() {
     const filesPathesToIgnore = []

@@ -24,7 +24,7 @@ export class ProjectAngularLib extends LibProject {
     super(location);
     if (_.isString(location)) {
       this.projectAngularClient = new ProjectAngularClient(location);
-      this.projectAngularClient.env = this.env; // TODO QUICK_FIX
+      this.projectAngularClient.env = this.env; // QUICK_FIX
     }
 
   }

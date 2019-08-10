@@ -528,15 +528,6 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  get isCloud() {
-    if (Morphi.IsBrowser) {
-      return this.browser.isCloud;
-    }
-    //#region @backend
-    return this.name === 'site' && this.type === 'workspace'; // TODO temporary solution
-    //#endregion
-  }
-
   get isWorkspaceChildProject() {
     if (Morphi.IsBrowser) {
       return this.browser.isWorkspaceChildProject;

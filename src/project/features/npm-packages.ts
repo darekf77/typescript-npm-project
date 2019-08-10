@@ -121,7 +121,7 @@ export class NpmPackages extends FeatureForProject {
         this.project.packageJson.save(`${type} instalation after[${triggeredMsg}]`);
       }
       if (type === 'workspace' || this.project.isStandaloneProject) {
-        // this.project.node_modules.dedupe(); /// TODO uncomment
+        // this.project.node_modules.dedupe(); /// UNCOMMENT
       }
       if (type === 'workspace') {
         this.project.tnpBundle.installAsPackage()
@@ -193,7 +193,7 @@ export class NpmPackages extends FeatureForProject {
 
     if (remove) {
       this.project.packageJson.removeDependency(pkg, reason);
-      // TODO UNCOMMENT
+      // UNCOMMENT
       // this.project.run(command,
       //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
     } else {
@@ -205,7 +205,7 @@ export class NpmPackages extends FeatureForProject {
           this.project.node_modules.installFrom(Project.Tnp, `Test mode instalaltion`);
         }
       } else {
-        // TODO UNCOMMENT
+        // UNCOMMENT
         // this.project.run(command,
         //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
       }

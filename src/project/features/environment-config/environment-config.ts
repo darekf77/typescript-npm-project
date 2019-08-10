@@ -37,13 +37,10 @@ export class EnvironmentConfig
   //#region @backend
 
   /**
-     * Avaliable for worksapce and children
-     * Use only for workspace things
-     */
-
-
-  /// TODO remove children config links
-
+   * Avaliable for worksapce and children
+   * Use only for workspace things
+   * QUICK_FIX? remove children config links
+   */
   get isChildProjectWithoutConfig() {
     const f = path.join(this.project.location, tmpEnvironmentFileName);
     return !fse.existsSync(f);
@@ -170,7 +167,7 @@ export class EnvironmentConfig
 
   private static configs: { [location: string]: EnvConfig } = {};
 
-  public get configsFromJs(): EnvConfig[] { // TODO something if weird here
+  public get configsFromJs(): EnvConfig[] { // QUICK_FIX something if weird here
     //#region @backendFunc
     const p = this.project.isWorkspaceChildProject ? this.project.parent : this.project;
     const locations = glob.sync(`${p.location}/*${config.file.environment}.*js`);

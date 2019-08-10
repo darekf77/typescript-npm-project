@@ -155,11 +155,11 @@ export class ProjectIsomorphicLib extends LibProject {
   async buildLib() {
     const { outDir } = this.buildOptions;
     // console.log('Build fucking this', this.buildOptions)
-    this.copyWhenExist('bin', outDir) // TODO make this for each library
-    this.copyWhenExist('package.json', outDir)
-    this.copyWhenExist('.npmrc', outDir)
-    this.copyWhenExist('.npmignore', outDir)
-    this.copyWhenExist('.gitignore', outDir)
+    this.copyWhenExist('bin', outDir);
+    this.copyWhenExist('package.json', outDir);
+    this.copyWhenExist('.npmrc', outDir);
+    this.copyWhenExist('.npmignore', outDir);
+    this.copyWhenExist('.gitignore', outDir);
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
       if (this.isTnp) {

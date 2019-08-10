@@ -484,7 +484,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
    * ONLY FOR BROWSER CODE CUT
    */
   public replaceBaslieneFromSiteBeforeBrowserCodeCut(input: string) {
-    // TODO run before browser codecut/compilation
+    // run before browser codecut/compilation
 
     if (!this.project.isSite) {
       // log(`Project is not site: ${this.project.genericName}`);

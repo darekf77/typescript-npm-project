@@ -166,7 +166,7 @@ describe('Db crud', () => {
     crud.set(new ProjectInstance('/asdasdaaaa'))
 
     expect(crud.getAll(ProjectInstance).length).to.be.eq(2)
-    // TODO FIX THIS
+    // QUICK_FIX
     // crud.setBulk([new ProjectInstance('/jhk'), new ProjectInstance('/asd'), new ProjectInstance('/aa')], PortInstance)
 
     // expect(crud.getAll(ProjectInstance).length).to.be.eq(3)

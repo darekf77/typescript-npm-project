@@ -1,5 +1,15 @@
 # tsc-npm-project (alpha)
 
+META COMMENTS:
+- LAST
+- REMOVE_THIS
+- UCOMMENT
+- TODO
+- QUICK_FIX
+
+
+
+
 Helper project for my typescript npm libraries.
 
 

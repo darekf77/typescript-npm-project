@@ -148,7 +148,7 @@ inside generated projects...
     }
 
     const transactions = (await (await TnpDB.Instance).transaction);
-    if (!this.project.isGenerated) { // TODO REMOVE THIS
+    if (!this.project.isGenerated) { // REMOVE_THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
     }
 
@@ -162,7 +162,7 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-    if (!this.project.isGenerated && buildOptions.watch) { // TODO REMOVE THIS
+    if (!this.project.isGenerated && buildOptions.watch) { // REMOVE_THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
     log(`

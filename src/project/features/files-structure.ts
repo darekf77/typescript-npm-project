@@ -141,7 +141,7 @@ export class FilesStructure extends FeatureForProject {
         await this.project.join.initAndWatch(someBuildIsActive)
 
       } else {
-        if (!someBuildIsActive) { // TODO
+        if (!someBuildIsActive) { // QUICK_FIX
           await this.project.join.init();
         }
       }

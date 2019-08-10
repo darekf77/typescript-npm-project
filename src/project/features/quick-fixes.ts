@@ -54,7 +54,7 @@ export class QuickFixes extends FeatureForProject {
     })
   }
 
-  public missingSourceFolders() { /// TODO make it more generic
+  public missingSourceFolders() { /// QUCIK_FIX make it more generic
     if (this.project.isWorkspace ||
       this.project.isWorkspaceChildProject ||
       this.project.isStandaloneProject) {

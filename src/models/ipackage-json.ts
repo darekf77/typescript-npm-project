@@ -61,8 +61,8 @@ export interface IPackageJSON {
       }
     }
     basedOn: string,
-    basedOnAbsolutePath1: string, // TODO QUICK_FIX
-    basedOnAbsolutePath2: string, // TODO QUICK_FIX
+    basedOnAbsolutePath1: string, // QUICK_FIX
+    basedOnAbsolutePath2: string, // QUICK_FIX
     resources?: string[];
     allowedEnv?: EnvironmentName[];
     isGenerated?: boolean;

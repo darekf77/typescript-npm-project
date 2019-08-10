@@ -87,7 +87,7 @@ export class PackageJsonBase {
       }
       warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
-      // TODO quick fix
+      // QUICK_FIX
       pathToBaseline = this.data.tnp.basedOnAbsolutePath1;
       if (fs.existsSync(pathToBaseline)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaseline)

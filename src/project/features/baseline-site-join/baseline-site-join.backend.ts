@@ -217,7 +217,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     const callback = (absolutePath, event, isCustomFolder) => {
 
       if (fse.existsSync(absolutePath)) {
-        if (fse.lstatSync(absolutePath).isDirectory()) { // TODO QUICK_FIX WATCHING
+        if (fse.lstatSync(absolutePath).isDirectory()) { // QUICK_FIX WATCHING
 
           const relative = absolutePath.replace(path.dirname(this.pathToCustom), '').replace(/^\//g, '');
           const base = absolutePath.replace(relative, '').replace(/\/$/g, '');
