@@ -1322,8 +1322,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
     entity.browser.name = entity.name;
-    entity.browser.isWorkspace = entity.isWorkspace
-    entity.browser.isCloud = true;
+    entity.browser.isWorkspace = entity.isWorkspace;
     entity.browser.isStandaloneProject = entity.isStandaloneProject;
 
   }

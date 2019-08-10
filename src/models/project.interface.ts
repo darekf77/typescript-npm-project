@@ -17,7 +17,6 @@ export interface IProject {
   isStandaloneProject: boolean;
   isUnknowNpmProject: boolean;
   isTnp: boolean;
-  isCloud: boolean;
   useFramework: boolean;
   name: string;
   genericName: string;
