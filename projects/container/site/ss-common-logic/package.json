@@ -18,5 +18,7 @@
   "name": "ss-common-logic",
   "version": "0.0.0",
   "license": "UNLICENSED",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {}
 }

@@ -26,5 +26,7 @@
     "ionic:serve": "npm-run ionic-app-scripts serve",
     "build:watch": "npm-run ionic serve --no-open"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "dependencies": {},
+  "devDependencies": {}
 }

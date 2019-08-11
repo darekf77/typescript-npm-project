@@ -36,5 +36,7 @@
     "hooks": {
       "pre-push": "tnp deps:show:if:standalone"
     }
-  }
+  },
+  "dependencies": {},
+  "devDependencies": {}
 }

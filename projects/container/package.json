@@ -226,5 +226,6 @@
     "webpack-dev-server": "~2.9.3",
     "zone.js": "0.8.20"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {}
 }

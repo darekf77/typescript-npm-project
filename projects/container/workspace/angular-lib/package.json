@@ -27,5 +27,7 @@
     "tnp-bundle",
     "typeorm",
     "typescript-class-helpers"
-  ]
+  ],
+  "dependencies": {},
+  "devDependencies": {}
 }

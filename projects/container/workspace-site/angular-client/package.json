@@ -19,5 +19,7 @@
   "scripts": {
     "build": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.js",
     "build:aot": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.aot.js"
-  }
+  },
+  "dependencies": {},
+  "devDependencies": {}
 }
