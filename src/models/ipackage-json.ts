@@ -33,7 +33,7 @@ export interface IPackageJSON {
     hooks: {
       'pre-push': string;
     }
-  }
+  };
   version: string;
   bin?: any;
   main?: string;
@@ -45,26 +45,74 @@ export interface IPackageJSON {
   devDependencies?: DependenciesFromPackageJsonStyle;
   tnp: {
     type: LibType;
+    /**
+     * framework available inside project/app
+     */
     frameworks?: UIFramework[];
+    /**
+     * project is template for other project
+     */
     isCoreProject: boolean;
+    /**
+     * only for container
+     */
+    overrideCoreDeps?: boolean;
+    /**
+     * Easy way to skip browser compilation
+     */
     isCommandLineToolOnly?: boolean;
+    /**
+     * Only for isomorphic lib
+     * - if true => generate controllers.ts, entities.ts
+     */
     useFramework: boolean;
+    /**
+     * Core and contant dependecies for all projects (workspace type/standalone)
+     */
     core: {
       dependencies: {
+        /**
+         * this dependenices are always included in some way
+         */
         always?: string[];
+        /**
+         * this dependencies are only included as devDependencies
+         */
         asDevDependencies?: string[];
+        /**
+         * list of package to dedupe
+         */
         dedupe: string[];
+        /**
+         * Comon dependencies for all kinds of project types
+         */
         common: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
-
-        // libtype of workspace project
+        /**
+         * Dependencies only for specyfic project type
+         */
         onlyFor: { [libType: string]: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle }; }
       }
     }
+    /**
+     * Only for site projects.
+     * Relative path to baseline.
+     */
     basedOn: string,
     basedOnAbsolutePath1: string, // QUICK_FIX
     basedOnAbsolutePath2: string, // QUICK_FIX
+    /**
+     * Static resurces for standalone project, that are
+     * going to be included in bundle
+     */
     resources?: string[];
+    /**
+     * Allowed environment for poroject
+     */
     allowedEnv?: EnvironmentName[];
+    /**
+     * Check wheter project is generated for static build.
+     * Generated projects are inside dist folder in workspace project
+     */
     isGenerated?: boolean;
     /**
      * Usable only in workspace children
@@ -81,6 +129,5 @@ export interface IPackageJSON {
       includeAsDev?: string[];
       dependencies?: DependenciesFromPackageJsonStyle;
     }
-    // requiredLibs?: string[];
   };
 }

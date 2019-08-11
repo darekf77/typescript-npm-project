@@ -56,7 +56,7 @@ export abstract class BaseProject {
   handleModyfications(relativeFilePath: string) {
 
   }
-
+  isTemporary = false;
 
   abstract location: string;
   //#region @backend
@@ -297,7 +297,7 @@ export abstract class BaseProject {
     }
     //#region @backend
     if (this.isContainer) {
-      if(global.tnp_normal_mode) {
+      if (global.tnp_normal_mode) {
         error(`Baseline for container is not supported`, true, false)
       }
     } else if (this.isWorkspace) {
@@ -482,6 +482,8 @@ export abstract class BaseProject {
     return this.packageJson.isCoreProject;
     //#endregion
   }
+
+
 
   get isCommandLineToolOnly() {
     if (Morphi.IsBrowser) {
@@ -728,7 +730,7 @@ export abstract class BaseProject {
       return this.packageJson.workspaceDependencies.map(name => {
         const child = this.parent.child(name);
         if (!child) {
-          error(`Unknow child "${name}" inside ${this.packageJson.locationOfJson}`, true, true);
+          error(`Unknow child "${name}" inside ${this.packageJson.path}`, true, true);
         }
         return child;
       }).filter(f => !!f);
@@ -1344,8 +1346,8 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static From(location: string): Project {
-
+  public static From(location: string, isTempProject = false): Project {
+    // LAST project temporary
     if (!_.isString(location)) {
       warn(`[project.from] location is not a string`)
       return;

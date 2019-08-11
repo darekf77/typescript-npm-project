@@ -1,8 +1,9 @@
 //#region imports
 import * as _ from 'lodash';
+import * as JSON5 from 'json5';
 import { Project } from '../../abstract';
-import { LibType, DependenciesFromPackageJsonStyle, PackageJsonSaveOptions } from '../../../models';
-import { sortKeys as sortKeysInObjAtoZ, error, log, warn } from '../../../helpers';
+import { LibType, DependenciesFromPackageJsonStyle, PackageJsonSaveOptions, Package } from '../../../models';
+import { sortKeys as sortKeysInObjAtoZ, error, log, warn, run } from '../../../helpers';
 //#endregion
 
 //#region resolve and save deps for project
@@ -305,3 +306,89 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
   });
 }
 //#endregion
+
+
+export function setDependencyAndSave(p: Package, reason: string, project: Project, ) {
+  if (!p || !p.name) {
+    error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
+  }
+  project = (project.isWorkspaceChildProject ? project.parent : project);
+
+  if (project.isTnp && !_.isString(p.version)) {
+    try {
+      p.version = run(`npm show ${p.name} version`, { output: false }).sync().toString().trim();
+    } catch (e) {
+      error(`No able to find package with name ${p.name}`, false, true);
+    }
+  }
+
+  if (project.isTnp) {
+    let updated = false;
+    getAndTravelCoreDeps({
+      updateFn: (obj, pkgName) => {
+        if (pkgName === p.name) {
+          obj[pkgName] = p.version;
+          updated = true;
+        }
+        return obj[pkgName];
+      }
+    });
+    if (!updated) {
+      project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
+    }
+  } else if (project.isContainer) {
+    error(`Instalation not suported`, false, true);
+  } else if (project.isUnknowNpmProject) {
+    if (p.installType === '--save') {
+      if (!project.packageJson.data.dependencies) {
+        project.packageJson.data.dependencies = {};
+      }
+      project.packageJson.data.dependencies[p.name] = p.version;
+    } else if (p.installType === '--save-dev') {
+      if (!project.packageJson.data.devDependencies) {
+        project.packageJson.data.devDependencies = {};
+      }
+      project.packageJson.data.devDependencies[p.name] = p.version;
+    }
+  } else if (project.isStandaloneProject || project.isWorkspace || project.isWorkspaceChildProject) {
+    if (p.version) {
+      delete project.packageJson.data.tnp.overrided.dependencies[p.name];
+    } else {
+      project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
+    }
+  }
+  project.packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${
+    project && project.genericName
+    }`);
+}
+
+
+export function removeDependency(p: Package, reason: string, project: Project) {
+
+  if (!p || !p.name) {
+    error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
+  }
+  project = (project.isWorkspaceChildProject ? project.parent : project);
+  if (project.isTnp) {
+    getAndTravelCoreDeps({
+      updateFn: (obj, pkgName) => {
+        if (pkgName === p.name) {
+          obj[pkgName] = void 0;
+        }
+        return obj[pkgName];
+      }
+    });
+  }
+  if (project.isUnknowNpmProject) {
+    project.packageJson.data.dependencies[p.name] = void 0;
+    project.packageJson.data.devDependencies[p.name] = void 0;
+  } else {
+    if (project.packageJson.data.tnp.overrided.dependencies[p.name]) {
+      project.packageJson.data.tnp.overrided.dependencies[p.name] = null;
+    }
+  }
+
+  project.packageJson.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${
+    project && project.genericName
+    }`);
+}

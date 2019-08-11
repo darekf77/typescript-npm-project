@@ -2,8 +2,10 @@
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
+import * as glob from 'glob';
+import chalk from 'chalk';
 import { FeatureForProject } from "../abstract";
-import { log, tryCopyFrom, tryRemoveDir, warn, HelpersLinks } from "../../helpers";
+import { log, tryCopyFrom, tryRemoveDir, warn, HelpersLinks, info } from "../../helpers";
 import config from "../../config";
 import { IPackageJSON } from "../../models";
 
@@ -117,6 +119,46 @@ export class QuickFixes extends FeatureForProject {
       }
 
     }
+  }
+
+  private get nodeModulesReplacements() {
+    const npmReplacements = glob
+      .sync(`${this.project.location} /${config.folder.node_modules}-*.zip`)
+      .map(p => p.replace(this.project.location, '').slice(1));
+
+    return npmReplacements;
+  }
+
+  /**
+   * FIX for missing npm packages from npmjs.com
+   *
+   * Extract each file: node_modules-<package Name>.zip
+   * to node_modules folder before instalation.
+   * This will prevent packages deletion from npm
+   */
+  public nodeModulesPackagesZipReplacement() {
+    if (!this.project.isWorkspace) {
+      return;
+    }
+    const nodeModulesPath = path.join(this.project.location, config.folder.node_modules);
+
+    if (!fse.existsSync(nodeModulesPath)) {
+      fse.mkdirpSync(nodeModulesPath)
+    }
+    this.nodeModulesReplacements.forEach(p => {
+      const name = p.replace(`${config.folder.node_modules}-`, '');
+      const moduleInNodeMdules = path.join(this.project.location, config.folder.node_modules, name);
+      if (fse.existsSync(moduleInNodeMdules)) {
+        info(`Extraction ${chalk.bold(name)} already exists in ` +
+          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`);
+      } else {
+        info(`Extraction before instalation ${chalk.bold(name)} in ` +
+          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`)
+
+        this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync()
+      }
+
+    });
   }
 
 }

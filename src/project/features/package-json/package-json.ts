@@ -13,7 +13,7 @@ import { PackageJsonBase } from './package-json-base.backend';
 
 import * as _ from "lodash";
 import { Morphi } from 'morphi';
-import { IPackageJSON } from '../../../models/ipackage-json';
+import { IPackageJSON, DependenciesFromPackageJsonStyle } from '../../../models/ipackage-json';
 
 
 @Morphi.Entity<PackageJSON>({
@@ -95,7 +95,20 @@ export class PackageJSON
     }
     return pkgJson;
   }
-  //#endregion
 
+  private restrictVersions(obj: DependenciesFromPackageJsonStyle) {
+    Object.keys(obj).forEach(name => {
+      if (obj[name].startsWith('^')) {
+        obj[name] = obj[name].slice(1)
+      }
+      if (obj[name].startsWith('~')) {
+        obj[name] = obj[name].slice(1)
+      }
+    });
+  }
+
+
+
+  //#endregion
 }
 

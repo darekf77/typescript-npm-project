@@ -8,6 +8,11 @@ META COMMENTS:
 - QUICK_FIX
 
 
+# good class structure
+ - feature-core // very basic functions that I will never change
+ - feature-base // other complex functionalities
+ - feature-helpers // everything that can be function
+ - feature # can be isomorphic, empty constructro should not trigger error
 
 
 Helper project for my typescript npm libraries.

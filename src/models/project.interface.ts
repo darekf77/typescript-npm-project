@@ -3,6 +3,7 @@ import { EnvironmentConfig } from '../project/features/environment-config/enviro
 import { EnvironmentName } from './environment-name';
 import { Project } from '../project';
 export interface IProject {
+  isTemporary: boolean;
   isSite: boolean;
   isCoreProject: boolean;
   isBuildedLib: boolean;
