@@ -4,15 +4,17 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import * as _ from 'lodash';
+import * as rimraf from "rimraf";
+
 
 import { Project } from '../../abstract';
-import { info, checkValidNpmPackageName, error, log, warn } from '../../../helpers';
+import { info, checkValidNpmPackageName, error, log, warn, tryCopyFrom } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { Package, InstalationTypeArr, InstalationType, LibType } from '../../../models';
+import { Package, InstalationTypeArr, InstalationType, LibType, ActualNpmInstallOptions } from '../../../models';
 import config from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
+import { executeCommand, fixOptions, prepareCommand, prepareTempProject, copyMainProject, copyMainProjectDependencies } from './npm-packages-helpers.backend';
 //#endregion
-
 
 export class NpmPackagesCore extends FeatureForProject {
 
@@ -20,30 +22,14 @@ export class NpmPackagesCore extends FeatureForProject {
     return !this.project.node_modules.exist;
   }
 
-  protected actualNpmProcess(options?:
-    { generatLockFiles?: boolean; useYarn?: boolean; pkg?: Package; reason: string; },
-    remove = false) {
-
-    const { generatLockFiles = false, useYarn = false, pkg = void 0, reason = '' } = options || {};
+  protected actualNpmProcess(options?: ActualNpmInstallOptions) {
+    const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
-    const install = (remove ? 'uninstall' : 'install');
-
-
-    let command: string;
-    if (useYarn) {
-      command = `yarn ${pkg ? 'add' : install} --ignore-engines ${pkg ? pkg.name : ''} `
-        + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
-    } else {
-      command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''}`;
-    }
-
-
+    const command: string = prepareCommand(pkg, remove, useYarn);
     if (remove) {
       this.project.packageJson.removeDependency(pkg, reason);
-      // UNCOMMENT
-      // this.project.run(command,
-      //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+      executeCommand(command, this.project);
     } else {
       if (global.testMode) {
         log(`Test mode: normal instalation`)
@@ -53,9 +39,11 @@ export class NpmPackagesCore extends FeatureForProject {
           this.project.node_modules.copyFrom(Project.Tnp, `Test mode instalaltion`);
         }
       } else {
-        // UNCOMMENT
-        // this.project.run(command,
-        //   { cwd: this.project.location, output: true, biggerBuffer: true }).sync();
+        if (smoothInstall) {
+          this.smoothInstallPrepare(pkg);
+        } else {
+          executeCommand(command, this.project);
+        }
       }
     }
 
@@ -79,5 +67,12 @@ export class NpmPackagesCore extends FeatureForProject {
   }
 
 
+  private smoothInstallPrepare(pkg: Package) {
+    const tmpProject = prepareTempProject(this.project, pkg);
+    const mainProjects = copyMainProject(tmpProject, this.project, pkg);
+    copyMainProjectDependencies(mainProjects, tmpProject, this.project, pkg);
+    // tmpProject.removeItself();
+  }
 
 }
+

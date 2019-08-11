@@ -2,14 +2,14 @@
 import { Project } from '../project';
 import { error } from '../helpers';
 
-export async function INSTALL(args, exit = true) {
-  await Project.Current.npmPackages.installFromArgs(args);
+export async function $INSTALL(args, smooth = false, exit = true) {
+  await Project.Current.npmPackages.installFromArgs(args, smooth);
   if (exit) {
     process.exit(0);
   }
 }
 
-export async function UNINSTALL(args, exit = true) {
+export async function $UNINSTALL(args, exit = true) {
   await Project.Current.npmPackages.uninstallFromArgs(args);
   if (exit) {
     process.exit(0);
@@ -17,13 +17,15 @@ export async function UNINSTALL(args, exit = true) {
 }
 
 export default {
-  INSTALL,
-  UNINSTALL,
+  $INSTALL,
+  UNINSTALL: $UNINSTALL,
   $I: (args) => {
-    INSTALL(args);
-    process.exit(0);
+    $INSTALL(args);
   },
-  async  LINK() {
+  $SINSTALL: (args) => {
+    $INSTALL(args, true);
+  },
+  async  $LINK() {
     let project = Project.Current;
     if (project.isWorkspaceChildProject) {
       project = project.parent;
@@ -34,7 +36,7 @@ export default {
     project.workspaceSymlinks.add(`Add workspace symlinks`);
     process.exit(0)
   },
-  async  UNLINK() {
+  async  $UNLINK() {
     let project = Project.Current;
     if (project.isWorkspaceChildProject) {
       project = project.parent;

@@ -3,7 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
+import * as glob from 'glob';
 import chalk from 'chalk';
+import * as rimraf from "rimraf";
 import * as TerminalProgressBar from 'progress';
 
 import config from '../../../config';
@@ -13,22 +15,12 @@ import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../.
 import { FeatureForProject } from '../../abstract';
 import { dedupePackages, nodeModulesExists, addDependenceis } from './node-modules-helpers.backend';
 import { NodeModulesCore } from './node-modules-core.backend';
-import rimraf = require('rimraf');
+
 //#endregion
 
 export class NodeModulesBase extends NodeModulesCore {
 
-  public async smoothInstall(pkg: Package) {
-    const tmpFolder = path.join(this.project.location,
-      `${config.folder.tmp}-${config.folder.node_modules}-installation-of-${pkg.name}`);
-    if (fse.existsSync(tmpFolder)) {
-      rimraf.sync(tmpFolder);
-    }
-    fse.mkdirpSync(tmpFolder);
-    this.project.packageJson.copyTo(tmpFolder);
-    Project.From(tmpFolder);
 
-  }
 
   /**
    * Copy (just linke npm install) all package from

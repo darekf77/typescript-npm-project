@@ -1,18 +1,20 @@
 # tsc-npm-project (alpha)
 
 META COMMENTS:
-- LAST
-- REMOVE_THIS
-- UCOMMENT
-- TODO
-- QUICK_FIX
+- @LAST
+- @REMOVE_THIS
+- @UCOMMENT
+- @TODO
+- @QUICK_FIX
 
 
 # good class structure
  - feature-core // very basic functions that I will never change
  - feature-base // other complex functionalities
- - feature-helpers // everything that can be function
+ - feature-helpers // everything that can be function, everything with "class this"
  - feature # can be isomorphic, empty constructro should not trigger error
+ - class methods only if the relate to class itself, otherwise as helper functions
+ - somehting === false is more clear that !somehting
 
 
 Helper project for my typescript npm libraries.

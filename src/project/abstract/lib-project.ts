@@ -160,7 +160,7 @@ export abstract class LibProject extends Project {
       this.run(`tnp reset`).sync();
 
       if (!this.node_modules.exist) {
-        await this.npmPackages.installAll(`release procedure`)
+        await this.npmPackages.installProcess(`release procedure`)
       }
       this.packageJson.save('show for release')
       await this.recreate.init();

@@ -235,6 +235,5 @@
     "webpack": "3.10.0",
     "webpack-dev-server": "~2.9.3",
     "zone.js": "0.8.20"
-  },
-  "devDependencies": {}
+  }
 }

@@ -4,6 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
 import * as _ from 'lodash';
+import * as semver from 'semver';
 import chalk from 'chalk';
 
 import { config } from '../../../config';
@@ -159,7 +160,7 @@ export class PackageJsonCore {
     this.copyTo(projectOrPath);
     const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
       (projectOrPath as Project).location);
-    Project.From(dest,)
+    Project.From(dest)
   }
 
   public copyTo(projectOrPath: Project | String) {
@@ -172,8 +173,10 @@ export class PackageJsonCore {
     fse.copyFileSync(this.path, dest);
   }
 
-  clearAllDependencies() {
-
+  public setNamFromContainingFolder() {
+    const name = path.basename(this.cwd);
+    this.data.name = name;
+    this.writeToDisc();
   }
 
   public writeToDisc() {
@@ -190,4 +193,9 @@ export class PackageJsonCore {
     }
   }
 
+
+
 }
+
+
+

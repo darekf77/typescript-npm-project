@@ -78,6 +78,9 @@ export class FilesStructure extends FeatureForProject {
       }
       return;
     }
+    if(this.project.isWorkspace) {
+      this.project.recreateCodeWorkspace();
+    }
     if (this.project.isWorkspace && this.project.isSite) {
       const recreated = this.recreateSiteChildren();
       for (let index = 0; index < recreated.length; index++) {
@@ -121,7 +124,7 @@ export class FilesStructure extends FeatureForProject {
             fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
           }
         } else {
-          await this.project.npmPackages.installAll(`initialize procedure of ${this.project.name}`);
+          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
         }
       }
       await this.project.recreate.init();

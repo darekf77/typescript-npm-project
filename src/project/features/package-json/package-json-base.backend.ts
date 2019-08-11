@@ -88,6 +88,27 @@ export class PackageJsonBase extends PackageJsonCore {
   public removeDependency = (p: Package, reason: string) => removeDependency(p, reason, this.project);
   public setDependencyAndSave = (p: Package, reason: string) => setDependencyAndSave(p, reason, this.project);
 
+  public depenciesAreSatisfyBy(dependency: Project): boolean {
+    const deps = [
+      ...this.project.getDepsAsPackage('dependencies'),
+      ...this.project.getDepsAsPackage('devDependencies'),
+      ...this.project.getDepsAsPackage('bundleDependencies'),
+    ];
+
+    deps.find(dep => {
+      // @LAST
+      if (dep.name === dependency.name) {
+        const versionRange = deps[depName];
+        if (depName === dependency.name && semver.satisfies(dependency.version, versionRange)) {
+          return true;
+        }
+        return false;
+      }
+      return false;
+    });
+  }
+
 }
+
 
 

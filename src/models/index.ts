@@ -1,5 +1,6 @@
 
 import { Project } from '../project/abstract/project';
+import { Package } from './ipackage-json';
 
 export * from './build-options.interface';
 export * from './build-dir';
@@ -11,6 +12,22 @@ export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
 export * from './start-for-options';
+
+export interface ActualNpmInstallOptions {
+  generatLockFiles?: boolean;
+  useYarn?: boolean;
+  pkg?: Package;
+  reason: string;
+  smoothInstall?: boolean;
+  remove?: boolean;
+}
+
+
+export interface NpmInstallOptions {
+  remove?: boolean;
+  npmPackage?: Package[],
+  smoothInstall?: boolean;
+}
 
 export interface GenerateProjectCopyOpt {
   override?: boolean;

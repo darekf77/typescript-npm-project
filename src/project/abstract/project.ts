@@ -56,7 +56,6 @@ export abstract class BaseProject {
   handleModyfications(relativeFilePath: string) {
 
   }
-  isTemporary = false;
 
   abstract location: string;
   //#region @backend
@@ -253,7 +252,14 @@ export abstract class BaseProject {
       return this.browser.parent;
     }
     //#region @backend
-    return _.isString(this.location) && Project.From(path.join(this.location, '..'));
+    if (!_.isString(this.location)) {
+      return void 0;
+    }
+    const parent = Project.From(path.join(this.location, '..'));
+    if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
+      return parent.parent;
+    }
+    return parent
     //#endregion
   }
   get preview(): Project {
@@ -535,6 +541,9 @@ export abstract class BaseProject {
       return this.browser.isWorkspaceChildProject;
     }
     //#region @backend
+    if (!!this.parent && this.parent.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
+      return true;
+    }
     return !!this.parent && this.parent.type === 'workspace';
     //#endregion
   }
@@ -559,7 +568,7 @@ export abstract class BaseProject {
       return this.browser.isStandaloneProject;
     }
     //#region @backend
-    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && this.type !== 'unknow-npm-project');
+    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && !this.isUnknowNpmProject);
     //#endregion
   }
 
@@ -817,7 +826,7 @@ export abstract class BaseProject {
   }
 
   //#region @backend
-  private recreateCodeWorkspace() {
+  public recreateCodeWorkspace() {
     if (this.isWorkspace) {
       const configSettings = {};
 
@@ -994,7 +1003,13 @@ export abstract class BaseProject {
   }
   //#endregion
 
-
+  //#region @backend
+  removeItself() {
+    const location = this.location;
+    Project.projects = Project.projects.filter(p => p.location !== location);
+    tryRemoveDir(location);
+  }
+  //#endregion
 
   //#region @backend
   public reset(showMsg = true) {
@@ -1346,7 +1361,7 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static From(location: string, isTempProject = false): Project {
+  public static From(location: string): Project {
     // LAST project temporary
     if (!_.isString(location)) {
       warn(`[project.from] location is not a string`)

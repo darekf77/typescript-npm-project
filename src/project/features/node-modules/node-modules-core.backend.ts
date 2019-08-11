@@ -22,6 +22,11 @@ export class NodeModulesCore extends FeatureForProject {
   public remove = () => tryRemoveDir(this.path);
   public linkToProject = (target: Project) => HelpersLinks.createSymLink(this.path, target.node_modules.path);
 
+  /**
+   * Just create folder... without npm instalation
+   */
+  public recreateFolder = () => !fse.existsSync(this.path) && fse.mkdirpSync(this.path);
+
   // public contains(pkg: Package) {
   //   if (_.isObject(pkg) && pkg.name) {
   //     if (fse.existsSync(path.join(this.path, pkg.name))) {

@@ -1,6 +1,7 @@
 //#region imports
 import * as _ from 'lodash';
 import * as JSON5 from 'json5';
+import * as semver from 'semver';
 import { Project } from '../../abstract';
 import { LibType, DependenciesFromPackageJsonStyle, PackageJsonSaveOptions, Package } from '../../../models';
 import { sortKeys as sortKeysInObjAtoZ, error, log, warn, run } from '../../../helpers';

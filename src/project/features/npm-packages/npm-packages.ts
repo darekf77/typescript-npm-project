@@ -6,17 +6,17 @@ import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
 
 export class NpmPackages extends NpmPackagesBase {
 
-  public async installFromArgs(packagesNamesSpaceSeparated: string) {
+  public async installFromArgs(packagesNamesSpaceSeparated: string, smoothInstall = false) {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      await project.npmPackages.installAll(`tnp install`);
+      await project.npmPackages.installProcess(`tnp install`);
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      await project.npmPackages.install(`tnp install ${packages
+      await project.npmPackages.installProcess(`tnp install ${packages
         .map(p => `${p.installType}${p.version ? `$@${p.version}` : ''}`)
-        .join(', ')} `, packages);
+        .join(', ')} `, { npmPackage: packages, smoothInstall });
     }
   }
 
@@ -28,9 +28,9 @@ export class NpmPackages extends NpmPackagesBase {
       error(`Please specify package name: tnp uninstall exapmle-npm-package `, false, true)
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      await project.npmPackages.install(`tnp uninstall ${packages
+      await project.npmPackages.installProcess(`tnp uninstall ${packages
         .map(p => `${p.installType}${p.version ? `$@${p.version}` : ''}`)
-        .join(', ')} `, packages, true);
+        .join(', ')} `, { npmPackage: packages, remove: true });
     }
   }
 

@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { Project } from '../../abstract';
 import { info, checkValidNpmPackageName, error, log, warn } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { Package, InstalationTypeArr, InstalationType, LibType } from '../../../models';
+import { Package, InstalationTypeArr, InstalationType, LibType, NpmInstallOptions } from '../../../models';
 import config from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 import { NpmPackagesCore } from './npm-packages-core.backend';
@@ -17,18 +17,14 @@ import { NpmPackagesCore } from './npm-packages-core.backend';
 
 export class NpmPackagesBase extends NpmPackagesCore {
 
-  public async installAll(triggeredMsg: string) {
-    await this.install(triggeredMsg)
-  }
+  public async installProcess(triggeredMsg: string, options?: NpmInstallOptions) {
 
-  public async install(triggeredMsg: string, npmPackage?: Package[], remove = false) {
-
-    if (!_.isArray(npmPackage)) {
-      npmPackage = [];
-    }
-
-    const type = this.project.type;
+    const { remove, npmPackage, smoothInstall } = fixOptions(options, this.project);
     const fullInstall = (npmPackage.length === 0);
+
+    if (remove && fullInstall) {
+      error(`[install process]] Please specify packages to remove`, false, true);
+    }
 
     if (remove) {
       log(`Package [${
@@ -50,60 +46,70 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (!this.emptyNodeModuls) {
-      const nodeModulePath = path.join(this.project.location, config.folder.node_modules);
-      if (!fse.existsSync(nodeModulePath)) {
-        fse.mkdirpSync(nodeModulePath);
-      }
+      this.project.node_modules.recreateFolder()
     }
 
     if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.npmPackages.install(`workspace child: ${this.project.name} ${triggeredMsg} `, npmPackage, remove)
+      await this.project.parent.npmPackages.installProcess(`workspace child: ${this.project.name} ${triggeredMsg} `, options)
     }
 
     if (this.project.isContainer) {
       for (let index = 0; index < this.project.children.length; index++) {
         const childWrokspace = this.project.children[index];
-        await childWrokspace.npmPackages.install(`from container  ${triggeredMsg} `, npmPackage, remove);
+        await childWrokspace.npmPackages.installProcess(`from container  ${triggeredMsg} `, options);
       }
     }
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject) {
-      if (type !== 'unknow-npm-project' && !remove) {
-        this.project.packageJson.save(`${type} instalation before [${triggeredMsg}]`);
-      }
-      if (type === 'workspace') {
+
+      this.project.packageJson.save(`${this.project.type} instalation before [${triggeredMsg}]`);
+
+      if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      if (remove) {
-        npmPackage.forEach(pkg => {
-          this.actualNpmProcess({ pkg, reason: triggeredMsg }, true);
-        });
+      if (fullInstall) {
+        this.actualNpmProcess({ reason: triggeredMsg })
       } else {
-        if (fullInstall) {
-          this.actualNpmProcess()
-        } else {
-          npmPackage.forEach(pkg => {
-            this.actualNpmProcess({ pkg, reason: triggeredMsg });
-          });
-        }
+        npmPackage.forEach(pkg => {
+          this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
+        });
       }
 
-      if (type === 'workspace') {
+      if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
-      if (type !== 'unknow-npm-project') {
-        this.project.packageJson.save(`${type} instalation after[${triggeredMsg}]`);
+      if (this.project.isUnknowNpmProject === false) {
+        this.project.packageJson.save(`${this.project.type} instalation after[${triggeredMsg}]`);
       }
-      if (type === 'workspace' || this.project.isStandaloneProject) {
-        // this.project.node_modules.dedupe(); /// UNCOMMENT
+      if (this.project.isWorkspace || this.project.isStandaloneProject) {
+        this.project.node_modules.dedupe();
       }
-      if (type === 'workspace') {
-        this.project.tnpBundle.installAsPackage()
+      if (this.project.isWorkspace && smoothInstall === false) {
+        this.project.tnpBundle.installAsPackage();
       }
     }
 
   }
-
-
 }
+
+
+function fixOptions(options: NpmInstallOptions, project: Project): NpmInstallOptions {
+  if (_.isNil(options)) {
+    options = {};
+  }
+  if (!_.isArray(options.npmPackage)) {
+    options.npmPackage = [];
+  }
+  if (_.isUndefined(options.remove)) {
+    options.remove = false;
+  }
+  if (_.isUndefined(options.smoothInstall)) {
+    options.smoothInstall = false;
+  }
+  if (options.npmPackage.length === 0) {
+    options.smoothInstall = false;
+  }
+  return options;
+}
+
