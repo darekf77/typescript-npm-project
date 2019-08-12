@@ -3,16 +3,17 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
+import * as semver from 'semver';
 import chalk from 'chalk';
 
 import { Project } from '../../abstract';
-import { LibType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package } from '../../../models';
+import { LibType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package, ArrNpmDependencyType } from '../../../models';
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from '../../../helpers';
 import { config } from '../../../config';
 
 import * as _ from 'lodash';
 import { Morphi } from 'morphi';
-import { getAndTravelCoreDeps, reolveAndSaveDeps, removeDependency, setDependencyAndSave } from './package-json-helpers.backend';
+import { getAndTravelCoreDeps, reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 
 
@@ -85,27 +86,25 @@ export class PackageJsonBase extends PackageJsonCore {
     reolveAndSaveDeps(this.project, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
-  public removeDependency = (p: Package, reason: string) => removeDependency(p, reason, this.project);
+  public removeDependencyAndSave = (p: Package, reason: string) => removeDependencyAndSave(p, reason, this.project);
   public setDependencyAndSave = (p: Package, reason: string) => setDependencyAndSave(p, reason, this.project);
 
-  public depenciesAreSatisfyBy(dependency: Project): boolean {
-    const deps = [
-      ...this.project.getDepsAsPackage('dependencies'),
-      ...this.project.getDepsAsPackage('devDependencies'),
-      ...this.project.getDepsAsPackage('bundleDependencies'),
-    ];
+  /**
+   * Look all package.json dependencies and check if version range
+   * of dependency is satisfy
+   * @param dependency
+   */
+  public checDepenciesAreSatisfyBy(dependency: Project): boolean {
 
-    deps.find(dep => {
-      // @LAST
-      if (dep.name === dependency.name) {
-        const versionRange = deps[depName];
-        if (depName === dependency.name && semver.satisfies(dependency.version, versionRange)) {
-          return true;
-        }
-        return false;
-      }
+    const versionRange = findVersionRange(this.project, dependency);
+    if (!versionRange) {
+      error(`Version range not avaliable root: ${this.name} dependency: ${dependency.name}`, true, true);
       return false;
-    });
+    }
+    const result = semver.satisfies(dependency.version, versionRange);
+    const namePackage = `${dependency.name}@${dependency.version}`;
+    log(`[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`);
+    return result;
   }
 
 }

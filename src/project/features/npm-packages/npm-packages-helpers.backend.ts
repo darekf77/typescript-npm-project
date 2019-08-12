@@ -46,36 +46,60 @@ export function executeCommand(command: string, project: Project) {
 }
 
 
-export function copyMainProjectDependencies(projects: { mainProjectExisted: Project, mainProjectInTemp: Project; }, tmpProject: Project, project: Project, pkg: Package) {
-  const { mainProjectExisted, mainProjectInTemp } = projects;
+export function copyMainProjectDependencies
+  (projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
+    tmpProject: Project, project: Project, pkg: Package) {
 
-  const folderInNodeModules = fse.readdirSync(tmpProject.node_modules.path);
-  folderInNodeModules
-    .filter(name => name !== mainProjectInTemp.name)
-    .filter(name => !name.startsWith('.'))
-    .map(f => Project.From(path.join(tmpProject.node_modules.path, f)))
-    .filter(f => !!f)
-    .forEach(otherDependeny => {
+  const { mainProjectInTemp, mainProjectExisted } = projects;
+  const alreadyChecked = [];
+  function copyOtherProcess(parent: Project) {
+    const otherDepsInTemp: Project[] = parent
+      .allPackageJsonDeps(tmpProject.location)
+      .filter(f => !alreadyChecked.includes(f));
 
-      const existedPkgPath = path.join(project.node_modules.path, otherDependeny.name)
-      const existedInNodeModules = Project.From(existedPkgPath);
-      if (existedInNodeModules) {
-        if (!mainProjectInTemp.packageJson.depenciesAreSatisfyBy(existedInNodeModules)) {
-          const nestedPath = path.join(mainProjectExisted.node_modules.path, otherDependeny.name);
-          if (fse.existsSync(nestedPath)) {
-            fse.mkdirpSync(nestedPath)
+    if (otherDepsInTemp.length === 0) {
+      return;
+    }
+    otherDepsInTemp
+      .filter(otherDependenyInTemp => {
+        return fse.existsSync(path.join(tmpProject.node_modules.path, otherDependenyInTemp.name))
+      })
+      .forEach(otherDependenyInTemp => {
+
+        const existedPkgPath = path.join(project.node_modules.path, otherDependenyInTemp.name)
+        const existedOtherDependency = Project.From(existedPkgPath);
+        if (existedOtherDependency) {
+          if (existedOtherDependency.version === otherDependenyInTemp.version) {
+            log(`[smoothInstallPrepare] nothing to do for same dependency version ${otherDependenyInTemp.name}`);
+          } else {
+            if (parent.packageJson.checDepenciesAreSatisfyBy(existedOtherDependency)) {
+              log(`[smoothInstallPrepare] nothing to do dependency is satisfy ${otherDependenyInTemp.name}`);
+            } else {
+              const diff = `${existedOtherDependency.version} != ${otherDependenyInTemp.version}`;
+              warn(`[smoothInstallPrepare] "${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
+              const dest = path.join(project.node_modules.path, mainProjectExisted.name,
+                config.folder.node_modules, otherDependenyInTemp.name);
+
+              if (fse.existsSync(dest)) {
+                warn(`[smoothInstallPrepare] nested "${otherDependenyInTemp.name}" already exists to nested folder ${dest} `);
+              } else {
+                fse.mkdirpSync(dest);
+                warn(`[smoothInstallPrepare] copy "${otherDependenyInTemp.name}" to nested folder ${dest} `);
+                tryCopyFrom(otherDependenyInTemp.location, dest);
+              }
+            }
           }
-          log(`[smoothInstallPrepare] copy as nested dependency ${otherDependeny.name}`);
-          tryCopyFrom(otherDependeny.location, nestedPath);
         } else {
-          log(`[smoothInstallPrepare] nothing to do for ${otherDependeny.name}`);
+          log(`[smoothInstallPrepare] copy new package ${otherDependenyInTemp.name}`);
+          tryCopyFrom(otherDependenyInTemp.location, existedPkgPath);
         }
-      } else {
-        log(`[smoothInstallPrepare] copy new package ${otherDependeny.name}`);
-        tryCopyFrom(otherDependeny.location, existedPkgPath);
-      }
+      });
+    otherDepsInTemp.forEach(p => {
+      alreadyChecked.push(p);
+      copyOtherProcess(p);
     });
-  console.log('folderInNodeModules', folderInNodeModules);
+  }
+  copyOtherProcess(mainProjectInTemp);
 }
 
 export function copyMainProject(tmpProject: Project, project: Project, pkg: Package) {

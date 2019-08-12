@@ -3,8 +3,31 @@ import * as _ from 'lodash';
 import * as JSON5 from 'json5';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
-import { LibType, DependenciesFromPackageJsonStyle, PackageJsonSaveOptions, Package } from '../../../models';
+import {
+  LibType, DependenciesFromPackageJsonStyle,
+  PackageJsonSaveOptions, Package, ArrNpmDependencyType
+} from '../../../models';
 import { sortKeys as sortKeysInObjAtoZ, error, log, warn, run } from '../../../helpers';
+//#endregion
+
+//#region find npm version range
+export function findVersionRange(rootProject: Project, dependency: Project | string) {
+  let result: string;
+  const name = _.isString(dependency) ? dependency : dependency.name;
+  ArrNpmDependencyType.find(depType => {
+    if (_.isObject(rootProject.packageJson.data[depType])) {
+      const deps = rootProject.packageJson.data[depType];
+      const versionRange = deps[name];
+      if (_.isString(versionRange) && semver.validRange(versionRange)) {
+        log(`[findVersionRange] valid range founded "${name}":${versionRange}`);
+        result = versionRange;
+        return true;
+      }
+    }
+    return false;
+  });
+  return result;
+}
 //#endregion
 
 //#region resolve and save deps for project
@@ -134,8 +157,8 @@ function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
       project.packageJson.data.license = license;
     } else {
       log(`[package.json] save for clean - standalone project: "${project.name}" , [${reasonToHidePackages}]`)
-      project.packageJson.data.devDependencies = void 0;
-      project.packageJson.data.dependencies = void 0;
+      project.packageJson.data.devDependencies = {};
+      project.packageJson.data.dependencies = {};
       project.packageJson.data.engines = void 0;
       project.packageJson.data.license = void 0;
     }
@@ -308,7 +331,7 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 }
 //#endregion
 
-
+//#region set dependency and save
 export function setDependencyAndSave(p: Package, reason: string, project: Project, ) {
   if (!p || !p.name) {
     error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
@@ -362,9 +385,10 @@ export function setDependencyAndSave(p: Package, reason: string, project: Projec
     project && project.genericName
     }`);
 }
+//#endregion
 
-
-export function removeDependency(p: Package, reason: string, project: Project) {
+//#region remove dependency and save
+export function removeDependencyAndSave(p: Package, reason: string, project: Project) {
 
   if (!p || !p.name) {
     error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
@@ -393,3 +417,4 @@ export function removeDependency(p: Package, reason: string, project: Project) {
     project && project.genericName
     }`);
 }
+//#endregion

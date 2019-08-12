@@ -33,7 +33,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
     })
     this.project.children.forEach(c => {
       log(`Remove child node_modules ${c.genericName} ${triggeredMsg}`)
-      c.node_modules.remove()
+      c.node_modules.remove();
     })
   }
 

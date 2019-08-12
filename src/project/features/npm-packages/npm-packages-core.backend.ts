@@ -28,7 +28,7 @@ export class NpmPackagesCore extends FeatureForProject {
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn);
     if (remove) {
-      this.project.packageJson.removeDependency(pkg, reason);
+      this.project.packageJson.removeDependencyAndSave(pkg, reason);
       executeCommand(command, this.project);
     } else {
       if (global.testMode) {

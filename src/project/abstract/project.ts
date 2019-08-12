@@ -10,7 +10,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 
 import config from '../../config';
-import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType } from '../../models';
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType, ArrNpmDependencyType } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
   pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
@@ -1053,6 +1053,17 @@ export abstract class BaseProject {
     log(`Cleaning project: ${this.genericName}`);
     this.node_modules.remove();
     this.reset(false)
+  }
+  //#endregion
+
+  //#region @backend
+  public allPackageJsonDeps(contextFolder?: string): Project[] {
+    let projectsInNodeModules = [];
+    ArrNpmDependencyType.forEach(depName => {
+      projectsInNodeModules = projectsInNodeModules
+        .concat(this.getDepsAsProject(depName, contextFolder));
+    });
+    return projectsInNodeModules;
   }
   //#endregion
 

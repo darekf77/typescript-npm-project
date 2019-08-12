@@ -65,7 +65,7 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
     newNames = newNames.concat(project.getDepsAsProject(depName, context)
       .filter(d => !allNamesBefore.includes(d.name))
       .map(d => d.name))
-  })
+  });
 
 
   const uniq = {};
