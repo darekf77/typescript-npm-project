@@ -81,6 +81,9 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (localLib === "i") {
       argsv[2] = 'install'
     }
+    if (localLib === "ui") {
+      argsv[2] = 'uninstall'
+    }
     // if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
     //   recognized = true;
     //   const localPath = path.join(config.pathes.bin_in_node_modules, localLib)

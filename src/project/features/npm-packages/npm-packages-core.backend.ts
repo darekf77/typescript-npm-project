@@ -23,12 +23,12 @@ export class NpmPackagesCore extends FeatureForProject {
   }
 
   protected actualNpmProcess(options?: ActualNpmInstallOptions) {
+    return
     const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn);
     if (remove) {
-      this.project.packageJson.removeDependencyAndSave(pkg, reason);
       executeCommand(command, this.project);
     } else {
       if (global.testMode) {
@@ -71,7 +71,7 @@ export class NpmPackagesCore extends FeatureForProject {
     const tmpProject = prepareTempProject(this.project, pkg);
     const mainProjects = copyMainProject(tmpProject, this.project, pkg);
     copyMainProjectDependencies(mainProjects, tmpProject, this.project, pkg);
-    // tmpProject.removeItself();
+    tmpProject.removeItself();
   }
 
 }

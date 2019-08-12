@@ -40,15 +40,19 @@ export class PackageJsonBase extends PackageJsonCore {
 
   public save(reasonToShowPackages: string) {
     this.reasonToShowPackages = `\n${reasonToShowPackages}`;
-    if (!this.project.isUnknowNpmProject && !this.project.isContainer) {
-      this.prepareForSave();
-    }
+    this.prepareForSave('save');
+    this.writeToDisc();
+  }
+
+  public showDeps(reasonToHidePackages: string) {
+    this.reasonToHidePackages = `\n${reasonToHidePackages}`;
+    this.prepareForSave('show');
     this.writeToDisc();
   }
 
   public hideDeps(reasonToHidePackages: string) {
     this.reasonToHidePackages = `\n${reasonToHidePackages}`;
-    this.prepareForSave(false);
+    this.prepareForSave('hide');
     this.writeToDisc();
   }
 
@@ -63,27 +67,24 @@ export class PackageJsonBase extends PackageJsonCore {
     }
   }
 
-  private prepareForSave(showPackagesinFile = true) {
-
-    if (!showPackagesinFile && this.project.isTnp) {
-      showPackagesinFile = true;
+  private prepareForSave(action: 'save' | 'show' | 'hide' = 'save', caller?: Project) {
+    if (caller === this.project) {
+      return;
+    }
+    if (this.project.isUnknowNpmProject) {
+      log(`Prepare for save not for unknow projects`);
+      return;
     }
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject || this.project.isContainer) {
-      this.recreateForWorkspaceOrContainer(showPackagesinFile)
-    } else if (this.project.isStandaloneProject) {
-      this.recreateForStandalone(showPackagesinFile)
+    if (this.project.isStandaloneProject || this.project.isContainer || (this.project.isWorkspace && !this.project.isContainerChild)) {
+      Project.Tnp.packageJson.prepareForSave(action, Project.Tnp);
     }
-  }
 
-  private recreateForWorkspaceOrContainer(recreateInPackageJson: boolean) {
-    const workspace = (this.project.isWorkspace || this.project.isContainer) ?
-      this.project : (this.project.isWorkspaceChildProject ? this.project.parent : undefined)
-    reolveAndSaveDeps(workspace, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages);
-  }
+    if (this.project.isContainerChild || this.project.isWorkspaceChildProject) {
+      this.project.parent.packageJson.prepareForSave(action);
+    }
 
-  private recreateForStandalone(recreateInPackageJson: boolean) {
-    reolveAndSaveDeps(this.project, recreateInPackageJson, this.reasonToHidePackages, this.reasonToShowPackages);
+    reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
   public removeDependencyAndSave = (p: Package, reason: string) => removeDependencyAndSave(p, reason, this.project);
@@ -105,6 +106,18 @@ export class PackageJsonBase extends PackageJsonCore {
     const namePackage = `${dependency.name}@${dependency.version}`;
     log(`[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`);
     return result;
+  }
+
+  public reset() {
+    if (this.project.isTnp) {
+      log(`Npm reset not available for Tnp project`)
+      return;
+    }
+    if (this.project.isWorkspaceChildProject || this.project.isContainerChild) {
+      this.project.parent.packageJson.reset();
+    }
+    this.data.tnp.overrided.dependencies = {};
+    this.hideDeps(`reset of npm`);
   }
 
 }

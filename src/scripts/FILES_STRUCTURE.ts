@@ -81,6 +81,14 @@ export async function RESET(args: string, exit = true) {
   }
 }
 
+
+export async function $RESET_NPM(args: string, exit = true) {
+  await Project.Current.packageJson.
+  if (exit) {
+    process.exit(0);
+  }
+}
+
 export async function RESET_ALL(args: string, exit = true) {
   await Project.Current.filesStructure.reset({ recrusive: true })
   if (exit) {
@@ -122,6 +130,7 @@ export default {
   STATIC_CLEAN_ALL,
   STATIC_CLEAR_ALL,
   SCLA: STATIC_CLEAN_ALL,
+  $RESET_NPM,
   RESET,
   RESET_ALL,
   RST: RESET,

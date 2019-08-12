@@ -11,8 +11,6 @@ import { config } from '../../../config';
 import { Project } from '../../abstract';
 import { LibType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package } from '../../../models';
 import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from '../../../helpers';
-import { Morphi } from 'morphi';
-import { getAndTravelCoreDeps, reolveAndSaveDeps } from './package-json-helpers.backend';
 //#endregion
 
 export class PackageJsonCore {
@@ -192,7 +190,6 @@ export class PackageJsonCore {
       HelpersLinks.createSymLink(pathToBaseline, baselineInNodeModuels)
     }
   }
-
 
 
 }

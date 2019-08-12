@@ -1373,7 +1373,7 @@ export class Project extends BaseProject implements IProject {
 
   //#region @backend
   public static From(location: string): Project {
-    // LAST project temporary
+
     if (!_.isString(location)) {
       warn(`[project.from] location is not a string`)
       return;

@@ -5,7 +5,7 @@ import * as semver from 'semver';
 import { Project } from '../../abstract';
 import {
   LibType, DependenciesFromPackageJsonStyle,
-  PackageJsonSaveOptions, Package, ArrNpmDependencyType
+  PackageJsonSaveOptions, Package, ArrNpmDependencyType, SaveAction
 } from '../../../models';
 import { sortKeys as sortKeysInObjAtoZ, error, log, warn, run } from '../../../helpers';
 //#endregion
@@ -31,12 +31,21 @@ export function findVersionRange(rootProject: Project, dependency: Project | str
 //#endregion
 
 //#region resolve and save deps for project
-export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolean,
+export function reolveAndSaveDeps(project: Project, action: SaveAction,
   reasonToHidePackages: string, reasonToShowPackages: string) {
+
+  let toOverrideDependencies = (project.packageJson.data.tnp.overrided &&
+    project.packageJson.data.tnp.overrided.dependencies) ?
+    project.packageJson.data.tnp.overrided.dependencies : {};
+  if (project.isWorkspaceChildProject) {
+    toOverrideDependencies = {};
+  }
 
   let newDepsForProject = {};
   if (project.isStandaloneProject && !project.isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project.type });
+  } else if ((project.isWorkspace && project.isContainerChild) || project.isWorkspaceChildProject) {
+    newDepsForProject = _.cloneDeep(project.parent.packageJson.data.dependencies);
   } else {
     newDepsForProject = getAndTravelCoreDeps();
   }
@@ -47,9 +56,7 @@ export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolea
   const orginalDevDependencies = !project.packageJson.data.devDependencies ? {}
     : _.cloneDeep(project.packageJson.data.devDependencies) as DependenciesFromPackageJsonStyle;
 
-  const toOverrideDependencies = (project.packageJson.data.tnp.overrided &&
-    project.packageJson.data.tnp.overrided.dependencies) ?
-    project.packageJson.data.tnp.overrided.dependencies : {};
+
 
   _.merge(newDepsForProject, toOverrideDependencies);
   Object.keys(newDepsForProject).forEach(key => {
@@ -63,7 +70,7 @@ export function reolveAndSaveDeps(project: Project, recrateInPackageJson: boolea
   beforeSaveAction(project, {
     newDeps: newDepsForProject,
     toOverride: toOverrideDependencies,
-    recrateInPackageJson,
+    action,
     reasonToHidePackages,
     reasonToShowPackages,
   });
@@ -140,59 +147,56 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 
 //#region save action
 function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
-  const { newDeps, toOverride, recrateInPackageJson, reasonToHidePackages, reasonToShowPackages } = options;
-  cleanForIncludeOnly(project, newDeps, toOverride);
-
+  const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
   const engines = Project.Tnp.packageJson.data.engines;
   const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
 
-  if (project.isStandaloneProject) {
-    const devDependencies = sortKeysInObjAtoZ(filterDevDepOnly(project, _.cloneDeep(newDeps)));
-    const dependencies = sortKeysInObjAtoZ(filterDepOnly(project, _.cloneDeep(newDeps)));
-    if (recrateInPackageJson) {
-      log(`[package.json] save for install - standalone project: "${project.name}" , [${reasonToShowPackages}]`)
-      project.packageJson.data.devDependencies = devDependencies;
-      project.packageJson.data.dependencies = dependencies;
+  let recrateInPackageJson = (action === 'save' || action === 'show');
+  if (project.isTnp) {
+    recrateInPackageJson = true;
+  }
+  if (recrateInPackageJson && action === 'save' && (project.isWorkspaceChildProject || project.isContainerChild)) {
+    recrateInPackageJson = false;
+  }
+
+  cleanForIncludeOnly(project, newDeps, toOverride);
+  const devDependencies = project.isStandaloneProject ?
+    sortKeysInObjAtoZ(filterDevDepOnly(project, _.cloneDeep(newDeps)))
+    : {};
+  const dependencies = project.isStandaloneProject ?
+    sortKeysInObjAtoZ(filterDepOnly(project, _.cloneDeep(newDeps)))
+    : sortKeysInObjAtoZ(newDeps);
+
+  if (recrateInPackageJson) {
+    log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`)
+    project.packageJson.data.devDependencies = devDependencies;
+    project.packageJson.data.dependencies = dependencies;
+    if (!project.isCoreProject) {
       project.packageJson.data.engines = engines;
       project.packageJson.data.license = license;
-    } else {
-      log(`[package.json] save for clean - standalone project: "${project.name}" , [${reasonToHidePackages}]`)
-      project.packageJson.data.devDependencies = {};
-      project.packageJson.data.dependencies = {};
+    }
+  } else {
+    log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`)
+    project.packageJson.data.devDependencies = {};
+    project.packageJson.data.dependencies = {};
+    if (!project.isCoreProject) {
       project.packageJson.data.engines = void 0;
       project.packageJson.data.license = void 0;
     }
-    if (project.isTnp) {
-      const keysToDelete = [];
-      Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
-        const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];
-        if (!version && !devDependencies[pkgName] && !dependencies[pkgName]) {
-          keysToDelete.push(pkgName);
-        }
-      });
-      keysToDelete.forEach(key => {
-        delete project.packageJson.data.tnp.overrided.dependencies[key];
-      });
-    }
-
-  } else if (project.isWorkspace || project.isWorkspaceChildProject) {
-    project.packageJson.data.devDependencies = void 0;
-    if (recrateInPackageJson) {
-      log(`[package.json] save for install - workspace project: "${project.name}" , [${reasonToShowPackages}]`)
-      project.packageJson.data.dependencies = sortKeysInObjAtoZ(newDeps)
-      if (!project.isCoreProject) {
-        project.packageJson.data.engines = engines;
-        project.packageJson.data.license = license;
-      }
-    } else {
-      log(`[package.json] save for clean - workspace project: "${project.name}" , [${reasonToHidePackages}]`)
-      project.packageJson.data.dependencies = void 0;
-      if (!project.isCoreProject) {
-        project.packageJson.data.engines = void 0;
-        project.packageJson.data.license = void 0;
-      }
-    }
   }
+  if (project.isTnp) {
+    const keysToDelete = [];
+    Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
+      const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];
+      if (!version && !devDependencies[pkgName] && !dependencies[pkgName]) {
+        keysToDelete.push(pkgName);
+      }
+    });
+    keysToDelete.forEach(key => {
+      delete project.packageJson.data.tnp.overrided.dependencies[key];
+    });
+  }
+
 }
 //#endregion
 
@@ -360,8 +364,6 @@ export function setDependencyAndSave(p: Package, reason: string, project: Projec
     if (!updated) {
       project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
     }
-  } else if (project.isContainer) {
-    error(`Instalation not suported`, false, true);
   } else if (project.isUnknowNpmProject) {
     if (p.installType === '--save') {
       if (!project.packageJson.data.dependencies) {
@@ -374,11 +376,11 @@ export function setDependencyAndSave(p: Package, reason: string, project: Projec
       }
       project.packageJson.data.devDependencies[p.name] = p.version;
     }
-  } else if (project.isStandaloneProject || project.isWorkspace || project.isWorkspaceChildProject) {
+  } else if (project.isStandaloneProject || project.isWorkspace || project.isWorkspaceChildProject || project.isContainer) {
     if (p.version) {
-      delete project.packageJson.data.tnp.overrided.dependencies[p.name];
-    } else {
       project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
+    } else {
+      delete project.packageJson.data.tnp.overrided.dependencies[p.name];
     }
   }
   project.packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${
@@ -408,8 +410,9 @@ export function removeDependencyAndSave(p: Package, reason: string, project: Pro
     project.packageJson.data.dependencies[p.name] = void 0;
     project.packageJson.data.devDependencies[p.name] = void 0;
   } else {
-    if (project.packageJson.data.tnp.overrided.dependencies[p.name]) {
-      project.packageJson.data.tnp.overrided.dependencies[p.name] = null;
+    const existedOverrideVer = project.packageJson.data.tnp.overrided.dependencies[p.name];
+    if (_.isString(existedOverrideVer) || _.isNull(existedOverrideVer)) {
+      project.packageJson.data.tnp.overrided.dependencies[p.name] = project.isTnp ? null : void 0;
     }
   }
 

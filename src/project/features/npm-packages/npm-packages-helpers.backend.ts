@@ -76,16 +76,16 @@ export function copyMainProjectDependencies
               log(`[smoothInstallPrepare] nothing to do dependency is satisfy ${otherDependenyInTemp.name}`);
             } else {
               const diff = `${existedOtherDependency.version} != ${otherDependenyInTemp.version}`;
-              warn(`[smoothInstallPrepare] "${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
+              warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
               const dest = path.join(project.node_modules.path, mainProjectExisted.name,
                 config.folder.node_modules, otherDependenyInTemp.name);
 
               if (fse.existsSync(dest)) {
-                warn(`[smoothInstallPrepare] nested "${otherDependenyInTemp.name}" already exists to nested folder ${dest} `);
+                warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" nested already exists in neste folder`);
               } else {
                 fse.mkdirpSync(dest);
-                warn(`[smoothInstallPrepare] copy "${otherDependenyInTemp.name}" to nested folder ${dest} `);
-                tryCopyFrom(otherDependenyInTemp.location, dest);
+                warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" please copy manualy to nested folder`);
+                // tryCopyFrom(otherDependenyInTemp.location, dest); // @TODO
               }
             }
           }
@@ -116,11 +116,10 @@ export function copyMainProject(tmpProject: Project, project: Project, pkg: Pack
 }
 
 export function prepareTempProject(project: Project, pkg: Package): Project {
+  const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of-`;
   const tmpFolder = path.join(project.location,
-    `${config.folder.tmp}-${config.folder.node_modules}-installation-of-${pkg.name}`);
-  if (fse.existsSync(tmpFolder)) {
-    rimraf.sync(tmpFolder);
-  }
+    `${pathPart}-${pkg.name}`);
+  rimraf.sync(`${path.join(project.location, pathPart)}*`);
   fse.mkdirpSync(tmpFolder);
   project.packageJson.copyTo(tmpFolder);
   const tmpProject = Project.From(tmpFolder);

@@ -38,8 +38,10 @@ export interface GenerateProjectCopyOpt {
   useTempLocation?: boolean;
 }
 
+export type SaveAction = 'save' | 'show' | 'hide';
+
 export type PackageJsonSaveOptions = {
-  recrateInPackageJson;
+  action: SaveAction;
   newDeps: any;
   toOverride: any;
   reasonToShowPackages: string;

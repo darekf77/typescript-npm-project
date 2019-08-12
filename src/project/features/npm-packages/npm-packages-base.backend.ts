@@ -30,7 +30,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
       log(`Package [${
         npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
           .join(',')
-        }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
+        }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
+      npmPackage.forEach(p => {
+        this.project.packageJson.removeDependencyAndSave(p, `package ${p && p.name} instalation`);
+      });
     } else {
       if (fullInstall) {
         log(`Packages full installation for ${this.project.genericName}`)
@@ -46,41 +49,42 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (!this.emptyNodeModuls) {
-      this.project.node_modules.recreateFolder()
+      if (this.project.isContainer) {
+        this.project.node_modules.remove();
+      } else {
+        this.project.node_modules.recreateFolder();
+      }
     }
 
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.npmPackages.installProcess(`workspace child: ${this.project.name} ${triggeredMsg} `, options)
     }
 
-    if (this.project.isContainer) {
-      for (let index = 0; index < this.project.children.length; index++) {
-        const childWrokspace = this.project.children[index];
-        await childWrokspace.npmPackages.installProcess(`from container  ${triggeredMsg} `, options);
+    if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject || this.project.isContainer) {
+
+      if (fullInstall) {
+        this.project.packageJson.save(`${this.project.type} instalation before full insall [${triggeredMsg}]`);
       }
-    }
-
-    if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject) {
-
-      this.project.packageJson.save(`${this.project.type} instalation before [${triggeredMsg}]`);
 
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      if (fullInstall) {
-        this.actualNpmProcess({ reason: triggeredMsg })
-      } else {
-        npmPackage.forEach(pkg => {
-          this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
-        });
+      if (!this.project.isContainer) {
+        if (fullInstall) {
+          this.actualNpmProcess({ reason: triggeredMsg })
+        } else {
+          npmPackage.forEach(pkg => {
+            this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
+          });
+        }
       }
 
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
-      if (this.project.isUnknowNpmProject === false) {
-        this.project.packageJson.save(`${this.project.type} instalation after[${triggeredMsg}]`);
+      if (this.project.isContainerChild) {
+        this.project.packageJson.hideDeps(`${this.project.type} hide deps for container child [${triggeredMsg}]`);
       }
       if (this.project.isWorkspace || this.project.isStandaloneProject) {
         this.project.node_modules.dedupe();

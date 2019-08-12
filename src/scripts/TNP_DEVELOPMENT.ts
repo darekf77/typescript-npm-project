@@ -75,7 +75,7 @@ function version() {
 }
 
 function DEPS_SHOW(args: string) {
-  Project.Current.packageJson.save('deps show')
+  Project.Current.packageJson.showDeps('deps show')
   process.exit(0)
 }
 
