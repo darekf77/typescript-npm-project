@@ -9,7 +9,7 @@ import * as rimraf from "rimraf";
 import { Project } from '../../abstract';
 import { info, checkValidNpmPackageName, error, log, warn, tryCopyFrom } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { Package, InstalationTypeArr, InstalationType, LibType, ActualNpmInstallOptions } from '../../../models';
+import { Package, InstalationTypeArr, InstalationType, LibType, ActualNpmInstallOptions, NpmInstallOptions } from '../../../models';
 import config from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
@@ -166,6 +166,27 @@ export function fixOptions(options?: ActualNpmInstallOptions): ActualNpmInstallO
   }
   if (_.isUndefined(options.reason)) {
     options.reason = `Reason not defined`
+  }
+  return options;
+}
+
+
+
+export function fixOptionsNpmInstall(options: NpmInstallOptions, project: Project): NpmInstallOptions {
+  if (_.isNil(options)) {
+    options = {};
+  }
+  if (!_.isArray(options.npmPackage)) {
+    options.npmPackage = [];
+  }
+  if (_.isUndefined(options.remove)) {
+    options.remove = false;
+  }
+  if (_.isUndefined(options.smoothInstall)) {
+    options.smoothInstall = false;
+  }
+  if (options.npmPackage.length === 0) {
+    options.smoothInstall = false;
   }
   return options;
 }

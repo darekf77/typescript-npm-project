@@ -87,8 +87,14 @@ export class PackageJsonBase extends PackageJsonCore {
     reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
-  public removeDependencyAndSave = (p: Package, reason: string) => removeDependencyAndSave(p, reason, this.project);
-  public setDependencyAndSave = (p: Package, reason: string) => setDependencyAndSave(p, reason, this.project);
+  public removeDependencyAndSave = (p: Package, reason: string) => {
+    this.prepareForSave('save')
+    removeDependencyAndSave(p, reason, this.project);
+  }
+  public setDependencyAndSave = (p: Package, reason: string) => {
+    this.prepareForSave('save')
+    setDependencyAndSave(p, reason, this.project)
+  }
 
   /**
    * Look all package.json dependencies and check if version range
@@ -117,7 +123,7 @@ export class PackageJsonBase extends PackageJsonCore {
       this.project.parent.packageJson.reset();
     }
     this.data.tnp.overrided.dependencies = {};
-    this.hideDeps(`reset of npm`);
+    this.save(`reset of npm`);
   }
 
 }

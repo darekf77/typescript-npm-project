@@ -83,7 +83,20 @@ export async function RESET(args: string, exit = true) {
 
 
 export async function $RESET_NPM(args: string, exit = true) {
-  await Project.Current.packageJson.
+  await Project.Current.packageJson.reset()
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+export async function $RESET_NPM_ALL(args: string, exit = true) {
+  const db = await TnpDB.Instance;
+  const projects = db.getProjects();
+  for (let index = 0; index < projects.length; index++) {
+    const project = projects[index];
+    // console.log(project.project.genericName)
+    project.project.packageJson.reset();
+  }
   if (exit) {
     process.exit(0);
   }
@@ -131,6 +144,13 @@ export default {
   STATIC_CLEAR_ALL,
   SCLA: STATIC_CLEAN_ALL,
   $RESET_NPM,
+  $RESET_NPM_ALL,
+  $DEPS_RESET(args) {
+    $RESET_NPM(args)
+  },
+  $DEPS_RESET_ALL(args) {
+    $RESET_NPM_ALL(args)
+  },
   RESET,
   RESET_ALL,
   RST: RESET,

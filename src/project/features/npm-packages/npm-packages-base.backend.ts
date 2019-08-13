@@ -12,6 +12,7 @@ import { Package, InstalationTypeArr, InstalationType, LibType, NpmInstallOption
 import config from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 import { NpmPackagesCore } from './npm-packages-core.backend';
+import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
 //#endregion
 
 
@@ -19,7 +20,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
   public async installProcess(triggeredMsg: string, options?: NpmInstallOptions) {
 
-    const { remove, npmPackage, smoothInstall } = fixOptions(options, this.project);
+    const { remove, npmPackage, smoothInstall } = fixOptionsNpmInstall(options, this.project);
     const fullInstall = (npmPackage.length === 0);
 
     if (remove && fullInstall) {
@@ -98,22 +99,4 @@ export class NpmPackagesBase extends NpmPackagesCore {
 }
 
 
-function fixOptions(options: NpmInstallOptions, project: Project): NpmInstallOptions {
-  if (_.isNil(options)) {
-    options = {};
-  }
-  if (!_.isArray(options.npmPackage)) {
-    options.npmPackage = [];
-  }
-  if (_.isUndefined(options.remove)) {
-    options.remove = false;
-  }
-  if (_.isUndefined(options.smoothInstall)) {
-    options.smoothInstall = false;
-  }
-  if (options.npmPackage.length === 0) {
-    options.smoothInstall = false;
-  }
-  return options;
-}
 

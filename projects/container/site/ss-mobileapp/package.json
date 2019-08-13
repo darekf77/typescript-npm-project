@@ -27,5 +27,6 @@
   },
   "description": "An Ionic project",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "license": "UNLICENSED"
 }

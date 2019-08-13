@@ -13,7 +13,8 @@
   },
   "name": "ss-common-ui",
   "version": "0.0.0",
-  "license": "UNLICENSED",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "license": "UNLICENSED",
+  "private": true
 }

@@ -9,9 +9,7 @@
       "ignoreDepsPattern": [],
       "includeAsDev": [],
       "includeOnly": [],
-      "dependencies": {
-        "enquirer": "23"
-      }
+      "dependencies": {}
     }
   },
   "name": "container",
@@ -114,7 +112,7 @@
     "dateformat": "^3.0.3",
     "diff": "^3.2.0",
     "element-resize-detector": "1.1.15",
-    "enquirer": "23",
+    "enquirer": "^2.3.0",
     "enum-values": "1.2.1",
     "errorhandler": "^1.5.0",
     "eslint": "^4.15.0",
@@ -233,5 +231,6 @@
     "webpack": "3.10.0",
     "webpack-dev-server": "~2.9.3",
     "zone.js": "0.8.20"
-  }
+  },
+  "private": true
 }

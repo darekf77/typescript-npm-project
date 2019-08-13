@@ -40,6 +40,7 @@ export interface IPackageJSON {
   preferGlobal?: boolean;
   engines?: { node: string; npm: string; }
   license?: string;
+  private?: boolean;
 
   dependencies?: DependenciesFromPackageJsonStyle;
   devDependencies?: DependenciesFromPackageJsonStyle;

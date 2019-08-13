@@ -16,11 +16,12 @@
   },
   "name": "angular-client",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.js",
     "build:aot": "tnp rimraf dist-app && tnp npm-run webpack --config=webpack.config.build.aot.js"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "private": true
 }

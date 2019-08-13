@@ -17,5 +17,6 @@
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "private": true
 }

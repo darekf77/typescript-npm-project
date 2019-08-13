@@ -29,5 +29,6 @@
     "typescript-class-helpers"
   ],
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "private": true
 }

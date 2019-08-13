@@ -35,5 +35,6 @@
     }
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "license": "UNLICENSED"
 }

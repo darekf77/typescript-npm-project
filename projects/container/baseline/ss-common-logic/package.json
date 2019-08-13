@@ -18,15 +18,14 @@
   },
   "name": "ss-common-logic",
   "version": "0.0.0",
-  "license": "UNLICENSED",
   "main": "index.js",
-  "dependencies": {
-    "typeorm": "^0.2.7"
-  },
+  "dependencies": {},
   "husky": {
     "hooks": {
       "pre-push": "tnp deps:show:if:standalone"
     }
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "license": "UNLICENSED",
+  "private": true
 }
