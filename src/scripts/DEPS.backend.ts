@@ -4,6 +4,20 @@ import { Project } from '../project/abstract/project';
 import { commitWhatIs } from '../helpers/helpers-git';
 import { info } from '../helpers/helpers-messages';
 import { TnpDB } from '../tnp-db/wrapper-db';
+import { resolvePacakgesFromArgs } from '../project/features/npm-packages/npm-packages-helpers.backend';
+
+export async function $DEPS_SET_CATEGORY(args: string, exit = true) {
+  let argumn: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;
+  process.chdir(Project.Tnp.location);
+  const packages = resolvePacakgesFromArgs(argumn);
+  for (let index = 0; index < packages.length; index++) {
+    const pkg = packages[index];
+    await Project.Tnp.packageJson.setCategoryFor(pkg);
+  }
+  if (exit) {
+    process.exit(0);
+  }
+}
 
 export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
   let locations: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;
@@ -57,6 +71,10 @@ function DEPS_HIDE(args: string) {
 
 
 export default {
+  $DEPS_SET_CATEGORY,
+  $DEPS_SET_CAT(args) {
+    $DEPS_SET_CATEGORY(args);
+  },
   $DEPS_UPDATE_FROM,
   async $DEPS_FROM(args) {
     await $DEPS_UPDATE_FROM(args)

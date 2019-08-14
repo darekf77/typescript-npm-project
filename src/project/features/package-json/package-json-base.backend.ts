@@ -13,14 +13,16 @@ import { config } from '../../../config';
 
 import * as _ from 'lodash';
 import { Morphi } from 'morphi';
-import { getAndTravelCoreDeps, reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
+import { reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
-
+import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';
 
 export class PackageJsonBase extends PackageJsonCore {
+
   public readonly project: Project;
   private reasonToHidePackages: string = ''
-  private reasonToShowPackages: string = ''
+  private reasonToShowPackages: string = '';
+  private readonly coreCategories: PackageJsonDepsCoreCategories;
 
   constructor(options: { data: Object, location?: string; project?: Project; }) {
     super((options.project && !options.location) ? options.project.location : options.location);
@@ -36,6 +38,7 @@ export class PackageJsonBase extends PackageJsonCore {
         }
       } as IPackageJSON, options.data as any);
     }
+    this.coreCategories = new PackageJsonDepsCoreCategories(this.project);
   }
 
   public save(reasonToShowPackages: string) {
@@ -126,6 +129,10 @@ export class PackageJsonBase extends PackageJsonCore {
     this.save(`reset of npm`);
   }
 
+  async setCategoryFor(pkg: Package) {
+    await this.coreCategories.setWizard(pkg)
+  }
+
   public updateFrom(locations: string[]) {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
@@ -149,7 +156,7 @@ function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
       mainProj.packageJson.setDependencyAndSave({
         name: depName,
         version
-      }, `update from location: ${otherProj.location}`);
+      }, `update from project: ${otherProj.name}`);
     }
   });
 }
