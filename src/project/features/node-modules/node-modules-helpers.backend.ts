@@ -11,14 +11,19 @@ import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../.
 import config from '../../../config';
 import { FeatureForProject } from '../../abstract';
 
-export function dedupePackages(projectLocation: string, packages?: string[]) {
+export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {
   const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
     Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;
   // console.log('Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;',Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe)
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
   packagesNames.forEach(f => {
-    log(`Scanning for duplicates fo ${f}....`)
+    const current = Project.From(path.join(projectLocation, config.folder.node_modules, f));
+    if (!current) {
+      warn(`Project with name ${f} not founded`);
+      return
+    }
+    log(`Scanning for duplicates of current ${f}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       fse.mkdirpSync(nodeMod);
@@ -32,11 +37,24 @@ export function dedupePackages(projectLocation: string, packages?: string[]) {
       .filter(l => !l.startsWith(`${config.folder.node_modules}/${config.folder._bin}`))
       .filter(l => path.basename(path.dirname(l)) === config.folder.node_modules)
 
-    duplicates.forEach(duplicateRelativePath => {
-      const p = path.join(projectLocation, duplicateRelativePath)
-      tryRemoveDir(p)
-      info(`Duplicate of ${f} removed from ${p}`)
-    });
+    if (countOnly) {
+      duplicates.forEach((duplicateRelativePath, i) => {
+        let p = path.join(projectLocation, duplicateRelativePath)
+        const nproj = Project.From(p);
+        p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
+        log(`${i + 1}. Duplicate "${f}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
+      });
+      if (duplicates.length === 0) {
+        log(`No dupicate of ${f} fouded.`);
+      }
+    } else {
+      duplicates.forEach(duplicateRelativePath => {
+        const p = path.join(projectLocation, duplicateRelativePath)
+        tryRemoveDir(p)
+        info(`Duplicate of ${f} removed from ${p}`)
+      });
+    }
+
   });
 }
 

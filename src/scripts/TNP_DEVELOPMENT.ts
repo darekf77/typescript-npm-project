@@ -74,16 +74,6 @@ function version() {
   process.exit(0)
 }
 
-function DEPS_SHOW(args: string) {
-  Project.Current.packageJson.showDeps('deps show')
-  process.exit(0)
-}
-
-function DEPS_HIDE(args: string) {
-  Project.Current.packageJson.hideDeps('deps hide')
-  process.exit(0)
-}
-
 async function RUN_PROCESS() {
   console.log(`RUNNING ON PID: ${chalk.bold(process.pid.toString())}`)
   console.log(`----------PPID: ${process.ppid}`)
@@ -227,35 +217,6 @@ export default {
   $CHECK_ENVIRONMENT: (args) => {
     HelpersMorphi.checkEnvironment()
     process.exit(0)
-  },
-
-  $DEDUPE(args: string) {
-    Project.Current.node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
-    process.exit(0)
-  },
-
-  $DEPS_DEDUPE(args: string) {
-    Project.Current.node_modules.dedupe()
-    process.exit(0)
-  },
-
-  DEPS_SHOW,
-  $DEPS_RECREATE(args: string) {
-    DEPS_SHOW(args)
-  },
-
-  DEPS_SHOW_IF_STANDALONE(args: string) {
-    if (Project.Current.isStandaloneProject) {
-      info(`Showing deps for standalone project`)
-      Project.Current.packageJson.save('is standalone show')
-    }
-    commitWhatIs(`show package.json dependencies`)
-    process.exit(0)
-  },
-
-  DEPS_HIDE,
-  $DEPS_CLEAN(args: string) {
-    DEPS_HIDE(args)
   },
 
   $copytoproject: (args) => {

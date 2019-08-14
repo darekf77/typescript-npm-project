@@ -19,6 +19,7 @@ export class NodeModulesCore extends FeatureForProject {
   public get path() { return path.join(this.project.location, config.folder.node_modules); }
   public get exist() { return nodeModulesExists(this.project); }
   public dedupe = (packages?: string[]) => dedupePackages(this.project.location, packages);
+  public dedupeCount = (packages?: string[]) => dedupePackages(this.project.location, packages, true);
   public remove = () => tryRemoveDir(this.path);
   public linkToProject = (target: Project) => HelpersLinks.createSymLink(this.path, target.node_modules.path);
 
