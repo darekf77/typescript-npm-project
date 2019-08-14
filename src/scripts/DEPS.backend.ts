@@ -1,12 +1,31 @@
+import * as _ from 'lodash';
+import * as path from 'path';
 import { Project } from '../project/abstract/project';
 import { commitWhatIs } from '../helpers/helpers-git';
 import { info } from '../helpers/helpers-messages';
 import { TnpDB } from '../tnp-db/wrapper-db';
 
+export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
+  let locations: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;
 
+  if (_.isArray(locations)) {
+    locations = locations
+      .map(l => {
+        if (path.isAbsolute(l)) {
+          return path.resolve(l);
+        }
+        return path.resolve(path.join(process.cwd(), l));
+      });
+  }
+  Project.Current.packageJson.updateFrom(locations);
+
+  if (exit) {
+    process.exit(0);
+  }
+}
 
 export async function $RESET_NPM(args: string, exit = true) {
-  await Project.Current.packageJson.reset()
+  await Project.Current.packageJson.reset();
   if (exit) {
     process.exit(0);
   }
@@ -38,6 +57,10 @@ function DEPS_HIDE(args: string) {
 
 
 export default {
+  $DEPS_UPDATE_FROM,
+  async $DEPS_FROM(args) {
+    await $DEPS_UPDATE_FROM(args)
+  },
   $RESET_NPM,
   $RESET_NPM_ALL,
   $DEPS_RESET(args) {

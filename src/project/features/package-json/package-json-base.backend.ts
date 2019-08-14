@@ -126,7 +126,31 @@ export class PackageJsonBase extends PackageJsonCore {
     this.save(`reset of npm`);
   }
 
+  public updateFrom(locations: string[]) {
+    for (let index = 0; index < locations.length; index++) {
+      const location = locations[index];
+      const otherProj = Project.From(location);
+      log(`Updating package.json from ${otherProj.name}`)
+      updaPackage(this.project, otherProj.packageJson.data.dependencies, otherProj);
+      updaPackage(this.project, otherProj.packageJson.data.devDependencies, otherProj);
+    }
+  }
+
 }
 
-
+function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
+  if (!deps) {
+    log(`Cant read deps`);
+    return;
+  }
+  Object.keys(deps).forEach(depName => {
+    const version = deps[depName];
+    if (_.isString(version)) {
+      mainProj.packageJson.setDependencyAndSave({
+        name: depName,
+        version
+      }, `update from location: ${otherProj.location}`);
+    }
+  });
+}
 
