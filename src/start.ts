@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand, match } from "./helpers";
+import { run as runCommand, match, vscodeCwdFix } from "./helpers";
 import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
@@ -24,7 +24,7 @@ export async function start(argsv: string[], spinner?: Ora) {
   } = require('minimist')(argsv);
   global.tnpShowProgress = tnpShowProgress;
   global.tnpNoColorsMode = tnpNoColorsMode;
-  if(global.tnpNoColorsMode) {
+  if (global.tnpNoColorsMode) {
     chalk.level = 0;
   }
 
@@ -135,7 +135,7 @@ export async function start(argsv: string[], spinner?: Ora) {
                 // spinner && spinner.stop()
                 // console.log('FNNAME',vFn.name)
                 // process.exit(0)
-                vFn.apply(null, [check.restOfArgs.join(' ')]);
+                vFn.apply(null, [vscodeCwdFix(check.restOfArgs)]);
                 return true;
               }
             }

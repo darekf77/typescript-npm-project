@@ -137,46 +137,7 @@ export default {
     process.exit(0)
   },
 
-  $VSCODE_FIX: async () => {
-    const db = await TnpDB.Instance;
-    const projects = db.getProjects();
-    for (let index = 0; index < projects.length; index++) {
-      const proj = projects[index];
-      proj.project && proj.project.recreate.vscode.settings.changeColorTheme(false)
-    }
-    sleep(1);
-    for (let index = 0; index < projects.length; index++) {
-      const proj = projects[index];
-      proj.project && proj.project.recreate.vscode.settings.changeColorTheme()
-    }
-    sleep(1);
-    for (let index = 0; index < projects.length; index++) {
-      const proj = projects[index];
-      proj.project && proj.project.recreate.vscode.settings.gitReset()
-    }
-    process.exit(0)
-  },
 
-  async VSCODEALL() {
-    const db = await TnpDB.Instance;
-    const projects = db.getProjects();
-    for (let index = 0; index < projects.length; index++) {
-      const proj = projects[index];
-      proj.project.recreate.vscode.settings.excludedFiles();
-      proj.project.recreate.vscode.settings.colorsFromWorkspace()
-    }
-    process.exit(0)
-  },
-  VSCODE: () => {
-    Project.Current.recreate.vscode.settings.excludedFiles();
-    Project.Current.recreate.vscode.settings.colorsFromWorkspace()
-    process.exit(0)
-  },
-  $INIT_VSCODE: () => {
-    Project.Current.recreate.vscode.settings.excludedFiles();
-    Project.Current.recreate.vscode.settings.colorsFromWorkspace()
-    process.exit(0)
-  },
   $INIT_EVERYWHERE: (args) => {
     Project.projects.forEach(p => {
       p.run(`tnp init`).sync()

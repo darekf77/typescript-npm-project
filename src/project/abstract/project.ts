@@ -1438,17 +1438,30 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static nearestTo(location: string) {
-    // log('nearestPorjectLocaiont', location)
-    const project = this.From(location);
-    if (project) {
-      return project;
+  public static nearestTo(absoluteLocation: string) {
+    if (fse.existsSync(absoluteLocation)) {
+      absoluteLocation = fse.realpathSync(absoluteLocation)
     }
-    location = path.join(location, '..');
-    if (!fs.existsSync(location)) {
-      return void 0;
+    if (fse.existsSync(absoluteLocation) && !fse.lstatSync(absoluteLocation).isDirectory()) {
+      absoluteLocation = path.dirname(absoluteLocation)
     }
-    return this.From(path.resolve(location));
+    let project: Project;
+    let previousLocation: string
+    while (true) {
+      project = Project.From(absoluteLocation);
+      if (project) {
+        break;
+      }
+      previousLocation = absoluteLocation;
+      absoluteLocation = path.resolve(path.join(absoluteLocation, '..'))
+      if (!fse.existsSync(absoluteLocation)) {
+        return;
+      }
+      if (previousLocation === absoluteLocation) {
+        return;
+      }
+    }
+    return project;
   }
   //#endregion
 

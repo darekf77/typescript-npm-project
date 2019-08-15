@@ -10,11 +10,55 @@ import { sleep } from 'sleep';
 import { error, warn, log } from "./helpers-messages";
 //#endregion
 
-import * as _ from 'lodash'
-
-
-
+import * as _ from 'lodash';
 import { config } from '../config';
+import { Project } from '../project';
+
+export function vscodeCwdFix(argsv: string[]) {
+  const findNearestProjectIndex = argsv.findIndex((f, i) => f === '--findNearestProject');
+  let findNearestProject = (findNearestProjectIndex !== -1) ? argsv[findNearestProjectIndex + 1] : void 0;
+  const cwdFromArgsIndex = argsv.findIndex((f, i) => f === '--cwd');
+  let cwdFromArgs = (cwdFromArgsIndex !== -1) ? argsv[cwdFromArgsIndex + 1] : void 0;
+  if (_.isString(cwdFromArgs)) {
+    if (fse.existsSync(cwdFromArgs)) {
+      if (findNearestProject) {
+        var nearest = Project.nearestTo(cwdFromArgs);
+      }
+      if (nearest) {
+        cwdFromArgs = nearest.location;
+      }
+      if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
+        cwdFromArgs = path.dirname(cwdFromArgs);
+      }
+      if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
+        process.chdir(cwdFromArgs);
+      }
+    } else {
+      warn(`Bad cwd from args: ${cwdFromArgs}`);
+    }
+  }
+  if (findNearestProjectIndex !== -1) {
+    argsv = argsv.filter((f, i) => {
+      if (f === '--findNearestProject') {
+        argsv[i + 1] = ''
+        return false;
+      }
+      return true;
+    }).filter(f => !!f);
+  }
+  if (cwdFromArgsIndex !== -1) {
+    argsv = argsv.filter((f, i) => {
+      if (f === '--cwd') {
+        argsv[i + 1] = ''
+        return false;
+      }
+      return true;
+    }).filter(f => !!f);
+  }
+  return argsv.join(' ');
+}
+
+
 
 export const sortKeys = function (obj) {
   if (_.isArray(obj)) {

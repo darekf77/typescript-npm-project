@@ -222,12 +222,14 @@ export class FilesRecreator extends FeatureForProject {
             });
           },
 
-          excludedFiles() {
+          excludedFiles(hide: boolean = true) {
             self.modifyVscode(settings => {
               settings["files.exclude"] = {};
-              self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
-                settings["files.exclude"][f] = true
-              })
+              if (hide) {
+                self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
+                  settings["files.exclude"][f] = true
+                })
+              }
               return settings
             });
           }

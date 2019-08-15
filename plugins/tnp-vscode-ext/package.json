@@ -27,6 +27,18 @@
       {
         "command": "extension.tnpCLIBuildProject",
         "title": "FIREDEV: build project"
+      },
+      {
+        "command": "extension.tnpCLIShowTempFiles",
+        "title": "FIREDEV: show temp files"
+      },
+      {
+        "command": "extension.tnpCLIHideTempFiles",
+        "title": "FIREDEV: hide temp files"
+      },
+      {
+        "command": "extension.tnpCLIRebuildExtension",
+        "title": "FIREDEV: rebuild/reinstal vscode ext"
       }
     ],
     "menus": {
@@ -36,6 +48,15 @@
         },
         {
           "command": "extension.tnpCLIBuildProject"
+        },
+        {
+          "command": "extension.tnpCLIShowTempFiles"
+        },
+        {
+          "command": "extension.tnpCLIHideTempFiles"
+        },
+        {
+          "command": "extension.tnpCLIRebuildExtension"
         }
       ],
       "editor/title/context": [
@@ -45,6 +66,18 @@
         },
         {
           "command": "extension.tnpCLIBuildProject",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.tnpCLIShowTempFiles",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.tnpCLIHideTempFiles",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.tnpCLIRebuildExtension",
           "group": "Firedev CLI essentials"
         }
       ]
