@@ -41,7 +41,9 @@ function $GIT_REMOVE_UNTRACKED() {
 
 export function $GIT_QUICK_COMMIT_AND_PUSH(args: string, exit = true) {
   if (Project.Current.git.isGitRepo) {
-    Project.Current.run(`git add --all . && git commit -m "update"`).sync();
+    try {
+      Project.Current.run(`git add --all . && git commit -m "update"`).sync();
+    } catch (error) { }
     Project.Current.git.pushCurrentBranch();
   } else {
     throw `This is not a git repo: ${process.cwd()}`
