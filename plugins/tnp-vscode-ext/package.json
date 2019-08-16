@@ -33,6 +33,26 @@
         "title": "FIREDEV: build dist"
       },
       {
+        "command": "extension.fIREDEVstaticbuilddist",
+        "title": "FIREDEV: static build dist"
+      },
+      {
+        "command": "extension.fIREDEVresetproject",
+        "title": "FIREDEV: reset project"
+      },
+      {
+        "command": "extension.fIREDEVresetallprojects",
+        "title": "FIREDEV: reset all projects"
+      },
+      {
+        "command": "extension.fIREDEVclearproject",
+        "title": "FIREDEV: clear project"
+      },
+      {
+        "command": "extension.fIREDEVclearallprojects",
+        "title": "FIREDEV: clear all projects"
+      },
+      {
         "command": "extension.fIREDEVrebuildreinstalvscodeext",
         "title": "FIREDEV: rebuild/reinstal vscode ext"
       },
@@ -43,6 +63,10 @@
       {
         "command": "extension.fIREDEVshowversion",
         "title": "FIREDEV: show version"
+      },
+      {
+        "command": "extension.fIREDEVfixtermialvscode",
+        "title": "FIREDEV: fix termial vscode"
       }
     ],
     "menus": {
@@ -57,6 +81,21 @@
           "command": "extension.fIREDEVbuilddist"
         },
         {
+          "command": "extension.fIREDEVstaticbuilddist"
+        },
+        {
+          "command": "extension.fIREDEVresetproject"
+        },
+        {
+          "command": "extension.fIREDEVresetallprojects"
+        },
+        {
+          "command": "extension.fIREDEVclearproject"
+        },
+        {
+          "command": "extension.fIREDEVclearallprojects"
+        },
+        {
           "command": "extension.fIREDEVrebuildreinstalvscodeext"
         },
         {
@@ -64,6 +103,9 @@
         },
         {
           "command": "extension.fIREDEVshowversion"
+        },
+        {
+          "command": "extension.fIREDEVfixtermialvscode"
         }
       ],
       "editor/title/context": [
@@ -80,6 +122,26 @@
           "group": "Firedev CLI essentials"
         },
         {
+          "command": "extension.fIREDEVstaticbuilddist",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVresetproject",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVresetallprojects",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVclearproject",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVclearallprojects",
+          "group": "Firedev CLI essentials"
+        },
+        {
           "command": "extension.fIREDEVrebuildreinstalvscodeext",
           "group": "Firedev CLI essentials"
         },
@@ -89,6 +151,10 @@
         },
         {
           "command": "extension.fIREDEVshowversion",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVfixtermialvscode",
           "group": "Firedev CLI essentials"
         }
       ]

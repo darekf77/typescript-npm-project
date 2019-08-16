@@ -113,7 +113,7 @@ inside generated projects...
       warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
 
-    if (!this.checkIfGeneratedTnpBundle) {
+    if (!this.project.isStandaloneProject && !this.checkIfGeneratedTnpBundle) {
       error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
 

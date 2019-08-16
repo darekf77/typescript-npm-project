@@ -17,13 +17,16 @@ export async function start(argsv: string[], spinner?: Ora) {
 
   const {
     tnpShowProgress,
-    tnpNoColorsMode
+    tnpNoColorsMode,
+    tnpNonInteractive,
   }: {
     tnpShowProgress: boolean;
     tnpNoColorsMode: boolean;
+    tnpNonInteractive: boolean;
   } = require('minimist')(argsv);
-  global.tnpShowProgress = tnpShowProgress;
-  global.tnpNoColorsMode = tnpNoColorsMode;
+  global.tnpShowProgress = !!tnpShowProgress;
+  global.tnpNoColorsMode = !!tnpNoColorsMode;
+  global.tnpNonInteractive = !!tnpNonInteractive;
   if (global.tnpNoColorsMode) {
     chalk.level = 0;
   }

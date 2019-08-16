@@ -14,10 +14,40 @@ import * as _ from 'lodash';
 import { config } from '../config';
 import { Project } from '../project';
 
+function indexForArg(arg: string, argsv: string[]) {
+  return argsv.findIndex((f, i) => f === `--${arg}`);
+}
+
+function removeArg(arg: string, argsv: string[]) {
+  const index = indexForArg(arg, argsv);
+  if (index !== -1) {
+    argsv = argsv.filter((f, i) => {
+      if (f === `--${arg}`) {
+        argsv[i + 1] = ''
+        return false;
+      }
+      return true;
+    }).filter(f => !!f);
+  }
+  return argsv;
+}
+
+// function argAction(arg: string, argsv: string[], action: (newArg: string) => any) {
+//   const index = indexForArg(arg, argsv);
+//   if (index !== -1) {
+//     action(argsv[index + 1]);
+//   }
+//   argsv = removeArg(arg, argsv);
+//   return argsv;
+// }
+
 export function vscodeCwdFix(argsv: string[]) {
-  const findNearestProjectIndex = argsv.findIndex((f, i) => f === '--findNearestProject');
-  let findNearestProject = (findNearestProjectIndex !== -1) ? argsv[findNearestProjectIndex + 1] : void 0;
-  const cwdFromArgsIndex = argsv.findIndex((f, i) => f === '--cwd');
+  const findNearestProjectIndex = indexForArg('findNearestProject', argsv);
+  const cwdFromArgsIndex = indexForArg('cwd', argsv);
+  const tnpNonInteractiveIndex = indexForArg('tnpNonInteractive', argsv);
+
+  global.tnpNonInteractive = (tnpNonInteractiveIndex !== -1);
+  const findNearestProject = (findNearestProjectIndex !== -1) ? argsv[findNearestProjectIndex + 1] : void 0;
   let cwdFromArgs = (cwdFromArgsIndex !== -1) ? argsv[cwdFromArgsIndex + 1] : void 0;
   if (_.isString(cwdFromArgs)) {
     if (fse.existsSync(cwdFromArgs)) {
@@ -37,24 +67,10 @@ export function vscodeCwdFix(argsv: string[]) {
       warn(`Bad cwd from args: ${cwdFromArgs}`);
     }
   }
-  if (findNearestProjectIndex !== -1) {
-    argsv = argsv.filter((f, i) => {
-      if (f === '--findNearestProject') {
-        argsv[i + 1] = ''
-        return false;
-      }
-      return true;
-    }).filter(f => !!f);
-  }
-  if (cwdFromArgsIndex !== -1) {
-    argsv = argsv.filter((f, i) => {
-      if (f === '--cwd') {
-        argsv[i + 1] = ''
-        return false;
-      }
-      return true;
-    }).filter(f => !!f);
-  }
+
+  argsv = removeArg('tnpNonInteractive', argsv);
+  argsv = removeArg('findNearestProject', argsv);
+  argsv = removeArg('cwd', argsv);
   return argsv.join(' ');
 }
 

@@ -1164,26 +1164,28 @@ export abstract class BaseProject {
   private async selectProjectToCopyTO() {
     // clearConsole()
     const db = await TnpDB.Instance;
-    const existedProject = db
-      .getProjects()
-      .map(p => p.project)
-      .filter(p => p && !p.isWorkspaceChildProject)
-      .filter(p => p.location !== this.location)
+    if (!global.tnpNonInteractive) {
+      const existedProject = db
+        .getProjects()
+        .map(p => p.project)
+        .filter(p => p && !p.isWorkspaceChildProject)
+        .filter(p => p.location !== this.location)
 
-    const { projects = [] }: { projects: string[] } = await inquirer
-      .prompt([
-        {
-          type: 'checkbox',
-          name: 'projects',
-          message: 'Select projects where to copy bundle after finish: ',
-          choices: existedProject
-            .map(c => {
-              return { value: c.location, name: c.genericName }
-            })
-        }
-      ]) as any;
+      const { projects = [] }: { projects: string[] } = await inquirer
+        .prompt([
+          {
+            type: 'checkbox',
+            name: 'projects',
+            message: 'Select projects where to copy bundle after finish: ',
+            choices: existedProject
+              .map(c => {
+                return { value: c.location, name: c.genericName }
+              })
+          }
+        ]) as any;
 
-    this.buildOptions.copyto = projects.map(p => Project.From(p))
+      this.buildOptions.copyto = projects.map(p => Project.From(p));
+    }
 
     if (!_.isArray(this.buildOptions.copyto)) {
       this.buildOptions.copyto = []

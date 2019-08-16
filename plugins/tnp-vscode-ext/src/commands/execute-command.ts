@@ -23,7 +23,11 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.cancellable === 'undefined') {
     options.cancellable = true;
   }
-  const { findNearestProject, reloadAfterSuccesFinish, syncProcess, cancellable, title } = options;
+  if (typeof options.tnpNonInteractive === 'undefined') {
+    options.tnpNonInteractive = true;
+  }
+  const { findNearestProject, reloadAfterSuccesFinish,
+    syncProcess, cancellable, title, tnpNonInteractive } = options;
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
       if (vscode.window.activeTextEditor) {
@@ -49,9 +53,7 @@ export function executeCommand(registerName: string, command: string, options?: 
       title: title ? title : `Executing: ${command}`,
       cancellable,
     }, (progress, token) => {
-      token.onCancellationRequested(() => {
-        console.log("User canceled the long running operation")
-      });
+
 
       progress.report({ increment: 0 });
 
@@ -72,6 +74,13 @@ export function executeCommand(registerName: string, command: string, options?: 
           resolve();
         }
 
+        token.onCancellationRequested(() => {
+          if (proc) {
+            proc.kill('SIGINT');
+          }
+          window.showInformationMessage(`User canceled command: ${command}`)
+        });
+
         try {
           let newCwd = isAbsolute ? cwd : path.join(cwd, realtivePath);
           if (!fse.existsSync(newCwd)) {
@@ -90,7 +99,13 @@ export function executeCommand(registerName: string, command: string, options?: 
           } else {
             window.showWarningMessage(`cwd not found: ${newCwd}`);
           }
-          const commandToExecute = `${command} --cwd ${newCwd} ${findNearestProject ? '--findNearestProject' : ''}`;
+
+          const flags = [
+            tnpNonInteractive && '--tnpNonInteractive',
+            findNearestProject && '--findNearestProject',
+          ].filter(f => !!f).join(' ');
+
+          const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
 
           // window.showInformationMessage(commandToExecute)
 
@@ -103,16 +118,22 @@ export function executeCommand(registerName: string, command: string, options?: 
             progress.report({ increment: 50 });
             finishAction(childResult)
           } else {
-            let proc = child.exec(commandToExecute);
+            var proc = child.exec(commandToExecute);
             proc.stdout.on('data', (message) => {
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
+            proc.stdout.on('error', (err) => {
+              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
+            });
             proc.stderr.on('data', (message) => {
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
+            });
+            proc.stderr.on('error', (err) => {
+              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
             });
             proc.on('error', (err) => {
               finishError(err);

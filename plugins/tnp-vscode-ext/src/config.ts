@@ -29,6 +29,41 @@ export const commands: CommandType[] = ([
     }
   },
   {
+    title: 'FIREDEV: static build dist',
+    exec: 'tnp static:build:dist',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV: reset project',
+    exec: 'tnp reset',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV: reset all projects',
+    exec: 'tnp reset:all',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV: clear project',
+    exec: 'tnp clear',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV: clear all projects',
+    exec: 'tnp clear:all',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
     title: 'FIREDEV: rebuild/reinstal vscode ext',
     exec: 'tnp vscode:ext',
     options: {
@@ -50,6 +85,12 @@ export const commands: CommandType[] = ([
     options: {
       syncProcess: true,
       title: 'Show version of firedev'
+    }
+  },
+  {
+    title: 'FIREDEV: fix termial vscode',
+    exec: 'tnp vscodefix',
+    options: {
     }
   }
 ] as CommandType[]).map(c => {

@@ -4,4 +4,5 @@ export type ProcesOptions = {
   reloadAfterSuccesFinish?: boolean;
   cancellable?: boolean;
   title?: string;
+  tnpNonInteractive?: boolean;
 };
