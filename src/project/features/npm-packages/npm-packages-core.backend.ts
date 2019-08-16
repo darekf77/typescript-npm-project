@@ -13,7 +13,10 @@ import { FeatureForProject } from '../../abstract';
 import { Package, InstalationTypeArr, InstalationType, LibType, ActualNpmInstallOptions } from '../../../models';
 import config from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
-import { executeCommand, fixOptions, prepareCommand, prepareTempProject, copyMainProject, copyMainProjectDependencies } from './npm-packages-helpers.backend';
+import {
+  executeCommand, fixOptions, prepareCommand, prepareTempProject,
+  copyMainProject, copyMainProjectDependencies
+} from './npm-packages-helpers.backend';
 //#endregion
 
 export class NpmPackagesCore extends FeatureForProject {
