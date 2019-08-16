@@ -53,6 +53,10 @@
         "title": "FIREDEV: clear all projects"
       },
       {
+        "command": "extension.fIREDEVQUICKGITcommitandpushupdate",
+        "title": "FIREDEV QUICK GIT commit and push update"
+      },
+      {
         "command": "extension.fIREDEVrebuildreinstalvscodeext",
         "title": "FIREDEV: rebuild/reinstal vscode ext"
       },
@@ -94,6 +98,9 @@
         },
         {
           "command": "extension.fIREDEVclearallprojects"
+        },
+        {
+          "command": "extension.fIREDEVQUICKGITcommitandpushupdate"
         },
         {
           "command": "extension.fIREDEVrebuildreinstalvscodeext"
@@ -139,6 +146,10 @@
         },
         {
           "command": "extension.fIREDEVclearallprojects",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVQUICKGITcommitandpushupdate",
           "group": "Firedev CLI essentials"
         },
         {

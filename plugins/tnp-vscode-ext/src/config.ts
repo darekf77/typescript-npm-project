@@ -64,6 +64,13 @@ export const commands: CommandType[] = ([
     }
   },
   {
+    title: 'FIREDEV QUICK GIT commit and push update',
+    exec: 'tnp git:quick:commit:and:push',
+    options: {
+      findNearestProject: true
+    }
+  },
+  {
     title: 'FIREDEV: rebuild/reinstal vscode ext',
     exec: 'tnp vscode:ext',
     options: {
