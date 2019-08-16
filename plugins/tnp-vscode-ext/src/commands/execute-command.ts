@@ -108,7 +108,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
 
           // window.showInformationMessage(commandToExecute)
-
+          const debug = true;
           if (syncProcess) {
             let childResult = child.execSync(commandToExecute);
             progress.report({ increment: 50 });
@@ -120,20 +120,28 @@ export function executeCommand(registerName: string, command: string, options?: 
           } else {
             var proc = child.exec(commandToExecute);
             proc.stdout.on('data', (message) => {
+              // tslint:disable-next-line: no-unused-expression
+              debug && window.showInformationMessage(message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stdout.on('error', (err) => {
+              // tslint:disable-next-line: no-unused-expression
+              debug && window.showInformationMessage(err.toString());
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
             });
             proc.stderr.on('data', (message) => {
+              // tslint:disable-next-line: no-unused-expression
+              debug && window.showInformationMessage(message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stderr.on('error', (err) => {
-              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
+              // tslint:disable-next-line: no-unused-expression
+              debug && window.showInformationMessage(err.toString());
+              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
             });
             proc.on('error', (err) => {
               finishError(err);
