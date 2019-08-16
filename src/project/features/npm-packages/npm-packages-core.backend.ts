@@ -23,7 +23,6 @@ export class NpmPackagesCore extends FeatureForProject {
   }
 
   protected actualNpmProcess(options?: ActualNpmInstallOptions) {
-    return
     const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
