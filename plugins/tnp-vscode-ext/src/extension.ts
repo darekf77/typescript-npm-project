@@ -3,21 +3,15 @@
 import * as vscode from 'vscode';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-import { createMorphiModel } from './commands/create-morphi-model';
-import { buildProject } from './commands/build-project';
 import { executeCommand } from './commands/execute-command';
+import { commands } from './config';
 
 
 export function activate(context: vscode.ExtensionContext) {
-
-  context.subscriptions.push(createMorphiModel('extension.tnpCLIcreateFiredevModel'));
-  context.subscriptions.push(buildProject('extension.tnpCLIBuildProject'));
-  context.subscriptions.push(executeCommand('extension.tnpCLIShowTempFiles', 'tnp vscode:temp:show', { findNearestProject: true }));
-  context.subscriptions.push(executeCommand('extension.tnpCLIHideTempFiles', 'tnp vscode:temp:hide', { findNearestProject: true }));
-  context.subscriptions.push(executeCommand('extension.tnpCLIRebuildExtension', 'tnp vscode:ext', { reloadAfterSuccesFinish: true }));
-
-
-
+  for (let index = 0; index < commands.length; index++) {
+    const { command = '', exec = '', options } = commands[index];
+    context.subscriptions.push(executeCommand(command, exec, options));
+  }
 }
 
 // this method is called when your extension is deactivated

@@ -21,63 +21,74 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.tnpCLIcreateFiredevModel",
-        "title": "FIREDEV: Create model"
-      },
-      {
-        "command": "extension.tnpCLIBuildProject",
-        "title": "FIREDEV: build project"
-      },
-      {
-        "command": "extension.tnpCLIShowTempFiles",
+        "command": "extension.fIREDEVshowtempfiles",
         "title": "FIREDEV: show temp files"
       },
       {
-        "command": "extension.tnpCLIHideTempFiles",
+        "command": "extension.fIREDEVhidetempfiles",
         "title": "FIREDEV: hide temp files"
       },
       {
-        "command": "extension.tnpCLIRebuildExtension",
+        "command": "extension.fIREDEVbuilddist",
+        "title": "FIREDEV: build dist"
+      },
+      {
+        "command": "extension.fIREDEVrebuildreinstalvscodeext",
         "title": "FIREDEV: rebuild/reinstal vscode ext"
+      },
+      {
+        "command": "extension.fIREDEVTESTEXT",
+        "title": "FIREDEV: TEST EXT"
+      },
+      {
+        "command": "extension.fIREDEVshowversion",
+        "title": "FIREDEV: show version"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "extension.tnpCLIcreateFiredevModel"
+          "command": "extension.fIREDEVshowtempfiles"
         },
         {
-          "command": "extension.tnpCLIBuildProject"
+          "command": "extension.fIREDEVhidetempfiles"
         },
         {
-          "command": "extension.tnpCLIShowTempFiles"
+          "command": "extension.fIREDEVbuilddist"
         },
         {
-          "command": "extension.tnpCLIHideTempFiles"
+          "command": "extension.fIREDEVrebuildreinstalvscodeext"
         },
         {
-          "command": "extension.tnpCLIRebuildExtension"
+          "command": "extension.fIREDEVTESTEXT"
+        },
+        {
+          "command": "extension.fIREDEVshowversion"
         }
       ],
       "editor/title/context": [
         {
-          "command": "extension.tnpCLIcreateFiredevModel",
+          "command": "extension.fIREDEVshowtempfiles",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.tnpCLIBuildProject",
+          "command": "extension.fIREDEVhidetempfiles",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.tnpCLIShowTempFiles",
+          "command": "extension.fIREDEVbuilddist",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.tnpCLIHideTempFiles",
+          "command": "extension.fIREDEVrebuildreinstalvscodeext",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.tnpCLIRebuildExtension",
+          "command": "extension.fIREDEVTESTEXT",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVshowversion",
           "group": "Firedev CLI essentials"
         }
       ]
@@ -86,7 +97,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "build": "vsce package",
-    "build:install": "npm run build && code --install-extension tnp-vscode-ext-0.0.1.vsix",
+    "build:install": "ts-node update-proj.js && npm run build && code --install-extension tnp-vscode-ext-0.0.1.vsix",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
@@ -97,6 +108,8 @@
     "vscode": "^1.1.25",
     "tslint": "^5.8.0",
     "@types/node": "^8.10.25",
-    "@types/mocha": "^2.2.42"
+    "@types/mocha": "^2.2.42",
+    "ts-node": "^7.0.1",
+    "lodash": "^4.17.4"
   }
 }

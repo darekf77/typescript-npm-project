@@ -4,12 +4,8 @@ import * as path from 'path';
 import * as fse from 'fs';
 import * as child from 'child_process';
 import { window, ProgressLocation } from 'vscode';
-
-export type ProcesOptions = {
-  findNearestProject?: boolean;
-  syncProcess?: boolean;
-  reloadAfterSuccesFinish?: boolean;
-}
+import { ProgressData } from './progress-output';
+import { ProcesOptions } from '../process-options';
 
 export function executeCommand(registerName: string, command: string, options?: ProcesOptions) {
   if (!options) {
@@ -24,7 +20,10 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.reloadAfterSuccesFinish === 'undefined') {
     options.reloadAfterSuccesFinish = false;
   }
-  const { findNearestProject, reloadAfterSuccesFinish, syncProcess } = options;
+  if (typeof options.cancellable === 'undefined') {
+    options.cancellable = true;
+  }
+  const { findNearestProject, reloadAfterSuccesFinish, syncProcess, cancellable, title } = options;
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
       if (vscode.window.activeTextEditor) {
@@ -47,15 +46,14 @@ export function executeCommand(registerName: string, command: string, options?: 
     }
     window.withProgress({
       location: ProgressLocation.Notification,
-      title: `Executing: ${command}`,
-      cancellable: true
+      title: title ? title : `Executing: ${command}`,
+      cancellable,
     }, (progress, token) => {
       token.onCancellationRequested(() => {
         console.log("User canceled the long running operation")
       });
 
       progress.report({ increment: 0 });
-
 
 
       var p = new Promise(async (resolve) => {
@@ -94,7 +92,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           }
           const commandToExecute = `${command} --cwd ${newCwd} ${findNearestProject ? '--findNearestProject' : ''}`;
 
-          window.showInformationMessage(commandToExecute)
+          // window.showInformationMessage(commandToExecute)
 
           if (syncProcess) {
             let childResult = child.execSync(commandToExecute);
@@ -106,8 +104,15 @@ export function executeCommand(registerName: string, command: string, options?: 
             finishAction(childResult)
           } else {
             let proc = child.exec(commandToExecute);
-            proc.on('message', (message) => {
-              progress.report({ message });
+            proc.stdout.on('data', (message) => {
+              ProgressData.resolveFrom(message.toString(), (json) => {
+                progress.report({ message: json.msg, increment: json.value / 100 });
+              });
+            });
+            proc.stderr.on('data', (message) => {
+              ProgressData.resolveFrom(message.toString(), (json) => {
+                progress.report({ message: json.msg, increment: json.value / 100 });
+              });
             });
             proc.on('error', (err) => {
               finishError(err);
