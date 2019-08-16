@@ -67,7 +67,8 @@ export const commands: CommandType[] = ([
     title: 'FIREDEV QUICK GIT commit and push update',
     exec: 'tnp git:quick:commit:and:push',
     options: {
-      findNearestProject: true
+      findNearestProject: true,
+      debug: true,
     }
   },
   {
@@ -76,6 +77,7 @@ export const commands: CommandType[] = ([
     options: {
       reloadAfterSuccesFinish: true,
       cancellable: false,
+      debug: true,
     }
   },
   {

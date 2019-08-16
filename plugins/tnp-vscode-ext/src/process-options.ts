@@ -5,4 +5,5 @@ export type ProcesOptions = {
   cancellable?: boolean;
   title?: string;
   tnpNonInteractive?: boolean;
+  debug?: boolean;
 };

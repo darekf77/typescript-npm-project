@@ -26,8 +26,14 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.tnpNonInteractive === 'undefined') {
     options.tnpNonInteractive = true;
   }
+  if (typeof options.debug === 'undefined') {
+    options.debug = false;
+  }
+
   const { findNearestProject, reloadAfterSuccesFinish,
-    syncProcess, cancellable, title, tnpNonInteractive } = options;
+    syncProcess, cancellable, title, tnpNonInteractive,
+    debug } = options;
+
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
       if (vscode.window.activeTextEditor) {
@@ -48,9 +54,10 @@ export function executeCommand(registerName: string, command: string, options?: 
     if (typeof cwd !== 'string') {
       return;
     }
+    const mainTitle = title ? title : `Executing: ${command}`;
     window.withProgress({
       location: ProgressLocation.Notification,
-      title: title ? title : `Executing: ${command}`,
+      title: mainTitle,
       cancellable,
     }, (progress, token) => {
 
@@ -106,9 +113,13 @@ export function executeCommand(registerName: string, command: string, options?: 
           ].filter(f => !!f).join(' ');
 
           const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
+          // tslint:disable-next-line: no-unused-expression
+
+          const log = window.createOutputChannel(mainTitle);
 
           // window.showInformationMessage(commandToExecute)
-          const debug = true;
+          // tslint:disable-next-line: no-unused-expression
+          debug && log.appendLine(`commandToExecute: ${commandToExecute}`);
           if (syncProcess) {
             let childResult = child.execSync(commandToExecute);
             progress.report({ increment: 50 });
@@ -121,26 +132,26 @@ export function executeCommand(registerName: string, command: string, options?: 
             var proc = child.exec(commandToExecute);
             proc.stdout.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && window.showInformationMessage(message.toString());
+              debug && log.appendLine(message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stdout.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && window.showInformationMessage(err.toString());
+              debug && log.appendLine(err.toString());
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
             });
             proc.stderr.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && window.showInformationMessage(message.toString());
+              debug && log.appendLine(message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stderr.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && window.showInformationMessage(err.toString());
+              debug && log.appendLine(err.toString());
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
             });
             proc.on('error', (err) => {

@@ -47,7 +47,7 @@ export function vscodeCwdFix(argsv: string[]) {
   const tnpNonInteractiveIndex = indexForArg('tnpNonInteractive', argsv);
 
   global.tnpNonInteractive = (tnpNonInteractiveIndex !== -1);
-  const findNearestProject = (findNearestProjectIndex !== -1) ? argsv[findNearestProjectIndex + 1] : void 0;
+  const findNearestProject = (findNearestProjectIndex !== -1);
   let cwdFromArgs = (cwdFromArgsIndex !== -1) ? argsv[cwdFromArgsIndex + 1] : void 0;
   if (_.isString(cwdFromArgs)) {
     if (fse.existsSync(cwdFromArgs)) {

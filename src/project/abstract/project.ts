@@ -1495,7 +1495,11 @@ export class Project extends BaseProject implements IProject {
 
     const current = Project.From(process.cwd())
     if (!current) {
-      error(`Current location is not a ${chalk.bold('tnp')} type project.\n\n${process.cwd()}`, false, false)
+      error(`Current location is not a ${chalk.bold('tnp')} type project.
+
+      locatino: "${process.cwd()}"
+
+      }`, false, false);
     }
     // log('CURRENT', current.location)
     return current;
