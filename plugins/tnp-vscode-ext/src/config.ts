@@ -168,7 +168,6 @@ export const commands: CommandType[] = ([
     options: {
       title: 'quick git commit and push',
       findNearestProjectWithGitRoot: true,
-      cancellable: false,
     }
   },
   {
