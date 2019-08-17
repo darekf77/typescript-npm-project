@@ -1,22 +1,10 @@
 import * as _ from 'lodash';
-import * as fse from 'fs-extra';
-import { Project, LibProject } from "../project";
-import { BaselineSiteJoin } from "../project/features/baseline-site-join";
-import * as  psList from 'ps-list';
-import { PsListInfo } from '../models/ps-info';
-import { error, info, HelpersLinks, killProcess, warn } from '../helpers';
-import chalk from 'chalk';
-import { getMostRecentFilesNames } from '../helpers';
-import { Helpers as HelpersMorphi } from "morphi";
+import { Project } from "../project";
 import { run } from "../helpers";
-import * as glob from 'glob';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
-import { commitWhatIs } from '../helpers';
 import { paramsFrom } from '../helpers';
-import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-import { TnpDB } from '../tnp-db';
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = Project.Current.recreate.filesIgnoredBy.gitignore
@@ -39,7 +27,7 @@ function $GIT_REMOVE_UNTRACKED() {
   process.exit(0)
 }
 
-export function $GIT_QUICK_COMMIT_AND_PUSH(args: string, exit = true) {
+export function $GIT_QUICK_COMMIT_AND_PUSH(exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git add --all . && git commit -m "update"`).sync();
@@ -51,7 +39,7 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(args: string, exit = true) {
   exit && process.exit(0);
 }
 
-export function $GIT_QUICK_RESET_HARD_AND_PULL(args: string, exit = true) {
+export function $GIT_QUICK_RESET_HARD_AND_PULL(exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git reset --hard`).sync();
