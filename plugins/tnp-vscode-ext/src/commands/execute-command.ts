@@ -74,7 +74,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           if (reloadAfterSuccesFinish) {
             vscode.commands.executeCommand('workbench.action.reloadWindow');
           } else {
-            vscode.window.showInformationMessage(`Done executing command: ${command}.\n\n` + (childResult && childResult.toString()));
+            vscode.window.showInformationMessage(`Done executing kurwa command: ${command}.\n\n` + (childResult && childResult.toString()));
           }
           resolve();
         }
