@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import { Project } from '../project';
-import { run } from '../helpers';
+import { run, error } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
 import { paramsFrom } from '../helpers';
+import { PROGRESS_DATA } from '../progress-output';
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = Project.Current.recreate.filesIgnoredBy.gitignore
@@ -31,10 +32,14 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git add --all . && git commit -m "update"`).sync();
-    } catch (error) { }
+      global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Adding and Commit Success` })
+    } catch (e) {
+      error(`Error adding/commiting git ${e}`, false, true);
+    }
     Project.Current.git.pushCurrentBranch();
+    global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Pushing to repository success` })
   } else {
-    throw `This is not a git repo: ${process.cwd()}`
+    error(`This is not a git repo: ${process.cwd()}`, false, true)
   }
   exit && process.exit(0);
 }
