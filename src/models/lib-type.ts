@@ -1,11 +1,22 @@
-export type LibType = "angular-lib"
-  | "isomorphic-lib"
+export type LibType = 'angular-lib'
+  | 'isomorphic-lib'
   | 'angular-client'
-  | "ionic-client"
+  | 'ionic-client'
   | 'workspace'
   | 'container'
   | 'docker'
-  | 'unknow-npm-project'
+  | 'unknow-npm-project';
+
+export const LibTypeArr: LibType[] = [
+  'angular-lib',
+  'isomorphic-lib',
+  'angular-client',
+  'ionic-client',
+  'workspace',
+  'container',
+  'docker',
+  'unknow-npm-project',
+]
 
 export type CoreLibCategory = LibType | 'common';
 

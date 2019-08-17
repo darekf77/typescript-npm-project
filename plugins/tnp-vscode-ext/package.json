@@ -57,6 +57,10 @@
         "title": "FIREDEV QUICK GIT commit and push update"
       },
       {
+        "command": "extension.fIREDEVQUICKGITresethardandpull",
+        "title": "FIREDEV QUICK GIT reset hard and pull"
+      },
+      {
         "command": "extension.fIREDEVrebuildreinstalvscodeext",
         "title": "FIREDEV: rebuild/reinstal vscode ext"
       },
@@ -101,6 +105,9 @@
         },
         {
           "command": "extension.fIREDEVQUICKGITcommitandpushupdate"
+        },
+        {
+          "command": "extension.fIREDEVQUICKGITresethardandpull"
         },
         {
           "command": "extension.fIREDEVrebuildreinstalvscodeext"
@@ -150,6 +157,10 @@
         },
         {
           "command": "extension.fIREDEVQUICKGITcommitandpushupdate",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.fIREDEVQUICKGITresethardandpull",
           "group": "Firedev CLI essentials"
         },
         {

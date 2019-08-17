@@ -51,6 +51,18 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(args: string, exit = true) {
   exit && process.exit(0);
 }
 
+export function $GIT_QUICK_RESET_HARD_AND_PULL(args: string, exit = true) {
+  if (Project.Current.git.isGitRepo) {
+    try {
+      Project.Current.run(`git reset --hard`).sync();
+    } catch (error) { }
+    Project.Current.git.pullCurrentBranch();
+  } else {
+    throw `This is not a git repo: ${process.cwd()}`
+  }
+  exit && process.exit(0);
+}
+
 export default {
   $GIT_QUICK_COMMIT_AND_PUSH,
   $GIT_REMOVE_UNTRACKED,

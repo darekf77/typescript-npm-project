@@ -65,10 +65,16 @@ export const commands: CommandType[] = ([
   },
   {
     title: 'FIREDEV QUICK GIT commit and push update',
-    exec: 'tnp git:quick:commit:and:push',
+    exec: `tnp ${camelize('$GIT_QUICK_COMMIT_AND_PUSH')}`,
     options: {
-      findNearestProject: true,
-      debug: true,
+      findNearestProjectWithGitRoot: true,
+    }
+  },
+  {
+    title: 'FIREDEV QUICK GIT reset hard and pull',
+    exec: `tnp ${camelize('$GIT_QUICK_RESET_HARD_AND_PULL')}`,
+    options: {
+      findNearestProjectWithGitRoot: true,
     }
   },
   {
@@ -101,7 +107,40 @@ export const commands: CommandType[] = ([
     exec: 'tnp vscodefix',
     options: {
     }
-  }
+  },
+  // only for tests
+  // {
+  //   title: 'FIREDEV TEST nearest project',
+  //   exec: 'tnp processcwd',
+  //   options: {
+  //     findNearestProject: true,
+  //     syncProcess: true
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV TEST nearest project with git root',
+  //   exec: 'tnp processcwd',
+  //   options: {
+  //     findNearestProjectWithGitRoot: true,
+  //     syncProcess: true
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV TEST nearest project workspace',
+  //   exec: 'tnp processcwd',
+  //   options: {
+  //     findNearestProjectType: 'container',
+  //     syncProcess: true
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV TEST nearest project workspace with git root',
+  //   exec: 'tnp processcwd',
+  //   options: {
+  //     findNearestProjectTypeWithGitRoot: 'workspace',
+  //     syncProcess: true
+  //   }
+  // }
 ] as CommandType[]).map(c => {
   if (!c.command) {
     c.command = `extension.${camelize(c.title)}`;

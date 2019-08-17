@@ -10,7 +10,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
 
 import config from '../../config';
-import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType, ArrNpmDependencyType } from '../../models';
+import { RecreateFile, RunOptions, Package, BuildDir, EnvConfig, IPackageJSON, InstalationType, TnpNpmDependencyType, ArrNpmDependencyType, LibTypeArr } from '../../models';
 import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
   pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
@@ -1440,7 +1440,13 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static nearestTo(absoluteLocation: string) {
+  public static nearestTo(absoluteLocation: string, options: { type?: LibType; findGitRoot?: boolean; }) {
+    options = options || {};
+    const { type, findGitRoot } = options;
+
+    if (_.isString(type) && !LibTypeArr.includes(type)) {
+      error(`[nearestTo] wrong type: ${type}`, false, true)
+    }
     if (fse.existsSync(absoluteLocation)) {
       absoluteLocation = fse.realpathSync(absoluteLocation)
     }
@@ -1448,12 +1454,31 @@ export class Project extends BaseProject implements IProject {
       absoluteLocation = path.dirname(absoluteLocation)
     }
     let project: Project;
-    let previousLocation: string
+    let previousLocation: string;
     while (true) {
       project = Project.From(absoluteLocation);
-      if (project) {
-        break;
+      if (_.isString(type)) {
+        if (project && project.type === type) {
+          if (findGitRoot) {
+            if (project.git.isGitRoot) {
+              break;
+            }
+          } else {
+            break;
+          }
+        }
+      } else {
+        if (project) {
+          if (findGitRoot) {
+            if (project.git.isGitRoot) {
+              break;
+            }
+          } else {
+            break;
+          }
+        }
       }
+
       previousLocation = absoluteLocation;
       absoluteLocation = path.resolve(path.join(absoluteLocation, '..'))
       if (!fse.existsSync(absoluteLocation)) {
@@ -1634,11 +1659,17 @@ export class Project extends BaseProject implements IProject {
         }
         return !!test;
       },
+      get isGitRoot() {
+        return fse.existsSync(path.join(self.location, '.git'))
+      },
       async updateOrigin(askToRetry = false) {
         await pullCurrentBranch(self.location, askToRetry);
       },
       pushCurrentBranch() {
         self.run(`git push origin ${currentBranchName(self.location)}`).sync()
+      },
+      pullCurrentBranch() {
+        self.run(`git pull origin ${currentBranchName(self.location)}`).sync()
       },
       resetHard() {
         self.run(`git reset --hard`).sync()

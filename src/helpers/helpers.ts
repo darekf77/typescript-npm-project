@@ -12,65 +12,104 @@ import { error, warn, log } from "./helpers-messages";
 
 import * as _ from 'lodash';
 import { config } from '../config';
-import { Project } from '../project';
-
-function indexForArg(arg: string, argsv: string[]) {
-  return argsv.findIndex((f, i) => f === `--${arg}`);
-}
+import { Project, LibProject } from '../project';
+import { LibType, LibTypeArr } from '../models';
 
 function removeArg(arg: string, argsv: string[]) {
-  const index = indexForArg(arg, argsv);
-  if (index !== -1) {
-    argsv = argsv.filter((f, i) => {
-      if (f === `--${arg}`) {
-        argsv[i + 1] = ''
-        return false;
+  argsv = argsv.filter((f, i) => {
+    const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
+    // console.log(regexString)
+    if ((new RegExp(regexString)).test(f)) {
+      // console.log(`true: ${f}`)
+      const nextParam = argsv[i + 1];
+      if (nextParam && !nextParam.startsWith(`--`)) {
+        argsv[i + 1] = '';
       }
-      return true;
-    }).filter(f => !!f);
-  }
+      return false;
+    } else {
+      // console.log(`false: ${f}`)
+    }
+    return true;
+  }).filter(f => !!f);
   return argsv;
 }
 
-// function argAction(arg: string, argsv: string[], action: (newArg: string) => any) {
-//   const index = indexForArg(arg, argsv);
-//   if (index !== -1) {
-//     action(argsv[index + 1]);
-//   }
-//   argsv = removeArg(arg, argsv);
-//   return argsv;
-// }
+export type RootArgsType = {
+  findNearestProject: boolean;
+  findNearestProjectWithGitRoot: boolean;
+  tnpNonInteractive: boolean;
+  findNearestProjectType: LibType;
+  findNearestProjectTypeWithGitRoot: LibType;
+  cwd: string;
+};
 
 export function vscodeCwdFix(argsv: string[]) {
-  const findNearestProjectIndex = indexForArg('findNearestProject', argsv);
-  const cwdFromArgsIndex = indexForArg('cwd', argsv);
-  const tnpNonInteractiveIndex = indexForArg('tnpNonInteractive', argsv);
 
-  global.tnpNonInteractive = (tnpNonInteractiveIndex !== -1);
-  const findNearestProject = (findNearestProjectIndex !== -1);
-  let cwdFromArgs = (cwdFromArgsIndex !== -1) ? argsv[cwdFromArgsIndex + 1] : void 0;
-  if (_.isString(cwdFromArgs)) {
-    if (fse.existsSync(cwdFromArgs)) {
-      if (findNearestProject) {
-        var nearest = Project.nearestTo(cwdFromArgs);
-      }
-      if (nearest) {
-        cwdFromArgs = nearest.location;
-      }
-      if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
-        cwdFromArgs = path.dirname(cwdFromArgs);
-      }
-      if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
-        process.chdir(cwdFromArgs);
-      }
-    } else {
-      warn(`Bad cwd from args: ${cwdFromArgs}`);
-    }
+  let {
+    findNearestProject,
+    findNearestProjectWithGitRoot,
+    findNearestProjectType,
+    findNearestProjectTypeWithGitRoot,
+    tnpNonInteractive,
+    cwd
+  }: RootArgsType = require('minimist')(argsv);
+
+  global.tnpNonInteractive = (!!tnpNonInteractive);
+  let cwdFromArgs = cwd;
+  const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
+    !!findNearestProjectTypeWithGitRoot;
+
+  if (_.isBoolean(findNearestProjectType)) {
+    error(`argument --findNearestProjectType needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
+  }
+  if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
+    error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
   }
 
+  if (!!findNearestProjectWithGitRoot) {
+    findNearestProject = findNearestProjectWithGitRoot;
+  }
+  if (_.isString(findNearestProjectTypeWithGitRoot)) {
+    findNearestProjectType = findNearestProjectTypeWithGitRoot;
+  }
+
+  // console.log(`findProjectWithGitRoot: ${findProjectWithGitRoot}`)
+  // console.log(`findNearestProjectIndex: ${findNearestProject}`)
+  // console.log(`findNearestProjectTypeIndex: ${findNearestProjectType}`)
+  // console.log(`tnpNonInteractive: ${findNearestProjectType}`)
+  // console.log(`cwdFromArgs: ${cwdFromArgs}`)
+
+  if (_.isString(cwdFromArgs)) {
+    if (findNearestProject || _.isString(findNearestProjectType)) {
+      // console.log('look for nearest')
+      var nearest = Project.nearestTo(cwdFromArgs, {
+        type: findNearestProjectType,
+        findGitRoot: findProjectWithGitRoot,
+      });
+      if (!nearest) {
+        error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
+      }
+    }
+    if (nearest) {
+      cwdFromArgs = nearest.location;
+    }
+    if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
+      cwdFromArgs = path.dirname(cwdFromArgs);
+    }
+    if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
+      process.chdir(cwdFromArgs);
+    } else {
+      error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
+    }
+
+  }
+  argsv = removeArg('findNearestProjectType', argsv);
+
+  // process.exit(0)
   argsv = removeArg('tnpNonInteractive', argsv);
   argsv = removeArg('findNearestProject', argsv);
   argsv = removeArg('cwd', argsv);
+
   return argsv.join(' ');
 }
 

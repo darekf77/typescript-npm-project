@@ -30,7 +30,8 @@ export function executeCommand(registerName: string, command: string, options?: 
     options.debug = false;
   }
 
-  const { findNearestProject, reloadAfterSuccesFinish,
+  const { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
+    findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
     syncProcess, cancellable, title, tnpNonInteractive,
     debug } = options;
 
@@ -76,8 +77,11 @@ export function executeCommand(registerName: string, command: string, options?: 
           resolve();
         }
 
-        function finishError(err: any) {
-          vscode.window.showErrorMessage(`Can not execute command: ${command} ${err} `);
+        function finishError(err: any, data?: string) {
+          vscode.window.showErrorMessage(`Can not execute command:\n ${command}
+          ${err}
+          ${data}
+          `);
           resolve();
         }
 
@@ -88,6 +92,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           window.showInformationMessage(`User canceled command: ${command}`)
         });
 
+        let data = '';
         try {
           let newCwd = isAbsolute ? cwd : path.join(cwd, realtivePath);
           if (!fse.existsSync(newCwd)) {
@@ -110,16 +115,20 @@ export function executeCommand(registerName: string, command: string, options?: 
           const flags = [
             tnpNonInteractive && '--tnpNonInteractive',
             findNearestProject && '--findNearestProject',
+            findNearestProjectWithGitRoot && '--findNearestProjectWithGitRoot',
+            findNearestProjectType && `--findNearestProjectType=${findNearestProjectType}`,
+            findNearestProjectTypeWithGitRoot && `--findNearestProjectTypeWithGitRoot=${findNearestProjectTypeWithGitRoot}`,
           ].filter(f => !!f).join(' ');
 
           const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
           // tslint:disable-next-line: no-unused-expression
 
-          const log = window.createOutputChannel(mainTitle);
+          // const log = window.createOutputChannel(mainTitle);
 
-          // window.showInformationMessage(commandToExecute)
+          debug && window.showInformationMessage(commandToExecute)
           // tslint:disable-next-line: no-unused-expression
-          debug && log.appendLine(`commandToExecute: ${commandToExecute}`);
+
+          debug && (data += `commandToExecute: ${commandToExecute}`);
           if (syncProcess) {
             let childResult = child.execSync(commandToExecute);
             progress.report({ increment: 50 });
@@ -130,32 +139,33 @@ export function executeCommand(registerName: string, command: string, options?: 
             finishAction(childResult)
           } else {
             var proc = child.exec(commandToExecute);
+
             proc.stdout.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && log.appendLine(message.toString());
+              debug && (data += message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stdout.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && log.appendLine(err.toString());
+              debug && (data += err.toString());
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
             });
             proc.stderr.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && log.appendLine(message.toString());
+              debug && (data += message.toString());
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stderr.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && log.appendLine(err.toString());
+              debug && (data += (err.toString()));
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
             });
             proc.on('error', (err) => {
-              finishError(err);
+              finishError(err, data);
             });
             proc.on('exit', (code) => {
               finishAction(`Exit code: ${code}`)
@@ -163,7 +173,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           }
 
         } catch (err) {
-          finishError(err);
+          finishError(err, data);
         }
       });
       return p;
