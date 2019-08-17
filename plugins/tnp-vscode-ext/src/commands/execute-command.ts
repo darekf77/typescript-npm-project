@@ -166,11 +166,12 @@ export function executeCommand(registerName: string, command: string, options?: 
               debug && (data += (err.toString()));
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
             });
-            proc.on('error', (err) => {
-              finishError(err, data);
-            });
             proc.on('exit', (code) => {
-              finishAction(data)
+              if (code == 0) {
+                finishAction(data)
+              } else {
+                finishError(`Command exited with code: ${code}`, data);
+              }
             });
           }
 
