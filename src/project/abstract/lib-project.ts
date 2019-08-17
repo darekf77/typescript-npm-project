@@ -223,7 +223,9 @@ export abstract class LibProject extends Project {
 
     this.checkIfReadyForNpm()
     const bundleFolder = path.join(this.location, config.folder.bundle);
-    if (!fs.existsSync(bundleFolder)) fs.mkdirSync(bundleFolder);
+    if (!fs.existsSync(bundleFolder)) {
+      fs.mkdirSync(bundleFolder);
+    }
     ['package.json'].concat(this.resources).forEach(res => {
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);

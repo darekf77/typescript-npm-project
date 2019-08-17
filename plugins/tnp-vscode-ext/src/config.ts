@@ -73,6 +73,38 @@ export const commands: CommandType[] = ([
     }
   },
   {
+    title: 'FIREDEV package.json hide deps',
+    exec: 'tnp deps:hide',
+    options: {
+      title: 'package.json hide dependencies',
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV package.json show deps',
+    exec: 'tnp deps:show',
+    options: {
+      title: 'package.json show dependencies',
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV INIT project',
+    exec: 'tnp init',
+    options: {
+      title: 'init project temporary files',
+      findNearestProject: true
+    }
+  },
+  {
+    title: 'FIREDEV RELEASE project',
+    exec: 'tnp release',
+    options: {
+      title: 'release project',
+      findNearestProject: true
+    }
+  },
+  {
     title: 'FIREDEV RESET project',
     exec: 'tnp reset',
     options: {
@@ -81,13 +113,21 @@ export const commands: CommandType[] = ([
     }
   },
   {
-    title: 'FIREDEV RESET_ALL projects',
-    exec: 'tnp reset:all',
+    title: 'FIREDEV CLEAN AND INIT',
+    exec: 'tnp clean && tnp init',
     options: {
-      title: 'remove workspace projects temporary files',
+      title: 'clean and init projects',
       findNearestProject: true
     }
   },
+  // {
+  //   title: 'FIREDEV RESET_ALL projects',
+  //   exec: 'tnp reset:all',
+  //   options: {
+  //     title: 'remove workspace projects temporary files',
+  //     findNearestProject: true
+  //   }
+  // },
   // {
   //   title: 'FIREDEV CLEAR project',
   //   exec: 'tnp clear',

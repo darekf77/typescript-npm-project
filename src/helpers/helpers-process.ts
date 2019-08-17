@@ -41,21 +41,23 @@ export async function questionYesNo(message: string,
   //     callbackFalse()
   //   }
   // }
-
-
-  const response = await prompts({
-    type: 'toggle',
-    name: 'value',
-    message,
-    initial: true,
-    active: 'yes',
-    inactive: 'no'
-  });
-
+  let response = {
+    value: true
+  };
+  if (!global.tnpNonInteractive) {
+    response = await prompts({
+      type: 'toggle',
+      name: 'value',
+      message,
+      initial: true,
+      active: 'yes',
+      inactive: 'no'
+    });
+  }
   if (response.value) {
-    await runSyncOrAsync(callbackTrue)
+    await runSyncOrAsync(callbackTrue);
   } else {
-    await runSyncOrAsync(callbackFalse)
+    await runSyncOrAsync(callbackFalse);
   }
   return response.value;
 }

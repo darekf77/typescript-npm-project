@@ -41,12 +41,28 @@
         "title": "FIREDEV STATIC BUILD PROD dist"
       },
       {
+        "command": "extension.firedevpackagejsonhidedeps",
+        "title": "FIREDEV package.json hide deps"
+      },
+      {
+        "command": "extension.firedevpackagejsonshowdeps",
+        "title": "FIREDEV package.json show deps"
+      },
+      {
+        "command": "extension.firedevinitproject",
+        "title": "FIREDEV INIT project"
+      },
+      {
+        "command": "extension.firedevreleaseproject",
+        "title": "FIREDEV RELEASE project"
+      },
+      {
         "command": "extension.firedevresetproject",
         "title": "FIREDEV RESET project"
       },
       {
-        "command": "extension.firedevreset_allprojects",
-        "title": "FIREDEV RESET_ALL projects"
+        "command": "extension.firedevcleanandinit",
+        "title": "FIREDEV CLEAN AND INIT"
       },
       {
         "command": "extension.firedevquickgitcommitandpushupdate",
@@ -83,10 +99,22 @@
           "command": "extension.firedevstaticbuildproddist"
         },
         {
+          "command": "extension.firedevpackagejsonhidedeps"
+        },
+        {
+          "command": "extension.firedevpackagejsonshowdeps"
+        },
+        {
+          "command": "extension.firedevinitproject"
+        },
+        {
+          "command": "extension.firedevreleaseproject"
+        },
+        {
           "command": "extension.firedevresetproject"
         },
         {
-          "command": "extension.firedevreset_allprojects"
+          "command": "extension.firedevcleanandinit"
         },
         {
           "command": "extension.firedevquickgitcommitandpushupdate"
@@ -123,11 +151,27 @@
           "group": "Firedev CLI essentials"
         },
         {
+          "command": "extension.firedevpackagejsonhidedeps",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevpackagejsonshowdeps",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevinitproject",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevreleaseproject",
+          "group": "Firedev CLI essentials"
+        },
+        {
           "command": "extension.firedevresetproject",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevreset_allprojects",
+          "command": "extension.firedevcleanandinit",
           "group": "Firedev CLI essentials"
         },
         {
