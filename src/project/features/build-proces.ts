@@ -170,8 +170,14 @@ inside generated projects...
     ${chalk.bold('Start of Building')} ${this.project.genericName}
 
     `);
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
+    }
     await this.project.build(buildOptions);
     log(`End of Building ${this.project.genericName}`);
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `End of building ${this.project.genericName}` })
+    }
     if (exit && !buildOptions.watch) {
       log('Build process exit')
       process.exit(0);

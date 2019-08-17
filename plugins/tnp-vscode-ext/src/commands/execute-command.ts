@@ -103,9 +103,9 @@ export function executeCommand(registerName: string, command: string, options?: 
 
           function finishError(err: any, data?: string) {
             let doneMsg = title ? title : `command: ${command}`;
-            vscode.window.showErrorMessage(`Can not execute ${doneMsg}:\n ${command}
+            vscode.window.showErrorMessage(`Execution of ${doneMsg} failed:\n ${command}
           ${err}
-          ${debug ? data : ''}
+          ${data}
           `);
             resolve();
           }
@@ -155,9 +155,9 @@ export function executeCommand(registerName: string, command: string, options?: 
             }
             // tslint:disable-next-line: no-unused-expression
 
-            if (debug) {
-              data += `commandToExecute: ${commandToExecute}`
-            };
+
+            data += `commandToExecute: ${commandToExecute}`
+
             if (syncProcess) {
               let childResult = child.execSync(commandToExecute);
               progress.report({ increment: 50 });
@@ -171,34 +171,34 @@ export function executeCommand(registerName: string, command: string, options?: 
 
               proc.stdout.on('data', (message) => {
                 // tslint:disable-next-line: no-unused-expression
-                if (debug) {
-                  data += message.toString();
-                }
+
+                data += message.toString();
+
                 ProgressData.resolveFrom(message.toString(), (json) => {
                   progress.report({ message: json.msg, increment: json.value / 100 });
                 });
               });
               proc.stdout.on('error', (err) => {
                 // tslint:disable-next-line: no-unused-expression
-                if (debug) {
-                  data += err.toString();
-                }
+
+                data += err.toString();
+
                 window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
               });
               proc.stderr.on('data', (message) => {
                 // tslint:disable-next-line: no-unused-expression
-                if (debug) {
-                  data += message.toString();
-                }
+
+                data += message.toString();
+
                 ProgressData.resolveFrom(message.toString(), (json) => {
                   progress.report({ message: json.msg, increment: json.value / 100 });
                 });
               });
               proc.stderr.on('error', (err) => {
                 // tslint:disable-next-line: no-unused-expression
-                if (debug) {
-                  data += (err.toString());
-                }
+
+                data += (err.toString());
+
                 window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
               });
               proc.on('exit', (code) => {
