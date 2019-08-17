@@ -10,6 +10,7 @@ import { TnpDB } from '../../tnp-db';
 import config from '../../config';
 import { OutFolder } from 'morphi/build';
 import { ProjectFactory } from '../../scripts/NEW';
+import { PROGRESS_DATA } from '../../progress-output';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -107,7 +108,9 @@ export class FilesStructure extends FeatureForProject {
     }
     // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
     log(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
-
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
+    }
 
     if (this.project.isWorkspaceChildProject) {
       const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);

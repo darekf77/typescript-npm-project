@@ -1,6 +1,7 @@
 
 import { Project } from '../project/abstract/project';
 import { Package } from './ipackage-json';
+import { LibType } from './lib-type';
 
 export * from './build-options.interface';
 export * from './build-dir';
@@ -12,6 +13,18 @@ export * from './ps-info';
 export * from './replace-options-extended';
 export * from './project.interface';
 export * from './start-for-options';
+
+export type RootArgsType = {
+  tnpNonInteractive: boolean;
+  tnpShowProgress: boolean;
+  tnpNoColorsMode: boolean;
+  findNearestProject: boolean;
+  findNearestProjectWithGitRoot: boolean;
+  findNearestProjectType: LibType;
+  findNearestProjectTypeWithGitRoot: LibType;
+  cwd: string;
+};
+
 
 export interface ActualNpmInstallOptions {
   generatLockFiles?: boolean;

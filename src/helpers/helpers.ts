@@ -13,7 +13,7 @@ import { error, warn, log } from "./helpers-messages";
 import * as _ from 'lodash';
 import { config } from '../config';
 import { Project, LibProject } from '../project';
-import { LibType, LibTypeArr } from '../models';
+import { LibType, LibTypeArr, RootArgsType } from '../models';
 
 //#region @backend
 function removeArg(arg: string, argsv: string[]) {
@@ -35,27 +35,30 @@ function removeArg(arg: string, argsv: string[]) {
   return argsv;
 }
 
-export type RootArgsType = {
-  findNearestProject: boolean;
-  findNearestProjectWithGitRoot: boolean;
-  tnpNonInteractive: boolean;
-  findNearestProjectType: LibType;
-  findNearestProjectTypeWithGitRoot: LibType;
-  cwd: string;
-};
 
-export function vscodeCwdFix(argsv: string[]) {
+export function globalArgumentsParser(argsv: string[]) {
 
+  let options: RootArgsType = require('minimist')(argsv);
   let {
     findNearestProject,
     findNearestProjectWithGitRoot,
     findNearestProjectType,
     findNearestProjectTypeWithGitRoot,
-    tnpNonInteractive,
     cwd
-  }: RootArgsType = require('minimist')(argsv);
+  } = options;
 
-  global.tnpNonInteractive = (!!tnpNonInteractive);
+  Object
+    .keys(options)
+    .filter(key => key.startsWith('tnp'))
+    .forEach(key => {
+      options[key] = !!options[key];
+      global[key] = options[key];
+    });
+
+  if (global.tnpNoColorsMode) {
+    chalk.level = 0;
+  }
+
   let cwdFromArgs = cwd;
   const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
     !!findNearestProjectTypeWithGitRoot;
@@ -73,12 +76,6 @@ export function vscodeCwdFix(argsv: string[]) {
   if (_.isString(findNearestProjectTypeWithGitRoot)) {
     findNearestProjectType = findNearestProjectTypeWithGitRoot;
   }
-
-  // console.log(`findProjectWithGitRoot: ${findProjectWithGitRoot}`)
-  // console.log(`findNearestProjectIndex: ${findNearestProject}`)
-  // console.log(`findNearestProjectTypeIndex: ${findNearestProjectType}`)
-  // console.log(`tnpNonInteractive: ${findNearestProjectType}`)
-  // console.log(`cwdFromArgs: ${cwdFromArgs}`)
 
   if (_.isString(cwdFromArgs)) {
     if (findNearestProject || _.isString(findNearestProjectType)) {
@@ -107,10 +104,18 @@ export function vscodeCwdFix(argsv: string[]) {
   argsv = removeArg('findNearestProjectType', argsv);
 
   // process.exit(0)
-  argsv = removeArg('tnpNonInteractive', argsv);
-  argsv = removeArg('findNearestProject', argsv);
-  argsv = removeArg('cwd', argsv);
+  Object.keys(options).forEach(argName => {
+    argsv = removeArg(argName, argsv);
+  });
 
+  // Object
+  //   .keys(global)
+  //   .filter(key => key.startsWith('tnp'))
+  //   .forEach(key => {
+  //     console.log(`globa.${key} = ${global[key]}`)
+  //   })
+  // console.log(argsv)
+  // process.exit(0)
   return argsv.join(' ');
 }
 //#endregion

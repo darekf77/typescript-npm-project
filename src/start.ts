@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand, match, vscodeCwdFix } from "./helpers";
+import { run as runCommand, match, globalArgumentsParser } from "./helpers";
 import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
@@ -14,22 +14,6 @@ import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 
 export async function start(argsv: string[], spinner?: Ora) {
-
-  const {
-    tnpShowProgress,
-    tnpNoColorsMode,
-    tnpNonInteractive,
-  }: {
-    tnpShowProgress: boolean;
-    tnpNoColorsMode: boolean;
-    tnpNonInteractive: boolean;
-  } = require('minimist')(argsv);
-  global.tnpShowProgress = !!tnpShowProgress;
-  global.tnpNoColorsMode = !!tnpNoColorsMode;
-  global.tnpNonInteractive = !!tnpNonInteractive;
-  if (global.tnpNoColorsMode) {
-    chalk.level = 0;
-  }
 
   argsv = argsv.map(arg => {
     if (arg === 'baw') {
@@ -138,7 +122,7 @@ export async function start(argsv: string[], spinner?: Ora) {
                 // spinner && spinner.stop()
                 // console.log('FNNAME',vFn.name)
                 // process.exit(0)
-                vFn.apply(null, [vscodeCwdFix(check.restOfArgs)]);
+                vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
                 return true;
               }
             }

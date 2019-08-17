@@ -1,25 +1,21 @@
 //#region imports
 import chalk from 'chalk';
-import * as path from 'path';
-import * as fse from 'fs-extra';
-import * as glob from 'glob';
 import * as _ from 'lodash';
 
-import { Project } from '../../abstract';
-import { info, checkValidNpmPackageName, error, log, warn } from '../../../helpers';
-import { FeatureForProject } from '../../abstract';
-import { Package, InstalationTypeArr, InstalationType, LibType, NpmInstallOptions } from '../../../models';
-import config from '../../../config';
-import { PackagesRecognitionExtended } from '../packages-recognition-extended';
+import { error, log } from '../../../helpers';
+import { NpmInstallOptions } from '../../../models';
 import { NpmPackagesCore } from './npm-packages-core.backend';
 import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
+import { PROGRESS_DATA } from '../../../progress-output';
 //#endregion
 
 
 export class NpmPackagesBase extends NpmPackagesCore {
 
   public async installProcess(triggeredMsg: string, options?: NpmInstallOptions) {
-
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `npm instalation for "${this.project.genericName}" started..` });
+    }
     const { remove, npmPackage, smoothInstall } = fixOptionsNpmInstall(options, this.project);
     const fullInstall = (npmPackage.length === 0);
 
@@ -94,7 +90,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.tnpBundle.installAsPackage();
       }
     }
-
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `npm instalation finish ok` });
+    }
   }
 }
 

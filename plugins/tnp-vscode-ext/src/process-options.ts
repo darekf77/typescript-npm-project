@@ -17,6 +17,7 @@ export type ProcesOptions = {
   cancellable?: boolean;
   title?: string;
   tnpNonInteractive?: boolean;
+  tnpShowProgress?: boolean;
   debug?: boolean;
   askBeforeExecute?: boolean;
 };

@@ -32,10 +32,14 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.askBeforeExecute === 'undefined') {
     options.askBeforeExecute = false;
   }
+  if (typeof options.tnpShowProgress === 'undefined') {
+    options.tnpShowProgress = true;
+  }
 
   let { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
     findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
     syncProcess, cancellable, title, tnpNonInteractive, askBeforeExecute,
+    tnpShowProgress,
     debug } = options;
 
   debug = false; // TODO
@@ -134,6 +138,7 @@ export function executeCommand(registerName: string, command: string, options?: 
             }
 
             const flags = [
+              tnpShowProgress && '--tnpShowProgress',
               tnpNonInteractive && '--tnpNonInteractive',
               findNearestProject && '--findNearestProject',
               findNearestProjectWithGitRoot && '--findNearestProjectWithGitRoot',

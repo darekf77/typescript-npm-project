@@ -98,7 +98,6 @@ export const commands: CommandType[] = ([
     options: {
       title: 'init project temporary files',
       findNearestProject: true,
-      cancellable: false,
     }
   },
   {
