@@ -74,18 +74,16 @@ export function executeCommand(registerName: string, command: string, options?: 
           if (reloadAfterSuccesFinish) {
             vscode.commands.executeCommand('workbench.action.reloadWindow');
           } else {
-            const msg = (`Done executing command: ${command}.\n\n` + (childResult && childResult.toString()));
-            progress.report({ message: msg });
+            vscode.window.showInformationMessage(`Done executing command: ${command}.\n\n` + (childResult && childResult.toString()));
           }
           resolve();
         }
 
         function finishError(err: any, data?: string) {
-          const msg = (`Can not execute command:\n ${command}
+          vscode.window.showErrorMessage(`Can not execute command:\n ${command}
           ${err}
           ${debug ? data : ''}
           `);
-          progress.report({ message: msg });
           resolve();
         }
 
