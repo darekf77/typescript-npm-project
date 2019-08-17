@@ -171,6 +171,7 @@ export const commands: CommandType[] = ([
     options: {
       title: 'quick git reset and pull',
       findNearestProjectWithGitRoot: true,
+      askBeforeExecute: true,
     }
   },
   {
