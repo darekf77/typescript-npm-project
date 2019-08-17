@@ -42,11 +42,11 @@
       },
       {
         "command": "extension.firedevpackagejsonhidedeps",
-        "title": "FIREDEV package.json hide deps"
+        "title": "FIREDEV PACKAGE.JSON hide deps"
       },
       {
         "command": "extension.firedevpackagejsonshowdeps",
-        "title": "FIREDEV package.json show deps"
+        "title": "FIREDEV PACKAGE.JSON show deps"
       },
       {
         "command": "extension.firedevinitproject",

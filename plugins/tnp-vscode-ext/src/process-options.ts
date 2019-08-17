@@ -18,4 +18,5 @@ export type ProcesOptions = {
   title?: string;
   tnpNonInteractive?: boolean;
   debug?: boolean;
+  askBeforeExecute?: boolean;
 };

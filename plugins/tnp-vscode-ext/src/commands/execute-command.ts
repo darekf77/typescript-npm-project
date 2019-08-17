@@ -29,10 +29,13 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.debug === 'undefined') {
     options.debug = false;
   }
+  if (typeof options.askBeforeExecute === 'undefined') {
+    options.askBeforeExecute = false;
+  }
 
   let { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
     findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
-    syncProcess, cancellable, title, tnpNonInteractive,
+    syncProcess, cancellable, title, tnpNonInteractive, askBeforeExecute,
     debug } = options;
 
   debug = false; // TODO
@@ -57,143 +60,158 @@ export function executeCommand(registerName: string, command: string, options?: 
     if (typeof cwd !== 'string') {
       return;
     }
-    const mainTitle = title ? title : `Executing: ${command}`;
-    window.withProgress({
-      location: ProgressLocation.Notification,
-      title: mainTitle,
-      cancellable,
-    }, (progress, token) => {
-
-
-      progress.report({ increment: 0 });
-
-
-      var p = new Promise(async (resolve) => {
-
-        function finishAction(childResult: any) {
-          if (reloadAfterSuccesFinish) {
-            vscode.commands.executeCommand('workbench.action.reloadWindow');
-          } else {
-            let doneMsg = title ? title : `command: ${command}`;
-            vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult && childResult.toString()));
-          }
-          resolve();
+    if (askBeforeExecute) {
+      const continueMsg = `Continue: ` + (title ? title : `command: ${command}`);
+      window.showQuickPick(['Abort', continueMsg], {
+        canPickMany: false,
+      }).then((data) => {
+        if (data === continueMsg) {
+          process();
         }
+      });
+    } else {
+      process();
+    }
 
-        function finishError(err: any, data?: string) {
-          let doneMsg = title ? title : `command: ${command}`;
-          vscode.window.showErrorMessage(`Can not execute ${doneMsg}:\n ${command}
+    function process() {
+      const mainTitle = title ? title : `Executing: ${command}`;
+      window.withProgress({
+        location: ProgressLocation.Notification,
+        title: mainTitle,
+        cancellable,
+      }, (progress, token) => {
+
+
+        progress.report({ increment: 0 });
+
+
+        var p = new Promise(async (resolve) => {
+
+          function finishAction(childResult: any) {
+            if (reloadAfterSuccesFinish) {
+              vscode.commands.executeCommand('workbench.action.reloadWindow');
+            } else {
+              let doneMsg = title ? title : `command: ${command}`;
+              vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult && childResult.toString()));
+            }
+            resolve();
+          }
+
+          function finishError(err: any, data?: string) {
+            let doneMsg = title ? title : `command: ${command}`;
+            vscode.window.showErrorMessage(`Can not execute ${doneMsg}:\n ${command}
           ${err}
           ${debug ? data : ''}
           `);
-          resolve();
-        }
-
-        token.onCancellationRequested(() => {
-          if (proc) {
-            proc.kill('SIGINT');
+            resolve();
           }
-          window.showInformationMessage(`User canceled command: ${command}`)
+
+          token.onCancellationRequested(() => {
+            if (proc) {
+              proc.kill('SIGINT');
+            }
+            window.showInformationMessage(`User canceled command: ${command}`)
+          });
+
+          let data = '';
+          try {
+            let newCwd = isAbsolute ? cwd : path.join(cwd as string, realtivePath);
+            if (!fse.existsSync(newCwd as string)) {
+              // QUICK_FIX for vscode workspace
+              const cwdBase = path.basename(cwd as string);
+              // window.showInformationMessage('cwdBase', cwdBase)
+              const testCwd = (newCwd as string).replace(`/${cwdBase}/${cwdBase}/`, `/${cwdBase}/`);
+              if (fse.existsSync(testCwd)) {
+                newCwd = testCwd;
+              }
+            }
+            if (fse.existsSync(newCwd as string)) {
+              if (!fse.lstatSync(newCwd as string).isDirectory()) {
+                newCwd = path.dirname(newCwd as string);
+              }
+            } else {
+              window.showWarningMessage(`cwd not found: ${newCwd}`);
+            }
+
+            const flags = [
+              tnpNonInteractive && '--tnpNonInteractive',
+              findNearestProject && '--findNearestProject',
+              findNearestProjectWithGitRoot && '--findNearestProjectWithGitRoot',
+              findNearestProjectType && `--findNearestProjectType=${findNearestProjectType}`,
+              findNearestProjectTypeWithGitRoot && `--findNearestProjectTypeWithGitRoot=${findNearestProjectTypeWithGitRoot}`,
+            ].filter(f => !!f).join(' ');
+
+            const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
+            // tslint:disable-next-line: no-unused-expression
+
+            // const log = window.createOutputChannel(mainTitle);
+            if (debug) {
+              window.showInformationMessage(commandToExecute);
+            }
+            // tslint:disable-next-line: no-unused-expression
+
+            if (debug) {
+              data += `commandToExecute: ${commandToExecute}`
+            };
+            if (syncProcess) {
+              let childResult = child.execSync(commandToExecute);
+              progress.report({ increment: 50 });
+              if (typeof childResult !== 'object') {
+                throw `Child result is not a object`
+              }
+              progress.report({ increment: 50 });
+              finishAction(childResult)
+            } else {
+              var proc = child.exec(commandToExecute);
+
+              proc.stdout.on('data', (message) => {
+                // tslint:disable-next-line: no-unused-expression
+                if (debug) {
+                  data += message.toString();
+                }
+                ProgressData.resolveFrom(message.toString(), (json) => {
+                  progress.report({ message: json.msg, increment: json.value / 100 });
+                });
+              });
+              proc.stdout.on('error', (err) => {
+                // tslint:disable-next-line: no-unused-expression
+                if (debug) {
+                  data += err.toString();
+                }
+                window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
+              });
+              proc.stderr.on('data', (message) => {
+                // tslint:disable-next-line: no-unused-expression
+                if (debug) {
+                  data += message.toString();
+                }
+                ProgressData.resolveFrom(message.toString(), (json) => {
+                  progress.report({ message: json.msg, increment: json.value / 100 });
+                });
+              });
+              proc.stderr.on('error', (err) => {
+                // tslint:disable-next-line: no-unused-expression
+                if (debug) {
+                  data += (err.toString());
+                }
+                window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
+              });
+              proc.on('exit', (code) => {
+                if (code == 0) {
+                  finishAction(data);
+                } else {
+                  finishError(`Command exited with code: ${code}`, data);
+                }
+              });
+            }
+
+          } catch (err) {
+            finishError(err, data);
+          }
         });
-
-        let data = '';
-        try {
-          let newCwd = isAbsolute ? cwd : path.join(cwd, realtivePath);
-          if (!fse.existsSync(newCwd)) {
-            // QUICK_FIX for vscode workspace
-            const cwdBase = path.basename(cwd);
-            // window.showInformationMessage('cwdBase', cwdBase)
-            const testCwd = newCwd.replace(`/${cwdBase}/${cwdBase}/`, `/${cwdBase}/`);
-            if (fse.existsSync(testCwd)) {
-              newCwd = testCwd;
-            }
-          }
-          if (fse.existsSync(newCwd)) {
-            if (!fse.lstatSync(newCwd).isDirectory()) {
-              newCwd = path.dirname(newCwd);
-            }
-          } else {
-            window.showWarningMessage(`cwd not found: ${newCwd}`);
-          }
-
-          const flags = [
-            tnpNonInteractive && '--tnpNonInteractive',
-            findNearestProject && '--findNearestProject',
-            findNearestProjectWithGitRoot && '--findNearestProjectWithGitRoot',
-            findNearestProjectType && `--findNearestProjectType=${findNearestProjectType}`,
-            findNearestProjectTypeWithGitRoot && `--findNearestProjectTypeWithGitRoot=${findNearestProjectTypeWithGitRoot}`,
-          ].filter(f => !!f).join(' ');
-
-          const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
-          // tslint:disable-next-line: no-unused-expression
-
-          // const log = window.createOutputChannel(mainTitle);
-          if (debug) {
-            window.showInformationMessage(commandToExecute);
-          }
-          // tslint:disable-next-line: no-unused-expression
-
-          if (debug) {
-            data += `commandToExecute: ${commandToExecute}`
-          };
-          if (syncProcess) {
-            let childResult = child.execSync(commandToExecute);
-            progress.report({ increment: 50 });
-            if (typeof childResult !== 'object') {
-              throw `Child result is not a object`
-            }
-            progress.report({ increment: 50 });
-            finishAction(childResult)
-          } else {
-            var proc = child.exec(commandToExecute);
-
-            proc.stdout.on('data', (message) => {
-              // tslint:disable-next-line: no-unused-expression
-              if (debug) {
-                data += message.toString();
-              }
-              ProgressData.resolveFrom(message.toString(), (json) => {
-                progress.report({ message: json.msg, increment: json.value / 100 });
-              });
-            });
-            proc.stdout.on('error', (err) => {
-              // tslint:disable-next-line: no-unused-expression
-              if (debug) {
-                data += err.toString();
-              }
-              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
-            });
-            proc.stderr.on('data', (message) => {
-              // tslint:disable-next-line: no-unused-expression
-              if (debug) {
-                data += message.toString();
-              }
-              ProgressData.resolveFrom(message.toString(), (json) => {
-                progress.report({ message: json.msg, increment: json.value / 100 });
-              });
-            });
-            proc.stderr.on('error', (err) => {
-              // tslint:disable-next-line: no-unused-expression
-              if (debug) {
-                data += (err.toString());
-              }
-              window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
-            });
-            proc.on('exit', (code) => {
-              if (code == 0) {
-                finishAction(data);
-              } else {
-                finishError(`Command exited with code: ${code}`, data);
-              }
-            });
-          }
-
-        } catch (err) {
-          finishError(err, data);
-        }
+        return p;
       });
-      return p;
-    });
+    }
 
   });
 }

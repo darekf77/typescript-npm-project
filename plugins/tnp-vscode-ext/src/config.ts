@@ -73,19 +73,19 @@ export const commands: CommandType[] = ([
     }
   },
   {
-    title: 'FIREDEV package.json hide deps',
+    title: 'FIREDEV PACKAGE.JSON hide deps',
     exec: 'tnp deps:hide',
     options: {
       title: 'package.json hide dependencies',
-      findNearestProject: true
+      findNearestProject: true,
     }
   },
   {
-    title: 'FIREDEV package.json show deps',
+    title: 'FIREDEV PACKAGE.JSON show deps',
     exec: 'tnp deps:show',
     options: {
       title: 'package.json show dependencies',
-      findNearestProject: true
+      findNearestProject: true,
     }
   },
   {
@@ -117,7 +117,8 @@ export const commands: CommandType[] = ([
     exec: 'tnp clean && tnp init',
     options: {
       title: 'clean and init projects',
-      findNearestProject: true
+      findNearestProject: true,
+      askBeforeExecute: true,
     }
   },
   // {
