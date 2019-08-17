@@ -30,6 +30,7 @@ function $GIT_REMOVE_UNTRACKED() {
 
 export function $GIT_QUICK_COMMIT_AND_PUSH(exit = true) {
   if (Project.Current.git.isGitRepo) {
+    global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Quick push start` })
     try {
       Project.Current.run(`git add --all . && git commit -m "update"`).sync();
       global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Adding and Commit Success` })
