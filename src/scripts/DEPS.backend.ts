@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import { Project } from '../project/abstract/project';
 import { commitWhatIs } from '../helpers/helpers-git';
-import { info } from '../helpers/helpers-messages';
+import { info, log } from '../helpers/helpers-messages';
 import { TnpDB } from '../tnp-db/wrapper-db';
 import { resolvePacakgesFromArgs } from '../project/features/npm-packages/npm-packages-helpers.backend';
 
@@ -108,11 +108,13 @@ export default {
   },
 
   DEPS_SHOW_IF_STANDALONE(args: string) {
+    log(`Hook update start`)
     if (Project.Current.isStandaloneProject) {
       info(`Showing deps for standalone project`)
       Project.Current.packageJson.save('is standalone show')
     }
     commitWhatIs(`show package.json dependencies`)
+    log(`Hook update ended`)
     process.exit(0)
   },
 
