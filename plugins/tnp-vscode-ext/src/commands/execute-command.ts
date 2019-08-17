@@ -35,7 +35,7 @@ export function executeCommand(registerName: string, command: string, options?: 
     syncProcess, cancellable, title, tnpNonInteractive,
     debug } = options;
 
-  debug = true;
+  debug = false; // TODO
 
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
@@ -74,7 +74,7 @@ export function executeCommand(registerName: string, command: string, options?: 
           if (reloadAfterSuccesFinish) {
             vscode.commands.executeCommand('workbench.action.reloadWindow');
           } else {
-            vscode.window.showInformationMessage(`Done executing kurwa command: ${command}.\n\n` + (childResult && childResult.toString()));
+            vscode.window.showInformationMessage(`Done executing command: ${command}.\n\n` + (childResult && childResult.toString()));
           }
           resolve();
         }
@@ -82,7 +82,7 @@ export function executeCommand(registerName: string, command: string, options?: 
         function finishError(err: any, data?: string) {
           vscode.window.showErrorMessage(`Can not execute command:\n ${command}
           ${err}
-          ${data}
+          ${debug ? data : ''}
           `);
           resolve();
         }
@@ -126,11 +126,14 @@ export function executeCommand(registerName: string, command: string, options?: 
           // tslint:disable-next-line: no-unused-expression
 
           // const log = window.createOutputChannel(mainTitle);
-
-          debug && window.showInformationMessage(commandToExecute)
+          if (debug) {
+            window.showInformationMessage(commandToExecute);
+          }
           // tslint:disable-next-line: no-unused-expression
 
-          debug && (data += `commandToExecute: ${commandToExecute}`);
+          if (debug) {
+            data += `commandToExecute: ${commandToExecute}`
+          };
           if (syncProcess) {
             let childResult = child.execSync(commandToExecute);
             progress.report({ increment: 50 });
@@ -144,31 +147,39 @@ export function executeCommand(registerName: string, command: string, options?: 
 
             proc.stdout.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && (data += message.toString());
+              if (debug) {
+                data += message.toString();
+              }
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stdout.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && (data += err.toString());
+              if (debug) {
+                data += err.toString();
+              }
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`)
             });
             proc.stderr.on('data', (message) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && (data += message.toString());
+              if (debug) {
+                data += message.toString();
+              }
               ProgressData.resolveFrom(message.toString(), (json) => {
                 progress.report({ message: json.msg, increment: json.value / 100 });
               });
             });
             proc.stderr.on('error', (err) => {
               // tslint:disable-next-line: no-unused-expression
-              debug && (data += (err.toString()));
+              if (debug) {
+                data += (err.toString());
+              }
               window.showErrorMessage(`Error: ${JSON.stringify(err, null, 2)}`);
             });
             proc.on('exit', (code) => {
               if (code == 0) {
-                finishAction(data)
+                finishAction(data);
               } else {
                 finishError(`Command exited with code: ${code}`, data);
               }

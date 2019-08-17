@@ -12,53 +12,95 @@ export type CommandType = {
 
 export const commands: CommandType[] = ([
   {
-    title: 'FIREDEV: show temp files',
+    title: 'FIREDEV TEMP FILES - show',
     exec: 'tnp vscode:temp:show',
     options: { findNearestProject: true }
   },
   {
-    title: 'FIREDEV: hide temp files',
+    title: 'FIREDEV TEMP FILES - hide',
     exec: 'tnp vscode:temp:hide',
     options: { findNearestProject: true }
   },
   {
-    title: 'FIREDEV: build dist',
+    title: 'FIREDEV BUILD dist',
     exec: 'tnp build:dist',
     options: {
       findNearestProject: true
     }
   },
+  // {
+  //   title: 'FIREDEV STATIC REBUILD AND START',
+  //   exec: 'tnp static:build:dist && tnp start',
+  //   options: {
+  //     findNearestProjectType: 'workspace',
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV STATIC REBUILD PROD AND START',
+  //   exec: 'tnp static:build:dist:prod && tnp start',
+  //   options: {
+  //     findNearestProjectType: 'workspace',
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV STATIC START workspace',
+  //   exec: 'tnp start',
+  //   options: {
+  //     findNearestProjectType: 'workspace',
+  //   }
+  // },
   {
-    title: 'FIREDEV: static build dist',
+    title: 'FIREDEV STATIC BUILD dist',
     exec: 'tnp static:build:dist',
     options: {
-      findNearestProject: true
+      findNearestProject: true,
     }
   },
   {
-    title: 'FIREDEV: reset project',
+    title: 'FIREDEV STATIC BUILD PROD dist',
+    exec: 'tnp static:build:dist:prod',
+    options: {
+      findNearestProject: true,
+    }
+  },
+  {
+    title: 'FIREDEV RESET project',
     exec: 'tnp reset',
     options: {
       findNearestProject: true
     }
   },
   {
-    title: 'FIREDEV: reset all projects',
+    title: 'FIREDEV RESET_ALL projects',
     exec: 'tnp reset:all',
     options: {
       findNearestProject: true
     }
   },
+  // {
+  //   title: 'FIREDEV CLEAR project',
+  //   exec: 'tnp clear',
+  //   options: {
+  //     findNearestProject: true
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV CLEAR_ALL projects',
+  //   exec: 'tnp clear:all',
+  //   options: {
+  //     findNearestProject: true
+  //   }
+  // },
   {
-    title: 'FIREDEV: clear project',
-    exec: 'tnp clear',
+    title: 'FIREDEV STATIC CLEAR',
+    exec: 'tnp static:clear:all',
     options: {
       findNearestProject: true
     }
   },
   {
-    title: 'FIREDEV: clear all projects',
-    exec: 'tnp clear:all',
+    title: 'FIREDEV STATIC CLEAR_ALL',
+    exec: 'tnp static:clear:all',
     options: {
       findNearestProject: true
     }
@@ -78,36 +120,37 @@ export const commands: CommandType[] = ([
     }
   },
   {
-    title: 'FIREDEV: rebuild/reinstal vscode ext',
+    title: 'FIREDEV AUTOUPDATE VSCODE EXT',
     exec: 'tnp vscode:ext',
     options: {
       reloadAfterSuccesFinish: true,
       cancellable: false,
-      debug: true,
     }
   },
   {
-    title: 'FIREDEV: TEST EXT',
-    exec: 'tnp show:loop:messages --max 6 --tnpShowProgress',
-    options: {
-      cancellable: false,
-      title: 'Testing progress'
-    }
-  },
-  {
-    title: 'FIREDEV: show version',
-    exec: 'tnp version',
-    options: {
-      syncProcess: true,
-      title: 'Show version of firedev'
-    }
-  },
-  {
-    title: 'FIREDEV: fix termial vscode',
+    title: 'FIREDEV FIX termial vscode',
     exec: 'tnp vscodefix',
     options: {
+      cancellable: false,
     }
   },
+  // {
+  //   title: 'FIREDEV: TEST EXT',
+  //   exec: 'tnp show:loop:messages --max 6 --tnpShowProgress',
+  //   options: {
+  //     cancellable: false,
+  //     title: 'Testing progress'
+  //   }
+  // },
+  // {
+  //   title: 'FIREDEV: show version',
+  //   exec: 'tnp version',
+  //   options: {
+  //     syncProcess: true,
+  //     title: 'Show version of firedev'
+  //   }
+  // },
+
   // only for tests
   // {
   //   title: 'FIREDEV TEST nearest project',

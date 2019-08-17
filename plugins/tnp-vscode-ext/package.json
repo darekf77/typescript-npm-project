@@ -21,36 +21,40 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.firedevshowtempfiles",
-        "title": "FIREDEV: show temp files"
+        "command": "extension.firedevtempfilesshow",
+        "title": "FIREDEV TEMP FILES - show"
       },
       {
-        "command": "extension.firedevhidetempfiles",
-        "title": "FIREDEV: hide temp files"
+        "command": "extension.firedevtempfileshide",
+        "title": "FIREDEV TEMP FILES - hide"
       },
       {
         "command": "extension.firedevbuilddist",
-        "title": "FIREDEV: build dist"
+        "title": "FIREDEV BUILD dist"
       },
       {
         "command": "extension.firedevstaticbuilddist",
-        "title": "FIREDEV: static build dist"
+        "title": "FIREDEV STATIC BUILD dist"
+      },
+      {
+        "command": "extension.firedevstaticbuildproddist",
+        "title": "FIREDEV STATIC BUILD PROD dist"
       },
       {
         "command": "extension.firedevresetproject",
-        "title": "FIREDEV: reset project"
+        "title": "FIREDEV RESET project"
       },
       {
-        "command": "extension.firedevresetallprojects",
-        "title": "FIREDEV: reset all projects"
+        "command": "extension.firedevreset_allprojects",
+        "title": "FIREDEV RESET_ALL projects"
       },
       {
-        "command": "extension.firedevclearproject",
-        "title": "FIREDEV: clear project"
+        "command": "extension.firedevstaticclear",
+        "title": "FIREDEV STATIC CLEAR"
       },
       {
-        "command": "extension.firedevclearallprojects",
-        "title": "FIREDEV: clear all projects"
+        "command": "extension.firedevstaticclear_all",
+        "title": "FIREDEV STATIC CLEAR_ALL"
       },
       {
         "command": "extension.firedevquickgitcommitandpushupdate",
@@ -61,29 +65,21 @@
         "title": "FIREDEV QUICK GIT reset hard and pull"
       },
       {
-        "command": "extension.firedevrebuildreinstalvscodeext",
-        "title": "FIREDEV: rebuild/reinstal vscode ext"
-      },
-      {
-        "command": "extension.firedevtestext",
-        "title": "FIREDEV: TEST EXT"
-      },
-      {
-        "command": "extension.firedevshowversion",
-        "title": "FIREDEV: show version"
+        "command": "extension.firedevautoupdatevscodeext",
+        "title": "FIREDEV AUTOUPDATE VSCODE EXT"
       },
       {
         "command": "extension.firedevfixtermialvscode",
-        "title": "FIREDEV: fix termial vscode"
+        "title": "FIREDEV FIX termial vscode"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "extension.firedevshowtempfiles"
+          "command": "extension.firedevtempfilesshow"
         },
         {
-          "command": "extension.firedevhidetempfiles"
+          "command": "extension.firedevtempfileshide"
         },
         {
           "command": "extension.firedevbuilddist"
@@ -92,16 +88,19 @@
           "command": "extension.firedevstaticbuilddist"
         },
         {
+          "command": "extension.firedevstaticbuildproddist"
+        },
+        {
           "command": "extension.firedevresetproject"
         },
         {
-          "command": "extension.firedevresetallprojects"
+          "command": "extension.firedevreset_allprojects"
         },
         {
-          "command": "extension.firedevclearproject"
+          "command": "extension.firedevstaticclear"
         },
         {
-          "command": "extension.firedevclearallprojects"
+          "command": "extension.firedevstaticclear_all"
         },
         {
           "command": "extension.firedevquickgitcommitandpushupdate"
@@ -110,13 +109,7 @@
           "command": "extension.firedevquickgitresethardandpull"
         },
         {
-          "command": "extension.firedevrebuildreinstalvscodeext"
-        },
-        {
-          "command": "extension.firedevtestext"
-        },
-        {
-          "command": "extension.firedevshowversion"
+          "command": "extension.firedevautoupdatevscodeext"
         },
         {
           "command": "extension.firedevfixtermialvscode"
@@ -124,11 +117,11 @@
       ],
       "editor/title/context": [
         {
-          "command": "extension.firedevshowtempfiles",
+          "command": "extension.firedevtempfilesshow",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevhidetempfiles",
+          "command": "extension.firedevtempfileshide",
           "group": "Firedev CLI essentials"
         },
         {
@@ -140,19 +133,23 @@
           "group": "Firedev CLI essentials"
         },
         {
+          "command": "extension.firedevstaticbuildproddist",
+          "group": "Firedev CLI essentials"
+        },
+        {
           "command": "extension.firedevresetproject",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevresetallprojects",
+          "command": "extension.firedevreset_allprojects",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevclearproject",
+          "command": "extension.firedevstaticclear",
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevclearallprojects",
+          "command": "extension.firedevstaticclear_all",
           "group": "Firedev CLI essentials"
         },
         {
@@ -164,15 +161,7 @@
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevrebuildreinstalvscodeext",
-          "group": "Firedev CLI essentials"
-        },
-        {
-          "command": "extension.firedevtestext",
-          "group": "Firedev CLI essentials"
-        },
-        {
-          "command": "extension.firedevshowversion",
+          "command": "extension.firedevautoupdatevscodeext",
           "group": "Firedev CLI essentials"
         },
         {
