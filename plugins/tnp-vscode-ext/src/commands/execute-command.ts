@@ -30,10 +30,12 @@ export function executeCommand(registerName: string, command: string, options?: 
     options.debug = false;
   }
 
-  const { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
+  let { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
     findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
     syncProcess, cancellable, title, tnpNonInteractive,
     debug } = options;
+
+  debug = true;
 
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
@@ -168,7 +170,7 @@ export function executeCommand(registerName: string, command: string, options?: 
               finishError(err, data);
             });
             proc.on('exit', (code) => {
-              finishAction(`Exit code: ${code}`)
+              finishAction(data)
             });
           }
 
