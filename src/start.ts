@@ -156,10 +156,10 @@ export async function start(argsv: string[], spinner?: Ora) {
     // console.log("NOT RECOGNIZED !!")
     if (Array.isArray(argsv) && argsv.length == 3) {
       console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
-      process.exit(0);
+      process.exit(1);
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
       console.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
-      process.exit(0);
+      process.exit(1);
     } else {
       const p = Project.Current;
 
@@ -170,11 +170,11 @@ export async function start(argsv: string[], spinner?: Ora) {
           await ui.init(functions)
         } catch (e) {
           // console.log(e)
-          process.exit(0)
+          process.exit(1)
         }
       } else {
         console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
-        process.exit(0);
+        process.exit(1);
       }
     }
   }
