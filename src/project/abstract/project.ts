@@ -1171,20 +1171,25 @@ export abstract class BaseProject {
         .filter(p => p && !p.isWorkspaceChildProject)
         .filter(p => p.location !== this.location)
 
-      const { projects = [] }: { projects: string[] } = await inquirer
-        .prompt([
-          {
-            type: 'checkbox',
-            name: 'projects',
-            message: 'Select projects where to copy bundle after finish: ',
-            choices: existedProject
-              .map(c => {
-                return { value: c.location, name: c.genericName }
-              })
-          }
-        ]) as any;
+      if (global.tnpNonInteractive) {
+        this.buildOptions.copyto = [];
+      } else {
+        const { projects = [] }: { projects: string[] } = await inquirer
+          .prompt([
+            {
+              type: 'checkbox',
+              name: 'projects',
+              message: 'Select projects where to copy bundle after finish: ',
+              choices: existedProject
+                .map(c => {
+                  return { value: c.location, name: c.genericName }
+                })
+            }
+          ]) as any;
 
-      this.buildOptions.copyto = projects.map(p => Project.From(p));
+        this.buildOptions.copyto = projects.map(p => Project.From(p));
+      }
+
     }
 
     if (!_.isArray(this.buildOptions.copyto)) {

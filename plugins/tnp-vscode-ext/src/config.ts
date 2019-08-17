@@ -16,7 +16,8 @@ export const commands: CommandType[] = ([
     exec: 'tnp vscode:temp:show',
     options: {
       title: 'show temporary files',
-      findNearestProject: true
+      findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -24,7 +25,8 @@ export const commands: CommandType[] = ([
     exec: 'tnp vscode:temp:hide',
     options: {
       title: 'hide temporary files',
-      findNearestProject: true
+      findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -78,6 +80,7 @@ export const commands: CommandType[] = ([
     options: {
       title: 'package.json hide dependencies',
       findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -86,6 +89,7 @@ export const commands: CommandType[] = ([
     options: {
       title: 'package.json show dependencies',
       findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -93,7 +97,8 @@ export const commands: CommandType[] = ([
     exec: 'tnp init',
     options: {
       title: 'init project temporary files',
-      findNearestProject: true
+      findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -109,7 +114,8 @@ export const commands: CommandType[] = ([
     exec: 'tnp reset',
     options: {
       title: 'remove project temporary files',
-      findNearestProject: true
+      findNearestProject: true,
+      cancellable: false,
     }
   },
   {
@@ -163,6 +169,7 @@ export const commands: CommandType[] = ([
     options: {
       title: 'quick git commit and push',
       findNearestProjectWithGitRoot: true,
+      cancellable: false,
     }
   },
   {

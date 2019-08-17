@@ -74,25 +74,27 @@ export class ProjectIsomorphicLib extends LibProject {
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
     let client = _.first(forClient as Project[]);
-    if (!this.isStandaloneProject && forClient.length === 0) {
 
-      const answer: { project: string } = await inquirer
-        .prompt([
-          {
-            type: 'list',
-            name: 'project',
-            message: 'Which project do you wanna simulate ?',
-            choices: this.parent.children
-              .filter(c => config.allowedTypes.app.includes(c.type))
-              .filter(c => c.name !== this.name)
-              .map(c => c.name),
-            filter: function (val) {
-              return val.toLowerCase();
+    if (!global.tnpNonInteractive) {
+      if (!this.isStandaloneProject && forClient.length === 0) {
+        const answer: { project: string } = await inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'project',
+              message: 'Which project do you wanna simulate ?',
+              choices: this.parent.children
+                .filter(c => config.allowedTypes.app.includes(c.type))
+                .filter(c => c.name !== this.name)
+                .map(c => c.name),
+              filter: function (val) {
+                return val.toLowerCase();
+              }
             }
-          }
-        ]) as any;
-      // console.log('ANSWER', answer)
-      client = Project.From(path.join(this.location, '..', answer.project));
+          ]) as any;
+        // console.log('ANSWER', answer)
+        client = Project.From(path.join(this.location, '..', answer.project));
+      }
     }
 
     if (client) {
