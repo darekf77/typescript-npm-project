@@ -65,6 +65,7 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args: string, exit = true) {
 
 export default {
   $GIT_QUICK_COMMIT_AND_PUSH,
+  $GIT_QUICK_RESET_HARD_AND_PULL,
   $GIT_REMOVE_UNTRACKED,
   $GIT_REMOVE_UNTRACKED_EVERYWHERE: () => {
     Project.projects.forEach(p => {
