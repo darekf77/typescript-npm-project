@@ -1445,7 +1445,7 @@ export class Project extends BaseProject implements IProject {
   //#endregion
 
   //#region @backend
-  public static nearestTo(absoluteLocation: string, options: { type?: LibType; findGitRoot?: boolean; }) {
+  public static nearestTo(absoluteLocation: string, options?: { type?: LibType; findGitRoot?: boolean; }) {
     options = options || {};
     const { type, findGitRoot } = options;
 

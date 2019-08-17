@@ -8,7 +8,7 @@ import * as inquirer from 'inquirer';
 
 import { Project } from './abstract';
 
-import { tryCopyFrom, getControllers, getEntites, log, info } from '../helpers';
+import { tryCopyFrom, getControllers, getEntites, log, info, error } from '../helpers';
 
 import { HelpersLinks } from '../helpers';
 import { config } from '../config';

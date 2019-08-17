@@ -128,7 +128,8 @@ export async function compilationWrapperTnp(fn: () => void, taskName: string = '
     log(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`)
   } catch (error) {
     log(chalk.red(error));
-    log(`${currentDate()} ${executionType} of ${taskName} ERROR`)
+    log(`${currentDate()} ${executionType} of ${taskName} ERROR`);
+    process.exit(1);
   }
 
 }

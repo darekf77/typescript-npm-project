@@ -27,6 +27,14 @@ export class BackendCompilationExtended extends BackendCompilation {
 export class BroswerForModuleCompilation extends BroswerCompilation {
 
   private ENV: EnvConfig;
+
+  compile(watch: boolean) {
+    try {
+      super.compile(watch);
+    } catch (e) {
+      error(`Browser compilation fail: ${e}`, false, true);
+    }
+  }
   get customCompilerName() {
 
     if (this.ENV) {
