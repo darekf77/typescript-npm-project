@@ -49,14 +49,6 @@
         "title": "FIREDEV RESET_ALL projects"
       },
       {
-        "command": "extension.firedevstaticclear",
-        "title": "FIREDEV STATIC CLEAR"
-      },
-      {
-        "command": "extension.firedevstaticclear_all",
-        "title": "FIREDEV STATIC CLEAR_ALL"
-      },
-      {
         "command": "extension.firedevquickgitcommitandpushupdate",
         "title": "FIREDEV QUICK GIT commit and push update"
       },
@@ -65,8 +57,8 @@
         "title": "FIREDEV QUICK GIT reset hard and pull"
       },
       {
-        "command": "extension.firedevautoupdatevscodeext",
-        "title": "FIREDEV AUTOUPDATE VSCODE EXT"
+        "command": "extension.firedevautoupdate",
+        "title": "FIREDEV AUTOUPDATE"
       },
       {
         "command": "extension.firedevfixtermialvscode",
@@ -97,19 +89,13 @@
           "command": "extension.firedevreset_allprojects"
         },
         {
-          "command": "extension.firedevstaticclear"
-        },
-        {
-          "command": "extension.firedevstaticclear_all"
-        },
-        {
           "command": "extension.firedevquickgitcommitandpushupdate"
         },
         {
           "command": "extension.firedevquickgitresethardandpull"
         },
         {
-          "command": "extension.firedevautoupdatevscodeext"
+          "command": "extension.firedevautoupdate"
         },
         {
           "command": "extension.firedevfixtermialvscode"
@@ -145,14 +131,6 @@
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevstaticclear",
-          "group": "Firedev CLI essentials"
-        },
-        {
-          "command": "extension.firedevstaticclear_all",
-          "group": "Firedev CLI essentials"
-        },
-        {
           "command": "extension.firedevquickgitcommitandpushupdate",
           "group": "Firedev CLI essentials"
         },
@@ -161,7 +139,7 @@
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevautoupdatevscodeext",
+          "command": "extension.firedevautoupdate",
           "group": "Firedev CLI essentials"
         },
         {
