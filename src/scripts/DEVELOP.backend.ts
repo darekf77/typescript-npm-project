@@ -18,7 +18,7 @@ import { paramsFrom } from '../helpers';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { TnpDB } from '../tnp-db';
 
-function killvscode(exit = true) {
+function killvscode(args: string, exit = true) {
   try {
     run(`kill -9 $(pgrep Electron)`).sync();
     info(`Killled`)
@@ -97,7 +97,7 @@ export async function develop(args: string, exit = true) {
 
   });
 
-  killvscode(false);
+  killvscode('', false);
   for (let index = 0; index < projectForAction.length; index++) {
     const projectToOpen = projectForAction[index];
     projectToOpen.openInVscode();
@@ -108,10 +108,10 @@ export async function develop(args: string, exit = true) {
 export default {
   develop,
   killvscode,
-  vscodekill() {
-    killvscode();
+  vscodekill(args) {
+    killvscode(args);
   },
-  close() {
-    killvscode();
+  close(args) {
+    killvscode(args);
   },
 }

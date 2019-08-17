@@ -28,7 +28,7 @@ function $GIT_REMOVE_UNTRACKED() {
   process.exit(0)
 }
 
-export function $GIT_QUICK_COMMIT_AND_PUSH(exit = true) {
+export function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
   if (Project.Current.git.isGitRepo) {
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Quick push start` })
     try {
@@ -45,7 +45,7 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(exit = true) {
   exit && process.exit(0);
 }
 
-export function $GIT_QUICK_RESET_HARD_AND_PULL(exit = true) {
+export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git reset --hard`).sync();
