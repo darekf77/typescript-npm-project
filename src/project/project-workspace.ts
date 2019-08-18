@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as glob from 'glob';
 // local
 import { Project } from "./abstract";
-import { ReorganizeArray, log } from "../helpers";
+import { arrayMoveElementBefore, log } from "../helpers";
 import { config } from '../config';
 import { info, warn } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
@@ -11,6 +11,24 @@ import { ProxyRouter } from './features/proxy-router';
 import { BuildOptions } from './features/build-options';
 import { ProjectBuild } from '../models';
 
+function reorderResult(result = [], update: (result) => void): boolean {
+  let neededNextOrder = false;
+  result.some((res, index, arr) => {
+    return !_.isUndefined(result.find((res2, index2, arr2) => {
+      if (res.name === res2.name) {
+        return false;
+      }
+      if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
+        result = arrayMoveElementBefore(result, res2, res);
+        update(result);
+        neededNextOrder = true;
+        return true;
+      }
+      return false;
+    }));
+  });
+  return neededNextOrder;
+}
 
 export class ProjectWorkspace extends Project {
 
@@ -58,7 +76,7 @@ export class ProjectWorkspace extends Project {
     const existed = {};
     const targetLibs = targetClients
       .map(t => t.project.workspaceDependencies)
-      .reduce((a, b) => a.concat(b))
+      .reduce((a, b) => a.concat(b), [])
       .map(d => {
         if (!existed[d.name]) {
           existed[d.name] = d;
@@ -82,6 +100,7 @@ export class ProjectWorkspace extends Project {
 
     let result: Project[] = [];
 
+
     function recrusiveSearchForDependencies(lib: Project) {
       if (_.isUndefined(result.find(r => r.name === lib.name))) {
         result.push(lib);
@@ -102,26 +121,9 @@ export class ProjectWorkspace extends Project {
     }
     targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
 
-    function order(): boolean {
-      let neededNextOrder = false;
-      result.some((res, index, arr) => {
-        return !_.isUndefined(result.find((res2, index2, arr2) => {
-          if (res.name === res2.name) {
-            return false;
-          }
-          if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
-            result = ReorganizeArray(result).moveElement(res2).before(res);
-            neededNextOrder = true;
-            return true;
-          }
-          return false;
-        }));
-      });
-      return neededNextOrder;
-    }
 
     let lastArr = [];
-    while (order()) {
+    while (reorderResult(result, r => { result = r; })) {
       // log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
       if (_.isEqual(lastArr, result.map(c => c.name))) {
         break;
@@ -135,7 +137,7 @@ export class ProjectWorkspace extends Project {
 
   get projectsInOrder(): ProjectBuild[] {
     const targetClients: ProjectBuild[] = (this.children.filter(p => {
-      return !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
+      return this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
     })).map(c => {
       return { project: c, appBuild: true };
     });
@@ -146,7 +148,7 @@ export class ProjectWorkspace extends Project {
 
     return [
       ...libs,
-      ...(!this.buildOptions.watch ? targetClients : [])
+      ...(this.buildOptions && !this.buildOptions.watch ? targetClients : [])
     ];
   }
 

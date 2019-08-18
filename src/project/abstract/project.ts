@@ -797,7 +797,12 @@ export abstract class BaseProject {
       const f = fse.readJSONSync(p, {
         encoding: 'utf8'
       });
-      return f[configMorphi.array.isomorphicPackages];
+      const arr = f[configMorphi.array.isomorphicPackages];
+      if(_.isArray(arr)) {
+        return arr;
+      } else {
+        return [];
+      }
       // warn(`Isomorphic package file does not exists : ${p}`);
     } catch (e) {
       log(e);

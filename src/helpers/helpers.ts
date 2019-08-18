@@ -505,35 +505,28 @@ export async function runSyncOrAsync(fn: Function, args?: any[]) {
   return promisOrValue;
 }
 
-export function ReorganizeArray<T>(arr: T[]) {
-  return {
-    moveElement(a: T) {
-      return {
-        before(b: T): T[] {
-          let indexA = arr.indexOf(a);
-          _.pullAt(arr, indexA);
-          let indexB = arr.indexOf(b);
-          if (indexB === 0) {
-            arr.unshift(a);
-          } else {
-            arr = arr.splice(indexB - 1, 0, a);
-          }
-          return arr;
-        },
-        after(b: T) {
-          let indexA = arr.indexOf(a);
-          _.pullAt(arr, indexA);
-          let indexB = arr.indexOf(b);
-          if (indexB === arr.length - 1) {
-            arr.push(a);
-          } else {
-            arr = arr.splice(indexB + 1, 0, a);
-          }
-          return arr;
-        }
-      }
-    }
+
+export function arrayMoveElementBefore(arr: any[], a: any, b: any) {
+  let indexA = arr.indexOf(a);
+  _.pullAt(arr, indexA);
+  let indexB = arr.indexOf(b);
+  if (indexB === 0) {
+    arr.unshift(a);
+  } else {
+    arr = arr.splice(indexB - 1, 0, a);
   }
+  return arr;
+}
+export function arrayMoveElementAfterB(arr: any[], a: any, b: any) {
+  let indexA = arr.indexOf(a);
+  _.pullAt(arr, indexA);
+  let indexB = arr.indexOf(b);
+  if (indexB === arr.length - 1) {
+    arr.push(a);
+  } else {
+    arr = arr.splice(indexB + 1, 0, a);
+  }
+  return arr;
 }
 
 
