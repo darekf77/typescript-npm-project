@@ -875,8 +875,10 @@ export abstract class BaseProject {
       }
       // warn(`Isomorphic package file does not exists : ${p}`);
     } catch (e) {
-      log(e);
-      error(`Erro while reading ismorphic package file: ${p}`, true, true);
+      if(global.tnp_normal_mode) {
+        log(e);
+        error(`Erro while reading ismorphic package file: ${p}`, true, true);
+      }
       return [];
     };
   }

@@ -40,8 +40,8 @@ export interface IPROJECT extends IProject {
   createTable: false,
   browserTransformFn: (entity: PROJECT) => {
     // entity = PROJECT.createFrom(entity);
-    const project = PROJECT.createFrom(entity);
-    entity.browser.selectedEnv = project.getProjectEnv()
+    // const project = PROJECT.createFrom(entity);
+    entity.browser.selectedEnv = PROJECT.getProjectEnv(entity);
     return entity;
   }
   //#endregion
@@ -52,7 +52,14 @@ export class PROJECT extends Project {
     if (!classFn) {
       return obj;
     }
-    return _.merge(new PROJECT(), obj);
+    // @QUICK_FIX this is how to extend unknow class with new methods
+    Object.keys(PROJECT.prototype).forEach(key => {
+      console.log(key)
+      if (typeof classFn.prototype[key] === 'undefined') {
+        classFn.prototype[key] = PROJECT.prototype[key]
+      }
+    });
+    return obj;
   }
 
   set selectedIndex(v: number) {
@@ -67,15 +74,11 @@ export class PROJECT extends Project {
   private _selectedIndex = 0;
   selectedEnv: string;
 
-
-  getProjectEnv() {
-    if (Morphi.IsBrowser) {
-      return this.selectedEnv;
-    }
-    //#region @backend
-    return this.env && this.env.config && this.env.config.name;
-    //#endregion
+//#region @backend
+  static getProjectEnv(project: Project) {
+    return project.env && project.env.config && project.env.config.name;
   }
+  //#endregion
 
 
   selectedTabChanged = new BehaviorSubject<number>(0)
