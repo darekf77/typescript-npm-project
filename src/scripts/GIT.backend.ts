@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Project } from '../project';
-import { run, error } from '../helpers';
+import { run, error, warn } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config';
@@ -35,12 +35,12 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
       Project.Current.run(`git add --all . && git commit -m "update"`).sync();
       global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Adding and Commit Success` })
     } catch (e) {
-      error(`Error adding/commiting git ${e}`, false, true);
+      warn(`Error adding/commiting git ${e}`, false);
     }
     Project.Current.git.pushCurrentBranch();
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Pushing to repository success` })
   } else {
-    error(`This is not a git repo: ${process.cwd()}`, false, true)
+    warn(`This is not a git repo: ${process.cwd()}`, false)
   }
   exit && process.exit(0);
 }
