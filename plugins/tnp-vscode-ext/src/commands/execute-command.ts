@@ -6,6 +6,7 @@ import * as child from 'child_process';
 import { window, ProgressLocation } from 'vscode';
 import { ProgressData } from './progress-output';
 import { ProcesOptions } from '../process-options';
+import { capitalizeFirstLetter } from '../helpers';
 
 export function executeCommand(registerName: string, command: string, options?: ProcesOptions) {
   if (!options) {
@@ -81,7 +82,7 @@ export function executeCommand(registerName: string, command: string, options?: 
     }
 
     function process() {
-      const mainTitle = title ? title : `Executing: ${command}`;
+      const mainTitle = capitalizeFirstLetter(title ? title : `Executing: ${command}`);
       window.withProgress({
         location: ProgressLocation.Notification,
         title: mainTitle,
