@@ -4,7 +4,7 @@ const group = 'Firedev CLI essentials';
 
 export type CommandType = {
   command?: string;
-  exec?: string;
+  exec?: string | string[];
   title?: string;
   group?: string;
   options?: ProcesOptions;
@@ -101,6 +101,14 @@ export const commands: CommandType[] = ([
     }
   },
   {
+    title: 'FIREDEV OPEN workspace',
+    exec: 'tnp open:workspace',
+    options: {
+      title: 'open vscode workspace',
+      findNearestProjectType: 'workspace',
+    }
+  },
+  {
     title: 'FIREDEV RELEASE project',
     exec: 'tnp release',
     options: {
@@ -118,10 +126,10 @@ export const commands: CommandType[] = ([
     }
   },
   {
-    title: 'FIREDEV CLEAN AND INIT',
-    exec: 'tnp clean && tnp init',
+    title: 'FIREDEV CLEAN ALL AND INIT',
+    exec: ['tnp clean:all', 'tnp init'],
     options: {
-      title: 'clean and init projects',
+      title: 'clean all project and init projects current',
       findNearestProject: true,
       askBeforeExecute: true,
     }

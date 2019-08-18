@@ -1527,7 +1527,7 @@ export class Project extends BaseProject implements IProject {
     if (!current) {
       error(`Current location is not a ${chalk.bold('tnp')} type project.
 
-      locatino: "${process.cwd()}"
+      location: "${process.cwd()}"
 
       }`, false, false);
     }

@@ -19,7 +19,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
 
     log(`Searching isomorphic packages`);
     super.start(force);
-    log(`Founded ${this.count} isorphic packages`);
+    log(`Founded ${this.count} isomorphic packages`);
   }
 
   checkIsomorphic(node_modules: string, packageName: string) {

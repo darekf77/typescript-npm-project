@@ -59,9 +59,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject || this.project.isContainer) {
 
-      if (fullInstall) {
-        this.project.packageJson.save(`${this.project.type} instalation before full insall [${triggeredMsg}]`);
-      }
+      this.project.packageJson.showDeps(`${this.project.type} instalation before full insall [${triggeredMsg}]`);
 
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.remove(triggeredMsg)
@@ -75,6 +73,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
             this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
           });
         }
+      } else {
+        log(`Dont install node_modules - project is container`)
       }
 
       if (this.project.isWorkspace && smoothInstall === false) {
@@ -89,6 +89,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.tnpBundle.installAsPackage();
       }
+      this.project.packageJson.save(`${this.project.type} instalation after  [${triggeredMsg}]`);
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation finish ok` });

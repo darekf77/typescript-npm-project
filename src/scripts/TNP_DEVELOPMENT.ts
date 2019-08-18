@@ -127,6 +127,10 @@ export default {
   // },
 
   $COMMAND,
+  $OPEN_WORKSPACE() {
+    Project.Current.run(`code ${Project.Current.nameOfCodeWorkspace} &`).sync();
+    process.exit(0)
+  },
   CIRCURAL_CHECK() {
     Project.Current.run(`madge --circular --extensions ts ./src`).sync()
     process.exit(0)

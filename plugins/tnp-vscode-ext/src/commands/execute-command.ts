@@ -8,7 +8,10 @@ import { ProgressData } from './progress-output';
 import { ProcesOptions } from '../process-options';
 import { capitalizeFirstLetter } from '../helpers';
 
-export function executeCommand(registerName: string, command: string, options?: ProcesOptions) {
+export function executeCommand(registerName: string, commandToExecute: string | string[], options?: ProcesOptions) {
+  const commandToExecuteReadable = '"' + ((Array.isArray(commandToExecute) && typeof commandToExecute !== 'string') ?
+    commandToExecute.join(',') : commandToExecute) + '"'
+  //#region handle args
   if (!options) {
     options = {};
   }
@@ -39,7 +42,7 @@ export function executeCommand(registerName: string, command: string, options?: 
   if (typeof options.showOutputDataOnSuccess === 'undefined') {
     options.showOutputDataOnSuccess = false;
   }
-
+  //#endregion
 
   let { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
     findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
@@ -69,7 +72,7 @@ export function executeCommand(registerName: string, command: string, options?: 
       return;
     }
     if (askBeforeExecute) {
-      const continueMsg = `Continue: ` + (title ? title : `command: ${command}`);
+      const continueMsg = `Continue: ` + (title ? title : `command: ${commandToExecuteReadable}`);
       window.showQuickPick(['Abort', continueMsg], {
         canPickMany: false,
       }).then((data) => {
@@ -82,7 +85,7 @@ export function executeCommand(registerName: string, command: string, options?: 
     }
 
     function process() {
-      const mainTitle = capitalizeFirstLetter(title ? title : `Executing: ${command}`);
+      const mainTitle = capitalizeFirstLetter(title ? title : `Executing: ${commandToExecuteReadable}`);
       window.withProgress({
         location: ProgressLocation.Notification,
         title: mainTitle,
@@ -99,15 +102,15 @@ export function executeCommand(registerName: string, command: string, options?: 
             if (reloadAfterSuccesFinish) {
               vscode.commands.executeCommand('workbench.action.reloadWindow');
             } else {
-              let doneMsg = title ? title : `command: ${command}`;
+              let doneMsg = title ? title : `command: ${commandToExecuteReadable}`;
               vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult ? childResult.toString() : ''));
             }
             resolve();
           }
 
           function finishError(err: any, data?: string) {
-            let doneMsg = title ? title : `command: ${command}`;
-            vscode.window.showErrorMessage(`Execution of ${doneMsg} failed:\n ${command}
+            let doneMsg = title ? title : `command: ${commandToExecuteReadable}`;
+            vscode.window.showErrorMessage(`Execution of ${doneMsg} failed:\n ${commandToExecuteReadable}
           ${err}
           ${data}
           `);
@@ -118,7 +121,7 @@ export function executeCommand(registerName: string, command: string, options?: 
             if (proc) {
               proc.kill('SIGINT');
             }
-            window.showInformationMessage(`User canceled command: ${command}`)
+            window.showInformationMessage(`User canceled command: ${commandToExecuteReadable}`)
           });
 
           let data = '';
@@ -150,20 +153,21 @@ export function executeCommand(registerName: string, command: string, options?: 
               findNearestProjectTypeWithGitRoot && `--findNearestProjectTypeWithGitRoot=${findNearestProjectTypeWithGitRoot}`,
             ].filter(f => !!f).join(' ');
 
-            const commandToExecute = `${command} --cwd ${newCwd} ${flags}`;
+            const cmd = (typeof commandToExecute === 'string') ? `${commandToExecute} --cwd ${newCwd} ${flags}` :
+              commandToExecute.map(c => `${c} --cwd ${newCwd} ${flags}`).join(' && ')
             // tslint:disable-next-line: no-unused-expression
 
             // const log = window.createOutputChannel(mainTitle);
             if (debug) {
-              window.showInformationMessage(commandToExecute);
+              window.showInformationMessage(cmd);
             }
             // tslint:disable-next-line: no-unused-expression
 
 
-            data += `commandToExecute: ${commandToExecute}`
+            data += `commandToExecute: ${commandToExecuteReadable}`
 
             if (syncProcess) {
-              let childResult = child.execSync(commandToExecute);
+              let childResult = child.execSync(cmd);
               progress.report({ increment: 50 });
               if (typeof childResult !== 'object') {
                 throw `Child result is not a object`
@@ -171,7 +175,7 @@ export function executeCommand(registerName: string, command: string, options?: 
               progress.report({ increment: 50 });
               finishAction(showOutputDataOnSuccess ? childResult : '')
             } else {
-              var proc = child.exec(commandToExecute);
+              var proc = child.exec(cmd);
 
               proc.stdout.on('data', (message) => {
                 // tslint:disable-next-line: no-unused-expression

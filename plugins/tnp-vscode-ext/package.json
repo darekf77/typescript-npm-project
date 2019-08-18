@@ -53,6 +53,10 @@
         "title": "FIREDEV INIT project"
       },
       {
+        "command": "extension.firedevopenworkspace",
+        "title": "FIREDEV OPEN workspace"
+      },
+      {
         "command": "extension.firedevreleaseproject",
         "title": "FIREDEV RELEASE project"
       },
@@ -61,8 +65,8 @@
         "title": "FIREDEV RESET project"
       },
       {
-        "command": "extension.firedevcleanandinit",
-        "title": "FIREDEV CLEAN AND INIT"
+        "command": "extension.firedevcleanallandinit",
+        "title": "FIREDEV CLEAN ALL AND INIT"
       },
       {
         "command": "extension.firedevquickgitcommitandpushupdate",
@@ -108,13 +112,16 @@
           "command": "extension.firedevinitproject"
         },
         {
+          "command": "extension.firedevopenworkspace"
+        },
+        {
           "command": "extension.firedevreleaseproject"
         },
         {
           "command": "extension.firedevresetproject"
         },
         {
-          "command": "extension.firedevcleanandinit"
+          "command": "extension.firedevcleanallandinit"
         },
         {
           "command": "extension.firedevquickgitcommitandpushupdate"
@@ -163,6 +170,10 @@
           "group": "Firedev CLI essentials"
         },
         {
+          "command": "extension.firedevopenworkspace",
+          "group": "Firedev CLI essentials"
+        },
+        {
           "command": "extension.firedevreleaseproject",
           "group": "Firedev CLI essentials"
         },
@@ -171,7 +182,7 @@
           "group": "Firedev CLI essentials"
         },
         {
-          "command": "extension.firedevcleanandinit",
+          "command": "extension.firedevcleanallandinit",
           "group": "Firedev CLI essentials"
         },
         {
