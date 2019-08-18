@@ -33,10 +33,13 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
   }
 
   async tabSelectedAction() {
-    this.model.selectedEnv = void 0;
     await this.model.updateEndGetEnvironments();
-    if (this.model.procStaticBuild.state !== 'notStarted') {
-      this.model.selectedIndex += 1;
+    if (this.model.procStaticBuild.state !== 'notStarted' ||
+      (_.isString(this.model.selectedEnv) && this.model.envionments.includes(this.model.selectedEnv as any))
+    ) {
+      setTimeout(() => {
+        this.model.selectedIndex += 1;
+      })
     }
     this.data = this.environments;
   }

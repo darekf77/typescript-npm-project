@@ -72,7 +72,13 @@ export class PROJECT extends Project {
   }
 
   private _selectedIndex = 0;
-  selectedEnv: string;
+  get selectedEnv(): string {
+    return this.browser.selectedEnv;
+  }
+
+  set selectedEnv(v) {
+    this.browser.selectedEnv = v;
+  }
 
 //#region @backend
   static getProjectEnv(project: Project) {
