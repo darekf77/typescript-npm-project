@@ -5,7 +5,11 @@ import baseline from 'baseline/ss-common-logic/src/app';
 
 // declare const ENV;
 export default function () {
-  baseline()
+  baseline();
+  if(Morphi.IsNode) {
+    let proj = new Project()
+    console.log(proj)
+  }
 }
 
 //#endregion
@@ -18,6 +22,7 @@ import {
 } from './index';
 
 import { Morphi } from 'morphi';
+import { Project } from 'tnp-bundle';
 
 async function start() {
   const project = ENV.workspace.projects.find(p => p.name === ENV.currentProjectName)
@@ -39,7 +44,8 @@ async function start() {
 
   // console.log(builds)
 
-  let pc = new ProcessController()
+  if (Morphi.IsBrowser) {
+    let pc = new ProcessController()
     let example = new ExamplesController();
     // console.log('pc', pc)
     // let loveme = await pc.killmeee().received;
@@ -52,7 +58,10 @@ async function start() {
     // console.log('proceses',proceses)
 
     const backednData = await pc.example().received;
-    console.log('backednData',backednData.body.json)
+    console.log('backednData', backednData.body.json)
+  }
+
+
 }
 
 if (Morphi.IsBrowser) {

@@ -6,7 +6,8 @@ export type LibType = 'angular-lib'
   | 'container'
   | 'docker'
   | 'vscode-ext'
-  | 'unknow-npm-project';
+  | 'unknow-npm-project'
+  | 'unknow';
 
 export const LibTypeArr: LibType[] = [
   'angular-lib',

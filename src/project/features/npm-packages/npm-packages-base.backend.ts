@@ -13,6 +13,9 @@ import { PROGRESS_DATA } from '../../../progress-output';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   public async installProcess(triggeredMsg: string, options?: NpmInstallOptions) {
+    if (!global.tnp_normal_mode) {
+      return;
+    }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation for "${this.project.genericName}" started..` });
     }

@@ -1,6 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as glob from 'glob';
+import * as fse from 'fs-extra';
 // local
 import { Project } from "./abstract";
 import { arrayMoveElementBefore, log } from "../helpers";
@@ -136,8 +137,11 @@ export class ProjectWorkspace extends Project {
   }
 
   get projectsInOrder(): ProjectBuild[] {
+    if (!fse.existsSync(this.location)) {
+      return [];
+    }
     const targetClients: ProjectBuild[] = (this.children.filter(p => {
-      return this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
+      return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
     })).map(c => {
       return { project: c, appBuild: true };
     });
@@ -154,6 +158,9 @@ export class ProjectWorkspace extends Project {
 
 
   async buildSteps(buildOptions?: BuildOptions) {
+    if (!fse.existsSync(this.location)) {
+      return;
+    }
     PROGRESS_DATA.log({ msg: 'Process started', value: 0 });
     const { prod, watch, outDir, args } = buildOptions;
     const projects = this.projectsInOrder;

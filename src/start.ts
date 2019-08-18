@@ -16,7 +16,6 @@ import { TnpDB } from './tnp-db/wrapper-db';
 import { LibTypeArr } from './models/lib-type';
 
 
-//#region @backend
 function removeArg(arg: string, argsv: string[]) {
   argsv = argsv.filter((f, i) => {
     const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
@@ -119,7 +118,7 @@ export function globalArgumentsParser(argsv: string[]) {
   // process.exit(0)
   return argsv.join(' ');
 }
-//#endregion
+
 
 
 

@@ -53,9 +53,6 @@ import * as json5 from 'json5';
 
 export abstract class BaseProject {
 
-  handleModyfications(relativeFilePath: string) {
-
-  }
 
   abstract location: string;
   //#region @backend
@@ -150,6 +147,9 @@ export abstract class BaseProject {
       return this.browser.genericName;
     }
     //#region @backendFunc
+    if (this.type === 'unknow') {
+      return;
+    }
     return [
       (this.isGenerated ? `((${chalk.bold('GENERATED')}))` : ''),
       ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
@@ -182,6 +182,9 @@ export abstract class BaseProject {
       return this.browser.backupName;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return;
+    }
     return `tmp-${this.name}`
     //#endregion
   }
@@ -189,6 +192,9 @@ export abstract class BaseProject {
   //#region @backend
   get hasNpmOrganization() {
     // log('path.dirname(this.location)', path.dirname(this.location))
+    if(this.type === 'unknow') {
+      return false;
+    }
     return path.basename(path.dirname(this.location)).startsWith('@');
   }
 
@@ -252,7 +258,7 @@ export abstract class BaseProject {
       return this.browser.parent;
     }
     //#region @backend
-    if (!_.isString(this.location)) {
+    if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
     const parent = Project.From(path.join(this.location, '..'));
@@ -281,6 +287,9 @@ export abstract class BaseProject {
       return this.browser.isBasedOnOtherProject;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     if (this.isWorkspace) {
       return !!this.packageJson.pathToBaseline;
     } else if (this.isWorkspaceChildProject) {
@@ -302,6 +311,9 @@ export abstract class BaseProject {
       return this.browser.baseline;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return;
+    }
     if (this.isContainer) {
       if (global.tnp_normal_mode) {
         error(`Baseline for container is not supported`, true, false)
@@ -319,6 +331,9 @@ export abstract class BaseProject {
    * Only for generated projects
    */
   get origin(): Project {
+    if (this.type === 'unknow') {
+      return;
+    }
     if (!this.isGenerated) {
       // console.log('global.tnp_normal_mode',global.tnp_normal_mode)
       if (global.tnp_normal_mode) {
@@ -346,6 +361,9 @@ export abstract class BaseProject {
    * ready for serving by tnp router/proxy
    */
   get distribution(): Project {
+    if (this.type === 'unknow') {
+      return;
+    }
     const outDir: BuildDir = 'dist';
     let projectToBuild: Project;
     if (this.isGenerated) {
@@ -372,7 +390,9 @@ export abstract class BaseProject {
    * case that the does not exists
    */
   async StaticVersion(regenerate = true): Promise<Project> {
-
+    if (this.type === 'unknow') {
+      return;
+    }
     let staticVersion: Project;
     if (this.isGenerated) {
       if (regenerate) {
@@ -396,6 +416,9 @@ export abstract class BaseProject {
       return this.browser.isBuildedLib;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     if (this.type === 'angular-lib') {
       return fse.existsSync(path.join(this.location, config.folder.module)) &&
         fse.existsSync(path.join(this.location, config.folder.dist));
@@ -404,6 +427,7 @@ export abstract class BaseProject {
       return fse.existsSync(path.join(this.location, config.folder.browser)) &&
         fse.existsSync(path.join(this.location, config.folder.dist));
     }
+    return false;
     //#endregion
   }
 
@@ -412,7 +436,7 @@ export abstract class BaseProject {
       return this.browser.version;
     }
     //#region @backend
-    return this.packageJson.version;
+    return this.packageJson && this.packageJson.version;
     //#endregion
   }
 
@@ -421,6 +445,9 @@ export abstract class BaseProject {
       return this.browser.useFramework;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     if (!!this.baseline) {
       return this.baseline.packageJson.useFramework;
     }
@@ -430,7 +457,9 @@ export abstract class BaseProject {
 
   //#region @backend
   get versionPatchedPlusOne() {
-
+    if (this.type === 'unknow') {
+      return '';
+    }
     if (!this.version) {
 
       if (!global[config.message.tnp_normal_mode]) {
@@ -453,6 +482,9 @@ export abstract class BaseProject {
       return this.browser.resources;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return []
+    }
     return this.packageJson.resources;
     //#endregion
   }
@@ -462,6 +494,9 @@ export abstract class BaseProject {
       return this.browser.isSite;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     let basedOn = '';
     if (this.isWorkspace) {
       basedOn = this.packageJson.pathToBaseline;
@@ -473,7 +508,7 @@ export abstract class BaseProject {
 
     const res = (basedOn && basedOn !== '');
     // log(`[tnp] Project '${this.location}' is site: ${res}`)
-    return res;
+    return !!res;
     //#endregion
   }
 
@@ -485,7 +520,7 @@ export abstract class BaseProject {
       return this.browser.isCoreProject;
     }
     //#region @backend
-    return this.packageJson.isCoreProject;
+    return this.packageJson && this.packageJson.isCoreProject;
     //#endregion
   }
 
@@ -496,7 +531,7 @@ export abstract class BaseProject {
       return this.browser.isCommandLineToolOnly;
     }
     //#region @backend
-    return this.packageJson.isCommandLineToolOnly;
+    return this.packageJson && this.packageJson.isCommandLineToolOnly;
     //#endregion
   }
 
@@ -522,6 +557,9 @@ export abstract class BaseProject {
       return this.browser.isGenerated;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
       (this.isWorkspace && this.packageJson.isGenerated)
     //#endregion
@@ -532,6 +570,9 @@ export abstract class BaseProject {
       return this.browser.isTnp;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     return this.name === 'tnp';
     //#endregion
   }
@@ -553,6 +594,9 @@ export abstract class BaseProject {
       return this.browser.allowedEnvironments;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return [];
+    }
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
       return this.packageJson.data.tnp.allowedEnv.concat('local')
     }
@@ -568,6 +612,9 @@ export abstract class BaseProject {
       return this.browser.isStandaloneProject;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
     return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && !this.isUnknowNpmProject);
     //#endregion
   }
@@ -590,7 +637,9 @@ export abstract class BaseProject {
       return this.browser.customizableFilesAndFolders;
     }
     //#region @backend
-
+    if (this.type === 'unknow') {
+      return [];
+    }
     const extraFolders = this.getFolders()
       .filter(f => !this.children.map(c => c.name).includes(path.basename(f)))
       .filter(f => !['src', 'backup'].includes(path.basename(f)))
@@ -686,6 +735,9 @@ export abstract class BaseProject {
 
   //#region @backend
   getAllChildren(options?: { excludeUnknowProjects: boolean; }) {
+    if (this.type === 'unknow') {
+      return [];
+    }
     if (_.isUndefined(options)) {
       options = {} as any;
     }
@@ -724,12 +776,18 @@ export abstract class BaseProject {
    * available frameworks in project
    */
   get frameworks() {
+    if (this.type === 'unknow') {
+      return [];
+    }
     return this.packageJson.frameworks;
   }
   //#endregion
 
   //#region @backend
   get workspaceDependencies(): Project[] {
+    if (this.type === 'unknow') {
+      return [];
+    }
     if (this.isWorkspaceChildProject) {
       if (this.isSite) {
         return this.baseline.workspaceDependencies.map(c => {
@@ -753,6 +811,9 @@ export abstract class BaseProject {
       return this.browser.children;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return [];
+    }
     return this.getAllChildren()
     //#endregion
   }
@@ -762,6 +823,9 @@ export abstract class BaseProject {
       return this.browser.childrenThatAreLibs;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return [];
+    }
     return this.children.filter(c => {
       return ([
         'angular-lib',
@@ -776,6 +840,9 @@ export abstract class BaseProject {
       return this.browser.childrenThatAreClients;
     }
     //#region @backend
+    if (this.type === 'unknow') {
+      return [];
+    }
     return this.children.filter(c => {
       return ([
         'angular-lib',
@@ -789,6 +856,9 @@ export abstract class BaseProject {
 
   //#region  @backend
   get isomorphicPackages() {
+    if (this.type === 'unknow') {
+      return [];
+    }
     try {
       var p = path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES)
       if (!fse.existsSync(p)) {
@@ -823,6 +893,9 @@ export abstract class BaseProject {
       return this.browser.childrenThatAreThirdPartyInNodeModules;
     }
     //#region @backend
+    if(this.type === 'unknow') {
+      return;
+    }
     return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
       return Project.From(p);
@@ -927,6 +1000,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public projectSourceFiles(): string[] {
+    if(this.type === 'unknow') {
+      return [];
+    }
     // should be abstract
     return [
       ...this.filesTemplates(),
@@ -954,6 +1030,9 @@ export abstract class BaseProject {
       return this.browser._routerTargetHttp;
     }
     //#region @backend
+    if(this.type === 'unknow') {
+      return;
+    }
     return `http://localhost:${this.getDefaultPort()}`;
     //#endregion
   }
@@ -993,6 +1072,9 @@ export abstract class BaseProject {
 
   //#region @backend
   removeRecognizedIsomorphicLIbs() {
+    if(this.type === 'unknow') {
+      return;
+    }
     try {
       const pjPath = path.join(this.location, config.file.package_json);
       const pj: IPackageJSON = fse.readJsonSync(pjPath, {
@@ -1022,6 +1104,9 @@ export abstract class BaseProject {
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
       tryRemoveDir(siteLocationInDist);
+    }
+    if(this.type === 'unknow') {
+      return;
     }
     if (showMsg) {
       log(`Reseting project: ${this.genericName}`);
@@ -1056,6 +1141,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public clear() {
+    if(this.type === 'unknow') {
+      return;
+    }
     log(`Cleaning project: ${this.genericName}`);
     this.node_modules.remove();
     this.reset(false)
@@ -1064,6 +1152,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public allPackageJsonDeps(contextFolder?: string): Project[] {
+    if(this.type === 'unknow') {
+      return [];
+    }
     let projectsInNodeModules = [];
     ArrNpmDependencyType.forEach(depName => {
       projectsInNodeModules = projectsInNodeModules
@@ -1075,6 +1166,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public getDepsAsProject(type: NpmDependencyType | TnpNpmDependencyType, contextFolder?: string): Project[] {
+    if(this.type === 'unknow') {
+      return [];
+    }
     return this.getDepsAsPackage(type).map(packageObj => {
       if (type === 'tnp_required_workspace_child') {
         let p = path.resolve(path.join(this.location, '..', packageObj.name))
@@ -1097,6 +1191,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public getDepsAsPackage(type: NpmDependencyType | TnpNpmDependencyType): Package[] {
+    if(this.type === 'unknow') {
+      return [];
+    }
     if (!this.packageJson.data) {
       return [];
     }
@@ -1145,7 +1242,9 @@ export abstract class BaseProject {
 
   //#region @backend
   public checkIfReadyForNpm() {
-
+    if(this.type === 'unknow') {
+      return false;
+    }
     // log('TYPEEEEE', this.type)
     const libs: LibType[] = ['angular-lib', 'isomorphic-lib'];
     if (!libs.includes(this.type)) {
@@ -1168,6 +1267,9 @@ export abstract class BaseProject {
   }
 
   private async selectProjectToCopyTO() {
+    if(this.type === 'unknow') {
+      return;
+    }
     // clearConsole()
     const db = await TnpDB.Instance;
     if (!global.tnpNonInteractive) {
@@ -1212,6 +1314,9 @@ export abstract class BaseProject {
   //#region @backend
   async build(buildOptions?: BuildOptions) {
     // log('BUILD OPTIONS', buildOptions)
+    if(this.type === 'unknow') {
+      return;
+    }
 
     if (this.isCommandLineToolOnly) {
       buildOptions.onlyBackend = true;
@@ -1278,7 +1383,9 @@ export abstract class BaseProject {
    * @param port
    */
   public async start(args?: string) {
-
+    if(this.type === 'unknow') {
+      return;
+    }
     if (this.isWorkspace && !this.isGenerated) {
 
       const genLocationWOrkspace = path.join(this.location, config.folder.dist, this.name);
@@ -1378,6 +1485,9 @@ export class Project extends BaseProject implements IProject {
 
   //#region @backend
   private static typeFrom(location: string): LibType {
+    if (!fse.existsSync(location)) {
+      return void 0;
+    }
     const packageJson = PackageJSON.fromLocation(location);
     const type = packageJson.type;
     return type;
@@ -1591,56 +1701,45 @@ export class Project extends BaseProject implements IProject {
   constructor(location?: string) {
     super()
 
-    if (!_.isUndefined(location)) {
-
-
-      this.location = location;
-
-      if (fs.existsSync(location)) {
-
-        // log('PROJECT FROM', location)
-
-
-        this.packageJson = PackageJSON.fromProject(this);
-        this.type = this.packageJson.type;
-        this.quickFixes = new QuickFixes(this)
-        this.quickFixes.missingSourceFolders()
-        this.staticBuild = new StaticBuild(this)
-        this.workspaceSymlinks = new WorkspaceSymlinks(this);
-        this.tnpBundle = new TnpBundle(this);
-        this.node_modules = new NodeModules(this);
-        this.npmPackages = new NpmPackages(this)
-        this.recreate = new FilesRecreator(this);
-        this.filesFactory = new FilesFactory(this);
-        this.sourceModifier = new SourceModifier(this);
-        this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
-        this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
-        if (!this.isStandaloneProject) {
-          this.join = new BaselineSiteJoin(this);
-        }
-        this.tests = new TestRunner(this);
-
-        Project.projects.push(this);
-
-        // this.requiredLibs = this.packageJson.requiredProjects;
-
-
-        this.__defaultPort = Project.DefaultPortByType(this.type);
-        // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
-        if (!this.isStandaloneProject) {
-          this.env = new EnvironmentConfig(this);
-          this.proxyRouter = new ProxyRouter(this);
-        }
-        this.copyManager = new CopyManager(this);
-        if (this.isStandaloneProject) {
-          this.packageJson.updateHooks()
-        }
-        this.filesStructure = new FilesStructure(this);
-        this.buildProcess = new BuildProcess(this);
-      } else {
-        warn(`Invalid project location: ${location}`);
-      }
+    this.location = _.isString(location) ? location : '';
+    this.packageJson = PackageJSON.fromProject(this);
+    this.type = this.packageJson ? this.packageJson.type : 'unknow';
+    this.quickFixes = new QuickFixes(this)
+    this.quickFixes.missingSourceFolders()
+    this.staticBuild = new StaticBuild(this)
+    this.workspaceSymlinks = new WorkspaceSymlinks(this);
+    this.tnpBundle = new TnpBundle(this);
+    this.node_modules = new NodeModules(this);
+    this.npmPackages = new NpmPackages(this)
+    this.recreate = new FilesRecreator(this);
+    this.filesFactory = new FilesFactory(this);
+    this.sourceModifier = new SourceModifier(this);
+    this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
+    this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
+    if (!this.isStandaloneProject) {
+      this.join = new BaselineSiteJoin(this);
     }
+    this.tests = new TestRunner(this);
+
+    Project.projects.push(this);
+
+    // this.requiredLibs = this.packageJson.requiredProjects;
+
+
+    this.__defaultPort = Project.DefaultPortByType(this.type);
+    // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
+    if (this.isWorkspace || this.isWorkspaceChildProject) {
+      this.env = new EnvironmentConfig(this);
+      this.proxyRouter = new ProxyRouter(this);
+    }
+    this.copyManager = new CopyManager(this);
+    if (this.isStandaloneProject && this.packageJson) {
+      this.packageJson.updateHooks()
+    }
+    this.filesStructure = new FilesStructure(this);
+    this.buildProcess = new BuildProcess(this);
+
+
   }
   //#endregion
 

@@ -207,7 +207,7 @@ export class EnvironmentConfig
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      warn(`confg doesnt exist: ${configPath}`)
+      global.tnp_normal_mode && warn(`confg doesnt exist: ${configPath}`)
       return EnvironmentConfig.configs[configPath]
     }
     //#endregion

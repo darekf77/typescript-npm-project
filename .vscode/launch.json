@@ -5,8 +5,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/run.js",
-      "useWSL": true
+      "program": "${workspaceFolder}/run.js"
     },
     {
       "type": "node",
@@ -19,8 +18,7 @@
       "restart": true,
       "sourceMaps": true,
       "console": "internalConsole",
-      "internalConsoleOptions": "neverOpen",
-      "useWSL": true
+      "internalConsoleOptions": "neverOpen"
     },
   ]
 }

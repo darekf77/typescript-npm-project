@@ -153,7 +153,9 @@ export class FilesStructure extends FeatureForProject {
       }
 
       if (!onlyJoin) {
-        await this.project.env.init(args);
+        if(this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+          await this.project.env.init(args);
+        }
         this.project.filesTemplatesBuilder.rebuild();
       }
 

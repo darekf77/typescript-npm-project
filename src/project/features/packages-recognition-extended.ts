@@ -16,7 +16,9 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
   }
 
   start(force = false) {
-
+    if (!global.tnp_normal_mode) {
+      return;
+    }
     log(`Searching isomorphic packages`);
     super.start(force);
     log(`Founded ${this.count} isomorphic packages`);

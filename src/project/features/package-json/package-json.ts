@@ -34,7 +34,9 @@ export class PackageJSON
     return this.fromLocation(project.location, project);
   }
   public static fromLocation(location: string, project: Project = null, warings = true): PackageJSON {
-
+    if(!fse.existsSync(location)) {
+      return void 0;
+    }
     const isTnpProject = (location === config.pathes.tnp_folder_location);
     const filePath = path.join(location, 'package.json');
     if (!fs.existsSync(filePath)) {

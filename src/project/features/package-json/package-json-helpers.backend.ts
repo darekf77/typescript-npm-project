@@ -330,6 +330,9 @@ function cleanForIncludeOnly(project: Project, deps: DependenciesFromPackageJson
 
 //#region travel object
 function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj: Object, pkgName: string) => string) {
+  if (!_.isObject(obj)) {
+    return;
+  }
   Object.keys(obj).forEach(key => {
     if (key !== '@') {
       if (!_.isArray(obj[key])) {
