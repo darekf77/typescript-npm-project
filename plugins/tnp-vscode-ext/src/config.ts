@@ -4,7 +4,7 @@ const group = 'Firedev CLI essentials';
 
 export type CommandType = {
   command?: string;
-  exec?: string | string[];
+  exec?:     string[];
   title?: string;
   group?: string;
   options?: ProcesOptions;
@@ -125,6 +125,15 @@ export const commands: CommandType[] = ([
     exec: 'tnp open:core:project',
     options: {
       title: 'open core project',
+      findNearestProject: true,
+      showSuccessMessage: false
+    }
+  },
+  {
+    title: 'FIREDEV OPEN TNP project',
+    exec: 'tnp open:tnp:project',
+    options: {
+      title: 'open tnp project',
       findNearestProject: true,
       showSuccessMessage: false
     }

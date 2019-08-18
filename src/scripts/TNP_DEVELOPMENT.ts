@@ -135,6 +135,10 @@ export default {
     Project.Current.run(`code ${Project.by(Project.Current.type).location} &`).sync();
     process.exit(0)
   },
+  $OPEN_TNP_PROJECT() {
+    Project.Tnp.run(`code ${Project.Tnp.location} &`).sync();
+    process.exit(0)
+  },
   $OPEN_BASELINE() {
     if (Project.Current.isSite) {
       if (Project.Current.isWorkspace) {

@@ -75,6 +75,10 @@
         "title": "FIREDEV OPEN core project"
       },
       {
+        "command": "extension.firedevopentnpproject",
+        "title": "FIREDEV OPEN TNP project"
+      },
+      {
         "command": "extension.firedevreleaseproject",
         "title": "FIREDEV RELEASE project"
       },
@@ -137,6 +141,9 @@
         },
         {
           "command": "extension.firedevopencoreproject"
+        },
+        {
+          "command": "extension.firedevopentnpproject"
         },
         {
           "command": "extension.firedevreleaseproject"
@@ -203,6 +210,10 @@
         },
         {
           "command": "extension.firedevopencoreproject",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevopentnpproject",
           "group": "Firedev CLI essentials"
         },
         {
