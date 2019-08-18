@@ -3,6 +3,7 @@ import chalk from 'chalk';
 //#endregion
 import { Morphi } from 'morphi';
 import config from '../config';
+import { PROGRESS_DATA } from '../progress-output';
 
 //#region @backend
 declare global {
@@ -79,7 +80,10 @@ export function info(details: string) {
     return;
   }
   //#region @backend
-  (!global.muteMessages && !global.hideInfos) && console.log(chalk.green(details))
+  if (!global.muteMessages && !global.hideInfos) {
+    console.log(chalk.green(details))
+    global.tnpNonInteractive && PROGRESS_DATA.log({ msg: details })
+  }
   //#endregion
 }
 
@@ -91,7 +95,10 @@ export function log(details: string) {
   //#region @backend
   // console.log('global.muteMessages', global.muteMessages);
   // console.log('global.hideLog', global.hideLog);
-  (!global.muteMessages && !global.hideLog) && console.log(chalk.gray(details))
+  if ((!global.muteMessages && !global.hideLog)) {
+    console.log(chalk.gray(details))
+    global.tnpNonInteractive && PROGRESS_DATA.log({ msg: details })
+  }
   //#endregion
 }
 
