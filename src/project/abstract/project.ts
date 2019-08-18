@@ -798,7 +798,7 @@ export abstract class BaseProject {
         encoding: 'utf8'
       });
       const arr = f[configMorphi.array.isomorphicPackages];
-      if(_.isArray(arr)) {
+      if (_.isArray(arr)) {
         return arr;
       } else {
         return [];
@@ -857,6 +857,7 @@ export abstract class BaseProject {
       if (!fse.existsSync(distributionFolder)) {
         fse.mkdirpSync(distributionFolder);
       }
+      configSettings['terminal.integrated.cwd'] = '.';
 
       const codeWorkspace = {
         folders: [

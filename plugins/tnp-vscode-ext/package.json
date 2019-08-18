@@ -67,6 +67,14 @@
         "title": "FIREDEV OPEN workspace"
       },
       {
+        "command": "extension.firedevopenbaseline",
+        "title": "FIREDEV OPEN baseline"
+      },
+      {
+        "command": "extension.firedevopencoreproject",
+        "title": "FIREDEV OPEN core project"
+      },
+      {
         "command": "extension.firedevreleaseproject",
         "title": "FIREDEV RELEASE project"
       },
@@ -125,6 +133,12 @@
           "command": "extension.firedevopenworkspace"
         },
         {
+          "command": "extension.firedevopenbaseline"
+        },
+        {
+          "command": "extension.firedevopencoreproject"
+        },
+        {
           "command": "extension.firedevreleaseproject"
         },
         {
@@ -181,6 +195,14 @@
         },
         {
           "command": "extension.firedevopenworkspace",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevopenbaseline",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevopencoreproject",
           "group": "Firedev CLI essentials"
         },
         {

@@ -131,6 +131,21 @@ export default {
     Project.Current.run(`code ${Project.Current.nameOfCodeWorkspace} &`).sync();
     process.exit(0)
   },
+  $OPEN_CORE_PROJECT() {
+    Project.Current.run(`code ${Project.by(Project.Current.type).location} &`).sync();
+    process.exit(0)
+  },
+  $OPEN_BASELINE() {
+    if (Project.Current.isSite) {
+      if (Project.Current.isWorkspace) {
+        Project.Current.baseline.run(`code ${Project.Current.baseline.nameOfCodeWorkspace} &`).sync();
+      } else {
+        Project.Current.baseline.run(`code . &`).sync();
+      }
+      process.exit(0)
+    }
+    error(`This is not "site project"`, false, true);
+  },
   CIRCURAL_CHECK() {
     Project.Current.run(`madge --circular --extensions ts ./src`).sync()
     process.exit(0)

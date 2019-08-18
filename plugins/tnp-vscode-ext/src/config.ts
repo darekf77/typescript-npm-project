@@ -108,6 +108,25 @@ export const commands: CommandType[] = ([
     options: {
       title: 'open vscode workspace',
       findNearestProjectType: 'workspace',
+      showSuccessMessage: false
+    }
+  },
+  {
+    title: 'FIREDEV OPEN baseline',
+    exec: 'tnp open:baseline',
+    options: {
+      title: 'open baseline for site',
+      findNearestProject: true,
+      showSuccessMessage: false
+    }
+  },
+  {
+    title: 'FIREDEV OPEN core project',
+    exec: 'tnp open:core:project',
+    options: {
+      title: 'open core project',
+      findNearestProject: true,
+      showSuccessMessage: false
     }
   },
   {
