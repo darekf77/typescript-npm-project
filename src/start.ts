@@ -1,8 +1,9 @@
 //#region @backend
 import * as _ from 'lodash';
+import * as fse from 'fs-extra';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand, match, globalArgumentsParser } from "./helpers";
+import { run as runCommand, match, error } from "./helpers";
 import { isString } from 'util';
 import chalk from 'chalk';
 import { Project } from './project';
@@ -12,6 +13,115 @@ import config from './config';
 import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
+import { LibTypeArr } from './models/lib-type';
+
+
+//#region @backend
+function removeArg(arg: string, argsv: string[]) {
+  argsv = argsv.filter((f, i) => {
+    const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
+    // console.log(regexString)
+    if ((new RegExp(regexString)).test(f)) {
+      // console.log(`true: ${f}`)
+      const nextParam = argsv[i + 1];
+      if (nextParam && !nextParam.startsWith(`--`)) {
+        argsv[i + 1] = '';
+      }
+      return false;
+    } else {
+      // console.log(`false: ${f}`)
+    }
+    return true;
+  }).filter(f => !!f);
+  return argsv;
+}
+
+
+export function globalArgumentsParser(argsv: string[]) {
+
+  let options = require('minimist')(argsv);
+  let {
+    findNearestProject,
+    findNearestProjectWithGitRoot,
+    findNearestProjectType,
+    findNearestProjectTypeWithGitRoot,
+    cwd
+  } = options;
+
+  Object
+    .keys(options)
+    .filter(key => key.startsWith('tnp'))
+    .forEach(key => {
+      options[key] = !!options[key];
+      global[key] = options[key];
+    });
+
+  if (global.tnpNoColorsMode) {
+    chalk.level = 0;
+  }
+
+  let cwdFromArgs = cwd;
+  const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
+    !!findNearestProjectTypeWithGitRoot;
+
+  if (_.isBoolean(findNearestProjectType)) {
+    error(`argument --findNearestProjectType needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
+  }
+  if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
+    error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
+  }
+
+  if (!!findNearestProjectWithGitRoot) {
+    findNearestProject = findNearestProjectWithGitRoot;
+  }
+  if (_.isString(findNearestProjectTypeWithGitRoot)) {
+    findNearestProjectType = findNearestProjectTypeWithGitRoot;
+  }
+
+  if (_.isString(cwdFromArgs)) {
+    if (findNearestProject || _.isString(findNearestProjectType)) {
+      // console.log('look for nearest')
+      var nearest = Project.nearestTo(cwdFromArgs, {
+        type: findNearestProjectType,
+        findGitRoot: findProjectWithGitRoot,
+      });
+      if (!nearest) {
+        error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
+      }
+    }
+    if (nearest) {
+      cwdFromArgs = nearest.location;
+    }
+    if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
+      cwdFromArgs = path.dirname(cwdFromArgs);
+    }
+    if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
+      process.chdir(cwdFromArgs);
+    } else {
+      error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
+    }
+
+  }
+  argsv = removeArg('findNearestProjectType', argsv);
+
+  // process.exit(0)
+  Object.keys(options).forEach(argName => {
+    argsv = removeArg(argName, argsv);
+  });
+
+  // Object
+  //   .keys(global)
+  //   .filter(key => key.startsWith('tnp'))
+  //   .forEach(key => {
+  //     console.log(`globa.${key} = ${global[key]}`)
+  //   })
+  // console.log(argsv)
+  // process.exit(0)
+  return argsv.join(' ');
+}
+//#endregion
+
+
 
 export async function start(argsv: string[], spinner?: Ora) {
 

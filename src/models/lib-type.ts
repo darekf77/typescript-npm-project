@@ -5,6 +5,7 @@ export type LibType = 'angular-lib'
   | 'workspace'
   | 'container'
   | 'docker'
+  | 'vscode-ext'
   | 'unknow-npm-project';
 
 export const LibTypeArr: LibType[] = [
@@ -16,6 +17,7 @@ export const LibTypeArr: LibType[] = [
   'container',
   'docker',
   'unknow-npm-project',
+  'vscode-ext',
 ]
 
 export type CoreLibCategory = LibType | 'common';

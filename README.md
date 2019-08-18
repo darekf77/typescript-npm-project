@@ -16,6 +16,9 @@ META COMMENTS:
  - class methods only if the relate to class itself, otherwise as helper functions
  - somehting === false is more clear that !somehting
 
+# good files/folders structure
+- models - only simple interfaces/types/ without 3party lib references
+- helper - extendable classes with static fields
 
 Helper project for my typescript npm libraries.
 

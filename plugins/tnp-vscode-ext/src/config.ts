@@ -18,6 +18,7 @@ export const commands: CommandType[] = ([
       title: 'show temporary files',
       findNearestProject: true,
       cancellable: false,
+      showSuccessMessage: false
     }
   },
   {
@@ -27,6 +28,7 @@ export const commands: CommandType[] = ([
       title: 'hide temporary files',
       findNearestProject: true,
       cancellable: false,
+      showSuccessMessage: false
     }
   },
   {

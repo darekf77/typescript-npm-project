@@ -114,7 +114,7 @@ export class ProcessController extends Morphi.Base.Controller<entities.PROCESS> 
     //#region @backendFunc
     return ()=> {
 
-      const p = Project.From('/home/dariusz/projects/npm/tsc-npm-project');
+      const p = Project.Tnp;
 
       // const d:any = { dupa: 'dupa' };
       return (()=> p) as any;

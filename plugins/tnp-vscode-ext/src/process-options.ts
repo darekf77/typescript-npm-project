@@ -20,5 +20,6 @@ export type ProcesOptions = {
   tnpShowProgress?: boolean;
   debug?: boolean;
   showOutputDataOnSuccess?: boolean;
+  showSuccessMessage?: boolean;
   askBeforeExecute?: boolean;
 };

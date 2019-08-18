@@ -1,4 +1,14 @@
 {
+  "tnp": {
+    "resources": [],
+    "type": "vscode-ext",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
   "name": "tnp-vscode-ext",
   "displayName": "tnp-vscode-ext",
   "publisher": "morphi-io",
@@ -221,5 +231,6 @@
     "@types/mocha": "^2.2.42",
     "ts-node": "^7.0.1",
     "lodash": "^4.17.4"
-  }
+  },
+  "dependencies": {}
 }

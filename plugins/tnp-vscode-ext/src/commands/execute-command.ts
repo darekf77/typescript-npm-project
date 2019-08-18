@@ -42,12 +42,15 @@ export function executeCommand(registerName: string, commandToExecute: string | 
   if (typeof options.showOutputDataOnSuccess === 'undefined') {
     options.showOutputDataOnSuccess = false;
   }
+  if (typeof options.showSuccessMessage === 'undefined') {
+    options.showSuccessMessage = true;
+  }
   //#endregion
 
   let { findNearestProject, findNearestProjectType, reloadAfterSuccesFinish,
     findNearestProjectTypeWithGitRoot, findNearestProjectWithGitRoot,
     syncProcess, cancellable, title, tnpNonInteractive, askBeforeExecute,
-    tnpShowProgress, showOutputDataOnSuccess, debug } = options;
+    tnpShowProgress, showOutputDataOnSuccess, debug, showSuccessMessage } = options;
 
   debug = false; // TODO
 
@@ -102,8 +105,10 @@ export function executeCommand(registerName: string, commandToExecute: string | 
             if (reloadAfterSuccesFinish) {
               vscode.commands.executeCommand('workbench.action.reloadWindow');
             } else {
-              let doneMsg = title ? title : `command: ${commandToExecuteReadable}`;
-              vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult ? childResult.toString() : ''));
+              if (showSuccessMessage) {
+                let doneMsg = title ? title : `command: ${commandToExecuteReadable}`;
+                vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult ? childResult.toString() : ''));
+              }
             }
             resolve();
           }
