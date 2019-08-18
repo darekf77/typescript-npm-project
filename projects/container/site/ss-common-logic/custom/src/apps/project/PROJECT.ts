@@ -76,7 +76,17 @@ export class PROJECT extends Project {
 
 //#region @backend
   static getProjectEnv(project: Project) {
-    return project.env && project.env.config && project.env.config.name;
+    let wasNulled = false;
+    let result: any;
+    if(project.env && project.env['project'] === null) {
+      wasNulled = true;
+      project.env['project'] = project;
+    }
+    result = project.env && project.env.config && project.env.config.name;
+    if(wasNulled) {
+      project.env['project'] = null;
+    }
+    return result;
   }
   //#endregion
 
