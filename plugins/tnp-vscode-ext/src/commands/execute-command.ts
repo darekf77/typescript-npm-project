@@ -99,7 +99,7 @@ export function executeCommand(registerName: string, command: string, options?: 
               vscode.commands.executeCommand('workbench.action.reloadWindow');
             } else {
               let doneMsg = title ? title : `command: ${command}`;
-              vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (showOutputDataOnSuccess && childResult && childResult.toString()));
+              vscode.window.showInformationMessage(`Done executing ${doneMsg}.\n\n` + (childResult ? childResult.toString() : ''));
             }
             resolve();
           }
