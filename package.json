@@ -27,8 +27,9 @@
           "typescript-class-helpers",
           "morphi",
           "rxjs",
-          "@ngtools",
-          "typeorm"
+          "@ngtools/webpack",
+          "typeorm",
+          "portfinder"
         ],
         "always": [
           "@types/node",
@@ -249,7 +250,7 @@
               "watch": "~1.0.2"
             },
             "operating-system": {
-              "portfinder": "^1.0.13",
+              "portfinder": "1.0.21",
               "@types/node-notifier": "0.0.28",
               "node-notifier": "^5.3.0",
               "@types/glob": "^5.0.35",
@@ -516,7 +517,7 @@
     "passport": "^0.3.2",
     "passport-http-bearer": "^1.0.1",
     "password-hash": "^1.2.2",
-    "portfinder": "^1.0.13",
+    "portfinder": "1.0.21",
     "postcss-custom-properties": "^7.0.0",
     "postcss-loader": "^2.0.8",
     "postcss-url": "^7.1.2",

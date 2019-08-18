@@ -19,6 +19,10 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
   // process.exit(0)
   packagesNames.forEach(f => {
     const current = Project.From(path.join(projectLocation, config.folder.node_modules, f));
+    // QUICK_FIX
+    if (f.search('/') !== -1) {
+      f = _.first(f.split('/'));
+    }
     if (!current) {
       warn(`Project with name ${f} not founded`);
       return
@@ -28,7 +32,9 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
     if (!fse.existsSync(nodeMod)) {
       fse.mkdirpSync(nodeMod);
     }
-    const res = run(`find ${config.folder.node_modules}/ -name ${f} `, { output: false, cwd: projectLocation }).sync().toString()
+    const removeCommand = `find ${config.folder.node_modules}/ -name ${f.replace('@', '\\@')} `;
+    // console.log(`removeCommand: ${removeCommand}`)
+    const res = run(removeCommand, { output: false, cwd: projectLocation }).sync().toString()
     const duplicates = res
       .split('\n')
       .map(l => l.replace(/\/\//g, '/'))

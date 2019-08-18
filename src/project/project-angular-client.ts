@@ -73,12 +73,15 @@ export class ProjectAngularClient extends Project {
     const outDirApp = 'dist-app';
     if (watch) {
       const p = (port !== undefined ? `--port ${port}` : '');
+      let command: string;
       if (this.isEjectedProject) {
         await killProcessByPort(port)
-        this.run(`npm-run webpack-dev-server ${p} `, { biggerBuffer: true }).async()
+        command = `npm-run webpack-dev-server ${p} `;
       } else {
-        this.run(`npm-run ng serve ${p} `, { biggerBuffer: true }).async()
+        command = `npm-run ng serve ${p} `;
       }
+      // console.log(command)
+      this.run(command, { biggerBuffer: true }).async()
     } else {
       baseHref = baseHref ? `base-href ${baseHref}` : ''
       if (this.isEjectedProject) {
