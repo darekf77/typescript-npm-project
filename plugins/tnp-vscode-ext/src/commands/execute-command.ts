@@ -168,7 +168,7 @@ export function executeCommand(registerName: string, command: string, options?: 
                 throw `Child result is not a object`
               }
               progress.report({ increment: 50 });
-              finishAction(childResult)
+              finishAction(showOutputDataOnSuccess ? childResult : '')
             } else {
               var proc = child.exec(commandToExecute);
 
@@ -206,7 +206,7 @@ export function executeCommand(registerName: string, command: string, options?: 
               });
               proc.on('exit', (code) => {
                 if (code == 0) {
-                  finishAction(data);
+                  finishAction(showOutputDataOnSuccess ? data : '');
                 } else {
                   finishError(`Command exited with code: ${code}`, data);
                 }
