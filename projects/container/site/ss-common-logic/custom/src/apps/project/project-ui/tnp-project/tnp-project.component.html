@@ -25,7 +25,7 @@
                             #stepper="matHorizontalStepper">
       <mat-step [stepControl]="environmentFormGroup">
 
-        <ng-template matStepLabel><span [ngClass]="ngClass(0)">
+        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.ENV)">
             ENVIRONMENT {{model.selectedEnv ? ('('+model.selectedEnv+')'):''  }}
           </span></ng-template>
         <app-item-environment [model]="model"
@@ -34,7 +34,7 @@
 
       </mat-step>
       <mat-step [stepControl]="buildFormGroup"  >
-        <ng-template matStepLabel> <span [ngClass]="ngClass(1)">BUILD</span></ng-template>
+        <ng-template matStepLabel> <span [ngClass]="ngClass(TnpProjectTabIndex.BUILD)">BUILD</span></ng-template>
         <app-item-build [model]="model"
                         [formGroup]="buildFormGroup"></app-item-build>
         <!-- <mat-progress-bar mode="determinate"
@@ -42,14 +42,15 @@
 
 
       </mat-step>
-      <!-- <mat-step [stepControl]="testFormGroup" [disabled]="true" >
-        <ng-template matStepLabel><span [ngClass]="ngClass(2)">TEST</span></ng-template>
-        <app-item-test [model]="model"
-                       [formGroup]="testFormGroup"></app-item-test>
+      <mat-step [stepControl]="testFormGroup" disabled="true" >
+        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.TEST)">TEST</span></ng-template>
+        test
+        <!-- <app-item-test [model]="model"
+                       [formGroup]="testFormGroup"></app-item-test> -->
 
-      </mat-step> -->
+      </mat-step>
       <mat-step [stepControl]="serveFormGroup">
-        <ng-template matStepLabel><span [ngClass]="ngClass(3)">SERVE</span></ng-template>
+        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.SERVE)">SERVE</span></ng-template>
         <app-item-serve [model]="model"
                         [formGroup]="serveFormGroup"></app-item-serve>
         <!--

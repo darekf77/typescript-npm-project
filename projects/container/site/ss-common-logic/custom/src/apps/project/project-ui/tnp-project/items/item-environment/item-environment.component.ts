@@ -10,6 +10,7 @@ import { PROJECT } from '../../../../PROJECT';
 
 
 import { Log, Level } from 'ng2-logger';
+import { TnpProjectTabIndex } from '../../project-tab-index';
 const log = Log.create('item-environment.componetn');
 
 @Component({
@@ -21,26 +22,27 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
 
   public data = [];
   tabNumber() {
-    return 0;
+    return TnpProjectTabIndex.ENV;
   }
 
   async formValueChanged() {
-    if (this.model.selectedEnv) {
-      setTimeout(() => {
-        this.model.selectedIndex += 1;
-      })
-    }
+
+    // if (this.model.selectedEnv) {
+    //   setTimeout(() => {
+    //     this.model.selectedIndex += 1;
+    //   })
+    // }
   }
 
   async tabSelectedAction() {
     await this.model.updateEndGetEnvironments();
-    if (this.model.procStaticBuild.state !== 'notStarted' ||
-      (_.isString(this.model.selectedEnv) && this.model.envionments.includes(this.model.selectedEnv as any))
-    ) {
-      setTimeout(() => {
-        this.model.selectedIndex += 1;
-      })
-    }
+    // if (this.model.procStaticBuild.state !== 'notStarted' ||
+    //   (_.isString(this.model.selectedEnv) && this.model.envionments.includes(this.model.selectedEnv as any))
+    // ) {
+    //   setTimeout(() => {
+    //     this.model.selectedIndex += 1;
+    //   })
+    // }
     this.data = this.environments;
   }
   entity = PROJECT;
@@ -50,15 +52,15 @@ export class ItemEnvironmentComponent extends BaseItemStepperProcessBuildCompone
       return [];
     }
     return this.model.envionments
-      .filter(env => env !== 'local')
+      // .filter(env => env !== 'local')
       .map(env => {
         return {
           name: env, action: ({ name }) => {
-            // setTimeout(() => {
-            this.model.selectedEnv = name;
-            this.cd.detectChanges()
-            // })
-
+            setTimeout(() => {
+              this.model.selectedEnv = name;
+              this.model.selectedIndex = TnpProjectTabIndex.BUILD;
+              this.cd.detectChanges();
+            });
           }
         }
       })

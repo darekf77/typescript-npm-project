@@ -4,6 +4,7 @@ import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 
 
 import { PROJECT } from '../../../../PROJECT';
+import { TnpProjectTabIndex } from '../../project-tab-index';
 
 
 @Component({
@@ -24,7 +25,7 @@ export class ItemTestComponent  extends BaseItemStepperProcessBuildComponent  im
   }
 
   tabNumber() {
-    return void 0;
+    return TnpProjectTabIndex.TEST;
   }
   ngOnInit() {
   }

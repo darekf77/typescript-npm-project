@@ -11,7 +11,8 @@
 <app-list-wrapper *ngIf="data; else loading"
                   [data]="data"></app-list-wrapper>
 
-<form [formGroup]="formGroup">
+<form [formGroup]="formGroup"
+      style="visibility: hidden;">
 
   <input matInput
          [(ngModel)]="model.selectedEnv"

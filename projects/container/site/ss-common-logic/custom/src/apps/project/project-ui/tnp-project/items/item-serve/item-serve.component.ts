@@ -5,6 +5,7 @@ import { MatRadioChange } from '@angular/material/radio';
 
 
 import { PROJECT } from '../../../../PROJECT';
+import { TnpProjectTabIndex } from '../../project-tab-index';
 
 
 @Component({
@@ -23,7 +24,7 @@ export class ItemServeComponent extends BaseItemStepperProcessBuildComponent imp
   }
 
   tabNumber() {
-    return 2;
+    return TnpProjectTabIndex.SERVE;
   }
 
   ngOnInit() {

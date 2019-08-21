@@ -6,6 +6,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { Helpers } from 'baseline/ss-common-logic/src/helpers';
 
 import { PROJECT } from '../../../../PROJECT';
+import { TnpProjectTabIndex } from '../../project-tab-index';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { PROJECT } from '../../../../PROJECT';
 export class ItemBuildComponent extends BaseItemStepperProcessBuildComponent implements OnInit {
 
   tabNumber() {
-    return 1;
+    return TnpProjectTabIndex.BUILD;
   }
   @Input() model: PROJECT;
 
@@ -25,16 +26,16 @@ export class ItemBuildComponent extends BaseItemStepperProcessBuildComponent imp
   }
 
   tabSelectedAction() {
-    const proc = this.model.procStaticBuild;
-    const parameters = _.isString(this.model.selectedEnv) ? { env: this.model.selectedEnv } : void 0;
-    this.model.procStaticBuild.parameters = parameters
+    // const proc = this.model.procStaticBuild;
+    // const parameters = _.isString(this.model.selectedEnv) ? { env: this.model.selectedEnv } : void 0;
+    // this.model.procStaticBuild.parameters = parameters
 
-    const COMMAND_TO_EXECUTE = proc.parameters ? Helpers
-      .interpolateString(proc.cmd)
-      .withParameters(proc.parameters)
-      : proc.cmd;
+    // const COMMAND_TO_EXECUTE = proc.parameters ? Helpers
+    //   .interpolateString(proc.cmd)
+    //   .withParameters(proc.parameters)
+    //   : proc.cmd;
 
-    proc.cmd = COMMAND_TO_EXECUTE;
+    // proc.cmd = COMMAND_TO_EXECUTE;
   }
 
 

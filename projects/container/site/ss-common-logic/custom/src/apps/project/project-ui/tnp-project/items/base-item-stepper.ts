@@ -6,6 +6,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material';
 import { PROJECT } from '../../../PROJECT';
 import { BaseComponent } from 'baseline/ss-helpers/components';
+import { TnpProjectTabIndex } from '../project-tab-index';
 
 @Component({
   selector: 'app-base-item-stepper-process-build',
@@ -16,7 +17,7 @@ export abstract class BaseItemStepperProcessBuildComponent extends BaseComponent
   @Input() formGroup: FormGroup;
   @Input() model: PROJECT;
 
-  abstract tabNumber(): number;
+  abstract tabNumber(): TnpProjectTabIndex;
 
   abstract async tabSelectedAction(tabIndex?: number);
 

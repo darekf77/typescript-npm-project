@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
-console.log('asd')
-
+import { TnpProjectTabIndex } from './project-tab-index';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
@@ -16,6 +15,7 @@ import { BaseComponent } from 'baseline/ss-helpers/components';
   styleUrls: ['./tnp-project.component.scss']
 })
 export class TnpProjectComponent extends BaseComponent implements OnInit {
+  TnpProjectTabIndex = TnpProjectTabIndex;
 
   constructor(private formBuilder: FormBuilder) {
     super()
@@ -64,7 +64,7 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
 
   async selectionChange(e: StepperSelectionEvent) {
     this.model.selectedIndex = e.selectedIndex;
-    if (this.model.selectedIndex === 0) {
+    if (this.model.selectedIndex === TnpProjectTabIndex.ENV) {
       await this.model.updateEndGetEnvironments()
     }
   }
@@ -113,9 +113,9 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
   async updateModel() {
     await this.model.updaetAndGetProceses()
     await this.model.updateEndGetEnvironments();
-    // return _.debounce(async () => {
-
-    // }, 1000)
+    if (this.model.selectedEnv && this.model.selectedEnv.length > 2) {
+      this.model.selectedIndex = TnpProjectTabIndex.ENV;
+    }
   }
 
 }
