@@ -192,7 +192,7 @@ export abstract class BaseProject {
   //#region @backend
   get hasNpmOrganization() {
     // log('path.dirname(this.location)', path.dirname(this.location))
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return false;
     }
     return path.basename(path.dirname(this.location)).startsWith('@');
@@ -875,7 +875,7 @@ export abstract class BaseProject {
       }
       // warn(`Isomorphic package file does not exists : ${p}`);
     } catch (e) {
-      if(global.tnp_normal_mode) {
+      if (global.tnp_normal_mode) {
         log(e);
         error(`Erro while reading ismorphic package file: ${p}`, true, true);
       }
@@ -895,7 +895,7 @@ export abstract class BaseProject {
       return this.browser.childrenThatAreThirdPartyInNodeModules;
     }
     //#region @backend
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     return this.isomorphicPackages.map(c => {
@@ -907,50 +907,52 @@ export abstract class BaseProject {
 
   //#region @backend
   public recreateCodeWorkspace() {
-    if (this.isWorkspace) {
-      const configSettings = {};
-
-      try {
-        const settings = json5.parse(fse.readFileSync(path.join(this.location, '.vscode', 'settings.json'), {
-          encoding: 'utf8'
-        }).toString());
-        // console.log(settings)
-        Object.keys(settings)
-          .filter(key => {
-            const start = key.startsWith('workbench');
-            // console.log(`${key} ${start}`)
-            return start;
-          })
-          .forEach(key => {
-            configSettings[key] = settings[key];
-          });
-      } catch (err) {
-        // console.log(err)
-      }
-
-      const distributionFolder = path.join(this.location, config.folder.dist);
-      if (!fse.existsSync(distributionFolder)) {
-        fse.mkdirpSync(distributionFolder);
-      }
-      configSettings['terminal.integrated.cwd'] = '.';
-
-      const codeWorkspace = {
-        folders: [
-          { path: '.' },
-          ...this.children
-            .map(c => {
-              return { path: c.name }
-            }),
-          { path: 'dist' }
-        ],
-        settings: configSettings
-      };
-      fse.writeJSONSync(path.join(this.location,
-        this.nameOfCodeWorkspace), codeWorkspace, {
-          encoding: 'utf8',
-          spaces: 2
-        });
+    if (!this.isWorkspace) {
+      return;
     }
+    const configSettings = {};
+
+    try {
+      const settings = json5.parse(fse.readFileSync(path.join(this.location, '.vscode', 'settings.json'), {
+        encoding: 'utf8'
+      }).toString());
+      // console.log(settings)
+      Object.keys(settings)
+        .filter(key => {
+          const start = key.startsWith('workbench');
+          // console.log(`${key} ${start}`)
+          return start;
+        })
+        .forEach(key => {
+          configSettings[key] = settings[key];
+        });
+    } catch (err) {
+      // console.log(err)
+    }
+
+    const distributionFolder = path.join(this.location, config.folder.dist);
+    if (!fse.existsSync(distributionFolder)) {
+      fse.mkdirpSync(distributionFolder);
+    }
+    configSettings['terminal.integrated.cwd'] = '.';
+
+    const codeWorkspace = {
+      folders: [
+        { path: '.' },
+        ...this.children
+          .map(c => {
+            return { path: c.name }
+          }),
+        { path: 'dist' }
+      ],
+      settings: configSettings
+    };
+    fse.writeJSONSync(path.join(this.location,
+      this.nameOfCodeWorkspace), codeWorkspace, {
+        encoding: 'utf8',
+        spaces: 2
+      });
+
   }
 
   get nameOfCodeWorkspace() {
@@ -1002,7 +1004,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public projectSourceFiles(): string[] {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return [];
     }
     // should be abstract
@@ -1032,7 +1034,7 @@ export abstract class BaseProject {
       return this.browser._routerTargetHttp;
     }
     //#region @backend
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     return `http://localhost:${this.getDefaultPort()}`;
@@ -1074,7 +1076,7 @@ export abstract class BaseProject {
 
   //#region @backend
   removeRecognizedIsomorphicLIbs() {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     try {
@@ -1107,7 +1109,7 @@ export abstract class BaseProject {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
       tryRemoveDir(siteLocationInDist);
     }
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     if (showMsg) {
@@ -1133,9 +1135,12 @@ export abstract class BaseProject {
     }
 
     for (let index = 0; index < gitginoredfiles.length; index++) {
-      const fileOrDirPath = path.join(this.location, gitginoredfiles[index].trim());
-      // log(`Removing: ${fileOrDirPath}`)
-      rimraf.sync(fileOrDirPath)
+      const head = gitginoredfiles[index].trim();
+      const fileOrDirPath = path.join(this.location, head);
+      if (!head.startsWith('**')) {
+        log(`Removing: "${head}"`)
+        rimraf.sync(fileOrDirPath)
+      }
     }
     this.quickFixes.missingSourceFolders()
   }
@@ -1143,7 +1148,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public clear() {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     log(`Cleaning project: ${this.genericName}`);
@@ -1154,7 +1159,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public allPackageJsonDeps(contextFolder?: string): Project[] {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return [];
     }
     let projectsInNodeModules = [];
@@ -1168,7 +1173,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public getDepsAsProject(type: NpmDependencyType | TnpNpmDependencyType, contextFolder?: string): Project[] {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return [];
     }
     return this.getDepsAsPackage(type).map(packageObj => {
@@ -1193,7 +1198,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public getDepsAsPackage(type: NpmDependencyType | TnpNpmDependencyType): Package[] {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return [];
     }
     if (!this.packageJson.data) {
@@ -1244,7 +1249,7 @@ export abstract class BaseProject {
 
   //#region @backend
   public checkIfReadyForNpm() {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return false;
     }
     // log('TYPEEEEE', this.type)
@@ -1269,7 +1274,7 @@ export abstract class BaseProject {
   }
 
   private async selectProjectToCopyTO() {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     // clearConsole()
@@ -1316,7 +1321,7 @@ export abstract class BaseProject {
   //#region @backend
   async build(buildOptions?: BuildOptions) {
     // log('BUILD OPTIONS', buildOptions)
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
 
@@ -1385,7 +1390,7 @@ export abstract class BaseProject {
    * @param port
    */
   public async start(args?: string) {
-    if(this.type === 'unknow') {
+    if (this.type === 'unknow') {
       return;
     }
     if (this.isWorkspace && !this.isGenerated) {

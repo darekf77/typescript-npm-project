@@ -57,7 +57,11 @@ export async function STATIC_CLEAN(args: string, exit = true) {
 export const STATIC_CLEAR = STATIC_CLEAN;
 
 export async function CLEAN_ALL(args: string, exit = true) {
-  await Project.Current.filesStructure.clear({ recrusive: true })
+  if (Project.Current.isWorkspaceChildProject) {
+    await Project.Current.parent.filesStructure.clear({ recrusive: true })
+  } else {
+    await Project.Current.filesStructure.clear({ recrusive: true })
+  }
   if (exit) {
     process.exit(0);
   }
@@ -83,7 +87,11 @@ export async function RESET(args: string, exit = true) {
 
 
 export async function RESET_ALL(args: string, exit = true) {
-  await Project.Current.filesStructure.reset({ recrusive: true })
+  if (Project.Current.isWorkspaceChildProject) {
+    await Project.Current.parent.filesStructure.reset({ recrusive: true })
+  } else {
+    await Project.Current.filesStructure.reset({ recrusive: true })
+  }
   if (exit) {
     process.exit(0);
   }
@@ -97,6 +105,10 @@ export async function STATIC_RESET(args: string, exit = true) {
 }
 
 export async function STATIC_RESET_ALL(args: string, exit = true) {
+  let staticProj = await Project.Current.StaticVersion(false);
+  if (staticProj.isWorkspaceChildProject) {
+    staticProj = staticProj.parent;
+  }
   await (await Project.Current.StaticVersion(false)).filesStructure.reset({ recrusive: true })
   if (exit) {
     process.exit(0);
