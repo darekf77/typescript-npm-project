@@ -29,7 +29,7 @@ function getVscodeSettingsFrom(project: Project) {
   let settings: VSCodeSettings;
   const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
   try {
-    settings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
+    settings = JSON5.parse(fse.readFileSync(pathSettingsVScode, 'utf8'))
   } catch (e) { }
   return settings;
 }
@@ -160,11 +160,21 @@ export class FilesRecreator extends FeatureForProject {
         }
       }
     }
-    if (fs.existsSync(pathSettingsVScode)) {
+    if (fse.existsSync(pathSettingsVScode)) {
       try {
-        let settings: VSCodeSettings = JSON5.parse(fs.readFileSync(pathSettingsVScode, 'utf8'))
+        let settings: VSCodeSettings = JSON5.parse(fse.readFileSync(pathSettingsVScode, 'utf8'))
         settings = modifyFN(settings, this.project);
-        fs.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+        fse.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+      } catch (e) {
+        console.log(e)
+      }
+    } else {
+      try {
+        const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
+        fse.mkdirpSync(path.dirname(pathSettingsVScode));
+        let settings: VSCodeSettings = JSON5.parse(fse.readFileSync(settingFromCore, 'utf8'))
+        settings = modifyFN(settings, this.project);
+        fse.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
       } catch (e) {
         console.log(e)
       }
@@ -245,7 +255,7 @@ export class FilesRecreator extends FeatureForProject {
     if (this.project.isBasedOnOtherProject) {
       const customFolder = path.join(this.project.location, config.folder.custom)
       const srcFolder = path.join(this.project.location, config.folder.src)
-      if (!fs.existsSync(customFolder)) {
+      if (!fse.existsSync(customFolder)) {
         fse.mkdirpSync(customFolder);
         fse.mkdirpSync(srcFolder);
       }
@@ -254,12 +264,12 @@ export class FilesRecreator extends FeatureForProject {
 
 
   npmignore() {
-    fs.writeFileSync(path.join(this.project.location, '.npmignore'),
+    fse.writeFileSync(path.join(this.project.location, '.npmignore'),
       this.filesIgnoredBy.npmignore.join('\n').concat('\n'), 'utf8');
   }
 
   gitignore() {
-    fs.writeFileSync(path.join(this.project.location, '.gitignore'),
+    fse.writeFileSync(path.join(this.project.location, '.gitignore'),
       this.filesIgnoredBy.gitignore.join('\n').concat('\n'), 'utf8');
   }
 
@@ -323,10 +333,10 @@ export class FilesRecreator extends FeatureForProject {
         project.location,
         previewAssetsPathProjectRelative
       );
-      if (fs.existsSync(previewAssetsPath)) {
+      if (fse.existsSync(previewAssetsPath)) {
         project.run(`rimraf ${previewAssetsPathProjectRelative}`).sync()
       }
-      if (fs.existsSync(libAssetsPath)) {
+      if (fse.existsSync(libAssetsPath)) {
         filesPathesToIgnore.push(path.join(
           config.folder.src,
           config.folder.assets,
@@ -349,10 +359,10 @@ export class FilesRecreator extends FeatureForProject {
           config.folder.assets,
           child.name
         );
-        if (fs.existsSync(clientAssetsPath)) {
+        if (fse.existsSync(clientAssetsPath)) {
           tryRemoveDir(clientAssetsPath)
         }
-        if (fs.existsSync(libAssetsPath)) {
+        if (fse.existsSync(libAssetsPath)) {
           filesPathesToIgnore.push(path.join(
             config.folder.src,
             config.folder.assets,
