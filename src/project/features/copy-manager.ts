@@ -168,15 +168,21 @@ export class CopyManager extends FeatureForProject {
     if (_.isUndefined(options.useTempLocation)) {
       options.useTempLocation = true;
     }
+    if (_.isUndefined(options.markAsGenerated)) {
+      options.markAsGenerated = true;
+    }
+    if (_.isUndefined(options.regenerateOnlyCoreProjects)) {
+      options.regenerateOnlyCoreProjects = true;
+    }
 
-    const { override, showInfo } = options;
+    const { override, showInfo, markAsGenerated } = options;
 
     const sourceLocation = this.project.location;
     if (this.project.isForRecreation) {
       var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
         encoding: 'utf8'
       });
-      if (this.project.isWorkspace) {
+      if (this.project.isWorkspace && markAsGenerated) {
         packageJson.tnp.isGenerated = true;
       }
     }
@@ -205,9 +211,15 @@ export class CopyManager extends FeatureForProject {
       // console.log(`packageJsonLocation saved: ${packageJsonLocation}`)
     }
     if (this.project.isWorkspace) {
-      fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
-      This workspace is generated.
-    `);
+      if (options.markAsGenerated) {
+        fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
+        This workspace is generated.
+      `);
+      } else {
+        fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
+        This is container for workspaces.
+      `);
+      }
     }
 
     if (showInfo) {
@@ -222,12 +234,18 @@ export class CopyManager extends FeatureForProject {
     if (options.regenerateProjectChilds && this.project.isForRecreation) {
       let childs = this.project.children;
 
-      if (this.project.isCoreProject && this.project.isContainer) {
-        childs = this.project.children.filter(c => c.name === 'workspace');
-      }
+      if (options.regenerateOnlyCoreProjects) {
+        if (this.project.isCoreProject) {
+          if (this.project.isContainer) {
+            childs = this.project.children.filter(c => c.name === 'workspace');
+          }
 
-      if (this.project.isCoreProject && this.project.isWorkspace) {
-        childs = this.project.children.filter(c => config.libsTypes.includes(c.name as any));
+          if (this.project.isWorkspace) {
+            childs = this.project.children.filter(c => config.libsTypes.includes(c.name as any));
+          }
+        } else {
+          childs = [];
+        }
       }
 
       childs.forEach(c => {

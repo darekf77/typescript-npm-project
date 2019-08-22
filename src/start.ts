@@ -39,6 +39,17 @@ function removeArg(arg: string, argsv: string[]) {
 export function globalArgumentsParser(argsv: string[]) {
 
   let options = require('minimist')(argsv);
+  const toCheck = {
+    'findNearestProject': void 0,
+    'findNearestProjectWithGitRoot': void 0,
+    'findNearestProjectType': void 0,
+    'findNearestProjectTypeWithGitRoot': void 0,
+    'cwd': void 0
+  };
+  Object.keys(toCheck).forEach(key => {
+    toCheck[key] = options[key];
+  });
+  options = _.cloneDeep(toCheck);
   let {
     findNearestProject,
     findNearestProjectWithGitRoot,
@@ -104,7 +115,7 @@ export function globalArgumentsParser(argsv: string[]) {
   argsv = removeArg('findNearestProjectType', argsv);
 
   // process.exit(0)
-  Object.keys(options).forEach(argName => {
+  Object.keys(toCheck).forEach(argName => {
     argsv = removeArg(argName, argsv);
   });
 
@@ -114,7 +125,7 @@ export function globalArgumentsParser(argsv: string[]) {
   //   .forEach(key => {
   //     console.log(`globa.${key} = ${global[key]}`)
   //   })
-  // console.log(argsv)
+  // console.log('after remove', argsv)
   // process.exit(0)
   return argsv.join(' ');
 }

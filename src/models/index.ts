@@ -44,6 +44,8 @@ export interface NpmInstallOptions {
 
 export interface GenerateProjectCopyOpt {
   override?: boolean;
+  markAsGenerated?: boolean;
+  regenerateOnlyCoreProjects?: boolean;
   filterForBundle?: boolean;
   showInfo?: boolean;
   ommitSourceCode?: boolean;

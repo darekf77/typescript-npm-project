@@ -120,6 +120,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (!onlyJoin) {
+      await this.project.recreate.init();
       this.project.tnpBundle.installAsPackage()
       if (!this.project.node_modules.exist) {
         if (skipNodeModules) {
@@ -130,7 +131,6 @@ export class FilesStructure extends FeatureForProject {
           await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
         }
       }
-      await this.project.recreate.init();
     }
 
     if (this.project.isStandaloneProject) {

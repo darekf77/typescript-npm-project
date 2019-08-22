@@ -12,7 +12,7 @@ import { IPackageJSON } from "../../models";
 export class QuickFixes extends FeatureForProject {
 
   public badNpmPackages() {
-    log(`Fixing bad npm packages - START`);
+    log(`Fixing bad npm packages - START for ${this.project.genericName}`);
     if (this.project.isGenerated && this.project.isWorkspace) {
       this.project.origin.node_modules.fixesForNodeModulesPackages
         .forEach(f => {

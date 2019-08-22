@@ -128,7 +128,7 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
     const configProject = workspaceConfig.workspace.projects[i];
     const project = Project.From(path.join(workspaceProjectLocation, configProject.name))
     if (project === undefined) {
-      error(`Undefined project: ${configProject.name} inside environment.js workpace.projects`);
+      error(`Undefined project "${configProject.name}" inside environment.js workpace.projects`, false, true);
     }
     await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
   }

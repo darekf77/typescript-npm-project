@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import { Project } from '../project/abstract/project';
-import { commitWhatIs } from '../helpers/helpers-git';
-import { info, log } from '../helpers/helpers-messages';
-import { TnpDB } from '../tnp-db/wrapper-db';
-import { resolvePacakgesFromArgs } from '../project/features/npm-packages/npm-packages-helpers.backend';
+import { Project } from '../../project/abstract/project';
+import { commitWhatIs } from '../../helpers/helpers-git';
+import { info, log } from '../../helpers/helpers-messages';
+import { TnpDB } from '../../tnp-db/wrapper-db';
+import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 
 export async function $DEPS_SET_CATEGORY(args: string, exit = true) {
   let argumn: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;

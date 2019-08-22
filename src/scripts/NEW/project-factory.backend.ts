@@ -1,15 +1,14 @@
 
-//#region @backend
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import config from "../config";
-import { LibType, IPackageJSON, NewFactoryType } from '../models';
-import { run, log } from "../helpers";
-import { Project } from "../project";
-import { info, error } from "../helpers";
+import config from '../../config';
+import { LibType, IPackageJSON, NewFactoryType } from '../../models';
+import { run, log } from '../../helpers';
+import { Project } from '../../project';
+import { info, error } from '../../helpers';
 
 
 export class ProjectFactory {
@@ -39,7 +38,7 @@ export class ProjectFactory {
   }
 
   private errorMsgCreateSite() {
-    console.log(chalk.green(`Good examples: tnp:new site-project-name --basedOn baseline-workspace-project-name`));
+    console.log(chalk.green(`Good examples: tnp new site-project-name --basedOn baseline-workspace-project-name`));
     error(`Please use example above.`, false, true);
   }
 
@@ -54,7 +53,7 @@ export class ProjectFactory {
       json.tnp.useFramework = false;
     }
     if (basedOn) {
-      json.tnp.basedOn = `./${basedOn}`;
+      json.tnp.basedOn = `./${basedOn.replace(/\/$/, '')}`;
     }
 
     fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
@@ -64,25 +63,33 @@ export class ProjectFactory {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
-      info(`Project name renemed to: ${nameKebakCase}`)
+      info(`Project name renemed to: ${nameKebakCase} `)
     }
     name = nameKebakCase;
-
-    const project = Project.by(type);
-    // console.log('PROJECt TO GENERATE', project.location)
+    const basedOnProject = basedOn && Project.From(path.join(cwd, basedOn));
+    if (basedOn && !basedOnProject) {
+      error(`Not able to find baseline project from relative path: ${basedOn} `, false, true);
+    }
+    if (basedOn && basedOnProject && basedOnProject.type !== 'workspace') {
+      error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
+    }
+    const baseline = basedOn ? basedOnProject : Project.by(type);
+    console.log('PROJECt BASELINE', baseline.location);
     const destinationPath = this.getDestinationPath(name, cwd);
     if (fse.pathExistsSync(destinationPath)) {
       info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
     } else {
-      if (project) {
+      if (baseline) {
         try {
-          project.copyManager.generateSourceCopyIn(destinationPath, {
+          baseline.copyManager.generateSourceCopyIn(destinationPath, {
             // ommitSourceCode: global.testMode,
+            regenerateOnlyCoreProjects: !basedOn,
+            markAsGenerated: false,
             regenerateProjectChilds: true,
           });
           // console.log(destinationPath)
           this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
-          info(`Project ${project.name} create successfully`);
+          info(`Project ${baseline.name} create successfully`);
         } catch (err) {
           error(err);
         }
@@ -117,11 +124,17 @@ export class ProjectFactory {
 
   public workspaceFromArgs(args: string, exit = true, cwd = process.cwd()) {
     const argv = args.split(' ');
+
     if (!_.isArray(argv) || argv.length < 2) {
       error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
-    // const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
+    const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
+
+    if (basedOn) {
+      error(`To create workspace site use command: tnp new: site name - of - workspace - site`
+        + `--basedOn relativePathToBaselineWorkspace`, false, true);
+    }
     const type = argv[0] as any;
     const name = argv[1]
     this.create(type, name, cwd);
@@ -137,9 +150,6 @@ export class ProjectFactory {
     if (!basedOn) {
       this.errorMsgCreateSite()
     }
-    if (!Project.From(basedOn)) {
-      error(`Please provide proper path to project in ${chalk.bold('--basedOn')}  parameter`);
-    }
     this.create('workspace', argv[0] as any, cwd, basedOn);
     if (exit) {
       process.exit(0)
@@ -150,43 +160,3 @@ export class ProjectFactory {
 }
 
 
-
-export function NEW(args: string, exit = true, cwd = process.cwd()) {
-  let argv = args.split(' ');
-
-  const type = argv[0] as NewFactoryType;
-
-
-  const cwdFromArgsIndex = argv.findIndex((f, i) => f === '--cwd');
-  const cwdFromArgs = (cwdFromArgsIndex !== -1) ? argv[cwdFromArgsIndex + 1] : void 0;
-  if (_.isString(cwdFromArgs)) {
-    cwd = cwdFromArgs;
-    argv = argv.filter((f, i) => {
-      if (f === '--cwd') {
-        argv[i + 1] = ''
-        return false;
-      }
-      return true;
-    })
-      .filter(f => !!f)
-    args = argv.join(' ')
-
-  }
-  // console.log(`ARGS: ${args}`)
-
-  if (type === 'model') {
-    ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
-  } else {
-    ProjectFactory.Instance.workspaceFromArgs(args, exit, cwd)
-  }
-}
-export function NEW_SITE(args: string, exit = true, cwd = process.cwd()) {
-  ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd);
-}
-
-export default {
-  NEW,
-  NEW_SITE
-};
-
-//#endregion

@@ -1,0 +1,26 @@
+{
+  "tnp": {
+    "resources": [
+      "README.md"
+    ],
+    "isCoreProject": true,
+    "type": "workspace",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    },
+    "isGenerated": false
+  },
+  "name": "simple-workspace",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=9.2.0",
+    "npm": ">=5.6.0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "private": true
+}

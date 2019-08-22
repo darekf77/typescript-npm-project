@@ -1,0 +1,80 @@
+{
+  "workspace": {
+    "workspace": {
+      "baseUrl": "/info",
+      "name": "workspace",
+      "port": 5000,
+      "host": "http://localhost:5000"
+    },
+    "projects": [
+      {
+        "baseUrl": "/api",
+        "name": "simple-lib",
+        "port": 4000,
+        "$db": {
+          "name": "default",
+          "database": "tmp/db.sqlite3",
+          "type": "sqlite",
+          "synchronize": true,
+          "dropSchema": true,
+          "logging": false
+        },
+        "host": "http://localhost:4000"
+      }
+    ],
+    "build": {
+      "browser": {
+        "aot": false,
+        "minify": false,
+        "production": false
+      },
+      "server": {
+        "minify": false,
+        "production": false
+      }
+    }
+  },
+  "name": "local",
+  "isCoreProject": true,
+  "ip": "localhost",
+  "packageJSON": {
+    "tnp": {
+      "resources": [
+        "README.md"
+      ],
+      "isCoreProject": true,
+      "type": "workspace",
+      "overrided": {
+        "ignoreDepsPattern": [],
+        "includeAsDev": [],
+        "includeOnly": [],
+        "dependencies": {}
+      },
+      "isGenerated": false
+    },
+    "name": "simple-workspace",
+    "version": "0.0.0",
+    "license": "UNLICENSED",
+    "engines": {
+      "node": ">=9.2.0",
+      "npm": ">=5.6.0"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "private": true
+  },
+  "build": {
+    "number": 1391,
+    "date": "2019-08-21T14:22:47.000Z",
+    "hash": "8ee9f76bdce150cf97c2de8ecc44550c2f8f2473"
+  },
+  "currentProjectName": "simple-workspace",
+  "currentProjectType": "workspace",
+  "currentProjectLocation": "/Users/dfilipiak/projects/npm/tsc-npm-project/projects/simple/simple-workspace",
+  "currentProjectIsSite": false,
+  "frameworks": [
+    "bootstrap",
+    "ionic",
+    "material"
+  ]
+}

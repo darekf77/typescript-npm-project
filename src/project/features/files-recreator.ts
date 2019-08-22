@@ -273,11 +273,11 @@ export class FilesRecreator extends FeatureForProject {
         files.push({
           from: path.join(defaultProjectProptotype.location, f),
           where: path.join(this.project.location, f)
-        })
-      })
+        });
+      });
       files.forEach(file => {
         copyFile(file.from, file.where)
-      })
+      });
     }
   }
 
