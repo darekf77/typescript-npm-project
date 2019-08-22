@@ -1,3 +1,4 @@
+import * as chokidar from 'chokidar';
 
 function AfterAsyncAction(unsub?: (change: ChangeOfFile, target: Function) => any) {
   return function (target: any, m, c) {
@@ -45,6 +46,10 @@ export class ClientCompiler2 extends BaseClientCompiler {
 
 }
 
+export type ChangeOfFileCloneOptios = {
+  onlyForClient?: BaseClientCompiler[];
+}
+
 export class ChangeOfFile {
 
   public clientBy<T = BaseClientCompiler>(fun: Function): T {
@@ -61,6 +66,10 @@ export class ChangeOfFile {
   public fileAbsolutePath: string;
   public fileExt: FileExtension;
   public readonly datetime: Date;
+
+  clone(options?: ChangeOfFileCloneOptios): ChangeOfFile {
+    return void 0;
+  }
 }
 
 export type FileExtension = 'ts' | 'js' | 'json' | 'html' | 'jpg' | 'png' | 'txt';
@@ -81,9 +90,16 @@ export class CompilerManager {
   }
 
   public static async init(
-    onAsyncFileChange?: (event: ChangeOfFile) => Promise<ChangeOfFile>,
-    onSyncFilesChange?: (event: ChangeOfFile) => Promise<ChangeOfFile>) {
+    onAsyncFileChange?: (event: ChangeOfFile, restOfQueue?: ChangeOfFile[]) => Promise<ChangeOfFile>,
+    onSyncFilesChange?: (event: ChangeOfFile, restOfQueue?: ChangeOfFile[]) => Promise<ChangeOfFile>) {
 
+
+    chokidar.watch('', {
+      atomic: true,
+
+    }).on('all', (absolutePath) => {
+
+    });
   }
 
   public static changeExecuted(cange: ChangeOfFile, target: Function) {
@@ -95,7 +111,12 @@ export class CompilerManager {
   }
 
 }
-CompilerManager.init(async asyncEvents => {
+
+/**
+ * 1. Only one task at the time
+ * 2. Only files changes not directories
+ */
+CompilerManager.init(async (asyncEvents, queue) => {
   const { clientsForChange, clientBy, clients } = asyncEvents;
   const customClientActions = {
     ClientCompiler1,
@@ -107,7 +128,9 @@ CompilerManager.init(async asyncEvents => {
 
 
   if ((await c.ClientCompiler1.asyncAction(asyncEvents)).dupa) {
-
+    queue.push(asyncEvents.clone({
+      onlyForClient: [c.ClientCompiler2]
+    }));
   }
 
   return asyncEvents;
