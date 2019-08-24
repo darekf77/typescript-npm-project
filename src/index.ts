@@ -15,6 +15,6 @@ export * from './helpers/helpers-links';
 export * from './tnp-db';
 export * from './helpers/helpers-git';
 export * from './helpers/helpers-process';
-export * from './project/features/build-isomorphic-lib';
+export * from './project/compilers/build-isomorphic-lib';
 //#endregion
 export * from './progress-output';

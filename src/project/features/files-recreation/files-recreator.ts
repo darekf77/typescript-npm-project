@@ -6,21 +6,20 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 // local
-import { Project } from "../abstract";
-import { LibType, RecreateFile } from "../../models";
-import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../helpers';
-import config from '../../config';
-import { BaselineSiteJoin, PathHelper } from './baseline-site-join';
-import { error } from '../../helpers';
-import { FeatureForProject } from '../abstract';
+import { Project } from '../../abstract';
+import { LibType, RecreateFile } from '../../../models';
+import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../../helpers';
+import config from '../../../config';
+import { BaselineSiteJoin, PathHelper } from '../../compilers/baseline-site-join';
+import { FeatureForProject } from '../../abstract';
 
 interface VSCodeSettings {
   'files.exclude': { [files: string]: boolean; };
-  "workbench.colorTheme": "Default Light+" | "Kimbie Dark",
-  "workbench.colorCustomizations": {
-    "activityBar.background"?: string;
-    "activityBar.foreground"?: string;
-    "statusBar.background"?: string;
+  'workbench.colorTheme': 'Default Light+' | 'Kimbie Dark',
+  'workbench.colorCustomizations': {
+    'activityBar.background'?: string;
+    'activityBar.foreground'?: string;
+    'statusBar.background'?: string;
   }
 }
 
@@ -131,15 +130,15 @@ export class FilesRecreator extends FeatureForProject {
         const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
         const canBeUseAsNpmPackage = allowedProject.includes(self.project.type);
         const npmignoreFiles = [
-          ".vscode",
-          "dist/",
+          '.vscode',
+          'dist/',
           'src/',
-          "/scripts",
-          "/docs",
-          "/preview",
+          '/scripts',
+          '/docs',
+          '/preview',
           '/tests',
-          "tsconfig.json",
-          "npm-debug.log*"
+          'tsconfig.json',
+          'npm-debug.log*'
         ].concat(self.commonFilesForAllProjects)
 
         return npmignoreFiles;
@@ -194,7 +193,7 @@ export class FilesRecreator extends FeatureForProject {
           },
           changeColorTheme(white = true) {
             self.modifyVscode((settings) => {
-              settings['workbench.colorTheme'] = white ? "Default Light+" : "Kimbie Dark";
+              settings['workbench.colorTheme'] = white ? 'Default Light+' : 'Kimbie Dark';
               return settings;
             });
           },
@@ -204,25 +203,25 @@ export class FilesRecreator extends FeatureForProject {
 
               if (project.isWorkspaceChildProject) {
 
-                if (!settings["workbench.colorCustomizations"]) {
-                  settings["workbench.colorCustomizations"] = {};
+                if (!settings['workbench.colorCustomizations']) {
+                  settings['workbench.colorCustomizations'] = {};
                 }
 
                 // update activity bar color
                 const parentSettings = getVscodeSettingsFrom(project.parent);
                 const statuBarColor = parentSettings &&
-                  parentSettings["workbench.colorCustomizations"] &&
-                  parentSettings["workbench.colorCustomizations"]["statusBar.background"];
-                settings["workbench.colorCustomizations"]["statusBar.background"] = statuBarColor;
-                settings["workbench.colorCustomizations"]["statusBar.debuggingBackground"] = statuBarColor;
+                  parentSettings['workbench.colorCustomizations'] &&
+                  parentSettings['workbench.colorCustomizations']['statusBar.background'];
+                settings['workbench.colorCustomizations']['statusBar.background'] = statuBarColor;
+                settings['workbench.colorCustomizations']['statusBar.debuggingBackground'] = statuBarColor;
 
                 // update background color
                 if (project.isSite) {
                   const baselineColor = getVscodeSettingsFrom(project.baseline);
                   const activityBarBcg = baselineColor &&
-                    baselineColor["workbench.colorCustomizations"] &&
-                    baselineColor["workbench.colorCustomizations"]["activityBar.background"];
-                  settings["workbench.colorCustomizations"]["activityBar.background"] = activityBarBcg;
+                    baselineColor['workbench.colorCustomizations'] &&
+                    baselineColor['workbench.colorCustomizations']['activityBar.background'];
+                  settings['workbench.colorCustomizations']['activityBar.background'] = activityBarBcg;
 
                 }
 
@@ -234,10 +233,10 @@ export class FilesRecreator extends FeatureForProject {
 
           excludedFiles(hide: boolean = true) {
             self.modifyVscode(settings => {
-              settings["files.exclude"] = {};
+              settings['files.exclude'] = {};
               if (hide) {
                 self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
-                  settings["files.exclude"][f] = true
+                  settings['files.exclude'][f] = true
                 })
               }
               return settings

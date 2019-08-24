@@ -9,7 +9,7 @@ import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
 import config from '../../../config';
 import { Project } from '../../../project';
 import { warn, error } from '../../../helpers';
-import { BuildOptions } from '../build-options';
+import { BuildOptions } from '../../features/build-process';
 
 function useDefaultBrowserCompilation(project: Project) {
   if (project.isStandaloneProject && project.type === 'isomorphic-lib') {

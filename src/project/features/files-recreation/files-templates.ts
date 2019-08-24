@@ -2,10 +2,10 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
-import { FeatureForProject } from '../abstract';
-import { EnvConfig } from '../../models';
-import { warn, error } from '../../helpers';
-import config from '../../config';
+import { FeatureForProject } from '../../abstract';
+import { EnvConfig } from '../../../models';
+import { warn, error } from '../../../helpers';
+import config from '../../../config';
 
 export class FilesTemplatesBuilder extends FeatureForProject {
 

@@ -9,7 +9,7 @@ import { error, escapeStringForRegEx } from '../../../helpers';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from './incremental-build-process';
 import config from '../../../config';
-import { BuildOptions } from '../build-options';
+import { BuildOptions } from '../..//features/build-process';
 
 
 

@@ -1,9 +1,6 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { Project, LibProject } from "../project";
-import { BaselineSiteJoin } from "../project/features/baseline-site-join";
-import * as  psList from 'ps-list';
-import { PsListInfo } from '../models/ps-info';
 import { error, info, HelpersLinks, killProcess, warn, escapeStringForRegEx } from '../helpers';
 import chalk from 'chalk';
 import { getMostRecentFilesNames } from '../helpers';

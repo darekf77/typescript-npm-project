@@ -4,13 +4,13 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 
-import { clearConsole, log, error, info, tryRemoveDir } from '../../helpers';
-import { FeatureForProject, Project } from '../abstract';
-import { TnpDB } from '../../tnp-db';
-import config from '../../config';
+import { clearConsole, log, error, info, tryRemoveDir } from '../../../helpers';
+import { FeatureForProject, Project } from '../../abstract';
+import { TnpDB } from '../../../tnp-db';
+import config from '../../../config';
 import { OutFolder } from 'morphi/build';
-import { ProjectFactory } from '../../scripts/NEW';
-import { PROGRESS_DATA } from '../../progress-output';
+import { ProjectFactory } from '../../../scripts/NEW';
+import { PROGRESS_DATA } from '../../../progress-output';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {

@@ -7,7 +7,7 @@ import { ExtendedCodeCut } from './browser-code-cut.backend';
 import { EnvConfig } from '../../../models';
 import { Project } from '../../abstract';
 import { compilationWrapperTnp, error } from '../../../helpers';
-import { BuildOptions } from '../build-options';
+import { BuildOptions } from '../../features/build-process';
 
 export class BackendCompilationExtended extends BackendCompilation {
 

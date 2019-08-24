@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
-import { LibType, RecreateFile, FileEvent, SourceFolder } from "../../../models";
+import { LibType, RecreateFile, FileEvent, SourceFolder } from '../../../models';
 import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp, patchingForAsync } from '../../../helpers';
 import config from '../../../config';
 import { error } from '../../../helpers';
@@ -270,7 +270,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
           watch.watchTree(pfileOrFolderPath, (f, curr, prev) => {
 
-            if (typeof f == "object" && prev === null && curr === null) {
+            if (typeof f == 'object' && prev === null && curr === null) {
               // Finished walking the tree
             } else if (prev === null) {
               filesEventCallback(f as any, 'created', pisCustomFolder)

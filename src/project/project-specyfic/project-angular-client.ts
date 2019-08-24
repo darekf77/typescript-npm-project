@@ -3,12 +3,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
-import { Project } from "./abstract";
-import { error, info } from "../helpers";
-import config from "../config";
-import { killProcessByPort } from '../helpers';
-import { BuildOptions } from './features/build-options';
-import { EnvConfig, EnvironmentName } from '../models';
+import { Project } from "../abstract";
+import { error, info } from "../../helpers";
+import config from "../../config";
+import { killProcessByPort } from '../../helpers';
+import { BuildOptions } from '../features';
+import { EnvConfig, EnvironmentName } from '../../models';
 
 /**
  * DO NOT USE environment variables in this project directly

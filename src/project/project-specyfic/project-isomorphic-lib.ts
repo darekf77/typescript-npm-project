@@ -1,4 +1,4 @@
-import { LibProject } from './abstract';
+import { LibProject } from '../abstract';
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -6,20 +6,18 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-import { Project } from './abstract';
+import { Project } from '../abstract';
 
-import { tryCopyFrom, getControllers, getEntites, log, info, error } from '../helpers';
+import { tryCopyFrom, getControllers, getEntites, log, info, error } from '../../helpers';
 
-import { HelpersLinks } from '../helpers';
-import { config } from '../config';
-import { IncrementalBuildProcessExtended } from './features/build-isomorphic-lib/incremental-build-process';
-import { copyFile } from '../helpers';
-import { TnpDB } from '../tnp-db';
-import { CommandInstance } from '../tnp-db/entites/command-instance';
-import { killProcessByPort } from '../helpers';
-import { BuildOptions } from './features/build-options';
+import { HelpersLinks } from '../../helpers';
+import { config } from '../../config';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
+import { copyFile } from '../../helpers';
+import { killProcessByPort } from '../../helpers';
+import { BuildOptions } from '../features';
 import { selectClients } from './select-clients';
-import { BuildDir } from '../models';
+import { BuildDir } from '../../models';
 //#endregion
 
 

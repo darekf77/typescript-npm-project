@@ -3,13 +3,11 @@ import * as path from 'path';
 import * as sleep from 'sleep';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
-import { Project, FeatureForProject } from '../abstract';
-import * as rimraf from 'rimraf';
-import { BuildOptions } from './build-options';
-import { info, log, tryCopyFrom, error } from '../../helpers';
+import { Project, FeatureForProject } from '../../abstract';
+import { info, log, tryCopyFrom, error } from '../../../helpers';
 import chalk from 'chalk';
-import config from '../../config';
-import { BuildDir } from '../../models';
+import config from '../../../config';
+import { BuildDir } from '../../../models';
 
 export class StaticBuild extends FeatureForProject {
 

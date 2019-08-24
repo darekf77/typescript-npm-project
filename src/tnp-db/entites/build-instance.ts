@@ -5,7 +5,7 @@ import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
 import { killProcess } from '../../helpers';
 import chalk from 'chalk';
-import { BuildOptions } from '../../project/features/build-options';
+import { BuildOptions } from '../../project/features';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;

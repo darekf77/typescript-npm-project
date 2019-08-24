@@ -11,7 +11,7 @@ import {
   ProcessInstance
 } from './entites';
 import { error } from '../helpers';
-import { BuildOptions } from '../project/features/build-options';
+import { BuildOptions } from '../project/features';
 
 
 export class DbCrud {

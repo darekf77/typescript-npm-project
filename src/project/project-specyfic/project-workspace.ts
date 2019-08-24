@@ -3,14 +3,14 @@ import * as _ from 'lodash';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
 // local
-import { Project } from "./abstract";
-import { arrayMoveElementBefore, log } from "../helpers";
-import { config } from '../config';
-import { info, warn } from '../helpers';
-import { PROGRESS_DATA } from '../progress-output';
-import { ProxyRouter } from './features/proxy-router';
-import { BuildOptions } from './features/build-options';
-import { ProjectBuild } from '../models';
+import { Project } from "../abstract";
+import { arrayMoveElementBefore, log } from "../../helpers";
+import { config } from '../../config';
+import { info, warn } from '../../helpers';
+import { PROGRESS_DATA } from '../../progress-output';
+import { ProxyRouter } from '../features/proxy-router';
+import { BuildOptions } from '../features';
+import { ProjectBuild } from '../../models';
 
 function reorderResult(result = [], update: (result) => void): boolean {
   let neededNextOrder = false;

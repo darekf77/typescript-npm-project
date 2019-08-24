@@ -1,9 +1,9 @@
 //#region @backend
 import * as path from 'path';
 // local
-import { Project } from "./abstract";
-import config from "../config";
-import { BuildOptions } from './features/build-options';
+import { Project } from "../abstract";
+import config from "../../config";
+import { BuildOptions } from '../features';
 
 export class ProjectIonicClient extends Project {
 

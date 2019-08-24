@@ -16,7 +16,7 @@ import { info, warn, log } from '../../helpers';
 import { tryRemoveDir, tryCopyFrom } from '../../helpers';
 import { GenerateProjectCopyOpt } from '../../models/index';
 import { copyFile } from '../../helpers';
-import { BuildOptions } from './build-options';
+import { BuildOptions } from './build-process';
 import { FeatureForProject } from '../abstract';
 
 export class CopyManager extends FeatureForProject {

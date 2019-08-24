@@ -15,25 +15,29 @@ import {
   error, info, warn, run as __run, watcher as __watcher, killProcessByPort,
   pullCurrentBranch, countCommits, lastCommitDate, lastCommitHash, currentBranchName, log, tryRemoveDir, HelpersLinks
 } from '../../helpers';
+import { SourceModifier } from '../compilers/source-modifier';
+import { BaselineSiteJoin } from '../compilers/baseline-site-join';
+import { FrameworkFilesGenerator } from '../compilers/framework-file-generator';
+
 import { NodeModules } from "../features/node-modules";
-import { FilesRecreator } from '../features/files-recreator';
+import { FilesRecreator } from '../features';
 import { ProxyRouter } from '../features/proxy-router';
 import { CopyManager } from '../features/copy-manager';
-import { SourceModifier } from '../features/source-modifier';
+
 import { TestRunner } from '../features/test-runner';
-import { BuildOptions } from '../features/build-options';
+import { BuildOptions } from '../features';
 import { NpmPackages } from '../features/npm-packages';
-import { BaselineSiteJoin } from '../features/baseline-site-join';
+
 import { TnpBundle } from '../features/tnp-bundle';
-import { FilesStructure } from '../features/files-structure';
-import { BuildProcess } from '../features/build-proces';
-import { FrameworkFilesGenerator } from '../features/framework-files-generator';
-import { FilesTemplatesBuilder } from '../features/files-templates';
+import { FilesStructure } from '../features';
+import { BuildProcess } from '../features';
+
+import { FilesTemplatesBuilder } from '../features';
 import { WorkspaceSymlinks } from '../features/workspace-symlinks';
 import { TnpDB } from '../../tnp-db';
-import { FilesFactory } from '../features/files-factory.backend';
+import { FilesFactory } from '../features';
 import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
-import { StaticBuild } from '../features/static-build';
+import { StaticBuild } from '../features';
 import { QuickFixes } from '../features/quick-fixes';
 import { config as configMorphi } from 'morphi/build/config';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';

@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
-import { Project } from "../../abstract";
+import { Project } from '../../abstract';
 import config from '../../../config';
 //#endregion
 

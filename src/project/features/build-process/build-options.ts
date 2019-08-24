@@ -1,12 +1,12 @@
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
-import { error, info } from '../../helpers/helpers-messages';
+import { error, info } from '../../../helpers/helpers-messages';
 //#endregion
 
 import * as _ from 'lodash';
-import { Project } from '../abstract';
-import { IBuildOptions, BuildDir } from '../../models';
+import { Project } from '../../abstract';
+import { IBuildOptions, BuildDir } from '../../../models';
 
 export class BuildOptions implements IBuildOptions {
 

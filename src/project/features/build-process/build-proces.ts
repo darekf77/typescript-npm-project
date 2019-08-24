@@ -5,13 +5,13 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import { FeatureForProject, Project } from '../abstract';
+import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from './build-options';
-import { BuildDir, LibType, StartForOptions } from '../../models';
-import { config } from '../../config';
-import { error, info, warn, log } from '../../helpers';
-import { TnpDB } from '../../tnp-db';
-import { PROGRESS_DATA } from '../../progress-output';
+import { BuildDir, LibType, StartForOptions } from '../../../models';
+import { config } from '../../../config';
+import { error, info, warn, log } from '../../../helpers';
+import { TnpDB } from '../../../tnp-db';
+import { PROGRESS_DATA } from '../../../progress-output';
 
 
 export class BuildProcess extends FeatureForProject {

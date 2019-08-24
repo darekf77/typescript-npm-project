@@ -13,7 +13,7 @@ import config from "../../config";
 import { PackageJSON } from '../features/package-json';
 
 import { tryCopyFrom } from '../../helpers';
-import { BuildProcess } from '../features/build-proces';
+import { BuildProcess } from '../features';
 
 /**
  * Project ready to be build/publish as npm package.

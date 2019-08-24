@@ -25,7 +25,7 @@ import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } fr
 import { PortsSet } from './controllers/ports-set';
 import { PsListInfo } from '../models/ps-info';
 import chalk from 'chalk';
-import { BuildOptions } from '../project/features/build-options';
+import { BuildOptions } from '../project/features';
 import config from '../config';
 
 export type ProcessBoundAction = (

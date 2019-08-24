@@ -6,10 +6,10 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 
-import { Project } from '../abstract';
-import { config } from '../../config';
-import { getEntites, getControllers, log } from '../../helpers';
-import { FeatureCompilerForProject } from '../abstract';
+import { Project } from '../../abstract';
+import { config } from '../../../config';
+import { getEntites, getControllers, log } from '../../../helpers';
+import { FeatureCompilerForProject } from '../../abstract';
 
 
 export class FrameworkFilesGenerator extends FeatureCompilerForProject {

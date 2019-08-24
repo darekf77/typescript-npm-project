@@ -20,7 +20,7 @@ import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
 import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';
 import config from '../config';
-import { BuildOptions } from '../project/features/build-options';
+import { BuildOptions } from '../project/features';
 
 
 export class TnpDB {

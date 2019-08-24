@@ -8,7 +8,7 @@ import { PsListInfo } from '../../models/ps-info';
 import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { warn } from '../../helpers';
-import { BuildOptions } from '../../project/features/build-options';
+import { BuildOptions } from '../../project/features';
 
 export class BuildsController extends BaseController {
 
