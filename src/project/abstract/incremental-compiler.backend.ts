@@ -38,13 +38,7 @@ export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any> {
 }
 
 
-export class ClientCompiler1 extends BaseClientCompiler<{ dupa: boolean; }> {
 
-}
-
-export class ClientCompiler2 extends BaseClientCompiler {
-
-}
 
 export type ChangeOfFileCloneOptios = {
   onlyForClient?: BaseClientCompiler[];
@@ -58,7 +52,7 @@ export class ChangeOfFile {
   public clientsForChange: BaseClientCompiler[] = [];
   public clients<C>(clients): { [name in keyof C]: BaseClientCompiler } {
     Object.keys(clients).forEach(key => {
-      clients[key] = this.clientBy<ClientCompiler1>(clients[key]);
+      clients[key] = this.clientBy<C>(clients[key]);
     });
     return void 0;
   };
@@ -112,26 +106,3 @@ export class CompilerManager {
 
 }
 
-/**
- * 1. Only one task at the time
- * 2. Only files changes not directories
- */
-CompilerManager.init(async (asyncEvents, queue) => {
-  const { clientsForChange, clientBy, clients } = asyncEvents;
-  const customClientActions = {
-    ClientCompiler1,
-    ClientCompiler2
-  };
-  const c = clients<typeof customClientActions>(customClientActions);
-
-
-
-
-  if ((await c.ClientCompiler1.asyncAction(asyncEvents)).dupa) {
-    queue.push(asyncEvents.clone({
-      onlyForClient: [c.ClientCompiler2]
-    }));
-  }
-
-  return asyncEvents;
-})

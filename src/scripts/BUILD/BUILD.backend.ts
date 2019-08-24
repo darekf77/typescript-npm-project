@@ -1,9 +1,9 @@
 //#region @backend
 import * as _ from 'lodash';
 
-import { Project } from '../project';
-import { config } from '../config';
-import { SystemTerminal, error } from '../helpers';
+import { Project } from '../../project';
+import { config } from '../../config';
+import { SystemTerminal, error } from '../../helpers';
 import chalk from 'chalk';
 
 async function buildWatch(args) {

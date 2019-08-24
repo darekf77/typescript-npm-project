@@ -14,6 +14,33 @@ import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 import { LibTypeArr } from './models/lib-type';
+import { CompilerManager } from './project/abstract/incremental-compiler.backend';
+import { ClientCompiler1 } from './scripts/INCREMENTAL-CHANGE-MANAGER';
+import { ClientCompiler2 } from './scripts/INCREMENTAL-CHANGE-MANAGER';
+
+/**
+ * 1. Only one task at the time
+ * 2. Only files changes not directories
+ */
+CompilerManager.init(async (asyncEvents, queue) => {
+  const { clientsForChange, clientBy, clients } = asyncEvents;
+  const customClientActions = {
+    ClientCompiler1,
+    ClientCompiler2
+  };
+  const c = clients<typeof customClientActions>(customClientActions);
+
+
+
+
+  if ((await c.ClientCompiler1.asyncAction(asyncEvents)).dupa) {
+    queue.push(asyncEvents.clone({
+      onlyForClient: [c.ClientCompiler2]
+    }));
+  }
+
+  return asyncEvents;
+});
 
 
 function removeArg(arg: string, argsv: string[]) {
