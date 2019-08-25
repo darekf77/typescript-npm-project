@@ -18,7 +18,7 @@ import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject } from '../../abstract';
 import {
   fastCopy, fastUnlink,
-  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin
+  getPrefixedBasename, PathHelper, getRegexSourceString, getPrefixedPathInJoin, pathToBaselineThroughtNodeModules, allBaselineFiles, allCustomFiles, pathToBaselineNodeModulesRelative, pathToBaselineAbsolute, pathToCustom, relativePathesBaseline, relativePathesCustom
 } from './baseline-site-join.helpers.backend';
 import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './baseline-site-join.debug.backend';
 import { REGEXS } from './baseline-site-join.regexes.backend';
@@ -34,119 +34,6 @@ export class BaselineSiteJoin extends FeatureForProject {
   private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
 
   public joinNotAllowed = false;
-
-  //#region getters
-
-  private get pathToBaselineAbsolute() {
-    // console.log('this.pathToBaseline', this.pathToBaselineThroughtNodeModules)
-    const isInsideWokrspace = (this.project.parent && this.project.parent.type === 'workspace');
-
-    const toReplace = path.join(
-      isInsideWokrspace ? (
-        path.join(this.project.parent.name, this.project.name))
-        : this.project.name
-      , config.folder.node_modules)
-
-    // console.log('toReplace', toReplace)
-    const resultPath = this.pathToBaselineThroughtNodeModules.replace(`${toReplace}/`, '')
-    return crossPlatofrmPath(resultPath);
-  }
-
-  private get pathToBaselineThroughtNodeModules() {
-    const baselinePath = this.pathToBaselineNodeModulesRelative;
-
-    const resultPath = path.join(
-      this.project.location,
-      config.folder.node_modules,
-      baselinePath
-    );
-    return crossPlatofrmPath(resultPath);
-  }
-
-  private get pathToCustom() {
-    const resultPath = path.join(this.project.location, config.folder.custom);
-    return crossPlatofrmPath(resultPath);
-  }
-
-  private get pathToBaselineNodeModulesRelative() {
-    const baselinePath = this.project.type === 'workspace' ? this.project.baseline.name
-      : path.join(this.project.baseline.parent.name, this.project.baseline.name)
-
-    return baselinePath;
-  }
-
-  private get relativePathesBaseline() {
-    let baselineFiles: string[] = this.files.allBaselineFiles;
-    // console.log('baselineFiles', baselineFiles)
-    const baselineReplacePath = this.pathToBaselineThroughtNodeModules;
-    // console.log('baselineReplacePath', baselineReplacePath)
-
-    baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
-
-    return baselineFiles;
-  }
-
-  /**
-   *
-   *
-   */
-  private get relativePathesCustom() {
-    let customFiles: string[] = this.files.allCustomFiles;
-    // console.log('customFiles', customFiles)
-    const customReplacePath = path.join(this.project.location, config.folder.custom);
-    // console.log('customReplacePath', customReplacePath)
-
-    customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
-
-    return customFiles;
-  }
-
-  private get files() {
-
-    const self = this;
-    return {
-      get allCustomFiles() {
-
-        const globPath = path.join(
-          self.project.location,
-          config.folder.custom);
-        const files = glob.sync(`${globPath}/**/*.*`);
-        // console.log('CUSTOM FIELS', files)
-
-        return files;
-      },
-      get allBaselineFiles() {
-
-        let files = [];
-        // console.log('CUSTOMIZABLE', this.project.baseline.customizableFilesAndFolders)
-
-        self.project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
-          let globPath = path.join(self.pathToBaselineThroughtNodeModules, customizableFileOrFolder)
-          if (!fse.existsSync(globPath)) {
-            error(`Custombizable folder of file doesn't exist: ${globPath}
-
-            Please add: ${path.basename(globPath)} to your baseline
-
-            or maybe forget ${chalk.bold('tnp install')} or ${chalk.bold('tnp link')} ?
-
-            `)
-          }
-          if (fse.statSync(globPath).isDirectory()) {
-            const globFiles = glob.sync(`${globPath}/**/*.*`);
-            files = files.concat(globFiles);
-          } else {
-            files.push(globPath)
-          }
-
-        })
-        // console.log('allBaselineFiles', files)
-
-        return files;
-      }
-    }
-  }
-
-  //#endregion
 
   //#region init
   async init() {
@@ -190,7 +77,7 @@ export class BaselineSiteJoin extends FeatureForProject {
     // rejoin baseline/site files
 
     await compilationWrapperTnp(() => {
-      uniqArray(this.relativePathesBaseline.concat(this.relativePathesCustom))
+      uniqArray(relativePathesBaseline(this.project).concat(relativePathesCustom(this.project)))
         .forEach(relativeFile => {
           this.merge(relativeFile)
         });
@@ -219,7 +106,7 @@ export class BaselineSiteJoin extends FeatureForProject {
       if (fse.existsSync(absolutePath)) {
         if (fse.lstatSync(absolutePath).isDirectory()) { // QUICK_FIX WATCHING
 
-          const relative = absolutePath.replace(path.dirname(this.pathToCustom), '').replace(/^\//g, '');
+          const relative = absolutePath.replace(path.dirname(pathToCustom(this.project)), '').replace(/^\//g, '');
           const base = absolutePath.replace(relative, '').replace(/\/$/g, '');
           // console.log(`[baselineSiteJoin] relative`, relative)
           // console.log(`[baselineSiteJoin] base`, base)
@@ -234,9 +121,9 @@ export class BaselineSiteJoin extends FeatureForProject {
       patchingForAsync(absolutePath, () => {
         if (isCustomFolder) {
           this.project.sourceModifier.asyncAction(absolutePath);
-          this.merge(absolutePath.replace(this.pathToCustom, ''));
+          this.merge(absolutePath.replace(pathToCustom(this.project), ''));
         } else {
-          this.merge(absolutePath.replace(this.pathToBaselineAbsolute, ''));
+          this.merge(absolutePath.replace(pathToBaselineAbsolute(this.project), ''));
         }
       }, 'baseline-site-join', 0);
 
@@ -335,8 +222,8 @@ export class BaselineSiteJoin extends FeatureForProject {
       console.log(`File: ${relativeBaselineCustomPath}`)
     }
 
-    const baselineAbsoluteLocation = path.join(this.pathToBaselineThroughtNodeModules, relativeBaselineCustomPath)
-    const baselineFileInCustomPath = path.join(this.pathToCustom, relativeBaselineCustomPath);
+    const baselineAbsoluteLocation = path.join(pathToBaselineThroughtNodeModules(this.project), relativeBaselineCustomPath)
+    const baselineFileInCustomPath = path.join(pathToCustom(this.project), relativeBaselineCustomPath);
     const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath);
 
     let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
@@ -436,7 +323,7 @@ export class BaselineSiteJoin extends FeatureForProject {
         const toReplaceImportPath =
           getRegexSourceString(
             crossPlatofrmPath(
-              `${path.join(self.pathToBaselineNodeModulesRelative.replace(/\//g, '//'),
+              `${path.join(pathToBaselineNodeModulesRelative(this.project).replace(/\//g, '//'),
                 baselineFilePathNoExit)}`
             )
           )
@@ -502,10 +389,10 @@ export class BaselineSiteJoin extends FeatureForProject {
         const levelBack = relativeBaselineCustomPath.split('/').length - 3;
         const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
         if (debuggin) console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
-        const pathToBaselineNodeModulesRelative = getRegexSourceString(self.pathToBaselineNodeModulesRelative)
+        const tmpPathToBaselineNodeModulesRelative = getRegexSourceString(pathToBaselineNodeModulesRelative(self.project))
         const pathPart = REGEXS.baselinePart;
         if (debuggin) console.log('pathPart', pathPart)
-        const baselineRegex = `${pathToBaselineNodeModulesRelative}${pathPart}*`
+        const baselineRegex = `${tmpPathToBaselineNodeModulesRelative}${pathPart}*`
         if (debuggin) console.log(`\nbaselineRegex: ${baselineRegex}`)
         let patterns = input.match(new RegExp(baselineRegex, 'g'))
 
@@ -517,9 +404,9 @@ export class BaselineSiteJoin extends FeatureForProject {
           patterns.forEach(pathToReplaceInInput => {
 
             if (debuggin) console.log(`PATTERN IN INPUT ${pathToReplaceInInput}`)
-            if (debuggin) console.log(`BASELINE: ${self.pathToBaselineNodeModulesRelative}`);
+            if (debuggin) console.log(`BASELINE: ${pathToBaselineNodeModulesRelative(self.project)}`);
             let patternWithoutBaselinePart = pathToReplaceInInput
-              .replace(self.pathToBaselineNodeModulesRelative, '')
+              .replace(pathToBaselineNodeModulesRelative(self.project), '')
             if (debuggin) console.log(`PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
             if (debuggin) console.log(`pathPart = ${pathPart}`)
 
@@ -545,12 +432,12 @@ export class BaselineSiteJoin extends FeatureForProject {
        * - site:  src/app.ts => is refereing to 'totaly-new-file.ts' which is new file only available in site/custom
        */
       _4___handleReferingToNewFilesOnlyAvailableInCustom() {
-        self.relativePathesCustom.forEach(relativePthInCustom => {
+        relativePathesCustom(self.project).forEach(relativePthInCustom => {
           if (relativePthInCustom !== relativeBaselineCustomPath) {
             let baselineFilePathNoExit = PathHelper.removeExtension(relativePthInCustom);
 
             const pathToSiteeFile = path.join(self.project.location, baselineFilePathNoExit)
-            const pathToBaselineFile = path.join(self.pathToBaselineAbsolute, baselineFilePathNoExit)
+            const pathToBaselineFile = path.join(pathToBaselineAbsolute(self.project), baselineFilePathNoExit)
 
             if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
               let toReplace = getPrefixedBasename(baselineFilePathNoExit);

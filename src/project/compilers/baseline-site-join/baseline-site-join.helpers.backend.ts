@@ -9,6 +9,8 @@ import * as rimraf from 'rimraf';
 // local
 import { Project } from '../../abstract';
 import config from '../../../config';
+import { error } from '../../../helpers';
+import chalk from 'chalk';
 //#endregion
 
 
@@ -80,15 +82,105 @@ export function fastUnlink(filePath) {
   }
 }
 
+export function pathToBaselineNodeModulesRelative(project: Project) {
+  const baselinePath = project.type === 'workspace' ? project.baseline.name
+    : path.join(project.baseline.parent.name, project.baseline.name)
 
-// export function  handleUsingSelfPathesInAngularLib(joinFilePath: string) {
-//   // console.log(`this project: ${this.project.location}`)
-//   // console.log(`baseline: ${this.project.baseline.location}`)
-//   // console.log(`joinFilePath: ${joinFilePath}`)
-//   let orgFileCopiedToSIte = fse.readFileSync(joinFilePath, { encoding: 'utf8' });
-//   const reg = new RegExp(`${this.project.name}\/${config.folder.components}`, 'g')
-//   orgFileCopiedToSIte = orgFileCopiedToSIte.replace(reg,
-//     `${this.project.parent.baseline.name}/${this.project.name}/${config.folder.components}`);
-//   fse.writeFileSync(joinFilePath, orgFileCopiedToSIte, { encoding: 'utf8' });
-// }
+  return baselinePath;
+}
 
+export function pathToBaselineThroughtNodeModules(project: Project) {
+  const baselinePath = pathToBaselineNodeModulesRelative(project);
+
+  const resultPath = path.join(
+    project.location,
+    config.folder.node_modules,
+    baselinePath
+  );
+  return resultPath;
+}
+
+
+export function allCustomFiles(project: Project) {
+
+  const globPath = path.join(
+    project.location,
+    config.folder.custom);
+  const files = glob.sync(`${globPath}/**/*.*`);
+  // console.log('CUSTOM FIELS', files)
+
+  return files;
+}
+
+export function allBaselineFiles(project: Project) {
+
+  let files = [];
+
+  project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
+    let globPath = path.join(pathToBaselineThroughtNodeModules(project), customizableFileOrFolder)
+    if (!fse.existsSync(globPath)) {
+      error(`Custombizable folder of file doesn't exist: ${globPath}
+
+      Please add: ${path.basename(globPath)} to your baseline
+
+      or maybe forget ${chalk.bold('tnp install')} or ${chalk.bold('tnp link')} ?
+
+      `)
+    }
+    if (fse.statSync(globPath).isDirectory()) {
+      const globFiles = glob.sync(`${globPath}/**/*.*`);
+      files = files.concat(globFiles);
+    } else {
+      files.push(globPath)
+    }
+
+  })
+  // console.log('allBaselineFiles', files)
+
+  return files;
+}
+
+
+export function pathToBaselineAbsolute(project: Project) {
+  const isInsideWokrspace = (project.parent && project.parent.type === 'workspace');
+
+  const toReplace = path.join(
+    isInsideWokrspace ? (
+      path.join(project.parent.name, project.name))
+      : project.name
+    , config.folder.node_modules)
+
+  // console.log('toReplace', toReplace)
+  const resultPath = pathToBaselineThroughtNodeModules(project).replace(`${toReplace}/`, '')
+  return resultPath;
+}
+
+export function pathToCustom(project: Project) {
+  const resultPath = path.join(project.location, config.folder.custom);
+  return resultPath;
+}
+
+
+
+
+export function relativePathesBaseline(project: Project) {
+  let baselineFiles: string[] = allBaselineFiles(project);
+  // console.log('baselineFiles', baselineFiles)
+  const baselineReplacePath = pathToBaselineThroughtNodeModules(project);
+  // console.log('baselineReplacePath', baselineReplacePath)
+
+  baselineFiles = baselineFiles.map(f => f.replace(baselineReplacePath, ''))
+
+  return baselineFiles;
+}
+
+export function relativePathesCustom(project: Project) {
+  let customFiles: string[] = allCustomFiles(project);
+  // console.log('customFiles', customFiles)
+  const customReplacePath = path.join(project.location, config.folder.custom);
+  // console.log('customReplacePath', customReplacePath)
+
+  customFiles = customFiles.map(f => f.replace(customReplacePath, ''))
+
+  return customFiles;
+}
