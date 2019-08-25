@@ -71,6 +71,8 @@ export type FileEvent = 'created' | 'changed' | 'removed' | 'rename';
 
 export type CutableFileExt = 'scss' | 'css' | 'sass' | 'html' | 'ts';
 
+export type FileExtension = 'ts' | 'js' | 'json' | 'html' | 'jpg' | 'png' | 'txt' | CutableFileExt;
+
 
 export type RecreateFile = { where: string; from: string };
 
