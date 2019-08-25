@@ -8,7 +8,7 @@ import { log } from '../helpers/helpers-messages';
 export class ClientCompiler1 extends BaseClientCompiler<{ dupa: boolean; }> {
 
   async syncAction(files) {
-    console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
+    // console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
   }
 
   asyncAction(change: ChangeOfFile) {
@@ -17,7 +17,7 @@ export class ClientCompiler1 extends BaseClientCompiler<{ dupa: boolean; }> {
       setTimeout(() => {
         console.log(`async end for ${CLASS.getNameFromObject(this)}`, change.fileAbsolutePath)
         resolve();
-      }, 1000)
+      }, 2000)
     })
   }
 
@@ -28,7 +28,7 @@ export type IClientCompiler1 = ClientCompiler1;
 @CLASS.NAME('ClientCompiler2')
 export class ClientCompiler2 extends BaseClientCompiler {
   async syncAction(files) {
-    console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
+    // console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
   }
 
   asyncAction(change: ChangeOfFile) {
@@ -37,7 +37,7 @@ export class ClientCompiler2 extends BaseClientCompiler {
       setTimeout(() => {
         console.log(`async end for ${CLASS.getNameFromObject(this)}`, change.fileAbsolutePath)
         resolve();
-      }, 1000)
+      }, 2000)
     })
   }
 }
@@ -51,8 +51,8 @@ export default {
     const c2 = new ClientCompiler2(path.join(process.cwd(), 'tmp-test2'));
     CompilerManager.Instance.addClient(c1)
     CompilerManager.Instance.addClient(c2)
-    c1.initAndWatch()
-    c2.initAndWatch()
+    c1.initAndWatch();
+    c2.initAndWatch();
   }
 
 }

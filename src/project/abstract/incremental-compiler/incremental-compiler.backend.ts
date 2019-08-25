@@ -73,6 +73,7 @@ export class CompilerManager {
   }
 
   private watcher: chokidar.FSWatcher;
+  private lastAsyncFiles = [];
   public async asyncInit(client: BaseClientCompiler) {
     log(`asyncInit of ${CLASS.getNameFromObject(client)}`);
     await this.syncInit(client);
@@ -82,9 +83,14 @@ export class CompilerManager {
         ignoreInitial: true,
         followSymlinks: true,
         ignorePermissionErrors: true,
-        // @LAST before client without watch and using async in init()
       }).on('all', async (event, f) => {
         if (event !== 'addDir') {
+
+          if (this.lastAsyncFiles.includes(f)) {
+            return;
+          } else {
+            this.lastAsyncFiles.push(f);
+          }
 
           log(`event ${event}, path: ${f}`);
           const toNotify = this.clients
@@ -100,6 +106,7 @@ export class CompilerManager {
             const c = toNotify[index];
             await c.asyncAction(change);
           }
+          this.lastAsyncFiles = this.lastAsyncFiles.filter(ef => ef !== f);
         }
       });
     } else if (_.isString(client.folderPath) && !this.currentObservedFolder.includes(client.folderPath)) {

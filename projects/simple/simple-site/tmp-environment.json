@@ -35,14 +35,14 @@
     }
   },
   "name": "local",
-  "isCoreProject": true,
+  "isCoreProject": false,
   "ip": "localhost",
   "packageJSON": {
     "tnp": {
       "resources": [
         "README.md"
       ],
-      "isCoreProject": true,
+      "isCoreProject": false,
       "type": "workspace",
       "overrided": {
         "ignoreDepsPattern": [],
@@ -50,28 +50,26 @@
         "includeOnly": [],
         "dependencies": {}
       },
-      "isGenerated": false
+      "isGenerated": false,
+      "useFramework": false,
+      "basedOn": "./simple-workspace"
     },
-    "name": "simple-workspace",
+    "name": "simple-site",
     "version": "0.0.0",
     "license": "UNLICENSED",
-    "engines": {
-      "node": ">=9.2.0",
-      "npm": ">=5.6.0"
-    },
     "dependencies": {},
     "devDependencies": {},
     "private": true
   },
   "build": {
-    "number": 1391,
-    "date": "2019-08-21T14:22:47.000Z",
-    "hash": "8ee9f76bdce150cf97c2de8ecc44550c2f8f2473"
+    "number": 1398,
+    "date": "2019-08-25T01:31:09.000Z",
+    "hash": "16ad4152df701d3f2f6f99aad27149dbc1821065"
   },
-  "currentProjectName": "simple-workspace",
+  "currentProjectName": "simple-site",
   "currentProjectType": "workspace",
-  "currentProjectLocation": "/Users/dfilipiak/projects/npm/tsc-npm-project/projects/simple/simple-workspace",
-  "currentProjectIsSite": false,
+  "currentProjectLocation": "/Users/dfilipiak/projects/npm/tsc-npm-project/projects/simple/simple-site",
+  "currentProjectIsSite": true,
   "frameworks": [
     "bootstrap",
     "ionic",

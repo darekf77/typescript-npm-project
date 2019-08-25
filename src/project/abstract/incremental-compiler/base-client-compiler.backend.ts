@@ -60,7 +60,7 @@ export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any> {
    * Do not override this
    */
   public async initAndWatch() {
-    console.log(`initAndWatch()  ${CLASS.getNameFromObject(this)}`)
+    // console.log(`initAndWatch()  ${CLASS.getNameFromObject(this)}`)
     await CompilerManager.Instance.asyncInit(this)
   }
 
