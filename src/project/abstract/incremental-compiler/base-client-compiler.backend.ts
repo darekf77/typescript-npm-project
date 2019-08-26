@@ -9,23 +9,23 @@ import { ChangeOfFile } from './change-of-file.backend';
 import { CompilerManager } from './incremental-compiler.backend';
 import { FileExtension } from '../../../models';
 import { warn } from '../../../helpers/helpers-messages';
+import { compilationWrapperTnp } from '../../../helpers/helpers-process';
 
-function AfterAsyncAction(unsub?: (change: ChangeOfFile, target: Function) => any) {
-  return function (target: any, m, c) {
-    // TODO
 
-    ///
-  } as any;
+export interface BaseClientCompilerOptions {
+  folderPath?: string;
+  asyncWatch?: boolean;
+  subscribeOnlyFor?: FileExtension[];
 }
 
-@AfterAsyncAction((c, target) => {
-  CompilerManager.Instance.changeExecuted(c, target);
-})
-export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any> {
 
-  private __folderPath: string;
+export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA = any> {
+
+  private compilationWrapper = compilationWrapperTnp;
   private pathResolve = false;
 
+  //#region folder path
+  private __folderPath: string;
   public set folderPath(v) {
     this.__folderPath = v;
   }
@@ -41,42 +41,72 @@ export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any> {
     }
     return this.__folderPath;
   }
-  constructor(
-    folderPath: string,
-    public subscribeOnlyFor: FileExtension[] = []
-  ) {
+  //#endregion
+
+  public readonly subscribeOnlyFor: FileExtension[] = []
+  public readonly asyncWatch: boolean;
+
+  //#region constructor
+  constructor(options?: BaseClientCompilerOptions) {
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (_.isUndefined(options.asyncWatch)) {
+      options.asyncWatch = true;
+    }
+    if (!_.isArray(options.subscribeOnlyFor)) {
+      options.subscribeOnlyFor = []
+    }
+    if (!_.isString(options.folderPath)) {
+      options.folderPath = void 0;
+    }
+    const { asyncWatch, folderPath, subscribeOnlyFor } = options;
+    this.asyncWatch = asyncWatch;
     this.folderPath = folderPath;
+    this.subscribeOnlyFor = subscribeOnlyFor;
+  }
+  //#endregion
+
+  //#region init
+
+  private fixTaskName(taskName: string) {
+    if (!_.isString(taskName)) {
+      taskName = `task of client "${CLASS.getNameFromObject(this)}"`;
+    }
+    return taskName;
   }
 
   /**
    * Do not override this
    */
-  public async init() {
-    console.log(`init() ${CLASS.getNameFromObject(this)}`)
+  public async init(taskName?: string, afterInitCallBack?: () => void) {
+    taskName = this.fixTaskName(taskName)
     await CompilerManager.Instance.syncInit(this)
   }
 
   /**
    * Do not override this
    */
-  public async initAndWatch() {
-    // console.log(`initAndWatch()  ${CLASS.getNameFromObject(this)}`)
+  public async initAndWatch(taskName?: string, afterInitCallBack?: () => void) {
+    taskName = this.fixTaskName(taskName)
+    await this.init(taskName, afterInitCallBack);
+    if (_.isFunction(this.preAsyncAction)) {
+      await this.compilationWrapper(this.preAsyncAction, `pre-async action for ${taskName}`);
+    }
     await CompilerManager.Instance.asyncInit(this)
   }
+  //#endregion
 
+  //#region actions
   public syncAction(absolteFilesPathes?: string[]): Promise<RES_SYNC> {
     return void 0;
   }
+  public async preAsyncAction() { }
 
-  public async preAsyncAction(asyncEvents: ChangeOfFile) {
 
-  }
-
-  public asyncAction(asyncEvents: ChangeOfFile): Promise<RES_ASYNC> {
+  public asyncAction(asyncEvents: ChangeOfFile, additionalData?: ADDITIONAL_DATA): Promise<RES_ASYNC> {
     return void 0;
   }
+  //#endregion
 
-  get fileChangesQueue(): ChangeOfFile[] {
-    return [];
-  }
 }

@@ -14,33 +14,6 @@ import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 import { LibTypeArr } from './models/lib-type';
-import { CompilerManager } from './project/abstract/incremental-compiler';
-import { IClientCompiler1 } from './scripts/INCREMENTAL-CHANGE-MANAGER';
-import { IClientCompiler2 } from './scripts/INCREMENTAL-CHANGE-MANAGER';
-import { CLASS } from 'typescript-class-helpers';
-
-/**
- * 1. Only one task at the time
- * 2. Only files changes not directories
- */
-CompilerManager.Instance.init(async (asyncEvents) => {
-  const { clientsForChange, clientBy, clients } = asyncEvents;
-  const customClientActions = {
-    ClientCompiler1: CLASS.getSingleton<IClientCompiler1>(CLASS.getBy('ClientCompiler1')),
-    ClientCompiler2: CLASS.getSingleton<IClientCompiler2>(CLASS.getBy('ClientCompiler2'))
-  };
-  // console.log('customClientActions', customClientActions)
-  // const c = clients<typeof customClientActions>(customClientActions);
-
-
-  // if ((await c.ClientCompiler1.asyncAction(asyncEvents)).dupa) {
-  //   queue.push(asyncEvents.clone({
-  //     onlyForClient: [c.ClientCompiler2]
-  //   }));
-  // }
-
-  return asyncEvents;
-});
 
 
 function removeArg(arg: string, argsv: string[]) {

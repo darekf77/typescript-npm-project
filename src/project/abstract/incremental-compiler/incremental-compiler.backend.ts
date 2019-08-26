@@ -22,7 +22,14 @@ export class CompilerManager {
   }
   //#endregion
 
+
+  private watcher: chokidar.FSWatcher;
+  private lastAsyncFiles = [];
+  private currentObservedFolder = [];
   private clients: BaseClientCompiler[] = [];
+  private asyncEventScenario: (event: ChangeOfFile) => Promise<ChangeOfFile>;
+  private inited = false;
+
   public addClient(client: BaseClientCompiler) {
     const existed = this.clients.find(c => CLASS.getNameFromObject(c) === CLASS.getNameFromObject(client));
     if (existed) {
@@ -31,14 +38,67 @@ export class CompilerManager {
     this.clients.push(client);
   }
 
-  private asyncEventScenario: (event: ChangeOfFile) => Promise<ChangeOfFile>;
-
   public async init(
-    onAsyncFileChange?: (event: ChangeOfFile) => Promise<ChangeOfFile>) {
+    onAsyncFileChange?: (event: ChangeOfFile) => Promise<any>) {
     this.asyncEventScenario = onAsyncFileChange;
+    this.inited = true;
   }
 
   public changeExecuted(cange: ChangeOfFile, target: Function) {
+
+  }
+
+
+  public async syncInit(client: BaseClientCompiler) {
+    log(`syncInit of ${CLASS.getNameFromObject(client)}`);
+    await client.syncAction(this.syncActionResolvedFiles(client));
+  }
+
+  public async asyncInit(client: BaseClientCompiler) {
+    log(`asyncInit of ${CLASS.getNameFromObject(client)}`);
+    if (this.currentObservedFolder.length === 0 && this.allFoldersToWatch.length > 0) {
+      this.watcher = chokidar.watch(this.allFoldersToWatch, {
+        ignoreInitial: true,
+        followSymlinks: true,
+        ignorePermissionErrors: true,
+      }).on('all', async (event, f) => {
+        if (event !== 'addDir') {
+          if (this.lastAsyncFiles.includes(f)) {
+            return;
+          } else {
+            this.lastAsyncFiles.push(f);
+          }
+          // log(`event ${event}, path: ${f}`);
+          const toNotify = this.clients
+            .filter(c => f.startsWith(c.folderPath));
+
+          const change = new ChangeOfFile(toNotify, f);
+          if (this.asyncEventScenario) {
+            await this.asyncEventScenario(change);
+          }
+          for (let index = 0; index < toNotify.length; index++) {
+            const clientOfAsyncAction = toNotify[index];
+            if (!change.executedFor.includes(clientOfAsyncAction)) {
+              await clientOfAsyncAction.asyncAction(change);
+            }
+          }
+          this.lastAsyncFiles = this.lastAsyncFiles.filter(ef => ef !== f);
+        }
+      });
+    } else if (_.isString(client.folderPath) && !this.currentObservedFolder.includes(client.folderPath)) {
+      this.watcher.add(client.folderPath);
+    }
+  }
+
+  private preventNotInited() {
+    if (!this.inited) {
+      error(`Please init Compiler Manager:
+      CompilerManager.Instance.init( ... async scenario ...  );
+      `, false, true)
+    }
+  }
+
+  private constructor() {
 
   }
 
@@ -51,9 +111,9 @@ export class CompilerManager {
     });
     return folders;
   }
-  private currentObservedFolder = [];
 
-  syncActionResolvedFiles(client: BaseClientCompiler) {
+
+  private syncActionResolvedFiles(client: BaseClientCompiler) {
     if (client.folderPath) {
       return glob.sync(`${client.folderPath}/**/*.*`, {
         symlinks: false,
@@ -65,57 +125,6 @@ export class CompilerManager {
       })
     }
     return [];
-  }
-
-  public async syncInit(client: BaseClientCompiler) {
-    log(`syncInit of ${CLASS.getNameFromObject(client)}`);
-    await client.syncAction(this.syncActionResolvedFiles(client));
-  }
-
-  private watcher: chokidar.FSWatcher;
-  private lastAsyncFiles = [];
-  public async asyncInit(client: BaseClientCompiler) {
-    log(`asyncInit of ${CLASS.getNameFromObject(client)}`);
-    await this.syncInit(client);
-
-    if (this.currentObservedFolder.length === 0 && this.allFoldersToWatch.length > 0) {
-      this.watcher = chokidar.watch(this.allFoldersToWatch, {
-        ignoreInitial: true,
-        followSymlinks: true,
-        ignorePermissionErrors: true,
-      }).on('all', async (event, f) => {
-        if (event !== 'addDir') {
-
-          if (this.lastAsyncFiles.includes(f)) {
-            return;
-          } else {
-            this.lastAsyncFiles.push(f);
-          }
-
-          log(`event ${event}, path: ${f}`);
-          const toNotify = this.clients
-            .filter(c => f.startsWith(c.folderPath));
-
-          const change = new ChangeOfFile();
-          change.clientsForChange = toNotify;
-          change.fileAbsolutePath = f;
-          if (this.asyncEventScenario) {
-            await this.asyncEventScenario(change);
-          }
-          for (let index = 0; index < toNotify.length; index++) {
-            const c = toNotify[index];
-            await c.asyncAction(change);
-          }
-          this.lastAsyncFiles = this.lastAsyncFiles.filter(ef => ef !== f);
-        }
-      });
-    } else if (_.isString(client.folderPath) && !this.currentObservedFolder.includes(client.folderPath)) {
-      this.watcher.add(client.folderPath);
-    }
-  }
-
-  private constructor() {
-
   }
 
 }
