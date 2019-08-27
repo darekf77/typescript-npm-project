@@ -2,6 +2,8 @@
 import { CLASS } from 'typescript-class-helpers';
 import * as _ from 'lodash';
 import { ChangeOfFile } from './change-of-file.backend';
+import { error } from '../../../helpers';
+import { CompilerManager } from './incremental-compiler.backend';
 
 export function AsyncAction(options?: any[]) {
   return (
@@ -39,9 +41,15 @@ export function AsyncAction(options?: any[]) {
 export interface IncCompilerClassOptions {
   className: string;
 }
+
+const instancesNames = [];
 export function IncCompilerClass(options: IncCompilerClassOptions) {
   return (target) => {
     const { className } = options;
-    CLASS.NAME(className)(target);
+    if (instancesNames.includes(className)) {
+      error(`Compiler class "${className}" already has instance.`, false, true);
+    }
+    instancesNames.push(className);
+    CLASS.NAME(className, { singleton: 'first-instance' })(target);
   };
 }

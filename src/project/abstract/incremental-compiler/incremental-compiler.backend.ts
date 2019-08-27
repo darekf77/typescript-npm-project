@@ -56,7 +56,7 @@ export class CompilerManager {
 
   public async asyncInit(client: BaseClientCompiler) {
     log(`asyncInit of ${CLASS.getNameFromObject(client)}`);
-    if (this.currentObservedFolder.length === 0 && this.allFoldersToWatch.length > 0) {
+    if (!this.watcher) {
       this.watcher = chokidar.watch(this.allFoldersToWatch, {
         ignoreInitial: true,
         followSymlinks: true,

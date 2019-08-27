@@ -36,11 +36,10 @@ export namespace IncCompiler {
     (event: change.ChangeOfFile) => Promise<any>) => {
     incCompiler.CompilerManager.Instance.init(onAsyncChangeOfFile);
   };
-  export const Add = (c: incBase.BaseClientCompiler) => {
-    incCompiler.CompilerManager.Instance.addClient(c);
-  };
   export import Base = incBase.BaseClientCompiler;
   export import Class = deco.IncCompilerClass;
-  export import AsyncAction = deco.AsyncAction;
+  export namespace methods {
+    export import AsyncAction = deco.AsyncAction;
+  }
   export import Change = change.ChangeOfFile;
 }

@@ -28,6 +28,8 @@ export class ChangeOfFile {
   }
 
   public clients<C>(clients): { [name in keyof C]: BaseClientCompiler } {
+    console.log(clients)
+    process.exit(0)
     Object.keys(clients).forEach(key => {
       clients[key] = this.clientBy<C>(clients[key]);
     });

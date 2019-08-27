@@ -79,7 +79,8 @@ export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA
   /**
    * Do not override this
    */
-  public async init(taskName?: string, afterInitCallBack?: () => void) {
+  public async start(taskName?: string, afterInitCallBack?: () => void) {
+    CompilerManager.Instance.addClient(this);
     taskName = this.fixTaskName(taskName)
     await CompilerManager.Instance.syncInit(this)
   }
@@ -87,9 +88,9 @@ export class BaseClientCompiler<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA
   /**
    * Do not override this
    */
-  public async initAndWatch(taskName?: string, afterInitCallBack?: () => void) {
+  public async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
     taskName = this.fixTaskName(taskName)
-    await this.init(taskName, afterInitCallBack);
+    await this.start(taskName, afterInitCallBack);
     if (_.isFunction(this.preAsyncAction)) {
       await this.compilationWrapper(this.preAsyncAction, `pre-async action for ${taskName}`);
     }

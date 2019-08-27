@@ -7,12 +7,17 @@ import { log } from '../helpers/helpers-messages';
 
 IncCompiler.init(async (asyncEvents) => {
   const { clients } = asyncEvents;
+  const cs = CLASS.getBy('ClientCompiler1');
+  const ss = CLASS.getSingleton(cs);
+  console.log('singleont', CLASS.getBy('ClientCompiler1'))
+  console.log('ss', CLASS.getBy('ss'))
+  // @LAST singleont is not wokriing
+  process.exit(0  )
   const customClientActions = {
     ClientCompiler1: CLASS.getSingleton<IClientCompiler1>(CLASS.getBy('ClientCompiler1')),
     ClientCompiler2: CLASS.getSingleton<IClientCompiler2>(CLASS.getBy('ClientCompiler2'))
   };
   const c = clients<typeof customClientActions>(customClientActions);
-  // @LAST make it work
   c.ClientCompiler1.asyncAction(asyncEvents, 'This is amaizing');
   return asyncEvents;
 });
@@ -25,7 +30,7 @@ export class ClientCompiler1 extends IncCompiler.Base<{ dupa: boolean; }> {
     // console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
   }
 
-  @IncCompiler.AsyncAction()
+  @IncCompiler.methods.AsyncAction()
   asyncAction(change: IncCompiler.Change, data) {
     console.log(`Async action ${CLASS.getNameFromObject(this)}, data: ${data}`)
     return new Promise<any>((resolve) => {
@@ -47,7 +52,7 @@ export class ClientCompiler2 extends IncCompiler.Base {
     // console.log(`sync Files for ${CLASS.getNameFromObject(this)}`, files)
   }
 
-  @IncCompiler.AsyncAction()
+  @IncCompiler.methods.AsyncAction()
   asyncAction(change: IncCompiler.Change, data) {
     console.log(`Async action ${CLASS.getNameFromObject(this)}, data: ${data}`)
     return new Promise<any>((resolve) => {
@@ -71,10 +76,8 @@ export default {
     const c2 = new ClientCompiler2({
       folderPath: path.join(process.cwd(), 'tmp-test1')
     });
-    IncCompiler.Add(c1);
-    IncCompiler.Add(c2);
-    c1.initAndWatch();
-    c2.initAndWatch();
+    c1.startAndWatch();
+    c2.startAndWatch();
   }
 
 }
