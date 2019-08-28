@@ -113,7 +113,7 @@ export function patchingForAsync(absoluteFilePath: string,
 }
 
 export async function compilationWrapperTnp(fn: () => void, taskName: string = 'Task',
-  executionType: 'Compilation' | 'Code execution' = 'Compilation') {
+  executionType: 'Compilation of' | 'Code execution of' | 'Event:' = 'Compilation of') {
   function currentDate() {
     return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
   }
@@ -123,12 +123,12 @@ export async function compilationWrapperTnp(fn: () => void, taskName: string = '
   }
 
   try {
-    log(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" starte...`)
+    log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Started..`)
     await runSyncOrAsync(fn)
-    log(`${currentDate()} ${executionType} of "${chalk.bold(taskName)}" finish OK...`)
+    log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Done\u2713`)
   } catch (error) {
     log(chalk.red(error));
-    log(`${currentDate()} ${executionType} of ${taskName} ERROR`);
+    log(`${currentDate()} ${executionType} ${taskName} ERROR`);
     process.exit(1);
   }
 

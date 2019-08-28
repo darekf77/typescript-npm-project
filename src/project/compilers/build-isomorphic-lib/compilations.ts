@@ -11,7 +11,7 @@ import { BuildOptions } from '../../features/build-process';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
-  CompilationWrapper = compilationWrapperTnp;
+  CompilationWrapper = compilationWrapperTnp as any;
   compile(watch = false) {
 
     // QUICK_FIX for backend in tnp projects
@@ -43,7 +43,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     return `Browser Extended compilation`
   }
 
-  CompilationWrapper = compilationWrapperTnp;
+  CompilationWrapper = compilationWrapperTnp as any;
 
   constructor(
     private compilationProject: Project,

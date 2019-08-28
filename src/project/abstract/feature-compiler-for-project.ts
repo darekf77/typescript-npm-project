@@ -6,7 +6,7 @@ import { compilationWrapperTnp } from '../../helpers';
 
 export abstract class FeatureCompilerForProject extends IncrementalCompilation {
 
-  CompilationWrapper = compilationWrapperTnp;
+  CompilationWrapper = compilationWrapperTnp as any;
 
   constructor(globalPatter: string, location: string, cwd: string, protected project: Project) {
     super(globalPatter, location, cwd);

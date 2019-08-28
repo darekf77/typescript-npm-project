@@ -29,7 +29,8 @@
           "rxjs",
           "@ngtools/webpack",
           "typeorm",
-          "portfinder"
+          "portfinder",
+          "incremental-compiler"
         ],
         "always": [
           "@types/node",
@@ -575,7 +576,8 @@
     "ng2-rest",
     "timespan",
     "typeorm",
-    "typescript-class-helpers"
+    "typescript-class-helpers",
+    "incremental-compiler"
   ],
   "private": false
 }
