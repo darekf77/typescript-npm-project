@@ -52,13 +52,6 @@ export abstract class RecreatableProject {
   //#endregion
 
   //#region @backend
-  public projectSpecyficFiles(this: Project): string[] {
-    // should be abstract
-    return []
-  }
-  //#endregion
-
-  //#region @backend
   public projectSpecyficIgnoredFiles(this: Project) {
     return [];
   }

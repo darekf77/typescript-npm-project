@@ -174,9 +174,13 @@ inside generated projects...
       PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
     }
     await this.project.build(buildOptions);
-    Helpers.log(`End of Building ${this.project.genericName}`);
+    Helpers.log(`End of Building ${this.project.genericName}`
+      + (buildOptions.watch ? 'waching files..' : ''));
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `End of building ${this.project.genericName}` })
+      PROGRESS_DATA.log({
+        msg: `End of building ${this.project.genericName}`
+          + (buildOptions.watch ? 'waching files..' : '')
+      })
     }
     if (exit && !buildOptions.watch) {
       Helpers.log('Build process exit')

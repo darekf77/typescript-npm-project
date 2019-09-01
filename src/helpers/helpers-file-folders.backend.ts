@@ -267,7 +267,7 @@ export class HelpersFileFolders {
       const destinationContent = fse.readFileSync(destinationPath, { encoding: 'utf8' }).toString();
       const sourceContent = fse.readFileSync(sourcePath, { encoding: 'utf8' }).toString();
       if (destinationContent === sourceContent) {
-        Helpers.warn(`Destination has the same content as source: ${sourcePath}`);
+        Helpers.warn(`Destination has the same content as source: ${path.basename(sourcePath)}`);
         return false;
       }
     }
