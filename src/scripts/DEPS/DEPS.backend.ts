@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
 import * as path from 'path';
+import * as fse from 'fs-extra';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from '../../helpers';
+import { config } from '../../config';
 import { TnpDB } from '../../tnp-db/wrapper-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 
@@ -68,8 +70,23 @@ function DEPS_HIDE(args: string) {
   process.exit(0)
 }
 
+function $INSTALL_IN_TNP() {
+  const inTnp = path.join(Project.Tnp.location, config.folder.node_modules, Project.Current.name);
+  const inCurrent = path.join(Project.Current.location, config.folder.dist);
+  if (!fse.existsSync(inCurrent)) {
+    Helpers.error(`Please build dist version of project first with tsc: tsc`, false, true);
+  }
+  Helpers.tryRemoveDir(inTnp);
+  Helpers.tryCopyFrom(inCurrent, inTnp);
+  Helpers.info(`Current project "${Project.Current.genericName}" installed in node_moduels of tnp`);
+  process.exit(0)
+}
 
 export default {
+  $INSTALL_IN_TNP,
+  $I_IN_TNP() {
+    $INSTALL_IN_TNP()
+  },
   $DEPS_SET_CATEGORY,
   $DEPS_SET_CAT(args) {
     $DEPS_SET_CATEGORY(args);

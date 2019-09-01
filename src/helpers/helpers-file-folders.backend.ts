@@ -90,7 +90,7 @@ export class HelpersFileFolders {
     } catch (e) {
       console.log(e)
       sleep(1);
-      this.tryCopyFrom(source, destination, options)
+      Helpers.tryCopyFrom(source, destination, options)
     }
   }
 
@@ -104,13 +104,12 @@ export class HelpersFileFolders {
     } catch (e) {
       Helpers.log(`Trying to remove directory: ${dirpath}`)
       sleep(1);
-      this.tryRemoveDir(dirpath, contentOnly);
+      Helpers.tryRemoveDir(dirpath, contentOnly);
     }
   }
 
 
   findChildren<T>(location, createFn: (childLocation: string) => T): T[] {
-    // console.log('from ' + this.location)
 
     const notAllowed: RegExp[] = [
       '\.vscode', 'node\_modules',
@@ -144,7 +143,7 @@ export class HelpersFileFolders {
       const fullPath = path.join(dir, f);
       // console.log(`is direcotry ${fs.lstatSync(fullPath).isDirectory()} `, fullPath)
       if (fse.lstatSync(fullPath).isDirectory()) {
-        this.getRecrusiveFilesFrom(fullPath).forEach(aa => files.push(aa))
+        Helpers.getRecrusiveFilesFrom(fullPath).forEach(aa => files.push(aa))
       }
       return fullPath;
     })
@@ -194,7 +193,7 @@ export class HelpersFileFolders {
    * @param dir absoulute path to file
    */
   getMostRecentFileName(dir): string {
-    let files = this.getRecrusiveFilesFrom(dir);
+    let files = Helpers.getRecrusiveFilesFrom(dir);
 
     // use underscore for max()
     return underscore.max(files, (f) => {
@@ -209,8 +208,8 @@ export class HelpersFileFolders {
 
   getMostRecentFilesNames(dir): string[] {
 
-    const allFiles = this.getRecrusiveFilesFrom(dir);
-    const mrf = this.getMostRecentFileName(dir);
+    const allFiles = Helpers.getRecrusiveFilesFrom(dir);
+    const mrf = Helpers.getMostRecentFileName(dir);
     const mfrMtime = fse.lstatSync(mrf).mtimeMs;
 
     return allFiles.filter(f => {
@@ -250,12 +249,12 @@ export class HelpersFileFolders {
       return false;
     }
     if (fse.lstatSync(sourcePath).isDirectory()) {
-      Helpers.warn(`[copyFile]Trying to copy directory as file: ${sourcePath}`, false)
+      Helpers.warn(`[copyFile] Trying to copy directory as file: ${sourcePath}`, false)
       return false;
     }
 
     if (sourcePath === destinationPath) {
-      Helpers.warn(`Trying to copy same file ${sourcePath}`);
+      Helpers.warn(`[copyFile] Trying to copy same file ${sourcePath}`);
       return false;
     }
     const destDirPath = path.dirname(destinationPath);

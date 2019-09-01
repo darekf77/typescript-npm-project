@@ -13,7 +13,6 @@ import { ModType, SourceCodeType } from './source-modifier.models';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { AppSourceReplicator } from './app-source-replicator.backend';
-import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
 const debugFiles = [
@@ -30,14 +29,14 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   async init(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
     }
     await super.init(taskName, callback);
   }
 
   async initAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`);
     }
     await super.initAndWatch(taskName, callback);
   }
@@ -110,15 +109,12 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   //#region constructor
   sourceMod: SourceModForWorkspaceChilds;
+  public appSourceReplicator: AppSourceReplicator;
   constructor(public project: Project,
-    public appSourceReplicator: AppSourceReplicator = IncCompiler
-      .getInstance<AppSourceReplicator>('AppSourceReplicator')
   ) {
     super(getFolderPattern(project), '', project && project.location, project);
     this.sourceMod = new SourceModForWorkspaceChilds(project);
-    appSourceReplicator.set({
-      project
-    });
+    this.appSourceReplicator = new AppSourceReplicator(project);
   }
   //#endregion
 

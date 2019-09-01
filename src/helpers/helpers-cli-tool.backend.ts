@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-
+import { Helpers } from './index';
 export class HelpersCliTool {
 
   paramsFrom(command: string) {
@@ -11,13 +11,13 @@ export class HelpersCliTool {
     let restOfArgs = argv;
 
     isMatch = !!argv.find((vv, i) => {
-      const nameInKC = this.paramsFrom(name)
+      const nameInKC = Helpers.cliTool.paramsFrom(name)
         .replace(/\$/g, '')
         .replace(/\-/g, '')
         .replace(/\:/g, '')
         .replace(/\_/g, '')
         .toLowerCase()
-      const argInKC = this.paramsFrom(vv)
+      const argInKC = Helpers.cliTool.paramsFrom(vv)
         .replace(/\$/g, '')
         .replace(/\-/g, '')
         .replace(/\:/g, '')

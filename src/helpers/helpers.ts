@@ -15,15 +15,16 @@ import { HelpersTerminal } from './helpers-system-terminal.backend';
 import { HelpersFileFolders } from './helpers-file-folders.backend';
 import { Models } from '../models';
 //#endregion
+import { Helpers } from './index';
 
-export class Helpers {
+export class HelpersTnp {
   //#region singleton
-  private static _instance: Helpers;
+  private static _instance: HelpersTnp;
   public static get Instance() {
-    if (!this._instance) {
-      this._instance = new Helpers();
+    if (!HelpersTnp._instance) {
+      HelpersTnp._instance = new HelpersTnp();
     }
-    return this._instance;
+    return HelpersTnp._instance;
   }
   //#endregion
 
@@ -61,7 +62,7 @@ export class Helpers {
 
     var proto = Object.getPrototypeOf(obj);
     if (proto) {
-      return this.getMethodName(proto, method);
+      return Helpers.getMethodName(proto, method);
     }
     return null;
   }
@@ -78,7 +79,7 @@ export class Helpers {
 
 }
 
-export interface Helpers extends
+export interface HelpersTnp extends
   HelpersMessages,
   HelpersStringsRegexes,
   HelpersEnvironment,
@@ -88,7 +89,7 @@ export interface Helpers extends
 //#endregion
 { }
 
-Helpers.Instance.applyMixins(Helpers, [
+HelpersTnp.Instance.applyMixins(HelpersTnp, [
   HelpersMessages,
   HelpersStringsRegexes,
   HelpersEnvironment,

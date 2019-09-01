@@ -98,7 +98,7 @@ export class SpecWrap {
       }
       process.chdir(newCWD);
       if (_.isFunction(callback)) {
-        await this.runSyncOrAsync(callback)
+        await Helpers.runSyncOrAsync(callback)
       }
       process.chdir(oldCwd);
     }
@@ -119,7 +119,7 @@ export class SpecWrap {
     const oldCwd = process.cwd()
     process.chdir(location);
 
-    await this.runSyncOrAsync(() => {
+    await Helpers.runSyncOrAsync(() => {
       return test(location, this.testName, {
         packageJSON: this.packageJSON(location),
         cwdChange: this.cwdChange(location)

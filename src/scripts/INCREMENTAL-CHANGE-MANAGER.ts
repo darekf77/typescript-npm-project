@@ -15,14 +15,7 @@ IncCompiler.init(async (asyncEvents) => {
 
   // c.ClientCompiler1.asyncAction(asyncEvents, 'This is amaizing');
 
-}, {
-    info: Helpers.info,
-    error: Helpers.error,
-    warn: Helpers.warn,
-    log: Helpers.log,
-    runSyncOrAsync: Helpers.runSyncOrAsync,
-    compilationWrapper: Helpers.compilationWrapperTnp
-  });
+}, Helpers as any);
 
 
 @IncCompiler.Class({ className: 'ClientCompiler1' })

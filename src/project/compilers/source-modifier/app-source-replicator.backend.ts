@@ -6,24 +6,19 @@ import * as glob from 'glob';
 
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
-import { Project } from '../../abstract';
+import { Project, FeatureCompilerForProject } from '../../abstract';
 import { SourceModifier } from './source-modifier.backend';
-import { IncCompiler } from 'incremental-compiler';
 
-@IncCompiler.Class({ className: 'AppSourceReplicator' })
-export class AppSourceReplicator
-  extends IncCompiler.Base<{ modifiedFilePath: string }, { modifedSyncFilesAbsPthsArr: string[] }> {
 
-  public project: Project;
+export class AppSourceReplicator extends FeatureCompilerForProject {
 
-  set(options: IncCompiler.Models.BaseClientCompilerOptions & { project: Project }) {
-    const { project } = options;
-    this.project = project;
-    options.executeOutsideScenario = false;
-    options.folderPath = path.join(project.location, config.folder.src);
-    return super.set(options);
+  constructor(public project: Project) {
+    super(`src/**/*.*`, '', project && project.location, project);
   }
 
+  public async preAsyncAction() {
+
+  }
   public async syncAction(filesPathes: string[]) {
     Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
@@ -48,7 +43,7 @@ export class AppSourceReplicator
     return { modifedSyncFilesAbsPthsArr };
   }
 
-  public async asyncAction(event, filePath: string) {
+  public async asyncAction(filePath: string) {
 
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {

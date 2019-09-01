@@ -2,6 +2,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+export { ChildProcess } from 'child_process';
+import { ChildProcess } from 'child_process';
 
 import { Project } from './project';
 import { Helpers } from '../../../helpers';

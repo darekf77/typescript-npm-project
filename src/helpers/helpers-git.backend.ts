@@ -80,7 +80,7 @@ export class HelpersGit {
       Helpers.error(`Cannot update current branch in: ${directoryPath}`, askToRetry, true)
       if (askToRetry) {
         await Helpers.questionYesNo(`Do you wanna try again ?`, async () => {
-          await this.pullCurrentBranch(directoryPath, askToRetry)
+          await Helpers.git.pullCurrentBranch(directoryPath, askToRetry)
         }, () => {
           process.exit(0)
         })

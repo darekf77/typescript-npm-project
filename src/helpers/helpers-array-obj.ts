@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { Helpers } from './index';
 
 export class HelpersArrayObj {
 
@@ -13,7 +14,7 @@ export class HelpersArrayObj {
     }
     return arr;
   }
-   arrayMoveElementAfterB(arr: any[], a: any, b: any) {
+  arrayMoveElementAfterB(arr: any[], a: any, b: any) {
     let indexA = arr.indexOf(a);
     _.pullAt(arr, indexA);
     let indexB = arr.indexOf(b);
@@ -34,10 +35,10 @@ export class HelpersArrayObj {
 
   sortKeys(obj) {
     if (_.isArray(obj)) {
-      return obj.map(this.sortKeys);
+      return obj.map(Helpers.arrays.sortKeys);
     }
     if (_.isObject(obj)) {
-      return _.fromPairs(_.keys(obj).sort().map(key => [key, this.sortKeys(obj[key])]));
+      return _.fromPairs(_.keys(obj).sort().map(key => [key, Helpers.arrays.sortKeys(obj[key])]));
     }
     return obj;
   };

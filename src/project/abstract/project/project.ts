@@ -133,35 +133,35 @@ export class Project {
     // console.log(`TYpe "${type}" for ${location} `)
     let resultProject: Project;
     if (type === 'isomorphic-lib') {
-      const { ProjectIsomorphicLib } = require('../project-specyfic/project-isomorphic-lib');
+      const { ProjectIsomorphicLib } = require('../../project-specyfic/project-isomorphic-lib');
       resultProject = new ProjectIsomorphicLib(location);
     }
     if (type === 'angular-lib') {
-      const { ProjectAngularLib } = require('../project-specyfic/project-angular-lib')
+      const { ProjectAngularLib } = require('../../project-specyfic/project-angular-lib')
       resultProject = new ProjectAngularLib(location);
     }
     if (type === 'angular-client') {
-      const { ProjectAngularClient } = require('../project-specyfic/project-angular-client');
+      const { ProjectAngularClient } = require('../../project-specyfic/project-angular-client');
       resultProject = new ProjectAngularClient(location);
     }
     if (type === 'workspace') {
-      const { ProjectWorkspace } = require('../project-specyfic/project-workspace');
+      const { ProjectWorkspace } = require('../../project-specyfic/project-workspace');
       resultProject = new ProjectWorkspace(location);
     }
     if (type === 'docker') {
-      const { ProjectDocker } = require('../project-specyfic/project-docker');
+      const { ProjectDocker } = require('../../project-specyfic/project-docker');
       resultProject = new ProjectDocker(location);
     }
     if (type === 'ionic-client') {
-      const { ProjectIonicClient } = require('../project-specyfic/project-ionic-client');
+      const { ProjectIonicClient } = require('../../project-specyfic/project-ionic-client');
       resultProject = new ProjectIonicClient(location);
     }
     if (type === 'container') {
-      const { ProjectContainer } = require('../project-specyfic/project-container');
+      const { ProjectContainer } = require('../../project-specyfic/project-container');
       resultProject = new ProjectContainer(location);
     }
     if (type === 'unknow-npm-project') {
-      const { ProjectUnknowNpm } = require('../project-specyfic/project-unknow-npm');
+      const { ProjectUnknowNpm } = require('../../project-specyfic/project-unknow-npm');
       resultProject = new ProjectUnknowNpm(location);
     }
 

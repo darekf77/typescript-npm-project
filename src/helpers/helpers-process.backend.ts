@@ -34,29 +34,6 @@ export class HelpersProcess {
   async  questionYesNo(message: string,
     callbackTrue?: () => any, callbackFalse?: () => any) {
 
-    // const response: { value: boolean } = await inquirer
-    //   .prompt([
-    //     {
-    //       type: 'confirm',
-    //       name: 'value',
-    //       message,
-    //       // choices: this.parent.children
-    //       //   .filter(c => config.allowedTypes.app.includes(c.type))
-    //       //   .filter(c => c.name !== this.name)
-    //       //   .map(c => c.name),
-    //       // filter: function (val) {
-    //       //   return val.toLowerCase();
-    //       // }
-    //     }
-    //   ]) as any;
-
-    // if (response.value) {
-    //   callbackTrue()
-    // } else {
-    //   if (_.isFunction(callbackFalse)) {
-    //     callbackFalse()
-    //   }
-    // }
     let response = {
       value: true
     };
@@ -71,9 +48,9 @@ export class HelpersProcess {
       });
     }
     if (response.value) {
-      await this.runSyncOrAsync(callbackTrue);
+      await Helpers.runSyncOrAsync(callbackTrue);
     } else {
-      await this.runSyncOrAsync(callbackFalse);
+      await Helpers.runSyncOrAsync(callbackFalse);
     }
     return response.value;
   }
@@ -99,7 +76,7 @@ export class HelpersProcess {
 
     try {
       Helpers.log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Started..`)
-      await this.runSyncOrAsync(fn)
+      await Helpers.runSyncOrAsync(fn)
       Helpers.log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Done\u2713`)
     } catch (error) {
       Helpers.log(chalk.red(error));
@@ -114,7 +91,7 @@ export class HelpersProcess {
   }
 
   killProcess(byPid: number) {
-    this.run(`kill -9 ${byPid}`).sync()
+    Helpers.run(`kill -9 ${byPid}`).sync()
   }
 
   async  killProcessByPort(port: number) {
@@ -159,7 +136,7 @@ export class HelpersProcess {
 
   readonly processes: child.ChildProcess[] = [];
   cleanExit() {
-    this.processes.forEach(p => {
+    Helpers.processes.forEach(p => {
       p.kill('SIGINT')
       p.kill('SIGTERM')
       Helpers.log(`Killing child process on ${p.pid}`)
@@ -169,8 +146,8 @@ export class HelpersProcess {
   };
 
   constructor() {
-    process.on('SIGINT', this.cleanExit); // catch ctrl-c
-    process.on('SIGTERM', this.cleanExit); // catch kill
+    process.on('SIGINT', Helpers.cleanExit); // catch ctrl-c
+    process.on('SIGTERM', Helpers.cleanExit); // catch kill
   }
 
 
@@ -196,7 +173,7 @@ export class HelpersProcess {
 
   logProc(proc: child.ChildProcess, output = true, stdio,
     outputLineReplace: (outputLine: string) => string) {
-    this.processes.push(proc);
+    Helpers.processes.push(proc);
 
     proc.stdio = stdio;
 
@@ -204,19 +181,19 @@ export class HelpersProcess {
 
     if (output) {
       proc.stdout.on('data', (data) => {
-        process.stdout.write(this.modifyLineByLine(data, outputLineReplace))
+        process.stdout.write(Helpers.modifyLineByLine(data, outputLineReplace))
       })
 
       proc.stdout.on('error', (data) => {
-        console.log(this.modifyLineByLine(data, outputLineReplace));
+        console.log(Helpers.modifyLineByLine(data, outputLineReplace));
       })
 
       proc.stderr.on('data', (data) => {
-        process.stderr.write(this.modifyLineByLine(data, outputLineReplace))
+        process.stderr.write(Helpers.modifyLineByLine(data, outputLineReplace))
       })
 
       proc.stderr.on('error', (data) => {
-        console.log(this.modifyLineByLine(data, outputLineReplace));
+        console.log(Helpers.modifyLineByLine(data, outputLineReplace));
       })
 
     }
@@ -256,18 +233,18 @@ export class HelpersProcess {
 
   runSyncIn(command: string, options?: Models.dev.RunOptions) {
     const { cwd, biggerBuffer } = options;
-    const maxBuffer = biggerBuffer ? this.bigMaxBuffer : undefined;
-    let stdio = this.getStdio(options)
-    this.checkProcess(cwd, command);
+    const maxBuffer = biggerBuffer ? Helpers.bigMaxBuffer : undefined;
+    let stdio = Helpers.getStdio(options)
+    Helpers.checkProcess(cwd, command);
     return child.execSync(command, { stdio, cwd, maxBuffer })
   }
 
   runAsyncIn(command: string, options?: Models.dev.RunOptions) {
     const { output, cwd, biggerBuffer, outputLineReplace } = options;
-    const maxBuffer = biggerBuffer ? this.bigMaxBuffer : undefined;
-    let stdio = this.getStdio(options)
-    this.checkProcess(cwd, command);
-    return this.logProc(child.exec(command, { cwd, maxBuffer }), output, stdio, outputLineReplace);
+    const maxBuffer = biggerBuffer ? Helpers.bigMaxBuffer : undefined;
+    let stdio = Helpers.getStdio(options)
+    Helpers.checkProcess(cwd, command);
+    return Helpers.logProc(child.exec(command, { cwd, maxBuffer }), output, stdio, outputLineReplace);
   }
 
   prepareWatchCommand(cmd) {
@@ -275,7 +252,7 @@ export class HelpersProcess {
   }
 
   get watcher() {
-    const that = this;
+    const that = Helpers;
     return {
       run(command: string, folderPath: string = 'src', options: Models.system.WatchOptions) {
         const { cwd = process.cwd(), wait } = options;
@@ -312,18 +289,18 @@ export class HelpersProcess {
       sync(): Buffer {
         if (_.isNumber(options.tryAgainWhenFailAfter) && options.tryAgainWhenFailAfter > 0) {
           try {
-            const proc = this.runSyncIn(command, options);
+            const proc = Helpers.runSyncIn(command, options);
             return proc;
           } catch (error) {
             console.log(`Trying again command: ${command}`)
             sleep.msleep(options.tryAgainWhenFailAfter)
-            return this.run(command, options).sync()
+            return Helpers.run(command, options).sync()
           }
         }
-        return this.runSyncIn(command, options);
+        return Helpers.runSyncIn(command, options);
       },
       async() {
-        return this.runAsyncIn(command, options);
+        return Helpers.runAsyncIn(command, options);
       }
     }
   }
