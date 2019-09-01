@@ -6,9 +6,9 @@ import chalk from 'chalk';
 
 import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
 import { IncrementalBuildProcess, OutFolder } from 'morphi/build';
-import config from '../../../config';
+import { config } from '../../../config';
 import { Project } from '../../../project';
-import { warn, error } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { BuildOptions } from '../../features/build-process';
 
 function useDefaultBrowserCompilation(project: Project) {
@@ -103,7 +103,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
             return true;
           }
           const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
-          warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
+          Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
           fse.writeFileSync(absolutePathToFile, '')
           return false;
         })
@@ -120,7 +120,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           const proj = this.project.parent.child(moduleName);
           const envConfig = proj.env.config;
           if (!envConfig) {
-            error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
+            Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
           }
 
           this.browserCompilations.push(

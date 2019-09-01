@@ -4,8 +4,8 @@ import * as path from 'path';
 import { FeatureForProject } from '../abstract';
 //#endregion
 
-import config from '../../config';
-import { error } from '../../helpers';
+import { config } from '../../config';
+import { Helpers } from '../../helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 
@@ -40,7 +40,7 @@ export class TestRunner
         break;
     }
     if (!command) {
-      error(`Tests not impolemented for ${this.project.type}`, false, true)
+      Helpers.error(`Tests not impolemented for ${this.project.type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }
@@ -58,7 +58,7 @@ export class TestRunner
         break;
     }
     if (!command) {
-      error(`Tests not impolemented for ${this.project.type}`, false, true)
+      Helpers.error(`Tests not impolemented for ${this.project.type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }

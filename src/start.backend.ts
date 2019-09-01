@@ -3,17 +3,16 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import glob = require('glob')
 import * as path from 'path';
-import { run as runCommand, match, error } from "./helpers";
-import { isString } from 'util';
+import { Helpers } from "./helpers";
 import chalk from 'chalk';
 import { Project } from './project';
 import { Ora } from 'ora';
 
-import config from './config';
+import { config } from './config';
 import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
-import { LibTypeArr } from './models/lib-type';
+import { Models } from './models';
 
 
 function removeArg(arg: string, argsv: string[]) {
@@ -75,10 +74,12 @@ export function globalArgumentsParser(argsv: string[]) {
     !!findNearestProjectTypeWithGitRoot;
 
   if (_.isBoolean(findNearestProjectType)) {
-    error(`argument --findNearestProjectType needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
+    Helpers.error(`argument --findNearestProjectType needs to be library type:\n ${
+      Models.libs.LibTypeArr.join(', ')}`, false, true);
   }
   if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
-    error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
+    Helpers.error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${
+      Models.libs.LibTypeArr.join(', ')}`, false, true);
   }
 
   if (!!findNearestProjectWithGitRoot) {
@@ -96,7 +97,7 @@ export function globalArgumentsParser(argsv: string[]) {
         findGitRoot: findProjectWithGitRoot,
       });
       if (!nearest) {
-        error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
+        Helpers.error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
       }
     }
     if (nearest) {
@@ -108,7 +109,7 @@ export function globalArgumentsParser(argsv: string[]) {
     if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
       process.chdir(cwdFromArgs);
     } else {
-      error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
+      Helpers.error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
     }
 
   }
@@ -232,11 +233,11 @@ export async function start(argsv: string[], spinner?: Ora) {
           if (recognized) {
             return true;
           }
-          if (!isString(v)) {
+          if (!_.isString(v)) {
             const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
             functions.push(vFn)
             if (_.isFunction(vFn)) {
-              const check = match(k, argsv);
+              const check = Helpers.cliTool.match(k, argsv);
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner.stop()

@@ -3,7 +3,7 @@
 import * as _ from 'lodash';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
-import { Range } from '../helpers';
+import { Models } from '../models';
 import { PortInstance } from '../tnp-db/entites/port-instance';
 
 describe('Ports type spec', () => {
@@ -59,32 +59,32 @@ describe('Ports type spec', () => {
   it('it should compare correcly range types', async function () {
 
     (() => {
-      let t1 = new PortInstance(Range.from(3000).to(5000))
-      let t2 = new PortInstance(Range.from(4000).to(4500))
+      let t1 = new PortInstance(Models.other.Range.from(3000).to(5000))
+      let t2 = new PortInstance(Models.other.Range.from(4000).to(4500))
       expect(t1.includes(t2)).to.be.true;
     })();
 
     (() => {
-      let t1 = new PortInstance(Range.from(3000).to(5000))
-      let t2 = new PortInstance(Range.from(3000).to(5000))
+      let t1 = new PortInstance(Models.other.Range.from(3000).to(5000))
+      let t2 = new PortInstance(Models.other.Range.from(3000).to(5000))
       expect(t1.includes(t2)).to.be.true;
     })();
 
     (() => {
-      let t1 = new PortInstance(Range.from(3000).to(5000))
-      let t2 = new PortInstance(Range.from(2000).to(4500))
+      let t1 = new PortInstance(Models.other.Range.from(3000).to(5000))
+      let t2 = new PortInstance(Models.other.Range.from(2000).to(4500))
       expect(t1.includes(t2)).to.be.false;
     })();
 
     (() => {
-      let t1 = new PortInstance(Range.from(3000).to(5000))
-      let t2 = new PortInstance(Range.from(4000).to(5500))
+      let t1 = new PortInstance(Models.other.Range.from(3000).to(5000))
+      let t2 = new PortInstance(Models.other.Range.from(4000).to(5500))
       expect(t1.includes(t2)).to.be.false;
     })();
 
     (() => {
-      let t1 = new PortInstance(Range.from(3000).to(5000))
-      let t2 = new PortInstance(Range.from(2000).to(5500))
+      let t1 = new PortInstance(Models.other.Range.from(3000).to(5000))
+      let t2 = new PortInstance(Models.other.Range.from(2000).to(5500))
       expect(t1.includes(t2)).to.be.false;
     })();
 
@@ -97,12 +97,12 @@ describe('Ports type spec', () => {
     it('it should compare correcly number and range ', function () {
       (() => {
         let t1 = new PortInstance(3000)
-        let t2 = new PortInstance(Range.from(2000).to(5500))
+        let t2 = new PortInstance(Models.other.Range.from(2000).to(5500))
         expect(t1.includes(t2)).to.be.true;
       })();
 
       (() => {
-        let t1 = new PortInstance(Range.from(2000).to(5500))
+        let t1 = new PortInstance(Models.other.Range.from(2000).to(5500))
         let t2 = new PortInstance(3000)
         expect(t1.includes(t2)).to.be.true;
       })();
@@ -112,36 +112,36 @@ describe('Ports type spec', () => {
 
       (() => {
         let t1 = new PortInstance([3000])
-        let t2 = new PortInstance(Range.from(2000).to(5500))
+        let t2 = new PortInstance(Models.other.Range.from(2000).to(5500))
         expect(t1.includes(t2)).to.be.true;
       })();
 
       (() => {
-        let t1 = new PortInstance(Range.from(2000).to(5500))
+        let t1 = new PortInstance(Models.other.Range.from(2000).to(5500))
         let t2 = new PortInstance([3000])
         expect(t1.includes(t2)).to.be.true;
       })();
 
       (() => {
         let t1 = new PortInstance([3000])
-        let t2 = new PortInstance(Range.from(4000).to(5500))
+        let t2 = new PortInstance(Models.other.Range.from(4000).to(5500))
         expect(t1.includes(t2)).to.be.false;
       })();
 
       (() => {
-        let t1 = new PortInstance(Range.from(4000).to(5500))
+        let t1 = new PortInstance(Models.other.Range.from(4000).to(5500))
         let t2 = new PortInstance([3000])
         expect(t1.includes(t2)).to.be.false;
       })();
 
       (() => {
         let t1 = new PortInstance([3000])
-        let t2 = new PortInstance(Range.from(2000).to(2500))
+        let t2 = new PortInstance(Models.other.Range.from(2000).to(2500))
         expect(t1.includes(t2)).to.be.false;
       })();
 
       (() => {
-        let t1 = new PortInstance(Range.from(2000).to(2500))
+        let t1 = new PortInstance(Models.other.Range.from(2000).to(2500))
         let t2 = new PortInstance([3000])
         expect(t1.includes(t2)).to.be.false;
       })();

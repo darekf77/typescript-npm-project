@@ -4,12 +4,13 @@ import * as fse from 'fs-extra';
 import * as sass from 'node-sass';
 
 import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi/build';
-import { EnvConfig, ReplaceOptionsExtended, CutableFileExt } from '../../../models';
-import { error, escapeStringForRegEx } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
 import { Project } from '../../abstract';
+
 import { IncrementalBuildProcessExtended } from './incremental-build-process';
-import config from '../../../config';
-import { BuildOptions } from '../..//features/build-process';
+import { BuildOptions } from '../../features/build-process';
 
 
 
@@ -18,7 +19,7 @@ export class ExtendedCodeCut extends CodeCut {
   browserCodeCut: any;
 
   constructor(
-    protected cwd: string, filesPathes: string[], options: ReplaceOptionsExtended,
+    protected cwd: string, filesPathes: string[], options: Models.dev.ReplaceOptionsExtended,
     /**
      * it may be not available for global, for all compilatoin
      */
@@ -51,7 +52,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   // private debugging = false;
 
   get allowedToReplace() {
-    return ['ts', 'html', 'css', 'sass', 'scss'] as CutableFileExt[];
+    return ['ts', 'html', 'css', 'sass', 'scss'] as Models.other.CutableFileExt[];
   }
 
   constructor(
@@ -136,13 +137,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   protected handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
-      error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
+      Helpers.error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
       replacement = replacement.replace(/\`/g, '\\`');
     }
     return replacement;
   }
 
-  private handleOutput(replacement: string, ext: CutableFileExt): string {
+  private handleOutput(replacement: string, ext: Models.other.CutableFileExt): string {
     replacement = this.handleTickInCode(replacement);
 
     return replacement;
@@ -163,7 +164,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       }
     }
     const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      escapeStringForRegEx(path.basename(htmlTemplatePath))
+      Helpers.escapeStringForRegEx(path.basename(htmlTemplatePath))
       }\\s*(\\'|\\")`;
     content = content.replace(
       new RegExp(regex,
@@ -189,7 +190,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       }
     }
     const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      escapeStringForRegEx(path.basename(cssFilePath))
+      Helpers.escapeStringForRegEx(path.basename(cssFilePath))
       }\s*(\\'|\\")\\s*\\]`;
     content = content.replace(
       new RegExp(regex,
@@ -224,7 +225,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         } catch (e) {
           // this.debugging && console.log('erorororor', e);
           // error(error, true, true);
-          error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
+          Helpers.error(`[browser-code-dut] There are errors in your sass file: ${absoluteFilePath} `, true, true);
         }
       }
 
@@ -236,7 +237,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
 
     const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      escapeStringForRegEx(path.basename(scssFilePath))
+      Helpers.escapeStringForRegEx(path.basename(scssFilePath))
       }\s*(\\'|\\")\\s*\\]`;
     // console.log(`regex: ${regex}`)
     content = content.replace(
@@ -249,8 +250,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   private findReplacements(
     stringContent: string,
     pattern: string,
-    codeCuttFn: (jsExpressionToEval: string, env: EnvConfig, absoluteFilePath: string) => boolean,
-    ext: CutableFileExt = 'ts'
+    codeCuttFn: (jsExpressionToEval: string,
+      env: Models.env.EnvConfig,
+      absoluteFilePath: string) => boolean,
+    ext: Models.other.CutableFileExt = 'ts'
   ) {
     // this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
     // const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
@@ -275,7 +278,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
           if (codeCuttFn(value.replace(/\-\-\>$/, ''), this.project && this.project.env.config, this.absoluteFilePath)) {
             // this.isDebuggingFile && console.log('[findReplacements] CUT CODE ! ')
 
-            const regexRep = new RegExp(`${pattern}\\s+${escapeStringForRegEx(value)}`, 'g');
+            const regexRep = new RegExp(`${pattern}\\s+${Helpers.escapeStringForRegEx(value)}`, 'g');
             // this.isDebuggingFile && console.log(`[findReplacements] value: "${regexRep.source}"`)
 
             // this.isDebuggingFile && console.log(regexRep.source)
@@ -367,14 +370,15 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   }
 
-  replaceRegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
+  replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
     options = _.clone(options);
     // console.log('options.replacements', options.replacements)
-    const ext = path.extname(this.absoluteFilePath).replace('.', '') as CutableFileExt;
+    const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-      this.rawContent = this.project.sourceModifier.sourceMod.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
+      this.rawContent = this.project.sourceModifier.sourceMod
+        .replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
       this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
     }
     this.rawContent = this.afterRegionsReplacement(this.rawContent);
@@ -382,7 +386,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
 
   protected REGEX_REGION_HTML(word) {
-    const regex = new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\<\\!\\-\\-\\s*#?endregion\\s\\-\\-\\> ?[\\t ]*\\n?", "g");
+    const regex = new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" +
+      word + " ?[\\s\\S]*?\\<\\!\\-\\-\\s*#?endregion\\s\\-\\-\\> ?[\\t ]*\\n?", "g");
     // this.isDebuggingFile && console.log(regex.source)
     return regex;
   }
@@ -395,7 +400,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   }
 
-  replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '', ext: CutableFileExt = 'ts') {
+  replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '',
+    ext: Models.other.CutableFileExt = 'ts') {
 
     if (replacementPatterns.length === 0) {
       return stringContent;

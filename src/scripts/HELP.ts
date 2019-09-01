@@ -3,11 +3,9 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import glob = require('glob')
 import * as path from 'path';
-import { paramsFrom, match } from '../helpers';
+import { Helpers } from '../helpers';
 import chalk from 'chalk';
-import { clearConsole } from "../helpers";
-import { error } from '../helpers';
-import config from '../config';
+import { config } from '../config';
 
 const generalHelp = `
 
@@ -33,10 +31,11 @@ export function getHelpFor(command: string, warnings = false) {
           const tsFile = file.replace(path.basename(file), path.basename(file).replace('.js', '.ts'));
           console.log(`WARN: No documentation for: ${v.name}  in ${tsFile.replace('dist', 'src')} `)
         }
-        if (paramsFrom(k) === paramsFrom(command)) {
+        if (Helpers.cliTool.paramsFrom(k) === Helpers.cliTool.paramsFrom(command)) {
           commandNameFit = true;
         }
-        const res = Array.isArray(v) && v.length == 2 && _.isString(v[1]) && command !== undefined && paramsFrom(k) === paramsFrom(command);
+        const res = Array.isArray(v) && v.length == 2 && _.isString(v[1]) && command !== undefined
+          && Helpers.cliTool.paramsFrom(k) === Helpers.cliTool.paramsFrom(command);
         if (res) {
           docs = v[1];
         }
@@ -67,11 +66,11 @@ function help(argsString: string) {
     const command = args[0];
     const docs = getHelpFor(command);
     if (docs) {
-      clearConsole()
+      Helpers.clearConsole()
       console.log(`\nHelp for command "${chalk.green(command)}":\n`)
       console.log(docs)
     } else {
-      error(`No documentation for ${chalk.bold(command)}`)
+      Helpers.error(`No documentation for ${chalk.bold(command)}`)
     }
   }
   process.exit(0);

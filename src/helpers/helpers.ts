@@ -1,215 +1,53 @@
+import * as _ from 'lodash';
+import { HelpersArrayObj } from './helpers-array-obj';
+import { HelpersMessages } from './helpers-messages';
+import { HelpersStringsRegexes } from './helpers-strings-regexes';
+import { HelpersEnvironment } from './helpers-environment';
 //#region @backend
-import chalk from 'chalk';
-import * as  underscore from 'underscore';
-import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as glob from 'glob';
-import * as rimraf from "rimraf";
-import { sleep } from 'sleep';
-import { error, warn, log } from "./helpers-messages";
+import { Helpers as MorpiHelpers } from 'morphi/helpers';
+import { HelpersGit } from './helpers-git.backend';
+import { HelpersCliTool } from './helpers-cli-tool.backend';
+import { HelpersMorphiFramework } from './helpers-morphi-framework.backend';
+import { HelpersProcess } from './helpers-process.backend';
+import { TsCodeModifer } from './ts-code-modifier';
+import { HelpersNpm } from './helpers-npm.backend';
+import { HelpersTerminal } from './helpers-system-terminal.backend';
+import { HelpersFileFolders } from './helpers-file-folders.backend';
+import { Models } from '../models';
 //#endregion
 
-import * as _ from 'lodash';
-import { config } from '../config';
-
-export const sortKeys = function (obj) {
-  if (_.isArray(obj)) {
-    return obj.map(sortKeys);
+export class Helpers {
+  //#region singleton
+  private static _instance: Helpers;
+  public static get Instance() {
+    if (!this._instance) {
+      this._instance = new Helpers();
+    }
+    return this._instance;
   }
-  if (_.isObject(obj)) {
-    return _.fromPairs(_.keys(obj).sort().map(key => [key, sortKeys(obj[key])]));
-  }
-  return obj;
-};
+  //#endregion
 
+  private constructor(
+    public tsCodeModifier = new TsCodeModifer(),
+    public arrays = new HelpersArrayObj(),
+    public git = new HelpersGit(),
+    public npm = new HelpersNpm(),
+    public morphi = new HelpersMorphiFramework(),
+    public terminal = new HelpersTerminal(),
+    public cliTool = new HelpersCliTool()
+  ) {
 
-//#region @backend
-export function crossPlatofrmPath(p: string) {
-  return p;
-}
-
-export function getEntites(cwd: string): string[] {
-  const entityRegEx = /^([A-Z]|\_|[0-9])+\.ts$/;
-  return glob
-    .sync(`${config.folder.apps}/**/*.ts`, {
-      cwd: cwd
-    }).filter(p => {
-
-      const isMatchRegex = entityRegEx.test(path.basename(p));
-      // if (!isMatchRegex) {
-      //   log(`Not match entity patern: ${p + path.basename(p)}`)
-      // }
-      return isMatchRegex &&
-        !p.endsWith('Controller.ts') &&
-        !p.endsWith('_REPOSITORY.ts') &&
-        !p.endsWith('.REPOSITORY.ts') &&
-        !p.endsWith('Repository.ts') &&
-        !p.endsWith('Service.ts') &&
-        !p.endsWith('.d.ts') &&
-        !p.endsWith('.spec.ts') &&
-        !p.endsWith('.component.ts') &&
-        !p.endsWith('.module.ts') &&
-        !p.endsWith('.service.ts') &&
-        !p.endsWith('.model.ts') &&
-        !(['index.ts', 'app.ts', 'controllers.ts', 'entities.ts'].includes(path.basename(p)));
-    })
-}
-
-
-export function getControllers(cwd: string): string[] {
-  return glob
-    .sync(`${config.folder.apps}/**/*Controller.ts`, {
-      cwd: cwd
-    })
-}
-
-
-
-export function paramsFrom(command: string) {
-  return _.kebabCase(command);
-}
-
-export function match(name: string, argv: string[]): { isMatch: boolean; restOfArgs: string[] } {
-  let isMatch = false;
-  let restOfArgs = argv;
-
-  isMatch = !!argv.find((vv, i) => {
-    const nameInKC = paramsFrom(name)
-      .replace(/\$/g, '')
-      .replace(/\-/g, '')
-      .replace(/\:/g, '')
-      .replace(/\_/g, '')
-      .toLowerCase()
-    const argInKC = paramsFrom(vv)
-      .replace(/\$/g, '')
-      .replace(/\-/g, '')
-      .replace(/\:/g, '')
-      .replace(/\_/g, '')
-      .toLowerCase()
-
-    const condition = (nameInKC === argInKC)
-    if (condition) {
-      restOfArgs = _.slice(argv, i + 1, argv.length);
-    }
-    return condition;
-  });
-  return { isMatch, restOfArgs };
-}
-
-export function fixWebpackEnv(env: Object) {
-  _.forIn(env, (v, k) => {
-    const value: string = v as any;
-    if (value === 'true') env[k] = true;
-    if (value === 'false') env[k] = false;
-  })
-}
-
-export function escapeStringForRegEx(s: string) {
-  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-
-export function copyFile(sourcePath: string, destinationPath: string,
-  transformTextFn?: (input: string) => string, debugMode = false) {
-
-  try {
-    if (fse.lstatSync(sourcePath).isDirectory()) {
-      warn(`Trying to copy directory as file: ${sourcePath}`, false)
-      return
-    }
-    if (!fs.existsSync(sourcePath)) {
-      warn(`[${copyFile.name}] No able to find source of ${sourcePath}`);
-      return;
-    }
-    if (sourcePath === destinationPath) {
-      warn(`Trying to copy same file ${sourcePath}`);
-      return;
-    }
-    const destDirPath = path.dirname(destinationPath);
-    if (debugMode) console.log('destDirPath', destDirPath)
-    if (!fs.existsSync(destDirPath)) {
-      fse.mkdirpSync(destDirPath);
-    }
-
-    // console.log('path.extname(sourcePath)', path.extname(sourcePath))
-    // console.log('config.fileExtensionsText', config.fileExtensionsText)
-    if (config.fileExtensionsText.includes(path.extname(sourcePath))) {
-
-      let sourceData = fs.readFileSync(sourcePath).toString();
-      if (transformTextFn) {
-        sourceData = transformTextFn(sourceData);
-      }
-      // if (debugMode) {
-      //   console.log(`
-
-
-      //   Write to: ${destinationPath} file:
-      //   ============================================================================================
-      //   ${sourceData}
-      //   ============================================================================================
-      //   `);
-
-      // }
-      fs.writeFileSync(destinationPath, sourceData, 'utf8')
-    } else {
-
-      fse.copyFileSync(sourcePath, destinationPath);
-    }
-
-
-  } catch (e) {
-    error(`Error while copying file: ${sourcePath} to ${destinationPath}`, true)
-    // console.log(e)
   }
 
-}
+  applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
+      });
+    });
+  }
 
-// export function clearFiles(files: string[] | string, preserveSymlinks = false) {
-//   if (!files) return;
-//   const filesPathesToDelete = !Array.isArray(files) ? [files] : files;
-//   if (preserveSymlinks) {
-//     filesPathesToDelete.forEach(file => {
-//       const fpath = path.join(process.cwd(), file);
-//       if (HelpersLinks.isLink(fpath)) {
-//         run(`rm ${HelpersLinks.removeSlashAtEnd(file)}`).sync()
-//       } else {
-//         run(`rimraf ${file}`).sync()
-//       }
-//     })
-//   } else {
-//     run(`rimraf ${filesPathesToDelete.join(' ')}`).sync()
-//   }
-//   filesPathesToDelete.forEach(file => {
-//     console.log(`Deleted ${file}`)
-//   })
-// }
-
-
-// export function getWebpackEnv(params: string): BuildOptions {
-
-//   // console.log('params', params)
-
-//   const regex1 = new RegExp(`(-|--)env.(-|[a-zA-Z])+=([a-zA-Z0-9]|\%|\\|\/|-)+`, 'g')
-//   const match = params.match(regex1);
-
-//   // console.log('match', match)
-
-//   const env = {};
-//   match.forEach(s => {
-//     const split = s.split('=');
-//     const key = split[0].replace('--env.', '')
-//     const value = split[1];
-//     env[key] = decodeURIComponent(value);
-//     if ((env[key] as string).search(',') !== -1) {
-//       env[key] = (env[key] as string).split(',')
-//     }
-//   })
-//   fixWebpackEnv(env);
-//   return env as any;
-// }
-
-export class ClassHelper {
-  static getMethodName(obj, method): string {
+  getMethodName(obj, method): string {
     var methodName = null;
     Object.getOwnPropertyNames(obj).forEach(prop => {
       if (obj[prop] === method) {
@@ -223,249 +61,41 @@ export class ClassHelper {
 
     var proto = Object.getPrototypeOf(obj);
     if (proto) {
-      return ClassHelper.getMethodName(proto, method);
+      return this.getMethodName(proto, method);
     }
     return null;
   }
-}
 
-export function tryCopyFrom(source, destination, options = {}) {
-  // console.log(`Trying to copy from hahah: ${source} to ${destination}`)
-  try {
-    fse.copySync(source, destination, _.merge({
-      overwrite: true,
-      recursive: true
-    }, options))
-  } catch (e) {
-    console.log(e)
-    sleep(1);
-    tryCopyFrom(source, destination, options)
-  }
-}
-
-export function tryRemoveDir(dirpath: string, contentOnly = false) {
-  try {
-    if (contentOnly) {
-      rimraf.sync(`${dirpath}/*`)
-    } else {
-      rimraf.sync(dirpath)
-    }
-  } catch (e) {
-    log(`Trying to remove directory: ${dirpath}`)
-    sleep(1);
-    tryRemoveDir(dirpath, contentOnly);
-  }
-}
-
-
-export function findChildren<T>(location, createFn: (childLocation: string) => T): T[] {
-  // console.log('from ' + this.location)
-
-  const notAllowed: RegExp[] = [
-    '\.vscode', 'node\_modules',
-    ..._.values(config.folder),
-    'e2e', 'tmp.*', 'dist.*', 'tests', 'module', 'browser', 'bundle*',
-    'components', '\.git', 'bin', 'custom'
-  ].map(s => new RegExp(s))
-
-  const isDirectory = source => fse.lstatSync(source).isDirectory()
-  const getDirectories = source =>
-    fse.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
-
-  let subdirectories = getDirectories(location)
-    .filter(f => {
-      const folderNam = path.basename(f);
-      return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+  fixWebpackEnv(env: Object) {
+    _.forIn(env, (v, k) => {
+      const value: string = v as any;
+      if (value === 'true') env[k] = true;
+      if (value === 'false') env[k] = false;
     })
-
-  return subdirectories
-    .map(dir => {
-      // console.log('child:', dir)
-      return createFn(dir);
-    })
-    .filter(c => !!c)
-}
-
-
-export function getRecrusiveFilesFrom(dir): string[] {
-  let files = [];
-  const readed = fs.readdirSync(dir).map(f => {
-    const fullPath = path.join(dir, f);
-    // console.log(`is direcotry ${fs.lstatSync(fullPath).isDirectory()} `, fullPath)
-    if (fs.lstatSync(fullPath).isDirectory()) {
-      getRecrusiveFilesFrom(fullPath).forEach(aa => files.push(aa))
-    }
-    return fullPath;
-  })
-  if (Array.isArray(readed)) {
-    readed.forEach(r => files.push(r))
   }
-  return files;
+
+  checkEnvironment = (deps?: Models.morphi.GlobalDependencies) => MorpiHelpers.checkEnvironment(deps)
+
 }
 
-
-
-/**
- * Get the most recent changes file in direcory
- * @param dir absoulute path to file
- */
-export function getMostRecentFileName(dir): string {
-  let files = getRecrusiveFilesFrom(dir);
-
-  // use underscore for max()
-  return underscore.max(files, (f) => {
-    // console.log(f);
-    // ctime = creation time is used
-    // replace with mtime for modification time
-    // console.log( `${fs.statSync(f).mtimeMs} for ${f}`   )
-    return fs.statSync(f).mtimeMs;
-
-  });
-}
-
-export function getMostRecentFilesNames(dir): string[] {
-
-  const allFiles = getRecrusiveFilesFrom(dir);
-  const mrf = getMostRecentFileName(dir);
-  const mfrMtime = fs.lstatSync(mrf).mtimeMs;
-
-  return allFiles.filter(f => {
-    const info = fs.lstatSync(f);
-    return (info.mtimeMs === mfrMtime && !info.isDirectory())
-  })
-}
-
-
-
-export function getLinesFromFiles(filename: string, lineCount?: number) {
-  return new Promise<string[]>((resolve, reject) => {
-    let stream = fs.createReadStream(filename, {
-      flags: "r",
-      encoding: "utf-8",
-      fd: null,
-      mode: 438, // 0666 in Octal
-      // bufferSize: 64 * 1024 as any
-    });
-
-    let data = "";
-    let lines = [];
-    stream.on("data", function (moreData) {
-      data += moreData;
-      lines = data.split("\n");
-      // probably that last line is "corrupt" - halfway read - why > not >=
-      if (lines.length > lineCount + 1) {
-        stream.destroy();
-        lines = lines.slice(0, lineCount); // junk as above
-        resolve(lines);
-      }
-    });
-
-    stream.on("error", function () {
-      reject(`Error reading ${filename}`);
-    });
-
-    stream.on("end", function () {
-      resolve(lines);
-    });
-  })
-
-};
-
+export interface Helpers extends
+  HelpersMessages,
+  HelpersStringsRegexes,
+  HelpersEnvironment,
+  //#region @backend
+  HelpersProcess,
+  HelpersFileFolders
 //#endregion
+{ }
 
-export function uniqArray(array: any[]) {
-  var seen = {};
-  return array.filter(function (item) {
-    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-  });
-}
-
-const AsyncFunction = (async () => { }).constructor;
-// const GeneratorFunction = (function* () { }).constructor as any;
-
-export async function runSyncOrAsync(fn: Function, args?: any[]) {
-  if (_.isUndefined(fn)) {
-    return;
-  }
-  // let wasPromise = false;
-  let promisOrValue = fn(args);
-  if (promisOrValue instanceof Promise) {
-    // wasPromise = true;
-    promisOrValue = Promise.resolve(promisOrValue)
-  }
-  // console.log('was promis ', wasPromise)
-  return promisOrValue;
-}
+Helpers.Instance.applyMixins(Helpers, [
+  HelpersMessages,
+  HelpersStringsRegexes,
+  HelpersEnvironment,
+  //#region @backend
+  HelpersProcess,
+  HelpersFileFolders,
+  //#endregion
+]);
 
 
-export function arrayMoveElementBefore(arr: any[], a: any, b: any) {
-  let indexA = arr.indexOf(a);
-  _.pullAt(arr, indexA);
-  let indexB = arr.indexOf(b);
-  if (indexB === 0) {
-    arr.unshift(a);
-  } else {
-    arr = arr.splice(indexB - 1, 0, a);
-  }
-  return arr;
-}
-export function arrayMoveElementAfterB(arr: any[], a: any, b: any) {
-  let indexA = arr.indexOf(a);
-  _.pullAt(arr, indexA);
-  let indexB = arr.indexOf(b);
-  if (indexB === arr.length - 1) {
-    arr.push(a);
-  } else {
-    arr = arr.splice(indexB + 1, 0, a);
-  }
-  return arr;
-}
-
-
-export function checkValidNpmPackageName(pkg) {
-  if (!_.isString(pkg) || pkg.length > 214) return false;
-  return new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*(\@.+$)?').test(pkg);
-}
-
-
-export class Range {
-
-  static from(from: number) {
-    // const self = this;
-    return {
-      to(to: number) {
-        return new Range(from, to);
-      }
-    }
-  }
-
-  constructor(
-    public from: number,
-    public to: number) {
-    if (_.isNative(from) || _.isNative(to)) {
-      throw `This Range type is only for positive numbers`
-    }
-  }
-
-  get length() {
-    return this.to - this.from;
-  }
-
-  get array() {
-    const arr = [];
-    for (let index = this.from; index <= this.to; index++) {
-      arr.push(index);
-    }
-    return arr;
-  }
-
-  contains(anotherRangeOrNumber: Range | number) {
-    if (_.isNumber(anotherRangeOrNumber)) {
-      return anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to;
-    }
-    anotherRangeOrNumber = anotherRangeOrNumber as Range;
-
-    return (anotherRangeOrNumber.from >= this.from && anotherRangeOrNumber.to <= this.to);
-  }
-
-}

@@ -1,18 +1,18 @@
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
-import { error, info } from '../../../helpers/helpers-messages';
+import { Helpers } from '../../../helpers';
 //#endregion
 
 import * as _ from 'lodash';
 import { Project } from '../../abstract';
-import { IBuildOptions, BuildDir } from '../../../models';
+import { Models } from '../../../models';
 
-export class BuildOptions implements IBuildOptions {
+export class BuildOptions implements Models.dev.IBuildOptions {
 
   public static PropsToOmmitWhenStringify = ['copyto', 'forClient'];
   prod?: boolean;
-  outDir?: BuildDir;
+  outDir?: Models.dev.BuildDir;
   watch?: boolean;
   args?: string;
   progressCallback?: (fractionValue: number) => any;
@@ -86,7 +86,7 @@ export class BuildOptions implements IBuildOptions {
   }
 
   public static from(argsString: string, projectCurrent: Project,
-    mainOptions?: IBuildOptions): BuildOptions {
+    mainOptions?: Models.dev.IBuildOptions): BuildOptions {
 
     const split = argsString.split(' ');
     // console.log('split', split)
@@ -95,7 +95,7 @@ export class BuildOptions implements IBuildOptions {
     if (!optionsToMerge) {
       return;
     }
-    const argsObj: IBuildOptions = require('minimist')(split)
+    const argsObj: Models.dev.IBuildOptions = require('minimist')(split)
     // console.log('argsObj', argsObj)
     argsObj.watch = optionsToMerge.watch;
     argsObj.prod = optionsToMerge.prod;
@@ -112,9 +112,9 @@ export class BuildOptions implements IBuildOptions {
         argsObj.forClient = (argsObj.forClient as string[]).map(projectParentChildName => {
           const proj = projectCurrent.parent.children.find(c => c.name === (projectParentChildName as string)) as Project;
           if (!proj) {
-            error(`${chalk.bold('--forClient argument')} : Cannot find module ${chalk.bold(projectParentChildName)}`);
+            Helpers.error(`${chalk.bold('--forClient argument')} : Cannot find module ${chalk.bold(projectParentChildName)}`);
           }
-          info(`Build only for client ${chalk.bold(projectParentChildName)}`)
+          Helpers.info(`Build only for client ${chalk.bold(projectParentChildName)}`)
           return proj;
         })
       }
@@ -131,7 +131,7 @@ export class BuildOptions implements IBuildOptions {
         // console.log('argPath', argPath)
         if (process.platform === 'win32') {
           if (!argPath.match(/\\/g) && !argPath.match(/\//g)) {
-            error(`On windows.. please wrap your "copyto" parameter with double-quote like this:\n
+            Helpers.error(`On windows.. please wrap your "copyto" parameter with double-quote like this:\n
   tnp build:${argsObj.outDir}${argsObj.watch ? ':watch' : ''} --copyto "<windows path here>"`)
             process.exit(1)
           }
@@ -141,7 +141,7 @@ export class BuildOptions implements IBuildOptions {
         // console.log('path', argPath)
         const project = Project.nearestTo(argPath);
         if (!project) {
-          error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
+          Helpers.error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
         } else {
           return project;
         }

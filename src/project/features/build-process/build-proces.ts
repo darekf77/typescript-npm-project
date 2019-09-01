@@ -7,16 +7,16 @@ import * as glob from 'glob';
 
 import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from './build-options';
-import { BuildDir, LibType, StartForOptions } from '../../../models';
+import { Models } from '../../../models';
 import { config } from '../../../config';
-import { error, info, warn, log } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { TnpDB } from '../../../tnp-db';
 import { PROGRESS_DATA } from '../../../progress-output';
 
 
 export class BuildProcess extends FeatureForProject {
 
-  public static prepareOptionsLib(options: StartForOptions, project: Project) {
+  public static prepareOptionsLib(options: Models.dev.StartForOptions, project: Project) {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
@@ -36,7 +36,7 @@ export class BuildProcess extends FeatureForProject {
       options.staticBuildAllowed = false;
     }
     if (project.isGenerated && !options.staticBuildAllowed) {
-      error(`Please use command:
+      Helpers.error(`Please use command:
 $ tnp static:build
 inside generated projects...
 `, false, true);
@@ -48,25 +48,25 @@ inside generated projects...
     return options;
   }
 
-  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string) {
+  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
     return this.startForLib({ prod, watch, outDir, args });
   }
 
   /**
    * prod, watch, outDir, args, overrideOptions
    */
-  async  startForLib(options: StartForOptions, exit = true) {
+  async  startForLib(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     options.appBuild = false;
     const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
-  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: BuildDir, args: string) {
+  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
     return this.startForApp({ prod, watch, outDir, args });
   }
 
-  async  startForApp(options: StartForOptions, exit = true) {
+  async  startForApp(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsLib(options, this.project);
     options.appBuild = true;
     const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
@@ -106,15 +106,15 @@ inside generated projects...
     return Project.Current.isTnp ? true : fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser))
   }
 
-  private async  build(buildOptions: BuildOptions, allowedLibs: LibType[], exit = true) {
+  private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
 
     if (this.project.isGenerated && buildOptions.watch) {
       buildOptions.watch = false;
-      warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
+      Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
 
     if (!this.project.isStandaloneProject && !this.checkIfGeneratedTnpBundle) {
-      error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
+      Helpers.error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
 
     // if (this.project.isGenerated) {
@@ -127,23 +127,23 @@ inside generated projects...
 
     const { env } = require('minimist')(!buildOptions.args ? [] : buildOptions.args.split(' '));
     if (env) {
-      info(`ENVIRONMENT: ${chalk.bold(env)}`)
+      Helpers.info(`ENVIRONMENT: ${chalk.bold(env)}`)
     } else {
       if (this.project.isGenerated) {
         buildOptions.args += `${buildOptions.args} --env=static`;
-        info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`)
+        Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`)
       } else {
         buildOptions.args += `${buildOptions.args} --env=local`;
-        info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`)
+        Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`)
       }
 
     }
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
       if (buildOptions.appBuild) {
-        error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
+        Helpers.error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       } else {
-        error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
+        Helpers.error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       }
     }
 
@@ -165,7 +165,7 @@ inside generated projects...
     if (!this.project.isGenerated && buildOptions.watch) { // REMOVE_THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
     }
-    log(`
+    Helpers.log(`
 
     ${chalk.bold('Start of Building')} ${this.project.genericName}
 
@@ -174,12 +174,12 @@ inside generated projects...
       PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
     }
     await this.project.build(buildOptions);
-    log(`End of Building ${this.project.genericName}`);
+    Helpers.log(`End of Building ${this.project.genericName}`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `End of building ${this.project.genericName}` })
     }
     if (exit && !buildOptions.watch) {
-      log('Build process exit')
+      Helpers.log('Build process exit')
       process.exit(0);
     }
 

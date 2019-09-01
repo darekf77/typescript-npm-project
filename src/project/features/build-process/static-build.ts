@@ -4,10 +4,10 @@ import * as sleep from 'sleep';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../../abstract';
-import { info, log, tryCopyFrom, error } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import chalk from 'chalk';
-import config from '../../../config';
-import { BuildDir } from '../../../models';
+import { config } from '../../../config';
+import { Models } from '../../../models';
 
 export class StaticBuild extends FeatureForProject {
 
@@ -15,7 +15,7 @@ export class StaticBuild extends FeatureForProject {
   async regenerate(regenerateWorkspaceChildren = true) {
     // console.log(StaticBuild.alerdyRegenerated)
     if (StaticBuild.alerdyRegenerated.includes(this.project.location)) {
-      log(`Already regenrated workspace ${this.project.genericName}`)
+      Helpers.log(`Already regenrated workspace ${this.project.genericName}`)
       return;
     } else {
       // console.log(`NOT YET GENERATED ${this.project.genericName}`)
@@ -39,9 +39,9 @@ export class StaticBuild extends FeatureForProject {
 }
 
 async function regenerateDistribution(project: Project) {
-  info(`Actual Regenerating project: ${project.genericName}`);
+  Helpers.info(`Actual Regenerating project: ${project.genericName}`);
   StaticBuild.alerdyRegenerated.push(project.location)
-  const outDir: BuildDir = 'dist';
+  const outDir: Models.dev.BuildDir = 'dist';
 
   const locationOfGeneratedProject = getLocationOfGeneratedProject(project, outDir);
 

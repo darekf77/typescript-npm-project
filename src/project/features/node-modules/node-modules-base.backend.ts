@@ -8,12 +8,14 @@ import chalk from 'chalk';
 import * as rimraf from "rimraf";
 import * as TerminalProgressBar from 'progress';
 
-import config from '../../../config';
+import { config } from '../../../config';
 import { Project } from '../../abstract';
-import { ArrNpmDependencyType, Package } from '../../../models';
-import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { dedupePackages, nodeModulesExists, addDependenceis } from './node-modules-helpers.backend';
+import {
+  dedupePackages, nodeModulesExists, addDependenceis
+} from './node-modules-helpers.backend';
 import { NodeModulesCore } from './node-modules-core.backend';
 
 //#endregion
@@ -30,13 +32,13 @@ export class NodeModulesBase extends NodeModulesCore {
    */
   public async copyFrom(source: Project, triggerMsg: string) {
     source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
-    log(`[node_modules] Copy instalation of npm packages from ` +
+    Helpers.log(`[node_modules] Copy instalation of npm packages from ` +
       `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
 
     // global.spinner.start()
 
-    for (let index = 0; index < ArrNpmDependencyType.length; index++) {
-      const depName = ArrNpmDependencyType[index];
+    for (let index = 0; index < Models.npm.ArrNpmDependencyType.length; index++) {
+      const depName = Models.npm.ArrNpmDependencyType[index];
       const deppp = source.getDepsAsProject(depName);
       for (let index2 = 0; index2 < deppp.length; index2++) {
         const dep = deppp[index2];
@@ -68,7 +70,7 @@ export class NodeModulesBase extends NodeModulesCore {
         const dest = path.join(destinationProject.location, config.folder.node_modules, '.bin')
         if (fse.existsSync(source)) {
           if (linkOnly) {
-            HelpersLinks.createSymLink(source, dest)
+            Helpers.createSymLink(source, dest)
           } else {
             fse.copySync(source, dest, {
               recursive: true,
@@ -85,14 +87,14 @@ export class NodeModulesBase extends NodeModulesCore {
    * @param pkg
    * @param options
    */
-  public copy(pkg: string | Package, options?: { override?: boolean; linkOnly?: boolean; }) {
+  public copy(pkg: string | Models.npm.Package, options?: { override?: boolean; linkOnly?: boolean; }) {
     const self = this;
     return {
       async to(destination: Project, ) {
 
         const { override = false, linkOnly = false } = options || {};
 
-        const packageName = (_.isObject(pkg) ? (pkg as Package).name : pkg) as string;
+        const packageName = (_.isObject(pkg) ? (pkg as Models.npm.Package).name : pkg) as string;
         let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
         if (!fse.existsSync(nodeModeulesPath)) {
@@ -133,7 +135,7 @@ export class NodeModulesBase extends NodeModulesCore {
               }
 
             } else {
-              warn(`This is not a npm package: '${pkgName}' inside "${self.project.location}"`)
+              Helpers.warn(`This is not a npm package: '${pkgName}' inside "${self.project.location}"`)
             }
             prog.tick()
           })

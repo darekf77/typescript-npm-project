@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
-import { replace } from './replace';
-import config from '../../../config';
-import { escapeStringForRegEx, info, log, warn } from '../../../helpers';
-import { ModType } from './source-code-type';
+import { config } from '../../../config';
+import { Helpers } from '../../../helpers';
+import { ModType, SourceCodeType } from './source-modifier.models';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
 
@@ -52,13 +51,13 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
       return `(${p
         .map(part => {
           if (part === config.folder.browser) {
-            return `${escapeStringForRegEx(part)}(?!\\-)`;
+            return `${Helpers.escapeStringForRegEx(part)}(?!\\-)`;
           }
-          return escapeStringForRegEx(part);
+          return Helpers.escapeStringForRegEx(part);
         }).join('|')})`;
     }
     if (_.isString(p)) {
-      return escapeStringForRegEx(p);
+      return Helpers.escapeStringForRegEx(p);
     }
   });
 
@@ -67,11 +66,11 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
       if (_.isArray(p)) {
         return `(${p
           .map(part => {
-            return escapeStringForRegEx(part);
+            return Helpers.escapeStringForRegEx(part);
           }).join('|')})`;
       }
       if (_.isString(p)) {
-        return escapeStringForRegEx(p);
+        return Helpers.escapeStringForRegEx(p);
       }
     });
   }
@@ -109,14 +108,16 @@ function impReplace(impReplaceOptions: ImpReplaceOptions) {
     const element = arr[index];
     const regex = new RegExp(element.regexSource, 'g');
     const isMatch = regex.test(input);
-    input = replace(input, regex, element.replacement);
+    input = Helpers.tsCodeModifier.replace(input, regex, element.replacement);
     if (isMatch) {
-      debugMatch && info(`(${modType})(${project.isSite ? 'SITE - ' : ''}"${project.genericName}") (${element.description})` +
+      debugMatch && Helpers.info(`(${modType})(${project.isSite ? 'SITE - ' :
+        ''}"${project.genericName}") (${element.description})` +
         `\nMATCH: ${element.regexSource}` +
         `\nREGEX: ${element.regexSource}`) +
         `\nFILE: ${relativePath}\n`;
     } else {
-      debugNotMatch && log(`(${modType})(${project.isSite ? 'SITE - ' : ''}"${project.genericName}") (${element.description})` +
+      debugNotMatch && Helpers.log(`(${modType})(${project.isSite ? 'SITE - ' :
+        ''}"${project.genericName}") (${element.description})` +
         `\nDON'T MATCH: ${element.regexSource}` +
         `\nDON'T REGEX: ${element.regexSource}`) +
         `\nFILE: ${relativePath}\n`;
@@ -141,7 +142,11 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  protected mod3rdPartyLibsReferces(input: string, modType: ModType, relativePath: string): string {
+  protected mod3rdPartyLibsReferces(
+    input: string,
+    modType: ModType,
+    relativePath: string): string {
+
     const method: CheckType = 'standalone';
     const folders = [
       ...this.foldersSources,
@@ -196,7 +201,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     return input;
   }
 
-  protected modWorkspaceChildrenLibsBetweenItself(input: string, modType: ModType, relativePath: string): string {
+  protected modWorkspaceChildrenLibsBetweenItself(
+    input: string, modType: ModType, relativePath: string): string {
+
     const method: CheckType = 'baseline';
     const childrenLibs = this.project.parent.childrenThatAreLibs;
 
@@ -492,9 +499,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
     }
 
     const baselineName = this.project.parent.baseline.name;
-    const regexSource = `(\\"|\\')${escapeStringForRegEx(baselineName)}\\/`;
+    const regexSource = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/`;
     const regex = new RegExp(regexSource, 'g');
-    input = replace(input, regex, `'`);
+    input = Helpers.tsCodeModifier.replace(input, regex, `'`);
 
     return input;
   }

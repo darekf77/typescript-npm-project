@@ -1,27 +1,22 @@
-import { LibProject } from '../abstract';
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
-
 import { Project } from '../abstract';
 
-import { tryCopyFrom, getControllers, getEntites, log, info, error } from '../../helpers';
-
-import { HelpersLinks } from '../../helpers';
+import { Helpers } from '../../helpers';
 import { config } from '../../config';
+import { Models } from '../../models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
-import { copyFile } from '../../helpers';
-import { killProcessByPort } from '../../helpers';
 import { BuildOptions } from '../features';
 import { selectClients } from './select-clients';
-import { BuildDir } from '../../models';
+
 //#endregion
 
 
-export class ProjectIsomorphicLib extends LibProject {
+export class ProjectIsomorphicLib extends Project {
 
   //#region @backend
   startOnCommand(args: string) {
@@ -67,7 +62,7 @@ export class ProjectIsomorphicLib extends LibProject {
     ].concat(this.projectSpecyficFiles())
   }
 
-  private async selectToSimulate(outDir: BuildDir, watch: boolean, forClient: Project[] | string[]) {
+  private async selectToSimulate(outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[]) {
     let webpackEnvParams = `--env.outFolder=${outDir}`;
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
@@ -97,7 +92,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
     if (client) {
       const port = client.getDefaultPort()
-      await killProcessByPort(port)
+      await Helpers.killProcessByPort(port)
       webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
     }
 
@@ -112,7 +107,7 @@ export class ProjectIsomorphicLib extends LibProject {
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         if (!watch) {
-          log(`App build not possible for isomorphic-lib in static build mode`)
+          Helpers.log(`App build not possible for isomorphic-lib in static build mode`)
           return;
         }
         await this.selectToSimulate(outDir, watch, forClient);
@@ -131,12 +126,12 @@ export class ProjectIsomorphicLib extends LibProject {
     if (fse.existsSync(source)) {
       if (fse.lstatSync(source).isDirectory()) {
         // console.log('copy folder')
-        tryCopyFrom(source, outDir)
+        Helpers.tryCopyFrom(source, outDir)
         // fse.copySync(source, outDir, { overwrite: true, recursive: true })
       } else {
         // console.log('copy copyfile')
         // fse.copyFileSync(source, outDir);
-        copyFile(source, outDir)
+        Helpers.copyFile(source, outDir)
       }
     } else {
       // console.log('not exist', source)
@@ -148,7 +143,7 @@ export class ProjectIsomorphicLib extends LibProject {
     outLInk = path.join(this.location, outLInk, basename);
 
     if (fse.existsSync(source)) {
-      HelpersLinks.createSymLink(source, outLInk)
+      Helpers.createSymLink(source, outLInk)
     }
   }
 
@@ -177,7 +172,7 @@ export class ProjectIsomorphicLib extends LibProject {
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     if (skipBuild) {
-      log(`Skip build `);
+      Helpers.log(`Skip build `);
       return;
     }
     if (this.buildOptions.watch) {
@@ -209,7 +204,7 @@ export function getReservedClassNames(project = Project.Current) {
       .filter((p) => p.type === 'isomorphic-lib')
       .forEach(p => {
 
-        const controllers = getControllers(path.join(
+        const controllers = Helpers.morphi.getControllers(path.join(
           p.location,
           config.folder.src
         ))
@@ -219,7 +214,7 @@ export function getReservedClassNames(project = Project.Current) {
           names.push(path.basename(c, '.ts'))
         });
 
-        const entities = getEntites(path.join(
+        const entities = Helpers.morphi.getEntites(path.join(
           p.location,
           config.folder.src
         ))

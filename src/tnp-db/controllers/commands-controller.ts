@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
-import { start } from '../../start';
-import { error, warn } from '../../helpers';
+import { start } from '../../start.backend';
+import { Helpers } from '../../helpers';
 
 import { BaseController } from './base-controlller';
 import { CommandInstance } from '../entites/command-instance';
@@ -29,7 +29,7 @@ export class CommandsController extends BaseController {
     if (cmd && _.isString(cmd.command) && cmd.command.trim() !== '') {
       await start(cmd.command.split(' '), void 0);
     } else {
-      error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+      Helpers.error(`Last command for location: ${cmd.location} doen't exists`, false, true);
     }
 
   }
@@ -39,7 +39,7 @@ export class CommandsController extends BaseController {
     if (cmd) {
       await start(cmd.command.split(' '), void 0);
     } else {
-      error(`Last command for location: ${cmd.location} doen't exists`, false, true);
+      Helpers.error(`Last command for location: ${cmd.location} doen't exists`, false, true);
     }
   }
 
@@ -57,7 +57,7 @@ export class CommandsController extends BaseController {
       cmd.command = cmd.command + ' ' + clients + ' ' + copyto;
       this.crud.set(cmd)
     } else {
-      warn(`Cannot update unexisted last commadn in location: ${location}`)
+      Helpers.warn(`Cannot update unexisted last commadn in location: ${location}`)
     }
   }
 

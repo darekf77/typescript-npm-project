@@ -4,13 +4,12 @@ import * as glob from 'glob';
 import * as fse from 'fs-extra';
 // local
 import { Project } from "../abstract";
-import { arrayMoveElementBefore, log } from "../../helpers";
+import { Helpers } from "../../helpers";
 import { config } from '../../config';
-import { info, warn } from '../../helpers';
 import { PROGRESS_DATA } from '../../progress-output';
 import { ProxyRouter } from '../features/proxy-router';
 import { BuildOptions } from '../features';
-import { ProjectBuild } from '../../models';
+import { Models } from '../../models';
 
 function reorderResult(result = [], update: (result) => void): boolean {
   let neededNextOrder = false;
@@ -20,7 +19,7 @@ function reorderResult(result = [], update: (result) => void): boolean {
         return false;
       }
       if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
-        result = arrayMoveElementBefore(result, res2, res);
+        result = Helpers.arrays.arrayMoveElementBefore(result, res2, res);
         update(result);
         neededNextOrder = true;
         return true;
@@ -32,12 +31,15 @@ function reorderResult(result = [], update: (result) => void): boolean {
 }
 
 export class ProjectWorkspace extends Project {
+  buildLib() {
+    // throw new Error("Method not implemented.");
+  }
 
 
   startOnCommand(args: string) {
 
     this.proxyRouter.activateServer((port) => {
-      log(`proxy server ready on port ${port}`)
+      Helpers.log(`proxy server ready on port ${port}`)
     })
     const workspace: Project = this as any;
     workspace.children
@@ -73,7 +75,7 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
-  private libs(targetClients: ProjectBuild[]) {
+  private libs(targetClients: Models.dev.ProjectBuild[]) {
     const existed = {};
     const targetLibs = targetClients
       .map(t => t.project.workspaceDependencies)
@@ -136,11 +138,11 @@ export class ProjectWorkspace extends Project {
     });
   }
 
-  get projectsInOrder(): ProjectBuild[] {
+  get projectsInOrder(): Models.dev.ProjectBuild[] {
     if (!fse.existsSync(this.location)) {
       return [];
     }
-    const targetClients: ProjectBuild[] = (this.children.filter(p => {
+    const targetClients: Models.dev.ProjectBuild[] = (this.children.filter(p => {
       return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
     })).map(c => {
       return { project: c, appBuild: true };
@@ -193,7 +195,7 @@ export class ProjectWorkspace extends Project {
             }
           }, false);
         } else {
-          log(`Ommiting app build for ${this.genericName}`)
+          Helpers.log(`Ommiting app build for ${this.genericName}`)
         }
       } else {
         showProgress('lib', project.genericName, (precentIndex / sum));

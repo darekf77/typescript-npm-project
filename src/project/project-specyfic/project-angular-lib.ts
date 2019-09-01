@@ -3,18 +3,16 @@ import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { LibProject } from '../abstract';
 import { ProjectAngularClient } from './project-angular-client';
-import { error, tryRemoveDir, HelpersLinks, log } from '../../helpers';
-import config from '../../config';
+import { Helpers } from '../../helpers';
+import { config } from '../../config';
 import { Project } from '../abstract';
-import { Helpers } from 'morphi/helpers';
 import { BuildOptions } from '../features';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib';
 import { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { selectClients } from './select-clients';
 
-export class ProjectAngularLib extends LibProject {
+export class ProjectAngularLib extends Project {
 
   private projectAngularClient: ProjectAngularClient;
 
@@ -81,7 +79,7 @@ export class ProjectAngularLib extends LibProject {
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     if (skipBuild) {
-      log(`Skip build `);
+      Helpers.log(`Skip build `);
       return;
     }
 

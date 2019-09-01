@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import { PackagesRecognition } from 'morphi/build/packages-recognition';
 import { Project } from '../abstract';
-import { log } from '../../helpers';
-import config from '../../config';
-import { IPackageJSON } from '../../models';
+import { Helpers } from '../../helpers';
+import { config } from '../../config';
+import { Models } from '../../models';
 
 
 export class PackagesRecognitionExtended extends PackagesRecognition {
@@ -19,9 +19,9 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     if (!global.tnp_normal_mode) {
       return;
     }
-    log(`Searching isomorphic packages`);
+    Helpers.log(`Searching isomorphic packages`);
     super.start(force);
-    log(`Founded ${this.count} isomorphic packages`);
+    Helpers.log(`Founded ${this.count} isomorphic packages`);
   }
 
   checkIsomorphic(node_modules: string, packageName: string) {

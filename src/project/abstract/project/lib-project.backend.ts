@@ -1,19 +1,14 @@
-import { Project } from "./project";
-//#region @backend
+import { Project } from './project';
 import * as _ from 'lodash';
-import * as fs from 'fs';
-import * as fse from "fs-extra";
+import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as  getDependents from 'npm-get-dependents';
+import * as getDependents from 'npm-get-dependents';
 
-import { BuildDir, LibType, FileEvent, ReleaseOptions } from "../../models";
-import { questionYesNo, log } from "../../helpers";
-import { error, info, warn } from "../../helpers";
-import config from "../../config";
-import { PackageJSON } from '../features/package-json';
-
-import { tryCopyFrom } from '../../helpers';
-import { BuildProcess } from '../features';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
+import { BuildProcess } from '../../features';
+import { Morphi } from 'morphi';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -23,10 +18,39 @@ import { BuildProcess } from '../features';
  */
 //#endregion
 
-export abstract class LibProject extends Project {
+export abstract class LibProject {
+
+
+  get isCommandLineToolOnly(this: Project) {
+    if (Morphi.IsBrowser) {
+      return this.browser.isCommandLineToolOnly;
+    }
+    //#region @backend
+    return this.packageJson && this.packageJson.isCommandLineToolOnly;
+    //#endregion
+  }
+  get isBuildedLib(this: Project) {
+    if (Morphi.IsBrowser) {
+      return this.browser.isBuildedLib;
+    }
+    //#region @backend
+    if (this.type === 'unknow') {
+      return false;
+    }
+    if (this.type === 'angular-lib') {
+      return fse.existsSync(path.join(this.location, config.folder.module)) &&
+        fse.existsSync(path.join(this.location, config.folder.dist));
+    }
+    if (this.type === 'isomorphic-lib') {
+      return fse.existsSync(path.join(this.location, config.folder.browser)) &&
+        fse.existsSync(path.join(this.location, config.folder.dist));
+    }
+    return false;
+    //#endregion
+  }
 
   //#region @backend
-  projectSpecyficFiles() {
+  projectSpecyficFiles(this: Project) {
     const files = [
       'index.js',
       'index.d.ts',
@@ -38,15 +62,15 @@ export abstract class LibProject extends Project {
 
   abstract async buildLib();
 
-  checkIfLogginInToNpm() {
+  checkIfLogginInToNpm(this: Project) {
     try {
       this.run('npm whoami').sync();
     } catch (e) {
-      error(`Please login in to npm.`, false, true)
+      Helpers.error(`Please login in to npm.`, false, true)
     }
   }
 
-  private updateChildren(project: Project, newVersion, updatedProjectw: Project[] = []) {
+  private updateChildren(this: Project, project: Project, newVersion, updatedProjectw: Project[] = []) {
     if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
       console.log(`Exition alredy ${project.genericName}`)
       return;
@@ -90,7 +114,7 @@ export abstract class LibProject extends Project {
    * @param newVersion
    * @param onlyInThisProjectSubprojects
    */
-  async bumpVersionInOtherProjects(newVersion, onlyInThisProjectSubprojects = false) {
+  async bumpVersionInOtherProjects(this: Project, newVersion, onlyInThisProjectSubprojects = false) {
     if (onlyInThisProjectSubprojects) {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       this.updateChildren(this, newVersion);
@@ -105,7 +129,7 @@ export abstract class LibProject extends Project {
             reject(`[lib-projecty] Can't get depended packages..`)
           } else {
             packages.forEach(pkg => {
-              info(`Please update "${pkg}" depended on this package...`)
+              Helpers.info(`Please update "${pkg}" depended on this package...`)
             })
             resolve()
           }
@@ -114,21 +138,21 @@ export abstract class LibProject extends Project {
     }
   }
 
-  private commit(newVer) {
+  private commit(this: Project, newVer) {
     try {
       this.run(`git add --all . `).sync()
     } catch (error) {
-      warn(`Failed to git add --all .`);
+      Helpers.warn(`Failed to git add --all .`);
     }
 
     try {
       this.run(`git commit -m "new version ${newVer}"`).sync()
     } catch (error) {
-      warn(`Failed to git commit -m "new vers...`);
+      Helpers.warn(`Failed to git commit -m "new vers...`);
     }
   }
 
-  public async release(c?: ReleaseOptions) {
+  public async release(this: Project, c?: Models.dev.ReleaseOptions) {
 
     this.checkIfLogginInToNpm()
 
@@ -145,7 +169,7 @@ export abstract class LibProject extends Project {
       console.log(`git tag --delete v${newVersion}`)
     }
 
-    await questionYesNo(`Release new version: ${newVersion} ?`, async () => {
+    await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
 
       await this.bumpVersionInOtherProjects(newVersion, true)
       this.commit(newVersion);
@@ -154,7 +178,7 @@ export abstract class LibProject extends Project {
         this.run(`npm version patch`).sync()
       } catch (e) {
         removeTagAndCommit(true)
-        error(e);
+        Helpers.error(e);
       }
 
       this.run(`tnp reset`).sync();
@@ -175,15 +199,15 @@ export abstract class LibProject extends Project {
       this.commit(newVersion);
     }, () => {
       if (Project.isBundleMode) {
-        warn(`Project not in bundle mode return`)
+        Helpers.warn(`Project not in bundle mode return`)
         return;
       } else {
-        warn(`Project not in bundle mode exit`);
+        Helpers.warn(`Project not in bundle mode exit`);
         process.exit(0)
       }
     });
 
-    await questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
+    await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;
       try {
         this.run('npm publish', {
@@ -204,35 +228,35 @@ export abstract class LibProject extends Project {
 
   }
 
-  pushToGitRepo() {
+  pushToGitRepo(this: Project) {
     console.log('Pushing to git repository... ')
     const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
     console.log(`Git branch: ${branchName}`)
     this.run(`git push origin ${branchName}`, { output: false }).sync()
-    info('Pushing to git repository done.')
+    Helpers.info('Pushing to git repository done.')
   }
 
-  private createClientVersionAsCopyOfBrowser() {
+  private createClientVersionAsCopyOfBrowser(this: Project) {
     const bundleFolder = path.join(this.location, config.folder.bundle);
     const browser = path.join(bundleFolder, config.folder.browser)
     const client = path.join(bundleFolder, config.folder.client)
-    tryCopyFrom(browser, client);
+    Helpers.tryCopyFrom(browser, client);
   }
 
-  public bundleResources() {
+  public bundleResources(this: Project) {
 
     this.checkIfReadyForNpm()
     const bundleFolder = path.join(this.location, config.folder.bundle);
-    if (!fs.existsSync(bundleFolder)) {
-      fs.mkdirSync(bundleFolder);
+    if (!fse.existsSync(bundleFolder)) {
+      fse.mkdirSync(bundleFolder);
     }
     ['package.json'].concat(this.resources).forEach(res => {
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);
-      if (!fs.existsSync(file)) {
-        error(`Resource file ${file} does not exist in ${this.location}`)
+      if (!fse.existsSync(file)) {
+        Helpers.error(`Resource file ${file} does not exist in ${this.location}`)
       }
-      if (fs.lstatSync(file).isDirectory()) {
+      if (fse.lstatSync(file).isDirectory()) {
         // console.log('IS DIRECTORY', file)
         // console.log('IS DIRECTORY DEST', dest)
         const options: fse.CopyOptionsSync = {
@@ -249,9 +273,10 @@ export abstract class LibProject extends Project {
         fse.copyFileSync(file, dest);
       }
     })
-    info(`Resources copied to release folder: ${config.folder.bundle}`)
+    Helpers.info(`Resources copied to release folder: ${config.folder.bundle}`)
   }
   //#endregion
 
 }
 
+// export interface LibProject extends Partial<Project> { }

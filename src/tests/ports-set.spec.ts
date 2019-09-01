@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
-import { Range } from '../helpers';
+import { Helpers } from '../helpers';
 import { Project } from '../project';
 import { PortInstance } from '../tnp-db/entites/port-instance';
-import { SystemService } from '../models/system-service';
 import { PortsSet } from '../tnp-db/controllers/ports-set';
+import { Models } from '../models';
 
 
 
@@ -28,10 +28,10 @@ describe('Ports set tests', () => {
       saveCallCounter++;
     })
 
-    s.add(new PortInstance(Range.from(3000).to(4000)))
-    s.add(new PortInstance(80, new SystemService('http')))
-    s.add(new PortInstance([21, 22], new SystemService('System communication')))
-    s.add(new PortInstance(Range.from(4100).to(4110), baseline))
+    s.add(new PortInstance(Models.other.Range.from(3000).to(4000)))
+    s.add(new PortInstance(80, new Models.system.SystemService('http')))
+    s.add(new PortInstance([21, 22], new Models.system.SystemService('System communication')))
+    s.add(new PortInstance(Models.other.Range.from(4100).to(4110), baseline))
 
     expect(saveCallCounter).to.be.eq(4);
 
@@ -45,10 +45,10 @@ describe('Ports set tests', () => {
     ])
 
     expect(s.numOfFreePortsAvailable).to.be.eq(2)
-    s.update(new PortInstance([2000, 2001], new SystemService('test')))
+    s.update(new PortInstance([2000, 2001], new Models.system.SystemService('test')))
     expect(s.numOfFreePortsAvailable).to.be.eq(0)
 
-    const twoThousandsFreePors = new PortInstance(Range.from(3000).to(5000))
+    const twoThousandsFreePors = new PortInstance(Models.other.Range.from(3000).to(5000))
     s.add(twoThousandsFreePors)
     expect(s.numOfFreePortsAvailable).to.be.eq(2000)
     expect(s.numOfAllPortsAvailable).to.be.eq(2002)
@@ -86,7 +86,7 @@ describe('Ports set tests', () => {
     let s = new PortsSet([
       new PortInstance(4000, baseline),
       new PortInstance(6000),
-      new PortInstance(Range.from(7000).to(7005))
+      new PortInstance(Models.other.Range.from(7000).to(7005))
     ])
 
     expect(s.reserveFreePortsFor(tnp)).to.be.true;
@@ -100,7 +100,7 @@ describe('Ports set tests', () => {
     let s = new PortsSet([
       new PortInstance(4000),
       new PortInstance(6000),
-      new PortInstance(Range.from(7000).to(7010))
+      new PortInstance(Models.other.Range.from(7000).to(7010))
     ])
 
     expect(s.reserveFreePortsFor(baseline)).to.be.true;
@@ -113,7 +113,7 @@ describe('Ports set tests', () => {
   it('should not reserve ports if is not a space', async function () {
 
     let s = new PortsSet([
-      new PortInstance(Range.from(7000).to(baseline.children.length))
+      new PortInstance(Models.other.Range.from(7000).to(baseline.children.length))
     ])
 
     expect(s.reserveFreePortsFor(baseline)).to.be.false;

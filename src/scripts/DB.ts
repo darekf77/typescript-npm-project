@@ -2,7 +2,7 @@
 import * as  psList from 'ps-list';
 import { TnpDB } from '../tnp-db/wrapper-db';
 import { CommandInstance } from '../tnp-db/entites';
-import { PsListInfo } from '../models/ps-info';
+import { Models } from '../models';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
@@ -25,9 +25,9 @@ const $DB = async (args: string) => {
   process.exit(0)
 }
 
-async function $EXISTS(args:string) {
+async function $EXISTS(args: string) {
   const pid = Number(args.trim())
-  const ps: PsListInfo[] = await psList();
+  const ps: Models.system.PsListInfo[] = await psList();
   console.log(`process.pid: ${process.pid}`)
   console.log(`pid to check: ${pid}`)
   console.log(!!ps.find(p => p.pid === pid))

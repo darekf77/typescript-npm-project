@@ -13,8 +13,8 @@ global.spinner = spinner;
 var pathToDistFolder = path.join(__dirname, '../dist');
 var pathToBundleFolder = path.join(__dirname, '../bundle');
 
-var pathToDistRun = path.join(__dirname, '../dist/start.js');
-var pathToBundletRun = path.join(__dirname, '../bundle/start.js');
+var pathToDistRun = path.join(__dirname, '../dist/start.backend.js');
+var pathToBundletRun = path.join(__dirname, '../bundle/start.backend.js');
 
 var distExist = fs.existsSync(pathToDistRun);
 var bundleExist = fs.existsSync(pathToBundletRun);

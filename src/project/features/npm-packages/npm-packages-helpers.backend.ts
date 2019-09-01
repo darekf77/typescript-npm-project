@@ -7,26 +7,26 @@ import * as _ from 'lodash';
 import * as rimraf from "rimraf";
 
 import { Project } from '../../abstract';
-import { info, checkValidNpmPackageName, error, log, warn, tryCopyFrom } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { Package, InstalationTypeArr, InstalationType, LibType, ActualNpmInstallOptions, NpmInstallOptions } from '../../../models';
-import config from '../../../config';
+import { Models } from '../../../models';
+import { config } from '../../../config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
 
-export function resolvePacakgesFromArgs(args: string[]): Package[] {
-  let installType: InstalationType = '--save';
+export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
+  let installType: Models.npm.InstalationType = '--save';
   return args
     .map(p => p.trim())
     .filter(p => {
-      if (InstalationTypeArr.includes(p)) {
-        installType = p as InstalationType;
+      if (Models.npm.InstalationTypeArr.includes(p)) {
+        installType = p as Models.npm.InstalationType;
         return false;
       }
-      const res = checkValidNpmPackageName(p)
+      const res = Helpers.npm.checkValidNpmPackageName(p)
       if (!res) {
-        error(`Invalid package to install: "${p}"`, true, true)
+        Helpers.error(`Invalid package to install: "${p}"`, true, true)
       }
       return res;
     })
@@ -48,7 +48,7 @@ export function executeCommand(command: string, project: Project) {
 
 export function copyMainProjectDependencies
   (projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
-    tmpProject: Project, project: Project, pkg: Package) {
+  tmpProject: Project, project: Project, pkg: Models.npm.Package) {
 
   const { mainProjectInTemp, mainProjectExisted } = projects;
   const alreadyChecked = [];
@@ -70,28 +70,28 @@ export function copyMainProjectDependencies
         const existedOtherDependency = Project.From(existedPkgPath);
         if (existedOtherDependency) {
           if (existedOtherDependency.version === otherDependenyInTemp.version) {
-            log(`[smoothInstallPrepare] nothing to do for same dependency version ${otherDependenyInTemp.name}`);
+            Helpers.log(`[smoothInstallPrepare] nothing to do for same dependency version ${otherDependenyInTemp.name}`);
           } else {
             if (parent.packageJson.checDepenciesAreSatisfyBy(existedOtherDependency)) {
-              log(`[smoothInstallPrepare] nothing to do dependency is satisfy ${otherDependenyInTemp.name}`);
+              Helpers.log(`[smoothInstallPrepare] nothing to do dependency is satisfy ${otherDependenyInTemp.name}`);
             } else {
               const diff = `${existedOtherDependency.version} != ${otherDependenyInTemp.version}`;
-              warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
+              Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
               const dest = path.join(project.node_modules.path, mainProjectExisted.name,
                 config.folder.node_modules, otherDependenyInTemp.name);
 
               if (fse.existsSync(dest)) {
-                warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" nested already exists in neste folder`);
+                Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" nested already exists in neste folder`);
               } else {
                 fse.mkdirpSync(dest);
-                warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" please copy manualy to nested folder`);
+                Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" please copy manualy to nested folder`);
                 // tryCopyFrom(otherDependenyInTemp.location, dest); // @TODO
               }
             }
           }
         } else {
-          log(`[smoothInstallPrepare] copy new package ${otherDependenyInTemp.name}`);
-          tryCopyFrom(otherDependenyInTemp.location, existedPkgPath);
+          Helpers.log(`[smoothInstallPrepare] copy new package ${otherDependenyInTemp.name}`);
+          Helpers.tryCopyFrom(otherDependenyInTemp.location, existedPkgPath);
         }
       });
     otherDepsInTemp.forEach(p => {
@@ -102,20 +102,20 @@ export function copyMainProjectDependencies
   copyOtherProcess(mainProjectInTemp);
 }
 
-export function copyMainProject(tmpProject: Project, project: Project, pkg: Package) {
+export function copyMainProject(tmpProject: Project, project: Project, pkg: Models.npm.Package) {
   const mainProjectInTemp = Project.From(path.join(tmpProject.node_modules.path, pkg.name));
   const mainProjectExistedPath = path.join(project.node_modules.path, pkg.name)
   let mainProjectExisted = Project.From(mainProjectExistedPath);
   if (mainProjectExisted) {
     mainProjectExisted.removeItself();
   }
-  tryCopyFrom(mainProjectInTemp.location, mainProjectExistedPath);
-  log(`[smoothInstallPrepare] main package copy ${mainProjectInTemp.name}`);
+  Helpers.tryCopyFrom(mainProjectInTemp.location, mainProjectExistedPath);
+  Helpers.log(`[smoothInstallPrepare] main package copy ${mainProjectInTemp.name}`);
   mainProjectExisted = Project.From(mainProjectExistedPath);
   return { mainProjectExisted, mainProjectInTemp };
 }
 
-export function prepareTempProject(project: Project, pkg: Package): Project {
+export function prepareTempProject(project: Project, pkg: Models.npm.Package): Project {
   const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of-`;
   const tmpFolder = path.join(project.location,
     `${pathPart}-${pkg.name}`);
@@ -132,7 +132,7 @@ export function prepareTempProject(project: Project, pkg: Package): Project {
 }
 
 
-export function prepareCommand(pkg: Package, remove: boolean, useYarn: boolean) {
+export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean) {
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
   if (useYarn) {
@@ -145,7 +145,7 @@ export function prepareCommand(pkg: Package, remove: boolean, useYarn: boolean) 
 }
 
 
-export function fixOptions(options?: ActualNpmInstallOptions): ActualNpmInstallOptions {
+export function fixOptions(options?: Models.npm.ActualNpmInstallOptions): Models.npm.ActualNpmInstallOptions {
   if (_.isNil(options)) {
     options = {} as any;
   }
@@ -172,7 +172,8 @@ export function fixOptions(options?: ActualNpmInstallOptions): ActualNpmInstallO
 
 
 
-export function fixOptionsNpmInstall(options: NpmInstallOptions, project: Project): NpmInstallOptions {
+export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
+  project: Project): Models.npm.NpmInstallOptions {
   if (_.isNil(options)) {
     options = {};
   }

@@ -3,26 +3,32 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
-import { error, escapeStringForRegEx, log, warn, copyFile, tryRemoveDir, info, patchingForAsync } from '../../../helpers';
 
-import config from '../../../config';
-
-import { FeatureForProject, FeatureCompilerForProject, Project } from '../../abstract';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
+import { Project } from '../../abstract';
 import { SourceModifier } from './source-modifier.backend';
+import { IncCompiler } from 'incremental-compiler';
 
-export class AppSourceReplicator extends FeatureCompilerForProject {
+@IncCompiler.Class({ className: 'AppSourceReplicator' })
+export class AppSourceReplicator
+  extends IncCompiler.Base<{ modifiedFilePath: string }, { modifedSyncFilesAbsPthsArr: string[] }> {
 
+  public project: Project;
 
-  constructor(public project: Project) {
-    super(`src/**/*.*`, '', project && project.location, project);
+  set(options: IncCompiler.Models.BaseClientCompilerOptions & { project: Project }) {
+    const { project } = options;
+    this.project = project;
+    options.executeOutsideScenario = false;
+    options.folderPath = path.join(project.location, config.folder.src);
+    return super.set(options);
   }
 
+  public async syncAction(filesPathes: string[]) {
+    Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
-  public syncAction(filesPathes: string[]): void {
-    tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
-    const files = glob
-      .sync(this.globPattern, { cwd: this.project.location })
-      .forEach(f => {
+    const modifedSyncFilesAbsPthsArr = filesPathes
+      .map(f => {
         const orgPath = path.join(this.project.location, f);
         // const orgContent = fse.readFileSync(orgPath, {
         //   encoding: 'utf8'
@@ -32,38 +38,34 @@ export class AppSourceReplicator extends FeatureCompilerForProject {
         // fse.writeFileSync(newPath, orgContent, {
         //   encoding: 'utf8'
         // });
-        copyFile(orgPath, newPath);
+        Helpers.copyFile(orgPath, newPath);
         if (fse.existsSync(newPath)) {
           SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath)
+          return newPath;
         }
-      });
-    // console.log(files);
-    // throw new Error("Method not implemented.");
-  }
-  public preAsyncAction(): void {
-    // throw new Error("Method not implemented.");
+      })
+      .filter(f => !!f);
+    return { modifedSyncFilesAbsPthsArr };
   }
 
-  public asyncAction(filePath: string) {
+  public async asyncAction(event, filePath: string) {
 
     const f = filePath.replace(this.project.location, '').replace(/^\//, '');
     if (this.project.sourceFilesToIgnore().includes(f)) {
       return;
     }
 
-    patchingForAsync(filePath, () => {
-      if (fse.existsSync(filePath)) {
-        const relative = f.replace(`${this.project.location}/`, '');
-        const relativePath = relative.replace(/^src/, config.folder.tempSrc)
-        const newPath = path.join(this.project.location, relativePath);
-        copyFile(f, newPath);
-        if (fse.existsSync(newPath)) {
-          SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
-        }
+
+    if (fse.existsSync(filePath)) {
+      const relative = f.replace(`${this.project.location}/`, '');
+      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+      const newPath = path.join(this.project.location, relativePath);
+      Helpers.copyFile(f, newPath);
+      if (fse.existsSync(newPath)) {
+        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
       }
-    }, 'app-source-replikator', 1);
-
-
+    }
+    return void 0;
   }
 
 

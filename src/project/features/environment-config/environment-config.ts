@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as glob from 'glob';
 
-import { error, warn, isValidIp, log } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
   saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
@@ -14,17 +14,17 @@ import { FeatureForProject } from '../../abstract';
 //#endregion
 
 import { Morphi } from 'morphi';
-import config from '../../../config';
-import { EnvConfig, EnvironmentName } from '../../../models';
+import { config } from '../../../config';
+import { Models } from '../../../models';
 import chalk from 'chalk';
 
 
 //#region @backend
-const environmentWithGeneratedIps: EnvironmentName[] = ['prod', 'stage'];
+const environmentWithGeneratedIps: Models.env.EnvironmentName[] = ['prod', 'stage'];
 //#endregion
 
 export interface IEnvironmentConfig {
-  readonly config: EnvConfig
+  readonly config: Models.env.EnvConfig
 }
 
 export class EnvironmentConfig
@@ -54,7 +54,7 @@ export class EnvironmentConfig
 
     overridePortsOnly = !_.isUndefined(overridePortsOnly) ? overridePortsOnly : !initFromScratch;
     if (!initFromScratch) {
-      log(`Config alredy ${chalk.bold('init')}ed tnp. ${'Environment for'} `
+      Helpers.log(`Config alredy ${chalk.bold('init')}ed tnp. ${'Environment for'} `
         + `${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
         + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
     }
@@ -85,7 +85,7 @@ export class EnvironmentConfig
       return
     }
 
-    const { generateIps, env }: { generateIps: boolean, env: EnvironmentName } =
+    const { generateIps, env }: { generateIps: boolean, env: Models.env.EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
 
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
@@ -99,14 +99,14 @@ export class EnvironmentConfig
     await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
 
     if (overridePortsOnly) {
-      log('Only ports overriding.. ')
+      Helpers.log('Only ports overriding.. ')
       return;
     }
 
     config.isCoreProject = this.project.isCoreProject;
 
     if (!config.workspace || !config.workspace.workspace) {
-      error(`You shoud define 'workspace' object inside config.workspace object`, true)
+      Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
       err(config)
     }
     if (!config.ip) {
@@ -115,8 +115,8 @@ export class EnvironmentConfig
       if (_.isString(config.ip)) {
         config.ip = config.ip.replace(/^https?:\/\//, '');
       }
-      if (!isValidIp(config.ip)) {
-        error(`Bad ip address in your environment .json config`, true)
+      if (!Helpers.isValidIp(config.ip)) {
+        Helpers.error(`Bad ip address in your environment .json config`, true)
         err(config)
       }
     }
@@ -165,14 +165,14 @@ export class EnvironmentConfig
   }
   //#endregion
 
-  private static configs: { [location: string]: EnvConfig } = {};
+  private static configs: { [location: string]: Models.env.EnvConfig } = {};
 
-  public get configsFromJs(): EnvConfig[] { // QUICK_FIX something if weird here
+  public get configsFromJs(): Models.env.EnvConfig[] { // QUICK_FIX something if weird here
     //#region @backendFunc
     const p = this.project.isWorkspaceChildProject ? this.project.parent : this.project;
     const locations = glob.sync(`${p.location}/*${config.file.environment}.*js`);
     const configs = locations.map(l => {
-      let c: EnvConfig;
+      let c: Models.env.EnvConfig;
       try {
         const jsFileName = l.replace(/\.js$/, '');
         // console.log('jsFileName', jsFileName)
@@ -196,18 +196,18 @@ export class EnvironmentConfig
   /**
    * Can be accesed only after env.prepare()
    */
-  public get config(): EnvConfig {
+  public get config(): Models.env.EnvConfig {
     if (Morphi.IsBrowser) {
       return this.browser.config;
     }
     //#region @backend
     const configPath = path.resolve(path.join(this.project.location, tmpEnvironmentFileName));
     if (fse.existsSync(configPath)) {
-      const res = fse.readJsonSync(configPath) as EnvConfig;
+      const res = fse.readJsonSync(configPath) as Models.env.EnvConfig;
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      global.tnp_normal_mode && warn(`confg doesnt exist: ${configPath}`)
+      global.tnp_normal_mode && Helpers.warn(`confg doesnt exist: ${configPath}`)
       return EnvironmentConfig.configs[configPath]
     }
     //#endregion

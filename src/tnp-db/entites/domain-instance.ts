@@ -1,6 +1,6 @@
 //#region @backend
 import { Project } from '../../project';
-import { EnvironmentName } from '../../models';
+import { Models } from '../../models';
 import { BuildInstance } from './build-instance';
 import { DBBaseEntity } from './base-entity';
 
@@ -30,7 +30,7 @@ export class DomainInstance extends DBBaseEntity implements IDomainInstance {
 
   declaredIn: {
     project: Project;
-    environment: EnvironmentName
+    environment: Models.env.EnvironmentName
   }[] = [];
   get activeFor(): BuildInstance {
     return

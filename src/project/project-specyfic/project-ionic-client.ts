@@ -2,10 +2,13 @@
 import * as path from 'path';
 // local
 import { Project } from "../abstract";
-import config from "../../config";
+import { config } from "../../config";
 import { BuildOptions } from '../features';
 
 export class ProjectIonicClient extends Project {
+  buildLib() {
+    // throw new Error("Method not implemented.");
+  }
 
   startOnCommand(args: string) {
     const command = `echo "hello from ionic" ${args}`;

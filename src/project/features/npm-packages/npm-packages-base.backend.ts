@@ -2,8 +2,8 @@
 import chalk from 'chalk';
 import * as _ from 'lodash';
 
-import { error, log } from '../../../helpers';
-import { NpmInstallOptions } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { Models } from '../../../models';
 import { NpmPackagesCore } from './npm-packages-core.backend';
 import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
 import { PROGRESS_DATA } from '../../../progress-output';
@@ -12,7 +12,7 @@ import { PROGRESS_DATA } from '../../../progress-output';
 
 export class NpmPackagesBase extends NpmPackagesCore {
 
-  public async installProcess(triggeredMsg: string, options?: NpmInstallOptions) {
+  public async installProcess(triggeredMsg: string, options?: Models.npm.NpmInstallOptions) {
     if (!global.tnp_normal_mode) {
       return;
     }
@@ -23,11 +23,11 @@ export class NpmPackagesBase extends NpmPackagesCore {
     const fullInstall = (npmPackage.length === 0);
 
     if (remove && fullInstall) {
-      error(`[install process]] Please specify packages to remove`, false, true);
+      Helpers.error(`[install process]] Please specify packages to remove`, false, true);
     }
 
     if (remove) {
-      log(`Package [${
+      Helpers.log(`Package [${
         npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
           .join(',')
         }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
@@ -36,9 +36,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
       });
     } else {
       if (fullInstall) {
-        log(`Packages full installation for ${this.project.genericName}`)
+        Helpers.log(`Packages full installation for ${this.project.genericName}`)
       } else {
-        log(`Package [${
+        Helpers.log(`Package [${
           npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
             .join(',')
           }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
@@ -77,7 +77,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
           });
         }
       } else {
-        log(`Dont install node_modules - project is container`)
+        Helpers.log(`Dont install node_modules - project is container`)
       }
 
       if (this.project.isWorkspace && smoothInstall === false) {

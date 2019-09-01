@@ -1,7 +1,7 @@
 //#region @backend
 import { Ora } from 'ora';
 //#endregion
-import { BuildDir } from './models';
+import { Models } from './models';
 
 
 
@@ -9,7 +9,8 @@ declare global {
   namespace NodeJS {
     interface Global {
       tnp_normal_mode: boolean;
-      tnp_out_folder: BuildDir;
+      tnp_out_folder: Models.dev.BuildDir;
+      muteMessages: boolean;
       testMode: boolean;
       hideWarnings: boolean;
       hideInfos: boolean;

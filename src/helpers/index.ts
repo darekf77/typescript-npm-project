@@ -1,11 +1,6 @@
-export * from './helpers-messages';
-//#region @backend
-export * from './helpers-process';
-//#endregion
-export * from './helpers';
-//#region @backend
-export * from './helpers-environment';
-export * from './helpers-git';
-export * from './helpers-links';
-export * from './helpers-system-terminal';
-//#endregion
+// //#region @backend
+// export * from './ts-code-modifier';
+// //#endregion
+import { Helpers as Base } from './helpers';
+
+export const Helpers = Base.Instance;

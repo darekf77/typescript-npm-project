@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { EnumValues } from 'enum-values'
 import { CommandInstance } from './tnp-db/entites';
-import { killProcessByPort } from './helpers';
+import { Helpers } from './helpers';
 import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
@@ -192,7 +192,7 @@ export class ConsoleUi {
           name: 'port',
           message: 'Please port number'
         }) as any;
-        await killProcessByPort(num.port);
+        await Helpers.killProcessByPort(num.port);
         process.exit(0)
         break;
 

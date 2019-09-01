@@ -1,6 +1,6 @@
 //#region @backend
 import { Project } from '../project';
-import { error } from '../helpers';
+import { Helpers } from '../helpers';
 
 export async function $INSTALL(args, smooth = false, exit = true) {
   await Project.Current.npmPackages.installFromArgs(args, smooth);
@@ -31,7 +31,7 @@ export default {
       project = project.parent;
     }
     if (!project.isWorkspace) {
-      error(`This is not workspace or workpace child projct`, false, true)
+      Helpers.error(`This is not workspace or workpace child projct`, false, true)
     }
     project.workspaceSymlinks.add(`Add workspace symlinks`);
     process.exit(0)
@@ -42,7 +42,7 @@ export default {
       project = project.parent;
     }
     if (!project.isWorkspace) {
-      error(`This is not workspace or workpace child projct`, false, true)
+      Helpers.error(`This is not workspace or workpace child projct`, false, true)
     }
     project.workspaceSymlinks.remove(`Remove workspace symlinks`);
     process.exit(0)

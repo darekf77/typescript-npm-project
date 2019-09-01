@@ -10,7 +10,7 @@ import {
   EntityNames, CommandInstance, ProjectInstance,
   ProcessInstance
 } from './entites';
-import { error } from '../helpers';
+import { Helpers } from '../helpers';
 import { BuildOptions } from '../project/features';
 
 
@@ -76,10 +76,10 @@ export class DbCrud {
 
   setBulk(entites: DBBaseEntity[], classFN: Function): boolean {
     if (!_.isArray(entites)) {
-      error(`[db-crud] setBuild - this is not array of entities`)
+      Helpers.error(`[db-crud] setBuild - this is not array of entities`)
     }
     if (entites.length === 0 && !_.isFunction(classFN)) {
-      error(`Please provide class function in setBuild(entites, <class function hrere>)`)
+      Helpers.error(`Please provide class function in setBuild(entites, <class function hrere>)`)
     }
     const className = _.isFunction(classFN) ? CLASS.getName(classFN) :
       CLASS.getNameFromObject(_.first(entites))

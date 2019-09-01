@@ -4,12 +4,10 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import config from '../../config';
-import { LibType, IPackageJSON, NewFactoryType } from '../../models';
-import { run, log } from '../../helpers';
+import { config } from '../../config';
+import { Models } from '../../models';
+import { Helpers } from '../../helpers';
 import { Project } from '../../project';
-import { info, error } from '../../helpers';
-
 
 export class ProjectFactory {
 
@@ -34,22 +32,22 @@ export class ProjectFactory {
     config.libsTypes.forEach(t => {
       console.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
     })
-    error(chalk.red(`Please use example above.`), false, true);
+    Helpers.error(chalk.red(`Please use example above.`), false, true);
   }
 
   private errorMsgCreateSite() {
     console.log(chalk.green(`Good examples: tnp new site-project-name --basedOn baseline-workspace-project-name`));
-    error(`Please use example above.`, false, true);
+    Helpers.error(`Please use example above.`, false, true);
   }
 
-  private pacakgeJsonNameFix(locationDest, type: LibType, basedOn?: string) {
+  private pacakgeJsonNameFix(locationDest, type: Models.libs.LibType, basedOn?: string) {
     const pkgJSONpath = path.join(locationDest, config.file.package_json);
-    const json: IPackageJSON = fse.readJSONSync(pkgJSONpath)
+    const json: Models.npm.IPackageJSON = fse.readJSONSync(pkgJSONpath)
     json.name = _.kebabCase(path.basename(locationDest));
 
     json.tnp.isCoreProject = false;
     json.tnp.isGenerated = false;
-    if ((['isomorphic-lib', 'angular-lib'] as LibType[])) {
+    if ((['isomorphic-lib', 'angular-lib'] as Models.libs.LibType[])) {
       json.tnp.useFramework = false;
     }
     if (basedOn) {
@@ -59,25 +57,25 @@ export class ProjectFactory {
     fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
   }
 
-  public create(type: LibType, name: string, cwd: string, basedOn?: string): Project {
+  public create(type: Models.libs.LibType, name: string, cwd: string, basedOn?: string): Project {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
-      info(`Project name renemed to: ${nameKebakCase} `)
+      Helpers.info(`Project name renemed to: ${nameKebakCase} `)
     }
     name = nameKebakCase;
     const basedOnProject = basedOn && Project.From(path.join(cwd, basedOn));
     if (basedOn && !basedOnProject) {
-      error(`Not able to find baseline project from relative path: ${basedOn} `, false, true);
+      Helpers.error(`Not able to find baseline project from relative path: ${basedOn} `, false, true);
     }
     if (basedOn && basedOnProject && basedOnProject.type !== 'workspace') {
-      error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
+      Helpers.error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
     const baseline = basedOn ? basedOnProject : Project.by(type);
     console.log('PROJECt BASELINE', baseline.location);
     const destinationPath = this.getDestinationPath(name, cwd);
     if (fse.pathExistsSync(destinationPath)) {
-      info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
+      Helpers.info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
     } else {
       if (baseline) {
         try {
@@ -89,9 +87,9 @@ export class ProjectFactory {
           });
           // console.log(destinationPath)
           this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
-          info(`Project ${baseline.name} create successfully`);
+          Helpers.info(`Project ${baseline.name} create successfully`);
         } catch (err) {
-          error(err);
+          Helpers.error(err);
         }
       } else {
         this.errorMsgCreateProject()
@@ -126,13 +124,13 @@ export class ProjectFactory {
     const argv = args.split(' ');
 
     if (!_.isArray(argv) || argv.length < 2) {
-      error(`Top few argument for ${chalk.black('init')} parameter.`, true);
+      Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
     const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
 
     if (basedOn) {
-      error(`To create workspace site use command: tnp new: site name - of - workspace - site`
+      Helpers.error(`To create workspace site use command: tnp new: site name - of - workspace - site`
         + `--basedOn relativePathToBaselineWorkspace`, false, true);
     }
     const type = argv[0] as any;

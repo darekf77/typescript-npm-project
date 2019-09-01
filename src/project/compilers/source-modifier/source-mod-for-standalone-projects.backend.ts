@@ -1,7 +1,6 @@
 import { FeatureForProject } from '../../abstract';
-import { replace } from './replace';
-import config from '../../../config';
-import { ModType } from './source-code-type';
+import { config } from '../../../config';
+import { ModType, SourceCodeType } from './source-modifier.models';
 
 
 export class SourceModForStandaloneProjects extends FeatureForProject {

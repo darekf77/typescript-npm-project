@@ -9,10 +9,11 @@ import { CLASS } from 'typescript-class-helpers';
 
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
-import { Range } from '../helpers';
+import { Helpers } from '../helpers';
+import { Models } from '../models';
 import { DBBaseEntity, PortInstance, DomainInstance, BuildInstance, CommandInstance, ProjectInstance } from '../tnp-db/entites';
 import { DbCrud } from '../tnp-db/db-crud';
-import config from '../config';
+import { config } from '../config';
 
 
 function db() {

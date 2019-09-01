@@ -5,17 +5,15 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 
-import config from '../../../config';
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib/incremental-build-process';
+import { config } from '../../../config';
 import { FeatureCompilerForProject, Project } from '../../abstract';
-import { LibType, SourceFolder } from '../../../models';
-import { TsUsage } from 'morphi/build';
-import { error, escapeStringForRegEx, log, warn, info, patchingForAsync } from '../../../helpers';
-import { replace } from './replace';
-import { ModType, SourceCodeType } from './source-code-type';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { ModType, SourceCodeType } from './source-modifier.models';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { AppSourceReplicator } from './app-source-replicator.backend';
+import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
 const debugFiles = [
@@ -23,7 +21,7 @@ const debugFiles = [
 ];
 
 export class SourceModifier extends FeatureCompilerForProject {
-  appSourceReplicator: AppSourceReplicator;
+
 
   get allowedToRunReplikator() {
     const libs = config.allowedTypes.angularClient.concat(this.project.isSite ? ['isomorphic-lib'] : []);
@@ -32,21 +30,21 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   async init(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
     }
     await super.init(taskName, callback);
   }
 
   async initAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
     }
     await super.initAndWatch(taskName, callback);
   }
 
   //#region get source type lib - for libs, app - for clients
   private static getModType(project: Project, relativePath: string): ModType {
-    const startFolder: SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as SourceFolder;
+    const startFolder: Models.other.SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as Models.other.SourceFolder;
     if (/^tmp\-src(?!\-)/.test(startFolder)) {
       return 'tmp-src';
     }
@@ -112,10 +110,15 @@ export class SourceModifier extends FeatureCompilerForProject {
 
   //#region constructor
   sourceMod: SourceModForWorkspaceChilds;
-  constructor(public project: Project) {
+  constructor(public project: Project,
+    public appSourceReplicator: AppSourceReplicator = IncCompiler
+      .getInstance<AppSourceReplicator>('AppSourceReplicator')
+  ) {
     super(getFolderPattern(project), '', project && project.location, project);
     this.sourceMod = new SourceModForWorkspaceChilds(project);
-    this.appSourceReplicator = new AppSourceReplicator(project);
+    appSourceReplicator.set({
+      project
+    });
   }
   //#endregion
 
@@ -144,9 +147,9 @@ export class SourceModifier extends FeatureCompilerForProject {
       return;
     }
 
-    patchingForAsync(filePath, () => {
-      SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
-    }, 'source-modifier', 3);
+    // patchingForAsync(filePath, () => {
+    SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
+    // }, 'source-modifier', 3);
 
   }
   //#endregion

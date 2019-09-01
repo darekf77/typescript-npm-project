@@ -1,10 +1,10 @@
 //#region @backend
 import * as _ from 'lodash';
 
-import { Range } from '../../helpers';
+import { Helpers } from '../../helpers';
 import { PortInstance } from '../entites';
 import { Project } from '../../project';
-import { SystemService } from '../../models/system-service';
+import { Models } from '../../models';
 
 
 
@@ -32,7 +32,7 @@ export class PortsSet {
   private makeSmaller(allInstacesSingle: PortInstance[]) {
     const ports: PortInstance[] = []
 
-    let currentProjectLocationOrSystemService: Project | SystemService = undefined;
+    let currentProjectLocationOrSystemService: Project | Models.system.SystemService = undefined;
     let curretnPortIns: PortInstance;
     allInstacesSingle.forEach(ins => {
 
@@ -93,7 +93,10 @@ export class PortsSet {
     return PortsSet.count.allPorts(this.ports);
   }
 
-  checkIfFreePortAmountEnouth(projectLocationOrSystemService: Project | SystemService, howManyPorts: number, ports: PortInstance[]) {
+  checkIfFreePortAmountEnouth(
+    projectLocationOrSystemService: Project | Models.system.SystemService,
+    howManyPorts: number, ports: PortInstance[]) {
+
     if (_.isUndefined(howManyPorts) && _.isString(projectLocationOrSystemService)) {
       const project = Project.From(projectLocationOrSystemService);
       howManyPorts = 1 + (project.isWorkspace ? project.children.length : 0)
@@ -118,7 +121,7 @@ export class PortsSet {
             allInstaces.push(new PortInstance(idelem, ins.reservedFor))
           })
         } else {
-          const rangeID = ins.id as Range;
+          const rangeID = ins.id as Models.other.Range;
           allInstaces = allInstaces.concat(rangeID.array.map(idelem => {
             return new PortInstance(idelem, ins.reservedFor)
           }));
@@ -128,11 +131,14 @@ export class PortsSet {
     return allInstaces;
   }
 
-  reserveFreePortsFor(projectLocationOrSystemService: Project | SystemService, howManyPorts: number = 1) {
+  reserveFreePortsFor(projectLocationOrSystemService: Project | Models.system.SystemService,
+    howManyPorts: number = 1) {
     return this._reserveFreePortsFor(projectLocationOrSystemService, howManyPorts, this.ports);
   }
 
-  private _reserveFreePortsFor(projectLocationOrSystemService: Project | SystemService, howManyPorts: number = 1, ports: PortInstance[],
+  private _reserveFreePortsFor(
+    projectLocationOrSystemService: Project | Models.system.SystemService,
+    howManyPorts: number = 1, ports: PortInstance[],
     allInstaces?: PortInstance[]): boolean {
 
     let saveInstancesToDb = false;
@@ -196,7 +202,7 @@ export class PortsSet {
     return true;
   }
 
-  getReserverFor(projectLocationOrSevice: string | SystemService): PortInstance[] {
+  getReserverFor(projectLocationOrSevice: string | Models.system.SystemService): PortInstance[] {
     return this.ports.filter(f => _.isEqual(f.reservedFor, projectLocationOrSevice));
   }
 

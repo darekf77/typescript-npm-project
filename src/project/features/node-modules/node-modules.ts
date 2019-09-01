@@ -7,9 +7,9 @@ import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
-import { ArrNpmDependencyType, Package } from '../../../models';
-import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../../helpers';
-import config from '../../../config';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
 import { FeatureForProject } from '../../abstract';
 import { dedupePackages, nodeModulesExists } from './node-modules-helpers.backend';
 import { NodeModulesBase } from './node-modules-base.backend';

@@ -1,26 +1,17 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import { Project, LibProject } from "../project";
-import { error, info, HelpersLinks, killProcess, warn, escapeStringForRegEx } from '../helpers';
-import chalk from 'chalk';
-import { getMostRecentFilesNames } from '../helpers';
-import { Helpers as HelpersMorphi } from "morphi";
-import { run } from "../helpers";
-import * as glob from 'glob';
-import * as fs from 'fs';
+import { Project } from "../project";
+import { Helpers } from '../helpers';
 import * as path from 'path';
-import config from '../config';
-import { commitWhatIs } from '../helpers';
-import { paramsFrom } from '../helpers';
-import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
+import { config } from '../config';
 import { TnpDB } from '../tnp-db';
 
 function killvscode(args: string, exit = true) {
   try {
-    run(`kill -9 $(pgrep Electron)`).sync();
-    info(`Killled`)
+    Helpers.run(`kill -9 $(pgrep Electron)`).sync();
+    Helpers.info(`Killled`)
   } catch (error) {
-    warn(`kill not needed`)
+    Helpers.warn(`kill not needed`)
   }
   if (exit) {
     process.exit(0)
@@ -74,7 +65,7 @@ export async function develop(args: string, exit = true) {
     try {
       var regex = new RegExp(projectName);
     } catch (err) {
-      error(`Invalid regular expresion: ${projectName}`, false, true)
+      Helpers.error(`Invalid regular expresion: ${projectName}`, false, true)
     }
 
     // console.log(`source: "${regex.source}"`)
@@ -84,7 +75,7 @@ export async function develop(args: string, exit = true) {
     if (projs) {
       projs.forEach(c => projectForAction.push(c));
     } else {
-      error(`Cannot find project: "${projectName}"`, true, true)
+      Helpers.error(`Cannot find project: "${projectName}"`, true, true)
     }
 
     // projects.forEach(p => {

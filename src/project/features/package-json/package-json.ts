@@ -1,19 +1,19 @@
 //#region @backend
-
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from "chalk";
+//#endregion
 
 import { Project } from "../../abstract";
-import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from "../../../helpers";
+import { Helpers } from "../../../helpers";
 import { config } from '../../../config';
+import { Models } from '../../../models';
 import { PackageJsonBase } from './package-json-base.backend';
-//#endregion
 
 import * as _ from "lodash";
 import { Morphi } from 'morphi';
-import { IPackageJSON, DependenciesFromPackageJsonStyle } from '../../../models/ipackage-json';
+
 
 
 @Morphi.Entity<PackageJSON>({
@@ -34,7 +34,7 @@ export class PackageJSON
     return this.fromLocation(project.location, project);
   }
   public static fromLocation(location: string, project: Project = null, warings = true): PackageJSON {
-    if(!fse.existsSync(location)) {
+    if (!fse.existsSync(location)) {
       return void 0;
     }
     const isTnpProject = (location === config.pathes.tnp_folder_location);
@@ -45,7 +45,7 @@ export class PackageJSON
     }
     try {
       const file = fs.readFileSync(filePath, 'utf8').toString();
-      const json: IPackageJSON = JSON.parse(file) as any;
+      const json: Models.npm.IPackageJSON = JSON.parse(file) as any;
       if (!json.tnp && !isTnpProject) {
         // warn(`Unrecognized project type from location: ${location}`, false);
       }
@@ -87,18 +87,18 @@ export class PackageJSON
       var pkgJson = new PackageJSON({ data: json, location, project });
 
     } catch (err) {
-      error(`Error while parsing package.json in: ${filePath}`, true, true);
-      error(err)
+      Helpers.error(`Error while parsing package.json in: ${filePath}`, true, true);
+      Helpers.error(err)
       return;
     }
     if (saveAtLoad) {
-      log(`Saving fixed package.json structure`);
+      Helpers.log(`Saving fixed package.json structure`);
       pkgJson.writeToDisc()
     }
     return pkgJson;
   }
 
-  private restrictVersions(obj: DependenciesFromPackageJsonStyle) {
+  private restrictVersions(obj: Models.npm.DependenciesFromPackageJsonStyle) {
     Object.keys(obj).forEach(name => {
       if (obj[name].startsWith('^')) {
         obj[name] = obj[name].slice(1)

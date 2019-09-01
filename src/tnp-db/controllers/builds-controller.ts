@@ -3,11 +3,10 @@ import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
-import { getWorkingDirOfProcess } from '../../helpers';
-import { PsListInfo } from '../../models/ps-info';
+import { Helpers } from '../../helpers';
+import { Models } from '../../models';
 import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
-import { warn } from '../../helpers';
 import { BuildOptions } from '../../project/features';
 
 export class BuildsController extends BaseController {
@@ -16,7 +15,7 @@ export class BuildsController extends BaseController {
    * Update if proceses exists (by pid)
    */
   async update() {
-    const ps: PsListInfo[] = await psList();
+    const ps: Models.system.PsListInfo[] = await psList();
     const all = this.crud.getAll<BuildInstance>(BuildInstance);
     // console.log('[UPDATE BUILDS] BEFORE FILTER', all.map(c => c.pid))
     const filteredBuilds = all.filter(b => ps.filter(p => p.pid == b.pid).length > 0)
@@ -26,16 +25,16 @@ export class BuildsController extends BaseController {
   }
 
   async addExisted() {
-    const ps: PsListInfo[] = await psList();
+    const ps: Models.system.PsListInfo[] = await psList();
     // console.log(ps.filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0));
     const builds = ps
       .filter(p => p.cmd.split(' ').filter(p => p.endsWith(`/bin/tnp`)).length > 0)
       .map(p => {
-        const location = getWorkingDirOfProcess(p.pid);
+        const location = Helpers.getWorkingDirOfProcess(p.pid);
         const project = Project.From(location)
         if (project) {
           const b = new BuildInstance({
-            location: getWorkingDirOfProcess(p.pid),
+            location: Helpers.getWorkingDirOfProcess(p.pid),
             pid: p.pid,
             cmd: p.cmd
           });
@@ -58,7 +57,7 @@ export class BuildsController extends BaseController {
         try {
           b.kill()
         } catch (error) {
-          warn(`Not able to kill ${b.brief}`)
+          Helpers.warn(`Not able to kill ${b.brief}`)
         }
       })
 

@@ -1,22 +1,14 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import { Project, LibProject } from "../project";
+import { Project } from "../project";
 import * as  psList from 'ps-list';
-import { PsListInfo } from '../models/ps-info';
-import { error, info, HelpersLinks, killProcess, warn } from '../helpers';
+import { Helpers } from '../helpers';
+import { Models } from '../models';
 import chalk from 'chalk';
-import { getMostRecentFilesNames } from '../helpers';
-import { Helpers as HelpersMorphi } from "morphi";
-import { run } from "../helpers";
-import * as glob from 'glob';
-import * as fs from 'fs';
 import * as path from 'path';
-import config from '../config';
-import { commitWhatIs } from '../helpers';
-import { paramsFrom } from '../helpers';
+import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-import { TnpDB } from '../tnp-db';
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -31,9 +23,9 @@ async function copyModuleto(args: string) {
     }
 
     await project.node_modules.copy(packageName).to(project);
-    info(`Copy DONE`)
+    Helpers.info(`Copy DONE`)
   } else {
-    error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
+    Helpers.error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
   }
   process.exit(0)
 }
@@ -41,13 +33,13 @@ async function copyModuleto(args: string) {
 
 function copy(destLocaiton) {
 
-  const currentLib = (Project.Current as LibProject);
+  const currentLib = Project.Current;
   const destination = Project.From(destLocaiton);
   if (!destination) {
-    error(`Incorect project in: ${destLocaiton}`)
+    Helpers.error(`Incorect project in: ${destLocaiton}`)
   }
   currentLib.copyManager.copyBuildedDistributionTo(destination, void 0, false);
-  info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
+  Helpers.info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
 
 function copyto(args: string) {
@@ -84,11 +76,11 @@ async function RUN_PROCESS() {
 async function $PSINFO(args: string) {
   const pid = Number(args)
 
-  let ps: PsListInfo[] = await psList()
+  let ps: Models.system.PsListInfo[] = await psList()
 
   let info = ps.find(p => p.pid == pid);
   if (!info) {
-    error(`No process found with pid: ${args}`, false, true)
+    Helpers.error(`No process found with pid: ${args}`, false, true)
   }
   console.log(info)
 }
@@ -96,7 +88,7 @@ async function $PSINFO(args: string) {
 function $COMMAND(args) {
   const command = decodeURIComponent(args);
   // info(`Starting command: ${command}`)
-  run(decodeURIComponent(args)).sync()
+  Helpers.run(decodeURIComponent(args)).sync()
   // info(`Finish command: ${command}`)
   process.exit(0)
 }
@@ -115,7 +107,7 @@ export default {
 
   LN(args: string) {
     let [target, link] = args.split(' ');
-    HelpersLinks.createSymLink(target, link)
+    Helpers.createSymLink(target, link)
     process.exit(0)
   },
 
@@ -151,14 +143,14 @@ export default {
       }
       process.exit(0)
     }
-    error(`This is not "site project"`, false, true);
+    Helpers.error(`This is not "site project"`, false, true);
   },
   CIRCURAL_CHECK() {
     Project.Current.run(`madge --circular --extensions ts ./src`).sync()
     process.exit(0)
   },
   $FILEINFO: (args) => {
-    console.log(getMostRecentFilesNames(process.cwd()))
+    console.log(Helpers.getMostRecentFilesNames(process.cwd()))
 
     process.exit(0)
   },
@@ -206,16 +198,15 @@ export default {
   },
   COPY_RESOURCES: () => {
     Project.Current.checkIfReadyForNpm();
-    (Project.Current as LibProject).bundleResources()
-
+    Project.Current.bundleResources();
     process.exit(0)
   },
   $CHECK_ENV: (args) => {
-    HelpersMorphi.checkEnvironment()
+    Helpers.checkEnvironment()
     process.exit(0)
   },
   $CHECK_ENVIRONMENT: (args) => {
-    HelpersMorphi.checkEnvironment()
+    Helpers.checkEnvironment()
     process.exit(0)
   },
 

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Project } from '../../project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
-import { killProcess } from '../../helpers';
+import { Helpers } from '../../helpers';
 import chalk from 'chalk';
 import { BuildOptions } from '../../project/features';
 
@@ -80,7 +80,7 @@ export class BuildInstance extends DBBaseEntity implements IBuildInstance {
 
   kill() {
     console.log(`Killing ${this.brief}`)
-    killProcess(this.pid)
+    Helpers.killProcess(this.pid)
   }
 
   pid: number;

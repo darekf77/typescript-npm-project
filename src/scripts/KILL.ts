@@ -1,12 +1,11 @@
 //#region @backend
-import { info, error } from "../helpers";
-import { run, killProcessByPort } from '../helpers';
+import { Helpers } from "../helpers";
 import * as os from 'os';
 import { TnpDB } from '../tnp-db';
 import { Project } from '../project';
 
 function killallnode() {
-  run(`fkill -f node`).sync()
+  Helpers.run(`fkill -f node`).sync()
   // if (process.platform === 'win32') {
   //   run(`taskkill /F /im node.exe`).sync();
   // } else {
@@ -29,7 +28,7 @@ export async function killAll() {
 
 export async function killonport(args, noExit = false) {
   const port = parseInt(args.trim())
-  await killProcessByPort(port);
+  await Helpers.killProcessByPort(port);
   if (!noExit) {
     process.exit(0)
   }

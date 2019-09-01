@@ -1,13 +1,13 @@
 
 //#region @backend
 import * as _ from 'lodash';
-import { LibType, IPackageJSON, NewFactoryType } from '../../models';
+import { Models } from '../../models';
 
 import { ProjectFactory } from './project-factory.backend';
 
 export function NEW(args: string, exit = true, cwd = process.cwd()) {
   const argv = args.split(' ');
-  const type = argv[0] as NewFactoryType;
+  const type = argv[0] as Models.libs.NewFactoryType;
   if (type === 'model') {
     ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
   } else {

@@ -6,7 +6,7 @@ import { Project } from '../../project';
 import { DbCrud } from '../db-crud';
 import { BaseController } from './base-controlller';
 import { ProjectInstance } from '../entites';
-import config from '../../config';
+import { config } from '../../config';
 
 export class ProjectsController extends BaseController {
 

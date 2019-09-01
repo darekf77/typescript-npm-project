@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as  psList from 'ps-list';
 import * as sleep from 'sleep';
 
-import { runSyncOrAsync, log } from '../helpers';
+import { Helpers } from '../helpers';
 
 import { DbCrud } from './db-crud';
 import {
@@ -19,14 +19,12 @@ import {
 } from './controllers';
 import { Project } from '../project';
 import { BuildInstance } from './entites/build-instance';
-import { warn, error } from '../helpers';
-import { killProcess, questionYesNo } from '../helpers';
 import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
-import { PsListInfo } from '../models/ps-info';
+import { Models } from '../models';
 import chalk from 'chalk';
 import { BuildOptions } from '../project/features';
-import config from '../config';
+import { config } from '../config';
 
 export type ProcessBoundAction = (
   process: ProcessInstance
@@ -77,7 +75,7 @@ export class DBTransaction {
     // console.log(`Set commadn: ${command}`)
     let location: string = process.cwd();
     if (!fse.existsSync(location)) {
-      error(`Cannot set command - location doesn't exists: ${location}`)
+      Helpers.error(`Cannot set command - location doesn't exists: ${location}`)
       return
     }
     await this.start(`set command: ${command} in location: ${location}`, () => {
@@ -129,7 +127,7 @@ export class DBTransaction {
 
   private killAndRemove(existed: BuildInstance) {
     try {
-      killProcess(existed.pid)
+      Helpers.killProcess(existed.pid)
     } catch (error) {
     }
     this.crud.remove(existed)
@@ -204,12 +202,12 @@ export class DBTransaction {
         if (existed) {
 
           if (!existed.buildOptions.watch) {
-            warn('automatic kill of active build instance in static build mode')
+            Helpers.warn('automatic kill of active build instance in static build mode')
             this.killAndRemove(existed)
             continue;
           } else {
             console.log(`Current process pid: ${process.pid}`)
-            const confirm = await questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
+            const confirm = await Helpers.questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
            build options: ${existed.buildOptions.toString()}`)
             if (confirm) {
               this.killAndRemove(existed)
@@ -234,7 +232,7 @@ export class DBTransaction {
     name = '-'
     const debug = false;
 
-    debug && log(`Transaction started for pid: ${process.pid},`
+    debug && Helpers.log(`Transaction started for pid: ${process.pid},`
       + ` name: ${chalk.bold(name)}`)
 
     let rewriteFile = true;
@@ -266,7 +264,7 @@ export class DBTransaction {
         if (process.ppid === pidInFile || process.pid === pidInFile) {
           rewriteFile = false;
         } else {
-          let ps: PsListInfo[] = await psList()
+          let ps: Models.system.PsListInfo[] = await psList()
           if (ps.filter(p => p.pid == pidInFile).length >= 1) {
 
             debug && console.log(`Waiting for transaction on pid ${pidInFile} to end - current pid: ${process.pid}`)
@@ -281,7 +279,7 @@ export class DBTransaction {
       fse.writeFileSync(transactionFilePath, `[${process.pid}]`);
     }
 
-    await runSyncOrAsync(callback)
+    await Helpers.runSyncOrAsync(callback)
     if (rewriteFile) {
       fse.unlinkSync(transactionFilePath);
     }

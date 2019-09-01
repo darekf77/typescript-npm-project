@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 
-import { LibType, EnvironmentName, UIFramework } from './models';
+import { Models } from './models';
 
-const allowedEnvironments: EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
+const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
 const allowedEnvironmentsObj = {};
 allowedEnvironments.forEach(s => {
   allowedEnvironmentsObj[s] = s
@@ -93,7 +93,7 @@ export const config = {
     TEST_TIMEOUT: 3600000
   },
   tnp: 'tnp',
-  frameworks: ['bootstrap', 'ionic', 'material'] as UIFramework[],
+  frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   pathes: {
 
     tnp_folder_location: pathResolved(__dirname, '..'),
@@ -129,7 +129,7 @@ export const config = {
   default: {
     cloud: {
       environment: {
-        name: 'online' as EnvironmentName
+        name: 'online' as Models.env.EnvironmentName
       }
     }
   },
@@ -155,7 +155,7 @@ export const config = {
       'angular-client',
       'angular-lib',
       'ionic-client',
-    ] as LibType[],
+    ] as Models.libs.LibType[],
     app: [
       'angular-cli',
       'angular-client',
@@ -164,13 +164,13 @@ export const config = {
       'ionic-client',
       'docker',
       'container'
-    ] as LibType[],
+    ] as Models.libs.LibType[],
     libs: [
       'angular-lib',
       'isomorphic-lib',
       'server-lib',
       'workspace'
-    ] as LibType[]
+    ] as Models.libs.LibType[]
   },
   moduleNameAngularLib,
   moduleNameIsomorphicLib,
@@ -181,7 +181,7 @@ export const config = {
     'angular-client',
     'angular-lib',
     'ionic-client'
-  ] as LibType[],
+  ] as Models.libs.LibType[],
   libsTypes: [
     'workspace',
     'docker',
@@ -190,7 +190,7 @@ export const config = {
     'angular-lib',
     'angular-client',
     'angular-cli'
-  ] as LibType[],
+  ] as Models.libs.LibType[],
   // environmentName,
   localLibs: [
     'eslint',
@@ -245,5 +245,3 @@ export const config = {
   }
 }
 
-
-export default config;

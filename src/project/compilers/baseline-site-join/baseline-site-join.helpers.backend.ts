@@ -8,8 +8,8 @@ import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
 import { Project } from '../../abstract';
-import config from '../../../config';
-import { error } from '../../../helpers';
+import {config} from '../../../config';
+import { Helpers } from '../../../helpers';
 import chalk from 'chalk';
 //#endregion
 
@@ -119,7 +119,7 @@ export function allBaselineFiles(project: Project) {
   project.baseline.customizableFilesAndFolders.forEach(customizableFileOrFolder => {
     let globPath = path.join(pathToBaselineThroughtNodeModules(project), customizableFileOrFolder)
     if (!fse.existsSync(globPath)) {
-      error(`Custombizable folder of file doesn't exist: ${globPath}
+      Helpers.error(`Custombizable folder of file doesn't exist: ${globPath}
 
       Please add: ${path.basename(globPath)} to your baseline
 

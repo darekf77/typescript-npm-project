@@ -1,18 +1,18 @@
 //#region @backend
 import * as _ from 'lodash';
 import { Project } from '../../project';
-import { SystemService } from '../../models/system-service';
-import { Range } from '../../helpers';
+import { Models } from '../../models';
+import { Helpers } from '../../helpers';
 import { DBBaseEntity } from './base-entity';
 
-export type PortIdType = number | number[] | Range;
+export type PortIdType = number | number[] | Models.other.Range;
 
 
 export class PortInstance extends DBBaseEntity {
 
   constructor(
     public id?: PortIdType,
-    public reservedFor?: Project | SystemService) {
+    public reservedFor?: Project | Models.system.SystemService) {
     super()
     if (_.isArray(id)) {
       this.id = _.sortBy(id);
@@ -32,7 +32,7 @@ export class PortInstance extends DBBaseEntity {
       }
     }
     if (_.isObject(this.id) && _.isNumber(id)) {
-      const idRange = this.id as Range;
+      const idRange = this.id as Models.other.Range;
       if (idRange.to + 1 === id) {
         idRange.to = id;
         return true;
@@ -60,7 +60,7 @@ export class PortInstance extends DBBaseEntity {
       return this.id.length;
     }
     // console.log('THIS ID',this.id)
-    return (this.id as Range).length;
+    return (this.id as Models.other.Range).length;
   }
 
   isEqual(port: PortInstance) {
@@ -77,7 +77,7 @@ export class PortInstance extends DBBaseEntity {
     if (_.isArray(this.id)) {
       return _.first(this.id);
     }
-    return (this.id as Range).from;
+    return (this.id as Models.other.Range).from;
   }
 
 
@@ -93,12 +93,12 @@ export class PortInstance extends DBBaseEntity {
         return;
       }
       if (_.first(this.id) + (this.id.length - 1) === _.last(this.id)) {
-        this.id = Range.from(_.first(this.id)).to(_.last(this.id))
+        this.id = Models.other.Range.from(_.first(this.id)).to(_.last(this.id))
         return
       }
     }
     if (_.isObject(this.id)) {
-      const rangeId = this.id as Range;
+      const rangeId = this.id as Models.other.Range;
       if (rangeId.from === rangeId.to) {
         this.id = rangeId.from;
         return;
@@ -122,8 +122,8 @@ export class PortInstance extends DBBaseEntity {
 
     if (_.isObject(this.id) && !_.isArray(this.id) &&
       _.isObject(anotherId) && !_.isArray(anotherId)) {
-      const idRange = this.id as Range;
-      const anotherIdRange = anotherId as Range;
+      const idRange = this.id as Models.other.Range;
+      const anotherIdRange = anotherId as Models.other.Range;
       return idRange.contains(anotherIdRange);
     }
 
@@ -133,7 +133,7 @@ export class PortInstance extends DBBaseEntity {
     }
 
     if (_.isNumber(this.id) && _.isObject(anotherId)) {
-      return (anotherId as Range).contains(this.id);
+      return (anotherId as Models.other.Range).contains(this.id);
     }
 
     if (_.isArray(this.id) && _.isNumber(anotherId)) {
@@ -141,16 +141,16 @@ export class PortInstance extends DBBaseEntity {
     }
 
     if (_.isArray(this.id) && _.isObject(anotherId) && !_.isArray(anotherId)) {
-      return this.id.filter(num => (anotherId as Range).contains(num))
+      return this.id.filter(num => (anotherId as Models.other.Range).contains(num))
         .length === this.id.length;
     }
 
     if (_.isObject(this.id) && !_.isArray(this.id) && _.isNumber(anotherId)) {
-      return (this.id as Range).contains(anotherId)
+      return (this.id as Models.other.Range).contains(anotherId)
     }
 
     if (_.isObject(this.id) && !_.isArray(this.id) && _.isArray(anotherId)) {
-      return (anotherId as number[]).filter(num => (this.id as Range).contains(num))
+      return (anotherId as number[]).filter(num => (this.id as Models.other.Range).contains(num))
         .length === (anotherId as number[]).length;
     }
     // console.warn('Port instacne unknow types')

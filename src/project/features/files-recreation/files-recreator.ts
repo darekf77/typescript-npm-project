@@ -1,15 +1,12 @@
 //#region @backend
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
-import * as glob from 'glob';
-import * as rimraf from 'rimraf';
 // local
 import { Project } from '../../abstract';
-import { LibType, RecreateFile } from '../../../models';
-import { copyFile, crossPlatofrmPath, tryRemoveDir } from '../../../helpers';
-import config from '../../../config';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
 import { BaselineSiteJoin, PathHelper } from '../../compilers/baseline-site-join';
 import { FeatureForProject } from '../../abstract';
 
@@ -127,7 +124,7 @@ export class FilesRecreator extends FeatureForProject {
         return gitignoreFiles.map(f => `/${f}`)
       },
       get npmignore() {
-        const allowedProject: LibType[] = ['isomorphic-lib', 'angular-lib']
+        const allowedProject: Models.libs.LibType[] = ['isomorphic-lib', 'angular-lib']
         const canBeUseAsNpmPackage = allowedProject.includes(self.project.type);
         const npmignoreFiles = [
           '.vscode',
@@ -276,7 +273,7 @@ export class FilesRecreator extends FeatureForProject {
 
   projectSpecyficFiles() {
     const defaultProjectProptotype = Project.by(this.project.type);
-    let files: RecreateFile[] = [];
+    let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
       this.project.projectSpecyficFiles().forEach(f => {
         files.push({
@@ -285,7 +282,7 @@ export class FilesRecreator extends FeatureForProject {
         });
       });
       files.forEach(file => {
-        copyFile(file.from, file.where)
+        Helpers.copyFile(file.from, file.where)
       });
     }
   }
@@ -299,7 +296,7 @@ export class FilesRecreator extends FeatureForProject {
         where: path.join(this.project.location, file)
       }
     }).forEach(file => {
-      copyFile(file.from, file.where)
+      Helpers.copyFile(file.from, file.where)
     })
   }
 
@@ -359,7 +356,7 @@ export class FilesRecreator extends FeatureForProject {
           child.name
         );
         if (fse.existsSync(clientAssetsPath)) {
-          tryRemoveDir(clientAssetsPath)
+          Helpers.tryRemoveDir(clientAssetsPath)
         }
         if (fse.existsSync(libAssetsPath)) {
           filesPathesToIgnore.push(path.join(
@@ -375,7 +372,7 @@ export class FilesRecreator extends FeatureForProject {
     //         lib === 'angular-client' || lib === 'angular-lib'
     //     }).join(' or ')} project type.`)
     // }
-    this.assetsToIgnore = filesPathesToIgnore.map(p => crossPlatofrmPath(p))
+    this.assetsToIgnore = filesPathesToIgnore;
   }
 
 

@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { info, checkValidNpmPackageName, error, log, warn } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { NpmPackagesBase } from './npm-packages-base.backend';
 import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
 
@@ -25,7 +25,7 @@ export class NpmPackages extends NpmPackagesBase {
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      error(`Please specify package name: tnp uninstall exapmle-npm-package `, false, true)
+      Helpers.error(`Please specify package name: tnp uninstall exapmle-npm-package `, false, true)
     } else {
       const packages = resolvePacakgesFromArgs(args);
       await project.npmPackages.installProcess(`tnp uninstall ${packages

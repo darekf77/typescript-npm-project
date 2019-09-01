@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import { FeatureForProject } from '../../abstract';
-import { EnvConfig } from '../../../models';
-import { warn, error } from '../../../helpers';
-import config from '../../../config';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
 
 export class FilesTemplatesBuilder extends FeatureForProject {
 
@@ -22,11 +22,11 @@ export class FilesTemplatesBuilder extends FeatureForProject {
           encoding: 'utf8'
         }) : void 0
         if (!fileContent) {
-          warn(`[filesTemplats] Not able to read file: ${filePath}`);
+          Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
           return;
         }
       } catch (error) {
-        warn(`[filesTemplats] Not able to read file: ${filePath}`);
+        Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
         return;
       }
       const env = this.project.isWorkspaceChildProject ? this.project.env.config : void 0;
@@ -35,7 +35,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
 
   }
 
-  private processFile(orgFilePath: string, content: string, ENV: EnvConfig) {
+  private processFile(orgFilePath: string, content: string, ENV: Models.env.EnvConfig) {
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
 
     const newContent = content
@@ -56,7 +56,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
               const toReplace = eval(exp);
               line = line.replace(pattern, toReplace);
             } catch (err) {
-              error(err, false, true);
+              Helpers.error(err, false, true);
             }
             // console.log('toReplace', toReplace)
           });

@@ -4,7 +4,7 @@ import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
 import { ProcessInstance, ProcessMetaInfo } from '../entites';
-import { PsListInfo } from '../../models/ps-info';
+import { Models } from '../../models';
 
 
 export class ProcessController extends BaseController {

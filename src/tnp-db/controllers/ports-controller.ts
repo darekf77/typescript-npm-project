@@ -1,9 +1,8 @@
 //#region @backend
-import { Range } from '../../helpers';
-
+import { Helpers } from '../../helpers';
+import { Models } from '../../models';
 import { BaseController } from './base-controlller';
 import { PortInstance } from '../entites/port-instance';
-import { SystemService } from '../../models/system-service';
 import { PortsSet } from './ports-set';
 
 export class PortsController extends BaseController {
@@ -23,8 +22,8 @@ export class PortsController extends BaseController {
 
     const defaultPorts: PortInstance[] = [
 
-      new PortInstance([80, 443], new SystemService('http(s) related')),
-      new PortInstance(Range.from(4000).to(6000))
+      new PortInstance([80, 443], new Models.system.SystemService('http(s) related')),
+      new PortInstance(Models.other.Range.from(4000).to(6000))
 
     ]
 

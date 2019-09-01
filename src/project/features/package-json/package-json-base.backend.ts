@@ -7,8 +7,8 @@ import * as semver from 'semver';
 import chalk from 'chalk';
 
 import { Project } from '../../abstract';
-import { LibType, IPackageJSON, DependenciesFromPackageJsonStyle, UIFramework, Package, ArrNpmDependencyType } from '../../../models';
-import { tryRemoveDir, sortKeys as sortKeysInObjAtoZ, run, error, info, warn, log, HelpersLinks } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 
 import * as _ from 'lodash';
@@ -36,7 +36,7 @@ export class PackageJsonBase extends PackageJsonCore {
         tnp: {
           resources: []
         }
-      } as IPackageJSON, options.data as any);
+      } as Models.npm.IPackageJSON, options.data as any);
     }
     this.coreCategories = new PackageJsonDepsCoreCategories(this.project);
   }
@@ -75,7 +75,7 @@ export class PackageJsonBase extends PackageJsonCore {
       return;
     }
     if (this.project.isUnknowNpmProject) {
-      log(`Prepare for save not for unknow projects`);
+      Helpers.log(`Prepare for save not for unknow projects`);
       return;
     }
 
@@ -90,11 +90,11 @@ export class PackageJsonBase extends PackageJsonCore {
     reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
-  public removeDependencyAndSave = (p: Package, reason: string) => {
+  public removeDependencyAndSave = (p: Models.npm.Package, reason: string) => {
     this.prepareForSave('save')
     removeDependencyAndSave(p, reason, this.project);
   }
-  public setDependencyAndSave = (p: Package, reason: string) => {
+  public setDependencyAndSave = (p: Models.npm.Package, reason: string) => {
     this.prepareForSave('save')
     setDependencyAndSave(p, reason, this.project)
   }
@@ -108,18 +108,18 @@ export class PackageJsonBase extends PackageJsonCore {
 
     const versionRange = findVersionRange(this.project, dependency);
     if (!versionRange) {
-      error(`Version range not avaliable root: ${this.name} dependency: ${dependency.name}`, true, true);
+      Helpers.error(`Version range not avaliable root: ${this.name} dependency: ${dependency.name}`, true, true);
       return false;
     }
     const result = semver.satisfies(dependency.version, versionRange);
     const namePackage = `${dependency.name}@${dependency.version}`;
-    log(`[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`);
+    Helpers.log(`[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`);
     return result;
   }
 
   public reset() {
     if (this.project.isTnp) {
-      log(`Npm reset not available for Tnp project`)
+      Helpers.log(`Npm reset not available for Tnp project`)
       return;
     }
     if (this.project.isWorkspaceChildProject || this.project.isContainerChild) {
@@ -129,7 +129,7 @@ export class PackageJsonBase extends PackageJsonCore {
     this.save(`reset of npm`);
   }
 
-  async setCategoryFor(pkg: Package) {
+  async setCategoryFor(pkg: Models.npm.Package) {
     await this.coreCategories.setWizard(pkg)
   }
 
@@ -137,7 +137,7 @@ export class PackageJsonBase extends PackageJsonCore {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
       const otherProj = Project.From(location);
-      log(`Updating package.json from ${otherProj.name}`)
+      Helpers.log(`Updating package.json from ${otherProj.name}`)
       updaPackage(this.project, otherProj.packageJson.data.dependencies, otherProj);
       updaPackage(this.project, otherProj.packageJson.data.devDependencies, otherProj);
     }
@@ -147,7 +147,7 @@ export class PackageJsonBase extends PackageJsonCore {
 
 function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
   if (!deps) {
-    log(`Cant read deps`);
+    Helpers.log(`Cant read deps`);
     return;
   }
   Object.keys(deps).forEach(depName => {

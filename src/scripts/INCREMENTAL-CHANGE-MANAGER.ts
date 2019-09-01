@@ -2,7 +2,7 @@
 import * as path from 'path';
 import { CLASS } from 'typescript-class-helpers';
 import { IncCompiler } from 'incremental-compiler';
-import { info, warn, log, error, runSyncOrAsync, compilationWrapperTnp } from '../helpers';
+import { Helpers } from '../helpers';
 
 IncCompiler.init(async (asyncEvents) => {
 
@@ -16,12 +16,12 @@ IncCompiler.init(async (asyncEvents) => {
   // c.ClientCompiler1.asyncAction(asyncEvents, 'This is amaizing');
 
 }, {
-    info,
-    error,
-    warn,
-    log,
-    runSyncOrAsync,
-    compilationWrapper: compilationWrapperTnp
+    info: Helpers.info,
+    error: Helpers.error,
+    warn: Helpers.warn,
+    log: Helpers.log,
+    runSyncOrAsync: Helpers.runSyncOrAsync,
+    compilationWrapper: Helpers.compilationWrapperTnp
   });
 
 

@@ -1,7 +1,7 @@
 //#region @backend
-import { EnvConfig } from '../../../models';
+import { Models } from '../../../models';
 
-export const config: EnvConfig = {
+export const config: Models.env.EnvConfig = {
   workspace: {
     workspace: {
       baseUrl: '/info',

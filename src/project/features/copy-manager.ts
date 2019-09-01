@@ -9,13 +9,10 @@ import chalk from 'chalk';
 import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
-import config from "../../config";
+import { config } from "../../config";
 import { Project } from '../abstract';
-import { FileEvent, IPackageJSON } from '../../models';
-import { info, warn, log } from '../../helpers';
-import { tryRemoveDir, tryCopyFrom } from '../../helpers';
-import { GenerateProjectCopyOpt } from '../../models/index';
-import { copyFile } from '../../helpers';
+import { Models } from '../../models';
+import { Helpers } from '../../helpers';;
 import { BuildOptions } from './build-process';
 import { FeatureForProject } from '../abstract';
 
@@ -28,7 +25,7 @@ export class CopyManager extends FeatureForProject {
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
     if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-      info(`No need to copying on build finsh... `)
+      Helpers.info(`No need to copying on build finsh... `)
       return;
     }
     if (watch) {
@@ -76,7 +73,7 @@ export class CopyManager extends FeatureForProject {
   //     });
   // }
 
-  private executeCopy(sourceLocation: string, destinationLocation: string, options: GenerateProjectCopyOpt) {
+  private executeCopy(sourceLocation: string, destinationLocation: string, options: Models.other.GenerateProjectCopyOpt) {
     const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
     if (useTempLocation) {
@@ -130,10 +127,10 @@ export class CopyManager extends FeatureForProject {
       this.project.projectSourceFiles().forEach(f => {
         const source = path.join(this.project.location, f);
         if (fse.existsSync(source)) {
-          log(`Copying env file to static build: ${path.basename(f)} `)
-          tryCopyFrom(source, path.join(destinationLocation, f));
+          Helpers.log(`Copying env file to static build: ${path.basename(f)} `)
+          Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
         } else {
-          warn(`[executeCopy] Doesn not exist source: ${source}`);
+          Helpers.warn(`[executeCopy] Doesn not exist source: ${source}`);
         }
       });
     }
@@ -141,7 +138,7 @@ export class CopyManager extends FeatureForProject {
   }
 
   public generateSourceCopyIn(destinationLocation: string,
-    options?: GenerateProjectCopyOpt): boolean {
+    options?: Models.other.GenerateProjectCopyOpt): boolean {
     // if (this.project.isWorkspace) {
     //   console.log('GENERATING WORKSPACE')
     // }
@@ -179,7 +176,7 @@ export class CopyManager extends FeatureForProject {
 
     const sourceLocation = this.project.location;
     if (this.project.isForRecreation) {
-      var packageJson: IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
+      var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
         encoding: 'utf8'
       });
       if (this.project.isWorkspace && markAsGenerated) {
@@ -189,11 +186,11 @@ export class CopyManager extends FeatureForProject {
 
     if (fse.existsSync(destinationLocation)) {
       if (override) {
-        tryRemoveDir(destinationLocation);
+        Helpers.tryRemoveDir(destinationLocation);
         fse.mkdirpSync(destinationLocation);
       } else {
         if (showInfo) {
-          warn(`Destination for project "${this.project.name}" already exists, only: source copy`);
+          Helpers.warn(`Destination for project "${this.project.name}" already exists, only: source copy`);
         };
       }
     }
@@ -227,7 +224,7 @@ export class CopyManager extends FeatureForProject {
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
         dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
       }
-      info(`Source of project "${this.project.genericName})" generated in ${dir}/(< here >) `)
+      Helpers.info(`Source of project "${this.project.genericName})" generated in ${dir}/(< here >) `)
     }
 
 
@@ -264,7 +261,7 @@ export class CopyManager extends FeatureForProject {
     const { specyficFileRelativePath = void 0, outDir = 'dist' } = options;
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
-      warn(`Invalid project: ${destination.name}`)
+      Helpers.warn(`Invalid project: ${destination.name}`)
       return
     }
 
@@ -280,7 +277,7 @@ export class CopyManager extends FeatureForProject {
         namePackageName,
         specyficFileRelativePath));
 
-      copyFile(sourceFile, destinationFile)
+      Helpers.copyFile(sourceFile, destinationFile)
     } else {
       const projectOudDirDest = path.join(destination.location,
         config.folder.node_modules,
@@ -288,7 +285,7 @@ export class CopyManager extends FeatureForProject {
       );
 
       if (!dontRemoveDestFolder) {
-        tryRemoveDir(projectOudDirDest, true)
+        Helpers.tryRemoveDir(projectOudDirDest, true)
       }
 
       if (this.project.isTnp) {
@@ -298,14 +295,15 @@ export class CopyManager extends FeatureForProject {
         // console.info('[copyto] NORMAL INTSTALL')
         const monitoredOutDir: string = path.join(this.project.location, outDir)
 
-        tryCopyFrom(monitoredOutDir, projectOudDirDest)
+        Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest)
       }
     }
 
   }
 
   // private __firstTimeWatchCopyTOFiles = [];
-  private copyToProjectsOnFinish(event?: FileEvent, specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
+  private copyToProjectsOnFinish(event?: Models.other.FileEvent,
+    specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
     // console.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
     // prevent first unnecesary copy after watch
     // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {

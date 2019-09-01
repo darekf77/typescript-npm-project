@@ -5,7 +5,7 @@ import * as portfinder from 'portfinder';
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
-import { error } from "../../helpers";
+import { Helpers } from "../../helpers";
 import { Project, FeatureForProject } from '../abstract';
 
 export class ProxyRouter extends FeatureForProject {
@@ -25,7 +25,7 @@ export class ProxyRouter extends FeatureForProject {
       this.takenPorts.push(port);
       return port;
     } catch (err) {
-      error(err)
+      Helpers.error(err)
     }
   }
 
@@ -56,8 +56,8 @@ export class ProxyRouter extends FeatureForProject {
 
       this.server(onServerReady)
     } else {
-      error(`Bad project type "${this.project.type}" for server activation.`, true)
-      error(`Project "${this.project.name}" is not a ${chalk.bold('workspace')} type project.`)
+      Helpers.error(`Bad project type "${this.project.type}" for server activation.`, true)
+      Helpers.error(`Project "${this.project.name}" is not a ${chalk.bold('workspace')} type project.`)
     }
   }
 

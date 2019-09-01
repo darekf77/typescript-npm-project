@@ -4,10 +4,10 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 
-import { clearConsole, log, error, info, tryRemoveDir } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { FeatureForProject, Project } from '../../abstract';
 import { TnpDB } from '../../../tnp-db';
-import config from '../../../config';
+import { config } from '../../../config';
 import { OutFolder } from 'morphi/build';
 import { ProjectFactory } from '../../../scripts/NEW';
 import { PROGRESS_DATA } from '../../../progress-output';
@@ -60,10 +60,10 @@ export class FilesStructure extends FeatureForProject {
     await db.transaction.addProjectIfNotExist(this.project);
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
-      log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
+      Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
       return;
     }
-    log(`Initing project: ${chalk.bold(this.project.genericName)}`);
+    Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
     alreadyInitedPorjects.push(this.project)
 
     if (this.project.isContainer) {
@@ -79,7 +79,7 @@ export class FilesStructure extends FeatureForProject {
       }
       return;
     }
-    if(this.project.isWorkspace) {
+    if (this.project.isWorkspace) {
       this.project.recreateCodeWorkspace();
     }
     if (this.project.isWorkspace && this.project.isSite) {
@@ -107,7 +107,7 @@ export class FilesStructure extends FeatureForProject {
       await this.project.parent.filesStructure.init(args, options);
     }
     // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
-    log(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
+    Helpers.log(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
     }
@@ -153,7 +153,7 @@ export class FilesStructure extends FeatureForProject {
       }
 
       if (!onlyJoin) {
-        if(this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+        if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
           await this.project.env.init(args);
         }
         this.project.filesTemplatesBuilder.rebuild();
@@ -183,7 +183,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
 
-    log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
+    Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
   recreateSiteChildren() {
@@ -195,8 +195,8 @@ export class FilesStructure extends FeatureForProject {
         ProjectFactory.Instance.create(c.type, c.name, this.project.location);
         const newChild = Project.From(siteChild);
         c.packageJson.copyTo(newChild);
-        tryRemoveDir(path.join(newChild.location, config.folder.src));
-        tryRemoveDir(path.join(newChild.location, config.folder.components));
+        Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));
+        Helpers.tryRemoveDir(path.join(newChild.location, config.folder.components));
         newChild.recreate.vscode.settings.colorsFromWorkspace();
         newChilds.push(newChild);
       }

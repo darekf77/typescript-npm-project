@@ -4,10 +4,10 @@ import * as inquirer from 'inquirer';
 
 import { FeatureForProject, Project } from '../../abstract';
 import { getAndTravelCoreDeps } from './package-json-helpers.backend';
-import { LibType, Package, CoreLibCategory, CoreLibCategoryArr } from '../../../models';
-import { error, info } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 
-export type GetPkgType = { category: CoreLibCategory; version: string; };
+export type GetPkgType = { category: Models.libs.CoreLibCategory; version: string; };
 
 export class PackageJsonDepsCoreCategories extends FeatureForProject {
 
@@ -17,11 +17,11 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     return Project.Tnp.packageJson.data.tnp.core.dependencies;
   }
 
-  private for(libType: LibType) {
+  private for(libType: Models.libs.LibType) {
     let result = this.all[this.s_onlyFor][libType];
     _.keys(result).find(key => {
       if (key === '@') {
-        result = this.for(result[key] as LibType);
+        result = this.for(result[key] as Models.libs.LibType);
         return true;
       }
       return false;
@@ -73,8 +73,8 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     }
     rem(this.commonForAllLibTypes);
 
-    CoreLibCategoryArr.forEach(type => {
-      const deps = this.for(type as LibType);
+    Models.libs.CoreLibCategoryArr.forEach(type => {
+      const deps = this.for(type as Models.libs.LibType);
       if (deps) {
         rem(deps);
       }
@@ -83,7 +83,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
 
   public getBy(name: string): GetPkgType {
 
-    function cattt(deps, cat: CoreLibCategory): GetPkgType {
+    function cattt(deps, cat: Models.libs.CoreLibCategory): GetPkgType {
       if (_.isString(deps[name])) {
         return { category: cat, version: deps[name] };
       }
@@ -105,8 +105,8 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     }
 
     let result: GetPkgType;
-    CoreLibCategoryArr.find(type => {
-      const deps = this.for(type as LibType);
+    Models.libs.CoreLibCategoryArr.find(type => {
+      const deps = this.for(type as Models.libs.LibType);
       if (deps) {
         result = cattt(deps, type);
         return _.isObject(result);
@@ -116,15 +116,15 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     return result;
   }
 
-  public async setWizard(pkg: Package) {
-    info('Please select at lease one client..')
-    const { type }: { type: CoreLibCategory } = await inquirer
+  public async setWizard(pkg: Models.npm.Package) {
+    Helpers.info('Please select at lease one client..')
+    const { type }: { type: Models.libs.CoreLibCategory } = await inquirer
       .prompt([
         {
           type: 'list',
           name: 'type',
           message: 'Select lib type ',
-          choices: CoreLibCategoryArr.reverse()
+          choices: Models.libs.CoreLibCategoryArr.reverse()
             .map(c => {
               let name = _.startCase(c);
               if (c === 'common') {
@@ -134,17 +134,17 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
             })
         }
       ]) as any;
-      // TODO finish it later
+    // TODO finish it later
     process.exit(0)
   }
 
-  public set(pkg: Package, type: CoreLibCategory) {
+  public set(pkg: Models.npm.Package, type: Models.libs.CoreLibCategory) {
 
-    if (!CoreLibCategoryArr.includes(type)) {
-      error(`[depscorecategories][set] Incrorrect type ${type}`, false, true);
+    if (!Models.libs.CoreLibCategoryArr.includes(type)) {
+      Helpers.error(`[depscorecategories][set] Incrorrect type ${type}`, false, true);
     }
     if (!pkg || !pkg.name || !pkg.version) {
-      error(`[depscorecategories][set] Incrorrect package ${JSON5.stringify(pkg)}`, false, true);
+      Helpers.error(`[depscorecategories][set] Incrorrect package ${JSON5.stringify(pkg)}`, false, true);
     }
     this.removeAllWithName(pkg.name);
     if (type === 'common') {

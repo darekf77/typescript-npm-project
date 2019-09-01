@@ -1,11 +1,11 @@
-import { run } from '../../helpers';
+import { Helpers } from '../../helpers';
 import * as path from 'path';
-import config from '../../config';
+import { config } from '../../config';
 import { TnpDB } from '../../tnp-db';
 import { sleep } from 'sleep';
 import { Project } from '../../project/abstract/project';
 export function $VSCODE_EXT(args: string, exit = true) {
-  run(`npm install && npm-run tsc && npm run build:install`, {
+  Helpers.run(`npm install && npm-run tsc && npm run build:install`, {
     cwd: config.pathes.tnp_vscode_ext_location,
     output: true
   }).sync();

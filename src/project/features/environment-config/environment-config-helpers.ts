@@ -5,12 +5,12 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { config } from '../../../config';
-import { EnvConfig, EnvironmentName, EnvConfigProject } from '../../../models';
-import { error, warn, log } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 import { ProxyRouter } from '../proxy-router';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
-import { terminalLine } from '../../../helpers';
+
 
 
 
@@ -18,7 +18,7 @@ export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
 
-export function err(workspaceConfig: EnvConfig, fileContent?: string) {
+export function err(workspaceConfig: Models.env.EnvConfig, fileContent?: string) {
 
   let configString = fileContent ? fileContent : `
   ...
@@ -26,23 +26,23 @@ ${chalk.bold(JSON.stringify(workspaceConfig, null, 4))}
   ...
   `
 
-  error(`Please follow worksapce environment config schema:\n
-${terminalLine()}
+  Helpers.error(`Please follow worksapce environment config schema:\n
+${Helpers.terminalLine()}
   let { config } = require('tnp-bundle/environment-config')
 
   config = ${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
 
   module.exports = exports = { config };
-${terminalLine()}
+${Helpers.terminalLine()}
 
 Your config:
-${terminalLine()}
+${Helpers.terminalLine()}
 ${configString}
-${terminalLine()}
+${Helpers.terminalLine()}
 `)
 }
 
-export function validateWorkspaceConfig(workspaceConfig: EnvConfig, filePath: string) {
+export function validateWorkspaceConfig(workspaceConfig: Models.env.EnvConfig, filePath: string) {
   if (!_.isObject(workspaceConfig)) {
     err(undefined, fse.readFileSync(filePath, 'utf8'));
   }
@@ -75,10 +75,10 @@ export function validateWorkspaceConfig(workspaceConfig: EnvConfig, filePath: st
 
 export interface OverridePortType {
   workspaceProjectLocation: string;
-  workspaceConfig: EnvConfig;
+  workspaceConfig: Models.env.EnvConfig;
 }
 
-async function handleProject(project: Project, configProject: EnvConfigProject, generatePorts) {
+async function handleProject(project: Project, configProject: Models.env.EnvConfigProject, generatePorts) {
   if (generatePorts) {
     const port = await ProxyRouter.getFreePort();
     // console.log(`Overrided/Generated port from ${project.getDefaultPort()} to ${port} in project: ${project.name}`)
@@ -107,7 +107,7 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
 
   const project = Project.From(workspaceProjectLocation)
   if (project === undefined) {
-    error(`Router (worksapce) port is not defined in your environment.js `);
+    Helpers.error(`Router (worksapce) port is not defined in your environment.js `);
   }
 
   const configProject = workspaceConfig.workspace.workspace;
@@ -128,14 +128,14 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
     const configProject = workspaceConfig.workspace.projects[i];
     const project = Project.From(path.join(workspaceProjectLocation, configProject.name))
     if (project === undefined) {
-      error(`Undefined project "${configProject.name}" inside environment.js workpace.projects`, false, true);
+      Helpers.error(`Undefined project "${configProject.name}" inside environment.js workpace.projects`, false, true);
     }
     await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
   }
 }
 
 
-function frontendCuttedVersion(workspaceConfig: EnvConfig) {
+function frontendCuttedVersion(workspaceConfig: Models.env.EnvConfig) {
   const c = _.cloneDeep(workspaceConfig);
   // walk.Object(c, (lodashPath, isPrefixed) => { // TODO CUT PREFIXED!!!!
   //   if (isPrefixed) {
@@ -145,7 +145,7 @@ function frontendCuttedVersion(workspaceConfig: EnvConfig) {
   return c;
 }
 
-export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig) {
+export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
   workspaceConfig.currentProjectType = project.type;
   workspaceConfig.currentProjectLocation = project.location;
@@ -159,7 +159,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
       encoding: 'utf8',
       spaces: 2
     })
-    log(`config saved in worksapce ${tmpEnvironmentPath}`)
+    Helpers.log(`config saved in worksapce ${tmpEnvironmentPath}`)
 
     project.children.forEach(p => {
       saveConfigWorkspca(p, workspaceConfig);
@@ -172,15 +172,15 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
         encoding: 'utf8',
         spaces: 2
       })
-      log(`config saved for child ${tmpEnvironmentPath}`)
+      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
     } else if (project.type === 'isomorphic-lib') {
       fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
         encoding: 'utf8',
         spaces: 2
       })
-      log(`config saved for child ${tmpEnvironmentPath}`)
+      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
     } else {
-      log(`config not needed for child ${tmpEnvironmentPath}`)
+      Helpers.log(`config not needed for child ${tmpEnvironmentPath}`)
     }
 
 
@@ -192,11 +192,11 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: EnvConfig)
 
 
 
-export const existedConfigs = {} as { [workspacePath in string]: EnvConfig; }
+export const existedConfigs = {} as {[workspacePath in string]: Models.env.EnvConfig; }
 
 
-export async function workspaceConfigBy(workspace: Project, environment: EnvironmentName): Promise<EnvConfig> {
-  let configWorkspaceEnv: EnvConfig;
+export async function workspaceConfigBy(workspace: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
+  let configWorkspaceEnv: Models.env.EnvConfig;
 
   const alreadyExistProject = (workspace && workspace.isWorkspace) ? existedConfigs[workspace.location] : null;
 
@@ -204,7 +204,7 @@ export async function workspaceConfigBy(workspace: Project, environment: Environ
 
 
   if (!workspace.isWorkspace) {
-    error(`Funciton only accessible from workspace type project`);
+    Helpers.error(`Funciton only accessible from workspace type project`);
   }
 
   if (_.isObject(alreadyExistProject) && alreadyExistProject !== null) {
@@ -213,27 +213,27 @@ export async function workspaceConfigBy(workspace: Project, environment: Environ
   } else {
     const envSurfix = (environment === 'local') ? '' : `.${environment}`;
     var pathToProjectEnvironment = path.join(workspace.location, `${config.file.environment}${envSurfix}`);
-    log('pathToProjectEnvironment:' + pathToProjectEnvironment)
+    Helpers.log('pathToProjectEnvironment:' + pathToProjectEnvironment)
 
     if (workspace.isSite) {
       if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
-        log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
+        Helpers.log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
         try {
           if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
-            log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
+            Helpers.log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
             const w = workspace.join.joinNotAllowed
             workspace.join.joinNotAllowed = false;
             await workspace.join.init()
             workspace.join.joinNotAllowed = w;
           }
         } catch (e) {
-          error(e)
+          Helpers.error(e)
         }
       }
     }
 
     if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
-      error(`Workspace ${workspace.location}
+      Helpers.error(`Workspace ${workspace.location}
         ...without environment${envSurfix}.js config.`);
     }
 

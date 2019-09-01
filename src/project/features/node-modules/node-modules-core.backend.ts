@@ -6,12 +6,14 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
-import config from '../../../config';
+import { config } from '../../../config';
 import { Project } from '../../abstract';
-import { ArrNpmDependencyType, Package } from '../../../models';
-import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
-import { dedupePackages, nodeModulesExists, addDependenceis } from './node-modules-helpers.backend';
+import {
+  dedupePackages, nodeModulesExists, addDependenceis
+} from './node-modules-helpers.backend';
 //#endregion
 
 export class NodeModulesCore extends FeatureForProject {
@@ -20,8 +22,8 @@ export class NodeModulesCore extends FeatureForProject {
   public get exist() { return nodeModulesExists(this.project); }
   public dedupe = (packages?: string[]) => dedupePackages(this.project.location, packages);
   public dedupeCount = (packages?: string[]) => dedupePackages(this.project.location, packages, true);
-  public remove = () => tryRemoveDir(this.path);
-  public linkToProject = (target: Project) => HelpersLinks.createSymLink(this.path, target.node_modules.path);
+  public remove = () => Helpers.tryRemoveDir(this.path);
+  public linkToProject = (target: Project) => Helpers.createSymLink(this.path, target.node_modules.path);
 
   /**
    * Just create folder... without npm instalation

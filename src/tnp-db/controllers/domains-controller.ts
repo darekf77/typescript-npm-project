@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { BaseController } from './base-controlller';
 import { DomainInstance, ProjectInstance } from '../entites';
 import { Project } from '../../project';
-import { EnvironmentName } from '../../models/environment-name';
+import { Models } from '../../models';
 
 
 export class DomainsController extends BaseController {
@@ -40,7 +40,7 @@ export class DomainsController extends BaseController {
     this.crud.setBulk(domains, DomainInstance);
   }
 
-  private addDomain(address: string, environment: EnvironmentName,
+  private addDomain(address: string, environment: Models.env.EnvironmentName,
     domains: DomainInstance[], project: Project) {
 
     if (!_.isString(address) || address.trim() === '') {

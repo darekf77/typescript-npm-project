@@ -4,16 +4,18 @@ import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
 import { Project } from "../abstract";
-import { error, info } from "../../helpers";
-import config from "../../config";
-import { killProcessByPort } from '../../helpers';
+import { config } from "../../config";
+import { Helpers } from '../../helpers';
 import { BuildOptions } from '../features';
-import { EnvConfig, EnvironmentName } from '../../models';
+import { Models } from '../../models';
 
 /**
  * DO NOT USE environment variables in this project directly
  */
 export class ProjectAngularClient extends Project {
+  buildLib() {
+    // throw new Error("Method not implemented.");
+  }
 
 
   get isEjectedProject() {
@@ -22,7 +24,7 @@ export class ProjectAngularClient extends Project {
       const config: { project: { ejected: boolean; } } = JSON.parse(file);
       return (config.project && config.project.ejected);
     } catch (e) {
-      error(e)
+      Helpers.error(e)
     }
   }
 
@@ -75,7 +77,7 @@ export class ProjectAngularClient extends Project {
       const p = (port !== undefined ? `--port ${port}` : '');
       let command: string;
       if (this.isEjectedProject) {
-        await killProcessByPort(port)
+        await Helpers.killProcessByPort(port)
         command = `npm-run webpack-dev-server ${p} `;
       } else {
         command = `npm-run ng serve ${p} `;
@@ -120,10 +122,11 @@ export class ProjectAngularClient extends Project {
       } else {
         baseHref = `--${baseHref}`
         if (prod) {
-          info(`BUILDING PRODUCTION`)
+          Helpers.info(`BUILDING PRODUCTION`)
         }
         try {
-          const showOutput = (['local', 'static'] as EnvironmentName[]).includes(this.env.config.name);
+          const showOutput = (['local', 'static'] as Models.env.EnvironmentName[])
+            .includes(this.env.config.name);
           this.run(`npm-run ng build  ${this.env.config.name === 'static' ? '--stats-json' : ''} --aot=false ${prod ? '-prod' : ''} - --output-path ${config.folder.previewDistApp} ${baseHref}`,
             {
               output: showOutput,
@@ -131,7 +134,7 @@ export class ProjectAngularClient extends Project {
               biggerBuffer: true
             }).sync()
         } catch (e) {
-          error(e, false, true);
+          Helpers.error(e, false, true);
         }
 
       }

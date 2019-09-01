@@ -1,8 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
-import { getLinesFromFiles } from "../helpers";
+import { Helpers } from "../helpers";
 import { Project } from '../project';
-import { run } from '../helpers';
 import { PROGRESS_DATA } from '../progress-output';
 
 function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
@@ -66,14 +65,14 @@ export default {
     const argsObj: { lines: number; file: string } = require('minimist')(args.split(' '));
     const { lines = 100, file = '' } = argsObj;
 
-    const res = await getLinesFromFiles(argsObj.file, Number(argsObj.lines));
+    const res = await Helpers.getLinesFromFiles(argsObj.file, Number(argsObj.lines));
     console.log('lines', res);
     process.exit(0)
   },
 
   TEST_ASYNC_PROC: async (args) => {
     global.tnpShowProgress = true;
-    let p = run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
+    let p =  Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
     p.stdout.on('data', (chunk) => {
       console.log('prod:' + chunk)
     })
@@ -87,7 +86,7 @@ export default {
   TEST_SYNC_PROC: async (args) => {
     global.tnpShowProgress = true;
     try {
-      let p = run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
+      let p =  Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
       process.exit(0)
     } catch (err) {
       console.log('Erroroejk')

@@ -3,23 +3,20 @@ import * as _ from 'lodash';
 import * as JSON5 from 'json5';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
-import {
-  LibType, DependenciesFromPackageJsonStyle,
-  PackageJsonSaveOptions, Package, ArrNpmDependencyType, SaveAction
-} from '../../../models';
-import { sortKeys as sortKeysInObjAtoZ, error, log, warn, run } from '../../../helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
 //#endregion
 
 //#region find npm version range
 export function findVersionRange(rootProject: Project, dependency: Project | string) {
   let result: string;
   const name = _.isString(dependency) ? dependency : dependency.name;
-  ArrNpmDependencyType.find(depType => {
+  Models.npm.ArrNpmDependencyType.find(depType => {
     if (_.isObject(rootProject.packageJson.data[depType])) {
       const deps = rootProject.packageJson.data[depType];
       const versionRange = deps[name];
       if (_.isString(versionRange) && semver.validRange(versionRange)) {
-        log(`[findVersionRange] valid range founded "${name}":${versionRange}`);
+        Helpers.log(`[findVersionRange] valid range founded "${name}":${versionRange}`);
         result = versionRange;
         return true;
       }
@@ -68,14 +65,14 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
 
 
 //#region resolve and save deps for project
-export function reolveAndSaveDeps(project: Project, action: SaveAction,
+export function reolveAndSaveDeps(project: Project, action: Models.npm.SaveAction,
   reasonToHidePackages: string, reasonToShowPackages: string) {
 
   const orginalDependencies = !project.packageJson.data.dependencies ? {}
-    : _.cloneDeep(project.packageJson.data.dependencies) as DependenciesFromPackageJsonStyle;
+    : _.cloneDeep(project.packageJson.data.dependencies) as Models.npm.DependenciesFromPackageJsonStyle;
 
   const orginalDevDependencies = !project.packageJson.data.devDependencies ? {}
-    : _.cloneDeep(project.packageJson.data.devDependencies) as DependenciesFromPackageJsonStyle;
+    : _.cloneDeep(project.packageJson.data.devDependencies) as Models.npm.DependenciesFromPackageJsonStyle;
 
   const { newDepsForProject, toOverrideDependencies } = resovleNewDepsAndOverrideForProject(project);
 
@@ -146,7 +143,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
           }
         }
         if (overrideMsg) {
-          log(`[override-info] ${overrideMsg}`);
+          Helpers.log(`[override-info] ${overrideMsg}`);
         } else {
           // warn(`No override info `);
         }
@@ -160,7 +157,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 //#endregion
 
 //#region save action
-function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
+function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
   const engines = Project.Tnp.packageJson.data.engines;
   const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
@@ -176,17 +173,17 @@ function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
 
   cleanForIncludeOnly(project, newDeps, toOverride);
   const devDependencies = project.isStandaloneProject ?
-    sortKeysInObjAtoZ(filterDevDepOnly(project, _.cloneDeep(newDeps)))
+    Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
     : {};
   const dependencies = project.isStandaloneProject ?
-    sortKeysInObjAtoZ(filterDepOnly(project, _.cloneDeep(newDeps)))
-    : sortKeysInObjAtoZ(newDeps);
+    Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
+    : Helpers.arrays.sortKeys(newDeps);
 
   if (recrateInPackageJson) {
-    log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`)
+    Helpers.log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`)
     if (project.isTnp) {
       project.packageJson.data.devDependencies = {};
-      project.packageJson.data.dependencies = sortKeysInObjAtoZ(newDeps);
+      project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
     } else {
       project.packageJson.data.devDependencies = devDependencies;
       project.packageJson.data.dependencies = dependencies;
@@ -195,7 +192,7 @@ function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
       project.packageJson.data.engines = engines;
     }
   } else {
-    log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`)
+    Helpers.log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`)
     project.packageJson.data.devDependencies = {};
     project.packageJson.data.dependencies = {};
     if (!project.isCoreProject) {
@@ -223,7 +220,7 @@ function beforeSaveAction(project: Project, options: PackageJsonSaveOptions) {
 //#region get deps by
 export function getAndTravelCoreDeps(options?: {
   updateFn?: (obj: Object, pkgName: string) => string,
-  type?: LibType,
+  type?: Models.libs.LibType,
 }) {
   const project: Project = Project.Tnp;
   if (_.isUndefined(options)) {
@@ -246,7 +243,7 @@ export function getAndTravelCoreDeps(options?: {
 //#endregion
 
 //#region deps filters
-function filterDevDepOnly(project: Project, deps: DependenciesFromPackageJsonStyle) {
+function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
   const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
   const onlyAsDevAllowed = (project.packageJson.data.tnp &&
     project.packageJson.data.tnp.overrided &&
@@ -270,7 +267,7 @@ function filterDevDepOnly(project: Project, deps: DependenciesFromPackageJsonSty
   return deps;
 }
 
-function filterDepOnly(project: Project, deps: DependenciesFromPackageJsonStyle) {
+function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
   const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.packageJson.data.tnp
     && project.packageJson.data.tnp.overrided
@@ -287,7 +284,8 @@ function filterDepOnly(project: Project, deps: DependenciesFromPackageJsonStyle)
 //#endregion
 
 //#region clean for include only
-function cleanForIncludeOnly(project: Project, deps: DependenciesFromPackageJsonStyle, overrided: DependenciesFromPackageJsonStyle) {
+function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle,
+  overrided: Models.npm.DependenciesFromPackageJsonStyle) {
   // log('overrided', overrided)
 
   deps[project.name] = undefined;
@@ -340,7 +338,7 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
           travelObject(obj[key], out, obj[key], updateFn);
         } else {
           if (_.isString(out[key])) {
-            error(`Duplicate key in workspace package.json tnp.core packages configuration:
+            Helpers.error(`Duplicate key in workspace package.json tnp.core packages configuration:
             "${key}": "${out[key]}"
           `);
           }
@@ -359,17 +357,17 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 //#endregion
 
 //#region set dependency and save
-export function setDependencyAndSave(p: Package, reason: string, project: Project, ) {
+export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project, ) {
   if (!p || !p.name) {
-    error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
+    Helpers.error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
   project = (project.isWorkspaceChildProject ? project.parent : project);
 
   if (project.isTnp && !_.isString(p.version)) {
     try {
-      p.version = run(`npm show ${p.name} version`, { output: false }).sync().toString().trim();
+      p.version = Helpers.run(`npm show ${p.name} version`, { output: false }).sync().toString().trim();
     } catch (e) {
-      error(`No able to find package with name ${p.name}`, false, true);
+      Helpers.error(`No able to find package with name ${p.name}`, false, true);
     }
   }
 
@@ -409,7 +407,7 @@ export function setDependencyAndSave(p: Package, reason: string, project: Projec
         project.packageJson.data.tnp.overrided.dependencies[p.name] = orgNewDeps[p.name];
       } else {
         delete project.packageJson.data.tnp.overrided.dependencies[p.name];
-        log(`Parent package version reverted`);
+        Helpers.log(`Parent package version reverted`);
       }
     }
   }
@@ -420,10 +418,10 @@ export function setDependencyAndSave(p: Package, reason: string, project: Projec
 //#endregion
 
 //#region remove dependency and save
-export function removeDependencyAndSave(p: Package, reason: string, project: Project) {
+export function removeDependencyAndSave(p: Models.npm.Package, reason: string, project: Project) {
 
   if (!p || !p.name) {
-    error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
+    Helpers.error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
   project = (project.isWorkspaceChildProject ? project.parent : project);
   if (project.isTnp) {

@@ -5,23 +5,23 @@ import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import { FeatureForProject } from "../abstract";
-import { log, tryCopyFrom, tryRemoveDir, warn, HelpersLinks, info } from "../../helpers";
-import config from "../../config";
-import { IPackageJSON } from "../../models";
+import { Helpers } from "../../helpers";
+import { config } from "../../config";
+import { Models } from "../../models";
 
 export class QuickFixes extends FeatureForProject {
 
   public badNpmPackages() {
-    log(`Fixing bad npm packages - START for ${this.project.genericName}`);
+    Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
     if (this.project.isGenerated && this.project.isWorkspace) {
       this.project.origin.node_modules.fixesForNodeModulesPackages
         .forEach(f => {
           const source = path.join(this.project.origin.location, f);
           const dest = path.join(this.project.location, f);
           if (fse.existsSync(dest)) {
-            tryRemoveDir(dest);
+            Helpers.tryRemoveDir(dest);
           }
-          tryCopyFrom(source, dest);
+          Helpers.tryCopyFrom(source, dest);
         });
     }
     if (this.project.isSite && this.project.isWorkspace) {
@@ -30,19 +30,19 @@ export class QuickFixes extends FeatureForProject {
           const source = path.join(this.project.baseline.location, f);
           const dest = path.join(this.project.location, f);
           if (fse.existsSync(dest)) {
-            tryRemoveDir(dest);
+            Helpers.tryRemoveDir(dest);
           }
-          tryCopyFrom(source, dest);
+          Helpers.tryCopyFrom(source, dest);
         });
     }
-    log(`Fixing bad npm packages - COMPLETE`);
+    Helpers.log(`Fixing bad npm packages - COMPLETE`);
   }
 
   public missingLibs(missingLibsNames: string[] = []) {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
-        warn(`Package "${missingLibName}" will replaced with empty package mock.`)
+        Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock.`)
       }
       rimraf.sync(pathInProjectNodeModules);
       fse.mkdirpSync(pathInProjectNodeModules);
@@ -51,13 +51,13 @@ export class QuickFixes extends FeatureForProject {
       fse.writeFileSync(path.join(pathInProjectNodeModules, config.file.package_json), JSON.stringify({
         name: missingLibName,
         version: "0.0.0"
-      } as IPackageJSON), 'utf8');
+      } as Models.npm.IPackageJSON), 'utf8');
 
     })
   }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
-    if(!fse.existsSync(this.project.location)) {
+    if (!fse.existsSync(this.project.location)) {
       return;
     }
     if (this.project.isWorkspace ||
@@ -104,7 +104,7 @@ export class QuickFixes extends FeatureForProject {
           fse.mkdirpSync(paretnFolderOfNodeModules)
         }
         // log('NODE_MODULES folder link to child recreated');
-        HelpersLinks.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
+        Helpers.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
       }
 
       if (this.project.isSite) {
@@ -116,7 +116,7 @@ export class QuickFixes extends FeatureForProject {
           );
           if (!fse.existsSync(baselineFolderInNodeModule)) {
             // log('BASELINE folder in NODE_MODUELS recreated');
-            HelpersLinks.createSymLink(this.project.baseline.location, baselineFolderInNodeModule);
+            Helpers.createSymLink(this.project.baseline.location, baselineFolderInNodeModule);
           }
         }
       }
@@ -152,10 +152,10 @@ export class QuickFixes extends FeatureForProject {
       const name = p.replace(`${config.folder.node_modules}-`, '');
       const moduleInNodeMdules = path.join(this.project.location, config.folder.node_modules, name);
       if (fse.existsSync(moduleInNodeMdules)) {
-        info(`Extraction ${chalk.bold(name)} already exists in ` +
+        Helpers.info(`Extraction ${chalk.bold(name)} already exists in ` +
           ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`);
       } else {
-        info(`Extraction before instalation ${chalk.bold(name)} in ` +
+        Helpers.info(`Extraction before instalation ${chalk.bold(name)} in ` +
           ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`)
 
         this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync()

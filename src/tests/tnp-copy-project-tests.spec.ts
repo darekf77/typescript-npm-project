@@ -6,15 +6,12 @@ import * as _ from 'lodash';
 
 import { SpecWrap } from "./_helpers.spec";
 import { NEW } from '../scripts/NEW';
-import { LibType } from '../models';
-import config from '../config';
+import { Models } from '../models';
+import { config } from '../config';
 import { Project } from '../project';
 
 const wrap = SpecWrap.create();
 describe(wrap.describe('Tnp copy project'), async () => {
-
-
-
 
   await wrap.it('should have defined location',
     (location, testName, { }) => {

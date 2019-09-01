@@ -15,11 +15,11 @@ import {
   ProcessController
 } from './controllers';
 import { Project } from '../project';
-import { error, warn } from '../helpers';
+import { Helpers } from '../helpers';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
 import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';
-import config from '../config';
+import { config } from '../config';
 import { BuildOptions } from '../project/features';
 
 
@@ -52,7 +52,7 @@ export class TnpDB {
 
   public static get InstanceSync() {
     if (!this._instance) {
-      error(`Please use (await TnpDB.Instance) here`);
+      Helpers.error(`Please use (await TnpDB.Instance) here`);
     }
     return this._instance;
   }

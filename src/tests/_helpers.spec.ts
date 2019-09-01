@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as rimraf from 'rimraf';
 import * as path from 'path';
-import { IPackageJSON } from '../models';
-import config from '../config';
-import { tryRemoveDir, error } from '../helpers';
+import { Models } from '../models';
+import { config } from '../config';
+import { Helpers } from '../helpers';
 import '../global-typings';
 
 const PATHES = {
@@ -25,7 +25,7 @@ function RemoveTestCatalogs() {
 }
 
 type FuncTest = (locationContext: string, testName: string, options?: {
-  packageJSON?: (relativePath: string, callback: (packageJSON: IPackageJSON) => void) => void;
+  packageJSON?: (relativePath: string, callback: (packageJSON: Models.npm.IPackageJSON) => void) => void;
   cwdChange: (relativePath: string, callback: () => void) => void
 }) => any
 
@@ -94,7 +94,7 @@ export class SpecWrap {
       const oldCwd = process.cwd()
       const newCWD = path.join(location, relativePath);
       if (!fse.existsSync(newCWD)) {
-        error(`[cwdChange] cannot change cwd to unexisted location: ${newCWD}`)
+        Helpers.error(`[cwdChange] cannot change cwd to unexisted location: ${newCWD}`)
       }
       process.chdir(newCWD);
       if (_.isFunction(callback)) {

@@ -5,7 +5,7 @@ import { Project } from '../abstract/project';
 import { config } from '../../config';
 import { BuildOptions } from '../features';
 import * as inquirer from 'inquirer';
-import { info } from '../../helpers';
+import { Helpers } from '../../helpers';
 import { TnpDB } from '../../tnp-db';
 
 export async function selectClients(buildOptions: BuildOptions, currentProject: Project, angularLib = false) {
@@ -31,7 +31,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
   let selectedChoices = choices.map(c => c.value);
 
   if (!global.tnpNonInteractive) {
-    info('Please select at lease one client..')
+    Helpers.info('Please select at lease one client..')
     const { projects = [] }: { projects: string[] } = await inquirer
       .prompt([
         {

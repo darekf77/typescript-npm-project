@@ -4,14 +4,14 @@ import * as path from 'path';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { ExtendedCodeCut } from './browser-code-cut.backend';
-import { EnvConfig } from '../../../models';
+import { Models } from '../../../models';
 import { Project } from '../../abstract';
-import { compilationWrapperTnp, error } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { BuildOptions } from '../../features/build-process';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
-  CompilationWrapper = compilationWrapperTnp as any;
+  CompilationWrapper = Helpers.compilationWrapperTnp as any;
   compile(watch = false) {
 
     // QUICK_FIX for backend in tnp projects
@@ -26,13 +26,13 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 export class BroswerForModuleCompilation extends BroswerCompilation {
 
-  private ENV: EnvConfig;
+  private ENV: Models.env.EnvConfig;
 
   compile(watch: boolean) {
     try {
       super.compile(watch);
     } catch (e) {
-      error(`Browser compilation fail: ${e}`, false, true);
+      Helpers.error(`Browser compilation fail: ${e}`, false, true);
     }
   }
   get customCompilerName() {
@@ -43,12 +43,12 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     return `Browser Extended compilation`
   }
 
-  CompilationWrapper = compilationWrapperTnp as any;
+  CompilationWrapper = Helpers.compilationWrapperTnp as any;
 
   constructor(
     private compilationProject: Project,
     private module: string,
-    ENV: EnvConfig,
+    ENV: Models.env.EnvConfig,
     sourceOut: string,
     outFolder: OutFolder,
     location: string,
@@ -66,7 +66,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   codeCuttFn(cutIftrue: boolean) {
-    return function (expression: string, e: EnvConfig, absoluteFilePath?: string) {
+    return function (expression: string, e: Models.env.EnvConfig, absoluteFilePath?: string) {
 
       let result = false;
 
@@ -90,8 +90,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
           result = cutIftrue ? res : !res;
         } catch (err) {
           // console.log(`Expression Failed`, err)
-          error(`[codecutFn] Eval failed `);
-          error(err, true, true);
+          Helpers.error(`[codecutFn] Eval failed `);
+          Helpers.error(err, true, true);
         }
       }
       // console.log(`Finally cut code  ? ${result} for ${path.basename(absoluteFilePath)}`)
@@ -100,7 +100,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   initCodeCut() {
-    let env: EnvConfig = arguments[0]
+    let env: Models.env.EnvConfig = arguments[0]
     const compilationProject: Project = arguments[1];
     const buildOptions = arguments[2];
     if (!compilationProject) {

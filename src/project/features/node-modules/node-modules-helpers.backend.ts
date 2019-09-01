@@ -6,9 +6,9 @@ import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
-import { ArrNpmDependencyType, Package } from '../../../models';
-import { HelpersLinks, error, info, warn, log, run, tryRemoveDir } from '../../../helpers';
-import config from '../../../config';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
 import { FeatureForProject } from '../../abstract';
 
 export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {
@@ -24,17 +24,17 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
       f = _.first(f.split('/'));
     }
     if (!current) {
-      warn(`Project with name ${f} not founded`);
+      Helpers.warn(`Project with name ${f} not founded`);
       return
     }
-    log(`Scanning for duplicates of current ${f}@${current.version} ....\n`)
+    Helpers.log(`Scanning for duplicates of current ${f}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       fse.mkdirpSync(nodeMod);
     }
     const removeCommand = `find ${config.folder.node_modules}/ -name ${f.replace('@', '\\@')} `;
     // console.log(`removeCommand: ${removeCommand}`)
-    const res = run(removeCommand, { output: false, cwd: projectLocation }).sync().toString()
+    const res = Helpers.run(removeCommand, { output: false, cwd: projectLocation }).sync().toString()
     const duplicates = res
       .split('\n')
       .map(l => l.replace(/\/\//g, '/'))
@@ -48,16 +48,16 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
         let p = path.join(projectLocation, duplicateRelativePath)
         const nproj = Project.From(p);
         p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
-        log(`${i + 1}. Duplicate "${f}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
+        Helpers.log(`${i + 1}. Duplicate "${f}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
       });
       if (duplicates.length === 0) {
-        log(`No dupicate of ${f} fouded.`);
+        Helpers.log(`No dupicate of ${f} fouded.`);
       }
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath)
-        tryRemoveDir(p)
-        info(`Duplicate of ${f} removed from ${p}`)
+        Helpers.tryRemoveDir(p)
+        Helpers.info(`Duplicate of ${f} removed from ${p}`)
       });
     }
 
@@ -85,7 +85,7 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
     newNames.push(project.name)
   }
 
-  ArrNpmDependencyType.forEach(depName => {
+  Models.npm.ArrNpmDependencyType.forEach(depName => {
     newNames = newNames.concat(project.getDepsAsProject(depName, context)
       .filter(d => !allNamesBefore.includes(d.name))
       .map(d => d.name))

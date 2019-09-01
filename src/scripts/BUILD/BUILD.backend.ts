@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { Project } from '../../project';
 import { config } from '../../config';
-import { SystemTerminal, error } from '../../helpers';
+import { Helpers } from '../../helpers';
 import chalk from 'chalk';
 
 async function buildWatch(args) {
@@ -12,7 +12,7 @@ async function buildWatch(args) {
   const isLegitApp = config.allowedTypes.app.includes(Project.Current.type);
 
   if (isLegitLib && isLegitApp) {
-    SystemTerminal.runInNewInstance(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`);
+    Helpers.terminal.runInNewInstance(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`);
     return;
   }
 
@@ -35,7 +35,7 @@ const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(
 
 const STATIC_BUILD = async (args) => {
   if (!Project.Current.isWorkspace) {
-    error(`Please use:
+    Helpers.error(`Please use:
 ${chalk.gray(`$ tnp static:build:lib`)}
 or
 ${chalk.gray(`$ tnp static:build:app`)}
@@ -56,7 +56,7 @@ const STATIC_BUILD_PROD = async (args) => (await Project.Current.StaticVersion()
 const STATIC_BUILD_LIB_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForLib({ prod: true, args, staticBuildAllowed: true })
 
-const STATIC_BUILD_APP =  async (args) => (await Project.Current.StaticVersion()).buildProcess
+const STATIC_BUILD_APP = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForApp({ args, staticBuildAllowed: true })
 
 const STATIC_BUILD_APP_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
@@ -64,7 +64,7 @@ const STATIC_BUILD_APP_PROD = async (args) => (await Project.Current.StaticVersi
 
 const $START = async (args) => {
   if (!Project.Current.isWorkspace) {
-    error(`Please use this command only on workspace level`, false, true)
+    Helpers.error(`Please use this command only on workspace level`, false, true)
   }
   await Project.Current.start(args);
 };

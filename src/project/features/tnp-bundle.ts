@@ -6,9 +6,9 @@ import * as _ from 'lodash';
 import * as sleep from 'sleep';
 
 import { config } from '../../config';
-import { getMostRecentFilesNames, tryCopyFrom, tryRemoveDir, log } from "../../helpers";
+import { Helpers } from "../../helpers";
 import { Project } from '../abstract';
-import { IPackageJSON } from '../../models';
+import { Models } from '../../models';
 import { TnpDB } from '../../tnp-db';
 import { FeatureForProject } from '../abstract';
 
@@ -28,7 +28,7 @@ export class TnpBundle extends FeatureForProject {
     if (!fse.existsSync(pathTnpCompiledJS)) {
       pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.bundle);
     }
-    const pathTnpPackageJSONData: IPackageJSON = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
+    const pathTnpPackageJSONData: Models.npm.IPackageJSON = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
 
     pathTnpPackageJSONData.name = config.file.tnpBundle;
     pathTnpPackageJSONData.tnp = undefined;
@@ -69,7 +69,7 @@ export class TnpBundle extends FeatureForProject {
 
   private reinstallTnp(project: Project,
     pathTnpCompiledJS: string,
-    pathTnpPackageJSONData: IPackageJSON) {
+    pathTnpPackageJSONData: Models.npm.IPackageJSON) {
 
     const workspaceLocation = project.isWorkspace ? project.location :
       (project.isWorkspaceChildProject ? project.parent.location : void 0);
@@ -94,7 +94,7 @@ export class TnpBundle extends FeatureForProject {
     }
 
     if (this.notNeededReinstallationTnp[workspaceLocation] > 2) {
-      log('[TNP helper] reinstall not needed')
+      Helpers.log('[TNP helper] reinstall not needed')
       return;
     }
     if (!project.isStandaloneProject) {
@@ -107,10 +107,10 @@ export class TnpBundle extends FeatureForProject {
 
       if (fs.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
         // console.log(`Removed tnp - helper from ${ dest } `)
-        tryRemoveDir(destCompiledJs)
+        Helpers.tryRemoveDir(destCompiledJs)
       }
 
-      tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
+      Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
         filter: (src: string, dest: string) => {
           return !src.endsWith('/dist/bin') &&
             !src.endsWith('/bin') &&
@@ -138,7 +138,7 @@ export class TnpBundle extends FeatureForProject {
         ++this.notNeededReinstallationTnp[workspaceLocation];
       }
 
-      log(`Tnp-helper installed in ${project.name} from ${lastTwo} , `
+      Helpers.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , `
         + `installs counter:${this.notNeededReinstallationTnp[workspaceLocation]} `)
     } else {
       // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)

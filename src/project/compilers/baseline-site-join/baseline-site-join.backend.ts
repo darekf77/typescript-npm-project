@@ -7,13 +7,10 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
-import { LibType, RecreateFile, FileEvent, SourceFolder } from '../../../models';
-import { copyFile, uniqArray, crossPlatofrmPath, log, compilationWrapperTnp, patchingForAsync } from '../../../helpers';
-import config from '../../../config';
-import { error } from '../../../helpers';
-import chalk from 'chalk';
-import { run } from '../../../helpers';
-import { Helpers } from 'morphi/helpers';
+import { Models } from '../../../models';
+import { Helpers } from '../../../helpers';
+import { config } from '../../../config';
+import chalk from 'chalk';;
 import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject } from '../../abstract';
 import {
@@ -39,7 +36,7 @@ export class BaselineSiteJoin extends FeatureForProject {
   async init() {
 
     if (!this.project.isBasedOnOtherProject) {
-      log(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
+      Helpers.log(`There is no baseline project for "${this.project.name}" in ${this.project.location} `)
     }
 
     if (!this.project.baseline) {
@@ -52,11 +49,11 @@ export class BaselineSiteJoin extends FeatureForProject {
     if (!this.project.isSite) {
       const db = await TnpDB.Instance;
       if (db.checkIf.allowed.toWatchWorkspace(this.project)) {
-        log('OK to baseline/site join')
+        Helpers.log('OK to baseline/site join')
       } else {
         const pids = []
-        log(`Current process pid: ${process.pid}`)
-        log(`Found active baseline/site join on pids: ${pids.toString()}
+        Helpers.log(`Current process pid: ${process.pid}`)
+        Helpers.log(`Found active baseline/site join on pids: ${pids.toString()}
         current pid: ${process.pid}, ppid ${process.ppid}`)
         this.joinNotAllowed = true;
         if (this.project.isWorkspaceChildProject) {
@@ -76,8 +73,8 @@ export class BaselineSiteJoin extends FeatureForProject {
     });
     // rejoin baseline/site files
 
-    await compilationWrapperTnp(() => {
-      uniqArray(relativePathesBaseline(this.project).concat(relativePathesCustom(this.project)))
+    await Helpers.compilationWrapperTnp(() => {
+      Helpers.arrays.uniqArray(relativePathesBaseline(this.project).concat(relativePathesCustom(this.project)))
         .forEach(relativeFile => {
           this.merge(relativeFile)
         });
@@ -110,7 +107,7 @@ export class BaselineSiteJoin extends FeatureForProject {
           const base = absolutePath.replace(relative, '').replace(/\/$/g, '');
           // console.log(`[baselineSiteJoin] relative`, relative)
           // console.log(`[baselineSiteJoin] base`, base)
-          log(`[baselineSiteJoin] watch new dir ${relative}`)
+          Helpers.log(`[baselineSiteJoin] watch new dir ${relative}`)
           this.watchFilesAndFolders(
             base,
             [relative], callback)
@@ -118,27 +115,27 @@ export class BaselineSiteJoin extends FeatureForProject {
         }
       }
 
-      patchingForAsync(absolutePath, () => {
-        if (isCustomFolder) {
-          this.project.sourceModifier.asyncAction(absolutePath);
-          this.merge(absolutePath.replace(pathToCustom(this.project), ''));
-        } else {
-          this.merge(absolutePath.replace(pathToBaselineAbsolute(this.project), ''));
-        }
-      }, 'baseline-site-join', 0);
+      // patchingForAsync(absolutePath, () => {
+      if (isCustomFolder) {
+        this.project.sourceModifier.asyncAction(absolutePath);
+        this.merge(absolutePath.replace(pathToCustom(this.project), ''));
+      } else {
+        this.merge(absolutePath.replace(pathToBaselineAbsolute(this.project), ''));
+      }
+      // }, 'baseline-site-join', 0);
 
     };
 
     this.monitor(callback)
   }
 
-  private monitor(callback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
+  private monitor(callback: (absolutePath: string, event: Models.other.FileEvent, isCustomFolder: boolean) => any) {
     this.watchFilesAndFolders(this.project.baseline.location, this.project.baseline.customizableFilesAndFolders, callback);
     this.watchFilesAndFolders(this.project.location, [config.folder.custom], callback)
   }
 
   private watchFilesAndFolders(location: string, customizableFilesOrFolders: string[],
-    filesEventCallback: (absolutePath: string, event: FileEvent, isCustomFolder: boolean) => any) {
+    filesEventCallback: (absolutePath: string, event: Models.other.FileEvent, isCustomFolder: boolean) => any) {
 
 
     const isCustomFolder = !_.isUndefined((customizableFilesOrFolders.find(f => {
@@ -153,7 +150,7 @@ export class BaselineSiteJoin extends FeatureForProject {
 
       const monitor = (pfileOrFolderPath, pisCustomFolder) => {
         if (fse.statSync(pfileOrFolderPath).isDirectory()) {
-          log(`[sitejoin] Monitoring directory: ${fileOrFolderPath} `)
+          Helpers.log(`[sitejoin] Monitoring directory: ${fileOrFolderPath} `)
 
           watch.watchTree(pfileOrFolderPath, (f, curr, prev) => {
 
@@ -169,7 +166,7 @@ export class BaselineSiteJoin extends FeatureForProject {
             }
           })
         } else {
-          log(`[sitejoin] Monitoring file: ${fileOrFolderPath} `)
+          Helpers.log(`[sitejoin] Monitoring file: ${fileOrFolderPath} `)
           fse.watch(pfileOrFolderPath, { recursive: true }, (event: 'rename' | 'change', filename) => {
             // console.log(`NODE FS WATCH Event: ${ event } for ${ filename }`)
             filesEventCallback(pfileOrFolderPath as any, event === 'change' ? 'changed' : 'rename', pisCustomFolder)
@@ -189,10 +186,10 @@ export class BaselineSiteJoin extends FeatureForProject {
 
           if (!fse.existsSync(pfileOrFolderPath)) {
             if (count === 4) {
-              error(`File ${chalk.bold(chalk.underline(pfileOrFolderPath))} doesn't exist and can't be monitored.`, true, true)
+              Helpers.error(`File ${chalk.bold(chalk.underline(pfileOrFolderPath))} doesn't exist and can't be monitored.`, true, true)
               return;
             }
-            log(`[baslinesitejoin][folderwatch] (${count} time) Waiting for file/folder be available: ${pfileOrFolderPath}`)
+            Helpers.log(`[baslinesitejoin][folderwatch] (${count} time) Waiting for file/folder be available: ${pfileOrFolderPath}`)
             setTimeout(() => {
               waitForFolder(pfileOrFolderPath, pisCustomFolder, ++count);
             }, 2000)
@@ -274,11 +271,13 @@ export class BaselineSiteJoin extends FeatureForProject {
     const replaceFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
     if (debugModel) console.log(`Replace fn for ${source} = ${!!replaceFn}`)
 
-    copyFile(
+    Helpers.copyFile(
       source,
       dest,
-      replaceFn,
-      debugModel
+      {
+        transformTextFn: replaceFn,
+        debugMode: debugModel
+      }
     )
   }
 
@@ -322,10 +321,8 @@ export class BaselineSiteJoin extends FeatureForProject {
 
         const toReplaceImportPath =
           getRegexSourceString(
-            crossPlatofrmPath(
-              `${path.join(pathToBaselineNodeModulesRelative(this.project).replace(/\//g, '//'),
-                baselineFilePathNoExit)}`
-            )
+            `${path.join(pathToBaselineNodeModulesRelative(this.project).replace(/\//g, '//'),
+              baselineFilePathNoExit)}`
           )
 
         const replacement = `./${getPrefixedBasename(baselineFilePathNoExit)}`;

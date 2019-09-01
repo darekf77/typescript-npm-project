@@ -1,5 +1,4 @@
 //#region @backend
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
@@ -8,7 +7,7 @@ import * as rimraf from 'rimraf';
 
 import { Project } from '../../abstract';
 import { config } from '../../../config';
-import { getEntites, getControllers, log } from '../../../helpers';
+import { Helpers } from '../../../helpers';
 import { FeatureCompilerForProject } from '../../abstract';
 
 
@@ -39,16 +38,16 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
       : path.join(this.project.location, config.folder.src);
 
     if (!fse.existsSync(cwd)) {
-      log(`Entites not geenrated, folder doesnt exists: ${cwd}`);
+      Helpers.log(`Entites not geenrated, folder doesnt exists: ${cwd}`);
       return;
     }
 
-    let entitesFiles = getEntites(cwd);
+    let entitesFiles = Helpers.morphi.getEntites(cwd);
 
     if (isSite) {
       entitesFiles = entitesFiles.filter(f => {
         const baselineFile = path.join(this.project.baseline.location, config.folder.src, f);
-        return !fs.existsSync(baselineFile)
+        return !fse.existsSync(baselineFile)
       })
     }
     entitesFiles = entitesFiles.map(f => `./${f.replace(/\.ts$/, '')}`)
@@ -112,16 +111,16 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
       : path.join(this.project.location, config.folder.src);
 
     if (!fse.existsSync(cwd)) {
-      log(`Controllers not geenrated, folder doesnt exists: ${cwd}`);
+      Helpers.log(`Controllers not geenrated, folder doesnt exists: ${cwd}`);
       return;
     }
 
-    let controllersFiles = getControllers(cwd);
+    let controllersFiles = Helpers.morphi.getControllers(cwd);
 
     if (isSite) {
       controllersFiles = controllersFiles.filter(f => {
         const baselineFile = path.join(this.project.baseline.location, config.folder.src, f);
-        return !fs.existsSync(baselineFile)
+        return !fse.existsSync(baselineFile)
       })
     }
 
@@ -181,7 +180,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
 
   private entityRepo(srcPath, entity, entityRelativePath, hideDot = false) {
     let repo = `${entityRelativePath.replace('entities', 'repositories')}_REPOSITORY.ts`
-    return fs.existsSync(path.join(srcPath, repo)) ? ` ${hideDot ? '' : ','} ${entity}_REPOSITORY` : '';
+    return fse.existsSync(path.join(srcPath, repo)) ? ` ${hideDot ? '' : ','} ${entity}_REPOSITORY` : '';
   }
 
   private entitesTemplateExportImport(srcPath, entityRelativePath) {
@@ -200,7 +199,7 @@ export class FrameworkFilesGenerator extends FeatureCompilerForProject {
     let entity = path.basename(entityRelativePath).toUpperCase()
     let repository = `${entityRelativePath.replace('entities', 'repositories')}_REPOSITORY`
     let repoExist = this.entityRepo(srcPath, entity, entityRelativePath, true);
-    return fs.existsSync(path.join(srcPath, `${repository}.ts`)) ? `
+    return fse.existsSync(path.join(srcPath, `${repository}.ts`)) ? `
     import { ${repoExist} } from '${repository}';
     export { ${repoExist} } from '${repository}';` : ''
   }
