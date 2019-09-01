@@ -332,11 +332,6 @@
       }
     }
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "tnp deps:show:if:standalone"
-    }
-  },
   "name": "tnp",
   "version": "0.0.3",
   "scripts": {
