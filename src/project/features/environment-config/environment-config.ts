@@ -13,7 +13,6 @@ import {
 import { FeatureForProject } from '../../abstract';
 //#endregion
 
-import { Morphi } from 'morphi';
 import { config } from '../../../config';
 import { Models } from '../../../models';
 import chalk from 'chalk';
@@ -197,7 +196,7 @@ export class EnvironmentConfig
    * Can be accesed only after env.prepare()
    */
   public get config(): Models.env.EnvConfig {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.config;
     }
     //#region @backend

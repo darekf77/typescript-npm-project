@@ -19,7 +19,7 @@ export abstract class SiteProject {
 
 
   get isSite(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isSite;
     }
     //#region @backend
@@ -47,7 +47,7 @@ export abstract class SiteProject {
      * (method works from any level)
      */
   get isBasedOnOtherProject(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isBasedOnOtherProject;
     }
     //#region @backend
@@ -71,7 +71,7 @@ export abstract class SiteProject {
    * For child site worksapce is baseline worksapce child
    */
   get baseline(this: Project): Project {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.baseline;
     }
     //#region @backend

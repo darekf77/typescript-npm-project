@@ -12,7 +12,7 @@ import { Morphi } from 'morphi';
 export class NpmProject {
 
   get version(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.version;
     }
     //#region @backend
@@ -21,7 +21,7 @@ export class NpmProject {
   }
 
   get resources(this: Project): string[] {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.resources;
     }
     //#region @backend
@@ -36,7 +36,7 @@ export class NpmProject {
    * Unknow npm project
    */
   get isUnknowNpmProject(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isUnknowNpmProject;
     }
     //#region @backend
@@ -45,7 +45,7 @@ export class NpmProject {
   }
 
   get preview(this: Project): Project {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.preview;
     }
     //#region @backend
@@ -76,7 +76,7 @@ export class NpmProject {
   //#endregion
 
   public get name(this: Project): string {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.name;
     }
     //#region @backendFunc
@@ -205,7 +205,7 @@ export class NpmProject {
   }
 
   get childrenThatAreThirdPartyInNodeModules(this: Project): Project[] {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.childrenThatAreThirdPartyInNodeModules;
     }
     //#region @backend

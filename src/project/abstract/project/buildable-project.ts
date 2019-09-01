@@ -31,7 +31,7 @@ export abstract class BuildableProject {
 
 
   get allowedEnvironments(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.allowedEnvironments;
     }
     //#region @backend

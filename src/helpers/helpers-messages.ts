@@ -4,10 +4,11 @@ import chalk from 'chalk';
 import { Morphi } from 'morphi';
 import { config } from '../config';
 import { PROGRESS_DATA } from '../progress-output';
+import { Helpers } from './index';
 
 export class HelpersMessages {
   error(details: any, noExit = false, noTrace = false) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       console.error(details)
       return;
     }
@@ -66,7 +67,7 @@ export class HelpersMessages {
   }
 
   info(details: string) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       console.info(details);
       return;
     }
@@ -79,7 +80,7 @@ export class HelpersMessages {
   }
 
   log(details: string) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       console.log(details);
       return;
     }
@@ -94,7 +95,7 @@ export class HelpersMessages {
   }
 
   warn(details: string, trace = false) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       console.warn(details);
       return;
     }

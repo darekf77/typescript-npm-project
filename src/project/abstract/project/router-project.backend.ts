@@ -22,7 +22,7 @@ export abstract class RouterProject {
   //#endregion
 
   public routerTargetHttp(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser._routerTargetHttp;
     }
     if (this.type === 'unknow') {
@@ -43,7 +43,7 @@ export abstract class RouterProject {
 
 
   public getDefaultPort(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser && this.browser.defaultPort;
     }
 

@@ -16,7 +16,7 @@ export abstract class BaseProject {
 
   public get genericName(this: Project): string {
 
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.genericName;
     }
     //#region @backendFunc
@@ -35,7 +35,7 @@ export abstract class BaseProject {
   }
 
   public get backupName(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.backupName;
     }
     //#region @backend
@@ -49,7 +49,7 @@ export abstract class BaseProject {
 
 
   get isForRecreation(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isForRecreation;
     }
     //#region @backend
@@ -58,7 +58,7 @@ export abstract class BaseProject {
   }
 
   get isWorkspace(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isWorkspace;
     }
     //#region @backend
@@ -67,7 +67,7 @@ export abstract class BaseProject {
   }
 
   get isContainer(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isContainer;
     }
     //#region @backend
@@ -76,7 +76,7 @@ export abstract class BaseProject {
   }
 
   get isContainerChild(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isContainerChild;
     }
     //#region @backend
@@ -101,7 +101,7 @@ export abstract class BaseProject {
 
 
   get isWorkspaceChildProject(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isWorkspaceChildProject;
     }
     //#region @backend
@@ -118,7 +118,7 @@ export abstract class BaseProject {
    * Standalone projects link: npm libs
    */
   get isStandaloneProject(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isStandaloneProject;
     }
     //#region @backend

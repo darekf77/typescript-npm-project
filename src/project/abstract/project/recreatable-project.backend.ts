@@ -15,7 +15,7 @@ export abstract class RecreatableProject {
    * Core project with basic tested functionality
    */
   get isCoreProject(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isCoreProject;
     }
     //#region @backend
@@ -65,7 +65,7 @@ export abstract class RecreatableProject {
   //#endregion
 
   get customizableFilesAndFolders(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.customizableFilesAndFolders;
     }
     //#region @backend

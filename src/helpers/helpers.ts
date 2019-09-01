@@ -3,6 +3,7 @@ import { HelpersArrayObj } from './helpers-array-obj';
 import { HelpersMessages } from './helpers-messages';
 import { HelpersStringsRegexes } from './helpers-strings-regexes';
 import { HelpersEnvironment } from './helpers-environment';
+import { Helpers as HelperNg2Logger } from 'ng2-logger';
 //#region @backend
 import { Helpers as MorpiHelpers } from 'morphi/helpers';
 import { HelpersGit } from './helpers-git.backend';
@@ -38,6 +39,14 @@ export class HelpersTnp {
     public cliTool = new HelpersCliTool()
   ) {
 
+  }
+
+  get isBrowser() {
+    return HelperNg2Logger.isBrowser;
+  }
+
+  get isNode() {
+    return HelperNg2Logger.isNode;
   }
 
   applyMixins(derivedCtor: any, baseCtors: any[]) {

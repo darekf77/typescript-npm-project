@@ -22,7 +22,7 @@ export abstract class LibProject {
 
 
   get isCommandLineToolOnly(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isCommandLineToolOnly;
     }
     //#region @backend
@@ -30,7 +30,7 @@ export abstract class LibProject {
     //#endregion
   }
   get isBuildedLib(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isBuildedLib;
     }
     //#region @backend

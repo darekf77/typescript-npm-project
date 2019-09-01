@@ -27,7 +27,7 @@ export abstract class StaticProject {
    * Is generated for static build
    */
   get isGenerated(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isGenerated;
     }
     //#region @backend

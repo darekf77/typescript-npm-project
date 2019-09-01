@@ -12,7 +12,6 @@ import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 
 import * as _ from 'lodash';
-import { Morphi } from 'morphi';
 import { reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';

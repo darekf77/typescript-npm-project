@@ -29,7 +29,7 @@ export abstract class TnpProject {
   //#endregion
 
   get isTnp(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.isTnp;
     }
     //#region @backend
@@ -42,7 +42,7 @@ export abstract class TnpProject {
 
 
   get useFramework(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.useFramework;
     }
     //#region @backend
@@ -57,7 +57,7 @@ export abstract class TnpProject {
   }
 
   get isBundleMode(this: Project) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return true;
     }
     //#region @backend

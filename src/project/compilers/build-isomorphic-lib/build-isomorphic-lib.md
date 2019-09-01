@@ -10,7 +10,7 @@ console.log('visible everywhere')
 //#region @backend
 console.log('visible in backend only')
 //#endregion
-if(Morphi.IsBrowser) {
+if(Helpers.isBrowser) {
   console.log('visible everywhere, but only in browser')
 }
 

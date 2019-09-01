@@ -241,7 +241,7 @@ export class Project {
   }
 
   public static get isBundleMode() {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return true;
     }
     //#region @backend

@@ -8,7 +8,6 @@ import { Helpers } from '../../../helpers';
 import { FeatureForProject, Project } from '../../abstract';
 import { TnpDB } from '../../../tnp-db';
 import { config } from '../../../config';
-import { OutFolder } from 'morphi/build';
 import { ProjectFactory } from '../../../scripts/NEW';
 import { PROGRESS_DATA } from '../../../progress-output';
 

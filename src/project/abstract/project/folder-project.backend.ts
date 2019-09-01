@@ -21,7 +21,7 @@ export abstract class FolderProject {
 
 
   get children(this: Project): Project[] {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.children;
     }
     //#region @backend
@@ -33,7 +33,7 @@ export abstract class FolderProject {
   }
 
   get childrenThatAreLibs(this: Project): Project[] {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.childrenThatAreLibs;
     }
     //#region @backend
@@ -50,7 +50,7 @@ export abstract class FolderProject {
   }
 
   get childrenThatAreClients(this: Project): Project[] {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.childrenThatAreClients;
     }
     //#region @backend
@@ -107,7 +107,7 @@ export abstract class FolderProject {
   //#endregion
 
   get parent(this: Project): Project {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.parent;
     }
     //#region @backend
