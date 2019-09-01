@@ -1,4 +1,4 @@
 //#region @backend
-export * from './baseline-site-join.backend';
-export { PathHelper } from './baseline-site-join.helpers.backend';
+export * from './join-merge.backend';
+export { HelpersMerge } from './merge-helpers.backend';
 //#endregion

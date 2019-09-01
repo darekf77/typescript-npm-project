@@ -8,12 +8,50 @@ import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { SourceModifier } from './source-modifier.backend';
+import { IncCompiler } from 'incremental-compiler';
 
+function optionsAppSoureceReplikator(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  let folderPath: string = void 0;
+  const executeOutsideScenario = false;
+  if (project.isWorkspaceChildProject) {
+    folderPath = path.join(project.location, config.folder.src);
+  } else {
+    return void 0;
+  }
+  const options: IncCompiler.Models.BaseClientCompilerOptions = {
+    folderPath,
+    executeOutsideScenario
+  };
 
-export class AppSourceReplicator extends FeatureCompilerForProject {
+  return options;
+}
+
+@IncCompiler.Class({ className: 'AppSourceReplicator' })
+export class AppSourceReplicator extends IncCompiler.Base {
 
   constructor(public project: Project) {
-    super(`src/**/*.*`, '', project && project.location, project);
+    super(optionsAppSoureceReplikator(project));
+  }
+
+  @IncCompiler.methods.AsyncAction()
+  public async asyncAction(event, filePath: string) {
+
+    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
+    if (this.project.sourceFilesToIgnore().includes(f)) {
+      return;
+    }
+
+
+    if (fse.existsSync(filePath)) {
+      const relative = f.replace(`${this.project.location}/`, '');
+      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+      const newPath = path.join(this.project.location, relativePath);
+      Helpers.copyFile(f, newPath);
+      if (fse.existsSync(newPath)) {
+        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+      }
+    }
+    return void 0;
   }
 
   public async preAsyncAction() {
@@ -42,26 +80,5 @@ export class AppSourceReplicator extends FeatureCompilerForProject {
       .filter(f => !!f);
     return { modifedSyncFilesAbsPthsArr };
   }
-
-  public async asyncAction(filePath: string) {
-
-    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
-    if (this.project.sourceFilesToIgnore().includes(f)) {
-      return;
-    }
-
-
-    if (fse.existsSync(filePath)) {
-      const relative = f.replace(`${this.project.location}/`, '');
-      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
-      const newPath = path.join(this.project.location, relativePath);
-      Helpers.copyFile(f, newPath);
-      if (fse.existsSync(newPath)) {
-        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
-      }
-    }
-    return void 0;
-  }
-
 
 }

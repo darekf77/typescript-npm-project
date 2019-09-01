@@ -160,16 +160,16 @@ export default {
   },
   $MOD: async () => {
     if (Project.Current.isSite) {
-      await Project.Current.join.init();
+      await Project.Current.join.start(`Baseline site join only`);
     }
-    await Project.Current.sourceModifier.init(`Source modfier`)
+    await Project.Current.sourceModifier.start(`Source modifer only`)
     process.exit(0)
   },
   UPDATE_ISOMORPHIC() {
     PackagesRecognitionExtended.fromProject(Project.Current).start(true);
   },
   $MOD_WATCH: () => {
-    Project.Current.sourceModifier.initAndWatch();
+    Project.Current.sourceModifier.startAndWatch(`Baseline site join`);
     // process.exit(0)
   },
   $isbundlemode(args) {
@@ -187,7 +187,7 @@ export default {
   // },
 
   JOIN: async () => {
-    await Project.Current.join.init()
+    await Project.Current.join.start()
     process.exit(0)
   },
 

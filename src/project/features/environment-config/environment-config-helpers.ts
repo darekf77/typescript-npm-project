@@ -221,10 +221,7 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
         try {
           if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
             Helpers.log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
-            const w = workspace.join.joinNotAllowed
-            workspace.join.joinNotAllowed = false;
-            await workspace.join.init()
-            workspace.join.joinNotAllowed = w;
+            await workspace.join.start(`QuickFix basleine/site join for "${workspace.genericName}"`);
           }
         } catch (e) {
           Helpers.error(e)

@@ -42,6 +42,16 @@ export class FilesStructure extends FeatureForProject {
     return options;
   }
 
+  private get taskNames() {
+    return {
+      sourceModifir: `[filestructure] (${chalk.bold(this.project.genericName)
+        }) Client source modules pathes modifier `,
+      frameworkFileGenerator: `[filestructure] (${chalk.bold(this.project.genericName)
+        }) Files generator: entites.ts, controllers.ts`,
+      joinMerge: `[filestructure] Join project ${this.project}`
+    };
+  }
+
   public async init(args: string, options?: InitOptions) {
     const { skipNodeModules, recrusive, onlyJoin }: {
       skipNodeModules: boolean; recrusive: boolean; onlyJoin?: boolean;
@@ -96,8 +106,6 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-
-
     if (this.project.baseline) {
       await this.project.baseline.filesStructure.init(args, options);
     }
@@ -137,18 +145,13 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
-
-      const someBuildIsActive = await db.transaction.someBuildIsActive(this.project);
-
       // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
       if (watch) {
-        await this.project.join.initAndWatch(someBuildIsActive)
+        await this.project.join.startAndWatch()
 
       } else {
-        if (!someBuildIsActive) { // QUICK_FIX
-          await this.project.join.init();
-        }
+        await this.project.join.start();
       }
 
       if (!onlyJoin) {
@@ -162,26 +165,22 @@ export class FilesStructure extends FeatureForProject {
 
 
       if (this.project.isWorkspaceChildProject) {
-        const sourceModifireName = `(${chalk.bold(this.project.genericName)})" Client source modules pathes modifier `;
-        const generatorName = `(${chalk.bold(this.project.genericName)}) Files generator: entites.ts, controllers.ts`;
+
         if (!onlyJoin) {
           if (watch) {
-            await this.project.frameworkFileGenerator.initAndWatch(generatorName);
-            if (!someBuildIsActive) {
-              await this.project.sourceModifier.initAndWatch(sourceModifireName);
-            }
+            await this.project.frameworkFileGenerator.startAndWatch(
+              this.taskNames.frameworkFileGenerator);
+            await this.project.sourceModifier.startAndWatch(
+              this.taskNames.sourceModifir);
           } else {
-            await this.project.frameworkFileGenerator.init(generatorName);
-            if (!someBuildIsActive) {
-              await this.project.sourceModifier.init(sourceModifireName);
-            }
+            await this.project.frameworkFileGenerator.start(
+              this.taskNames.frameworkFileGenerator);
+            await this.project.sourceModifier.start(
+              this.taskNames.sourceModifir);
           }
         }
       }
-
     }
-
-
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 

@@ -9,28 +9,46 @@ import { Project } from '../../abstract';
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
 import { FeatureCompilerForProject } from '../../abstract';
+import { IncCompiler } from 'incremental-compiler';
 
+function optionsFrameworkFileGen(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  let folderPath: string | string[] = void 0;
+  let executeOutsideScenario = false;
+  if (project.isWorkspaceChildProject) {
+    folderPath = path.join(project.location, config.folder.src);
+  } else {
+    return void 0;
+  }
+  const options: IncCompiler.Models.BaseClientCompilerOptions = {
+    folderPath,
+    executeOutsideScenario
+  };
+  return options;
+}
 
-export class FrameworkFilesGenerator extends FeatureCompilerForProject {
-  syncAction(): void {
-    if (this.project.type === 'isomorphic-lib' && !this.project.isStandaloneProject) {
-      this.generateEntityTs()
-      this.generateControllersTs()
-    }
+@IncCompiler.Class({ className: 'FrameworkFilesGenerator' })
+export class FrameworkFilesGenerator extends IncCompiler.Base {
+
+  constructor(public project: Project) {
+    super(optionsFrameworkFileGen(project));
   }
-  preAsyncAction(): void {
-    // throw new Error("Method not implemented.");
-  }
-  asyncAction(filePath: string) {
+
+  @IncCompiler.methods.AsyncAction()
+  async asyncAction(event: IncCompiler.Change, filePath: string) {
     // console.log('async action framework file gen ', filePath)
     this.syncAction()
     // console.log('asynlog action ended for generator')
   }
 
-  constructor(public project: Project) {
-    super(`(src|components)/**/*.ts`, '', project && project.location, project);
+  async syncAction() {
+    if (this.project.type === 'isomorphic-lib' && !this.project.isStandaloneProject) {
+      this.generateEntityTs()
+      this.generateControllersTs()
+    }
   }
-
+  async preAsyncAction() {
+    // throw new Error("Method not implemented.");
+  }
 
   private generateEntityTs() {
     const isSite = this.project.isSite;

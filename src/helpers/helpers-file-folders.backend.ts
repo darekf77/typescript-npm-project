@@ -93,6 +93,11 @@ export class HelpersFileFolders {
       Helpers.tryCopyFrom(source, destination, options)
     }
   }
+  removeFileIfExists(absoluteFilePath: string) {
+    if (fse.existsSync(absoluteFilePath)) {
+      fse.unlinkSync(absoluteFilePath);
+    }
+  }
 
   tryRemoveDir(dirpath: string, contentOnly = false) {
     try {

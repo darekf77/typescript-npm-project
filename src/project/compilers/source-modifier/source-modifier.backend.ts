@@ -13,13 +13,65 @@ import { ModType, SourceCodeType } from './source-modifier.models';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { AppSourceReplicator } from './app-source-replicator.backend';
+import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
 const debugFiles = [
   // 'components/index.ts',
 ];
 
-export class SourceModifier extends FeatureCompilerForProject {
+function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  let folderPath: string | string[] = void 0;
+  let executeOutsideScenario = true;
+  if (project.isWorkspaceChildProject) {
+    if (project.isSite) {
+      folderPath = path.join(project.location, config.folder.custom);
+      executeOutsideScenario = false;
+    } else {
+      if (project.type === 'angular-lib') {
+        folderPath = [
+          folderPath = path.join(project.location, config.folder.src),
+          folderPath = path.join(project.location, config.folder.components),
+        ]
+      } else {
+        folderPath = path.join(project.location, config.folder.src);
+      }
+    }
+  } else {
+    return void 0;
+  }
+  const options: IncCompiler.Models.BaseClientCompilerOptions = {
+    folderPath,
+    executeOutsideScenario
+  };
+  return options;
+}
+
+@IncCompiler.Class({ className: 'SourceModifier' })
+export class SourceModifier extends IncCompiler.Base {
+
+
+  constructor(public project: Project,
+  ) {
+    super(optionsSourceModifier(project));
+    this.sourceMod = new SourceModForWorkspaceChilds(project);
+    this.appSourceReplicator = new AppSourceReplicator(project);
+  }
+
+  @IncCompiler.methods.AsyncAction()
+  asyncAction(event: IncCompiler.Change, filePath: string): Promise<any> {
+
+    // console.log('SOurce modifier async !', filePath)
+    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
+    if (this.project.sourceFilesToIgnore().includes(f)) {
+      return;
+    }
+
+    // patchingForAsync(filePath, () => {
+    SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
+    // }, 'source-modifier', 3);
+
+  }
 
 
   get allowedToRunReplikator() {
@@ -27,18 +79,18 @@ export class SourceModifier extends FeatureCompilerForProject {
     return libs.includes(this.project.type);
   }
 
-  async init(taskName?: string, callback?: any) {
+  async start(taskName?: string, callback?: () => void) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.init(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
     }
-    await super.init(taskName, callback);
+    return await super.start(taskName, callback);
   }
 
-  async initAndWatch(taskName?: string, callback?: any) {
+  async startAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.initAndWatch(`Source Repl: ${taskName}`);
+      await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
     }
-    await super.initAndWatch(taskName, callback);
+    return await super.startAndWatch(taskName, callback);
   }
 
   //#region get source type lib - for libs, app - for clients
@@ -110,17 +162,12 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#region constructor
   sourceMod: SourceModForWorkspaceChilds;
   public appSourceReplicator: AppSourceReplicator;
-  constructor(public project: Project,
-  ) {
-    super(getFolderPattern(project), '', project && project.location, project);
-    this.sourceMod = new SourceModForWorkspaceChilds(project);
-    this.appSourceReplicator = new AppSourceReplicator(project);
-  }
+
   //#endregion
 
   //#region SYNC ACTION
-  syncAction(): void {
-    const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
+  async syncAction(files: string[]) {
+    // const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
     // console.log(files)
     files.forEach(f => {
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
@@ -129,26 +176,12 @@ export class SourceModifier extends FeatureCompilerForProject {
   //#endregion
 
   //#region PRE ASYNC ACTION
-  preAsyncAction(): void {
+  async preAsyncAction() {
     // throw new Error("Method not implemented.");
   }
   //#endregion
 
-  //#region ASYNC ACTION
-  asyncAction(filePath: string) {
 
-    // console.log('SOurce modifier async !', filePath)
-    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
-    if (this.project.sourceFilesToIgnore().includes(f)) {
-      return;
-    }
-
-    // patchingForAsync(filePath, () => {
-    SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
-    // }, 'source-modifier', 3);
-
-  }
-  //#endregion
 
 }
 
