@@ -576,10 +576,5 @@
     "typescript-class-helpers",
     "incremental-compiler"
   ],
-  "private": false,
-  "husky": {
-    "hooks": {
-      "pre-push": "tnp deps:show:if:standalone"
-    }
-  }
+  "private": false
 }
