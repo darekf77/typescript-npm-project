@@ -7,7 +7,7 @@ import { Project } from '../../abstract';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
-import { JoinMerge, HelpersMerge } from '../../compilers/baseline-site-join';
+import { BaselineSiteJoin, HelpersMerge } from '../../compilers/baseline-site-join';
 import { FeatureForProject } from '../../abstract';
 
 interface VSCodeSettings {

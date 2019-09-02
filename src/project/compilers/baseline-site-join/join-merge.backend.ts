@@ -53,8 +53,8 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
   return options;
 }
 
-@IncCompiler.Class({ className: 'JoinMerge' })
-export class JoinMerge extends IncCompiler.Base {
+@IncCompiler.Class({ className: 'BaselineSiteJoin' })
+export class BaselineSiteJoin extends IncCompiler.Base {
   private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
   constructor(public project: Project) {
     super(optionsBaselineSiteJoin(project));
@@ -164,6 +164,6 @@ export class JoinMerge extends IncCompiler.Base {
 
 }
 
-export interface JoinMerge extends Partial<FilesJoinActions> { }
+export interface BaselineSiteJoin extends Partial<FilesJoinActions> { }
 
-Helpers.applyMixins(JoinMerge, [FilesJoinActions]);
+Helpers.applyMixins(BaselineSiteJoin, [FilesJoinActions]);

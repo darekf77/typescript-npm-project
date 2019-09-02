@@ -10,14 +10,14 @@ import * as rimraf from 'rimraf';
 import { SourceModifier } from '../source-modifier';
 import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './bsj-debug.backend';
 
-import { JoinMerge } from './join-merge.backend';
+import { BaselineSiteJoin } from './join-merge.backend';
 import { REGEXS } from './bsj-regexes.backend';
 import { HelpersMerge } from './merge-helpers.backend';
 
 export class FilesJoinActions {
 
   //#region replace in input
-  replace(this: JoinMerge, input: string, relativeBaselineCustomPath: string) {
+  replace(this: BaselineSiteJoin, input: string, relativeBaselineCustomPath: string) {
     const self = this;
     const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
     if (debuggin) console.log(`relativeBaselineCustomPath: ${relativeBaselineCustomPath}`)
@@ -87,6 +87,10 @@ export class FilesJoinActions {
       _2___handleReferingTOAngularLibModulesName() {
         // console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
         if (self.project.isWorkspaceChildProject) {
+          // @LAST
+          // can this be separated from source modifer to baseline site ?
+          // how to execute baseline site join after sourcemodifer/baselin change
+          // test, test, test
           input = SourceModifier.PreventNotUseOfTsSourceFolders(self.project, relativeBaselineCustomPath, input);
         }
         return input;

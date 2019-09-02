@@ -9,7 +9,6 @@ function $CONFIGS() {
 }
 
 function CHECK_ENV() {
-  // @LAST
   Helpers.checkEnvironment(config.required);
 }
 

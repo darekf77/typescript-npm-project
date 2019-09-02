@@ -16,7 +16,7 @@ import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 import { Models } from '../../../models';
 import { config } from '../../../config';
-import { JoinMerge, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 
 export abstract class FeatureProject {
@@ -61,7 +61,7 @@ export abstract class FeatureProject {
 
 
   //#region @backend
-  public join: JoinMerge;
+  public join: BaselineSiteJoin;
   //#endregion
 
   //#region @backend
