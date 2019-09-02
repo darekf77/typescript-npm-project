@@ -10,9 +10,7 @@ import { FeatureCompilerForProject, Project } from '../../abstract';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
 import { ModType, SourceCodeType } from './source-modifier.models';
-import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
-import { AppSourceReplicator } from './app-source-replicator.backend';
 import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
@@ -20,43 +18,10 @@ const debugFiles = [
   // 'components/index.ts',
 ];
 
-function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
-  let folderPath: string | string[] = void 0;
-  let executeOutsideScenario = true;
-  if (project.isWorkspaceChildProject) {
-    if (project.isSite) {
-      folderPath = path.join(project.location, config.folder.custom);
-      executeOutsideScenario = false;
-    } else {
-      if (project.type === 'angular-lib') {
-        folderPath = [
-          folderPath = path.join(project.location, config.folder.src),
-          folderPath = path.join(project.location, config.folder.components),
-        ]
-      } else {
-        folderPath = path.join(project.location, config.folder.src);
-      }
-    }
-  } else {
-    return void 0;
-  }
-  const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath,
-    executeOutsideScenario
-  };
-  return options;
-}
+
 
 @IncCompiler.Class({ className: 'SourceModifier' })
-export class SourceModifier extends IncCompiler.Base {
-
-
-  constructor(public project: Project,
-  ) {
-    super(optionsSourceModifier(project));
-    this.sourceMod = new SourceModForWorkspaceChilds(project);
-    this.appSourceReplicator = new AppSourceReplicator(project);
-  }
+export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
   asyncAction(event: IncCompiler.Change, filePath: string): Promise<any> {
@@ -74,21 +39,66 @@ export class SourceModifier extends IncCompiler.Base {
   }
 
 
+  public async asyncActionReplikatorSrc(event, filePath: string) {
+
+    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
+    if (this.project.sourceFilesToIgnore().includes(f)) {
+      return;
+    }
+
+
+    if (fse.existsSync(filePath)) {
+      const relative = f.replace(`${this.project.location}/`, '');
+      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+      const newPath = path.join(this.project.location, relativePath);
+      Helpers.copyFile(f, newPath);
+      if (fse.existsSync(newPath)) {
+        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+      }
+    }
+    return void 0;
+  }
+
+  public async syncActionReplikatorSrc(filesPathes: string[]) {
+    Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
+
+    const modifedSyncFilesAbsPthsArr = filesPathes
+      .map(f => {
+        const orgPath = path.join(this.project.location, f);
+        // const orgContent = fse.readFileSync(orgPath, {
+        //   encoding: 'utf8'
+        // });
+        const relativePath = f.replace(/^src/, config.folder.tempSrc)
+        const newPath = path.join(this.project.location, relativePath);
+        // fse.writeFileSync(newPath, orgContent, {
+        //   encoding: 'utf8'
+        // });
+        Helpers.copyFile(orgPath, newPath);
+        if (fse.existsSync(newPath)) {
+          SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath)
+          return newPath;
+        }
+      })
+      .filter(f => !!f);
+    return { modifedSyncFilesAbsPthsArr };
+  }
+
   get allowedToRunReplikator() {
+    // @LAST
     const libs = config.allowedTypes.angularClient.concat(this.project.isSite ? ['isomorphic-lib'] : []);
     return libs.includes(this.project.type);
   }
 
   async start(taskName?: string, callback?: () => void) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
+      // await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
     }
     return await super.start(taskName, callback);
   }
 
   async startAndWatch(taskName?: string, callback?: any) {
     if (this.allowedToRunReplikator) {
-      await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
+      // await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
     }
     return await super.startAndWatch(taskName, callback);
   }
@@ -143,7 +153,7 @@ export class SourceModifier extends IncCompiler.Base {
       });
     }
     input = this.fixDoubleApostophe(input);
-    input = project.sourceModifier.sourceMod.process(input, modType, relativePath);
+    input = project.sourceModifier.process(input, modType, relativePath);
 
     if (saveMode) {
       fse.writeFileSync(filePath, input, {
@@ -153,19 +163,7 @@ export class SourceModifier extends IncCompiler.Base {
     return input;
   }
 
-  //#region folder patterns fn
-  private get foldersPattern() {
-    return getFolderPattern(this.project);
-  }
-  //#endregion
 
-  //#region constructor
-  sourceMod: SourceModForWorkspaceChilds;
-  public appSourceReplicator: AppSourceReplicator;
-
-  //#endregion
-
-  //#region SYNC ACTION
   async syncAction(files: string[]) {
     // const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
     // console.log(files)
@@ -173,22 +171,5 @@ export class SourceModifier extends IncCompiler.Base {
       SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
     });
   }
-  //#endregion
 
-  //#region PRE ASYNC ACTION
-  async preAsyncAction() {
-    // throw new Error("Method not implemented.");
-  }
-  //#endregion
-
-
-
-}
-
-
-function getFolderPattern(project: Project) {
-  return `${
-    project.isSite ? void 0 :
-      `{${[config.folder.src, config.folder.components].join(',')}}`
-    }/**/*.ts`
 }
