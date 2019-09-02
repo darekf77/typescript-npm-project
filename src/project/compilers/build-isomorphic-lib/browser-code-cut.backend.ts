@@ -377,8 +377,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-      this.rawContent = this.project.sourceModifier.sourceMod
-        .replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
+      this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
       this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
     }
     this.rawContent = this.afterRegionsReplacement(this.rawContent);

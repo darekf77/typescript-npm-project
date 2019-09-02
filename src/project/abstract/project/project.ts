@@ -325,11 +325,11 @@ export class Project {
     this.npmPackages = new NpmPackages(this)
     this.recreate = new FilesRecreator(this);
     this.filesFactory = new FilesFactory(this);
-    this.sourceModifier = new SourceModifier(this);
-    this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
+    // this.sourceModifier = new SourceModifier(this);
+    // this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
     this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
     if (!this.isStandaloneProject) {
-      this.join = new BaselineSiteJoin(this);
+      // this.join = new BaselineSiteJoin(this);
     }
     this.tests = new TestRunner(this);
 
