@@ -158,39 +158,15 @@ export default {
   PSINFO: async (a) => {
     await $PSINFO(a)
   },
-  $MOD: async () => {
-    if (Project.Current.isSite) {
-      await Project.Current.join.start(`Baseline site join only`);
-    }
-    await Project.Current.sourceModifier.start(`Source modifer only`)
-    process.exit(0)
-  },
   UPDATE_ISOMORPHIC() {
     PackagesRecognitionExtended.fromProject(Project.Current).start(true);
   },
-  $MOD_WATCH: () => {
-    Project.Current.sourceModifier.startAndWatch(`Baseline site join`);
-    // process.exit(0)
-  },
+
   $isbundlemode(args) {
     console.log('IS BUNDLE MODE? ', Project.isBundleMode)
     process.exit(0)
   },
   $ASSETS: () => recreate(),
-  // $FILES_CUSTOM: (args) => {
-  //   console.log(new BaselineSiteJoin(Project.Current).files.allCustomFiles)
-  //   process.exit(0)
-  // },
-  // $FILES_BASELINE: (args) => {
-  //   console.log(new BaselineSiteJoin(Project.Current).files.allBaselineFiles)
-  //   process.exit(0)
-  // },
-
-  JOIN: async () => {
-    await Project.Current.join.start()
-    process.exit(0)
-  },
-
   VERSION: () => version(),
   PATH: () => {
     console.log(Project.Tnp.location);

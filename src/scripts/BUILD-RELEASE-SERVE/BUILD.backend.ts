@@ -1,9 +1,11 @@
-//#region @backend
 import * as _ from 'lodash';
+import * as express from 'express';
+import * as path from 'path';
 
 import { Project } from '../../project';
 import { config } from '../../config';
 import { Helpers } from '../../helpers';
+import { Models } from '../../models';
 import chalk from 'chalk';
 
 async function buildWatch(args) {
@@ -153,11 +155,35 @@ export default {
   $START,
   $STATIC_START: $START,
 
-  'Documentation': `
-Building purpose:
-- library
-- application`
+  $SERVE: (args) => {
+    const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
+    if (!config.port && !config.baseUrl && !config.outDir) {
+      Helpers.error(`Bad arguments for tnp serve: ${config}`)
+    }
+    const app = express()
+    app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
+    app.listen(config.port, () => {
+      console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
+    });
+  },
+
+  $RELEASE: async (args) => {
+    const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
+    argsObj.args = args;
+    Project.Current.checkIfReadyForNpm();
+    await Project.Current.release(argsObj)
+
+    process.exit(0)
+  },
+  $RELEASE_PROD: async (args) => {
+    const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
+    argsObj.prod = true;
+    argsObj.args = args;
+    Project.Current.checkIfReadyForNpm();
+    await Project.Current.release(argsObj)
+
+    process.exit(0)
+  },
+
 
 };
-
-//#endregion

@@ -6,6 +6,39 @@ import * as path from 'path';
 import { config } from '../config';
 import { TnpDB } from '../tnp-db';
 
+
+function killallnode() {
+  Helpers.run(`fkill -f node`).sync()
+  // if (process.platform === 'win32') {
+  //   run(`taskkill /F /im node.exe`).sync();
+  // } else {
+  //   run(`killall -9 node`).sync();
+  // }
+}
+
+export async function killAll() {
+  const db = await TnpDB.Instance;
+  let projectsToKill = [];
+  let p = Project.Current;
+  projectsToKill.push(p)
+  let workspace = p.isWorkspaceChildProject ? p.parent : void 0;
+  if (!!workspace) {
+    projectsToKill = projectsToKill.concat(workspace.children)
+  }
+  await db.transaction.killInstancesFrom(projectsToKill)
+  process.exit(0)
+}
+
+export async function killonport(args, noExit = false) {
+  const port = parseInt(args.trim())
+  await Helpers.killProcessByPort(port);
+  if (!noExit) {
+    process.exit(0)
+  }
+}
+
+
+
 function killvscode(args: string, exit = true) {
   try {
     Helpers.run(`kill -9 $(pgrep Electron)`).sync();
@@ -18,7 +51,7 @@ function killvscode(args: string, exit = true) {
   }
 }
 
-export async function develop(args: string, exit = true) {
+export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
   const db = await TnpDB.Instance;
@@ -94,7 +127,7 @@ export async function develop(args: string, exit = true) {
 }
 
 export default {
-  develop,
+  $DEVELOP,
   killvscode,
   vscodekill(args) {
     killvscode(args);
@@ -102,4 +135,17 @@ export default {
   close(args) {
     killvscode(args);
   },
+  $KILL_ON_PORT: async (args: string) => {
+    await killonport(args);
+  },
+  $KILLONPORT: async (args: string) => {
+    await killonport(args);
+  },
+  $KILLALL: () => {
+    killAll()
+  },
+  $KILLALLNODE: () => {
+    killallnode()
+  }
+
 }

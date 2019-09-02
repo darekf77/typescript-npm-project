@@ -11,7 +11,7 @@ import { TnpDB } from './tnp-db/wrapper-db';
 import * as fuzzy from 'fuzzy'
 import * as inquirer from 'inquirer'
 import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
-import { killAll } from './scripts/KILL';
+import { killAll } from './scripts/DEVELOP.backend';
 inquirer.registerPrompt('autocomplete', inquirerAutocomplete)
 
 class Choice {
