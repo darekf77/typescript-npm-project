@@ -23,8 +23,27 @@ import { FilesJoinActions } from './files-join-actions.backend';
 import { HelpersMerge } from './merge-helpers.backend';
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
-  let folderPath: string | string[] = project.isSite ?
-    path.join(project.location, config.folder.custom) : void 0;
+  let folderPath: string | string[] = void 0;
+  if (project.isSite) {
+    if (project.isWorkspace) {
+      folderPath = [
+        path.join(project.location, config.folder.custom),
+        ...[
+          ...project.baseline.customizableFilesAndFolders,
+          ...project.baseline.quickFixes.nodeModulesReplacementsZips,
+          ...project.baseline.node_modules.fixesForNodeModulesPackages,
+        ].map(relativeFilePath => {
+          return path.join(project.baseline.location, relativeFilePath)
+        })
+      ]
+    } else if (project.isWorkspaceChildProject) {
+      folderPath = [
+        path.join(project.location, config.folder.custom),
+        path.join(project.baseline.location, config.folder.src),
+        (project.type === 'angular-lib' && path.join(project.baseline.location, config.folder.components))
+      ].filter(f => !!f);
+    }
+  }
 
   let executeOutsideScenario = false;
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
@@ -34,13 +53,6 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
   return options;
 }
 
-/**
- * @LAST
- * Join baseline files in site
- * - custom as source of changes
- * - workspace (folders except childrens)
- * - workspace childs (custom)
- */
 @IncCompiler.Class({ className: 'JoinMerge' })
 export class JoinMerge extends IncCompiler.Base {
   private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
@@ -50,7 +62,7 @@ export class JoinMerge extends IncCompiler.Base {
 
 
   @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change, fileAbsolutePath) {
+  async asyncAction(event: IncCompiler.Change, fileAbsolutePath: string) {
 
   }
 

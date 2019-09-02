@@ -124,7 +124,7 @@ export class QuickFixes extends FeatureForProject {
     }
   }
 
-  private get nodeModulesReplacements() {
+  public get nodeModulesReplacementsZips() {
     const npmReplacements = glob
       .sync(`${this.project.location} /${config.folder.node_modules}-*.zip`)
       .map(p => p.replace(this.project.location, '').slice(1));
@@ -148,7 +148,7 @@ export class QuickFixes extends FeatureForProject {
     if (!fse.existsSync(nodeModulesPath)) {
       fse.mkdirpSync(nodeModulesPath)
     }
-    this.nodeModulesReplacements.forEach(p => {
+    this.nodeModulesReplacementsZips.forEach(p => {
       const name = p.replace(`${config.folder.node_modules}-`, '');
       const moduleInNodeMdules = path.join(this.project.location, config.folder.node_modules, name);
       if (fse.existsSync(moduleInNodeMdules)) {
