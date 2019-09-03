@@ -7,11 +7,19 @@ import { IncCompiler } from 'incremental-compiler';
 
 function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;
-  let executeOutsideScenario = true;
   if (project.isWorkspaceChildProject) {
     if (project.isSite) {
-      folderPath = path.join(project.location, config.folder.custom);
-      executeOutsideScenario = false;
+      if (project.type === 'angular-lib') {
+        folderPath = [
+          folderPath = path.join(project.location, config.folder.src),
+          folderPath = path.join(project.location, config.folder.components),
+          folderPath = path.join(project.baseline.location, config.folder.src),
+          folderPath = path.join(project.baseline.location, config.folder.components),
+        ]
+      } else {
+        folderPath = path.join(project.location, config.folder.src),
+        folderPath = path.join(project.baseline.location, config.folder.src)
+      }
     } else {
       if (project.type === 'angular-lib') {
         folderPath = [
@@ -22,13 +30,20 @@ function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientC
         folderPath = path.join(project.location, config.folder.src);
       }
     }
-  } else {
-    return void 0;
+  } else if (project.isStandaloneProject) {
+    if (project.type === 'angular-lib') {
+      folderPath = [
+        folderPath = path.join(project.location, config.folder.src),
+        folderPath = path.join(project.location, config.folder.components),
+      ]
+    } else {
+      folderPath = path.join(project.location, config.folder.src);
+    }
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath,
-    executeOutsideScenario
+    folderPath
   };
+  console.log(options)
   return options;
 }
 

@@ -24,18 +24,19 @@ const debugFiles = [
 export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
-  asyncAction(event: IncCompiler.Change, filePath: string): Promise<any> {
+  asyncAction(event: IncCompiler.Change): Promise<any> {
 
-    // console.log('SOurce modifier async !', filePath)
-    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
-    if (this.project.sourceFilesToIgnore().includes(f)) {
-      return;
-    }
+    console.log(`SOurce modifier async ! ${event.fileAbsolutePath}`, )
+
+    // const f = filePath.replace(this.project.location, '').replace(/^\//, '');
+    // if (this.project.sourceFilesToIgnore().includes(f)) {
+    //   return;
+    // }
 
     // patchingForAsync(filePath, () => {
-    SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
+    // SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
     // }, 'source-modifier', 3);
-
+    return null;
   }
 
 
@@ -90,16 +91,16 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   }
 
   async start(taskName?: string, callback?: () => void) {
-    if (this.allowedToRunReplikator) {
-      // await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
-    }
+    // if (this.allowedToRunReplikator) {
+    // await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
+    // }
     return await super.start(taskName, callback);
   }
 
   async startAndWatch(taskName?: string, callback?: any) {
-    if (this.allowedToRunReplikator) {
-      // await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
-    }
+    // if (this.allowedToRunReplikator) {
+    // await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
+    // }
     return await super.startAndWatch(taskName, callback);
   }
 
@@ -165,11 +166,12 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
 
   async syncAction(files: string[]) {
+    console.log(`sync action files`, files)
     // const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
     // console.log(files)
-    files.forEach(f => {
-      SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
-    });
+    // files.forEach(f => {
+    //   SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
+    // });
   }
 
 }

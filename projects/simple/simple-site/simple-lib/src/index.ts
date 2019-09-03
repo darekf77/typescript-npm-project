@@ -4,6 +4,6 @@ import { BarService as SecondBar } from 'angular-lib/components';
 
 import { backendSeccond } from 'second-isomorphic-lib/src/second'
 
-backendSeccond()
+backendSeccond()asd
 
 console.log('hello')
