@@ -1,4 +1,3 @@
-//#region @backend
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { Project } from "../project";
@@ -10,46 +9,14 @@ import * as path from 'path';
 import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 
-async function copyModuleto(args: string) {
-  let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
-  if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
-    if (packageName.startsWith(`${config.folder.node_modules}/`)) {
-      packageName = packageName.replace(`${config.folder.node_modules}/`, '')
-    }
-    if (!path.isAbsolute(project)) {
-      project = Project.From(path.join(process.cwd(), project)) as Project;
-    } else {
-      project = Project.From(project) as Project;
-    }
 
-    await project.node_modules.copy(packageName).to(project);
-    Helpers.info(`Copy DONE`)
-  } else {
-    Helpers.error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
-  }
+function $CONFIGS() {
+  Helpers.log(Project.Current.env.configsFromJs.map(c => c.domain).join('\n'));
   process.exit(0)
 }
 
-
-function copy(destLocaiton) {
-
-  const currentLib = Project.Current;
-  const destination = Project.From(destLocaiton);
-  if (!destination) {
-    Helpers.error(`Incorect project in: ${destLocaiton}`)
-  }
-  currentLib.copyManager.copyBuildedDistributionTo(destination, void 0, false);
-  Helpers.info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
-}
-
-function copyto(args: string) {
-
-  const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
-
-  destLocaitons.forEach(c => copy(c));
-
-
-  process.exit(0)
+function CHECK_ENV() {
+  Helpers.checkEnvironment(config.required);
 }
 
 
@@ -118,33 +85,8 @@ export default {
   // },
 
   $COMMAND,
-  $OPEN_WORKSPACE() {
-    const workspacePath = path.join(Project.Current.location, Project.Current.nameOfCodeWorkspace);
-    if (!fse.existsSync(workspacePath)) {
-      Project.Current.recreateCodeWorkspace();
-    }
-    Project.Current.run(`code ${Project.Current.nameOfCodeWorkspace} &`).sync();
-    process.exit(0)
-  },
-  $OPEN_CORE_PROJECT() {
-    Project.Current.run(`code ${Project.by(Project.Current.type).location} &`).sync();
-    process.exit(0)
-  },
-  $OPEN_TNP_PROJECT() {
-    Project.Tnp.run(`code ${Project.Tnp.location} &`).sync();
-    process.exit(0)
-  },
-  $OPEN_BASELINE() {
-    if (Project.Current.isSite) {
-      if (Project.Current.isWorkspace) {
-        Project.Current.baseline.run(`code ${Project.Current.baseline.nameOfCodeWorkspace} &`).sync();
-      } else {
-        Project.Current.baseline.run(`code . &`).sync();
-      }
-      process.exit(0)
-    }
-    Helpers.error(`This is not "site project"`, false, true);
-  },
+
+
   CIRCURAL_CHECK() {
     Project.Current.run(`madge --circular --extensions ts ./src`).sync()
     process.exit(0)
@@ -186,23 +128,14 @@ export default {
     process.exit(0)
   },
 
-  $copytoproject: (args) => {
-    copyto(args)
+
+
+  $CONFIGS,
+  CHECK_ENV:[CHECK_ENV, `Sample docs`],
+  ENV_CHECK() {
+    CHECK_ENV()
   },
-  $copy_to_project: (args) => {
-    copyto(args)
-  },
-  $copyto: (args) => {
-    copyto(args)
-  },
-  $copymoduletoproject: async (args) => {
-    await copyModuleto(args)
-  },
-  $copy_module_to_project: async (args) => {
-    await copyModuleto(args)
-  }
+
 
 
 }
-
-//#endregion

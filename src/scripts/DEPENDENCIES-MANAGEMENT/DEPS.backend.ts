@@ -1,11 +1,55 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from '../../helpers';
 import { config } from '../../config';
 import { TnpDB } from '../../tnp-db/wrapper-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
+
+
+async function copyModuleto(args: string) {
+  let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
+  if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
+    if (packageName.startsWith(`${config.folder.node_modules}/`)) {
+      packageName = packageName.replace(`${config.folder.node_modules}/`, '')
+    }
+    if (!path.isAbsolute(project)) {
+      project = Project.From(path.join(process.cwd(), project)) as Project;
+    } else {
+      project = Project.From(project) as Project;
+    }
+
+    await project.node_modules.copy(packageName).to(project);
+    Helpers.info(`Copy DONE`)
+  } else {
+    Helpers.error(`Bad argument for ${chalk.bold('copy to module')} : "${args}"`)
+  }
+  process.exit(0)
+}
+
+
+function copy(destLocaiton) {
+
+  const currentLib = Project.Current;
+  const destination = Project.From(destLocaiton);
+  if (!destination) {
+    Helpers.error(`Incorect project in: ${destLocaiton}`)
+  }
+  currentLib.copyManager.copyBuildedDistributionTo(destination, void 0, false);
+  Helpers.info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
+}
+
+function copyto(args: string) {
+
+  const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
+
+  destLocaitons.forEach(c => copy(c));
+
+
+  process.exit(0)
+}
 
 export async function $INSTALL(args, smooth = false, exit = true) {
   await Project.Current.npmPackages.installFromArgs(args, smooth);
@@ -181,6 +225,22 @@ export default {
     }
     project.workspaceSymlinks.remove(`Remove workspace symlinks`);
     process.exit(0)
-  }
+  },
+
+  $copytoproject: (args) => {
+    copyto(args)
+  },
+  $copy_to_project: (args) => {
+    copyto(args)
+  },
+  $copyto: (args) => {
+    copyto(args)
+  },
+  $copymoduletoproject: async (args) => {
+    await copyModuleto(args)
+  },
+  $copy_module_to_project: async (args) => {
+    await copyModuleto(args)
+  },
 
 }

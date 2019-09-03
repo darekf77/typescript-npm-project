@@ -8,7 +8,7 @@ import { Helpers } from '../../../helpers';
 import { FeatureForProject, Project } from '../../abstract';
 import { TnpDB } from '../../../tnp-db';
 import { config } from '../../../config';
-import { ProjectFactory } from '../../../scripts/NEW';
+import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from '../../../progress-output';
 
 export type CleanType = 'all' | 'only_static_generated';

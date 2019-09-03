@@ -2,8 +2,8 @@
 // import * as path from 'path';
 // import { CLASS } from 'typescript-class-helpers';
 // import { IncCompiler } from 'incremental-compiler';
-// import { Helpers } from '../helpers';
-// import { Project } from '../index';
+// import { Helpers } from '../../helpers';
+// import { Project } from '../../project';
 
 // IncCompiler.init(async (asyncEvents) => {
 

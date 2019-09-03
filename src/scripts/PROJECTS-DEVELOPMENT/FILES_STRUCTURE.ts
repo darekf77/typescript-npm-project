@@ -1,6 +1,6 @@
 //#region @backend
-import { Project } from "../project";
-import { TnpDB } from '../tnp-db';
+import { Project } from "../../project";
+import { TnpDB } from '../../tnp-db';
 import { sleep } from 'sleep';
 
 export async function INIT(args: string, exit = true) {

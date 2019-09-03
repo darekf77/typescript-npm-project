@@ -1,8 +1,8 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Helpers } from "../helpers";
-import { Project } from '../project';
-import { PROGRESS_DATA } from '../progress-output';
+import { Helpers } from "../../helpers";
+import { Project } from '../../project';
+import { PROGRESS_DATA } from '../../progress-output';
 
 function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {

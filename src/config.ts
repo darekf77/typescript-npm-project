@@ -112,7 +112,7 @@ export const config = {
 
     scripts: {
       HELP_js: pathResolved(__dirname, folder.scripts, 'HELP.js'),
-      allHelpFiles: path.join(__dirname, folder.scripts, '/*.js'),
+      allHelpFiles: path.join(__dirname, folder.scripts, '/**/*.js'),
       allPattern: path.join(__dirname, `/${folder.scripts}/**/*.js`),
     },
 
