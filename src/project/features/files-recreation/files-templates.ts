@@ -18,9 +18,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     this.files.forEach(f => {
       const filePath = path.join(this.project.location, f);
       try {
-        var fileContent = fse.existsSync(filePath) ? fse.readFileSync(filePath, {
-          encoding: 'utf8'
-        }) : void 0
+        var fileContent =  Helpers.readFile(filePath);
         if (!fileContent) {
           Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
           return;
@@ -63,9 +61,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         }
         return line;
       }).join('\n');
-    fse.writeFileSync(filePath, newContent, {
-      encoding: 'utf8'
-    });
+    Helpers.writeFile(filePath, newContent);
 
   }
 

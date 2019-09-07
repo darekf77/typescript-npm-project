@@ -240,7 +240,7 @@ export class DBTransaction {
 
     if (fse.existsSync(transactionFilePath)) {
       try {
-        var pidString = fse.readFileSync(transactionFilePath, 'utf8').toString();
+        var pidString = Helpers.readFile(transactionFilePath);
       } catch (e) { }
 
       if (previousFileStatus === 'none' && _.isString(pidString) && pidString.trim() === '') {
@@ -276,7 +276,7 @@ export class DBTransaction {
       }
     }
     if (rewriteFile) {
-      fse.writeFileSync(transactionFilePath, `[${process.pid}]`);
+      Helpers.writeFile(transactionFilePath, `[${process.pid}]`);
     }
 
     await Helpers.runSyncOrAsync(callback)

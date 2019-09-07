@@ -1,4 +1,4 @@
-
+import * as _ from 'lodash';
 export class TsCodeModifer {
 
 
@@ -21,6 +21,18 @@ export class TsCodeModifer {
     }).join('\n');
   }
 
-
+  /**
+   * fix double apostrophes in imports,export, requires
+   */
+  fixDoubleApostophe(input: string) {
+    const regex = /(import|export|require\(|\}\sfrom\s(\"|\')).+(\"|\')/g;
+    const matches = input.match(regex);
+    if (_.isArray(matches)) {
+      matches.forEach(m => {
+        input = input.replace(m, m.replace(/\"/g, `'`));
+      });
+    }
+    return input;
+  }
 
 }

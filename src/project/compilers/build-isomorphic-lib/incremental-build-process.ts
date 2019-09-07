@@ -104,7 +104,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           }
           const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
           Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
-          fse.writeFileSync(absolutePathToFile, '')
+          Helpers.writeFile(absolutePathToFile, '')
           return false;
         })
         // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.

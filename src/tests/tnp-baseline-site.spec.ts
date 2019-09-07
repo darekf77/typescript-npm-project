@@ -145,12 +145,12 @@ export class ${fileNameWithoutExt} extends Base {
     })
 
     it('should change origin filepath to prefixed', async () => {
-      expect(!!~fse.readFileSync(filePathSite.absolute.normal).toString().trim()
+      expect(!!~Helpers.readFile(filePathSite.absolute.normal).toString().trim()
         .search(`import { ${fileNameWithoutExt} as Base } from './__${fileNameWithoutExt}';`)).to.be.true;
     });
 
     // it('should join new lines in import into one long import', async () => {
-    //   expect(!!~fse.readFileSync(filePathSite.absolute.normal).toString().trim()
+    //   expect(!!~Helpers.readFile(filePathSite.absolute.normal).toString().trim()
     //     .search(`import { Morphi } from 'morphi';`)).to.be.true;
     // });
 

@@ -92,6 +92,23 @@ export const config = {
   CONST: {
     TEST_TIMEOUT: 3600000
   },
+  debug: {
+    sourceModifier: [
+
+    ],
+    baselineSiteJoin: {
+      DEBUG_PATHES: [
+        // '/src/app/+preview-components/preview-components.component.ts',
+        // '/src/controllers.ts',
+        // '/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
+      ],
+      DEBUG_MERGE_PATHES: [
+        // '/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
+        // '/components/formly/base-components/editor/editor-wrapper.component.ts'
+        // '/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
+      ]
+    }
+  },
   tnp: 'tnp',
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   pathes: {
@@ -139,16 +156,30 @@ export const config = {
   names: {
     env: allowedEnvironmentsObj
   },
-  fileExtensionsText: [
-    'js',
-    'ts',
-    'txt',
-    'json',
-    'doc',
-    'rtf',
-    'md',
-    'sh'
-  ].map(f => `.${f}`),
+  extensions: {
+    /**
+       * Modify source: import,export, requires
+       */
+    get modificableByReplaceFn() {
+      return [
+        'ts',
+        'js',
+        'sass',
+        'scss',
+        'less',
+      ].map(f => `.${f}`)
+    },
+  },
+  // fileExtensionsText: [
+  //   'js',
+  //   'ts',
+  //   'txt',
+  //   'json',
+  //   'doc',
+  //   'rtf',
+  //   'md',
+  //   'sh'
+  // ].map(f => `.${f}`),
   allowedTypes: {
     angularClient: [
       'angular-cli',

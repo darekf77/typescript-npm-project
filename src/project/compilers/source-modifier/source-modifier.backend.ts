@@ -14,164 +14,54 @@ import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.ba
 import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
-const debugFiles = [
-  // 'components/index.ts',
-];
-
-
-
 @IncCompiler.Class({ className: 'SourceModifier' })
 export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
-  asyncAction(event: IncCompiler.Change): Promise<any> {
+  async asyncAction(event: IncCompiler.Change): Promise<Models.morphi.ModifiedFiles> {
+    const relativePathToProject = event.fileAbsolutePath
+      .replace(this.project.location, '')
+      .replace(/^\//, '');
+    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
 
-    console.log(`SOurce modifier async ! ${event.fileAbsolutePath}`, )
+    this.processFile(relativePathToProject, modifiedFiles);
 
-    // const f = filePath.replace(this.project.location, '').replace(/^\//, '');
-    // if (this.project.sourceFilesToIgnore().includes(f)) {
-    //   return;
-    // }
-
-    // patchingForAsync(filePath, () => {
-    // SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f, void 0, true);
-    // }, 'source-modifier', 3);
-    return null;
-  }
-
-
-  public async asyncActionReplikatorSrc(event, filePath: string) {
-
-    const f = filePath.replace(this.project.location, '').replace(/^\//, '');
-    if (this.project.sourceFilesToIgnore().includes(f)) {
-      return;
-    }
-
-
-    if (fse.existsSync(filePath)) {
-      const relative = f.replace(`${this.project.location}/`, '');
-      const relativePath = relative.replace(/^src/, config.folder.tempSrc)
+    if (fse.existsSync(event.fileAbsolutePath)) {
+      const relativePath = relativePathToProject.replace(/^src/, config.folder.tempSrc)
       const newPath = path.join(this.project.location, relativePath);
-      Helpers.copyFile(f, newPath);
-      if (fse.existsSync(newPath)) {
-        SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath, void 0, true);
+      if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles })) {
+        this.processFile(relativePath, modifiedFiles);
       }
     }
-    return void 0;
+    return modifiedFiles;
   }
 
-  public async syncActionReplikatorSrc(filesPathes: string[]) {
+  async syncAction(absoluteFilePathes: string[]): Promise<Models.morphi.ModifiedFiles> {
+    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
+
+    const relativePathesToProject = absoluteFilePathes.map(absoluteFilePath => {
+      return absoluteFilePath
+        .replace(this.project.location, '')
+        .replace(/^\//, '');
+    });
+
+    relativePathesToProject.forEach(relativePathToProject => {
+      this.processFile(relativePathToProject, modifiedFiles);
+    });
+
     Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
-    const modifedSyncFilesAbsPthsArr = filesPathes
-      .map(f => {
-        const orgPath = path.join(this.project.location, f);
-        // const orgContent = fse.readFileSync(orgPath, {
-        //   encoding: 'utf8'
-        // });
-        const relativePath = f.replace(/^src/, config.folder.tempSrc)
-        const newPath = path.join(this.project.location, relativePath);
-        // fse.writeFileSync(newPath, orgContent, {
-        //   encoding: 'utf8'
-        // });
-        Helpers.copyFile(orgPath, newPath);
-        if (fse.existsSync(newPath)) {
-          SourceModifier.PreventNotUseOfTsSourceFolders(this.project, relativePath)
-          return newPath;
+    relativePathesToProject.forEach(relativePathToProject => {
+      const orgAbsolutePath = path.join(this.project.location, relativePathToProject);
+      const relativePathToTempSrc = relativePathToProject.replace(/^src/, config.folder.tempSrc);
+      const destinationPath = path.join(this.project.location, relativePathToTempSrc);
+      if (Helpers.copyFile(orgAbsolutePath, destinationPath, { modifiedFiles })) {
+        if (fse.existsSync(destinationPath)) {
+          this.processFile(relativePathToTempSrc, modifiedFiles);
         }
-      })
-      .filter(f => !!f);
-    return { modifedSyncFilesAbsPthsArr };
-  }
-
-  get allowedToRunReplikator() {
-    // @LAST
-    const libs = config.allowedTypes.angularClient.concat(this.project.isSite ? ['isomorphic-lib'] : []);
-    return libs.includes(this.project.type);
-  }
-
-  async start(taskName?: string, callback?: () => void) {
-    // if (this.allowedToRunReplikator) {
-    // await this.appSourceReplicator.start(`Source Repl: ${taskName}`);
-    // }
-    return await super.start(taskName, callback);
-  }
-
-  async startAndWatch(taskName?: string, callback?: any) {
-    // if (this.allowedToRunReplikator) {
-    // await this.appSourceReplicator.startAndWatch(`Source Repl: ${taskName}`);
-    // }
-    return await super.startAndWatch(taskName, callback);
-  }
-
-  //#region get source type lib - for libs, app - for clients
-  private static getModType(project: Project, relativePath: string): ModType {
-    const startFolder: Models.other.SourceFolder = _.first(relativePath.replace(/^\//, '').split('/')) as Models.other.SourceFolder;
-    if (/^tmp\-src(?!\-)/.test(startFolder)) {
-      return 'tmp-src';
-    }
-    if (startFolder === 'src') {
-      return project.type === 'isomorphic-lib' ? 'lib' : 'app';
-    }
-    if (project.type === 'angular-lib' && startFolder === 'components') {
-      return 'lib';
-    }
-    if (project.isSite && startFolder === 'custom') {
-      return `custom/${this.getModType(project, relativePath.replace(`${startFolder}/`, '') as any)}` as any;
-    }
-  }
-  //#endregion
-
-  //#region fix double apostrophes in imports,export, requires
-  private static fixDoubleApostophe(input: string) {
-    const regex = /(import|export|require\(|\}\sfrom\s(\"|\')).+(\"|\')/g;
-    const matches = input.match(regex);
-    if (_.isArray(matches)) {
-      matches.forEach(m => {
-        input = input.replace(m, m.replace(/\"/g, `'`));
-      });
-    }
-    return input;
-  }
-  //#endregion
-
-  public static PreventNotUseOfTsSourceFolders(project: Project, relativePath: string, input?: string, asyncCall = false): string {
-
-    relativePath = relativePath.replace(/^\//, '');
-    // asyncCall && console.log(`MOD: "${relativePath}"`)
-    const debugging = debugFiles.includes(relativePath);
-    const saveMode = _.isUndefined(input);
-
-    if (saveMode && !config.fileExtensionsText.includes(path.extname(relativePath))) {
-      return;
-    }
-
-    const modType = this.getModType(project, relativePath);
-    const filePath = path.join(project.location, relativePath);
-    if (saveMode) {
-      input = fse.readFileSync(filePath, {
-        encoding: 'utf8'
-      });
-    }
-    input = this.fixDoubleApostophe(input);
-    input = project.sourceModifier.process(input, modType, relativePath);
-
-    if (saveMode) {
-      fse.writeFileSync(filePath, input, {
-        encoding: 'utf8'
-      });
-    }
-    return input;
-  }
-
-
-  async syncAction(files: string[]) {
-    console.log(`sync action files`, files)
-    // const files = glob.sync(this.foldersPattern, { cwd: this.project.location });
-    // console.log(files)
-    // files.forEach(f => {
-    //   SourceModifier.PreventNotUseOfTsSourceFolders(this.project, f)
-    // });
+      }
+    });
+    return modifiedFiles;
   }
 
 }

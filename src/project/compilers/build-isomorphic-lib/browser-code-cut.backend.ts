@@ -82,18 +82,18 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     const orgContentPath = `${absoluteFilePath}.orginal`;
     if (useBackupFile) {
-      fse.writeFileSync(this.absoluteFilePath, contentFromMorphi, { encoding: 'utf8' })
+      Helpers.writeFile(this.absoluteFilePath, contentFromMorphi)
       if (fse.existsSync(orgContentPath)) {
-        const backuContent = fse.readFileSync(orgContentPath, { encoding: 'utf8' })
+        const backuContent = Helpers.readFile(orgContentPath)
         if (backuContent.trim() !== '') {
           content = backuContent;
         } else {
           return content;
         }
       } else if (fse.existsSync(absoluteFilePath)) {
-        const orgContent = fse.readFileSync(absoluteFilePath, { encoding: 'utf8' })
+        const orgContent = Helpers.readFile(absoluteFilePath);
         if (orgContent.trim() !== '') {
-          fse.writeFileSync(orgContentPath, orgContent, { encoding: 'utf8' })
+          Helpers.writeFile(orgContentPath, orgContent)
           content = orgContent;
         } else {
           return content;
@@ -129,7 +129,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     // }
 
     if (useBackupFile) {
-      fse.writeFileSync(absoluteFilePath, content, { encoding: 'utf8' })
+      Helpers.writeFile(absoluteFilePath, content)
       return contentFromMorphi;
     }
     return content;
@@ -155,7 +155,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(htmlTemplatePath)) {
 
       // console.log(`regex: ${regex}`)
-      replacement = fse.readFileSync(htmlTemplatePath, { encoding: 'utf8' }).toString()
+      replacement = Helpers.readFile(htmlTemplatePath);
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
@@ -182,7 +182,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(cssFilePath)) {
 
       // console.log(`regex: ${regex}`)
-      replacement = fse.readFileSync(cssFilePath, { encoding: 'utf8' }).toString()
+      replacement = Helpers.readFile(cssFilePath);
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
         /* put your styles here */
@@ -208,7 +208,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     /* file ${base}.component.${ext} does not exist */
   `;
     if (fse.existsSync(scssFilePath)) {
-      const contentScss = fse.readFileSync(scssFilePath, { encoding: 'utf8' }).toString()
+      const contentScss = Helpers.readFile(scssFilePath);
       // this.debugging && console.log(`content of file:\n${contentScss}`)
 
       if (contentScss.trim() !== '') {

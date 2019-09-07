@@ -47,11 +47,11 @@ export class QuickFixes extends FeatureForProject {
       rimraf.sync(pathInProjectNodeModules);
       fse.mkdirpSync(pathInProjectNodeModules);
 
-      fse.writeFileSync(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `, 'utf8');
-      fse.writeFileSync(path.join(pathInProjectNodeModules, config.file.package_json), JSON.stringify({
+      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `);
+      Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json),{
         name: missingLibName,
         version: "0.0.0"
-      } as Models.npm.IPackageJSON), 'utf8');
+      } as Models.npm.IPackageJSON);
 
     })
   }

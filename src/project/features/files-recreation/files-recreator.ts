@@ -25,7 +25,7 @@ function getVscodeSettingsFrom(project: Project) {
   let settings: VSCodeSettings;
   const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
   try {
-    settings = JSON5.parse(fse.readFileSync(pathSettingsVScode, 'utf8'))
+    settings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
   } catch (e) { }
   return settings;
 }
@@ -158,9 +158,9 @@ export class FilesRecreator extends FeatureForProject {
     }
     if (fse.existsSync(pathSettingsVScode)) {
       try {
-        let settings: VSCodeSettings = JSON5.parse(fse.readFileSync(pathSettingsVScode, 'utf8'))
+        let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
         settings = modifyFN(settings, this.project);
-        fse.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+        Helpers.writeFile(pathSettingsVScode, settings);
       } catch (e) {
         console.log(e)
       }
@@ -168,9 +168,9 @@ export class FilesRecreator extends FeatureForProject {
       try {
         const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
         fse.mkdirpSync(path.dirname(pathSettingsVScode));
-        let settings: VSCodeSettings = JSON5.parse(fse.readFileSync(settingFromCore, 'utf8'))
+        let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
         settings = modifyFN(settings, this.project);
-        fse.writeFileSync(pathSettingsVScode, JSON.stringify(settings, null, 2), 'utf8')
+        Helpers.writeFile(pathSettingsVScode, settings)
       } catch (e) {
         console.log(e)
       }
@@ -260,13 +260,13 @@ export class FilesRecreator extends FeatureForProject {
 
 
   npmignore() {
-    fse.writeFileSync(path.join(this.project.location, '.npmignore'),
-      this.filesIgnoredBy.npmignore.join('\n').concat('\n'), 'utf8');
+    Helpers.writeFile(path.join(this.project.location, '.npmignore'),
+      this.filesIgnoredBy.npmignore.join('\n').concat('\n'));
   }
 
   gitignore() {
-    fse.writeFileSync(path.join(this.project.location, '.gitignore'),
-      this.filesIgnoredBy.gitignore.join('\n').concat('\n'), 'utf8');
+    Helpers.writeFile(path.join(this.project.location, '.gitignore'),
+      this.filesIgnoredBy.gitignore.join('\n').concat('\n'));
   }
 
 

@@ -44,7 +44,7 @@ ${Helpers.terminalLine()}
 
 export function validateWorkspaceConfig(workspaceConfig: Models.env.EnvConfig, filePath: string) {
   if (!_.isObject(workspaceConfig)) {
-    err(undefined, fse.readFileSync(filePath, 'utf8'));
+    err(undefined, Helpers.readFile(filePath));
   }
   if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig);
   if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig)

@@ -8,18 +8,32 @@ import * as watch from 'watch'
 import * as rimraf from 'rimraf';
 // local
 import { SourceModifier } from '../source-modifier';
-import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './bsj-debug.backend';
 
-import { BaselineSiteJoin } from './join-merge.backend';
-import { REGEXS } from './bsj-regexes.backend';
+import { BaselineSiteJoin } from './baseline-site-join.backend';
 import { HelpersMerge } from './merge-helpers.backend';
+import { config } from '../../../config';
 
 export class FilesJoinActions {
+
+  /**
+  *   "baseline/ss-common-logic/src/db-mocks";
+  *                            |<--------->|
+  */
+  getPattern(this: BaselineSiteJoin, input: string, tmpPathToBaselineNodeModulesRelative: string,
+    debuggin: boolean) {
+
+    if (debuggin) console.log('pathPart', HelpersMerge.pathPartStringRegex)
+    const baselineRegex = `${tmpPathToBaselineNodeModulesRelative}${HelpersMerge.pathPartStringRegex}*`
+    if (debuggin) console.log(`\nbaselineRegex: ${baselineRegex}`)
+    let patterns = input.match(new RegExp(baselineRegex, 'g'))
+    return patterns;
+  }
+
 
   //#region replace in input
   replace(this: BaselineSiteJoin, input: string, relativeBaselineCustomPath: string) {
     const self = this;
-    const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
+    const debuggin = (config.debug.baselineSiteJoin.DEBUG_PATHES.includes(relativeBaselineCustomPath));
     if (debuggin) console.log(`relativeBaselineCustomPath: ${relativeBaselineCustomPath}`)
 
     return {
@@ -91,7 +105,7 @@ export class FilesJoinActions {
           // can this be separated from source modifer to baseline site ?
           // how to execute baseline site join after sourcemodifer/baselin change
           // test, test, test
-          input = SourceModifier.PreventNotUseOfTsSourceFolders(self.project, relativeBaselineCustomPath, input);
+          input = self.project.sourceModifier.process(input, relativeBaselineCustomPath);
         }
         return input;
       },
@@ -103,7 +117,8 @@ export class FilesJoinActions {
        */
       _3___handleReferingToBaselinePathes() {
 
-        const debuggin = (DEBUG_PATHES.includes(relativeBaselineCustomPath));
+        const debuggin = (config.debug.baselineSiteJoin.DEBUG_PATHES
+          .includes(relativeBaselineCustomPath));
 
         if (debuggin) console.log(`
 
@@ -116,14 +131,11 @@ export class FilesJoinActions {
         if (debuggin) console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
         const tmpPathToBaselineNodeModulesRelative = HelpersMerge
           .getRegexSourceString(HelpersMerge.pathToBaselineNodeModulesRelative(self.project))
-        const pathPart = REGEXS.baselinePart;
-        if (debuggin) console.log('pathPart', pathPart)
-        const baselineRegex = `${tmpPathToBaselineNodeModulesRelative}${pathPart}*`
-        if (debuggin) console.log(`\nbaselineRegex: ${baselineRegex}`)
-        let patterns = input.match(new RegExp(baselineRegex, 'g'))
 
+        let patterns = self.getPattern(input, tmpPathToBaselineNodeModulesRelative, debuggin);
 
-        if (debuggin) console.log(`[baselinepath] recognized patterns\n`, _.isArray(patterns) && patterns.map(d => `\t${d}`).join('\n'))
+        if (debuggin) console.log(`[baselinepath] recognized patterns\n`,
+          _.isArray(patterns) && patterns.map(d => `\t${d}`).join('\n'))
 
 
         if (Array.isArray(patterns) && patterns.length >= 1) {
@@ -134,10 +146,9 @@ export class FilesJoinActions {
             let patternWithoutBaselinePart = pathToReplaceInInput
               .replace(HelpersMerge.pathToBaselineNodeModulesRelative(self.project), '')
             if (debuggin) console.log(`PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
-            if (debuggin) console.log(`pathPart = ${pathPart}`)
+            if (debuggin) console.log(`pathPart = ${HelpersMerge.pathPartStringRegex}`)
 
-            patternWithoutBaselinePart = patternWithoutBaselinePart
-              .replace(new RegExp(`^${pathPart}`, 'g'), '')
+            patternWithoutBaselinePart = HelpersMerge.PathHelper.removeRootFolder(patternWithoutBaselinePart);
 
             if (debuggin) console.log('PATTERN WITHOUT BASELINE no path part', patternWithoutBaselinePart)
             const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`

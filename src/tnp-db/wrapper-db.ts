@@ -65,7 +65,7 @@ export class TnpDB {
 
   public async init(recreate = true) {
     if (recreate) {
-      fse.writeFileSync(this.location, '')
+      Helpers.writeFile(this.location, '')
     }
     this._adapter = new FileSync(this.location)
     this.db = low(this._adapter)

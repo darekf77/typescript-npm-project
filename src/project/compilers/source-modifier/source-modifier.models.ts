@@ -1,3 +1,5 @@
+import { Project } from '../../index';
+
 export type SourceCodeType =
   'angular-lib(app) src/' |
   'angular-lib(lib) components/' |
@@ -14,3 +16,20 @@ export type SourceCodeType =
   ;
 
 export type ModType = 'app' | 'lib' | 'custom/app' | 'custom/lib' | 'tmp-src';
+
+export type CheckType = 'standalone' | 'baseline' | 'site';
+
+export type ImpReplaceOptions = {
+  debugMatch?: boolean;
+  debugNotMatch?: boolean;
+  relativePath: string,
+  project: Project,
+  method: CheckType,
+  modType: ModType,
+  partsReplacementsOptions?: { replaceWhole?: boolean };
+  urlParts: (string | string[])[],
+  notAllowedAfterSlash?: (string | string[])[],
+  partsReplacements: (string | string[])[],
+  name: string;
+  input: string,
+}

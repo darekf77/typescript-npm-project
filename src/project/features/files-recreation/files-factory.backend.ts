@@ -2,6 +2,7 @@ import { FeatureForProject } from '../../abstract';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
+import { Helpers } from '../../../index';
 
 
 export class FilesFactory extends FeatureForProject {
@@ -19,7 +20,7 @@ export class FilesFactory extends FeatureForProject {
     if (_.isObject(content)) {
       fse.writeJSONSync(destPath, content, { encoding: 'utf8', spaces: 2 })
     } else {
-      fse.writeFileSync(destPath, content ? content.toString() : '', { encoding: 'utf8' });
+      Helpers.writeFile(destPath, content);
     }
   }
 
@@ -46,7 +47,7 @@ export class FilesFactory extends FeatureForProject {
     const fileNameWithoutExt = _.upperCase(_.kebabCase(name).replace(/\-/g, '_')).replace(/\s/g, '_');
     this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`)
       .file(
-        `
+      `
 import { Morphi } from 'morphi';
 
 export interface I${fileNameWithoutExt} {
@@ -85,7 +86,7 @@ export class ${fileNameWithoutExt} extends Morphi.Base.Entity<${fileNameWithoutE
     const NameController = `${camelCaseUpperFirst}Controller`;
     this.create(relativePath, kebebCaseName, `${NameController}.ts`)
       .file(
-        `
+      `
 import { Morphi } from 'morphi';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 

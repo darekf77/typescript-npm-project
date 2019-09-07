@@ -209,11 +209,11 @@ export class CopyManager extends FeatureForProject {
     }
     if (this.project.isWorkspace) {
       if (options.markAsGenerated) {
-        fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
+        Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
         This workspace is generated.
       `);
       } else {
-        fse.writeFileSync(path.resolve(path.join(destinationLocation, '../info.txt')), `
+        Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
         This is container for workspaces.
       `);
       }

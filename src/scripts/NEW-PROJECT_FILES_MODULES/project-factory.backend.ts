@@ -54,7 +54,7 @@ export class ProjectFactory {
       json.tnp.basedOn = `./${basedOn.replace(/\/$/, '')}`;
     }
 
-    fse.writeFileSync(pkgJSONpath, JSON.stringify(json, null, 2), 'utf8')
+    Helpers.writeFile(pkgJSONpath, json);
   }
 
   public create(type: Models.libs.LibType, name: string, cwd: string, basedOn?: string): Project {

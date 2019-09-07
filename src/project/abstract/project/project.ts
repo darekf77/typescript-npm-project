@@ -272,14 +272,14 @@ export class Project {
     if (tnp) {
       const currentPathInSystem = path.join(tnp.location, config.file.tnp_system_path_txt);
       if (!fse.existsSync(currentPathInSystem)) {
-        fse.writeFileSync(currentPathInSystem, tnp.location, 'utf8')
+        Helpers.writeFile(currentPathInSystem, tnp.location)
       }
     } else {
       let tnpBundleTnpPath;
       if (global.tnp_normal_mode) {
-        tnpBundleTnpPath = fse.readFileSync(config.pathes.tnp_system_path_txt).toString().trim()
+        tnpBundleTnpPath = Helpers.readFile(config.pathes.tnp_system_path_txt).toString().trim()
       } else {
-        tnpBundleTnpPath = fse.readFileSync(config.pathes.tnp_system_path_txt_tnp_bundle).toString().trim()
+        tnpBundleTnpPath = Helpers.readFile(config.pathes.tnp_system_path_txt_tnp_bundle).toString().trim()
       }
       if (!fse.existsSync(tnpBundleTnpPath)) {
         Helpers.error(`Please build you ${chalk.bold('tnp-npm-project')} first... `)

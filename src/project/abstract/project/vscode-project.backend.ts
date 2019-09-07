@@ -22,9 +22,7 @@ export abstract class VscodeProject {
     const configSettings = {};
 
     try {
-      const settings = json5.parse(fse.readFileSync(path.join(this.location, '.vscode', 'settings.json'), {
-        encoding: 'utf8'
-      }).toString());
+      const settings = json5.parse(Helpers.readFile(path.join(this.location, '.vscode', 'settings.json')));
       // console.log(settings)
       Object.keys(settings)
         .filter(key => {

@@ -2,204 +2,22 @@ import * as _ from 'lodash';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
-import { ModType, SourceCodeType } from './source-modifier.models';
+import { ModType, SourceCodeType, CheckType } from './source-modifier.models';
 import { Project } from '../../abstract';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
-
-export type CheckType = 'standalone' | 'baseline' | 'site';
-
-export type ImpReplaceOptions = {
-  debugMatch?: boolean;
-  debugNotMatch?: boolean;
-  relativePath: string,
-  project: Project,
-  method: CheckType,
-  modType: ModType,
-  partsReplacementsOptions?: { replaceWhole?: boolean };
-  urlParts: (string | string[])[],
-  notAllowedAfterSlash?: (string | string[])[],
-  partsReplacements: (string | string[])[],
-  name: string;
-  input: string,
-}
-
-function impReplace(impReplaceOptions: ImpReplaceOptions) {
-  let { input, name, urlParts, modType, notAllowedAfterSlash, partsReplacementsOptions,
-    debugMatch, debugNotMatch } = impReplaceOptions;
-  const { partsReplacements, project, relativePath, method, } = impReplaceOptions;
-
-  if (!partsReplacementsOptions) {
-    partsReplacementsOptions = {};
-  }
-  if (_.isUndefined(partsReplacementsOptions.replaceWhole)) {
-    partsReplacementsOptions.replaceWhole = false;
-  }
-  const { replaceWhole } = partsReplacementsOptions;
-
-
-  // if (relativePath === 'custom/src/app/+preview-components/components/+preview-buildtnpprocess/preview-buildtnpprocess.component.ts'
-  //   && method === 'site') {
-  //   debugMatch = true;
-  //   debugNotMatch = true;
-  // }
-
-
-  name = name.replace(/\n/g, ' ')
-
-  urlParts = urlParts.map(p => {
-    if (_.isArray(p)) {
-      return `(${p
-        .map(part => {
-          if (part === config.folder.browser) {
-            return `${Helpers.escapeStringForRegEx(part)}(?!\\-)`;
-          }
-          return Helpers.escapeStringForRegEx(part);
-        }).join('|')})`;
-    }
-    if (_.isString(p)) {
-      return Helpers.escapeStringForRegEx(p);
-    }
-  });
-
-  if (_.isArray(notAllowedAfterSlash)) {
-    notAllowedAfterSlash = notAllowedAfterSlash.map(p => {
-      if (_.isArray(p)) {
-        return `(${p
-          .map(part => {
-            return Helpers.escapeStringForRegEx(part);
-          }).join('|')})`;
-      }
-      if (_.isString(p)) {
-        return Helpers.escapeStringForRegEx(p);
-      }
-    });
-  }
-
-
-  modType = modType ? modType : 'BROWSER' as any;
-
-  let arr: { regexSource: string; replacement: string; description: string; }[] = [];
-  if (replaceWhole) {
-    arr = [
-      {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}.*(\\"|\\')`,
-        replacement: `'${partsReplacements.join('/')}'`,
-        description: `exactly between whole imporrt`
-      }
-    ];
-  } else {
-    arr = [
-      {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}(\\"|\\')`,
-        replacement: `'${partsReplacements.join('/')}'`,
-        description: `exactly between apostrophes`
-      },
-      {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
-        replacement: `'${partsReplacements.join('/')}/`,
-        description: `between apostrophe and slash`
-      },
-    ];
-  }
-
-
-
-  for (let index = 0; index < arr.length; index++) {
-    const element = arr[index];
-    const regex = new RegExp(element.regexSource, 'g');
-    const isMatch = regex.test(input);
-    input = Helpers.tsCodeModifier.replace(input, regex, element.replacement);
-    if (isMatch) {
-      debugMatch && Helpers.info(`(${modType})(${project.isSite ? 'SITE - ' :
-        ''}"${project.genericName}") (${element.description})` +
-        `\nMATCH: ${element.regexSource}` +
-        `\nREGEX: ${element.regexSource}`) +
-        `\nFILE: ${relativePath}\n`;
-    } else {
-      debugNotMatch && Helpers.log(`(${modType})(${project.isSite ? 'SITE - ' :
-        ''}"${project.genericName}") (${element.description})` +
-        `\nDON'T MATCH: ${element.regexSource}` +
-        `\nDON'T REGEX: ${element.regexSource}`) +
-        `\nFILE: ${relativePath}\n`;
-    }
-  }
-
-
-
-  return input;
-}
+import { impReplace } from './source-modifier.helpers.backend';
 
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {
-  constructor(public project: Project) {
-    super(project);
-  }
 
-  process(input: string, modType: ModType = 'lib', relativePath: string) {
-    input = super.process(input, modType, relativePath);
-    input = this.mod3rdPartyLibsReferces(input, modType, relativePath);
+  process(input: string, relativePath: string) {
+    const modType = this.getModType(this.project, relativePath);
+    input = Helpers.tsCodeModifier.fixDoubleApostophe(input);
+    input = super.process(input, relativePath);
     input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
     input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
     return input;
   }
 
-  protected mod3rdPartyLibsReferces(
-    input: string,
-    modType: ModType,
-    relativePath: string): string {
-
-    const method: CheckType = 'standalone';
-    const folders = [
-      ...this.foldersSources,
-      ...this.foldersCompiledJsDtsMap,
-    ];
-
-    const children = this.project.parent.childrenThatAreThirdPartyInNodeModules;
-
-    children.forEach(child => {
-      const libName = child.name;
-
-      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
-        input = impReplace({
-          name: `${libName}/${folders.join('|\n')} -> ${libName}`,
-          project: this.project,
-          input,
-          modType,
-          urlParts: [libName, folders],
-          partsReplacements: [libName],
-          relativePath,
-          method
-        });
-      }
-
-      if (modType === 'tmp-src' && this.project.type !== 'isomorphic-lib') {
-        input = impReplace({
-          name: `${libName} -> ${libName}/${config.folder.browser}`,
-          project: this.project,
-          input,
-          modType,
-          urlParts: [libName],
-          notAllowedAfterSlash: [config.folder.browser],
-          partsReplacements: [libName, config.folder.browser],
-          relativePath,
-          method
-        });
-
-        input = impReplace({
-          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
-          project: this.project,
-          input,
-          modType,
-          urlParts: [libName, folders],
-          partsReplacements: [libName, config.folder.browser],
-          relativePath,
-          method
-        });
-      }
-
-    });
-
-    return input;
-  }
 
   protected modWorkspaceChildrenLibsBetweenItself(
     input: string, modType: ModType, relativePath: string): string {

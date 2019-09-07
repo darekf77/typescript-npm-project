@@ -13,8 +13,6 @@ import chalk from 'chalk';;
 import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject } from '../../abstract';
 
-import { DEBUG_PATHES, DEBUG_MERGE_PATHES } from './bsj-debug.backend';
-import { REGEXS } from './bsj-regexes.backend';
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
 import { SourceModifier } from '../source-modifier';
 import { IncCompiler } from 'incremental-compiler';
@@ -69,7 +67,7 @@ export class BaselineSiteJoin extends IncCompiler.Base {
   //#region merge strategy
   private merge(relativeBaselineCustomPath: string) {
 
-    const isDebugMode = DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
+    const isDebugMode = config.debug.baselineSiteJoin.DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
     //#region debug
     if (isDebugMode) {
       console.log(_.times(5, () => '\n').join())

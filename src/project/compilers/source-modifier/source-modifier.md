@@ -1,3 +1,7 @@
+# SOURCE MODIFIER
+
+~ use ts pathes and be vocal about it 
+
 Lib types     = 'isomorphic-lib'|'angular-lib'
 Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'electron-client'
 

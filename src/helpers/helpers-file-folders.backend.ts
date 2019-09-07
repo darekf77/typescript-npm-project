@@ -8,9 +8,12 @@ import * as os from 'os';
 
 import { Helpers } from './index';
 import { config } from '../config';
+import { Models } from '../index';
 
+const encoding = 'utf8';
 
 export class HelpersFileFolders {
+
 
 
   isLink(filePath: string) {
@@ -230,6 +233,7 @@ export class HelpersFileFolders {
       debugMode?: boolean;
       fast?: boolean;
       dontCopySameContent?: boolean;
+      modifiedFiles?: Models.morphi.ModifiedFiles;
     }): boolean {
 
     if (_.isUndefined(options)) {
@@ -244,7 +248,7 @@ export class HelpersFileFolders {
     if (_.isUndefined(options.dontCopySameContent)) {
       options.dontCopySameContent = true;
     }
-    const { debugMode, fast, transformTextFn, dontCopySameContent } = options;
+    const { debugMode, fast, transformTextFn, dontCopySameContent, modifiedFiles } = options;
     if (_.isFunction(transformTextFn) && fast) {
       Helpers.error(`[copyFile] You cannot use  transformTextFn in fast mode`);
     }
@@ -269,8 +273,8 @@ export class HelpersFileFolders {
     }
 
     if (dontCopySameContent && fse.existsSync(destinationPath)) {
-      const destinationContent = fse.readFileSync(destinationPath, { encoding: 'utf8' }).toString();
-      const sourceContent = fse.readFileSync(sourcePath, { encoding: 'utf8' }).toString();
+      const destinationContent = Helpers.readFile(destinationPath);
+      const sourceContent = Helpers.readFile(sourcePath).toString();
       if (destinationContent === sourceContent) {
         Helpers.log(`Destination has the same content as source: ${path.basename(sourcePath)}`);
         return false;
@@ -278,12 +282,11 @@ export class HelpersFileFolders {
     }
 
     debugMode && Helpers.log(`path.extname(sourcePath) ${path.extname(sourcePath)}`);
-    debugMode && Helpers.log(`config.fileExtensionsText ${config.fileExtensionsText}`);
 
-    if (fast || !config.fileExtensionsText.includes(path.extname(sourcePath))) {
+    if (fast || !config.extensions.modificableByReplaceFn.includes(path.extname(sourcePath))) {
       fse.copyFileSync(sourcePath, destinationPath);
     } else {
-      let sourceData = fse.readFileSync(sourcePath, { encoding: 'utf8' }).toString();
+      let sourceData = Helpers.readFile(sourcePath).toString();
       if (_.isFunction(transformTextFn)) {
         sourceData = transformTextFn(sourceData);
       }
@@ -295,9 +298,37 @@ export class HelpersFileFolders {
         ============================================================================================
         `);
 
-      fse.writeFileSync(destinationPath, sourceData, 'utf8');
+      Helpers.writeFile(destinationPath, sourceData);
     }
-
+    modifiedFiles.modifiedFiles.push(destinationPath);
   }
 
+  readFile(absoluteFilePath: string): string | undefined {
+    if (!fse.existsSync(absoluteFilePath)) {
+      return void 0;
+    }
+    return fse.readFileSync(absoluteFilePath, {
+      encoding
+    }).toString().trim()
+  }
+
+  writeFile(absoluteFilePath: string, input: string | object): boolean {
+    if (!fse.existsSync(absoluteFilePath)) {
+      return false;
+    }
+    if (_.isObject(input)) {
+      fse.writeJsonSync(absoluteFilePath, input, {
+        encoding,
+        spaces: 2
+      })
+      return true;
+    }
+    if (!_.isString(input)) {
+      input = ''
+    }
+    fse.writeFileSync(absoluteFilePath, input, {
+      encoding
+    });
+    return true;
+  }
 }
