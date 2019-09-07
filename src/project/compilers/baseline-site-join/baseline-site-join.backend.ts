@@ -53,19 +53,20 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
 
 @IncCompiler.Class({ className: 'BaselineSiteJoin' })
 export class BaselineSiteJoin extends IncCompiler.Base {
-  private readonly ALLOWED_EXT_TO_REPLACE_BASELINE_PATH = ['.ts', '.js', '.scss', '.css']
   constructor(public project: Project) {
     super(optionsBaselineSiteJoin(project));
   }
 
 
   @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change, fileAbsolutePath: string) {
-
+  async asyncAction(event: IncCompiler.Change, data) {
+    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
+    // this.merge()
   }
 
   //#region merge strategy
-  private merge(relativeBaselineCustomPath: string) {
+  private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.morphi.ModifiedFiles)
+    : Models.morphi.ModifiedFiles {
 
     const isDebugMode = config.debug.baselineSiteJoin.DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
     //#region debug
@@ -108,7 +109,7 @@ export class BaselineSiteJoin extends IncCompiler.Base {
       }
       const source = baselineFileInCustomPath;
       const dest = joinFilePath;
-      const replace = this.ALLOWED_EXT_TO_REPLACE_BASELINE_PATH.includes(path.extname(source));
+      const replace = config.extensions.modificableByReplaceFn.includes(path.extname(source));
       const transformTextFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
       //#region debug
       if (isDebugMode) console.log(`SOURCE: ${source} ,extname: ${path.extname(source)}`)
@@ -142,9 +143,7 @@ export class BaselineSiteJoin extends IncCompiler.Base {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
     // @LAST make something smart here
-    return {
-      variant
-    }
+    return modifiedFiles;
   }
 
   private replacePathFn(relativeBaselineCustomPath: string) {

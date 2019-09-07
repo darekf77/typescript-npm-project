@@ -12,6 +12,7 @@ import { SourceModifier } from '../source-modifier';
 import { BaselineSiteJoin } from './baseline-site-join.backend';
 import { HelpersMerge } from './merge-helpers.backend';
 import { config } from '../../../config';
+import { Helpers } from '../../../index';
 
 export class FilesJoinActions {
 
@@ -57,7 +58,7 @@ export class FilesJoinActions {
         if (debuggin) console.log(`baselineFilePathNoExit: ${baselineFilePathNoExit}`)
 
         const toReplaceImportPath =
-          HelpersMerge.getRegexSourceString(
+          Helpers.escapeStringForRegEx(
             `${path.join(HelpersMerge.pathToBaselineNodeModulesRelative(this.project)
               .replace(/\//g, '//'),
               baselineFilePathNoExit)}`
@@ -129,8 +130,8 @@ export class FilesJoinActions {
         const levelBack = relativeBaselineCustomPath.split('/').length - 3;
         const levelBackPath = _.times(levelBack, () => '../').join('').replace(/\/$/g, '');
         if (debuggin) console.log(`Level back for ${relativeBaselineCustomPath} is ${levelBack} ${levelBackPath}`)
-        const tmpPathToBaselineNodeModulesRelative = HelpersMerge
-          .getRegexSourceString(HelpersMerge.pathToBaselineNodeModulesRelative(self.project))
+        const tmpPathToBaselineNodeModulesRelative = Helpers
+          .escapeStringForRegEx(HelpersMerge.pathToBaselineNodeModulesRelative(self.project))
 
         let patterns = self.getPattern(input, tmpPathToBaselineNodeModulesRelative, debuggin);
 
@@ -179,7 +180,7 @@ export class FilesJoinActions {
             if (fse.existsSync(pathToBaselineFile) && !fse.existsSync(pathToSiteeFile)) {
               let toReplace = HelpersMerge.getPrefixedBasename(baselineFilePathNoExit);
 
-              baselineFilePathNoExit = HelpersMerge.getRegexSourceString(baselineFilePathNoExit);
+              baselineFilePathNoExit = Helpers.escapeStringForRegEx(baselineFilePathNoExit);
               baselineFilePathNoExit = `\.${HelpersMerge.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
               const dirPath = path.dirname(relativePthInCustom);
               toReplace = HelpersMerge.PathHelper.removeRootFolder(path.join(dirPath, toReplace))

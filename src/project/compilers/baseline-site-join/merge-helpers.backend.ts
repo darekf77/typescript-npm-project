@@ -17,15 +17,6 @@ export namespace HelpersMerge {
   export const pathPartStringRegex = `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   const BaselineSiteJoinprefix = '__';
 
-  export function getRegexSourceString(s) {
-    return s
-      .replace(/\//g, '\\/')
-      .replace(/\-/g, '\\-')
-      .replace(/\+/g, '\\+')
-      .replace(/\./g, '\\.')
-      .replace(/\_/g, '\\_')
-  }
-
   export const PathHelper = {
     PREFIX(baseFileName) {
       return `${BaselineSiteJoinprefix}${baseFileName}`
@@ -37,10 +28,6 @@ export namespace HelpersMerge {
       const ext = path.extname(filePath);
       return path.join(path.dirname(filePath), path.basename(filePath, ext))
     },
-    isBaselineParent(filePath: string) {
-      const basename = path.basename(filePath);
-      return basename.startsWith(BaselineSiteJoinprefix)
-    }
 
   }
 

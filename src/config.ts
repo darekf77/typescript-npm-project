@@ -164,6 +164,7 @@ export const config = {
       return [
         'ts',
         'js',
+        'css',
         'sass',
         'scss',
         'less',
