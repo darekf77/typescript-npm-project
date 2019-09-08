@@ -1,5 +1,4 @@
 //#region @backend
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -42,29 +41,29 @@ export class TnpBundle extends FeatureForProject {
   }
 
 
-  // checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
-  //   const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
+  checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
+    const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
 
-  //   return getMostRecentFilesNames(tnpDistCompiled)
-  //     .map(f => f.replace(tnpDistCompiled, ''))
-  //     .filter(f => {
-  //       const fileInDest = path.join(destination, f)
-  //       const fileInTnp = path.join(tnpDistCompiled, f);
+    return Helpers.getMostRecentFilesNames(tnpDistCompiled)
+      .map(f => f.replace(tnpDistCompiled, ''))
+      .filter(f => {
+        const fileInDest = path.join(destination, f)
+        const fileInTnp = path.join(tnpDistCompiled, f);
 
-  //       if (!fs.existsSync(fileInDest)) {
-  //         // console.log(`File ${fileInDest} doesn't exist`)
-  //         return true;
-  //       }
+        if (!fse.existsSync(fileInDest)) {
+          // console.log(`File ${fileInDest} doesn't exist`)
+          return true;
+        }
 
-  //       const res = fs.readFileSync(fileInTnp).toString().trim() !== fs.readFileSync(fileInDest).toString().trim()
-  //       // console.log(`
-  //       //   compare: "${fileInDest}" ${fs.readFileSync(fileInDest).toString().length}
-  //       //   with : "${fileInTnp}" ${fs.readFileSync(fileInTnp).toString().length}
-  //       //   result: ${res}
-  //       // `)
-  //       return res;
-  //     }).length === 0;
-  // }
+        const res = Helpers.readFile(fileInTnp).trim() !== Helpers.readFile(fileInDest).trim()
+        console.log(`
+          compare: "${fileInDest}" ${Helpers.readFile(fileInDest).toString().length}
+          with : "${fileInTnp}" ${Helpers.readFile(fileInTnp).toString().length}
+          result: ${res}
+        `)
+        return res;
+      }).length === 0;
+  }
 
 
   private reinstallTnp(project: Project,
@@ -105,7 +104,7 @@ export class TnpBundle extends FeatureForProject {
 
       const destPackageJSON = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
-      if (fs.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
+      if (fse.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
         // console.log(`Removed tnp - helper from ${ dest } `)
         Helpers.tryRemoveDir(destCompiledJs)
       }

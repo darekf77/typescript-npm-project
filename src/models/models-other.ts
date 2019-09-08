@@ -7,6 +7,7 @@ import { Project } from '../project';
 
 export namespace ModelsOther {
 
+  export type ModifiedFiles = { modifiedFiles: string[] };
 
   export class Range {
 

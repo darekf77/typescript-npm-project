@@ -52,7 +52,7 @@ function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientC
 
 
 export class SourceModForStandaloneProjects
-  extends IncCompiler.Base<Models.morphi.ModifiedFiles, Models.morphi.ModifiedFiles> {
+  extends IncCompiler.Base<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
 
   constructor(public project: Project) {
     super(optionsSourceModifier(project));
@@ -81,7 +81,7 @@ export class SourceModForStandaloneProjects
     return input;
   }
 
-  public processFile(relativePath: string, files: Models.morphi.ModifiedFiles): boolean {
+  public processFile(relativePath: string, files: Models.other.ModifiedFiles): boolean {
     const absoluteFilePath = path.join(this.project.location, relativePath);
 
     if (!fse.existsSync(absoluteFilePath) ||

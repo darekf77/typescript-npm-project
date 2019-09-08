@@ -1,5 +1,4 @@
 //#region imports
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
@@ -84,14 +83,14 @@ export class PackageJsonCore {
 
       // QUICK_FIX
       pathToBaseline = this.data.tnp.basedOnAbsolutePath1;
-      if (fs.existsSync(pathToBaseline)) {
+      if (fse.existsSync(pathToBaseline)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
         return pathToBaseline;
       }
       Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
       pathToBaseline = this.data.tnp.basedOnAbsolutePath2;
-      if (fs.existsSync(pathToBaseline)) {
+      if (fse.existsSync(pathToBaseline)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
         return pathToBaseline;
       }

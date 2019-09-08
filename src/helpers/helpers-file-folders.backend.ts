@@ -96,9 +96,11 @@ export class HelpersFileFolders {
       Helpers.tryCopyFrom(source, destination, options)
     }
   }
-  removeFileIfExists(absoluteFilePath: string) {
+  removeFileIfExists(absoluteFilePath: string, options?: { modifiedFiles?: Models.other.ModifiedFiles; }) {
+    const { modifiedFiles } = options || { modifiedFiles: { modifiedFiles: [] } };
     if (fse.existsSync(absoluteFilePath)) {
       fse.unlinkSync(absoluteFilePath);
+      modifiedFiles.modifiedFiles.push(absoluteFilePath);
     }
   }
 
@@ -149,7 +151,7 @@ export class HelpersFileFolders {
     let files = [];
     const readed = fse.readdirSync(dir).map(f => {
       const fullPath = path.join(dir, f);
-      // console.log(`is direcotry ${fs.lstatSync(fullPath).isDirectory()} `, fullPath)
+      // console.log(`is direcotry ${fse.lstatSync(fullPath).isDirectory()} `, fullPath)
       if (fse.lstatSync(fullPath).isDirectory()) {
         Helpers.getRecrusiveFilesFrom(fullPath).forEach(aa => files.push(aa))
       }
@@ -208,7 +210,7 @@ export class HelpersFileFolders {
       // console.log(f);
       // ctime = creation time is used
       // replace with mtime for modification time
-      // console.log( `${fs.statSync(f).mtimeMs} for ${f}`   )
+      // console.log( `${fse.statSync(f).mtimeMs} for ${f}`   )
       return fse.statSync(f).mtimeMs;
 
     });
@@ -233,7 +235,7 @@ export class HelpersFileFolders {
       debugMode?: boolean;
       fast?: boolean;
       dontCopySameContent?: boolean;
-      modifiedFiles?: Models.morphi.ModifiedFiles;
+      modifiedFiles?: Models.other.ModifiedFiles;
     }): boolean {
 
     if (_.isUndefined(options)) {
@@ -303,6 +305,9 @@ export class HelpersFileFolders {
     modifiedFiles.modifiedFiles.push(destinationPath);
   }
 
+  /**
+   * wrapper for fs.readFileSync
+   */
   readFile(absoluteFilePath: string): string | undefined {
     if (!fse.existsSync(absoluteFilePath)) {
       return void 0;
@@ -312,6 +317,9 @@ export class HelpersFileFolders {
     }).toString().trim()
   }
 
+  /**
+   * wrapper for fs.writeFileSync
+   */
   writeFile(absoluteFilePath: string, input: string | object): boolean {
     if (!fse.existsSync(absoluteFilePath)) {
       return false;

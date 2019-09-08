@@ -1,5 +1,4 @@
 //#region @backend
-import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from "chalk";
@@ -39,12 +38,12 @@ export class PackageJSON
     }
     const isTnpProject = (location === config.pathes.tnp_folder_location);
     const filePath = path.join(location, 'package.json');
-    if (!fs.existsSync(filePath)) {
+    if (!fse.existsSync(filePath)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)
       return;
     }
     try {
-      const file = fs.readFileSync(filePath, 'utf8').toString();
+      const file = Helpers.readFile(filePath);
       const json: Models.npm.IPackageJSON = JSON.parse(file) as any;
       if (!json.tnp && !isTnpProject) {
         // warn(`Unrecognized project type from location: ${location}`, false);

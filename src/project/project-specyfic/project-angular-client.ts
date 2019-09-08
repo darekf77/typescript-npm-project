@@ -1,6 +1,6 @@
 //#region @backend
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as child from 'child_process';
 // third part
 import { Project } from "../abstract";
@@ -20,7 +20,7 @@ export class ProjectAngularClient extends Project {
 
   get isEjectedProject() {
     try {
-      const file = fs.readFileSync(path.join(this.location, '.angular-cli.json')).toString()
+      const file = Helpers.readFile(path.join(this.location, '.angular-cli.json'));
       const config: { project: { ejected: boolean; } } = JSON.parse(file);
       return (config.project && config.project.ejected);
     } catch (e) {

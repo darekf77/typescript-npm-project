@@ -35,7 +35,7 @@ export class ControllersGenerator extends EntitesGenerator {
 
     // controllersFiles = controllersFiles.filter(f => {
     //   const fileAbsolutePatg = path.join(this.project.location, config.folder.src, f);
-    //   return !fs.existsSync(baselineFile)
+    //   return !fse.existsSync(baselineFile)
     // })
 
     controllersFiles = controllersFiles.map(f => `./${f.replace(/\.ts$/, '')}`)

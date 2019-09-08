@@ -18,9 +18,7 @@ import { config } from '../config';
 
 function db() {
   let location = config.pathes.tmp_db_tests_json;
-  if (fse.existsSync(location)) {
-    fse.unlinkSync(location)
-  }
+  Helpers.removeFileIfExists(location)
   let adapter = new FileSync(location)
   let db = low(adapter)
   return db;

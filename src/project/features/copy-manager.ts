@@ -1,7 +1,6 @@
 //#region @backend
 
 import * as _ from 'lodash';
-import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as path from 'path';
 import * as glob from 'glob';
@@ -78,7 +77,7 @@ export class CopyManager extends FeatureForProject {
     let tempDestination: string;
     if (useTempLocation) {
       tempDestination = `/tmp/${_.camelCase(destinationLocation)}`;
-      if (fs.existsSync(tempDestination)) {
+      if (fse.existsSync(tempDestination)) {
         rimraf.sync(tempDestination)
       }
       fse.mkdirpSync(tempDestination);
@@ -326,7 +325,7 @@ export class CopyManager extends FeatureForProject {
 
     // console.log('watching   folder for as copy source !! ', monitorDir)
 
-    if (fs.existsSync(monitorDir)) {
+    if (fse.existsSync(monitorDir)) {
       watch(monitorDir, {
         followSymlinks: false,
         interval: process.platform === 'darwin' ? void 0 : 500,

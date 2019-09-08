@@ -18,11 +18,11 @@ import { IncCompiler } from 'incremental-compiler';
 export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change): Promise<Models.morphi.ModifiedFiles> {
+  async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
-    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
     this.processFile(relativePathToProject, modifiedFiles);
 
@@ -36,8 +36,8 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     return modifiedFiles;
   }
 
-  async syncAction(absoluteFilePathes: string[]): Promise<Models.morphi.ModifiedFiles> {
-    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
+  async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
     const relativePathesToProject = absoluteFilePathes.map(absoluteFilePath => {
       return absoluteFilePath

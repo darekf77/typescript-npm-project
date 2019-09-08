@@ -60,11 +60,11 @@ export class NpmPackagesCore extends FeatureForProject {
             this.project.git.resetFiles(config.file.yarn_lock);
           }
         } else {
-          fse.existsSync(yarnLockPath) && fse.unlinkSync(yarnLockPath);
+          fse.existsSync(yarnLockPath) && Helpers.removeFileIfExists(yarnLockPath);
         }
       } else {
         const packageLockPath = path.join(this.project.location, config.file.package_lock_json)
-        fse.existsSync(packageLockPath) && fse.unlinkSync(packageLockPath);
+        fse.existsSync(packageLockPath) && Helpers.removeFileIfExists(packageLockPath);
       }
     }
   }

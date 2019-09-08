@@ -2,7 +2,7 @@
 import * as child from 'child_process'
 import * as _ from 'lodash';
 import chalk from 'chalk';
-import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as os from "os";
 import * as path from 'path';
 import * as sleep from 'sleep';
@@ -70,7 +70,7 @@ export class HelpersProcess {
       return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
     }
     if (!fn || !_.isFunction(fn)) {
-      Helpers.error(`${executionType} wrapper: "${fs}" is not a function.`)
+      Helpers.error(`${executionType} wrapper: "${fn}" is not a function.`)
       process.exit(1)
     }
 
@@ -202,7 +202,7 @@ export class HelpersProcess {
   }
 
   checkProcess(dirPath: string, command: string) {
-    if (!fs.existsSync(dirPath)) {
+    if (!fse.existsSync(dirPath)) {
       Helpers.error(`
   Path for process cwd doesn't exist: ${dirPath}
   command: ${command}

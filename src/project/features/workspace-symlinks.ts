@@ -28,7 +28,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
       const symPkgPath = path.join(this.project.location, config.folder.node_modules, c.name);
       if (fse.existsSync(symPkgPath)) {
         Helpers.log(`Removing symlinks: ${c.genericName} from node_module ${triggeredMsg}`)
-        fse.unlinkSync(symPkgPath);
+        Helpers.removeFileIfExists(symPkgPath);
       }
     })
     this.project.children.forEach(c => {

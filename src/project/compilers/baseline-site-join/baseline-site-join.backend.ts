@@ -60,13 +60,13 @@ export class BaselineSiteJoin extends IncCompiler.Base {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change, data) {
-    const modifiedFiles: Models.morphi.ModifiedFiles = { modifiedFiles: [] };
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     // this.merge()
   }
 
   //#region merge strategy
-  private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.morphi.ModifiedFiles)
-    : Models.morphi.ModifiedFiles {
+  private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.other.ModifiedFiles)
+    : Models.other.ModifiedFiles {
 
     const isDebugMode = config.debug.baselineSiteJoin.DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
     //#region debug
@@ -99,18 +99,20 @@ export class BaselineSiteJoin extends IncCompiler.Base {
         variant = 'join'
         Helpers.copyFile(
           baselineAbsoluteLocation,
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project)
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
+          { modifiedFiles }
         )
       } else {
         variant = 'no-in-baseline'
         Helpers.removeFileIfExists(
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project)
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
+          { modifiedFiles }
         );
       }
       const source = baselineFileInCustomPath;
       const dest = joinFilePath;
       const replace = config.extensions.modificableByReplaceFn.includes(path.extname(source));
-      const transformTextFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : undefined;
+      const transformTextFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : void 0;
       //#region debug
       if (isDebugMode) console.log(`SOURCE: ${source} ,extname: ${path.extname(source)}`)
       if (isDebugMode) console.log(`DEST: ${dest} ,extname: ${path.extname(dest)}`)
@@ -122,27 +124,34 @@ export class BaselineSiteJoin extends IncCompiler.Base {
         {
           transformTextFn,
           debugMode: isDebugMode,
-          fast: false
+          fast: false,
+          modifiedFiles
         }
       )
     } else {
       if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'no-in-custom'
-        Helpers.copyFile(baselineAbsoluteLocation, joinFilePath, { fast: true });
-        Helpers.removeFileIfExists(HelpersMerge
-          .getPrefixedPathInJoin(relativeBaselineCustomPath, this.project))
+        Helpers.copyFile(baselineAbsoluteLocation, joinFilePath, { fast: true, modifiedFiles });
+        Helpers.removeFileIfExists(
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
+          { modifiedFiles }
+        );
       } else {
         variant = 'deleted'
-        Helpers.removeFileIfExists(joinFilePath)
-        Helpers.removeFileIfExists(HelpersMerge
-          .getPrefixedPathInJoin(relativeBaselineCustomPath, this.project))
+        Helpers.removeFileIfExists(
+          joinFilePath,
+          { modifiedFiles }
+        );
+        Helpers.removeFileIfExists(
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
+          { modifiedFiles }
+        );
       }
     }
 
     if (isDebugMode) {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
-    // @LAST make something smart here
     return modifiedFiles;
   }
 
