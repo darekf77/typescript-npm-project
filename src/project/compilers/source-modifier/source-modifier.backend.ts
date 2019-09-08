@@ -24,15 +24,18 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       .replace(/^\//, '');
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
+    Helpers.log(`Source modifer async action for ${relativePathToProject}`)
+
     this.processFile(relativePathToProject, modifiedFiles);
 
     if (fse.existsSync(event.fileAbsolutePath)) {
       const relativePath = relativePathToProject.replace(/^src/, config.folder.tempSrc)
       const newPath = path.join(this.project.location, relativePath);
-      if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles })) {
+      if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles, fast: true })) {
         this.processFile(relativePath, modifiedFiles);
       }
     }
+    console.log(modifiedFiles)
     return modifiedFiles;
   }
 
