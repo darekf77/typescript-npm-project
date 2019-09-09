@@ -17,6 +17,7 @@ import { HelpersFileFolders } from './helpers-file-folders.backend';
 import { Models } from '../models';
 //#endregion
 import { Helpers } from './index';
+import { config } from '../config';
 
 export class HelpersTnp {
   //#region singleton
@@ -58,6 +59,13 @@ export class HelpersTnp {
         Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
       });
     });
+  }
+
+  getBrowserVerPath(moduleName?: string) {
+    if (!moduleName) {
+      return config.folder.browser;
+    }
+    return `${config.folder.browser}-for-${moduleName}`;
   }
 
   getMethodName(obj, method): string {

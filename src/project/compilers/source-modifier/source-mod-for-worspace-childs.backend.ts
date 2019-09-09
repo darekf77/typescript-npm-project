@@ -57,7 +57,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
 
         folders = this.project.parent.childrenThatAreClients.map(client => {
-          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
+          return Helpers.getBrowserVerPath(client.name);
         });
         process(folders);
       }
@@ -81,8 +81,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
           } else {
 
-            const browserForCurrentClient = IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project.name);
+            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
 
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
@@ -107,7 +106,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         folders = this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+            return Helpers.getBrowserVerPath(client.name)
           });
 
         process(folders);
@@ -162,7 +161,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
 
         folders = this.project.parent.childrenThatAreClients.map(client => {
-          return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
+          return Helpers.getBrowserVerPath(client.name);
         });
         process(folders);
 
@@ -208,7 +207,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       //   folders = this.project.parent.childrenThatAreClients
       //     .map(client => {
-      //       return IncrementalBuildProcessExtended.getBrowserVerPath(client.name)
+      //       return Helpers.getBrowserVerPath(client.name)
       //     });
 
       //   process(folders);
@@ -267,8 +266,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
           } else {
 
-            const browserForCurrentClient = IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project.name);
+            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
 
             input = impReplace({
               name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${libName}/${browserForCurrentClient}`,
@@ -292,7 +290,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
         folders = this.project.parent.childrenThatAreClients
           .map(client => {
-            return IncrementalBuildProcessExtended.getBrowserVerPath(client.name);
+            return Helpers.getBrowserVerPath(client.name);
           });
 
         process(folders);

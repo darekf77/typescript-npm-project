@@ -324,9 +324,10 @@ export class HelpersFileFolders {
    * wrapper for fs.writeFileSync
    */
   writeFile(absoluteFilePath: string, input: string | object): boolean {
-    if (!fse.existsSync(absoluteFilePath)) {
-      return false;
+    if (!fse.existsSync(path.dirname(absoluteFilePath))) {
+      fse.mkdirpSync(path.dirname(absoluteFilePath));
     }
+
     if (_.isObject(input)) {
       fse.writeJsonSync(absoluteFilePath, input, {
         encoding,

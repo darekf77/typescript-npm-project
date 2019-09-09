@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Morphi  } from 'morphi/browser';
+import { Morphi  } from 'morphi';
 
 
 @Component({

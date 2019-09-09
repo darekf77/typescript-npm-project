@@ -40,12 +40,6 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     return [];
   }
 
-  public static getBrowserVerPath(moduleName?: string) {
-    if (!moduleName) {
-      return config.folder.browser;
-    }
-    return `${config.folder.browser}-for-${moduleName}`;
-  }
 
   constructor(private project: Project, private buildOptions: BuildOptions) {
 
@@ -112,7 +106,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
       this.resolveModulesLocations
         .forEach(moduleName => {
-          let browserOutFolder = IncrementalBuildProcessExtended.getBrowserVerPath(moduleName);
+          let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
           if (outFolder === 'bundle') {
             browserOutFolder = path.join(outFolder, browserOutFolder);
           }

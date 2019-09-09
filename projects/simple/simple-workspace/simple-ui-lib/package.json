@@ -1,0 +1,15 @@
+{
+  "tnp": {
+    "resources": [],
+    "type": "angular-lib",
+    "overrided": {
+      "ignoreDepsPattern": [],
+      "includeAsDev": [],
+      "includeOnly": [],
+      "dependencies": {}
+    }
+  },
+  "name": "simple-ui-lib",
+  "dependencies": {},
+  "devDependencies": {}
+}

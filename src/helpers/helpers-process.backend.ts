@@ -75,9 +75,9 @@ export class HelpersProcess {
     }
 
     try {
-      Helpers.log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Started..`)
+      Helpers.log(`${currentDate()} ${executionType} "${taskName}" Started..`)
       await Helpers.runSyncOrAsync(fn)
-      Helpers.log(`${currentDate()} ${executionType} "${chalk.bold(taskName)}" Done\u2713`)
+      Helpers.log(`${currentDate()} ${executionType} "${taskName}" Done\u2713`)
     } catch (error) {
       Helpers.log(chalk.red(error));
       Helpers.log(`${currentDate()} ${executionType} ${taskName} ERROR`);

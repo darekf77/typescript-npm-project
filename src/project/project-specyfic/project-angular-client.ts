@@ -19,13 +19,7 @@ export class ProjectAngularClient extends Project {
 
 
   get isEjectedProject() {
-    try {
-      const file = Helpers.readFile(path.join(this.location, '.angular-cli.json'));
-      const config: { project: { ejected: boolean; } } = JSON.parse(file);
-      return (config.project && config.project.ejected);
-    } catch (e) {
-      Helpers.error(e)
-    }
+    return this.type !== 'angular-lib';
   }
 
   filesTemplates() {

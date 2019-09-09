@@ -324,8 +324,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
             imp = imp.replace(regex, pkgName);
           } else {
 
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project && this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -344,8 +343,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
             imp = imp.replace(regex, pkgName);
           } else {
 
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${IncrementalBuildProcessExtended
-              .getBrowserVerPath(this.project && this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -360,8 +358,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
         }
         const replacedImp = imp.replace(pkgName,
-          `${pkgName}/${IncrementalBuildProcessExtended
-            .getBrowserVerPath(this.project && this.project.name)}`);
+          `${pkgName}/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
         this.rawContent = this.rawContent.replace(orgImp, replacedImp);
         return;
 
