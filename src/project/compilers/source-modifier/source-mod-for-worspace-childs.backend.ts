@@ -9,15 +9,6 @@ import { impReplace } from './source-modifier.helpers.backend';
 
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {
 
-  process(input: string, relativePath: string) {
-    const modType = this.getModType(this.project, relativePath);
-    input = Helpers.tsCodeModifier.fixDoubleApostophe(input);
-    input = super.process(input, relativePath);
-    input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
-    input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
-    return input;
-  }
-
 
   protected modWorkspaceChildrenLibsBetweenItself(
     input: string, modType: ModType, relativePath: string): string {

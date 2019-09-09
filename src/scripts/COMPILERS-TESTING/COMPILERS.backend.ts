@@ -2,36 +2,36 @@ import { Project } from "../../project";
 
 const testTasks = 'Test task'
 
-function $COMPILER_BSJ_WATCH() {
-  Project.Current.join.startAndWatch(testTasks);
-  // process.exit(0)
-}
-
-function $COMPILER_BSJ() {
-  Project.Current.join.startAndWatch(testTasks);
-  // process.exit(0)
-}
-
-function $COMPILER_SM_WATCH() {
-  Project.Current.sourceModifier.startAndWatch(testTasks);
-  // process.exit(0)
-}
-
-function $COMPILER_SM() {
-  Project.Current.sourceModifier.startAndWatch(testTasks);
-  // process.exit(0)
-}
 
 
-function $COMPILER_FFG_WATCH() {
-  Project.Current.frameworkFileGenerator.startAndWatch(testTasks);
-  // process.exit(0)
+async function $COMPILER_BSJ() {
+  await Project.Current.join.start(testTasks);
+  process.exit(0)
 }
 
-function $COMPILER_FFG() {
-  Project.Current.frameworkFileGenerator.startAndWatch(testTasks);
-  // process.exit(0)
+async function $COMPILER_BSJ_WATCH() {
+  await Project.Current.join.startAndWatch(testTasks);
 }
+
+async function $COMPILER_SM() {
+  await Project.Current.sourceModifier.start(testTasks);
+  process.exit(0)
+}
+
+async function $COMPILER_SM_WATCH() {
+  await Project.Current.sourceModifier.startAndWatch(testTasks);
+}
+
+async function $COMPILER_FFG() {
+  await Project.Current.frameworkFileGenerator.start(testTasks);
+  process.exit(0)
+}
+
+async function $COMPILER_FFG_WATCH() {
+  await Project.Current.frameworkFileGenerator.startAndWatch(testTasks);
+}
+
+
 
 
 export default {

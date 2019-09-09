@@ -31,6 +31,7 @@ export class SourceModForStandaloneProjects
       config.folder.dist,
       config.folder.bundle,
       config.folder.browser,
+      config.folder.client,
       config.folder.module,
     ];
   };
@@ -93,7 +94,9 @@ export class SourceModForStandaloneProjects
       ...this.foldersCompiledJsDtsMap,
     ];
 
-    const children = this.project.parent.childrenThatAreThirdPartyInNodeModules;
+    const children = this.project.isWorkspaceChildProject ?
+      this.project.parent.childrenThatAreThirdPartyInNodeModules
+      : this.project.childrenThatAreThirdPartyInNodeModules;
 
     children.forEach(child => {
       const libName = child.name;

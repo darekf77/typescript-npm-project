@@ -38,6 +38,20 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
     }
   }
 
+  async start(taskName?: string, afterInitCallBack?: () => void) {
+    if (this.project.isSite) {
+      await this.project.baseline.frameworkFileGenerator.start(taskName, afterInitCallBack);
+    }
+    return super.start(taskName, afterInitCallBack);
+  }
+
+  async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
+    if (this.project.isSite) {
+      await this.project.baseline.frameworkFileGenerator.startAndWatch(taskName, afterInitCallBack);
+    }
+    return super.startAndWatch(taskName, afterInitCallBack);
+  }
+
 
 }
 

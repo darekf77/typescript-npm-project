@@ -115,7 +115,10 @@ export abstract class BaseProject {
 
 
   /**
-   * Standalone projects link: npm libs
+   * Standalone project ready for publish on npm
+   * Types of standalone project:
+   * - isomorphic-lib : backend/fronded ts library with server,app preview
+   * - angular-lib: frontend ui lib with angular preview
    */
   get isStandaloneProject(this: Project) {
     if (Helpers.isBrowser) {

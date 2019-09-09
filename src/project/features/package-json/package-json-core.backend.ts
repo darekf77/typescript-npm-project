@@ -43,6 +43,11 @@ export class PackageJsonCore {
   }
 
   get name() {
+    if (!_.isString(this.data.name)) {
+      if(global.tnp_normal_mode) {
+        Helpers.error(`Please define name for npm project in location: ${this.path}`, false, true)
+      }
+    }
     return this.data.name;
   }
 

@@ -23,13 +23,17 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
     if (project.type === 'angular-lib') {
       folderPath.push(path.join(project.location, config.folder.components));
     }
-    if(project.isSite) {
+    if (project.isSite) {
       folderPath.push(path.join(project.location, config.folder.custom));
     }
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
     folderPath
   };
+  if (project.isStandaloneProject) {
+    console.log(`${project.genericName}: optionsSourceModifier`, options)
+  }
+
   return options;
 }
 
@@ -39,6 +43,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
+    console.log('hejhehehehh')
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
@@ -85,6 +90,32 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       }
     });
     return modifiedFiles;
+  }
+
+  process(input: string, relativePath: string) {
+    const modType = this.getModType(this.project, relativePath);
+    input = Helpers.tsCodeModifier.fixDoubleApostophe(input);
+    input = super.process(input, relativePath);
+    if (this.project.isWorkspaceChildProject) {
+      input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
+      input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
+    }
+    return input;
+  }
+
+  async start(taskName?: string, afterInitCallBack?: () => void) {
+    if (this.project.isSite) {
+      await this.project.baseline.sourceModifier.start(taskName, afterInitCallBack);
+    }
+    return super.start(taskName, afterInitCallBack);
+  }
+
+  async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
+    Helpers.log(`Start source modifer for ${this.project.genericName}`)
+    if (this.project.isSite) {
+      await this.project.baseline.sourceModifier.startAndWatch(taskName, afterInitCallBack);
+    }
+    return super.startAndWatch(taskName, afterInitCallBack);
   }
 
 }

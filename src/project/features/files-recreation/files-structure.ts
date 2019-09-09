@@ -15,7 +15,6 @@ export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
   watch: boolean;
   alreadyInitedPorjects?: Project[];
-  onlyJoin?: boolean;
 }
 
 export class FilesStructure extends FeatureForProject {
@@ -53,8 +52,8 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async init(args: string, options?: InitOptions) {
-    const { skipNodeModules, recrusive, onlyJoin }: {
-      skipNodeModules: boolean; recrusive: boolean; onlyJoin?: boolean;
+    const { skipNodeModules, recrusive }: {
+      skipNodeModules: boolean; recrusive: boolean;
     } = require('minimist')(!args ? [] : args.split(' '));
 
     this.project.quickFixes.missingSourceFolders()
@@ -126,17 +125,15 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    if (!onlyJoin) {
-      await this.project.recreate.init();
-      this.project.tnpBundle.installAsPackage()
-      if (!this.project.node_modules.exist) {
-        if (skipNodeModules) {
-          if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
-            fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
-          }
-        } else {
-          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
+    await this.project.recreate.init();
+    this.project.tnpBundle.installAsPackage()
+    if (!this.project.node_modules.exist) {
+      if (skipNodeModules) {
+        if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
+          fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
         }
+      } else {
+        await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
       }
     }
 
@@ -144,7 +141,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-    if (!this.project.isStandaloneProject && this.project.type !== 'unknow-npm-project') {
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
       if (watch) {
@@ -153,42 +150,22 @@ export class FilesStructure extends FeatureForProject {
       } else {
         await this.project.join.start();
       }
+      await this.project.env.init(args);
+      this.project.filesTemplatesBuilder.rebuild();
+    }
 
-      if (!onlyJoin) {
-        if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-          await this.project.env.init(args);
-        }
-        this.project.filesTemplatesBuilder.rebuild();
-      }
+    this.project.quickFixes.missingSourceFolders();
 
-      this.project.quickFixes.missingSourceFolders();
-
-
-      if (this.project.isWorkspaceChildProject) {
-
-        if (!onlyJoin) {
-          if (watch) {
-            if (this.project.isSite) {
-              await this.project.baseline.frameworkFileGenerator.startAndWatch(
-                this.taskNames.sourceModifir);
-            }
-            await this.project.frameworkFileGenerator.startAndWatch(
-              this.taskNames.frameworkFileGenerator);
-            if (this.project.isSite) {
-              await this.project.baseline.sourceModifier.startAndWatch(
-                this.taskNames.sourceModifir);
-            }
-            await this.project.sourceModifier.startAndWatch(
-              this.taskNames.sourceModifir);
-          } else {
-            await this.project.frameworkFileGenerator.start(
-              this.taskNames.frameworkFileGenerator);
-            await this.project.sourceModifier.start(
-              this.taskNames.sourceModifir);
-          }
-        }
+    if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
+      if (watch) {
+        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
+        await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir);
+      } else {
+        await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+        await this.project.sourceModifier.start(this.taskNames.sourceModifir);
       }
     }
+
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
