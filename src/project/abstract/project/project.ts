@@ -3,28 +3,24 @@ import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
-
 import * as rimraf from 'rimraf';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from "child_process";
-
+//#endregion
 import { config } from '../../../config';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
 
-//#endregion
-
 import { Morphi, ModelDataConfig } from 'morphi';
-
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
+import { TnpProject } from './tnp-project';
 //#region @backend
 import { LibProject } from './lib-project.backend';
 import { ProjectGit } from './git-project.backend';
 import { VscodeProject } from './vscode-project.backend';
-import { TnpProject } from './tnp-project.backend';
 import { StaticProject } from './static-project.backend';
 import { RouterProject } from './router-project.backend';
 import { RecreatableProject } from './recreatable-project.backend';
@@ -363,7 +359,9 @@ export interface Project extends
   BaseProject,
   NpmProject,
   FeatureProject,
+  TnpProject
   //#region @backend
+  ,
   LibProject,
   ProjectGit,
   VscodeProject,
@@ -385,12 +383,13 @@ Helpers.applyMixins(Project, [
   BaseProject,
   NpmProject,
   FeatureProject,
+  TnpProject,
   //#region @backend
   LibProject,
   ProjectGit,
   VscodeProject,
   ProjectGit,
-  TnpProject,
+
   StaticProject,
   RouterProject,
   RecreatableProject,

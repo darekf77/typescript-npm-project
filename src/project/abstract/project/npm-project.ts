@@ -107,6 +107,7 @@ export class NpmProject {
   }
   //#endregion
 
+  //#region @backend
   public allPackageJsonDeps(this: Project, contextFolder?: string): Project[] {
     if (this.type === 'unknow') {
       return [];
@@ -118,7 +119,9 @@ export class NpmProject {
     });
     return projectsInNodeModules;
   }
+  //#endregion
 
+  //#region @backend
   public getDepsAsProject(this: Project, type: Models.npm.NpmDependencyType | Models.npm.TnpNpmDependencyType,
     contextFolder?: string): Project[] {
     if (this.type === 'unknow') {
@@ -142,7 +145,9 @@ export class NpmProject {
     })
       .filter(f => !!f)
   }
+  //#endregion
 
+  //#region @backend
   public getDepsAsPackage(this: Project, type: Models.npm.NpmDependencyType | Models.npm.TnpNpmDependencyType): Models.npm.Package[] {
     if (this.type === 'unknow') {
       return [];
@@ -191,7 +196,9 @@ export class NpmProject {
 
       })
   }
+  //#endregion
 
+  //#region @backend
   public checkIfReadyForNpm(this: Project) {
     if (this.type === 'unknow') {
       return false;
@@ -203,6 +210,8 @@ export class NpmProject {
     }
     return true;
   }
+  //#endregion
+
 
   get childrenThatAreThirdPartyInNodeModules(this: Project): Project[] {
     if (Helpers.isBrowser) {

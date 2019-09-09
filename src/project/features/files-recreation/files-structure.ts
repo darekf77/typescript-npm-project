@@ -168,8 +168,16 @@ export class FilesStructure extends FeatureForProject {
 
         if (!onlyJoin) {
           if (watch) {
+            if (this.project.isSite) {
+              await this.project.baseline.frameworkFileGenerator.startAndWatch(
+                this.taskNames.sourceModifir);
+            }
             await this.project.frameworkFileGenerator.startAndWatch(
               this.taskNames.frameworkFileGenerator);
+            if (this.project.isSite) {
+              await this.project.baseline.sourceModifier.startAndWatch(
+                this.taskNames.sourceModifir);
+            }
             await this.project.sourceModifier.startAndWatch(
               this.taskNames.sourceModifir);
           } else {

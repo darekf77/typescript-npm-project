@@ -12,6 +12,17 @@ import { FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { ControllersGenerator } from './controllers-generator.backend';
 
+export function optionsFrameworkFileGen(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  let folderPath: string | string[] = void 0;
+  if (project.isWorkspaceChildProject && project.type === 'isomorphic-lib') {
+    folderPath = path.join(project.location, config.folder.src);
+  }
+  const options: IncCompiler.Models.BaseClientCompilerOptions = {
+    folderPath
+  };
+  return options;
+}
+
 @IncCompiler.Class({ className: 'FrameworkFilesGenerator' })
 export class FrameworkFilesGenerator extends ControllersGenerator {
 

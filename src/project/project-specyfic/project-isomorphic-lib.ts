@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
-import { Project } from '../abstract';
 
 import { Helpers } from '../../helpers';
 import { config } from '../../config';
@@ -12,8 +11,8 @@ import { Models } from '../../models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
 import { BuildOptions } from '../features';
 import { selectClients } from './select-clients';
-
 //#endregion
+import { Project } from '../abstract';
 
 
 export class ProjectIsomorphicLib extends Project {

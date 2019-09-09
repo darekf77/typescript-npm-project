@@ -2,7 +2,9 @@
   "files.exclude": {},
   "workbench.colorCustomizations": {
     "activityBar.background": "#0084ff",
-    "activityBar.foreground": "#000000"
+    "activityBar.foreground": "#000000",
+    "statusBar.background": "#23daca",
+    "statusBar.debuggingBackground": "#23daca"
   },
   "editor.rulers": [
     100,

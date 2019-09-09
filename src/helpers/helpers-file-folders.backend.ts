@@ -302,7 +302,10 @@ export class HelpersFileFolders {
 
       Helpers.writeFile(destinationPath, sourceData);
     }
-    modifiedFiles.modifiedFiles.push(destinationPath);
+    if (modifiedFiles && _.isArray(modifiedFiles.modifiedFiles)) {
+      modifiedFiles.modifiedFiles.push(destinationPath);
+    }
+
   }
 
   /**

@@ -3,11 +3,13 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 import {
-  StaticBuild, TestRunner, PackageJSON, TnpBundle,
+  StaticBuild, TestRunner, TnpBundle,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
-  QuickFixes, NpmPackages, EnvironmentConfig, ProxyRouter
+  QuickFixes, NpmPackages, ProxyRouter
 } from '../../features';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
+import { CopyManager } from '../../features/copy-manager';
 //#endregion
 import * as _ from 'lodash';
 
@@ -16,8 +18,7 @@ import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 import { Models } from '../../../models';
 import { config } from '../../../config';
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
-import { CopyManager } from '../../features/copy-manager';
+import { PackageJSON, EnvironmentConfig } from '../../features';
 
 export abstract class FeatureProject {
 
@@ -90,9 +91,4 @@ export abstract class FeatureProject {
   public copyManager: CopyManager;
   //#endregion
 
-
-
 }
-
-
-// export interface FeatureProject extends Partial<Project> { }

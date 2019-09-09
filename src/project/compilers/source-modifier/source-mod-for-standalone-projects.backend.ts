@@ -2,60 +2,21 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 
-import { Project } from '../../abstract';
+import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from '../../../config';
 import { ModType, SourceCodeType, CheckType } from './source-modifier.models';
 import { IncCompiler } from 'incremental-compiler';
 import { Models, Helpers } from '../../../index';
 import { impReplace } from './source-modifier.helpers.backend';
+import { optionsSourceModifier } from './source-modifier.backend';
 
-function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
-  let folderPath: string | string[] = void 0;
-  if (project.isWorkspaceChildProject) {
-    if (project.isSite) {
-      if (project.type === 'angular-lib') {
-        folderPath = [
-          folderPath = path.join(project.location, config.folder.src),
-          folderPath = path.join(project.location, config.folder.components),
-          folderPath = path.join(project.baseline.location, config.folder.src),
-          folderPath = path.join(project.baseline.location, config.folder.components),
-        ]
-      } else {
-        folderPath = path.join(project.location, config.folder.src),
-          folderPath = path.join(project.baseline.location, config.folder.src)
-      }
-    } else {
-      if (project.type === 'angular-lib') {
-        folderPath = [
-          folderPath = path.join(project.location, config.folder.src),
-          folderPath = path.join(project.location, config.folder.components),
-        ]
-      } else {
-        folderPath = path.join(project.location, config.folder.src);
-      }
-    }
-  } else if (project.isStandaloneProject) {
-    if (project.type === 'angular-lib') {
-      folderPath = [
-        folderPath = path.join(project.location, config.folder.src),
-        folderPath = path.join(project.location, config.folder.components),
-      ]
-    } else {
-      folderPath = path.join(project.location, config.folder.src);
-    }
-  }
-  const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath
-  };
-  return options;
-}
 
 
 export class SourceModForStandaloneProjects
-  extends IncCompiler.Base<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
+  extends FeatureCompilerForProject<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
 
   constructor(public project: Project) {
-    super(optionsSourceModifier(project));
+    super(project, optionsSourceModifier(project));
   }
 
   protected get foldersSources() {

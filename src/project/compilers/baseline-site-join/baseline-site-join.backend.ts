@@ -11,7 +11,7 @@ import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import chalk from 'chalk';;
 import { TnpDB } from '../../../tnp-db';
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 
 import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
 import { SourceModifier } from '../source-modifier';
@@ -52,9 +52,9 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
 }
 
 @IncCompiler.Class({ className: 'BaselineSiteJoin' })
-export class BaselineSiteJoin extends IncCompiler.Base {
+export class BaselineSiteJoin extends FeatureCompilerForProject {
   constructor(public project: Project) {
-    super(optionsBaselineSiteJoin(project));
+    super(project, optionsBaselineSiteJoin(project), true);
   }
 
 

@@ -3,8 +3,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as glob from 'glob';
-
-import { Helpers } from '../../../helpers';
+import chalk from 'chalk';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
   saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
@@ -13,9 +12,9 @@ import {
 import { FeatureForProject } from '../../abstract';
 //#endregion
 
+import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { Models } from '../../../models';
-import chalk from 'chalk';
 
 
 //#region @backend

@@ -5,30 +5,15 @@ import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 
 import { Helpers } from '../../../index';
-import { Project } from '../../index';
+import { Project, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { config } from '../../../config';
+import { optionsFrameworkFileGen } from './framework-files-generator.backend';
 
 
-function optionsFrameworkFileGen(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
-  let folderPath: string | string[] = void 0;
-  let executeOutsideScenario = false;
-  if (project.isWorkspaceChildProject) {
-    folderPath = path.join(project.location, config.folder.src);
-  } else {
-    return void 0;
-  }
-  const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath,
-    executeOutsideScenario
-  };
-  return options;
-}
-
-
-export class EntitesGenerator extends IncCompiler.Base {
+export class EntitesGenerator extends FeatureCompilerForProject {
   constructor(public project: Project) {
-    super(optionsFrameworkFileGen(project));
+    super(project, optionsFrameworkFileGen(project));
   }
 
   private entityRepo(srcPath, entity, entityRelativePath, hideDot = false) {

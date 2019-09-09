@@ -1,4 +1,3 @@
-//#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
 
@@ -11,7 +10,7 @@ export class HelpersEnvironment {
     name = name.replace(/\./g, '');
     return name === '' ? local_env_name : name
   }
-  //#endregion
+
 
   isValidIp(ip: string) {
     if (ip === 'localhost') {

@@ -3,7 +3,6 @@
     "resources": [
       "README.md"
     ],
-    "isCoreProject": true,
     "useFramework": true,
     "type": "isomorphic-lib",
     "overrided": {

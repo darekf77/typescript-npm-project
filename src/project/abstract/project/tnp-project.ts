@@ -1,16 +1,21 @@
+//#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+
+import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
+import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
+import { config as configMorphi } from 'morphi/build/config';
+//#endregion
 
 import { Project } from './project';
 import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 import { Models } from '../../../models';
 import { config } from '../../../config';
-import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
-import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
-import { config as configMorphi } from 'morphi/build/config';
+
+
 
 export abstract class TnpProject {
 
@@ -40,7 +45,6 @@ export abstract class TnpProject {
     //#endregion
   }
 
-
   get useFramework(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.useFramework;
@@ -65,6 +69,7 @@ export abstract class TnpProject {
     //#endregion
   }
 
+  //#region @backend
   get isomorphicPackages(this: Project) {
     if (this.type === 'unknow') {
       return [];
@@ -92,6 +97,5 @@ export abstract class TnpProject {
       return [];
     };
   }
+  //#endregion
 }
-
-// export interface TnpProject extends Partial<Project> { }

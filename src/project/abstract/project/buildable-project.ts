@@ -5,9 +5,9 @@ import { Project } from './project';
 import { Helpers } from '../../../helpers';
 import { Models } from '../../../models';
 import { ModelDataConfig, Morphi } from 'morphi';
-import { BuildOptions, PackagesRecognitionExtended } from '../../features';
 
 //#region @backend
+import { BuildOptions, PackagesRecognitionExtended } from '../../features';
 import * as inquirer from 'inquirer';
 import * as path from 'path';
 import { TnpDB } from '../../../tnp-db';
@@ -20,8 +20,6 @@ export abstract class BuildableProject {
   //#region @backend
   protected buildOptions?: BuildOptions;
   //#endregion
-
-
 
   //#region @backend
   protected async buildSteps(buildOptions?: BuildOptions) {
@@ -168,6 +166,3 @@ export abstract class BuildableProject {
   }
   //#endregion
 }
-
-
-// export interface BuildableProject extends Partial<Project> { };

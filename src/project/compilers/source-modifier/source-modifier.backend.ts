@@ -14,6 +14,26 @@ import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.ba
 import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
+export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  let folderPath: string | string[] = void 0;
+  if (project.isWorkspaceChildProject || project.isStandaloneProject) {
+    folderPath = [
+      folderPath = path.join(project.location, config.folder.src),
+    ]
+    if (project.type === 'angular-lib') {
+      folderPath.push(path.join(project.location, config.folder.components));
+    }
+    if(project.isSite) {
+      folderPath.push(path.join(project.location, config.folder.custom));
+    }
+  }
+  const options: IncCompiler.Models.BaseClientCompilerOptions = {
+    folderPath
+  };
+  return options;
+}
+
+
 @IncCompiler.Class({ className: 'SourceModifier' })
 export class SourceModifier extends SourceModForWorkspaceChilds {
 

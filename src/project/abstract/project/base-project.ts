@@ -85,20 +85,20 @@ export abstract class BaseProject {
   }
 
 
+  //#region @backend
   get labels(this: Project) {
     const self = this;
     return {
       get generated() {
         return self.isGenerated ? '(generated)' : ''
       },
-      //#region @backend
       get extendedBoldName() {
         return chalk.bold(`${self.labels.generated} ${self.parent ? (self.parent.name + '/') : ''}${self.name}`);
       }
-      //#endregion
+
     }
   }
-
+  //#endregion
 
   get isWorkspaceChildProject(this: Project) {
     if (Helpers.isBrowser) {

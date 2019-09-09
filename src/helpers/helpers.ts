@@ -30,13 +30,16 @@ export class HelpersTnp {
   //#endregion
 
   private constructor(
+    //#region @backend
     public tsCodeModifier = new TsCodeModifer(),
-    public arrays = new HelpersArrayObj(),
+    public cliTool = new HelpersCliTool(),
+    public terminal = new HelpersTerminal(),
     public git = new HelpersGit(),
     public npm = new HelpersNpm(),
     public morphi = new HelpersMorphiFramework(),
-    public terminal = new HelpersTerminal(),
-    public cliTool = new HelpersCliTool()
+    //#endregion
+    public arrays = new HelpersArrayObj(),
+
   ) {
 
   }
@@ -84,15 +87,18 @@ export class HelpersTnp {
     })
   }
 
+  //#region @backend
   checkEnvironment = (deps?: Models.morphi.GlobalDependencies) => MorpiHelpers.checkEnvironment(deps)
+  //#endregion
 
 }
 
 export interface HelpersTnp extends
   HelpersMessages,
   HelpersStringsRegexes,
-  HelpersEnvironment,
+  HelpersEnvironment
   //#region @backend
+  ,
   HelpersProcess,
   HelpersFileFolders
 //#endregion
