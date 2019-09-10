@@ -13,6 +13,17 @@ import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 import { Models } from './models';
+import { IncCompiler } from 'incremental-compiler';
+
+IncCompiler.init(async (asyncEvents) => {
+
+}, {
+  error: Helpers.error,
+  log: Helpers.log,
+  info: Helpers.info,
+  warn: Helpers.warn
+} as any);
+
 
 
 function removeArg(arg: string, argsv: string[]) {

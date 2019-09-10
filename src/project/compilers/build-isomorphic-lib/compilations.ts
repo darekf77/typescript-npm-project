@@ -11,7 +11,7 @@ import { BuildOptions } from '../../features/build-process';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
-  CompilationWrapper = Helpers.compilationWrapperTnp as any;
+  CompilationWrapper = Helpers.compilationWrapper as any;
   compile(watch = false) {
 
     // QUICK_FIX for backend in tnp projects
@@ -43,7 +43,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     return `Browser Extended compilation`
   }
 
-  CompilationWrapper = Helpers.compilationWrapperTnp as any;
+  CompilationWrapper = Helpers.compilationWrapper as any;
 
   constructor(
     private compilationProject: Project,
@@ -56,7 +56,6 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     backendOut: string,
     public buildOptions: BuildOptions
   ) {
-
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
 
@@ -100,6 +99,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   initCodeCut() {
+    // console.log('inside')
     let env: Models.env.EnvConfig = arguments[0]
     const compilationProject: Project = arguments[1];
     const buildOptions = arguments[2];
@@ -108,7 +108,15 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     }
     env = _.cloneDeep(env);
     this.ENV = env;
-
+    // console.log('here1')
+    // console.log('this.compilationFolderPath',this.compilationFolderPath)
+    let project: Project;
+    if(env) {
+      project = Project.From(env.currentProjectLocation);
+    }
+    if(compilationProject.type === 'angular-lib') {
+      project = compilationProject;
+    }
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {
       replacements: [
         ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
@@ -117,9 +125,10 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
         ["@cutCodeIfFalse", this.codeCuttFn(false)]
       ].filter(f => !!f),
       env
-    }, env ? Project.From(env.currentProjectLocation) : void 0,
+    }, project,
       compilationProject,
       buildOptions);
+    // console.log('here2')
   }
 
 

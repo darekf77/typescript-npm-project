@@ -1,6 +1,6 @@
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
+declare var require: any;
 const ENV = require('../tmp-environment.json');
 window['ENV'] = ENV;
 console.log('ENV', ENV);

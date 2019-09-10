@@ -3,8 +3,7 @@ import { SourceModForStandaloneProjects } from './source-mod-for-standalone-proj
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
 import { ModType, SourceCodeType, CheckType } from './source-modifier.models';
-import { Project } from '../../abstract';
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
+
 import { impReplace } from './source-modifier.helpers.backend';
 
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {

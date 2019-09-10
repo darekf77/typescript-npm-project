@@ -48,6 +48,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       useDefaultBrowserCompilation(project)
     );
 
+    // console.log(buildOptions)
     // const useDefaultCompilation = useDefaultBrowserCompilation(project)
     // if (useDefaultCompilation && project.name === 'angular-lib') {
     //   console.log(project.parent.children.map(c => {
@@ -90,47 +91,69 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     } else {
 
-      if (project.type === 'isomorphic-lib' && project.isStandaloneProject && !buildOptions.watch) {
-        const browser = _.first(this.browserCompilations)
-        browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
-          if (f !== 'app.ts') {
-            return true;
-          }
-          const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
-          Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
-          Helpers.writeFile(absolutePathToFile, '')
-          return false;
-        })
-        // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
-      }
 
-      this.resolveModulesLocations
-        .forEach(moduleName => {
-          let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
-          if (outFolder === 'bundle') {
-            browserOutFolder = path.join(outFolder, browserOutFolder);
-          }
 
-          const proj = this.project.parent.child(moduleName);
-          const envConfig = proj.env.config;
-          if (!envConfig) {
-            Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
-          }
-
-          this.browserCompilations.push(
+      if (project.isStandaloneProject) {
+        if (project.type === 'isomorphic-lib' && !buildOptions.watch) {
+          const browser = _.first(this.browserCompilations)
+          browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
+            if (f !== 'app.ts') {
+              return true;
+            }
+            const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
+            Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
+            Helpers.writeFile(absolutePathToFile, '')
+            return false;
+          })
+          // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
+        }
+        if (project.type === 'angular-lib') {
+          let browserOutFolder = Helpers.getBrowserVerPath();
+          this.browserCompilations = [
             new BroswerForModuleCompilation(
               this.project,
-              moduleName,
-              envConfig,
-              `tmp-src-${outFolder}-${browserOutFolder}`,
+              void 0,
+              void 0,
+              `tmp-src-${outFolder}`,
               browserOutFolder as any,
               location,
               cwd,
               outFolder,
               buildOptions)
-          )
-        })
+          ]
+        }
+      } else {
+        this.resolveModulesLocations
+          .forEach(moduleName => {
+            let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
+            if (outFolder === 'bundle') {
+              browserOutFolder = path.join(outFolder, browserOutFolder);
+            }
 
+            const proj = this.project.parent.child(moduleName);
+            const envConfig = proj.env.config;
+            if (!envConfig) {
+              Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
+            }
+
+            this.browserCompilations.push(
+              new BroswerForModuleCompilation(
+                this.project,
+                moduleName,
+                envConfig,
+                `tmp-src-${outFolder}-${browserOutFolder}`,
+                browserOutFolder as any,
+                location,
+                cwd,
+                outFolder,
+                buildOptions)
+            )
+          })
+      }
+
+
+
+      // console.log(this.browserCompilations.length)
       // console.log('this.browserCompilation', this.browserCompilations.map(c => c.location))
       // process.exit(0)
     }

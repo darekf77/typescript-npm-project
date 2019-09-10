@@ -64,7 +64,7 @@ export class HelpersProcess {
     }
   }
 
-  async  compilationWrapperTnp(fn: () => void, taskName: string = 'Task',
+  async  compilationWrapper(fn: () => void, taskName: string = 'Task',
     executionType: 'Compilation of' | 'Code execution of' | 'Event:' = 'Compilation of') {
     function currentDate() {
       return `[${dateformat(new Date(), 'HH:MM:ss')}]`;
@@ -134,7 +134,7 @@ export class HelpersProcess {
 
   }
 
-  readonly processes: child.ChildProcess[] = [];
+
   cleanExit() {
     Helpers.processes.forEach(p => {
       p.kill('SIGINT')

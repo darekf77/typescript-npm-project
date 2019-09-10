@@ -5,6 +5,7 @@ import { HelpersStringsRegexes } from './helpers-strings-regexes';
 import { HelpersEnvironment } from './helpers-environment';
 import { Helpers as HelperNg2Logger } from 'ng2-logger';
 //#region @backend
+import * as child from 'child_process';
 import { Helpers as MorpiHelpers } from 'morphi/helpers';
 import { HelpersGit } from './helpers-git.backend';
 import { HelpersCliTool } from './helpers-cli-tool.backend';
@@ -19,6 +20,15 @@ import { Models } from '../models';
 import { Helpers } from './index';
 import { config } from '../config';
 
+export function applyMixins(derivedCtor: any, baseCtors: any[]) {
+  baseCtors.forEach(baseCtor => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+      Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
+    });
+  });
+}
+
+
 export class HelpersTnp {
   //#region singleton
   private static _instance: HelpersTnp;
@@ -29,6 +39,7 @@ export class HelpersTnp {
     return HelpersTnp._instance;
   }
   //#endregion
+  readonly processes: child.ChildProcess[] = [];
 
   private constructor(
     //#region @backend
@@ -53,13 +64,7 @@ export class HelpersTnp {
     return HelperNg2Logger.isNode;
   }
 
-  applyMixins(derivedCtor: any, baseCtors: any[]) {
-    baseCtors.forEach(baseCtor => {
-      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-        Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
-      });
-    });
-  }
+
 
   getBrowserVerPath(moduleName?: string) {
     if (!moduleName) {
@@ -98,7 +103,7 @@ export class HelpersTnp {
   //#region @backend
   checkEnvironment = (deps?: Models.morphi.GlobalDependencies) => MorpiHelpers.checkEnvironment(deps)
   //#endregion
-
+  public applyMixins = applyMixins;
 }
 
 export interface HelpersTnp extends
@@ -112,7 +117,7 @@ export interface HelpersTnp extends
 //#endregion
 { }
 
-HelpersTnp.Instance.applyMixins(HelpersTnp, [
+applyMixins(HelpersTnp, [
   HelpersMessages,
   HelpersStringsRegexes,
   HelpersEnvironment,
@@ -121,5 +126,3 @@ HelpersTnp.Instance.applyMixins(HelpersTnp, [
   HelpersFileFolders,
   //#endregion
 ]);
-
-

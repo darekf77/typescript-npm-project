@@ -30,9 +30,9 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
     folderPath
   };
-  if (project.isStandaloneProject) {
-    console.log(`${project.genericName}: optionsSourceModifier`, options)
-  }
+  // if (project.isStandaloneProject) {
+  //   console.log(`${project.genericName}: optionsSourceModifier`, options)
+  // }
 
   return options;
 }

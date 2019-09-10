@@ -48,7 +48,7 @@ export class QuickFixes extends FeatureForProject {
       fse.mkdirpSync(pathInProjectNodeModules);
 
       Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `);
-      Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json),{
+      Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json), {
         name: missingLibName,
         version: "0.0.0"
       } as Models.npm.IPackageJSON);
@@ -64,6 +64,9 @@ export class QuickFixes extends FeatureForProject {
       this.project.isWorkspaceChildProject ||
       this.project.isStandaloneProject) {
 
+      if (this.project.isStandaloneProject && this.project.type === 'angular-lib') {
+        Helpers.writeFile(path.join(this.project.location, config.file.tnpEnvironment_json), {});
+      }
 
       const srcFolder = path.join(this.project.location, config.folder.src);
       if (!this.project.isWorkspace) {

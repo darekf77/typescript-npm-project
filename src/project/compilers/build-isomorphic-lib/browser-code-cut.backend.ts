@@ -9,7 +9,6 @@ import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 
-import { IncrementalBuildProcessExtended } from './incremental-build-process';
 import { BuildOptions } from '../../features/build-process';
 
 

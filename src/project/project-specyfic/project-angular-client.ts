@@ -36,7 +36,9 @@ export class ProjectAngularClient extends Project {
   projectSpecyficFiles() {
     return [
       "tsconfig.json",
-      'src/typings.d.ts',
+      ...(!this.isStandaloneProject ? [
+        'src/typings.d.ts',
+      ] : []),
       'src/main.ts',
       'src/polyfills.ts',
       'src/tsconfig.spec.json',

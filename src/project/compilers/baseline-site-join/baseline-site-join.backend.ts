@@ -13,8 +13,6 @@ import chalk from 'chalk';;
 import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 
-import { IncrementalBuildProcessExtended } from '../build-isomorphic-lib';
-import { SourceModifier } from '../source-modifier';
 import { IncCompiler } from 'incremental-compiler';
 import { Project } from '../../../index';
 import { FilesJoinActions } from './files-join-actions.backend';
