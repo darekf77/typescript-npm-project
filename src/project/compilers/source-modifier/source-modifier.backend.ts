@@ -43,7 +43,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
-    console.log('hejhehehehh')
+    // console.log('hejhehehehh')
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
@@ -60,7 +60,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
         this.processFile(relativePath, modifiedFiles);
       }
     }
-    console.log(modifiedFiles)
+    // console.log(modifiedFiles)
     return modifiedFiles;
   }
 

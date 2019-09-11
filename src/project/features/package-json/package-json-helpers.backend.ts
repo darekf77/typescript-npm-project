@@ -172,12 +172,18 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   cleanForIncludeOnly(project, newDeps, toOverride);
-  const devDependencies = project.isStandaloneProject ?
+
+  let devDependencies = project.isStandaloneProject ?
     Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
     : {};
-  const dependencies = project.isStandaloneProject ?
+  let dependencies = project.isStandaloneProject ?
     Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
     : Helpers.arrays.sortKeys(newDeps);
+
+  if ((project.packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
+    devDependencies = { ...devDependencies, ...dependencies };
+    dependencies = {};
+  }
 
   if (recrateInPackageJson) {
     Helpers.log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`)
@@ -245,7 +251,7 @@ export function getAndTravelCoreDeps(options?: {
 //#region deps filters
 function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
   const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
-  const onlyAsDevAllowed = (project.packageJson.data.tnp &&
+  let onlyAsDevAllowed = (project.packageJson.data.tnp &&
     project.packageJson.data.tnp.overrided &&
     project.packageJson.data.tnp.overrided.includeAsDev) || [];
 
@@ -258,11 +264,15 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
     }
   });
 
+  if (!_.isArray(onlyAsDevAllowed)) {
+    onlyAsDevAllowed = [];
+  }
+
   Object.keys(allDeps).forEach(name => {
-    if (onlyAsDevAllowed.includes(name) || onlyAsDevAllowed.filter(d => (new RegExp(d)).test(name)).length > 0) {
+    if (onlyAsDevAllowed.includes(name) || (onlyAsDevAllowed as any[]).filter(d => (new RegExp(d)).test(name)).length > 0) {
       deps[name] = allDeps[name]
     }
-  })
+  });
 
   return deps;
 }
@@ -274,8 +284,14 @@ function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackag
     && project.packageJson.data.tnp.overrided.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
+
+  if (!_.isArray(onlyAsDevAllowed)) {
+    onlyAsDevAllowed = [];
+  }
+
   Object.keys(deps).forEach(name => {
-    if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) || onlyAsDevAllowed.filter(f => (new RegExp(f)).test(name)).length > 0) {
+    if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) ||
+      (onlyAsDevAllowed as any[]).filter(f => (new RegExp(f)).test(name)).length > 0) {
       deps[name] = undefined;
     }
   })
@@ -332,7 +348,8 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
     return;
   }
   Object.keys(obj).forEach(key => {
-    if (key !== '@') {
+    const extendable = new RegExp(`^\@[0-9]$`);
+    if (!extendable.test(key)) {
       if (!_.isArray(obj[key])) {
         if (_.isObject(obj[key])) {
           travelObject(obj[key], out, obj[key], updateFn);
@@ -350,7 +367,9 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
         }
       }
     } else if (!!parent) {
-      travelObject(parent[key], out, parent, updateFn)
+      // console.log('parent!11')
+      // console.log(`parent[${key}]`, parent[key])
+      travelObject(parent[obj[key]], out, parent, updateFn)
     }
   });
 }

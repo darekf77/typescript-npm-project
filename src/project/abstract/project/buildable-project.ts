@@ -101,7 +101,7 @@ export abstract class BuildableProject {
   //#endregion
 
   //#region @backend
-  async build(this: Project,buildOptions?: BuildOptions) {
+  async build(this: Project, buildOptions?: BuildOptions) {
     // log('BUILD OPTIONS', buildOptions)
     if (this.type === 'unknow') {
       return;
@@ -128,34 +128,36 @@ export abstract class BuildableProject {
     // log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;
 
-    if (this.buildOptions.copytoAll) {
-      await this.selectAllProjectCopyto();
-    } else {
-      if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-        if (this.isStandaloneProject) {
-          await this.selectProjectToCopyTO()
+    if (!buildOptions.appBuild) {
+      if (this.buildOptions.copytoAll) {
+        await this.selectAllProjectCopyto();
+      } else {
+        if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
+          if (this.isStandaloneProject) {
+            await this.selectProjectToCopyTO()
+          }
         }
+      }
+      if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+
+        const unique = {};
+        (this.buildOptions.copyto as Project[]).forEach(p => unique[p.location] = p);
+        this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
+
+        (this.buildOptions.copyto as Project[]).forEach(proj => {
+          const project = proj;
+          const projectCurrent = this;
+          const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;
+          const what = path.normalize(`${project.location}/node_module/${projectName}`)
+          Helpers.info(`After each build finish ${what} will be update.`)
+        });
+      }
+
+      if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
+        this.packageJson.save('show before build')
       }
     }
 
-    if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-
-      const unique = {};
-      (this.buildOptions.copyto as Project[]).forEach(p => unique[p.location] = p);
-      this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
-
-      (this.buildOptions.copyto as Project[]).forEach(proj => {
-        const project = proj;
-        const projectCurrent = this;
-        const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;
-        const what = path.normalize(`${project.location}/node_module/${projectName}`)
-        Helpers.info(`After each build finish ${what} will be update.`)
-      });
-    }
-
-    if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
-      this.packageJson.save('show before build')
-    }
     PackagesRecognitionExtended.fromProject(this as any).start();
     // console.log('before build steps')
     await this.buildSteps(buildOptions);

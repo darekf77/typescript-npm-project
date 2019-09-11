@@ -154,7 +154,7 @@
         },
         "onlyFor": {
           "angular-lib": {
-            "@": "angular-client"
+            "@1": "angular-client"
           },
           "angular-client": {
             "ngx-formly": {

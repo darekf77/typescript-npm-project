@@ -154,7 +154,7 @@ export namespace ModelsNpm {
         dedupe?: string[];
         ignoreDepsPattern?: string[];
         includeOnly?: string[];
-        includeAsDev?: string[];
+        includeAsDev?: string[] | '*';
         dependencies?: DependenciesFromPackageJsonStyle;
       }
     };

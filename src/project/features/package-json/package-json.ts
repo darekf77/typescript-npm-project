@@ -56,7 +56,7 @@ export class PackageJSON
           json.tnp.overrided.ignoreDepsPattern = [];
           saveAtLoad = true;
         }
-        if (!_.isArray(json.tnp.overrided.includeAsDev)) {
+        if (_.isUndefined(json.tnp.overrided.includeAsDev)) {
           json.tnp.overrided.includeAsDev = [];
           saveAtLoad = true;
         }
@@ -84,8 +84,7 @@ export class PackageJSON
       var pkgJson = new PackageJSON({ data: json, location, project });
 
     } catch (err) {
-      Helpers.error(`Error while parsing package.json in: ${filePath}`, true, true);
-      Helpers.error(err)
+      Helpers.error(`Error while parsing package.json in: ${filePath}`, false, false);
       return;
     }
     if (saveAtLoad) {
