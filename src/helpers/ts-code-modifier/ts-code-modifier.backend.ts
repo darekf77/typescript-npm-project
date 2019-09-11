@@ -29,7 +29,9 @@ export class TsCodeModifer {
     const matches = input.match(regex);
     if (_.isArray(matches)) {
       matches.forEach(m => {
-        input = input.replace(m, m.replace(/\"/g, `'`));
+        if (m.search('`') === -1) {
+          input = input.replace(m, m.replace(/\"/g, `'`));
+        }
       });
     }
     return input;

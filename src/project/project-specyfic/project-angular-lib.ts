@@ -8,7 +8,7 @@ import { Helpers } from '../../helpers';
 import { config } from '../../config';
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
 import { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { selectClients } from './select-clients';
 
