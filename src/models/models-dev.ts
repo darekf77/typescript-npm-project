@@ -66,7 +66,7 @@ export namespace ModelsDev {
     outDir: string;
   }
 
-  export type BuildDir = 'dist' | 'bundle';
+  export type BuildDir = 'dist' | 'bundle' | 'docs';
 
 
   export interface ReplaceOptionsExtended {

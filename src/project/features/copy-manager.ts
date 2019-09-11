@@ -314,7 +314,7 @@ export class CopyManager extends FeatureForProject {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       (this.buildOptions.copyto as Project[]).forEach(p => {
         // console.log(`Copy to ${p.name}`)
-        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir }, dontRemoveDestFolder)
+        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
       })
     }
 

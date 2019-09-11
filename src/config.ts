@@ -40,6 +40,7 @@ const file = {
 const tempFolders = {
   bundle: 'bundle',
   vendor: 'vendor',
+  docs: 'docs',
   dist: 'dist',
   tmp: 'tmp',
   tempSrc: 'tmp-src',

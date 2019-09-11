@@ -105,7 +105,7 @@
             "fs-extra": "^5.0.0",
             "@types/fs-extra": "^5.0.4",
             "@types/rimraf": "^2.0.2",
-            "incremental-compiler": "0.0.2"
+            "incremental-compiler": "0.0.9"
           },
           "sockets": {
             "@types/socket.io-client": "^1.4.32",
@@ -172,7 +172,7 @@
             },
             "essentials": {
               "element-resize-detector": "1.1.15",
-              "static-columns": "0.0.18",
+              "static-columns": "0.0.25",
               "ngx-breadcrumbs": "0.0.3",
               "ngx-editor": "^3.3.0",
               "ngx-moment": "^3.0.1",
@@ -463,7 +463,7 @@
     "http-proxy-middleware": "0.19.1",
     "http-server": "0.11.1",
     "husky": "^1.3.1",
-    "incremental-compiler": "0.0.2",
+    "incremental-compiler": "0.0.9",
     "inquirer": "^5.2.0",
     "inquirer-autocomplete-prompt": "^1.0.1",
     "ionic": "^3.19.1",
@@ -541,7 +541,7 @@
     "sort-package-json": "^1.11.0",
     "source-map-loader": "^0.2.0",
     "sqlite3": "4.0.9",
-    "static-columns": "0.0.18",
+    "static-columns": "0.0.25",
     "style-loader": "^0.13.1",
     "stylus-loader": "^3.0.1",
     "sw-toolbox": "^3.6.0",

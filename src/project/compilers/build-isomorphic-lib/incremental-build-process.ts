@@ -43,7 +43,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
   constructor(private project: Project, private buildOptions: BuildOptions) {
 
-    super(buildOptions ? buildOptions.outDir : undefined,
+    super(buildOptions ? buildOptions.outDir as any : undefined,
       config && config.folder.src, project && project.location,
       useDefaultBrowserCompilation(project)
     );
@@ -64,9 +64,9 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     if (project.type === 'isomorphic-lib') {
       if (project.isSite) {
-        this.backendCompilation = new BackendCompilationExtended(outFolder, config.folder.tempSrc, cwd);
+        this.backendCompilation = new BackendCompilationExtended(outFolder as any, config.folder.tempSrc, cwd);
       } else {
-        this.backendCompilation = new BackendCompilationExtended(outFolder, location, cwd);
+        this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
       }
 
     } else {

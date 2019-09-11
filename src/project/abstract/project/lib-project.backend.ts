@@ -70,43 +70,6 @@ export abstract class LibProject {
     }
   }
 
-  private updateChildren(this: Project, project: Project, newVersion, updatedProjectw: Project[] = []) {
-    if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
-      console.log(`Exition alredy ${project.genericName}`)
-      return;
-    }
-    project.packageJson.setDependencyAndSave({
-      name: this.name,
-      version: newVersion
-    }, `Bump versoin of library ${this.name}`);
-    // const packageJson = project.packageJson;
-    // if (packageJson && packageJson.data) {
-    //   if (project.type !== 'unknow-npm-project') {
-    //     project.packageJson.show(`For release of ${this.name}`)
-    //   }
-    //   let versionBumped = false;
-    //   if (packageJson.data.dependencies && packageJson.data.dependencies[this.name]) {
-    //     versionBumped = true;
-    //     packageJson.data.dependencies[this.name] = newVersion;
-    //   }
-    //   if (packageJson.data.devDependencies && packageJson.data.devDependencies[this.name]) {
-    //     versionBumped = true;
-    //     packageJson.data.devDependencies[this.name] = newVersion
-    //   }
-    //   if (versionBumped) {
-    //     packageJson.save(`Version bumped to ${} for ${this.name}  ${}`)
-    //     info(`[release - ${this.name}] Version of current project "${this.name}" bumped in ${project.genericName}`)
-    //   } else {
-    //     log(`[release - ${this.name}] ${this.name} has not a dependency of ${this.name}`)
-    //   }
-    // } else {
-    //   log(`[release - ${this.name}] No package json for ${project.genericName}`)
-    // }
-    updatedProjectw.push(project);
-    console.log(`[release - ${this.name}]  children of ${project.genericName}`, project.children.map(c => c.location))
-
-    project.children.forEach(p => this.updateChildren(p, newVersion, updatedProjectw));
-  }
 
   /**
    * Return how many projects has changed
@@ -117,7 +80,7 @@ export abstract class LibProject {
   async bumpVersionInOtherProjects(this: Project, newVersion, onlyInThisProjectSubprojects = false) {
     if (onlyInThisProjectSubprojects) {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
-      this.updateChildren(this, newVersion);
+      updateChildrenVersion(this, newVersion, this.name);
     } else {
       Project.Tnp.packageJson.setDependencyAndSave({
         name: this.name,
@@ -162,11 +125,11 @@ export abstract class LibProject {
     const newVersion = Project.Current.versionPatchedPlusOne;
     const self = this;
     function removeTagAndCommit(tagOnly = false) {
-      console.log(`PLEASE RUN: `)
+      Helpers.error(`PLEASE RUN: `, true, true)
       if (!tagOnly) {
-        console.log(`git reset --hard HEAD~1`)
+        Helpers.error(`git reset --hard HEAD~1`, true, true)
       }
-      console.log(`git tag --delete v${newVersion}`)
+      Helpers.error(`git tag --delete v${newVersion}`, false, true)
     }
 
     await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
@@ -177,8 +140,7 @@ export abstract class LibProject {
       try {
         this.run(`npm version patch`).sync()
       } catch (e) {
-        removeTagAndCommit(true)
-        Helpers.error(e);
+        removeTagAndCommit(true);
       }
 
       this.run(`tnp reset`).sync();
@@ -188,11 +150,37 @@ export abstract class LibProject {
       }
       this.packageJson.save('show for release')
       await this.recreate.init();
-      await this.build(BuildProcess.prepareOptionsLib({
+      await this.build(BuildProcess.prepareOptionsBuildProcess({
         prod, outDir: config.folder.bundle as 'bundle', args: c.args
       }, this));
+
+      if (this.type === 'angular-lib') {
+        Helpers.log(`
+
+      Building docs prevew - start
+
+      `);
+        await this.run(`tnp build:app`).sync();
+        Helpers.log(`
+
+      Building docs prevew - done
+
+      `);
+      }
+
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
+      }
+      if (this.type === 'angular-lib') {
+        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+tslib_1.__exportStar(require("./browser"), exports);
+        `.trim());
+        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.d.ts')}`, `
+export * from './browser';
+        `.trim());
       }
 
       this.bundleResources()
@@ -215,7 +203,7 @@ export abstract class LibProject {
           output: true
         }).sync()
         successPublis = true;
-      } catch (error) {
+      } catch (e) {
         removeTagAndCommit()
       }
       if (successPublis) {
@@ -240,7 +228,16 @@ export abstract class LibProject {
     const bundleFolder = path.join(this.location, config.folder.bundle);
     const browser = path.join(bundleFolder, config.folder.browser)
     const client = path.join(bundleFolder, config.folder.client)
-    Helpers.tryCopyFrom(browser, client);
+    if (fse.existsSync(browser)) {
+      Helpers.tryCopyFrom(browser, client);
+    } else {
+      Helpers.warn(`Browser forlder not generated.. replacing with dummy files: browser.js, client.js`,
+        false);
+      const msg = `console.log('${this.genericName} only for backend') `;
+      Helpers.writeFile(`${browser}.js`, msg);
+      Helpers.writeFile(`${client}.js`, msg);
+    }
+
   }
 
   public bundleResources(this: Project) {
@@ -280,3 +277,21 @@ export abstract class LibProject {
 }
 
 // export interface LibProject extends Partial<Project> { }
+export function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
+  if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
+    Helpers.log(`[release - ${name}][updateChildrenVersion] Alredy update ${project.genericName}`)
+    return;
+  }
+  if (project.name !== name) {
+    project.packageJson.setDependencyAndSave({
+      name,
+      version: newVersion
+    }, `Bump versoin of library ${name}`);
+  } else {
+    project.packageJson.data.version = newVersion;
+    project.packageJson.save(`[updateChildrenVersion] set version`);
+  }
+  updatedProjectw.push(project);
+  Helpers.log(`[release - ${name}][updateChildrenVersion] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
+  project.children.forEach(childProject => updateChildrenVersion(childProject, newVersion, name, updatedProjectw));
+}

@@ -81,7 +81,7 @@ export class ProjectAngularClient extends Project {
       // console.log(command)
       this.run(command, { biggerBuffer: true }).async()
     } else {
-      baseHref = baseHref ? `base-href ${baseHref}` : ''
+      baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '')
       if (this.isEjectedProject) {
         baseHref = `--env.${baseHref}`
         const aot = (prod ? 'aot.' : '');
@@ -116,21 +116,27 @@ export class ProjectAngularClient extends Project {
         // })
 
       } else {
+
         baseHref = `--${baseHref}`
+
         if (prod) {
           Helpers.info(`BUILDING PRODUCTION`)
         }
+        const command = `npm-run ng build  ${!this.isStandaloneProject ? (
+          this.env.config.name === 'static' ? '--stats-json' : ''
+        ) : ''} --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
         try {
-          const showOutput = (['local', 'static'] as Models.env.EnvironmentName[])
+          const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as Models.env.EnvironmentName[])
             .includes(this.env.config.name);
-          this.run(`npm-run ng build  ${this.env.config.name === 'static' ? '--stats-json' : ''} --aot=false ${prod ? '-prod' : ''} - --output-path ${config.folder.previewDistApp} ${baseHref}`,
+          this.run(command,
             {
               output: showOutput,
               silence: !showOutput,
               biggerBuffer: true
             }).sync()
         } catch (e) {
-          Helpers.error(e, false, true);
+          Helpers.error(e, true, true);
+          Helpers.error(`Build app from lib command failed: ${command}`)
         }
 
       }

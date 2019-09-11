@@ -16,7 +16,7 @@ import { PROGRESS_DATA } from '../../../progress-output';
 
 export class BuildProcess extends FeatureForProject {
 
-  public static prepareOptionsLib(options: Models.dev.StartForOptions, project: Project) {
+  public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project) {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
@@ -56,7 +56,7 @@ inside generated projects...
    * prod, watch, outDir, args, overrideOptions
    */
   async  startForLib(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsLib(options, this.project);
+    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = false;
     const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
     await this.build(buildOptions, config.allowedTypes.libs, exit);
@@ -67,7 +67,7 @@ inside generated projects...
   }
 
   async  startForApp(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsLib(options, this.project);
+    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = true;
     const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
     await this.build(buildOptions, config.allowedTypes.app, exit);
@@ -167,7 +167,7 @@ inside generated projects...
     }
     Helpers.log(`
 
-    ${chalk.bold('Start of Building')} ${this.project.genericName}
+    ${chalk.bold('Start of Building')} ${this.project.genericName} (${buildOptions.appBuild ? 'app' : 'lib'})
 
     `);
     if (global.tnpNonInteractive) {
