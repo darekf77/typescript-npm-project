@@ -164,6 +164,30 @@ export const commands: CommandType[] = ([
       askBeforeExecute: true,
     }
   },
+  {
+    title: 'FIREDEV NEW LOGIC-UI MODULE',
+    exec: 'tnp new model %name% %realtivePath%',
+    options: {
+      title: 'craete new logic-ui model',
+      findNearestProject: true,
+    }
+  },
+  {
+    title: 'FIREDEV NEW UI MODULE',
+    exec: 'tnp new model %name% %realtivePath%',
+    options: {
+      title: 'craete new logic-ui model',
+      findNearestProject: true,
+    }
+  },
+  {
+    title: 'FIREDEV NEW PREVIEW FOR UI MODULE',
+    exec: 'tnp new model %name% %realtivePath%',
+    options: {
+      title: 'craete new logic-ui model',
+      findNearestProject: true,
+    }
+  },
   // {
   //   title: 'FIREDEV RESET_ALL projects',
   //   exec: 'tnp reset:all',

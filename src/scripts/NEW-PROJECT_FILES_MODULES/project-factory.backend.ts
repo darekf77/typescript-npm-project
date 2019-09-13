@@ -110,7 +110,7 @@ export class ProjectFactory {
     return Project.From(destinationPath);
   }
 
-  public createModelFromArgs(args: string, exit = true, cwd = process.cwd()) {
+  public createModelFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
     const name = argv[1]
     const relativePath = argv[2]
@@ -120,7 +120,7 @@ export class ProjectFactory {
     }
   }
 
-  public workspaceFromArgs(args: string, exit = true, cwd = process.cwd()) {
+  public workspaceFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
 
     if (!_.isArray(argv) || argv.length < 2) {
@@ -142,7 +142,7 @@ export class ProjectFactory {
 
   }
 
-  public workspaceSiteFromArgs(args: string, exit = true, cwd = process.cwd()) {
+  public workspaceSiteFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
     const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
     if (!basedOn) {

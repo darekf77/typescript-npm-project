@@ -9,7 +9,7 @@ import { ProcesOptions } from '../process-options';
 import { capitalizeFirstLetter } from '../helpers';
 
 export function executeCommand(registerName: string, commandToExecute: string | string[], options?: ProcesOptions) {
-  const commandToExecuteReadable = '"' + ((Array.isArray(commandToExecute) && typeof commandToExecute !== 'string') ?
+  let commandToExecuteReadable = '"' + ((Array.isArray(commandToExecute) && typeof commandToExecute !== 'string') ?
     commandToExecute.join(',') : commandToExecute) + '"'
   //#region handle args
   if (!options) {
@@ -52,7 +52,7 @@ export function executeCommand(registerName: string, commandToExecute: string | 
     syncProcess, cancellable, title, tnpNonInteractive, askBeforeExecute,
     tnpShowProgress, showOutputDataOnSuccess, debug, showSuccessMessage } = options;
 
-  debug = false; // TODO
+  debug = true; // TODO
 
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {
@@ -87,7 +87,7 @@ export function executeCommand(registerName: string, commandToExecute: string | 
       process();
     }
 
-    function process() {
+    async function process() {
       const mainTitle = capitalizeFirstLetter(title ? title : `Executing: ${commandToExecuteReadable}`);
       window.withProgress({
         location: ProgressLocation.Notification,
@@ -158,8 +158,32 @@ export function executeCommand(registerName: string, commandToExecute: string | 
               findNearestProjectTypeWithGitRoot && `--findNearestProjectTypeWithGitRoot=${findNearestProjectTypeWithGitRoot}`,
             ].filter(f => !!f).join(' ');
 
-            const cmd = (typeof commandToExecute === 'string') ? `${commandToExecute} --cwd ${newCwd} ${flags}` :
-              commandToExecute.map(c => `${c} --cwd ${newCwd} ${flags}`).join(' && ')
+            let cmd = (typeof commandToExecute === 'string') ? `${commandToExecute} --cwd ${newCwd} ${flags}` :
+              commandToExecute.map(c => `${c} --cwd ${newCwd} ${flags}`).join(' && ');
+
+            //#region exec params
+            const execParams = commandToExecuteReadable.match(/\%[a-zA-Z]+\%/g);
+            if (Array.isArray(execParams) && execParams.length > 0) {
+              for (let index = 0; index < execParams.length; index++) {
+                const paramToResolve = execParams[index];
+                if (paramToResolve === '%name%') {
+                  const name = await getModuleName();
+                  commandToExecuteReadable = commandToExecuteReadable
+                    .replace(paramToResolve, name);
+                  cmd = cmd
+                    .replace(paramToResolve, name);
+
+                }
+                if (paramToResolve === '%realtivePath%') {
+                  commandToExecuteReadable = commandToExecuteReadable
+                    .replace(paramToResolve, realtivePath);
+                  cmd = cmd
+                    .replace(paramToResolve, realtivePath);
+                }
+              }
+            }
+            //#endregion
+
             // tslint:disable-next-line: no-unused-expression
 
             // const log = window.createOutputChannel(mainTitle);
@@ -232,4 +256,13 @@ export function executeCommand(registerName: string, commandToExecute: string | 
     }
 
   });
+}
+
+
+async function getModuleName(value: string = 'Filename') {
+  const result = await vscode.window.showInputBox({
+    value,
+    placeHolder: value
+  });
+  return !result ? '' : result;
 }

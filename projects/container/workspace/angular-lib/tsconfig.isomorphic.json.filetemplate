@@ -43,6 +43,7 @@
     "browser",
     "module",
     "tests",
+    "{{{ ENV ? 'src' : 'tmp-src' }}}",
     "{{{ ENV ? 'tmp-src' : 'src' }}}/tests",
     "{{{ ENV ? 'tmp-src' : 'src' }}}/**/*.spec.ts",
     "tmp-site-src",

@@ -1,6 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
+import chalk from 'chalk';
 import { Project } from '../abstract/project';
 import { config } from '../../config';
 import { BuildOptions } from '../features';
@@ -18,7 +19,6 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
   }
   const choices = currentProject.parent.children
     .filter(c => config.allowedTypes.app.includes(c.type))
-    .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name)))
     // .filter(c => {
     //   if (angularLib) {
     //     return true;
@@ -26,7 +26,11 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     //   return c.name !== currentProject.name;
     // })
     .map(c => {
-      return { value: c.name, name: c.name }
+      const notIncludedInEnv = !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));
+      return {
+        value: c.name,
+        name: `${c.name}${notIncludedInEnv ? chalk.red(' -> not included in environment.js config') : ''}`
+      };
     });
   let selectedChoices = choices.map(c => c.value);
 

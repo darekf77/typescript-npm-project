@@ -91,6 +91,18 @@
         "title": "FIREDEV CLEAN ALL AND INIT"
       },
       {
+        "command": "extension.firedevnewlogicuimodule",
+        "title": "FIREDEV NEW LOGIC-UI MODULE"
+      },
+      {
+        "command": "extension.firedevnewuimodule",
+        "title": "FIREDEV NEW UI MODULE"
+      },
+      {
+        "command": "extension.firedevnewpreviewforuimodule",
+        "title": "FIREDEV NEW PREVIEW FOR UI MODULE"
+      },
+      {
         "command": "extension.firedevquickgitcommitandpushupdate",
         "title": "FIREDEV QUICK GIT commit and push update"
       },
@@ -153,6 +165,15 @@
         },
         {
           "command": "extension.firedevcleanallandinit"
+        },
+        {
+          "command": "extension.firedevnewlogicuimodule"
+        },
+        {
+          "command": "extension.firedevnewuimodule"
+        },
+        {
+          "command": "extension.firedevnewpreviewforuimodule"
         },
         {
           "command": "extension.firedevquickgitcommitandpushupdate"
@@ -226,6 +247,18 @@
         },
         {
           "command": "extension.firedevcleanallandinit",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevnewlogicuimodule",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevnewuimodule",
+          "group": "Firedev CLI essentials"
+        },
+        {
+          "command": "extension.firedevnewpreviewforuimodule",
           "group": "Firedev CLI essentials"
         },
         {

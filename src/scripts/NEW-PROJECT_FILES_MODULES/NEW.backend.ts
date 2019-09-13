@@ -5,7 +5,8 @@ import { Models } from '../../models';
 
 import { ProjectFactory } from './project-factory.backend';
 
-export function NEW(args: string, exit = true, cwd = process.cwd()) {
+export function NEW(args: string, exit = true) {
+  const cwd = process.cwd();
   const argv = args.split(' ');
   const type = argv[0] as Models.libs.NewFactoryType;
   if (type === 'model') {
@@ -14,7 +15,8 @@ export function NEW(args: string, exit = true, cwd = process.cwd()) {
     ProjectFactory.Instance.workspaceFromArgs(args, exit, cwd)
   }
 }
-export function NEW_SITE(args: string, exit = true, cwd = process.cwd()) {
+export function NEW_SITE(args: string, exit = true) {
+  const cwd = process.cwd();
   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd);
 }
 
