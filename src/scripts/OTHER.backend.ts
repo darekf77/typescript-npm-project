@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import { Project } from "../project";
+import { Project } from '../project';
 import * as  psList from 'ps-list';
 import { Helpers } from '../helpers';
 import { Models } from '../models';

@@ -1,15 +1,15 @@
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import chalk from "chalk";
+import chalk from 'chalk';
 import { PackageJsonBase } from './package-json-base.backend';
 //#endregion
 
-import * as _ from "lodash";
+import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 
-import { Project } from "../../abstract";
-import { Helpers } from "../../../helpers";
+import { Project } from '../../abstract';
+import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { Models } from '../../../models';
 
@@ -109,4 +109,3 @@ export class PackageJSON
 
   //#endregion
 }
-

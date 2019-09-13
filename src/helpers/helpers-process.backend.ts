@@ -3,14 +3,14 @@ import * as child from 'child_process'
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
-import * as os from "os";
+import * as os from 'os';
 import * as path from 'path';
 import * as sleep from 'sleep';
 import * as fkill from 'fkill';
-import * as dateformat from "dateformat";
+import * as dateformat from 'dateformat';
 
-import { Helpers } from "./index";
-import { Models } from "../models";
+import { Helpers } from './index';
+import { Models } from '../models';
 
 const prompts = require('prompts');
 //#endregion

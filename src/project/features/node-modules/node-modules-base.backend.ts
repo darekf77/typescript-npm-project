@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as glob from 'glob';
 import chalk from 'chalk';
-import * as rimraf from "rimraf";
+import * as rimraf from 'rimraf';
 import * as TerminalProgressBar from 'progress';
 
 import { config } from '../../../config';

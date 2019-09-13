@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as child from 'child_process';
 // third part
-import { Project } from "../abstract";
+import { Project } from '../abstract';
 import { BuildOptions } from '../features';
 
 

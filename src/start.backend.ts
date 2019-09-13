@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import glob = require('glob')
 import * as path from 'path';
-import { Helpers } from "./helpers";
+import { Helpers } from './helpers';
 import chalk from 'chalk';
 import { Project } from './project';
 import { Ora } from 'ora';

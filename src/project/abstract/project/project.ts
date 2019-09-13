@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as rimraf from 'rimraf';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
-import { ChildProcess } from "child_process";
+import { ChildProcess } from 'child_process';
 //#endregion
 import { config } from '../../../config';
 import { Models } from '../../../models';
@@ -399,5 +399,3 @@ Helpers.applyMixins(Project, [
   SiteProject
   //#endregion
 ])
-
-

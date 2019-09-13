@@ -1,5 +1,5 @@
 //#region @backend
-import { Project } from "../abstract";
+import { Project } from '../abstract';
 import { BuildOptions } from '../features';
 
 export class ProjectContainer extends Project {

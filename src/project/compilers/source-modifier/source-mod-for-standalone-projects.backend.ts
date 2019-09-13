@@ -53,9 +53,9 @@ export class SourceModForStandaloneProjects
       return false;
     }
     const input = Helpers.readFile(absoluteFilePath);
-    const modified = this.process(input, relativePath);
-    if (input !== modified) {
-      Helpers.writeFile(absoluteFilePath, modified);
+    const modified = this.process(input, relativePath).trim();
+    if (input.trim() !== modified) {
+      Helpers.writeFile(absoluteFilePath, `${modified}\n`);
       files.modifiedFiles.push(absoluteFilePath);
       return true;
     }

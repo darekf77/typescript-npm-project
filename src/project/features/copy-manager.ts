@@ -1,14 +1,14 @@
 //#region @backend
 
 import * as _ from 'lodash';
-import * as fse from "fs-extra";
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import { watch } from 'chokidar'
 import * as rimraf from 'rimraf';
 
-import { config } from "../../config";
+import { config } from '../../config';
 import { Project } from '../abstract';
 import { Models } from '../../models';
 import { Helpers } from '../../helpers';;

@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
 // third part
-import { Project } from "../abstract";
-import { config } from "../../config";
+import { Project } from '../abstract';
+import { config } from '../../config';
 import { Helpers } from '../../helpers';
 import { BuildOptions } from '../features';
 import { Models } from '../../models';
@@ -88,8 +88,8 @@ export class ProjectAngularClient extends Project {
         // const stats = [
         //   "--display-chunks false",
         //   "--display-optimization-bailout false",
-        //   "--display-provided-exports false",
-        //   "--display-used-exports false",
+        //   "--display-provided-exports false',
+        //   "--display-used-exports false',
         //   "--display-depth false",
         //   "--display-reasons false",
         //   "--display-cached-assets false",

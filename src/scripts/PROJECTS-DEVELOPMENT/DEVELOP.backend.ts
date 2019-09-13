@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import { Project } from "../../project";
+import { Project } from '../../project';
 import { Helpers } from '../../helpers';
 import * as path from 'path';
 import { config } from '../../config';

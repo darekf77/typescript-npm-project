@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
-import { SpecWrap } from "./_helpers.spec";
+import { SpecWrap } from './_helpers.spec';
 import { NEW, NEW_SITE } from '../scripts/NEW';
 import { INIT, CLEAR_ALL } from '../scripts/FILES_STRUCTURE';
 import { Project } from '../project';

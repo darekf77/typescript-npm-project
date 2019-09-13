@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import * as _ from 'lodash';
-import * as rimraf from "rimraf";
+import * as rimraf from 'rimraf';
 
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';

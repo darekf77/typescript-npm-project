@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
 // local
-import { Project } from "../abstract";
-import { Helpers } from "../../helpers";
+import { Project } from '../abstract';
+import { Helpers } from '../../helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { ProxyRouter } from '../features/proxy-router';
@@ -220,4 +220,3 @@ function showProgress(type: 'app' | 'lib', name: string, precentFraction: number
 
 
 //#endregion
-

@@ -25,11 +25,11 @@ export class TsCodeModifer {
    * fix double apostrophes in imports,export, requires
    */
   fixDoubleApostophe(input: string) {
-    const regex = /(import|export|require\(|\}\sfrom\s(\"|\')).+(\"|\')/g;
+    const regex = new RegExp(`(import|export|require\\(|\\}\\sfrom\\s(\\"|\\')).+(\\"|\\')`, 'g');
     const matches = input.match(regex);
     if (_.isArray(matches)) {
       matches.forEach(m => {
-        if (m.search('`') === -1) {
+        if (m.search('`') === -1 && !m.trim().startsWith('//')) {
           input = input.replace(m, m.replace(/\"/g, `'`));
         }
       });

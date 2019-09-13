@@ -4,10 +4,10 @@ import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import chalk from 'chalk';
-import { FeatureForProject } from "../abstract";
-import { Helpers } from "../../helpers";
-import { config } from "../../config";
-import { Models } from "../../models";
+import { FeatureForProject } from '../abstract';
+import { Helpers } from '../../helpers';
+import { config } from '../../config';
+import { Models } from '../../models';
 
 export class QuickFixes extends FeatureForProject {
 
