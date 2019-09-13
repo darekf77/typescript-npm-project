@@ -94,7 +94,8 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   process(input: string, relativePath: string) {
     const modType = this.getModType(this.project, relativePath);
-    input = Helpers.tsCodeModifier.fixDoubleApostophe(input);
+    input = Helpers.tsCodeModifier.fixApostrphes(input);
+    input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);
     if (this.project.isWorkspaceChildProject) {
       input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
