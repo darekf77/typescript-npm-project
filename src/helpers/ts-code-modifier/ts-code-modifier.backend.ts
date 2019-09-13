@@ -28,7 +28,7 @@ export class TsCodeModifer {
     if (_.isArray(matches)) {
       matches.forEach(m => {
         if (m.search('`') === -1 && !m.trim().startsWith('//')) {
-          input = input.replace(m, `new RegEx(\`${Helpers.escapeStringForRegEx(m)}\`,'g')`);
+          input = input.replace(m, `(new RegExp(\`${Helpers.escapeStringForRegEx(m)}\`,'g'))`);
         }
       });
     }
