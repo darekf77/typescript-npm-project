@@ -102,10 +102,6 @@ export class FilesJoinActions {
       _2___handleReferingTOAngularLibModulesName() {
         // console.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
         if (self.project.isWorkspaceChildProject) {
-          // @LAST
-          // can this be separated from source modifer to baseline site ?
-          // how to execute baseline site join after sourcemodifer/baselin change
-          // test, test, test
           input = self.project.sourceModifier.process(input, relativeBaselineCustomPath);
         }
         return input;

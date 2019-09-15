@@ -39,7 +39,10 @@ export class HelpersTnp {
     return HelpersTnp._instance;
   }
   //#endregion
+
+  //#region @backend
   readonly processes: child.ChildProcess[] = [];
+  //#endregion
 
   private constructor(
     //#region @backend
