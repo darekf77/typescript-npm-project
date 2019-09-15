@@ -24,6 +24,8 @@ const filesNotAllowedToClen = {
 }
 
 const file = {
+  controllers_ts: 'controllers.ts',
+  entities_ts: 'entities.ts',
   autob_actions_js: 'auto-actions.js',
   package_json: 'package.json',
   yarn_lock: 'yarn.lock',

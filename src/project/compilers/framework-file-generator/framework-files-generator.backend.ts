@@ -18,7 +18,8 @@ export function optionsFrameworkFileGen(project: Project): IncCompiler.Models.Ba
     folderPath = path.join(project.location, config.folder.src);
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath
+    folderPath,
+    notifyOnFileUnlink: true
   };
   return options;
 }
@@ -28,13 +29,18 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
-    this.syncAction()
+    if (![config.file.controllers_ts, config.file.entities_ts]
+      .includes(path.basename(event.fileAbsolutePath))) {
+      await this.syncAction()
+    }
   }
 
   async syncAction() {
     if (this.project.type === 'isomorphic-lib' && this.project.useFramework) {
       this.generateEntityTs()
       this.generateControllersTs()
+    } else {
+
     }
   }
 
