@@ -9,13 +9,12 @@ import { config } from '../../../config';
 import { FeatureCompilerForProject, Project } from '../../abstract';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
-import { ModType, SourceCodeType } from './source-modifier.models';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
 export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
-  console.log('PROJECT', project.name)
+  // console.log('PROJECT', project.name)
   let folderPath: string | string[] = void 0;
   if (project.isWorkspaceChildProject || project.isStandaloneProject) {
     folderPath = [
@@ -29,14 +28,15 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
     }
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath
+    folderPath,
+
   };
   // if (project.isStandaloneProject) {
   //   console.log(`${project.genericName}: optionsSourceModifier`, options)
   // }
-  if (project.name === 'simple-lib') {
-    console.log('optionsSourceModifier', options)
-  }
+  // if (project.name === 'simple-lib') {
+  //   console.log('optionsSourceModifier', options)
+  // }
   return options;
 }
 
@@ -46,9 +46,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
-    console.log('hejhehehehh', event)
-    // @LAST
-    // fix source modiferfor wroksapce child src -> not chaning morphi/browser -> browser
+    // @LAST fix watching to much files
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
@@ -99,7 +97,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   process(input: string, relativePath: string) {
     const modType = this.getModType(this.project, relativePath);
-    console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
+    // console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
     input = Helpers.tsCodeModifier.fixApostrphes(input);
     // input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);

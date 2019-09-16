@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from '../../../config';
-import { ModType, SourceCodeType, CheckType } from './source-modifier.models';
+import { ModType, CheckType } from './source-modifier.models';
 import { IncCompiler } from 'incremental-compiler';
 import { Models, Helpers } from '../../../index';
 import { impReplace } from './source-modifier.helpers.backend';
@@ -98,7 +98,7 @@ export class SourceModForStandaloneProjects
       this.project.parent.childrenThatAreThirdPartyInNodeModules
       : this.project.childrenThatAreThirdPartyInNodeModules;
 
-    console.log('this.project.childrenThatAreThirdPartyInNodeModules', children.map(c => c.name))
+    // console.log('this.project.childrenThatAreThirdPartyInNodeModules', children.map(c => c.name))
 
     children.forEach(child => {
       const libName = child.name;

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
-import { ModType, SourceCodeType, CheckType } from './source-modifier.models';
+import { ModType, CheckType } from './source-modifier.models';
 
 import { impReplace } from './source-modifier.helpers.backend';
 
