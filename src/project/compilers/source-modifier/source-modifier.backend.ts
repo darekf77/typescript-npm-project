@@ -15,6 +15,7 @@ import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
 export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
+  console.log('PROJECT', project.name)
   let folderPath: string | string[] = void 0;
   if (project.isWorkspaceChildProject || project.isStandaloneProject) {
     folderPath = [
@@ -33,7 +34,9 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
   // if (project.isStandaloneProject) {
   //   console.log(`${project.genericName}: optionsSourceModifier`, options)
   // }
-
+  if (project.name === 'simple-lib') {
+    console.log('optionsSourceModifier', options)
+  }
   return options;
 }
 
@@ -43,7 +46,9 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
-    // console.log('hejhehehehh')
+    console.log('hejhehehehh', event)
+    // @LAST
+    // fix source modiferfor wroksapce child src -> not chaning morphi/browser -> browser
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
@@ -94,6 +99,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   process(input: string, relativePath: string) {
     const modType = this.getModType(this.project, relativePath);
+    console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
     input = Helpers.tsCodeModifier.fixApostrphes(input);
     // input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);

@@ -98,6 +98,8 @@ export class SourceModForStandaloneProjects
       this.project.parent.childrenThatAreThirdPartyInNodeModules
       : this.project.childrenThatAreThirdPartyInNodeModules;
 
+    console.log('this.project.childrenThatAreThirdPartyInNodeModules', children.map(c => c.name))
+
     children.forEach(child => {
       const libName = child.name;
 
