@@ -94,19 +94,18 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
 
       if (project.isStandaloneProject) {
-        if (project.type === 'isomorphic-lib' && !buildOptions.watch) {
-          const browser = _.first(this.browserCompilations)
-          browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
-            if (f !== 'app.ts') {
-              return true;
-            }
-            const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
-            Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
-            Helpers.writeFile(absolutePathToFile, '')
-            return false;
-          })
-          // browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.
-        }
+        // if (project.type === 'isomorphic-lib' && !buildOptions.watch) {
+        //   const browser = _.first(this.browserCompilations)
+        //   browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
+        //     if (f !== 'app.ts') {
+        //       return true;
+        //     }
+        //     const absolutePathToFile = path.join(cwd, browser.sourceOutBrowser, f);
+        //     Helpers.warn(`For static build ${chalk.bold('app.ts')} will be ignored`);
+        //     Helpers.writeFile(absolutePathToFile, '')
+        //     return false;
+        //   })
+        // }
         if (project.type === 'angular-lib') {
           let browserOutFolder = Helpers.getBrowserVerPath();
           this.browserCompilations = [

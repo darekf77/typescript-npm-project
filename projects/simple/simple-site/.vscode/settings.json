@@ -8,7 +8,9 @@
   "tslint.enable": false,
   "workbench.colorCustomizations": {
     "activityBar.background": "#399bd4",
-    "activityBar.foreground": "#080800"
+    "activityBar.foreground": "#080800",
+    "statusBar.background": "#23da2c",
+    "statusBar.debuggingBackground": "#23da2c"
   },
   "workbench.colorTheme": "Default Light+",
   "files.exclude": {}

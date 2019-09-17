@@ -26,8 +26,6 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 export class BroswerForModuleCompilation extends BroswerCompilation {
 
-  private ENV: Models.env.EnvConfig;
-
   compile(watch: boolean) {
     try {
       super.compile(watch);
@@ -48,7 +46,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   constructor(
     private compilationProject: Project,
     private module: string,
-    ENV: Models.env.EnvConfig,
+    public ENV: Models.env.EnvConfig,
     sourceOut: string,
     outFolder: OutFolder,
     location: string,
@@ -58,9 +56,6 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   ) {
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
-
-    this.initCodeCut.call(this, ENV, compilationProject, buildOptions)
-
 
   }
 
@@ -98,26 +93,33 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     }
   }
 
-  initCodeCut() {
+  initCodeCut(filesPathes: string[]) {
     // console.log('inside')
-    let env: Models.env.EnvConfig = arguments[0]
-    const compilationProject: Project = arguments[1];
-    const buildOptions = arguments[2];
+    let env: Models.env.EnvConfig = this.ENV;
+    const compilationProject: Project = this.compilationProject;
+    const buildOptions = this.buildOptions;
     if (!compilationProject) {
       return;
     }
     env = _.cloneDeep(env);
     this.ENV = env;
     // console.log('here1')
-    // console.log('this.compilationFolderPath',this.compilationFolderPath)
+
     let project: Project;
-    if(env) {
+    if (env) {
       project = Project.From(env.currentProjectLocation);
     }
-    if(compilationProject.type === 'angular-lib') {
+    if (compilationProject.type === 'angular-lib') {
       project = compilationProject;
     }
-    this.codecut = new ExtendedCodeCut(this.compilationFolderPath, this.filesAndFoldesRelativePathes, {
+    // @LAST FIX FILE PATHES
+    filesPathes = filesPathes.map(f => {
+      return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
+    })
+    console.log('this.compilationFolderPath', this.compilationFolderPath)
+    console.log('filesPathes', filesPathes)
+    // process.exit(0)
+    this.codecut = new ExtendedCodeCut(this.compilationFolderPath, filesPathes, {
       replacements: [
         ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
         ((compilationProject.type === 'isomorphic-lib') && "@backend") as any,
@@ -127,7 +129,9 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       env
     }, project,
       compilationProject,
-      buildOptions);
+      buildOptions,
+      this.sourceOutBrowser
+      );
     // console.log('here2')
   }
 

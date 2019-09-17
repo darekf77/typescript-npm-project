@@ -5,6 +5,8 @@ import { Project } from './project';
 import { Helpers } from '../../helpers';
 import { IncCompiler } from 'incremental-compiler';
 import { config } from '../../config';
+import { CLASS } from 'typescript-class-helpers';
+import { FrameworkFilesGenerator } from '../compilers/index';
 //#endregion
 
 export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA = any>
@@ -13,6 +15,17 @@ export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any,
   constructor(public project: Project, options: IncCompiler.Models.BaseClientCompilerOptions,
     allowFolderOutSideProject = false) {
     super(checkFolderCompiler(project, options, allowFolderOutSideProject));
+  }
+
+  protected get notAllowedToWachFiles() {
+    let notAllowedFiles = [];
+
+    notAllowedFiles = notAllowedFiles.concat([
+      config.file.controllers_ts,
+      config.file.entities_ts,
+    ]);
+
+    return notAllowedFiles;
   }
 
 }

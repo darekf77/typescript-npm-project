@@ -3,7 +3,6 @@
     "resources": [
       "README.md"
     ],
-    "useFramework": true,
     "type": "isomorphic-lib",
     "overrided": {
       "ignoreDepsPattern": [],

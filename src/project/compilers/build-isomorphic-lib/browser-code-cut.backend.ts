@@ -25,6 +25,7 @@ export class ExtendedCodeCut extends CodeCut {
     private project: Project,
     private compilationProject: Project,
     private buildOptions: BuildOptions,
+    public sourceOutBrowser: string,
 
   ) {
     super(cwd, filesPathes, options as any);
@@ -34,7 +35,7 @@ export class ExtendedCodeCut extends CodeCut {
   file(absolutePathToFile) {
 
     // console.log('options here ', options)
-    return new (this.browserCodeCut)(absolutePathToFile, this.project, this.compilationProject, this.buildOptions)
+    return new (this.browserCodeCut)(absolutePathToFile, this.project, this.compilationProject, this.buildOptions, this.sourceOutBrowser)
       .flatTypescriptImportExport('import')
       .flatTypescriptImportExport('export')
       .replaceRegionsForIsomorphicLib(_.cloneDeep(this.options))
@@ -59,6 +60,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     private project?: Project,
     private compilationProject?: Project,
     private buildOptions?: BuildOptions,
+    private sourceOutBrowser?: string,
   ) {
     super(absoluteFilePath);
     // this.debug('modal.service.ts');
@@ -72,14 +74,28 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     let useBackupFile = false;
     ['html', 'css', 'scss', 'sass']
       .map(d => `.${d}`)
-      .forEach(ext => {
+      .find(ext => {
         if (!useBackupFile && absoluteFilePath.endsWith(ext)) {
           absoluteFilePath = absoluteFilePath.replace(ext, '.ts');
           useBackupFile = true;
+          return true;
         }
       });
 
-    const orgContentPath = `${absoluteFilePath}.orginal`;
+    let orgContentPath = `${absoluteFilePath}.orginal`;
+    // console.log('orgContentPath', orgContentPath)
+    // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
+    // console.log('this.compilationProject.name', this.compilationProject.name)
+    // console.log('this.project.name', this.project.name)
+    // orgContentPath = orgContentPath.replace(
+    //   path.join(this.compilationProject.location, this.sourceOutBrowser),
+    //   path.join(this.compilationProject.location,
+    //     this.compilationProject.type === 'angular-lib' ? config.folder.components : config.folder.src)
+    // ).replace(/\.orginal$/, '')
+    // console.log('orgContentPath', orgContentPath)
+    // console.log('orgContentPath exisits', fse.existsSync(orgContentPath));
+    // process.exit(0)
+
     if (useBackupFile) {
       Helpers.writeFile(this.absoluteFilePath, contentFromMorphi)
       if (fse.existsSync(orgContentPath)) {
@@ -424,6 +440,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     // this.isDebuggingFile && console.log(`-------------------------- ${pattern} --------------------------------`)
     // this.isDebuggingFile && console.log(stringContent)
     return this.replaceRegionsWith(stringContent, replacementPatterns, '', ext);
+  }
+
+  saveOrDelete() {
+    Helpers.writeFile(this.absoluteFilePath, this.rawContent);
   }
 
 }

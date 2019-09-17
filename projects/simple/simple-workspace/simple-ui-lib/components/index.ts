@@ -1,7 +1,4 @@
-// import { testLib  } from 'simple-lib/src';
-
+// import { testLib  } from 'simple-lib/browser-for-simple-ui-lib';
 export function angularlibFUn() {
-
 }
-
 //  testLib();

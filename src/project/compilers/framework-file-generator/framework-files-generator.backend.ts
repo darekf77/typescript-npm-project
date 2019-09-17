@@ -29,8 +29,7 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
-    if (![config.file.controllers_ts, config.file.entities_ts]
-      .includes(path.basename(event.fileAbsolutePath))) {
+    if (!this.notAllowedToWachFiles.includes(path.basename(event.fileAbsolutePath))) {
       await this.syncAction()
     }
   }
