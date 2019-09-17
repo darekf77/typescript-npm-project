@@ -116,8 +116,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     filesPathes = filesPathes.map(f => {
       return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
     })
-    console.log('this.compilationFolderPath', this.compilationFolderPath)
-    console.log('filesPathes', filesPathes)
+    // console.log('this.compilationFolderPath', this.compilationFolderPath)
+    // console.log('filesPathes', filesPathes)
     // process.exit(0)
     this.codecut = new ExtendedCodeCut(this.compilationFolderPath, filesPathes, {
       replacements: [

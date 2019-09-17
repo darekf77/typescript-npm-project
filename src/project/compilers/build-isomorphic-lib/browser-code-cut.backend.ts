@@ -70,12 +70,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
     let absoluteFilePath = this.absoluteFilePath.replace(/\/$/, '');
+    // console.log('[afterRegionsReplacement] this.absoluteFilePath', this.absoluteFilePath)
 
     let useBackupFile = false;
     ['html', 'css', 'scss', 'sass']
       .map(d => `.${d}`)
       .find(ext => {
-        if (!useBackupFile && absoluteFilePath.endsWith(ext)) {
+        if (absoluteFilePath.endsWith(ext)) {
           absoluteFilePath = absoluteFilePath.replace(ext, '.ts');
           useBackupFile = true;
           return true;
@@ -122,6 +123,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       .map(c => `.${c}.ts`)
       .filter(c => absoluteFilePath.endsWith(c)).length === 0) {
       return content;
+    } else if (!fse.existsSync(orgContentPath)) {
+      Helpers.writeFile(orgContentPath, contentFromMorphi)
     }
 
     const dir = path.dirname(absoluteFilePath);
@@ -164,7 +167,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return replacement;
   }
 
-  private replaceHtmlTemplateInComponent(dir, base, content) {
+  private replaceHtmlTemplateInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const htmlTemplatePath = path.join(dir, `${base}.component.html`);
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
     if (fse.existsSync(htmlTemplatePath)) {
@@ -174,9 +177,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        <!-- Put your html here -->
+        <!-- html tmeplate is empty: ${path.basename(htmlTemplatePath)} -->
         `;
       }
+    } else if (!orginalFileExists) {
+      return content;
     }
     const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${
       Helpers.escapeStringForRegEx(path.basename(htmlTemplatePath))
@@ -189,8 +194,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return content;
   }
 
-  private replaceCssInComponent(dir, base, content) {
+  private replaceCssInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const cssFilePath = path.join(dir, `${base}.component.css`);
+    // console.log('cssFilePath', cssFilePath)
     let replacement = `
       /* file ${base}.component.css does not exist */
     `;
@@ -200,9 +206,16 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       replacement = Helpers.readFile(cssFilePath);
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        /* put your styles here */
+        /* css file is empty: ${path.basename(cssFilePath)} */
         `;
       }
+    } else {
+      if (!orginalFileExists) {
+        return content;
+      }
+      replacement = `
+      /* css file does not exists: ${path.basename(cssFilePath)} */
+      `;
     }
     const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
       Helpers.escapeStringForRegEx(path.basename(cssFilePath))
@@ -215,12 +228,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return content;
   }
 
-  private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath) {
+  private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath,
+    orginalFileExists: boolean = true) {
 
     const scssFilePath = path.join(dir, `${base}.component.${ext}`);
     // this.debugging && console.log(`(${ext}) scssFilePath`, scssFilePath)
     let replacement = `
-    /* file ${base}.component.${ext} does not exist */
+    /* file ${path.basename(scssFilePath)} does not exist */
   `;
     if (fse.existsSync(scssFilePath)) {
       const contentScss = Helpers.readFile(scssFilePath);
@@ -246,9 +260,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        /* put your styles here */
+        /* ${ext} file is empty : ${path.basename(scssFilePath)} */
         `;
       }
+    } else if (!orginalFileExists) {
+      return content;
     }
 
     const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
@@ -443,7 +459,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
 
   saveOrDelete() {
-    Helpers.writeFile(this.absoluteFilePath, this.rawContent);
+    if (fse.existsSync(this.absoluteFilePath)) {
+      Helpers.writeFile(this.absoluteFilePath, this.rawContent);
+    }
   }
 
 }
