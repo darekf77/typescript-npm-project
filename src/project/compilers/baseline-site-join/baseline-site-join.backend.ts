@@ -9,7 +9,7 @@ import * as rimraf from 'rimraf';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
-import chalk from 'chalk';;
+import chalk from 'chalk';
 import { TnpDB } from '../../../tnp-db';
 import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 
@@ -32,7 +32,8 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
           return path.join(project.baseline.location, relativeFilePath)
         })
       ]
-    } else if (project.isWorkspaceChildProject) {
+    }
+    if (project.isWorkspaceChildProject) {
       folderPath = [
         path.join(project.location, config.folder.custom),
         path.join(project.baseline.location, config.folder.src),
@@ -41,11 +42,12 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
     }
   }
 
-  let executeOutsideScenario = false;
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath,
-    executeOutsideScenario
+    folderPath
   };
+  // if(project.name === 'simple-site') {
+  //   console.log(options)
+  // }
   return options;
 }
 
@@ -63,6 +65,30 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // this.merge()
   }
 
+  async syncAction(filesAbsolutePathes: string[]) {
+    // console.log('syncAction',filesAbsolutePathes)
+    filesAbsolutePathes = filesAbsolutePathes.map(absolutePath => {
+      const customPath = path.join(this.project.location, config.folder.custom);
+      if (absolutePath.startsWith(customPath)) {
+        return absolutePath.replace(customPath, '').replace(/^\//, '');
+      }
+      const baselinePath = path.join(this.project.baseline.location);
+      if (absolutePath.startsWith(baselinePath)) {
+        return absolutePath.replace(baselinePath, '').replace(/^\//, '');
+      }
+      return absolutePath;
+    });
+    filesAbsolutePathes = Helpers.arrays.uniqArray(filesAbsolutePathes)
+    // console.log('filesAbsolutePathes', filesAbsolutePathes)
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] }
+    for (let index = 0; index < filesAbsolutePathes.length; index++) {
+      const relativePath = filesAbsolutePathes[index];
+      // console.log(`= ${relativePath}`)
+      this.merge(relativePath, modifiedFiles);
+    }
+    // console.log('modifierFiled', modifiedFiles);
+  }
+
   //#region merge strategy
   private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.other.ModifiedFiles)
     : Models.other.ModifiedFiles {
@@ -78,9 +104,10 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
 
     const baselineAbsoluteLocation = path.join(HelpersMerge
       .pathToBaselineThroughtNodeModules(this.project), relativeBaselineCustomPath)
+    // console.log('h2')
     const baselineFileInCustomPath = path.join(HelpersMerge
       .pathToCustom(this.project), relativeBaselineCustomPath);
-
+    // console.log('h3')
     const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath);
 
     let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
@@ -96,6 +123,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
 
       if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'join'
+        // Helpers.log(variant)
         Helpers.copyFile(
           baselineAbsoluteLocation,
           HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
@@ -103,10 +131,12 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         )
       } else {
         variant = 'no-in-baseline'
+        // Helpers.log(variant)
         Helpers.removeFileIfExists(
           HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
           { modifiedFiles }
         );
+        // Helpers.log('after');
       }
       const source = baselineFileInCustomPath;
       const dest = joinFilePath;
@@ -130,6 +160,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     } else {
       if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'no-in-custom'
+        // Helpers.log(variant)
         Helpers.copyFile(baselineAbsoluteLocation, joinFilePath, { fast: true, modifiedFiles });
         Helpers.removeFileIfExists(
           HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
@@ -137,6 +168,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         );
       } else {
         variant = 'deleted'
+        // Helpers.log(variant)
         Helpers.removeFileIfExists(
           joinFilePath,
           { modifiedFiles }

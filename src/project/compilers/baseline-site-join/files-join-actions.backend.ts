@@ -59,7 +59,7 @@ export class FilesJoinActions {
 
         const toReplaceImportPath =
           Helpers.escapeStringForRegEx(
-            `${path.join(HelpersMerge.pathToBaselineNodeModulesRelative(this.project)
+            `${path.join(HelpersMerge.pathToBaselineNodeModulesRelative(self.project)
               .replace(/\//g, '//'),
               baselineFilePathNoExit)}`
           )
@@ -181,7 +181,7 @@ export class FilesJoinActions {
               const dirPath = path.dirname(relativePthInCustom);
               toReplace = HelpersMerge.PathHelper.removeRootFolder(path.join(dirPath, toReplace))
               toReplace = `.${toReplace}`
-              // console.log(`Replace: ${baselineFilePathNoExit} on this: ${toReplace}`)
+              // console.log(`Replace: ${baselineFilePathNoExit} on self: ${toReplace}`)
               input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)
             }
           }

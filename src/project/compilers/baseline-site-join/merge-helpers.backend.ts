@@ -44,7 +44,8 @@ export namespace HelpersMerge {
   export function getPrefixedPathInJoin(relativeFilePath: string, project: Project) {
 
     const dirPath = path.dirname(relativeFilePath);
-
+    // console.log('dirPath', dirPath)
+    // console.log('project', project && project.name)
     const resultPath = path.join(
       project.location,
       dirPath,

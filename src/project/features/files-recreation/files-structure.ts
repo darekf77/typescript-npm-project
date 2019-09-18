@@ -15,6 +15,7 @@ export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
   watch: boolean;
   alreadyInitedPorjects?: Project[];
+  initiator: Project;
 }
 
 export class FilesStructure extends FeatureForProject {
@@ -37,6 +38,9 @@ export class FilesStructure extends FeatureForProject {
     }
     if (_.isUndefined(options.watch)) {
       options.watch = false;
+    }
+    if (_.isUndefined(options.initiator)) {
+      options.initiator = this.project;
     }
     return options;
   }
@@ -62,7 +66,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
     options = this.fixOptionsArgs(options);
-    const { alreadyInitedPorjects, watch } = options;
+    const { alreadyInitedPorjects, watch, initiator } = options;
 
     const db = await TnpDB.Instance;
     await db.transaction.addProjectIfNotExist(this.project);
@@ -144,12 +148,14 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
-      if (watch) {
-        await this.project.join.startAndWatch()
-
-      } else {
-        await this.project.join.start();
+      if(this.project.isSite) {
+        if (watch) {
+          await this.project.join.startAndWatch(this.taskNames.joinMerge)
+        } else {
+          await this.project.join.start(this.taskNames.joinMerge);
+        }
       }
+
       await this.project.env.init(args);
       this.project.filesTemplatesBuilder.rebuild();
     }
