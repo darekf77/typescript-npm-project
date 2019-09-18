@@ -49,6 +49,7 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
   return options;
 }
 
+// @LASt sync action this
 @IncCompiler.Class({ className: 'BaselineSiteJoin' })
 export class BaselineSiteJoin extends FeatureCompilerForProject {
   constructor(public project: Project) {

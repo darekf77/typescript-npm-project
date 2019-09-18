@@ -62,9 +62,9 @@
     "private": true
   },
   "build": {
-    "number": 1441,
-    "date": "2019-09-16T11:31:31.000Z",
-    "hash": "bfbeb1a12fbbd77b19c71a3c374c1d0af920c61b"
+    "number": 1443,
+    "date": "2019-09-17T15:28:56.000Z",
+    "hash": "629b14a2d312329f012fa9278af0c023e61af7ca"
   },
   "currentProjectName": "simple-site",
   "currentProjectType": "workspace",

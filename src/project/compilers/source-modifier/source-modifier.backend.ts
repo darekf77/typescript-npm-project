@@ -47,7 +47,6 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
 
-    // @LAST fix watching to much files
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');

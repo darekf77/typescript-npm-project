@@ -112,7 +112,6 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     if (compilationProject.type === 'angular-lib') {
       project = compilationProject;
     }
-    // @LAST FIX FILE PATHES
     filesPathes = filesPathes.map(f => {
       return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
     })

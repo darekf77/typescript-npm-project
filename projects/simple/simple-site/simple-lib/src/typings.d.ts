@@ -1,4 +1,3 @@
-
 import { EnvConfig } from 'tnp-bundle';
 
 declare global {
