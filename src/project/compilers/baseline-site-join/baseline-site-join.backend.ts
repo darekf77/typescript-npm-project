@@ -43,7 +43,8 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
   }
 
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
-    folderPath
+    folderPath,
+    notifyOnFileUnlink: true
   };
   // if(project.name === 'simple-site') {
   //   console.log(options)
@@ -59,20 +60,38 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
 
 
   @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change, data) {
+  async asyncAction(event: IncCompiler.Change) {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     const absolutePath = event.fileAbsolutePath;
     const relativePath = this.resolvePath(absolutePath);
     this.merge(relativePath, modifiedFiles);
   }
 
+  /**
+   * check at start if files in (src|componets) should exisit in site project
+   */
+  private get syncActionAlreadyMergedFiles() {
+    let files = [];
+    files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.src)}/**/*.*`));
+    if (this.project.type === 'angular-lib') {
+      files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.components)}/**/*.*`));
+    }
+    return files;
+  }
 
   async syncAction(filesAbsolutePathes: string[]) {
-    // console.log('syncAction',filesAbsolutePathes)
+
+    filesAbsolutePathes = filesAbsolutePathes.concat(this.syncActionAlreadyMergedFiles);
+    // console.log('syncAction', filesAbsolutePathes)
+
     filesAbsolutePathes = filesAbsolutePathes.map(absolutePath => {
       return this.resolvePath(absolutePath);
     });
+
+    // glob.sync(`${this.project.location}`)
     filesAbsolutePathes = Helpers.arrays.uniqArray(filesAbsolutePathes)
+    // console.log('relatives', filesAbsolutePathes)
+    // process.exit(0)
     // console.log('filesAbsolutePathes', filesAbsolutePathes)
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] }
     for (let index = 0; index < filesAbsolutePathes.length; index++) {
@@ -93,15 +112,20 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     if (absolutePath.startsWith(baselinePath)) {
       return absolutePath.replace(baselinePath, '').replace(/^\//, '');
     }
+    const sitePath = path.join(this.project.location);
+    if (absolutePath.startsWith(sitePath)) {
+      return absolutePath.replace(sitePath, '').replace(/^\//, '');
+    }
+    // console.log('absolutePath',absolutePath)
     return absolutePath;
   }
 
   //#region merge strategy
   private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.other.ModifiedFiles)
     : Models.other.ModifiedFiles {
-
-    const isDebugMode = config.debug.baselineSiteJoin.DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
     //#region debug
+    const isDebugMode = config.debug.baselineSiteJoin.DEBUG_MERGE_PATHES.includes(relativeBaselineCustomPath)
+
     if (isDebugMode) {
       console.log(_.times(5, () => '\n').join())
       console.log(chalk.blue(`Baseline/Site modyfication detected...`))
@@ -111,10 +135,10 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
 
     const baselineAbsoluteLocation = path.join(HelpersMerge
       .pathToBaselineThroughtNodeModules(this.project), relativeBaselineCustomPath)
-    // console.log('h2')
+
     const baselineFileInCustomPath = path.join(HelpersMerge
       .pathToCustom(this.project), relativeBaselineCustomPath);
-    // console.log('h3')
+
     const joinFilePath = path.join(this.project.location, relativeBaselineCustomPath);
 
     let variant: 'no-in-custom' | 'no-in-baseline' | 'join' | 'deleted';
@@ -145,18 +169,17 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         );
         // Helpers.log('after');
       }
-      const source = baselineFileInCustomPath;
-      const dest = joinFilePath;
-      const replace = config.extensions.modificableByReplaceFn.includes(path.extname(source));
+
+      const replace = config.extensions.modificableByReplaceFn.includes(path.extname(baselineFileInCustomPath));
       const transformTextFn = replace ? this.replacePathFn(relativeBaselineCustomPath) : void 0;
       //#region debug
-      if (isDebugMode) console.log(`SOURCE: ${source} ,extname: ${path.extname(source)}`)
-      if (isDebugMode) console.log(`DEST: ${dest} ,extname: ${path.extname(dest)}`)
-      if (isDebugMode) console.log(`Replace fn for ${source} = ${!!transformTextFn}`)
+      if (isDebugMode) console.log(`SOURCE: ${baselineFileInCustomPath} ,extname: ${path.extname(baselineFileInCustomPath)}`)
+      if (isDebugMode) console.log(`DEST: ${joinFilePath} ,extname: ${path.extname(joinFilePath)}`)
+      if (isDebugMode) console.log(`Replace fn for ${baselineFileInCustomPath} = ${!!transformTextFn}`)
       //#endregion
       Helpers.copyFile(
-        source,
-        dest,
+        baselineFileInCustomPath,
+        joinFilePath,
         {
           transformTextFn,
           debugMode: isDebugMode,
@@ -175,7 +198,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         );
       } else {
         variant = 'deleted'
-        // Helpers.log(variant)
+        // Helpers.log(`${variant}: ${joinFilePath}`)
         Helpers.removeFileIfExists(
           joinFilePath,
           { modifiedFiles }
@@ -186,10 +209,11 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         );
       }
     }
-
+    //#region debug
     if (isDebugMode) {
       console.log(`${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
+    //#endregion
     return modifiedFiles;
   }
 
