@@ -164,10 +164,10 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
       if (watch) {
-        // await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
+        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
         await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir);
       } else {
-        // await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+        await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
         await this.project.sourceModifier.start(this.taskNames.sourceModifir);
       }
     }

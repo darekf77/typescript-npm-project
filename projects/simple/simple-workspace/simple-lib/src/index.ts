@@ -4,7 +4,7 @@ import { Morphi } from 'morphi';
 // import { angularlibFUn } from 'simple-ui-lib/components';
 
 // angularlibFUn()
-console.log('aaaaaaaa')
+console.log('aaaabbaaaa')
 
 
 export function testLib() {
