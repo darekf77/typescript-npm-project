@@ -83,6 +83,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('modifierFiled', modifiedFiles);
   }
 
+  /// @LAST handle files deletion in site
   private resolvePath(absolutePath: string) {
     const customPath = path.join(this.project.location, config.folder.custom);
     if (absolutePath.startsWith(customPath)) {
