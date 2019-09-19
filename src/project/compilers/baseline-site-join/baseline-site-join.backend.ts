@@ -51,7 +51,6 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
   return options;
 }
 
-// @LASt sync action this
 @IncCompiler.Class({ className: 'BaselineSiteJoin' })
 export class BaselineSiteJoin extends FeatureCompilerForProject {
   constructor(public project: Project) {
@@ -62,21 +61,16 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change, data) {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
-    // this.merge()
+    const absolutePath = event.fileAbsolutePath;
+    const relativePath = this.resolvePath(absolutePath);
+    this.merge(relativePath, modifiedFiles);
   }
+
 
   async syncAction(filesAbsolutePathes: string[]) {
     // console.log('syncAction',filesAbsolutePathes)
     filesAbsolutePathes = filesAbsolutePathes.map(absolutePath => {
-      const customPath = path.join(this.project.location, config.folder.custom);
-      if (absolutePath.startsWith(customPath)) {
-        return absolutePath.replace(customPath, '').replace(/^\//, '');
-      }
-      const baselinePath = path.join(this.project.baseline.location);
-      if (absolutePath.startsWith(baselinePath)) {
-        return absolutePath.replace(baselinePath, '').replace(/^\//, '');
-      }
-      return absolutePath;
+      return this.resolvePath(absolutePath);
     });
     filesAbsolutePathes = Helpers.arrays.uniqArray(filesAbsolutePathes)
     // console.log('filesAbsolutePathes', filesAbsolutePathes)
@@ -87,6 +81,18 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
       this.merge(relativePath, modifiedFiles);
     }
     // console.log('modifierFiled', modifiedFiles);
+  }
+
+  private resolvePath(absolutePath: string) {
+    const customPath = path.join(this.project.location, config.folder.custom);
+    if (absolutePath.startsWith(customPath)) {
+      return absolutePath.replace(customPath, '').replace(/^\//, '');
+    }
+    const baselinePath = path.join(this.project.baseline.location);
+    if (absolutePath.startsWith(baselinePath)) {
+      return absolutePath.replace(baselinePath, '').replace(/^\//, '');
+    }
+    return absolutePath;
   }
 
   //#region merge strategy

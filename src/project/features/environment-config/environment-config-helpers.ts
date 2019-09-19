@@ -39,7 +39,7 @@ Your config:
 ${Helpers.terminalLine()}
 ${configString}
 ${Helpers.terminalLine()}
-`)
+`, false, true)
 }
 
 export function validateWorkspaceConfig(workspaceConfig: Models.env.EnvConfig, filePath: string) {

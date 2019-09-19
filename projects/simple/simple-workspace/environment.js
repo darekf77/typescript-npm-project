@@ -1,6 +1,8 @@
 
 let { config } = require('tnp-bundle/environment-config')
 
+console.log('hello change2')
+
 config = {
 
   workspace: {

@@ -160,7 +160,7 @@ export abstract class BuildableProject {
 
     PackagesRecognitionExtended.fromProject(this as any).start();
     // console.log('before build steps')
-    await this.buildSteps(buildOptions);
+    // await this.buildSteps(buildOptions); // TODO @UNCOMMENT
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);

@@ -15,7 +15,7 @@ export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
   watch: boolean;
   alreadyInitedPorjects?: Project[];
-  initiator: Project;
+  // initiator: Project;
 }
 
 export class FilesStructure extends FeatureForProject {
@@ -39,9 +39,9 @@ export class FilesStructure extends FeatureForProject {
     if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
-    if (_.isUndefined(options.initiator)) {
-      options.initiator = this.project;
-    }
+    // if (_.isUndefined(options.initiator)) {
+    //   options.initiator = this.project;
+    // }
     return options;
   }
 
@@ -66,7 +66,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
     options = this.fixOptionsArgs(options);
-    const { alreadyInitedPorjects, watch, initiator } = options;
+    const { alreadyInitedPorjects, watch } = options;
 
     const db = await TnpDB.Instance;
     await db.transaction.addProjectIfNotExist(this.project);
@@ -164,10 +164,10 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
       if (watch) {
-        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
+        // await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
         await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir);
       } else {
-        await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+        // await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
         await this.project.sourceModifier.start(this.taskNames.sourceModifir);
       }
     }

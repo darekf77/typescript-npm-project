@@ -18,7 +18,7 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
   let folderPath: string | string[] = void 0;
   if (project.isWorkspaceChildProject || project.isStandaloneProject) {
     folderPath = [
-      folderPath = path.join(project.location, config.folder.src),
+      path.join(project.location, config.folder.src),
     ]
     if (project.type === 'angular-lib') {
       folderPath.push(path.join(project.location, config.folder.components));
@@ -29,7 +29,6 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
     folderPath,
-
   };
   // if (project.isStandaloneProject) {
   //   console.log(`${project.genericName}: optionsSourceModifier`, options)
@@ -50,21 +49,25 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     const relativePathToProject = event.fileAbsolutePath
       .replace(this.project.location, '')
       .replace(/^\//, '');
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
-    Helpers.log(`Source modifer async action for ${relativePathToProject}`)
+    console.log('async relativePathToProject', relativePathToProject)
+    return;
 
-    this.processFile(relativePathToProject, modifiedFiles);
+    // const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
-    if (fse.existsSync(event.fileAbsolutePath)) {
-      const relativePath = relativePathToProject.replace(/^src/, config.folder.tempSrc)
-      const newPath = path.join(this.project.location, relativePath);
-      if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles, fast: true })) {
-        this.processFile(relativePath, modifiedFiles);
-      }
-    }
+    // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
+
+    // this.processFile(relativePathToProject, modifiedFiles);
+
+    // if (fse.existsSync(event.fileAbsolutePath)) {
+    //   const relativePath = relativePathToProject.replace(/^src/, config.folder.tempSrc)
+    //   const newPath = path.join(this.project.location, relativePath);
+    //   if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles, fast: true })) {
+    //     this.processFile(relativePath, modifiedFiles);
+    //   }
+    // }
     // console.log(modifiedFiles)
-    return modifiedFiles;
+    // return modifiedFiles;
   }
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
@@ -77,6 +80,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     });
 
     relativePathesToProject.forEach(relativePathToProject => {
+      console.log('sync relativePathToProject', relativePathToProject)
       this.processFile(relativePathToProject, modifiedFiles);
     });
 

@@ -12,4 +12,8 @@ export class MyModuleMorphiComponent implements OnInit {
   ngOnInit() {
   }
 
+  asdas() {
+
+  }
+
 }
