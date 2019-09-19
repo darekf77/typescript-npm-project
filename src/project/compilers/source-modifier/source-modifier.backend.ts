@@ -50,24 +50,17 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       .replace(this.project.location, '')
       .replace(/^\//, '');
 
-    console.log('async relativePathToProject', relativePathToProject)
-    return;
-
-    // const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
     // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
 
-    // this.processFile(relativePathToProject, modifiedFiles);
+    this.processFile(relativePathToProject, modifiedFiles);
 
-    // if (fse.existsSync(event.fileAbsolutePath)) {
-    //   const relativePath = relativePathToProject.replace(/^src/, config.folder.tempSrc)
-    //   const newPath = path.join(this.project.location, relativePath);
-    //   if (Helpers.copyFile(relativePathToProject, newPath, { modifiedFiles, fast: true })) {
-    //     this.processFile(relativePath, modifiedFiles);
-    //   }
-    // }
+    if (fse.existsSync(event.fileAbsolutePath)) {
+      this.replikatorAction(relativePathToProject, modifiedFiles)
+    }
     // console.log(modifiedFiles)
-    // return modifiedFiles;
+    return modifiedFiles;
   }
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
@@ -80,13 +73,20 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     });
 
     relativePathesToProject.forEach(relativePathToProject => {
-      console.log('sync relativePathToProject', relativePathToProject)
+      // console.log('sync relativePathToProject', relativePathToProject)
       this.processFile(relativePathToProject, modifiedFiles);
     });
 
     Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
     relativePathesToProject.forEach(relativePathToProject => {
+      this.replikatorAction(relativePathToProject, modifiedFiles)
+    });
+    return modifiedFiles;
+  }
+
+  private replikatorAction(relativePathToProject: string, modifiedFiles: Models.other.ModifiedFiles) {
+    if (relativePathToProject.startsWith(config.folder.src)) {
       const orgAbsolutePath = path.join(this.project.location, relativePathToProject);
       const relativePathToTempSrc = relativePathToProject.replace(/^src/, config.folder.tempSrc);
       const destinationPath = path.join(this.project.location, relativePathToTempSrc);
@@ -95,8 +95,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
           this.processFile(relativePathToTempSrc, modifiedFiles);
         }
       }
-    });
-    return modifiedFiles;
+    }
   }
 
   process(input: string, relativePath: string) {

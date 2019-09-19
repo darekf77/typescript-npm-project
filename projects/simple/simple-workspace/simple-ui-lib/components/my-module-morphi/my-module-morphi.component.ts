@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Morphi } from 'morphi'
 
 @Component({
   selector: 'app-my-module-morphi',
@@ -13,7 +14,7 @@ export class MyModuleMorphiComponent implements OnInit {
   }
 
   asdas() {
-
+    console.log('ab')
   }
 
 }
