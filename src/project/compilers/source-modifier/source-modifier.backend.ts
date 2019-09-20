@@ -81,8 +81,9 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     // console.log(relativePathesToProject)
     // process.exit(0)
     if (!this.project.isStandaloneProject) {
-      Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
+      Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
+      // console.log('for app replikator', relativePathesToProject)
       relativePathesToProject.forEach(relativePathToProject => {
         this.replikatorAction(relativePathToProject, modifiedFiles)
       });
@@ -95,10 +96,15 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       const orgAbsolutePath = path.join(this.project.location, relativePathToProject);
       const relativePathToTempSrc = relativePathToProject.replace(/^src/, config.folder.tempSrc);
       const destinationPath = path.join(this.project.location, relativePathToTempSrc);
+      // console.log('destinationPath', destinationPath)
       if (Helpers.copyFile(orgAbsolutePath, destinationPath, { modifiedFiles })) {
+        // console.log('process tmp file', destinationPath)
         if (fse.existsSync(destinationPath)) {
+
           this.processFile(relativePathToTempSrc, modifiedFiles);
         }
+      } else {
+        // console.log('WRONG process tmp file', destinationPath)
       }
     }
   }

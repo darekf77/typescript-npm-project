@@ -306,7 +306,7 @@ export class HelpersFileFolders {
     if (modifiedFiles && _.isArray(modifiedFiles.modifiedFiles)) {
       modifiedFiles.modifiedFiles.push(destinationPath);
     }
-
+    return true;
   }
 
   /**
