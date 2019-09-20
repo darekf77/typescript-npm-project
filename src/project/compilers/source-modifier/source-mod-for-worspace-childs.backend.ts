@@ -157,6 +157,9 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       }
 
+      // @LAST I think this is needed
+      // tnp-src should wokr for copy of app/src in clients
+
       // if (modType === 'tmp-src') {
       //   console.log(relativePath)
       // }
