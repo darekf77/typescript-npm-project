@@ -5,6 +5,8 @@ import { Models } from './models';
 
 export * from './global-typings';
 export type EnvConfig = Models.env.EnvConfig;
+export type EnvironmentName = Models.env.EnvironmentName;
+export type IProject = Models.other.IProject;
 
 export * from './config';
 export * from './helpers'

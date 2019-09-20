@@ -154,7 +154,11 @@ export abstract class FolderProject {
     if (this.type === 'unknow') {
       return;
     }
-    Helpers.log(`Cleaning project: ${this.genericName}`);
+    Helpers.log(`
+
+    Cleaning project: ${this.genericName}
+
+    `);
     this.node_modules.remove();
     this.reset(false)
   }

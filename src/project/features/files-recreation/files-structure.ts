@@ -51,7 +51,7 @@ export class FilesStructure extends FeatureForProject {
         }) Client source modules pathes modifier `,
       frameworkFileGenerator: `[filestructure] (${chalk.bold(this.project.genericName)
         }) Files generator: entites.ts, controllers.ts`,
-      joinMerge: `[filestructure] Join project ${this.project}`
+      joinMerge: `[filestructure] Join project ${this.project.genericName}`
     };
   }
 
