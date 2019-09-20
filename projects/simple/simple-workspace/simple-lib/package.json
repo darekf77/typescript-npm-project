@@ -1,5 +1,6 @@
 {
   "tnp": {
+    "useFramework": true,
     "resources": [
       "README.md"
     ],

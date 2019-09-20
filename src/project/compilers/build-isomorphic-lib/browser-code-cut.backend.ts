@@ -84,18 +84,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       });
 
     let orgContentPath = `${absoluteFilePath}.orginal`;
-    // console.log('orgContentPath', orgContentPath)
-    // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
-    // console.log('this.compilationProject.name', this.compilationProject.name)
-    // console.log('this.project.name', this.project.name)
-    // orgContentPath = orgContentPath.replace(
-    //   path.join(this.compilationProject.location, this.sourceOutBrowser),
-    //   path.join(this.compilationProject.location,
-    //     this.compilationProject.type === 'angular-lib' ? config.folder.components : config.folder.src)
-    // ).replace(/\.orginal$/, '')
-    // console.log('orgContentPath', orgContentPath)
-    // console.log('orgContentPath exisits', fse.existsSync(orgContentPath));
-    // process.exit(0)
 
     if (useBackupFile) {
       Helpers.writeFile(this.absoluteFilePath, contentFromMorphi)
@@ -104,6 +92,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         if (backuContent.trim() !== '') {
           content = backuContent;
         } else {
+          fse.unlinkSync(orgContentPath);
           return content;
         }
       } else if (fse.existsSync(absoluteFilePath)) {

@@ -54,6 +54,11 @@ export abstract class TnpProject {
       return false;
     }
     if (!!this.baseline) {
+      const baselineValue = this.baseline.packageJson.useFramework;
+      if (!_.isUndefined(this.packageJson.useFramework)) {
+        this.packageJson.data.tnp.useFramework = void 0;
+        this.packageJson.writeToDisc();
+      }
       return this.baseline.packageJson.useFramework;
     }
     return this.packageJson.useFramework;

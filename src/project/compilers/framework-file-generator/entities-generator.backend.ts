@@ -34,7 +34,7 @@ export class EntitesGenerator extends FeatureCompilerForProject {
   }
 
   protected generateEntityTs() {
-    const isSite = this.project.isSite;
+    const isSite = false;
     const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
       : path.join(this.project.location, config.folder.src);
 
