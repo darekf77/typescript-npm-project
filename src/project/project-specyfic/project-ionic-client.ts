@@ -6,7 +6,7 @@ import { config } from '../../config';
 import { BuildOptions } from '../features';
 
 export class ProjectIonicClient extends Project {
-  buildLib() {
+  async buildLib() {
     // throw new Error("Method not implemented.");
   }
 

@@ -91,7 +91,6 @@ export class ProjectAngularLib extends Project {
         .start('isomorphic angular-lib compilation');
     }
 
-    return this;
   }
 
   async buildSteps(buildOptions?: BuildOptions) {

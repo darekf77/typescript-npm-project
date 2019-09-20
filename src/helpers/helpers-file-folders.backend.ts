@@ -269,7 +269,7 @@ export class HelpersFileFolders {
       return false;
     }
     const destDirPath = path.dirname(destinationPath);
-    debugMode && Helpers.log(`destDirPath: ${destDirPath}`);
+    debugMode && Helpers.log(`[copyFile] destDirPath: ${destDirPath}`);
     if (!fse.existsSync(destDirPath)) {
       fse.mkdirpSync(destDirPath);
     }
@@ -295,10 +295,10 @@ export class HelpersFileFolders {
       }
 
       debugMode && Helpers.log(`
-        Write to: ${destinationPath} file:
-        ============================================================================================
-        ${sourceData}
-        ============================================================================================
+[copyFile] Write to: ${destinationPath} file:
+============================================================================================
+${sourceData}
+============================================================================================
         `);
 
       Helpers.writeFile(destinationPath, sourceData);

@@ -4,7 +4,7 @@ import { BuildOptions } from '../features';
 
 
 export class ProjectDocker extends Project {
-  buildLib() {
+  async buildLib() {
     // throw new Error("Method not implemented.");
   }
 

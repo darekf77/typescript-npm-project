@@ -12,7 +12,7 @@ import { BuildOptions } from '../features';
  * DO NOT USE environment variables in this project directly
  */
 export class ProjectUnknowNpm extends Project {
-  buildLib() {
+  async buildLib() {
     // throw new Error("Method not implemented.");
   }
   projectSpecyficFiles(): string[] {

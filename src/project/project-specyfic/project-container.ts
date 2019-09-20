@@ -3,7 +3,7 @@ import { Project } from '../abstract';
 import { BuildOptions } from '../features';
 
 export class ProjectContainer extends Project {
-  buildLib() {
+  async buildLib() {
     // throw new Error("Method not implemented.");
   }
 

@@ -15,7 +15,7 @@ import chalk from 'chalk';
 export namespace HelpersMerge {
 
   export const pathPartStringRegex = `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
-  const BaselineSiteJoinprefix = '__';
+  export const BaselineSiteJoinprefix = '__';
 
   export const PathHelper = {
     PREFIX(baseFileName) {

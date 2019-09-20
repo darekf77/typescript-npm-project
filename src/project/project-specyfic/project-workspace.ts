@@ -31,7 +31,7 @@ function reorderResult(result = [], update: (result) => void): boolean {
 }
 
 export class ProjectWorkspace extends Project {
-  buildLib() {
+  async buildLib() {
     // throw new Error("Method not implemented.");
   }
 

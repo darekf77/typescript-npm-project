@@ -1,6 +1,7 @@
 import * as glob from 'glob';
 import * as path from 'path';
 import { config } from '../config';
+import { HelpersMerge } from '../project/compilers/baseline-site-join/merge-helpers.backend';
 
 export class HelpersMorphiFramework {
 
@@ -16,6 +17,7 @@ export class HelpersMorphiFramework {
         //   log(`Not match entity patern: ${p + path.basename(p)}`)
         // }
         return isMatchRegex &&
+          !path.basename(p).startsWith(HelpersMerge.BaselineSiteJoinprefix) &&
           !p.endsWith('Controller.ts') &&
           !p.endsWith('_REPOSITORY.ts') &&
           !p.endsWith('.REPOSITORY.ts') &&
@@ -36,6 +38,9 @@ export class HelpersMorphiFramework {
     return glob
       .sync(`${config.folder.apps}/**/*Controller.ts`, {
         cwd: cwd
+      })
+      .filter(p => {
+        return !path.basename(p).startsWith(HelpersMerge.BaselineSiteJoinprefix);
       });
   }
 

@@ -60,7 +60,9 @@ export abstract class LibProject {
   }
 
 
-  abstract async buildLib();
+  async buildLib() {
+    Helpers.log(`[buildLib] callend buildLib not implemented`)
+  }
 
   checkIfLogginInToNpm(this: Project) {
     try {
