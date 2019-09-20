@@ -56,11 +56,11 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   ) {
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
-    console.log('SOURCE OUT', sourceOut)
-    console.log('OUT FOLDER', outFolder)
-    console.log('LOCATION', location)
-    console.log('MODULE NAME', moduleName)
-    console.log(Helpers.terminalLine())
+    // console.log('SOURCE OUT', sourceOut)
+    // console.log('OUT FOLDER', outFolder)
+    // console.log('LOCATION', location)
+    // console.log('MODULE NAME', moduleName)
+    // console.log(Helpers.terminalLine())
   }
 
   codeCuttFn(cutIftrue: boolean) {

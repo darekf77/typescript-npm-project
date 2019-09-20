@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
 
-import { run, TnpDB, killProcess, Project } from 'tnp-bundle';
+import { TnpDB, Helpers as TnpHelpers, Project } from 'tnp-bundle';
 import * as child from 'child_process';
 import { Morphi } from 'morphi';
 import * as psList from 'ps-list';
@@ -63,7 +63,7 @@ export class PROCESS_REPOSITORY extends Morphi.Base.Repository<PROCESS, PROCESS_
       fse.writeFileSync(proc.stdoutLogPath, !stdout ? '' : stdout);
       fse.writeFileSync(proc.stderLogPath, !stderr ? '' : stderr);
     } else {
-      var p = run(COMMAND_TO_EXECUTE, { cwd: proc.cwd, output: false }).async()
+      var p = TnpHelpers.run(COMMAND_TO_EXECUTE, { cwd: proc.cwd, output: false }).async()
       // console.log(`PROCESS STARTED ON PID: ${p.pid}`)
       proc.pid = p.pid;
       proc.previousPid = p.pid;

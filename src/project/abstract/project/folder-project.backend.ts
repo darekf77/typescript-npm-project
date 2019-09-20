@@ -216,7 +216,11 @@ export abstract class FolderProject {
       return;
     }
     if (showMsg) {
-      Helpers.log(`Reseting project: ${this.genericName}`);
+      Helpers.log(`
+
+      Reseting project: ${this.genericName}
+
+      `);
     }
     this.removeRecognizedIsomorphicLIbs();
     let gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
