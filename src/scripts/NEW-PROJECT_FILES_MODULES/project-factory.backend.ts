@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as path from 'path';
@@ -156,5 +155,3 @@ export class ProjectFactory {
 
 
 }
-
-

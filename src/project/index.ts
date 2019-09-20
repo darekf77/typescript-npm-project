@@ -1,4 +1,3 @@
-
 export * from './project-specyfic/project-isomorphic-lib';
 export * from './features/package-json';
 export * from './abstract';

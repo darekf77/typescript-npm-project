@@ -1,5 +1,3 @@
-
-
 import * as _ from 'lodash';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
@@ -181,4 +179,3 @@ describe('Ports type spec', () => {
 
 
 });
-

@@ -1,5 +1,3 @@
-
-
 import * as _ from 'lodash';
 import * as low from 'lowdb';
 import * as path from 'path';

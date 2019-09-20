@@ -1,4 +1,3 @@
-
 export namespace ModelsLibTypes {
   export type LibType = 'angular-lib'
     | 'isomorphic-lib'

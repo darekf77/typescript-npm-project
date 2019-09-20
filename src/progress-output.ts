@@ -74,4 +74,3 @@ export class PROGRESS_DATA implements IPROGRESS_DATA {
 
 
 }
-

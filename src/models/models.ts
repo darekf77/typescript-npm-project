@@ -1,4 +1,3 @@
-
 import * as npmModels from './models-npm';
 import * as libsModels from './models-libs';
 import * as envModels from './models-environment';
@@ -20,4 +19,3 @@ export namespace Models {
   export import morphi = morphiModels.Models;
   //#endregion
 }
-

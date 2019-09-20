@@ -279,4 +279,3 @@ export const config = {
     ]
   }
 }
-

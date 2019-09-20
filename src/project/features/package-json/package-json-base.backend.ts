@@ -1,4 +1,3 @@
-
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -159,4 +158,3 @@ function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
     }
   });
 }
-

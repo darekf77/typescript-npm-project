@@ -62,4 +62,3 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
 
 //#endregion
-
