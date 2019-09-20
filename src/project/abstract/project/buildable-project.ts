@@ -133,7 +133,7 @@ export abstract class BuildableProject {
         await this.selectAllProjectCopyto();
       } else {
         if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-          if (this.isStandaloneProject) {
+          if (this.isStandaloneProject && this.buildOptions.watch) {
             await this.selectProjectToCopyTO()
           }
         }

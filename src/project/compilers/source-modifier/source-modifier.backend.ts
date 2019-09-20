@@ -65,6 +65,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+    // console.log('absoluteFilePathes sm', absoluteFilePathes)
 
     const relativePathesToProject = absoluteFilePathes.map(absoluteFilePath => {
       return absoluteFilePath
@@ -77,11 +78,15 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       this.processFile(relativePathToProject, modifiedFiles);
     });
 
-    Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
+    // console.log(relativePathesToProject)
+    // process.exit(0)
+    if (!this.project.isStandaloneProject) {
+      Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
 
-    relativePathesToProject.forEach(relativePathToProject => {
-      this.replikatorAction(relativePathToProject, modifiedFiles)
-    });
+      relativePathesToProject.forEach(relativePathToProject => {
+        this.replikatorAction(relativePathToProject, modifiedFiles)
+      });
+    }
     return modifiedFiles;
   }
 

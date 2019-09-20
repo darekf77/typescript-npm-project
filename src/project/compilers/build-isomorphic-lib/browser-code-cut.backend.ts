@@ -33,7 +33,7 @@ export class ExtendedCodeCut extends CodeCut {
   }
 
   file(absolutePathToFile) {
-
+    // console.log('FILE: ', absolutePathToFile)
     // console.log('options here ', options)
     return new (this.browserCodeCut)(absolutePathToFile, this.project, this.compilationProject, this.buildOptions, this.sourceOutBrowser)
       .flatTypescriptImportExport('import')
@@ -458,10 +458,5 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     return this.replaceRegionsWith(stringContent, replacementPatterns, '', ext);
   }
 
-  saveOrDelete() {
-    if (fse.existsSync(this.absoluteFilePath)) {
-      Helpers.writeFile(this.absoluteFilePath, this.rawContent);
-    }
-  }
 
 }
