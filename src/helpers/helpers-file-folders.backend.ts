@@ -278,7 +278,8 @@ export class HelpersFileFolders {
       const destinationContent = Helpers.readFile(destinationPath);
       const sourceContent = Helpers.readFile(sourcePath).toString();
       if (destinationContent === sourceContent) {
-        Helpers.log(`Destination has the same content as source: ${path.basename(sourcePath)}`);
+        // @REMEMBER uncomment if any problem
+        // Helpers.log(`Destination has the same content as source: ${path.basename(sourcePath)}`);
         return false;
       }
     }

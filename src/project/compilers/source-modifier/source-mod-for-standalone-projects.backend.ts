@@ -53,25 +53,28 @@ export class SourceModForStandaloneProjects
       return false;
     }
 
-    if (this.project.isStandaloneProject) {
-      const input = Helpers.readFile(absoluteFilePath);
-      const trimedInput = input.trim();
-      const trimedInputWithEnd = `${trimedInput}\n`;
-      const modified = `${this.process(trimedInput, relativePath).trim()}\n`;
-      if (input !== trimedInputWithEnd || input !== modified) {
-        Helpers.writeFile(absoluteFilePath, modified);
-        files.modifiedFiles.push(absoluteFilePath);
-        return true;
-      }
-    } else { // MAYBE_TODO someday make it work for site
-      const input = Helpers.readFile(absoluteFilePath);
-      const modified = this.process(input, relativePath);
-      if (input !== modified) {
-        Helpers.writeFile(absoluteFilePath, modified);
-        files.modifiedFiles.push(absoluteFilePath);
-        return true;
-      }
+    // if (this.project.isStandaloneProject) {
+      // TODO this would be good
+    //   // MAYBE_TODO someday make it work for site
+    //   // this is causing repeat same file watching problem
+    //   const input = Helpers.readFile(absoluteFilePath);
+    //   const trimedInput = input.trim();
+    //   const trimedInputWithEnd = `${trimedInput}\n`;
+    //   const modified = `${this.process(trimedInput, relativePath).trim()}\n`;
+    //   if (input !== trimedInputWithEnd || input !== modified) {
+    //     Helpers.writeFile(absoluteFilePath, modified);
+    //     files.modifiedFiles.push(absoluteFilePath);
+    //     return true;
+    //   }
+    // } else {
+    const input = Helpers.readFile(absoluteFilePath);
+    const modified = this.process(input, relativePath);
+    if (input !== modified) {
+      Helpers.writeFile(absoluteFilePath, modified);
+      files.modifiedFiles.push(absoluteFilePath);
+      return true;
     }
+    // }
 
     return false;
   }

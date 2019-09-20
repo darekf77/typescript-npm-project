@@ -3,11 +3,11 @@ import * as _ from 'lodash';
 import * as path from 'path';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
-import { ExtendedCodeCut } from './browser-code-cut.backend';
 import { Models } from '../../../models';
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';
 import { BuildOptions } from '../../features/build-process';
+import { ExtendedCodeCut } from './extended-code-cut.backend';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -45,7 +45,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
   constructor(
     private compilationProject: Project,
-    private module: string,
+    private moduleName: string,
     public ENV: Models.env.EnvConfig,
     sourceOut: string,
     outFolder: OutFolder,
@@ -56,7 +56,11 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   ) {
     super(sourceOut, outFolder, location, cwd, backendOut)
     this.compilerName = this.customCompilerName;
-
+    console.log('SOURCE OUT', sourceOut)
+    console.log('OUT FOLDER', outFolder)
+    console.log('LOCATION', location)
+    console.log('MODULE NAME', moduleName)
+    console.log(Helpers.terminalLine())
   }
 
   codeCuttFn(cutIftrue: boolean) {
@@ -94,6 +98,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   initCodeCut(filesPathes: string[]) {
+
     // console.log('inside')
     let env: Models.env.EnvConfig = this.ENV;
     const compilationProject: Project = this.compilationProject;
@@ -109,27 +114,35 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     if (env) {
       project = Project.From(env.currentProjectLocation);
     }
-    if (compilationProject.type === 'angular-lib') {
+
+    if (compilationProject.isStandaloneProject && compilationProject.type === 'angular-lib') {
       project = compilationProject;
     }
+
     filesPathes = filesPathes.map(f => {
       return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
     })
+    // console.log('project', project.name)
+    // console.log('compilationProject', compilationProject.name)
     // console.log('filesPathes', filesPathes)
     // process.exit(0)
-    this.codecut = new ExtendedCodeCut(this.compilationFolderPath, filesPathes, {
-      replacements: [
-        ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
-        ((compilationProject.type === 'isomorphic-lib') && "@backend") as any,
-        ["@cutCodeIfTrue", this.codeCuttFn(true)],
-        ["@cutCodeIfFalse", this.codeCuttFn(false)]
-      ].filter(f => !!f),
-      env
-    }, project,
+    this.codecut = new ExtendedCodeCut(
+      this.compilationFolderPath,
+      filesPathes,
+      {
+        replacements: [
+          ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
+          ((compilationProject.type === 'isomorphic-lib') && "@backend") as any,
+          ["@cutCodeIfTrue", this.codeCuttFn(true)],
+          ["@cutCodeIfFalse", this.codeCuttFn(false)]
+        ].filter(f => !!f),
+        env
+      },
+      project,
       compilationProject,
       buildOptions,
       this.sourceOutBrowser
-      );
+    );
     // console.log('here2')
   }
 

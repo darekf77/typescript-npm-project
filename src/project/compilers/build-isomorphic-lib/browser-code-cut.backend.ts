@@ -10,51 +10,39 @@ import { config } from '../../../config';
 import { Project } from '../../abstract';
 
 import { BuildOptions } from '../../features/build-process';
+import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
 
-
-
-export class ExtendedCodeCut extends CodeCut {
-
-  browserCodeCut: any;
-
-  constructor(
-    protected cwd: string, filesPathes: string[], options: Models.dev.ReplaceOptionsExtended,
-    /**
-     * it may be not available for global, for all compilatoin
-     */
-    private project: Project,
-    private compilationProject: Project,
-    private buildOptions: BuildOptions,
-    public sourceOutBrowser: string,
-
-  ) {
-    super(cwd, filesPathes, options as any);
-    this.browserCodeCut = BrowserCodeCutExtended;
-  }
-
-  file(absolutePathToFile) {
-    // console.log('FILE: ', absolutePathToFile)
-    // console.log('options here ', options)
-    return new (this.browserCodeCut)(absolutePathToFile, this.project, this.compilationProject, this.buildOptions, this.sourceOutBrowser)
-      .flatTypescriptImportExport('import')
-      .flatTypescriptImportExport('export')
-      .replaceRegionsForIsomorphicLib(_.cloneDeep(this.options))
-      .replaceRegionsFromTsImportExport('import')
-      .replaceRegionsFromTsImportExport('export')
-      .replaceRegionsFromJSrequire()
-      .saveOrDelete();
-  }
-
-}
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {
-
-  // private debugging = false;
 
   get allowedToReplace() {
     return ['ts', 'html', 'css', 'sass', 'scss'] as Models.other.CutableFileExt[];
   }
+  debug(fileName: string) {
+    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
+    if (this.project) {
+      this.isDebuggingFile = true; // (path.basename(this.absoluteFilePath) === fileName);
+    }
 
+  }
+
+
+  handleTickInCode(replacement: string): string {
+    if (replacement.search('`') !== -1) {
+      Helpers.error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
+      replacement = replacement.replace(/\`/g, '\\`');
+    }
+    return replacement;
+  }
+
+
+  handleOutput(replacement: string, ext: Models.other.CutableFileExt): string {
+    replacement = this.handleTickInCode(replacement);
+
+    return replacement;
+  }
+
+  //#region constructor
   constructor(
     absoluteFilePath: string,
     private project?: Project,
@@ -63,10 +51,16 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     private sourceOutBrowser?: string,
   ) {
     super(absoluteFilePath);
+    // console.log(`
+    // absoluteFilePath: ${absoluteFilePath},
+    // project: ${project && project.name},
+    // compilationProject: ${compilationProject && compilationProject.name},
+    // `)
     // this.debug('modal.service.ts');
-    // console.log('Build Options', buildOptions)
   }
+  //#endregion
 
+  //#region after regions replacement
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
     let absoluteFilePath = this.absoluteFilePath.replace(/\/$/, '');
@@ -141,21 +135,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     return content;
   }
+  //#endregion
 
-  protected handleTickInCode(replacement: string): string {
-    if (replacement.search('`') !== -1) {
-      Helpers.error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
-      replacement = replacement.replace(/\`/g, '\\`');
-    }
-    return replacement;
-  }
-
-  private handleOutput(replacement: string, ext: Models.other.CutableFileExt): string {
-    replacement = this.handleTickInCode(replacement);
-
-    return replacement;
-  }
-
+  //#region replace html
   private replaceHtmlTemplateInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const htmlTemplatePath = path.join(dir, `${base}.component.html`);
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
@@ -182,7 +164,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return content;
   }
+  //#endregion
 
+  //#region replace css
   private replaceCssInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const cssFilePath = path.join(dir, `${base}.component.css`);
     // console.log('cssFilePath', cssFilePath)
@@ -216,7 +200,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return content;
   }
+  //#endregion
 
+  //#region replace scss
   private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath,
     orginalFileExists: boolean = true) {
 
@@ -267,6 +253,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return content;
   }
+  //#endregion
+
+  //#region find replecaments
   private findReplacements(
     stringContent: string,
     pattern: string,
@@ -316,7 +305,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       replacements
     };
   }
+  //#endregion
 
+  //#region remove from line pkg
   replaceFromLine(pkgName: string, imp: string) {
     // console.log(`Check package: "${pkgName}"`)
     // console.log(`imp: "${imp}"`)
@@ -386,7 +377,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
 
   }
+  //#endregion
 
+  //#region replace regions for isomorphic-lib/angular-lib
   replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
     options = _.clone(options);
@@ -400,22 +393,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     this.rawContent = this.afterRegionsReplacement(this.rawContent);
     return this;
   }
+  //#endregion
 
-  protected REGEX_REGION_HTML(word) {
-    const regex = new RegExp("[\\t ]*\\<\\!\\-\\-\\s*#?region\\s+" +
-      word + " ?[\\s\\S]*?\\<\\!\\-\\-\\s*#?endregion\\s\\-\\-\\> ?[\\t ]*\\n?", "g");
-    // this.isDebuggingFile && console.log(regex.source)
-    return regex;
-  }
-
-  debug(fileName: string) {
-    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-    if (this.project) {
-      this.isDebuggingFile = true; // (path.basename(this.absoluteFilePath) === fileName);
-    }
-
-  }
-
+  //#region replace region width
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '',
     ext: Models.other.CutableFileExt = 'ts') {
 
@@ -437,7 +417,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       }
     }
     if (ext === 'html') {
-      stringContent = stringContent.replace(this.REGEX_REGION_HTML(pattern), replacement);
+      stringContent = stringContent.replace(REGEX_REGION_HTML(pattern), replacement);
     } else {
       stringContent = stringContent.replace(this.REGEX_REGION(pattern), replacement);
     }
@@ -446,6 +426,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     // this.isDebuggingFile && console.log(stringContent)
     return this.replaceRegionsWith(stringContent, replacementPatterns, '', ext);
   }
-
+  //#endregion
 
 }

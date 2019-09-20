@@ -77,17 +77,19 @@ export class QuickFixes extends FeatureForProject {
 
       }
       const componentsFolder = path.join(this.project.location, config.folder.components);
-      const browserStandaloneFolder = path.join(this.project.location, config.folder.browser);
+
       if (this.project.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
         fse.mkdirpSync(componentsFolder);
       }
 
-      if (this.project.type === 'angular-lib' && this.project.isStandaloneProject
-        && !fse.existsSync(browserStandaloneFolder)) {
-        // log('BROWSER folder recreated');
-        fse.symlinkSync(this.project.location, path.join(this.project.location, config.folder.browser));
-      }
+      // TODO why would I do that ?
+      // const browserStandaloneFolder = path.join(this.project.location, config.folder.browser);
+      // if (this.project.type === 'angular-lib' && this.project.isStandaloneProject
+      //   && !fse.existsSync(browserStandaloneFolder)) {
+      //   // log('BROWSER folder recreated');
+      //   fse.symlinkSync(this.project.location, browserStandaloneFolder);
+      // }
 
       const customFolder = path.join(this.project.location, config.folder.custom);
       if (this.project.isSite && !fse.existsSync(customFolder)) {

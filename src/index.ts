@@ -4,6 +4,7 @@ import { Ora } from 'ora';
 import { Models } from './models';
 
 export * from './global-typings';
+export type EnvConfig = Models.env.EnvConfig;
 
 export * from './config';
 export * from './helpers'
