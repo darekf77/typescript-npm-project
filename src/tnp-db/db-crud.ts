@@ -129,7 +129,8 @@ export class DbCrud {
     }
     // @LAST why null in projects ? static-columns-aaa fileter not existed
     if (entityName === 'projects') {
-      return new ProjectInstance(value);
+      const p = new ProjectInstance(value);
+      return p.project ? p : void 0;
     }
     if (entityName === 'processes') {
       return _.merge(new ProcessInstance(), value) as PortInstance;

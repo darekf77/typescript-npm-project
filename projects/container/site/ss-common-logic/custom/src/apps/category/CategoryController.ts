@@ -12,7 +12,7 @@ export class CategoryController extends BaselineCategoryController {
 
   //#region @backend
   async initExampleDbData() {
-    console.log('Don not init this! OK asd ')
+    console.log('Don not init dasdshis! OK asd ')
   }
   //#endregion
 

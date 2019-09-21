@@ -18,6 +18,21 @@
       </mat-panel-description>
     </mat-expansion-panel-header>
     <!-- {{ model.selectedIndex }} -->
+
+    <mat-horizontal-stepper [linear]="true"
+                            *ngIf="model && model.isStandalone"
+                            #stepper="matHorizontalStepperStandalone">
+      <mat-step [stepControl]="environmentFormGroup">
+          <ng-template matStepLabel>
+              <span >
+                RELEASE
+              </span>
+            </ng-template>
+
+      </mat-step>
+    </mat-horizontal-stepper>
+
+
     <mat-horizontal-stepper [linear]="true"
                             *ngIf="model && model.isWorkspace"
                             [selectedIndex]="model.selectedIndex"
@@ -25,15 +40,17 @@
                             #stepper="matHorizontalStepper">
       <mat-step [stepControl]="environmentFormGroup">
 
-        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.ENV)">
+        <ng-template matStepLabel>
+          <span [ngClass]="ngClass(TnpProjectTabIndex.ENV)">
             ENVIRONMENT {{model.selectedEnv ? ('('+model.selectedEnv+')'):''  }}
-          </span></ng-template>
+          </span>
+        </ng-template>
         <app-item-environment [model]="model"
                               [formGroup]="environmentFormGroup"></app-item-environment>
 
 
       </mat-step>
-      <mat-step [stepControl]="buildFormGroup"  >
+      <mat-step [stepControl]="buildFormGroup">
         <ng-template matStepLabel> <span [ngClass]="ngClass(TnpProjectTabIndex.BUILD)">BUILD</span></ng-template>
         <app-item-build [model]="model"
                         [formGroup]="buildFormGroup"></app-item-build>
@@ -42,7 +59,8 @@
 
 
       </mat-step>
-      <mat-step [stepControl]="testFormGroup" disabled="true" >
+      <mat-step [stepControl]="testFormGroup"
+                disabled="true">
         <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.TEST)">TEST</span></ng-template>
         test
         <!-- <app-item-test [model]="model"

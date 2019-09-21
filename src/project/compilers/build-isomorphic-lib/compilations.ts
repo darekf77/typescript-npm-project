@@ -23,7 +23,7 @@ export class BackendCompilationExtended extends BackendCompilation {
 
 }
 
-
+// @LAST fix for site - tmp-src instead src for tmp-src-dist-for-lib-name
 export class BroswerForModuleCompilation extends BroswerCompilation {
 
   compile(watch: boolean) {

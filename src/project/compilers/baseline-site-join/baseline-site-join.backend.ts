@@ -80,6 +80,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
       files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.components)}/**/*.*`));
     }
 
+    // @LAST apply this for async and for every change
     const genratedFiles = [
       ...this.project.projectSpecyficIgnoredFiles(),
       ...this.project.sourceFilesToIgnore(),
@@ -87,7 +88,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
       ...this.project.quickFixes.nodeModulesReplacementsZips,
       ...this.project.node_modules.fixesForNodeModulesPackages,
     ];
-    console.log('generated files', genratedFiles);
+    // console.log('generated files', genratedFiles);
 
     return files.filter(f => {
       if (path.basename(f).startsWith(HelpersMerge.BaselineSiteJoinprefix)) {

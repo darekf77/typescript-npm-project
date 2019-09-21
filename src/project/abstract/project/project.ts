@@ -17,6 +17,7 @@ import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
 import { TnpProject } from './tnp-project';
+import { FolderProject } from './folder-project';
 //#region @backend
 import { LibProject } from './lib-project.backend';
 import { ProjectGit } from './git-project.backend';
@@ -24,7 +25,6 @@ import { VscodeProject } from './vscode-project.backend';
 import { StaticProject } from './static-project.backend';
 import { RouterProject } from './router-project.backend';
 import { RecreatableProject } from './recreatable-project.backend';
-import { FolderProject } from './folder-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
@@ -84,6 +84,7 @@ import { CopyManager } from '../../features/copy-manager';
     entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace;
     entity.browser.isStandaloneProject = entity.isStandaloneProject;
+    entity.browser.isContainer = entity.isContainer;
 
   }
   //#endregion
@@ -362,7 +363,8 @@ export interface Project extends
   BaseProject,
   NpmProject,
   FeatureProject,
-  TnpProject
+  TnpProject,
+  FolderProject
   //#region @backend
   ,
   LibProject,
@@ -373,7 +375,6 @@ export interface Project extends
   StaticProject,
   RouterProject,
   RecreatableProject,
-  FolderProject,
   EntityProject,
   BuildableProject,
   SiteProject
@@ -387,6 +388,7 @@ Helpers.applyMixins(Project, [
   NpmProject,
   FeatureProject,
   TnpProject,
+  FolderProject,
   //#region @backend
   LibProject,
   ProjectGit,
@@ -396,7 +398,6 @@ Helpers.applyMixins(Project, [
   StaticProject,
   RouterProject,
   RecreatableProject,
-  FolderProject,
   EntityProject,
   BuildableProject,
   SiteProject

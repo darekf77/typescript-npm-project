@@ -1,12 +1,13 @@
+//#region @backend
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as inquirer from 'inquirer';
 import * as rimraf from 'rimraf';
-import * as json5 from 'json5';
-
 import { config as configMorphi } from 'morphi/build/config';
+//#endregion
+import * as json5 from 'json5';
 
 import { config } from '../../../config';
 import { Project } from './project';
@@ -122,6 +123,7 @@ export abstract class FolderProject {
     //#endregion
   }
 
+  //#region @backend
   getFolders(this: Project) {
     const notAllowed: RegExp[] = [
       '^\.vscode$', '^node\_modules$',
@@ -149,7 +151,9 @@ export abstract class FolderProject {
     }
     return subdirectories;
   }
+  //#endregion
 
+  //#region @backend
   public clear(this: Project) {
     if (this.type === 'unknow') {
       return;
@@ -162,6 +166,7 @@ export abstract class FolderProject {
     this.node_modules.remove();
     this.reset(false)
   }
+  //#endregion
 
   //#region @backend
   private _path(this: Project, relativePath: string, currentProjectLocation?: string) {
@@ -190,8 +195,6 @@ export abstract class FolderProject {
 
   //#endregion
 
-
-
   //#region @backend
   containsFile(this: Project, filePaht: string) {
     let fullPath = path.resolve(path.join(this.location, filePaht));
@@ -205,12 +208,15 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  //#region @backend
   removeItself(this: Project) {
     const location = this.location;
     Project.projects = Project.projects.filter(p => p.location !== location);
     Helpers.tryRemoveDir(location);
   }
+  //#endregion
 
+  //#region @backend
   public reset(this: Project, showMsg = true) {
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
@@ -255,7 +261,9 @@ export abstract class FolderProject {
     }
     this.quickFixes.missingSourceFolders()
   }
+  //#endregion
 
+  //#region @backend
   removeRecognizedIsomorphicLIbs(this: Project) {
     if (this.type === 'unknow') {
       return;
@@ -274,6 +282,7 @@ export abstract class FolderProject {
 
     }
   }
+  //#endregion
 
 }
 

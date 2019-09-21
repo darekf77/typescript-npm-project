@@ -3,7 +3,7 @@ import { Component, OnInit, AfterContentInit, ViewChild, TemplateRef } from '@an
 import { Observable } from 'rxjs/Observable';
 import { Log } from 'ng2-logger';
 
-const log = Log.create('privew build tnp ');
+const log = Log.create('privew build tnp  aa ');
 import { PROJECT } from 'ss-common-logic/src/apps/project/PROJECT';
 
 import { ModelDataConfig } from 'morphi';
@@ -47,7 +47,6 @@ export class PreviewBuildtnpprocessComponent extends BaseComponentForRouter
     values: [true],
     levels: [0]
   }
-
 
   async ngOnInit() {
 

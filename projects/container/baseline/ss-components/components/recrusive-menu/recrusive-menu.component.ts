@@ -36,6 +36,7 @@ export class RecrusiveMenuComponent implements OnInit {
 
   ngOnInit() {
     // console.log(this.filter)
+    // debugger
   }
 
 }
