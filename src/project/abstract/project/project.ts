@@ -58,6 +58,9 @@ import { CopyManager } from '../../features/copy-manager';
   browserTransformFn: (entity: Project, mdc: ModelDataConfig) => {
     // log('I AM TRANSFORMING ENTITY!!!', mdc)
     let exclude = [];
+    if (!entity.browser) {
+      entity.browser = {} as any;
+    }
     if (!!mdc && mdc.exclude.length > 0) {
       exclude = mdc.exclude;
     }

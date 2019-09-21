@@ -31,6 +31,12 @@ export abstract class RecreatableProject {
 
 
   //#region @backend
+  /**
+   * Generated automaticly file templates exmpale:
+   * file.ts.filetemplate -> will generate file.ts
+   * inside triple bracked: {{{  ENV. }}}
+   * property ENV can be used to check files
+   */
   public filesTemplates(this: Project): string[] {
     // should be abstract
     return []

@@ -79,7 +79,26 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     if (this.project.type === 'angular-lib') {
       files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.components)}/**/*.*`));
     }
-    return files;
+
+    const genratedFiles = [
+      ...this.project.projectSpecyficIgnoredFiles(),
+      ...this.project.sourceFilesToIgnore(),
+      ...this.project.filesTemplates(),
+      ...this.project.quickFixes.nodeModulesReplacementsZips,
+      ...this.project.node_modules.fixesForNodeModulesPackages,
+    ];
+    console.log('generated files', genratedFiles);
+
+    return files.filter(f => {
+      if (path.basename(f).startsWith(HelpersMerge.BaselineSiteJoinprefix)) {
+        return false;
+      }
+      const relativePath = f.replace(this.project.location).replace(/^\//, '');
+      if (genratedFiles.includes(relativePath)) {
+        return false;
+      }
+      return true;
+    });
   }
 
   async syncAction(filesAbsolutePathes: string[]) {
