@@ -59,9 +59,9 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
 
     const outFolder = buildOptions.outDir;
-    const location = project.type === 'isomorphic-lib' ?
+    const location = ((project.type === 'isomorphic-lib') ?
       (project.isSite ? config.folder.tempSrc : config.folder.src)
-      : config.folder.components;
+      : config.folder.components);
     const cwd = project.location;
 
     if (project.type === 'isomorphic-lib') {

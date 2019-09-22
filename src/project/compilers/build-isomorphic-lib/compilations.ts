@@ -8,6 +8,7 @@ import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';
 import { BuildOptions } from '../../features/build-process';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
+import { IncCompiler } from 'incremental-compiler';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -41,6 +42,17 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   CompilationWrapper = Helpers.compilationWrapper as any;
+
+  @IncCompiler.methods.AsyncAction()
+  async asyncAction(event: IncCompiler.Change) {
+    const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
+    if (triggerTsEventExts
+      .includes(path.extname(event.fileAbsolutePath))) {
+      // console.log(`Ommit for ${path.basename(event.fileAbsolutePath)}`)
+      return;
+    }
+    await super.asyncAction(event);
+  }
 
   constructor(
     private compilationProject: Project,

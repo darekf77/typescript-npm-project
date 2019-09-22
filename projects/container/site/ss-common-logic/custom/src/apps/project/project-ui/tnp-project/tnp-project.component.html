@@ -19,19 +19,21 @@
     </mat-expansion-panel-header>
     <!-- {{ model.selectedIndex }} -->
 
-    <!-- <mat-horizontal-stepper [linear]="true"
-                            *ngIf="model && model.isStandalone"
+    <mat-horizontal-stepper [linear]="true"
+                            *ngIf="model && model.isStandaloneProject"
                             #stepper="matHorizontalStepperStandalone">
-      <mat-step [stepControl]="environmentFormGroup">
-          <ng-template matStepLabel>
-              <span >
-                RELEASE
-              </span>asds
-            </ng-template>
+
+      <mat-step >
+
+        <ng-template matStepLabel>
+          <span >
+            RELEASE
+          </span>
+        </ng-template>
 
       </mat-step>
-    </mat-horizontal-stepper> -->
 
+    </mat-horizontal-stepper>
 
     <mat-horizontal-stepper [linear]="true"
                             *ngIf="model && model.isWorkspace"

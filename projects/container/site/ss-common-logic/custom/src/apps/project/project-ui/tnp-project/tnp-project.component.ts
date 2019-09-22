@@ -8,7 +8,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { ProjectController } from '../../ProjectController';
 import { PROJECT } from '../../PROJECT';
 import { BaseComponent } from 'baseline/ss-helpers/components';
-console.log('dasdupa')
+console.log('amazing heelelelelel')
 
 @Component({
   selector: 'app-tnp-project',

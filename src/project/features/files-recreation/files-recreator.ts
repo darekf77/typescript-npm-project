@@ -69,13 +69,13 @@ export class FilesRecreator extends FeatureForProject {
           ])
           .concat(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           .map(f => f.startsWith('/') ? f.slice(1) : f)
-          // .filter(f => {
-          //   // console.log('f',siteFiles)
-          //   if (self.project.isSite && siteFiles.includes(f)) {
-          //     return false
-          //   }
-          //   return true;
-          // })
+        // .filter(f => {
+        //   // console.log('f',siteFiles)
+        //   if (self.project.isSite && siteFiles.includes(f)) {
+        //     return false
+        //   }
+        //   return true;
+        // })
       },
       get gitignore() {
         const gitignoreFiles = [ // for sure ingored
@@ -99,6 +99,7 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
+          .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
           .concat(self.project.type === 'angular-lib' ? ['src/tsconfig.app.json'] : [])
           .concat( // for site ignore auto-generate scr
           self.project.isSite ? (

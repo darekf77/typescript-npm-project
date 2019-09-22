@@ -12,12 +12,6 @@ import { Project } from '../../abstract';
 import { BuildOptions } from '../../features/build-process';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
 
-// @LAST tnp-project.componetn.ts
-/*
-problemm-> after template change source modifier should be apply for tmp-src-dist-for-module-name
-note: there is not problem withg .ts file
-
-*/
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   get allowedToReplace() {
