@@ -48,8 +48,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
     if (triggerTsEventExts
       .includes(path.extname(event.fileAbsolutePath))) {
-      // console.log(`Ommit for ${path.basename(event.fileAbsolutePath)}`)
-      return;
+      event.fileAbsolutePath.replace('ts') //#LAST
     }
     await super.asyncAction(event);
   }

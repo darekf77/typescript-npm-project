@@ -15,6 +15,7 @@
 /npm-debug.log*
 /.sass-cache
 /.sourcemaps
+/tsconfig.json
 /src
 /__src
 /!custom/src
