@@ -151,7 +151,7 @@ export abstract class LibProject {
         await this.npmPackages.installProcess(`release procedure`)
       }
       this.packageJson.save('show for release')
-      await this.recreate.init();
+      this.run(`tnp init`).sync();
       await this.build(BuildProcess.prepareOptionsBuildProcess({
         prod, outDir: config.folder.bundle as 'bundle', args: c.args
       }, this));

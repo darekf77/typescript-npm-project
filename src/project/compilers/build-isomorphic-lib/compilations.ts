@@ -1,6 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
+import * as fse from 'fs-extra';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
 import { Models } from '../../../models';
@@ -48,7 +49,29 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
     if (triggerTsEventExts
       .includes(path.extname(event.fileAbsolutePath))) {
-      event.fileAbsolutePath.replace('ts') //#LAST
+
+      const absoluteFilePath = event.fileAbsolutePath;
+      const relativeFilePath = absoluteFilePath.replace(path.join(this.cwd, this.location), '');
+      const destinationFilePath = path.join(this.cwd, this.sourceOutBrowser, relativeFilePath);
+      if (event.eventName === 'unlink') {
+        if (fse.existsSync(destinationFilePath)) {
+          fse.unlinkSync(destinationFilePath)
+        }
+        // console.log('FILE UNLINKED')
+      } else {
+        if (fse.existsSync(absoluteFilePath)) {
+          if (!fse.existsSync(path.dirname(destinationFilePath))) {
+            fse.mkdirpSync(path.dirname(destinationFilePath));
+          }
+          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+            fse.removeSync(destinationFilePath);
+          }
+          fse.copyFileSync(absoluteFilePath, destinationFilePath);
+        }
+        // console.log('FILE COPIED')
+      }
+      changeAbsoluteFilePathExt(event, 'ts');
+      // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
     }
     await super.asyncAction(event);
   }
@@ -158,4 +181,13 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
 
 }
+
+
+function changeAbsoluteFilePathExt(event: IncCompiler.Change, newExtension: string) {
+  const ext = newExtension.replace(/^\./, '');
+  const oldExt = path.extname(event.fileAbsolutePath).replace(/^\./, '');
+  event.fileAbsolutePath = event.fileAbsolutePath
+    .replace(new RegExp(`\\.${oldExt}$`), `.${ext}`);
+}
+
 //#endregion
