@@ -127,7 +127,7 @@ export class DbCrud {
       }
       return r as any;
     }
-    // @LAST why null in projects ? static-columns-aaa fileter not existed
+
     if (entityName === 'projects') {
       const p = new ProjectInstance(value);
       return p.project ? p : void 0;
