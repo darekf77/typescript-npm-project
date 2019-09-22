@@ -324,21 +324,26 @@ ${sourceData}
   /**
    * wrapper for fs.writeFileSync
    */
-  writeFile(absoluteFilePath: string, input: string | object): boolean {
+  writeFile(absoluteFilePath: string, input: string | object, dontWriteSameFile = true): boolean {
     if (!fse.existsSync(path.dirname(absoluteFilePath))) {
       fse.mkdirpSync(path.dirname(absoluteFilePath));
     }
 
     if (_.isObject(input)) {
-      fse.writeJsonSync(absoluteFilePath, input, {
-        encoding,
-        spaces: 2
-      })
-      return true;
-    }
-    if (!_.isString(input)) {
+      input = JSON.stringify(input, null, 2);
+    } else if (!_.isString(input)) {
       input = ''
     }
+    if (dontWriteSameFile) {
+      if (fse.existsSync(absoluteFilePath)) {
+        const existedInput = Helpers.readFile(absoluteFilePath);
+        if (input === existedInput) {
+          Helpers.log(`[helpers][writeFile] not writing same file: ${absoluteFilePath}`);
+          return false;
+        }
+      }
+    }
+
     fse.writeFileSync(absoluteFilePath, input, {
       encoding
     });

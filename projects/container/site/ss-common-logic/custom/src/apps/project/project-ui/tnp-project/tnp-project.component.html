@@ -19,28 +19,24 @@
     </mat-expansion-panel-header>
     <!-- {{ model.selectedIndex }} -->
 
-    <mat-horizontal-stepper [linear]="true"
-                            *ngIf="model && model.isStandaloneProject"
-                            #stepper="matHorizontalStepperStandalone">
-
-      <mat-step >
-
-        <ng-template matStepLabel>
-          <span >
-            RELEASE 77aa666666
-          </span>
-        </ng-template>
-
-      </mat-step>
-
-    </mat-horizontal-stepper>
 
     <mat-horizontal-stepper [linear]="true"
-                            *ngIf="model && model.isWorkspace"
+                            *ngIf="model"
                             [selectedIndex]="model.selectedIndex"
                             (selectionChange)="selectionChange($event)"
                             #stepper="matHorizontalStepper">
-      <mat-step [stepControl]="environmentFormGroup">
+      <mat-step [stepControl]="releaseFormGroup"
+                *ngIf="model.isStandaloneProject">
+        <ng-template matStepLabel>
+          <span>
+            RELEASE
+          </span>
+        </ng-template>
+      </mat-step>
+
+
+      <mat-step [stepControl]="environmentFormGroup"
+                *ngIf="model.isWorkspace">
 
         <ng-template matStepLabel>
           <span [ngClass]="ngClass(TnpProjectTabIndex.ENV)">
@@ -52,7 +48,9 @@
 
 
       </mat-step>
-      <mat-step [stepControl]="buildFormGroup">
+
+      <mat-step [stepControl]="buildFormGroup"
+                *ngIf="model.isWorkspace">
         <ng-template matStepLabel> <span [ngClass]="ngClass(TnpProjectTabIndex.BUILD)">BUILD</span></ng-template>
         <app-item-build [model]="model"
                         [formGroup]="buildFormGroup"></app-item-build>
@@ -61,7 +59,9 @@
 
 
       </mat-step>
+
       <mat-step [stepControl]="testFormGroup"
+                *ngIf="model.isWorkspace"
                 disabled="true">
         <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.TEST)">TEST</span></ng-template>
         test
@@ -69,7 +69,9 @@
                        [formGroup]="testFormGroup"></app-item-test> -->
 
       </mat-step>
-      <mat-step [stepControl]="serveFormGroup">
+
+      <mat-step [stepControl]="serveFormGroup"
+                *ngIf="model.isWorkspace">
         <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.SERVE)">SERVE</span></ng-template>
         <app-item-serve [model]="model"
                         [formGroup]="serveFormGroup"></app-item-serve>
@@ -78,6 +80,7 @@
                           value="45"></mat-progress-bar> -->
 
       </mat-step>
+
     </mat-horizontal-stepper>
 
     <a href="javascript:void(0)"

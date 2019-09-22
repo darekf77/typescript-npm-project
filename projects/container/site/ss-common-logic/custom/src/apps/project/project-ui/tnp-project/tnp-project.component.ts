@@ -37,6 +37,7 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
   buildFormGroup: FormGroup;
   testFormGroup: FormGroup;
   serveFormGroup: FormGroup;
+  releaseFormGroup: FormGroup;
 
   closeChild(name: string) {
     if (this.expandedChild === name) {
@@ -83,6 +84,10 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
       // hidden: ['', Validators.required]
     });
     this.serveFormGroup = this.formBuilder.group({
+      // hidden: ['', Validators.required]
+    });
+
+    this.releaseFormGroup = this.formBuilder.group({
       // hidden: ['', Validators.required]
     });
 

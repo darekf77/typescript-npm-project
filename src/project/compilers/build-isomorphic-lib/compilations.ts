@@ -66,7 +66,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
           if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
             fse.removeSync(destinationFilePath);
           }
-          fse.copyFileSync(absoluteFilePath, destinationFilePath);
+          Helpers.copyFile(absoluteFilePath, destinationFilePath);
         }
         // console.log('FILE COPIED')
       }
