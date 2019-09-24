@@ -97,6 +97,7 @@ export class HelpersFileFolders {
     }
   }
   removeFileIfExists(absoluteFilePath: string, options?: { modifiedFiles?: Models.other.ModifiedFiles; }) {
+    console.log(`removeFileIfExists: ${absoluteFilePath}`)
     const { modifiedFiles } = options || { modifiedFiles: { modifiedFiles: [] } };
     if (fse.existsSync(absoluteFilePath)) {
       fse.unlinkSync(absoluteFilePath);
@@ -105,6 +106,7 @@ export class HelpersFileFolders {
   }
 
   tryRemoveDir(dirpath: string, contentOnly = false) {
+    console.log(`tryRemoveDir: ${dirpath}`)
     try {
       if (contentOnly) {
         rimraf.sync(`${dirpath}/*`)
@@ -119,6 +121,7 @@ export class HelpersFileFolders {
   }
 
   remove(fileOrFolderPathOrPatter: string) {
+    console.log(`remove: ${fileOrFolderPathOrPatter}`)
     rimraf.sync(fileOrFolderPathOrPatter);
   }
 
@@ -232,6 +235,19 @@ export class HelpersFileFolders {
     })
   }
 
+  copy(sourceDir: string, destinationDir: string, options?: { filter: any }) {
+    if (!fse.existsSync(sourceDir)) {
+      Helpers.warn(`[helper][copy] Source dir doesnt exist: ${sourceDir} for destination: ${destinationDir}`);
+      return;
+    }
+    if (!fse.existsSync(path.basename(destinationDir))) {
+      fse.mkdirpSync(path.basename(destinationDir));
+    }
+    if (!options) {
+      options = {} as any;
+    }
+    fse.copySync(sourceDir, destinationDir, _.merge({ overwrite: true, recursive: true }, options));
+  }
 
   copyFile(sourcePath: string, destinationPath: string,
     options?: {

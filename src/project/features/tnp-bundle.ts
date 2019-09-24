@@ -8,7 +8,6 @@ import { config } from '../../config';
 import { Helpers } from '../../helpers';
 import { Project } from '../abstract';
 import { Models } from '../../models';
-import { TnpDB } from '../../tnp-db';
 import { FeatureForProject } from '../abstract';
 
 export class TnpBundle extends FeatureForProject {
@@ -84,9 +83,6 @@ export class TnpBundle extends FeatureForProject {
     if (project.isStandaloneProject) {
       return;
     }
-    const db = TnpDB.InstanceSync;
-    let allowedToRemoveTnpBundleFolder = db.checkIf.allowed.removeTnpBundleFolder(project)
-    // console.log('allowedToRemoveTnpBundleFolder', allowedToRemoveTnpBundleFolder)
 
     if (project.isTnp) {
       return
@@ -104,10 +100,6 @@ export class TnpBundle extends FeatureForProject {
 
       const destPackageJSON = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
-      if (fse.existsSync(destCompiledJs) && allowedToRemoveTnpBundleFolder) {
-        // console.log(`Removed tnp - helper from ${ dest } `)
-        Helpers.tryRemoveDir(destCompiledJs)
-      }
 
       Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
         filter: (src: string, dest: string) => {

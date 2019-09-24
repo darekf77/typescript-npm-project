@@ -221,6 +221,9 @@ export abstract class FolderProject {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
       Helpers.tryRemoveDir(siteLocationInDist);
     }
+    if (!this.isUnknowNpmProject && !this.isStandaloneProject) {
+      Helpers.remove(path.join(this.location, config.folder.node_modules, config.file.tnpBundle))
+    }
     if (this.type === 'unknow') {
       return;
     }

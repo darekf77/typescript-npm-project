@@ -43,10 +43,19 @@ export class QuickFixes extends FeatureForProject {
       if (fse.existsSync(pathInProjectNodeModules)) {
         Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock.`)
       }
-      Helpers.remove(pathInProjectNodeModules);
-      fse.mkdirpSync(pathInProjectNodeModules);
+      // Helpers.remove(pathInProjectNodeModules);
+      if (!fse.existsSync(pathInProjectNodeModules)) {
+        fse.mkdirpSync(pathInProjectNodeModules);
+      }
 
-      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `);
+      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), `
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {};
+`);
+      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.d.ts'), `
+declare const _default: {};
+export default _default;
+`);
       Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json), {
         name: missingLibName,
         version: "0.0.0"

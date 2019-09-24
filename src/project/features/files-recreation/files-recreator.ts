@@ -330,15 +330,13 @@ export class FilesRecreator extends FeatureForProject {
         project.location,
         previewAssetsPathProjectRelative
       );
-      if (fse.existsSync(previewAssetsPath)) {
-        Helpers.remove(path.join(project.location, previewAssetsPathProjectRelative));
-      }
       if (fse.existsSync(libAssetsPath)) {
         filesPathesToIgnore.push(path.join(
           config.folder.src,
           config.folder.assets,
           project.name))
-        fse.copySync(libAssetsPath, previewAssetsPath);
+
+        Helpers.copy(libAssetsPath, previewAssetsPath);
       }
     } else if (project.type === 'angular-client' && project.parent && project.parent.type === 'workspace') {
       const parent = project.parent;
@@ -356,15 +354,12 @@ export class FilesRecreator extends FeatureForProject {
           config.folder.assets,
           child.name
         );
-        if (fse.existsSync(clientAssetsPath)) {
-          Helpers.tryRemoveDir(clientAssetsPath)
-        }
         if (fse.existsSync(libAssetsPath)) {
           filesPathesToIgnore.push(path.join(
             config.folder.src,
             config.folder.assets,
             child.name))
-          fse.copySync(libAssetsPath, clientAssetsPath);
+            Helpers.copy(libAssetsPath, clientAssetsPath);
         }
       })
     }

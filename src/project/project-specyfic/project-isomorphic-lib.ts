@@ -126,7 +126,6 @@ export class ProjectIsomorphicLib extends Project {
       if (fse.lstatSync(source).isDirectory()) {
         // console.log('copy folder')
         Helpers.tryCopyFrom(source, outDir)
-        // fse.copySync(source, outDir, { overwrite: true, recursive: true })
       } else {
         // console.log('copy copyfile')
         // fse.copyFileSync(source, outDir);

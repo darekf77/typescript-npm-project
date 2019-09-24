@@ -83,10 +83,6 @@ export class CopyManager extends FeatureForProject {
     } else {
       tempDestination = destinationLocation;
     }
-    const copyOpt = {
-      overwrite: true,
-      recursive: true,
-    };
 
     const sourceFolders = [
       config.folder.src,
@@ -106,15 +102,11 @@ export class CopyManager extends FeatureForProject {
     // console.log(foldersToSkip)
 
     const filter = override ? this.filterOnlyCopy(sourceFolders) : this.filterDontCopy(foldersToSkip);
-    copyOpt['filter'] = filter;
 
-    fse.copySync(`${sourceLocation}/`, tempDestination, copyOpt);
+    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter });
 
     if (useTempLocation) {
-      fse.copySync(`${tempDestination}/`, destinationLocation, {
-        overwrite: true,
-        recursive: true,
-      });
+      Helpers.copy(`${tempDestination}/`, destinationLocation);
       Helpers.remove(tempDestination);
     }
 

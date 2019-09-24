@@ -258,15 +258,10 @@ export * from './browser';
       if (fse.lstatSync(file).isDirectory()) {
         // console.log('IS DIRECTORY', file)
         // console.log('IS DIRECTORY DEST', dest)
-        const options: fse.CopyOptionsSync = {
-          overwrite: true,
-          recursive: true,
-          errorOnExist: true,
-          filter: (src) => {
-            return !/.*node_modules.*/g.test(src);
-          }
+        const filter = (src) => {
+          return !/.*node_modules.*/g.test(src);
         };
-        fse.copySync(file, dest, options);
+        Helpers.copy(file, dest, { filter });
       } else {
         // console.log('IS FILE', file)
         fse.copyFileSync(file, dest);

@@ -20,6 +20,7 @@
 /src/tsconfig.app.json
 /.angular-cli.json
 /src/tsconfig.app.json
+/.npmrc
 /tslint.json
 /.editorconfig
 /index.js

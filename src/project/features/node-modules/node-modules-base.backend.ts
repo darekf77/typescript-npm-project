@@ -71,10 +71,7 @@ export class NodeModulesBase extends NodeModulesCore {
           if (linkOnly) {
             Helpers.createSymLink(source, dest)
           } else {
-            fse.copySync(source, dest, {
-              recursive: true,
-              overwrite: true
-            });
+            Helpers.copy(source, dest);
           };
         }
       }
