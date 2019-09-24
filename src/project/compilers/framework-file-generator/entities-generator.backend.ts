@@ -2,7 +2,6 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
-import * as rimraf from 'rimraf';
 
 import { Helpers } from '../../../index';
 import { Project, FeatureCompilerForProject } from '../../abstract';

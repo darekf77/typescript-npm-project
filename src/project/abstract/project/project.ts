@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
-import * as rimraf from 'rimraf';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';

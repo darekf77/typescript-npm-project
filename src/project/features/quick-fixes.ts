@@ -1,6 +1,5 @@
 //#region @backend
 import * as path from 'path';
-import * as rimraf from 'rimraf';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import chalk from 'chalk';
@@ -44,7 +43,7 @@ export class QuickFixes extends FeatureForProject {
       if (fse.existsSync(pathInProjectNodeModules)) {
         Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock.`)
       }
-      rimraf.sync(pathInProjectNodeModules);
+      Helpers.remove(pathInProjectNodeModules);
       fse.mkdirpSync(pathInProjectNodeModules);
 
       Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), ` export default { } `);

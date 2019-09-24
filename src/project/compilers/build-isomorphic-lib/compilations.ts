@@ -54,9 +54,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       const relativeFilePath = absoluteFilePath.replace(path.join(this.cwd, this.location), '');
       const destinationFilePath = path.join(this.cwd, this.sourceOutBrowser, relativeFilePath);
       if (event.eventName === 'unlink') {
-        if (fse.existsSync(destinationFilePath)) {
-          fse.unlinkSync(destinationFilePath)
-        }
+        Helpers.removeFileIfExists(destinationFilePath);
         // console.log('FILE UNLINKED')
       } else {
         if (fse.existsSync(absoluteFilePath)) {

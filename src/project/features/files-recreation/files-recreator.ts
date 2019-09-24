@@ -49,7 +49,7 @@ export class FilesRecreator extends FeatureForProject {
 
   private get commonFilesForAllProjects() {
     return [
-      // '.npmrc',
+      '.npmrc',
       'tslint.json',
       '.editorconfig'
     ]
@@ -331,7 +331,7 @@ export class FilesRecreator extends FeatureForProject {
         previewAssetsPathProjectRelative
       );
       if (fse.existsSync(previewAssetsPath)) {
-        project.run(`rimraf ${previewAssetsPathProjectRelative}`).sync()
+        Helpers.remove(path.join(project.location, previewAssetsPathProjectRelative));
       }
       if (fse.existsSync(libAssetsPath)) {
         filesPathesToIgnore.push(path.join(

@@ -104,17 +104,13 @@ export class ProjectAngularClient extends Project {
         //   "--hide-modules true",
         //   "--display none"
         // ]
-
-        this.run(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
+        Helpers.tryRemoveDir(path.join(this.location, outDirApp));
+        this.run(`npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
           {
             output: (this.env.config.name === 'local'),
             silence: (this.env.config.name !== 'local'),
             biggerBuffer: true
-          }).sync()
-        // child.execSync(`rimraf ${outDirApp} && npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`, {
-        //   stdio: 'ignore'
-        // })
-
+          }).sync();
       } else {
 
         baseHref = `--${baseHref}`

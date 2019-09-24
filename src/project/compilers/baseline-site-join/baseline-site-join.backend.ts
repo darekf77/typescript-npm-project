@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as watch from 'watch'
-import * as rimraf from 'rimraf';
+
 // local
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';

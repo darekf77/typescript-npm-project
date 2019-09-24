@@ -3,7 +3,6 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as inquirer from 'inquirer';
-import * as rimraf from 'rimraf';
 import * as json5 from 'json5';
 
 import { config as configMorphi } from 'morphi/build/config';

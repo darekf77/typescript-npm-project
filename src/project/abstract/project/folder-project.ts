@@ -4,7 +4,6 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as inquirer from 'inquirer';
-import * as rimraf from 'rimraf';
 import { config as configMorphi } from 'morphi/build/config';
 //#endregion
 import * as json5 from 'json5';
@@ -256,7 +255,7 @@ export abstract class FolderProject {
       const fileOrDirPath = path.join(this.location, head);
       if (!head.startsWith('**')) {
         Helpers.log(`Removing: "${head}"`)
-        rimraf.sync(fileOrDirPath)
+        Helpers.remove(fileOrDirPath)
       }
     }
     this.quickFixes.missingSourceFolders()

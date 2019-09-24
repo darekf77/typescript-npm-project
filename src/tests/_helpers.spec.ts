@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import * as rimraf from 'rimraf';
 import * as path from 'path';
 import { Models } from '../models';
 import { config } from '../config';
@@ -109,7 +108,7 @@ export class SpecWrap {
     const location = path.join(path.join(PATHES.BASE_FOLDER_TEST, this.kamelCaseTestName));
 
     if (this.options.removeTestFolder) {
-      rimraf.sync(location);
+      Helpers.remove(location);
     }
     if (!fse.existsSync(location)) {
       fse.mkdirpSync(location);

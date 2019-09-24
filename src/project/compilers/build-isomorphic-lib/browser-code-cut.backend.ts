@@ -85,7 +85,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         if (backuContent.trim() !== '') {
           content = backuContent;
         } else {
-          fse.unlinkSync(orgContentPath);
+          Helpers.removeFileIfExists(orgContentPath);
           return content;
         }
       } else if (fse.existsSync(absoluteFilePath)) {

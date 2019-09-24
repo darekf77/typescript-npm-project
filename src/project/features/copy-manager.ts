@@ -6,7 +6,6 @@ import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import { watch } from 'chokidar'
-import * as rimraf from 'rimraf';
 
 import { config } from '../../config';
 import { Project } from '../abstract';
@@ -78,7 +77,7 @@ export class CopyManager extends FeatureForProject {
     if (useTempLocation) {
       tempDestination = `/tmp/${_.camelCase(destinationLocation)}`;
       if (fse.existsSync(tempDestination)) {
-        rimraf.sync(tempDestination)
+        Helpers.remove(tempDestination)
       }
       fse.mkdirpSync(tempDestination);
     } else {
@@ -116,7 +115,7 @@ export class CopyManager extends FeatureForProject {
         overwrite: true,
         recursive: true,
       });
-      rimraf.sync(tempDestination);
+      Helpers.remove(tempDestination);
     }
 
     if (this.project.isForRecreation) {

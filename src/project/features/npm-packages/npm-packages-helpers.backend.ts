@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import * as _ from 'lodash';
-import * as rimraf from 'rimraf';
 
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';
@@ -119,7 +118,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of-`;
   const tmpFolder = path.join(project.location,
     `${pathPart}-${pkg.name}`);
-  rimraf.sync(`${path.join(project.location, pathPart)}*`);
+  Helpers.remove(`${path.join(project.location, pathPart)}*`);
   fse.mkdirpSync(tmpFolder);
   project.packageJson.copyTo(tmpFolder);
   const tmpProject = Project.From(tmpFolder);

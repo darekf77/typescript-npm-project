@@ -118,6 +118,10 @@ export class HelpersFileFolders {
     }
   }
 
+  remove(fileOrFolderPathOrPatter: string) {
+    rimraf.sync(fileOrFolderPathOrPatter);
+  }
+
 
   findChildren<T>(location, createFn: (childLocation: string) => T): T[] {
 
