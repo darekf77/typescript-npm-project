@@ -82,7 +82,7 @@ export function copyMainProjectDependencies
               if (fse.existsSync(dest)) {
                 Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" nested already exists in neste folder`);
               } else {
-                fse.mkdirpSync(dest);
+                Helpers.mkdirp(dest);
                 Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" please copy manualy to nested folder`);
                 // tryCopyFrom(otherDependenyInTemp.location, dest); // @TODO
               }
@@ -119,7 +119,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   const tmpFolder = path.join(project.location,
     `${pathPart}-${pkg.name}`);
   Helpers.remove(`${path.join(project.location, pathPart)}*`);
-  fse.mkdirpSync(tmpFolder);
+  Helpers.mkdirp(tmpFolder);
   project.packageJson.copyTo(tmpFolder);
   const tmpProject = Project.From(tmpFolder);
   tmpProject.packageJson.setNamFromContainingFolder();

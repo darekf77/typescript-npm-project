@@ -59,7 +59,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       } else {
         if (fse.existsSync(absoluteFilePath)) {
           if (!fse.existsSync(path.dirname(destinationFilePath))) {
-            fse.mkdirpSync(path.dirname(destinationFilePath));
+            Helpers.mkdirp(path.dirname(destinationFilePath));
           }
           if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
             fse.removeSync(destinationFilePath);

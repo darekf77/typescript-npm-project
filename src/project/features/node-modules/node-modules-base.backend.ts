@@ -94,7 +94,7 @@ export class NodeModulesBase extends NodeModulesCore {
         let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
         if (!fse.existsSync(nodeModeulesPath)) {
-          fse.mkdirpSync(nodeModeulesPath)
+          Helpers.mkdirp(nodeModeulesPath)
         }
 
         const pDestPath = path.join(nodeModeulesPath, projToCopy.name)
@@ -109,13 +109,16 @@ export class NodeModulesBase extends NodeModulesCore {
           }
         }
 
+        const orghideInfos = global.hideInfos;
         global.hideInfos = true;
+        const orghideWarnings = global.hideWarnings;
         global.hideWarnings = true;
+        const orghideLog = global.hideLog;
         global.hideLog = true;
         const depsNames = addDependenceis(self.project, self.project.location);
-        global.hideInfos = false;
-        global.hideWarnings = false;
-        global.hideLog = false;
+        global.hideInfos = orghideInfos;
+        global.hideWarnings = orghideWarnings;
+        global.hideLog = orghideLog;
         const prog = new TerminalProgressBar('Please wait: :current / :total', depsNames.length);
         depsNames
           // .filter(dep => dep !== self.project.name)

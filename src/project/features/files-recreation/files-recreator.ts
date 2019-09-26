@@ -150,7 +150,7 @@ export class FilesRecreator extends FeatureForProject {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
     if (this.project.isSite) {
       if (!fse.existsSync(pathSettingsVScode)) {
-        fse.mkdirpSync(path.dirname(pathSettingsVScode));
+        Helpers.mkdirp(path.dirname(pathSettingsVScode));
         const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
         if (fse.existsSync(settingsFromBaseline)) {
           fse.copyFileSync(settingsFromBaseline, pathSettingsVScode);
@@ -168,7 +168,7 @@ export class FilesRecreator extends FeatureForProject {
     } else {
       try {
         const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
-        fse.mkdirpSync(path.dirname(pathSettingsVScode));
+        Helpers.mkdirp(path.dirname(pathSettingsVScode));
         let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
         settings = modifyFN(settings, this.project);
         Helpers.writeFile(pathSettingsVScode, settings)
@@ -253,8 +253,8 @@ export class FilesRecreator extends FeatureForProject {
       const customFolder = path.join(this.project.location, config.folder.custom)
       const srcFolder = path.join(this.project.location, config.folder.src)
       if (!fse.existsSync(customFolder)) {
-        fse.mkdirpSync(customFolder);
-        fse.mkdirpSync(srcFolder);
+        Helpers.mkdirp(customFolder);
+        Helpers.mkdirp(srcFolder);
       }
     }
   }

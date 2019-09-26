@@ -45,7 +45,7 @@ export class QuickFixes extends FeatureForProject {
       }
       // Helpers.remove(pathInProjectNodeModules);
       if (!fse.existsSync(pathInProjectNodeModules)) {
-        fse.mkdirpSync(pathInProjectNodeModules);
+        Helpers.mkdirp(pathInProjectNodeModules);
       }
 
       Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), `
@@ -79,7 +79,7 @@ export default _default;
       const srcFolder = path.join(this.project.location, config.folder.src);
       if (!this.project.isWorkspace) {
         if (!fse.existsSync(srcFolder)) {
-          fse.mkdirpSync(srcFolder);
+          Helpers.mkdirp(srcFolder);
         }
         // log('SRC folder recreated')
 
@@ -88,7 +88,7 @@ export default _default;
 
       if (this.project.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
-        fse.mkdirpSync(componentsFolder);
+        Helpers.mkdirp(componentsFolder);
       }
 
       // TODO why would I do that ?
@@ -102,19 +102,19 @@ export default _default;
       const customFolder = path.join(this.project.location, config.folder.custom);
       if (this.project.isSite && !fse.existsSync(customFolder)) {
         // log('CUSTOM folder recreated');
-        fse.mkdirpSync(customFolder);
+        Helpers.mkdirp(customFolder);
       }
 
       const nodeModulesFolder = path.join(this.project.location, config.folder.node_modules);
       if (this.project.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
         // log('NODE_MODULES folder recreated');
-        fse.mkdirpSync(nodeModulesFolder)
+        Helpers.mkdirp(nodeModulesFolder)
       }
       if (this.project.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
         const paretnFolderOfNodeModules = path.join(this.project.parent.location, config.folder.node_modules);
         if (!fse.existsSync(paretnFolderOfNodeModules)) {
           // log('NODE_MODULES (parent) folder recreated');
-          fse.mkdirpSync(paretnFolderOfNodeModules)
+          Helpers.mkdirp(paretnFolderOfNodeModules)
         }
         // log('NODE_MODULES folder link to child recreated');
         Helpers.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
@@ -159,7 +159,7 @@ export default _default;
     const nodeModulesPath = path.join(this.project.location, config.folder.node_modules);
 
     if (!fse.existsSync(nodeModulesPath)) {
-      fse.mkdirpSync(nodeModulesPath)
+      Helpers.mkdirp(nodeModulesPath)
     }
     this.nodeModulesReplacementsZips.forEach(p => {
       const name = p.replace(`${config.folder.node_modules}-`, '');

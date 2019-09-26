@@ -15,7 +15,7 @@ export class FilesFactory extends FeatureForProject {
       content = '';
     }
     if (!fse.existsSync(path.dirname(destPath))) {
-      fse.mkdirpSync(path.dirname(destPath))
+      Helpers.mkdirp(path.dirname(destPath))
     }
     if (_.isObject(content)) {
       fse.writeJSONSync(destPath, content, { encoding: 'utf8', spaces: 2 })

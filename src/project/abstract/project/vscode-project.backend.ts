@@ -37,7 +37,7 @@ export abstract class VscodeProject {
 
     const distributionFolder = path.join(this.location, config.folder.dist);
     if (!fse.existsSync(distributionFolder)) {
-      fse.mkdirpSync(distributionFolder);
+      Helpers.mkdirp(distributionFolder);
     }
     configSettings['terminal.integrated.cwd'] = '.';
 

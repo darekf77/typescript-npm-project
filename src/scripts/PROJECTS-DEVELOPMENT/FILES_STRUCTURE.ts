@@ -32,6 +32,8 @@ export async function INIT(args: string, exit = true) {
 // }
 
 export async function STATIC_INIT(args: string, exit = true) {
+  console.log('INITINT STAIC VERSION')
+  // process.exit(0)
   await (await Project.Current.StaticVersion()).filesStructure.init(args);
   if (exit) {
     process.exit(0)

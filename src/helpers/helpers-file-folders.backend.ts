@@ -73,7 +73,7 @@ export class HelpersFileFolders {
     }
 
     if (!fse.existsSync(path.dirname(link))) {
-      fse.mkdirpSync(path.dirname(link))
+      Helpers.mkdirp(path.dirname(link))
     }
 
 
@@ -123,6 +123,18 @@ export class HelpersFileFolders {
   remove(fileOrFolderPathOrPatter: string) {
     // console.log(`remove: ${fileOrFolderPathOrPatter}`)
     rimraf.sync(fileOrFolderPathOrPatter);
+  }
+
+  mkdirp(folderPath: string) {
+    if (!path.isAbsolute(folderPath)) {
+      Helpers.warn(`[helpers][mkdirp] Path is not absolute, abort ${folderPath}`, true);
+      return;
+    }
+    if (_.isString(folderPath) && folderPath.startsWith('/tmp ') && os.platform() === 'darwin') {
+      Helpers.warn(`[helpers][mkdirp] On mac osx /tmp is changed to /private/tmp`, false);
+      folderPath = folderPath.replace(`/tmp/`, '/private/tmp/');
+    }
+    fse.mkdirpSync(folderPath);
   }
 
 
@@ -240,8 +252,8 @@ export class HelpersFileFolders {
       Helpers.warn(`[helper][copy] Source dir doesnt exist: ${sourceDir} for destination: ${destinationDir}`);
       return;
     }
-    if (!fse.existsSync(path.basename(destinationDir))) {
-      fse.mkdirpSync(path.basename(destinationDir));
+    if (!fse.existsSync(path.dirname(destinationDir))) {
+      Helpers.mkdirp(path.dirname(destinationDir));
     }
     if (!options) {
       options = {} as any;
@@ -291,7 +303,7 @@ export class HelpersFileFolders {
     const destDirPath = path.dirname(destinationPath);
     debugMode && Helpers.log(`[copyFile] destDirPath: ${destDirPath}`);
     if (!fse.existsSync(destDirPath)) {
-      fse.mkdirpSync(destDirPath);
+      Helpers.mkdirp(destDirPath);
     }
 
     if (dontCopySameContent && fse.existsSync(destinationPath)) {
@@ -346,7 +358,7 @@ ${sourceData}
    */
   writeFile(absoluteFilePath: string, input: string | object, dontWriteSameFile = true): boolean {
     if (!fse.existsSync(path.dirname(absoluteFilePath))) {
-      fse.mkdirpSync(path.dirname(absoluteFilePath));
+      Helpers.mkdirp(path.dirname(absoluteFilePath));
     }
 
     if (_.isObject(input)) {
@@ -358,7 +370,7 @@ ${sourceData}
       if (fse.existsSync(absoluteFilePath)) {
         const existedInput = Helpers.readFile(absoluteFilePath);
         if (input === existedInput) {
-          Helpers.log(`[helpers][writeFile] not writing same file: ${absoluteFilePath}`);
+          // Helpers.log(`[helpers][writeFile] not writing same file (good thing): ${absoluteFilePath}`);
           return false;
         }
       }

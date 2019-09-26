@@ -28,7 +28,7 @@ export class NodeModulesCore extends FeatureForProject {
   /**
    * Just create folder... without npm instalation
    */
-  public recreateFolder = () => !fse.existsSync(this.path) && fse.mkdirpSync(this.path);
+  public recreateFolder = () => !fse.existsSync(this.path) && Helpers.mkdirp(this.path);
 
   // public contains(pkg: Package) {
   //   if (_.isObject(pkg) && pkg.name) {

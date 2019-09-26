@@ -79,7 +79,10 @@ export class CopyManager extends FeatureForProject {
       if (fse.existsSync(tempDestination)) {
         Helpers.remove(tempDestination)
       }
-      fse.mkdirpSync(tempDestination);
+
+      Helpers.mkdirp(tempDestination);
+      // console.log(`tempDestination: "${tempDestination}"`);
+      // process.exit(0)
     } else {
       tempDestination = destinationLocation;
     }
@@ -120,7 +123,7 @@ export class CopyManager extends FeatureForProject {
           Helpers.log(`Copying env file to static build: ${path.basename(f)} `)
           Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
         } else {
-          Helpers.warn(`[executeCopy] Doesn not exist source: ${source}`);
+          Helpers.log(`[executeCopy] Doesn not exist source: ${source}`);
         }
       });
     }
@@ -177,7 +180,7 @@ export class CopyManager extends FeatureForProject {
     if (fse.existsSync(destinationLocation)) {
       if (override) {
         Helpers.tryRemoveDir(destinationLocation);
-        fse.mkdirpSync(destinationLocation);
+        Helpers.mkdirp(destinationLocation);
       } else {
         if (showInfo) {
           Helpers.warn(`Destination for project "${this.project.name}" already exists, only: source copy`);

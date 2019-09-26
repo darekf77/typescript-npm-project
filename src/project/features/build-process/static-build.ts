@@ -70,7 +70,7 @@ async function initBaseline(project: Project) {
   // prevent npm full instatalation
   const binInBasleine = path.join(baselineWorkspace.location, config.folder.node_modules, config.folder._bin);
   if (!fse.existsSync(binInBasleine)) {
-    fse.mkdirpSync(binInBasleine);
+    Helpers.mkdirp(binInBasleine);
   }
   await baselineWorkspace.filesStructure.init('');
   if (initAll) {
@@ -98,7 +98,7 @@ async function initGeneratedBaselienInDist(generatedInDistBaselineWorkspaceLocat
     config.folder.node_modules,
     config.folder._bin);
   if (!fse.existsSync(binInBasleine)) {
-    fse.mkdirpSync(binInBasleine);
+    Helpers.mkdirp(binInBasleine);
   }
   await generateBaselineWorkspaceInDist.filesStructure.init('');
   for (let index = 0; index < generateBaselineWorkspaceInDist.children.length; index++) {

@@ -16,7 +16,7 @@ function RemoveTestCatalogs() {
   return function (target) {
     // tryRemoveDir(PATHES.BASE_FOLDER_TEST);
     if (!fse.existsSync(PATHES.BASE_FOLDER_TEST)) {
-      fse.mkdirpSync(PATHES.BASE_FOLDER_TEST);
+      Helpers.mkdirp(PATHES.BASE_FOLDER_TEST);
     }
     // tryRemoveDir(PATHES.TNP_DB_FOT_TESTS);
 
@@ -111,7 +111,7 @@ export class SpecWrap {
       Helpers.remove(location);
     }
     if (!fse.existsSync(location)) {
-      fse.mkdirpSync(location);
+      Helpers.mkdirp(location);
     }
 
 

@@ -146,6 +146,7 @@ export function globalArgumentsParser(argsv: string[]) {
 
 
 export async function start(argsv: string[], spinner?: Ora) {
+  global.hideLog = true;
 
   argsv = argsv.map(arg => {
     if (arg === 'baw') {

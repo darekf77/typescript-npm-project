@@ -30,7 +30,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
     Helpers.log(`Scanning for duplicates of current ${f}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
-      fse.mkdirpSync(nodeMod);
+      Helpers.mkdirp(nodeMod);
     }
     const removeCommand = `find ${config.folder.node_modules}/ -name ${f.replace('@', '\\@')} `;
     // console.log(`removeCommand: ${removeCommand}`)

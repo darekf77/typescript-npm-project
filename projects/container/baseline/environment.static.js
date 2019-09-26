@@ -6,7 +6,7 @@ config.domain = void 0;
 config.ip = void 0;
 
 config.workspace.projects.forEach(p => {
-  p.port = `${p.port + 600}+`;
+  p.port = `${Number(p.port) + 600}`;
 })
 
 

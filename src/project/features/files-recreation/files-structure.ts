@@ -134,7 +134,7 @@ export class FilesStructure extends FeatureForProject {
     if (!this.project.node_modules.exist) {
       if (skipNodeModules) {
         if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
-          fse.mkdirpSync(path.join(this.project.location, config.folder.node_modules));
+          Helpers.mkdirp(path.join(this.project.location, config.folder.node_modules));
         }
       } else {
         await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
