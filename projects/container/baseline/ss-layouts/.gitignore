@@ -15,7 +15,12 @@
 /npm-debug.log*
 /.sass-cache
 /.sourcemaps
+/tsconfig.isomorphic.json
+/tsconfig.json
 /src/tsconfig.app.json
+/.angular-cli.json
+/src/tsconfig.app.json
+/.npmrc
 /tslint.json
 /.editorconfig
 /index.js

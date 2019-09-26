@@ -91,13 +91,13 @@ export class HelpersFileFolders {
         recursive: true
       }, options))
     } catch (e) {
-      console.log(e)
+      Helpers.log(e)
       sleep(1);
       Helpers.tryCopyFrom(source, destination, options)
     }
   }
   removeFileIfExists(absoluteFilePath: string, options?: { modifiedFiles?: Models.other.ModifiedFiles; }) {
-    console.log(`removeFileIfExists: ${absoluteFilePath}`)
+    // console.log(`removeFileIfExists: ${absoluteFilePath}`)
     const { modifiedFiles } = options || { modifiedFiles: { modifiedFiles: [] } };
     if (fse.existsSync(absoluteFilePath)) {
       fse.unlinkSync(absoluteFilePath);
@@ -106,7 +106,7 @@ export class HelpersFileFolders {
   }
 
   tryRemoveDir(dirpath: string, contentOnly = false) {
-    console.log(`tryRemoveDir: ${dirpath}`)
+    // console.log(`tryRemoveDir: ${dirpath}`)
     try {
       if (contentOnly) {
         rimraf.sync(`${dirpath}/*`)
@@ -121,7 +121,7 @@ export class HelpersFileFolders {
   }
 
   remove(fileOrFolderPathOrPatter: string) {
-    console.log(`remove: ${fileOrFolderPathOrPatter}`)
+    // console.log(`remove: ${fileOrFolderPathOrPatter}`)
     rimraf.sync(fileOrFolderPathOrPatter);
   }
 

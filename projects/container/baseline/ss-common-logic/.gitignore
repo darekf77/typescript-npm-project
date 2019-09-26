@@ -16,6 +16,7 @@
 /.sass-cache
 /.sourcemaps
 /tsconfig.json
+/.npmrc
 /tslint.json
 /.editorconfig
 /index.js

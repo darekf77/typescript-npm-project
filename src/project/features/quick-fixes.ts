@@ -49,7 +49,7 @@ export class QuickFixes extends FeatureForProject {
       }
 
       Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), `
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.default = {};
 `);
       Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.d.ts'), `
