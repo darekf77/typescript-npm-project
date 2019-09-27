@@ -8,7 +8,16 @@ export async function INIT(args: string, exit = true) {
   if (exit) {
     process.exit(0)
   }
-
+}
+export async function INIT_ALL(args: string, exit = true) {
+  if (!args) {
+    args = ''
+  }
+  args += ` --recrusive`;
+  await Project.Current.filesStructure.init(args);
+  if (exit) {
+    process.exit(0)
+  }
 }
 
 // export async function INIT_ALL(args: string, exit = true) {
@@ -32,7 +41,18 @@ export async function INIT(args: string, exit = true) {
 // }
 
 export async function STATIC_INIT(args: string, exit = true) {
-  console.log('INITINT STAIC VERSION')
+  // process.exit(0)
+  await (await Project.Current.StaticVersion()).filesStructure.init(args);
+  if (exit) {
+    process.exit(0)
+  }
+}
+
+export async function STATIC_INIT_ALL(args: string, exit = true) {
+  if (!args) {
+    args = ''
+  }
+  args += ` --recrusive`;
   // process.exit(0)
   await (await Project.Current.StaticVersion()).filesStructure.init(args);
   if (exit) {
@@ -124,7 +144,9 @@ export async function STATIC_RESET_ALL(args: string, exit = true) {
 
 export default {
   INIT,
+  INIT_ALL,
   STATIC_INIT,
+  STATIC_INIT_ALL,
   S_INIT: STATIC_INIT,
   CLEAN,
   CLEAR,

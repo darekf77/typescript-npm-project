@@ -10,6 +10,7 @@ import { TnpDB } from '../../../tnp-db';
 import { config } from '../../../config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from '../../../progress-output';
+import { Models } from '../../../index';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -56,15 +57,26 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async init(args: string, options?: InitOptions) {
-    const { skipNodeModules, recrusive }: {
-      skipNodeModules: boolean; recrusive: boolean;
-    } = require('minimist')(!args ? [] : args.split(' '));
-
-    this.project.quickFixes.missingSourceFolders()
-    if (this.project.isWorkspace) {
-      this.project.quickFixes.badNpmPackages();
-      this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
+    if (!args) {
+      args = '';
     }
+    let { skipNodeModules, recrusive, env }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+
+    if (env) {
+      Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
+    } else {
+      if (this.project.isGenerated) {
+        args += `${args} --env=static`;
+        Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
+          + ` initing for ${this.project.genericName}`)
+      } else {
+        args += `${args} --env=local`;
+        Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
+          + ` initing for ${this.project.genericName}`)
+      }
+    }
+
+
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
 
@@ -75,7 +87,17 @@ export class FilesStructure extends FeatureForProject {
       Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
       return;
     }
-    Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
+
+    this.project.quickFixes.missingSourceFolders()
+    if (this.project.isWorkspace) {
+      this.project.quickFixes.badNpmPackages();
+      this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
+    }
+
+    if (this.project.isWorkspace || this.project.isStandaloneProject) {
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+    }
+
     alreadyInitedPorjects.push(this.project)
 
     if (this.project.isContainer) {
@@ -116,8 +138,10 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.filesStructure.init(args, options);
     }
-    // console.log('alreadyInitedPorjects', alreadyInitedPorjects.map(p => p.name))
-    Helpers.log(`Actual initing project: ${chalk.bold(this.project.genericName)}`);
+    // console.log('alreadyInitedPorjects', alreadyInitedPorjell replaced with emcts.map(p => p.name))
+    if (this.project.isWorkspaceChildProject) {
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+    }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
     }
@@ -148,7 +172,7 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
 
-      if(this.project.isSite) {
+      if (this.project.isSite) {
         if (watch) {
           await this.project.join.startAndWatch(this.taskNames.joinMerge)
         } else {

@@ -123,22 +123,6 @@ inside generated projects...
 
     this.mergeNpmPorject();
 
-
-
-    const { env } = require('minimist')(!buildOptions.args ? [] : buildOptions.args.split(' '));
-    if (env) {
-      Helpers.info(`ENVIRONMENT: ${chalk.bold(env)}`)
-    } else {
-      if (this.project.isGenerated) {
-        buildOptions.args += `${buildOptions.args} --env=static`;
-        Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`)
-      } else {
-        buildOptions.args += `${buildOptions.args} --env=local`;
-        Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`)
-      }
-
-    }
-
     if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
       if (buildOptions.appBuild) {
         Helpers.error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)

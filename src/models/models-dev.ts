@@ -1,8 +1,15 @@
 import { ModelsEnvinronment } from './models-environment';
 import { Project } from '../project';
+import { EnvironmentName } from '../index';
 
 
 export namespace ModelsDev {
+
+  export type  InitArgOptions = {
+    skipNodeModules: boolean;
+    recrusive: boolean;
+    env: EnvironmentName;
+  }
 
   export type ProjectBuild = { project: Project; appBuild: boolean; }
   export interface ProjectForAutoBuild {

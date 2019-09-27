@@ -41,7 +41,9 @@ export class QuickFixes extends FeatureForProject {
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
-        Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock.`)
+        if (this.project.isStandaloneProject || this.project.isWorkspace) {
+          Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock. ${this.project.genericName}`)
+        }
       }
       // Helpers.remove(pathInProjectNodeModules);
       if (!fse.existsSync(pathInProjectNodeModules)) {
