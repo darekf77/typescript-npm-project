@@ -26,6 +26,7 @@
 /__components
 /!custom/src
 /!custom/components
+/.npmrc
 /tslint.json
 /.editorconfig
 /index.js

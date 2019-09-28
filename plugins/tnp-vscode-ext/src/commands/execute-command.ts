@@ -52,7 +52,7 @@ export function executeCommand(registerName: string, commandToExecute: string | 
     syncProcess, cancellable, title, tnpNonInteractive, askBeforeExecute,
     tnpShowProgress, showOutputDataOnSuccess, debug, showSuccessMessage } = options;
 
-  debug = true; // TODO
+  // debug = true; // TODO
 
   return vscode.commands.registerCommand(registerName, function (uri) {
     if (typeof uri === 'undefined') {

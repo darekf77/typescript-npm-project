@@ -19,6 +19,7 @@
 /src
 /__src
 /!custom/src
+/.npmrc
 /tslint.json
 /.editorconfig
 /index.js
