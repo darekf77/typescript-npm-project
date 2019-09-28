@@ -36,6 +36,7 @@
 /!custom/environment.stage.js
 /!custom/environment.static.js
 /!custom/environment.online.js
+/.npmrc
 /tslint.json
 /.editorconfig
 /environment.d.ts
