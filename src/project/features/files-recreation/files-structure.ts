@@ -62,20 +62,21 @@ export class FilesStructure extends FeatureForProject {
     }
     let { skipNodeModules, recrusive, env }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
 
-    if (env) {
-      Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
-    } else {
-      if (this.project.isGenerated) {
-        args += `${args} --env=static`;
-        Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
-          + ` initing for ${this.project.genericName}`)
+    if(this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+      if (env) {
+        Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
       } else {
-        args += `${args} --env=local`;
-        Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
-          + ` initing for ${this.project.genericName}`)
+        if (this.project.isGenerated) {
+          args += `${args} --env=static`;
+          Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
+            + ` initing for ${this.project.genericName}`)
+        } else {
+          args += `${args} --env=local`;
+          Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
+            + ` initing for ${this.project.genericName}`)
+        }
       }
     }
-
 
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
@@ -91,6 +92,9 @@ export class FilesStructure extends FeatureForProject {
     this.project.quickFixes.missingSourceFolders()
     if (this.project.isWorkspace) {
       this.project.quickFixes.badNpmPackages();
+
+    }
+    if(this.project.isWorkspace || this.project.isStandaloneProject) {
       this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
 

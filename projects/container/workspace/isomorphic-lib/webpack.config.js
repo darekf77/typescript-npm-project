@@ -14,7 +14,6 @@ const fs = require('fs');
 const _ = require('lodash')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin');
-const { fixWebpackEnv } = require('tnp-bundle')
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 
 const noEmitOnErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
@@ -122,4 +121,10 @@ module.exports = (env) => {
   };
 }
 
-
+function fixWebpackEnv(env = {}) {
+  _.forIn(env, (v, k) => {
+    const value = v;
+    if (value === 'true') env[k] = true;
+    if (value === 'false') env[k] = false;
+  })
+}

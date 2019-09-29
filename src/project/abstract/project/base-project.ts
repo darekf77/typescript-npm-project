@@ -23,7 +23,7 @@ export abstract class BaseProject {
     if (this.type === 'unknow') {
       return;
     }
-    return [
+    let result = [
       (this.isGenerated ? `((${chalk.bold('GENERATED')}))` : ''),
       ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
       (this.isWorkspaceChildProject ? this.parent.name : ''),
@@ -31,6 +31,10 @@ export abstract class BaseProject {
       ((this.isStandaloneProject && this.parent && this.parent.name) ? `<<${this.parent.genericName}>>` : ''),
       this.name
     ].filter(f => !!f).join('/').trim()
+    if (this.isStandaloneProject) {
+      return `<<STANDALONE>>${result}`;
+    }
+    return result;
     //#endregion
   }
 
