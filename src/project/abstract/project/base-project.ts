@@ -31,9 +31,6 @@ export abstract class BaseProject {
       ((this.isStandaloneProject && this.parent && this.parent.name) ? `<<${this.parent.genericName}>>` : ''),
       this.name
     ].filter(f => !!f).join('/').trim()
-    if (this.isStandaloneProject) {
-      return `<<STANDALONE>>${result}`;
-    }
     return result;
     //#endregion
   }

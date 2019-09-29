@@ -12,8 +12,6 @@ import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
 
 
-
-
 export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
@@ -230,8 +228,10 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
     }
 
     if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
-      Helpers.error(`Workspace ${workspace.location}
-        ...without environment${envSurfix}.js config.`);
+      Helpers.warn(`Workspace ${workspace.location}
+        ...without environment${envSurfix}.js config... creating new... `);
+      Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(workspace));
+      Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
     }
 
     // try {
@@ -251,6 +251,64 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
 
 
   return configWorkspaceEnv;
+}
+
+function createExampleConfigFor(workspace: Project) {
+
+  function templetForInfo(project: Project, counter = 0) {
+    return JSON.stringify({
+      baseUrl: `/${project.name}`,
+      name: project.name,
+      $db: (project.type === 'isomorphic-lib') && {
+        database: 'tmp/db.sqlite3',
+        type: 'sqlite',
+        synchronize: true,
+        dropSchema: true,
+        logging: false
+      },
+      port: 9000 + Number(counter)
+    }, null, 2)
+      .split('\n')
+      .map(l => {
+        // console.log('l  : '+l)
+        l = l.trim();
+        const cc = l.match(/^\"[a-zA-Z0-9|\$]+\"/);
+        const m = (cc ? cc : []).map(s => s.replace(/\"/g, ""));
+        // if (m.length === 2) {
+        const first = _.first(m);
+        if (first) {
+          l = l.replace(`"${first}"`, `${first}`);
+        }
+        // }
+        return l;
+      })
+      .join('\n');
+  }
+
+  return `
+  const path = require('path')
+var { config } = require('tnp-bundle/environment-config')
+
+config = {
+
+  domain: '${workspace.name}.example.domain.com',
+
+  workspace: {
+    workspace: {
+      //  baseUrl: "/${workspace.name}",
+      name: "${workspace.name}",
+      port: 5000
+    },
+    projects: [
+      ${workspace.children.map((c, i) => {
+      return templetForInfo(c, i)
+    }).join(',\n')}
+    ]
+  }
+
+}
+module.exports = exports = { config };
+  `;
 }
 
 

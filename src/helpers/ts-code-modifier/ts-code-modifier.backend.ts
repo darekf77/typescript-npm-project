@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as tsfmt from 'typescript-formatter';
 import { Helpers } from '../index';
 export class TsCodeModifer {
 
@@ -50,6 +51,23 @@ export class TsCodeModifer {
       });
     }
     return input;
+  }
+
+  /**
+   * Format JS, TS file
+   */
+  public formatFile(filePath: string) {
+    tsfmt.processFiles([filePath], {
+      // dryRun?: boolean;
+      verbose: true,
+      // baseDir: ['bundle', 'dist'].includes(path.basename(__dirname)) ? path.join(__dirname, '..') : __dirname,
+      replace: true,
+      verify: false,
+      // tsconfig: true,
+      // tslint: true,
+      // editorconfig: true,
+      tsfmt: true,
+    } as any)
   }
 
 }
