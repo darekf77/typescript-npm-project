@@ -52,7 +52,7 @@ export abstract class BaseProject {
 
 
 
-  get isForRecreation(this: Project) {
+  get isContainerWorkspaceRelated(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isForRecreation;
     }

@@ -113,7 +113,7 @@ export class CopyManager extends FeatureForProject {
       Helpers.remove(tempDestination);
     }
 
-    if (this.project.isForRecreation) {
+    if (this.project.isContainerWorkspaceRelated) {
       // console.log(`For project: ${this.project.genericName} files:
       // ${this.project.projectSourceFiles()}
       // `)
@@ -139,9 +139,11 @@ export class CopyManager extends FeatureForProject {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
-
     if (_.isUndefined(options.filterForBundle)) {
       options.filterForBundle = true;
+    }
+    if (_.isUndefined(options.forceCopyPackageJSON)) {
+      options.forceCopyPackageJSON = false;
     }
     if (_.isUndefined(options.ommitSourceCode)) {
       options.ommitSourceCode = false;
@@ -168,7 +170,7 @@ export class CopyManager extends FeatureForProject {
     const { override, showInfo, markAsGenerated } = options;
 
     const sourceLocation = this.project.location;
-    if (this.project.isForRecreation) {
+    if (this.project.isContainerWorkspaceRelated || options.forceCopyPackageJSON) {
       var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
         encoding: 'utf8'
       });
@@ -190,7 +192,7 @@ export class CopyManager extends FeatureForProject {
 
     this.executeCopy(sourceLocation, destinationLocation, options);
 
-    if (this.project.isForRecreation) {
+    if (this.project.isContainerWorkspaceRelated || options.forceCopyPackageJSON) {
       const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
       // console.log(`packageJsonLocation: ${packageJsonLocation}`)
       // console.log('packageJson', packageJson)
@@ -221,7 +223,7 @@ export class CopyManager extends FeatureForProject {
     }
 
 
-    if (options.regenerateProjectChilds && this.project.isForRecreation) {
+    if (options.regenerateProjectChilds && this.project.isContainerWorkspaceRelated) {
       let childs = this.project.children;
 
       if (options.regenerateOnlyCoreProjects) {

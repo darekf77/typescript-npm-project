@@ -140,7 +140,8 @@ export const config = {
 
     projectsExamples: {
       workspace: pathResolved(__dirname, `../projects/container/workspace`),
-      container: pathResolved(__dirname, `../projects/container`)
+      container: pathResolved(__dirname, `../projects/container`),
+      singlefileproject: pathResolved(__dirname, `../projects/single-file-project`)
     }
   },
   allowedEnvironments,

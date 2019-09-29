@@ -67,6 +67,7 @@ export namespace ModelsOther {
     override?: boolean;
     markAsGenerated?: boolean;
     regenerateOnlyCoreProjects?: boolean;
+    forceCopyPackageJSON?: boolean;
     filterForBundle?: boolean;
     showInfo?: boolean;
     ommitSourceCode?: boolean;

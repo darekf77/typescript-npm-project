@@ -39,7 +39,7 @@ export class ProjectFactory {
     Helpers.error(`Please use example above.`, false, true);
   }
 
-  private pacakgeJsonNameFix(locationDest, type: Models.libs.LibType, basedOn?: string) {
+  private pacakgeJsonNameFix(locationDest, basedOn?: string) {
     const pkgJSONpath = path.join(locationDest, config.file.package_json);
     const json: Models.npm.IPackageJSON = fse.readJSONSync(pkgJSONpath)
     json.name = _.kebabCase(path.basename(locationDest));
@@ -56,7 +56,7 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public create(type: Models.libs.LibType, name: string, cwd: string, basedOn?: string): Project {
+  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Project {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
@@ -83,9 +83,10 @@ export class ProjectFactory {
             regenerateOnlyCoreProjects: !basedOn,
             markAsGenerated: false,
             regenerateProjectChilds: true,
+            forceCopyPackageJSON: type === 'single-file-project'
           });
           // console.log(destinationPath)
-          this.pacakgeJsonNameFix(destinationPath, type, basedOn ? basedOn : void 0)
+          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0)
           Helpers.info(`Project ${baseline.name} create successfully`);
         } catch (err) {
           Helpers.error(err);
@@ -133,7 +134,7 @@ export class ProjectFactory {
         + `--basedOn relativePathToBaselineWorkspace`, false, true);
     }
     const type = argv[0] as any;
-    const name = argv[1]
+    const name = argv[1];
     this.create(type, name, cwd);
     if (exit) {
       process.exit(0)

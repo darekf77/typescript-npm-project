@@ -290,7 +290,7 @@ export class Project {
   //#endregion
 
   //#region @backend
-  public static by(libraryType: Models.libs.LibType): Project {
+  public static by(libraryType: Models.libs.NewFactoryType): Project {
 
     if (libraryType === 'workspace') {
       const workspaceProject = Project.From(config.pathes.projectsExamples.workspace);
@@ -299,6 +299,11 @@ export class Project {
     if (libraryType === 'container') {
       const containerProject = Project.From(config.pathes.projectsExamples.container);
       return containerProject;
+    }
+
+    if(libraryType === 'single-file-project') {
+      const singleFileProject = Project.From(config.pathes.projectsExamples.singlefileproject);
+      return singleFileProject;
     }
 
     const projectPath = path.join(config.pathes.projectsExamples.workspace, libraryType);

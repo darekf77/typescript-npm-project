@@ -33,6 +33,6 @@ export namespace ModelsLibTypes {
     'common'
   ]
 
-  export type NewFactoryType = LibType | 'model';
+  export type NewFactoryType = LibType | 'model' | 'single-file-project';
 
 }
