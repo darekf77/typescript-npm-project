@@ -65,7 +65,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 }
 
 export function nodeModulesExists(project: Project) {
-  if (project.isWorkspace) {
+  if (project.isWorkspace || project.isStandaloneProject) {
     const p = path.join(project.location, config.folder.node_modules, '.bin');
     return fse.existsSync(p);
   }

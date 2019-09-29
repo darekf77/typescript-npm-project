@@ -86,7 +86,7 @@ export class ProjectFactory {
             forceCopyPackageJSON: type === 'single-file-project'
           });
           // console.log(destinationPath)
-          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0)
+          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0);
           Helpers.info(`Project ${baseline.name} create successfully`);
         } catch (err) {
           Helpers.error(err);
@@ -107,8 +107,16 @@ export class ProjectFactory {
         // log(`Child project "${c.genericName}"`);
       });
     }
-    return Project.From(destinationPath);
+    const destProje = Project.From(destinationPath);
+    if (destProje) {
+      if (type === 'single-file-project') {
+        destProje.recreate.vscode.settings.excludedFiles();
+        destProje.recreate.vscode.settings.colorsFromWorkspace()
+      }
+    }
+    return destProje;
   }
+
 
   public createModelFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
