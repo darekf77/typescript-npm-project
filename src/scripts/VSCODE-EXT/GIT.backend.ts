@@ -48,10 +48,10 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git reset --hard`).sync();
-    } catch (error) { }
+    } catch (error) {}
     Project.Current.git.pullCurrentBranch();
   } else {
-    throw `This is not a git repo: ${process.cwd()}`
+    Helpers.error(`Not able to pull and reset hard: ${process.cwd()}`);
   }
   exit && process.exit(0);
 }
