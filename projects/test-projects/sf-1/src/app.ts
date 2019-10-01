@@ -58,7 +58,9 @@ console.log(`absoluteDatabasePath: ${absoluteDatabasePath}`)
 })
 export class DBWatcher extends IncCompiler.Base {
 
-  constructor(connection:) {
+  constructor(
+    // @LAST realtime project
+  ) {
     super({
       folderPath: [absoluteDatabasePath]
     });
