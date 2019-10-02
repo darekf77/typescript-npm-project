@@ -1,6 +1,9 @@
-import { Morphi } from 'morphi'
+import * as _ from 'lodash';
+import * as $ from 'jquery';
+import { Morphi } from 'morphi';
 //#region @backend
 import * as path from 'path';
+import { Connection } from 'typeorm/connection/Connection';
 import { IncCompiler } from 'incremental-compiler';
 //#endregion
 const database = 'tmp-db.sqlite';
@@ -24,6 +27,15 @@ export class USER extends Morphi.Base.Entity<any, any, IUserController> {
     const data = await this.ctrl.getAll().received;
     return data.body.json;
   }
+
+  public static db(users: USER[]) {
+    return {
+      find(id: number): USER {
+        return users.find(u => u.id == id);
+      }
+    }
+  }
+
 
 }
 
@@ -58,16 +70,32 @@ console.log(`absoluteDatabasePath: ${absoluteDatabasePath}`)
 })
 export class DBWatcher extends IncCompiler.Base {
 
-  constructor(connection:) {
+  constructor(public connection: Connection) {
     super({
       folderPath: [absoluteDatabasePath]
     });
   }
 
-  @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change) {
-    // console.log(`Db changed: ${event.fileAbsolutePath}`);
+  users: USER[];
 
+  @IncCompiler.methods.AsyncAction()
+  async asyncAction() {
+    // console.log(`Db changed: ${event.fileAbsolutePath}`);
+    const newUsers = await (await this.connection.getRepository(USER)).find();
+    if (_.isUndefined(this.users)) {
+      this.users = newUsers;
+      console.log('first time users', newUsers)
+    } else {
+      if (!_.isEqual(this.users, newUsers)) {
+        this.users.forEach(u => {
+          const inNew = USER.db(newUsers).find(u.id);
+          if (!_.isEqual(u, inNew)) {
+            Morphi.Realtime.Server.TrigggerEntityChanges(u);
+          }
+        });
+        this.users = newUsers;
+      }
+    }
   }
 
 }
@@ -90,24 +118,61 @@ const start = async () => {
   } as any;
   //#endregion
 
-  const c = await Morphi.init({
+  const connection = await Morphi.init({
     host,
     controllers,
     entities,
     //#region @backend
     config
     //#endregion
-  })
+  });
 
- // @LAST
+  // @LAST
   if (Morphi.IsBrowser) {
-    const users = await USER.getUsers();
-    console.log(users);
+    document.body.innerHTML = `<div id="app" ></div>`;
+    const appDiv: HTMLElement = document.getElementById('app');
+
+    const updateView = (users: USER[]) => {
+      appDiv.innerHTML = `
+      <h1>TypeScript Starter</h1>
+
+      <button id="subscribe"> subscribe </button>
+      <button id="unsubsubscribe"> unsubsubscribe </button>
+      <br>
+      ${users ? JSON.stringify(users) : ' - '}
+      `;
+    }
+
+    const usersFromDb = await USER.getUsers();
+    const [first, second] = usersFromDb;
+    first.subscribeRealtimeUpdates({
+      callback: (r) => {
+        console.log(`realtime update for first user ${first.id}, ${first.name}`, r);
+        _.merge(first, r.body.json);
+        updateView(usersFromDb)
+      }
+    });
+    second.subscribeRealtimeUpdates({
+      callback: (r) => {
+        console.log(`realtime update for second user ${second.id}, ${second.name}`, r);
+        _.merge(second, r.body.json);
+        updateView(usersFromDb)
+      }
+    });
+    updateView(usersFromDb);
+
+    $('#subscribe').click(e => {
+      console.log('sub')
+    })
+    $('#unsubsubscribe').click(e => {
+      console.log('unsub')
+    })
   }
 
   if (Morphi.IsNode) {
     //#region @backend
-    const w = new DBWatcher(c);
+    const w = new DBWatcher(connection);
+    await w.asyncAction()
     await w.startAndWatch();
     //#endregion
   }
@@ -116,7 +181,7 @@ const start = async () => {
 
 
 if (Morphi.IsBrowser) {
-  start()
+  start();
 }
 
 export default function () {
