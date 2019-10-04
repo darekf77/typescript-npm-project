@@ -20,7 +20,7 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.js"
   },
-  "name": "sf-1",
+  "name": "realtime-example-1",
   "license": "MIT",
   "devDependencies": {},
   "dependencies": {},
