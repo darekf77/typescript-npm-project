@@ -1,110 +1,15 @@
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { Morphi } from 'morphi';
+import { database, host } from './config';
+import { USER } from './USER';
+import { UserController } from './UserController';
 //#region @backend
-import * as path from 'path';
-import { Connection } from 'typeorm/connection/Connection';
-import { IncCompiler } from 'incremental-compiler';
-//#endregion
-const database = 'tmp-db.sqlite';
-
-@Morphi.Entity()
-export class USER extends Morphi.Base.Entity<any, any, IUserController> {
-
-  public static ctrl: UserController;
-
-  //#region @backend
-  @Morphi.Orm.Column.Generated()
-  //#endregion
-  id: number;
-
-  //#region @backend
-  @Morphi.Orm.Column.Custom('varchar')
-  //#endregion
-  name: string;
-
-  public static async getUsers() {
-    const data = await this.ctrl.getAll().received;
-    return data.body.json;
-  }
-
-  public static db(users: USER[]) {
-    return {
-      find(id: number): USER {
-        return users.find(u => u.id == id);
-      }
-    }
-  }
-
-
-}
-
-export type IUserController = UserController;
-
-@Morphi.Controller({
-  entity: USER
-})
-export class UserController extends Morphi.Base.Controller<USER> {
-
-  //#region @backend
-  async initExampleDbData() {
-    const repo = await this.connection.getRepository(USER);
-
-    const user1 = new USER()
-    user1.name = 'Dariusz F'
-    await repo.save(user1)
-
-    const user2 = new USER()
-    user2.name = 'Peter Parker'
-    await repo.save(user2);
-  }
-  //#endregion
-
-}
-
-//#region @backend
-const absoluteDatabasePath = path.resolve(path.join(__dirname, '..', database));
-console.log(`absoluteDatabasePath: ${absoluteDatabasePath}`)
-@IncCompiler.Class({
-  className: 'IncCompiler'
-})
-export class DBWatcher extends IncCompiler.Base {
-
-  constructor(public connection: Connection) {
-    super({
-      folderPath: [absoluteDatabasePath]
-    });
-  }
-
-  users: USER[];
-
-  @IncCompiler.methods.AsyncAction()
-  async asyncAction() {
-    // console.log(`Db changed: ${event.fileAbsolutePath}`);
-    const newUsers = await (await this.connection.getRepository(USER)).find();
-    if (_.isUndefined(this.users)) {
-      this.users = newUsers;
-      console.log('first time users', newUsers)
-    } else {
-      if (!_.isEqual(this.users, newUsers)) {
-        this.users.forEach(u => {
-          const inNew = USER.db(newUsers).find(u.id);
-          if (!_.isEqual(u, inNew)) {
-            Morphi.Realtime.Server.TrigggerEntityChanges(u);
-          }
-        });
-        this.users = newUsers;
-      }
-    }
-  }
-
-}
+import { DBWatcher } from './DBWatcher.backend';
 //#endregion
 
-const host = 'http://localhost:3000'
 const controllers: Morphi.Base.Controller<any>[] = [UserController as any];
 const entities: Morphi.Base.Entity<any>[] = [USER as any];
-
 
 const start = async () => {
 

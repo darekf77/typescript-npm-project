@@ -115,9 +115,9 @@ export function copyMainProject(tmpProject: Project, project: Project, pkg: Mode
 }
 
 export function prepareTempProject(project: Project, pkg: Models.npm.Package): Project {
-  const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of-`;
-  const tmpFolder = path.join(project.location,
-    `${pathPart}-${pkg.name}`);
+  const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of`;
+  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}`);
+
   Helpers.remove(`${path.join(project.location, pathPart)}*`);
   Helpers.mkdirp(tmpFolder);
   project.packageJson.copyTo(tmpFolder);

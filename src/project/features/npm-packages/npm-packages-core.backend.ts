@@ -69,6 +69,8 @@ export class NpmPackagesCore extends FeatureForProject {
 
 
   private smoothInstallPrepare(pkg: Models.npm.Package) {
+    console.log(pkg)
+
     const tmpProject = prepareTempProject(this.project, pkg);
     const mainProjects = copyMainProject(tmpProject, this.project, pkg);
     copyMainProjectDependencies(mainProjects, tmpProject, this.project, pkg);
