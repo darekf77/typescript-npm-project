@@ -20,6 +20,25 @@ export class DBWatcher extends IncCompiler.Base {
     });
   }
 
+  async runUpdateUserInterval() {
+    setTimeout(async () => {
+      const repo = await this.connection.getRepository(USER);
+
+      let users = await repo.find();
+      users = users.map(u => this.updateUser(u));
+      await repo.save(users);
+      this.runUpdateUserInterval();
+    }, 2000);
+  }
+
+  updateUser(u: USER) {
+    u.age += 1;
+    return u;
+  }
+
+
+  private
+
   users: USER[];
 
   @IncCompiler.methods.AsyncAction()

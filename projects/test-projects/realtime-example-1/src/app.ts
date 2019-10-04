@@ -50,27 +50,32 @@ const start = async () => {
 
     const usersFromDb = await USER.getUsers();
     const [first, second] = usersFromDb;
-    first.subscribeRealtimeUpdates({
-      callback: (r) => {
-        console.log(`realtime update for first user ${first.id}, ${first.name}`, r);
-        _.merge(first, r.body.json);
-        updateView(usersFromDb)
-      }
-    });
-    second.subscribeRealtimeUpdates({
-      callback: (r) => {
-        console.log(`realtime update for second user ${second.id}, ${second.name}`, r);
-        _.merge(second, r.body.json);
-        updateView(usersFromDb)
-      }
-    });
+
     updateView(usersFromDb);
 
     $('#subscribe').click(e => {
-      console.log('sub')
+      console.log('subscribed!')
+      // first.subscribeRealtimeUpdates({
+      //   callback: (r) => {
+      //     console.log(`realtime update for first user ${first.id}, ${first.fullName}`, r);
+      //     _.merge(first, r.body.json);
+      //     updateView(usersFromDb)
+      //   }
+      // });
+      // second.subscribeRealtimeUpdates({
+      //   callback: (r) => {
+      //     console.log(`realtime update for second user ${second.id}, ${second.fullName}`, r);
+      //     _.merge(second, r.body.json);
+      //     updateView(usersFromDb)
+      //   }
+      // });
     })
     $('#unsubsubscribe').click(e => {
-      console.log('unsub')
+      // @ LAST unsubscribe click not workin g
+      console.log('unsubscribe')
+      first.unsubscribeRealtimeUpdates();
+      second.unsubscribeRealtimeUpdates();
+      // console.log('unsubscribe end')
     })
   }
 
@@ -79,6 +84,7 @@ const start = async () => {
     const w = new DBWatcher(connection);
     await w.asyncAction()
     await w.startAndWatch();
+    w.runUpdateUserInterval()
     //#endregion
   }
 

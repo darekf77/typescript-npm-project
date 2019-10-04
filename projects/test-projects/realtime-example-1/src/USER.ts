@@ -18,9 +18,20 @@ export class USER extends Morphi.Base.Entity<any, any, IUserController> {
   //#endregion
   name: string;
 
+  //#region @backend
+  @Morphi.Orm.Column.Custom('bigint', {
+    default: 0
+  })
+  //#endregion
+  age: number;
+
   public static async getUsers() {
     const data = await this.ctrl.getAll().received;
     return data.body.json;
+  }
+
+  get fullName() {
+    return `${this.name} age: ${this.age}`;
   }
 
   public static db(users: USER[]) {
