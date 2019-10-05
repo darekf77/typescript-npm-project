@@ -34,15 +34,16 @@ const start = async () => {
 
   // @LAST
   if (Morphi.IsBrowser) {
-    document.body.innerHTML = `<div id="app" ></div>`;
-    const appDiv: HTMLElement = document.getElementById('app');
+    document.body.innerHTML = `
+    <h1>TypeScript Starter</h1>
+    <button id="subscribe"> subscribe </button>
+    <button id="unsubsubscribe"> unsubsubscribe </button>
+    <div id="app" ></div>
+    `;
 
     const updateView = (users: USER[]) => {
+      const appDiv: HTMLElement = document.getElementById('app');
       appDiv.innerHTML = `
-      <h1>TypeScript Starter</h1>
-
-      <button id="subscribe"> subscribe </button>
-      <button id="unsubsubscribe"> unsubsubscribe </button>
       <br>
       ${users ? JSON.stringify(users) : ' - '}
       `;
@@ -55,27 +56,25 @@ const start = async () => {
 
     $('#subscribe').click(e => {
       console.log('subscribed!')
-      // first.subscribeRealtimeUpdates({
-      //   callback: (r) => {
-      //     console.log(`realtime update for first user ${first.id}, ${first.fullName}`, r);
-      //     _.merge(first, r.body.json);
-      //     updateView(usersFromDb)
-      //   }
-      // });
-      // second.subscribeRealtimeUpdates({
-      //   callback: (r) => {
-      //     console.log(`realtime update for second user ${second.id}, ${second.fullName}`, r);
-      //     _.merge(second, r.body.json);
-      //     updateView(usersFromDb)
-      //   }
-      // });
+      first.subscribeRealtimeUpdates({
+        callback: (r) => {
+          console.log(`realtime update for first user ${first.id}, ${first.fullName}`, r);
+          _.merge(first, r.body.json);
+          updateView(usersFromDb)
+        }
+      });
+      second.subscribeRealtimeUpdates({
+        callback: (r) => {
+          console.log(`realtime update for second user ${second.id}, ${second.fullName}`, r);
+          _.merge(second, r.body.json);
+          updateView(usersFromDb)
+        }
+      });
     })
     $('#unsubsubscribe').click(e => {
-      // @ LAST unsubscribe click not workin g
       console.log('unsubscribe')
       first.unsubscribeRealtimeUpdates();
       second.unsubscribeRealtimeUpdates();
-      // console.log('unsubscribe end')
     })
   }
 
