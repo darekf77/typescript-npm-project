@@ -17,6 +17,7 @@ function $CONFIGS() {
 
 function CHECK_ENV() {
   Helpers.checkEnvironment(config.required);
+  process.exit(0)
 }
 
 

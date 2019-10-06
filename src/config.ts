@@ -271,6 +271,7 @@ export const config = {
       { name: 'mocha' },
       // { name: 'chai' },
       { name: 'ts-node' },
+      { name: 'vsce' },
       { name: 'stmux' },
       { name: 'webpack-bundle-analyzer' },
     ],
