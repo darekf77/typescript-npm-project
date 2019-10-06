@@ -81,7 +81,7 @@ export class PackageJsonBase extends PackageJsonCore {
       Project.Tnp.packageJson.prepareForSave(action, Project.Tnp);
     }
 
-    if (this.project.isContainerChild || this.project.isWorkspaceChildProject) {
+    if ((this.project.isContainerChild && this.project.isWorkspace) || this.project.isWorkspaceChildProject) {
       this.project.parent.packageJson.prepareForSave(action);
     }
 
@@ -120,7 +120,7 @@ export class PackageJsonBase extends PackageJsonCore {
       Helpers.log(`Npm reset not available for Tnp project`)
       return;
     }
-    if (this.project.isWorkspaceChildProject || this.project.isContainerChild) {
+    if (this.project.isWorkspaceChildProject || (this.project.isContainerChild && this.project.isWorkspace)) {
       this.project.parent.packageJson.reset();
     }
     this.data.tnp.overrided.dependencies = {};

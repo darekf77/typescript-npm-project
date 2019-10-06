@@ -23,6 +23,9 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
         installType = p as Models.npm.InstalationType;
         return false;
       }
+      if (p.endsWith('@')) {
+        p = `${p}latest`;
+      }
       const res = Helpers.npm.checkValidNpmPackageName(p)
       if (!res) {
         Helpers.error(`Invalid package to install: "${p}"`, true, true)
@@ -32,6 +35,9 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
     .map(p => {
       if (!~p.search('@')) {
         return { name: p, installType }
+      }
+      if (p.endsWith('@')) {
+        p = `${p}latest`;
       }
       const isOrg = p.startsWith('@')
       const [name, version] = (isOrg ? p.slice(1) : p).split('@')
@@ -47,7 +53,7 @@ export function executeCommand(command: string, project: Project) {
 
 export function copyMainProjectDependencies
   (projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
-  tmpProject: Project, project: Project, pkg: Models.npm.Package) {
+    tmpProject: Project, project: Project, pkg: Models.npm.Package) {
 
   const { mainProjectInTemp, mainProjectExisted } = projects;
   const alreadyChecked = [];
@@ -176,8 +182,8 @@ export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
   if (_.isNil(options)) {
     options = {};
   }
-  if (!_.isArray(options.npmPackage)) {
-    options.npmPackage = [];
+  if (!_.isArray(options.npmPackages)) {
+    options.npmPackages = [];
   }
   if (_.isUndefined(options.remove)) {
     options.remove = false;
@@ -185,7 +191,7 @@ export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
   if (_.isUndefined(options.smoothInstall)) {
     options.smoothInstall = false;
   }
-  if (options.npmPackage.length === 0) {
+  if (options.npmPackages.length === 0) {
     options.smoothInstall = false;
   }
   return options;

@@ -55,6 +55,22 @@ export class HelpersProcess {
     return response.value;
   }
 
+  get isWsl() {
+    if (process.platform !== 'linux') {
+      return false;
+    }
+
+    if (os.release().toLowerCase().includes('microsoft')) {
+      return true;
+    }
+
+    try {
+      return fse.readFileSync('/proc/version', 'utf8').toLowerCase().includes('microsoft');
+    } catch (_) {
+      return false;
+    }
+  };
+
   getWorkingDirOfProcess(PID: number) {
     try {
       const cwd = child.execSync(`lsof -p ${PID} | awk '$4=="cwd" {print $9}'`).toString().trim()

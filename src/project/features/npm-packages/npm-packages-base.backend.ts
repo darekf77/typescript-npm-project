@@ -19,8 +19,11 @@ export class NpmPackagesBase extends NpmPackagesCore {
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation for "${this.project.genericName}" started..` });
     }
-    const { remove, npmPackage, smoothInstall } = fixOptionsNpmInstall(options, this.project);
-    const fullInstall = (npmPackage.length === 0);
+    const { remove, npmPackages, smoothInstall } = fixOptionsNpmInstall(options, this.project);
+    const fullInstall = (npmPackages.length === 0);
+
+    // console.log(npmPackages)
+    // process.exit(0)
 
     if (remove && fullInstall) {
       Helpers.error(`[install process]] Please specify packages to remove`, false, true);
@@ -28,10 +31,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
     if (remove) {
       Helpers.log(`Package [${
-        npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+        npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
           .join(',')
         }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
-      npmPackage.forEach(p => {
+      npmPackages.forEach(p => {
         this.project.packageJson.removeDependencyAndSave(p, `package ${p && p.name} instalation`);
       });
     } else {
@@ -39,10 +42,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
         Helpers.log(`Packages full installation for ${this.project.genericName}`)
       } else {
         Helpers.log(`Package [${
-          npmPackage.map(p => p.name + (p.version ? `@${p.version}` : ''))
+          npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
             .join(',')
           }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
-        npmPackage.forEach(p => {
+        npmPackages.forEach(p => {
           this.project.packageJson.setDependencyAndSave(p, `package ${p && p.name} instalation`);
         });
       }
@@ -72,7 +75,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
         if (fullInstall) {
           this.actualNpmProcess({ reason: triggeredMsg })
         } else {
-          npmPackage.forEach(pkg => {
+          npmPackages.forEach(pkg => {
             this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
           });
         }
@@ -83,7 +86,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
-      if (this.project.isContainerChild) {
+      if (this.project.isContainerChild && this.project.isWorkspace) {
         this.project.packageJson.hideDeps(`${this.project.type} hide deps for container child [${triggeredMsg}]`);
       }
       if (this.project.isWorkspace || this.project.isStandaloneProject) {

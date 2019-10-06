@@ -167,7 +167,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   if (project.isTnp) {
     recrateInPackageJson = true;
   }
-  if (recrateInPackageJson && action === 'save' && (project.isWorkspaceChildProject || project.isContainerChild)) {
+  if (recrateInPackageJson && action === 'save' && (project.isWorkspaceChildProject || (project.isContainerChild && project.isWorkspace))) {
     recrateInPackageJson = false;
   }
 
@@ -377,6 +377,8 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 
 //#region set dependency and save
 export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project, ) {
+  // console.log('set DEPS', p)
+  // process.exit(0)
   if (!p || !p.name) {
     Helpers.error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }

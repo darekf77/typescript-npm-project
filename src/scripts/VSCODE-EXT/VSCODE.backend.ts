@@ -9,6 +9,10 @@ export function $VSCODE_EXT(args: string, exit = true) {
     cwd: config.pathes.tnp_vscode_ext_location,
     output: true
   }).sync();
+  if (Helpers.isWsl) {
+    Helpers.warn(`MANUALL INSTALL NEEDED FOR EXTENSION ${
+      path.join(config.pathes.tnp_vscode_ext_location, 'tnp-vscode-ext-0.0.1.vsix')}`)
+  }
   exit && process.exit(0)
 }
 

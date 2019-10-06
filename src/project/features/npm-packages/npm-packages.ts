@@ -16,7 +16,7 @@ export class NpmPackages extends NpmPackagesBase {
       const packages = resolvePacakgesFromArgs(args);
       await project.npmPackages.installProcess(`tnp install ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
-        .join(', ')} `, { npmPackage: packages, smoothInstall });
+        .join(', ')} `, { npmPackages: packages, smoothInstall });
     }
   }
 
@@ -30,7 +30,7 @@ export class NpmPackages extends NpmPackagesBase {
       const packages = resolvePacakgesFromArgs(args);
       await project.npmPackages.installProcess(`tnp uninstall ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
-        .join(', ')} `, { npmPackage: packages, remove: true });
+        .join(', ')} `, { npmPackages: packages, remove: true });
     }
   }
 

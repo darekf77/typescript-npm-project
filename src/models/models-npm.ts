@@ -24,7 +24,7 @@ export namespace ModelsNpm {
 
   export interface NpmInstallOptions {
     remove?: boolean;
-    npmPackage?: ModelsNpm.Package[],
+    npmPackages?: ModelsNpm.Package[],
     smoothInstall?: boolean;
   }
 
