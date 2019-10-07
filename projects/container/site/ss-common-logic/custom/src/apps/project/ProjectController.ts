@@ -40,8 +40,9 @@ export class ProjectController extends Morphi.Base.Controller<entities.PROJECT> 
     //#region @backendFunc
     return async (req, res) => {
       req.headers[Morphi.MDC_KEY] = MDC.create({ include: ['name'] }).toString()
-      const menuPorojects = await this.db.PROJECT.getAllProjects() as any;
-      return () => menuPorojects;
+      const menuPorojects = await this.db.PROJECT
+        .getAllProjects() as PROJECT[];
+      return () => menuPorojects.filter(f => !f.isGenerated);
     }
     //#endregion
   }

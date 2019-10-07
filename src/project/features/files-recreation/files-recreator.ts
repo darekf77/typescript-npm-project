@@ -99,6 +99,10 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
+          .concat((self.project.isSite && self.project.type === 'isomorphic-lib' && self.project.useFramework) ? [
+            path.join(config.folder.custom, config.folder.src, config.file.entities_ts),
+            path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
+          ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
           .concat(self.project.type === 'angular-lib' ? ['src/tsconfig.app.json'] : [])
           .concat( // for site ignore auto-generate scr
@@ -359,7 +363,7 @@ export class FilesRecreator extends FeatureForProject {
             config.folder.src,
             config.folder.assets,
             child.name))
-            Helpers.copy(libAssetsPath, clientAssetsPath);
+          Helpers.copy(libAssetsPath, clientAssetsPath);
         }
       })
     }

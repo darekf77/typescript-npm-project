@@ -80,6 +80,7 @@ import { CopyManager } from '../../features/copy-manager';
       entity.browser.parent = void 0
     }
 
+    entity.browser.genericName = entity.genericName;
     entity.browser.name = entity.name;
     entity.browser.isWorkspace = entity.isWorkspace;
     entity.browser.isStandaloneProject = entity.isStandaloneProject;
@@ -301,7 +302,7 @@ export class Project {
       return containerProject;
     }
 
-    if(libraryType === 'single-file-project') {
+    if (libraryType === 'single-file-project') {
       const singleFileProject = Project.From(config.pathes.projectsExamples.singlefileproject);
       return singleFileProject;
     }

@@ -121,6 +121,7 @@ export namespace ModelsOther {
     env: EnvironmentConfig;
     allowedEnvironments: ModelsEnvinronment.EnvironmentName[];
     children: Project[];
+    distribution: Project;
     childrenThatAreLibs?: Project[];
     childrenThatAreClients?: Project[];
     childrenThatAreThirdPartyInNodeModules?: Project[];

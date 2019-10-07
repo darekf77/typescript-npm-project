@@ -32,8 +32,7 @@ export class EntitesGenerator extends FeatureCompilerForProject {
     return entity
   }
 
-  protected generateEntityTs() {
-    const isSite = false;
+  protected generateEntityTs(isSite = this.project.isSite) {
     const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
       : path.join(this.project.location, config.folder.src);
 
@@ -100,8 +99,23 @@ export class EntitesGenerator extends FeatureCompilerForProject {
     const currentFile = Helpers.readFile(entitesFilePath)
 
     if (currentFile !== newEntitesFile) {
-      Helpers.writeFile(entitesFilePath, newEntitesFile)
+      Helpers.writeFile(entitesFilePath, newEntitesFile);
     }
+    if(isSite) {
+      this.generateEntityTs(false)
+    }
+    // const entitesLinkInSitePath = path.join(
+    //   this.project.location,
+    //   config.folder.custom,
+    //   config.folder.src,
+    //   'entities.ts'
+    // );
+    // if (this.project.isSite && !fse.existsSync(entitesLinkInSitePath)) {
+    //   Helpers.createSymLink(
+    //     entitesFilePath,
+    //     entitesLinkInSitePath
+    //   );
+    // }
   }
 
 

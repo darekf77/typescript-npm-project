@@ -4,14 +4,20 @@
 
 <ng-template #loader>
   <br>
-  ..loading model
-</ng-template>
+  <div *ngIf="projects.length > 0 && !selected" >
+    Models ready.. select project
+  </div>
+  <div *ngIf="projects.length === 0" >
+    ...loading models
+  </div>
 
+</ng-template>
 
 <ng-template #menu>
 
   <app-recrusive-menu *ngIf="projects"
                       [items]="projects"
+                      [nameProperty]="'genericName'"
                       [filter]="filter"
                       (selected)="selectProject($event)"></app-recrusive-menu>
 

@@ -23,6 +23,7 @@ async function $COMPILER_SM_WATCH() {
 }
 
 async function $COMPILER_FFG() {
+  console.info('FRAMEWORK FILES FGENERATOR')
   await Project.Current.frameworkFileGenerator.start(testTasks);
   process.exit(0)
 }

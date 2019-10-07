@@ -45,6 +45,7 @@ export class HelpersFileFolders {
 
     // console.log('Create link!')
 
+
     let target = existedFileOrFolder;
     let link = destinationPath;
 

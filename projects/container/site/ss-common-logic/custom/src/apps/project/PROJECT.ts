@@ -80,16 +80,16 @@ export class PROJECT extends Project {
     this.browser.selectedEnv = v;
   }
 
-//#region @backend
+  //#region @backend
   static getProjectEnv(project: Project) {
     let wasNulled = false;
     let result: any;
-    if(project.env && project.env['project'] === null) {
+    if (project.env && project.env['project'] === null) {
       wasNulled = true;
       project.env['project'] = project;
     }
     result = project.env && project.env.config && project.env.config.name;
-    if(wasNulled) {
+    if (wasNulled) {
       project.env['project'] = null;
     }
     return result;
@@ -129,7 +129,7 @@ export class PROJECT extends Project {
   async updateEndGetEnvironments() {
     try {
       const data = await this.ctrl.getEnvironments(this.location).received;
-      this.envionments = data.body.json;
+      this.envionments = data.body.json.filter(f => f !== 'local');
     } catch (error) { }
   }
 

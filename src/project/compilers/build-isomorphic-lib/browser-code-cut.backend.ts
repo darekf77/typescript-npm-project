@@ -28,7 +28,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
-      Helpers.error(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`, true, true)
+      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`)
       replacement = replacement.replace(/\`/g, '\\`');
     }
     return replacement;

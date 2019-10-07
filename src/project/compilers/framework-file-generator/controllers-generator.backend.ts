@@ -13,8 +13,7 @@ import { EntitesGenerator } from './entities-generator.backend';
 
 export class ControllersGenerator extends EntitesGenerator {
 
-  protected generateControllersTs() {
-    const isSite = false; // this.project.isSite;
+  protected generateControllersTs(isSite = this.project.isSite) {
     const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
       : path.join(this.project.location, config.folder.src);
 
@@ -83,6 +82,22 @@ export class ControllersGenerator extends EntitesGenerator {
     if (currentFile !== newControllerFile) {
       Helpers.writeFile(controllerFilePath, newControllerFile)
     }
+    if(isSite) {
+      this.generateControllersTs(false) // @LAST fix controller, entities generation in site
+    }
+    // const controllersLinkInSitePath = path.join(
+    //   this.project.location,
+    //   config.folder.custom,
+    //   config.folder.src,
+    //   'controllers.ts'
+    // );
+    // Helpers.info(`controllersLinkInSitePath: ${controllersLinkInSitePath}`);
+    // if (this.project.isSite && !fse.existsSync(controllersLinkInSitePath)) {
+    //   Helpers.createSymLink(
+    //     controllerFilePath,
+    //     controllersLinkInSitePath
+    //   );
+    // }
   }
 
 

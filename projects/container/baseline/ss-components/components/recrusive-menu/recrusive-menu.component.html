@@ -6,6 +6,7 @@
     <app-recrusive-menu *ngIf="item[childrenProperty]"
                         [level]="level + 1"
                         [filter]="filter"
+                        [nameProperty]="nameProperty"
                         (selected)="onSelected($event)"
                         [items]="item[childrenProperty]"></app-recrusive-menu>
   </li>
@@ -20,6 +21,7 @@
     <app-recrusive-menu *ngIf="item[childrenProperty]"
                         [level]="level + 1"
                         [filter]="filter"
+                        [nameProperty]="nameProperty"
                         (selected)="onSelected($event)"
                         [items]="item[childrenProperty]"></app-recrusive-menu>
   </li>
