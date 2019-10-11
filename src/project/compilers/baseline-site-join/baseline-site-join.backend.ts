@@ -17,6 +17,7 @@ import { IncCompiler } from 'incremental-compiler';
 import { Project } from '../../../index';
 import { FilesJoinActions } from './files-join-actions.backend';
 import { HelpersMerge } from './merge-helpers.backend';
+import { relative } from 'path';
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;
@@ -63,7 +64,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
   async asyncAction(event: IncCompiler.Change) {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     const absolutePath = event.fileAbsolutePath;
-    const relativePath = this.resolvePath(absolutePath);
+    const relativePath = this.resolveRelativePath(absolutePath);
     if (!relativePath) {
       return;
     }
@@ -88,6 +89,8 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
       ...this.project.quickFixes.nodeModulesReplacementsZips,
       ...this.project.node_modules.fixesForNodeModulesPackages,
     ];
+    console.log('genratedFiles', genratedFiles)
+    // process.exit(0)
     // console.log('generated files', genratedFiles);
 
     return files.filter(f => {
@@ -108,7 +111,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('syncAction', filesAbsolutePathes)
 
     filesAbsolutePathes = filesAbsolutePathes.map(absolutePath => {
-      return this.resolvePath(absolutePath);
+      return this.resolveRelativePath(absolutePath);
     }).filter(f => !!f);
 
 
@@ -128,18 +131,33 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('modifierFiled', modifiedFiles);
   }
 
-  private resolvePath(absolutePath: string) {
+  private returnRelativePathIfAllowed(relativePath: string, contactWith: string) {
+    const pathToCheck = path.join(contactWith, relativePath);
+    const res = [
+      ...this.project.sourceFilesToIgnore()
+    ].includes(pathToCheck)
+    if (res) {
+      console.log(`ignore: ${pathToCheck}`);
+      return;
+    }
+    return relativePath;
+  }
+
+  private resolveRelativePath(absolutePath: string) {
     const customPath = path.join(this.project.location, config.folder.custom);
     if (absolutePath.startsWith(customPath)) {
-      return absolutePath.replace(customPath, '').replace(/^\//, '');
+      const relativePath = absolutePath.replace(customPath, '').replace(/^\//, '');
+      return this.returnRelativePathIfAllowed(relativePath, config.folder.custom);
     }
     const baselinePath = path.join(this.project.baseline.location);
     if (absolutePath.startsWith(baselinePath)) {
-      return absolutePath.replace(baselinePath, '').replace(/^\//, '');
+      const relativePath = absolutePath.replace(baselinePath, '').replace(/^\//, '');
+      return this.returnRelativePathIfAllowed(relativePath, '');
     }
     const sitePath = path.join(this.project.location);
     if (absolutePath.startsWith(sitePath)) {
-      return absolutePath.replace(sitePath, '').replace(/^\//, '');
+      const relativePath = absolutePath.replace(sitePath, '').replace(/^\//, '');
+      return this.returnRelativePathIfAllowed(relativePath, '');
     }
     Helpers.warn(`Unrecognized merge aciton for: ${absolutePath}`)
   }

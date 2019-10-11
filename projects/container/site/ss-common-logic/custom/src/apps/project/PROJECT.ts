@@ -8,7 +8,7 @@ export { IProject } from 'tnp-bundle';
 import { IProject } from 'tnp-bundle';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CLASS } from 'typescript-class-helpers';
-const log = Log.create('PROJECT')
+const log = Log.create('PROJECT');
 
 export interface IPROJECT extends IProject {
   procStaticBuild?: PROCESS;
