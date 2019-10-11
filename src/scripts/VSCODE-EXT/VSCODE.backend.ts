@@ -47,6 +47,10 @@ export async function $VSCODE_INIT_ALL() {
   process.exit(0);
 }
 
+function $WSL_FIX() {
+  Helpers.run(`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`).sync();
+  process.exit(0)
+}
 
 export default {
   $VSCODE_EXT,
@@ -72,6 +76,10 @@ export default {
     process.exit(0)
   },
 
+  $WSL_FIX,
+  $FIX_WSL() {
+    $WSL_FIX();
+  },
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
