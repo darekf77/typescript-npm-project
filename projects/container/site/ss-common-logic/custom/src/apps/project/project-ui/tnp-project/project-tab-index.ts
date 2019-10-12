@@ -4,4 +4,5 @@ export enum TnpProjectTabIndex {
   BUILD = 1,
   TEST = 2,
   SERVE = 3,
+  RELEASE = 4,
 }

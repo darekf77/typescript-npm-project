@@ -26,9 +26,9 @@ export class ItemBuildComponent extends BaseItemStepperProcessBuildComponent imp
   }
 
   tabSelectedAction() {
-    // const proc = this.model.procStaticBuild;
-    // const parameters = _.isString(this.model.selectedEnv) ? { env: this.model.selectedEnv } : void 0;
-    // this.model.procStaticBuild.parameters = parameters
+    const proc = this.model.procStaticBuild;
+    const parameters = _.isString(this.model.selectedEnv) ? { env: this.model.selectedEnv } : void 0;
+    this.model.procStaticBuild.parameters = parameters
 
     // const COMMAND_TO_EXECUTE = proc.parameters ? Helpers
     //   .interpolateString(proc.cmd)
