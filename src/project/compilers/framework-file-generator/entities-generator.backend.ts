@@ -32,9 +32,7 @@ export class EntitesGenerator extends FeatureCompilerForProject {
     return entity
   }
 
-  protected generateEntityTs(isSite = this.project.isSite) {
-    const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
-      : path.join(this.project.location, config.folder.src);
+  protected generateEntityTs(cwd: string, isSite = false) {
 
     if (!fse.existsSync(cwd)) {
       Helpers.log(`Entites not geenrated, folder doesnt exists: ${cwd}`);
@@ -42,13 +40,6 @@ export class EntitesGenerator extends FeatureCompilerForProject {
     }
 
     let entitesFiles = Helpers.morphi.getEntites(cwd);
-
-    if (isSite) {
-      entitesFiles = entitesFiles.filter(f => {
-        const baselineFile = path.join(this.project.baseline.location, config.folder.src, f);
-        return !fse.existsSync(baselineFile)
-      })
-    }
     entitesFiles = entitesFiles.map(f => `./${f.replace(/\.ts$/, '')}`)
 
 
@@ -101,21 +92,6 @@ export class EntitesGenerator extends FeatureCompilerForProject {
     if (currentFile !== newEntitesFile) {
       Helpers.writeFile(entitesFilePath, newEntitesFile);
     }
-    if(isSite) {
-      this.generateEntityTs(false)
-    }
-    // const entitesLinkInSitePath = path.join(
-    //   this.project.location,
-    //   config.folder.custom,
-    //   config.folder.src,
-    //   'entities.ts'
-    // );
-    // if (this.project.isSite && !fse.existsSync(entitesLinkInSitePath)) {
-    //   Helpers.createSymLink(
-    //     entitesFilePath,
-    //     entitesLinkInSitePath
-    //   );
-    // }
   }
 
 

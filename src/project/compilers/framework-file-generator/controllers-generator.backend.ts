@@ -13,28 +13,14 @@ import { EntitesGenerator } from './entities-generator.backend';
 
 export class ControllersGenerator extends EntitesGenerator {
 
-  protected generateControllersTs(isSite = this.project.isSite) {
-    const cwd = isSite ? path.join(this.project.location, config.folder.custom, config.folder.src)
-      : path.join(this.project.location, config.folder.src);
+  protected generateControllersTs(cwd: string, isSite = false) {
 
     if (!fse.existsSync(cwd)) {
-      Helpers.log(`Controllers not geenrated, folder doesnt exists: ${cwd}`);
+      Helpers.warn(`Controllers not geenrated, folder doesnt exists: ${cwd}`);
       return;
     }
 
     let controllersFiles = Helpers.morphi.getControllers(cwd);
-
-    if (isSite) {
-      controllersFiles = controllersFiles.filter(f => {
-        const baselineFile = path.join(this.project.baseline.location, config.folder.src, f);
-        return !fse.existsSync(baselineFile)
-      })
-    }
-
-    // controllersFiles = controllersFiles.filter(f => {
-    //   const fileAbsolutePatg = path.join(this.project.location, config.folder.src, f);
-    //   return !fse.existsSync(baselineFile)
-    // })
 
     controllersFiles = controllersFiles.map(f => `./${f.replace(/\.ts$/, '')}`)
 
@@ -82,22 +68,6 @@ export class ControllersGenerator extends EntitesGenerator {
     if (currentFile !== newControllerFile) {
       Helpers.writeFile(controllerFilePath, newControllerFile)
     }
-    if(isSite) {
-      this.generateControllersTs(false) // @LAST fix controller, entities generation in site
-    }
-    // const controllersLinkInSitePath = path.join(
-    //   this.project.location,
-    //   config.folder.custom,
-    //   config.folder.src,
-    //   'controllers.ts'
-    // );
-    // Helpers.info(`controllersLinkInSitePath: ${controllersLinkInSitePath}`);
-    // if (this.project.isSite && !fse.existsSync(controllersLinkInSitePath)) {
-    //   Helpers.createSymLink(
-    //     controllerFilePath,
-    //     controllersLinkInSitePath
-    //   );
-    // }
   }
 
 

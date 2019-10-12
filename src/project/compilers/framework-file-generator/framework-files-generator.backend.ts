@@ -35,8 +35,15 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   async syncAction() {
     if (this.project.type === 'isomorphic-lib' && this.project.useFramework) {
-      this.generateEntityTs()
-      this.generateControllersTs()
+      const isSite = this.project.isSite;
+      let cwd = path.join(this.project.location, config.folder.src);
+      this.generateEntityTs(cwd);
+      this.generateControllersTs(cwd);
+      if (isSite) {
+        cwd = path.join(this.project.location, config.folder.custom, config.folder.src);
+        this.generateEntityTs(cwd, true);
+        this.generateControllersTs(cwd, true);
+      }
     } else {
 
     }

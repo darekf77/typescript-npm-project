@@ -25,8 +25,8 @@ export class ProjectIsomorphicLib extends Project {
 
   sourceFilesToIgnore() {
     let toIgnore = [
-      'src/entites.ts',
-      'src/controllers.ts',
+      `src/${config.file.entities_ts}`,
+      `src/${config.file.controllers_ts}`,
     ];
     if (this.isSite) {
       toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
@@ -43,9 +43,9 @@ export class ProjectIsomorphicLib extends Project {
         'run.js',
         ...this.filesTemplates(),
       ]).concat(
-        !this.isStandaloneProject ? [
-          'src/typings.d.ts',
-        ] : []);
+      !this.isStandaloneProject ? [
+        'src/typings.d.ts',
+      ] : []);
   }
 
   filesTemplates() {

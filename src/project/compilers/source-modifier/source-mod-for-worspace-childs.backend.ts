@@ -157,7 +157,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       }
 
-      // @LAST Angulair lib and generala angular-clint...
+      // TODO delete this ?
+      // Angulair lib and generala angular-clint...
       // there is a problem with join for tnp baw
 
       // tnp-src should wokr for copy of app/src in clients
