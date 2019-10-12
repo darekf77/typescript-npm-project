@@ -99,7 +99,7 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
-          .concat((self.project.isSite && self.project.type === 'isomorphic-lib' && self.project.useFramework) ? [
+          .concat((self.project.isSite && self.project.isGeneratingControllerEntities) ? [
             path.join(config.folder.custom, config.folder.src, config.file.entities_ts),
             path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
           ] : [])

@@ -49,6 +49,10 @@ export abstract class LibProject {
     //#endregion
   }
 
+  get isGeneratingControllerEntities(this: Project) {
+    return this.type === 'isomorphic-lib' && this.useFramework;
+  }
+
   //#region @backend
   projectSpecyficFiles(this: Project) {
     const files = [

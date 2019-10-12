@@ -13,7 +13,7 @@ import { ControllersGenerator } from './controllers-generator.backend';
 
 export function optionsFrameworkFileGen(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;
-  if (project.isWorkspaceChildProject && project.type === 'isomorphic-lib' && project.useFramework) {
+  if (project.isWorkspaceChildProject && project.isGeneratingControllerEntities) {
     folderPath = path.join(project.location, config.folder.src);
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
@@ -34,7 +34,7 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
   }
 
   async syncAction() {
-    if (this.project.type === 'isomorphic-lib' && this.project.useFramework) {
+    if (this.project.isGeneratingControllerEntities) {
       const isSite = this.project.isSite;
       let cwd = path.join(this.project.location, config.folder.src);
       this.generateEntityTs(cwd);

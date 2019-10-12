@@ -15,6 +15,26 @@ import { Models } from '../models';
 const prompts = require('prompts');
 //#endregion
 
+// TODO idea of procees someday to change
+
+/**
+ * - long buffer by default
+ * - easy catch output of commands
+ * - wrap with try catch
+ * - handle backgroud proceses
+ */
+// function childExc(command: string) {
+//   return {
+//     syncExecutedValue({ displayOutput = false }): string {
+//       return '';
+//     },
+//     asycRun({ hideOutput: 'all' | 'stdout' | 'stder' }) {
+
+//     }
+//   }
+// }
+
+
 export class HelpersProcess {
 
   async  runSyncOrAsync(fn: Function, args?: any[]) {
@@ -291,6 +311,8 @@ export class HelpersProcess {
       }
     }
   }
+
+
 
 
 
