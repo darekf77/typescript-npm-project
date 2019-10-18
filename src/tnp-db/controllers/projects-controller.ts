@@ -46,6 +46,9 @@ export class ProjectsController extends BaseController {
     }
 
     if (this.crud.addIfNotExist(projectInstance)) {
+      if (_.isArray(projectInstance.project.preview)) {
+        this.addIfNotExists(ProjectInstance.from(projectInstance.project.preview))
+      }
       if (_.isArray(projectInstance.project.children)) {
         projectInstance.project.children.forEach(c => this.addIfNotExists(ProjectInstance.from(c)))
       }

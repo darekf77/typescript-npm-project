@@ -181,6 +181,11 @@ export default {
     DEPS_SHOW(args)
   },
 
+  $SHOW_CHILDREN() {
+    console.log(Project.Current.children.map(c => c.genericName).join('\n'))
+    process.exit(0)
+  },
+
   DEPS_SHOW_IF_STANDALONE(args: string) {
     Helpers.log(`Hook update start`)
     if (Project.Current.isStandaloneProject) {

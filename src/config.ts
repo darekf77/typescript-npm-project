@@ -47,6 +47,7 @@ const tempFolders = {
   tmp: 'tmp',
   tempSrc: 'tmp-src',
   previewDistApp: 'dist-app',
+  preview: 'preview',
   browser: 'browser',
   module: 'module',
   backup: 'backup',

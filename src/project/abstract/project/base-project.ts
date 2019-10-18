@@ -9,6 +9,7 @@ import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 
 import { Project } from './project';
+import { config } from '../../../config';
 
 export abstract class BaseProject {
 
@@ -24,15 +25,58 @@ export abstract class BaseProject {
       return;
     }
     let result = [
-      (this.isGenerated ? `((${chalk.bold('GENERATED')}))` : ''),
-      ((this.isWorkspaceChildProject && this.parent.isContainerChild) ? this.parent.parent.name : ''),
-      (this.isWorkspaceChildProject ? this.parent.name : ''),
-      (this.isContainerChild ? this.parent.name : ''),
-      ((this.isStandaloneProject && this.parent && this.parent.name) ? `<<${this.parent.genericName}>>` : ''),
-      this.name
-    ].filter(f => !!f).join('/').trim()
-    return result;
+      (this.isWorkspace && this.isGenerated) ? `${(this.origin && this.origin.parent) ?
+        this.origin.parent.name : ' - no origin - '}` : ''
+    ];
+    result = result.concat(this.findPrentsNames(this));
+    if (this.isGenerated) {
+      result.push(`((${chalk.bold('GENERATED')}))${this.name}`)
+    } else {
+      result.push(this.name);
+    }
+    return result.filter(f => !!f).join('/').trim()
     //#endregion
+  }
+
+  private findPrentsNames(this: Project, project: Project, result = []): string[] {
+    if (!project) {
+      return result.reverse();
+    }
+    if (project && project.parent) {
+      result.push(project.parent.name)
+    }
+    return this.findPrentsNames(project.parent, result);
+  }
+
+  get isPreviewFor(this: Project): Project {
+    let previewFor: Project;
+
+    if (
+      this.parent &&
+      this.parent.isStandaloneProject &&
+      (this.name === config.folder.preview)
+    ) {
+      previewFor = this.parent;
+    } else if (
+      this.parent &&
+      this.parent.parent &&
+      this.parent.parent.isStandaloneProject &&
+      (this.parent.name === config.folder.preview)
+    ) {
+      previewFor = this.parent.parent;
+    } else if (
+      this.parent &&
+      this.parent.parent &&
+      this.parent.parent.parent &&
+      this.parent.parent.parent.isStandaloneProject &&
+      (this.parent.parent.name === config.folder.preview)
+    ) {
+      previewFor = this.parent.parent;
+    }
+    if (previewFor && previewFor.isTnp) {
+      return;
+    }
+    return previewFor;
   }
 
   public get backupName(this: Project) {

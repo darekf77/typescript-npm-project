@@ -165,6 +165,7 @@
               "@ngx-formly/material": "^3.1.0"
             },
             "ui-libs": {
+              "bootstrap": "4.3.1",
               "ngx-bootstrap": "^2.0.2"
             },
             "icons": {
