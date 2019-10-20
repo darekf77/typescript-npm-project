@@ -136,10 +136,12 @@ inside generated projects...
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
     }
 
-    if (buildOptions.watch) {
-      await this.project.filesStructure.init(buildOptions.args, { watch: true });
-    } else {
-      await this.project.filesStructure.init(buildOptions.args);
+    if (!buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+      if (buildOptions.watch) {
+        await this.project.filesStructure.init(buildOptions.args, { watch: true });
+      } else {
+        await this.project.filesStructure.init(buildOptions.args);
+      }
     }
 
     if (!buildOptions.watch && this.project.isGenerated && this.project.isWorkspace) {
