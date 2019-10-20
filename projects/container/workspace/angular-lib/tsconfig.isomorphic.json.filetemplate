@@ -26,11 +26,11 @@
     "types": [
       "node"
     ],
-    "rootDir": "./{{{ ENV ? 'tmp-src' : 'src' }}}",
+    "rootDir": "./tmp-src",
     "outDir": "dist"
   },
   "include": [
-    "{{{ ENV ? 'tmp-src' : 'src' }}}/**/*"
+    "tmp-src/**/*"
   ],
   "exclude": [
     "node_modules",
@@ -43,9 +43,9 @@
     "browser",
     "module",
     "tests",
-    "{{{ ENV ? 'src' : 'tmp-src' }}}",
-    "{{{ ENV ? 'tmp-src' : 'src' }}}/tests",
-    "{{{ ENV ? 'tmp-src' : 'src' }}}/**/*.spec.ts",
+    "src",
+    "tmp-src/tests",
+    "tmp-src/**/*.spec.ts",
     "tmp-site-src",
     "tmp-tests-context"
   ]

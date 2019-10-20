@@ -80,7 +80,8 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
     // console.log(relativePathesToProject)
     // process.exit(0)
-    if (!this.project.isStandaloneProject) {
+    if (!this.project.isStandaloneProject ||
+      (this.project.isStandaloneProject && this.project.type === 'angular-lib')) {
 
       Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
       // console.log('for app replikator', relativePathesToProject)

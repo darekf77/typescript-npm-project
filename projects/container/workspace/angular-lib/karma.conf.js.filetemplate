@@ -16,10 +16,10 @@ module.exports = function (config) {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     files: [
-      { pattern: './{{{ ENV ? 'tmp-src' : 'src' }}}/test.ts', watched: false }
+      { pattern: './tmp-src/test.ts', watched: false }
     ],
     preprocessors: {
-      './{{{ ENV ? 'tmp-src' : 'src' }}}/test.ts': ['@angular/cli']
+      './tmp-src/test.ts': ['@angular/cli']
     },
     mime: {
       'text/x-typescript': ['ts','tsx']

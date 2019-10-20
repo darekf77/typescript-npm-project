@@ -2,6 +2,7 @@ import { Project } from '../../index';
 
 /**
  * app - angular app
+ * - src (angular-lib)
  * lib
  *  - src (isomorphic-lib) -> lib-name/src
  *  - components (angular-lib)   -> lib-name/components

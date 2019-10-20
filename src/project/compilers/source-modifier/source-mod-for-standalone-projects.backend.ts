@@ -54,7 +54,7 @@ export class SourceModForStandaloneProjects
     }
 
     // if (this.project.isStandaloneProject) {
-      // TODO this would be good
+    // TODO this would be good
     //   // MAYBE_TODO someday make it work for site
     //   // this is causing repeat same file watching problem
     //   const input = Helpers.readFile(absoluteFilePath);
@@ -105,6 +105,11 @@ export class SourceModForStandaloneProjects
     modType: ModType,
     relativePath: string): string {
 
+    // if (relativePath === 'src/app/app.component.ts') {
+    //   console.log(`${modType}: ${relativePath}`)
+    //   console.log('input: \n' + input)
+    // }
+
     const method: CheckType = 'standalone';
     const folders = [
       ...this.foldersSources,
@@ -115,7 +120,7 @@ export class SourceModForStandaloneProjects
       this.project.parent.childrenThatAreThirdPartyInNodeModules
       : this.project.childrenThatAreThirdPartyInNodeModules;
 
-    // console.log('this.project.childrenThatAreThirdPartyInNodeModules', children.map(c => c.name))
+    // console.log(children.map(c => c.name).join(','))
 
     children.forEach(child => {
       const libName = child.name;

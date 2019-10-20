@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
-    "baseUrl": "{{{ ENV ? 'tmp-src' : 'src' }}}",
+    "baseUrl": "tmp-src",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -25,6 +25,6 @@
     "node_modules",
     "dist",
     "module*",
-    "{{{ ENV ? 'src' : 'tmp-src' }}}"
+    "src"
   ]
 }
