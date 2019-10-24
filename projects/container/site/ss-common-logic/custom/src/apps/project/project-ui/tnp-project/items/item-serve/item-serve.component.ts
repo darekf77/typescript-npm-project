@@ -5,7 +5,7 @@ import { MatRadioChange } from '@angular/material/radio';
 
 
 import { PROJECT } from '../../../../PROJECT';
-import { TnpProjectTabIndex } from '../../project-tab-index';
+import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
 
 
 @Component({

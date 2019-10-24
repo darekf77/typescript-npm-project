@@ -1,9 +1,9 @@
-import { TnpProjectTabIndex } from "./project-tab-index";
-import { TemplateRef } from "@angular/core";
+import { TnpProjectTabIndex } from './project-tab-index';
+import { TemplateRef } from '@angular/core';
 
 export class MenuStepTnpProject {
 
-  static All: { [indexName in TnpProjectTabIndex]: MenuStepTnpProject } = {} as any;
+  static All = {} as any;
 
 
   private static init = (() => {
@@ -37,7 +37,7 @@ export class MenuStepTnpProject {
   })()
 
   constructor(
-    public name: string,
+    public name: any,
     public index: TnpProjectTabIndex,
     public template?: TemplateRef<any>
   ) {

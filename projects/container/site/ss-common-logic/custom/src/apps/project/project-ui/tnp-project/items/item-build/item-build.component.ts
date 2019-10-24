@@ -6,7 +6,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { Helpers } from 'baseline/ss-common-logic/src/helpers';
 
 import { PROJECT } from '../../../../PROJECT';
-import { TnpProjectTabIndex } from '../../project-tab-index';
+import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
 
 
 @Component({

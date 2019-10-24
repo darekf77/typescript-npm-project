@@ -4,7 +4,7 @@ import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 
 
 import { PROJECT } from '../../../../PROJECT';
-import { TnpProjectTabIndex } from '../../project-tab-index';
+import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
 
 
 @Component({

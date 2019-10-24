@@ -116,7 +116,12 @@ export class PROJECT extends Project {
   }
 
   static async getAllForMenu() {
+    if(this.ctrl.getAllStandalone().received.cache) {
+      const data = this.ctrl.getAllStandalone().received.cache.response;
+      return data.body.json;
+    }
     const data = await this.ctrl.getAllStandalone().received;
+    data.cache.store();
     return data.body.json;
   }
 

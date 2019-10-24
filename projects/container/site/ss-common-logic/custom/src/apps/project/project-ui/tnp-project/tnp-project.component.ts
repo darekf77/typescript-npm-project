@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
-import { TnpProjectTabIndex } from './project-tab-index';
+import { TnpProjectTabIndex } from './tabs-menu-tnp-project';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 

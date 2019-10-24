@@ -6,7 +6,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material';
 import { PROJECT } from '../../../PROJECT';
 import { BaseComponent } from 'baseline/ss-helpers/components';
-import { TnpProjectTabIndex } from '../project-tab-index';
+import { TnpProjectTabIndex } from '../tabs-menu-tnp-project';
 
 @Component({
   selector: 'app-base-item-stepper-process-build',

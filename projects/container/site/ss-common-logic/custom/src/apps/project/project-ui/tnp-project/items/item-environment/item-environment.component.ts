@@ -10,7 +10,7 @@ import { PROJECT } from '../../../../PROJECT';
 
 
 import { Log, Level } from 'ng2-logger';
-import { TnpProjectTabIndex } from '../../project-tab-index';
+import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
 const log = Log.create('item-environment.componetn');
 
 @Component({
