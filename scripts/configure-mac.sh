@@ -7,3 +7,4 @@ nvm alias default node
 nvm install 9.4
 nvm use 9.4
 npm install npm@latest -g
+git config --global core.editor code --wait

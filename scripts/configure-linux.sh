@@ -18,7 +18,7 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
 
 git config --global user.email "darekf77@gmail.com"
 git config --global user.name  "Dariusz"
-
+git config --global core.editor code --wait
 echo "Client configuration done"
 
 

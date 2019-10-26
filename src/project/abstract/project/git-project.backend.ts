@@ -6,7 +6,7 @@ import { Helpers } from '../../../helpers';
 
 export abstract class ProjectGit {
   //#region @backend
-  public get git(this: Project,) {
+  public get git(this: Project, ) {
     const self = this;
     return {
       resetFiles(...relativePathes: string[]) {

@@ -56,34 +56,43 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
     const githubGitUrl = `${address}${projectName}`;
     let action: TAction = 'clone';
     const dest = path.join(npmLocation, projectName);
-    action = fse.existsSync(dest) ? 'pull' : 'clone';
 
-    const process = async () => {
+    const process = async (retry = false) => {
+      Helpers.info(`${retry ? '' : '\n\n'} --- ${retry ? 'Retrying' : 'Starting'
+        } dump of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
+      action = fse.existsSync(dest) ? 'pull' : 'clone';
       try {
         const dest = path.join(npmLocation, projectName);
         if (action === 'pull') {
-          const proj = Project.From(dest);
+          let proj: Project;
+          while (!proj) {
+            proj = Project.From(dest);
+            if (!proj) {
+              Helpers.run(`code ${dest}`).async();
+              await Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
+                chalk.bold(projectName)} to continue and press any key`)
+            }
+          }
           if (proj.git.thereAreSomeUncommitedChange) {
             Helpers.run(`code ${dest}`).async();
-            await Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull `+
-            `from git press any key to try again`)
+            await Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull ` +
+              `from git press any key to try again`)
           }
-          Project.From(dest).git.pullCurrentBranch();
+          proj.git.pullCurrentBranch();
           Helpers.info(`Pull new origin for ${projectName}`);
         } else {
           Helpers.run(`git clone ${githubGitUrl}`, { cwd: npmLocation }).sync();
           Helpers.info(`Cloned origin for ${projectName}`);
         }
       } catch (err) {
-        Helpers.error(err);
-        // if (action === 'pull') {
-        //   Helpers.error(err);
-        //   Helpers.run(`code ${dest}`).async();
-        //   await Helpers.pressKeyAndContinue(`After fix press any key to try again`)
-        //   await process();
-        // } else {
-
-        // }
+        Helpers.error(err, true);
+        Helpers.run(`code ${dest}`).async();
+        const tryAgain = await Helpers.questionYesNo(`Try again dump project ${projectName} ?`);
+        if (tryAgain) {
+          await process(true);
+        } else {
+          Helpers.info(`Skipping project ${chalk.underline(projectName)}`);
+        }
       }
     }
     await process();
