@@ -51,6 +51,15 @@ export class HelpersProcess {
     return promisOrValue;
   }
 
+  pressKeyAndContinue(message = 'Press enter try again') {
+    return new Promise((resovle) => {
+      Helpers.log(message);
+      process.stdin.once('data', function () {
+        resovle()
+      });
+    })
+  }
+
   async  questionYesNo(message: string,
     callbackTrue?: () => any, callbackFalse?: () => any) {
 

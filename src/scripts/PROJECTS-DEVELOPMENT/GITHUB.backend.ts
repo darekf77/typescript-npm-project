@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from '../../helpers';
 
@@ -42,27 +43,52 @@ const githubProjects = [
   'pdf-in-browser-angular-nodejs',
 
 
-]
+];
+
+export type TAction = 'clone' | 'pull';
 
 
-function $GITHUB_DUMP(args: string, exit = true) {
+export async function $GITHUB_DUMP(args: string, exit = true) {
   const address = 'git@github.com:darekf77/';
   const npmLocation = path.resolve(path.join(Project.Tnp.location, '..'));
   for (let index = 0; index < githubProjects.length; index++) {
     const projectName = githubProjects[index];
     const githubGitUrl = `${address}${projectName}`;
-    try {
-      const dest = path.join(npmLocation, projectName);
-      if (fse.existsSync(dest)) {
-        Project.From(dest).git.pullCurrentBranch();
-      } else {
-        Helpers.run(`git clone ${githubGitUrl}`, { cwd: npmLocation }).sync();
+    let action: TAction = 'clone';
+    const dest = path.join(npmLocation, projectName);
+    action = fse.existsSync(dest) ? 'pull' : 'clone';
+
+    const process = async () => {
+      try {
+        const dest = path.join(npmLocation, projectName);
+        if (action === 'pull') {
+          const proj = Project.From(dest);
+          if (proj.git.thereAreSomeUncommitedChange) {
+            Helpers.run(`code ${dest}`).async();
+            await Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull `+
+            `from git press any key to try again`)
+          }
+          Project.From(dest).git.pullCurrentBranch();
+          Helpers.info(`Pull new origin for ${projectName}`);
+        } else {
+          Helpers.run(`git clone ${githubGitUrl}`, { cwd: npmLocation }).sync();
+          Helpers.info(`Cloned origin for ${projectName}`);
+        }
+      } catch (err) {
+        Helpers.error(err);
+        // if (action === 'pull') {
+        //   Helpers.error(err);
+        //   Helpers.run(`code ${dest}`).async();
+        //   await Helpers.pressKeyAndContinue(`After fix press any key to try again`)
+        //   await process();
+        // } else {
+
+        // }
       }
-    } catch (err) {
-      console.log(err);
     }
+    await process();
   }
-  if(exit) {
+  if (exit) {
     process.exit(0)
   }
 }

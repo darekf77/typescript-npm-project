@@ -39,6 +39,9 @@ export abstract class ProjectGit {
       pushCurrentBranch() {
         self.run(`git push origin ${Helpers.git.currentBranchName(self.location)}`).sync()
       },
+      get thereAreSomeUncommitedChange() {
+        return Helpers.run(`git diff --name-only`, { output: false, cwd: self.location }).sync().toString().trim() !== ''
+      },
       pullCurrentBranch() {
         self.run(`git pull origin ${Helpers.git.currentBranchName(self.location)}`).sync()
       },
