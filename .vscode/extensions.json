@@ -18,6 +18,9 @@
         "taddison.gitlazy",
         "jack89ita.copy-filename",
         "natqe.reload",
-        "aeschli.vscode-css-formatter"
+        "aeschli.vscode-css-formatter",
+        "shakram02.bash-beautify",
+        "rogalmic.bash-debug",
+        ""
     ]
 }
