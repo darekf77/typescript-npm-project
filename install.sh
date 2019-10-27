@@ -9,4 +9,6 @@ case "$OSTYPE" in
   *)        echo "unknown: $OSTYPE" ;;
 esac
 
+# install dependencies
 # todo configura mac/wsl/linux/server whatere and quick
+# secure machine
