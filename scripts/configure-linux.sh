@@ -22,6 +22,15 @@ git config --global core.editor code --wait
 echo "Client configuration done"
 
 
+# ==================== set terminal font ====================
+# file " /etc/default/console-setup
+# CHARMAP="UTF-8"
+# CODESET="Lat7"
+# FONTFACE="Terminus"
+# FONTSIZE="28x14"
+# ===========================================================
+
+
 # # server
 # sudo apt-get update && sudo apt-get upgrade
 # sudo apt install git build-essential python
