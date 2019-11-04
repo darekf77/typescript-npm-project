@@ -137,8 +137,8 @@ export class SESSION extends Morphi.Base.Entity<SESSION> implements ISESSION {
   public activateBrowserToken() {
     const session: SESSION = this;
     // console.log('THIS', this)
-    Resource.Headers.request.set(this.CONFIG.AUTHORIZATION_HEADER,
-      `${session.token_type} ${session.token}`)
+    Resource.DEFAULT_HEADERS.set(this.CONFIG.AUTHORIZATION_HEADER,
+      `${session.token_type} ${session.token}`);
   }
 
   public static localStorage = new LocalStorage()
