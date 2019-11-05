@@ -24,7 +24,7 @@ global.tnp_normal_mode = true;
 
 if (bundleExist && distExist) {
   if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
-    console.log('- tnp dist -> becouse is newer -');
+    // console.log('- tnp dist -> becouse is newer -');
     global.tnp_out_folder = 'dist'
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   } else {
@@ -34,11 +34,11 @@ if (bundleExist && distExist) {
   }
 } else {
   if (bundleExist) {
-    console.log('- tnp bundle -');
+    // console.log('- tnp bundle -');
     global.tnp_out_folder = 'bundle'
     start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
   } else {
-    console.log('- tnp dist -');
+    // console.log('- tnp dist -');
     global.tnp_out_folder = 'dist'
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 

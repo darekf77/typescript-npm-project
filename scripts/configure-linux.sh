@@ -1,5 +1,6 @@
 sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install git build-essential python
+
+sudo apt-get install git build-essential python gedit
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -21,6 +22,40 @@ git config --global user.name  "Dariusz"
 git config --global core.editor code --wait
 echo "Client configuration done"
 
+
+
+# ==================== set password for ssh server ====================
+# locale: Cannot set LC_CTYPE to default locale: No such file or directory
+# locale: Cannot set LC_ALL to default locale: No such file or directory
+# fix:
+# export LC_ALL="en_US.UTF-8"
+# ===========================================================
+
+# ==================== vnc server ====================
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-debian-9
+sudo apt install xfce4 xfce4-goodies
+sudo apt install tightvncserver
+vncserver
+vncserver -kill :1
+mv ~/.vnc/xstartup ~/.vnc/xstartup.bak
+`tnp bashconfigvncstart` >> ~/.vnc/xstartup
+sudo chmod +x ~/.vnc/xstartup
+sudo `tnp bashconfigvncservice` >> /etc/systemd/system/vncserver@.service
+sudo systemctl daemon-reload
+sudo systemctl enable vncserver@1.service
+sudo systemctl start vncserver@1
+# ===========================================================
+
+# ==================== set password for ssh server ====================
+# crate good password for users
+sudo apt install openssh-server
+# ===========================================================
+
+# ==================== set password for samba ====================
+sudo apt-get install samba
+smbpasswd -a john
+sudo usermod -a -G sambashare john # wil fix issue on debian
+# ===========================================================
 
 # ==================== set terminal font ====================
 # file " /etc/default/console-setup
