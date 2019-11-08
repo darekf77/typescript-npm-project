@@ -64,7 +64,7 @@ export abstract class BuildableProject {
       const existedProject = db
         .getProjects()
         .map(p => p.project)
-        .filter(p => p && !p.isWorkspaceChildProject)
+        .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
         .filter(p => p.location !== this.location)
 
       if (global.tnpNonInteractive) {
