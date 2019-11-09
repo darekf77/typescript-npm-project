@@ -125,6 +125,9 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
     if (this.project.isSite) {
+      // if(!this.project || !this.project.baseline) {
+      //   console.trace('HERE')
+      // }
       await this.project.baseline.sourceModifier.start(taskName, afterInitCallBack);
     }
     return super.start(taskName, afterInitCallBack);
@@ -133,6 +136,9 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
     if (this.project.isSite) {
+      // if(!this.project || !this.project.baseline) {
+      //   console.trace('HERE')
+      // }
       await this.project.baseline.sourceModifier.startAndWatch(taskName, afterInitCallBack);
     }
     return super.startAndWatch(taskName, afterInitCallBack);

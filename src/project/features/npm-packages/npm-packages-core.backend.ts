@@ -28,7 +28,7 @@ export class NpmPackagesCore extends FeatureForProject {
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn);
-    Helpers.log(`[actualNpmProcess] command: ${command}`)
+    Helpers.log(`[actualNpmProcess] command: ${command} in folder: <...>/${this.project.location}`)
     if (remove) {
       executeCommand(command, this.project);
     } else {

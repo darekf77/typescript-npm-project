@@ -253,6 +253,14 @@ export abstract class FolderProject {
       gitginoredfiles = gitginoredfiles.filter(f => !f.startsWith(config.folder.dist))
     }
 
+    if (this.isCoreProject) {
+      gitginoredfiles = gitginoredfiles.filter(f => {
+        return [
+          config.folder.node_modules
+        ].map(c => `/${c}`).includes(f);
+      })
+    }
+
     for (let index = 0; index < gitginoredfiles.length; index++) {
       const head = gitginoredfiles[index].trim();
       const fileOrDirPath = path.join(this.location, head);

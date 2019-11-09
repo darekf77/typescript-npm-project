@@ -62,7 +62,7 @@ export class FilesStructure extends FeatureForProject {
     }
     let { skipNodeModules, recrusive, env }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
 
-    if(this.project.isWorkspace || this.project.isWorkspaceChildProject) {
+    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (env) {
         Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
       } else {
@@ -94,7 +94,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.quickFixes.badNpmPackages();
 
     }
-    if(this.project.isWorkspace || this.project.isStandaloneProject) {
+    if (this.project.isWorkspace || this.project.isStandaloneProject) {
       this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
 
@@ -193,9 +193,15 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
       if (watch) {
         await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
+        // if (!this.project) {
+        //   console.trace('HERE')
+        // }
         await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir);
       } else {
         await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+        // if (!this.project) {
+        //   console.trace('HERE')
+        // }
         await this.project.sourceModifier.start(this.taskNames.sourceModifir);
       }
     }

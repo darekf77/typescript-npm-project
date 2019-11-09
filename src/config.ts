@@ -19,8 +19,10 @@ allowedEnvironments.forEach(s => {
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
 const filesNotAllowedToClen = {
   _gitignore: '.gitignore',
+  _npmrc: '.npmrc',
   tslint_json: 'tslint.json',
-  _editorconfig: '.editorconfig'
+  _editorconfig: '.editorconfig',
+  _angularCli_json: '.angular-cli.json',
 }
 
 const file = {

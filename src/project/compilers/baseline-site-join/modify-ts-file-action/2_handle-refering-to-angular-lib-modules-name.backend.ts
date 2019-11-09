@@ -32,6 +32,9 @@ export class HandleReferingToAndularLibModuleName extends ModifyTsFileActionBase
   action(relativeBaselineCustomPath, input) {
     // Helpers.log(`relativeBaselineCustomPath: "${relativeBaselineCustomPath}"`)
     if (this.project.isWorkspaceChildProject) {
+      // if(!this.project) {
+      //   console.trace('HERE')
+      // }
       input = this.project.sourceModifier.process(input, relativeBaselineCustomPath);
     }
     if (this.debuggin) Helpers.log(`

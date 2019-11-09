@@ -305,6 +305,7 @@ export class FilesRecreator extends FeatureForProject {
     })
   }
 
+  // @LAST remove it
   private assetsToIgnore = []; // QUICK_FIX make this better, not dependedn gitgnore on it
 
   /**
