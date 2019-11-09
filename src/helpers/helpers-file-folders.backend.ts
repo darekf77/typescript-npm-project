@@ -126,6 +126,14 @@ export class HelpersFileFolders {
     rimraf.sync(fileOrFolderPathOrPatter);
   }
 
+  exists(folderOrFilePath: string) {
+    if (!path.isAbsolute(folderOrFilePath)) {
+      Helpers.warn(`[helpers][exists] Path is not absolute, abort ${folderOrFilePath}`, true);
+      return false;
+    }
+    return fse.existsSync(folderOrFilePath);
+  }
+
   mkdirp(folderPath: string) {
     if (!path.isAbsolute(folderPath)) {
       Helpers.warn(`[helpers][mkdirp] Path is not absolute, abort ${folderPath}`, true);

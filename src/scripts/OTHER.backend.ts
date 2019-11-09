@@ -22,7 +22,7 @@ function CHECK_ENV() {
 
 
 function recreate() {
-  Project.Current.recreate.assets()
+  Project.Current.recreate.initAssets()
   Project.Current.recreate.gitignore()
   process.exit(0)
 
