@@ -309,7 +309,7 @@ export class Project {
 
     const projectPath = path.join(config.pathes.projectsExamples.workspace, libraryType);
     if (!fse.existsSync(projectPath)) {
-      Helpers.error(`Bad library type: ${libraryType}`, true)
+      Helpers.error(`Bad library type: ${libraryType}`, true, true);
     }
     return Project.From(projectPath);
   }

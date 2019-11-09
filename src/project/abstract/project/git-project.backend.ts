@@ -43,7 +43,13 @@ export abstract class ProjectGit {
         return Helpers.run(`git diff --name-only`, { output: false, cwd: self.location }).sync().toString().trim() !== ''
       },
       pullCurrentBranch() {
-        self.run(`git pull origin ${Helpers.git.currentBranchName(self.location)}`).sync()
+        self.run(`git pull origin ${self.git.currentBranchName}`).sync()
+      },
+      get currentBranchName() {
+        // if (!self.git.isGitRepo) {
+        //   return;
+        // }
+        return Helpers.git.currentBranchName(self.location);
       },
       resetHard() {
         self.run(`git reset --hard`).sync()

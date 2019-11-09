@@ -3,9 +3,12 @@ import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from '../../helpers';
-
-const githubProjects = [
+const ADDRESS_GITHUB = 'git@github.com:darekf77/';
+const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
+const GITHUB_PROJECTS_NAMES = [
+  'tsc-npm-project',
   'firedev',
+  'firedev-projects',
   'ng2-rest',
   'ng2-logger',
   'morphi',
@@ -49,20 +52,19 @@ export type TAction = 'clone' | 'pull';
 
 
 export async function $GITHUB_DUMP(args: string, exit = true) {
-  const address = 'git@github.com:darekf77/';
-  const npmLocation = path.resolve(path.join(Project.Tnp.location, '..'));
-  for (let index = 0; index < githubProjects.length; index++) {
-    const projectName = githubProjects[index];
-    const githubGitUrl = `${address}${projectName}`;
+
+  for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
+    const projectName = GITHUB_PROJECTS_NAMES[index];
+    const githubGitUrl = `${ADDRESS_GITHUB}${projectName}`;
     let action: TAction = 'clone';
-    const dest = path.join(npmLocation, projectName);
+    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
 
     const process = async (retry = false) => {
       Helpers.info(`${retry ? '' : '\n\n'} --- ${retry ? 'Retrying' : 'Starting'
         } dump of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
       action = fse.existsSync(dest) ? 'pull' : 'clone';
       try {
-        const dest = path.join(npmLocation, projectName);
+        const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
         if (action === 'pull') {
           let proj: Project;
           while (!proj) {
@@ -81,7 +83,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
           proj.git.pullCurrentBranch();
           Helpers.info(`Pull new origin for ${projectName}`);
         } else {
-          Helpers.run(`git clone ${githubGitUrl}`, { cwd: npmLocation }).sync();
+          Helpers.run(`git clone ${githubGitUrl}`, { cwd: NPM_PROJCETS_LOCATION }).sync();
           Helpers.info(`Cloned origin for ${projectName}`);
         }
       } catch (err) {
@@ -102,6 +104,29 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
   }
 }
 
+
+export async function $GITHUB_PUSH(args: string, exit = true) {
+  for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
+    const projectName = GITHUB_PROJECTS_NAMES[index];
+    const githubGitUrl = `${ADDRESS_GITHUB}${projectName}`;
+    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+    const proj = Project.From(dest);
+    if (proj.git.thereAreSomeUncommitedChange) {
+      Helpers.run(`code .`, { cwd: dest }).async();
+      await Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
+    }
+    if (proj.git.currentBranchName !== 'master') {
+      Helpers.run(`code .`, { cwd: dest }).async();
+      await Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
+    }
+    proj.git.pushCurrentBranch();
+  }
+  if (exit) {
+    process.exit(0);
+  }
+}
+
 export default {
-  $GITHUB_DUMP
+  $GITHUB_DUMP,
+  $GITHUB_PUSH,
 }

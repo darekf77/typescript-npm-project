@@ -140,9 +140,9 @@ export const config = {
     },
 
     projectsExamples: {
-      workspace: pathResolved(__dirname, `../projects/container/workspace`),
-      container: pathResolved(__dirname, `../projects/container`),
-      singlefileproject: pathResolved(__dirname, `../projects/single-file-project`)
+      workspace: pathResolved(__dirname, `../../firedev-projects/container/workspace`),
+      container: pathResolved(__dirname, `../../firedev-projects/container`),
+      singlefileproject: pathResolved(__dirname, `../../firedev-projects/single-file-project`)
     }
   },
   allowedEnvironments,
