@@ -108,6 +108,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
 export async function $GITHUB_PUSH(args: string, exit = true) {
   for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
     const projectName = GITHUB_PROJECTS_NAMES[index];
+    Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
     const githubGitUrl = `${ADDRESS_GITHUB}${projectName}`;
     const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
     const proj = Project.From(dest);
@@ -120,6 +121,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
       await Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
     }
     proj.git.pushCurrentBranch();
+    Helpers.info(`Success push of project ${chalk.bold(projectName)}.`)
   }
   if (exit) {
     process.exit(0);
