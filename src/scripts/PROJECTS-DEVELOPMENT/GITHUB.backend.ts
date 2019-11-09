@@ -128,7 +128,12 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
   }
 }
 
+export async function $GITHUB_PULL(args: string, exit = true) {
+  await $GITHUB_DUMP(args, exit);
+}
+
 export default {
   $GITHUB_DUMP,
   $GITHUB_PUSH,
+  $GITHUB_PULL,
 }
