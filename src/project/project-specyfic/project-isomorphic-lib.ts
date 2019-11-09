@@ -156,7 +156,7 @@ export class ProjectIsomorphicLib extends Project {
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
       if (this.isTnp) {
-        this.linkWhenExist('projects', outDir);
+        // this.linkWhenExist('../firedev-projects', outDir);
         this.linkWhenExist('tests', outDir);
         this.linkWhenExist('autobuild.json', outDir);
       }

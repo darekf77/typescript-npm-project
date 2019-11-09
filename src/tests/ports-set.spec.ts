@@ -15,7 +15,7 @@ import { Models } from '../models';
 describe('Ports set tests', () => {
 
 
-  const baseline = Project.From(path.join(Project.Tnp.location, 'projects', 'container', 'baseline'));
+  const baseline = Project.From(path.join(Project.Tnp.location, '../firedev-projects', 'container', 'baseline'));
   const tnp = Project.Tnp;
 
 

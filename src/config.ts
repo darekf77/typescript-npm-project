@@ -66,7 +66,7 @@ const folder = {
   apps: 'apps',
   // entities: 'entities',
   // controllers: 'controllers',
-  projects: 'projects',
+  // projects: 'projects',
   workspace: 'workspace',
   container: 'container',
   bin: 'bin',

@@ -20,7 +20,7 @@ export class ProjectsController extends BaseController {
     if (global.testMode) {
       this.discoverProjectsInLocation(path.resolve(config.pathes.tnp_tests_context), true)
     } else {
-      this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, 'projects')))
+      this.discoverProjectsInLocation(path.resolve(path.join(Project.Tnp.location, '../firedev-projects')))
     }
   }
 

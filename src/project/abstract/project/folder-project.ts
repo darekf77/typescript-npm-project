@@ -142,7 +142,7 @@ export abstract class FolderProject {
       })
 
     if (this.isTnp) {
-      subdirectories = subdirectories.concat(getDirectories(path.join(this.location, config.folder.projects))
+      subdirectories = subdirectories.concat(getDirectories(path.join(this.location, '../firedev-projects'))
         .filter(f => {
           const folderNam = path.basename(f);
           return (notAllowed.filter(p => p.test(folderNam)).length === 0);
