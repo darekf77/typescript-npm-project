@@ -33,6 +33,17 @@ export abstract class ProjectGit {
       get isGitRoot() {
         return fse.existsSync(path.join(self.location, '.git'))
       },
+      get originURL() {
+        let url = '';
+        try {
+          // git config --get remote.origin.url
+          url = Helpers.run(`git config --get remote.origin.url`,
+            { output: false, cwd: self.location }).sync().toString().trim()
+        } catch (error) {
+
+        }
+        return url;
+      },
       async updateOrigin(askToRetry = false) {
         await Helpers.git.pullCurrentBranch(self.location, askToRetry);
       },

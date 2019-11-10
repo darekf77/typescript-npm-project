@@ -136,6 +136,21 @@ export async function $GITHUB_PULL(args: string, exit = true) {
 }
 
 export default {
+  $GITHUB_LIST_ORIGINS() {
+    for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
+      const projectName = GITHUB_PROJECTS_NAMES[index];
+      Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
+      const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+      const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+      const proj = Project.From(dest);
+      if (proj) {
+        Helpers.info(proj.git.originURL);
+      }
+
+    }
+    // git config --get remote.origin.url
+    process.exit(0);
+  },
   $GITHUB_DUMP,
   $GITHUB_PUSH,
   $GITHUB_PULL,
