@@ -1,9 +1,12 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as os from 'os';
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from '../../helpers';
-const ADDRESS_GITHUB = 'git@github.com:darekf77/';
+const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
+const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
+const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
 const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
 const GITHUB_PROJECTS_NAMES = [
   'tsc-npm-project',
@@ -109,7 +112,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
   for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
     const projectName = GITHUB_PROJECTS_NAMES[index];
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
-    const githubGitUrl = `${ADDRESS_GITHUB}${projectName}`;
+    const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
     const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
     const proj = Project.From(dest);
     if (proj.git.thereAreSomeUncommitedChange) {
