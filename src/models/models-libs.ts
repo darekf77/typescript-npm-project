@@ -7,6 +7,7 @@ export namespace ModelsLibTypes {
     | 'container'
     | 'docker'
     | 'vscode-ext'
+    | 'chrome-ext'
     | 'unknow-npm-project'
     | 'unknow';
 
@@ -20,6 +21,7 @@ export namespace ModelsLibTypes {
     'docker',
     'unknow-npm-project',
     'vscode-ext',
+    'chrome-ext',
   ]
 
   export type CoreLibCategory = LibType | 'common';
