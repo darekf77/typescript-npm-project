@@ -191,36 +191,37 @@ export class DBTransaction {
     await this.start(`update builds with current`, async () => {
       this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
 
-      while (true) {
-        await this.__buildsCtrl.update()
-        if (onlyUpdate) {
-          break;
-        }
+      // TODO fix it when process exists with pid but is it is not process of TNP!
+      // while (true) {
+      //   await this.__buildsCtrl.update()
+      //   if (onlyUpdate) {
+      //     break;
+      //   }
 
-        const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
+      //   const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
 
-        if (existed) {
+      //   if (existed) {
 
-          if (!existed.buildOptions.watch) {
-            Helpers.warn('automatic kill of active build instance in static build mode')
-            this.killAndRemove(existed)
-            continue;
-          } else {
-            console.log(`Current process pid: ${process.pid}`)
-            const confirm = await Helpers.questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
-           build options: ${existed.buildOptions.toString()}`)
-            if (confirm) {
-              this.killAndRemove(existed)
-              continue;
-            } else {
-              process.exit(0)
-            }
-          }
-        } else if (!existed) {
-          this.__buildsCtrl.add(currentProject, buildOptions, pid);
-        }
-        break;
-      }
+      //     if (!existed.buildOptions.watch) {
+      //       Helpers.warn('automatic kill of active build instance in static build mode')
+      //       this.killAndRemove(existed)
+      //       continue;
+      //     } else {
+      //       console.log(`Current process pid: ${process.pid}`)
+      //       const confirm = await Helpers.questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
+      //      build options: ${existed.buildOptions.toString()}`)
+      //       if (confirm) {
+      //         this.killAndRemove(existed)
+      //         continue;
+      //       } else {
+      //         process.exit(0)
+      //       }
+      //     }
+      //   } else if (!existed) {
+      //     this.__buildsCtrl.add(currentProject, buildOptions, pid);
+      //   }
+      //   break;
+      // }
     })
   }
 

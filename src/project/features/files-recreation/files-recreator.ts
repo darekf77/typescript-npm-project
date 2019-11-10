@@ -351,6 +351,7 @@ export class FilesRecreator extends FeatureForProject {
     if (!Helpers.exists(pathTOCheck)) {
       Helpers.mkdirp(pathTOCheck);
       Helpers.writeFile(path.join(pathTOCheck, 'put-your-assets-here.txt'), `
+    This file is generated..
     Please put asset files related for this project here..
       ` );
       // this.quickFixForFileNotInRightFolder();
