@@ -277,6 +277,7 @@ export const config = {
       { name: 'vsce' },
       { name: 'stmux' },
       { name: 'webpack-bundle-analyzer' },
+      { name: '@angular/cli' },
     ],
     programs: [
       //   {
