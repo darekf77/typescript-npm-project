@@ -32,6 +32,14 @@ export class PackageJsonCore {
     }
   }
 
+  get frameworkVersion(): 'v1' | 'v2' {
+    const res = this.data.tnp ? this.data.tnp.version : undefined;
+    if (_.isString(res)) {
+      return res;
+    }
+    return config.defaultFrameworkVersion;
+  }
+
   get frameworks(): Models.env.UIFramework[] {
     const res = this.data.tnp &&
       _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
@@ -44,7 +52,7 @@ export class PackageJsonCore {
 
   get name() {
     if (!_.isString(this.data.name)) {
-      if(global.tnp_normal_mode) {
+      if (global.tnp_normal_mode) {
         Helpers.error(`Please define name for npm project in location: ${this.path}`, false, true)
       }
     }

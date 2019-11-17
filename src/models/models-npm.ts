@@ -72,6 +72,7 @@ export namespace ModelsNpm {
     devDependencies?: DependenciesFromPackageJsonStyle;
     tnp: {
       type: ModelsLibTypes.LibType;
+      version?: 'v1' | 'v2',
       /**
        * framework available inside project/app
        */

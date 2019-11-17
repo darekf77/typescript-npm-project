@@ -95,6 +95,7 @@ const moduleNameIsomorphicLib = [
 ];
 
 export const config = {
+  defaultFrameworkVersion: 'v1' as ('v1' | 'v2'),
   CONST: {
     TEST_TIMEOUT: 3600000
   },
@@ -141,10 +142,13 @@ export const config = {
       allPattern: path.join(__dirname, `/${folder.scripts}/**/*.js`),
     },
 
-    projectsExamples: {
-      workspace: pathResolved(__dirname, `../../firedev-projects/container/workspace`),
-      container: pathResolved(__dirname, `../../firedev-projects/container`),
-      singlefileproject: pathResolved(__dirname, `../../firedev-projects/single-file-project`)
+    projectsExamples: (version?: 'v1' | 'v2') => {
+      version = (!version || version === 'v1') ? '' : `-${version}` as any;
+      return {
+        workspace: pathResolved(__dirname, `../../firedev-projects/container${version}/workspace`),
+        container: pathResolved(__dirname, `../../firedev-projects/container${version}`),
+        singlefileproject: pathResolved(__dirname, `../../firedev-projects/single-file-project`)
+      }
     }
   },
   allowedEnvironments,

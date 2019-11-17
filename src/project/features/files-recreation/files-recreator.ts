@@ -278,7 +278,7 @@ export class FilesRecreator extends FeatureForProject {
 
 
   projectSpecyficFiles() {
-    const defaultProjectProptotype = Project.by(this.project.type);
+    const defaultProjectProptotype = Project.by(this.project.type, this.project.frameworkVersion);
     let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
       this.project.projectSpecyficFiles().forEach(f => {

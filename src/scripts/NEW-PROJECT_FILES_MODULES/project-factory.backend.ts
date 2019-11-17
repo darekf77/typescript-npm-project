@@ -54,7 +54,7 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Project {
+  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string, version?: 'v1' | 'v2'): Project {
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
@@ -68,7 +68,7 @@ export class ProjectFactory {
     if (basedOn && basedOnProject && basedOnProject.type !== 'workspace') {
       Helpers.error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
-    const baseline = basedOn ? basedOnProject : Project.by(type);
+    const baseline = basedOn ? basedOnProject : Project.by(type, version);
     console.log('PROJECt BASELINE', baseline.location);
     const destinationPath = this.getDestinationPath(name, cwd);
     if (fse.pathExistsSync(destinationPath)) {

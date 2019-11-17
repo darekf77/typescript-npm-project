@@ -291,23 +291,23 @@ export class Project {
   //#endregion
 
   //#region @backend
-  public static by(libraryType: Models.libs.NewFactoryType): Project {
+  public static by(libraryType: Models.libs.NewFactoryType, version: 'v1' | 'v2' = config.defaultFrameworkVersion): Project {
 
     if (libraryType === 'workspace') {
-      const workspaceProject = Project.From(config.pathes.projectsExamples.workspace);
+      const workspaceProject = Project.From(config.pathes.projectsExamples(version).workspace);
       return workspaceProject;
     }
     if (libraryType === 'container') {
-      const containerProject = Project.From(config.pathes.projectsExamples.container);
+      const containerProject = Project.From(config.pathes.projectsExamples(version).container);
       return containerProject;
     }
 
     if (libraryType === 'single-file-project') {
-      const singleFileProject = Project.From(config.pathes.projectsExamples.singlefileproject);
+      const singleFileProject = Project.From(config.pathes.projectsExamples(version).singlefileproject);
       return singleFileProject;
     }
 
-    const projectPath = path.join(config.pathes.projectsExamples.workspace, libraryType);
+    const projectPath = path.join(config.pathes.projectsExamples(version).workspace, libraryType);
     if (!fse.existsSync(projectPath)) {
       Helpers.error(`Bad library type: ${libraryType}`, true, true);
     }

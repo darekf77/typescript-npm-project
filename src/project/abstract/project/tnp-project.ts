@@ -20,6 +20,9 @@ import { config } from '../../../config';
 export abstract class TnpProject {
 
   public type: Models.libs.LibType;
+  public get frameworkVersion(this: Project) {
+    return this.packageJson.frameworkVersion;
+  }
 
   //#region @backend
   /**

@@ -20,7 +20,7 @@ export default {
     process.exit(0)
   },
   $OPEN_CORE_PROJECT() {
-    Project.Current.run(`code ${Project.by(Project.Current.type).location} &`).sync();
+    Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersion).location} &`).sync();
     process.exit(0)
   },
   $OPEN_TNP_PROJECT() {
