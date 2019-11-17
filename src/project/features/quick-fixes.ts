@@ -88,7 +88,7 @@ export default _default;
       }
       const componentsFolder = path.join(this.project.location, config.folder.components);
 
-      if (this.project.type === 'angular-lib' && !fse.existsSync(componentsFolder)) {
+      if (config.projectTypes.with.componetsAsSrc.includes(this.project.type) && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
         Helpers.mkdirp(componentsFolder);
       }

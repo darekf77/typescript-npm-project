@@ -233,7 +233,7 @@ export class CopyManager extends FeatureForProject {
           }
 
           if (this.project.isWorkspace) {
-            childs = this.project.children.filter(c => config.libsTypes.includes(c.name as any));
+            childs = this.project.children.filter(c => config.projectTypes.forNpmLibs.includes(c.name as any));
           }
         } else {
           childs = [];

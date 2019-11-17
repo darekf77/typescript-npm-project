@@ -4,7 +4,7 @@ import { Helpers } from '../../helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from '../../progress-output';
 
-function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
+function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {
     var { max = Infinity, err = false } = require('minimist')(c.split(' '));
     maximum = max;
@@ -22,7 +22,7 @@ function SHOW_LOOP(c = 0, maximum = Infinity, errExit = false) {
   }, 1000)
 }
 
-function SHOW_LOOP_MESSAGES(c = 0, maximum = Infinity, errExit = false) {
+function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {
     var { max = Infinity, err = false } = require('minimist')(c.split(' '));
     maximum = _.isNumber(max) ? max : Infinity;
@@ -72,7 +72,7 @@ export default {
 
   TEST_ASYNC_PROC: async (args) => {
     global.tnpShowProgress = true;
-    let p =  Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
+    let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
     p.stdout.on('data', (chunk) => {
       console.log('prod:' + chunk)
     })
@@ -86,7 +86,7 @@ export default {
   TEST_SYNC_PROC: async (args) => {
     global.tnpShowProgress = true;
     try {
-      let p =  Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
+      let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
       process.exit(0)
     } catch (err) {
       console.log('Erroroejk')

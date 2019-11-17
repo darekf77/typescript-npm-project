@@ -29,25 +29,6 @@ export abstract class LibProject {
     return this.packageJson && this.packageJson.isCommandLineToolOnly;
     //#endregion
   }
-  get isBuildedLib(this: Project) {
-    if (Helpers.isBrowser) {
-      return this.browser.isBuildedLib;
-    }
-    //#region @backend
-    if (this.type === 'unknow') {
-      return false;
-    }
-    if (this.type === 'angular-lib') {
-      return fse.existsSync(path.join(this.location, config.folder.module)) &&
-        fse.existsSync(path.join(this.location, config.folder.dist));
-    }
-    if (this.type === 'isomorphic-lib') {
-      return fse.existsSync(path.join(this.location, config.folder.browser)) &&
-        fse.existsSync(path.join(this.location, config.folder.dist));
-    }
-    return false;
-    //#endregion
-  }
 
   get isGeneratingControllerEntities(this: Project) {
     return this.type === 'isomorphic-lib' && this.useFramework;

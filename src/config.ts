@@ -180,37 +180,28 @@ export const config = {
       ].map(f => `.${f}`)
     },
   },
-  // fileExtensionsText: [
-  //   'js',
-  //   'ts',
-  //   'txt',
-  //   'json',
-  //   'doc',
-  //   'rtf',
-  //   'md',
-  //   'sh'
-  // ].map(f => `.${f}`),
+  /**
+   * Build allowed types
+   */
   allowedTypes: {
-    angularClient: [
-      'angular-cli',
-      'angular-client',
-      'angular-lib',
-      'ionic-client',
-    ] as Models.libs.LibType[],
+    /**
+     * Projects for build:app:watch command
+     */
     app: [
-      'angular-cli',
-      'angular-client',
-      'angular-lib',
-      'isomorphic-lib',
-      'ionic-client',
-      'docker',
-      'container'
+      Models.libs.GlobalLibTypeName.angularClient,
+      Models.libs.GlobalLibTypeName.angularLib,
+      Models.libs.GlobalLibTypeName.isomorphicLib,
+      Models.libs.GlobalLibTypeName.ionicClient,
+      Models.libs.GlobalLibTypeName.docker,
+      Models.libs.GlobalLibTypeName.container,
     ] as Models.libs.LibType[],
+    /**
+     * Projects for build:(dist|bundle):(watch) command
+     */
     libs: [
-      'angular-lib',
-      'isomorphic-lib',
-      'server-lib',
-      'workspace'
+      Models.libs.GlobalLibTypeName.angularLib,
+      Models.libs.GlobalLibTypeName.isomorphicLib,
+      Models.libs.GlobalLibTypeName.workspace,
     ] as Models.libs.LibType[]
   },
   moduleNameAngularLib,
@@ -218,20 +209,22 @@ export const config = {
   filesExtensions: {
     filetemplate: 'filetemplate'
   },
-  appTypes: [
-    'angular-client',
-    'angular-lib',
-    'ionic-client'
-  ] as Models.libs.LibType[],
-  libsTypes: [
-    'workspace',
-    'docker',
-    'server-lib',
-    'isomorphic-lib',
-    'angular-lib',
-    'angular-client',
-    'angular-cli'
-  ] as Models.libs.LibType[],
+  projectTypes: {
+    forNpmLibs: [
+      Models.libs.GlobalLibTypeName.angularLib,
+      Models.libs.GlobalLibTypeName.isomorphicLib,
+    ],
+    with: {
+      angularAsCore: [
+        Models.libs.GlobalLibTypeName.angularClient,
+        Models.libs.GlobalLibTypeName.angularLib,
+        Models.libs.GlobalLibTypeName.ionicClient,
+      ],
+      componetsAsSrc: [
+        Models.libs.GlobalLibTypeName.angularLib,
+      ],
+    }
+  },
   // environmentName,
   localLibs: [
     'eslint',

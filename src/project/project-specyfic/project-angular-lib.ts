@@ -85,10 +85,10 @@ export class ProjectAngularLib extends Project {
 
     if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .startAndWatch('isomorphic angular-lib compilation (watch mode)');
+        .startAndWatch(`isomorphic ${this.type} compilation (watch mode)`);
     } else {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .start('isomorphic angular-lib compilation');
+        .start(`isomorphic ${this.type} compilation`);
     }
 
   }

@@ -28,7 +28,7 @@ export class ProjectFactory {
 
   private errorMsgCreateProject() {
     console.log(chalk.green(`Good examples:`));
-    config.libsTypes.forEach(t => {
+    config.projectTypes.forNpmLibs.forEach(t => {
       console.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
     })
     Helpers.error(chalk.red(`Please use example above.`), false, true);
@@ -46,9 +46,7 @@ export class ProjectFactory {
 
     json.tnp.isCoreProject = false;
     json.tnp.isGenerated = false;
-    if ((['isomorphic-lib', 'angular-lib'] as Models.libs.LibType[])) {
-      json.tnp.useFramework = false;
-    }
+    json.tnp.useFramework = false;
     if (basedOn) {
       json.tnp.basedOn = `./${basedOn.replace(/\/$/, '')}`;
     }

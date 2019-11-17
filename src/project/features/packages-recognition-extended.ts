@@ -30,7 +30,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     try {
       const proj = Project.From(pjPath);
       if (proj) {
-        if (proj.type === 'isomorphic-lib' || proj.type === 'angular-lib') {
+        if (config.projectTypes.forNpmLibs.includes(proj.type)) {
           // console.log(`Proj "${proj.genericName}" standalone`, proj.isStandaloneProject)
           res = proj.isStandaloneProject;
         } else {

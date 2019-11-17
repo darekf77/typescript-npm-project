@@ -17,7 +17,7 @@ function useDefaultBrowserCompilation(project: Project) {
   }
   if (project.type === 'isomorphic-lib') {
     return _.isUndefined(project.parent.children.find(c => {
-      return config.appTypes.includes(c.type);
+      return config.projectTypes.with.angularAsCore.includes(c.type);
     }));
   }
   return false;

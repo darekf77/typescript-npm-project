@@ -95,7 +95,6 @@ export namespace ModelsOther {
   export interface IProject {
     isSite: boolean;
     isCoreProject: boolean;
-    isBuildedLib: boolean;
     isCommandLineToolOnly: boolean;
     isGenerated: boolean;
     isWorkspaceChildProject: boolean;

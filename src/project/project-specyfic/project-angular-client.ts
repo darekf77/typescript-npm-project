@@ -19,7 +19,7 @@ export class ProjectAngularClient extends Project {
 
 
   get isEjectedProject() {
-    return this.type !== 'angular-lib';
+    return this.type === 'angular-client'
   }
 
   filesTemplates() {
