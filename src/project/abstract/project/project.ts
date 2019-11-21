@@ -258,7 +258,7 @@ export class Project {
 
       location: "${process.cwd()}"
 
-      }`, false, false);
+      }`, false, true);
     }
     // log('CURRENT', current.location)
     return current;
@@ -307,7 +307,7 @@ export class Project {
       return singleFileProject;
     }
 
-    const projectPath = path.join(config.pathes.projectsExamples(version).workspace, libraryType);
+    const projectPath = path.join(config.pathes.projectsExamples(version).projectByType(libraryType));
     if (!fse.existsSync(projectPath)) {
       Helpers.error(`Bad library type: ${libraryType}`, true, true);
     }

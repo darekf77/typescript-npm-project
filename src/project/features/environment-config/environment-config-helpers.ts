@@ -148,6 +148,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectType = project.type;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsSite = project.isSite;
+  workspaceConfig.currentProjectIsStatic = project.isGenerated;
   workspaceConfig.frameworks = project.frameworks;
   const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 

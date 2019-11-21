@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
+import chalk from 'chalk';
 // local
 import { Project } from '../abstract';
 import { Helpers } from '../../helpers';
@@ -31,6 +32,23 @@ function reorderResult(result = [], update: (result) => void): boolean {
 }
 
 export class ProjectWorkspace extends Project {
+
+
+  constructor(public location: string) {
+    super(location);
+    if (this.frameworkVersion === 'v2' && this.isWorkspace) {
+      if (this.children.filter(c => {
+        Helpers.log(`Checking child: ${c.name}`)
+        const isNotMatch = (c.frameworkVersion !== this.frameworkVersion);
+        if (isNotMatch) {
+          Helpers.error(`Please match framework in ${chalk.bold(c.name)}/package.json/tnp/version`, true, true);
+        }
+        return isNotMatch;
+      }).length > 0) {
+        Helpers.error(`Please match framework version in workspace-v2 children`, false, true);
+      }
+    }
+  }
   async buildLib() {
     // throw new Error("Method not implemented.");
   }

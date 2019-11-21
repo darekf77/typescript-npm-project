@@ -16,7 +16,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
     projectsToLink.forEach(c => {
       if (path.basename(c.location) != c.name) {
         Helpers.error(`Project "${c.location}" has different packaage.json name`
-          + ` property than his own folder name "${path.basename(c.location)}"`)
+          + ` property than his own folder name "${path.basename(c.location)}"`, false, true)
       }
     })
 

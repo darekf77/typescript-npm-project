@@ -124,7 +124,11 @@ function DEPS_SHOW(args: string) {
 }
 
 function DEPS_HIDE(args: string) {
-  Project.Current.packageJson.hideDeps('deps hide')
+  if (Project.Current.isCoreProject) {
+    Project.Current.packageJson.showDeps('deps show')
+  } else {
+    Project.Current.packageJson.hideDeps('deps hide')
+  }
   process.exit(0)
 }
 

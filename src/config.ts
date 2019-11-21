@@ -145,8 +145,11 @@ export const config = {
     projectsExamples: (version?: 'v1' | 'v2') => {
       version = (!version || version === 'v1') ? '' : `-${version}` as any;
       return {
-        workspace: pathResolved(__dirname, `../../firedev-projects/container${version}/workspace`),
+        workspace: pathResolved(__dirname, `../../firedev-projects/container${version}/workspace${version}`),
         container: pathResolved(__dirname, `../../firedev-projects/container${version}`),
+        projectByType(libType: Models.libs.NewFactoryType) {
+          return pathResolved(__dirname, `../../firedev-projects/container${version}/workspace${version}/${libType}${version}`);
+        },
         singlefileproject: pathResolved(__dirname, `../../firedev-projects/single-file-project`)
       }
     }

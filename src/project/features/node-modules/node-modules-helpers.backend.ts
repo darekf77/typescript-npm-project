@@ -18,16 +18,20 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
   packagesNames.forEach(f => {
-    const current = Project.From(path.join(projectLocation, config.folder.node_modules, f));
-    // QUICK_FIX
+    let organizationProjectSeondPart = '';
     if (f.search('/') !== -1) {
+      organizationProjectSeondPart = f.split('/')[1];
       f = _.first(f.split('/'));
     }
+    let pathToCurrent = path.join(projectLocation, config.folder.node_modules, f, organizationProjectSeondPart);
+
+    const current = Project.From(pathToCurrent);
+
     if (!current) {
       Helpers.warn(`Project with name ${f} not founded`);
       return
     }
-    Helpers.log(`Scanning for duplicates of current ${f}@${current.version} ....\n`)
+    Helpers.log(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       Helpers.mkdirp(nodeMod);
@@ -45,19 +49,23 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 
     if (countOnly) {
       duplicates.forEach((duplicateRelativePath, i) => {
-        let p = path.join(projectLocation, duplicateRelativePath)
+        let p = path.join(projectLocation, duplicateRelativePath, organizationProjectSeondPart);
         const nproj = Project.From(p);
-        p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
-        Helpers.log(`${i + 1}. Duplicate "${f}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
+        if (!nproj) {
+          // Helpers.warn(`Not able to identyfy project in ${p}`)
+        } else {
+          p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
+          Helpers.log(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
+        }
       });
       if (duplicates.length === 0) {
-        Helpers.log(`No dupicate of ${f} fouded.`);
+        Helpers.log(`No dupicate of ${current.name} fouded.`);
       }
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath)
         Helpers.tryRemoveDir(p)
-        Helpers.info(`Duplicate of ${f} removed from ${p}`)
+        Helpers.info(`Duplicate of ${current.name} removed from ${p}`)
       });
     }
 

@@ -23,7 +23,9 @@ export class ProjectAngularLib extends Project {
       this.projectAngularClient = new ProjectAngularClient(location);
       this.projectAngularClient.env = this.env; // QUICK_FIX
     }
-
+    if (this.frameworkVersion === 'v2' && this.isWorkspaceChildProject && this.parent.frameworkVersion !== 'v2') {
+      Helpers.error(`Please use angular-lib-v2 only in workspace-v2`, false, true);
+    }
   }
 
   public setDefaultPort(port: number) {
@@ -41,17 +43,30 @@ export class ProjectAngularLib extends Project {
   }
 
   filesTemplates() {
-    return [
+    let config = [
       'tsconfig.isomorphic.json.filetemplate',
       'tsconfig.json.filetemplate',
       ...this.projectAngularClient
         .filesTemplates()
         .filter(f => !f.startsWith('webpack.config.'))
     ]
+    if (this.frameworkVersion === 'v2') {
+      config = config.concat([
+        'angular.json.filetemplate',
+        'browserslist.filetemplate',
+        'ngsw-config.json.filetemplate'
+      ])
+      return config.filter(f => {
+        return ![
+          '.angular-cli.json.filetemplate'
+        ].includes(f)
+      })
+    }
+    return config;
   }
 
   projectSpecyficFiles() {
-    return super.projectSpecyficFiles().concat([
+    const config = super.projectSpecyficFiles().concat([
       'tsconfig.isomorphic.json',
       'tsconfig.browser.json',
       'karma.conf.js.filetemplate',
@@ -63,7 +78,16 @@ export class ProjectAngularLib extends Project {
       .filter(f => {
         return f !== 'src/tsconfig.app.json';
       }));
+
+
+    if (this.frameworkVersion === 'v2') {
+      return config.concat([
+        'src/manifest.webmanifest'
+      ])
+    }
+    return config
   }
+
 
   sourceFilesToIgnore() {
     return this.projectSpecyficFiles();
