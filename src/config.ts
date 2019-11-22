@@ -271,6 +271,7 @@ export const config = {
       { name: 'increase-memory-limit' },
       { name: 'bower' },
       { name: 'fkill', installName: 'fkill-cli' },
+      { name: 'yo' },
       { name: 'mocha' },
       // { name: 'chai' },
       { name: 'ts-node' },
