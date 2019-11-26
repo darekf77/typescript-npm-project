@@ -272,8 +272,7 @@ export class FilesRecreator extends FeatureForProject {
 
   gitignore() {
     Helpers.writeFile(path.join(this.project.location, '.gitignore'),
-      `
-# profiling files
+      `# profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
 
