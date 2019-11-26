@@ -272,6 +272,25 @@ export class FilesRecreator extends FeatureForProject {
 
   gitignore() {
     Helpers.writeFile(path.join(this.project.location, '.gitignore'),
+      `
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+`+
       this.filesIgnoredBy.gitignore.join('\n').concat('\n'));
   }
 
