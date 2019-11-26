@@ -43,7 +43,13 @@ export class NpmPackagesCore extends FeatureForProject {
         if (smoothInstall) {
           this.smoothInstallPrepare(pkg);
         } else {
-          executeCommand(command, this.project);
+          try {
+            executeCommand(command, this.project);
+          } catch (err) {
+            Helpers.error(err, true, true);
+            Helpers.error(`Error durinf npm instalation`, false, true);
+          }
+
         }
       }
     }

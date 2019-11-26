@@ -46,7 +46,8 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
       .filter(l => !l.startsWith(`${config.folder.node_modules}/${f}`))
       .filter(l => !l.startsWith(`${config.folder.node_modules}/${config.folder._bin}`))
       .filter(l => path.basename(path.dirname(l)) === config.folder.node_modules)
-
+    // console.log(duplicates);
+    // process.exit(0)
     if (countOnly) {
       duplicates.forEach((duplicateRelativePath, i) => {
         let p = path.join(projectLocation, duplicateRelativePath, organizationProjectSeondPart);
@@ -64,7 +65,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath)
-        Helpers.tryRemoveDir(p)
+        Helpers.remove(p, true)
         Helpers.info(`Duplicate of ${current.name} removed from ${p}`)
       });
     }

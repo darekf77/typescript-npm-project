@@ -38,7 +38,7 @@ export class ProjectWorkspace extends Project {
     super(location);
     if (this.frameworkVersion === 'v2' && this.isWorkspace) {
       if (this.children.filter(c => {
-        Helpers.log(`Checking child: ${c.name}`)
+        // Helpers.log(`Checking child: ${c.name}`)
         const isNotMatch = (c.frameworkVersion !== this.frameworkVersion);
         if (isNotMatch) {
           Helpers.error(`Please match framework in ${chalk.bold(c.name)}/package.json/tnp/version`, true, true);

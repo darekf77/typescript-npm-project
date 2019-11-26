@@ -121,7 +121,15 @@ export class HelpersFileFolders {
     }
   }
 
-  remove(fileOrFolderPathOrPatter: string) {
+  remove(fileOrFolderPathOrPatter: string, exactFolder = false) {
+    if (exactFolder) {
+      if (!fse.existsSync(fileOrFolderPathOrPatter)) {
+        Helpers.warn(`[remove] Folder doesnt not exists: ${fileOrFolderPathOrPatter}`)
+        return;
+      }
+      rimraf.sync(fileOrFolderPathOrPatter, { glob: false, disableGlob: true, });
+      return;
+    }
     // console.log(`remove: ${fileOrFolderPathOrPatter}`)
     rimraf.sync(fileOrFolderPathOrPatter);
   }

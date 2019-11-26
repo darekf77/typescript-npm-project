@@ -117,6 +117,10 @@ inside generated projects...
       Helpers.error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
 
+    if (this.project.isWorkspace && !buildOptions.appBuild && buildOptions.watch) {
+      Helpers.error(`Build watch only for workspace childs`, false, true)
+    }
+
     // if (this.project.isGenerated) {
     //   this.project.reset();
     // }
