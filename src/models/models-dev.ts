@@ -8,6 +8,10 @@ export namespace ModelsDev {
   export type  InitArgOptions = {
     skipNodeModules: boolean;
     recrusive: boolean;
+    /**
+     * init without installing node modules
+     */
+    struct?: boolean;
     env: EnvironmentName;
   }
 

@@ -66,7 +66,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath)
         Helpers.remove(p, true)
-        Helpers.info(`Duplicate of ${current.name} removed from ${p}`)
+        Helpers.info(`Duplicate of ${current.name} removed from ${p.replace(projectLocation, '')}`)
       });
     }
 

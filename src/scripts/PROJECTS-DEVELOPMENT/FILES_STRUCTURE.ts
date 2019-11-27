@@ -3,6 +3,23 @@ import { Project } from '../../project';
 import { TnpDB } from '../../tnp-db';
 import { sleep } from 'sleep';
 
+
+
+export async function STRUCT(args: string, exit = true) {
+  if (!args) {
+    args = '';
+  }
+  args += ' --struct';
+  await Project.Current.filesStructure.init(args);
+  if (exit) {
+    process.exit(0)
+  }
+}
+
+export async function STRUCTURE(args: string, exit = true) {
+  await STRUCT(args, exit);
+}
+
 export async function INIT(args: string, exit = true) {
   await Project.Current.filesStructure.init(args);
   if (exit) {
@@ -144,6 +161,7 @@ export async function STATIC_RESET_ALL(args: string, exit = true) {
 
 export default {
   INIT,
+  STRUCT,
   INIT_ALL,
   STATIC_INIT,
   STATIC_INIT_ALL,

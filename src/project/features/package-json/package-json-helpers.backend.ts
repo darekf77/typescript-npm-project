@@ -171,6 +171,13 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     recrateInPackageJson = false;
   }
 
+  if (project.frameworkVersion !== 'v1') {
+    const newVersionDeps = Project.by('container', project.frameworkVersion).packageJson.data;
+    Object.keys(newVersionDeps.dependencies).forEach(pkgNameInNewVer => {
+      newDeps[pkgNameInNewVer] = newVersionDeps.dependencies[pkgNameInNewVer];
+    });
+  }
+
   cleanForIncludeOnly(project, newDeps, toOverride);
 
   let devDependencies = project.isStandaloneProject ?

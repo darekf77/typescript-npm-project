@@ -40,6 +40,7 @@ export class FilesStructure extends FeatureForProject {
     if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
+
     // if (_.isUndefined(options.initiator)) {
     //   options.initiator = this.project;
     // }
@@ -60,7 +61,10 @@ export class FilesStructure extends FeatureForProject {
     if (!args) {
       args = '';
     }
-    let { skipNodeModules, recrusive, env }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    let { skipNodeModules, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    if (struct) {
+      skipNodeModules = true;
+    }
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (env) {
@@ -158,7 +162,11 @@ export class FilesStructure extends FeatureForProject {
     }
 
     await this.project.recreate.init();
+    if (this.project.isStandaloneProject) {
+      this.project.filesTemplatesBuilder.rebuild();
+    }
     this.project.tnpBundle.installAsPackage()
+
     if (!this.project.node_modules.exist) {
       if (skipNodeModules) {
         if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
@@ -167,10 +175,6 @@ export class FilesStructure extends FeatureForProject {
       } else {
         await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
       }
-    }
-
-    if (this.project.isStandaloneProject) {
-      this.project.filesTemplatesBuilder.rebuild();
     }
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
