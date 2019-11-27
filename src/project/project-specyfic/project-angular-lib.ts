@@ -26,6 +26,18 @@ export class ProjectAngularLib extends Project {
     if (this.frameworkVersion === 'v2' && this.isWorkspaceChildProject && this.parent.frameworkVersion !== 'v2') {
       Helpers.error(`Please use angular-lib-v2 only in workspace-v2`, false, true);
     }
+
+    if (this.frameworkVersion === 'v2') {
+      const styleCss = path.join(this.location, 'src/styles.css');
+      const styleScss = path.join(this.location, 'src/styles.scss');
+      if (!fse.existsSync(styleScss)) {
+        if (fse.existsSync(styleCss)) {
+          Helpers.copyFile(styleCss, styleScss);
+        } else {
+          Helpers.writeFile(styleScss, ` /* You can add global styles to this file, and also import other style files */`);
+        }
+      }
+    }
   }
 
   public setDefaultPort(port: number) {
@@ -54,7 +66,8 @@ export class ProjectAngularLib extends Project {
       config = config.concat([
         'angular.json.filetemplate',
         'browserslist.filetemplate',
-        'ngsw-config.json.filetemplate'
+        'ngsw-config.json.filetemplate',
+        'tsconfig.app.json.filetemplate',
       ])
       return config.filter(f => {
         return ![
