@@ -11,3 +11,6 @@ npm install npm@latest -g
 git config --global core.editor code --wait
 # brew
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+# disable eject message
+# /System/Library/LaunchDaemons/com.apple.UserNotificationCenter.plist: Operation not permitted# while System Integrity Protection is engag
+sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.UserNotificationCenter.plist
