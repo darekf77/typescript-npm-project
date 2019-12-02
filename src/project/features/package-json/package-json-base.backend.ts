@@ -45,8 +45,8 @@ export class PackageJsonBase extends PackageJsonCore {
     this.writeToDisc();
   }
 
-  public showDeps(reasonToHidePackages: string) {
-    this.reasonToHidePackages = `\n${reasonToHidePackages}`;
+  public showDeps(reasonToShowPackages: string) {
+    this.reasonToHidePackages = `\n${reasonToShowPackages}`;
     this.prepareForSave('show');
     this.writeToDisc();
   }

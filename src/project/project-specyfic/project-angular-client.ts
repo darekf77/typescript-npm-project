@@ -120,7 +120,16 @@ export class ProjectAngularClient extends Project {
         }
         const command = `npm-run ng build  ${!this.isStandaloneProject ? (
           this.env.config.name === 'static' ? '--stats-json' : ''
-        ) : ''} --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+        ) : ''} ${
+          this.frameworkVersion !== 'v1' ? '--serviceWorker=true': ''
+        } --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+
+        Helpers.info(`
+
+Angular cli build command: ${command}
+
+        `)
+
         try {
           const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as Models.env.EnvironmentName[])
             .includes(this.env.config.name);

@@ -39,7 +39,8 @@ export abstract class LibProject {
     const files = [
       'index.js',
       'index.d.ts',
-      'index.js.map'
+      'index.js.map',
+      'src/index.html'
     ]
     return files;
   }

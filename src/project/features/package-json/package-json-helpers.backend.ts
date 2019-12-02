@@ -1,6 +1,7 @@
 //#region imports
 import * as _ from 'lodash';
 import * as JSON5 from 'json5';
+import chalk from 'chalk';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
 import { Models } from '../../../models';
@@ -172,24 +173,35 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (project.frameworkVersion !== 'v1') {
-    const newVersionDeps = Project.by('container', project.frameworkVersion).packageJson.data;
-    Object.keys(newVersionDeps.dependencies).forEach(pkgNameInNewVer => {
-      newDeps[pkgNameInNewVer] = newVersionDeps.dependencies[pkgNameInNewVer];
+    const projForVer = Project.by('container', project.frameworkVersion);
+    projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project.frameworkVersion}`);
+    const depsForVer = projForVer.packageJson.data;
+    Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
+      Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
+      newDeps[pkgNameInNewVer] = depsForVer.dependencies[pkgNameInNewVer];
     });
+  } else {
+    cleanForIncludeOnly(project, newDeps, toOverride);
   }
 
-  cleanForIncludeOnly(project, newDeps, toOverride);
+
 
   let devDependencies = project.isStandaloneProject ?
     Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
     : {};
+  // console.log('project.genericName', project.genericName)
+  // console.log('project.isStandaloneProject', project.isStandaloneProject)
+  // console.log('devDependencies', devDependencies);
+  // process.exit(0)
+
   let dependencies = project.isStandaloneProject ?
     Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
     : Helpers.arrays.sortKeys(newDeps);
 
   if ((project.packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
-    devDependencies = { ...devDependencies, ...dependencies };
+    devDependencies = _.merge(devDependencies, dependencies);
     dependencies = {};
+    // console.log('inlcude as dev', devDependencies)
   }
 
   if (recrateInPackageJson) {
@@ -198,6 +210,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
     } else {
+
       project.packageJson.data.devDependencies = devDependencies;
       project.packageJson.data.dependencies = dependencies;
     }
@@ -280,7 +293,6 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
       deps[name] = allDeps[name]
     }
   });
-
   return deps;
 }
 
