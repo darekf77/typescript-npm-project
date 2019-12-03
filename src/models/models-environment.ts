@@ -4,6 +4,7 @@ import { ConnectionOptions } from 'typeorm';
 
 import { ModelsLibTypes } from './models-libs';
 import { ModelsNpm } from './models-npm';
+import { Models } from './index';
 
 export namespace ModelsEnvinronment {
 
@@ -33,6 +34,7 @@ export namespace ModelsEnvinronment {
     pathes?: any;
     isCoreProject?: boolean; // tnp generated
     isSiteProject?: boolean; // tnp generated
+    isStandaloneProject?: boolean; // tnp generated
     name?: EnvironmentName; // tnp generated
     frameworks?: UIFramework[];
     domain?: string;
@@ -70,6 +72,10 @@ export namespace ModelsEnvinronment {
       number?: number;
       hash?: string;
       date?: Date;
+      options?: {
+        isWatchBuild?: boolean;
+        outDir?: Models.dev.BuildDir;
+      }
     }
 
   }

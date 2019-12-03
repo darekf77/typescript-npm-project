@@ -7,7 +7,8 @@ import chalk from 'chalk';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
   saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
-  overrideWorksapceRouterPort
+  overrideWorksapceRouterPort,
+  standaloneConfigBy
 } from './environment-config-helpers';
 import { FeatureForProject } from '../../abstract';
 //#endregion
@@ -44,69 +45,95 @@ export class EnvironmentConfig
     return !fse.existsSync(f);
   }
 
+  public async updateData(config?: Models.env.EnvConfig) {
+    config = !!config ? config : this.project.env.config;
+    if (this.project.git.isGitRepo) {
+      config.build = {
+        number: this.project.git.countComits(),
+        date: this.project.git.lastCommitDate(),
+        hash: this.project.git.lastCommitHash(),
+        options: {
+          isWatchBuild: this.project.buildOptions.watch,
+          outDir: this.project.buildOptions.outDir,
+        }
+      }
+    }
+    saveConfigWorkspca(this.project, config);
+  }
+
+
   public async init(args?: string, overridePortsOnly: boolean = void 0) {
 
-
-    const initFromScratch = (!this.project.env.config ||
-      (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
-
-    overridePortsOnly = !_.isUndefined(overridePortsOnly) ? overridePortsOnly : !initFromScratch;
-    if (!initFromScratch) {
-      Helpers.log(`Config alredy ${chalk.bold('init')}ed tnp. ${'Environment for'} `
-        + `${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
-        + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
-    }
-
+    console.log('INITIN ENV!')
 
     let workspaceProjectLocation: string;
 
-    if (this.project.isWorkspace) {
-      workspaceProjectLocation = path.join(this.project.location);
-    } else if (this.project.isWorkspaceChildProject) {
-      workspaceProjectLocation = path.join(this.project.parent.location);
+    if (this.project.isStandaloneProject) {
+
     } else {
-      return;
+      const initFromScratch = (!this.project.env.config ||
+        (this.project.isWorkspaceChildProject && !this.project.parent.env.config));
+
+      overridePortsOnly = !_.isUndefined(overridePortsOnly) ? overridePortsOnly : !initFromScratch;
+      if (!initFromScratch) {
+        Helpers.log(`Config alredy ${chalk.bold('init')}ed tnp. ${'Environment for'} `
+          + `${this.project.isGenerated ? chalk.bold('(generated)') : ''} `
+          + `${chalk.green(chalk.bold(this.project.genericName))}: ${chalk.bold(this.project.env.config.name)}`)
+      }
+      if (this.project.isWorkspace) {
+        workspaceProjectLocation = path.join(this.project.location);
+      } else if (this.project.isWorkspaceChildProject) {
+        workspaceProjectLocation = path.join(this.project.parent.location);
+      }
+
+      if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
+        await this.project.parent.env.init(args, overridePortsOnly);
+        this.project.parent.filesTemplatesBuilder.rebuild();
+        // error(`[${path.basename(__filename)}] Please override parent config first`);
+      }
+
+      if (this.project.isWorkspaceChildProject) {
+        await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: this.config }, false)
+        await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: this.config }, false);
+      }
+
+      if (!this.project.isWorkspace) {
+        return
+      }
+
     }
 
-    if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-      await this.project.parent.env.init(args, overridePortsOnly);
-      this.project.parent.filesTemplatesBuilder.rebuild()
-      // error(`[${path.basename(__filename)}] Please override parent config first`);
-    }
-
-    if (this.project.isWorkspaceChildProject) {
-      await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: this.config }, false)
-      await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: this.config }, false);
-    }
-
-    if (!this.project.isWorkspace) {
-      return
-    }
 
     const { generateIps, env }: { generateIps: boolean, env: Models.env.EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
 
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
 
-    const config = await workspaceConfigBy(this.project, environmentName);
+    if (this.project.isStandaloneProject) {
+      var config = await standaloneConfigBy(this.project, environmentName);
+    } else {
+      var config = await workspaceConfigBy(this.project, environmentName);
+    }
+
     config.name = environmentName;
 
     config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
 
-    await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
-    await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
+    if (this.project.isStandaloneProject) {
 
-    if (overridePortsOnly) {
-      Helpers.log('Only ports overriding.. ')
-      return;
+    } else {
+      await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
+      await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
+
+      if (overridePortsOnly) {
+        Helpers.log('Only ports overriding.. ')
+        return;
+      }
     }
 
     config.isCoreProject = this.project.isCoreProject;
 
-    if (!config.workspace || !config.workspace.workspace) {
-      Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
-      err(config)
-    }
+
     if (!config.ip) {
       config.ip = 'localhost'
     } else {
@@ -124,42 +151,46 @@ export class EnvironmentConfig
       config.domain = config.domain.replace(/^https?:\/\//, '');
     }
 
-    if (config.name === 'local' || !config.domain) {
-      config.workspace.workspace.host =
-        `http://${config.ip}:${config.workspace.workspace.port}`;
-    } else {
-      const workspaceBaseUrl = _.isString(config.workspace.workspace.baseUrl) ? config.workspace.workspace.baseUrl : ''
-      config.workspace.workspace.host =
-        `https://${config.domain}${workspaceBaseUrl}`;
-    }
-
-    config.workspace.workspace.host = config.workspace.workspace.host.replace(/\/$/, '');
-
     config.packageJSON = this.project.packageJson.data;
     // config.frameworks = this.project.frameworks;
     // console.log(`this.project.frameworks for ${this.project.genericName}`, this.project.frameworks)
     // process.exit(0)
 
-    config.workspace.projects.forEach(p => {
+    if (this.project.isStandaloneProject) {
 
-      if (config.name === 'local') {
-        p.host = `http://${config.ip}:${p.port}`;
+
+    } else {
+
+      if (!config.workspace || !config.workspace.workspace) {
+        Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
+        err(config)
+      }
+
+      if (config.name === 'local' || !config.domain) {
+        config.workspace.workspace.host =
+          `http://${config.ip}:${config.workspace.workspace.port}`;
       } else {
-        p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
+        const workspaceBaseUrl = _.isString(config.workspace.workspace.baseUrl) ? config.workspace.workspace.baseUrl : ''
+        config.workspace.workspace.host =
+          `https://${config.domain}${workspaceBaseUrl}`;
       }
 
-    })
+      config.workspace.workspace.host = config.workspace.workspace.host.replace(/\/$/, '');
 
+      config.workspace.projects.forEach(p => {
 
-    if (this.project.git.isGitRepo) {
-      config.build = {
-        number: this.project.git.countComits(),
-        date: this.project.git.lastCommitDate(),
-        hash: this.project.git.lastCommitHash()
-      }
+        if (config.name === 'local') {
+          p.host = `http://${config.ip}:${p.port}`;
+        } else {
+          p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
+        }
+
+      });
     }
 
-    saveConfigWorkspca(this.project, config)
+
+
+    await this.updateData(config);
   }
   //#endregion
 

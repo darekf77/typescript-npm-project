@@ -40,34 +40,40 @@ ${Helpers.terminalLine()}
 `, false, true)
 }
 
-export function validateWorkspaceConfig(workspaceConfig: Models.env.EnvConfig, filePath: string) {
+export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePath: string, isStandalone = false) {
   if (!_.isObject(workspaceConfig)) {
     err(undefined, Helpers.readFile(filePath));
   }
-  if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig);
-  if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig)
-  workspaceConfig.workspace.projects.forEach(p => {
-    if (_.isUndefined(p.name)) err(workspaceConfig)
-    if (_.isUndefined(p.port)) err(workspaceConfig)
-    if (_.isUndefined(p.baseUrl)) err(workspaceConfig)
-  });
 
-  if (_.isUndefined(_.get(workspaceConfig, 'workspace.build'))) {
-    workspaceConfig.workspace.build = {
-      browser: {
-        aot: false,
-        minify: false,
-        production: false
-      },
-      server: {
-        minify: false,
-        production: false
+  if (isStandalone) {
+
+  } else {
+    if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig);
+    if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig)
+    workspaceConfig.workspace.projects.forEach(p => {
+      if (_.isUndefined(p.name)) err(workspaceConfig)
+      if (_.isUndefined(p.port)) err(workspaceConfig)
+      if (_.isUndefined(p.baseUrl)) err(workspaceConfig)
+    });
+
+    if (_.isUndefined(_.get(workspaceConfig, 'workspace.build'))) {
+      workspaceConfig.workspace.build = {
+        browser: {
+          aot: false,
+          minify: false,
+          production: false
+        },
+        server: {
+          minify: false,
+          production: false
+        }
       }
     }
+    if (!_.isObject(_.get(workspaceConfig, 'workspace.build'))) {
+      err(workspaceConfig)
+    }
   }
-  if (!_.isObject(_.get(workspaceConfig, 'workspace.build'))) {
-    err(workspaceConfig)
-  }
+
 
 }
 
@@ -149,16 +155,25 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsSite = project.isSite;
   workspaceConfig.currentProjectIsStatic = project.isGenerated;
+  workspaceConfig.isStandaloneProject = project.isStandaloneProject;
   workspaceConfig.frameworks = project.frameworks;
   const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 
-  if (project.isWorkspace) {
+  if (project.isStandaloneProject) {
 
     fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
       encoding: 'utf8',
       spaces: 2
     })
-    Helpers.log(`config saved in worksapce ${tmpEnvironmentPath}`)
+    Helpers.log(`config saved in standalone project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
+
+  } else if (project.isWorkspace) {
+
+    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+      encoding: 'utf8',
+      spaces: 2
+    })
+    Helpers.log(`config saved in worksapce ${tmpEnvironmentPath}`);
 
     project.children.forEach(p => {
       saveConfigWorkspca(p, workspaceConfig);
@@ -182,8 +197,6 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
       Helpers.log(`config not needed for child ${tmpEnvironmentPath}`)
     }
 
-
-
   }
 }
 
@@ -193,6 +206,22 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 
 export const existedConfigs = {} as {[workspacePath in string]: Models.env.EnvConfig; }
 
+
+export async function standaloneConfigBy(standaloneProject: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
+  let configStandaloneEnv: Models.env.EnvConfig;
+  const envSurfix = (environment === 'local') ? '' : `.${environment}`;
+  var pathToProjectEnvironment = path.join(standaloneProject.location, `${config.file.environment}${envSurfix}`);
+  if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
+    Helpers.warn(`Standalone project ${standaloneProject.location}
+      ...without environment${envSurfix}.js config... creating new... `);
+    Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(standaloneProject));
+    Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
+  }
+  configStandaloneEnv = require(pathToProjectEnvironment).config as any;
+  validateEnvConfig(configStandaloneEnv, `${pathToProjectEnvironment}.js`, true);
+  existedConfigs[standaloneProject.location] = configStandaloneEnv;
+  return configStandaloneEnv;
+}
 
 export async function workspaceConfigBy(workspace: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
   let configWorkspaceEnv: Models.env.EnvConfig;
@@ -247,14 +276,14 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
     // }
 
   }
-  validateWorkspaceConfig(configWorkspaceEnv, `${pathToProjectEnvironment}.js`);
+  validateEnvConfig(configWorkspaceEnv, `${pathToProjectEnvironment}.js`);
   existedConfigs[workspace.location] = configWorkspaceEnv;
 
 
   return configWorkspaceEnv;
 }
 
-function createExampleConfigFor(workspace: Project) {
+function createExampleConfigFor(proj: Project) {
 
   function templetForInfo(project: Project, counter = 0) {
     return JSON.stringify({
@@ -286,26 +315,31 @@ function createExampleConfigFor(workspace: Project) {
       .join('\n');
   }
 
-  return `
-  const path = require('path')
-var { config } = require('tnp-bundle/environment-config')
-
-config = {
-
-  domain: '${workspace.name}.example.domain.com',
-
+  const workspacePart = proj.isStandaloneProject ? '' : `
   workspace: {
     workspace: {
-      //  baseUrl: "/${workspace.name}",
-      name: "${workspace.name}",
+      //  baseUrl: "/${proj.name}",
+      name: "${proj.name}",
       port: 5000
     },
     projects: [
-      ${workspace.children.map((c, i) => {
+      ${proj.children.map((c, i) => {
       return templetForInfo(c, i)
     }).join(',\n')}
     ]
   }
+  `;
+
+  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp-bundle/environment-config')`;
+
+  return `
+  const path = require('path')
+var { config } = ${configPathRequire};
+
+config = {
+
+  domain: '${proj.name}.example.domain.com',
+  ${workspacePart}
 
 }
 module.exports = exports = { config };

@@ -147,6 +147,11 @@ inside generated projects...
         await this.project.filesStructure.init(buildOptions.args);
       }
     }
+    if (this.project.isStandaloneProject) {  // TODO for workspace also ?
+      this.project.buildOptions = buildOptions;
+      await this.project.env.updateData();
+    }
+
 
     if (!buildOptions.watch && this.project.isGenerated && this.project.isWorkspace) {
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });

@@ -156,15 +156,31 @@ export default {
   $STATIC_START: $START,
 
   $SERVE: (args) => {
-    const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
-    if (!config.port && !config.baseUrl && !config.outDir) {
-      Helpers.error(`Bad arguments for tnp serve: ${config}`)
+    let proj = Project.Current;
+    if (!proj) {
+      proj = Project.nearestTo(process.cwd());
     }
-    const app = express()
-    app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
-    app.listen(config.port, () => {
-      console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
-    });
+    if (proj && proj.isStandaloneProject) {
+      if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
+        Helpers.error(`Please build your project first`, false, true);
+      }
+      const app = express()
+      app.use('/', express.static(path.join(proj.location, config.folder.docs)))
+      app.listen(8080, () => {
+        console.log(`tnp standalone serve is runnning on: http://localhost:${8080}`)
+      });
+    } else {
+      const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
+      if (!config.port && !config.baseUrl && !config.outDir) {
+        Helpers.error(`Bad arguments for tnp serve: ${config}`)
+      }
+      const app = express()
+      app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
+      app.listen(config.port, () => {
+        console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
+      });
+    }
+
   },
 
   $RELEASE: async (args) => {

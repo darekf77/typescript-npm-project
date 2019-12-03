@@ -162,9 +162,12 @@ export class FilesStructure extends FeatureForProject {
     }
 
     await this.project.recreate.init();
+
     if (this.project.isStandaloneProject) {
       this.project.filesTemplatesBuilder.rebuild();
+      await this.project.env.init(args);
     }
+
     this.project.tnpBundle.installAsPackage()
 
     if (!this.project.node_modules.exist) {

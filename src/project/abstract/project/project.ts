@@ -345,8 +345,12 @@ export class Project {
 
     this.__defaultPort = Project.DefaultPortByType(this.type);
     // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
-    if (this.isWorkspace || this.isWorkspaceChildProject) {
+
+    if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {
       this.env = new EnvironmentConfig(this);
+    }
+
+    if (this.isWorkspace || this.isWorkspaceChildProject) {
       this.proxyRouter = new ProxyRouter(this);
     }
     this.copyManager = new CopyManager(this);
