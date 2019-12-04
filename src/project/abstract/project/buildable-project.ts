@@ -17,7 +17,7 @@ import { config as configMorphi } from 'morphi/build/config';
 export abstract class BuildableProject {
 
   //#region @backend
-  public buildOptions?: BuildOptions;
+  public buildOptions?: BuildOptions = {};
   //#endregion
 
   //#region @backend

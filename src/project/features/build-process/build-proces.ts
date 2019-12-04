@@ -107,6 +107,7 @@ inside generated projects...
   }
 
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
+    this.project.buildOptions = buildOptions;
 
     if (this.project.isGenerated && buildOptions.watch) {
       buildOptions.watch = false;
@@ -147,8 +148,8 @@ inside generated projects...
         await this.project.filesStructure.init(buildOptions.args);
       }
     }
+
     if (this.project.isStandaloneProject) {  // TODO for workspace also ?
-      this.project.buildOptions = buildOptions;
       await this.project.env.updateData();
     }
 

@@ -305,7 +305,7 @@ export class HelpersFileFolders {
     }
 
     if (!fse.existsSync(sourcePath)) {
-      Helpers.warn(`[copyFile] No able to find source of ${sourcePath}`);
+      Helpers.warn(`[copyFile] No able to find source of ${sourcePath}`, true);
       return false;
     }
     if (fse.lstatSync(sourcePath).isDirectory()) {

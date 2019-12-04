@@ -63,34 +63,44 @@ export class ProjectAngularLib extends Project {
         .filter(f => !f.startsWith('webpack.config.'))
     ]
     if (this.frameworkVersion === 'v2') {
+
       config = config.concat([
         'angular.json.filetemplate',
         'browserslist.filetemplate',
         'ngsw-config.json.filetemplate',
         'tsconfig.app.json.filetemplate',
+        'src/index.html.filetemplate',
       ])
-      return config.filter(f => {
-        return ![
-          '.angular-cli.json.filetemplate'
-        ].includes(f)
-      })
+      config = config.filter(f => {
+        return !['.angular-cli.json.filetemplate'].includes(f)
+      });
+
+      // console.log('config',config)
+      // process.exit(0)
     }
     return config;
   }
 
   projectSpecyficFiles() {
-    const config = super.projectSpecyficFiles().concat([
-      'tsconfig.isomorphic.json',
-      'tsconfig.browser.json',
-      'karma.conf.js.filetemplate',
-      ...this.filesTemplates(),
-      'src/tsconfig.packages.json'
-    ]).concat(this.projectAngularClient
-      .projectSpecyficFiles()
-      .filter(f => !f.startsWith('webpack.config.'))
+    const config = super.projectSpecyficFiles()
       .filter(f => {
-        return f !== 'src/tsconfig.app.json';
-      }));
+        return !['src/index.html'].includes(f)
+      })
+      .concat([
+        'tsconfig.isomorphic.json',
+        'tsconfig.browser.json',
+        'karma.conf.js.filetemplate',
+        ...this.filesTemplates(),
+        'src/tsconfig.packages.json'
+      ]).concat(this.projectAngularClient
+        .projectSpecyficFiles()
+        .filter(f => {
+          return !['.angular-cli.json.filetemplate'].includes(f)
+        })
+        .filter(f => !f.startsWith('webpack.config.'))
+        .filter(f => {
+          return f !== 'src/tsconfig.app.json';
+        }));
 
 
     if (this.frameworkVersion === 'v2') {

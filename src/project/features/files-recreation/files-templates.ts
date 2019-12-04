@@ -18,7 +18,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     this.files.forEach(f => {
       const filePath = path.join(this.project.location, f);
       try {
-        var fileContent =  Helpers.readFile(filePath);
+        var fileContent = Helpers.readFile(filePath);
         if (!fileContent) {
           Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
           return;
@@ -27,7 +27,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
         return;
       }
-      const env = this.project.isWorkspaceChildProject ? this.project.env.config : void 0;
+      const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
       this.processFile(filePath, fileContent, env);
     });
 
@@ -44,16 +44,18 @@ export class FilesTemplatesBuilder extends FeatureForProject {
           matches.forEach(pattern => {
             const expression = pattern.replace(/(\{|\})/g, '');
             const e = ENV;
+            const lodash = _;
             // console.log('varssss: ', pattern)
-            const exp = `(function(ENV){
+            const exp = `(function(ENV,_){
               // console.log(typeof ENV)
               return ${expression.trim()}
-            })(e)`;
+            })(e,lodash)`;
             // console.log(exp)
             try {
               const toReplace = eval(exp);
               line = line.replace(pattern, toReplace);
             } catch (err) {
+              Helpers.error(`Error during filtemplate parse: ${orgFilePath}`, true, true);
               Helpers.error(err, false, true);
             }
             // console.log('toReplace', toReplace)

@@ -122,6 +122,9 @@ export const config = {
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   pathes: {
 
+    logoSvg: 'logo.svg',
+    logoPng: 'logo.png',
+
     tnp_folder_location: pathResolved(__dirname, '..'),
     tnp_vscode_ext_location: pathResolved(__dirname, '../../firedev-projects', 'plugins', 'tnp-vscode-ext'),
 
@@ -279,6 +282,8 @@ export const config = {
       { name: 'stmux' },
       { name: 'webpack-bundle-analyzer' },
       { name: '@angular/cli' },
+      { name: 'ngx-pwa-icons', version: '0.1.2' },
+      { name: 'cli-real-favicon' }
     ],
     programs: [
       //   {

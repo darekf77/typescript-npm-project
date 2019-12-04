@@ -165,6 +165,9 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isStandaloneProject) {
       this.project.filesTemplatesBuilder.rebuild();
+      if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
+        this.project.buildOptions = {};
+      }
       await this.project.env.init(args);
     }
 
