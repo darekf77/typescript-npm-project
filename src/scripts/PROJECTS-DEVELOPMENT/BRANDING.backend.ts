@@ -1,11 +1,15 @@
+import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as glob from 'glob';
+import * as _ from 'lodash';
 import * as sharp from 'sharp';
 import { png2svg } from 'svg-png-converter';
 
-import { Helpers } from '../helpers';
-import { Project } from '../project';
-import { config } from '../config';
+import { Helpers } from '../../helpers';
+import { Project } from '../../project';
+import { config } from '../../config';
+import { FilesRenaming } from '../../project/features/files-recreation/files-renaming.backend';
 
 
 export async function $BRANDING(args: string, exit = true) {
@@ -46,8 +50,19 @@ export async function $BRANDING(args: string, exit = true) {
 }
 
 
+export function $RENAMING(aa: string, exit = true) {
+
+  FilesRenaming.start(aa);
+  if (exit) {
+    process.exit(0);
+  }
+
+}
+
+
 export default {
-  $BRANDING
+  $BRANDING,
+  $RENAMING,
 }
 
 

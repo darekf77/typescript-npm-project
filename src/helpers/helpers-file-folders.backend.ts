@@ -121,6 +121,24 @@ export class HelpersFileFolders {
     }
   }
 
+  move(from: string, to: string) {
+    if (!fse.existsSync(from)) {
+      Helpers.warn(`[move] File or folder doesnt not exists: ${from}`)
+      return;
+    }
+    if (!path.isAbsolute(from)) {
+      Helpers.warn(`[move] Source path is not absolute: ${from}`)
+      return;
+    }
+    if (!path.isAbsolute(to)) {
+      Helpers.warn(`[move] Destination path is not absolute: ${to}`)
+      return;
+    }
+    fse.moveSync(from, to, {
+      overwrite: true
+    });
+  }
+
   remove(fileOrFolderPathOrPatter: string, exactFolder = false) {
     if (exactFolder) {
       if (!fse.existsSync(fileOrFolderPathOrPatter)) {
