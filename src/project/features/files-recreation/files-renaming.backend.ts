@@ -23,40 +23,20 @@ export class RenameRule {
   ) {
     this.org.from = from;
     this.org.to = to;
-    this.from = from.toLowerCase().replace(/\W/g, ' ')
-    this.to = to.toLowerCase().replace(/\W/g, ' ')
+    this.from = from.trim().toLowerCase().replace(/\W/g, ' ')
+    this.to = to.trim().toLowerCase().replace(/\W/g, ' ')
   }
 
   applyTo(s: string): boolean {
-    s = s.trim().toLowerCase().replace(/\W/g, ' ')
-    return (s.search(this.from) !== -1);
+    s = s.trim().toLowerCase().replace(/\W/g, '')
+    return (s.search(this.from.replace(/\W/g, '')) !== -1);
   }
 
-  private findIndexes(s: string) {
-    const indexes = [];
-    let stmp = s.trim().toLowerCase().replace(/\W/g, ' ');
-    const thisFrom = this.from;
-    while (true) {
-      const startIndex = stmp.search(thisFrom);
-      if (startIndex === -1) {
-        break;
-      }
-      if (!indexes.includes(startIndex)) {
-        indexes.push(startIndex);
-      }
-      if (startIndex + thisFrom.length > stmp.length - 1) {
-        break;
-      }
-      stmp = stmp.substr(startIndex + thisFrom.length);
+  toString = () => {
+    return `${this.from} => ${this.to}`
+  };
 
-    }
-    return indexes;
-  }
-
-  private replaceFromIndex(orgString: string, startIndex: number) {
-    if (startIndex === -1) {
-      return;
-    }
+  replace(orgString: string) {
 
     const thisTo = this.to;
     const thisFrom = this.from;
@@ -70,28 +50,16 @@ export class RenameRule {
       [_.upperCase(thisFrom), _.upperCase(thisTo)],
       [_.lowerCase(thisFrom), _.lowerCase(thisTo)],
     ].forEach((v) => {
-      const [from, to] = v;
-      orgString = orgString.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+      let [from, to] = v;
+      // console.log(`${from} => ${to}`)
+      orgString = orgString.replace(new RegExp(from, 'g'), to);
+      from = from.replace(/\s/g, '');
+      to = to.replace(/\s/g, '');
+      // console.log(`${from} => ${to}`)
+      orgString = orgString.replace(new RegExp(from, 'g'), to);
     });
 
     return orgString;
-  }
-
-  mapFileContent(s: string): string {
-    this.findIndexes(s).forEach(i => {
-      s = this.replaceFromIndex(s, i);
-    });
-    return s;
-  }
-
-  mapFileName(s: string): string {
-    let stmp = s.trim().toLowerCase().replace(/\W/g, ' ')
-    let startIndex = stmp.search(this.from);
-    if (startIndex === -1) {
-      stmp = s.trim().toLowerCase().replace(/\W/g, '')
-      startIndex = stmp.search(this.from.replace(/\W/g, ''));
-    }
-    return this.replaceFromIndex(s, startIndex);
   }
 
 }
@@ -116,10 +84,11 @@ export class FilesRenaming {
     argString = this.argString;
 
     let args = this.argString.split(' ') as string[];
-    Helpers.log('Rules');
+    Helpers.log('---- Rules ----');
     args.forEach(a => {
       Helpers.log(a)
-    })
+    });
+    Helpers.log('---------------');
     this.rules = args
       .filter(a => a.search('->') !== -1)
       .map(a => {
@@ -152,10 +121,13 @@ export class FilesRenaming {
   }
 
   changeFiles(files: string[] = [], startProcessAgain: (newFolder: string) => any, isFirstCall = true) {
+    // if (isFirstCall) {
+    //   console.log(files)
+    // }
     if (files.length === 0) {
       return;
     }
-    const file = files.shift();
+    let file = files.shift();
     Helpers.log(`Processing file: ${path.basename(file)}`)
     const fileName = path.basename(file);
     for (let index = 0; index < this.rules.length; index++) {
@@ -163,22 +135,22 @@ export class FilesRenaming {
       // Helpers.log(`Checking rule ${r}`)
       if (r.applyTo(fileName)) {
         // Helpers.log(`Apply to: ${fileName}`);
-        const dest = path.join(path.dirname(file), r.mapFileName(fileName));
-        Helpers.log(`dest: ${dest}`);
+        const dest = path.join(path.dirname(file), r.replace(fileName));
+        // Helpers.log(`des ${dest}`);
         Helpers.move(file, dest);
+        file = dest;
         if (path.extname(dest) === '') {
+          files.length = 0;
           Helpers.info(`Starting process again from: ${dest}`)
           startProcessAgain(isFirstCall ? dest : void 0);
           return false;
         }
+
       } else {
         // Helpers.log(`Not apply to: ${fileName}`);
       }
     }
-    if (!this.changeFiles(files, startProcessAgain, false)) {
-      return false;
-    }
-    return true;
+    return this.changeFiles(_.cloneDeep(files), startProcessAgain, false);
   }
 
   changeContent(files: string[] = []) {
@@ -186,13 +158,13 @@ export class FilesRenaming {
       return;
     }
     const file = files.shift();
-    Helpers.log(`Processing file: ${path.basename(file)}`)
+    Helpers.log(`Processing content of file: ${path.basename(file)}`)
     const fileContent = Helpers.readFile(file);
     this.rules.forEach(r => {
       // Helpers.log(`Checking rule ${r}`)
       if (r.applyTo(fileContent)) {
         // Helpers.log(`Apply to: ${fileContent}`);
-        Helpers.writeFile(file, r.mapFileContent(fileContent));
+        Helpers.writeFile(file, r.replace(fileContent));
       } else {
         // Helpers.log(`Not apply to: ${fileContent}`);
       }
