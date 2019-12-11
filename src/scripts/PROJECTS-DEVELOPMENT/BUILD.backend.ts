@@ -165,9 +165,9 @@ export default {
         Helpers.error(`Please build your project first`, false, true);
       }
       const app = express()
-      app.use('/', express.static(path.join(proj.location, config.folder.docs)))
+      app.use(`/${proj.name}`, express.static(path.join(proj.location, config.folder.docs)))
       app.listen(8080, () => {
-        console.log(`tnp standalone serve is runnning on: http://localhost:${8080}`)
+        console.log(`tnp standalone serve is runnning on: http://localhost:${8080}/${proj.name}`)
       });
     } else {
       const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));

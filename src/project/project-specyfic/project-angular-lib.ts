@@ -70,6 +70,7 @@ export class ProjectAngularLib extends Project {
         'ngsw-config.json.filetemplate',
         'tsconfig.app.json.filetemplate',
         'src/index.html.filetemplate',
+        'src/manifest.webmanifest.filetemplate'
       ])
       config = config.filter(f => {
         return !['.angular-cli.json.filetemplate'].includes(f)
@@ -105,7 +106,7 @@ export class ProjectAngularLib extends Project {
 
     if (this.frameworkVersion === 'v2') {
       return config.concat([
-        'src/manifest.webmanifest'
+
       ])
     }
     return config
