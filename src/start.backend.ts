@@ -179,6 +179,9 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (arg === 'ba') {
       return 'build:app';
     }
+    if (arg === 'bap') {
+      return 'build:app:prod';
+    }
     return arg;
   });
   // console.log(argsv)

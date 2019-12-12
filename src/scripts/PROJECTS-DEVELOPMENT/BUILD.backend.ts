@@ -175,6 +175,7 @@ export default {
         let filePath = req.originalUrl
           .replace(/\/$/, '')
           .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
+          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
           .replace(/^\//, '')
         // console.log(`path file: "${filePath}"`)
         // res.send(filePath)

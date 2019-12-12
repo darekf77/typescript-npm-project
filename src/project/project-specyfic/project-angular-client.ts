@@ -118,11 +118,20 @@ export class ProjectAngularClient extends Project {
         if (prod) {
           Helpers.info(`BUILDING PRODUCTION`)
         }
-        const command = `npm-run ng build  ${!this.isStandaloneProject ? (
-          this.env.config.name === 'static' ? '--stats-json' : ''
-        ) : ''} ${
-          this.frameworkVersion !== 'v1' ? '--serviceWorker=true': ''
-        } --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+        let command: string;
+
+        if (this.frameworkVersion === 'v1') {
+          command = `npm-run ng build  ${!this.isStandaloneProject ? (
+            this.env.config.name === 'static' ? '--stats-json' : ''
+          ) : ''} ${
+            this.frameworkVersion !== 'v1' ? '--serviceWorker=true' : ''
+            } --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+        } else {
+          command = `npm-run ng build  ${!this.isStandaloneProject ? (
+            this.env.config.name === 'static' ? '--stats-json' : ''
+          ) : ''} ${'--serviceWorker=true'
+            } --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+        }
 
         Helpers.info(`
 
