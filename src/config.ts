@@ -38,6 +38,7 @@ const file = {
   tnp_system_path_txt: 'tnp-system-path.txt',
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
   tmp_db_tests_json: 'tmp-db-tests.json',
+  manifest_webmanifest: 'manifest.webmanifest',
   ...filesNotAllowedToClen
 };
 
