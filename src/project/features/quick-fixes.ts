@@ -10,6 +10,17 @@ import { Models } from '../../models';
 
 export class QuickFixes extends FeatureForProject {
 
+  public missingAngularLibFiles() {
+    if (this.project.type === 'angular-lib') {
+      const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
+      if (!fse.existsSync(pubilcApiLoc)) {
+        Helpers.writeFile(pubilcApiLoc, `
+        export * from './index'
+        `.trimLeft())
+      }
+    }
+  }
+
   public badNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
     if (this.project.isGenerated && this.project.isWorkspace) {

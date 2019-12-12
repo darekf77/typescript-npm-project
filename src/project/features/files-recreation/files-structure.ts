@@ -94,6 +94,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     this.project.quickFixes.missingSourceFolders()
+    this.project.quickFixes.missingAngularLibFiles();
     if (this.project.isWorkspace) {
       this.project.quickFixes.badNpmPackages();
 

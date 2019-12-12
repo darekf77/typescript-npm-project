@@ -39,6 +39,7 @@ const file = {
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
   tmp_db_tests_json: 'tmp-db-tests.json',
   manifest_webmanifest: 'manifest.webmanifest',
+  publicApi_ts: 'public_api.ts',
   ...filesNotAllowedToClen
 };
 

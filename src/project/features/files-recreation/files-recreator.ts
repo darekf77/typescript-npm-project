@@ -66,7 +66,9 @@ export class FilesRecreator extends FeatureForProject {
             '.gitignore',
             '.npmignore',
             '.npmrc',
-            '.babelrc'
+            '.babelrc',
+            'docs',
+            'logo.svg'
           ])
           .concat(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           .map(f => f.startsWith('/') ? f.slice(1) : f)
