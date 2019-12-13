@@ -60,7 +60,11 @@
           "typescript",
           "@types/node",
           "core-js",
-          "core-js-compat"
+          "core-js-compat",
+          "@ngx-formly/bootstrap",
+          "@ngx-formly/core",
+          "@ngx-formly/ionic",
+          "@ngx-formly/material"
         ],
         "dedupe-for-testing": [
           "@types/jasmine",

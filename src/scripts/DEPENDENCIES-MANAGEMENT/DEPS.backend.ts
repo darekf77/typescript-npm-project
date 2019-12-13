@@ -175,6 +175,11 @@ export default {
     process.exit(0)
   },
 
+  $DEDUPE_CHECK(args: string) {
+    Project.Current.node_modules.dedupeCount(args.trim() === '' ? void 0 : args.split(' '))
+    process.exit(0)
+  },
+
   $DEPS_DEDUPE(args: string) {
     Project.Current.node_modules.dedupe()
     process.exit(0)

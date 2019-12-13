@@ -40,7 +40,6 @@ export abstract class LibProject {
       'index.js',
       'index.d.ts',
       'index.js.map',
-      'src/index.html'
     ]
     return files;
   }
