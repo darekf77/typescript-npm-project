@@ -94,8 +94,10 @@ export default {
     await BUILD_DIST(args);
   },
   async BL(args) {
-    await BUILD_DIST(args);
+    await
+    BUILD_DIST(args);
   },
+  BUILD_BUNDLE,
   async BB(args) {
     await BUILD_BUNDLE(args);
   },
