@@ -64,7 +64,7 @@ export class EnvironmentConfig
 
   public async init(args?: string, overridePortsOnly: boolean = void 0) {
 
-    console.log('INITIN ENV!')
+    // console.log('INITIN ENV!')
 
     let workspaceProjectLocation: string;
 

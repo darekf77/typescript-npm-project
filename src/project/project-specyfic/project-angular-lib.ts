@@ -105,9 +105,14 @@ export class ProjectAngularLib extends Project {
 
 
     if (this.frameworkVersion === 'v2') {
-      return config.concat([
-
-      ])
+      return config.filter(f => {
+        return ![
+          'src/tsconfig.packages.json',
+          'src/tsconfig.spec.json',
+          'src/tsconfig.app.json.filetemplate',
+          'src/tsconfig.app.json',
+        ].includes(f);
+      })
     }
     return config
   }
