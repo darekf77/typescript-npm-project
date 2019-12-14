@@ -4,6 +4,7 @@ import { Project } from './project';
 import { Helpers } from '../../../helpers';
 import { Models } from '../../../models';
 import { ModelDataConfig, Morphi } from 'morphi';
+import { JSON10 } from 'json10';
 
 //#region @backend
 import { BuildOptions, PackagesRecognitionExtended } from '../../features';
@@ -11,13 +12,37 @@ import * as inquirer from 'inquirer';
 import * as path from 'path';
 import { TnpDB } from '../../../tnp-db';
 import { config as configMorphi } from 'morphi/build/config';
+import chalk from 'chalk';
 //#endregion
 
 
 export abstract class BuildableProject {
 
   //#region @backend
-  public buildOptions?: BuildOptions = {};
+  public _buildOptions?: BuildOptions;
+  get buildOptions() {
+    if (!this._buildOptions) {
+      return {};
+    }
+    return this._buildOptions;
+  }
+  set buildOptions(this: Project, v) {
+    if (!v) {
+      Helpers.log(`Trying to assign empty buildOption for ${chalk.bold(this.name)}`)
+      return;
+    }
+
+
+    Helpers.log(`
+    Assign build option for ${chalk.bold(this.name)}
+
+    ${_.isObject(v) ? JSON10.stringify(v) : ''};
+
+
+    `);
+
+    this._buildOptions = v;
+  }
   //#endregion
 
   //#region @backend

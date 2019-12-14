@@ -30,7 +30,7 @@ async function copyModuleto(args: string) {
 }
 
 
-function copy(destLocaiton) {
+function copyToDestination(destLocaiton) {
 
   const currentLib = Project.Current;
   const destination = Project.From(destLocaiton);
@@ -41,11 +41,11 @@ function copy(destLocaiton) {
   Helpers.info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
 
-function copyto(args: string) {
+function copyToHandleArgs(args: string) {
 
   const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
 
-  destLocaitons.forEach(c => copy(c));
+  destLocaitons.forEach(c => copyToDestination(c));
 
 
   process.exit(0)
@@ -242,13 +242,13 @@ export default {
   },
 
   $copytoproject: (args) => {
-    copyto(args)
+    copyToHandleArgs(args)
   },
   $copy_to_project: (args) => {
-    copyto(args)
+    copyToHandleArgs(args)
   },
   $copyto: (args) => {
-    copyto(args)
+    copyToHandleArgs(args)
   },
   $copymoduletoproject: async (args) => {
     await copyModuleto(args)

@@ -102,6 +102,31 @@ export abstract class LibProject {
     }
   }
 
+  public compileES5version(this: Project) {
+
+    if (this.frameworkVersion === 'v1') {
+      return;
+    }
+
+    const pathBundle = path.join(this.location, config.folder.bundle);
+    const cwdBrowser = path.join(pathBundle, config.folder.browser);
+    const cwdClient = path.join(pathBundle, config.folder.client);
+    const pathBabelRc = path.join(cwdBrowser, config.file._babelrc);
+    const pathCompiled = path.join(cwdBrowser, 'es5');
+    const pathCompiledClient = path.join(cwdClient, 'es5');
+    Helpers.writeFile(pathBabelRc, '{ "presets": ["env"] }\n');
+    try {
+      Helpers.run(` babel . -d es5`, { cwd: cwdBrowser }).sync();
+      Helpers.copy(pathCompiled, pathCompiledClient);
+    } catch (err) {
+      Helpers.removeFileIfExists(pathBabelRc);
+      Helpers.error(err, true, true);
+      Helpers.error(`Not able to create es5 version of lib`, false, true);
+    }
+    Helpers.removeFileIfExists(pathBabelRc);
+
+  }
+
   public async release(this: Project, c?: Models.dev.ReleaseOptions) {
 
     this.checkIfLogginInToNpm()
@@ -158,6 +183,8 @@ export abstract class LibProject {
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
       }
+
+
       if (this.type === 'angular-lib') {
         Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
 "use strict";
@@ -169,6 +196,7 @@ tslib_1.__exportStar(require('./browser'), exports);
 export * from './browser';
         `.trim());
       }
+      this.compileES5version();
 
       this.bundleResources()
       this.commit(newVersion);

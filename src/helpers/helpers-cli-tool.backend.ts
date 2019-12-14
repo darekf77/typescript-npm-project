@@ -10,7 +10,14 @@ export class HelpersCliTool {
     let isMatch = false;
     let restOfArgs = argv;
 
+    let counter = 0;
     isMatch = !!argv.find((vv, i) => {
+
+      if (++counter > 3) {
+        // console.log(`counter NOT OK ${vv}`)
+        return false
+      }
+      // console.log(`counter ok for ${vv}`)
       const nameInKC = Helpers.cliTool.paramsFrom(name)
         .replace(/\$/g, '')
         .replace(/\-/g, '')

@@ -253,7 +253,7 @@ export class CopyManager extends FeatureForProject {
   public copyBuildedDistributionTo(destination: Project,
     options: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }, dontRemoveDestFolder: boolean) {
 
-    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options;
+    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
       Helpers.warn(`Invalid project: ${destination.name}`)

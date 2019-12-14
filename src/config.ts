@@ -40,6 +40,7 @@ const file = {
   tmp_db_tests_json: 'tmp-db-tests.json',
   manifest_webmanifest: 'manifest.webmanifest',
   publicApi_ts: 'public_api.ts',
+  _babelrc: '.babelrc',
   ...filesNotAllowedToClen
 };
 
@@ -285,7 +286,8 @@ export const config = {
       { name: 'webpack-bundle-analyzer' },
       { name: '@angular/cli' },
       { name: 'ngx-pwa-icons', version: '0.1.2' },
-      { name: 'cli-real-favicon' }
+      { name: 'cli-real-favicon' },
+      { name: 'babel', installName: 'fkill-cli' },
     ],
     programs: [
       //   {
