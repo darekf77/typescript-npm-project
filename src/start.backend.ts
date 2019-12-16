@@ -182,6 +182,12 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (arg === 'bap') {
       return 'build:app:prod';
     }
+    if (arg === 'rp') {
+      return 'releaseprod';
+    }
+    if (arg === 'r') {
+      return 'releaseprod';
+    }
     return arg;
   });
   // console.log(argsv)

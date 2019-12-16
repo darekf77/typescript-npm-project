@@ -109,19 +109,19 @@ export class FilesRecreator extends FeatureForProject {
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
           .concat(self.project.type === 'angular-lib' ? ['src/tsconfig.app.json'] : [])
           .concat( // for site ignore auto-generate scr
-            self.project.isSite ? (
-              self.project.customizableFilesAndFolders
-                .concat(self.project.customizableFilesAndFolders.map(f => {
-                  return HelpersMerge.PathHelper.PREFIX(f);
-                }))
-                .concat(self.project.customizableFilesAndFolders.map(f => {
-                  return `!${path.join(config.folder.custom, f)}`
-                }))
-            ) : []
+          self.project.isSite ? (
+            self.project.customizableFilesAndFolders
+              .concat(self.project.customizableFilesAndFolders.map(f => {
+                return HelpersMerge.PathHelper.PREFIX(f);
+              }))
+              .concat(self.project.customizableFilesAndFolders.map(f => {
+                return `!${path.join(config.folder.custom, f)}`
+              }))
+          ) : []
           )).concat( // common files for all project
-            self.project.isCoreProject ? [] : self.commonFilesForAllProjects
+          self.project.isCoreProject ? [] : self.commonFilesForAllProjects
           ).concat( // core files of projects types
-            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
+          self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
           )
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
@@ -291,8 +291,11 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-`+
-      this.filesIgnoredBy.gitignore.join('\n').concat('\n'));
+`+ this.filesIgnoredBy.gitignore.join('\n').concat('\n') + `
+!*.filetemplate
+
+`);
+
   }
 
 

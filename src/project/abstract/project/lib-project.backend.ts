@@ -166,20 +166,6 @@ export abstract class LibProject {
         prod, outDir: config.folder.bundle as 'bundle', args: c.args
       }, this));
 
-      if (this.type === 'angular-lib') {
-        Helpers.log(`
-
-      Building docs prevew - start
-
-      `);
-        await this.run(`tnp build:app`).sync();
-        Helpers.log(`
-
-      Building docs prevew - done
-
-      `);
-      }
-
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
       }
@@ -223,7 +209,27 @@ export * from './browser';
       }
       if (successPublis) {
         await this.bumpVersionInOtherProjects(newVersion);
-        this.pushToGitRepo()
+
+        if (this.type === 'angular-lib') {
+          await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+            Helpers.log(`
+
+          Building docs prevew - start
+
+          `);
+            await this.run(`tnp build:app${prod ? 'prod' : ''}`).sync();
+            Helpers.log(`
+
+          Building docs prevew - done
+
+          `);
+            this.pushToGitRepo()
+          }, () => {
+            this.pushToGitRepo()
+          });
+        } else {
+          this.pushToGitRepo()
+        }
       }
     }, () => {
       removeTagAndCommit()

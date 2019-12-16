@@ -91,7 +91,10 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
       }
     } else {
       duplicates.forEach(duplicateRelativePath => {
-        const p = path.join(projectLocation, duplicateRelativePath)
+        const p = path.join(projectLocation, duplicateRelativePath);
+        const projRem = Project.From(p);
+        const versionRem = projRem && projRem.version;
+
         let parentName = path.basename(
           path.dirname(p)
             .replace(new RegExp(`${Helpers.escapeStringForRegEx(config.folder.node_modules)}\/?$`), '')
@@ -108,16 +111,17 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
         if (rules[current.name]) {
           const r = rules[current.name];
           if (_.isArray(r.ommitParents) && r.ommitParents.includes(parentName)) {
-            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name} inside ${chalk.bold(parentName)}`)
+            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
             return
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
-            Helpers.warn(`[not included] Ommiting duplicate of ${current.name} inside ${chalk.bold(parentName)}`)
+            Helpers.warn(`[not included] Ommiting duplicate of ${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
             return
           }
         }
+
         Helpers.remove(p, true)
-        Helpers.info(`Duplicate of ${current.name} removed from ${chalk.bold(parentName)}`)
+        Helpers.info(`Duplicate of ${current.name}@${versionRem} removed from ${chalk.bold(parentName)}`)
       });
     }
 

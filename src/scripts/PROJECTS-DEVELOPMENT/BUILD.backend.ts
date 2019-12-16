@@ -64,7 +64,71 @@ const STATIC_BUILD_APP = async (args) => (await Project.Current.StaticVersion())
 const STATIC_BUILD_APP_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true })
 
+const $SERVE = (args) => {
+  let proj = Project.Current;
+  if (!proj) {
+    proj = Project.nearestTo(process.cwd());
+  }
+  if (proj && proj.isStandaloneProject) {
+    if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
+      Helpers.error(`Please build your project first`, false, true);
+    }
+    const localUrl = `http://localhost:${8080}/${proj.name}/`;
+    const app = express()
+    const filesLocation = path.join(proj.location, config.folder.docs);
+    const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
+
+    app.get(`/${proj.name}/*`, (req, res) => {
+      // console.log(`path: "${req.path}"`)
+      // console.log(`ORIG: "${req.originalUrl}"`)
+      let filePath = req.originalUrl
+        .replace(/\/$/, '')
+        .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
+        .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
+        .replace(/^\//, '')
+      // console.log(`path file: "${filePath}"`)
+      // res.send(filePath)
+      // res.end()
+      if (filePath.includes('?')) {
+        filePath = filePath.split('?')[0];
+      }
+      if (filePath === '') {
+        filePath = 'index.html';
+      }
+
+      if (filePath === config.file.manifest_webmanifest) {
+        const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
+        const file = JSON.parse(Helpers.readFile(localMainfest));
+        file.start_url = localUrl;
+        // console.log('mainfest override')
+        res.json(file);
+      } else {
+        res.sendFile(filePath, { root: filesLocation });
+      }
+    })
+    app.listen(8080, () => {
+      console.log(`tnp standalone serve is runnning on: ${localUrl}`)
+    });
+  } else {
+    const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
+    if (!config.port && !config.baseUrl && !config.outDir) {
+      Helpers.error(`Bad arguments for tnp serve: ${config}`)
+    }
+    const app = express()
+    app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
+    app.listen(config.port, () => {
+      console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
+    });
+  }
+
+};
+
+
 const $START = async (args) => {
+  if (Project.Current.isStandaloneProject) {
+    $SERVE(args);
+    return;
+  }
   if (!Project.Current.isWorkspace) {
     Helpers.error(`Please use this command only on workspace level`, false, true)
   }
@@ -95,7 +159,7 @@ export default {
   },
   async BL(args) {
     await
-    BUILD_DIST(args);
+      BUILD_DIST(args);
   },
   BUILD_BUNDLE,
   async BB(args) {
@@ -157,64 +221,7 @@ export default {
   $START,
   $STATIC_START: $START,
 
-  $SERVE: (args) => {
-    let proj = Project.Current;
-    if (!proj) {
-      proj = Project.nearestTo(process.cwd());
-    }
-    if (proj && proj.isStandaloneProject) {
-      if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
-        Helpers.error(`Please build your project first`, false, true);
-      }
-      const localUrl = `http://localhost:${8080}/${proj.name}/`;
-      const app = express()
-      const filesLocation = path.join(proj.location, config.folder.docs);
-      const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
-
-      app.get(`/${proj.name}/*`, (req, res) => {
-        // console.log(`path: "${req.path}"`)
-        // console.log(`ORIG: "${req.originalUrl}"`)
-        let filePath = req.originalUrl
-          .replace(/\/$/, '')
-          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
-          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
-          .replace(/^\//, '')
-        // console.log(`path file: "${filePath}"`)
-        // res.send(filePath)
-        // res.end()
-        if (filePath.includes('?')) {
-          filePath = filePath.split('?')[0];
-        }
-        if (filePath === '') {
-          filePath = 'index.html';
-        }
-
-        if (filePath === config.file.manifest_webmanifest) {
-          const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
-          const file = JSON.parse(Helpers.readFile(localMainfest));
-          file.start_url = localUrl;
-          // console.log('mainfest override')
-          res.json(file);
-        } else {
-          res.sendFile(filePath, { root: filesLocation });
-        }
-      })
-      app.listen(8080, () => {
-        console.log(`tnp standalone serve is runnning on: ${localUrl}`)
-      });
-    } else {
-      const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
-      if (!config.port && !config.baseUrl && !config.outDir) {
-        Helpers.error(`Bad arguments for tnp serve: ${config}`)
-      }
-      const app = express()
-      app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
-      app.listen(config.port, () => {
-        console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
-      });
-    }
-
-  },
+  $SERVE,
 
   $RELEASE: async (args) => {
     const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));

@@ -85,10 +85,11 @@ export class ProjectAngularLib extends Project {
   projectSpecyficFiles() {
     const config = super.projectSpecyficFiles()
       .filter(f => {
-        return !['src/index.html'].includes(f)
+        return ![
+          'src/index.html',
+        ].includes(f)
       })
       .concat([
-        'tsconfig.isomorphic.json',
         'tsconfig.browser.json',
         'karma.conf.js.filetemplate',
         ...this.filesTemplates(),
@@ -96,7 +97,10 @@ export class ProjectAngularLib extends Project {
       ]).concat(this.projectAngularClient
         .projectSpecyficFiles()
         .filter(f => {
-          return !['.angular-cli.json.filetemplate'].includes(f)
+          return ![
+            '.angular-cli.json.filetemplate',
+            'tsconfig.json',
+          ].includes(f)
         })
         .filter(f => !f.startsWith('webpack.config.'))
         .filter(f => {

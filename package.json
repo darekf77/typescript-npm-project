@@ -230,7 +230,7 @@
             },
             "essentials": {
               "element-resize-detector": "1.1.15",
-              "static-columns": "0.0.25",
+              "static-columns": "1.0.4",
               "ngx-breadcrumbs": "0.0.3",
               "ngx-editor": "^3.3.0",
               "ngx-moment": "^3.0.1",
@@ -603,7 +603,7 @@
     "sort-package-json": "^1.11.0",
     "source-map-loader": "^0.2.0",
     "sqlite3": "4.0.9",
-    "static-columns": "0.0.25",
+    "static-columns": "1.0.4",
     "style-loader": "^0.13.1",
     "stylus-loader": "^3.0.1",
     "svg-png-converter": "0.0.9",
