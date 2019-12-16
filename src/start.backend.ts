@@ -188,6 +188,12 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (arg === 'r') {
       return 'releaseprod';
     }
+    if (arg === 'ghpush') {
+      return 'githubpush';
+    }
+    if (arg === 'ghpull') {
+      return 'githubpull';
+    }
     return arg;
   });
   // console.log(argsv)
