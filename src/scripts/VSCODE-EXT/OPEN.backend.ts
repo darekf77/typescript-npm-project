@@ -19,6 +19,11 @@ export default {
     Project.Current.run(`code ${Project.Current.nameOfCodeWorkspace} &`).sync();
     process.exit(0)
   },
+  $IS_CORE_PROJECT() {
+    Helpers.info(`(${Project.Current.genericName})
+    - is core project: ${chalk.bold(String(Project.Current.isCoreProject))}`)
+    process.exit(0)
+  },
   $OPEN_CORE_PROJECT() {
     Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersion).location} &`).sync();
     process.exit(0)

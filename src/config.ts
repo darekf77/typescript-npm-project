@@ -284,10 +284,10 @@ export const config = {
       { name: 'vsce' },
       { name: 'stmux' },
       { name: 'webpack-bundle-analyzer' },
-      { name: '@angular/cli' },
+      { name: 'ng', installName: '@angular/cli' },
       { name: 'ngx-pwa-icons', version: '0.1.2' },
-      { name: 'cli-real-favicon' },
-      { name: 'babel', installName: 'fkill-cli' },
+      { name: 'real-favicon', installName: 'cli-real-favicon' },
+      { name: 'babel', installName: 'babel-cli' },
     ],
     programs: [
       //   {

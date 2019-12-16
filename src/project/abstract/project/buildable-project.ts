@@ -33,13 +33,13 @@ export abstract class BuildableProject {
     }
 
 
-    Helpers.log(`
-    Assign build option for ${chalk.bold(this.name)}
+    // Helpers.log(`
+    // Assign build option for ${chalk.bold(this.name)}
 
-    ${_.isObject(v) ? JSON10.stringify(v) : ''};
+    // ${_.isObject(v) ? JSON10.stringify(v) : ''};
 
 
-    `);
+    // `);
 
     this._buildOptions = v;
   }

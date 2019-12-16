@@ -116,7 +116,7 @@ export abstract class LibProject {
     const pathCompiledClient = path.join(cwdClient, 'es5');
     Helpers.writeFile(pathBabelRc, '{ "presets": ["env"] }\n');
     try {
-      Helpers.run(` babel . -d es5`, { cwd: cwdBrowser }).sync();
+      Helpers.run(`babel . -d es5`, { cwd: cwdBrowser }).sync();
       Helpers.copy(pathCompiled, pathCompiledClient);
     } catch (err) {
       Helpers.removeFileIfExists(pathBabelRc);

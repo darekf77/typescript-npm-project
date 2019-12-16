@@ -12,11 +12,38 @@ import { config } from '../../../config';
 import { FeatureForProject } from '../../abstract';
 
 export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {
-  const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
+  let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
     Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;
   // console.log('Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe;',Project.Tnp.packageJson.data.tnp.core.dependencies.dedupe)
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
+
+  const rules: { [key: string]: { ommitParents: string[]; onlyFor: string[]; } } = {};
+
+  packagesNames = packagesNames.reduce((a, current, i, arr) => {
+    return a.concat([
+      ...(Array.isArray(current) ? ((depsArr: string[]) => {
+        const first: string = _.first(depsArr);
+        depsArr = depsArr.slice(1);
+        rules[first] = {
+          ommitParents: depsArr
+            .filter(f => f.startsWith('\!'))
+            .map(f => f.replace(/^\!/, '')),
+          onlyFor: depsArr
+            .filter(f => !f.startsWith('\!'))
+        };
+        if (rules[first].onlyFor.length === 0) {
+          delete rules[first].onlyFor;
+        }
+        if (rules[first].ommitParents.length === 0) {
+          delete rules[first].ommitParents;
+        }
+
+        return [first];
+      })(current) : [current])
+    ]);
+  }, []);
+
   packagesNames.forEach(f => {
     let organizationProjectSeondPart = '';
     if (f.search('/') !== -1) {
@@ -65,8 +92,32 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath)
+        let parentName = path.basename(
+          path.dirname(p)
+            .replace(new RegExp(`${Helpers.escapeStringForRegEx(config.folder.node_modules)}\/?$`), '')
+            .replace(/\/$/, '')
+        );
+
+
+
+        const org = path.basename(path.dirname(path.dirname(path.dirname(p))));
+        if (org.startsWith('\@')) {
+          parentName = `${org}/${parentName}`
+        }
+
+        if (rules[current.name]) {
+          const r = rules[current.name];
+          if (_.isArray(r.ommitParents) && r.ommitParents.includes(parentName)) {
+            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name} inside ${chalk.bold(parentName)}`)
+            return
+          }
+          if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
+            Helpers.warn(`[not included] Ommiting duplicate of ${current.name} inside ${chalk.bold(parentName)}`)
+            return
+          }
+        }
         Helpers.remove(p, true)
-        Helpers.info(`Duplicate of ${current.name} removed from ${p.replace(projectLocation, '')}`)
+        Helpers.info(`Duplicate of ${current.name} removed from ${chalk.bold(parentName)}`)
       });
     }
 

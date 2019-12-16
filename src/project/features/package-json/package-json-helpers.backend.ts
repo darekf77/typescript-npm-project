@@ -144,7 +144,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
           }
         }
         if (overrideMsg) {
-          Helpers.log(`[override-info] ${overrideMsg}`);
+          // Helpers.log(`[override-info] ${overrideMsg}`);
         } else {
           // warn(`No override info `);
         }
@@ -177,31 +177,79 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project.frameworkVersion}`);
     const depsForVer = projForVer.packageJson.data;
     Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
-      Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
+      // Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
       newDeps[pkgNameInNewVer] = depsForVer.dependencies[pkgNameInNewVer];
     });
+
   } else {
     cleanForIncludeOnly(project, newDeps, toOverride);
   }
 
+  let devDependencies = {};
 
+  let dependencies = {};
 
-  let devDependencies = project.isStandaloneProject ?
-    Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
-    : {};
-  // console.log('project.genericName', project.genericName)
-  // console.log('project.isStandaloneProject', project.isStandaloneProject)
-  // console.log('devDependencies', devDependencies);
-  // process.exit(0)
+  if (project.frameworkVersion === 'v1') {
+    devDependencies = project.isStandaloneProject ?
+      Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
+      : {};
+    dependencies = project.isStandaloneProject ?
+      Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
+      : Helpers.arrays.sortKeys(newDeps);
+  } else {
+    devDependencies = project.isStandaloneProject ?
+      Helpers.arrays.sortKeys(_.cloneDeep(newDeps))
+      : {};
+    dependencies = project.isStandaloneProject ?
+      Helpers.arrays.sortKeys(_.cloneDeep(newDeps))
+      : Helpers.arrays.sortKeys(newDeps);
+  }
 
-  let dependencies = project.isStandaloneProject ?
-    Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
-    : Helpers.arrays.sortKeys(newDeps);
 
   if ((project.packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
     devDependencies = _.merge(devDependencies, dependencies);
     dependencies = {};
     // console.log('inlcude as dev', devDependencies)
+  }
+
+  const onlyAllowedInDependencies = project.packageJson.data.tnp.overrided.includeOnly || [];
+  if (project.frameworkVersion !== 'v1' && onlyAllowedInDependencies.length > 0) {
+
+    // Helpers.info(`Inlcude only: \n${onlyAllowedInDependencies.join('\n')}`);
+
+    const keyToDeleteDevDeps = []
+    Object.keys(devDependencies)
+      .filter(key => !!devDependencies[key])
+      .forEach(key => {
+        // Helpers.info(`key devDependencies: ${key}@${devDependencies[key]}`)
+        if (onlyAllowedInDependencies.includes(key)) {
+          // Helpers.log(`Fix in devDependencies: ${key}@${devDependencies[key]}`);
+          dependencies[key] = devDependencies[key];
+          keyToDeleteDevDeps.push(key);
+        }
+      });
+
+    const keyToDeleteDeps = []
+    Object.keys(dependencies)
+      .filter(key => !!dependencies[key])
+      .forEach(key => {
+        // Helpers.info(`key dependencies: ${key}@${dependencies[key]}`)
+        if (!onlyAllowedInDependencies.includes(key)) {
+          // Helpers.log(`Fix in dependencies: ${key}@${dependencies[key]}`);
+          devDependencies[key] = dependencies[key];
+          keyToDeleteDeps.push(key);
+        }
+      });
+
+    keyToDeleteDeps.forEach(key => {
+      delete dependencies[key];
+    });
+    keyToDeleteDevDeps.forEach(key => {
+      delete devDependencies[key];
+    });
+
+    // Helpers.log(`${chalk.bold('dependencies')}: \n${JSON.stringify(dependencies, null, 2)}`);
+    // Helpers.log(`${chalk.bold('devDependencies')}: \n${JSON.stringify(devDependencies, null, 2)}`);
   }
 
   if (recrateInPackageJson) {
@@ -228,6 +276,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   project.packageJson.data.license = license;
   project.packageJson.data.private = prv;
   if (project.isTnp) {
+    Helpers.info('Execte tnp aciton')
     const keysToDelete = [];
     Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
       const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];

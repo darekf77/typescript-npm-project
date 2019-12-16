@@ -274,8 +274,13 @@ export class FilesStructure extends FeatureForProject {
   }
 
   async  clearFromArgs(args) {
-    const { recrusive } = this.resolveArgs(args)
-    await this.clear({ recrusive })
+    const { recrusive } = this.resolveArgs(args);
+    await Helpers.questionYesNo(`Do you wanna delete node_modules and reset ${recrusive ? 'project recursively' : 'project'} ?`, async () => {
+      await this.clear({ recrusive });
+      process.exit(0)
+    }, () => {
+      process.exit(0)
+    });
   }
 
 }

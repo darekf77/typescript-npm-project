@@ -74,13 +74,13 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
             proj = Project.From(dest);
             if (!proj) {
               Helpers.run(`code ${dest}`).async();
-              await Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
+              Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
                 chalk.bold(projectName)} to continue and press any key`)
             }
           }
           if (proj.git.thereAreSomeUncommitedChange) {
             Helpers.run(`code ${dest}`).async();
-            await Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull ` +
+            Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull ` +
               `from git press any key to try again`)
           }
           proj.git.pullCurrentBranch();
@@ -117,11 +117,11 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
     const proj = Project.From(dest);
     if (proj.git.thereAreSomeUncommitedChange) {
       Helpers.run(`code .`, { cwd: dest }).async();
-      await Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
     }
     if (proj.git.currentBranchName !== 'master') {
       Helpers.run(`code .`, { cwd: dest }).async();
-      await Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
     }
     proj.git.pushCurrentBranch();
     Helpers.info(`Success push of project ${chalk.bold(projectName)}.`)

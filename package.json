@@ -59,7 +59,12 @@
           "tslint",
           "typescript",
           "@types/node",
-          "core-js",
+          [
+            "core-js",
+            "!babel-register",
+            "!babel-runtime",
+            "!babel-polyfill"
+          ],
           "core-js-compat",
           "@ngx-formly/bootstrap",
           "@ngx-formly/core",
@@ -85,7 +90,13 @@
           "typescript",
           "ts-node",
           "tslint",
-          "enum-values"
+          "enum-values",
+          "babel-cli",
+          "babel-core",
+          "babel-loader",
+          "babel-plugin-syntax-dynamic-import",
+          "babel-preset-env",
+          "babel-preset-es2015"
         ],
         "asDevDependencies": [
           "@types/node",
@@ -103,7 +114,7 @@
           "q": "^1.5.1",
           "morphi": "2.1.1",
           "gulp": "^3.9.1",
-          "ng2-logger": "2.0.48",
+          "ng2-logger": "3.0.10",
           "ng2-rest": "9.3.1",
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",
@@ -545,7 +556,7 @@
     "morphi": "2.1.1",
     "ng-packagr": "^2.0.0",
     "ng2-file-upload": "^1.3.0",
-    "ng2-logger": "2.0.48",
+    "ng2-logger": "3.0.10",
     "ng2-rest": "9.3.1",
     "ngc-webpack": "^4.1.2",
     "ngx-bootstrap": "^2.0.2",
