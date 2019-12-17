@@ -217,6 +217,9 @@ export abstract class FolderProject {
 
   //#region @backend
   public reset(this: Project, showMsg = true) {
+
+    this.quickFixes.removeUncessesaryFiles();
+
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
       Helpers.tryRemoveDir(siteLocationInDist);

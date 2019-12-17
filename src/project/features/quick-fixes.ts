@@ -10,6 +10,22 @@ import { Models } from '../../models';
 
 export class QuickFixes extends FeatureForProject {
 
+  removeUncessesaryFiles() {
+    const filesV1 = [
+      'src/tsconfig.packages.json',
+      'src/tsconfig.spec.json',
+      'src/tsconfig.app.json',
+      '.angular-cli.json'
+    ]
+
+    if (this.project.frameworkVersion !== 'v1' && this.project.type === 'angular-lib') {
+      for (let index = 0; index < filesV1.length; index++) {
+        const oldFile = path.join(this.project.location, filesV1[index]);
+        Helpers.removeFileIfExists(oldFile)
+      }
+    }
+  }
+
   public missingAngularLibFiles() {
     if (this.project.type === 'angular-lib') {
       const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
