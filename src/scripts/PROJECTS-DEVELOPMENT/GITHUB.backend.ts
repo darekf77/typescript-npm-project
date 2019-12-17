@@ -23,7 +23,7 @@ const GITHUB_PROJECTS_NAMES = [
   'base-model-wrap',
   'ng2-rest-docs-server',
   'isomorphic-region-loader',
-  'aurora',
+  // 'aurora',
 
   'static-columns',
   'bs4-breakpoint',
