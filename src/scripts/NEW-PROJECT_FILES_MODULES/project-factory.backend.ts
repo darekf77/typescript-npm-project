@@ -54,7 +54,12 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string, version?: 'v1' | 'v2'): Project {
+  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Project {
+    let version: 'v1' | 'v2' = 'v1';
+    const cwdProj = Project.From(cwd);
+    if (cwdProj && cwdProj.isWorkspace) {
+      version = cwdProj.frameworkVersion;
+    }
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {

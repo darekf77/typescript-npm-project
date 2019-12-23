@@ -182,6 +182,10 @@ export class FilesStructure extends FeatureForProject {
       } else {
         await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
       }
+    } else {
+      if (this.project.isStandaloneProject && this.project.frameworkVersion !== 'v1') {
+        this.project.packageJson.showDeps(`Show new deps for ${this.project.frameworkVersion} `);
+      }
     }
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {

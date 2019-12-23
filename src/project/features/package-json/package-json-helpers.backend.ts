@@ -273,6 +273,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.engines = void 0;
     }
   }
+
+  Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project.frameworkVersion}`);
   project.packageJson.data.license = license;
   project.packageJson.data.private = prv;
   if (project.isTnp) {

@@ -26,7 +26,8 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     //   return c.name !== currentProject.name;
     // })
     .map(c => {
-      const notIncludedInEnv = !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));
+      const notIncludedInEnv = (!c || !c.env || !c.env.config) ? true :
+        !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));
       return {
         value: c.name,
         name: `${c.name}${!notIncludedInEnv ? chalk.red(' -> not included in environment.js config') : ''}`
