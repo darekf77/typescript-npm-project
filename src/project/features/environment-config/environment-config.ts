@@ -133,7 +133,6 @@ export class EnvironmentConfig
 
     config.isCoreProject = this.project.isCoreProject;
 
-
     if (!config.ip) {
       config.ip = 'localhost'
     } else {

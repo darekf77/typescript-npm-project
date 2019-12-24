@@ -38,6 +38,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
 
     const newContent = content
       .split('\n')
+      .filter(line => !line.trimLeft().startsWith('#'))
       .map(line => {
         const matches = line.match(/\{\{\{.*\}\}\}/);
         if (_.isArray(matches)) {

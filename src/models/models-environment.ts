@@ -59,6 +59,7 @@ export namespace ModelsEnvinronment {
     currentProjectLocation?: string;
     currentProjectIsSite?: boolean;
     currentProjectIsStatic?: boolean;
+    currentProjectComponentsFolder?: string;
     currentProjectType?: ModelsLibTypes.LibType;
     packageJSON?: ModelsNpm.IPackageJSON;
 

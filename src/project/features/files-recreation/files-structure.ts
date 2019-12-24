@@ -165,11 +165,11 @@ export class FilesStructure extends FeatureForProject {
     await this.project.recreate.init();
 
     if (this.project.isStandaloneProject) {
-      this.project.filesTemplatesBuilder.rebuild();
       if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
         this.project.buildOptions = {};
       }
       await this.project.env.init(args);
+      this.project.filesTemplatesBuilder.rebuild();
     }
 
     this.project.tnpBundle.installAsPackage()

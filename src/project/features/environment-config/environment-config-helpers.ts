@@ -157,6 +157,12 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectIsStatic = project.isGenerated;
   workspaceConfig.isStandaloneProject = project.isStandaloneProject;
   workspaceConfig.frameworks = project.frameworks;
+
+  if (project.type === 'angular-lib') {
+    const componentsFolder = `tmp-src-dist${project.isStandaloneProject ? '' : `-browser-for-${project.name}`}`;
+    workspaceConfig.currentProjectComponentsFolder = componentsFolder;
+  }
+
   const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 
   if (project.isStandaloneProject) {
@@ -204,7 +210,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 
 
 
-export const existedConfigs = {} as {[workspacePath in string]: Models.env.EnvConfig; }
+export const existedConfigs = {} as { [workspacePath in string]: Models.env.EnvConfig; }
 
 
 export async function standaloneConfigBy(standaloneProject: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
@@ -324,8 +330,8 @@ function createExampleConfigFor(proj: Project) {
     },
     projects: [
       ${proj.children.map((c, i) => {
-      return templetForInfo(c, i)
-    }).join(',\n')}
+    return templetForInfo(c, i)
+  }).join(',\n')}
     ]
   }
   `;

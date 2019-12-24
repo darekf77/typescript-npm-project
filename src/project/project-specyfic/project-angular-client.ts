@@ -76,7 +76,7 @@ export class ProjectAngularClient extends Project {
         await Helpers.killProcessByPort(port)
         command = `npm-run webpack-dev-server ${p} `;
       } else {
-        command = `npm-run ng serve ${p} `;
+        command = `npm-run ng serve ${p} --aot=false`;
       }
       // console.log(command)
       this.run(command, { biggerBuffer: true }).async()

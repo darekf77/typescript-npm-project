@@ -25,7 +25,11 @@ export default {
     process.exit(0)
   },
   $OPEN_CORE_PROJECT() {
-    Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersion).location} &`).sync();
+    if (Project.Current.isCoreProject && Project.Current.frameworkVersion !== 'v1') {
+      Project.Current.run(`code ${Project.by(Project.Current.type, 'v1').location} &`).sync();
+    } else {
+      Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersion).location} &`).sync();
+    }
     process.exit(0)
   },
   $OPEN_TNP_PROJECT() {
