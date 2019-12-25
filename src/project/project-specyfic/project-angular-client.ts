@@ -70,7 +70,7 @@ export class ProjectAngularClient extends Project {
   async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
     const outDirApp = 'dist-app';
     if (watch) {
-      const p = (port !== undefined ? `--port ${port}` : '');
+      const p = (port !== undefined ? `--port=${port}` : '');
       let command: string;
       if (this.isEjectedProject) {
         await Helpers.killProcessByPort(port)
@@ -78,7 +78,11 @@ export class ProjectAngularClient extends Project {
       } else {
         command = `npm-run ng serve ${p} --aot=false`;
       }
-      // console.log(command)
+      Helpers.info(`
+
+      ANGULAR SERVE COMMAND: ${command}
+
+      `)
       this.run(command, { biggerBuffer: true }).async()
     } else {
       baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '')

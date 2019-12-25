@@ -82,13 +82,18 @@ export interface OverridePortType {
   workspaceConfig: Models.env.EnvConfig;
 }
 
-async function handleProject(project: Project, configProject: Models.env.EnvConfigProject, generatePorts) {
+export async function handleProjectsPorts(project: Project, configProject: Models.env.EnvConfigProject, generatePorts) {
   if (generatePorts) {
+    Helpers.log(`[handleProject] generatedPort`)
+
+
     const port = await ProxyRouter.getFreePort();
     // console.log(`Overrided/Generated port from ${project.getDefaultPort()} to ${port} in project: ${project.name}`)
     project.setDefaultPort(port);
     configProject.port = port;
   } else {
+    Helpers.log(`[handleProject] from config`)
+
     const port = Number(configProject.port);
     if (!isNaN(port)) {
       if (port != project.getDefaultPort()) {
@@ -116,7 +121,7 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
 
   const configProject = workspaceConfig.workspace.workspace;
 
-  await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps);
+  await handleProjectsPorts(project, configProject, generatePorts && workspaceConfig.dynamicGenIps);
 
 }
 
@@ -134,7 +139,7 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
     if (project === undefined) {
       Helpers.error(`Undefined project "${configProject.name}" inside environment.js workpace.projects`, false, true);
     }
-    await handleProject(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
+    await handleProjectsPorts(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
   }
 }
 

@@ -12,6 +12,7 @@ import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
 import { TnpDB } from '../../../tnp-db';
 import { PROGRESS_DATA } from '../../../progress-output';
+import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
 
 
 export class BuildProcess extends FeatureForProject {
@@ -141,7 +142,18 @@ inside generated projects...
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
     }
 
-    if (!buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+    if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+      if (buildOptions.watch) {
+        let config;
+        if (this.project.isWorkspace) {
+          config = this.project.env.config.workspace.workspace;
+        } else if (this.project.isWorkspaceChildProject) {
+          config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
+        }
+        await handleProjectsPorts(this.project, config, false);
+      }
+
+    } else {
       if (buildOptions.watch) {
         await this.project.filesStructure.init(buildOptions.args, { watch: true });
       } else {

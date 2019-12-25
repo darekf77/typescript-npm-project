@@ -65,9 +65,9 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         return line;
       }).join('\n');
     Helpers.writeFile(filePath, newContent);
-    if (!this.project.isCoreProject) {
-      fse.unlinkSync(orgFilePath);
-    }
+    // if (!this.project.isCoreProject) {
+    //   fse.unlinkSync(orgFilePath);
+    // }
 
   }
 
