@@ -159,9 +159,13 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.frameworks = project.frameworks;
 
   if (project.type === 'angular-lib') {
-    const componentsFolder = `tmp-src-dist${project.isStandaloneProject ? '' : `-browser-for-${project.name}`}`;
+    const componentsFolder = `browser${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
     workspaceConfig.currentProjectComponentsFolder = componentsFolder;
   }
+  // if (project.type === 'angular-lib') {
+  //   const componentsFolder = `tmp-src-dist${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
+  //   workspaceConfig.currentProjectComponentsFolder = componentsFolder;
+  // }
 
   const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
 

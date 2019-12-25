@@ -28,6 +28,9 @@ Helper project for my typescript npm libraries.
 # TO REMEBER
 - issue with angular loadChildren: './components/+preview-buildtnpprocess/preview-buildtnpprocess.module#PreviewBuildTnpProcesssModule'
      => just change name to wrong... reload... change to  normal and it will be ok !
+  @@@@ RESOLVE WITH NEW ANGULAR IMPORT SYSTEM
+
+# ISSUES
 - should be ONLY ONE VERION of (NG2-REST, MORPHI, RXJS and other...)
 - id, shoud be with undefined (TODO temp soluition)
 - class properties: arrays and object can't have defult propty
@@ -46,6 +49,8 @@ Helper project for my typescript npm libraries.
   import { ProcessController } from './controllers'; // OK 
   import { ProcessController } from './controllers/core/ProcessController'; // error undefined
 - angular-lib 'ss-common-ui/module' is not working in src
+- DONT DO THAT: export class Helpers extends HelpersLogger {  static JSON = JSON10; } -> nested types problem in angular
+
 
 BUILDS are only projects :
  - worksapces (that contains with childen | with childen previews)

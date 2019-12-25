@@ -171,11 +171,11 @@ inside generated projects...
     }
     await this.project.build(buildOptions);
     Helpers.log(`End of Building ${this.project.genericName}\n\n`
-      + (buildOptions.watch ? ' waching files..' : ''));
+      + (buildOptions.watch ? ' waching files.. starting.. please watit...' : ''));
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({
         msg: `End of building ${this.project.genericName}\n`
-          + (buildOptions.watch ? ' waching files..' : '')
+          + (buildOptions.watch ? ' waching files.. starting.. please watit...' : '')
       })
     }
     if (exit && !buildOptions.watch) {
