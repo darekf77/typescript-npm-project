@@ -56,7 +56,7 @@ export class HandleReferingToBaselinePathes extends ModifyTsFileActionBase {
         let patternWithoutBaselinePart = pathToReplaceInInput
           .replace(HelpersMerge.pathToBaselineNodeModulesRelative(this.project), '')
         if (debuggin) Helpers.log(`[replace][3] PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
-        if (debuggin) Helpers.log(`[replace][3] pathPart = ${HelpersMerge.pathPartStringRegex}`)
+        if (debuggin) Helpers.log(`[replace][3] pathPart = ${config.regexString.pathPartStringRegex}`)
 
         patternWithoutBaselinePart = HelpersMerge.PathHelper.removeRootFolder(patternWithoutBaselinePart);
 
@@ -82,8 +82,8 @@ ${Helpers.terminalLine()}
   getPattern(input: string, tmpPathToBaselineNodeModulesRelative: string,
     debuggin: boolean) {
 
-    if (debuggin) Helpers.log(`[replace][3] pathPart ${HelpersMerge.pathPartStringRegex}`)
-    const baselineRegex = `${tmpPathToBaselineNodeModulesRelative}${HelpersMerge.pathPartStringRegex}*`
+    if (debuggin) Helpers.log(`[replace][3] pathPart ${config.regexString.pathPartStringRegex}`)
+    const baselineRegex = `${tmpPathToBaselineNodeModulesRelative}${config.regexString.pathPartStringRegex}*`
     if (debuggin) Helpers.log(`[replace][3] \nbaselineRegex: ${baselineRegex}`)
     let patterns = input.match(new RegExp(baselineRegex, 'g'))
     return patterns;

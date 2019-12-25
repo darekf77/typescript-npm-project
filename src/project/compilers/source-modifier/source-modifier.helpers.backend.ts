@@ -4,7 +4,6 @@ import { Helpers } from '../../../index';
 import { config } from '../../../config';
 
 
-
 export function impReplace(impReplaceOptions: ImpReplaceOptions) {
   let { input, name, urlParts, modType, notAllowedAfterSlash, partsReplacementsOptions,
     debugMatch, debugNotMatch } = impReplaceOptions;
@@ -27,20 +26,29 @@ export function impReplace(impReplaceOptions: ImpReplaceOptions) {
 
   name = name.replace(/\n/g, ' ')
 
-  urlParts = urlParts.map(p => {
-    if (_.isArray(p)) {
-      return `(${p
-        .map(part => {
-          if (part === config.folder.browser) {
-            return `${Helpers.escapeStringForRegEx(part)}(?!\\-)`;
-          }
-          return Helpers.escapeStringForRegEx(part);
-        }).join('|')})`;
-    }
-    if (_.isString(p)) {
-      return Helpers.escapeStringForRegEx(p);
-    }
-  });
+  let urlPartsString: string;
+  if (urlParts instanceof RegExp) {
+    urlPartsString = urlParts.source;
+    // Helpers.log(`regex urlPartsString: "${urlPartsString}"`)
+  } else {
+    urlParts = urlParts.map(p => {
+      if (_.isArray(p)) {
+        return `(${p
+          .map(part => {
+            if (part === config.folder.browser) {
+              return `${Helpers.escapeStringForRegEx(part)}(?!\\-)`;
+            }
+            return Helpers.escapeStringForRegEx(part);
+          }).join('|')})`;
+      }
+      if (_.isString(p)) {
+        return Helpers.escapeStringForRegEx(p);
+      }
+    });
+    urlPartsString = urlParts.join(`\\/`);
+  }
+
+
 
   if (_.isArray(notAllowedAfterSlash)) {
     notAllowedAfterSlash = notAllowedAfterSlash.map(p => {
@@ -63,7 +71,7 @@ export function impReplace(impReplaceOptions: ImpReplaceOptions) {
   if (replaceWhole) {
     arr = [
       {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}.*(\\"|\\')`,
+        regexSource: `(\\"|\\')${urlPartsString}.*(\\"|\\')`,
         replacement: `'${partsReplacements.join('/')}'`,
         description: `exactly between whole imporrt`
       }
@@ -71,12 +79,12 @@ export function impReplace(impReplaceOptions: ImpReplaceOptions) {
   } else {
     arr = [
       {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}(\\"|\\')`,
+        regexSource: `(\\"|\\')${urlPartsString}(\\"|\\')`,
         replacement: `'${partsReplacements.join('/')}'`,
         description: `exactly between apostrophes`
       },
       {
-        regexSource: `(\\"|\\')${urlParts.join(`\\/`)}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
+        regexSource: `(\\"|\\')${urlPartsString}\\/${notAllowedAfterSlash ? `(?!(${notAllowedAfterSlash.join('|')}))` : ''}`,
         replacement: `'${partsReplacements.join('/')}/`,
         description: `between apostrophe and slash`
       },

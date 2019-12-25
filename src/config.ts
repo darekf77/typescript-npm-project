@@ -98,6 +98,9 @@ const moduleNameIsomorphicLib = [
 ];
 
 export const config = {
+  regexString: {
+    pathPartStringRegex: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
+  },
   defaultFrameworkVersion: 'v1' as ('v1' | 'v2'),
   CONST: {
     TEST_TIMEOUT: 3600000

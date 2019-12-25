@@ -6,7 +6,7 @@ import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from '../../../config';
 import { ModType, CheckType } from './source-modifier.models';
 import { IncCompiler } from 'incremental-compiler';
-import { Models, Helpers } from '../../../index';
+import { Models, Helpers, HelpersMerge } from '../../../index';
 import { impReplace } from './source-modifier.helpers.backend';
 import { optionsSourceModifier } from './source-modifier.backend';
 
@@ -124,6 +124,18 @@ export class SourceModForStandaloneProjects
 
     children.forEach(child => {
       const libName = child.name;
+
+      input = impReplace({
+        name: `'${libName}*whatever*' -> ${libName} strict solution for standalone libs`,
+        project: this.project,
+        input,
+        modType,
+        urlParts: new RegExp(`${Helpers.escapeStringForRegEx(libName)}${config.regexString.pathPartStringRegex}`),
+        partsReplacements: [libName],
+        relativePath,
+        partsReplacementsOptions: { replaceWhole: true },
+        method
+      });
 
       if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
         input = impReplace({

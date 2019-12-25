@@ -28,7 +28,7 @@ export type ImpReplaceOptions = {
   method: CheckType,
   modType: ModType,
   partsReplacementsOptions?: { replaceWhole?: boolean };
-  urlParts: (string | string[])[],
+  urlParts: (string | string[])[] | RegExp,
   notAllowedAfterSlash?: (string | string[])[],
   partsReplacements: (string | string[])[],
   name: string;

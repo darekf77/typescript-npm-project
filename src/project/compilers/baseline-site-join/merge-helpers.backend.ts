@@ -13,7 +13,6 @@ import chalk from 'chalk';
 
 export namespace HelpersMerge {
 
-  export const pathPartStringRegex = `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   export const BaselineSiteJoinprefix = '__';
 
   export const PathHelper = {
@@ -21,7 +20,7 @@ export namespace HelpersMerge {
       return `${BaselineSiteJoinprefix}${baseFileName}`
     },
     removeRootFolder(filePath: string) {
-      return filePath.replace(new RegExp(`^${pathPartStringRegex}`, 'g'), '')
+      return filePath.replace(new RegExp(`^${config.regexString.pathPartStringRegex}`, 'g'), '')
     },
     removeExtension(filePath: string) {
       const ext = path.extname(filePath);
