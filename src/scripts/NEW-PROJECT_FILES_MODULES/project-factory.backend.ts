@@ -54,7 +54,7 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Project {
+  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Promise<Project> {
     let version: 'v1' | 'v2' = 'v1';
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
@@ -116,6 +116,9 @@ export class ProjectFactory {
         destProje.recreate.vscode.settings.excludedFiles();
         destProje.recreate.vscode.settings.colorsFromWorkspace()
       }
+      destProje.recreate.vscode.settings.excludedFiles();
+      destProje.recreate.vscode.settings.colorsFromWorkspace()
+      await destProje.filesStructure.init('')
     }
     return destProje;
   }
@@ -131,7 +134,7 @@ export class ProjectFactory {
     }
   }
 
-  public workspaceFromArgs(args: string, exit = true, cwd: string) {
+  public async workspaceFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
 
     if (!_.isArray(argv) || argv.length < 2) {
@@ -146,20 +149,20 @@ export class ProjectFactory {
     }
     const type = argv[0] as any;
     const name = argv[1];
-    this.create(type, name, cwd);
+    await this.create(type, name, cwd);
     if (exit) {
       process.exit(0)
     }
 
   }
 
-  public workspaceSiteFromArgs(args: string, exit = true, cwd: string) {
+  public async workspaceSiteFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
     const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
     if (!basedOn) {
       this.errorMsgCreateSite()
     }
-    this.create('workspace', argv[0] as any, cwd, basedOn);
+    await this.create('workspace', argv[0] as any, cwd, basedOn);
     if (exit) {
       process.exit(0)
     }
