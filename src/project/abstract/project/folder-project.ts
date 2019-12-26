@@ -274,6 +274,8 @@ export abstract class FolderProject {
     }
     if (this.isCoreProject) {
       Helpers.remove(`${this.location}/tmp*`);
+      Helpers.remove(`${this.location}/browser-*`);
+      Helpers.remove(`${this.location}/dist`);
     }
     this.quickFixes.missingSourceFolders()
   }

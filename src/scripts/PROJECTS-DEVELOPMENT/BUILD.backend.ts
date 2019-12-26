@@ -27,6 +27,7 @@ async function buildWatch(args) {
 }
 const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 const BUILD_DIST_WATCH_ALL = async (args) => {
+  args += ' --buildForAllClients';
   Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 }
 const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
@@ -38,6 +39,7 @@ const BUILD_DIST = async (args) => {
 const BUILD_DIST_ALL = async (args) => {
   // console.log('AM FUCKING HEre',Project.Current.isGenerated)
   // process.exit(0)
+  args += ' --buildForAllClients';
   await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);

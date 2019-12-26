@@ -69,6 +69,7 @@ export class ProjectAngularLib extends Project {
         'browserslist.filetemplate',
         'ngsw-config.json.filetemplate',
         'tsconfig.app.json.filetemplate',
+        'tsconfig.base.json.filetemplate',
         'src/index.html.filetemplate',
         'src/manifest.webmanifest.filetemplate'
       ])

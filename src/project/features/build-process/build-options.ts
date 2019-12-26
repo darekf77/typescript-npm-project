@@ -24,6 +24,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
    */
   genOnlyClientCode?: boolean;
   appBuild?: boolean;
+  buildForAllClients?: boolean;
   baseHref?: string;
 
   /**

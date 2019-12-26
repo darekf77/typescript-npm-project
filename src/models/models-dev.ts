@@ -5,7 +5,7 @@ import { EnvironmentName } from '../index';
 
 export namespace ModelsDev {
 
-  export type  InitArgOptions = {
+  export type InitArgOptions = {
     skipNodeModules: boolean;
     recrusive: boolean;
     /**
@@ -104,6 +104,7 @@ export namespace ModelsDev {
     onlyBackend?: boolean;
     baseHref?: string;
     onlyWatchNoBuild?: boolean;
+    buildForAllClients?: boolean;
     forClient?: Project[] | string[];
     copyto?: Project[] | string[];
     additionalIsomorphicLibs?: string[];

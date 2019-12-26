@@ -35,7 +35,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     });
   let selectedChoices = choices.map(c => c.value);
 
-  if (!global.tnpNonInteractive) {
+  if (!global.tnpNonInteractive && !buildOptions.buildForAllClients) {
     Helpers.info('Please select at lease one client..')
     const { projects = [] }: { projects: string[] } = await inquirer
       .prompt([

@@ -84,7 +84,7 @@ export interface OverridePortType {
 
 export async function handleProjectsPorts(project: Project, configProject: Models.env.EnvConfigProject, generatePorts) {
   if (generatePorts) {
-    Helpers.log(`[handleProject] generatedPort`)
+    // Helpers.log(`[handleProject] generatedPort`)
 
 
     const port = await ProxyRouter.getFreePort();
@@ -92,7 +92,7 @@ export async function handleProjectsPorts(project: Project, configProject: Model
     project.setDefaultPort(port);
     configProject.port = port;
   } else {
-    Helpers.log(`[handleProject] from config`)
+    // Helpers.log(`[handleProject] from config`)
 
     const port = Number(configProject.port);
     if (!isNaN(port)) {
