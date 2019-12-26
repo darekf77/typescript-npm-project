@@ -272,6 +272,9 @@ export abstract class FolderProject {
         Helpers.remove(fileOrDirPath)
       }
     }
+    if (this.isCoreProject) {
+      Helpers.remove(`${this.location}/tmp*`);
+    }
     this.quickFixes.missingSourceFolders()
   }
   //#endregion

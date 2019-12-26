@@ -155,6 +155,9 @@ export async function start(argsv: string[], spinner?: Ora) {
     if (arg === 'bdw') {
       return 'build:dist:watch';
     }
+    if (arg === 'bdwa') {
+      return 'build:dist:watch:all';
+    }
     if (arg === 'blw') {
       return 'build:lib:watch';
     }
@@ -163,6 +166,9 @@ export async function start(argsv: string[], spinner?: Ora) {
     }
     if (arg === 'bd') {
       return 'build:dist';
+    }
+    if (arg === 'bda') {
+      return 'build:dist:all';
     }
     if (arg === 'bb') {
       return 'build:bundle';

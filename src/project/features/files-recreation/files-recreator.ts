@@ -292,7 +292,7 @@ testem.log
 .DS_Store
 Thumbs.db
 `+ this.filesIgnoredBy.gitignore.join('\n').concat('\n') + `
-!*.filetemplate
+*.filetemplate
 
 `);
 

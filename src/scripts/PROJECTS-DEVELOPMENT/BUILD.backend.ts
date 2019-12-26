@@ -26,8 +26,16 @@ async function buildWatch(args) {
   }
 }
 const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+const BUILD_DIST_WATCH_ALL = async (args) => {
+  Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+}
 const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const BUILD_DIST = async (args) => {
+  // console.log('AM FUCKING HEre',Project.Current.isGenerated)
+  // process.exit(0)
+  await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+};
+const BUILD_DIST_ALL = async (args) => {
   // console.log('AM FUCKING HEre',Project.Current.isGenerated)
   // process.exit(0)
   await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
@@ -151,6 +159,7 @@ export default {
   SBAP: (args) => STATIC_BUILD_APP_PROD(args),
 
   BUILD_DIST,
+  BUILD_DIST_ALL,
   async BUILD_LIB(args) {
     await BUILD_DIST(args);
   },
@@ -167,6 +176,7 @@ export default {
   },
 
   BUILD_DIST_WATCH,
+  BUILD_DIST_WATCH_ALL,
   BDW: BUILD_DIST_WATCH,
   BUILD_LIB_WATCH: BUILD_DIST_WATCH,
   BLW: BUILD_DIST_WATCH,

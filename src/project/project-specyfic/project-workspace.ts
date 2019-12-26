@@ -160,11 +160,13 @@ export class ProjectWorkspace extends Project {
     if (!fse.existsSync(this.location)) {
       return [];
     }
-    const targetClients: Models.dev.ProjectBuild[] = (this.children.filter(p => {
-      return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
-    })).map(c => {
-      return { project: c, appBuild: true };
-    });
+    const targetClients: Models.dev.ProjectBuild[] = (
+      this.children.filter(p => {
+        return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
+      }))
+      .map(c => {
+        return { project: c, appBuild: true };
+      });
 
     // console.log('targetClients', targetClients.map(c => c.project.genericName))
 
@@ -178,12 +180,20 @@ export class ProjectWorkspace extends Project {
 
 
   async buildSteps(buildOptions?: BuildOptions) {
+
+
     if (!fse.existsSync(this.location)) {
       return;
     }
     PROGRESS_DATA.log({ msg: 'Process started', value: 0 });
-    const { prod, watch, outDir, args } = buildOptions;
-    const projects = this.projectsInOrder;
+    const { prod, watch, outDir, args, appBuild } = buildOptions;
+    Helpers.log(`build opt  ${JSON.stringify({ prod, watch, outDir, args, appBuild })}`)
+    const projects = this.projectsInOrder.map(p => {
+      p.appBuild = this.isGenerated;
+      return p;
+    })
+    console.log('project', projects.map(p => p.project.genericName))
+
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
         const c = projects[index];
@@ -194,7 +204,7 @@ export class ProjectWorkspace extends Project {
     // process.exit(0)
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
-
+    // console.log('project length', projects.length)
     for (let index = 0; index < projects.length; index++) {
       const { project, appBuild } = projects[index];
       const sum = projects.length;
@@ -213,9 +223,10 @@ export class ProjectWorkspace extends Project {
             }
           }, false);
         } else {
-          Helpers.log(`Ommiting app build for ${this.genericName}`)
+          Helpers.log(`Ommiting app build for ${project.genericName}`)
         }
       } else {
+        // Helpers.log(`AAAA BUILD HERER`)
         showProgress('lib', project.genericName, (precentIndex / sum));
         await project.buildProcess.startForLib({
           watch,
