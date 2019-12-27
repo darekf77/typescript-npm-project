@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as path from 'path';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
@@ -19,7 +20,40 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       const libName = child.name;
 
-      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
+      if (([
+        'tmp-src-for'
+      ] as ModType[]).includes(modType)) {
+        // if (relativePath === 'tmp-src-dist-browser-for-test-ui-lib/test-ui-mod/test-ui-mod.component.ts') {
+        //   console.log('PROCESSING!', JSON.stringify({ modType, libName }))
+        // }
+
+        let clientName = relativePath.split('/')[0]
+        clientName = clientName.replace(`tmp-src-dist-browser-for-`, '');
+        const browserForCurrentClient = Helpers.getBrowserVerPath(clientName);
+        const process = (compiled: any[]) => {
+          // console.log(`${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`)
+          input = impReplace({
+            name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
+            project: this.project,
+            input,
+            modType,
+            urlParts: [libName, compiled],
+            partsReplacements: [libName, browserForCurrentClient],
+            relativePath,
+            method
+          });
+        };
+
+        process(this.foldersSources);
+
+      }
+
+      if (([
+        'lib',
+        'custom/lib',
+        'app',
+        'custom/app',
+      ] as ModType[]).includes(modType)) {
 
         let sourceFolder: string;
         if (child.type === 'angular-lib') {

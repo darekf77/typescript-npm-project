@@ -427,4 +427,32 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
+  saveOrDelete() {
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+    // console.log('saving ismoprhic file', this.absoluteFilePath)
+    if (this.isEmpty && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
+      if (fse.existsSync(this.absoluteFilePath)) {
+        fse.unlinkSync(this.absoluteFilePath)
+      }
+      // console.log(`Delete empty: ${deletePath}`)
+    } else {
+      // console.log(`Not empty: ${this.absoluteFilePath}`)
+      if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
+        fse.mkdirpSync(path.dirname(this.absoluteFilePath));
+      }
+      fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
+
+      const relativePath = this.absoluteFilePath
+        .replace(`${this.compilationProject.location}/`, '')
+        .replace(/^\//, '')
+      // if (path.isAbsolute(relativePath)) {
+      //   console.log(`is ABsolute !`, relativePath)
+      //   // process.exit(0)
+      // }
+
+      // console.log(`Written file: ${relativePath}`)
+      this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
+    }
+    // }
+  }
 }

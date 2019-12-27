@@ -16,7 +16,7 @@ import { Project } from '../../index';
  *  - src (isomorphic-lib)
  *  - components (angular-lib)
  */
-export type ModType = 'app' | 'lib' | 'custom/app' | 'custom/lib' | 'tmp-src';
+export type ModType = 'app' | 'lib' | 'custom/app' | 'custom/lib' | 'tmp-src' | 'tmp-src-for';
 
 export type CheckType = 'standalone' | 'baseline' | 'site';
 

@@ -112,6 +112,10 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   process(input: string, relativePath: string) {
     const modType = this.getModType(this.project, relativePath);
+    // if (modType === 'tmp-src-for') {
+    //   console.log(relativePath);
+    //   // return input;
+    // }
     // console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
     input = Helpers.tsCodeModifier.fixApostrphes(input);
     // input = Helpers.tsCodeModifier.fixRegexes(input);

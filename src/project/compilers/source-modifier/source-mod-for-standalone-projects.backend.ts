@@ -43,14 +43,28 @@ export class SourceModForStandaloneProjects
     return input;
   }
 
-  public processFile(relativePath: string, files: Models.other.ModifiedFiles): boolean {
+  public processFile(relativePath: string, files: Models.other.ModifiedFiles, source?: 'tmp-src-for'): boolean {
     const absoluteFilePath = path.join(this.project.location, relativePath);
 
-    if (!fse.existsSync(absoluteFilePath) ||
-      this.project.sourceFilesToIgnore().includes(relativePath) ||
-      !config.extensions.modificableByReplaceFn.includes(path.extname(relativePath))
-    ) {
+    if (!fse.existsSync(absoluteFilePath)) {
+      // if (source === 'tmp-src-for') {
+      //   console.log(`[not exist] Ignored ${relativePath}`)
+      // }
       return false;
+    }
+
+    if (source === 'tmp-src-for') {
+      if (path.extname(relativePath) !== '.ts') {
+        // console.log(`[not ts] Ignored ${relativePath}`)
+        return false;
+      }
+
+    } else {
+      if (this.project.sourceFilesToIgnore().includes(relativePath) ||
+        !config.extensions.modificableByReplaceFn.includes(path.extname(relativePath))
+      ) {
+        return false;
+      }
     }
 
     // if (this.project.isStandaloneProject) {
@@ -69,6 +83,11 @@ export class SourceModForStandaloneProjects
     // } else {
     const input = Helpers.readFile(absoluteFilePath);
     const modified = this.process(input, relativePath);
+
+    // if (source === 'tmp-src-for') {
+    //   console.log(`[finish proceess] ${relativePath}`)
+    // }
+
     if (input !== modified) {
       Helpers.writeFile(absoluteFilePath, modified);
       files.modifiedFiles.push(absoluteFilePath);
@@ -86,6 +105,9 @@ export class SourceModForStandaloneProjects
       .split('/')) as Models.other.SourceFolder;
     if (/^tmp\-src(?!\-)/.test(startFolder)) {
       return 'tmp-src';
+    }
+    if (/^tmp\-src\-/.test(startFolder)) {
+      return 'tmp-src-for';
     }
     if (startFolder === 'src') {
       return project.type === 'isomorphic-lib' ? 'lib' : 'app';
