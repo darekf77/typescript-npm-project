@@ -5,6 +5,7 @@ import { Helpers } from '../../helpers';
 import * as path from 'path';
 import { config } from '../../config';
 import { TnpDB } from '../../tnp-db';
+import * as chokidar from 'chokidar';
 
 
 function killallnode() {
@@ -146,6 +147,19 @@ export default {
   },
   $KILLALLNODE: () => {
     killallnode()
+  },
+
+  CHOKI: () => {
+    this.project = Project.Current;
+    // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
+    chokidar.watch([config.folder.src, config.folder.components], {
+      ignoreInitial: true,
+      followSymlinks: false,
+      ignorePermissionErrors: true,
+      cwd: this.project.location
+    }).on('unlinkDir', (relativeDir) => {
+
+    })
   }
 
 }

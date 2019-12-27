@@ -1,4 +1,5 @@
 import * as fse from 'fs-extra';
+import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as  underscore from 'underscore';
 import * as path from 'path';
@@ -105,6 +106,29 @@ export class HelpersFileFolders {
       modifiedFiles.modifiedFiles.push(absoluteFilePath);
     }
   }
+
+  removeFolderIfExists(absoluteFolderPath: string, options?: { modifiedFiles?: Models.other.ModifiedFiles; }) {
+    console.log(`remove folder: ${absoluteFolderPath}`)
+    const { modifiedFiles } = options || { modifiedFiles: { modifiedFiles: [] } };
+    if (fse.existsSync(absoluteFolderPath)) {
+      fse.removeSync(absoluteFolderPath);
+      modifiedFiles.modifiedFiles.push(absoluteFolderPath);
+    }
+  }
+
+  // private deleteFolderRecursive = (pathToFolder) => {
+  //   if (fs.existsSync(pathToFolder)) {
+  //     fs.readdirSync(pathToFolder).forEach((file, index) => {
+  //       const curPath = path.join(pathToFolder, file);
+  //       if (fs.lstatSync(curPath).isDirectory()) { // recurse
+  //         this.deleteFolderRecursive(curPath);
+  //       } else { // delete file
+  //         fs.unlinkSync(curPath);
+  //       }
+  //     });
+  //     fs.rmdirSync(pathToFolder);
+  //   }
+  // };
 
   tryRemoveDir(dirpath: string, contentOnly = false) {
     // console.log(`tryRemoveDir: ${dirpath}`)

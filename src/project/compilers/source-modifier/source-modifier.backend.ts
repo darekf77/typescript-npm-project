@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
+import * as chokidar from 'chokidar';
 
 import { config } from '../../../config';
 import { FeatureCompilerForProject, Project } from '../../abstract';
@@ -42,6 +43,66 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
 
 @IncCompiler.Class({ className: 'SourceModifier' })
 export class SourceModifier extends SourceModForWorkspaceChilds {
+
+  async preAsyncAction() {
+    if (!(this.project.isWorkspaceChildProject || this.project.isStandaloneProject)) {
+      return;
+    }
+    // console.log('INIT PRE ASYNC')
+    let pathToWatch: string;
+    let prefixTmpFolder = `tmp-src-dist-browser-for-`;
+
+    if (this.project.type === 'angular-lib') {
+      pathToWatch = config.folder.components;
+    } if (this.project.type === 'isomorphic-lib') {
+      pathToWatch = config.folder.src;
+    }
+    const isStandalone = this.project.isStandaloneProject;
+    if (isStandalone) {
+      if (this.project.type === 'angular-lib') {
+        prefixTmpFolder = `tmp-src-dist`;
+      } if (this.project.type === 'isomorphic-lib') {
+        prefixTmpFolder = `tmp-src-dist-browser`;
+      }
+    }
+    // console.log('INIT PRE ASYNC', pathToWatch)
+    const childrenNames = this.project.parent.childrenThatAreClients.map(p => p.name);
+    chokidar.watch([pathToWatch], {
+      ignoreInitial: true,
+      followSymlinks: false,
+      ignorePermissionErrors: true,
+      cwd: this.project.location
+    })
+      .on('unlinkDir', (relativeDir) => {
+        console.log('UNLINK', relativeDir)
+        relativeDir = relativeDir.split('/').slice(1).join('/');
+        if (isStandalone) {
+          const checkDelete = path.join(
+            this.project.location,
+            prefixTmpFolder,
+            relativeDir
+          );
+          Helpers.removeFolderIfExists(checkDelete);
+        } else {
+          for (let index = 0; index < childrenNames.length; index++) {
+            const checkDelete = path.join(
+              this.project.location,
+              `${prefixTmpFolder}${childrenNames[index]}`,
+              relativeDir
+            );
+            Helpers.removeFolderIfExists(checkDelete);
+          }
+        }
+      })
+      .on('addDir', (relativeDir) => {
+        console.log('ADD DIR', relativeDir)
+        const folderAdded = path.join(
+          this.project.location,
+          relativeDir
+        );
+        console.log(fse.readdirSync(folderAdded))
+      });
+  }
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
