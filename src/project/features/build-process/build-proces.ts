@@ -161,8 +161,11 @@ inside generated projects...
       }
     }
 
-    if (this.project.isStandaloneProject) {  // TODO for workspace also ?
+    if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
       await this.project.env.updateData();
+      if (this.project.type === 'angular-lib') {
+        this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
+      }
     }
 
 

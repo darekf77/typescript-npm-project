@@ -33,6 +33,22 @@ export class FilesTemplatesBuilder extends FeatureForProject {
 
   }
 
+  rebuildFile(filetemplateRelativePath) {
+    const filePath = path.join(this.project.location, filetemplateRelativePath);
+    try {
+      var fileContent = Helpers.readFile(filePath);
+      if (!fileContent) {
+        Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
+        return;
+      }
+    } catch (error) {
+      Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
+      return;
+    }
+    const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
+    this.processFile(filePath, fileContent, env);
+  }
+
   private processFile(orgFilePath: string, content: string, ENV: Models.env.EnvConfig) {
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
 

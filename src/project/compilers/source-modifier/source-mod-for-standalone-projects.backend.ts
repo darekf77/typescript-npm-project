@@ -147,6 +147,7 @@ export class SourceModForStandaloneProjects
     children.forEach(child => {
       const libName = child.name;
 
+
       input = impReplace({
         name: `'${libName}*whatever*' -> ${libName} strict solution for standalone libs`,
         project: this.project,
@@ -167,6 +168,31 @@ export class SourceModForStandaloneProjects
           modType,
           urlParts: [libName, folders],
           partsReplacements: [libName],
+          relativePath,
+          method
+        });
+      }
+
+      if(modType === 'tmp-src-for') {
+        input = impReplace({
+          name: `${libName} -> ${libName}/${config.folder.browser}`,
+          project: this.project,
+          input,
+          modType,
+          urlParts: [libName],
+          notAllowedAfterSlash: [config.folder.browser],
+          partsReplacements: [libName, config.folder.browser],
+          relativePath,
+          method
+        });
+
+        input = impReplace({
+          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
+          project: this.project,
+          input,
+          modType,
+          urlParts: [libName, folders],
+          partsReplacements: [libName, config.folder.browser],
           relativePath,
           method
         });
