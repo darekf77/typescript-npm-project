@@ -74,7 +74,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       cwd: this.project.location
     })
       .on('unlinkDir', (relativeDir) => {
-        console.log('UNLINK', relativeDir)
+        // console.log('UNLINK', relativeDir)
         relativeDir = relativeDir.split('/').slice(1).join('/');
         if (isStandalone) {
           const checkDelete = path.join(
@@ -95,13 +95,25 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
         }
       })
       .on('addDir', (relativeDir) => {
-        console.log('ADD DIR', relativeDir)
+        // console.log('ADD DIR', relativeDir)
         const folderAdded = path.join(
           this.project.location,
           relativeDir
         );
-        console.log(fse.readdirSync(folderAdded))
+        this.reSaveAllFilesIn(folderAdded);
       });
+  }
+
+  private reSaveAllFilesIn(folderPath) {
+    const files = fse.readdirSync(folderPath);
+    for (let index = 0; index < files.length; index++) {
+      const f = path.join(folderPath, files[index]);
+      if (fse.lstatSync(f).isDirectory()) {
+        this.reSaveAllFilesIn(f);
+      } else {
+        Helpers.writeFile(f, Helpers.readFile(f), false);
+      }
+    }
   }
 
   @IncCompiler.methods.AsyncAction()
