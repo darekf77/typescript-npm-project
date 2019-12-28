@@ -6,6 +6,7 @@ import * as path from 'path';
 import { config } from '../../config';
 import { TnpDB } from '../../tnp-db';
 import * as chokidar from 'chokidar';
+import { notify } from 'node-notifier';
 
 
 function killallnode() {
@@ -160,6 +161,17 @@ export default {
     }).on('unlinkDir', (relativeDir) => {
 
     })
+  },
+
+  async NOT(args: string) {
+    _.times(10, (n) => {
+      notify({
+        message: 'hey' + args + n.toString(),
+        sound: true
+      })
+    })
+
+    process.exit(0)
   }
 
 }

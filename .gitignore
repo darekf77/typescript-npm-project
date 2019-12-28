@@ -1,4 +1,3 @@
-
 # profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
@@ -40,6 +39,7 @@ Thumbs.db
 /index.js
 /index.d.ts
 /index.js.map
+/.vscode/tasks.json
 /.vscode/launch.json
 /tsconfig.browser.json
 /webpack.config.js
@@ -48,3 +48,6 @@ Thumbs.db
 /projects/tmp*
 /bin/db.json
 /bin/db-for-tests.json
+
+*.filetemplate
+

@@ -6,7 +6,7 @@ import { HelpersEnvironment } from './helpers-environment';
 import { Helpers as HelperNg2Logger } from 'ng2-logger';
 //#region @backend
 import * as child from 'child_process';
-import { Helpers as MorpiHelpers } from 'morphi/helpers';
+import { Helpers as MorpiHelpers } from 'morphi';
 import { HelpersGit } from './helpers-git.backend';
 import { HelpersCliTool } from './helpers-cli-tool.backend';
 import { HelpersMorphiFramework } from './helpers-morphi-framework.backend';

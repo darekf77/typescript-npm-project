@@ -80,6 +80,67 @@ export default {
   $FIX_WSL() {
     $WSL_FIX();
   },
+
+  $VSCODE_GLOBAL() {
+    let keybindingPath = `~/Library/Application Support/Code/User/keybindings.json`;
+    const keys = [
+      {
+        "key": "shift+cmd+s",
+        "command": "workbench.action.files.saveAll"
+      },
+      {
+        "key": "alt+cmd+s",
+        "command": "-workbench.action.files.saveAll"
+      },
+      {
+        "key": "shift+cmd+c",
+        "command": "workbench.action.tasks.terminate"
+      },
+      {
+        "key": "shift+cmd+b",
+        "command": "extension.firedevrunwatchbuild"
+      }
+    ];
+    Helpers.writeFile(keybindingPath, keys);
+
+    const settings = {
+      "git.enableSmartCommit": true,
+      "terminal.integrated.scrollback": 10000,
+      // "files.insertFinalNewline": true,
+      "html.format.endWithNewline": true,
+      "html.format.wrapAttributes": "force-aligned",
+      "files.hotExit": "onExitAndWindowClose",
+      "typescript.referencesCodeLens.enabled": true,
+      "git.autoRepositoryDetection": false,
+      // Whether auto fetching is enabled.
+      "git.autofetch": false,
+      "gitlens.keymap": "none",
+      "gitlens.advanced.messages": {
+        "suppressCommitHasNoPreviousCommitWarning": false,
+        "suppressCommitNotFoundWarning": false,
+        "suppressFileNotUnderSourceControlWarning": false,
+        "suppressGitVersionWarning": false,
+        "suppressLineUncommittedWarning": false,
+        "suppressNoRepositoryWarning": false,
+        "suppressResultsExplorerNotice": false,
+        "suppressShowKeyBindingsNotice": true
+      },
+      "search.followSymlinks": false,
+      "javascript.implicitProjectConfig.experimentalDecorators": true,
+      "gitlens.historyExplorer.enabled": true,
+      "diffEditor.ignoreTrimWhitespace": true,
+      "typescript.updateImportsOnFileMove.enabled": "never",
+      "javascript.updateImportsOnFileMove.enabled": "never",
+      "window.restoreWindows": "all",
+      "search.searchOnType": false,
+      "explorer.compactFolders": false,
+    };
+    let settingspath = '~/Library/Application Support/Code/User/settings.json';
+    Helpers.writeFile(settingspath, settings);
+    Helpers.info(`Vscode configured !`);
+    process.exit(0);
+  },
+
   $VSCODE_FIX: async () => {
     const db = await TnpDB.Instance;
     const projects = db.getProjects();
