@@ -1,6 +1,6 @@
 import * as json5 from 'json5';
 
-import { config as configMorphi } from 'morphi/build/config';
+import { config as configMorphi } from 'morphi';
 
 import { config } from '../../../config';
 import { Project } from './project';

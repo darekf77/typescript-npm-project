@@ -17,6 +17,15 @@ import { NodeModulesBase } from './node-modules-base.backend';
 export class NodeModules extends NodeModulesBase {
 
   get fixesForNodeModulesPackages() {
+    const notAllowedNames = [
+      'plugins',
+      'scripts',
+      'projects',
+      'examples',
+      'src',
+      'components',
+    ]
+
     return this.project
       .getFolders()
       .filter(f => {
@@ -24,6 +33,8 @@ export class NodeModules extends NodeModulesBase {
           !_.values(config.tempFolders).includes(path.basename(f));
       })
       .map(f => f.replace(this.project.location, '').replace(/^\//, ''))
+      .filter(f => f.search('\/') === -1)
+      .filter(f => !notAllowedNames.includes(f))
       ;
   }
 

@@ -258,7 +258,7 @@ export class Project {
 
       location: "${process.cwd()}"
 
-      }`, false, true);
+      }`, false, false);
     }
     // log('CURRENT', current.location)
     return current;

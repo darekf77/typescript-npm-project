@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as inquirer from 'inquirer';
-import { config as configMorphi } from 'morphi/build/config';
+import { config as configMorphi } from 'morphi';
 //#endregion
 import * as json5 from 'json5';
 

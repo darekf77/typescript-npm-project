@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import chalk from 'chalk';
 
 import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
-import { IncrementalBuildProcess } from 'morphi/build';
+import { IncrementalBuildProcess } from 'morphi';
 import { config } from '../../../config';
 import { Project } from '../../../project';
 import { Helpers } from '../../../helpers';

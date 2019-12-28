@@ -40,12 +40,13 @@ export class ProjectIsomorphicLib extends Project {
         '.vscode/launch.json',
         'tsconfig.browser.json',
         'webpack.config.js',
+        'webpack.backend-bundle-build.js',
         'run.js',
         ...this.filesTemplates(),
       ]).concat(
-      !this.isStandaloneProject ? [
-        'src/typings.d.ts',
-      ] : []);
+        !this.isStandaloneProject ? [
+          'src/typings.d.ts',
+        ] : []);
   }
 
   filesTemplates() {
@@ -146,7 +147,7 @@ export class ProjectIsomorphicLib extends Project {
   }
 
   async buildLib() {
-    const { outDir } = this.buildOptions;
+    const { outDir, prod } = this.buildOptions;
     // console.log('Build fucking this', this.buildOptions)
     this.copyWhenExist('bin', outDir);
     this.copyWhenExist('package.json', outDir);
@@ -176,7 +177,24 @@ export class ProjectIsomorphicLib extends Project {
     if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
     } else {
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation')
+      if (prod && outDir === 'bundle') {
+        Helpers.info(`
+
+        WEBPACK PRODUCTION BACKEND BUILD started...
+
+        `)
+        this.quickFixes.badNpmPackages();
+        try {
+          this.run('npm-run webpack --config webpack.backend-bundle-build.js').sync();
+        } catch (er) {
+          Helpers.error(`BUNDLE production build failsed`, false, true);
+        }
+
+        this.buildOptions.genOnlyClientCode = true;
+        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation (only client) ')
+      } else {
+        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation')
+      }
     }
   }
   //#endregion

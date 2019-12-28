@@ -401,6 +401,16 @@ ${sourceData}
   }
 
   /**
+   * get real absolute path
+   */
+  resolve(fileOrFolderPath: string) {
+    if (fileOrFolderPath.startsWith('~')) {
+      fileOrFolderPath = path.join(os.homedir(), fileOrFolderPath.replace(`~/`, ''));
+    }
+    return path.resolve(fileOrFolderPath);
+  }
+
+  /**
    * wrapper for fs.readFileSync
    */
   readFile(absoluteFilePath: string): string | undefined {

@@ -43,6 +43,7 @@ const BUILD_DIST_ALL = async (args) => {
   await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);
+const BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args);
 
 
 const STATIC_BUILD = async (args) => {
@@ -172,6 +173,7 @@ export default {
     await
       BUILD_DIST(args);
   },
+  BUILD_BUNDLE_PROD,
   BUILD_BUNDLE,
   async BB(args) {
     await BUILD_BUNDLE(args);

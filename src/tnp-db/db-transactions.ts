@@ -185,6 +185,12 @@ export class DBTransaction {
 
   }
 
+  public async updateProcesses() {
+    await this.start(`update processes`, async () => {
+      await this.__buildsCtrl.update();
+    });
+  }
+
   public async updateBuildsWithCurrent(currentProject: Project,
     buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {
     // console.log('current build options', buildOptions)

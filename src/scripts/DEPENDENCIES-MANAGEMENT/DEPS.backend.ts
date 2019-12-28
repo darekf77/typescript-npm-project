@@ -52,7 +52,9 @@ function copyToHandleArgs(args: string) {
 }
 
 export async function $INSTALL(args, smooth = false, exit = true) {
+  // console.log('instalaltion')
   await Project.Current.npmPackages.installFromArgs(args, smooth);
+  // console.log('instalaltion after')
   if (exit) {
     process.exit(0);
   }

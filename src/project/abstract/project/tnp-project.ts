@@ -5,8 +5,8 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
-import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi/build/packages-recognition';
-import { config as configMorphi } from 'morphi/build/config';
+import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
+import { config as configMorphi } from 'morphi';
 //#endregion
 
 import { Project } from './project';
@@ -21,7 +21,9 @@ export abstract class TnpProject {
 
   public type: Models.libs.LibType;
   public get frameworkVersion(this: Project) {
+    //#region @backendFunc
     return this.packageJson.frameworkVersion;
+    //#endregion
   }
 
   //#region @backend

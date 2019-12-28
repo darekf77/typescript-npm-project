@@ -39,6 +39,14 @@ export class QuickFixes extends FeatureForProject {
 
   public badNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
+    if (this.project.isTnp) {
+      this.project.node_modules.fixesForNodeModulesPackages
+        .forEach(f => {
+          const source = path.join(this.project.location, f);
+          const dest = path.join(this.project.location, config.folder.node_modules, f);
+          Helpers.tryCopyFrom(source, dest);
+        });
+    }
     if (this.project.isGenerated && this.project.isWorkspace) {
       this.project.origin.node_modules.fixesForNodeModulesPackages
         .forEach(f => {

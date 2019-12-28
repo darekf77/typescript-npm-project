@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi/build';
+import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi';
 import { Models } from '../../../models';
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';

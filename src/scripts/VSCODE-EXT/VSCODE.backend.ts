@@ -82,7 +82,7 @@ export default {
   },
 
   $VSCODE_GLOBAL() {
-    let keybindingPath = `~/Library/Application Support/Code/User/keybindings.json`;
+    let keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
     const keys = [
       {
         "key": "shift+cmd+s",
@@ -135,7 +135,7 @@ export default {
       "search.searchOnType": false,
       "explorer.compactFolders": false,
     };
-    let settingspath = '~/Library/Application Support/Code/User/settings.json';
+    let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');
     Helpers.writeFile(settingspath, settings);
     Helpers.info(`Vscode configured !`);
     process.exit(0);

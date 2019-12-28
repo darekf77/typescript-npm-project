@@ -118,7 +118,7 @@ export class PackageJsonCore {
 
       path desn't exist: ${pathToBaseline}
 
-      `)
+      `, false, true);
     }
   }
 

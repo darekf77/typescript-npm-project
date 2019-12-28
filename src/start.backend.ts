@@ -1,15 +1,17 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
-import glob = require('glob')
+// import glob = require('glob')
+import scriptsFnArr from './scripts/index';
+
 import * as path from 'path';
 import { Helpers } from './helpers';
 import chalk from 'chalk';
 import { Project } from './project';
-import { Ora } from 'ora';
+// import { Ora } from 'ora';
 
 import { config } from './config';
-import { ConsoleUi } from './console-ui';
+// import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 import { Models } from './models';
@@ -29,16 +31,16 @@ IncCompiler.init(async (asyncEvents) => {
 function removeArg(arg: string, argsv: string[]) {
   argsv = argsv.filter((f, i) => {
     const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
-    // console.log(regexString)
+    // Helpers.log(regexString)
     if ((new RegExp(regexString)).test(f)) {
-      // console.log(`true: ${f}`)
+      // Helpers.log(`true: ${f}`)
       const nextParam = argsv[i + 1];
       if (nextParam && !nextParam.startsWith(`--`)) {
         argsv[i + 1] = '';
       }
       return false;
     } else {
-      // console.log(`false: ${f}`)
+      // Helpers.log(`false: ${f}`)
     }
     return true;
   }).filter(f => !!f);
@@ -102,7 +104,7 @@ export function globalArgumentsParser(argsv: string[]) {
 
   if (_.isString(cwdFromArgs)) {
     if (findNearestProject || _.isString(findNearestProjectType)) {
-      // console.log('look for nearest')
+      // Helpers.log('look for nearest')
       var nearest = Project.nearestTo(cwdFromArgs, {
         type: findNearestProjectType,
         findGitRoot: findProjectWithGitRoot,
@@ -135,9 +137,9 @@ export function globalArgumentsParser(argsv: string[]) {
   //   .keys(global)
   //   .filter(key => key.startsWith('tnp'))
   //   .forEach(key => {
-  //     console.log(`globa.${key} = ${global[key]}`)
+  //     Helpers.log(`globa.${key} = ${global[key]}`)
   //   })
-  // console.log('after remove', argsv)
+  // Helpers.log('after remove', argsv)
   // process.exit(0)
   return argsv.join(' ');
 }
@@ -145,7 +147,7 @@ export function globalArgumentsParser(argsv: string[]) {
 
 
 
-export async function start(argsv: string[], spinner?: Ora) {
+export async function start(argsv: string[], spinner?: any /** Ora */) {
   global.hideLog = false;
 
   argsv = argsv.map(arg => {
@@ -172,6 +174,9 @@ export async function start(argsv: string[], spinner?: Ora) {
     }
     if (arg === 'bb') {
       return 'build:bundle';
+    }
+    if (arg === 'bbp') {
+      return 'build:bundle:prod';
     }
     if (arg === 'sb') {
       return 'static:build';
@@ -202,10 +207,10 @@ export async function start(argsv: string[], spinner?: Ora) {
     }
     return arg;
   });
-  // console.log(argsv)
+  // Helpers.log(argsv)
   // process.exit(0)
   const db = await TnpDB.Instance;
-  // console.log(argsv)
+  // Helpers.log(argsv)
   if (
     (argsv.length === 2 && argsv[1].endsWith('/bin/tnp')) ||
     (argsv.length === 3 && argsv[1].endsWith('/bin/tnp')
@@ -236,7 +241,7 @@ export async function start(argsv: string[], spinner?: Ora) {
     //     spinner && spinner.stop()
     //     runCommand(commadnToRun).sync()
     //   } catch (error) {
-    //     console.log(`Command ${localLib} ERROR...`);
+    //     Helpers.log(`Command ${localLib} ERROR...`);
     //   }
     //   process.exit(0)
     // }
@@ -245,15 +250,22 @@ export async function start(argsv: string[], spinner?: Ora) {
   // await initWatcherDB();
   // process.stdin.resume();
 
-  const helpFile = glob.sync(config.pathes.scripts.HELP_js)[0]
-  const files = [helpFile]
-    .concat(glob.sync(config.pathes.scripts.allPattern).filter(f => f !== helpFile));
+  // const helpFile = glob.sync(config.pathes.scripts.HELP_js)[0]
+  // const files = [helpFile]
+  //   .concat(glob.sync(config.pathes.scripts.allPattern).filter(f => f !== helpFile));
 
+  // Helpers.log(files);
 
-  const functions: Function[] = []
+  const functionsToCHeck: Function[] = []
 
-  files.some((file) => {
-    const defaultObjectFunctionsOrHelpString = require(path.resolve(file)).default;
+  const files = scriptsFnArr;
+
+  Helpers.log('checking commands')
+  for (let index = 0; index < files.length; index++) {
+    let breakLoop = false;
+    Helpers.log(`check function command ${index}`);
+    const file = files[index];
+    const defaultObjectFunctionsOrHelpString = file; //require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {
 
       Object.keys(defaultObjectFunctionsOrHelpString).map(key => {
@@ -267,54 +279,60 @@ export async function start(argsv: string[], spinner?: Ora) {
         if (defaultObjectFunctionsOrHelpString.hasOwnProperty(k)) {
           const v = defaultObjectFunctionsOrHelpString[k];
           if (recognized) {
-            return true;
+            breakLoop = true;
+            break;
           }
           if (!_.isString(v)) {
             const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
-            functions.push(vFn)
+            functionsToCHeck.push(vFn)
             if (_.isFunction(vFn)) {
               const check = Helpers.cliTool.match(k, argsv);
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner.stop()
-                // console.log('FNNAME',vFn.name)
+                // Helpers.log('FNNAME',vFn.name)
                 // process.exit(0)
+                Helpers.log('--- recognized command ---' + vFn.name)
                 vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
-                return true;
+                breakLoop = true;
+                break;
               }
             }
           }
         }
       }
     }
-    return false;
-  });
+    if (breakLoop) {
+      break;
+    }
+  }
+  // Helpers.log(' loop eneded ')
   // spinner && spinner.stop()
   if (recognized) {
-    // console.log("RECOGNIZED !!")
+    // Helpers.log("RECOGNIZED !!")
     process.stdin.resume();
   } else {
-    // console.log("NOT RECOGNIZED !!")
+    // Helpers.log("NOT RECOGNIZED !!")
     if (Array.isArray(argsv) && argsv.length == 3) {
-      console.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
+      Helpers.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
       process.exit(1);
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
-      console.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
+      Helpers.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
       process.exit(1);
     } else {
-      const p = Project.Current;
+      const p = void 0; //Project.Current;
 
       if (p) {
-
-        const ui = new ConsoleUi(p, db);
-        try {
-          await ui.init(functions)
-        } catch (e) {
-          // console.log(e)
-          process.exit(1)
-        }
+        // TODO console ui
+        // const ui = new ConsoleUi(p, db);
+        // try {
+        //   await ui.init(functions)
+        // } catch (e) {
+        //   // Helpers.log(e)
+        //   process.exit(1)
+        // }
       } else {
-        console.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
+        Helpers.log(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
         process.exit(1);
       }
     }

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi/build';
+import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi';
 import { Models } from '../../../models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';

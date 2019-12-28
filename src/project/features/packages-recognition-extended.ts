@@ -1,7 +1,7 @@
 //#region @backend
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import { PackagesRecognition } from 'morphi/build/packages-recognition';
+import { PackagesRecognition } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from '../../helpers';
 import { config } from '../../config';

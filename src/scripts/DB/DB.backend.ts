@@ -1,8 +1,9 @@
 //#region @backend
 import * as  psList from 'ps-list';
-import { TnpDB } from '../tnp-db/wrapper-db';
-import { CommandInstance } from '../tnp-db/entites';
-import { Models } from '../models';
+import { TnpDB } from '../../tnp-db/wrapper-db';
+import { CommandInstance } from '../../tnp-db/entites';
+import { Models } from '../../models';
+import { DBProcMonitor } from './db-proc-monitor.backend';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
@@ -34,7 +35,15 @@ async function $EXISTS(args: string) {
   process.exit(0)
 }
 
+async function $PROC_MONITOR() {
+  const db = await TnpDB.Instance;
+ (new DBProcMonitor(db)).start();
+
+}
+
+
 export default {
+  $PROC_MONITOR,
   $DB,
   $DB_REINTI() {
     return $DB('reinit')

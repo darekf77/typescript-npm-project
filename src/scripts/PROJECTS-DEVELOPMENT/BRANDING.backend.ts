@@ -27,7 +27,7 @@ export async function $BRANDING(args: string, exit = true) {
     input: fse.readFileSync(path.join(proj.location, config.pathes.logoPng)),
     numberofcolors: 24,
     pathomit: 1,
-  })
+  } as any)
   fse.writeFileSync(config.pathes.logoSvg, content)
 
   Helpers.log('Generation favicons...');
