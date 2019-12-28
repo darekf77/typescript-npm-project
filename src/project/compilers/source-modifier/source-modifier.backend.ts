@@ -66,7 +66,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       }
     }
     // console.log('INIT PRE ASYNC', pathToWatch)
-    const childrenNames = this.project.parent.childrenThatAreClients.map(p => p.name);
+    const childrenNames = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(p => p.name);
     chokidar.watch([pathToWatch], {
       ignoreInitial: true,
       followSymlinks: false,

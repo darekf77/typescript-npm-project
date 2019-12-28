@@ -80,7 +80,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         let folders = this.foldersCompiledJsDtsMap;
         process(folders);
 
-        folders = this.project.parent.childrenThatAreClients.map(client => {
+        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(client => {
           return Helpers.getBrowserVerPath(client.name);
         });
         process(folders);
@@ -127,7 +127,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
         process(folders);
 
-        folders = this.project.parent.childrenThatAreClients
+        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return Helpers.getBrowserVerPath(client.name)
@@ -184,7 +184,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         let folders = this.foldersCompiledJsDtsMap;
         process(folders);
 
-        folders = this.project.parent.childrenThatAreClients.map(client => {
+        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(client => {
           return Helpers.getBrowserVerPath(client.name);
         });
         process(folders);
@@ -235,7 +235,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       //   process(folders);
 
-      //   folders = this.project.parent.childrenThatAreClients
+      //   folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
       //     .map(client => {
       //       return Helpers.getBrowserVerPath(client.name)
       //     });
@@ -318,7 +318,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
         process(folders);
 
-        folders = this.project.parent.childrenThatAreClients
+        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .map(client => {
             return Helpers.getBrowserVerPath(client.name);
           });
