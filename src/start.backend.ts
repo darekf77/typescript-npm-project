@@ -179,6 +179,9 @@ export async function start(argsv: string[], spinner?: any /** Ora */) {
     if (arg === 'bbp') {
       return 'build:bundle:prod';
     }
+    if (arg === 'bbpw') {
+      return 'build:bundle:prod:watch';
+    }
     if (arg === 'sb') {
       return 'static:build';
     }

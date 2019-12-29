@@ -173,6 +173,7 @@ async function BB(args) {
 const $BUILD_DIST_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args);
 const $BUILD_BUNDLE_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'bundle', args);
 const $BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+const $BUILD_BUNDLE_PROD_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(true, true, 'bundle', args);
 const $BUILD_APP_PROD = (args) => Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
 const $BUILD_APP = (args) => Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args);
 const $BUILD_APP_WATCH_PROD = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
@@ -262,6 +263,7 @@ export default {
   $BUILD_DIST_PROD: CLIWRAP($BUILD_DIST_PROD, '$BUILD_DIST_PROD'),
   $BUILD_BUNDLE_WATCH: CLIWRAP($BUILD_BUNDLE_WATCH, '$BUILD_BUNDLE_WATCH'),
   $BUILD_BUNDLE_PROD: CLIWRAP($BUILD_BUNDLE_PROD, '$BUILD_BUNDLE_PROD'),
+  $BUILD_BUNDLE_PROD_WATCH: CLIWRAP($BUILD_BUNDLE_PROD_WATCH, '$BUILD_BUNDLE_PROD_WATCH'),
   $BUILD_APP_PROD: CLIWRAP($BUILD_APP_PROD, '$BUILD_APP_PROD'),
   $BUILD_APP: CLIWRAP($BUILD_APP, '$BUILD_APP'),
   $BUILD_APP_WATCH_PROD: CLIWRAP($BUILD_APP_WATCH_PROD, '$BUILD_APP_WATCH_PROD'),

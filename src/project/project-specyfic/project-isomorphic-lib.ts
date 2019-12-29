@@ -174,22 +174,33 @@ export class ProjectIsomorphicLib extends Project {
       Helpers.log(`Skip build `);
       return;
     }
+
+    if (prod && outDir === 'bundle') {
+      this.quickFixes.badNpmPackages();
+      Helpers.info(`
+
+        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} PRODUCTION BACKEND BUILD started...
+
+        `);
+    }
+
     if (this.buildOptions.watch) {
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
+      if (prod && outDir === 'bundle') {
+        try {
+          this.run('npm-run webpack --config webpack.backend-bundle-build.js --watch').async();
+        } catch (er) {
+          Helpers.error(`BUNDLE production build failsed`, false, true);
+        }
+      } else {
+        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
+      }
     } else {
       if (prod && outDir === 'bundle') {
-        Helpers.info(`
-
-        WEBPACK PRODUCTION BACKEND BUILD started...
-
-        `)
-        this.quickFixes.badNpmPackages();
         try {
           this.run('npm-run webpack --config webpack.backend-bundle-build.js').sync();
         } catch (er) {
           Helpers.error(`BUNDLE production build failsed`, false, true);
         }
-
         this.buildOptions.genOnlyClientCode = true;
         await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation (only client) ')
       } else {
