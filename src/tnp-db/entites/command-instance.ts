@@ -2,7 +2,9 @@
 import * as _ from 'lodash';
 
 import { DBBaseEntity } from './base-entity';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('DomainInstance')
 export class CommandInstance extends DBBaseEntity {
   isEqual(anotherInstace: CommandInstance): boolean {
     return this.location === anotherInstace.location;

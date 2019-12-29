@@ -12,6 +12,7 @@ export type ProcessMetaInfo = {
   pid?: number;
 }
 
+@CLASS.NAME('ProcessInstance')
 export class ProcessInstance extends DBBaseEntity {
   isEqual(anotherInstace: ProcessInstance): boolean {
     return (

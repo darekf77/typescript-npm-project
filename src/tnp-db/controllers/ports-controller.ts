@@ -4,7 +4,9 @@ import { Models } from '../../models';
 import { BaseController } from './base-controlller';
 import { PortInstance } from '../entites/port-instance';
 import { PortsSet } from './ports-set';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('PortsController')
 export class PortsController extends BaseController {
 
   async update() {

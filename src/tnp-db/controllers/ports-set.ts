@@ -1,13 +1,13 @@
 //#region @backend
 import * as _ from 'lodash';
-
 import { Helpers } from '../../helpers';
 import { PortInstance } from '../entites';
 import { Project } from '../../project';
 import { Models } from '../../models';
+import { CLASS } from 'typescript-class-helpers';
 
 
-
+@CLASS.NAME('PortsSet')
 export class PortsSet {
 
   private ports: PortInstance[];

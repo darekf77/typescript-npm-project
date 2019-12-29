@@ -4,10 +4,11 @@ import { Project } from '../../project';
 import { Models } from '../../models';
 import { Helpers } from '../../helpers';
 import { DBBaseEntity } from './base-entity';
+import { CLASS } from 'typescript-class-helpers';
 
 export type PortIdType = number | number[] | Models.other.Range;
 
-
+@CLASS.NAME('PortInstance')
 export class PortInstance extends DBBaseEntity {
 
   constructor(

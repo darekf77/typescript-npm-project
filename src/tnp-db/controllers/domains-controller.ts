@@ -5,8 +5,9 @@ import { BaseController } from './base-controlller';
 import { DomainInstance, ProjectInstance } from '../entites';
 import { Project } from '../../project';
 import { Models } from '../../models';
+import { CLASS } from 'typescript-class-helpers';
 
-
+@CLASS.NAME('DomainsController')
 export class DomainsController extends BaseController {
 
   async update() {

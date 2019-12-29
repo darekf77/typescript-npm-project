@@ -8,7 +8,9 @@ import { Models } from '../../models';
 import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { BuildOptions } from '../../project/features';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('BuildsController')
 export class BuildsController extends BaseController {
 
   /**

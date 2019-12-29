@@ -7,6 +7,7 @@ import { config } from '../../config';
 import { TnpDB } from '../../tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
+import { CLASS } from 'typescript-class-helpers';
 
 
 function killallnode() {
@@ -16,6 +17,13 @@ function killallnode() {
   // } else {
   //   run(`killall -9 node`).sync();
   // }
+}
+
+
+
+export async function $NAME_TEST() {
+  // CLASS.getConfig($NAME_TEST)[0].
+  console.log(CLASS.getName($NAME_TEST))
 }
 
 export async function killAll() {

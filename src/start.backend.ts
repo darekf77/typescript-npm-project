@@ -16,6 +16,7 @@ import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
 import { Models } from './models';
 import { IncCompiler } from 'incremental-compiler';
+import { CLASS } from 'typescript-class-helpers';
 
 IncCompiler.init(async (asyncEvents) => {
 
@@ -214,7 +215,7 @@ export async function start(argsv: string[], spinner?: any /** Ora */) {
   if (
     (argsv.length === 2 && argsv[1].endsWith('/bin/tnp')) ||
     (argsv.length === 3 && argsv[1].endsWith('/bin/tnp')
-      && argsv[2] === _.kebabCase(_.lowerCase($LAST.name))
+      && argsv[2] === _.kebabCase(_.lowerCase(CLASS.getName($LAST)))
     )
   ) {
     // info(`DO NOTHIGN`);

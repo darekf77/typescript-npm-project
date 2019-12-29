@@ -6,6 +6,7 @@ import { DBBaseEntity } from './base-entity';
 import { Helpers } from '../../helpers';
 import chalk from 'chalk';
 import { BuildOptions } from '../../project/features';
+import { CLASS } from 'typescript-class-helpers';
 
 export type IBuildInstance = {
   buildOptions?: BuildOptions;
@@ -14,6 +15,7 @@ export type IBuildInstance = {
   location?: string;
 };
 
+@CLASS.NAME('BuildInstance')
 export class BuildInstance extends DBBaseEntity implements IBuildInstance {
 
 

@@ -1,7 +1,9 @@
 //#region @backend
 import { DBBaseEntity } from './base-entity';
 import { Project } from '../../project';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('ProjectInstance')
 export class ProjectInstance extends DBBaseEntity {
 
   public static from(project: Project): ProjectInstance {

@@ -7,7 +7,10 @@ import { DbCrud } from '../db-crud';
 import { BaseController } from './base-controlller';
 import { ProjectInstance } from '../entites';
 import { config } from '../../config';
+import { CLASS } from 'typescript-class-helpers';
 
+
+@CLASS.NAME('ProjectsController')
 export class ProjectsController extends BaseController {
 
   async update() {

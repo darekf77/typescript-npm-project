@@ -3,6 +3,7 @@ import { Project } from '../../project';
 import { Models } from '../../models';
 import { BuildInstance } from './build-instance';
 import { DBBaseEntity } from './base-entity';
+import { CLASS } from 'typescript-class-helpers';
 
 
 export class IDomainInstance {
@@ -12,7 +13,7 @@ export class IDomainInstance {
   // production: boolean;
 }
 
-
+@CLASS.NAME('DomainInstance')
 export class DomainInstance extends DBBaseEntity implements IDomainInstance {
   isEqual(anotherInstace: DomainInstance): boolean {
     return this.address === anotherInstace.address;

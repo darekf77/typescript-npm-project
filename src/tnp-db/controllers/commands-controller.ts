@@ -7,7 +7,10 @@ import { BaseController } from './base-controlller';
 import { CommandInstance } from '../entites/command-instance';
 import { Project } from '../../project';
 import { BuildOptions } from '../../project/features';
+import { CLASS } from 'typescript-class-helpers';
 
+
+@CLASS.NAME('CommandsController')
 export class CommandsController extends BaseController {
   async addExisted() {
 
