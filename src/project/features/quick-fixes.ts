@@ -28,10 +28,18 @@ export class QuickFixes extends FeatureForProject {
 
   public missingAngularLibFiles() {
     if (this.project.type === 'angular-lib') {
+      const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
+      if (!fse.existsSync(indexTs)) {
+        Helpers.writeFile(indexTs, `
+        export * from './public_api';
+        `.trimLeft())
+
+      }
+
       const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
       if (!fse.existsSync(pubilcApiLoc)) {
         Helpers.writeFile(pubilcApiLoc, `
-        export * from './index'
+        export function helloWorld() { }
         `.trimLeft())
       }
     }
