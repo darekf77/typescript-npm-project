@@ -1,21 +1,19 @@
 import { Helpers } from '../helpers/index';
+import { CLIWRAP } from './cli-wrapper.backend';
 
-
-export default {
-
-  $BASH_CONFIG_VNC_START() {
-    console.log(`#!/bin/bash
+function $BASH_CONFIG_VNC_START() {
+  console.log(`#!/bin/bash
 xrdb $HOME/.Xresources
 startxfce4 &
 `);
-    process.exit(0);
-  },
+  process.exit(0);
+}
 
-  $BASH_CONFIG_VNC_SERVICE() {
-    const user = Helpers.run(`whoami`, { output: false }).sync().toString();
-    // console.log('user:' + user)
-    process.exit(0);
-    console.log(`[Unit]
+function $BASH_CONFIG_VNC_SERVICE() {
+  const user = Helpers.run(`whoami`, { output: false }).sync().toString();
+  // console.log('user:' + user)
+  // process.exit(0);
+  console.log(`[Unit]
 Description=Start TightVNC server at startup
 After=syslog.target network.target
 
@@ -32,8 +30,13 @@ ExecStop=/usr/bin/vncserver -kill :%i
 
 [Install]
 WantedBy=multi-user.target
-    `);
-    process.exit(0);
-  }
+  `);
+  process.exit(0);
+}
+
+export default {
+
+  $BASH_CONFIG_VNC_START: CLIWRAP($BASH_CONFIG_VNC_START, '$BASH_CONFIG_VNC_START'),
+  $BASH_CONFIG_VNC_SERVICE: CLIWRAP($BASH_CONFIG_VNC_SERVICE, '$BASH_CONFIG_VNC_SERVICE'),
 
 }

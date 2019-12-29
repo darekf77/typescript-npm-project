@@ -5,6 +5,7 @@ import { Helpers } from '../../helpers';
 import * as path from 'path';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = Project.Current.recreate.filesIgnoredBy.gitignore
@@ -48,7 +49,7 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
   if (Project.Current.git.isGitRepo) {
     try {
       Project.Current.run(`git reset --hard`).sync();
-    } catch (error) {}
+    } catch (error) { }
     Project.Current.git.pullCurrentBranch();
   } else {
     Helpers.error(`Not able to pull and reset hard: ${process.cwd()}`);
@@ -56,15 +57,16 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
   exit && process.exit(0);
 }
 
-export default {
-  $GIT_QUICK_COMMIT_AND_PUSH,
-  $GIT_QUICK_RESET_HARD_AND_PULL,
-  $GIT_REMOVE_UNTRACKED,
-  $GIT_REMOVE_UNTRACKED_EVERYWHERE: () => {
-    Project.projects.forEach(p => {
-      Helpers.run(`tnp ${Helpers.cliTool.paramsFrom($GIT_REMOVE_UNTRACKED.name)}`, { cwd: p.location }).sync()
-    });
-    process.exit(0);
-  },
+const $GIT_REMOVE_UNTRACKED_EVERYWHERE = () => {
+  Project.projects.forEach(p => {
+    Helpers.run(`tnp ${Helpers.cliTool.paramsFrom($GIT_REMOVE_UNTRACKED.name)}`, { cwd: p.location }).sync()
+  });
+  process.exit(0);
+}
 
+export default {
+  $GIT_QUICK_COMMIT_AND_PUSH: CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
+  $GIT_QUICK_RESET_HARD_AND_PULL: CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
+  $GIT_REMOVE_UNTRACKED: CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
+  $GIT_REMOVE_UNTRACKED_EVERYWHERE: CLIWRAP($GIT_REMOVE_UNTRACKED_EVERYWHERE, '$GIT_REMOVE_UNTRACKED_EVERYWHERE'),
 }

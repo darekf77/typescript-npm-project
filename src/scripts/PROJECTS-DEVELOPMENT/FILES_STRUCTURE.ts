@@ -2,6 +2,7 @@
 import { Project } from '../../project';
 import { TnpDB } from '../../tnp-db';
 import { sleep } from 'sleep';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 
 
@@ -154,48 +155,57 @@ export async function STATIC_RESET_ALL(args: string, exit = true) {
   }
 }
 
+function TEMPLATES_BUILDER() {
+  Project.Current.filesTemplatesBuilder.rebuild();
+  process.exit(0)
+}
+
+
+const $INIT_EVERYWHERE = (args) => {
+  Project.projects.forEach(p => {
+    p.run(`tnp init`).sync()
+  })
+}
 
 
 // init().project();
 // init().watch.project()
+const S_INIT = (args, exit) => STATIC_INIT(args, exit);
+const CL = (args, exit) => CLEAN(args, exit);
+const SCL = (args, exit) => STATIC_CLEAN(args, exit);
+const SCLA = (args, exit) => STATIC_CLEAN_ALL(args, exit);
+const RST = (args, exit) => RESET(args, exit);
+const RSTA = (args, exit) => RESET_ALL(args, exit);
+const SRST = (args, exit) => STATIC_RESET(args, exit);
+const SRSTA = (args, exit) => STATIC_RESET_ALL(args, exit);
 
 export default {
-  INIT,
-  STRUCT,
-  INIT_ALL,
-  STATIC_INIT,
-  STATIC_INIT_ALL,
-  S_INIT: STATIC_INIT,
-  CLEAN,
-  CLEAR,
-  CL: CLEAN,
-  STATIC_CLEAN,
-  STATIC_CLEAR,
-  SCL: STATIC_CLEAN,
-  CLEAN_ALL,
-  CLEAR_ALL,
-  STATIC_CLEAN_ALL,
-  STATIC_CLEAR_ALL,
-  SCLA: STATIC_CLEAN_ALL,
-  RESET,
-  RESET_ALL,
-  RST: RESET,
-  RSTA: RESET_ALL,
-  STATIC_RESET,
-  STATIC_RESET_ALL,
-  SRST: STATIC_RESET,
-  SRSTA: STATIC_RESET_ALL,
-
-  TEMPLATES_BUILDER() {
-    Project.Current.filesTemplatesBuilder.rebuild();
-    process.exit(0)
-  },
-
-
-  $INIT_EVERYWHERE: (args) => {
-    Project.projects.forEach(p => {
-      p.run(`tnp init`).sync()
-    })
-  }
+  INIT: CLIWRAP(INIT, 'INIT'),
+  STRUCT: CLIWRAP(STRUCT, 'STRUCT'),
+  INIT_ALL: CLIWRAP(INIT_ALL, 'INIT_ALL'),
+  STATIC_INIT: CLIWRAP(STATIC_INIT, 'STATIC_INIT'),
+  STATIC_INIT_ALL: CLIWRAP(STATIC_INIT_ALL, 'STATIC_INIT_ALL'),
+  S_INIT: CLIWRAP(S_INIT, 'S_INIT'),
+  CLEAN: CLIWRAP(CLEAN, 'CLEAN'),
+  CLEAR: CLIWRAP(CLEAR, 'CLEAR'),
+  CL: CLIWRAP(CL, 'CL'),
+  STATIC_CLEAN: CLIWRAP(STATIC_CLEAN, 'STATIC_CLEAN'),
+  STATIC_CLEAR: CLIWRAP(STATIC_CLEAR, 'STATIC_CLEAR'),
+  SCL: CLIWRAP(SCL, 'SCL'),
+  CLEAN_ALL: CLIWRAP(CLEAN_ALL, 'CLEAN_ALL'),
+  CLEAR_ALL: CLIWRAP(CLEAR_ALL, 'CLEAR_ALL'),
+  STATIC_CLEAN_ALL: CLIWRAP(STATIC_CLEAN_ALL, 'STATIC_CLEAN_ALL'),
+  STATIC_CLEAR_ALL: CLIWRAP(STATIC_CLEAR_ALL, 'STATIC_CLEAR_ALL,'),
+  SCLA: CLIWRAP(SCLA, 'SCLA'),
+  RESET: CLIWRAP(RESET, 'RESET'),
+  RESET_ALL: CLIWRAP(RESET_ALL, 'RESET_ALL'),
+  RST: CLIWRAP(RST, 'RST'),
+  RSTA: CLIWRAP(RSTA, 'RSTA'),
+  STATIC_RESET: CLIWRAP(STATIC_RESET, 'STATIC_RESET'),
+  STATIC_RESET_ALL: CLIWRAP(STATIC_RESET_ALL, 'STATIC_RESET_ALL'),
+  SRST: CLIWRAP(SRST, 'SRST'),
+  SRSTA: CLIWRAP(SRSTA, 'SRSTA'),
+  TEMPLATES_BUILDER: CLIWRAP(TEMPLATES_BUILDER, 'TEMPLATES_BUILDER'),
+  $INIT_EVERYWHERE: CLIWRAP($INIT_EVERYWHERE, '$INIT_EVERYWHERE'),
 }
 //#endregion

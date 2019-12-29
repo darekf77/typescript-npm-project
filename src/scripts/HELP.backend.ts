@@ -6,6 +6,7 @@ import * as path from 'path';
 import { Helpers } from '../helpers';
 import chalk from 'chalk';
 import { config } from '../config';
+import { CLIWRAP } from './cli-wrapper.backend';
 
 const generalHelp = `
 
@@ -75,13 +76,16 @@ function help(argsString: string) {
   }
   process.exit(0);
 }
+const $HELP = (args) => {
+  help(args)
+};
+
+const HELP = (args) => {
+  help(args)
+}
 
 export default {
-  $HELP: (args) => {
-    help(args)
-  },
-  HELP: (args) => {
-    help(args)
-  }
+  $HELP: CLIWRAP($HELP, '$HELP'),
+  HELP: CLIWRAP(HELP, 'HELP'),
 }
 //#endregion

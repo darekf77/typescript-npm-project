@@ -8,6 +8,7 @@ import { TnpDB } from '../../tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 
 function killallnode() {
@@ -136,50 +137,64 @@ export async function $DEVELOP(args: string, exit = true) {
   process.exit(0)
 }
 
+
+function vscodekill(args) {
+  killvscode(args);
+}
+
+function close(args) {
+  killvscode(args);
+}
+
+const $KILL_ON_PORT = async (args: string) => {
+  await killonport(args);
+}
+
+const $KILLONPORT = async (args: string) => {
+  await killonport(args);
+}
+
+const $KILLALL = () => {
+  killAll()
+}
+
+const $KILLALLNODE = () => {
+  killallnode()
+}
+
+const CHOKI = () => {
+  this.project = Project.Current;
+  // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
+  chokidar.watch([config.folder.src, config.folder.components], {
+    ignoreInitial: true,
+    followSymlinks: false,
+    ignorePermissionErrors: true,
+    cwd: this.project.location
+  }).on('unlinkDir', (relativeDir) => {
+
+  })
+}
+
+async function NOT(args: string) {
+  _.times(10, (n) => {
+    notify({
+      message: 'hey' + args + n.toString(),
+      sound: true
+    })
+  })
+
+  process.exit(0)
+}
+
 export default {
-  $DEVELOP,
-  killvscode,
-  vscodekill(args) {
-    killvscode(args);
-  },
-  close(args) {
-    killvscode(args);
-  },
-  $KILL_ON_PORT: async (args: string) => {
-    await killonport(args);
-  },
-  $KILLONPORT: async (args: string) => {
-    await killonport(args);
-  },
-  $KILLALL: () => {
-    killAll()
-  },
-  $KILLALLNODE: () => {
-    killallnode()
-  },
-
-  CHOKI: () => {
-    this.project = Project.Current;
-    // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
-    chokidar.watch([config.folder.src, config.folder.components], {
-      ignoreInitial: true,
-      followSymlinks: false,
-      ignorePermissionErrors: true,
-      cwd: this.project.location
-    }).on('unlinkDir', (relativeDir) => {
-
-    })
-  },
-
-  async NOT(args: string) {
-    _.times(10, (n) => {
-      notify({
-        message: 'hey' + args + n.toString(),
-        sound: true
-      })
-    })
-
-    process.exit(0)
-  }
-
+  $DEVELOP: CLIWRAP($DEVELOP, '$DEVELOP'),
+  killvscode: CLIWRAP(killvscode, 'killvscode'),
+  vscodekill: CLIWRAP(vscodekill, 'vscodekill'),
+  close: CLIWRAP(close, 'close'),
+  $KILL_ON_PORT: CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
+  $KILLONPORT: CLIWRAP($KILLONPORT, '$KILLONPORT'),
+  $KILLALL: CLIWRAP($KILLALL, '$KILLALL'),
+  $KILLALLNODE: CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
+  CHOKI: CLIWRAP(CHOKI, 'CHOKI'),
+  NOT: CLIWRAP(NOT, 'NOT'),
 }

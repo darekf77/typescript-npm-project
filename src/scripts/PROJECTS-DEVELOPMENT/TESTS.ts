@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { Helpers } from '../../helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from '../../progress-output';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {
@@ -40,81 +41,87 @@ function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false) {
   }, 3000)
 }
 
-export default {
+function $PROCESS_CWD() {
+  console.log(process.cwd());
+  process.exit(0)
+}
 
-  $PROCESS_CWD() {
-    console.log(process.cwd());
+const $TEST_WATCH = async (args: string) => {
+  await Project.Current.filesStructure.init(args);
+  await Project.Current.tests.startAndWatch(args.trim().split(' '))
+  process.exit(0)
+}
+
+const $TEST = async (args: string) => {
+  Project.Current.filesStructure.init(args);
+  Project.Current.tests.start(args.trim().split(' '))
+  process.exit(0)
+}
+
+
+const $READLAST = async (args) => {
+  // global.tnpShowProgress = true;
+  const argsObj: { lines: number; file: string } = require('minimist')(args.split(' '));
+  const { lines = 100, file = '' } = argsObj;
+
+  const res = await Helpers.getLinesFromFiles(argsObj.file, Number(argsObj.lines));
+  console.log('lines', res);
+  process.exit(0)
+}
+
+const TEST_ASYNC_PROC = async (args) => {
+  global.tnpShowProgress = true;
+  let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
+  p.stdout.on('data', (chunk) => {
+    console.log('prod:' + chunk)
+  })
+  p.on('exit', (c) => {
+    console.log('process exited with code: ' + c)
     process.exit(0)
-  },
+  })
+}
 
-  $TEST_WATCH: async (args: string) => {
-    await Project.Current.filesStructure.init(args);
-    await Project.Current.tests.startAndWatch(args.trim().split(' '))
+
+const TEST_SYNC_PROC = async (args) => {
+  global.tnpShowProgress = true;
+  try {
+    let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
     process.exit(0)
-  },
-
-  $TEST: async (args: string) => {
-    Project.Current.filesStructure.init(args);
-    Project.Current.tests.start(args.trim().split(' '))
-    process.exit(0)
-  },
-
-
-  $READLAST: async (args) => {
-    // global.tnpShowProgress = true;
-    const argsObj: { lines: number; file: string } = require('minimist')(args.split(' '));
-    const { lines = 100, file = '' } = argsObj;
-
-    const res = await Helpers.getLinesFromFiles(argsObj.file, Number(argsObj.lines));
-    console.log('lines', res);
-    process.exit(0)
-  },
-
-  TEST_ASYNC_PROC: async (args) => {
-    global.tnpShowProgress = true;
-    let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
-    p.stdout.on('data', (chunk) => {
-      console.log('prod:' + chunk)
-    })
-    p.on('exit', (c) => {
-      console.log('process exited with code: ' + c)
-      process.exit(0)
-    })
-  },
-
-
-  TEST_SYNC_PROC: async (args) => {
-    global.tnpShowProgress = true;
-    try {
-      let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
-      process.exit(0)
-    } catch (err) {
-      console.log('Erroroejk')
-      process.exit(1)
-    }
-  },
-
-
-  SHOW_LOOP: (args) => {
-    global.tnpShowProgress = true;
-    console.log('process pid', process.pid)
-    console.log('process ppid', process.ppid)
-    // process.on('SIGTERM', () => {
-    //   process.exit(0)
-    // })
-    SHOW_LOOP(args)
-  },
-
-  SHOW_LOOP_MESSAGES: (args) => {
-    global.tnpShowProgress = true;
-    console.log('process pid', process.pid)
-    console.log('process ppid', process.ppid)
-    // process.on('SIGTERM', () => {
-    //   process.exit(0)
-    // })
-    SHOW_LOOP_MESSAGES(args)
+  } catch (err) {
+    console.log('Erroroejk')
+    process.exit(1)
   }
+}
 
 
+function $SHOW_LOOP(args) {
+  global.tnpShowProgress = true;
+  console.log('process pid', process.pid)
+  console.log('process ppid', process.ppid)
+  // process.on('SIGTERM', () => {
+  //   process.exit(0)
+  // })
+  SHOW_LOOP(args)
+}
+
+function $SHOW_LOOP_MESSAGES(args) {
+  global.tnpShowProgress = true;
+  console.log('process pid', process.pid)
+  console.log('process ppid', process.ppid)
+  // process.on('SIGTERM', () => {
+  //   process.exit(0)
+  // })
+  SHOW_LOOP_MESSAGES(args)
+}
+
+export default {
+  $PROCESS_CWD: CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
+  $TEST_WATCH: CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
+  $TEST: CLIWRAP($TEST, '$TEST'),
+  $READLAST: CLIWRAP($READLAST, '$READLAST'),
+  TEST_ASYNC_PROC: CLIWRAP(TEST_ASYNC_PROC, 'TEST_ASYNC_PROC'),
+  TEST_SYNC_PROC: CLIWRAP(TEST_SYNC_PROC, 'TEST_SYNC_PROC'),
+  $SHOW_LOOP: CLIWRAP($SHOW_LOOP, '$SHOW_LOOP'),
+  $SHOW_LOOP_MESSAGES: CLIWRAP($SHOW_LOOP_MESSAGES, '$SHOW_LOOP_MESSAGES'),
 }
 //#endregion

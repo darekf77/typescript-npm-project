@@ -11,6 +11,7 @@ import * as dateformat from 'dateformat';
 
 import { Helpers } from './index';
 import { Models } from '../models';
+import { CLASS } from 'typescript-class-helpers';
 
 const prompts = require('prompts');
 //#endregion
@@ -53,7 +54,7 @@ export class HelpersProcess {
 
   pressKeyAndContinue(message = 'Press enter try again') {
     Helpers.log(message);
-    require('child_process').spawnSync('read _ ', {shell: true, stdio: [0, 1, 2]});
+    require('child_process').spawnSync('read _ ', { shell: true, stdio: [0, 1, 2] });
     // return new Promise((resovle) => {
     //   Helpers.log(message);
     //   process.stdin.once('data', function () {
@@ -314,7 +315,7 @@ export class HelpersProcess {
         if (!fn) {
           Helpers.error(`Bad function: ${fn} for watcher on folder: ${folderPath}, with params: ${params}`)
         }
-        const fnName = typeof fn === 'function' ? fn.name : fn;
+        const fnName = typeof fn === 'function' ? CLASS.getName(fn) : fn;
         // console.log('Function name ', fnName)
         let cmd = `tnp ${Helpers.cliTool.paramsFrom(fnName)} ${params}`;
         const toRun = `watch ${that.prepareWatchCommand(cmd)} ${folderPath}`;

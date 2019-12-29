@@ -13,7 +13,7 @@ import VSCODE from './VSCODE-EXT/VSCODE.backend';
 import GIT from './VSCODE-EXT/GIT.backend';
 import OPEN from './VSCODE-EXT/OPEN.backend';
 import OTHER from './OTHER.backend';
-import HELP from './HELP';
+import HELP from './HELP.backend';
 import BASH_CONFIG from './BASH-CONFIG.backend';
 
 export default [

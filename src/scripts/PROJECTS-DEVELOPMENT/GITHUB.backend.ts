@@ -4,6 +4,7 @@ import * as os from 'os';
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from '../../helpers';
+import { CLIWRAP } from '../cli-wrapper.backend';
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
 const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
@@ -135,23 +136,25 @@ export async function $GITHUB_PULL(args: string, exit = true) {
   await $GITHUB_DUMP(args, exit);
 }
 
-export default {
-  $GITHUB_LIST_ORIGINS() {
-    for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
-      const projectName = GITHUB_PROJECTS_NAMES[index];
-      Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
-      const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
-      const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
-      const proj = Project.From(dest);
-      if (proj) {
-        Helpers.info(proj.git.originURL);
-      }
-
+function $GITHUB_LIST_ORIGINS() {
+  for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
+    const projectName = GITHUB_PROJECTS_NAMES[index];
+    Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
+    const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+    const proj = Project.From(dest);
+    if (proj) {
+      Helpers.info(proj.git.originURL);
     }
-    // git config --get remote.origin.url
-    process.exit(0);
-  },
-  $GITHUB_DUMP,
-  $GITHUB_PUSH,
-  $GITHUB_PULL,
+
+  }
+  // git config --get remote.origin.url
+  process.exit(0);
+}
+
+export default {
+  $GITHUB_LIST_ORIGINS: CLIWRAP($GITHUB_LIST_ORIGINS, '$GITHUB_LIST_ORIGINS'),
+  $GITHUB_DUMP: CLIWRAP($GITHUB_DUMP, '$GITHUB_DUMP'),
+  $GITHUB_PUSH: CLIWRAP($GITHUB_PUSH, '$GITHUB_PUSH'),
+  $GITHUB_PULL: CLIWRAP($GITHUB_PULL, '$GITHUB_PULL'),
 }

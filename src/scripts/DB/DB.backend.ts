@@ -4,6 +4,7 @@ import { TnpDB } from '../../tnp-db/wrapper-db';
 import { CommandInstance } from '../../tnp-db/entites';
 import { Models } from '../../models';
 import { DBProcMonitor } from './db-proc-monitor.backend';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
@@ -37,19 +38,20 @@ async function $EXISTS(args: string) {
 
 async function $PROC_MONITOR() {
   const db = await TnpDB.Instance;
- (new DBProcMonitor(db)).start();
+  (new DBProcMonitor(db)).start();
 
 }
 
+const $DB_REINIT = () => {
+  return $DB('reinit')
+};
 
 export default {
-  $PROC_MONITOR,
-  $DB,
-  $DB_REINTI() {
-    return $DB('reinit')
-  },
-  $LAST,
-  $EXISTS
+  $PROC_MONITOR: CLIWRAP($PROC_MONITOR, '$PROC_MONITOR'),
+  $DB: CLIWRAP($DB, '$DB'),
+  $DB_REINIT: CLIWRAP($DB_REINIT, '$DB_REINIT'),
+  $LAST: CLIWRAP($LAST, '$LAST'),
+  $EXISTS: CLIWRAP($EXISTS, '$EXISTS')
 }
 
 //#endregion

@@ -276,24 +276,25 @@ export async function start(argsv: string[], spinner?: any /** Ora */) {
         }
       })
 
-      for (const k in defaultObjectFunctionsOrHelpString) {
-        if (defaultObjectFunctionsOrHelpString.hasOwnProperty(k)) {
-          const v = defaultObjectFunctionsOrHelpString[k];
+      for (const objectKey in defaultObjectFunctionsOrHelpString) {
+        if (defaultObjectFunctionsOrHelpString.hasOwnProperty(objectKey)) {
+          const v = defaultObjectFunctionsOrHelpString[objectKey];
           if (recognized) {
             breakLoop = true;
             break;
           }
           if (!_.isString(v)) {
             const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
+            const vFnName = CLASS.getName(vFn);
             functionsToCHeck.push(vFn)
             if (_.isFunction(vFn)) {
-              const check = Helpers.cliTool.match(k, argsv);
+              const check = Helpers.cliTool.match(vFnName, argsv);
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner.stop()
                 // Helpers.log('FNNAME',vFn.name)
                 // process.exit(0)
-                Helpers.log('--- recognized command ---' + vFn.name)
+                Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
                 vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
                 breakLoop = true;
                 break;

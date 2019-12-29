@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { Models } from '../../models';
 
 import { ProjectFactory } from './project-factory.backend';
+import { CLIWRAP } from '../cli-wrapper.backend';
 
 export async function NEW(args: string, exit = true) {
   const cwd = process.cwd();
@@ -20,8 +21,8 @@ export function NEW_SITE(args: string, exit = true) {
 }
 
 export default {
-  NEW,
-  NEW_SITE
+  NEW: CLIWRAP(NEW, 'NEW'),
+  NEW_SITE: CLIWRAP(NEW_SITE, 'NEW_SITE')
 };
 
 //#endregion

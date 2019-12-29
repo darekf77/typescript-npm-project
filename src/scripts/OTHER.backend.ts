@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
+import { CLIWRAP } from './cli-wrapper.backend';
 
 
 function $CONFIGS() {
@@ -68,75 +69,89 @@ function NPM_FIXES() {
   process.exit(0)
 }
 
+function LN(args: string) {
+  let [target, link] = args.split(' ');
+  Helpers.createSymLink(target, link)
+  process.exit(0)
+}
+
+function CIRCURAL_CHECK() {
+  Project.Current.run(`madge --circular --extensions ts ./src`).sync()
+  process.exit(0)
+}
+
+const $FILEINFO = (args) => {
+  console.log(Helpers.getMostRecentFilesNames(process.cwd()))
+
+  process.exit(0)
+}
+
+
+
+const PSINFO = async (a) => {
+  await $PSINFO(a)
+}
+
+function UPDATE_ISOMORPHIC() {
+  PackagesRecognitionExtended.fromProject(Project.Current).start(true);
+}
+
+function $isbundlemode(args) {
+  console.log('IS BUNDLE MODE? ', Project.isBundleMode)
+  process.exit(0)
+}
+
+const $ASSETS = () => recreate();
+const VERSION = () => version();
+const PATH = () => {
+  console.log(Project.Tnp.location);
+  process.exit(0)
+};
+
+const COPY_RESOURCES = () => {
+  Project.Current.checkIfReadyForNpm();
+  Project.Current.bundleResources();
+  process.exit(0)
+}
+
+const $CHECK_ENV = (args) => {
+  Helpers.checkEnvironment()
+  process.exit(0)
+};
+
+const $CHECK_ENVIRONMENT = (args) => {
+  Helpers.checkEnvironment()
+  process.exit(0)
+};
+
+function ENV_CHECK() {
+  CHECK_ENV()
+}
 
 export default {
 
-  NPM_FIXES,
-
-  LN(args: string) {
-    let [target, link] = args.split(' ');
-    Helpers.createSymLink(target, link)
-    process.exit(0)
-  },
-
+  NPM_FIXES: CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
+  LN: CLIWRAP(LN, 'LN'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');
   //   Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
   //   process.exit()
   // },
-
-  $COMMAND,
-
-
-  CIRCURAL_CHECK() {
-    Project.Current.run(`madge --circular --extensions ts ./src`).sync()
-    process.exit(0)
-  },
-  $FILEINFO: (args) => {
-    console.log(Helpers.getMostRecentFilesNames(process.cwd()))
-
-    process.exit(0)
-  },
-  RUN_PROCESS,
-  PSINFO: async (a) => {
-    await $PSINFO(a)
-  },
-  UPDATE_ISOMORPHIC() {
-    PackagesRecognitionExtended.fromProject(Project.Current).start(true);
-  },
-
-  $isbundlemode(args) {
-    console.log('IS BUNDLE MODE? ', Project.isBundleMode)
-    process.exit(0)
-  },
-  $ASSETS: () => recreate(),
-  VERSION: () => version(),
-  PATH: () => {
-    console.log(Project.Tnp.location);
-    process.exit(0)
-  },
-  COPY_RESOURCES: () => {
-    Project.Current.checkIfReadyForNpm();
-    Project.Current.bundleResources();
-    process.exit(0)
-  },
-  $CHECK_ENV: (args) => {
-    Helpers.checkEnvironment()
-    process.exit(0)
-  },
-  $CHECK_ENVIRONMENT: (args) => {
-    Helpers.checkEnvironment()
-    process.exit(0)
-  },
-
-
-
-  $CONFIGS,
-  CHECK_ENV:[CHECK_ENV, `Sample docs`],
-  ENV_CHECK() {
-    CHECK_ENV()
-  },
-
-
+  $COMMAND: CLIWRAP($COMMAND, '$COMMAND'),
+  CIRCURAL_CHECK: CLIWRAP(CIRCURAL_CHECK, 'CIRCURAL_CHECK'),
+  $FILEINFO: CLIWRAP($FILEINFO, '$FILEINFO'),
+  RUN_PROCESS: CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
+  PSINFO: CLIWRAP(PSINFO, 'PSINFO'),
+  UPDATE_ISOMORPHIC: CLIWRAP(UPDATE_ISOMORPHIC, 'UPDATE_ISOMORPHIC'),
+  $isbundlemode: CLIWRAP($isbundlemode, '$isbundlemode'),
+  $ASSETS: CLIWRAP($ASSETS, '$ASSETS'),
+  VERSION: CLIWRAP(VERSION, 'VERSION'),
+  PATH: CLIWRAP(PATH, 'PATH'),
+  COPY_RESOURCES: CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
+  $CHECK_ENV: CLIWRAP($CHECK_ENV, '$CHECK_ENV'),
+  $CHECK_ENVIRONMENT: CLIWRAP($CHECK_ENVIRONMENT, '$CHECK_ENVIRONMENT'),
+  $CONFIGS: CLIWRAP($CONFIGS, '$CONFIGS'),
+  CHECK_ENV: [CLIWRAP(CHECK_ENV, 'CHECK_ENV'), `Sample docs`],
+  ENV_CHECK: CLIWRAP(ENV_CHECK, 'ENV_CHECK'),
 
 }
