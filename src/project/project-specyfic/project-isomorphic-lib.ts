@@ -40,7 +40,7 @@ export class ProjectIsomorphicLib extends Project {
         '.vscode/launch.json',
         'tsconfig.browser.json',
         'webpack.config.js',
-        'webpack.backend-bundle-build.js',
+        ...(this.frameworkVersion === 'v1' ? ['webpack.backend-bundle-build.js'] : []),
         'run.js',
         ...this.filesTemplates(),
       ]).concat(

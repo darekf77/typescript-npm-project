@@ -5,9 +5,10 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { SpecWrap } from './_helpers.spec';
-import { NEW, NEW_SITE } from '../scripts/NEW';
-import { INIT, CLEAR_ALL } from '../scripts/FILES_STRUCTURE';
+import { NEW, NEW_SITE } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
+import { INIT, CLEAR_ALL } from '../scripts/PROJECTS-DEVELOPMENT/FILES_STRUCTURE';
 import { Project } from '../project';
+import { Helpers } from '../helpers';
 
 const BASELINE_WORKSPACE_PROJECT_NAME = 'test-1'
 const SITE_NAME = `site-for-${BASELINE_WORKSPACE_PROJECT_NAME}`;
@@ -54,8 +55,8 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
   await wrap.it(`should create baseline/site worksapces projects`,
     async (location, testName, { packageJSON, cwdChange }) => {
       global.muteMessages = true;
-      NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location);
-      NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false, location)
+      NEW(`workspace ${BASELINE_WORKSPACE_PROJECT_NAME}`, false);
+      NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false)
 
       const project = {
         baseline: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)),
@@ -110,7 +111,7 @@ function simpleContorllerJoin(ctx: BaselinSiteJoinTest) {
   const filePathBaseline = ctx.baselinChild.path(relative);
   const filePathSite = ctx.siteChild.path(relative);
 
-  ctx.baselinChild.filesFactory.createFile('src/helpers.ts',`
+  ctx.baselinChild.filesFactory.createFile('src/helpers.ts', `
   export class Helpers {
 
   }
