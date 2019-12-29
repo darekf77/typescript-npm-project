@@ -264,10 +264,10 @@ export async function start(argsv: string[], spinner?: any /** Ora */) {
 
   const files = scriptsFnArr;
 
-  Helpers.log('checking commands')
+  Helpers.log('checking commands... please wait')
   for (let index = 0; index < files.length; index++) {
     let breakLoop = false;
-    Helpers.log(`check function command ${index}`);
+    // Helpers.log(`check function command ${index}`);
     const file = files[index];
     const defaultObjectFunctionsOrHelpString = file; //require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {

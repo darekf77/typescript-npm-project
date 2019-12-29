@@ -95,13 +95,13 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   codeCuttFn(cutIftrue: boolean) {
-    return function (expression: string, e: Models.env.EnvConfig, absoluteFilePath?: string) {
+    return function (expression: string, reservedExpOne: Models.env.EnvConfig, absoluteFilePath?: string) {
 
       let result = false;
 
       // console.log(`------------------------`)
       // console.log('cutIftrue', cutIftrue)
-      if (!e) {
+      if (!reservedExpOne) {
         // console.log(`No environment`, e)
       } else {
         // console.log({
@@ -111,7 +111,12 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
         const exp = `(function(ENV){
           // console.log(typeof ENV)
           return ${expression.trim()}
-        })(e)`;
+        })(reservedExpOne)`;
+        // console.log(`Eval expre
+
+        // ${exp}
+
+        // `);
 
         try {
           const res = eval(exp);

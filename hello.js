@@ -15,4 +15,8 @@
 
 // console.log(file);
 
-console.log(require('./dist/index').default)
+// console.log(require('./dist/index').default)
+
+console.log(process.argv);
+
+

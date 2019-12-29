@@ -198,6 +198,14 @@ export class ProjectIsomorphicLib extends Project {
       if (prod && outDir === 'bundle') {
         try {
           this.run('npm-run webpack --config webpack.backend-bundle-build.js').sync();
+
+          const reservedNames = [
+            'reservedExpOne',
+            'reservedExpSec'
+          ];
+          this.uglifyCode(reservedNames);
+          this.obscureCode(reservedNames);
+          // process.exit(0)
         } catch (er) {
           Helpers.error(`BUNDLE production build failsed`, false, true);
         }
@@ -208,6 +216,45 @@ export class ProjectIsomorphicLib extends Project {
       }
     }
   }
+
+  /**
+   * TODO why small bundle is from webpack loader ?
+   */
+  uglifyCode(reservedNames: string[]) {
+    const command = `uglifyjs bundle/index.js --output bundle/index.js`
+      + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
+      // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
+
+    Helpers.info(`
+
+    JAVASCRIPT-UGLIFY PROCESSING...
+
+    ${command}
+
+      `)
+    this.run(command).sync();
+  }
+
+  obscureCode(reservedNames: string[]) {
+    const commnad = `javascript-obfuscator bundle/index.js `
+      + ` --output bundle/index.js`
+      + ` --target node`
+      + ` --rotate-string-array true`
+      + ` --stringArray true`
+      + ` --string-array-encoding base64`
+      + ` --reserved-names '${reservedNames.join(',')}'`
+      + ` --reserved-strings '${reservedNames.join(',')}'`
+
+    Helpers.info(`
+
+        JAVASCRIPT-OBFUSCATOR PROCESSING...
+
+        ${commnad}
+
+          `)
+    this.run(commnad).sync();
+  }
+
   //#endregion
 }
 

@@ -291,6 +291,8 @@ export const config = {
       { name: 'ngx-pwa-icons', version: '0.1.2' },
       { name: 'real-favicon', installName: 'cli-real-favicon' },
       { name: 'babel', installName: 'babel-cli' },
+      { name: 'javascript-obfuscator' },
+      { name: 'uglifyjs', installName: 'uglify-js' }
     ],
     programs: [
       //   {

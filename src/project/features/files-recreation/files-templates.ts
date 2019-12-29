@@ -28,7 +28,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         return;
       }
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
-      this.processFile(filePath, fileContent, env);
+      this.processFile(filePath, fileContent, env, _);
     });
 
   }
@@ -46,10 +46,14 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       return;
     }
     const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
-    this.processFile(filePath, fileContent, env);
+    this.processFile(filePath, fileContent, env, _);
   }
 
-  private processFile(orgFilePath: string, content: string, ENV: Models.env.EnvConfig) {
+  private processFile(
+    orgFilePath: string,
+    content: string,
+    reservedExpSec: Models.env.EnvConfig,
+    reservedExpOne: any) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
 
     const newContent = content
@@ -60,14 +64,21 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         if (_.isArray(matches)) {
           matches.forEach(pattern => {
             const expression = pattern.replace(/(\{|\})/g, '');
-            const e = ENV;
-            const lodash = _;
+            // const reservedExpSec = ENV;
+            // const reservedExpOne = _;
             // console.log('varssss: ', pattern)
             const exp = `(function(ENV,_){
               // console.log(typeof ENV)
               return ${expression.trim()}
-            })(e,lodash)`;
+            })(reservedExpSec,reservedExpOne)`;
             // console.log(exp)
+
+            //     console.log(`Eval expre
+
+            // ${exp}
+
+            // `);
+
             try {
               const toReplace = eval(exp);
               line = line.replace(pattern, toReplace);

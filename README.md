@@ -52,6 +52,10 @@ Helper project for my typescript npm libraries.
 - DONT DO THAT: export class Helpers extends HelpersLogger {  static JSON = JSON10; } -> nested types problem in angular
 - Use Helpers.require instead normal require for minification for backend
 
+# UGLIFY, OBSCURE donts
+- eval varaible just single ltter
+- require(variable) is not working  (require(''+variable) also sucks)
+
 
 BUILDS are only projects :
  - worksapces (that contains with childen | with childen previews)
