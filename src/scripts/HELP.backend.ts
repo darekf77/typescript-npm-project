@@ -19,7 +19,7 @@ export function getHelpFor(command: string, warnings = false) {
   let docs;
   glob.sync(config.pathes.scripts.allHelpFiles)
     .find((file) => {
-      let exportetFunctions: Object = require(path.resolve(file)).default;
+      let exportetFunctions: Object = Helpers.require(path.resolve(file));
       let groupHelp: { title: string, content: string }[] = [];
       let commandNameFit = false;
       const result = !!(_.isObject(exportetFunctions) && Object.keys(exportetFunctions).find(k => {

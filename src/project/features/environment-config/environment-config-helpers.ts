@@ -26,7 +26,7 @@ ${chalk.bold(JSON.stringify(workspaceConfig, null, 4))}
 
   Helpers.error(`Please follow worksapce environment config schema:\n
 ${Helpers.terminalLine()}
-  let { config } = require('tnp-bundle/environment-config')
+  let { config } = require('tnp-bundle').default;
 
   config = ${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
 
@@ -232,7 +232,7 @@ export async function standaloneConfigBy(standaloneProject: Project, environment
     Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(standaloneProject));
     Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
   }
-  configStandaloneEnv = require(pathToProjectEnvironment).config as any;
+  configStandaloneEnv = Helpers.require(pathToProjectEnvironment).config as any;
   validateEnvConfig(configStandaloneEnv, `${pathToProjectEnvironment}.js`, true);
   existedConfigs[standaloneProject.location] = configStandaloneEnv;
   return configStandaloneEnv;
@@ -279,8 +279,8 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
       Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
     }
 
+    configWorkspaceEnv = Helpers.require(pathToProjectEnvironment).config as any;
     // try {
-    configWorkspaceEnv = require(pathToProjectEnvironment).config as any;
     // console.log('configWorkspaceEnv', configWorkspaceEnv)
     // } catch (error) {
     //   if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
@@ -345,7 +345,7 @@ function createExampleConfigFor(proj: Project) {
   }
   `;
 
-  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp-bundle/environment-config')`;
+  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp-bundle/index.js').default`;
 
   return `
   const path = require('path')

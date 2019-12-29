@@ -20,3 +20,7 @@ export * from './project/compilers/build-isomorphic-lib';
 //#endregion
 export * from './progress-output';
 
+//#region @backend
+import { config } from './environment-config';
+export default { config };
+//#endregion

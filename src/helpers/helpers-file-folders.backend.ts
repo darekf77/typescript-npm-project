@@ -85,6 +85,21 @@ export class HelpersFileFolders {
     fse.symlinkSync(target, link)
   }
 
+  /**
+   * get default export object from  js file
+   * @param jsFilePath
+   */
+  require(jsFilePath: string) {
+    const orgPath = jsFilePath;
+    if (!fse.existsSync(jsFilePath)) {
+      jsFilePath = `${jsFilePath}.js`;
+    }
+    if (!fse.existsSync(jsFilePath)) {
+      Helpers.error(`Not able to find path: ${orgPath}`);
+    }
+    return eval(fse.readFileSync(jsFilePath).toLocaleString())
+  }
+
   tryCopyFrom(source, destination, options = {}) {
     // console.log(`Trying to copy from hahah: ${source} to ${destination}`)
     try {

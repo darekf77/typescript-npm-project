@@ -203,8 +203,7 @@ export class EnvironmentConfig
       let c: Models.env.EnvConfig;
       try {
         const jsFileName = l.replace(/\.js$/, '');
-        // console.log('jsFileName', jsFileName)
-        c = require(jsFileName).config
+        c = Helpers.require(jsFileName).config;
         if (path.basename(jsFileName).split('.').length === 2) {
           c.name = path.basename(jsFileName).split('.')[1] as any;
         } else {

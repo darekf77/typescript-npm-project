@@ -50,6 +50,7 @@ Helper project for my typescript npm libraries.
   import { ProcessController } from './controllers/core/ProcessController'; // error undefined
 - angular-lib 'ss-common-ui/module' is not working in src
 - DONT DO THAT: export class Helpers extends HelpersLogger {  static JSON = JSON10; } -> nested types problem in angular
+- Use Helpers.require instead normal require for minification for backend
 
 
 BUILDS are only projects :
