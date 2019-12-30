@@ -142,7 +142,7 @@ inside generated projects...
 
     const transactions = (await (await TnpDB.Instance).transaction);
     if (!this.project.isGenerated) { // REMOVE_THIS
-      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
+      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, process.ppid, true);
     }
 
 
@@ -178,7 +178,7 @@ inside generated projects...
     }
 
     if (!this.project.isGenerated && buildOptions.watch) { // REMOVE_THIS
-      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, false)
+      await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, process.ppid, false)
     }
     Helpers.log(`
 

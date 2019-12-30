@@ -225,6 +225,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   ) {
     // info(`DO NOTHIGN`);
   } else {
+    Helpers.info('SET COMMAND ')
     await db.transaction.setCommand(argsv.join(' '));
   }
 

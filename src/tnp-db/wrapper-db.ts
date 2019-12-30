@@ -117,6 +117,10 @@ export class TnpDB {
     return this.crud.getAll(ProcessInstance);
   }
 
+  public getCommands(): CommandInstance[] {
+    return this.crud.getAll(CommandInstance);
+  }
+
   constructor(private location: string) {
   }
 

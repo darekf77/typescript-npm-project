@@ -6,6 +6,7 @@ import { Models } from '../../models';
 import { DBProcMonitor } from './db-proc-monitor.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';
 import { DBMonitTop } from './monit-top.backend';
+import { DBMonitCommands } from './monit-commands.backend copy';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;
@@ -35,6 +36,12 @@ async function $MONIT_TOP() {
 
 }
 
+async function $MONIT_COMMANDS() {
+  const db = await TnpDB.Instance;
+  (new DBMonitCommands(db)).start();
+
+}
+
 async function $EXISTS(args: string) {
   const pid = Number(args.trim())
   const ps: Models.system.PsListInfo[] = await psList();
@@ -58,6 +65,7 @@ const $DB_REINIT = () => {
 export default {
   $PROC_MONITOR: CLIWRAP($PROC_MONITOR, '$PROC_MONITOR'),
   $MONIT_TOP: CLIWRAP($MONIT_TOP, '$MONIT_TOP'),
+  $MONIT_COMMANDS: CLIWRAP($MONIT_COMMANDS, '$MONIT_COMMANDS'),
   $DB: CLIWRAP($DB, '$DB'),
   $DB_REINIT: CLIWRAP($DB_REINIT, '$DB_REINIT'),
   $LAST: CLIWRAP($LAST, '$LAST'),

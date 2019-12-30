@@ -38,20 +38,6 @@ const prompts = require('prompts');
 
 export class HelpersProcess {
 
-  async  runSyncOrAsync(fn: Function, args?: any[]) {
-    if (_.isUndefined(fn)) {
-      return;
-    }
-    // let wasPromise = false;
-    let promisOrValue = fn(args);
-    if (promisOrValue instanceof Promise) {
-      // wasPromise = true;
-      promisOrValue = Promise.resolve(promisOrValue)
-    }
-    // console.log('was promis ', wasPromise)
-    return promisOrValue;
-  }
-
   pressKeyAndContinue(message = 'Press enter try again') {
     Helpers.log(message);
     require('child_process').spawnSync('read _ ', { shell: true, stdio: [0, 1, 2] });

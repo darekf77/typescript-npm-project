@@ -4,8 +4,9 @@ import { CommandInstance } from '../../tnp-db/entites';
 import { Models } from '../../models';
 import { Helpers } from '../../helpers';
 import { Project } from '../../project';
+import { JSON10 } from 'json10';
 
-export class DBProcMonitor {
+export class DBMonitCommands {
 
   constructor(private db: TnpDB) {
 
@@ -15,18 +16,18 @@ export class DBProcMonitor {
     this.repeat();
   }
 
+  counter = 0;
   private repeat(n = 0) {
-    this.db.transaction.updateProcesses();
-    const builds = this.db.getBuilds();
+    const cmds = this.db.getCommands();
     Helpers.clearConsole();
-    Helpers.log(`\n===== Check counter: ${n}, projects: ${Project.projects.length} === `)
-    builds.forEach(b => {
-      Helpers.log(`${b.pid}\t${b.location}\t${b.cmd}\t${b.buildOptions && b.buildOptions.watch}\n`);
+    Helpers.info(`COMMANDS ${++this.counter} :`)
+    cmds.forEach(p => {
+      Helpers.log(`\t${p.location}\t${p.command}\t${p.shortCommandForLastCommand}\n`);
     });
-    // console.log('waiting')
+
     setTimeout(() => {
-      this.repeat(n + 1);
-    }, 1000)
+      this.repeat(n + 1)
+    }, 1000);
   }
 
 }

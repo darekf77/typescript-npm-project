@@ -26,7 +26,7 @@ export class DBMonitTop {
         .filter(f => f.cmd.search(`/Applications/Visual Studio Code.app`) === -1)
         .forEach(p => {
 
-          Helpers.log(`${p.ppid}\t${p.pid}\t${p.cmd}\n`);
+          Helpers.log(`${p.ppid}\t${p.pid}\t${p.name}\t${p.cmd}\n`);
         });
 
 

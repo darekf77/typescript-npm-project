@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { DBBaseEntity } from './base-entity';
 import { CLASS } from 'typescript-class-helpers';
 
-@CLASS.NAME('DomainInstance')
+@CLASS.NAME('CommandInstance')
 export class CommandInstance extends DBBaseEntity {
   isEqual(anotherInstace: CommandInstance): boolean {
     return this.location === anotherInstace.location;
@@ -12,7 +12,7 @@ export class CommandInstance extends DBBaseEntity {
 
   constructor(
     public command?: string,
-    public location?: string
+    public location?: string,
   ) {
     super()
     this.command = CommandInstance.fixedCommand(command)

@@ -43,7 +43,7 @@ export class ProcessInstance extends DBBaseEntity {
     return {
       className: this.className,
       entityId: this.entityId,
-      entityProperty: this.entityProperty
+      entityProperty: this.entityProperty,
     };
   }
 

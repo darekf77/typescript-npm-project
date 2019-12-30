@@ -80,7 +80,7 @@ export class DBTransaction {
     }
     await this.start(`set command: ${command} in location: ${location}`, () => {
       const c = new CommandInstance(command, location);
-      if (_.isString(c.command) && !c.command.trim().startsWith('tnp build')) {
+      if (_.isString(c.command) && !c.command.trim().startsWith('tnp b')) {
         return;
       }
       this.crud.set(c)
@@ -192,51 +192,54 @@ export class DBTransaction {
   }
 
   public async updateBuildsWithCurrent(currentProject: Project,
-    buildOptions: BuildOptions, pid: number, onlyUpdate: boolean) {
+    buildOptions: BuildOptions, pid: number, ppid: number, onlyUpdate: boolean) {
     // console.log('current build options', buildOptions)
     await this.start(`update builds with current`, async () => {
       this.__projectsCtrl.addIfNotExists(ProjectInstance.from(currentProject))
 
       // TODO fix it when process exists with pid but is it is not process of TNP!
-      // while (true) {
-      //   await this.__buildsCtrl.update()
-      //   if (onlyUpdate) {
-      //     break;
-      //   }
+      while (true) {
+        if (onlyUpdate) {
+          break;
+        }
 
-      //   const existed = this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid);
+        const existed = await this.__buildsCtrl.getExistedForOptions(currentProject, buildOptions, pid, ppid);
 
-      //   if (existed) {
+        if (existed) {
 
-      //     if (!existed.buildOptions.watch) {
-      //       Helpers.warn('automatic kill of active build instance in static build mode')
-      //       this.killAndRemove(existed)
-      //       continue;
-      //     } else {
-      //       console.log(`Current process pid: ${process.pid}`)
-      //       const confirm = await Helpers.questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
-      //      build options: ${existed.buildOptions.toString()}`)
-      //       if (confirm) {
-      //         this.killAndRemove(existed)
-      //         continue;
-      //       } else {
-      //         process.exit(0)
-      //       }
-      //     }
-      //   } else if (!existed) {
-      //     this.__buildsCtrl.add(currentProject, buildOptions, pid);
-      //   }
-      //   break;
-      // }
+          if (!existed.buildOptions.watch) {
+            Helpers.warn('automatic kill of active build instance in static build mode')
+            this.killAndRemove(existed)
+            continue;
+          } else {
+            console.log(`Current process pid: ${process.pid}`)
+            const confirm = await Helpers.questionYesNo(`There is active process on pid ${existed.pid}, do you wanna kill this process ?
+           build options: ${existed.buildOptions.toString()}`)
+            if (confirm) {
+              this.killAndRemove(existed)
+              continue;
+            } else {
+              process.exit(0)
+            }
+          }
+        } else if (!existed) {
+          this.__buildsCtrl.add(currentProject, buildOptions, pid, ppid);
+        }
+        break;
+      }
     })
   }
 
 
 
+  static transactionCollisions = [];
+  static addColision() {
+
+  }
 
   private async start(name: string, callback: () => void,
     previousFileStatus: 'none' | 'empty' | 'written-started' = 'none') {
-    name = '-'
+    // name = '-'
     const debug = false;
 
     debug && Helpers.log(`Transaction started for pid: ${process.pid},`
@@ -251,14 +254,14 @@ export class DBTransaction {
       } catch (e) { }
 
       if (previousFileStatus === 'none' && _.isString(pidString) && pidString.trim() === '') {
-        debug && console.log(`Waiting shortly if other process is goint to write something to file  - current pid: ${process.pid} `)
+        debug && Helpers.log(`Waiting shortly if other process is goint to write something to file  - current pid: ${process.pid} `)
         sleep.msleep(500);
         await this.start(name, callback, 'empty')
         return;
       }
       if ((previousFileStatus === 'none' || previousFileStatus === 'empty') &&
         _.isString(pidString) && pidString.startsWith('[') && !pidString.endsWith(']')) {
-        debug && console.log(`Waiting for other process to finish wiring pid - current pid: ${process.pid}`)
+        debug && Helpers.log(`Waiting for other process to finish wiring pid - current pid: ${process.pid}`)
         sleep.msleep(500);
         await this.start(name, callback, 'written-started')
         return;
@@ -274,7 +277,7 @@ export class DBTransaction {
           let ps: Models.system.PsListInfo[] = await psList()
           if (ps.filter(p => p.pid == pidInFile).length >= 1) {
 
-            debug && console.log(`Waiting for transaction on pid ${pidInFile} to end - current pid: ${process.pid}`)
+            debug && Helpers.log(`Waiting for transaction on pid ${pidInFile} to end - current pid: ${process.pid}`)
             sleep.msleep(500);
             await this.start(name, callback)
             return;

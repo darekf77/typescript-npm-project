@@ -12,6 +12,7 @@ export type IBuildInstance = {
   buildOptions?: BuildOptions;
   cmd?: string;
   pid: number;
+  ppid: number;
   location?: string;
 };
 
@@ -86,6 +87,7 @@ export class BuildInstance extends DBBaseEntity implements IBuildInstance {
   }
 
   pid: number;
+  ppid: number;
   location?: string;
   get project() {
     return Project.From(this.location);

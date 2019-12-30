@@ -67,6 +67,20 @@ export class HelpersTnp {
     return HelperNg2Logger.isNode;
   }
 
+  async  runSyncOrAsync(fn: Function, args?: any[]) {
+    if (_.isUndefined(fn)) {
+      return;
+    }
+    // let wasPromise = false;
+    let promisOrValue = fn(args);
+    if (promisOrValue instanceof Promise) {
+      // wasPromise = true;
+      promisOrValue = Promise.resolve(promisOrValue)
+    }
+    // console.log('was promis ', wasPromise)
+    return promisOrValue;
+  }
+
   waitForCondition(conditionFn: (any) => boolean, howOfftenCheckInMs = 1000) {
     return new Promise(async (resolve, reject) => {
 
