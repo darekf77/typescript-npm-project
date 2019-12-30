@@ -67,7 +67,21 @@ export class HelpersTnp {
     return HelperNg2Logger.isNode;
   }
 
+  waitForCondition(conditionFn: (any) => boolean, howOfftenCheckInMs = 1000) {
+    return new Promise(async (resolve, reject) => {
 
+      const result = await Helpers.runSyncOrAsync(conditionFn);
+      if (result) {
+        resolve()
+      } else {
+        setTimeout(() => {
+          Helpers.waitForCondition(conditionFn, howOfftenCheckInMs).then(() => {
+            resolve();
+          })
+        }, howOfftenCheckInMs);
+      }
+    })
+  }
 
   getBrowserVerPath(moduleName?: string) {
     if (!moduleName) {

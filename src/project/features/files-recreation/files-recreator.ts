@@ -253,6 +253,7 @@ export class FilesRecreator extends FeatureForProject {
                   settings['files.exclude']["karma.conf.js"] = true;
                   settings['files.exclude'][".editorconfig"] = true;
                 }
+                settings['files.exclude']['bin/db.json'] = false;
 
               }
               return settings

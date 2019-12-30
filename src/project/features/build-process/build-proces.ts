@@ -76,7 +76,9 @@ inside generated projects...
 
   private mergeNpmPorject() {
     // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
+
     if (this.project.isWorkspaceChildProject) {
+      Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
       this.project.parent.getFolders()
         .filter(p => !this.project.parent.children.map(c => c.name).includes(path.basename(p)))
         .forEach(p => {
@@ -98,7 +100,8 @@ inside generated projects...
               }
             });
           }
-        })
+        });
+      Helpers.log(`[mergeNpmPorject] finish..`)
     }
 
   }
