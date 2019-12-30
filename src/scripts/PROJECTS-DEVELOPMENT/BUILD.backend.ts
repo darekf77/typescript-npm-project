@@ -50,9 +50,9 @@ const BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFrom
 const STATIC_BUILD = async (args) => {
   if (!Project.Current.isWorkspace) {
     Helpers.error(`Please use:
-${chalk.gray(`$ tnp static:build:lib`)}
+${chalk.gray(`$ ${config.frameworkName} static:build:lib`)}
 or
-${chalk.gray(`$ tnp static:build:app`)}
+${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
 
 inside workspace children.
     `, false, true)
@@ -119,17 +119,17 @@ const $SERVE = (args) => {
       }
     })
     app.listen(8080, () => {
-      console.log(`tnp standalone serve is runnning on: ${localUrl}`)
+      console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`)
     });
   } else {
-    const config: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
-    if (!config.port && !config.baseUrl && !config.outDir) {
-      Helpers.error(`Bad arguments for tnp serve: ${config}`)
+    const configServe: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
+    if (!configServe.port && !configServe.baseUrl && !configServe.outDir) {
+      Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`)
     }
     const app = express()
-    app.use(config.baseUrl, express.static(path.join(process.cwd(), config.outDir)))
-    app.listen(config.port, () => {
-      console.log(`tnp serve is runnning on: http://localhost:${config.port}${config.baseUrl}`)
+    app.use(configServe.baseUrl, express.static(path.join(process.cwd(), configServe.outDir)))
+    app.listen(configServe.port, () => {
+      console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}`)
     });
   }
 

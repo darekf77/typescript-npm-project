@@ -68,7 +68,7 @@ export abstract class StaticProject {
 
   /**
    * generated version of workspace/worskpace-childs project
-   * ready for serving by tnp router/proxy
+   * ready for serving by  framework router/proxy
    */
   get distribution(this: Project): Project {
     if (this.type === 'unknow') {

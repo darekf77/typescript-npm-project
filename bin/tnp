@@ -69,5 +69,5 @@ if (distOnly) {
   }
   // =======================================================================
 }
-start(process.argv, void 0);
+start(process.argv, 'tnp');
 //#endregion

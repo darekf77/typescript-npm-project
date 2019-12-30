@@ -124,7 +124,7 @@ export const config = {
       ]
     }
   },
-  tnp: 'tnp',
+  frameworkName: 'tnp',
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   pathes: {
 

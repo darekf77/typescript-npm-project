@@ -1,1 +1,1 @@
-# Internal tnp comilers
+# Internal ${config.frameworkName} comilers

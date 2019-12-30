@@ -268,11 +268,11 @@ export class Project {
   //#region @backend
   static get Tnp() {
 
-    let tnp = Project.From(config.pathes.tnp_folder_location);
-    if (tnp) {
-      const currentPathInSystem = path.join(tnp.location, config.file.tnp_system_path_txt);
+    let frameworkLocation = Project.From(config.pathes.tnp_folder_location);
+    if (frameworkLocation) {
+      const currentPathInSystem = path.join(frameworkLocation.location, config.file.tnp_system_path_txt);
       if (!fse.existsSync(currentPathInSystem)) {
-        Helpers.writeFile(currentPathInSystem, tnp.location)
+        Helpers.writeFile(currentPathInSystem, frameworkLocation.location)
       }
     } else {
       let tnpBundleTnpPath;
@@ -284,9 +284,9 @@ export class Project {
       if (!fse.existsSync(tnpBundleTnpPath)) {
         Helpers.error(`Please build you ${chalk.bold('tnp-npm-project')} first... `)
       }
-      tnp = Project.From(tnpBundleTnpPath)
+      frameworkLocation = Project.From(tnpBundleTnpPath)
     }
-    return tnp;
+    return frameworkLocation;
   }
   //#endregion
 

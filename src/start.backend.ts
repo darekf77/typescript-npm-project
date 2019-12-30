@@ -148,7 +148,9 @@ export function globalArgumentsParser(argsv: string[]) {
 
 
 
-export async function start(argsv: string[], spinner?: any /** Ora */) {
+export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 'tnp') {
+  config.frameworkName = frameworkName;
+
   global.hideLog = false;
 
   argsv = argsv.map(arg => {

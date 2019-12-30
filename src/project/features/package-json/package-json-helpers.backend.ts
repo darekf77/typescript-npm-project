@@ -278,7 +278,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   project.packageJson.data.license = license;
   project.packageJson.data.private = prv;
   if (project.isTnp) {
-    Helpers.info('Execte tnp aciton')
+    Helpers.info('Execute ${config.frameworkName} action')
     const keysToDelete = [];
     Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
       const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];

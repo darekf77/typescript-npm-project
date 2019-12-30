@@ -14,16 +14,16 @@ export namespace ModelsEnvinronment {
 
   export interface EnvConfigProject {
     baseUrl: string;
-    host?: string; // tnp generated
+    host?: string; // generated
     externalHost?: string;
-    name: string;  // tnp checked
-    type?: ModelsLibTypes.LibType; // tnp checked
+    name: string;  // checked
+    type?: ModelsLibTypes.LibType; // checked
 
-    port: number; // override tnp type port
+    port: number; // override type port
     //#region @backend
     $db?: ConnectionOptions;
     ommitAppBuild?: boolean;
-    isWatchBuild?: boolean; // tnp generated
+    isWatchBuild?: boolean; // generated
     //#endregion
   }
 
@@ -32,10 +32,10 @@ export namespace ModelsEnvinronment {
   export interface EnvConfig {
 
     pathes?: any;
-    isCoreProject?: boolean; // tnp generated
-    isSiteProject?: boolean; // tnp generated
-    isStandaloneProject?: boolean; // tnp generated
-    name?: EnvironmentName; // tnp generated
+    isCoreProject?: boolean; // generated
+    isSiteProject?: boolean; // generated
+    isStandaloneProject?: boolean; // generated
+    name?: EnvironmentName; // generated
     frameworks?: UIFramework[];
     domain?: string;
     dynamicGenIps?: boolean;

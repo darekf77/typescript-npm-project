@@ -16,7 +16,7 @@ export class BackendCompilationExtended extends BackendCompilation {
   CompilationWrapper = Helpers.compilationWrapper as any;
   compile(watch = false) {
 
-    // QUICK_FIX for backend in tnp projects
+    // QUICK_FIX for backend in ${config.frameworkName} projects
     const currentProject = Project.From(this.cwd);
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
     this.tscCompilation(this.compilationFolderPath, watch, `../${this.outFolder}` as any, generatedDeclarations);

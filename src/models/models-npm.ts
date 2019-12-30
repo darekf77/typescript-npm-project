@@ -148,7 +148,7 @@ export namespace ModelsNpm {
        */
       required?: string[],
       /**
-       * Override tnp automation generation
+       * Override automation generation
        */
       overrided: {
         dedupe?: string[];

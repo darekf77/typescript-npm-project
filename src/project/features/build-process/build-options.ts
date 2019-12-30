@@ -7,6 +7,7 @@ import { Helpers } from '../../../helpers';
 import * as _ from 'lodash';
 import { Project } from '../../abstract';
 import { Models } from '../../../models';
+import { config } from '../../../config';
 
 export class BuildOptions implements Models.dev.IBuildOptions {
 
@@ -133,7 +134,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
         if (process.platform === 'win32') {
           if (!argPath.match(/\\/g) && !argPath.match(/\//g)) {
             Helpers.error(`On windows.. please wrap your "copyto" parameter with double-quote like this:\n
-  tnp build:${argsObj.outDir}${argsObj.watch ? ':watch' : ''} --copyto "<windows path here>"`)
+  ${config.frameworkName} build:${argsObj.outDir}${argsObj.watch ? ':watch' : ''} --copyto "<windows path here>"`)
             process.exit(1)
           }
         }
@@ -142,7 +143,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
         // console.log('path', argPath)
         const project = Project.nearestTo(argPath);
         if (!project) {
-          Helpers.error(`autobuild.json : Path doesn't contain tnp type project: ${argPath}`, true, true)
+          Helpers.error(`autobuild.json : Path doesn't contain ${config.frameworkName} type project: ${argPath}`, true, true)
         } else {
           return project;
         }

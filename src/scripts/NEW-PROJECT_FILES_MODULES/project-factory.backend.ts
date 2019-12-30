@@ -35,7 +35,7 @@ export class ProjectFactory {
   }
 
   private errorMsgCreateSite() {
-    console.log(chalk.green(`Good examples: tnp new site-project-name --basedOn baseline-workspace-project-name`));
+    console.log(chalk.green(`Good examples: ${config.frameworkName} new site-project-name --basedOn baseline-workspace-project-name`));
     Helpers.error(`Please use example above.`, false, true);
   }
 
@@ -144,7 +144,7 @@ export class ProjectFactory {
     const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
 
     if (basedOn) {
-      Helpers.error(`To create workspace site use command: tnp new: site name - of - workspace - site`
+      Helpers.error(`To create workspace site use command: ${config.frameworkName} new: site name - of - workspace - site`
         + `--basedOn relativePathToBaselineWorkspace`, false, true);
     }
     const type = argv[0] as any;

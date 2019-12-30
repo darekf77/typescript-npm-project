@@ -38,7 +38,7 @@ export class BuildProcess extends FeatureForProject {
     }
     if (project.isGenerated && !options.staticBuildAllowed) {
       Helpers.error(`Please use command:
-$ tnp static:build
+$ ${config.frameworkName} static:build
 inside generated projects...
 `, false, true);
     }
@@ -134,9 +134,9 @@ inside generated projects...
 
     if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
       if (buildOptions.appBuild) {
-        Helpers.error(`App build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
+        Helpers.error(`App build only for ${config.frameworkName} ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       } else {
-        Helpers.error(`Library build only for tnp ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
+        Helpers.error(`Library build only for ${config.frameworkName} ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       }
     }
 
@@ -144,6 +144,7 @@ inside generated projects...
     if (!this.project.isGenerated) { // REMOVE_THIS
       await transactions.updateBuildsWithCurrent(this.project, buildOptions, process.pid, true);
     }
+
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
       if (buildOptions.watch) {
