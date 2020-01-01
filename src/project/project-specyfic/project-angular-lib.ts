@@ -95,7 +95,7 @@ export class ProjectAngularLib extends Project {
       files = files.concat([
         {
           sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),
-          relativePath: 'tsconfig.browser.json',
+          relativePath: 'tsconfig.browser.json.filetemplate',
         },
         {
           sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),

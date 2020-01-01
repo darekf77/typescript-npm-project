@@ -43,7 +43,7 @@ export class ProjectIsomorphicLib extends Project {
   }
 
   projectSpecyficFiles(): string[] {
-    return super.projectSpecyficFiles()
+    let files = super.projectSpecyficFiles()
       .concat([
         '.vscode/launch.json',
         'tsconfig.browser.json',
@@ -55,6 +55,12 @@ export class ProjectIsomorphicLib extends Project {
         !this.isStandaloneProject ? [
           'src/typings.d.ts',
         ] : []);
+
+    if (this.frameworkVersion !== 'v1') {
+      files = files.filter(f => f !== 'tsconfig.browser.json');
+    }
+
+    return files;
   }
 
   filesTemplates() {
@@ -64,6 +70,7 @@ export class ProjectIsomorphicLib extends Project {
 
     if (this.frameworkVersion !== 'v1') {
       files.push('tsconfig.isomorphic.json.filetemplate')
+      files.push('tsconfig.browser.json.filetemplate')
     }
 
     return files;

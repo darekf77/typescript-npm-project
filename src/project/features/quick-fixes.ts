@@ -10,6 +10,18 @@ import { Models } from '../../models';
 
 export class QuickFixes extends FeatureForProject {
 
+  updateTsconfigsInTmpSrcBrowserFolders() {
+    if (this.project.type === 'angular-lib' || this.project.type === 'isomorphic-lib') {
+      const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
+      const tempDirs = fse.readdirSync(this.project.location).filter(dir => dir.startsWith('tmp-src-'));
+      tempDirs.forEach(dirName => {
+        const dest = path.join(this.project.location, dirName, 'tsconfig.json');
+        Helpers.copyFile(tsconfigBrowserPath, dest);
+      })
+    }
+  }
+
+
   removeUncessesaryFiles() {
     const filesV1 = [
       'src/tsconfig.packages.json',

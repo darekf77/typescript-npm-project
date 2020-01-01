@@ -30,7 +30,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
       this.processFile(filePath, fileContent, env, _);
     });
-
+    this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
   }
 
   rebuildFile(filetemplateRelativePath) {

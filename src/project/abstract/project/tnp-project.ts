@@ -17,6 +17,15 @@ import { config } from '../../../config';
 import { TnpDB } from '../../../tnp-db';
 
 
+// function findProject(existedProject: Project[], processed: Project[] = []) {
+//   for (let index = 0; index < existedProject.length; index++) {
+//     const proj = existedProject[index];
+//     if (_.isUndefined(processed.find(({ location }) => proj.location === location))) {
+//       processed.push(proj);
+
+//     }
+//   }
+// }
 
 export abstract class TnpProject {
 
@@ -25,7 +34,7 @@ export abstract class TnpProject {
   get linkedProjects(this: Project): Project[] {
     const db = TnpDB.InstanceSync;
     //#region @backendFunc
-    return this.packageJson.linkedProjects.map(pathOrName => {
+    const projects = this.packageJson.linkedProjects.map(pathOrName => {
       let proj: Project;
       if (path.isAbsolute(pathOrName)) {
         proj = Project.From(pathOrName);
@@ -47,8 +56,14 @@ export abstract class TnpProject {
       }
       return proj;
     }).filter(f => !!f);
+
+    // findProject(projects);
+
+    return projects;
     //#endregion
   }
+
+
 
   public applyLinkedPorjects(this: Project) {
     this.linkedProjects.forEach(p => {
@@ -122,8 +137,10 @@ export abstract class TnpProject {
 
   //#region @backend
   get isomorphicPackages(this: Project) {
+    const isomorphicPackagesArr = this.linkedProjects.map(p => p.name)
+
     if (this.type === 'unknow') {
-      return [];
+      return isomorphicPackagesArr;
     }
     try {
       var p = path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES)
@@ -135,9 +152,9 @@ export abstract class TnpProject {
       });
       const arr = f[configMorphi.array.isomorphicPackages];
       if (_.isArray(arr)) {
-        return arr;
+        return isomorphicPackagesArr.concat(arr);
       } else {
-        return [];
+        return isomorphicPackagesArr;
       }
       // warn(`Isomorphic package file does not exists : ${p}`);
     } catch (e) {
@@ -145,7 +162,7 @@ export abstract class TnpProject {
         Helpers.log(e);
         Helpers.error(`Erro while reading ismorphic package file: ${p}`, true, true);
       }
-      return [];
+      return isomorphicPackagesArr;
     };
   }
   //#endregion

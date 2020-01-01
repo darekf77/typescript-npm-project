@@ -1,7 +1,7 @@
 //#region @backend
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import { PackagesRecognition } from 'morphi';
+import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from '../../helpers';
 import { config } from '../../config';
@@ -21,6 +21,9 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     }
     Helpers.log(`Searching isomorphic packages`);
     super.start(force);
+    const linked = Project.From(this.cwd);
+    BrowserCodeCut.IsomorphicLibs = BrowserCodeCut.IsomorphicLibs
+      .concat(linked.linkedProjects.map(p => p.name))
     Helpers.log(`Founded ${this.count} isomorphic packages`);
   }
 

@@ -179,7 +179,14 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 
   workspaceConfig.currentProjectTsConfigPathes = project.linkedProjects.map(({ name }) => {
     return `"${name}":["tmp-${name}"]`
-  }).join(',\n')
+  }).join(',\n\t')
+
+  if (currentLibProjectSourceFolder) {
+    workspaceConfig.currentProjectTsConfigPathesForBrowser = project.linkedProjects.map(({ name }) => {
+      return `"${name}/browser":["tmp-${name}"]`
+    }).join(',\n\t')
+  }
+
 
   // console.log(project.linkedProjects.map(p => p.name));
 

@@ -62,6 +62,7 @@ export namespace ModelsEnvinronment {
     currentProjectIsStatic?: boolean;
     currentProjectComponentsFolder?: string;
     currentProjectTsConfigPathes?:string;
+    currentProjectTsConfigPathesForBrowser?:string;
     currentProjectType?: ModelsLibTypes.LibType;
     packageJSON?: ModelsNpm.IPackageJSON;
 
