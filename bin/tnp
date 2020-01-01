@@ -2,8 +2,8 @@
 //#region @backend
 console.log('-- FIREDEV started... please wait. --')
 
-var distOnly = (process.argv[process.argv.length - 1] === '--distTnp');
-var bundleOnly = (process.argv[process.argv.length - 1] === '--bundleTnp');
+var distOnly = (process.argv[process.argv.length - 1] === '-dist');
+var bundleOnly = (process.argv[process.argv.length - 1] === '-bundle');
 if (distOnly) {
   // =========================== only dist ============================
   process.argv[process.argv.length - 1] = void 0;

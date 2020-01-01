@@ -6,7 +6,7 @@ import { Models } from '../../models';
 import { DBProcMonitor } from './db-proc-monitor.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';
 import { DBMonitTop } from './monit-top.backend';
-import { DBMonitCommands } from './monit-commands.backend copy';
+import { DBMonitCommands } from './monit-commands.backend';
 
 export async function $LAST(args: string) {
   const db = await TnpDB.Instance;

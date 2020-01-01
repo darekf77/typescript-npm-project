@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';
+import { TnpDB } from '../../../tnp-db';
 //#endregion
 
 import { Project } from './project';
@@ -14,26 +15,14 @@ import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 import { Models } from '../../../models';
 import { config } from '../../../config';
-import { TnpDB } from '../../../tnp-db';
-
-
-// function findProject(existedProject: Project[], processed: Project[] = []) {
-//   for (let index = 0; index < existedProject.length; index++) {
-//     const proj = existedProject[index];
-//     if (_.isUndefined(processed.find(({ location }) => proj.location === location))) {
-//       processed.push(proj);
-
-//     }
-//   }
-// }
 
 export abstract class TnpProject {
 
   public type: Models.libs.LibType;
 
   get linkedProjects(this: Project): Project[] {
-    const db = TnpDB.InstanceSync;
     //#region @backendFunc
+    const db = TnpDB.InstanceSync;
     const projects = this.packageJson.linkedProjects.map(pathOrName => {
       let proj: Project;
       if (path.isAbsolute(pathOrName)) {
@@ -56,9 +45,6 @@ export abstract class TnpProject {
       }
       return proj;
     }).filter(f => !!f);
-
-    // findProject(projects);
-
     return projects;
     //#endregion
   }
@@ -66,15 +52,13 @@ export abstract class TnpProject {
 
 
   public applyLinkedPorjects(this: Project) {
+    //#region @backendFunc
     this.linkedProjects.forEach(p => {
       const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
       Helpers.createSymLink(path.join(p.location, sourceFolder), path.join(this.location, sourceFolder, `tmp-${p.name}`));
-    })
+    });
+    //#endregion
   }
-
-  // get tsconfigPathes() {
-
-  // }
 
   public get frameworkVersion(this: Project) {
     //#region @backendFunc
