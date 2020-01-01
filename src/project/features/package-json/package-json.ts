@@ -52,6 +52,10 @@ export class PackageJSON
           json.tnp.overrided = {};
           saveAtLoad = true;
         }
+        if (_.isUndefined(json.tnp.linkedProjects)) {
+          json.tnp.linkedProjects = [];
+          saveAtLoad = true;
+        }
         if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
           json.tnp.overrided.ignoreDepsPattern = [];
           saveAtLoad = true;

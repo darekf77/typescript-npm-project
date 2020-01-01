@@ -41,7 +41,7 @@ export abstract class TnpProject {
         }
       }
       if (!proj) {
-        Helpers.warn(`[linkedProjects] Not able to find project by value: ${pathOrName}`);
+        Helpers.error(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`, false, true);
       }
       return proj;
     }).filter(f => !!f);

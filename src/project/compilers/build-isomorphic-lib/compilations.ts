@@ -78,7 +78,13 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     private compilationProject: Project,
     private moduleName: string,
     public ENV: Models.env.EnvConfig,
+    /**
+     * tmp-src-for-(dist|bundle)-browser
+     */
     sourceOut: string,
+    /**
+     * browser-for-(dist|bundle|projectName)
+     */
     outFolder: OutFolder,
     location: string,
     cwd: string,
