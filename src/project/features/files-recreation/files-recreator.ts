@@ -303,10 +303,22 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-`+ this.filesIgnoredBy.gitignore.join('\n').concat('\n') + `
-${this.project.isCoreProject ? '' : '*.filetemplate'}
+`+ this.filesIgnoredBy
+        .gitignore
+        .filter(f => {
+          if (this.project.isCoreProject && f.endsWith('.filetemplate')) {
+            return false;
+          }
+          return true;
+        })
+        .join('\n').concat('\n') + `
+${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 
-`);
+${this.project.projectLinkedFiles().map(({ relativePath }) => `/${relativePath.replace(/^\//, '')}`).join('\n')}
+
+`.trimRight() + '\n');
+
+
 
   }
 

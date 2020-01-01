@@ -4,7 +4,12 @@ import { TnpDB } from '../../tnp-db';
 import { sleep } from 'sleep';
 import { CLIWRAP } from '../cli-wrapper.backend';
 
+export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 
+  if (exit) {
+    process.exit(0)
+  }
+}
 
 export async function STRUCT(args: string, exit = true) {
   if (!args) {

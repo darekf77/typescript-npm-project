@@ -221,13 +221,19 @@ const $SINSTALL = (args) => {
 
 async function $LINK() {
   let project = Project.Current;
-  if (project.isWorkspaceChildProject) {
-    project = project.parent;
+
+  if (project.isStandaloneProject) {
+    Project.Current.link();
+  } else {
+    if (project.isWorkspaceChildProject) {
+      project = project.parent;
+    }
+    if (!project.isWorkspace) {
+      Helpers.error(`This is not workspace or workpace child projct`, false, true)
+    }
+    project.workspaceSymlinks.add(`Add workspace symlinks`);
   }
-  if (!project.isWorkspace) {
-    Helpers.error(`This is not workspace or workpace child projct`, false, true)
-  }
-  project.workspaceSymlinks.add(`Add workspace symlinks`);
+  Helpers.info(`Linking DONE!`)
   process.exit(0)
 }
 

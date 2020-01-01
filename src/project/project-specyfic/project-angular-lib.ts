@@ -38,6 +38,11 @@ export class ProjectAngularLib extends Project {
         }
       }
     }
+
+    if (this.isCoreProject && this.frameworkVersion !== 'v1') {
+      this.applyLinkedFiles();
+    }
+
   }
 
   public setDefaultPort(port: number) {
@@ -81,6 +86,24 @@ export class ProjectAngularLib extends Project {
       // process.exit(0)
     }
     return config;
+  }
+
+  projectLinkedFiles() {
+    let files = super.projectLinkedFiles();
+
+    if (this.frameworkVersion !== 'v1') {
+      files = files.concat([
+        {
+          sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),
+          relativePath: 'tsconfig.browser.json',
+        },
+        {
+          sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),
+          relativePath: 'tsconfig.isomorphic.json.filetemplate'
+        }
+      ])
+    }
+    return files;
   }
 
   projectSpecyficFiles() {

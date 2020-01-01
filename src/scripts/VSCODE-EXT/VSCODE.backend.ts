@@ -132,6 +132,7 @@ function $VSCODE_GLOBAL() {
     "javascript.updateImportsOnFileMove.enabled": "never",
     "window.restoreWindows": "all",
     "search.searchOnType": false,
+    "scm.alwaysShowProviders": false,
     "explorer.compactFolders": false,
   };
   let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');

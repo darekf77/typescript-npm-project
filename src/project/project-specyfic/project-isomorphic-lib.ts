@@ -50,9 +50,15 @@ export class ProjectIsomorphicLib extends Project {
   }
 
   filesTemplates() {
-    return [
+    const files = [
       'tsconfig.json.filetemplate',
     ];
+
+    if (this.frameworkVersion !== 'v1') {
+      files.push('tsconfig.isomorphic.json.filetemplate')
+    }
+
+    return files;
   }
 
   projectSpecyficIgnoredFiles() {
@@ -223,7 +229,7 @@ export class ProjectIsomorphicLib extends Project {
   uglifyCode(reservedNames: string[]) {
     const command = `uglifyjs bundle/index.js --output bundle/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
-      // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
+    // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
     Helpers.info(`
 

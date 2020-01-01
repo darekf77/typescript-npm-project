@@ -14,15 +14,56 @@ import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
 import { Models } from '../../../models';
 import { config } from '../../../config';
+import { TnpDB } from '../../../tnp-db';
 
 
 
 export abstract class TnpProject {
 
   public type: Models.libs.LibType;
+
+  get linkedProjects(this: Project): Project[] {
+    const db = TnpDB.InstanceSync;
+    //#region @backendFunc
+    return this.packageJson.linkedProjects.map(pathOrName => {
+      let proj: Project;
+      if (path.isAbsolute(pathOrName)) {
+        proj = Project.From(pathOrName);
+      }
+      if (!proj) {
+        proj = Project.From(path.join(this.location, pathOrName))
+      }
+      if (!proj) {
+        const fromALl = db.getProjects().find(({ project }) => {
+          const { name, genericName } = project;
+          return (name === pathOrName || genericName === pathOrName)
+        })
+        if (fromALl) {
+          proj = fromALl.project;
+        }
+      }
+      if (!proj) {
+        Helpers.warn(`[linkedProjects] Not able to find project by value: ${pathOrName}`);
+      }
+      return proj;
+    }).filter(f => !!f);
+    //#endregion
+  }
+
+  public link(this: Project) {
+    // this.linkedProjects.forEach(p => {
+    //   const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
+    //   Helpers.createSymLink(path.join(p.location, sourceFolder), path.join(this.location, config.folder.src, `tmp-${p.name}`));
+    // })
+  }
+
+  // get tsconfigPathes() {
+
+  // }
+
   public get frameworkVersion(this: Project) {
     //#region @backendFunc
-    return this.packageJson.frameworkVersion;
+    return this.packageJson.frameworkVersion
     //#endregion
   }
 

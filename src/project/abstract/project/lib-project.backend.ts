@@ -35,6 +35,25 @@ export abstract class LibProject {
   }
 
   //#region @backend
+
+  projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string, renameFileTo?: string }[] {
+    const files = [];
+    return files;
+  }
+
+  applyLinkedFiles(this: Project) {
+    const files = this.projectLinkedFiles();
+    files.forEach(({ sourceProject, relativePath, renameFileTo }) => {
+      const source = path.join(sourceProject.location, relativePath);
+      let dest = path.join(this.location, relativePath);
+      if (renameFileTo) {
+        dest = path.join(path.dirname(dest), renameFileTo);
+      }
+      Helpers.removeFileIfExists(dest);
+      Helpers.createSymLink(source, dest);
+    })
+  }
+
   projectSpecyficFiles(this: Project) {
     const files = [
       'index.js',
@@ -176,12 +195,22 @@ export abstract class LibProject {
 
 
       if (this.type === 'angular-lib') {
-        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-"use strict";
-Object.defineProperty(exports, '__esModule', { value: true });
-var tslib_1 = require('tslib');
-tslib_1.__exportStar(require('./browser'), exports);
+
+        if (this.frameworkVersion === 'v1') {
+          Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
+          "use strict";
+          Object.defineProperty(exports, '__esModule', { value: true });
+          var tslib_1 = require('tslib');
+          tslib_1.__exportStar(require('./browser'), exports);
+                  `.trim());
+        } else {
+          Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
+          export * from './browser';
         `.trim());
+        }
+
+
+
         Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.d.ts')}`, `
 export * from './browser';
         `.trim());

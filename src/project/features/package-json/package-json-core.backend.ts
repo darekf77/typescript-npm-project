@@ -32,6 +32,15 @@ export class PackageJsonCore {
     }
   }
 
+  get linkedProjects() {
+
+    const res = this.data.tnp ? this.data.tnp.linkedProjects : undefined;
+    if (_.isArray(res)) {
+      return res;
+    }
+    return [];
+  }
+
   get frameworkVersion(): 'v1' | 'v2' {
     const res = this.data.tnp ? this.data.tnp.version : undefined;
     if (_.isString(res)) {

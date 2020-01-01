@@ -10,7 +10,8 @@
         "sharp": "0.23.3",
         "@types/sharp": "0.23.1",
         "svg-png-converter": "0.0.9",
-        "ng2-rest-swagger-generator": "6.0.4"
+        "ng2-rest-swagger-generator": "6.0.4",
+        "wait.for": "0.6.6"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -624,6 +625,7 @@
     "underscore": "^1.9.1",
     "url-loader": "^0.6.2",
     "validator": "^9.2.0",
+    "wait.for": "0.6.6",
     "watch": "~1.0.2",
     "webpack": "3.10.0",
     "webpack-dev-server": "~2.9.3",

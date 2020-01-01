@@ -74,6 +74,14 @@ export namespace ModelsNpm {
       type: ModelsLibTypes.LibType;
       version?: 'v1' | 'v2',
       /**
+       * link your local projects *.ts files inside this project.. through tsconfig pathes
+       * Example:
+       *  - local projct 'tnp-helper' with 'src' folder
+       *  -> will be available inside:
+       *     import {  from 'tnp-helper';
+       */
+      linkedProjects?: string[];
+      /**
        * framework available inside project/app
        */
       frameworks?: ModelsEnvinronment.UIFramework[];
