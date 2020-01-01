@@ -55,11 +55,13 @@ export namespace ModelsEnvinronment {
       },
       projects: EnvConfigProject[]
     }
+    currentLibProjectSourceFolder?: 'src' | 'components';
     currentProjectName?: string;
     currentProjectLocation?: string;
     currentProjectIsSite?: boolean;
     currentProjectIsStatic?: boolean;
     currentProjectComponentsFolder?: string;
+    currentProjectTsConfigPathes?:string;
     currentProjectType?: ModelsLibTypes.LibType;
     packageJSON?: ModelsNpm.IPackageJSON;
 

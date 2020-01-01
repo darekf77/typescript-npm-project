@@ -126,6 +126,16 @@ export class FilesRecreator extends FeatureForProject {
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
+          .concat(self.project.isCoreProject ? [] : self.project.projectLinkedFiles().map(({ relativePath, renameFileTo }) => {
+            if (renameFileTo) {
+              relativePath = path.join(path.basename(relativePath), renameFileTo);
+            }
+            return relativePath;
+          }))
+          .concat(self.project.linkedProjects.map(p => {
+            const source = self.project.type === 'angular-lib' ? config.folder.components : config.folder.src;
+            return `${source}/tmp-${p.name}`;
+          }))
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)

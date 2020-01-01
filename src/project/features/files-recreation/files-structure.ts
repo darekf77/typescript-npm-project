@@ -169,6 +169,7 @@ export class FilesStructure extends FeatureForProject {
         this.project.buildOptions = {};
       }
       await this.project.env.init(args);
+      this.project.applyLinkedPorjects();
       this.project.filesTemplatesBuilder.rebuild();
     }
 

@@ -50,11 +50,11 @@ export abstract class TnpProject {
     //#endregion
   }
 
-  public link(this: Project) {
-    // this.linkedProjects.forEach(p => {
-    //   const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
-    //   Helpers.createSymLink(path.join(p.location, sourceFolder), path.join(this.location, config.folder.src, `tmp-${p.name}`));
-    // })
+  public applyLinkedPorjects(this: Project) {
+    this.linkedProjects.forEach(p => {
+      const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
+      Helpers.createSymLink(path.join(p.location, sourceFolder), path.join(this.location, sourceFolder, `tmp-${p.name}`));
+    })
   }
 
   // get tsconfigPathes() {

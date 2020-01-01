@@ -167,6 +167,22 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     const componentsFolder = `browser${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
     workspaceConfig.currentProjectComponentsFolder = componentsFolder;
   }
+
+  let currentLibProjectSourceFolder: 'src' | 'components';
+  if (project.type === 'angular-lib') {
+    currentLibProjectSourceFolder = 'components';
+  }
+  if (project.type === 'isomorphic-lib') {
+    currentLibProjectSourceFolder = 'src';
+  }
+  workspaceConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
+
+  workspaceConfig.currentProjectTsConfigPathes = project.linkedProjects.map(({ name }) => {
+    return `"${name}":["tmp-${name}"]`
+  }).join(',\n')
+
+  // console.log(project.linkedProjects.map(p => p.name));
+
   // if (project.type === 'angular-lib') {
   //   const componentsFolder = `tmp-src-dist${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
   //   workspaceConfig.currentProjectComponentsFolder = componentsFolder;

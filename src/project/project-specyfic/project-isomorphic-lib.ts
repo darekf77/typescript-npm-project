@@ -18,6 +18,14 @@ import { Project } from '../abstract';
 export class ProjectIsomorphicLib extends Project {
 
   //#region @backend
+
+  constructor(location: string) {
+    super(location);
+    if (this.isCoreProject && this.frameworkVersion !== 'v1') {
+      this.applyLinkedFiles();
+    }
+  }
+
   startOnCommand(args: string) {
     const command = `ts-node run.js ${args}`;
     return command;
@@ -58,6 +66,18 @@ export class ProjectIsomorphicLib extends Project {
       files.push('tsconfig.isomorphic.json.filetemplate')
     }
 
+    return files;
+  }
+
+  projectLinkedFiles() {
+    const files = super.projectLinkedFiles();
+
+    if (this.frameworkVersion !== 'v1') {
+      files.push({
+        sourceProject: Project.by(this.type, 'v1'),
+        relativePath: 'webpack.backend-bundle-build.js'
+      });
+    }
     return files;
   }
 

@@ -223,7 +223,7 @@ async function $LINK() {
   let project = Project.Current;
 
   if (project.isStandaloneProject) {
-    Project.Current.link();
+    Project.Current.applyLinkedPorjects();
   } else {
     if (project.isWorkspaceChildProject) {
       project = project.parent;
