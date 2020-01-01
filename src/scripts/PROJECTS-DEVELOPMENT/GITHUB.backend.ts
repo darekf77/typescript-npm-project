@@ -11,9 +11,9 @@ const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_H
 const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
 const GITHUB_PROJECTS_NAMES = [
   'tsc-npm-project',
-  'tsc-helpers',
-  'tsc-models',
-  'tsc-db',
+  'tnp-helpers',
+  'tnp-models',
+  'tnp-db',
   'firedev',
   'firedev-projects',
   'ng2-rest',
