@@ -127,7 +127,17 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
       Helpers.run(`code .`, { cwd: dest }).async();
       Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
     }
-    proj.git.pushCurrentBranch();
+    while (true) {
+      try {
+        proj.git.pushCurrentBranch();
+        break;
+      } catch (err) {
+        Helpers.error(`Not able to push brench... `);
+        Helpers.run(`code .`, { cwd: dest }).async();
+        Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - check your repository and press any key..`);
+      }
+    }
+
     Helpers.info(`Success push of project ${chalk.bold(projectName)}.`)
   }
   if (exit) {
