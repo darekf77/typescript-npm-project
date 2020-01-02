@@ -2,7 +2,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 
 import { Project } from './project';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 export abstract class ProjectGit {
   //#region @backend

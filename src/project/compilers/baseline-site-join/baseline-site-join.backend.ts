@@ -7,7 +7,7 @@ import * as watch from 'watch'
 
 // local
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import chalk from 'chalk';
 import { TnpDB } from '../../../tnp-db';

@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import scriptsFnArr from './scripts/index';
 
 import * as path from 'path';
-import { Helpers } from './helpers';
+import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { Project } from './project';
 // import { Ora } from 'ora';

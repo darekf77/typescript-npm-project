@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import glob = require('glob')
 import * as path from 'path';
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { config } from '../config';
 import { CLIWRAP } from './cli-wrapper.backend';

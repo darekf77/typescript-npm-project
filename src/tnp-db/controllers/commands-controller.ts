@@ -1,7 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import { start } from '../../start.backend';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 import { BaseController } from './base-controlller';
 import { CommandInstance } from '../entites/command-instance';

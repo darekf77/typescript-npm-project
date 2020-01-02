@@ -9,7 +9,7 @@ import { ChildProcess } from 'child_process';
 //#endregion
 import { config } from '../../../config';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 import { Morphi, ModelDataConfig } from 'morphi';
 import { BaseProject } from './base-project';

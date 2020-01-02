@@ -1,5 +1,5 @@
 //#region @backend
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BaseController } from './base-controlller';
 import { PortInstance } from '../entites/port-instance';

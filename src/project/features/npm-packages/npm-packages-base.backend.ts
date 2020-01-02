@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import * as _ from 'lodash';
 
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { NpmPackagesCore } from './npm-packages-core.backend';
 import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';

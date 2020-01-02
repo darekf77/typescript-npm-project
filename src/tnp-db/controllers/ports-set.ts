@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { PortInstance } from '../entites';
 import { Project } from '../../project';
 import { Models } from 'tnp-models';

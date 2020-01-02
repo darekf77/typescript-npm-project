@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import { Project } from './project';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { IncCompiler } from 'incremental-compiler';
 import { config } from '../../config';
 import { CLASS } from 'typescript-class-helpers';

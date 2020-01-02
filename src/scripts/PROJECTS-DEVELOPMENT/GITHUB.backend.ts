@@ -3,7 +3,7 @@ import * as fse from 'fs-extra';
 import * as os from 'os';
 import chalk from 'chalk';
 import { Project } from '../../project';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { CLIWRAP } from '../cli-wrapper.backend';
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';

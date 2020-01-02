@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 
 import { config } from '../../../config';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { ProxyRouter } from '../proxy-router';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';

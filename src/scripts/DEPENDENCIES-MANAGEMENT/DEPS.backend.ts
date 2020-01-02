@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { TnpDB } from '../../tnp-db/wrapper-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';

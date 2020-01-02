@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';

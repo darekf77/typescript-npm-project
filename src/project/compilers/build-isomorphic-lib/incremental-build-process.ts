@@ -8,7 +8,7 @@ import { BroswerForModuleCompilation, BackendCompilationExtended } from './compi
 import { IncrementalBuildProcess } from 'morphi';
 import { config } from '../../../config';
 import { Project } from '../../../project';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from '../../features/build-process';
 
 function useDefaultBrowserCompilation(project: Project) {

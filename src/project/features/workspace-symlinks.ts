@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { Project, FeatureForProject } from '../abstract';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 
 export class WorkspaceSymlinks extends FeatureForProject {

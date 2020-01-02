@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as sass from 'node-sass';
 
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 

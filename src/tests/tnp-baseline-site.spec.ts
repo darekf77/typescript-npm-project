@@ -8,7 +8,7 @@ import { SpecWrap } from './_helpers.spec';
 import { NEW, NEW_SITE } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
 import { INIT, CLEAR_ALL } from '../scripts/PROJECTS-DEVELOPMENT/FILES_STRUCTURE';
 import { Project } from '../project';
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 
 const BASELINE_WORKSPACE_PROJECT_NAME = 'test-1'
 const SITE_NAME = `site-for-${BASELINE_WORKSPACE_PROJECT_NAME}`;
@@ -118,7 +118,7 @@ function simpleContorllerJoin(ctx: BaselinSiteJoinTest) {
   `)
   ctx.baselinChild
     .filesFactory.createFile(filePathBaseline.relative.normal, `
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 export class ${fileNameWithoutExt} {
 

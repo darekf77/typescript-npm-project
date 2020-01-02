@@ -10,7 +10,7 @@ import * as TerminalProgressBar from 'progress';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import {
   dedupePackages, nodeModulesExists, addDependenceis

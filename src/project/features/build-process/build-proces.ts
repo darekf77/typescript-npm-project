@@ -9,7 +9,7 @@ import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from './build-options';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { TnpDB } from '../../../tnp-db';
 import { PROGRESS_DATA } from '../../../progress-output';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';

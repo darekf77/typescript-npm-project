@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import chalk from 'chalk';
 // local
 import { Project } from '../abstract';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { ProxyRouter } from '../features/proxy-router';

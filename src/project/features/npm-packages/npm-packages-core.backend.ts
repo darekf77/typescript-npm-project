@@ -6,7 +6,7 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 
 import { Project } from '../../abstract';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';

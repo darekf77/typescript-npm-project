@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as getDependents from 'npm-get-dependents';
 
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { BuildProcess } from '../../features';
 import { Morphi } from 'morphi';

@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 //#endregion
 
 export class PackageJsonCore {

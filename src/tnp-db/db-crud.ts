@@ -10,7 +10,7 @@ import {
   EntityNames, CommandInstance, ProjectInstance,
   ProcessInstance
 } from './entites';
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from '../project/features';
 
 

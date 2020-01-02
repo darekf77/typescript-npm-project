@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import { Helpers } from '../../../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 export class FileTmpForSave {
   public template: string;

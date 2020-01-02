@@ -6,7 +6,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
 
 import { Project } from './project';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';

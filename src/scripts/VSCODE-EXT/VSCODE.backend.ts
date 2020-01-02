@@ -1,4 +1,4 @@
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
 import { config } from '../../config';
 import { TnpDB } from '../../tnp-db';

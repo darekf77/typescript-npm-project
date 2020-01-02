@@ -1,7 +1,7 @@
 //#region @backend
 import chalk from 'chalk';
 import * as path from 'path';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 //#endregion
 
 import * as _ from 'lodash';

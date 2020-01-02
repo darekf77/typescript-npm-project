@@ -15,7 +15,7 @@ import {
   ProcessController
 } from './controllers';
 import { Project } from '../project';
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 import { DBTransaction } from './db-transactions';
 import { DbCrud } from './db-crud';
 import { BuildInstance, CommandInstance, ProjectInstance, ProcessInstance } from './entites';

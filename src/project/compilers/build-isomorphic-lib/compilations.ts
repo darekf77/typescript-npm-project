@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi';
 import { Models } from 'tnp-models';
 import { Project } from '../../abstract';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from '../../features/build-process';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
 import { IncCompiler } from 'incremental-compiler';

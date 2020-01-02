@@ -4,7 +4,7 @@ import * as sleep from 'sleep';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../../abstract';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { config } from '../../../config';
 import { Models } from 'tnp-models';

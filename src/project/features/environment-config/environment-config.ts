@@ -13,7 +13,7 @@ import {
 import { FeatureForProject } from '../../abstract';
 //#endregion
 
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Models } from 'tnp-models';
 

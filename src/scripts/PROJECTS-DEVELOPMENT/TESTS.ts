@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from '../../progress-output';
 import { CLIWRAP } from '../cli-wrapper.backend';

@@ -5,7 +5,7 @@ export { ChildProcess } from 'child_process';
 import * as _ from 'lodash';
 
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Morphi } from 'morphi';
 
 import { Project } from './project';

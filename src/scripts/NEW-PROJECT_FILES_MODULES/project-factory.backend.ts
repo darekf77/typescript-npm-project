@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 
 import { config } from '../../config';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 
 export class ProjectFactory {

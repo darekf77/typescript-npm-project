@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
 

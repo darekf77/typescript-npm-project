@@ -6,7 +6,7 @@ import * as glob from 'glob';
 // local
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { BaselineSiteJoin, HelpersMerge } from '../../compilers/baseline-site-join';
 import { FeatureForProject } from '../../abstract';

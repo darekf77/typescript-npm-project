@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { NpmPackagesBase } from './npm-packages-base.backend';
 import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
 import { config } from '../../../config';

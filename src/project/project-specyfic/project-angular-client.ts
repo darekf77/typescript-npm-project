@@ -5,7 +5,7 @@ import * as child from 'child_process';
 // third part
 import { Project } from '../abstract';
 import { config } from '../../config';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from '../features';
 import { Models } from 'tnp-models';
 

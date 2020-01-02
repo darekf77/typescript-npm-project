@@ -7,7 +7,7 @@ import { CLASS } from 'typescript-class-helpers';
 
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 // import { Models } from 'tnp-models';
 import { DBBaseEntity, PortInstance, DomainInstance, BuildInstance, CommandInstance, ProjectInstance } from '../tnp-db/entites';
 import { DbCrud } from '../tnp-db/db-crud';

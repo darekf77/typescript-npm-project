@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { ProjectAngularClient } from './project-angular-client';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';

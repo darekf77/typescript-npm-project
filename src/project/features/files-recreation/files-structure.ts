@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { FeatureForProject, Project } from '../../abstract';
 import { TnpDB } from '../../../tnp-db';
 import { config } from '../../../config';

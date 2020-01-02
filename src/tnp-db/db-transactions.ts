@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as  psList from 'ps-list';
 import * as sleep from 'sleep';
 
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 
 import { DbCrud } from './db-crud';
 import {

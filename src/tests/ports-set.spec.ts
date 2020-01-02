@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
-import { Helpers } from '../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../project';
 import { PortInstance } from '../tnp-db/entites/port-instance';
 import { PortsSet } from '../tnp-db/controllers/ports-set';

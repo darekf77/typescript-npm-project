@@ -10,7 +10,7 @@ export type EnvironmentName = Models.env.EnvironmentName;
 export type IProject = Models.other.IProject;
 
 export * from './config';
-export * from './helpers'
+export * from 'tnp-helpers'
 export * from 'tnp-models';
 export * from './project';
 //#region @backend

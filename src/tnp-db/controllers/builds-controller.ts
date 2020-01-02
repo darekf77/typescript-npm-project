@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';

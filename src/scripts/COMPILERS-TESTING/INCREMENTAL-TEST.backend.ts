@@ -2,7 +2,7 @@
 // import * as path from 'path';
 // import { CLASS } from 'typescript-class-helpers';
 // import { IncCompiler } from 'incremental-compiler';
-// import { Helpers } from '../../helpers';
+// import { Helpers } from 'tnp-helpers';
 // import { Project } from '../../project';
 
 // IncCompiler.init(async (asyncEvents) => {

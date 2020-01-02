@@ -5,7 +5,7 @@ import { FeatureForProject } from '../abstract';
 //#endregion
 
 import { config } from '../../config';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';
 

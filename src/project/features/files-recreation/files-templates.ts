@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 
 export class FilesTemplatesBuilder extends FeatureForProject {

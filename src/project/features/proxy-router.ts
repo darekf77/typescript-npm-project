@@ -5,7 +5,7 @@ import * as portfinder from 'portfinder';
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project, FeatureForProject } from '../abstract';
 
 export class ProxyRouter extends FeatureForProject {

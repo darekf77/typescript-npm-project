@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as sleep from 'sleep';
 
 import { config } from '../../config';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../abstract';
 import { Models } from 'tnp-models';
 import { FeatureForProject } from '../abstract';

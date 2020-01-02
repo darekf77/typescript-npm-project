@@ -5,7 +5,7 @@ import * as path from 'path';
 import chalk from 'chalk';
 
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Morphi } from 'morphi';
 

@@ -9,7 +9,7 @@ import { config as configMorphi } from 'morphi';
 
 import { config } from '../../../config';
 import { Project } from './project';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { Morphi } from 'morphi';
 import { StaticBuild } from '../../features';

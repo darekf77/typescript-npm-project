@@ -1,4 +1,4 @@
-import { Helpers } from '../helpers/index';
+import { Helpers } from 'tnp-helpers';
 import { CLIWRAP } from './cli-wrapper.backend';
 
 function $BASH_CONFIG_VNC_START() {

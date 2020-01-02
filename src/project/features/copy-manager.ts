@@ -10,7 +10,7 @@ import { watch } from 'chokidar'
 import { config } from '../../config';
 import { Project } from '../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../helpers';;
+import { Helpers } from 'tnp-helpers';;
 import { BuildOptions } from './build-process';
 import { FeatureForProject } from '../abstract';
 

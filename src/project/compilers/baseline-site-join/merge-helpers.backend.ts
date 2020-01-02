@@ -7,7 +7,7 @@ import * as watch from 'watch'
 // local
 import { Project } from '../../abstract';
 import { config } from '../../../config';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 //#endregion
 

@@ -6,7 +6,7 @@
 // import * as path from 'path';
 // import { EnumValues } from 'enum-values'
 // import { CommandInstance } from './tnp-db/entites';
-// import { Helpers } from './helpers';
+// import { Helpers } from 'tnp-helpers';
 // import { TnpDB } from './tnp-db/wrapper-db';
 // import * as fuzzy from 'fuzzy'
 // import * as inquirer from 'inquirer'

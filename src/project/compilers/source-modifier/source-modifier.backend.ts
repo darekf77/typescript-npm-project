@@ -9,7 +9,7 @@ import * as chokidar from 'chokidar';
 import { config } from '../../../config';
 import { FeatureCompilerForProject, Project } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from '../../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { IncCompiler } from 'incremental-compiler';
 //#endregion

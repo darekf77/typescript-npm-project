@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as sharp from 'sharp';
 import { png2svg } from 'svg-png-converter';
 
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { config } from '../../config';
 import { FilesRenaming } from '../../project/features/files-recreation/files-renaming.backend';

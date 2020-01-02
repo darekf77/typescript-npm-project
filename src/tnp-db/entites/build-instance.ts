@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Project } from '../../project'
 import { CommandInstance } from './command-instance';
 import { DBBaseEntity } from './base-entity';
-import { Helpers } from '../../helpers';
+import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { BuildOptions } from '../../project/features';
 import { CLASS } from 'typescript-class-helpers';
