@@ -5,8 +5,8 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { SpecWrap } from './_helpers.spec';
-import { NEW } from '../scripts/NEW';
-import { INIT } from '../scripts/FILES_STRUCTURE';
+import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
+import { INIT } from '../scripts/PROJECTS-DEVELOPMENT/FILES_STRUCTURE';
 
 
 
@@ -18,7 +18,7 @@ describe(wrap.describe('Tnp init'), async () => {
 
   await wrap.it(`should init worksapce project`,
     async (location, testName, { packageJSON, cwdChange }) => {
-      NEW(`workspace test1`, false, location);
+      // NEW(`workspace test1`, false, location); // TODO FIx int
 
       // packageJSON('test1', p => {
       //   p.dependencies = {}

@@ -7,7 +7,7 @@ import { config } from '../../config';
 import { BuildOptions } from '../features';
 import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';
-import { TnpDB } from '../../tnp-db';
+import { TnpDB } from 'tnp-db';
 
 export async function selectClients(buildOptions: BuildOptions, currentProject: Project, angularLib = false) {
   if (!buildOptions.watch) {

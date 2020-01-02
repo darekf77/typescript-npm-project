@@ -4,8 +4,8 @@ import { describe } from 'mocha'
 import { expect, use } from 'chai'
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../project';
-import { PortInstance } from '../tnp-db/entites/port-instance';
-import { PortsSet } from '../tnp-db/controllers/ports-set';
+import { PortInstance } from 'tnp-db';
+import { PortsSet } from 'tnp-db';
 import { Models } from 'tnp-models';
 
 

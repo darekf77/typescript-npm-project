@@ -1,6 +1,6 @@
 //#region @backend
 import { Project } from '../../project';
-import { TnpDB } from '../../tnp-db';
+import { TnpDB } from 'tnp-db';
 import { sleep } from 'sleep';
 import { CLIWRAP } from '../cli-wrapper.backend';
 

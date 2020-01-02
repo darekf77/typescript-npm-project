@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { describe } from 'mocha'
 import { expect, use } from 'chai'
 import { Models } from 'tnp-models';
-import { PortInstance } from '../tnp-db/entites/port-instance';
+import { PortInstance } from 'tnp-db';
 
 describe('Ports type spec', () => {
 

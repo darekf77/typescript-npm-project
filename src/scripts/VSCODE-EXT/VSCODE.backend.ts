@@ -1,7 +1,7 @@
 import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
 import { config } from '../../config';
-import { TnpDB } from '../../tnp-db';
+import { TnpDB } from 'tnp-db';
 import { sleep } from 'sleep';
 import { Project } from '../../project/abstract/project';
 import { CLIWRAP } from '../cli-wrapper.backend';

@@ -5,8 +5,8 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { SpecWrap } from './_helpers.spec';
-import { NEW } from '../scripts/NEW';
-import { INSTALL } from '../scripts/INSTALL';
+import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
+import { $INSTALL as INSTALL } from '../scripts/DEPENDENCIES-MANAGEMENT/DEPS.backend';
 
 
 

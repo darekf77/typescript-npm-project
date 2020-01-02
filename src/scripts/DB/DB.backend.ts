@@ -1,7 +1,7 @@
 //#region @backend
 import * as  psList from 'ps-list';
-import { TnpDB } from '../../tnp-db/wrapper-db';
-import { CommandInstance } from '../../tnp-db/entites';
+import { TnpDB } from 'tnp-db';
+import { CommandInstance } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { DBProcMonitor } from './db-proc-monitor.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';

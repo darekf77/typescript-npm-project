@@ -6,7 +6,7 @@ import * as fse from 'fs-extra';
 
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject, Project } from '../../abstract';
-import { TnpDB } from '../../../tnp-db';
+import { TnpDB } from 'tnp-db';
 import { config } from '../../../config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from '../../../progress-output';

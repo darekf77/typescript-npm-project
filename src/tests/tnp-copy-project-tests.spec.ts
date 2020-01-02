@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { SpecWrap } from './_helpers.spec';
-import { NEW } from '../scripts/NEW';
+import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
 import { Models } from 'tnp-models';
 import { config } from '../config';
 import { Project } from '../project';
@@ -25,14 +25,14 @@ describe(wrap.describe('Tnp copy project'), async () => {
     'isomorphic-lib',
     // 'angular-lib',
     'workspace'
-  ] as LibType[];
+  ] as Models.libs.LibType[];
 
   for (let index = 0; index < libTypesToTest.length; index++) {
     const libTypeName = libTypesToTest[index];
     await wrap.it(`should genrate copy project new project ${libTypeName} with new`,
       (location, testName, { }) => {
 
-        const projectType: LibType = libTypeName;
+        const projectType: Models.libs.LibType = libTypeName;
         const projectName = `test-copy-${projectType}`;
 
         Project.by(libTypeName).copyManager.generateSourceCopyIn(path.join(location, projectName));

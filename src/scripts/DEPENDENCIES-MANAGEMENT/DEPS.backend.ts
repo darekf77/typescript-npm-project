@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
-import { TnpDB } from '../../tnp-db/wrapper-db';
+import { TnpDB } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';
 

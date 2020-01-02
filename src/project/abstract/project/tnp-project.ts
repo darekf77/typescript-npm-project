@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';
-import { TnpDB } from '../../../tnp-db';
+import { TnpDB } from 'tnp-db';
 //#endregion
 
 import { Project } from './project';

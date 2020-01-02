@@ -14,7 +14,7 @@ export * from 'tnp-helpers'
 export * from 'tnp-models';
 export * from './project';
 //#region @backend
-export * from './tnp-db';
+export * from 'tnp-db';
 export * from './project/compilers/build-isomorphic-lib';
 
 //#endregion
