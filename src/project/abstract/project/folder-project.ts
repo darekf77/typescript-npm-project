@@ -215,7 +215,10 @@ export abstract class FolderProject {
   }
   //#endregion
 
-  private clearNodeModulesFromLinks() {
+  private clearNodeModulesFromLinks(this: Project) {
+    if (!this.isStandaloneProject) {
+      return;
+    }
     Helpers.log(`Reseting symbolic links from node_mouels.. start..`);
     const node_modules = path.join(this.location, config.folder.node_modules);
     const folders = fse.readdirSync(node_modules);
