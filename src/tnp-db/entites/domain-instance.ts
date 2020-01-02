@@ -1,6 +1,6 @@
 //#region @backend
 import { Project } from '../../project';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { BuildInstance } from './build-instance';
 import { DBBaseEntity } from './base-entity';
 import { CLASS } from 'typescript-class-helpers';

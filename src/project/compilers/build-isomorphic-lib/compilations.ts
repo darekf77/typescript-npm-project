@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';
 import { BuildOptions } from '../../features/build-process';

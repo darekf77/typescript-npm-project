@@ -7,7 +7,7 @@ import * as glob from 'glob';
 
 import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from './build-options';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { config } from '../../../config';
 import { Helpers } from '../../../helpers';
 import { TnpDB } from '../../../tnp-db';

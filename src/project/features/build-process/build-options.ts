@@ -6,7 +6,7 @@ import { Helpers } from '../../../helpers';
 
 import * as _ from 'lodash';
 import { Project } from '../../abstract';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { config } from '../../../config';
 
 export class BuildOptions implements Models.dev.IBuildOptions {
@@ -35,14 +35,14 @@ export class BuildOptions implements Models.dev.IBuildOptions {
 
 
   onlyWatchNoBuild?: boolean;
-  copyto?: Project[] | string[];
+  copyto?: Models.other.IProject[] | string[];
   copytoAll?: boolean;
 
   /**
    * For isomorphic-lib
    * Specyify build targets as workspace childs projects names
    */
-  forClient?: Project[] | string[];
+  forClient?: Models.other.IProject[] | string[];
 
 
   //#region @backend
@@ -118,7 +118,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
           }
           Helpers.info(`Build only for client ${chalk.bold(projectParentChildName)}`)
           return proj;
-        })
+        }) as any;
       }
     }
     if (!_.isArray(argsObj.forClient)) {
@@ -129,26 +129,20 @@ export class BuildOptions implements Models.dev.IBuildOptions {
       if (_.isString(argsObj.copyto)) {
         argsObj.copyto = [argsObj.copyto]
       }
-      argsObj.copyto = (argsObj.copyto as string[]).map(argPath => {
-        // console.log('argPath', argPath)
-        if (process.platform === 'win32') {
-          if (!argPath.match(/\\/g) && !argPath.match(/\//g)) {
-            Helpers.error(`On windows.. please wrap your "copyto" parameter with double-quote like this:\n
-  ${config.frameworkName} build:${argsObj.outDir}${argsObj.watch ? ':watch' : ''} --copyto "<windows path here>"`)
-            process.exit(1)
+      argsObj.copyto = (argsObj.copyto as string[])
+        .map(argPath => {
+          // console.log('argPath', argPath)
+          // console.log('raw arg', args)
+
+          // console.log('path', argPath)
+          const project = Project.nearestTo(argPath);
+          if (!project) {
+            Helpers.error(`autobuild.json : Path doesn't contain ${config.frameworkName} type project: ${argPath}`, true, true)
+          } else {
+            return project;
           }
-        }
-        // console.log('raw arg', args)
 
-        // console.log('path', argPath)
-        const project = Project.nearestTo(argPath);
-        if (!project) {
-          Helpers.error(`autobuild.json : Path doesn't contain ${config.frameworkName} type project: ${argPath}`, true, true)
-        } else {
-          return project;
-        }
-
-      }).filter(p => !!p)
+        }).filter(p => !!p) as any;
     }
     if (!_.isArray(argsObj.copyto)) {
       argsObj.copyto = []
@@ -169,7 +163,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
     let args = [];
 
     if (_.isArray(copyto)) {
-      const argsFromCopyto = (copyto as Project[]).map(c => {
+      const argsFromCopyto = (copyto as any[]).map(c => {
         let locationOfProject: string;
         if (_.isString(c)) {
           locationOfProject = c;
@@ -183,7 +177,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
     }
 
     if (_.isArray(forClient)) {
-      const argsFromForClient = (forClient as Project[]).map(c => {
+      const argsFromForClient = (forClient as any[]).map(c => {
         let project: string;
         if (_.isString(c)) {
           project = c;

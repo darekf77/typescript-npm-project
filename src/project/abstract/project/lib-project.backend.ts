@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as getDependents from 'npm-get-dependents';
 
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { BuildProcess } from '../../features';

@@ -10,7 +10,10 @@ import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { ProxyRouter } from '../features/proxy-router';
 import { BuildOptions } from '../features';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
+
+export type ProjectBuild = { project: Project; appBuild: boolean; }
+
 
 function reorderResult(result = [], update: (result) => void): boolean {
   let neededNextOrder = false;
@@ -93,7 +96,7 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
-  private libs(targetClients: Models.dev.ProjectBuild[]) {
+  private libs(targetClients: ProjectBuild[]) {
     const existed = {};
     const targetLibs = targetClients
       .map(t => t.project.workspaceDependencies)
@@ -156,11 +159,11 @@ export class ProjectWorkspace extends Project {
     });
   }
 
-  get projectsInOrder(): Models.dev.ProjectBuild[] {
+  get projectsInOrder(): ProjectBuild[] {
     if (!fse.existsSync(this.location)) {
       return [];
     }
-    const targetClients: Models.dev.ProjectBuild[] = (
+    const targetClients: ProjectBuild[] = (
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 import { config } from '../config';
 import { Helpers } from '../helpers';
 import '../global-typings';

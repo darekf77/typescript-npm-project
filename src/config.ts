@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 
-import { Models } from './models';
+import { Models } from 'tnp-models';
 
 const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
 const allowedEnvironmentsObj = {};

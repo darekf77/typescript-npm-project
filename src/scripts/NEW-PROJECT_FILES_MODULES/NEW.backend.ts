@@ -1,6 +1,6 @@
 //#region @backend
 import * as _ from 'lodash';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 
 import { ProjectFactory } from './project-factory.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';

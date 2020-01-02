@@ -1,5 +1,5 @@
 //#region @backend
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 
 export const config: Models.env.EnvConfig = {
   workspace: {

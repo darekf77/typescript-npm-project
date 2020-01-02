@@ -6,7 +6,7 @@ import { Helpers } from '../helpers';
 import { Project } from '../project';
 import { PortInstance } from '../tnp-db/entites/port-instance';
 import { PortsSet } from '../tnp-db/controllers/ports-set';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 
 
 

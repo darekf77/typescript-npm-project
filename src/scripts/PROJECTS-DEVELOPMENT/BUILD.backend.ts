@@ -5,7 +5,7 @@ import * as path from 'path';
 import { Project } from '../../project';
 import { config } from '../../config';
 import { Helpers } from '../../helpers';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import chalk from 'chalk';
 import { CLIWRAP } from '../cli-wrapper.backend';
 

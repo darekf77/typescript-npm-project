@@ -9,7 +9,7 @@ import * as TerminalProgressBar from 'progress';
 
 import { config } from '../../../config';
 import { Project } from '../../abstract';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { FeatureForProject } from '../../abstract';
 import {

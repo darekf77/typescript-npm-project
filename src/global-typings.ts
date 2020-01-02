@@ -1,7 +1,7 @@
 //#region @backend
 import { Ora } from 'ora';
 //#endregion
-import { Models } from './models';
+import { Models } from 'tnp-models';
 
 
 

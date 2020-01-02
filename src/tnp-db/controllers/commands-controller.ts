@@ -49,11 +49,11 @@ export class CommandsController extends BaseController {
   updateCommandBuildOptions(location: string, buildOptions: BuildOptions) {
     const cmd = this.lastCommandFrom(location);
     if (cmd) {
-      const clients = _.isArray(buildOptions.forClient) ? (buildOptions.forClient as Project[]).map(c => {
+      const clients = _.isArray(buildOptions.forClient) ? (buildOptions.forClient as any[]).map((c: Project) => {
         return `--forClient ${c.name}`
       }).join(' ') : '';
 
-      const copyto = _.isArray(buildOptions.copyto) ? (buildOptions.copyto as Project[]).map(c => {
+      const copyto = _.isArray(buildOptions.copyto) ? (buildOptions.copyto as any[]).map((c: Project) => {
         return `--copyto ${c.location}`
       }).join(' ') : '';
 

@@ -14,7 +14,7 @@ import { config } from './config';
 // import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from './tnp-db/wrapper-db';
-import { Models } from './models';
+import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
 

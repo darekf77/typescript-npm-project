@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 
 import { FeatureForProject, Project } from '../../abstract';
 import { getAndTravelCoreDeps } from './package-json-helpers.backend';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 
 export type GetPkgType = { category: Models.libs.CoreLibCategory; version: string; };

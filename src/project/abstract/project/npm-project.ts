@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { Morphi } from 'morphi';
@@ -46,7 +46,7 @@ export class NpmProject {
 
   get preview(this: Project): Project {
     if (Helpers.isBrowser) {
-      return this.browser.preview;
+      return this.browser.preview as any;
     }
     //#region @backend
     return _.isString(this.location) && Project.From(path.join(this.location, 'preview'));
@@ -215,7 +215,7 @@ export class NpmProject {
 
   get childrenThatAreThirdPartyInNodeModules(this: Project): Project[] {
     if (Helpers.isBrowser) {
-      return this.browser.childrenThatAreThirdPartyInNodeModules;
+      return this.browser.childrenThatAreThirdPartyInNodeModules as any;
     }
     //#region @backend
     if (this.type === 'unknow') {

@@ -2,7 +2,7 @@
 import * as  psList from 'ps-list';
 import { TnpDB } from '../../tnp-db/wrapper-db';
 import { CommandInstance } from '../../tnp-db/entites';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { DBProcMonitor } from './db-proc-monitor.backend';
 import { CLIWRAP } from '../cli-wrapper.backend';
 import { DBMonitTop } from './monit-top.backend';

@@ -1,7 +1,7 @@
 import * as  psList from 'ps-list';
 import { TnpDB } from '../../tnp-db/wrapper-db';
 import { CommandInstance } from '../../tnp-db/entites';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../helpers';
 import { Project } from '../../project';
 import { JSON10 } from 'json10';

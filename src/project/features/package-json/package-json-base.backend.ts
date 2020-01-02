@@ -6,7 +6,7 @@ import * as semver from 'semver';
 import chalk from 'chalk';
 
 import { Project } from '../../abstract';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 

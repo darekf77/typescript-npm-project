@@ -6,7 +6,7 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 
 // local
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import chalk from 'chalk';

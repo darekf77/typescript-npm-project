@@ -2,7 +2,7 @@
 export { start } from './start.backend';
 import { Ora } from 'ora';
 //#endregion
-import { Models } from './models';
+import { Models } from 'tnp-models';
 
 export * from './global-typings';
 export type EnvConfig = Models.env.EnvConfig;
@@ -11,7 +11,7 @@ export type IProject = Models.other.IProject;
 
 export * from './config';
 export * from './helpers'
-export * from './models';
+export * from 'tnp-models';
 export * from './project';
 //#region @backend
 export * from './tnp-db';

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { BaseController } from './base-controlller';
 import { DomainInstance, ProjectInstance } from '../entites';
 import { Project } from '../../project';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('DomainsController')

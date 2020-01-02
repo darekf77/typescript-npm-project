@@ -8,7 +8,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
 //#endregion
 import { config } from '../../../config';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 
 import { Morphi, ModelDataConfig } from 'morphi';
@@ -69,13 +69,13 @@ import { CopyManager } from '../../features/copy-manager';
 
     if (!(exclude.length > 0 && exclude.includes('children'))) {
       // log('SET CHILDREND')
-      entity.browser.children = entity.children;
+      entity.browser.children = entity.children as any;
     } else {
       entity.browser.children = void 0
     }
 
     if (!(exclude.length > 0 && exclude.includes('parent'))) {
-      entity.browser.parent = entity.parent;
+      entity.browser.parent = entity.parent as any;
     } else {
       entity.browser.parent = void 0
     }

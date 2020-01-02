@@ -9,7 +9,7 @@ import { watch } from 'chokidar'
 
 import { config } from '../../config';
 import { Project } from '../abstract';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../helpers';;
 import { BuildOptions } from './build-process';
 import { FeatureForProject } from '../abstract';
@@ -308,7 +308,7 @@ export class CopyManager extends FeatureForProject {
 
     const outDir = this.buildOptions.outDir;
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      (this.buildOptions.copyto as Project[]).forEach(p => {
+      (this.buildOptions.copyto as any[]).forEach((p: Project) => {
         // console.log(`Copy to ${p.name}`)
         this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
       })

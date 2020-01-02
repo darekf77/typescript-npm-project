@@ -5,7 +5,7 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 // local
 import { Project } from '../../abstract';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { BaselineSiteJoin, HelpersMerge } from '../../compilers/baseline-site-join';

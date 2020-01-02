@@ -7,7 +7,7 @@ import { Project, FeatureForProject } from '../../abstract';
 import { Helpers } from '../../../helpers';
 import chalk from 'chalk';
 import { config } from '../../../config';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 
 export class StaticBuild extends FeatureForProject {
 

@@ -10,7 +10,7 @@ import * as fkill from 'fkill';
 import * as dateformat from 'dateformat';
 
 import { Helpers } from './index';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 
 const prompts = require('prompts');
@@ -158,9 +158,6 @@ export class HelpersProcess {
 
     // process.stdout.write('\033c\033[3J');
     // try {
-    //   if (process.platform === 'win32') {
-    //     run('cls').sync()
-    //   }
     //   run('clear').sync()
     // } catch (error) {
     //   console.log('clear console not succedd')

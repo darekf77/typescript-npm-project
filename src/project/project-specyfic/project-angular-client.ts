@@ -7,7 +7,7 @@ import { Project } from '../abstract';
 import { config } from '../../config';
 import { Helpers } from '../../helpers';
 import { BuildOptions } from '../features';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 
 /**
  * DO NOT USE environment variables in this project directly

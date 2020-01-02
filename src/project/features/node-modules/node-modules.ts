@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
 import { FeatureForProject } from '../../abstract';

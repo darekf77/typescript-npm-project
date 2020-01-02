@@ -5,7 +5,7 @@ import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from '../../helpers';
 import { config } from '../../config';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 
 
 export class PackagesRecognitionExtended extends PackagesRecognition {

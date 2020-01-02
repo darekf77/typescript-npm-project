@@ -11,7 +11,7 @@ import * as json5 from 'json5';
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from '../../../helpers';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Morphi } from 'morphi';
 
 
@@ -22,7 +22,7 @@ export abstract class FolderProject {
 
   get children(this: Project): Project[] {
     if (Helpers.isBrowser) {
-      return this.browser.children;
+      return this.browser.children as any;
     }
     //#region @backend
     if (this.type === 'unknow') {
@@ -34,7 +34,7 @@ export abstract class FolderProject {
 
   get childrenThatAreLibs(this: Project): Project[] {
     if (Helpers.isBrowser) {
-      return this.browser.childrenThatAreLibs;
+      return this.browser.childrenThatAreLibs as any;
     }
     //#region @backend
     if (this.type === 'unknow') {
@@ -51,7 +51,7 @@ export abstract class FolderProject {
 
   get childrenThatAreClients(this: Project): Project[] {
     if (Helpers.isBrowser) {
-      return this.browser.childrenThatAreClients;
+      return this.browser.childrenThatAreClients as any;
     }
     //#region @backend
     if (this.type === 'unknow') {
@@ -108,7 +108,7 @@ export abstract class FolderProject {
 
   get parent(this: Project): Project {
     if (Helpers.isBrowser) {
-      return this.browser.parent;
+      return this.browser.parent as any;
     }
     //#region @backend
     if (!_.isString(this.location) || this.location.trim() === '') {

@@ -15,7 +15,7 @@ import { FeatureForProject } from '../../abstract';
 
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 
 
 //#region @backend

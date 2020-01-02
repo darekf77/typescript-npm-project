@@ -13,7 +13,7 @@ import { TnpDB } from '../../../tnp-db';
 import { Project } from './project';
 import { Helpers } from '../../../helpers';
 import { Morphi } from 'morphi';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { config } from '../../../config';
 
 export abstract class TnpProject {

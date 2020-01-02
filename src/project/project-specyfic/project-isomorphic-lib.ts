@@ -7,7 +7,7 @@ import * as inquirer from 'inquirer';
 
 import { Helpers } from '../../helpers';
 import { config } from '../../config';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
 import { BuildOptions } from '../features';
 import { selectClients } from './select-clients';
@@ -143,7 +143,7 @@ export class ProjectIsomorphicLib extends Project {
           Helpers.log(`App build not possible for isomorphic-lib in static build mode`)
           return;
         }
-        await this.selectToSimulate(outDir, watch, forClient);
+        await this.selectToSimulate(outDir, watch, forClient as any);
       } else {
         await this.buildLib();
       }

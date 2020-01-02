@@ -13,7 +13,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
   if (!buildOptions.watch) {
     buildOptions.forClient = currentProject.parent.children
       .filter(c => config.allowedTypes.app.includes(c.type))
-      .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name)))
+      .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name))) as any;
     // .filter(c => c.name !== currentProject.name)
     return;
   }
@@ -49,7 +49,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     selectedChoices = projects;
   }
 
-  buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p)))
+  buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
 
   const db = await TnpDB.Instance;
   await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);

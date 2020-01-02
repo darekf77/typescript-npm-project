@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { config } from '../../../config';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Helpers } from '../../../helpers';
 import { ProxyRouter } from '../proxy-router';
 import { Project } from '../../abstract';

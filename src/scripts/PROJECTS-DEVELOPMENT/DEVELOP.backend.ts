@@ -13,11 +13,8 @@ import { CLIWRAP } from '../cli-wrapper.backend';
 
 function killallnode() {
   Helpers.run(`fkill -f node`).sync()
-  // if (process.platform === 'win32') {
-  //   run(`taskkill /F /im node.exe`).sync();
-  // } else {
   //   run(`killall -9 node`).sync();
-  // }
+
 }
 
 

@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 
 import { SpecWrap } from './_helpers.spec';
 import { NEW } from '../scripts/NEW';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 import { config } from '../config';
 import { Project } from '../project';
 

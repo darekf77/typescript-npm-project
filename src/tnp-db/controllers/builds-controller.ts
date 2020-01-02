@@ -4,7 +4,7 @@ import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
 import { Helpers } from '../../helpers';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { Project } from '../../project';
 import { BuildInstance } from '../entites/build-instance';
 import { BuildOptions } from '../../project/features';

@@ -10,7 +10,7 @@ import { config as configMorphi } from 'morphi';
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from '../../../helpers';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { Morphi } from 'morphi';
 
 
@@ -71,7 +71,7 @@ export abstract class SiteProject {
    */
   get baseline(this: Project): Project {
     if (Helpers.isBrowser) {
-      return this.browser.baseline;
+      return this.browser.baseline as any;
     }
     //#region @backend
     if (this.type === 'unknow') {

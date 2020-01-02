@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from '../../../helpers';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 import { ModelDataConfig, Morphi } from 'morphi';
 import { JSON10 } from 'json10';
 
@@ -76,7 +76,7 @@ export abstract class BuildableProject {
       .map(p => p.project)
       .filter(p => p.location !== this.location)
 
-    this.buildOptions.copyto = projects;
+    this.buildOptions.copyto = projects as any;
   }
 
   private async selectProjectToCopyTO(this: Project) {
@@ -108,7 +108,7 @@ export abstract class BuildableProject {
             }
           ]) as any;
 
-        this.buildOptions.copyto = projects.map(p => Project.From(p));
+        this.buildOptions.copyto = projects.map(p => Project.From(p)) as any;
       }
 
     }
@@ -165,10 +165,10 @@ export abstract class BuildableProject {
       if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
 
         const unique = {};
-        (this.buildOptions.copyto as Project[]).forEach(p => unique[p.location] = p);
+        (this.buildOptions.copyto as any[]).forEach((p: Project) => unique[p.location] = p);
         this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
 
-        (this.buildOptions.copyto as Project[]).forEach(proj => {
+        (this.buildOptions.copyto as any[]).forEach((proj: Project) => {
           const project = proj;
           const projectCurrent = this;
           const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;

@@ -21,7 +21,7 @@ import { Project } from '../project';
 import { BuildInstance } from './entites/build-instance';
 import { CommandInstance, ProjectInstance, ProcessMetaInfo, ProcessInstance } from './entites';
 import { PortsSet } from './controllers/ports-set';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 import chalk from 'chalk';
 import { BuildOptions } from '../project/features';
 import { config } from '../config';

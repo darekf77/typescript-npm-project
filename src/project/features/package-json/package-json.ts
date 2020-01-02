@@ -11,7 +11,7 @@ import { Morphi } from 'morphi';
 import { Project } from '../../abstract';
 import { Helpers } from '../../../helpers';
 import { config } from '../../../config';
-import { Models } from '../../../models';
+import { Models } from 'tnp-models';
 
 @Morphi.Entity<PackageJSON>({
   className: 'PackageJSON',

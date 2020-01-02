@@ -7,7 +7,7 @@ import * as sleep from 'sleep';
 import { config } from '../../config';
 import { Helpers } from '../../helpers';
 import { Project } from '../abstract';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { FeatureForProject } from '../abstract';
 
 export class TnpBundle extends FeatureForProject {

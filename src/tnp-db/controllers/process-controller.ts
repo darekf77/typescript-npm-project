@@ -4,7 +4,7 @@ import * as  psList from 'ps-list';
 
 import { BaseController } from './base-controlller';
 import { ProcessInstance, ProcessMetaInfo } from '../entites';
-import { Models } from '../../models';
+import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProcessController')

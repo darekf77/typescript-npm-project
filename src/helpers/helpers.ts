@@ -15,7 +15,7 @@ import { TsCodeModifer } from './ts-code-modifier';
 import { HelpersNpm } from './helpers-npm.backend';
 import { HelpersTerminal } from './helpers-system-terminal.backend';
 import { HelpersFileFolders } from './helpers-file-folders.backend';
-import { Models } from '../models';
+import { Models } from 'tnp-models';
 //#endregion
 import { Helpers } from './index';
 import { config } from '../config';
