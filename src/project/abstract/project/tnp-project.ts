@@ -58,6 +58,9 @@ export abstract class TnpProject {
   public applyLinkedPorjects(this: Project) {
     //#region @backendFunc
     this.linkedProjects.forEach(p => {
+      if (p.location === this.location) {
+        Helpers.error(`[package.json[linkedProjects] Do not link module to itself`, false, true);
+      }
       const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
       const folderInSource = `tmp-${p.name}`;
       Helpers.createSymLink(

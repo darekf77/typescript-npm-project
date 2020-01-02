@@ -215,8 +215,23 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  private clearNodeModulesFromLinks() {
+    Helpers.log(`Reseting symbolic links from node_mouels.. start..`);
+    const node_modules = path.join(this.location, config.folder.node_modules);
+    const folders = fse.readdirSync(node_modules);
+    folders
+      .map(f => path.join(node_modules, f))
+      .filter(f => fse.lstatSync(f).isSymbolicLink())
+      .forEach(f => {
+        Helpers.log(`Deleting link  node_modules/${path.basename(f)}`);
+        Helpers.remove(f);
+      });
+    Helpers.log(`Reseting symbolic links from node_mouels.. DONE `);
+  }
+
   //#region @backend
   public reset(this: Project, showMsg = true) {
+
 
     this.quickFixes.removeUncessesaryFiles();
 
@@ -277,6 +292,7 @@ export abstract class FolderProject {
       Helpers.remove(`${this.location}/browser-*`);
       Helpers.remove(`${this.location}/dist`);
     }
+    this.clearNodeModulesFromLinks();
     this.quickFixes.missingSourceFolders()
   }
   //#endregion
