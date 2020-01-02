@@ -16,6 +16,11 @@ import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
 
+const outFolders = [
+  config.folder.dist,
+  config.folder.bundle,
+]
+
 export abstract class TnpProject {
 
   public type: Models.libs.LibType;
@@ -50,12 +55,49 @@ export abstract class TnpProject {
   }
 
 
-
   public applyLinkedPorjects(this: Project) {
     //#region @backendFunc
     this.linkedProjects.forEach(p => {
       const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
-      Helpers.createSymLink(path.join(p.location, sourceFolder), path.join(this.location, sourceFolder, `tmp-${p.name}`));
+      const folderInSource = `tmp-${p.name}`;
+      Helpers.createSymLink(
+        path.join(p.location, sourceFolder),
+        path.join(this.location, sourceFolder, folderInSource));
+
+      outFolders.forEach(outFolder => {
+
+        if (outFolder === config.folder.dist) {
+          // handle "package" in node_modules
+          const compiletFolderInDist = path.join(this.location, outFolder, folderInSource);
+          const linkFromDistInsideNodeModules = path.join(this.location, config.folder.node_modules, p.name);
+          if (!fse.existsSync(compiletFolderInDist)) {
+            Helpers.mkdirp(compiletFolderInDist)
+          }
+          Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
+          Helpers.createSymLink(
+            compiletFolderInDist,
+            linkFromDistInsideNodeModules
+          );
+        }
+
+
+        // handle "package/browser" in node_modules
+        const compiletFolderInDistForBrowser = path.join(
+          this.location, outFolder, config.folder.browser, folderInSource
+        );
+        if (!fse.existsSync(compiletFolderInDistForBrowser)) {
+          Helpers.mkdirp(compiletFolderInDistForBrowser)
+        }
+        const linkFromDistInsideNodeModulesForBrowser = path.join(
+          this.location, outFolder, folderInSource, config.folder.browser
+        );
+        Helpers.removeFileIfExists(linkFromDistInsideNodeModulesForBrowser);
+        Helpers.createSymLink(
+          compiletFolderInDistForBrowser,
+          linkFromDistInsideNodeModulesForBrowser
+        );
+      });
+
     });
     //#endregion
   }
