@@ -16,8 +16,8 @@ import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { Project } from '../../../index';
 import { FilesJoinActions } from './files-join-actions.backend';
-import { HelpersMerge } from './merge-helpers.backend';
-import { relative } from 'path';
+import { HelpersMerge } from 'tnp-helpers';
+
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;

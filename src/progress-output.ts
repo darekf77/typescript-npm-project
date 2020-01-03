@@ -74,3 +74,5 @@ export class PROGRESS_DATA implements IPROGRESS_DATA {
 
 
 }
+
+ENV.PROGRESS_DATA = PROGRESS_DATA;

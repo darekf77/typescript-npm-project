@@ -8,7 +8,8 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
-import { BaselineSiteJoin, HelpersMerge } from '../../compilers/baseline-site-join';
+import { BaselineSiteJoin } from '../../compilers/baseline-site-join';
+import { HelpersMerge } from "tnp-helpers";
 import { FeatureForProject } from '../../abstract';
 
 interface VSCodeSettings {

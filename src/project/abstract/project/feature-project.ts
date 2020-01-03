@@ -8,7 +8,7 @@ import {
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter
 } from '../../features';
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, OutputCodeModifier } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 //#endregion
 import * as _ from 'lodash';
@@ -67,6 +67,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public sourceModifier: SourceModifier;
+  //#endregion
+
+  //#region @backend
+  public outputCodeModifier: OutputCodeModifier;
   //#endregion
 
   //#region @backend

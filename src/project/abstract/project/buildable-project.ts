@@ -188,6 +188,15 @@ export abstract class BuildableProject {
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
+      // if (this.linkedProjects.length > 0) {
+      //   const taskOutputModifer = `Output modifer for linkableProjects`
+      //   if (buildOptions.watch) {
+      //     await this.outputCodeModifier.startAndWatch(taskOutputModifer)
+      //   } else {
+      //     await this.outputCodeModifier.start(taskOutputModifer)
+      //   }
+      // }
+
     }
   }
   //#endregion

@@ -7,7 +7,7 @@ import * as watch from 'watch'
 
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from '../../../../index';
-import { HelpersMerge } from '../merge-helpers.backend';
+import { HelpersMerge } from 'tnp-helpers';
 import { config } from '../../../../config';
 import { Project } from '../../../index';
 

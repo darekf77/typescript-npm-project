@@ -28,7 +28,7 @@ import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
 import { PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks, TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory, FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess } from '../../features';
-import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
+import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 //#endregion
 
@@ -331,6 +331,7 @@ export class Project {
     this.recreate = new FilesRecreator(this);
     this.filesFactory = new FilesFactory(this);
     this.sourceModifier = new SourceModifier(this);
+    this.outputCodeModifier = new OutputCodeModifier(this);
     this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
     this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
     if (!this.isStandaloneProject) {

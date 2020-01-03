@@ -1,6 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
+import { config } from './config';
 // import glob = require('glob')
 import scriptsFnArr from './scripts/index';
 
@@ -10,7 +11,7 @@ import chalk from 'chalk';
 import { Project } from './project';
 // import { Ora } from 'ora';
 
-import { config } from './config';
+
 // import { ConsoleUi } from './console-ui';
 import { $LAST } from './scripts/DB';
 import { TnpDB } from 'tnp-db';

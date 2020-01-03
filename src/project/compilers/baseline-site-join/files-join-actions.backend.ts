@@ -9,7 +9,6 @@ import * as watch from 'watch'
 import { SourceModifier } from '../source-modifier';
 
 import { BaselineSiteJoin } from './baseline-site-join.backend';
-import { HelpersMerge } from './merge-helpers.backend';
 import { config } from '../../../config';
 import { Helpers } from '../../../index';
 import {
