@@ -17,8 +17,7 @@ export function optionsOutputCodeModifer(project: Project): IncCompiler.Models.B
 
   if (project.isStandaloneProject) {
     folderPath = [
-      path.join(project.location, config.folder.dist),
-      path.join(project.location, config.folder.bundle),
+      path.join(project.location, config.folder.dist)
     ]
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
@@ -76,13 +75,15 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
     return input;
   }
 
-  modifyFileImportExportRequires(relativeFilePath: string, modifiedFiles: Models.other.ModifiedFiles) {
-    const absolutePath = path.join(this.project.location, relativeFilePath);
+  modifyFileImportExportRequires(relativeFilePath: string, modifiedFiles?: Models.other.ModifiedFiles) {
+    let absolutePath = path.join(this.project.location, relativeFilePath);
     let input = Helpers.readFile(absolutePath);
-    this.project.linkedProjects.forEach(linkedProject => {
-      input = this.replaceFor(input, linkedProject, relativeFilePath, true);
-      input = this.replaceFor(input, linkedProject, relativeFilePath, false);
-    });
+    // this.project.linkedProjects.forEach(linkedProject => {
+    //   input = this.replaceFor(input, linkedProject, relativeFilePath, true);
+    //   input = this.replaceFor(input, linkedProject, relativeFilePath, false);
+    // });
+    // @LAST
+    absolutePath = absolutePath.replace('/dist/', '/dist2/')
     Helpers.writeFile(absolutePath, input);
   }
 
@@ -110,6 +111,30 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
         Helpers.info(`modyfing ${f}`)
         this.modifyFileImportExportRequires(f, modifiedFiles)
       })
+    Helpers.info('MODIFY DONE!')
+
+    // await Helpers.workerCalculateArray(relativePathes, async () => {
+    //   let { contextClass, n, dataChunk }:
+    //     { contextClass: OutputCodeModifier; n: number; dataChunk: string[] } = global as any;
+    //   for (let index = 0; index < dataChunk.length; index++) {
+    //     const f = dataChunk[index];
+    //     contextClass.modifyFileImportExportRequires(f);
+    //     console.log(`worker (${n}) done job for ${f}`);
+    //   }
+    // }, {
+    //   globals: {
+    //     contextClass: this
+    //   },
+    //   maxesForWorkes: {
+    //     1: 5,
+    //     2: 10,
+    //     3: 15
+    //   }
+    // });
+    // .forEach(f => {
+    //   Helpers.info(`modyfing ${f}`)
+    //   this.modifyFileImportExportRequires(f, modifiedFiles)
+    // })
     // console.log('this.project.location: ' + this.project.location)
     // Helpers.log(`relativePathes: \n${relativePathes.join('\n')}`);
 

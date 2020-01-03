@@ -16,10 +16,7 @@ import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
 
-const outFolders = [
-  config.folder.dist,
-  config.folder.bundle,
-]
+
 
 export abstract class TnpProject {
 
@@ -67,6 +64,9 @@ export abstract class TnpProject {
         path.join(p.location, sourceFolder),
         path.join(this.location, sourceFolder, folderInSource));
 
+      const outFolders = [
+        config.folder.dist
+      ]
       outFolders.forEach(outFolder => {
 
         if (outFolder === config.folder.dist) {
