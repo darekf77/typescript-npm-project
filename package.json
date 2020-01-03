@@ -16,8 +16,7 @@
         "sharp": "0.23.3",
         "@types/sharp": "0.23.1",
         "svg-png-converter": "0.0.9",
-        "ng2-rest-swagger-generator": "6.0.4",
-        "wait.for": "0.6.6"
+        "ng2-rest-swagger-generator": "6.0.4"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -118,8 +117,6 @@
         ],
         "common": {
           "@types/node": "9.3.0",
-          "@types/q": "^1.0.3",
-          "q": "^1.5.1",
           "morphi": "3.0.8",
           "gulp": "^3.9.1",
           "ng2-logger": "3.0.11",
@@ -127,8 +124,14 @@
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",
           "randomcolor": "^0.5.3",
-          "ts-loader": "^2.3.1",
-          "typescript-class-helpers": "1.0.3",
+          "promises": {
+            "@types/q": "^1.0.3",
+            "q": "^1.5.1",
+            "wait.for": "0.6.6"
+          },
+          "multithread": {
+            "task.js": "^0.1.5"
+          },
           "date": {
             "dateformat": "^3.0.3",
             "@types/dateformat": "^1.0.1",
@@ -185,6 +188,8 @@
           },
           "typescript": {
             "reflect-metadata": "^0.1.10",
+            "ts-loader": "^2.3.1",
+            "typescript-class-helpers": "1.0.3",
             "tslib": "^1.8.1",
             "ts-node": "^7.0.1",
             "typescript": "2.6.2",
@@ -589,6 +594,7 @@
     "static-columns": "1.0.4",
     "svg-png-converter": "0.0.9",
     "systeminformation": "^3.45.7",
+    "task.js": "^0.1.5",
     "ts-loader": "^2.3.1",
     "ts-node": "~8.3.0",
     "tsickle": "^0.26.0",
