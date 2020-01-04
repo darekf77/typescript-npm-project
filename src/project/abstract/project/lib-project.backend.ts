@@ -39,34 +39,45 @@ export abstract class LibProject {
   private linkedProjectsCache: Project[];
 
   get linkedProjects(this: Project): Project[] {
-    const allProjectsToLink = [...this.linkedProjectsForProject];
-    // const toCheck = [...allProjectsToLink];
-    // while (toCheck.length > 0) {
+    if (!_.isUndefined(this.linkedProjectsCache)) {
+      // Helpers.info(`accesing this.linkedProjectsCache read for ${this.name}`)
+      return this.linkedProjectsCache;
+    }
+    const allProjectsToLink = [...this.linkedProjectsOnlyForThisProject];
+    const toCheck = [...allProjectsToLink];
+    while (toCheck.length > 0) {
+      const first = toCheck.shift();
+      // console.log('first', first.name)
+      if (first.location === this.location) {
+        continue;
+      }
+      // console.log('checking', first.name)
+      first.linkedProjectsOnlyForThisProject
+        .filter(c => first.location !== c.location && !toCheck.includes(c) && !allProjectsToLink.includes(c))
+        .forEach(c => {
+          // console.log('adding child', c.name)
+          allProjectsToLink.push(c);
+          toCheck.push(c);
+        });
+    }
 
-    //   const first = toCheck.shift();
-    //   if (first.location === this.location) {
-    //     continue;
-    //   }
-    //   console.log('checking', first.name)
-    //   first.linkedProjectsForProject.forEach(c => {
-    //     if (!allProjectsToLink.includes(c)) {
-    //       allProjectsToLink.push(c);
-    //     }
-    //     if (!toCheck.includes(c) && first.location !== c.location) {
-    //       toCheck.push(c);
-    //     }
-    //   });
-    // }
-
+    if (_.isUndefined(this.linkedProjectsCache)) {
+      // Helpers.info(`ready this.linkedProjectsCache read for ${this.name}`)
+      this.linkedProjectsCache = allProjectsToLink;
+    }
     return allProjectsToLink;
   }
 
-  private get linkedProjectsForProject(this: Project): Project[] {
+  private static allProjectsFromDBCache: Project[];
 
-    if (!_.isUndefined(this.linkedProjectsCache)) {
-      return this.linkedProjectsCache;
+  private linkedProjectsCacheOnlyForThisProject: Project[];
+  private get linkedProjectsOnlyForThisProject(this: Project): Project[] {
+
+    if (!_.isUndefined(this.linkedProjectsCacheOnlyForThisProject)) {
+      // Helpers.info(`accesing this.linkedProjectsCacheOnlyForThisProject read for ${this.name}`)
+      return this.linkedProjectsCacheOnlyForThisProject;
     }
-    const db = TnpDB.InstanceSync;
+
     let projects = [this]
       .concat(this.packageJson.linkedProjects
         .map(pathOrName => {
@@ -77,15 +88,21 @@ export abstract class LibProject {
           if (!proj) {
             proj = Project.From(path.join(this.location, pathOrName))
           }
-          if (!proj) {
-            const fromALl = db.getProjects().find(({ project }) => {
-              const { name, genericName } = project;
-              return (name === pathOrName || genericName === pathOrName)
-            })
-            if (fromALl) {
-              proj = fromALl.project as any;
-            }
-          }
+          // if (!proj) {
+          //   if (typeof LibProject.allProjectsFromDBCache === 'undefined') {
+          //     const db = TnpDB.InstanceSync;
+          //     LibProject.allProjectsFromDBCache = db.getProjects().map(p => p.project);
+          //     Helpers.info(`inited LibProject.allProjectsFromDBCache `)
+          //   }
+
+          //   const founded = LibProject.allProjectsFromDBCache.find((project) => {
+          //     const { name, genericName } = project;
+          //     return (name === pathOrName || genericName === pathOrName)
+          //   })
+          //   if (founded) {
+          //     proj = founded;
+          //   }
+          // }
           if (!proj) {
             Helpers.error(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`, false, true);
           }
@@ -93,20 +110,19 @@ export abstract class LibProject {
         })
         .filter(f => !!f));
 
-    if (_.isUndefined(this.linkedProjectsCache)) {
-
-      this.linkedProjectsCache = projects;
+    if (_.isUndefined(this.linkedProjectsCacheOnlyForThisProject)) {
+      // Helpers.info(`ready this.linkedProjectsCacheOnlyForThisProject read for ${this.name}`)
+      this.linkedProjectsCacheOnlyForThisProject = projects;
     }
     return projects;
   }
 
   public applyLinkedPorjects(this: Project) {
 
-    // Helpers.log(`Linked projects:
-    // ${this.linkedProjects.map(c => `${c.name}\n`)}
+    Helpers.log(`Linking projects:
+${this.linkedProjects.map(c => c.name).join(',\n')}
 
-    // `);
-    // process.exit(0)
+    `);
 
     this.linkedProjects.forEach(p => {
       const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
