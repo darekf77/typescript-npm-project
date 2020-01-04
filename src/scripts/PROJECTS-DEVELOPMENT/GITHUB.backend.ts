@@ -10,7 +10,7 @@ const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
 const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
 const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
 const GITHUB_PROJECTS_NAMES = [
-  'tsc-npm-project',
+  'tnp',
   'tnp-helpers',
   'tnp-models',
   'tnp-db',
