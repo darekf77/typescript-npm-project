@@ -415,7 +415,7 @@
     "link:db": "ln -s `pwd`/../tnp-db/src src/tmp-tnp-db",
     "linkedProjects": "npm run link:helpers && npm run link:models && npm run link:db",
     "linkedProjectsDist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db",
-    "postinstall": "pwd > tnp-system-path.txt && npm run linkedProjects"
+    "postinstall": "pwd > tnp-system-path.txt && npm run linkedProjects && tsc && npm run linkedProjectsDist"
   },
   "main": "index.js",
   "bin": {
