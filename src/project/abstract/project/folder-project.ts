@@ -7,7 +7,6 @@ import * as inquirer from 'inquirer';
 import { config as configMorphi } from 'morphi';
 //#endregion
 import * as json5 from 'json5';
-
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
@@ -215,6 +214,7 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  //#region @backend
   private clearNodeModulesFromLinks(this: Project) {
     if (!this.isStandaloneProject) {
       return;
@@ -231,6 +231,7 @@ export abstract class FolderProject {
       });
     Helpers.log(`Reseting symbolic links from node_mouels.. DONE `);
   }
+  //#endregion
 
   //#region @backend
   public reset(this: Project, showMsg = true) {

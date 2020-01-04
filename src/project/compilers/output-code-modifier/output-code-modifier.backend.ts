@@ -5,7 +5,7 @@ import { config } from '../../../config';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { Helpers } from 'tnp-helpers';
-import { CLASS } from 'morphi/decorators';
+import { CLASS } from 'typescript-class-helpers';
 
 /**
  * QUICK_FIX solution for tsconfig pathes that are not resolve
