@@ -9,6 +9,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { BuildProcess } from '../../features';
 import { Morphi } from 'morphi';
+import { TnpDB } from 'tnp-db';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -16,8 +17,6 @@ import { Morphi } from 'morphi';
  *  - isomorphic-lib
  *  - angular-lib
  */
-//#endregion
-
 export abstract class LibProject {
 
 
@@ -35,6 +34,135 @@ export abstract class LibProject {
   }
 
   //#region @backend
+
+
+  private linkedProjectsCache: Project[];
+
+  get linkedProjects(this: Project): Project[] {
+    const allProjectsToLink = [...this.linkedProjectsForProject];
+    // const toCheck = [...allProjectsToLink];
+    // while (toCheck.length > 0) {
+
+    //   const first = toCheck.shift();
+    //   if (first.location === this.location) {
+    //     continue;
+    //   }
+    //   console.log('checking', first.name)
+    //   first.linkedProjectsForProject.forEach(c => {
+    //     if (!allProjectsToLink.includes(c)) {
+    //       allProjectsToLink.push(c);
+    //     }
+    //     if (!toCheck.includes(c) && first.location !== c.location) {
+    //       toCheck.push(c);
+    //     }
+    //   });
+    // }
+
+    return allProjectsToLink;
+  }
+
+  private get linkedProjectsForProject(this: Project): Project[] {
+
+    if (!_.isUndefined(this.linkedProjectsCache)) {
+      return this.linkedProjectsCache;
+    }
+    const db = TnpDB.InstanceSync;
+    let projects = [this]
+      .concat(this.packageJson.linkedProjects
+        .map(pathOrName => {
+          let proj: Project;
+          if (path.isAbsolute(pathOrName)) {
+            proj = Project.From(pathOrName);
+          }
+          if (!proj) {
+            proj = Project.From(path.join(this.location, pathOrName))
+          }
+          if (!proj) {
+            const fromALl = db.getProjects().find(({ project }) => {
+              const { name, genericName } = project;
+              return (name === pathOrName || genericName === pathOrName)
+            })
+            if (fromALl) {
+              proj = fromALl.project as any;
+            }
+          }
+          if (!proj) {
+            Helpers.error(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`, false, true);
+          }
+          return proj;
+        })
+        .filter(f => !!f));
+
+    if (_.isUndefined(this.linkedProjectsCache)) {
+
+      this.linkedProjectsCache = projects;
+    }
+    return projects;
+  }
+
+  public applyLinkedPorjects(this: Project) {
+
+    // Helpers.log(`Linked projects:
+    // ${this.linkedProjects.map(c => `${c.name}\n`)}
+
+    // `);
+    // process.exit(0)
+
+    this.linkedProjects.forEach(p => {
+      const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
+      const folderInSource = `tmp-${p.name}`;
+
+      Helpers.createSymLink(
+        path.join(p.location, sourceFolder),
+        path.join(this.location, sourceFolder, folderInSource));
+
+      const outFolders = [
+        config.folder.dist
+      ]
+      outFolders.forEach(outFolder => {
+
+        if (outFolder === config.folder.dist) {
+          // handle "package" in node_modules
+          const compiletFolderInDist = path.join(this.location, outFolder, folderInSource);
+          const linkFromDistInsideNodeModules = path.join(this.location, config.folder.node_modules, p.name);
+          if (!fse.existsSync(compiletFolderInDist)) {
+            Helpers.mkdirp(compiletFolderInDist)
+          }
+          // Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
+          if (!fse.existsSync(linkFromDistInsideNodeModules)) {
+            Helpers.createSymLink(
+              compiletFolderInDist,
+              linkFromDistInsideNodeModules
+            );
+          }
+
+        }
+
+
+        // handle "package/browser" in node_modules
+        const compiletFolderInDistForBrowser = path.join(
+          this.location, outFolder, config.folder.browser, folderInSource
+        );
+        if (!fse.existsSync(compiletFolderInDistForBrowser)) {
+          Helpers.mkdirp(compiletFolderInDistForBrowser)
+        }
+        const linkFromDistInsideNodeModulesForBrowser = path.join(
+          this.location, outFolder, folderInSource, config.folder.browser
+        );
+        // Helpers.removeFileIfExists(linkFromDistInsideNodeModulesForBrowser);
+        if (!fse.existsSync(linkFromDistInsideNodeModulesForBrowser)) {
+          Helpers.createSymLink(
+            compiletFolderInDistForBrowser,
+            linkFromDistInsideNodeModulesForBrowser
+          );
+        }
+
+      });
+
+    });
+
+  }
+
 
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string, renameFileTo?: string }[] {
     const files = [];
@@ -326,6 +454,8 @@ export * from './browser';
 }
 
 // export interface LibProject extends Partial<Project> { }
+
+//#region @backend
 export function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
   if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
     Helpers.log(`[release - ${name}][updateChildrenVersion] Alredy update ${project.genericName}`)
@@ -344,3 +474,4 @@ export function updateChildrenVersion(project: Project, newVersion, name, update
   Helpers.log(`[release - ${name}][updateChildrenVersion] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
   project.children.forEach(childProject => updateChildrenVersion(childProject, newVersion, name, updatedProjectw));
 }
+//#endregion

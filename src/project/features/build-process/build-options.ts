@@ -8,7 +8,9 @@ import * as _ from 'lodash';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('BuildOptions')
 export class BuildOptions implements Models.dev.IBuildOptions {
 
   public static PropsToOmmitWhenStringify = ['copyto', 'forClient'];
