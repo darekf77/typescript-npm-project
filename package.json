@@ -117,7 +117,7 @@
         ],
         "common": {
           "@types/node": "9.3.0",
-          "morphi": "3.0.10",
+          "morphi": "3.0.12",
           "gulp": "^3.9.1",
           "ng2-logger": "3.0.11",
           "ng2-rest": "10.0.3",
@@ -407,10 +407,14 @@
   "name": "tnp",
   "version": "0.0.3",
   "scripts": {
+    "link:dist:helpers": "ln -s `pwd`/dist/tmp-tnp-helpers node_modules/tnp-helpers",
+    "link:dist:models": "ln -s `pwd`/dist/tmp-tnp-models node_modules/tnp-models",
+    "link:dist:db": "ln -s `pwd`/dist/tmp-tnp-db node_modules/tnp-db",
     "link:helpers": "ln -s `pwd`/../tnp-helpers/src src/tmp-tnp-helpers",
     "link:models": "ln -s `pwd`/../tnp-models/src src/tmp-tnp-models",
     "link:db": "ln -s `pwd`/../tnp-db/src src/tmp-tnp-db",
     "linkedProjects": "npm run link:helpers && npm run link:models && npm run link:db",
+    "linkedProjectsDist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db",
     "postinstall": "pwd > tnp-system-path.txt && npm run linkedProjects"
   },
   "main": "index.js",
@@ -552,7 +556,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
-    "morphi": "3.0.10",
+    "morphi": "3.0.12",
     "ng-packagr": "^5.7.1",
     "ng2-file-upload": "^1.3.0",
     "ng2-logger": "3.0.11",
