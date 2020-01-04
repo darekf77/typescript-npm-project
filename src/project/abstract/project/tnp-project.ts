@@ -22,8 +22,12 @@ export abstract class TnpProject {
 
   public type: Models.libs.LibType;
 
+  private linkedProjectsCache: Project[];
   get linkedProjects(this: Project): Project[] {
     //#region @backendFunc
+    if (!_.isUndefined(this.linkedProjectsCache)) {
+      return this.linkedProjectsCache;
+    }
     const db = TnpDB.InstanceSync;
     const projects = this.packageJson.linkedProjects.map(pathOrName => {
       let proj: Project;
@@ -39,7 +43,7 @@ export abstract class TnpProject {
           return (name === pathOrName || genericName === pathOrName)
         })
         if (fromALl) {
-          proj = fromALl.project;
+          proj = fromALl.project as any;
         }
       }
       if (!proj) {
@@ -47,6 +51,9 @@ export abstract class TnpProject {
       }
       return proj;
     }).filter(f => !!f);
+    if (_.isUndefined(this.linkedProjectsCache)) {
+      this.linkedProjectsCache = projects;
+    }
     return projects;
     //#endregion
   }

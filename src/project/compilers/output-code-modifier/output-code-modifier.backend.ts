@@ -30,6 +30,7 @@ export function optionsOutputCodeModifer(project: Project): IncCompiler.Models.B
 @CLASS.NAME('OutputCodeModifier')
 export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
 
+
   constructor(public project: Project) {
     super(project, optionsOutputCodeModifer(project));
   }
@@ -62,7 +63,7 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
     }
     // console.log(linkedProject.name)
     const name = linkedProject.name + (browser ? '/browser' : '')
-    Helpers.log(`Looking for "${name}"`)
+    // Helpers.log(`Looking for "${name}"`)
     const regexSource = `(\\"|\\')${
       Helpers.escapeStringForRegEx(name)
       }(\\"|\\')`;
@@ -70,20 +71,18 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
     input = Helpers.tsCodeModifier.replace(
       input,
       regex,
-      `'${beforePath}tmp-${linkedProject.name}${(browser ? '/browser' : '')}'`)
-    Helpers.info(`[${CLASS.getName(OutputCodeModifier)}]: ${relativeFilePath}`)
+      `'${beforePath}tmp-${linkedProject.name}'`)
+    // Helpers.info(`[${CLASS.getName(OutputCodeModifier)}]: ${relativeFilePath}`)
     return input;
   }
 
   modifyFileImportExportRequires(relativeFilePath: string, modifiedFiles?: Models.other.ModifiedFiles) {
     let absolutePath = path.join(this.project.location, relativeFilePath);
     let input = Helpers.readFile(absolutePath);
-    // this.project.linkedProjects.forEach(linkedProject => {
-    //   input = this.replaceFor(input, linkedProject, relativeFilePath, true);
-    //   input = this.replaceFor(input, linkedProject, relativeFilePath, false);
-    // });
-    // @LAST
-    absolutePath = absolutePath.replace('/dist/', '/dist2/')
+    this.project.linkedProjects.forEach(linkedProject => {
+      input = this.replaceFor(input, linkedProject, relativeFilePath, true);
+      input = this.replaceFor(input, linkedProject, relativeFilePath, false);
+    });
     Helpers.writeFile(absolutePath, input);
   }
 
@@ -96,49 +95,46 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
 
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     // Helpers.log(`relativePathToProject: ${relativePathToProject}`)
-    this.modifyFileImportExportRequires(relativePathToProject, modifiedFiles);
+    if (relativePathToProject.endsWith('.js')) {
+      this.modifyFileImportExportRequires(relativePathToProject, modifiedFiles);
+    }
     return modifiedFiles;
   }
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
-    Helpers.info(`Inside sync action`)
+    // Helpers.info(`Inside sync action`)
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     const projLocaiton = this.project.location;
     const relativePathes = absoluteFilePathes
       .filter(f => f.endsWith('.js'))
       .map(f => f.replace(`${projLocaiton}/`, ''))
       .forEach(f => {
-        Helpers.info(`modyfing ${f}`)
+        // Helpers.info(`modyfing ${f}`)
         this.modifyFileImportExportRequires(f, modifiedFiles)
       })
-    Helpers.info('MODIFY DONE!')
-
-    // await Helpers.workerCalculateArray(relativePathes, async () => {
-    //   let { contextClass, n, dataChunk }:
-    //     { contextClass: OutputCodeModifier; n: number; dataChunk: string[] } = global as any;
-    //   for (let index = 0; index < dataChunk.length; index++) {
-    //     const f = dataChunk[index];
-    //     contextClass.modifyFileImportExportRequires(f);
-    //     console.log(`worker (${n}) done job for ${f}`);
-    //   }
-    // }, {
-    //   globals: {
-    //     contextClass: this
-    //   },
-    //   maxesForWorkes: {
-    //     1: 5,
-    //     2: 10,
-    //     3: 15
-    //   }
-    // });
-    // .forEach(f => {
-    //   Helpers.info(`modyfing ${f}`)
-    //   this.modifyFileImportExportRequires(f, modifiedFiles)
-    // })
-    // console.log('this.project.location: ' + this.project.location)
-    // Helpers.log(`relativePathes: \n${relativePathes.join('\n')}`);
-
+    // Helpers.info('MODIFY DONE!')
     return modifiedFiles;
+  }
+
+  copyBundleCompiledLinkedCodeToNodeModules() {
+    this.project.linkedProjects.forEach(p => {
+      const dest = path.join(this.project.location, config.folder.node_modules, p.name);
+      const source = path.join(this.project.location, config.folder.bundle, `tmp-${p.name}`);
+      const sourceBrowser = path.join(this.project.location, config.folder.bundle, config.folder.browser, `tmp-${p.name}`);
+      const destBrowser = path.join(this.project.location, config.folder.node_modules, p.name, config.folder.browser);
+      if (this.project.isTnp) {
+        Helpers.copy(source, dest);
+        Helpers.remove(source)
+        Helpers.removeFolderIfExists(destBrowser);
+        Helpers.copy(sourceBrowser, destBrowser);
+      } else {
+        Helpers.removeFolderIfExists(source);
+        Helpers.removeFolderIfExists(sourceBrowser);
+      }
+
+
+
+    })
   }
 
 }

@@ -190,10 +190,14 @@ export abstract class BuildableProject {
       this.copyManager.initCopyingOnBuildFinish(buildOptions);
       if (this.linkedProjects.length > 0) {
         const taskOutputModifer = `Output modifer for linkableProjects`
-        if (buildOptions.watch) {
-          await this.outputCodeModifier.startAndWatch(taskOutputModifer)
+        if (buildOptions.outDir === 'bundle') {
+          this.outputCodeModifier.copyBundleCompiledLinkedCodeToNodeModules();
         } else {
-          await this.outputCodeModifier.start(taskOutputModifer)
+          if (buildOptions.watch) {
+            await this.outputCodeModifier.startAndWatch(taskOutputModifer)
+          } else {
+            await this.outputCodeModifier.start(taskOutputModifer)
+          }
         }
       }
 
