@@ -323,7 +323,10 @@ Thumbs.db
           return true;
         })
         .join('\n').concat('\n') + `
+${this.project.isTnp ? '!tsconfig*' : ''}
+${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
+
 
 ${this.project.projectLinkedFiles().map(({ relativePath }) => `/${relativePath.replace(/^\//, '')}`).join('\n')}
 

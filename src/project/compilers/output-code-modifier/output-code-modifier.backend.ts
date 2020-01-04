@@ -117,24 +117,21 @@ export class OutputCodeModifier extends FeatureCompilerForProject<Models.other.M
   }
 
   copyBundleCompiledLinkedCodeToNodeModules() {
-    this.project.linkedProjects.forEach(p => {
-      const dest = path.join(this.project.location, config.folder.node_modules, p.name);
-      const source = path.join(this.project.location, config.folder.bundle, `tmp-${p.name}`);
-      const sourceBrowser = path.join(this.project.location, config.folder.bundle, config.folder.browser, `tmp-${p.name}`);
-      const destBrowser = path.join(this.project.location, config.folder.node_modules, p.name, config.folder.browser);
-      if (this.project.isTnp) {
-        Helpers.copy(source, dest);
-        Helpers.remove(source)
-        Helpers.removeFolderIfExists(destBrowser);
-        Helpers.copy(sourceBrowser, destBrowser);
-      } else {
-        Helpers.removeFolderIfExists(source);
-        Helpers.removeFolderIfExists(sourceBrowser);
-      }
-
-
-
-    })
+    // this.project.linkedProjects.forEach(p => {
+    //   const dest = path.join(this.project.location, config.folder.node_modules, p.name);
+    //   const source = path.join(this.project.location, config.folder.bundle, `tmp-${p.name}`);
+    //   const sourceBrowser = path.join(this.project.location, config.folder.bundle, config.folder.browser, `tmp-${p.name}`);
+    //   const destBrowser = path.join(this.project.location, config.folder.node_modules, p.name, config.folder.browser);
+    //   if (this.project.isTnp) {
+    //     Helpers.copy(source, dest);
+    //     Helpers.remove(source)
+    //     Helpers.removeFolderIfExists(destBrowser);
+    //     Helpers.copy(sourceBrowser, destBrowser);
+    //   } else {
+    //     Helpers.removeFolderIfExists(source);
+    //     Helpers.removeFolderIfExists(sourceBrowser);
+    //   }
+    // })
   }
 
 }

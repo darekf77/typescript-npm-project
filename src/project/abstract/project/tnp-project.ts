@@ -83,11 +83,14 @@ export abstract class TnpProject {
           if (!fse.existsSync(compiletFolderInDist)) {
             Helpers.mkdirp(compiletFolderInDist)
           }
-          Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
-          Helpers.createSymLink(
-            compiletFolderInDist,
-            linkFromDistInsideNodeModules
-          );
+          // Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
+          if (!fse.existsSync(linkFromDistInsideNodeModules)) {
+            Helpers.createSymLink(
+              compiletFolderInDist,
+              linkFromDistInsideNodeModules
+            );
+          }
+
         }
 
 
@@ -101,11 +104,14 @@ export abstract class TnpProject {
         const linkFromDistInsideNodeModulesForBrowser = path.join(
           this.location, outFolder, folderInSource, config.folder.browser
         );
-        Helpers.removeFileIfExists(linkFromDistInsideNodeModulesForBrowser);
-        Helpers.createSymLink(
-          compiletFolderInDistForBrowser,
-          linkFromDistInsideNodeModulesForBrowser
-        );
+        // Helpers.removeFileIfExists(linkFromDistInsideNodeModulesForBrowser);
+        if (!fse.existsSync(linkFromDistInsideNodeModulesForBrowser)) {
+          Helpers.createSymLink(
+            compiletFolderInDistForBrowser,
+            linkFromDistInsideNodeModulesForBrowser
+          );
+        }
+
       });
 
     });
