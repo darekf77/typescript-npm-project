@@ -92,7 +92,7 @@ export class PackageJSON
       return;
     }
     if (saveAtLoad) {
-      Helpers.log(`Saving fixed package.json structure`);
+      Helpers.log(`Saving fixed package.json structure in ${location}`);
       pkgJson.writeToDisc()
     }
     return pkgJson;

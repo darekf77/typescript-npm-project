@@ -54,12 +54,14 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn?: string): Promise<Project> {
-    let version: 'v1' | 'v2' = 'v1';
+  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn: string, version: 'v1' | 'v2' = 'v1'): Promise<Project> {
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
       version = cwdProj.frameworkVersion;
     }
+
+    console.log('version', version)
+    // process.exit(0)
 
     const nameKebakCase = _.kebabCase(name)
     if (nameKebakCase !== name) {
@@ -74,8 +76,12 @@ export class ProjectFactory {
       Helpers.error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
     const baseline = basedOn ? basedOnProject : Project.by(type, version);
-    console.log('PROJECt BASELINE', baseline.location);
+    Helpers.log(`PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
+    baseline.run(`${config.frameworkName} init`).sync();
+
     const destinationPath = this.getDestinationPath(name, cwd);
+    Helpers.log(`Destination path: ${destinationPath}`);
+
     if (fse.pathExistsSync(destinationPath)) {
       Helpers.info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
     } else {
@@ -112,10 +118,6 @@ export class ProjectFactory {
     }
     const destProje = Project.From(destinationPath);
     if (destProje) {
-      if (type === 'single-file-project') {
-        destProje.recreate.vscode.settings.excludedFiles();
-        destProje.recreate.vscode.settings.colorsFromWorkspace()
-      }
       destProje.recreate.vscode.settings.excludedFiles();
       destProje.recreate.vscode.settings.colorsFromWorkspace()
       await destProje.filesStructure.init('')
@@ -141,7 +143,8 @@ export class ProjectFactory {
       Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
-    const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
+    const { basedOn, version }: { basedOn: string; version: 'v1' | 'v2'; } = require('minimist')(args.split(' '));
+
 
     if (basedOn) {
       Helpers.error(`To create workspace site use command: ${config.frameworkName} new: site name - of - workspace - site`
@@ -149,7 +152,10 @@ export class ProjectFactory {
     }
     const type = argv[0] as any;
     const name = argv[1];
-    await this.create(type, name, cwd);
+
+    await this.create(type, name, cwd, void 0,
+      (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0
+    );
     if (exit) {
       process.exit(0)
     }

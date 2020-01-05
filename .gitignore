@@ -52,9 +52,11 @@ Thumbs.db
 /bin/db.json
 /bin/db-for-tests.json
 /webpack.backend-bundle-build.js
+/src/tmp-tnp
 /src/tmp-tnp-helpers
 /src/tmp-tnp-models
 /src/tmp-tnp-db
+/src/tmp-tnp-ui
 
 !tsconfig*
 webpack.*

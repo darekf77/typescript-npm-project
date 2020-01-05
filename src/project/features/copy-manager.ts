@@ -299,7 +299,7 @@ export class CopyManager extends FeatureForProject {
   // private __firstTimeWatchCopyTOFiles = [];
   private copyToProjectsOnFinish(event?: Models.other.FileEvent,
     specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
-    // console.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
+    // Helpers.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
     // prevent first unnecesary copy after watch
     // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
     //   this.__firstTimeWatchCopyTOFiles.push(specificFile)
@@ -309,7 +309,7 @@ export class CopyManager extends FeatureForProject {
     const outDir = this.buildOptions.outDir;
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       (this.buildOptions.copyto as any[]).forEach((p: Project) => {
-        // console.log(`Copy to ${p.name}`)
+        // Helpers.log(`Copy to ${p.name}`)
         this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
       })
     }
@@ -319,13 +319,11 @@ export class CopyManager extends FeatureForProject {
   private watchAndCopyToProjectOnFinish() {
     const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
 
-    // console.log('watching   folder for as copy source !! ', monitorDir)
+    // Helpers.log(`watching folder for as copy source !! ${monitorDir}`)
 
     if (fse.existsSync(monitorDir)) {
       watch(monitorDir, {
-        followSymlinks: false,
-        interval: process.platform === 'darwin' ? void 0 : 500,
-        binaryInterval: process.platform === 'darwin' ? void 0 : 500,
+        followSymlinks: false
       }).on('change', (f) => {
         if (_.isString(f)) {
           f = f.replace(monitorDir, '') as any

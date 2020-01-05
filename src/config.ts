@@ -60,6 +60,7 @@ const tempFolders = {
   node_modules: 'node_modules',
   client: 'client',
   tnp_tests_context: 'tmp-tests-context',
+  tmpPackage: 'tmp-package'
 }
 
 const folder = {

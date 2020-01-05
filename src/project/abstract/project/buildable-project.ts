@@ -86,11 +86,14 @@ export abstract class BuildableProject {
     // clearConsole()
     const db = await TnpDB.Instance;
     if (!global.tnpNonInteractive) {
-      const existedProject = db
+      const existedProjects = db
         .getProjects()
         .map(p => p.project)
         .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
         .filter(p => p.location !== this.location)
+
+      _.sortBy(existedProjects, ['genericName']);
+      // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
 
       if (global.tnpNonInteractive) {
         this.buildOptions.copyto = [];
@@ -101,7 +104,7 @@ export abstract class BuildableProject {
               type: 'checkbox',
               name: 'projects',
               message: 'Select projects where to copy bundle after finish: ',
-              choices: existedProject
+              choices: existedProjects
                 .map(c => {
                   return { value: c.location, name: c.genericName }
                 })
@@ -188,18 +191,18 @@ export abstract class BuildableProject {
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       this.copyManager.initCopyingOnBuildFinish(buildOptions);
-      if (this.linkedProjects.length > 0) {
-        const taskOutputModifer = `Output modifer for linkableProjects`
-        if (buildOptions.outDir === 'bundle') {
-          this.outputCodeModifier.copyBundleCompiledLinkedCodeToNodeModules();
-        } else {
-          if (buildOptions.watch) {
-            await this.outputCodeModifier.startAndWatch(taskOutputModifer)
-          } else {
-            await this.outputCodeModifier.start(taskOutputModifer)
-          }
-        }
-      }
+      // if (this.linkedProjects.length > 0) {
+      //   const taskOutputModifer = `Output modifer for linkableProjects`
+      //   if (buildOptions.outDir === 'bundle') {
+      //     this.outputCodeModifier.copyBundleCompiledLinkedCodeToNodeModules();
+      //   } else {
+      //     if (buildOptions.watch) {
+      //       await this.outputCodeModifier.startAndWatch(taskOutputModifer)
+      //     } else {
+      //       await this.outputCodeModifier.start(taskOutputModifer)
+      //     }
+      //   }
+      // }
 
     }
   }

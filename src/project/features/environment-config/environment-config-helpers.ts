@@ -177,15 +177,16 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   }
   workspaceConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
 
-  workspaceConfig.currentProjectTsConfigPathes = project.linkedProjects.map(({ name }) => {
-    return `"${name}":["tmp-${name}"]`
-  }).join(',\n\t')
+  // TODO  maybe someday better pathes
+  // workspaceConfig.currentProjectTsConfigPathes = project.linkedProjects.map(({ name }) => {
+  //   return `\t"${name}":["./${config.folder.tmpPackage}-${name}"]`
+  // }).join(',\n')
 
-  if (currentLibProjectSourceFolder) {
-    workspaceConfig.currentProjectTsConfigPathesForBrowser = project.linkedProjects.map(({ name }) => {
-      return `"${name}/browser":["tmp-${name}"]`
-    }).join(',\n\t')
-  }
+  // if (currentLibProjectSourceFolder) {
+  //   workspaceConfig.currentProjectTsConfigPathesForBrowser = project.linkedProjects.map(({ name }) => {
+  //     return `"${name}/browser":["${config.folder.tmpPackage}-${name}"]`
+  //   }).join(',\n\t')
+  // }
 
 
   // console.log(project.linkedProjects.map(p => p.name));

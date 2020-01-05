@@ -19,7 +19,6 @@ import { TnpDB } from 'tnp-db';
  */
 export abstract class LibProject {
 
-
   get isCommandLineToolOnly(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isCommandLineToolOnly;
@@ -39,6 +38,7 @@ export abstract class LibProject {
   private linkedProjectsCache: Project[];
 
   get linkedProjects(this: Project): Project[] {
+
     if (!_.isUndefined(this.linkedProjectsCache)) {
       // Helpers.info(`accesing this.linkedProjectsCache read for ${this.name}`)
       return this.linkedProjectsCache;
@@ -68,8 +68,6 @@ export abstract class LibProject {
     return allProjectsToLink;
   }
 
-  private static allProjectsFromDBCache: Project[];
-
   private linkedProjectsCacheOnlyForThisProject: Project[];
   private get linkedProjectsOnlyForThisProject(this: Project): Project[] {
 
@@ -88,21 +86,6 @@ export abstract class LibProject {
           if (!proj) {
             proj = Project.From(path.join(this.location, pathOrName))
           }
-          // if (!proj) {
-          //   if (typeof LibProject.allProjectsFromDBCache === 'undefined') {
-          //     const db = TnpDB.InstanceSync;
-          //     LibProject.allProjectsFromDBCache = db.getProjects().map(p => p.project);
-          //     Helpers.info(`inited LibProject.allProjectsFromDBCache `)
-          //   }
-
-          //   const founded = LibProject.allProjectsFromDBCache.find((project) => {
-          //     const { name, genericName } = project;
-          //     return (name === pathOrName || genericName === pathOrName)
-          //   })
-          //   if (founded) {
-          //     proj = founded;
-          //   }
-          // }
           if (!proj) {
             Helpers.error(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`, false, true);
           }
@@ -118,67 +101,42 @@ export abstract class LibProject {
   }
 
   public applyLinkedPorjects(this: Project) {
+    // TODO
+    // this.linkedProjects.forEach(p => {
+    //   const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
+    //   const folderInSource = `tmp-${p.name}`;
 
-    Helpers.log(`Linking projects:
-${this.linkedProjects.map(c => c.name).join(',\n')}
+    //   Helpers.createSymLink(
+    //     path.join(p.location, sourceFolder),
+    //     path.join(this.location, sourceFolder, folderInSource));
 
-    `);
+    //   const outFolders = [
+    //     config.folder.dist
+    //   ]
+    //   outFolders.forEach(outFolder => {
 
-    this.linkedProjects.forEach(p => {
-      const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
-      const folderInSource = `tmp-${p.name}`;
+    //     if (outFolder === config.folder.dist) {
+    //       // handle "package" in node_modules
+    //       const compiletFolderInDist = path.join(this.location, outFolder, folderInSource);
+    //       const linkFromDistInsideNodeModules = path.join(this.location, config.folder.node_modules, p.name);
+    //       if (!fse.existsSync(compiletFolderInDist)) {
+    //         Helpers.mkdirp(compiletFolderInDist)
+    //       }
+    //       // Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
+    //       if (!fse.existsSync(linkFromDistInsideNodeModules)) {
+    //         Helpers.createSymLink(
+    //           compiletFolderInDist,
+    //           linkFromDistInsideNodeModules
+    //         );
+    //       }
 
-      Helpers.createSymLink(
-        path.join(p.location, sourceFolder),
-        path.join(this.location, sourceFolder, folderInSource));
+    //     }
 
-      const outFolders = [
-        config.folder.dist
-      ]
-      outFolders.forEach(outFolder => {
+    //   });
 
-        if (outFolder === config.folder.dist) {
-          // handle "package" in node_modules
-          const compiletFolderInDist = path.join(this.location, outFolder, folderInSource);
-          const linkFromDistInsideNodeModules = path.join(this.location, config.folder.node_modules, p.name);
-          if (!fse.existsSync(compiletFolderInDist)) {
-            Helpers.mkdirp(compiletFolderInDist)
-          }
-          // Helpers.removeFileIfExists(linkFromDistInsideNodeModules);
-          if (!fse.existsSync(linkFromDistInsideNodeModules)) {
-            Helpers.createSymLink(
-              compiletFolderInDist,
-              linkFromDistInsideNodeModules
-            );
-          }
-
-        }
-
-
-        // handle "package/browser" in node_modules
-        const compiletFolderInDistForBrowser = path.join(
-          this.location, outFolder, config.folder.browser, folderInSource
-        );
-        if (!fse.existsSync(compiletFolderInDistForBrowser)) {
-          Helpers.mkdirp(compiletFolderInDistForBrowser)
-        }
-        const linkFromDistInsideNodeModulesForBrowser = path.join(
-          this.location, outFolder, folderInSource, config.folder.browser
-        );
-        // Helpers.removeFileIfExists(linkFromDistInsideNodeModulesForBrowser);
-        if (!fse.existsSync(linkFromDistInsideNodeModulesForBrowser)) {
-          Helpers.createSymLink(
-            compiletFolderInDistForBrowser,
-            linkFromDistInsideNodeModulesForBrowser
-          );
-        }
-
-      });
-
-    });
+    // });
 
   }
-
 
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string, renameFileTo?: string }[] {
     const files = [];
@@ -342,22 +300,22 @@ ${this.linkedProjects.map(c => c.name).join(',\n')}
 
         if (this.frameworkVersion === 'v1') {
           Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-          "use strict";
-          Object.defineProperty(exports, '__esModule', { value: true });
-          var tslib_1 = require('tslib');
-          tslib_1.__exportStar(require('./browser'), exports);
-                  `.trim());
+                "use strict";
+                Object.defineProperty(exports, '__esModule', { value: true });
+                var tslib_1 = require('tslib');
+                tslib_1.__exportStar(require('./browser'), exports);
+                        `.trim());
         } else {
           Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-          export * from './browser';
-        `.trim());
+                export * from './browser';
+              `.trim());
         }
 
 
 
         Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.d.ts')}`, `
-export * from './browser';
-        `.trim());
+      export * from './browser';
+              `.trim());
       }
       this.compileES5version();
 
