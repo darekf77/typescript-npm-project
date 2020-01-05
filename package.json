@@ -407,15 +407,11 @@
   "name": "tnp",
   "version": "0.0.3",
   "scripts": {
-    "link:dist:helpers": "ln -s `pwd`/dist/tmp-tnp-helpers node_modules/tnp-helpers",
-    "link:dist:models": "ln -s `pwd`/dist/tmp-tnp-models node_modules/tnp-models",
-    "link:dist:db": "ln -s `pwd`/dist/tmp-tnp-db node_modules/tnp-db",
-    "link:helpers": "ln -s `pwd`/../tnp-helpers/src src/tmp-tnp-helpers",
-    "link:models": "ln -s `pwd`/../tnp-models/src src/tmp-tnp-models",
-    "link:db": "ln -s `pwd`/../tnp-db/src src/tmp-tnp-db",
-    "linkedProjects": "npm run link:helpers && npm run link:models && npm run link:db",
-    "linkedProjectsDist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db",
-    "postinstall": "pwd > tnp-system-path.txt && npm run linkedProjects && tsc && npm run linkedProjectsDist"
+    "postinstall": "pwd > tnp-system-path.txt",
+    "link:dist:helpers": "ln -sf `pwd`/../tnp-helpers/dist node_modules/tnp-helpers",
+    "link:dist:models": "ln -sf `pwd`/../tnp-models/dist node_modules/tnp-models",
+    "link:dist:db": "ln -sf `pwd`/../tnp-db/dist node_modules/tnp-db",
+    "link:dist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db"
   },
   "main": "index.js",
   "bin": {

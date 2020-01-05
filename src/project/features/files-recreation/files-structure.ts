@@ -233,7 +233,7 @@ export class FilesStructure extends FeatureForProject {
     baseline.children.forEach(c => {
       const siteChild = path.join(this.project.location, c.name);
       if (!fse.existsSync(siteChild)) {
-        ProjectFactory.Instance.create(c.type, c.name, this.project.location);
+        ProjectFactory.Instance.create(c.type, c.name, this.project.location, void 0);
         const newChild = Project.From(siteChild);
         c.packageJson.copyTo(newChild);
         Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));
