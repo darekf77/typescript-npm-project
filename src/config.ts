@@ -18,7 +18,7 @@ allowedEnvironments.forEach(s => {
 // environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
 // environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
 // console.log(`Current environment prefix: "${environmentName}"  , args: ${JSON.stringify(process.argv)}`);
-const filesNotAllowedToClen = {
+const filesNotAllowedToClean = {
   _gitignore: '.gitignore',
   _npmrc: '.npmrc',
   tslint_json: 'tslint.json',
@@ -42,7 +42,7 @@ const file = {
   manifest_webmanifest: 'manifest.webmanifest',
   publicApi_ts: 'public_api.ts',
   _babelrc: '.babelrc',
-  ...filesNotAllowedToClen
+  ...filesNotAllowedToClean
 };
 
 const tempFolders = {
@@ -168,7 +168,7 @@ export const config = {
   allowedEnvironments,
   folder,
   tempFolders,
-  filesNotAllowedToClen: Object.keys(filesNotAllowedToClen).map(key => filesNotAllowedToClen[key]) as string[],
+  filesNotAllowedToClean: Object.keys(filesNotAllowedToClean).map(key => filesNotAllowedToClean[key]) as string[],
   file,
   default: {
     cloud: {

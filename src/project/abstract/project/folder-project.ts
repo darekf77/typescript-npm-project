@@ -235,8 +235,6 @@ export abstract class FolderProject {
 
   //#region @backend
   public reset(this: Project, showMsg = true) {
-
-
     this.quickFixes.removeUncessesaryFiles();
 
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
@@ -260,10 +258,13 @@ export abstract class FolderProject {
     let gitginoredfiles = this.recreate.filesIgnoredBy.gitignore
       .map(f => f.startsWith('/') ? f.substr(1) : f)
       .filter(f => {
+        if (f.startsWith('tsconfig.') && this.isTnp) {
+          return false;
+        }
         if (f === config.folder.node_modules) {
           return false;
         }
-        if (config.filesNotAllowedToClen.includes(f)) {
+        if (config.filesNotAllowedToClean.includes(f)) {
           return false;
         }
         if (f.startsWith(config.folder.bundle) && this.isTnp) {
