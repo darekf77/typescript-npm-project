@@ -51,7 +51,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
 
   buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
 
-  const db = await TnpDB.Instance;
+  const db = await TnpDB.Instance(config.dbLocation);
   await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
 
 }

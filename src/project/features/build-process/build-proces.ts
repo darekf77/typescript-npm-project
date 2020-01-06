@@ -140,7 +140,7 @@ inside generated projects...
       }
     }
 
-    const transactions = (await (await TnpDB.Instance).transaction);
+    const transactions = (await (await TnpDB.Instance(config.dbLocation)).transaction);
     if (!this.project.isGenerated) { // REMOVE_THIS
       await transactions.updateBuildsWithCurrent(this.project as any, buildOptions, process.pid, process.ppid, true);
     }

@@ -69,71 +69,67 @@ export class TnpBundle extends FeatureForProject {
     pathTnpCompiledJS: string,
     pathTnpPackageJSONData: Models.npm.IPackageJSON) {
 
-    const workspaceLocation = project.isWorkspace ? project.location :
+    const workspaceOrStandaloneLocation = (project.isWorkspace || project.isStandaloneProject) ? project.location :
       (project.isWorkspaceChildProject ? project.parent.location : void 0);
 
-    if (!_.isString(workspaceLocation)) {
+    if (!_.isString(workspaceOrStandaloneLocation)) {
       return;
     }
 
-    if (_.isUndefined(this.notNeededReinstallationTnp[workspaceLocation])) {
-      this.notNeededReinstallationTnp[workspaceLocation] = 0;
+    if (_.isUndefined(this.notNeededReinstallationTnp[workspaceOrStandaloneLocation])) {
+      this.notNeededReinstallationTnp[workspaceOrStandaloneLocation] = 0;
     }
 
-    if (project.isStandaloneProject) {
-      return;
-    }
+
 
     if (project.isTnp) {
       return
     }
 
-    if (this.notNeededReinstallationTnp[workspaceLocation] > 2) {
+    if (this.notNeededReinstallationTnp[workspaceOrStandaloneLocation] > 2) {
       Helpers.log('[TNP helper] reinstall not needed')
       return;
     }
-    if (!project.isStandaloneProject) {
 
 
-      const destCompiledJs = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle)
+
+    const destCompiledJs = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, config.file.tnpBundle)
 
 
-      const destPackageJSON = path.join(workspaceLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
+    const destPackageJSON = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
 
 
-      Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
-        filter: (src: string, dest: string) => {
-          return !src.endsWith('/dist/bin') &&
-            !src.endsWith('/bin') &&
-            !/.*node_modules.*/g.test(src);
-        }
-      });
-
-      fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
-        encoding: 'utf8',
-        spaces: 2
-      })
-
-      const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
-      const destTnpPath = path.join(workspaceLocation, config.folder.node_modules,
-        config.file.tnpBundle, config.file.tnp_system_path_txt)
-
-      fse.copyFileSync(sourceTnpPath, destTnpPath);
-
-      let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
-      // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
-
-      if (_.isUndefined(this.notNeededReinstallationTnp[workspaceLocation])) {
-        this.notNeededReinstallationTnp[workspaceLocation] = 1;
-      } else {
-        ++this.notNeededReinstallationTnp[workspaceLocation];
+    Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
+      filter: (src: string, dest: string) => {
+        return !src.endsWith('/dist/bin') &&
+          !src.endsWith('/bin') &&
+          !/.*node_modules.*/g.test(src);
       }
+    });
 
-      Helpers.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , `
-        + `installs counter:${this.notNeededReinstallationTnp[workspaceLocation]} `)
+    fse.writeJsonSync(destPackageJSON, pathTnpPackageJSONData, {
+      encoding: 'utf8',
+      spaces: 2
+    })
+
+    const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
+    const destTnpPath = path.join(workspaceOrStandaloneLocation, config.folder.node_modules,
+      config.file.tnpBundle, config.file.tnp_system_path_txt)
+
+    fse.copyFileSync(sourceTnpPath, destTnpPath);
+
+    let lastTwo = _.first(pathTnpCompiledJS.match(/\/[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\/?$/));
+    // console.info(`** tnp-bundle reinstalled from ${lastTwo}`)
+
+    if (_.isUndefined(this.notNeededReinstallationTnp[workspaceOrStandaloneLocation])) {
+      this.notNeededReinstallationTnp[workspaceOrStandaloneLocation] = 1;
     } else {
-      // warn(`Standalone project "${project.name}" - ${chalk.bold('tnp')} is not goint be not installed.`)
+      ++this.notNeededReinstallationTnp[workspaceOrStandaloneLocation];
     }
+
+    Helpers.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , `
+      + `installs counter:${this.notNeededReinstallationTnp[workspaceOrStandaloneLocation]} `)
+
   }
 
 }

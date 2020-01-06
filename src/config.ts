@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Helpers } from 'ng2-logger';
 
 import { Models } from 'tnp-models';
+import { CLASS } from 'typescript-class-helpers';
 
 const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
 const allowedEnvironmentsObj = {};
@@ -38,7 +39,6 @@ const file = {
   environment: 'environment',
   tnp_system_path_txt: 'tnp-system-path.txt',
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
-  tmp_db_tests_json: 'tmp-db-tests.json',
   manifest_webmanifest: 'manifest.webmanifest',
   publicApi_ts: 'public_api.ts',
   _babelrc: '.babelrc',
@@ -100,6 +100,15 @@ const moduleNameIsomorphicLib = [
 ];
 
 export const config = {
+  get dbLocation() {
+    let dbPath = `bin/db.json`;
+    if (global.testMode) {
+      dbPath = `bin/${config.folder.tnp_db_for_tests_json}`;
+    }
+    const Project = CLASS.getBy('Project') as any;
+    const location = path.join(Project.Tnp.location, dbPath);
+    return location;
+  },
   regexString: {
     pathPartStringRegex: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   },
@@ -140,7 +149,6 @@ export const config = {
     tnp_system_path_txt_tnp_bundle: pathResolved(__dirname, '..', file.tnpBundle, file.tnp_system_path_txt),
 
     tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
-    tmp_db_tests_json: pathResolved(__dirname, '..', file.tmp_db_tests_json),
 
     tnp_tests_context: pathResolved(`/tmp/tnp/${folder.tnp_tests_context}`),
     tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, folder.tnp_db_for_tests_json),

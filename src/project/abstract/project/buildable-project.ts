@@ -70,7 +70,7 @@ export abstract class BuildableProject {
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
-    const db = await TnpDB.Instance;
+    const db = await TnpDB.Instance(config.dbLocation);
     const projects = db
       .getProjects()
       .map(p => p.project)
@@ -84,7 +84,7 @@ export abstract class BuildableProject {
       return;
     }
     // clearConsole()
-    const db = await TnpDB.Instance;
+    const db = await TnpDB.Instance(config.dbLocation);
     if (!global.tnpNonInteractive) {
       const existedProjects = db
         .getProjects()

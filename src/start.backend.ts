@@ -217,7 +217,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   // Helpers.log(argsv)
   // process.exit(0)
   Helpers.log(`[start] accesing db..please wait`)
-  const db = await TnpDB.Instance;
+  const db = await TnpDB.Instance(config.dbLocation);
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
   if (

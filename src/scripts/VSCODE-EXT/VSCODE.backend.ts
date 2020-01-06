@@ -38,7 +38,7 @@ export function $INIT_VSCODE() {
 };
 
 export async function $VSCODE_INIT_ALL() {
-  const db = await TnpDB.Instance;
+  const db = await TnpDB.Instance(config.dbLocation);
   const projects = db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
@@ -142,7 +142,7 @@ function $VSCODE_GLOBAL() {
 }
 
 const $VSCODE_FIX = async () => {
-  const db = await TnpDB.Instance;
+  const db = await TnpDB.Instance(config.dbLocation);
   const projects = db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];

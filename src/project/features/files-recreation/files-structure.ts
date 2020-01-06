@@ -86,7 +86,7 @@ export class FilesStructure extends FeatureForProject {
     const { alreadyInitedPorjects, watch } = options;
 
     Helpers.info(`[init] adding project is not exists...`)
-    const db = await TnpDB.Instance;
+    const db = await TnpDB.Instance(config.dbLocation);
     // await db.transaction.addProjectIfNotExist(this.project as any);
     Helpers.info(`[init] adding project is not exists...done`)
 
