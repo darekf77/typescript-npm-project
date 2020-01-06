@@ -133,10 +133,10 @@ export class FilesRecreator extends FeatureForProject {
             }
             return relativePath;
           }))
-          .concat(self.project.linkedProjects.map(p => {
-            const source = self.project.type === 'angular-lib' ? config.folder.components : config.folder.src;
-            return `${source}/tmp-${p.name}`;
-          }))
+        // .concat(self.project.linkedProjects.map(p => {
+        //   const source = self.project.type === 'angular-lib' ? config.folder.components : config.folder.src;
+        //   return `${source}/tmp-${p.name}`;
+        // }))
         // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
         // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
         // console.log('ignoref iles', gitignoreFiles)
@@ -326,9 +326,6 @@ Thumbs.db
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
-
-
-${this.project.projectLinkedFiles().map(({ relativePath }) => `/${relativePath.replace(/^\//, '')}`).join('\n')}
 
 `.trimRight() + '\n');
 
