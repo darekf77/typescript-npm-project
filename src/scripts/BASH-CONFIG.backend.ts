@@ -1,5 +1,5 @@
 import { Helpers } from 'tnp-helpers';
-import { CLIWRAP } from './cli-wrapper.backend';
+
 
 function $BASH_CONFIG_VNC_START() {
   console.log(`#!/bin/bash
@@ -36,7 +36,7 @@ WantedBy=multi-user.target
 
 export default {
 
-  $BASH_CONFIG_VNC_START: CLIWRAP($BASH_CONFIG_VNC_START, '$BASH_CONFIG_VNC_START'),
-  $BASH_CONFIG_VNC_SERVICE: CLIWRAP($BASH_CONFIG_VNC_SERVICE, '$BASH_CONFIG_VNC_SERVICE'),
+  $BASH_CONFIG_VNC_START: Helpers.CLIWRAP($BASH_CONFIG_VNC_START, '$BASH_CONFIG_VNC_START'),
+  $BASH_CONFIG_VNC_SERVICE: Helpers.CLIWRAP($BASH_CONFIG_VNC_SERVICE, '$BASH_CONFIG_VNC_SERVICE'),
 
 }

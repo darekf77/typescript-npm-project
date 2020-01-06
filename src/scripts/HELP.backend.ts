@@ -6,7 +6,7 @@ import * as path from 'path';
 import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { config } from '../config';
-import { CLIWRAP } from './cli-wrapper.backend';
+
 
 const generalHelp = `
 
@@ -85,7 +85,7 @@ const HELP = (args) => {
 }
 
 export default {
-  $HELP: CLIWRAP($HELP, '$HELP'),
-  HELP: CLIWRAP(HELP, 'HELP'),
+  $HELP: Helpers.CLIWRAP($HELP, '$HELP'),
+  HELP: Helpers.CLIWRAP(HELP, 'HELP'),
 }
 //#endregion

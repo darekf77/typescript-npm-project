@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from '../../progress-output';
-import { CLIWRAP } from '../cli-wrapper.backend';
+
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
   if (_.isString(c)) {
@@ -115,13 +115,13 @@ function $SHOW_LOOP_MESSAGES(args) {
 }
 
 export default {
-  $PROCESS_CWD: CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
-  $TEST_WATCH: CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
-  $TEST: CLIWRAP($TEST, '$TEST'),
-  $READLAST: CLIWRAP($READLAST, '$READLAST'),
-  TEST_ASYNC_PROC: CLIWRAP(TEST_ASYNC_PROC, 'TEST_ASYNC_PROC'),
-  TEST_SYNC_PROC: CLIWRAP(TEST_SYNC_PROC, 'TEST_SYNC_PROC'),
-  $SHOW_LOOP: CLIWRAP($SHOW_LOOP, '$SHOW_LOOP'),
-  $SHOW_LOOP_MESSAGES: CLIWRAP($SHOW_LOOP_MESSAGES, '$SHOW_LOOP_MESSAGES'),
+  $PROCESS_CWD: Helpers.CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
+  $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
+  $TEST: Helpers.CLIWRAP($TEST, '$TEST'),
+  $READLAST: Helpers.CLIWRAP($READLAST, '$READLAST'),
+  TEST_ASYNC_PROC: Helpers.CLIWRAP(TEST_ASYNC_PROC, 'TEST_ASYNC_PROC'),
+  TEST_SYNC_PROC: Helpers.CLIWRAP(TEST_SYNC_PROC, 'TEST_SYNC_PROC'),
+  $SHOW_LOOP: Helpers.CLIWRAP($SHOW_LOOP, '$SHOW_LOOP'),
+  $SHOW_LOOP_MESSAGES: Helpers.CLIWRAP($SHOW_LOOP_MESSAGES, '$SHOW_LOOP_MESSAGES'),
 }
 //#endregion

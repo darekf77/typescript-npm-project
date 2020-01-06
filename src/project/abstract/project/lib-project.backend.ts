@@ -8,8 +8,6 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { BuildProcess } from '../../features';
-import { Morphi } from 'morphi';
-import { TnpDB } from 'tnp-db';
 
 /**
  * Project ready to be build/publish as npm package.

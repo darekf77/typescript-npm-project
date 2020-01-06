@@ -8,7 +8,7 @@ import { TnpDB } from 'tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
-import { CLIWRAP } from '../cli-wrapper.backend';
+
 
 
 function killallnode() {
@@ -184,14 +184,14 @@ async function NOT(args: string) {
 }
 
 export default {
-  $DEVELOP: CLIWRAP($DEVELOP, '$DEVELOP'),
-  killvscode: CLIWRAP(killvscode, 'killvscode'),
-  vscodekill: CLIWRAP(vscodekill, 'vscodekill'),
-  close: CLIWRAP(close, 'close'),
-  $KILL_ON_PORT: CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
-  $KILLONPORT: CLIWRAP($KILLONPORT, '$KILLONPORT'),
-  $KILLALL: CLIWRAP($KILLALL, '$KILLALL'),
-  $KILLALLNODE: CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
-  CHOKI: CLIWRAP(CHOKI, 'CHOKI'),
-  NOT: CLIWRAP(NOT, 'NOT'),
+  $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),
+  killvscode: Helpers.CLIWRAP(killvscode, 'killvscode'),
+  vscodekill: Helpers.CLIWRAP(vscodekill, 'vscodekill'),
+  close: Helpers.CLIWRAP(close, 'close'),
+  $KILL_ON_PORT: Helpers.CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
+  $KILLONPORT: Helpers.CLIWRAP($KILLONPORT, '$KILLONPORT'),
+  $KILLALL: Helpers.CLIWRAP($KILLALL, '$KILLALL'),
+  $KILLALLNODE: Helpers.CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
+  CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
+  NOT: Helpers.CLIWRAP(NOT, 'NOT'),
 }

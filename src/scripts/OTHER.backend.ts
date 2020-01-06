@@ -9,8 +9,6 @@ import chalk from 'chalk';
 import * as path from 'path';
 import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-import { CLIWRAP } from './cli-wrapper.backend';
-
 
 function $CONFIGS() {
   Helpers.log(Project.Current.env.configsFromJs.map(c => c.domain).join('\n'));
@@ -135,29 +133,29 @@ async function $AA() {
 }
 
 export default {
-  $AA: CLIWRAP($AA, '$AA'),
-  NPM_FIXES: CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
-  LN: CLIWRAP(LN, 'LN'),
+  $AA: Helpers.CLIWRAP($AA, '$AA'),
+  NPM_FIXES: Helpers.CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
+  LN: Helpers.CLIWRAP(LN, 'LN'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');
   //   Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
   //   process.exit()
   // },
-  $COMMAND: CLIWRAP($COMMAND, '$COMMAND'),
-  CIRCURAL_CHECK: CLIWRAP(CIRCURAL_CHECK, 'CIRCURAL_CHECK'),
-  $FILEINFO: CLIWRAP($FILEINFO, '$FILEINFO'),
-  RUN_PROCESS: CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
-  PSINFO: CLIWRAP(PSINFO, 'PSINFO'),
-  UPDATE_ISOMORPHIC: CLIWRAP(UPDATE_ISOMORPHIC, 'UPDATE_ISOMORPHIC'),
-  $isbundlemode: CLIWRAP($isbundlemode, '$isbundlemode'),
-  $ASSETS: CLIWRAP($ASSETS, '$ASSETS'),
-  VERSION: CLIWRAP(VERSION, 'VERSION'),
-  PATH: CLIWRAP(PATH, 'PATH'),
-  COPY_RESOURCES: CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
-  $CHECK_ENV: CLIWRAP($CHECK_ENV, '$CHECK_ENV'),
-  $CHECK_ENVIRONMENT: CLIWRAP($CHECK_ENVIRONMENT, '$CHECK_ENVIRONMENT'),
-  $CONFIGS: CLIWRAP($CONFIGS, '$CONFIGS'),
-  CHECK_ENV: [CLIWRAP(CHECK_ENV, 'CHECK_ENV'), `Sample docs`],
-  ENV_CHECK: CLIWRAP(ENV_CHECK, 'ENV_CHECK'),
+  $COMMAND: Helpers.CLIWRAP($COMMAND, '$COMMAND'),
+  CIRCURAL_CHECK: Helpers.CLIWRAP(CIRCURAL_CHECK, 'CIRCURAL_CHECK'),
+  $FILEINFO: Helpers.CLIWRAP($FILEINFO, '$FILEINFO'),
+  RUN_PROCESS: Helpers.CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
+  PSINFO: Helpers.CLIWRAP(PSINFO, 'PSINFO'),
+  UPDATE_ISOMORPHIC: Helpers.CLIWRAP(UPDATE_ISOMORPHIC, 'UPDATE_ISOMORPHIC'),
+  $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
+  $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
+  VERSION: Helpers.CLIWRAP(VERSION, 'VERSION'),
+  PATH: Helpers.CLIWRAP(PATH, 'PATH'),
+  COPY_RESOURCES: Helpers.CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
+  $CHECK_ENV: Helpers.CLIWRAP($CHECK_ENV, '$CHECK_ENV'),
+  $CHECK_ENVIRONMENT: Helpers.CLIWRAP($CHECK_ENVIRONMENT, '$CHECK_ENVIRONMENT'),
+  $CONFIGS: Helpers.CLIWRAP($CONFIGS, '$CONFIGS'),
+  CHECK_ENV: [Helpers.CLIWRAP(CHECK_ENV, 'CHECK_ENV'), `Sample docs`],
+  ENV_CHECK: Helpers.CLIWRAP(ENV_CHECK, 'ENV_CHECK'),
 
 }

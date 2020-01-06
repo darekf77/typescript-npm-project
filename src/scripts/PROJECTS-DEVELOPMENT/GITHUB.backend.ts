@@ -4,7 +4,7 @@ import * as os from 'os';
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { CLIWRAP } from '../cli-wrapper.backend';
+
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
 const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
@@ -166,8 +166,8 @@ function $GITHUB_LIST_ORIGINS() {
 }
 
 export default {
-  $GITHUB_LIST_ORIGINS: CLIWRAP($GITHUB_LIST_ORIGINS, '$GITHUB_LIST_ORIGINS'),
-  $GITHUB_DUMP: CLIWRAP($GITHUB_DUMP, '$GITHUB_DUMP'),
-  $GITHUB_PUSH: CLIWRAP($GITHUB_PUSH, '$GITHUB_PUSH'),
-  $GITHUB_PULL: CLIWRAP($GITHUB_PULL, '$GITHUB_PULL'),
+  $GITHUB_LIST_ORIGINS: Helpers.CLIWRAP($GITHUB_LIST_ORIGINS, '$GITHUB_LIST_ORIGINS'),
+  $GITHUB_DUMP: Helpers.CLIWRAP($GITHUB_DUMP, '$GITHUB_DUMP'),
+  $GITHUB_PUSH: Helpers.CLIWRAP($GITHUB_PUSH, '$GITHUB_PUSH'),
+  $GITHUB_PULL: Helpers.CLIWRAP($GITHUB_PULL, '$GITHUB_PULL'),
 }

@@ -7,8 +7,6 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { TnpDB } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
-import { CLIWRAP } from '../cli-wrapper.backend';
-
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -113,7 +111,7 @@ export async function $RESET_NPM_ALL(args: string, exit = true) {
   for (let index = 0; index < projects.length; index++) {
     const project = projects[index];
     // console.log(project.project.genericName)
-    project.project.packageJson.reset();
+    (project.project as Project).packageJson.reset();
   }
   if (exit) {
     process.exit(0);
@@ -268,35 +266,35 @@ const $copy_module_to_project = async (args) => {
 
 
 export default {
-  $INSTALL_IN_TNP: CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),
-  $I_IN_TNP: CLIWRAP($I_IN_TNP, '$I_IN_TNP'),
-  $DEPS_SET_CATEGORY: CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),
-  $DEPS_SET_CAT: CLIWRAP($DEPS_SET_CAT, '$DEPS_SET_CAT'),
-  $DEPS_UPDATE_FROM: CLIWRAP($DEPS_UPDATE_FROM, '$DEPS_UPDATE_FROM'),
-  $DEPS_FROM: CLIWRAP($DEPS_FROM, '$DEPS_FROM'),
-  $RESET_NPM: CLIWRAP($RESET_NPM, '$RESET_NPM'),
-  $RESET_NPM_ALL: CLIWRAP($RESET_NPM_ALL, '$RESET_NPM_ALL'),
-  $DEPS_RESET: CLIWRAP($DEPS_RESET, '$DEPS_RESET'),
-  $DEPS_RESET_ALL: CLIWRAP($DEPS_RESET_ALL, '$DEPS_RESET_ALL'),
-  $DEDUPE: CLIWRAP($DEDUPE, '$DEDUPE'),
-  $DEDUPE_COUNT: CLIWRAP($DEDUPE_COUNT, '$DEDUPE_COUNT'),
-  $DEDUPE_CHECK: CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
-  $DEPS_DEDUPE: CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
-  DEPS_SHOW: CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
-  $DEPS_RECREATE: CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
-  $SHOW_CHILDREN: CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
-  DEPS_SHOW_IF_STANDALONE: CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
-  DEPS_HIDE: CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
-  $DEPS_CLEAN: CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
-  $INSTALL: CLIWRAP($INSTALL, '$INSTALL'),
-  $UNINSTALL: CLIWRAP($UNINSTALL, 'UNINSTALL'),
-  $I: CLIWRAP($I, '$I'),
-  $SINSTALL: CLIWRAP($SINSTALL, '$SINSTALL'),
-  $LINK: CLIWRAP($LINK, '$LINK'),
-  $UNLINK: CLIWRAP($UNLINK, '$UNLINK'),
-  $copytoproject: CLIWRAP($copytoproject, '$copytoproject'),
-  $copy_to_project: CLIWRAP($copy_to_project, '$copy_to_project'),
-  $copyto: CLIWRAP($copyto, '$copyto'),
-  $copymoduletoproject: CLIWRAP($copymoduletoproject, '$copymoduletoproject'),
-  $copy_module_to_project: CLIWRAP($copy_module_to_project, '$copy_module_to_project'),
+  $INSTALL_IN_TNP: Helpers.CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),
+  $I_IN_TNP: Helpers.CLIWRAP($I_IN_TNP, '$I_IN_TNP'),
+  $DEPS_SET_CATEGORY: Helpers.CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),
+  $DEPS_SET_CAT: Helpers.CLIWRAP($DEPS_SET_CAT, '$DEPS_SET_CAT'),
+  $DEPS_UPDATE_FROM: Helpers.CLIWRAP($DEPS_UPDATE_FROM, '$DEPS_UPDATE_FROM'),
+  $DEPS_FROM: Helpers.CLIWRAP($DEPS_FROM, '$DEPS_FROM'),
+  $RESET_NPM: Helpers.CLIWRAP($RESET_NPM, '$RESET_NPM'),
+  $RESET_NPM_ALL: Helpers.CLIWRAP($RESET_NPM_ALL, '$RESET_NPM_ALL'),
+  $DEPS_RESET: Helpers.CLIWRAP($DEPS_RESET, '$DEPS_RESET'),
+  $DEPS_RESET_ALL: Helpers.CLIWRAP($DEPS_RESET_ALL, '$DEPS_RESET_ALL'),
+  $DEDUPE: Helpers.CLIWRAP($DEDUPE, '$DEDUPE'),
+  $DEDUPE_COUNT: Helpers.CLIWRAP($DEDUPE_COUNT, '$DEDUPE_COUNT'),
+  $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
+  $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
+  DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
+  $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
+  $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
+  DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
+  DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
+  $DEPS_CLEAN: Helpers.CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
+  $INSTALL: Helpers.CLIWRAP($INSTALL, '$INSTALL'),
+  $UNINSTALL: Helpers.CLIWRAP($UNINSTALL, 'UNINSTALL'),
+  $I: Helpers.CLIWRAP($I, '$I'),
+  $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
+  $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
+  $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
+  $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
+  $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
+  $copyto: Helpers.CLIWRAP($copyto, '$copyto'),
+  $copymoduletoproject: Helpers.CLIWRAP($copymoduletoproject, '$copymoduletoproject'),
+  $copy_module_to_project: Helpers.CLIWRAP($copy_module_to_project, '$copy_module_to_project'),
 }

@@ -10,7 +10,7 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { config } from '../../config';
 import { FilesRenaming } from '../../project/features/files-recreation/files-renaming.backend';
-import { CLIWRAP } from '../cli-wrapper.backend';
+
 
 
 export async function $BRANDING(args: string, exit = true) {
@@ -123,6 +123,6 @@ export function faviconsDesc() {
 
 
 export default {
-  $BRANDING: CLIWRAP($BRANDING, '$BRANDING'),
-  $RENAMING: CLIWRAP($RENAMING, '$RENAMING'),
+  $BRANDING: Helpers.CLIWRAP($BRANDING, '$BRANDING'),
+  $RENAMING: Helpers.CLIWRAP($RENAMING, '$RENAMING'),
 }

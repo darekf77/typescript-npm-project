@@ -11,7 +11,6 @@ import { BuildOptions, PackagesRecognitionExtended } from '../../features';
 import * as inquirer from 'inquirer';
 import * as path from 'path';
 import { TnpDB } from 'tnp-db';
-import { config as configMorphi } from 'morphi';
 import chalk from 'chalk';
 //#endregion
 

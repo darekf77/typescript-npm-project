@@ -8,7 +8,7 @@ import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
-import { CLIWRAP } from '../cli-wrapper.backend';
+
 
 function $OPEN_WORKSPACE() {
   const workspacePath = path.join(Project.Current.location, Project.Current.nameOfCodeWorkspace);
@@ -52,9 +52,9 @@ function $OPEN_BASELINE() {
 }
 
 export default {
-  $OPEN_WORKSPACE: CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
-  $IS_CORE_PROJECT: CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
-  $OPEN_CORE_PROJECT: CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
-  $OPEN_TNP_PROJECT: CLIWRAP($OPEN_TNP_PROJECT, '$OPEN_TNP_PROJECT'),
-  $OPEN_BASELINE: CLIWRAP($OPEN_BASELINE, '$OPEN_BASELINE'),
+  $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
+  $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
+  $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
+  $OPEN_TNP_PROJECT: Helpers.CLIWRAP($OPEN_TNP_PROJECT, '$OPEN_TNP_PROJECT'),
+  $OPEN_BASELINE: Helpers.CLIWRAP($OPEN_BASELINE, '$OPEN_BASELINE'),
 }

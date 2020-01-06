@@ -13,7 +13,7 @@ import { Project } from './project';
 
 
 // import { ConsoleUi } from './console-ui';
-import { $LAST } from './scripts/DB';
+import { $LAST } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';

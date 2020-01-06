@@ -408,9 +408,9 @@
   "version": "0.0.3",
   "scripts": {
     "postinstall": "pwd > tnp-system-path.txt",
-    "link:dist:helpers": "rimraf node_modules/tnp-helpers && cpr `pwd`/../tnp-helpers/dist node_modules/tnp-helpers",
-    "link:dist:models": "rimraf node_modules/tnp-models && cpr `pwd`/../tnp-models/dist node_modules/tnp-models",
-    "link:dist:db": "rimraf node_modules/tnp-db && cpr `pwd`/../tnp-db/dist node_modules/tnp-db",
+    "dist:helpers": "rimraf node_modules/tnp-helpers && cpr `pwd`/../tnp-helpers/dist node_modules/tnp-helpers",
+    "dist:models": "rimraf node_modules/tnp-models && cpr `pwd`/../tnp-models/dist node_modules/tnp-models",
+    "dist:db": "rimraf node_modules/tnp-db && cpr `pwd`/../tnp-db/dist node_modules/tnp-db",
     "cpr:dist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db"
   },
   "main": "index.js",
