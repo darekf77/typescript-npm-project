@@ -70,5 +70,6 @@ if (distOnly) {
   // =======================================================================
 }
 global.start = start;
+console.log('start assigned to global')
 start(process.argv, 'tnp');
 //#endregion

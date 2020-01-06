@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { Project } from '../project';
 import * as  psList from 'ps-list';
-import { CLASS } from "typescript-class-helpers";
+import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';

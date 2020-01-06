@@ -251,6 +251,17 @@ export class FilesRecreator extends FeatureForProject {
             self.modifyVscode(settings => {
               settings['files.exclude'] = {};
               if (hide) {
+                if (self.project.isTnp) {
+                  self.project.node_modules.fixesForNodeModulesPackages.forEach(p => {
+                    settings['files.exclude'][p] = true
+                  })
+                  settings['files.exclude']["*.js"] = true;
+                  settings['files.exclude']["*.sh"] = true;
+                  settings['files.exclude']["*.xlsx"] = true;
+                  settings['files.exclude']["scripts"] = true;
+                  settings['files.exclude']["bin"] = true;
+                }
+
                 self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
                   settings['files.exclude'][f] = true
                 })

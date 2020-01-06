@@ -411,7 +411,7 @@
     "dist:helpers": "rimraf node_modules/tnp-helpers && cpr `pwd`/../tnp-helpers/dist node_modules/tnp-helpers",
     "dist:models": "rimraf node_modules/tnp-models && cpr `pwd`/../tnp-models/dist node_modules/tnp-models",
     "dist:db": "rimraf node_modules/tnp-db && cpr `pwd`/../tnp-db/dist node_modules/tnp-db",
-    "cpr:dist": "npm run link:dist:helpers && npm run link:dist:models && npm run link:dist:db"
+    "dist": "npm run dist:helpers && npm run dist:models && npm run dist:db"
   },
   "main": "index.js",
   "bin": {

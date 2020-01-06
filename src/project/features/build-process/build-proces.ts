@@ -141,9 +141,8 @@ inside generated projects...
     }
 
     const transactions = (await (await TnpDB.Instance(config.dbLocation)).transaction);
-    if (!this.project.isGenerated) { // REMOVE_THIS
-      await transactions.updateBuildsWithCurrent(this.project as any, buildOptions, process.pid, process.ppid, true);
-    }
+    await transactions.updateBuildsWithCurrent(this.project as any, buildOptions, process.pid, process.ppid, true);
+
 
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
@@ -177,9 +176,13 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-    if (!this.project.isGenerated && buildOptions.watch) { // REMOVE_THIS
-      await transactions.updateBuildsWithCurrent(this.project as any, buildOptions, process.pid, process.ppid, false)
+
+    await transactions.updateBuildsWithCurrent(this.project as any, buildOptions, process.pid, process.ppid, false)
+    if (buildOptions.watch && buildOptions.appBuild) {
+      await transactions.appBuildWaitForDistBuild(this.project as any);
     }
+
+
     Helpers.log(`
 
     ${chalk.bold('Start of Building')} ${this.project.genericName} (${buildOptions.appBuild ? 'app' : 'lib'})

@@ -2,9 +2,6 @@ import * as _ from 'lodash';
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
-import { ModelDataConfig, Morphi } from 'morphi';
-import { JSON10 } from 'json10';
 
 //#region @backend
 import { BuildOptions, PackagesRecognitionExtended } from '../../features';

@@ -13,7 +13,7 @@ import { Project } from './project';
 
 
 // import { ConsoleUi } from './console-ui';
-import { $LAST } from 'tnp-db';
+import { $LAST, $LAST_BUILD } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
@@ -212,6 +212,12 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
     if (arg === 'ghpull') {
       return 'githubpull';
     }
+    if (arg === 'l') {
+      return 'last';
+    }
+    if (arg === 'lb') {
+      return 'lastbuild';
+    }
     return arg;
   });
   // Helpers.log(argsv)
@@ -220,10 +226,19 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   const db = await TnpDB.Instance(config.dbLocation);
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
+
+  const lastCmds = [
+    Helpers.cliTool.paramsFrom(CLASS.getName($LAST)),
+    Helpers.cliTool.paramsFrom(CLASS.getName($LAST_BUILD)),
+  ];
+  const arg = Helpers.cliTool.paramsFrom(argsv[2]);
+  // console.log(lastCmds)
+  // console.log('Helpers.cliTool.paramsFrom(argsv[2])', Helpers.cliTool.paramsFrom(argsv[2]));
+  // process.exit(0)
   if (
-    (argsv.length === 2 && argsv[1].endsWith('/bin/tnp')) ||
-    (argsv.length === 3 && argsv[1].endsWith('/bin/tnp')
-      && argsv[2] === _.kebabCase(_.lowerCase(CLASS.getName($LAST)))
+    (argsv.length === 2 && argsv[1].endsWith(`/bin/${config.frameworkName}`)) ||
+    (argsv.length === 3 && argsv[1].endsWith(`/bin/${config.frameworkName}`)
+      && lastCmds.includes(arg)
     )
   ) {
     // info(`DO NOTHIGN`);
@@ -232,7 +247,6 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
     await db.transaction.setCommand(argsv.join(' '));
   }
 
-  // await db.transaction.updateCurrentProcess()
 
   let recognized = false;
   if (Array.isArray(argsv) && argsv.length >= 3) {
