@@ -132,7 +132,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
         proj.git.pushCurrentBranch();
         break;
       } catch (err) {
-        Helpers.error(`Not able to push brench... `);
+        Helpers.error(`Not able to push brench... `, true, true);
         Helpers.run(`code .`, { cwd: dest }).async();
         Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - check your repository and press any key..`);
       }
