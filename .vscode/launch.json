@@ -5,10 +5,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/run.js",
-      "runtimeArgs": [
-        "--experimental-worker"
-      ]
+      "program": "${workspaceFolder}/run.js"
     },
     {
       "type": "node",
@@ -21,10 +18,7 @@
       "restart": true,
       "sourceMaps": true,
       "console": "internalConsole",
-      "internalConsoleOptions": "neverOpen",
-      "runtimeArgs": [
-        "--experimental-worker"
-      ]
+      "internalConsoleOptions": "neverOpen"
     },
   ]
 }

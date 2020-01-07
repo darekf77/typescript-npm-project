@@ -2,6 +2,10 @@
   "extends": "./tsconfig.isomorphic.json",
   "compilerOptions": {
      "rootDir": "./src",
+     "baseUrl": "src",
+     "paths": {
+       
+      }
   },
   "include": [
     "src/**/*"

@@ -110,7 +110,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 
         if (rules[current.name]) {
           const r = rules[current.name];
-          if (_.isArray(r.ommitParents) && r.ommitParents.includes(parentName)) {
+          if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName) || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
             Helpers.warn(`[excluded] Ommiting duplicate of ${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
             return
           }
