@@ -140,6 +140,7 @@ inside generated projects...
       }
     }
 
+    Helpers.log(`[db][checkBuildIfAllowed] started... `);
     const db = await TnpDB.Instance(config.dbLocation);
     await db.transaction.checkBuildIfAllowed(
       this.project as any,
@@ -148,8 +149,16 @@ inside generated projects...
       process.ppid,
       true
     );
+    Helpers.log(`[db][checkBuildIfAllowed] finish `);
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+
+      if (this.project.node_modules.exist) {
+        Helpers.info(`NODE MODULE EXISTS`)
+      } else {
+        await this.project.filesStructure.init(buildOptions.args);
+      }
+
       if (buildOptions.watch) {
         let config;
         if (this.project.isWorkspace) {
@@ -254,7 +263,7 @@ async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
       const result = fse.existsSync(browserFolder);
       return result;
     },
-    errorMessage: `Please wait for dist build to finish`
+    errorMessage: `Please wait for dist build to finish (standalone project)`
   };
 
   if (project.isStandaloneProject) {
@@ -264,41 +273,38 @@ async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
     ])
   } else if (project.isWorkspaceChildProject) {
 
+    const conditionDist: Condition = {
+      name: `Dist finsh buildProjectErr`,
+      callback: async (context) => {
+        const childs = project.childrenSortedByDeps;
+        // console.log('childs', childs.map(c => c.name))
+        for (let index = 0; index < childs.length; index++) {
+          const c = childs[index];
+          const browserFor = path.join(c.location, `browser-for-${project.name}`);
+          if (!Helpers.exists(browserFor)) {
+            // console.log(`Not exists ${browserFor}`)
+            context.errorMessage = `
+
+            Please build project ${chalk.bold(c.name)}:
+              ${config.frameworkName} bdw --forClient ${project.name}
+
+              `;
+            return false;
+          }
+        }
+        return true;
+      },
+      errorMessage: 'Please wait for dist build to finish... (workspace child project) '
+    };
+
     const conditions = [
-      projectsChecksInWorkspaceFn(true, project),
+      conditionDist,
       commonCondtion,
-      projectsChecksInWorkspaceFn(false, project),
     ];
 
     await Helpers.conditionWait(conditions);
   }
 
 }
-
-function projectsChecksInWorkspaceFn(buildProjectErr: boolean, project: Project) {
-  const condition: Condition = {
-    name: `Dist finsh buildProjectErr: ${buildProjectErr}`,
-    callback: async (context) => {
-      const childs = project.parent.children;
-      for (let index = 0; index < childs.length; index++) {
-        const c = childs[index];
-        const browserFor = path.join(c.location, `browser-for-${project.name}`);
-        if (!Helpers.exists(browserFor)) {
-          // console.log(`Not exists ${browserFor}`)
-          if (buildProjectErr) {
-            context.errorMessage = `Please build project ${chalk.bold(c.name)}:
-            ${config.frameworkName} bdw --forClient ${this.project.name}
-            `
-          }
-          return false;
-        }
-      }
-      return true;
-    },
-    errorMessage: 'Please wait for dist build to finish...'
-  };
-  return condition;
-}
-
 
 //#endregion

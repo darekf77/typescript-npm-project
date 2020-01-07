@@ -137,6 +137,8 @@ export function nodeModulesExists(project: Project) {
     if (project.parent.node_modules.exist) {
       project.parent.node_modules.linkToProject(project);
       return true;
+    } else {
+      return false;
     }
   }
   const p = path.join(project.location, config.folder.node_modules);

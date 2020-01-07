@@ -136,19 +136,16 @@ export abstract class LibProject {
 
   }
 
-  projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string, renameFileTo?: string }[] {
+  projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
     const files = [];
     return files;
   }
 
   applyLinkedFiles(this: Project) {
     const files = this.projectLinkedFiles();
-    files.forEach(({ sourceProject, relativePath, renameFileTo }) => {
+    files.forEach(({ sourceProject, relativePath }) => {
       const source = path.join(sourceProject.location, relativePath);
       let dest = path.join(this.location, relativePath);
-      if (renameFileTo) {
-        dest = path.join(path.dirname(dest), renameFileTo);
-      }
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(source, dest);
     })

@@ -183,7 +183,16 @@ async function NOT(args: string) {
   process.exit(0)
 }
 
+async function $CHILDS_REQUIRED(args: string) {
+  if (!Project.Current.isWorkspaceChildProject) {
+    Helpers.error(`Not worksapce child`, false, true);
+  }
+  console.log(Project.Current.childrenSortedByDeps.map(c => c.name));
+  process.exit(0)
+}
+
 export default {
+  $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
   $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),
   killvscode: Helpers.CLIWRAP(killvscode, 'killvscode'),
   vscodekill: Helpers.CLIWRAP(vscodekill, 'vscodekill'),

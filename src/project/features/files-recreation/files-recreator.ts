@@ -3,6 +3,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
+import * as _ from 'lodash';
 // local
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
@@ -127,10 +128,8 @@ export class FilesRecreator extends FeatureForProject {
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
-          .concat(self.project.isCoreProject ? [] : self.project.projectLinkedFiles().map(({ relativePath, renameFileTo }) => {
-            if (renameFileTo) {
-              relativePath = path.join(path.basename(relativePath), renameFileTo);
-            }
+          .concat(self.project.projectLinkedFiles().map(({ relativePath }) => {
+            // console.log('linked', relativePath)
             return relativePath;
           }))
         // .concat(self.project.linkedProjects.map(p => {
@@ -337,6 +336,12 @@ Thumbs.db
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
+${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
+            .map(({ relativePath }) => {
+              return `/${relativePath}`;
+            })
+            .join('\n')
+          }
 
 `.trimRight() + '\n');
 

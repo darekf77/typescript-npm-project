@@ -69,7 +69,7 @@ async function $INIT_ALL_VSCODE() {
 async function PROJECT_KILL_ALL() {
   let command: string;
   if (process.platform === 'darwin') {
-    command = `kill -9 $(pgrep "Code Helper") && kill -9 $(pgrep "Code")`;
+    command = `kill -9 $(pgrep 'Code Helper') && kill -9 $(pgrep 'Code')`;
   }
   // run(`kill§ `).sync()
   process.exit(0)
@@ -84,56 +84,69 @@ function $VSCODE_GLOBAL() {
   let keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
   const keys = [
     {
-      "key": "shift+cmd+s",
-      "command": "workbench.action.files.saveAll"
+      'key': 'shift+cmd+s',
+      'command': 'workbench.action.files.saveAll'
     },
     {
-      "key": "alt+cmd+s",
-      "command": "-workbench.action.files.saveAll"
+      'key': 'alt+cmd+s',
+      'command': '-workbench.action.files.saveAll'
     },
     {
-      "key": "shift+cmd+c",
-      "command": "workbench.action.tasks.terminate"
+      'key': 'shift+cmd+c',
+      'command': 'workbench.action.tasks.terminate'
     },
     {
-      "key": "shift+cmd+b",
-      "command": "extension.firedevrunwatchbuild"
-    }
+      'key': 'shift+cmd+b',
+      'command': 'extension.firedevrunwatchbuild'
+    },
+    {
+      'key': 'ctrl+cmd+p',
+      'command': 'extension.vscode-git-automator.pushLocalCommits'
+    },
+    {
+      'key': 'shift+cmd+z',
+      'command': 'default:redo'
+    },
   ];
   Helpers.writeFile(keybindingPath, keys);
 
   const settings = {
-    "git.enableSmartCommit": true,
-    "terminal.integrated.scrollback": 10000,
-    // "files.insertFinalNewline": true,
-    "html.format.endWithNewline": true,
-    "html.format.wrapAttributes": "force-aligned",
-    "files.hotExit": "onExitAndWindowClose",
-    "typescript.referencesCodeLens.enabled": true,
-    "git.autoRepositoryDetection": false,
+    'git.enableSmartCommit': true,
+    'terminal.integrated.scrollback': 10000,
+    // 'files.insertFinalNewline': true,
+    'html.format.endWithNewline': true,
+    'html.format.wrapAttributes': 'force-aligned',
+    'files.hotExit': 'onExitAndWindowClose',
+    'typescript.referencesCodeLens.enabled': true,
+    'git.autoRepositoryDetection': false,
     // Whether auto fetching is enabled.
-    "git.autofetch": false,
-    "gitlens.keymap": "none",
-    "gitlens.advanced.messages": {
-      "suppressCommitHasNoPreviousCommitWarning": false,
-      "suppressCommitNotFoundWarning": false,
-      "suppressFileNotUnderSourceControlWarning": false,
-      "suppressGitVersionWarning": false,
-      "suppressLineUncommittedWarning": false,
-      "suppressNoRepositoryWarning": false,
-      "suppressResultsExplorerNotice": false,
-      "suppressShowKeyBindingsNotice": true
+    'git.autofetch': false,
+    'gitlens.keymap': 'none',
+    'gitlens.advanced.messages': {
+      'suppressCommitHasNoPreviousCommitWarning': false,
+      'suppressCommitNotFoundWarning': false,
+      'suppressFileNotUnderSourceControlWarning': false,
+      'suppressGitVersionWarning': false,
+      'suppressLineUncommittedWarning': false,
+      'suppressNoRepositoryWarning': false,
+      'suppressResultsExplorerNotice': false,
+      'suppressShowKeyBindingsNotice': true
     },
-    "search.followSymlinks": false,
-    "javascript.implicitProjectConfig.experimentalDecorators": true,
-    "gitlens.historyExplorer.enabled": true,
-    "diffEditor.ignoreTrimWhitespace": true,
-    "typescript.updateImportsOnFileMove.enabled": "never",
-    "javascript.updateImportsOnFileMove.enabled": "never",
-    "window.restoreWindows": "all",
-    "search.searchOnType": false,
-    "scm.alwaysShowProviders": false,
-    "explorer.compactFolders": false,
+    'search.followSymlinks': false,
+    'javascript.implicitProjectConfig.experimentalDecorators': true,
+    'gitlens.historyExplorer.enabled': true,
+    'diffEditor.ignoreTrimWhitespace': true,
+    'explorer.confirmDelete': false,
+    'typescript.updateImportsOnFileMove.enabled': 'never',
+    'javascript.updateImportsOnFileMove.enabled': 'never',
+    'window.restoreWindows': 'all',
+    'search.searchOnType': false,
+    'scm.alwaysShowProviders': false,
+    'breadcrumbs.enabled': true,
+    'extensions.ignoreRecommendations': true,
+    'git.showProgress': true,
+    'debug.node.showUseWslIsDeprecatedWarning': false,
+    'explorer.compactFolders': false,
   };
   let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');
   Helpers.writeFile(settingspath, settings);

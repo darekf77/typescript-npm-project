@@ -14,22 +14,27 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     return this.project.filesTemplates();
   }
   rebuild() {
+    const files = this.files;
+    Helpers.info(`Files templates for project:
 
-    this.files.forEach(f => {
+    ${files.map(f => f).join('\n')}
+
+    `);
+    for (let index = 0; index < files.length; index++) {
+      const f = files[index];
       const filePath = path.join(this.project.location, f);
-      try {
+      if (Helpers.exists(filePath)) {
         var fileContent = Helpers.readFile(filePath);
-        if (!fileContent) {
-          Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
-          return;
-        }
-      } catch (error) {
-        Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
-        return;
+      }
+      if (!fileContent) {
+        Helpers.warn(`[filesTemplats][rebuild] Not able to read file: ${filePath}`);
+        continue;
       }
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
+      Helpers.log(`Started for ${f}`);
       this.processFile(filePath, fileContent, env, _);
-    });
+      Helpers.info(`Processed DONE for ${f}`);
+    }
     this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
   }
 
@@ -38,11 +43,11 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     try {
       var fileContent = Helpers.readFile(filePath);
       if (!fileContent) {
-        Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
+        Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath}`);
         return;
       }
     } catch (error) {
-      Helpers.warn(`[filesTemplats] Not able to read file: ${filePath}`);
+      Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath}`);
       return;
     }
     const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
@@ -55,7 +60,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     reservedExpSec: Models.env.EnvConfig,
     reservedExpOne: any) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
-
+    // Helpers.pressKeyAndContinue();
     const newContent = content
       .split('\n')
       .filter(line => !line.trimLeft().startsWith('#'))
@@ -91,7 +96,11 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         }
         return line;
       }).join('\n');
+
+    Helpers.removeFileIfExists(filePath);
     Helpers.writeFile(filePath, newContent);
+
+
     // if (!this.project.isCoreProject) {
     //   fse.unlinkSync(orgFilePath);
     // }

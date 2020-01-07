@@ -69,22 +69,31 @@ export class ProjectAngularLib extends Project {
     ]
     if (this.frameworkVersion === 'v2') {
 
-      config = config.concat([
-        'angular.json.filetemplate',
-        'browserslist.filetemplate',
-        'ngsw-config.json.filetemplate',
-        'tsconfig.app.json.filetemplate',
-        'tsconfig.base.json.filetemplate',
-        'src/index.html.filetemplate',
-        'src/manifest.webmanifest.filetemplate'
-      ])
+      config = config
+        .concat([
+          'angular.json.filetemplate',
+          'browserslist.filetemplate',
+          'ngsw-config.json.filetemplate',
+          'tsconfig.app.json.filetemplate',
+          'tsconfig.base.json.filetemplate',
+          'src/index.html.filetemplate',
+          'src/manifest.webmanifest.filetemplate'
+        ]);
       config = config.filter(f => {
         return !['.angular-cli.json.filetemplate'].includes(f)
       });
 
+      config = config.concat(this.projectLinkedFiles()
+        .filter(({ relativePath }) => relativePath.endsWith('.filetemplate'))
+        .map(({ relativePath }) => {
+          return relativePath;
+        }));
       // console.log('config',config)
       // process.exit(0)
     }
+
+
+
     return config;
   }
 

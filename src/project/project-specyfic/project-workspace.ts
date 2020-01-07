@@ -12,28 +12,6 @@ import { ProxyRouter } from '../features/proxy-router';
 import { BuildOptions } from '../features';
 import { Models } from 'tnp-models';
 
-export type ProjectBuild = { project: Project; appBuild: boolean; }
-
-
-function reorderResult(result = [], update: (result) => void): boolean {
-  let neededNextOrder = false;
-  result.some((res, index, arr) => {
-    return !_.isUndefined(result.find((res2, index2, arr2) => {
-      if (res.name === res2.name) {
-        return false;
-      }
-      if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
-        result = Helpers.arrays.arrayMoveElementBefore(result, res2, res);
-        update(result);
-        neededNextOrder = true;
-        return true;
-      }
-      return false;
-    }));
-  });
-  return neededNextOrder;
-}
-
 export class ProjectWorkspace extends Project {
 
 
@@ -96,80 +74,17 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
-  private libs(targetClients: ProjectBuild[]) {
-    const existed = {};
-    const targetLibs = targetClients
-      .map(t => t.project.workspaceDependencies)
-      .reduce((a, b) => a.concat(b), [])
-      .map(d => {
-        if (!existed[d.name]) {
-          existed[d.name] = d;
-        }
-        return d;
-      })
-      .filter(c => {
-        if (existed[c.name]) {
-          existed[c.name] = void 0;
-          return true;
-        }
-        return false;
-      })
-      .sort((a, b) => {
-        return a.workspaceDependencies.filter(c => c === b).length;
-      });
-    // console.log('targetClients', targetClients.map(l => l.project.genericName))
-    // console.log('targetClients[0]', targetClients[0].project.workspaceDependencies.map(l => l.genericName))
-    // console.log('targetClients[1]', targetClients[1].project.workspaceDependencies.map(l => l.genericName))
-    // console.log('targetlibs', targetLibs.map(l => l.genericName))
-
-    let result: Project[] = [];
-
-
-    function recrusiveSearchForDependencies(lib: Project) {
-      if (_.isUndefined(result.find(r => r.name === lib.name))) {
-        result.push(lib);
-      }
-      if (lib.workspaceDependencies.length === 0) {
-        return;
-      }
-      lib.workspaceDependencies
-        .filter(f => {
-          return _.isUndefined(result.find(r => r.name === f.name))
-        })
-        .forEach(d => {
-          if (_.isUndefined(result.find(r => r.name === d.name))) {
-            result.unshift(d);
-          }
-          recrusiveSearchForDependencies(d);
-        });
-    }
-    targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
-
-
-    let lastArr = [];
-    while (reorderResult(result, r => { result = r; })) {
-      // log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
-      if (_.isEqual(lastArr, result.map(c => c.name))) {
-        break;
-      }
-      lastArr = result.map(c => c.name);
-    }
-    return result.map(c => {
-      return { project: c, appBuild: false };
-    });
-  }
-
-  get projectsInOrder(): ProjectBuild[] {
+  get projectsInOrder(): Models.dev.ProjectBuild[] {
     if (!fse.existsSync(this.location)) {
       return [];
     }
-    const targetClients: ProjectBuild[] = (
+    const targetClients: Models.dev.ProjectBuild[] = (
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))
       .map(c => {
         return { project: c, appBuild: true };
-      });
+      }) as any;
 
     // console.log('targetClients', targetClients.map(c => c.project.genericName))
 
@@ -178,7 +93,7 @@ export class ProjectWorkspace extends Project {
     return [
       ...libs,
       ...(this.buildOptions && !this.buildOptions.watch ? targetClients : [])
-    ];
+    ] as any;
   }
 
 
@@ -199,7 +114,7 @@ export class ProjectWorkspace extends Project {
 
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
-        const c = projects[index];
+        const c = projects[index] as any;
         await c.project.StaticVersion();
       }
     }
@@ -209,7 +124,7 @@ export class ProjectWorkspace extends Project {
 
     // console.log('project length', projects.length)
     for (let index = 0; index < projects.length; index++) {
-      const { project, appBuild } = projects[index];
+      const { project, appBuild }: { project: Project, appBuild: boolean; } = projects[index] as any;
       const sum = projects.length;
       const precentIndex = index;
 
