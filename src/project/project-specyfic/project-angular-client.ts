@@ -165,11 +165,11 @@ Angular cli build command: ${command}
   async buildSteps(buildOptions?: BuildOptions) {
     this.buildOptions = buildOptions;
     const { prod, watch, outDir, appBuild, args } = buildOptions;
-    let baseHref = buildOptions.baseHref;
     if (this.isEjectedProject) {
       this.preventWarningTypescirptMismatch()
     }
     if (appBuild) {
+      let baseHref = buildOptions.baseHref;
       if (baseHref) {
         baseHref = `${baseHref}/`;
         baseHref = baseHref.replace(/\/\//g, '/')

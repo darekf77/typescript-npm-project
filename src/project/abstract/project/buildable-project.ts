@@ -75,8 +75,8 @@ export abstract class BuildableProject {
     this.buildOptions.copyto = projects as any;
   }
 
-  private async selectProjectToCopyTO(this: Project) {
-    if (this.type === 'unknow') {
+  private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
+    if (project.type === 'unknow') {
       return;
     }
     // clearConsole()
@@ -86,13 +86,13 @@ export abstract class BuildableProject {
         .getProjects()
         .map(p => p.project)
         .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
-        .filter(p => p.location !== this.location)
+        .filter(p => p.location !== project.location)
 
       _.sortBy(existedProjects, ['genericName']);
       // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
 
       if (global.tnpNonInteractive) {
-        this.buildOptions.copyto = [];
+        buildOptions.copyto = [];
       } else {
         const { projects = [] }: { projects: string[] } = await inquirer
           .prompt([
@@ -107,19 +107,20 @@ export abstract class BuildableProject {
             }
           ]) as any;
 
-        this.buildOptions.copyto = projects.map(p => Project.From(p)) as any;
+        buildOptions.copyto = projects.map(p => Project.From(p)) as any;
       }
 
     }
 
-    if (!_.isArray(this.buildOptions.copyto)) {
-      this.buildOptions.copyto = []
+    if (!_.isArray(buildOptions.copyto)) {
+      buildOptions.copyto = []
     }
 
     // log(this.buildOptions)
     // process.exit(0)
 
-    await db.transaction.updateCommandBuildOptions(this.location, this.buildOptions);
+    await db.transaction.updateCommandBuildOptions(project.location, buildOptions);
+    await db.transaction.updateBuildOptions(buildOptions, process.pid);
   }
   //#endregion
 
@@ -142,10 +143,12 @@ export abstract class BuildableProject {
     if (this.type === 'workspace') {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.isWorkspaceChildProject) {
-      const proj = this.env.config && this.env.config.workspace.projects.find(p => {
-        return p.name === this.name
-      });
-      baseHref = proj ? proj.baseUrl : void 0
+      if (buildOptions.appBuild) {
+        const proj = this.env.config && this.env.config.workspace.projects.find(p => {
+          return p.name === this.name
+        });
+        baseHref = proj ? proj.baseUrl : void 0
+      }
     }
 
     // log(`basehref for current project `, baseHref)
@@ -157,7 +160,7 @@ export abstract class BuildableProject {
       } else {
         if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
           if (this.isStandaloneProject && this.buildOptions.watch && !this.isContainerChild) {
-            await this.selectProjectToCopyTO()
+            await BuildableProject.selectProjectToCopyTO(this.buildOptions, this);
           }
         }
       }

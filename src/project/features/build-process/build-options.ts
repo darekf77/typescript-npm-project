@@ -108,17 +108,26 @@ export class BuildOptions implements Models.dev.IBuildOptions {
     argsObj.args = argsString;
 
 
-    if (argsObj.forClient) {
+    if (!_.isNil(argsObj.forClient)) {
       if (_.isString(argsObj.forClient)) {
         argsObj.forClient = [argsObj.forClient]
       }
       if (!!projectCurrent && projectCurrent.isWorkspaceChildProject) {
         argsObj.forClient = (argsObj.forClient as string[]).map(projectParentChildName => {
-          const proj = projectCurrent.parent.children.find(c => c.name === (projectParentChildName as string)) as Project;
+          if (_.isObject(projectParentChildName)) {
+            projectParentChildName = (projectParentChildName as any).name;
+          }
+          // console.log('projectParentChildName', projectParentChildName)
+          const proj = projectCurrent.parent.children.find(c => {
+            return c.name === (projectParentChildName as string) || c.location === (projectParentChildName as string)
+          }) as Project;
           if (!proj) {
+            Helpers.log(`
+            projectCurrent.parent.children: ${projectCurrent.parent.children.map(c => c.name)}
+            `)
             Helpers.error(`${chalk.bold('--forClient argument')} : Cannot find module ${chalk.bold(projectParentChildName)}`);
           }
-          Helpers.info(`Build only for client ${chalk.bold(projectParentChildName)}`)
+          // Helpers.info(`(${projectCurrent.name}) Build only for client ${chalk.bold(projectParentChildName)}`)
           return proj;
         }) as any;
       }
@@ -127,7 +136,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
       argsObj.forClient = []
     }
 
-    if (argsObj.copyto) {
+    if (!_.isNil(argsObj.copyto)) {
       if (_.isString(argsObj.copyto)) {
         argsObj.copyto = [argsObj.copyto]
       }
@@ -137,6 +146,10 @@ export class BuildOptions implements Models.dev.IBuildOptions {
           // console.log('raw arg', args)
 
           // console.log('path', argPath)
+          if (_.isObject(argPath)) {
+            argPath = (argPath as any).location;
+          }
+
           const project = Project.nearestTo(argPath);
           if (!project) {
             Helpers.error(`autobuild.json : Path doesn't contain ${config.frameworkName} type project: ${argPath}`, true, true)
@@ -184,7 +197,7 @@ export class BuildOptions implements Models.dev.IBuildOptions {
         if (_.isString(c)) {
           project = c;
         } else {
-          project = c.location;
+          project = c.name;
         }
         return `--forClient ${project}`
       })
@@ -203,12 +216,12 @@ export class BuildOptions implements Models.dev.IBuildOptions {
       args.push('--onlyWatchNoBuild')
     }
 
-    if (baseHref) {
-      args.push('--baseHref')
+    if (baseHref && baseHref.trim() !== '') {
+      args.push(`--baseHref ${baseHref}`)
     }
 
 
-    return `tnp build:${type}${watch ? ':watch' : ''}${prod ? ':prod' : ''} ${args.join(' ')}`
+    return `${config.frameworkName} build:${type}${watch ? ':watch' : ''}${prod ? ':prod' : ''} ${args.join(' ')}`
   }
   //#endregion
 

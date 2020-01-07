@@ -55,11 +55,11 @@ export class TnpBundle extends FeatureForProject {
         }
 
         const res = Helpers.readFile(fileInTnp).trim() !== Helpers.readFile(fileInDest).trim()
-        console.log(`
-          compare: "${fileInDest}" ${Helpers.readFile(fileInDest).toString().length}
-          with : "${fileInTnp}" ${Helpers.readFile(fileInTnp).toString().length}
-          result: ${res}
-        `)
+        // console.log(`
+        //   compare: "${fileInDest}" ${Helpers.readFile(fileInDest).toString().length}
+        //   with : "${fileInTnp}" ${Helpers.readFile(fileInTnp).toString().length}
+        //   result: ${res}
+        // `)
         return res;
       }).length === 0;
   }
@@ -92,12 +92,31 @@ export class TnpBundle extends FeatureForProject {
     }
 
 
+    const toCopyTnpDeps = [
+      'tnp-models',
+      'tnp-helpers',
+      'tnp-db',
+    ];
 
-    const destCompiledJs = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, config.file.tnpBundle)
+    for (let index = 0; index < toCopyTnpDeps.length; index++) {
+      const depName = toCopyTnpDeps[index];
+      const sourceDep = path.join(Project.Tnp.location, config.folder.node_modules, depName);
+      const destDep = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, depName);
+      // Helpers.removeFolderIfExists(destDep);
+      Helpers.copy(sourceDep, destDep);
+    }
 
-
-    const destPackageJSON = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, config.file.tnpBundle, config.file.package_json)
-
+    const destCompiledJs = path.join(
+      workspaceOrStandaloneLocation,
+      config.folder.node_modules,
+      config.file.tnpBundle
+    );
+    const destPackageJSON = path.join(
+      workspaceOrStandaloneLocation,
+      config.folder.node_modules,
+      config.file.tnpBundle,
+      config.file.package_json
+    );
 
     Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
       filter: (src: string, dest: string) => {
