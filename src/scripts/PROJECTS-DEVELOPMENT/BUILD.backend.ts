@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 import * as path from 'path';
-
+import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
@@ -232,7 +232,41 @@ const BDW = (args) => BUILD_DIST_WATCH(args);
 const BLW = (args) => BUILD_DIST_WATCH(args);
 const $BAW = (args) => BUILD_APP_WATCH(args);
 
+const $STOP_BUILD_DIST_WATCH = async (args) => {
+  const db = await TnpDB.Instance(config.dbLocation);
+  const projectLocation = Project.Current.location;
+  await db.transaction.updateProcesses();
+  const pidsToKill = db.getBuilds()
+    .filter(f =>
+      f.location === projectLocation
+      && f.buildOptions
+      && f.buildOptions.watch
+      && !f.buildOptions.appBuild
+    )
+    .map(f => f.pid);
+  Helpers.info(`Killing build dist process in ${projectLocation}`);
+  for (let index = 0; index < pidsToKill.length; index++) {
+    const pid = pidsToKill[index];
+    try {
+      Helpers.killProcess(pid);
+      Helpers.info(`Process killed on pid ${pid}`);
+    } catch (error) {
+      Helpers.warn(`Not able to kill process on pid ${pid}`);
+    }
+  }
+  Helpers.info('Done')
+  process.exit(0);
+};
+
+async function $DB_BUILDS_UPDATE() {
+  const db = await TnpDB.Instance(config.dbLocation);
+  await db.transaction.updateProcesses();
+  process.exit(0)
+}
+
 export default {
+  $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
+  $STOP_BUILD_DIST_WATCH: Helpers.CLIWRAP($STOP_BUILD_DIST_WATCH, '$STOP_BUILD_DIST_WATCH'),
   STATIC_BUILD: Helpers.CLIWRAP(STATIC_BUILD, 'STATIC_BUILD'),
   SB: Helpers.CLIWRAP(SB, 'SB'),
   STATIC_BUILD_PROD: Helpers.CLIWRAP(STATIC_BUILD_PROD, 'STATIC_BUILD_PROD'),

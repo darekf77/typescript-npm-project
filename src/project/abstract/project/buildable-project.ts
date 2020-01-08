@@ -13,9 +13,63 @@ import chalk from 'chalk';
 
 
 export abstract class BuildableProject {
+  public _buildOptions?: BuildOptions;
 
   //#region @backend
-  public _buildOptions?: BuildOptions;
+
+  private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
+    if (project.type === 'unknow') {
+      return;
+    }
+    // clearConsole()
+    const db = await TnpDB.Instance(config.dbLocation);
+    if (!global.tnpNonInteractive) {
+      const existedProjects = db
+        .getProjects()
+        .map(p => p.project)
+        .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
+        .filter(p => p.location !== project.location)
+
+      _.sortBy(existedProjects, ['genericName']);
+      // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
+
+      if (global.tnpNonInteractive) {
+        buildOptions.copyto = [];
+      } else {
+        const { projects = [] }: { projects: string[] } = await inquirer
+          .prompt([
+            {
+              type: 'checkbox',
+              name: 'projects',
+              message: 'Select projects where to copy bundle after finish: ',
+              choices: existedProjects
+                .map(c => {
+                  return { value: c.location, name: c.genericName }
+                })
+            }
+          ]) as any;
+
+        buildOptions.copyto = projects.map(p => Project.From(p)) as any;
+      }
+
+    }
+
+    if (!_.isArray(buildOptions.copyto)) {
+      buildOptions.copyto = []
+    }
+
+    // log(this.buildOptions)
+    // process.exit(0)
+
+    await db.transaction.updateCommandBuildOptions(project.location, buildOptions);
+    await db.transaction.updateBuildOptions(buildOptions, process.pid);
+  }
+  //#endregion
+
+
+
+  //#region @backend
+
   get buildOptions() {
     if (!this._buildOptions) {
       return {};
@@ -73,54 +127,6 @@ export abstract class BuildableProject {
       .filter(p => p.location !== this.location)
 
     this.buildOptions.copyto = projects as any;
-  }
-
-  private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
-    if (project.type === 'unknow') {
-      return;
-    }
-    // clearConsole()
-    const db = await TnpDB.Instance(config.dbLocation);
-    if (!global.tnpNonInteractive) {
-      const existedProjects = db
-        .getProjects()
-        .map(p => p.project)
-        .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
-        .filter(p => p.location !== project.location)
-
-      _.sortBy(existedProjects, ['genericName']);
-      // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
-
-      if (global.tnpNonInteractive) {
-        buildOptions.copyto = [];
-      } else {
-        const { projects = [] }: { projects: string[] } = await inquirer
-          .prompt([
-            {
-              type: 'checkbox',
-              name: 'projects',
-              message: 'Select projects where to copy bundle after finish: ',
-              choices: existedProjects
-                .map(c => {
-                  return { value: c.location, name: c.genericName }
-                })
-            }
-          ]) as any;
-
-        buildOptions.copyto = projects.map(p => Project.From(p)) as any;
-      }
-
-    }
-
-    if (!_.isArray(buildOptions.copyto)) {
-      buildOptions.copyto = []
-    }
-
-    // log(this.buildOptions)
-    // process.exit(0)
-
-    await db.transaction.updateCommandBuildOptions(project.location, buildOptions);
-    await db.transaction.updateBuildOptions(buildOptions, process.pid);
   }
   //#endregion
 

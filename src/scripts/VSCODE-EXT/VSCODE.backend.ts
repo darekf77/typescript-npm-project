@@ -2,7 +2,6 @@ import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
 import { config } from '../../config';
 import { TnpDB } from 'tnp-db';
-import { sleep } from 'sleep';
 import { Project } from '../../project/abstract/project';
 
 export function $VSCODE_EXT(args: string, exit = true) {
@@ -93,7 +92,7 @@ function $VSCODE_GLOBAL() {
     },
     {
       'key': 'shift+cmd+c',
-      'command': 'workbench.action.tasks.terminate'
+      'command': 'extension.firedevstopwatchbuild'
     },
     {
       'key': 'shift+cmd+b',
@@ -161,12 +160,12 @@ const $VSCODE_FIX = async () => {
     const proj = projects[index];
     proj.project && proj.project.recreate.vscode.settings.changeColorTheme(false)
   }
-  sleep(1);
+  await new Promise(resolve => setTimeout(() => resolve(), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project && proj.project.recreate.vscode.settings.changeColorTheme()
   }
-  sleep(1);
+  await new Promise(resolve => setTimeout(() => resolve(), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project && proj.project.recreate.vscode.settings.gitReset()

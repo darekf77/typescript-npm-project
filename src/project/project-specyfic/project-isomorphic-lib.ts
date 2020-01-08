@@ -181,7 +181,7 @@ export class ProjectIsomorphicLib extends Project {
 
   async buildLib() {
     const { outDir, prod } = this.buildOptions;
-    // console.log('Build fucking this', this.buildOptions)
+    Helpers.log(`[buildLib] start of building`);
     this.copyWhenExist('bin', outDir);
     this.copyWhenExist('package.json', outDir);
     this.copyWhenExist('.npmrc', outDir);
@@ -198,6 +198,7 @@ export class ProjectIsomorphicLib extends Project {
 
     if (!this.isStandaloneProject && this.buildOptions.forClient.length === 0) {
       while (this.buildOptions.forClient.length === 0) {
+        Helpers.log(`[buildLib] select clients`);
         await selectClients(this.buildOptions, this);
       }
     }

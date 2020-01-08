@@ -204,10 +204,6 @@ export class PackageJsonCore {
       encoding: 'utf8',
       spaces: 2
     });
-    // if (this.name === 'ng2-logger') {
-    //   Helpers.info(`Sleeping...`)
-    //   Helpers.run(`sleep 20`).sync()
-    // }
 
     // Helpers.log(`Press any key`)
     // await Helpers.pressKeyAndContinue()

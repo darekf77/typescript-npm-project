@@ -1,7 +1,5 @@
 //#region @backend
 import * as path from 'path';
-import * as sleep from 'sleep';
-import * as glob from 'glob';
 import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../../abstract';
 import { Helpers } from 'tnp-helpers';

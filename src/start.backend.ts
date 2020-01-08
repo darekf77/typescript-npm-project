@@ -54,6 +54,7 @@ export function globalArgumentsParser(argsv: string[]) {
 
   let options = require('minimist')(argsv);
   const toCheck = {
+    'tnpNonInteractive': void 0,
     'findNearestProject': void 0,
     'findNearestProjectWithGitRoot': void 0,
     'findNearestProjectType': void 0,
@@ -65,6 +66,7 @@ export function globalArgumentsParser(argsv: string[]) {
   });
   options = _.cloneDeep(toCheck);
   let {
+    tnpNonInteractive,
     findNearestProject,
     findNearestProjectWithGitRoot,
     findNearestProjectType,
@@ -78,7 +80,10 @@ export function globalArgumentsParser(argsv: string[]) {
     .forEach(key => {
       options[key] = !!options[key];
       global[key] = options[key];
+      console.log(`assigned to global: ${key}`)
     });
+
+
 
   if (global.tnpNoColorsMode) {
     chalk.level = 0;
@@ -243,8 +248,9 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   ) {
     // info(`DO NOTHIGN`);
   } else {
-    Helpers.info('SET COMMAND ')
+    Helpers.log('[db] staring setting command...')
     await db.transaction.setCommand(argsv.join(' '));
+    Helpers.log('[db] finish setting command')
   }
 
 
