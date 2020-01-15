@@ -154,6 +154,7 @@ function $VSCODE_GLOBAL() {
     'git.showProgress': true,
     'debug.node.showUseWslIsDeprecatedWarning': false,
     'explorer.compactFolders': false,
+    'workbench.colorTheme': 'Default Light+',
   };
   let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');
   Helpers.writeFile(settingspath, settings);
