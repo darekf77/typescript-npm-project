@@ -145,8 +145,8 @@ export class ProjectWorkspace extends Project {
       return p;
     })
     console.log('project', projects.map(p => p.project.genericName))
-    // @LAST
-    process.exit(0)
+    // // @LAST
+    // process.exit(0)
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
         const c = projects[index] as any;

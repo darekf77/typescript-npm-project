@@ -33,6 +33,7 @@ Helper project for my typescript npm libraries.
   @@@@ RESOLVE WITH NEW ANGULAR IMPORT SYSTEM
 
 # ISSUES
+- maximulat call stack exceeded for lazy loading routing -> include router module
 - dont us getters in for loop, assign value firt
 - should be ONLY ONE VERION of (NG2-REST, MORPHI, RXJS and other...)
 - id, shoud be with undefined (TODO temp soluition)

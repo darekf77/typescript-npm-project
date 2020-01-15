@@ -157,7 +157,7 @@ inside generated projects...
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
       if (this.project.node_modules.exist) {
-        Helpers.info(`NODE MODULE EXISTS`)
+        Helpers.log(`NODE MODULE EXISTS`)
       } else {
         await this.project.filesStructure.init(buildOptions.args);
       }
