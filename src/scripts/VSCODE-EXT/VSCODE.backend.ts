@@ -16,16 +16,24 @@ export function $VSCODE_EXT(args: string, exit = true) {
   exit && process.exit(0)
 }
 
+function showfilesfor(project: Project) {
+  project.recreate.vscode.settings.excludedFiles(false);
+  project.recreate.vscode.settings.colorsFromWorkspace()
+}
+
+function hidefilesfor(project: Project) {
+  project.recreate.vscode.settings.excludedFiles(true);
+  project.recreate.vscode.settings.colorsFromWorkspace()
+}
+
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
-  Project.Current.recreate.vscode.settings.excludedFiles(false);
-  Project.Current.recreate.vscode.settings.colorsFromWorkspace()
-  console.log('proce cwd', process.cwd())
+  showfilesfor(Project.Current);
+  // console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
-  Project.Current.recreate.vscode.settings.excludedFiles(true);
-  Project.Current.recreate.vscode.settings.colorsFromWorkspace()
+  hidefilesfor(Project.Current);
   console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
@@ -173,10 +181,45 @@ const $VSCODE_FIX = async () => {
   process.exit(0)
 }
 
+
+const $FILES_HIDE = (args, exit) => $VSCODE_TEMP_HIDE(args, exit);
+const $FILES_SHOW = (args, exit) => $VSCODE_TEMP_SHOW(args, exit);
+const $FILES_SHOW_ALL = (args, exit = true) => {
+  let proj: Project;
+  if (Project.Current.isWorkspaceChildProject) {
+    proj = Project.Current.parent;
+  } else {
+    proj = Project.Current;
+  }
+  showfilesfor(proj);
+  if (proj.isWorkspace) {
+    proj.children.forEach(c => showfilesfor(c));
+  }
+  exit && process.exit(0);
+};
+
+const $FILES_HIDE_ALL = (args, exit = true) => {
+  let proj: Project;
+  if (Project.Current.isWorkspaceChildProject) {
+    proj = Project.Current.parent;
+  } else {
+    proj = Project.Current;
+  }
+  hidefilesfor(proj);
+  if (proj.isWorkspace) {
+    proj.children.forEach(c => hidefilesfor(c));
+  }
+  exit && process.exit(0);
+};
+
 export default {
   $VSCODE_EXT: Helpers.CLIWRAP($VSCODE_EXT, '$VSCODE_EXT'),
   $VSCODE_TEMP_SHOW: Helpers.CLIWRAP($VSCODE_TEMP_SHOW, '$VSCODE_TEMP_SHOW'),
+  $FILES_SHOW: Helpers.CLIWRAP($FILES_SHOW, '$FILES_SHOW'),
+  $FILES_SHOW_ALL: Helpers.CLIWRAP($FILES_SHOW_ALL, '$FILES_SHOW_ALL'),
   $VSCODE_TEMP_HIDE: Helpers.CLIWRAP($VSCODE_TEMP_HIDE, '$VSCODE_TEMP_HIDE'),
+  $FILES_HIDE: Helpers.CLIWRAP($FILES_HIDE, '$FILES_HIDE'),
+  $FILES_HIDE_ALL: Helpers.CLIWRAP($FILES_HIDE_ALL, '$FILES_HIDE_ALL'),
   $INIT_VSCODE: Helpers.CLIWRAP($INIT_VSCODE, '$INIT_VSCODE'),
   $VSCODE_INIT_ALL: Helpers.CLIWRAP($VSCODE_INIT_ALL, '$VSCODE_INIT_ALL'),
   $VSCODE: Helpers.CLIWRAP($VSCODE, '$VSCODE'),

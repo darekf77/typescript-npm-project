@@ -3,29 +3,26 @@ import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as glob from 'glob';
 
-import { FeatureForProject, Project } from '../../abstract';
-import { BuildOptions } from './build-options';
-import { Models } from 'tnp-models';
+import { Project } from '../../abstract';
 import { config } from '../../../config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
-import { PROGRESS_DATA } from '../../../progress-output';
-import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
 
 
-function distRequredCondition(childs: Project[], context: Condition, project: Project, db: TnpDB, targets: Project[]) {
+function distRequredCondition(requiredWithBuilds: Project[], context: Condition, project: Project, targets: Project[]) {
 
   // console.log('childs', childs.map(c => c.name))
-  for (let index = 0; index < childs.length; index++) {
-    const c = childs[index];
-    const browserFor = path.join(c.location, `browser-for-${project.name}`);
-    if (!Helpers.exists(browserFor)) {
-      // console.log(`Not exists ${browserFor}`)
+  for (let index = 0; index < requiredWithBuilds.length; index++) {
+    const c = requiredWithBuilds[index];
+    const targetsAreNotReady = (targets.filter(t => {
+      return c.isReadyForTarget(t);
+    }).length < targets.length);
+
+    if (targetsAreNotReady) {
       const targetsString = targets.map(t => {
         return `--forClient ${t.name}`; ''
-      }).join(' ')
+      }).join(' ');
       context.errorMessage = `
 
       Please build project ${chalk.bold(c.name)}:
@@ -47,7 +44,7 @@ export async function waitForRequiredDistsBuilds(db: TnpDB, project: Project, ta
     name: `Dist finsh buildProjectErr`,
     callback: async (context) => {
       const childs = project.libsForTraget(project);
-      return distRequredCondition(childs, context, project, db, targets);
+      return distRequredCondition(childs, context, project, targets);
     },
     errorMessage: 'Please wait for dist build to finish... (workspace child project) '
   };
@@ -77,7 +74,7 @@ export async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
 
   const browserFolder: Condition = {
     name: 'browser folder',
-    callback: (context) => {
+    callback: () => {
       const browserFolder = path.join(project.location, config.folder.browser);
       const result = fse.existsSync(browserFolder);
       return result;
@@ -96,7 +93,7 @@ export async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
       name: `Dist finsh buildProjectErr`,
       callback: async (context) => {
         const childs = project.sortedRequiredWorkspaceChilds;
-        return distRequredCondition(childs, context, project, db, [project]);
+        return distRequredCondition(childs, context, project, [project]);
       },
       errorMessage: 'Please wait for dist build to finish... (workspace child project) '
     };

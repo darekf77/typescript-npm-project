@@ -131,6 +131,14 @@ export abstract class BuildableProject {
   //#endregion
 
   //#region @backend
+  isReadyForTarget(this: Project, target: Project) {
+    const browserFor = path.join(this.location, `browser-for-${target.name}`);
+    // console.log(`Not exists ${browserFor}`)
+    return Helpers.exists(browserFor);
+  }
+  //#endregion
+
+  //#region @backend
   async build(this: Project, buildOptions?: BuildOptions) {
     // log('BUILD OPTIONS', buildOptions)
     if (this.type === 'unknow') {
