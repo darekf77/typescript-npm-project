@@ -35,6 +35,8 @@ function reorderResult(result = [], update: (result) => void): boolean {
 }
 //#endregion
 
+
+
 export abstract class FolderProject {
 
   abstract location: string;
@@ -61,20 +63,24 @@ export abstract class FolderProject {
    * etc......
    */
   //#region @backend
-  get childrenSortedByDeps(this: Project): Project[] {
+  get sortedRequiredWorkspaceChilds(this: Project): Project[] {
     if (!this.isWorkspaceChildProject) {
       return [];
     }
     // const libs = this.parent.childrenThatAreLibs;
     // console.log('this.parent.children', this.parent.children.map(c => c.name))
     // console.log('this.parent.childrenThatAreLibs', this.parent.childrenThatAreLibs.map(c => c.name))
-    return this.libs([this].map(a => {
-      return { project: a, appBuild: false } as any;
-    })).map(c => c.project).concat([this])
+    return this.libsForTraget(this).concat([this])
   }
   //#endregion
 
+
   //#region @backend
+
+  libsForTraget(this: Project, project: Project) {
+    return this.libs([{ project: project as any, appBuild: false }]).map(c => c.project);
+  }
+
   libs(this: Project, targetClients: Models.dev.ProjectBuild[]) {
     const existed = {};
     const targetLibs = targetClients
@@ -124,10 +130,10 @@ export abstract class FolderProject {
     }
     targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
 
-
+    let count = 0;
     let lastArr = [];
     while (reorderResult(result, r => { result = r; })) {
-      // log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
+      // Helpers.log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
       if (_.isEqual(lastArr, result.map(c => c.name))) {
         break;
       }

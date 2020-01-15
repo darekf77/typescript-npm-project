@@ -264,8 +264,58 @@ const $copy_module_to_project = async (args) => {
   await copyModuleto(args)
 }
 
+async function $DEPS_TREE() {
+  const proj = Project.Current;
+  if (proj.isWorkspaceChildProject) {
+    const c = proj;
+    Helpers.info(`child: ${c.name}`);
+    const libs = c.libsForTraget(c);
+    if (libs.length === 0) {
+      Helpers.log(`-- no deps --`);
+    } else {
+      libs.forEach(d => {
+        Helpers.log(`dep ${d.name}`);
+      })
+    }
+  } else if (proj.isWorkspace) {
+    proj.children.forEach(c => {
+      Helpers.info(`child: ${c.name}`);
+      const libs = c.libsForTraget(c);
+      if (libs.length === 0) {
+        Helpers.log(`-- no deps --`);
+      } else {
+        libs.forEach(d => {
+          Helpers.log(`dep ${d.name}`);
+        })
+      }
+
+    });
+  }
+
+  process.exit(0)
+
+}
+
+async function $DEPS_TREE2() {
+  const proj = Project.Current;
+  proj.children.forEach(c => {
+    Helpers.info(`child: ${c.name}`);
+    if (c.workspaceDependencies.length === 0) {
+      Helpers.log(`-- no deps --`);
+    } else {
+      c.workspaceDependencies.forEach(d => {
+        Helpers.log(`dep ${d.name}`);
+      })
+    }
+
+  });
+  process.exit(0)
+
+}
 
 export default {
+  $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
+  $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),
   $INSTALL_IN_TNP: Helpers.CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),
   $I_IN_TNP: Helpers.CLIWRAP($I_IN_TNP, '$I_IN_TNP'),
   $DEPS_SET_CATEGORY: Helpers.CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),

@@ -15,11 +15,11 @@ export class FilesTemplatesBuilder extends FeatureForProject {
   }
   rebuild() {
     const files = this.files;
-    Helpers.info(`Files templates for project:
+    // Helpers.info(`Files templates for project:
 
-    ${files.map(f => f).join('\n')}
+    // ${files.map(f => f).join('\n')}
 
-    `);
+    // `);
     for (let index = 0; index < files.length; index++) {
       const f = files[index];
       const filePath = path.join(this.project.location, f);

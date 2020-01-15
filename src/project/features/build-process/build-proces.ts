@@ -13,7 +13,10 @@ import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { PROGRESS_DATA } from '../../../progress-output';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
-
+import {
+  waitForAppBuildToBePossible, waitForRequiredDistsBuilds
+} from './waiting-for-builds-conditions-helpers.backend';
+import { selectClients, selectClientsAutomaticly } from '../../project-specyfic/select-clients';
 
 export class BuildProcess extends FeatureForProject {
 
@@ -192,24 +195,26 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
 
-
     await db.transaction.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
+
+    const allowedForSelectingCLients = [
+      'angular-lib',
+      'isomorphic-lib',
+      'angular-client',
+      'ionic-client',
+    ] as Models.libs.LibType[];
+
     if (buildOptions.appBuild) {
       await waitForAppBuildToBePossible(db, this.project);
-    } else {
-      const founded = await db.appBuildFoundedFor(this.project as any);
-      if (founded.length > 0) {
-        buildOptions.buildForAllClients = true;
-        buildOptions.forClient = founded.map(c => c.project);
-        Helpers.info(`
+    } else if (allowedForSelectingCLients.includes(this.project.type)) {
 
-        Automaticly assigne dist build target: ${founded.map(c => chalk.bold(c.project && c.project.name))}
-
-        `);
-
-        await db.transaction.updateCommandBuildOptions(this.project.location, buildOptions);
-        await db.transaction.updateBuildOptions(buildOptions, process.pid);
+      await selectClientsAutomaticly(buildOptions, this.project, db);
+      if (!this.project.isStandaloneProject && buildOptions.forClient.length === 0) {
+        while (buildOptions.forClient.length === 0) {
+          await selectClients(buildOptions, this.project, db);
+        }
       }
+      await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
     }
 
     Helpers.log(`
@@ -233,76 +238,6 @@ inside generated projects...
       Helpers.log('Build process exit')
       process.exit(0);
     }
-  }
-
-}
-
-
-async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
-
-  const commonCondtion: Condition = {
-    name: 'common condition',
-    callback: async () => {
-      const founded = await db.distBuildFoundedFor(project as any);
-      return _.isObject(founded);
-    },
-    errorMessage: `Waiting for dist build for this project:
-
-    Please run: ${config.frameworkName} bdw
-
-    inside this project in other console/terminal..
-
-    `,
-    timeoutNext: 10000
-  };
-
-  const browserFolder: Condition = {
-    name: 'browser folder',
-    callback: (context) => {
-      const browserFolder = path.join(project.location, config.folder.browser);
-      const result = fse.existsSync(browserFolder);
-      return result;
-    },
-    errorMessage: `Please wait for dist build to finish (standalone project)`
-  };
-
-  if (project.isStandaloneProject) {
-    await Helpers.conditionWait([
-      commonCondtion,
-      browserFolder,
-    ])
-  } else if (project.isWorkspaceChildProject) {
-
-    const conditionDist: Condition = {
-      name: `Dist finsh buildProjectErr`,
-      callback: async (context) => {
-        const childs = project.childrenSortedByDeps;
-        // console.log('childs', childs.map(c => c.name))
-        for (let index = 0; index < childs.length; index++) {
-          const c = childs[index];
-          const browserFor = path.join(c.location, `browser-for-${project.name}`);
-          if (!Helpers.exists(browserFor)) {
-            // console.log(`Not exists ${browserFor}`)
-            context.errorMessage = `
-
-            Please build project ${chalk.bold(c.name)}:
-              ${config.frameworkName} bdw --forClient ${project.name}
-
-              `;
-            return false;
-          }
-        }
-        return true;
-      },
-      errorMessage: 'Please wait for dist build to finish... (workspace child project) '
-    };
-
-    const conditions = [
-      conditionDist,
-      commonCondtion,
-    ];
-
-    await Helpers.conditionWait(conditions);
   }
 
 }

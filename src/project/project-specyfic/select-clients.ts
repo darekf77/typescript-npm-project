@@ -9,7 +9,23 @@ import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
-export async function selectClients(buildOptions: BuildOptions, currentProject: Project, angularLib = false) {
+export async function selectClientsAutomaticly(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+  const founded = await db.appBuildFoundedFor(currentProject as any);
+  if (founded.length > 0) {
+    buildOptions.buildForAllClients = true;
+    buildOptions.forClient = founded.map(c => c.project);
+    Helpers.info(`
+
+    Automaticly assigne dist build target: ${founded.map(c => chalk.bold(c.project && c.project.name))}
+
+    `);
+
+    await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
+    await db.transaction.updateBuildOptions(buildOptions, process.pid);
+  }
+}
+
+export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
   if (!buildOptions.watch) {
     buildOptions.forClient = currentProject.parent.children
       .filter(c => config.allowedTypes.app.includes(c.type))
@@ -50,7 +66,6 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
     buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
   }
 
-  const db = await TnpDB.Instance(config.dbLocation);
   await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
   await db.transaction.updateBuildOptions(buildOptions, process.pid);
 }

@@ -128,10 +128,10 @@ export class FilesRecreator extends FeatureForProject {
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
-          .concat(self.project.projectLinkedFiles().map(({ relativePath }) => {
-            // console.log('linked', relativePath)
-            return relativePath;
-          }))
+        // .concat(self.project.projectLinkedFiles().map(({ relativePath }) => {
+        //   // console.log('linked', relativePath)
+        //   return relativePath;
+        // }))
         // .concat(self.project.linkedProjects.map(p => {
         //   const source = self.project.type === 'angular-lib' ? config.folder.components : config.folder.src;
         //   return `${source}/tmp-${p.name}`;
@@ -200,6 +200,25 @@ export class FilesRecreator extends FeatureForProject {
     return {
       get settings() {
         return {
+          hideOrShowDeps() {
+            let action: 'hide' | 'show' | 'nothing';
+            self.modifyVscode((settings) => {
+              if (Object.keys(settings['files.exclude']).length === 0) {
+                action = 'show';
+              } else {
+                action = 'hide';
+              }
+              return settings;
+            });
+            if (action === 'hide') {
+              Helpers.info(`Auto hiding while init`);
+              self.vscode.settings.excludedFiles(true);
+            }
+            if (action === 'show') {
+              Helpers.info(`Auto showing while init`);
+              self.vscode.settings.excludedFiles(false);
+            }
+          },
           gitReset() {
             try {
               self.project.run('git checkout HEAD -- .vscode/settings.json').sync()

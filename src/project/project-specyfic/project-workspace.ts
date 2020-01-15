@@ -12,6 +12,39 @@ import { ProxyRouter } from '../features/proxy-router';
 import { BuildOptions } from '../features';
 import { Models } from 'tnp-models';
 
+
+//#region @backend
+/**
+ * TODO Replace it with topological sorting
+ */
+function checkForCircuralWorkspaceDeps(workspace: Project) {
+  const childs = workspace.children;
+  for (let index = 0; index < childs.length; index++) {
+    const c = childs[index];
+    const cWorkspaceDeps = c.workspaceDependencies.map(c => c.name);
+    // Helpers.log(`cWorkspaceDeps:
+    // ${cWorkspaceDeps.join('\n')}
+    // `);
+    const circural = c.workspaceDependencies.find(d => {
+      const dDeps = d.workspaceDependencies.map(aa => aa.name);
+      if (dDeps.includes(c.name)) {
+        return true;
+      }
+      return false;
+    });
+    if (!!circural) {
+      Helpers.error(`Circural dependency detected in workspace ${workspace.genericName}:
+
+        ${circural.name} => ${c.name}
+        ${c.name} => ${circural.name}
+
+      `, false, true);
+    }
+  }
+}
+
+//#endregion
+
 export class ProjectWorkspace extends Project {
 
 
@@ -28,6 +61,7 @@ export class ProjectWorkspace extends Project {
       }).length > 0) {
         Helpers.error(`Please match framework version in workspace-v2 children`, false, true);
       }
+      checkForCircuralWorkspaceDeps(this);
     }
   }
   async buildLib() {

@@ -10,7 +10,6 @@ import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
 import { BuildOptions } from '../features';
-import { selectClients } from './select-clients';
 //#endregion
 import { Project } from '../abstract';
 
@@ -193,13 +192,6 @@ export class ProjectIsomorphicLib extends Project {
         // this.linkWhenExist('../firedev-projects', outDir);
         this.linkWhenExist('tests', outDir);
         this.linkWhenExist('autobuild.json', outDir);
-      }
-    }
-
-    if (!this.isStandaloneProject && this.buildOptions.forClient.length === 0) {
-      while (this.buildOptions.forClient.length === 0) {
-        Helpers.log(`[buildLib] select clients`);
-        await selectClients(this.buildOptions, this);
       }
     }
 
