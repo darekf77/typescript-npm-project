@@ -16,7 +16,7 @@ import { handleProjectsPorts } from '../environment-config/environment-config-he
 import {
   waitForAppBuildToBePossible, waitForRequiredDistsBuilds
 } from './waiting-for-builds-conditions-helpers.backend';
-import { selectClients, selectClientsAutomaticly } from '../../project-specyfic/select-clients';
+import { selectClients } from '../../project-specyfic/select-clients';
 
 export class BuildProcess extends FeatureForProject {
 
@@ -208,12 +208,7 @@ inside generated projects...
       await waitForAppBuildToBePossible(db, this.project);
     } else if (allowedForSelectingCLients.includes(this.project.type)) {
 
-      await selectClientsAutomaticly(buildOptions, this.project, db);
-      if (!this.project.isStandaloneProject && buildOptions.forClient.length === 0) {
-        while (buildOptions.forClient.length === 0) {
-          await selectClients(buildOptions, this.project, db);
-        }
-      }
+      await selectClients(buildOptions, this.project, db);
       await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
     }
 
@@ -226,13 +221,17 @@ inside generated projects...
       PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
     }
     await this.project.build(buildOptions);
-    Helpers.log(`End of Building ${this.project.genericName}\n\n`
-      + (buildOptions.watch ? ' waching files.. starting.. please watit...' : ''));
+    const msg = (buildOptions.watch ? `
+      Waching files.. started.. please wait...
+    `: `
+      End of Building ${this.project.genericName}
+
+    ` )
+
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({
-        msg: `End of building ${this.project.genericName}\n`
-          + (buildOptions.watch ? ' waching files.. starting.. please watit...' : '')
-      })
+      PROGRESS_DATA.log({ msg });
+    } else {
+      Helpers.log(msg);
     }
     if (exit && !buildOptions.watch) {
       Helpers.log('Build process exit')

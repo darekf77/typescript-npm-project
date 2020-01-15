@@ -72,11 +72,11 @@ export class FilesStructure extends FeatureForProject {
       } else {
         if (this.project.isGenerated) {
           args += `${args} --env=static`;
-          Helpers.info(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
+          Helpers.log(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
             + ` initing for ${this.project.genericName}`)
         } else {
           args += `${args} --env=local`;
-          Helpers.info(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
+          Helpers.log(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
             + ` initing for ${this.project.genericName}`)
         }
       }
@@ -85,10 +85,10 @@ export class FilesStructure extends FeatureForProject {
     options = this.fixOptionsArgs(options);
     const { alreadyInitedPorjects, watch } = options;
 
-    Helpers.info(`[init] adding project is not exists...`)
+    Helpers.log(`[init] adding project is not exists...`)
     const db = await TnpDB.Instance(config.dbLocation);
     await db.transaction.addProjectIfNotExist(this.project as any);
-    Helpers.info(`[init] adding project is not exists...done`)
+    Helpers.log(`[init] adding project is not exists...done`)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);

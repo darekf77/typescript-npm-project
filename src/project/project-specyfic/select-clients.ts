@@ -9,10 +9,24 @@ import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
-export async function selectClientsAutomaticly(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+  if (
+    ((buildOptions.buildForAllClients && global.tnpNonInteractive) ||
+      (!buildOptions.buildForAllClients && !global.tnpNonInteractive)) &&
+    buildOptions.forClient.length === 0
+  ) {
+    await selectClientsAutomaticly(buildOptions, currentProject, db);
+  }
+  if (!currentProject.isStandaloneProject && buildOptions.forClient.length === 0) {
+    while (buildOptions.forClient.length === 0) {
+      await selectClientsMenu(buildOptions, currentProject, db);
+    }
+  }
+}
+
+async function selectClientsAutomaticly(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
   const founded = await db.appBuildFoundedFor(currentProject as any);
   if (founded.length > 0) {
-    buildOptions.buildForAllClients = true;
     buildOptions.forClient = founded.map(c => c.project);
     Helpers.info(`
 
@@ -25,7 +39,7 @@ export async function selectClientsAutomaticly(buildOptions: BuildOptions, curre
   }
 }
 
-export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
   if (!buildOptions.watch) {
     buildOptions.forClient = currentProject.parent.children
       .filter(c => config.allowedTypes.app.includes(c.type))
@@ -44,10 +58,6 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
       };
     });
   let selectedChoices = choices.map(c => c.value);
-
-  if (global.tnpNonInteractive) {
-    buildOptions.buildForAllClients = true;
-  }
 
   if (buildOptions.buildForAllClients) {
     buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;

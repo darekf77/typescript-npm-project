@@ -9,6 +9,12 @@ import { config } from '../../../config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
+export function presskeys(project: Project) {
+  return ` or press on keyboard: (${chalk.bold('CMD|Ctrl')} + ${chalk.bold('Shift')} + ${chalk.bold('B')})
+  in ${chalk.bold(project.name)} vscode window...
+`
+}
+
 
 function distRequredCondition(requiredWithBuilds: Project[], context: Condition, project: Project, targets: Project[]) {
 
@@ -28,9 +34,7 @@ function distRequredCondition(requiredWithBuilds: Project[], context: Condition,
       Please build project ${chalk.bold(c.name)}:
         ${config.frameworkName} bdw ${targetsString}
 
-
-      or press on keyboard: (${chalk.bold('CMD|Ctrl')} + ${chalk.bold('Shift')} + ${chalk.bold('B')})
-      in ${chalk.bold(c.name)} vscode window...
+      ${presskeys(c)}
 
         `;
       return false;
@@ -67,6 +71,8 @@ export async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
     Please run: ${config.frameworkName} bdw
 
     inside this project in other console/terminal..
+
+    ${presskeys(project)}
 
     `,
     timeoutNext: 10000

@@ -211,7 +211,7 @@ export class FilesRecreator extends FeatureForProject {
               return settings;
             });
             if (action === 'hide') {
-              Helpers.info(`Auto hiding while init`);
+              Helpers.log(`Auto hiding while init`);
               self.vscode.settings.excludedFiles(true);
             }
             if (action === 'show') {
@@ -271,7 +271,7 @@ export class FilesRecreator extends FeatureForProject {
               if (hide) {
                 if (self.project.isTnp) {
                   self.project.node_modules.fixesForNodeModulesPackages.forEach(p => {
-                    settings['files.exclude'][p] = true
+                    settings['files.exclude'][p] = true;
                   })
                   settings['files.exclude']["*.js"] = true;
                   settings['files.exclude']["*.sh"] = true;
@@ -279,7 +279,9 @@ export class FilesRecreator extends FeatureForProject {
                   settings['files.exclude']["scripts"] = true;
                   settings['files.exclude']["bin"] = true;
                 }
-
+                self.project.projectLinkedFiles().forEach(({ relativePath }) => {
+                  settings['files.exclude'][relativePath] = true;
+                })
                 self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
                   settings['files.exclude'][f] = true
                 })

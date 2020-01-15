@@ -31,9 +31,9 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         continue;
       }
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
-      Helpers.log(`Started for ${f}`);
+      // Helpers.log(`Started for ${f}`);
       this.processFile(filePath, fileContent, env, _);
-      Helpers.info(`Processed DONE for ${f}`);
+      // Helpers.log(`Processed DONE for ${f}`);
     }
     this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
   }

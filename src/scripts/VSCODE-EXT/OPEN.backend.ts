@@ -19,6 +19,19 @@ function $OPEN_WORKSPACE() {
   process.exit(0)
 }
 
+function $OPEN_WORKSPACE_CHILDS() {
+  let proj: Project;
+  if (Project.Current.isWorkspace) {
+    proj = Project.Current;
+  } else if (Project.Current.isWorkspaceChildProject) {
+    proj = Project.Current.parent;
+  }
+  if (proj.isWorkspace) {
+    proj.run(`${proj.children.map(c => `code ${c.name}`).join(' && ')}`).sync();
+  }
+  process.exit(0)
+}
+
 function $IS_CORE_PROJECT() {
   Helpers.info(`(${Project.Current.genericName})
   - is core project: ${chalk.bold(String(Project.Current.isCoreProject))}`)
@@ -52,6 +65,7 @@ function $OPEN_BASELINE() {
 }
 
 export default {
+  $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
   $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
