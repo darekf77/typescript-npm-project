@@ -3,13 +3,13 @@ import * as _ from 'lodash';
 import * as glob from 'glob';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
+import { BuildOptions } from '../features';
+//#endregion
 // local
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
-import { ProxyRouter } from '../features/proxy-router';
-import { BuildOptions } from '../features';
 import { Models } from 'tnp-models';
 
 
@@ -46,7 +46,7 @@ function checkForCircuralWorkspaceDeps(workspace: Project) {
 //#endregion
 
 export class ProjectWorkspace extends Project {
-
+  //#region @backend
 
   constructor(public location: string) {
     super(location);
@@ -194,11 +194,11 @@ export class ProjectWorkspace extends Project {
     }
     PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
   }
+  //#endregion
 }
 
+//#region @backend
 function showProgress(type: 'app' | 'lib', name: string, precentFraction: number) {
   PROGRESS_DATA.log({ value: (precentFraction) * 100, msg: `In progress of building ${type} "${name}"` });
 }
-
-
 //#endregion

@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
+//#region @backend
 import * as path from 'path';
+//#endregion
 import { Helpers } from 'ng2-logger';
 
 import { Models } from 'tnp-models';
@@ -82,9 +84,11 @@ const folder = {
   ...tempFolders
 };
 
+//#region @backend
 function pathResolved(...partOfPath: string[]) {
   return path.resolve(path.join(...partOfPath))
 }
+//#endregion
 
 const moduleNameAngularLib = [
   folder.components,
@@ -100,6 +104,7 @@ const moduleNameIsomorphicLib = [
 ];
 
 export const config = {
+  //#region @backend
   get dbLocation() {
     let dbPath = `bin/db.json`;
     if (global.testMode) {
@@ -109,6 +114,7 @@ export const config = {
     const location = path.join(Project.Tnp.location, dbPath);
     return location;
   },
+  //#endregion
   regexString: {
     pathPartStringRegex: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   },
@@ -137,6 +143,7 @@ export const config = {
   },
   frameworkName: 'tnp',
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
+  //#region @backend
   pathes: {
 
     logoSvg: 'logo.svg',
@@ -173,6 +180,7 @@ export const config = {
       }
     }
   },
+  //#endregion
   allowedEnvironments,
   folder,
   tempFolders,

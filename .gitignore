@@ -51,7 +51,6 @@ Thumbs.db
 /projects/tmp*
 /bin/db.json
 /bin/db-for-tests.json
-/webpack.backend-bundle-build.js
 
 !tsconfig*
 webpack.*

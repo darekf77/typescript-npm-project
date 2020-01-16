@@ -13,9 +13,10 @@ import chalk from 'chalk';
 
 
 export abstract class BuildableProject {
-  public _buildOptions?: BuildOptions;
+
 
   //#region @backend
+  public _buildOptions?: BuildOptions;
 
   private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
     if (project.type === 'unknow') {
