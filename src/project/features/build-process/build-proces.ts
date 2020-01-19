@@ -164,10 +164,23 @@ inside generated projects...
 
       if (buildOptions.watch) {
         let config;
-        if (this.project.isWorkspace) {
-          config = this.project.env.config.workspace.workspace;
-        } else if (this.project.isWorkspaceChildProject) {
-          config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
+        while (true) {
+          if (this.project.isWorkspace) {
+            if (this.project.env.config) {
+              config = this.project.env.config.workspace.workspace;
+            }
+          } else if (this.project.isWorkspaceChildProject) {
+            if (this.project.env.config) {
+              config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
+            }
+          } else {
+            break;
+          }
+          if (config) {
+            break;
+          } else {
+            await this.project.filesStructure.init(buildOptions.args);
+          }
         }
         if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
           await handleProjectsPorts(this.project, config, false);

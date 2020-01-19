@@ -80,7 +80,7 @@ export function globalArgumentsParser(argsv: string[]) {
     .forEach(key => {
       options[key] = !!options[key];
       global[key] = options[key];
-      console.log(`assigned to global: ${key}:${global[key]}`)
+      Helpers.log(`[start.backend] assigned to global: ${key}:${global[key]}`)
     });
 
 

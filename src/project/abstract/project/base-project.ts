@@ -192,7 +192,7 @@ export abstract class BaseProject {
       return this.packageJson.workspaceDependencies.map(name => {
         const child = this.parent.child(name);
         if (!child) {
-          Helpers.error(`Unknow child "${name}" inside ${this.packageJson.path}`, true, true);
+          Helpers.error(`Unknow child "${name}" inside ${this.packageJson.path}`, false, true);
         }
         return child;
       }).filter(f => !!f);

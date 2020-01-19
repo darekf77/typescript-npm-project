@@ -22,7 +22,9 @@ META COMMENTS:
 
 Helper project for my typescript npm libraries.
 
-
+# good angular structure
+- every Module.forRoot() in src
+- every Module.forChild() in components
 
 
 # TO REMEBER
@@ -33,6 +35,7 @@ Helper project for my typescript npm libraries.
   @@@@ RESOLVE WITH NEW ANGULAR IMPORT SYSTEM
 
 # ISSUES
+- dont put Class Componentts to input @Input() 
 - maximulat call stack exceeded for lazy loading routing -> include router module
 - dont us getters in for loop, assign value firt
 - should be ONLY ONE VERION of (NG2-REST, MORPHI, RXJS and other...)

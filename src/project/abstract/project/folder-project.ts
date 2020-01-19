@@ -213,7 +213,7 @@ export abstract class FolderProject {
   child(this: Project, name: string, errors = true): Project {
     const c = this.children.find(c => c.name === name);
     if (errors && !c) {
-      Helpers.error(`Project doesnt contain child with name: ${name}`)
+      Helpers.warn(`Project doesnt contain child with name: ${name}`)
     }
     return c;
   }
