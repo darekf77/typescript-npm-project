@@ -141,7 +141,9 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
   if (useYarn) {
-    command = `yarn ${pkg ? 'add' : install} --ignore-engines ${pkg ? pkg.name : ''} `
+    // --ignore-scripts
+    // yarn install --prefer-offline
+    command = `yarn ${pkg ? 'add' : install} --ignore-engines --no-progress ${pkg ? pkg.name : ''} `
       + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
   } else {
     command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} --ignore-scripts`;
