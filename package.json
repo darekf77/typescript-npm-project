@@ -79,9 +79,7 @@
           "@ngx-formly/ionic",
           "@ngx-formly/material"
         ],
-        "trusted": [
-
-        ],
+        "trusted": [],
         "dedupe-for-testing": [
           "@types/jasmine",
           "@types/jasminewd2",
