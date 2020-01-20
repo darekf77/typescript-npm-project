@@ -89,7 +89,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if (this.project.isContainerChild && this.project.isWorkspace) {
         this.project.packageJson.hideDeps(`${this.project.type} hide deps for container child [${triggeredMsg}]`);
       }
-      if (this.project.isWorkspace || this.project.isStandaloneProject) {
+      if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         this.project.node_modules.dedupe();
       }
       if (this.project.isWorkspace && smoothInstall === false) {

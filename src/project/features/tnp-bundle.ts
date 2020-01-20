@@ -25,7 +25,8 @@ export class TnpBundle extends FeatureForProject {
     if (!fse.existsSync(pathTnpCompiledJS)) {
       pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.bundle);
     }
-    const pathTnpPackageJSONData: Models.npm.IPackageJSON = fse.readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
+    const pathTnpPackageJSONData: Models.npm.IPackageJSON = fse
+      .readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
 
     pathTnpPackageJSONData.name = config.file.tnpBundle;
     pathTnpPackageJSONData.tnp = undefined;
@@ -82,7 +83,7 @@ export class TnpBundle extends FeatureForProject {
 
 
     if (project.isTnp) {
-      return
+      return;
     }
 
     if (this.notNeededReinstallationTnp[workspaceOrStandaloneLocation] > 2) {

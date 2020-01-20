@@ -81,7 +81,7 @@ inside generated projects...
     // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
 
     if (this.project.isWorkspaceChildProject) {
-      Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
+      // Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
       this.project.parent.getFolders()
         .filter(p => !this.project.parent.children.map(c => c.name).includes(path.basename(p)))
         .forEach(p => {
@@ -104,7 +104,7 @@ inside generated projects...
             });
           }
         });
-      Helpers.log(`[mergeNpmPorject] finish..`)
+      // Helpers.log(`[mergeNpmPorject] finish..`)
     }
 
   }
@@ -143,7 +143,7 @@ inside generated projects...
       }
     }
 
-    Helpers.log(`[db][checkBuildIfAllowed] started... `);
+    // Helpers.log(`[db][checkBuildIfAllowed] started... `);
     const db = await TnpDB.Instance(config.dbLocation);
     await db.transaction.checkBuildIfAllowed(
       this.project as any,
@@ -152,7 +152,7 @@ inside generated projects...
       process.ppid,
       true
     );
-    Helpers.log(`[db][checkBuildIfAllowed] finish `);
+    // Helpers.log(`[db][checkBuildIfAllowed] finish `);
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 

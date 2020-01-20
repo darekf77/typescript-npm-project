@@ -331,7 +331,7 @@ export class Project {
     this.recreate = new FilesRecreator(this);
     this.filesFactory = new FilesFactory(this);
     this.sourceModifier = new SourceModifier(this);
-    this.outputCodeModifier = new OutputCodeModifier(this);
+    // this.outputCodeModifier = new OutputCodeModifier(this);
     this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
     this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
     if (!this.isStandaloneProject) {

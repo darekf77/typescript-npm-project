@@ -1,7 +1,6 @@
 {
   "extends": "../tsconfig.isomorphic.json",
   "compilerOptions": {
-    "moduleResolution": "node",
     "target": "es2015",
     "module": "esnext",
     "rootDir": "./",
