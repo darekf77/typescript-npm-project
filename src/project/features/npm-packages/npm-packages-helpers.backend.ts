@@ -146,7 +146,7 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
     command = `yarn ${pkg ? 'add' : install} --ignore-engines --no-progress ${pkg ? pkg.name : ''} `
       + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
   } else {
-    command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} --ignore-scripts`;
+    command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} --ignore-engines --no-progress `;
   }
   return command;
 }

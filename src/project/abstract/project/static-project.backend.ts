@@ -70,17 +70,17 @@ export abstract class StaticProject {
    * generated version of workspace/worskpace-childs project
    * ready for serving by  framework router/proxy
    */
-  get distribution(this: Project): Project {
+  get bundledWorkspace(this: Project): Project {
     if (this.type === 'unknow') {
       return;
     }
-    const outDir: Models.dev.BuildDir = 'dist';
+    const outDir: Models.dev.BuildDir = 'bundle';
     let projectToBuild: Project;
     if (this.isGenerated) {
       if (!global.tnp_normal_mode) {
         return;
       }
-      Helpers.warn(`Trying to access distribution of distribution`, true);
+      Helpers.warn(`Trying to access bundle of bundle`, true);
       return;
     }
     if (this.isWorkspace) {
@@ -94,7 +94,7 @@ export abstract class StaticProject {
   }
 
   /**
-   * Same thing as distribution, but it will generate folder in
+   * Same thing as bundle workspace, but it will generate folder in
    * case that the does not exists
    */
   async StaticVersion(this: Project, regenerate = true): Promise<Project> {
@@ -109,10 +109,10 @@ export abstract class StaticProject {
       staticVersion = this as any;
     } else {
 
-      if (regenerate || !this.distribution) {
+      if (regenerate || !this.bundledWorkspace) {
         await this.staticBuild.regenerate();
       }
-      staticVersion = this.distribution;
+      staticVersion = this.bundledWorkspace;
     }
 
     return staticVersion;

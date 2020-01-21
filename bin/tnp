@@ -12,6 +12,7 @@ if (distOnly) {
   var pathToDistRun = path.join(__dirname, '../dist/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   global.tnp_normal_mode = true;
+  global.tnp_out_folder = 'dist';
   // =======================================================================
 } else if (bundleOnly) {
   // =========================== only dist ============================
@@ -21,6 +22,7 @@ if (distOnly) {
   var pathToDistRun = path.join(__dirname, '../bundle/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   global.tnp_normal_mode = true;
+  global.tnp_out_folder = 'bundle'
   // =======================================================================
 } else {
   // =========================== TODO speeding up! ============================

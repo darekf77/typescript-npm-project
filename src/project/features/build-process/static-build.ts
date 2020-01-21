@@ -19,27 +19,27 @@ export class StaticBuild extends FeatureForProject {
       // console.log(`NOT YET GENERATED ${this.project.genericName}`)
     }
     if (this.project.isWorkspaceChildProject) {
-      if (!this.project.parent.distribution) {
+      if (!this.project.parent.bundledWorkspace) {
         await this.project.parent.staticBuild.regenerate();
         return;
       }
       await this.project.parent.staticBuild.regenerate(false);
     }
-    await regenerateDistribution(this.project);
+    await regenerateBundledWorkspace(this.project);
     if (this.project.isWorkspace && regenerateWorkspaceChildren) {
       for (let index = 0; index < this.project.children.length; index++) {
         const c = this.project.children[index];
-        await regenerateDistribution(c);
+        await regenerateBundledWorkspace(c);
       }
     }
   }
 
 }
 
-async function regenerateDistribution(project: Project) {
+async function regenerateBundledWorkspace(project: Project) {
   Helpers.info(`Actual Regenerating project: ${project.genericName}`);
   StaticBuild.alerdyRegenerated.push(project.location)
-  const outDir: Models.dev.BuildDir = 'dist';
+  const outDir: Models.dev.BuildDir = 'bundle';
 
   const locationOfGeneratedProject = getLocationOfGeneratedProject(project, outDir);
 
@@ -51,8 +51,8 @@ async function regenerateDistribution(project: Project) {
   }
 
   if (project.isWorkspace) {
-    if (project.distribution) {
-      project.copyManager.generateSourceCopyIn(project.distribution.location, { override: false, });
+    if (project.bundledWorkspace) {
+      project.copyManager.generateSourceCopyIn(project.bundledWorkspace.location, { override: false, });
     } else {
       project.copyManager.generateSourceCopyIn(locationOfGeneratedProject);
     }
