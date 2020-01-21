@@ -35,9 +35,9 @@ export abstract class VscodeProject {
       // console.log(err)
     }
 
-    const distributionFolder = path.join(this.location, config.folder.dist);
-    if (!fse.existsSync(distributionFolder)) {
-      Helpers.mkdirp(distributionFolder);
+    const bundledChildrensFolder = path.join(this.location, config.folder.bundle);
+    if (!fse.existsSync(bundledChildrensFolder)) {
+      Helpers.mkdirp(bundledChildrensFolder);
     }
     configSettings['terminal.integrated.cwd'] = '.';
 
@@ -48,7 +48,7 @@ export abstract class VscodeProject {
           .map(c => {
             return { path: c.name }
           }),
-        { path: 'dist' }
+        { path: 'bundle' }
       ],
       settings: configSettings
     };
