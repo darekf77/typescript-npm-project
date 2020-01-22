@@ -33,6 +33,9 @@ export abstract class StaticProject {
     if (this.type === 'unknow') {
       return false;
     }
+    if (this.isStandaloneProject && this.packageJson.isGenerated) {
+      return true;
+    }
     return (this.isWorkspaceChildProject && this.parent.packageJson.isGenerated) ||
       (this.isWorkspace && this.packageJson.isGenerated)
     //#endregion

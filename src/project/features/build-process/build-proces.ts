@@ -116,7 +116,7 @@ inside generated projects...
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
     this.project.buildOptions = buildOptions;
 
-    if (this.project.isGenerated && buildOptions.watch) {
+    if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
       buildOptions.watch = false;
       Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }

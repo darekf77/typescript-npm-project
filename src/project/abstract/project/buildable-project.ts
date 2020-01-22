@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { JSON10 } from 'json10';
 import { config } from '../../../config';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
@@ -141,7 +142,7 @@ export abstract class BuildableProject {
 
   //#region @backend
   async build(this: Project, buildOptions?: BuildOptions) {
-    // log('BUILD OPTIONS', buildOptions)
+    // Helpers.log(`BUILD OPTIONS: ${JSON10.stringify(buildOptions)}`)
     if (this.type === 'unknow') {
       return;
     }
@@ -175,7 +176,9 @@ export abstract class BuildableProject {
       } else {
         if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
           if (this.isStandaloneProject && this.buildOptions.watch && !this.isContainerChild) {
-            await BuildableProject.selectProjectToCopyTO(this.buildOptions, this);
+            if (!this.isGenerated) {
+              await BuildableProject.selectProjectToCopyTO(this.buildOptions, this);
+            }
           }
         }
       }

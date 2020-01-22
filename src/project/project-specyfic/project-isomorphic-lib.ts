@@ -136,6 +136,7 @@ export class ProjectIsomorphicLib extends Project {
 
   async buildSteps(buildOptions?: BuildOptions) {
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
+    // console.log({ buildOptions })
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         if (!watch) {

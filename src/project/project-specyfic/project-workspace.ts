@@ -172,10 +172,20 @@ export class ProjectWorkspace extends Project {
           void 0, this.frameworkVersion, true);
       }
       this.node_modules.linkToProject(distProj);
+      // Helpers.writeFile(path.join(this.location, config.folder.dist, config.file.package_json), {
+      //   name: config.folder.dist,
+      //   tnp: {
+      //     type: 'container'
+      //   }
+      // })
       const singularDistSrc = path.join(distProj.location, config.folder.src);
       Helpers.removeFolderIfExists(singularDistSrc);
       Helpers.mkdirp(singularDistSrc);
       await distProj.filesStructure.init('');
+
+      distProj.packageJson.data.tnp.isGenerated = true;
+      await distProj.packageJson.writeToDisc();
+
       this.children.forEach(c => {
         const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
         Helpers.createSymLink(
@@ -185,6 +195,7 @@ export class ProjectWorkspace extends Project {
       await distProj.buildProcess.startForLib({
         watch,
         prod,
+        staticBuildAllowed: true
       }, false);
 
     } else {
