@@ -5,6 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
+import * as os from 'os';
 import { watch } from 'chokidar'
 
 import { config } from '../../config';
@@ -75,9 +76,9 @@ export class CopyManager extends FeatureForProject {
     const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
     if (useTempLocation) {
-      tempDestination = `/tmp/${_.camelCase(destinationLocation)}`;
+      tempDestination = `${os.platform() === 'darwin' ? '/private/tmp' : '/tmp'}/${_.camelCase(destinationLocation)}`;
       if (fse.existsSync(tempDestination)) {
-        Helpers.remove(tempDestination)
+        Helpers.remove(tempDestination);
       }
 
       Helpers.mkdirp(tempDestination);
