@@ -10,6 +10,14 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
 export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+  if (currentProject.isGenerated) {
+    if (currentProject.isWorkspaceChildProject) {
+      buildOptions.buildForAllClients = true;
+    } else {
+      return;
+    }
+
+  }
   if (
     ((buildOptions.buildForAllClients && global.tnpNonInteractive) ||
       (!buildOptions.buildForAllClients && !global.tnpNonInteractive)) &&

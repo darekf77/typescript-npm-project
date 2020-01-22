@@ -217,13 +217,18 @@ inside generated projects...
       'ionic-client',
     ] as Models.libs.LibType[];
 
-    if (buildOptions.appBuild) {
-      await waitForAppBuildToBePossible(db, this.project);
-    } else if (allowedForSelectingCLients.includes(this.project.type)) {
-
+    if (this.project.isGenerated) {
       await selectClients(buildOptions, this.project, db);
-      await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
+    } else {
+      if (buildOptions.appBuild) {
+        await waitForAppBuildToBePossible(db, this.project);
+      } else if (allowedForSelectingCLients.includes(this.project.type)) {
+
+        await selectClients(buildOptions, this.project, db);
+        await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
+      }
     }
+
 
     Helpers.log(`
 

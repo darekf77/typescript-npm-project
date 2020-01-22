@@ -28,6 +28,7 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
+- dont override symlink with fs
 - node_modules/link_from_another_project_dir is resolving packges not from this node_modules !!! 
       -> dont use links in node_modules
 - issue with angular loadChildren: './components/+preview-buildtnpprocess/preview-buildtnpprocess.module#PreviewBuildTnpProcesssModule'

@@ -38,6 +38,7 @@ export class CopyManager extends FeatureForProject {
   private filterDontCopy(basePathFoldersTosSkip: string[]) {
 
     return (src: string, dest: string) => {
+      // console.log('src',src)
       const baseFolder = _.first(src.replace(this.project.location, '')
         .replace(/^\//, '').split('/'));
       if (!baseFolder || baseFolder.trim() === '') {
@@ -75,6 +76,7 @@ export class CopyManager extends FeatureForProject {
   private executeCopy(sourceLocation: string, destinationLocation: string, options: Models.other.GenerateProjectCopyOpt) {
     const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
+    // console.log('useTempLocation',useTempLocation)
     if (useTempLocation) {
       tempDestination = `${os.platform() === 'darwin' ? '/private/tmp' : '/tmp'}/${_.camelCase(destinationLocation)}`;
       if (fse.existsSync(tempDestination)) {
@@ -97,8 +99,9 @@ export class CopyManager extends FeatureForProject {
     const foldersToSkip = [
       ...(filterForBundle ? [
         '.vscode',
-        ..._.values(config.tempFolders)
+        ..._.values(config.tempFolders),
       ] : []),
+      ...(this.project.projectLinkedFiles().map(c => c.relativePath)),
       ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
       ...(this.project.isWorkspace ? this.project.children.map(c => c.name) : [])
     ];
