@@ -108,7 +108,7 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
-  get projectsInOrder(): Models.dev.ProjectBuild[] {
+  projectsInOrder(appBuilds: boolean): Models.dev.ProjectBuild[] {
     if (!fse.existsSync(this.location)) {
       return [];
     }
@@ -116,17 +116,21 @@ export class ProjectWorkspace extends Project {
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))
+      .filter(c => c.type === 'angular-lib')
       .map(c => {
         return { project: c, appBuild: true };
       }) as any;
 
-    // console.log('targetClients', targetClients.map(c => c.project.genericName))
+    console.log('targetClients', targetClients.map(c => c.project.genericName))
 
-    const libs = this.libs(targetClients);
+    const libs = this.libs(targetClients, true);
+
+    console.log('libs', libs.map(c => c.project.genericName))
 
     return [
       ...libs,
-      ...(this.buildOptions && !this.buildOptions.watch ? targetClients : [])
+      // ...targetClients.map(c => c.appBuild = false),
+      ...(appBuilds ? targetClients : [])
     ] as any;
   }
 
@@ -140,11 +144,8 @@ export class ProjectWorkspace extends Project {
     PROGRESS_DATA.log({ msg: 'Process started', value: 0 });
     const { prod, watch, outDir, args, appBuild } = buildOptions;
     Helpers.log(`build opt  ${JSON.stringify({ prod, watch, outDir, args, appBuild })}`)
-    const projects = this.projectsInOrder.map(p => {
-      p.appBuild = this.isGenerated;
-      return p;
-    })
-    console.log('project', projects.map(p => p.project.genericName))
+    const projects = this.projectsInOrder(this.isGenerated ? true : (watch));
+    // console.log('project', projects.map(p => p.project.genericName))
     // // @LAST
     // process.exit(0)
     if (this.isGenerated) {
@@ -153,7 +154,10 @@ export class ProjectWorkspace extends Project {
         await c.project.StaticVersion();
       }
     }
-    // console.log('projects', projects.map(c => c.project.genericName))
+    console.log('projects', projects.map(c => {
+      return `${c.project.genericName} appBuild: ${c.appBuild} `
+    }));
+    // process.exit(0)
     // process.exit(0)
     PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 

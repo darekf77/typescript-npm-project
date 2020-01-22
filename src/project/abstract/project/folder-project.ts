@@ -81,7 +81,7 @@ export abstract class FolderProject {
     return this.libs([{ project: project as any, appBuild: false }]).map(c => c.project);
   }
 
-  libs(this: Project, targetClients: Models.dev.ProjectBuild[]) {
+  libs(this: Project, targetClients: Models.dev.ProjectBuild[], targetAsLibAlso = false) {
     const existed = {};
     const targetLibs = targetClients
       .map(t => ((t.project as any) as Project).workspaceDependencies)
@@ -139,6 +139,13 @@ export abstract class FolderProject {
       }
       lastArr = result.map(c => c.name);
     }
+
+    if (targetAsLibAlso) {
+      targetClients
+        .filter(f => _.isUndefined(result.find(p => p.location === f.project.location)))
+        .forEach(f => result.push(f.project as any))
+    }
+
     return result.map(c => {
       return { project: c, appBuild: false };
     });
