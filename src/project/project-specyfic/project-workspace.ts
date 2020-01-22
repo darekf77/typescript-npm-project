@@ -1,6 +1,7 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as glob from 'glob';
+import * as path from 'path';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { BuildOptions } from '../features';
@@ -11,6 +12,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { Models } from 'tnp-models';
+import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
 
 
 //#region @backend
@@ -158,45 +160,74 @@ export class ProjectWorkspace extends Project {
       return `${c.project.genericName} appBuild: ${c.appBuild} `
     }));
     // process.exit(0)
-    // process.exit(0)
-    PROGRESS_DATA.log({ value: 0, msg: `Process started` });
 
-    // console.log('project length', projects.length)
-    for (let index = 0; index < projects.length; index++) {
-      const { project, appBuild }: { project: Project, appBuild: boolean; } = projects[index] as any;
-      const sum = projects.length;
-      const precentIndex = index;
+    if (watch) {
+      const newFactory = ProjectFactory.Instance;
+      const projjjj = path.join(this.location, config.folder.dist, config.folder.tmp);
+      let distProj = Project.From(projjjj);
+      if (!distProj) {
+        Helpers.removeFolderIfExists(projjjj)
+        distProj = await newFactory.create('isomorphic-lib', config.folder.tmp,
+          path.join(this.location, config.folder.dist),
+          void 0, this.frameworkVersion, true);
+      }
+      this.node_modules.linkToProject(distProj);
+      const singularDistSrc = path.join(distProj.location, config.folder.src);
+      Helpers.removeFolderIfExists(singularDistSrc);
+      Helpers.mkdirp(singularDistSrc);
+      await distProj.filesStructure.init('');
+      this.children.forEach(c => {
+        const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
+        Helpers.createSymLink(
+          path.join(c.location, source),
+          path.join(singularDistSrc, c.name));
+      });
+      await distProj.buildProcess.startForLib({
+        watch,
+        prod,
+      }, false);
 
-      if (appBuild) {
-        if (this.isGenerated) {
-          showProgress('app', project.genericName, (precentIndex / sum));
-          await project.buildProcess.startForApp({
+    } else {
+      PROGRESS_DATA.log({ value: 0, msg: `Process started` });
+      for (let index = 0; index < projects.length; index++) {
+        const { project, appBuild }: { project: Project, appBuild: boolean; } = projects[index] as any;
+        const sum = projects.length;
+        const precentIndex = index;
+
+        if (appBuild) {
+          if (this.isGenerated) {
+            showProgress('app', project.genericName, (precentIndex / sum));
+            await project.buildProcess.startForApp({
+              watch,
+              prod,
+              args: `--noConsoleClear  ${args}`,
+              staticBuildAllowed: this.isGenerated,
+              progressCallback: (fraction) => {
+                showProgress('app', project.genericName, ((precentIndex + fraction) / sum));
+              }
+            }, false);
+          } else {
+            Helpers.log(`Ommiting app build for ${project.genericName}`)
+          }
+        } else {
+          // Helpers.log(`AAAA BUILD HERER`)
+          showProgress('lib', project.genericName, (precentIndex / sum));
+          await project.buildProcess.startForLib({
             watch,
             prod,
             args: `--noConsoleClear  ${args}`,
             staticBuildAllowed: this.isGenerated,
             progressCallback: (fraction) => {
-              showProgress('app', project.genericName, ((precentIndex + fraction) / sum));
+              showProgress('lib', project.genericName, ((precentIndex + fraction) / sum));
             }
           }, false);
-        } else {
-          Helpers.log(`Ommiting app build for ${project.genericName}`)
         }
-      } else {
-        // Helpers.log(`AAAA BUILD HERER`)
-        showProgress('lib', project.genericName, (precentIndex / sum));
-        await project.buildProcess.startForLib({
-          watch,
-          prod,
-          args: `--noConsoleClear  ${args}`,
-          staticBuildAllowed: this.isGenerated,
-          progressCallback: (fraction) => {
-            showProgress('lib', project.genericName, ((precentIndex + fraction) / sum));
-          }
-        }, false);
       }
+      PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
     }
-    PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
+
+    // console.log('project length', projects.length)
+
   }
   //#endregion
 }

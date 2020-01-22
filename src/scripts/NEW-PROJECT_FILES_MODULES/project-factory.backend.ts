@@ -54,7 +54,7 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn: string, version: 'v1' | 'v2' = 'v1'): Promise<Project> {
+  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn: string, version: 'v1' | 'v2' = 'v1', skipInit = false): Promise<Project> {
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
       version = cwdProj.frameworkVersion;
@@ -120,7 +120,9 @@ export class ProjectFactory {
     if (destProje) {
       destProje.recreate.vscode.settings.excludedFiles();
       destProje.recreate.vscode.settings.colorsFromWorkspace()
-      await destProje.filesStructure.init('')
+      if (!skipInit) {
+        await destProje.filesStructure.init('')
+      }
     }
     return destProje;
   }
