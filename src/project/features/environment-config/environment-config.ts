@@ -46,6 +46,9 @@ export class EnvironmentConfig
   }
 
   public async updateData(config?: Models.env.EnvConfig) {
+    if (this.project.isStandaloneProject && this.project.isGenerated) {
+      return;
+    }
     config = !!config ? config : this.project.env.config;
     if (this.project.git.isGitRepo) {
       config.build = {
@@ -63,7 +66,9 @@ export class EnvironmentConfig
 
 
   public async init(args?: string, overridePortsOnly: boolean = void 0) {
-
+    if (this.project.isStandaloneProject && this.project.isGenerated) {
+      return;
+    }
     // console.log('INITIN ENV!')
 
     let workspaceProjectLocation: string;

@@ -320,7 +320,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePath) {
       // console.log(`check child: ${pkgName}`)
-      const child = this.compilationProject.parent.child(pkgName, false);
+      const parent = this.compilationProject.isGenerated ? this.compilationProject.grandpa : this.compilationProject.parent;
+      const child = parent.child(pkgName, false);
       if (child && this.buildOptions && !this.buildOptions.appBuild) {
         // console.log(`child founded: ${pkgName}`)
         const orgImp = imp;

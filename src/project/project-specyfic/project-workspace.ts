@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { BuildOptions } from '../features';
+import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
 //#endregion
 // local
 import { Project } from '../abstract';
@@ -12,7 +13,6 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { Models } from 'tnp-models';
-import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
 
 
 //#region @backend
@@ -157,34 +157,48 @@ export class ProjectWorkspace extends Project {
       }
     }
     console.log('projects', projects.map(c => {
-      return `${c.project.genericName} appBuild: ${c.appBuild} `
+      return `${c.project.genericName} appBuild: ${c.appBuild}`;
     }));
     // process.exit(0)
 
     if (watch) {
+
       const newFactory = ProjectFactory.Instance;
-      const projjjj = path.join(this.location, config.folder.dist, config.folder.tmp);
-      let distProj = Project.From(projjjj);
-      if (!distProj) {
-        Helpers.removeFolderIfExists(projjjj)
-        distProj = await newFactory.create('isomorphic-lib', config.folder.tmp,
-          path.join(this.location, config.folder.dist),
-          void 0, this.frameworkVersion, true);
+      const tmpWorkspaceName = this.name;
+      const tmpWorkspaceDirpath = path.join(this.location, config.folder.dist);
+      const projjjj = path.join(tmpWorkspaceDirpath, tmpWorkspaceName);
+      let singularWatchProj = Project.From(projjjj);
+      if (!singularWatchProj) {
+        Helpers.removeFolderIfExists(projjjj);
+        singularWatchProj = await newFactory.create(
+          'isomorphic-lib',
+          tmpWorkspaceName,
+          tmpWorkspaceDirpath,
+          void 0,
+          this.frameworkVersion,
+          true
+        );
+        this.node_modules.linkToProject(singularWatchProj);
       }
-      this.node_modules.linkToProject(distProj);
+
       // Helpers.writeFile(path.join(this.location, config.folder.dist, config.file.package_json), {
       //   name: config.folder.dist,
       //   tnp: {
       //     type: 'container'
       //   }
       // })
-      const singularDistSrc = path.join(distProj.location, config.folder.src);
+      const singularDistSrc = path.join(singularWatchProj.location, config.folder.src);
       Helpers.removeFolderIfExists(singularDistSrc);
       Helpers.mkdirp(singularDistSrc);
-      await distProj.filesStructure.init('');
 
-      distProj.packageJson.data.tnp.isGenerated = true;
-      await distProj.packageJson.writeToDisc();
+      await singularWatchProj.filesStructure.init('');
+      Helpers.copyFile(
+        path.join(this.location, config.file.tnpEnvironment_json),
+        path.join(singularWatchProj.location, config.file.tnpEnvironment_json)
+      );
+
+      singularWatchProj.packageJson.data.tnp.isGenerated = true;
+      await singularWatchProj.packageJson.writeToDisc();
 
       this.children.forEach(c => {
         const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
@@ -192,11 +206,33 @@ export class ProjectWorkspace extends Project {
           path.join(c.location, source),
           path.join(singularDistSrc, c.name));
       });
-      await distProj.buildProcess.startForLib({
+
+
+      await singularWatchProj.buildProcess.startForLib({
         watch,
         prod,
         staticBuildAllowed: true
       }, false);
+      const targets = this.children
+        .filter(c => c.type === 'angular-lib')
+        .map(c => c.name)
+
+      this.children.forEach(c => {
+        const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
+        const dest = path.join(c.location, config.folder.dist);
+        Helpers.remove(dest, true);
+        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+
+        targets.forEach(targetName => {
+          const sourceBrowser = path.join(
+            singularWatchProj.location, config.folder.dist,
+            `${config.folder.browser}-for-${targetName}`, c.name);
+          const destBrowser = path.join(c.location, `${config.folder.browser}-for-${targetName}`);
+          Helpers.remove(destBrowser, true);
+          Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
+        });
+
+      });
 
     } else {
       PROGRESS_DATA.log({ value: 0, msg: `Process started` });

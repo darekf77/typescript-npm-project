@@ -140,7 +140,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   }
 
   initCodeCut(filesPathes: string[]) {
-
+    // console.trace(filesPathes)
     // console.log('inside')
     let env: Models.env.EnvConfig = this.ENV;
     const compilationProject: Project = this.compilationProject;
@@ -161,22 +161,31 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       project = compilationProject;
     }
 
+    // if (compilationProject.isStandaloneProject && compilationProject.isGenerated && compilationProject.type === 'isomorphic-lib') {
+    //   project = compilationProject;
+    // }
+
     filesPathes = filesPathes.map(f => {
       return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
-    })
+    });
+    // console.log('this.cwd', this.cwd)
+    // console.log('this.location', this.location)
     // console.log('project', project.name)
     // console.log('compilationProject', compilationProject.name)
     // console.log('filesPathes', filesPathes)
-    // process.exit(0)
+    // console.log('evn', env)
+    // console.log('this.buildOptions', this.buildOptions)
+    // // process.exit(0)
+    // return
     this.codecut = new ExtendedCodeCut(
       this.compilationFolderPath,
       filesPathes,
       {
         replacements: [
-          ((compilationProject.type === 'isomorphic-lib') && ["@backendFunc", `return undefined;`]) as any,
-          ((compilationProject.type === 'isomorphic-lib') && "@backend") as any,
-          ["@cutCodeIfTrue", this.codeCuttFn(true)],
-          ["@cutCodeIfFalse", this.codeCuttFn(false)]
+          ((compilationProject.type === 'isomorphic-lib') && ['@backendFunc', `return undefined;`]) as any,
+          ((compilationProject.type === 'isomorphic-lib') && '@backend') as any,
+          ['@cutCodeIfTrue', this.codeCuttFn(true)],
+          ['@cutCodeIfFalse', this.codeCuttFn(false)]
         ].filter(f => !!f),
         env
       },

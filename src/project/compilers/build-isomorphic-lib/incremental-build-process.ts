@@ -12,8 +12,9 @@ import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from '../../features/build-process';
 
 function useDefaultBrowserCompilation(project: Project) {
+
   if (project.isStandaloneProject && project.type === 'isomorphic-lib') {
-    return true;
+    return !project.isGenerated;
   }
   if (project.type === 'isomorphic-lib') {
     return _.isUndefined(project.parent.children.find(c => {
@@ -27,7 +28,7 @@ function useDefaultBrowserCompilation(project: Project) {
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
   private get resolveModulesLocations(): string[] {
-    if (this.project.isWorkspaceChildProject) {
+    if (this.project.isWorkspaceChildProject || (this.project.isStandaloneProject && this.project.isGenerated)) {
 
       if (_.isArray(this.buildOptions.forClient) && this.buildOptions.forClient.length > 0) {
         return (this.buildOptions.forClient as any[]).map((c: Project) => c.name)
@@ -95,7 +96,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
 
 
-      if (project.isStandaloneProject) {
+      if (project.isStandaloneProject && !project.isGenerated) {
         // if (project.type === 'isomorphic-lib' && !buildOptions.watch) {
         //   const browser = _.first(this.browserCompilations)
         //   browser.filesAndFoldesRelativePathes = browser.filesAndFoldesRelativePathes.filter(f => {
@@ -124,14 +125,17 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           ]
         }
       } else {
+
+
         this.resolveModulesLocations
           .forEach(moduleName => {
             let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
             if (outFolder === 'bundle') {
               browserOutFolder = path.join(outFolder, browserOutFolder);
             }
-
-            const proj = this.project.parent.child(moduleName);
+            const parentProj = (this.project.isStandaloneProject && this.project.isGenerated) ?
+              this.project.grandpa : this.project.parent;
+            const proj = parentProj.child(moduleName);
             const envConfig = proj.env.config;
             if (!envConfig) {
               Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);

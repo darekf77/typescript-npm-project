@@ -242,6 +242,19 @@ export abstract class FolderProject {
     //#endregion
   }
 
+  get grandpa(this: Project): Project {
+    if (Helpers.isBrowser) {
+      return this.browser.grandpa as any;
+    }
+    //#region @backend
+    if (!_.isString(this.location) || this.location.trim() === '') {
+      return void 0;
+    }
+    const grandpa = Project.From(path.join(this.location, '..', '..'));
+    return grandpa;
+    //#endregion
+  }
+
   //#region @backend
   getFolders(this: Project) {
     const notAllowed: RegExp[] = [

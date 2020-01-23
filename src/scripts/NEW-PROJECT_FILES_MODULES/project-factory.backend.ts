@@ -39,10 +39,10 @@ export class ProjectFactory {
     Helpers.error(`Please use example above.`, false, true);
   }
 
-  private pacakgeJsonNameFix(locationDest, basedOn?: string) {
+  private pacakgeJsonNameFix(locationDest, basedOn?: string, name?: string) {
     const pkgJSONpath = path.join(locationDest, config.file.package_json);
     const json: Models.npm.IPackageJSON = fse.readJSONSync(pkgJSONpath)
-    json.name = _.kebabCase(path.basename(locationDest));
+    json.name = ((name === path.basename(locationDest)) ? name : _.kebabCase(path.basename(locationDest)));
 
     json.tnp.isCoreProject = false;
     json.tnp.isGenerated = false;
@@ -63,11 +63,21 @@ export class ProjectFactory {
     console.log('version', version)
     // process.exit(0)
 
-    const nameKebakCase = _.kebabCase(name)
-    if (nameKebakCase !== name) {
-      Helpers.info(`Project name renemed to: ${nameKebakCase} `)
+    // console.log(`
+
+    //     skip init1 ${skipInit}
+
+
+    //   `);
+
+    if (!skipInit) {
+      const nameKebakCase = _.kebabCase(name)
+      if (nameKebakCase !== name) {
+        Helpers.info(`Project name renemed to: ${nameKebakCase} `)
+      }
+      name = nameKebakCase;
     }
-    name = nameKebakCase;
+
     const basedOnProject = basedOn && Project.From(path.join(cwd, basedOn));
     if (basedOn && !basedOnProject) {
       Helpers.error(`Not able to find baseline project from relative path: ${basedOn} `, false, true);
@@ -77,7 +87,10 @@ export class ProjectFactory {
     }
     const baseline = basedOn ? basedOnProject : Project.by(type, version);
     Helpers.log(`PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
-    baseline.run(`${config.frameworkName} init`).sync();
+
+    baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init`).sync();
+
+
 
     const destinationPath = this.getDestinationPath(name, cwd);
     Helpers.log(`Destination path: ${destinationPath}`);
@@ -95,7 +108,7 @@ export class ProjectFactory {
             forceCopyPackageJSON: type === 'single-file-project'
           });
           // console.log(destinationPath)
-          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0);
+          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0, name);
           Helpers.info(`Project ${baseline.name} create successfully`);
         } catch (err) {
           Helpers.error(err);
@@ -119,7 +132,13 @@ export class ProjectFactory {
     const destProje = Project.From(destinationPath);
     if (destProje) {
       destProje.recreate.vscode.settings.excludedFiles();
-      destProje.recreate.vscode.settings.colorsFromWorkspace()
+      destProje.recreate.vscode.settings.colorsFromWorkspace();
+      // console.log(`
+
+      //   skip init ${skipInit}
+
+
+      // `)
       if (!skipInit) {
         await destProje.filesStructure.init('')
       }
