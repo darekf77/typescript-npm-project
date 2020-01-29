@@ -457,6 +457,14 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  //#region @backend
+  notAllowedFiles() {
+    return [
+      '.vscode/tasks.json'
+    ]
+  }
+  //#endregion
+
 }
 
 

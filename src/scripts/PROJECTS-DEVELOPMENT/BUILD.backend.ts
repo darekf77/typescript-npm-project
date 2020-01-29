@@ -264,7 +264,25 @@ async function $DB_BUILDS_UPDATE() {
   process.exit(0)
 }
 
+
+async function $DEFAULT_BUILD(args) {
+  const project = Project.Current;
+  if (project.isStandaloneProject) {
+    if (project.type === 'angular-lib') {
+      await BUILD_DIST_WATCH(args);
+      // await $BUILD_APP(args);
+    } else if (project.type === 'isomorphic-lib') {
+      await BUILD_DIST_WATCH(args);
+    }
+  } else if (project.isWorkspace) {
+    await BUILD_DIST_WATCH(args);
+  } else if (project.isWorkspaceChildProject) {
+    await $BUILD_APP(args);
+  }
+}
+
 export default {
+  $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
   $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
   $STOP_BUILD_DIST_WATCH: Helpers.CLIWRAP($STOP_BUILD_DIST_WATCH, '$STOP_BUILD_DIST_WATCH'),
   STATIC_BUILD: Helpers.CLIWRAP(STATIC_BUILD, 'STATIC_BUILD'),

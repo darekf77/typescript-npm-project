@@ -157,10 +157,6 @@ export abstract class LibProject {
       'index.d.ts',
       'index.js.map',
     ];
-
-    if (this.type === 'isomorphic-lib' || this.type === 'angular-lib') {
-      files.push('.vscode/tasks.json')
-    }
     return files;
   }
 

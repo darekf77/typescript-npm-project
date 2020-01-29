@@ -361,7 +361,9 @@ export class Project {
     this.filesStructure = new FilesStructure(this);
     this.buildProcess = new BuildProcess(this);
 
-
+    this.notAllowedFiles().forEach(f => {
+      Helpers.removeFileIfExists(path.join(this.location, f));
+    });
   }
   //#endregion
 
