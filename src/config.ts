@@ -310,9 +310,33 @@ export const config = {
       { name: 'real-favicon', installName: 'cli-real-favicon' },
       { name: 'babel', installName: 'babel-cli' },
       { name: 'javascript-obfuscator' },
-      { name: 'uglifyjs', installName: 'uglify-js' }
+      { name: 'uglifyjs', installName: 'uglify-js' },
     ],
-    programs: [
+    niceTools: [
+      { name: 'speed-test' },
+      { name: 'npm-name' }, // check if name is available on npm
+      { name: 'vantage', platform: 'linux' }, // inspect you live applicaiton
+      { name: 'clinic', platform: 'linux' }, // check why nodejs is slow
+      { name: 'vtop', platform: 'linux' }, // inspect you live applicaiton,
+      { name: 'public-ip' },
+      { name: 'empty-trash' },
+      { name: 'is-up' }, // check if website is ok
+      { name: 'is-online' }, // check if internet is ok,
+      { name: 'ttystudio' }, // record terminal actions,
+      { name: 'bcat' }, // redirect any stream to browser,
+      { name: 'wifi-password', installName: 'wifi-password-cli' },
+      { name: 'wallpaper', installName: 'wallpaper-cli' },
+      { name: 'brightness', installName: 'brightness-cli' },
+      { name: 'subdownloader' },
+      { name: 'rtail' }, // monitor multiple server
+      { name: 'iponmap' }, // show ip in terminal map,
+      { name: 'jsome' }, // display colored jsons,
+      { name: 'drawille', isNotCli: true }, // 3d drwa in temrinal
+      { name: 'columnify', isNotCli: true } // draw nice columns in node,
+      { name: 'multispinner', isNotCli: true }, // progres for multiple async actions
+      { name: 'cfonts' }, // draw super nice fonts in console
+    ],
+    programs: [,
       //   {
       //     name: 'code',
       //     website: 'https://code.visualstudio.com/'
