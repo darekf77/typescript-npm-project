@@ -332,7 +332,7 @@ export const config = {
       { name: 'iponmap' }, // show ip in terminal map,
       { name: 'jsome' }, // display colored jsons,
       { name: 'drawille', isNotCli: true }, // 3d drwa in temrinal
-      { name: 'columnify', isNotCli: true } // draw nice columns in node,
+      { name: 'columnify', isNotCli: true }, // draw nice columns in node,
       { name: 'multispinner', isNotCli: true }, // progres for multiple async actions
       { name: 'cfonts' }, // draw super nice fonts in console
     ],
