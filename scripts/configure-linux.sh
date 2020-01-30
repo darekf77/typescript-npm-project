@@ -85,3 +85,5 @@ sudo usermod -a -G sambashare john # wil fix issue on debian
 # cd projects/site && tnp build
 # tnp start 2>&1 >/dev/null &
 
+# samba
+useradd dariusz
