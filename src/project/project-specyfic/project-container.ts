@@ -14,7 +14,7 @@ export class ProjectContainer extends Project {
   }
 
   private addGitReposAsLinkedProjects() {
-    console.log('this.getFolders()', this.getFolders())
+    // console.log('this.getFolders()', this.getFolders())
     const repoChilds = this.getFolders()
       .map(c => {
         const proj = Project.From(c);
