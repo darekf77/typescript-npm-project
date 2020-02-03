@@ -39,6 +39,9 @@ export class FilesRecreator extends FeatureForProject {
 
   public async init() {
     if (this.project.type === 'container') {
+      // console.log('GIGIIGIGII')
+      this.gitignore();
+      this.projectSpecyficFiles();
       return;
     }
     this.initAssets();
@@ -128,17 +131,12 @@ export class FilesRecreator extends FeatureForProject {
           .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
-        // .concat(self.project.projectLinkedFiles().map(({ relativePath }) => {
-        //   // console.log('linked', relativePath)
-        //   return relativePath;
-        // }))
-        // .concat(self.project.linkedProjects.map(p => {
-        //   const source = self.project.type === 'angular-lib' ? config.folder.components : config.folder.src;
-        //   return `${source}/tmp-${p.name}`;
-        // }))
-        // console.log(`self.project.isCoreProject for "${self.project.name}" = ${self.project.isCoreProject}`)
-        // console.log(`self.project.isSite for ${path.basename(path.dirname(self.project.location))} "${self.project.name}" = ${self.project.isSite}  `)
-        // console.log('ignoref iles', gitignoreFiles)
+        // .concat(self.project.isContainer ? [
+        //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
+        // ] : []);
+
+        // console.log('self.project:', self.project.name);
+        // console.log(gitignoreFiles)
         return gitignoreFiles.map(f => `/${f}`)
       },
       get npmignore() {
@@ -203,6 +201,10 @@ export class FilesRecreator extends FeatureForProject {
           hideOrShowDeps() {
             let action: 'hide' | 'show' | 'nothing';
             self.modifyVscode((settings) => {
+              const exclude = settings['files.exclude'];
+              if (!exclude) {
+                settings['files.exclude'] = {};
+              }
               if (Object.keys(settings['files.exclude']).length === 0) {
                 action = 'show';
               } else {
@@ -356,6 +358,11 @@ Thumbs.db
         .join('\n').concat('\n') + `
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
+${ this.project.isContainer ? `
+# container git projects
+${this.project.packageJson.linkedProjects.map(c => `/${c}`).join('\n')}
+` : []}
+# =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
             .map(({ relativePath }) => {
@@ -365,7 +372,6 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
           }
 
 `.trimRight() + '\n');
-
 
 
   }

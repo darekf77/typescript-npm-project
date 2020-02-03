@@ -112,8 +112,14 @@ export class FilesStructure extends FeatureForProject {
     alreadyInitedPorjects.push(this.project)
 
     if (this.project.isContainer) {
-
-      const containerChildren = this.project.children;
+      await this.project.recreate.init();
+      const containerChildren = this.project.children.filter(c => {
+        if(c.git.isGitRepo) {
+          Helpers.log(`[init] not initing recrusively, it is git repo ${c.name}`)
+          return false;
+        }
+        return true;
+      })
       for (let index = 0; index < containerChildren.length; index++) {
         const containerChild = containerChildren[index];
         await containerChild.filesStructure.init(args, options);

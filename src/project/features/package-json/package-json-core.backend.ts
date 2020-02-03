@@ -209,6 +209,17 @@ export class PackageJsonCore {
     // await Helpers.pressKeyAndContinue()
   }
 
+  public writeToDiscSync() {
+    // console.log(this.data)
+    fse.writeJSONSync(this.path, this.data, {
+      encoding: 'utf8',
+      spaces: 2
+    });
+
+    // Helpers.log(`Press any key`)
+    // await Helpers.pressKeyAndContinue()
+  }
+
   private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
     const baselineInNodeModuels = path.join(this.cwd, config.folder.node_modules, path.basename(pathToBaseline))
     if (!fse.existsSync(baselineInNodeModuels)) {

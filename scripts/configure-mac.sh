@@ -18,3 +18,8 @@ sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.UserNotificatio
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 # macports
 https://guide.macports.org/#installing
+
+# disable spotlight
+ sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+# or enable
+sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist

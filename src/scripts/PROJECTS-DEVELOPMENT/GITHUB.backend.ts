@@ -44,8 +44,8 @@ const GITHUB_PROJECTS_NAMES = [
   'bs3-breakpoint',
 
 
-  'IonicCoffeescript',
-  'angular2-example-http-login',
+  // 'IonicCoffeescript',
+  // 'angular2-example-http-login',
   'http-socket-proxy-router',
   'example-isomorphic-rest',
   'my-old-js-tests',
