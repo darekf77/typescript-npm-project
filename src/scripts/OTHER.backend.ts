@@ -10,6 +10,8 @@ import * as path from 'path';
 import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 
+// console.log('hello')
+
 function $CONFIGS() {
   Helpers.log(Project.Current.env.configsFromJs.map(c => c.domain).join('\n'));
   process.exit(0)

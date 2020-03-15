@@ -2,6 +2,11 @@
 //#region @backend
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
+global.hideLog = true;
+if (process.argv.includes('-verbose')) {
+  global.hideLog = false;
+  process.argv = process.argv.filter(f => f !== '-verbose');
+}
 var distOnly = (process.argv[process.argv.length - 1] === '-dist');
 var bundleOnly = (process.argv[process.argv.length - 1] === '-bundle');
 if (distOnly) {
@@ -72,6 +77,6 @@ if (distOnly) {
   // =======================================================================
 }
 global.start = start;
-// console.log('start assigned to global')
+// console.log('before start')
 start(process.argv, 'tnp');
 //#endregion

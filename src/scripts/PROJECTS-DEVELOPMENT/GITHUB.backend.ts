@@ -94,7 +94,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
           Helpers.info(`Cloned origin for ${projectName}`);
         }
       } catch (err) {
-        Helpers.error(err, true);
+        // Helpers.error(err, true);
         Helpers.run(`code ${dest}`).async();
         const tryAgain = await Helpers.questionYesNo(`Try again dump project ${projectName} ?`);
         if (tryAgain) {

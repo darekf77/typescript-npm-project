@@ -21,6 +21,9 @@ export class ProjectAngularLib extends Project {
       this.projectAngularClient = new ProjectAngularClient(location);
       this.projectAngularClient.env = this.env; // QUICK_FIX
     }
+  }
+
+  async initProcedure() {
     if (this.frameworkVersion === 'v2' && this.isWorkspaceChildProject && this.parent.frameworkVersion !== 'v2') {
       Helpers.error(`Please use angular-lib-v2 only in workspace-v2`, false, true);
     }
@@ -40,8 +43,8 @@ export class ProjectAngularLib extends Project {
     if (this.isCoreProject && this.frameworkVersion !== 'v1') {
       this.applyLinkedFiles();
     }
-
   }
+
 
   public setDefaultPort(port: number) {
     this.projectAngularClient.setDefaultPort(port)

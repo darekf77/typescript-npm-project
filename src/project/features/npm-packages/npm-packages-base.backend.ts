@@ -51,6 +51,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
     }
 
+
     if (!this.emptyNodeModuls) {
       if (this.project.isContainer) {
         this.project.node_modules.remove();
@@ -71,7 +72,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      if (!this.project.isContainer) {
+      const installAllowed = (!this.project.isContainer || this.project.isContainerWithLinkedProjects);
+
+      if (installAllowed) {
         if (fullInstall) {
           this.actualNpmProcess({ reason: triggeredMsg })
         } else {

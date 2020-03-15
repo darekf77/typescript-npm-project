@@ -140,14 +140,14 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
 export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean) {
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
-  const argsForFasterInstall = ''// `--ignore-engines --no-progress`;
+  const argsForFasterInstall = `--ignore-engines --no-progress --prefer-offline --no-audit`;
   if (useYarn) {
     // --ignore-scripts
     // yarn install --prefer-offline
     command = `yarn ${pkg ? 'add' : install} ${argsForFasterInstall} ${pkg ? pkg.name : ''} `
       + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
   } else {
-    command = `pnpm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} ${argsForFasterInstall} `;
+    command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} ${argsForFasterInstall} `;
   }
   return command;
 }

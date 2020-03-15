@@ -18,8 +18,7 @@ export class ProjectIsomorphicLib extends Project {
 
   //#region @backend
 
-  constructor(location: string) {
-    super(location);
+  async initProcedure() {
     if (this.isCoreProject && this.frameworkVersion !== 'v1') {
       this.applyLinkedFiles();
     }

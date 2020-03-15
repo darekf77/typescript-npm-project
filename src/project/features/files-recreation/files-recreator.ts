@@ -395,7 +395,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
   }
 
   commonFiles() {
-    const wokrspace = Project.by('workspace');
+    const wokrspace = Project.by('workspace');    
     const files = this.commonFilesForAllProjects;
     files.map(file => {
       return {

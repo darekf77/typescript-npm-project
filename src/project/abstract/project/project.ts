@@ -91,6 +91,11 @@ import { CopyManager } from '../../features/copy-manager';
 } as any)
 export class Project {
   public static projects: Project[] = [];
+  /**
+   * To speed up checking folder I am keeping pathes for alterdy checked folder
+   * This may break things that are creating new projects
+   */
+  public static emptyLocations: string[] = [];
   //#region @backend
   @Morphi.Orm.Column.Primary({ type: 'varchar', length: 400 })
   //#endregion
@@ -115,17 +120,23 @@ export class Project {
       return;
     }
     location = path.resolve(location);
+    if (Project.emptyLocations.includes(location)) {
+      // Helpers.log(`[project.from] empty location ${location}`)
+      return;
+    }
 
     const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
     if (alreadyExist) {
       return alreadyExist;
     }
     if (!fse.existsSync(location)) {
-      // warn(`[project.from] Cannot find project in location: ${location}`)
+      Helpers.log(`[project.from] Cannot find project in location: ${location}`);
+      Project.emptyLocations.push(location);
       return;
     }
     if (!PackageJSON.fromLocation(location)) {
-      // warn(`[project.from] Cannot find package.json in location: ${location}`)
+      Helpers.log(`[project.from] Cannot find package.json in location: ${location}`);
+      Project.emptyLocations.push(location);
       return;
     };
     const type = this.typeFrom(location);
@@ -168,7 +179,7 @@ export class Project {
     // log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
-    // log(`[project.from] Result project: ${resultProject.name}`)
+    Helpers.log(`[project.from] ${chalk.bold(resultProject.name)} from ...${location.substr(location.length - 100)}`)
     return resultProject;
   }
   //#endregion
@@ -316,28 +327,54 @@ export class Project {
   //#endregion
 
   //#region @backend
+
+  defineProperty(variableName: string, classFn: Function) {
+    const that = this;
+    const prefixedName = `__${variableName}`
+    Object.defineProperty(this, variableName, {
+      get: function () {
+        if (!that[prefixedName]) {
+          that[prefixedName] = new (classFn as any)(that);
+        }
+        return that[prefixedName];
+      }
+    })
+  }
+
   constructor(location?: string) {
 
     this.location = _.isString(location) ? location : '';
     this.packageJson = PackageJSON.fromProject(this);
     this.type = this.packageJson ? this.packageJson.type : 'unknow';
-    this.quickFixes = new QuickFixes(this)
+    this.defineProperty('quickFixes', QuickFixes);
+    // this.quickFixes = new QuickFixes(this)
     this.quickFixes.missingSourceFolders()
-    this.staticBuild = new StaticBuild(this)
-    this.workspaceSymlinks = new WorkspaceSymlinks(this);
-    this.tnpBundle = new TnpBundle(this);
-    this.node_modules = new NodeModules(this);
-    this.npmPackages = new NpmPackages(this)
-    this.recreate = new FilesRecreator(this);
-    this.filesFactory = new FilesFactory(this);
-    this.sourceModifier = new SourceModifier(this);
-    // this.outputCodeModifier = new OutputCodeModifier(this);
-    this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
-    this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
-    if (!this.isStandaloneProject) {
-      this.join = new BaselineSiteJoin(this);
-    }
-    this.tests = new TestRunner(this);
+    this.defineProperty('staticBuild', StaticBuild);
+    // this.staticBuild = new StaticBuild(this)
+    this.defineProperty('workspaceSymlinks', WorkspaceSymlinks);
+    // this.workspaceSymlinks = new WorkspaceSymlinks(this);
+    this.defineProperty('tnpBundle', TnpBundle);
+    // this.tnpBundle = new TnpBundle(this);
+    this.defineProperty('node_modules', NodeModules);
+    // this.node_modules = new NodeModules(this);
+    this.defineProperty('npmPackages', NpmPackages);
+    // this.npmPackages = new NpmPackages(this)
+    this.defineProperty('recreate', FilesRecreator);
+    // this.recreate = new FilesRecreator(this);
+    this.defineProperty('filesFactory', FilesFactory);
+    // this.filesFactory = new FilesFactory(this);
+    this.defineProperty('sourceModifier', SourceModifier);
+    // this.sourceModifier = new SourceModifier(this);
+
+    // this.outputCodeModifier = new OutputCodeModifier(this); //  NOT USED
+    this.defineProperty('frameworkFileGenerator', FrameworkFilesGenerator);
+    // this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
+    this.defineProperty('filesTemplatesBuilder', FilesTemplatesBuilder);
+    // this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
+    this.defineProperty('join', BaselineSiteJoin);
+    // this.join = new BaselineSiteJoin(this);
+    this.defineProperty('tests', TestRunner);
+    // this.tests = new TestRunner(this);
 
     Project.projects.push(this);
 
@@ -348,18 +385,22 @@ export class Project {
     // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
 
     if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {
+      // this.defineProperty('env', EnvironmentConfig);
       this.env = new EnvironmentConfig(this);
     }
 
     if (this.isWorkspace || this.isWorkspaceChildProject) {
-      this.proxyRouter = new ProxyRouter(this);
+      this.defineProperty('proxyRouter', ProxyRouter);
+      // this.proxyRouter = new ProxyRouter(this);
     }
     this.copyManager = new CopyManager(this);
     if (this.isStandaloneProject && this.packageJson) {
       this.packageJson.updateHooks()
     }
-    this.filesStructure = new FilesStructure(this);
-    this.buildProcess = new BuildProcess(this);
+    this.defineProperty('filesStructure', FilesStructure);
+    // this.filesStructure = new FilesStructure(this);
+    this.defineProperty('buildProcess', BuildProcess);
+    // this.buildProcess = new BuildProcess(this);
 
     this.notAllowedFiles().forEach(f => {
       Helpers.removeFileIfExists(path.join(this.location, f));

@@ -236,6 +236,7 @@ export const config = {
       Models.libs.GlobalLibTypeName.angularLib,
       Models.libs.GlobalLibTypeName.isomorphicLib,
       Models.libs.GlobalLibTypeName.workspace,
+      Models.libs.GlobalLibTypeName.container,
     ] as Models.libs.LibType[]
   },
   moduleNameAngularLib,

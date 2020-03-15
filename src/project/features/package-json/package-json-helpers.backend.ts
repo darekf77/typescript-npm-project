@@ -1,6 +1,7 @@
 //#region imports
 import * as _ from 'lodash';
 import * as JSON5 from 'json5';
+import { JSON10 } from 'json10';
 import chalk from 'chalk';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
@@ -49,8 +50,14 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
     newDepsForProject = getAndTravelCoreDeps();
   }
 
-
+  // console.log(JSON10.stringify(toOverrideDependencies))
+  // try {
   _.merge(newDepsForProject, toOverrideDependencies);
+  // } catch (error) {
+  //   console.log(JSON10.stringify(toOverrideDependencies))
+  //   process.exit(0)
+  // }
+
   Object.keys(newDepsForProject).forEach(key => {
     if (_.isNull(newDepsForProject[key])) {
       newDepsForProject[key] = void 0;
@@ -173,9 +180,11 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     recrateInPackageJson = false;
   }
 
-  if (project.frameworkVersion !== 'v1') {
+  if (project.frameworkVersion !== 'v1' && !global.actionShowingDepsForContainer) {
     const projForVer = Project.by('container', project.frameworkVersion);
+    global.actionShowingDepsForContainer = true;
     projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project.frameworkVersion}`);
+    global.actionShowingDepsForContainer = false;
     const depsForVer = projForVer.packageJson.data;
     Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
       // Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)

@@ -6,6 +6,7 @@ import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { BuildOptions } from '../features';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
+import { SingularBuild } from '../features/singular-build.backend';
 //#endregion
 // local
 import { Project } from '../abstract';
@@ -13,6 +14,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from '../../progress-output';
 import { Models } from 'tnp-models';
+
 
 
 //#region @backend
@@ -50,8 +52,7 @@ function checkForCircuralWorkspaceDeps(workspace: Project) {
 export class ProjectWorkspace extends Project {
   //#region @backend
 
-  constructor(public location: string) {
-    super(location);
+  async initProcedure() {
     if (this.frameworkVersion === 'v2' && this.isWorkspace) {
       if (this.children.filter(c => {
         // Helpers.log(`Checking child: ${c.name}`)
@@ -66,6 +67,8 @@ export class ProjectWorkspace extends Project {
       checkForCircuralWorkspaceDeps(this);
     }
   }
+
+
   async buildLib() {
     // throw new Error("Method not implemented.");
   }
@@ -123,11 +126,11 @@ export class ProjectWorkspace extends Project {
         return { project: c, appBuild: true };
       }) as any;
 
-    console.log('targetClients', targetClients.map(c => c.project.genericName))
+    Helpers.log(`targetClients: ${targetClients.map(c => c.project.genericName).join('\n')}`)
 
     const libs = this.libs(targetClients, true);
 
-    console.log('libs', libs.map(c => c.project.genericName))
+    Helpers.log(`libs: ${libs.map(c => c.project.genericName).join('\n')}`)
 
     return [
       ...libs,
@@ -147,93 +150,22 @@ export class ProjectWorkspace extends Project {
     const { prod, watch, outDir, args, appBuild } = buildOptions;
     Helpers.log(`build opt  ${JSON.stringify({ prod, watch, outDir, args, appBuild })}`)
     const projects = this.projectsInOrder(this.isGenerated ? true : (watch));
-    // console.log('project', projects.map(p => p.project.genericName))
-    // // @LAST
-    // process.exit(0)
+    console.log('project', projects.map(p => p.project.genericName))
+    
+    process.exit(0)
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
         const c = projects[index] as any;
         await c.project.StaticVersion();
       }
     }
-    console.log('projects', projects.map(c => {
+    Helpers.log(`projects: ${projects.map(c => {
       return `${c.project.genericName} appBuild: ${c.appBuild}`;
-    }));
+    })}`);
     // process.exit(0)
 
     if (watch) {
-
-      const newFactory = ProjectFactory.Instance;
-      const tmpWorkspaceName = this.name;
-      const tmpWorkspaceDirpath = path.join(this.location, config.folder.dist);
-      const projjjj = path.join(tmpWorkspaceDirpath, tmpWorkspaceName);
-      let singularWatchProj = Project.From(projjjj);
-      if (!singularWatchProj) {
-        Helpers.removeFolderIfExists(projjjj);
-        singularWatchProj = await newFactory.create(
-          'isomorphic-lib',
-          tmpWorkspaceName,
-          tmpWorkspaceDirpath,
-          void 0,
-          this.frameworkVersion,
-          true
-        );
-        this.node_modules.linkToProject(singularWatchProj);
-      }
-
-      // Helpers.writeFile(path.join(this.location, config.folder.dist, config.file.package_json), {
-      //   name: config.folder.dist,
-      //   tnp: {
-      //     type: 'container'
-      //   }
-      // })
-      const singularDistSrc = path.join(singularWatchProj.location, config.folder.src);
-      Helpers.removeFolderIfExists(singularDistSrc);
-      Helpers.mkdirp(singularDistSrc);
-
-      await singularWatchProj.filesStructure.init('');
-      Helpers.copyFile(
-        path.join(this.location, config.file.tnpEnvironment_json),
-        path.join(singularWatchProj.location, config.file.tnpEnvironment_json)
-      );
-
-      singularWatchProj.packageJson.data.tnp.isGenerated = true;
-      await singularWatchProj.packageJson.writeToDisc();
-
-      this.children.forEach(c => {
-        const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
-        Helpers.createSymLink(
-          path.join(c.location, source),
-          path.join(singularDistSrc, c.name));
-      });
-
-
-      await singularWatchProj.buildProcess.startForLib({
-        watch,
-        prod,
-        staticBuildAllowed: true
-      }, false);
-      const targets = this.children
-        .filter(c => c.type === 'angular-lib')
-        .map(c => c.name)
-
-      this.children.forEach(c => {
-        const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
-        const dest = path.join(c.location, config.folder.dist);
-        Helpers.remove(dest, true);
-        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-
-        targets.forEach(targetName => {
-          const sourceBrowser = path.join(
-            singularWatchProj.location, config.folder.dist,
-            `${config.folder.browser}-for-${targetName}`, c.name);
-          const destBrowser = path.join(c.location, `${config.folder.browser}-for-${targetName}`);
-          Helpers.remove(destBrowser, true);
-          Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
-        });
-
-      });
-
+      await (new SingularBuild(this)).init(watch, prod);
     } else {
       PROGRESS_DATA.log({ value: 0, msg: `Process started` });
       for (let index = 0; index < projects.length; index++) {

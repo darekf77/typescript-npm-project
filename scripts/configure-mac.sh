@@ -23,3 +23,18 @@ https://guide.macports.org/#installing
  sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
 # or enable
 sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+
+
+
+# disk temp
+brew install smartmontools
+diskutil list # slect disk
+smartctl -a disk1 | grep Temperature
+
+
+# disable batter plug in sound
+defaults write com.apple.PowerChime ChimeOnNoHardware -bool true
+killall PowerChime
+
+# default shell bash
+chsh -s /bin/bash

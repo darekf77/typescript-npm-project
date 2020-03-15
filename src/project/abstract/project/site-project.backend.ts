@@ -79,8 +79,9 @@ export abstract class SiteProject {
     }
     if (this.isContainer) {
       if (global.tnp_normal_mode) {
-        Helpers.error(`Baseline for container is not supported`, true, false)
+        Helpers.warn(`Baseline for container is not supported`)
       }
+      return;
     } else if (this.isWorkspace) {
       return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {

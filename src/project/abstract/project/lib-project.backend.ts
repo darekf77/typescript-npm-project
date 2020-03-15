@@ -85,7 +85,7 @@ export abstract class LibProject {
             proj = Project.From(path.join(this.location, pathOrName))
           }
           if (!proj) {
-            Helpers.error(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`, false, true);
+            Helpers.warn(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`);
           }
           return proj;
         })

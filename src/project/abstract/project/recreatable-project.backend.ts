@@ -70,6 +70,18 @@ export abstract class RecreatableProject {
   }
   //#endregion
 
+  //#region @backend
+  async initProcedure(this: Project) {
+
+  }
+
+  public async __initProcedure(this: Project) {
+    Helpers.log(`Started init procedure of project (${this.type}) "${this.genericName}...`);
+    await this.initProcedure();
+    Helpers.log(`End init procedure of project (${this.type}) "${this.genericName}" started...`);
+  }
+  //#endregion
+
   get customizableFilesAndFolders(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.customizableFilesAndFolders;

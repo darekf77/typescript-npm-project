@@ -48,7 +48,8 @@ export abstract class VscodeProject {
           .map(c => {
             return { path: c.name }
           }),
-        { path: 'bundle' }
+        { path: 'bundle' },
+        { path: 'dist' }
       ],
       settings: configSettings
     };

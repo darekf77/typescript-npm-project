@@ -66,6 +66,8 @@ export class FilesStructure extends FeatureForProject {
       skipNodeModules = true;
     }
 
+    await this.project.__initProcedure();
+
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (env) {
         Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
@@ -101,7 +103,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.quickFixes.badNpmPackages();
 
     }
-    if (this.project.isWorkspace || this.project.isStandaloneProject) {
+    if (this.project.isWorkspace || this.project.isStandaloneProject || this.project.isContainer) {
       this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
     }
 
@@ -113,22 +115,25 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isContainer) {
       await this.project.recreate.init();
-      const containerChildren = this.project.children.filter(c => {
-        if(c.git.isGitRepo) {
-          Helpers.log(`[init] not initing recrusively, it is git repo ${c.name}`)
-          return false;
-        }
-        return true;
-      })
-      for (let index = 0; index < containerChildren.length; index++) {
-        const containerChild = containerChildren[index];
-        await containerChild.filesStructure.init(args, options);
-        for (let indexChild = 0; indexChild < containerChild.children.length; indexChild++) {
-          const workspaceChild = containerChild.children[indexChild];
-          await workspaceChild.filesStructure.init(args, options)
+
+      if (!this.project.isContainerWithLinkedProjects) {
+        const containerChildren = this.project.children.filter(c => {
+          if (c.git.isGitRepo) {
+            Helpers.log(`[init] not initing recrusively, it is git repo ${c.name}`)
+            return false;
+          }
+          return true;
+        })
+        for (let index = 0; index < containerChildren.length; index++) {
+          const containerChild = containerChildren[index];
+          await containerChild.filesStructure.init(args, options);
+          for (let indexChild = 0; indexChild < containerChild.children.length; indexChild++) {
+            const workspaceChild = containerChild.children[indexChild];
+            await workspaceChild.filesStructure.init(args, options)
+          }
         }
       }
-      return;
+
     }
     if (this.project.isWorkspace) {
       this.project.recreateCodeWorkspace();

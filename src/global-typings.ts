@@ -15,6 +15,7 @@ declare global {
       hideWarnings: boolean;
       hideInfos: boolean;
       hideLog: boolean;
+      actionShowingDepsForContainer?: boolean;
       tnpShowProgress?: boolean;
       tnpNonInteractive?: boolean;
       //#region @backend

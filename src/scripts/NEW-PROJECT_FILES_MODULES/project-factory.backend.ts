@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
+import { JSON10 } from 'json10';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
@@ -27,10 +28,10 @@ export class ProjectFactory {
   }
 
   private errorMsgCreateProject() {
-    console.log(chalk.green(`Good examples:`));
+    Helpers.log(chalk.green(`Good examples:`));
     config.projectTypes.forNpmLibs.forEach(t => {
-      console.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
-    })
+      Helpers.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
+    });
     Helpers.error(chalk.red(`Please use example above.`), false, true);
   }
 
@@ -54,49 +55,52 @@ export class ProjectFactory {
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public async create(type: Models.libs.NewFactoryType, name: string, cwd: string, basedOn: string, version: 'v1' | 'v2' = 'v1', skipInit = false): Promise<Project> {
+  public async create(
+    type: Models.libs.NewFactoryType,
+    name: string,
+    cwd: string,
+    basedOn: string,
+    version: 'v1' | 'v2' = 'v1',
+    skipInit = false
+  ): Promise<Project> {
+
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
       version = cwdProj.frameworkVersion;
     }
+    if (cwdProj && cwdProj.isContainer) {
+      version = cwdProj.frameworkVersion;
+    }
 
-    console.log('version', version)
-    // process.exit(0)
-
-    // console.log(`
-
-    //     skip init1 ${skipInit}
-
-
-    //   `);
+    Helpers.log(`[create] version: ${version}`);
+    Helpers.log(`[create] cwdProj: ${cwdProj}`);
+    Helpers.log(`[create] skip init ${skipInit}`);
 
     if (!skipInit) {
-      const nameKebakCase = _.kebabCase(name)
+      const nameKebakCase = _.kebabCase(name);
       if (nameKebakCase !== name) {
-        Helpers.info(`Project name renemed to: ${nameKebakCase} `)
+        Helpers.info(`[craete] Project name renemed to: ${nameKebakCase} `)
       }
       name = nameKebakCase;
     }
 
     const basedOnProject = basedOn && Project.From(path.join(cwd, basedOn));
     if (basedOn && !basedOnProject) {
-      Helpers.error(`Not able to find baseline project from relative path: ${basedOn} `, false, true);
+      Helpers.error(`[create] Not able to find baseline project from relative path: ${basedOn} `, false, true);
     }
     if (basedOn && basedOnProject && basedOnProject.type !== 'workspace') {
-      Helpers.error(`Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
+      Helpers.error(`[create] Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
     const baseline = basedOn ? basedOnProject : Project.by(type, version);
-    Helpers.log(`PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
+    Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
     baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init`).sync();
 
-
-
     const destinationPath = this.getDestinationPath(name, cwd);
-    Helpers.log(`Destination path: ${destinationPath}`);
+    Helpers.log(`[create] Destination path: ${destinationPath}`);
 
     if (fse.pathExistsSync(destinationPath)) {
-      Helpers.info(`Project "${name}" already exist in this locationzation: ${destinationPath} `);
+      Helpers.info(`[create] Project "${name}" already exist in this locationzation: ${destinationPath} `);
     } else {
       if (baseline) {
         try {
@@ -109,12 +113,21 @@ export class ProjectFactory {
           });
           // console.log(destinationPath)
           this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0, name);
-          Helpers.info(`Project ${baseline.name} create successfully`);
+          Helpers.info(`[create] project ${name} created from baseline projec ${baseline.name} success`);
+          if (Project.emptyLocations.includes(destinationPath)) {
+            Project.emptyLocations = Project.emptyLocations.filter(f => {
+              return f !== destinationPath;
+            });
+            Helpers.info(`[create] Path removed from empty locations`);
+          } else {
+            Helpers.info(`[create] Path NOT removed from empty locations`);
+          }
+
         } catch (err) {
-          Helpers.error(err);
+          Helpers.error(`[create] Not able to create project`, false, true);
         }
       } else {
-        this.errorMsgCreateProject()
+        this.errorMsgCreateProject();
       }
     }
     if (type === 'workspace') {
@@ -122,14 +135,19 @@ export class ProjectFactory {
       const workspacePrroject = Project.From(destinationPath);
       if (basedOn) {
         workspacePrroject.baseline.children.forEach(c => {
-          // log(`Basleine Child project "${c.genericName}"`);
+          Helpers.log(`[craete] Basleine Child project "${c.genericName}"`);
         });
       }
       workspacePrroject.children.forEach(c => {
-        // log(`Child project "${c.genericName}"`);
+        Helpers.log(`[create] Child project "${c.genericName}"`);
       });
     }
+    Helpers.log(`[create] destinationPath: ${destinationPath}`);
     const destProje = Project.From(destinationPath);
+    if (!destProje) {
+      Helpers.error(`Not able to crate project in ${destinationPath}`, false, true);
+    }
+    Helpers.log(`[create] Project from create method: ${destProje && destProje.genericName} `)
     if (destProje) {
       destProje.recreate.vscode.settings.excludedFiles();
       destProje.recreate.vscode.settings.colorsFromWorkspace();

@@ -1,19 +1,20 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as path from 'path';
+import * as fse from 'fs-extra';
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';
 import { Helpers } from 'tnp-helpers';
+import { SingularBuild } from '../features/singular-build.backend';
+import { PROGRESS_DATA } from '../../progress-output';
 
 export class ProjectContainer extends Project {
 
-
-  constructor(location: string) {
-    super(location);
+  async initProcedure() {
     this.addGitReposAsLinkedProjects();
   }
 
-  private addGitReposAsLinkedProjects() {
+  public addGitReposAsLinkedProjects() {
     // console.log('this.getFolders()', this.getFolders())
     const repoChilds = this.getFolders()
       .map(c => {
@@ -24,12 +25,13 @@ export class ProjectContainer extends Project {
         return proj;
       })
       .filter(f => !!f)
-      .filter(c => c.git.isGitRepo).map(c => c.name);
+      .filter(c => c.git.isGitRoot).map(c => c.name);
     let chagned = false;
     // console.log(this.packageJson.linkedProjects.map(c => c.name))
     repoChilds.forEach(name => {
       // console.log('name', name)
-      if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))) {
+      if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
+        && Project.From(path.join(this.location, name))?.git.isGitRepo) {
         chagned = true;
         // console.log('added', name)
         this.packageJson.linkedProjects.push(name);
@@ -56,7 +58,14 @@ export class ProjectContainer extends Project {
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
-    const { prod, watch, outDir } = buildOptions;
+
+    if (!fse.existsSync(this.location)) {
+      return;
+    }
+    const { prod, watch, outDir, args, appBuild } = buildOptions;
+
+    await (new SingularBuild(this)).init(watch, prod);
+
 
   }
 }

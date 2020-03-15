@@ -79,9 +79,9 @@ inside generated projects...
 
   private mergeNpmPorject() {
     // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
-
+    Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
     if (this.project.isWorkspaceChildProject) {
-      // Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
+
       this.project.parent.getFolders()
         .filter(p => !this.project.parent.children.map(c => c.name).includes(path.basename(p)))
         .forEach(p => {
@@ -104,9 +104,9 @@ inside generated projects...
             });
           }
         });
-      // Helpers.log(`[mergeNpmPorject] finish..`)
-    }
 
+    }
+    Helpers.log(`[mergeNpmPorject] finish..`)
   }
 
   private get checkIfGeneratedTnpBundle() {
@@ -114,6 +114,7 @@ inside generated projects...
   }
 
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
+    Helpers.log('in build')
     this.project.buildOptions = buildOptions;
 
     if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
@@ -139,7 +140,7 @@ inside generated projects...
       }
     }
 
-    // Helpers.log(`[db][checkBuildIfAllowed] started... `);
+    Helpers.log(`[db][checkBuildIfAllowed] started... `);
     const db = await TnpDB.Instance(config.dbLocation);
     await db.transaction.checkBuildIfAllowed(
       this.project as any,
@@ -148,7 +149,7 @@ inside generated projects...
       process.ppid,
       true
     );
-    // Helpers.log(`[db][checkBuildIfAllowed] finish `);
+    Helpers.log(`[db][checkBuildIfAllowed] finish `);
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
@@ -213,6 +214,7 @@ inside generated projects...
       'ionic-client',
     ] as Models.libs.LibType[];
 
+
     if (this.project.isGenerated) {
       await selectClients(buildOptions, this.project, db);
     } else {
@@ -226,7 +228,7 @@ inside generated projects...
     }
 
 
-    Helpers.log(`
+    Helpers.info(`
 
     ${chalk.bold('Start of Building')} ${this.project.genericName} (${buildOptions.appBuild ? 'app' : 'lib'})
 

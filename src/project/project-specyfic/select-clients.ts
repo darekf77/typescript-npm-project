@@ -16,7 +16,12 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
       const parent = currentProject.isStandaloneProject ? currentProject.grandpa : currentProject.parent;
       buildOptions.forClient = parent.children.
         filter(c => config.allowedTypes.app.includes(c.type))
-        .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name))) as any;
+        .filter(c => {
+          if (parent.isContainer) {
+            return true;
+          }
+          return !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));
+        }) as any;
       return;
     }
   }
