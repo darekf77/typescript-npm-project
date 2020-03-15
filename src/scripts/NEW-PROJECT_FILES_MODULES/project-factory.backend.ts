@@ -122,7 +122,11 @@ export class ProjectFactory {
           } else {
             Helpers.info(`[create] Path NOT removed from empty locations`);
           }
-
+          if (baseline.isWorkspace) {
+            baseline.children.forEach(c => c.copyManager.generateSourceCopyIn(baseline.location, {
+              markAsGenerated: false,
+            }))
+          }
         } catch (err) {
           Helpers.error(`[create] Not able to create project`, false, true);
         }
@@ -182,7 +186,7 @@ export class ProjectFactory {
       Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
-    const { basedOn, version }: { basedOn: string; version: 'v1' | 'v2'; } = require('minimist')(args.split(' '));
+    const { basedOn, version, skipInit }: { basedOn: string; version: 'v1' | 'v2'; skipInit?: boolean } = require('minimist')(args.split(' '));
 
 
     if (basedOn) {
@@ -193,7 +197,8 @@ export class ProjectFactory {
     const name = argv[1];
 
     await this.create(type, name, cwd, void 0,
-      (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0
+      (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
+      skipInit
     );
     if (exit) {
       process.exit(0)

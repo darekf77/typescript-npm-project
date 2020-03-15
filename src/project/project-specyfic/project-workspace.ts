@@ -150,9 +150,9 @@ export class ProjectWorkspace extends Project {
     const { prod, watch, outDir, args, appBuild } = buildOptions;
     Helpers.log(`build opt  ${JSON.stringify({ prod, watch, outDir, args, appBuild })}`)
     const projects = this.projectsInOrder(this.isGenerated ? true : (watch));
-    console.log('project', projects.map(p => p.project.genericName))
-    
-    process.exit(0)
+    // console.log('project', projects.map(p => p.project.genericName))
+
+
     if (this.isGenerated) {
       for (let index = 0; index < projects.length; index++) {
         const c = projects[index] as any;
@@ -162,7 +162,6 @@ export class ProjectWorkspace extends Project {
     Helpers.log(`projects: ${projects.map(c => {
       return `${c.project.genericName} appBuild: ${c.appBuild}`;
     })}`);
-    // process.exit(0)
 
     if (watch) {
       await (new SingularBuild(this)).init(watch, prod);
