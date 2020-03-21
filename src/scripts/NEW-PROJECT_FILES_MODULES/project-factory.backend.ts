@@ -123,7 +123,7 @@ export class ProjectFactory {
             Helpers.info(`[create] Path NOT removed from empty locations`);
           }
           if (baseline.isWorkspace) {
-            baseline.children.forEach(c => c.copyManager.generateSourceCopyIn(baseline.location, {
+            baseline.children.forEach(c => c.copyManager.generateSourceCopyIn(path.join(destinationPath, c.name), {
               markAsGenerated: false,
             }))
           }
