@@ -8,7 +8,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 
 export class ProjectAngularLib extends Project {
 

@@ -8,7 +8,7 @@ import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { BuildOptions } from '../features';
 //#endregion
 import { Project } from '../abstract';

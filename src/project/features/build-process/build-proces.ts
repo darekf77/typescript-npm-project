@@ -114,7 +114,7 @@ inside generated projects...
   }
 
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
-    Helpers.log('in build')
+    Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project.type}`);
     this.project.buildOptions = buildOptions;
 
     if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
@@ -187,6 +187,10 @@ inside generated projects...
 
     } else {
       if (buildOptions.watch) {
+        if (this.project.isWorkspace) {
+          Helpers.log(`Removing on purpose tmp-environment.json from wokspace, before init`);
+          Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
+        }
         await this.project.filesStructure.init(buildOptions.args, { watch: true });
       } else {
         await this.project.filesStructure.init(buildOptions.args);

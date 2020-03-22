@@ -124,7 +124,7 @@ export class CopyManager extends FeatureForProject {
       this.project.projectSourceFiles().forEach(f => {
         const source = path.join(this.project.location, f);
         if (fse.existsSync(source)) {
-          Helpers.log(`Copying env file to static build: ${path.basename(f)} `)
+          Helpers.log(`Copying env file to static build: ${path.basename(f)} `, 1)
           Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
         } else {
           Helpers.log(`[executeCopy] Doesn not exist source: ${source}`);

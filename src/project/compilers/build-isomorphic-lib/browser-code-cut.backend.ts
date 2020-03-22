@@ -55,7 +55,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     // project: ${project && project.name},
     // compilationProject: ${compilationProject && compilationProject.name},
     // `)
-    // this.debug('modal.service.ts');
+    // this.debug('PiesController.ts');
   }
   //#endregion
 

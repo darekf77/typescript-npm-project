@@ -135,7 +135,7 @@ export class Project {
       return;
     }
     if (!PackageJSON.fromLocation(location)) {
-      Helpers.log(`[project.from] Cannot find package.json in location: ${location}`);
+      Helpers.log(`[project.from] Cannot find package.json in location: ${location}`, 1);
       Project.emptyLocations.push(location);
       return;
     };
@@ -179,7 +179,7 @@ export class Project {
     // log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
     //     : ('NO PROJECT FROM LOCATION ' + location))
 
-    Helpers.log(`[project.from] ${chalk.bold(resultProject.name)} from ...${location.substr(location.length - 100)}`)
+    Helpers.log(`[project.from] ${chalk.bold(resultProject.name)} from ...${location.substr(location.length - 100)}`, 1)
     return resultProject;
   }
   //#endregion

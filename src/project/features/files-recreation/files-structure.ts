@@ -65,6 +65,9 @@ export class FilesStructure extends FeatureForProject {
     if (struct) {
       skipNodeModules = true;
     }
+    if (this.project.isWorkspace && options?.watch) {
+      recrusive = true;
+    }
 
     await this.project.__initProcedure();
 

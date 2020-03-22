@@ -16,6 +16,8 @@ export class SingularBuild extends FeatureForProject {
 
   async init(watch: boolean, prod: boolean) {
 
+    Helpers.log(`[singular build] for ${this.project.genericName}, type: ${this.project.type}`);
+
     const children = this.project.children
       .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersion !== 'v1')
       .filter(c => !c.name.startsWith('tnp'))
@@ -36,7 +38,7 @@ export class SingularBuild extends FeatureForProject {
         this.project.frameworkVersion,
         true
       );
-      console.log('singularWatchProj', singularWatchProj && singularWatchProj.genericName)
+      Helpers.log(`[singular build] singularWatchProj: ${singularWatchProj && singularWatchProj.genericName}`);
       // console.log('this.this.project.node_modules.path', this.project.node_modules.path)
       this.project.node_modules.linkToProject(singularWatchProj);
     }
@@ -44,6 +46,8 @@ export class SingularBuild extends FeatureForProject {
     const singularDistSrc = path.join(singularWatchProj.location, config.folder.src);
     Helpers.removeFolderIfExists(singularDistSrc);
     Helpers.mkdirp(singularDistSrc);
+
+    Helpers.log(`[singular build] init structure`);
 
     await singularWatchProj.filesStructure.init('');
     Helpers.copyFile(
@@ -61,6 +65,8 @@ export class SingularBuild extends FeatureForProject {
         path.join(singularDistSrc, c.name));
     });
 
+    Helpers.log(`[singular build] symlink creation done`);
+    Helpers.log(`[singular build] singularWatchProjsingularWatchProj${singularWatchProj.genericName}, type: ${singularWatchProj.type}`);
 
     await singularWatchProj.buildProcess.startForLib({
       watch,
@@ -68,7 +74,6 @@ export class SingularBuild extends FeatureForProject {
       staticBuildAllowed: true
     }, false);
     const targets = children
-      .filter(c => c.type === 'angular-lib')
       .map(c => c.name)
 
     children.forEach(c => {

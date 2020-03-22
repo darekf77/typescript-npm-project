@@ -7,7 +7,7 @@ import { Helpers } from 'tnp-helpers';
 
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
-const ADDRESS_GITHUB = os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
+const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH; // os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
 const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
 const GITHUB_PROJECTS_NAMES = [
   'tnp',
