@@ -33,7 +33,7 @@ export async function killAll() {
   if (!!workspace) {
     projectsToKill = projectsToKill.concat(workspace.children)
   }
-  await db.transaction.killInstancesFrom(projectsToKill)
+  await db.killInstancesFrom(projectsToKill)
   process.exit(0)
 }
 

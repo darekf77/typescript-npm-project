@@ -7,14 +7,21 @@ import { ModType, CheckType } from './source-modifier.models';
 
 import { impReplace } from './source-modifier.helpers.backend';
 
+const debugFiles = [
+  // 'tmp-src/app/app.component.ts'
+]
+
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {
 
 
   protected modWorkspaceChildrenLibsBetweenItself(
     input: string, modType: ModType, relativePath: string): string {
 
+    const debug = debugFiles.includes(relativePath);
+
     const method: CheckType = 'baseline';
     const childrenLibs = this.project.parent.childrenThatAreLibs;
+    debug && Helpers.log(`[modWorkspaceChildrenLibsBetweenItself]  childrenLibs: \n\n ${childrenLibs.map(c => c.name).join('\n')} \n\n`);
 
     childrenLibs.forEach(child => {
 
@@ -88,10 +95,12 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
       if (modType === 'tmp-src' && this.project.type === 'angular-lib') {
 
+        debug && Helpers.log(`Should be processed ${relativePath}`)
+
         const process = (compiled: any[]) => {
 
           if (libName === this.project.name) {
-
+            debug && Helpers.log(`COMPONENTS TO BROWSER FOR ${relativePath}`)
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
               project: this.project,

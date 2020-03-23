@@ -235,7 +235,7 @@ const $BAW = (args) => BUILD_APP_WATCH(args);
 const $STOP_BUILD_DIST_WATCH = async (args) => {
   const db = await TnpDB.Instance(config.dbLocation);
   const projectLocation = Project.Current.location;
-  await db.transaction.updateProcesses();
+  await db.updateProcesses();
   const pidsToKill = db.getBuilds()
     .filter(f =>
       f.location === projectLocation
@@ -260,7 +260,7 @@ const $STOP_BUILD_DIST_WATCH = async (args) => {
 
 async function $DB_BUILDS_UPDATE() {
   const db = await TnpDB.Instance(config.dbLocation);
-  await db.transaction.updateProcesses();
+  await db.updateProcesses();
   process.exit(0)
 }
 
@@ -281,7 +281,15 @@ async function $DEFAULT_BUILD(args) {
   }
 }
 
+async function $ACTIVE_SINGULAR_BUILD(args) {
+  await Project.Current.hasParentWithSingularBuild()
+  // process.stdout.write();
+  process.exit(0)
+}
+
+
 export default {
+  $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
   $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
   $STOP_BUILD_DIST_WATCH: Helpers.CLIWRAP($STOP_BUILD_DIST_WATCH, '$STOP_BUILD_DIST_WATCH'),

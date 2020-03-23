@@ -137,6 +137,9 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   }
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
+
+    Helpers.log(`[sourceModifer][sync] files to check: \n\n${absoluteFilePathes.map(f => `${f}\n`)}\n\n`, 1);
+
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     // console.log('absoluteFilePathes sm', absoluteFilePathes)
 
@@ -147,7 +150,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     });
 
     relativePathesToProject.forEach(relativePathToProject => {
-      // console.log('sync relativePathToProject', relativePathToProject)
+      Helpers.log('[sourceModifier][syn] relativePathToProject')
       this.processFile(relativePathToProject, modifiedFiles);
     });
 
@@ -167,6 +170,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   private replikatorAction(relativePathToProject: string, modifiedFiles: Models.other.ModifiedFiles) {
     if (relativePathToProject.startsWith(config.folder.src)) {
+      Helpers.log(`[replikatorAction] OK ${relativePathToProject}`, 1);
       const orgAbsolutePath = path.join(this.project.location, relativePathToProject);
       const relativePathToTempSrc = relativePathToProject.replace(/^src/, config.folder.tempSrc);
       const destinationPath = path.join(this.project.location, relativePathToTempSrc);
@@ -180,11 +184,14 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
       } else {
         // console.log('WRONG process tmp file', destinationPath)
       }
+    } else {
+      Helpers.log(`[replikatorAction] not start with src ${relativePathToProject}`, 1);
     }
   }
 
   process(input: string, relativePath: string) {
     const modType = this.getModType(this.project, relativePath);
+    // Helpers.log(`[sourceModifier][process] modType: ${modType}, relative path: ${relativePath}`);
     // if (modType === 'tmp-src-for') {
     //   console.log(relativePath);
     //   // return input;

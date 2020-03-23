@@ -93,6 +93,7 @@ export class SourceModForStandaloneProjects
       files.modifiedFiles.push(absoluteFilePath);
       return true;
     }
+    // Helpers.log(``)
     // }
 
     return false;

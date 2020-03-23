@@ -13,7 +13,7 @@ import { Project } from './project';
 
 
 // import { ConsoleUi } from './console-ui';
-import { $LAST, $LAST_BUILD, $SHOW_LAST } from 'tnp-db';
+import { CLI_FUNCTIONS } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
@@ -238,11 +238,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
 
-  const lastCmds = [
-    Helpers.cliTool.paramsFrom(CLASS.getName($LAST)),
-    Helpers.cliTool.paramsFrom(CLASS.getName($LAST_BUILD)),
-    Helpers.cliTool.paramsFrom(CLASS.getName($SHOW_LAST)),
-  ];
+  const lastCmds = CLI_FUNCTIONS.map(f => Helpers.cliTool.paramsFrom(CLASS.getName(f)));
   const arg = Helpers.cliTool.paramsFrom(argsv[2]);
   Helpers.log(`lastCmds: ${lastCmds}`)
   Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
@@ -257,7 +253,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
     // info(`DO NOTHIGN`);
   } else {
     Helpers.log('[db] staring setting command...')
-    await db.transaction.setCommand(argsv.join(' '));
+    await db.setCommand(argsv.join(' '));
     Helpers.log('[db] finish setting command')
   }
 

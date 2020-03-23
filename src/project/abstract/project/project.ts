@@ -30,6 +30,7 @@ import { SiteProject } from './site-project.backend';
 import { PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks, TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory, FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
+import { DbProcessProject } from './db-process-project.backend';
 //#endregion
 
 
@@ -421,7 +422,6 @@ export interface Project extends
   //#region @backend
   ,
   LibProject,
-  ProjectGit,
   VscodeProject,
   ProjectGit,
   TnpProject,
@@ -430,7 +430,8 @@ export interface Project extends
   RecreatableProject,
   EntityProject,
   BuildableProject,
-  SiteProject
+  SiteProject,
+  DbProcessProject
 //#endregion
 {
 
@@ -444,7 +445,6 @@ Helpers.applyMixins(Project, [
   FolderProject,
   //#region @backend
   LibProject,
-  ProjectGit,
   VscodeProject,
   ProjectGit,
 
@@ -453,6 +453,7 @@ Helpers.applyMixins(Project, [
   RecreatableProject,
   EntityProject,
   BuildableProject,
-  SiteProject
+  SiteProject,
+  DbProcessProject
   //#endregion
 ])

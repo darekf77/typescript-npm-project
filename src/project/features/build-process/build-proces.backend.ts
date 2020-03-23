@@ -1,4 +1,4 @@
-//#region @backend
+//#region imports
 import * as _ from 'lodash';
 import chalk from 'chalk';
 import * as fse from 'fs-extra';
@@ -18,8 +18,18 @@ import {
 } from './waiting-for-builds-conditions-helpers.backend';
 import { selectClients } from '../../project-specyfic/select-clients';
 
+const allowedForSelectingCLients = [
+  'angular-lib',
+  'isomorphic-lib',
+  'angular-client',
+  'ionic-client',
+] as Models.libs.LibType[];
+
+//#endregion
+
 export class BuildProcess extends FeatureForProject {
 
+  //#region prepare build options
   public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project) {
     if (_.isUndefined(options)) {
       options = {} as any;
@@ -51,7 +61,9 @@ inside generated projects...
     }
     return options;
   }
+  //#endregion
 
+  //#region start for ...
   async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
     return this.startForLib({ prod, watch, outDir, args });
   }
@@ -76,7 +88,9 @@ inside generated projects...
     const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
     await this.build(buildOptions, config.allowedTypes.app, exit);
   }
+  //#endregion
 
+  //#region mereg npm project
   private mergeNpmPorject() {
     // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
     Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
@@ -108,12 +122,10 @@ inside generated projects...
     }
     Helpers.log(`[mergeNpmPorject] finish..`)
   }
-
-  private get checkIfGeneratedTnpBundle() {
-    return Project.Current.isTnp ? true : fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser))
-  }
+  //#endregion
 
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
+
     Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project.type}`);
     this.project.buildOptions = buildOptions;
 
@@ -121,17 +133,16 @@ inside generated projects...
       buildOptions.watch = false;
       Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
+    const checkIfGeneratedTnpBundle = Project.Current.isTnp ? true :
+      fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser));
 
-    if (!this.project.isStandaloneProject && !this.checkIfGeneratedTnpBundle) {
+    if (!this.project.isStandaloneProject && !checkIfGeneratedTnpBundle) {
       Helpers.error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
     }
 
-    // if (this.project.isGenerated) {
-    //   this.project.reset();
-    // }
-
     this.mergeNpmPorject();
 
+    //#region make sure project allowed for build
     if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
       if (buildOptions.appBuild) {
         Helpers.error(`App build only for ${config.frameworkName} ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
@@ -139,10 +150,13 @@ inside generated projects...
         Helpers.error(`Library build only for ${config.frameworkName} ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       }
     }
+    //#endregion
 
     Helpers.log(`[db][checkBuildIfAllowed] started... `);
     const db = await TnpDB.Instance(config.dbLocation);
-    await db.transaction.checkBuildIfAllowed(
+    const singularBuildInParent = await this.project.hasParentWithSingularBuild();
+
+    await db.checkBuildIfAllowed(
       this.project as any,
       buildOptions,
       process.pid,
@@ -153,10 +167,15 @@ inside generated projects...
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
-      if (this.project.node_modules.exist) {
-        Helpers.log(`NODE MODULE EXISTS`)
+      if (singularBuildInParent) {
+        Helpers.info(`[build[ DETECTED SINGULAR in parent project: ${this.project.parent.name}`);
+        await this.project.filesStructure.init(buildOptions.args, { watch: true });
       } else {
-        await this.project.filesStructure.init(buildOptions.args);
+        if (this.project.node_modules.exist) {
+          Helpers.log(`NODE MODULE EXISTS`)
+        } else {
+          await this.project.filesStructure.init(buildOptions.args);
+        }
       }
 
       if (buildOptions.watch) {
@@ -182,7 +201,6 @@ inside generated projects...
         if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
           await handleProjectsPorts(this.project, config, false);
         }
-
       }
 
     } else {
@@ -197,50 +215,50 @@ inside generated projects...
       }
     }
 
+    //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
       await this.project.env.updateData();
       if (this.project.type === 'angular-lib') {
         this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
       }
     }
+    //#endregion
 
-
+    //#region report initial progres
     if (!buildOptions.watch && this.project.isGenerated && this.project.isWorkspace) {
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
+    //#endregion
 
-    await db.transaction.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
+    await db.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
 
-    const allowedForSelectingCLients = [
-      'angular-lib',
-      'isomorphic-lib',
-      'angular-client',
-      'ionic-client',
-    ] as Models.libs.LibType[];
-
-
+    //#region handle build clients projects
     if (this.project.isGenerated) {
       await selectClients(buildOptions, this.project, db);
     } else {
       if (buildOptions.appBuild) {
-        await waitForAppBuildToBePossible(db, this.project);
+        if (!singularBuildInParent) {
+          await waitForAppBuildToBePossible(db, this.project);
+        }
       } else if (allowedForSelectingCLients.includes(this.project.type)) {
 
         await selectClients(buildOptions, this.project, db);
         await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
       }
     }
+    //#endregion
 
-
-    Helpers.info(`
-
-    ${chalk.bold('Start of Building')} ${this.project.genericName} (${buildOptions.appBuild ? 'app' : 'lib'})
-
-    `);
+    //#region report start building message
+    Helpers.info(`\n\n\t${chalk.bold('Start of Building')} ${this.project.genericName} `
+      + `(${buildOptions.appBuild ? 'app' : 'lib'})\n\n`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
     }
+    //#endregion
+
     await this.project.build(buildOptions);
+
+    //#region handle end of building
     const msg = (buildOptions.watch ? `
       Waching files.. started.. please wait...
     `: `
@@ -257,8 +275,7 @@ inside generated projects...
       Helpers.log('Build process exit')
       process.exit(0);
     }
+    //#endregion
   }
 
 }
-
-//#endregion

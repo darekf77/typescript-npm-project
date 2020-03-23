@@ -1,4 +1,3 @@
-//#region @backend
 import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
@@ -16,6 +15,7 @@ export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
   watch: boolean;
   alreadyInitedPorjects?: Project[];
+  initiator?: Project;
   // initiator: Project;
 }
 
@@ -40,7 +40,6 @@ export class FilesStructure extends FeatureForProject {
     if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
-
     // if (_.isUndefined(options.initiator)) {
     //   options.initiator = this.project;
     // }
@@ -61,11 +60,18 @@ export class FilesStructure extends FeatureForProject {
     if (!args) {
       args = '';
     }
+    options = this.fixOptionsArgs(options);
+    if (!options.initiator) {
+      options.initiator = this.project;
+    }
+    const { alreadyInitedPorjects, watch } = options;
     let { skipNodeModules, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+
     if (struct) {
       skipNodeModules = true;
     }
-    if (this.project.isWorkspace && options?.watch) {
+
+    if (options.initiator.location === this.project.location && this.project.isWorkspace && options.watch) {
       recrusive = true;
     }
 
@@ -87,12 +93,9 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    options = this.fixOptionsArgs(options);
-    const { alreadyInitedPorjects, watch } = options;
-
     Helpers.log(`[init] adding project is not exists...`)
     const db = await TnpDB.Instance(config.dbLocation);
-    await db.transaction.addProjectIfNotExist(this.project as any);
+    await db.addProjectIfNotExist(this.project as any);
     Helpers.log(`[init] adding project is not exists...done`)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -116,6 +119,7 @@ export class FilesStructure extends FeatureForProject {
 
     alreadyInitedPorjects.push(this.project)
 
+    //#region handle init of container
     if (this.project.isContainer) {
       await this.project.recreate.init();
 
@@ -138,6 +142,9 @@ export class FilesStructure extends FeatureForProject {
       }
 
     }
+    //#endregion
+
+    //#region recretate forsite
     if (this.project.isWorkspace) {
       this.project.recreateCodeWorkspace();
     }
@@ -155,6 +162,7 @@ export class FilesStructure extends FeatureForProject {
         await workspaceChild.filesStructure.init(args, options);
       }
     }
+    //#endregion
 
     if (this.project.baseline) {
       await this.project.baseline.filesStructure.init(args, options);
@@ -163,13 +171,15 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.filesStructure.init(args, options);
     }
-    // console.log('alreadyInitedPorjects', alreadyInitedPorjell replaced with emcts.map(p => p.name))
+
+    //#region report progress initing project
     if (this.project.isWorkspaceChildProject) {
       Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
     }
+    //#endregion
 
     if (this.project.isWorkspaceChildProject) {
       const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);
@@ -192,6 +202,7 @@ export class FilesStructure extends FeatureForProject {
 
     this.project.tnpBundle.installAsPackage()
 
+    //#region handle node modules instalation
     if (!this.project.node_modules.exist) {
       if (skipNodeModules) {
         if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
@@ -205,10 +216,9 @@ export class FilesStructure extends FeatureForProject {
         this.project.packageJson.showDeps(`Show new deps for ${this.project.frameworkVersion} `);
       }
     }
+    //#endregion
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      // console.log('someBuildIsActive FUCK OFFFFFFFFFFFFFF', someBuildIsActive)
-
       if (this.project.isSite) {
         if (watch) {
           await this.project.join.startAndWatch(this.taskNames.joinMerge)
@@ -237,6 +247,7 @@ export class FilesStructure extends FeatureForProject {
         // }
         await this.project.sourceModifier.start(this.taskNames.sourceModifir);
       }
+      // process.exit(0)
     }
 
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
@@ -306,10 +317,3 @@ export class FilesStructure extends FeatureForProject {
   }
 
 }
-
-
-
-
-
-
-//#endregion

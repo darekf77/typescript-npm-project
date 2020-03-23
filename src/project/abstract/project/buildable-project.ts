@@ -63,8 +63,8 @@ export abstract class BuildableProject {
     // log(this.buildOptions)
     // process.exit(0)
 
-    await db.transaction.updateCommandBuildOptions(project.location, buildOptions);
-    await db.transaction.updateBuildOptions(buildOptions, process.pid);
+    await db.updateCommandBuildOptions(project.location, buildOptions);
+    await db.updateBuildOptions(buildOptions, process.pid);
   }
   //#endregion
 

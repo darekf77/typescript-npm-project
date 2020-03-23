@@ -49,8 +49,8 @@ async function selectClientsAutomaticly(buildOptions: BuildOptions, currentProje
 
     `);
 
-    await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
-    await db.transaction.updateBuildOptions(buildOptions, process.pid);
+    await db.updateCommandBuildOptions(currentProject.location, buildOptions);
+    await db.updateBuildOptions(buildOptions, process.pid);
   }
 }
 
@@ -91,8 +91,8 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
     buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
   }
 
-  await db.transaction.updateCommandBuildOptions(currentProject.location, buildOptions);
-  await db.transaction.updateBuildOptions(buildOptions, process.pid);
+  await db.updateCommandBuildOptions(currentProject.location, buildOptions);
+  await db.updateBuildOptions(buildOptions, process.pid);
 }
 
 //#endregion
