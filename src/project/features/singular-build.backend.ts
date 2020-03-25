@@ -87,7 +87,7 @@ export class SingularBuild extends FeatureForProject {
         .filter(c => !c.locationOfProject.startsWith('tnp'))
         .map(c => c.project as Project);
       Helpers.log(`Statndalone projects to update:\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
-      process.exit(0)
+      // process.exit(0)
     }
 
 
@@ -99,8 +99,9 @@ export class SingularBuild extends FeatureForProject {
         const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
         projectsToUpdate.forEach(projForUp => {
           const dest = path.join(projForUp.location, config.folder.node_modules, c.name);
-          Helpers.remove(dest, true);
-          Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+          console.log(`LINK: ${source} -> ${dest}`)
+          // Helpers.remove(dest, true);
+          // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
         });
       } else if (this.project.type === 'workspace') {
         const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
