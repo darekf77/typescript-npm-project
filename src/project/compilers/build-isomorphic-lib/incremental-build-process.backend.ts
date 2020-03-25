@@ -100,32 +100,56 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     //#region modular build
     const modularBuild = () => {
-      this.resolveModulesLocations
-        .forEach(moduleName => {
-          let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
-          if (outFolder === 'bundle') {
-            browserOutFolder = path.join(outFolder, browserOutFolder);
-          }
-
-          const proj = parentProj.child(moduleName);
-          let envConfig = proj.env.config;
-          if (!envConfig) {
-            Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
-          }
-
-          this.browserCompilations.push(
-            new BroswerForModuleCompilation(
-              this.project,
-              moduleName,
-              envConfig,
-              `tmp-src-${outFolder}-${browserOutFolder}`,
-              browserOutFolder as any,
-              location,
-              cwd,
-              outFolder,
-              buildOptions)
+      if (parentProj.isContainer) {
+        Helpers.info(`SINULAR BUILD  - CONTAINER`);
+        const moduleName = '';
+        const envConfig = {} as any;
+        let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
+        if (outFolder === 'bundle') {
+          browserOutFolder = path.join(outFolder, browserOutFolder);
+        }
+        this.browserCompilations = [
+          new BroswerForModuleCompilation(
+            this.project,
+            moduleName,
+            envConfig,
+            `tmp-src-${outFolder}-${browserOutFolder}`,
+            browserOutFolder as any,
+            location,
+            cwd,
+            outFolder,
+            buildOptions
           )
-        });
+        ];
+      } else {
+        Helpers.info(`SINULAR BUILD  - WORKSPACE`);
+        this.resolveModulesLocations
+          .forEach(moduleName => {
+            let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
+            if (outFolder === 'bundle') {
+              browserOutFolder = path.join(outFolder, browserOutFolder);
+            }
+
+            const proj = parentProj.child(moduleName);
+            let envConfig = proj.env.config;
+            if (!envConfig) {
+              Helpers.error(`[incrementalBuildProcess] Please "tnp init" project: ${proj.genericName}`, false, true);
+            }
+
+            this.browserCompilations.push(
+              new BroswerForModuleCompilation(
+                this.project,
+                moduleName,
+                envConfig,
+                `tmp-src-${outFolder}-${browserOutFolder}`,
+                browserOutFolder as any,
+                location,
+                cwd,
+                outFolder,
+                buildOptions)
+            )
+          });
+      }
     };
     //#endregion
 

@@ -106,9 +106,9 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     location: ${location}
     backendOut: ${backendOut}
 
-    buildOptions: ${JSON10.stringify(buildOptions)}
-
     `);
+
+    Helpers.log(`\n\nbuildOptions: ${JSON10.stringify(buildOptions)}\n\n`, 2)
 
     // console.log('SOURCE OUT', sourceOut)
     // console.log('OUT FOLDER', outFolder)

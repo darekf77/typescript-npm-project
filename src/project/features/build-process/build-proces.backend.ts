@@ -269,7 +269,7 @@ inside generated projects...
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg });
     } else {
-      Helpers.log(msg);
+      Helpers.info(msg);
     }
     if (exit && !buildOptions.watch) {
       Helpers.log('Build process exit')

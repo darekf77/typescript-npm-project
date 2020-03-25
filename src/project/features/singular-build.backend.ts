@@ -7,7 +7,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-factory.backend';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
-
+import { TnpDB } from 'tnp-db';
 
 export class SingularBuild extends FeatureForProject {
   get isContainer() {
@@ -21,6 +21,8 @@ export class SingularBuild extends FeatureForProject {
     const children = this.project.children
       .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersion !== 'v1')
       .filter(c => !c.name.startsWith('tnp'))
+
+    Helpers.log(`[singularbuild] children for build: \n\n${children.map(c => c.name)}\n\n`);
 
     const newFactory = ProjectFactory.Instance;
     const tmpWorkspaceName = this.project.name;
@@ -71,14 +73,35 @@ export class SingularBuild extends FeatureForProject {
     await singularWatchProj.buildProcess.startForLib({
       watch,
       prod,
-      staticBuildAllowed: true
+      outDir: 'dist',
+      staticBuildAllowed: true,
     }, false);
     const targets = children
-      .map(c => c.name)
+      .map(c => c.name);
+
+
+    if (this.isContainer) {
+      const db = await TnpDB.Instance(config.dbLocation);
+      var projectsToUpdate = db.getProjects()
+        .filter(c => c.locationOfProject !== this.project.location)
+        .filter(c => !c.locationOfProject.startsWith('tnp'))
+        .map(c => c.project as Project);
+      Helpers.log(`Statndalone projects to update:\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
+      process.exit(0)
+    }
+
+
+    // console.log()
 
     children.forEach(c => {
       if (this.isContainer) {
-        console.log(`Do something for ${c.genericName}`)
+        // console.log(`Do something for ${c.genericName}`)
+        const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
+        projectsToUpdate.forEach(projForUp => {
+          const dest = path.join(projForUp.location, config.folder.node_modules, c.name);
+          Helpers.remove(dest, true);
+          Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+        });
       } else if (this.project.type === 'workspace') {
         const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
         const dest = path.join(c.location, config.folder.dist);
@@ -95,10 +118,11 @@ export class SingularBuild extends FeatureForProject {
           Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
         });
       }
-
-
-
     });
+    if (this.isContainer) {
+      console.info(`All Projects are linked OK... watching...`)
+    }
+
   }
 
 }

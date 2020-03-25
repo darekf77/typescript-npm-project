@@ -430,14 +430,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
-    // console.log('saving ismoprhic file', this.absoluteFilePath)
+    Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
     if (this.isEmpty && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
       if (fse.existsSync(this.absoluteFilePath)) {
         fse.unlinkSync(this.absoluteFilePath)
       }
-      // console.log(`Delete empty: ${deletePath}`)
+      Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
     } else {
-      // console.log(`Not empty: ${this.absoluteFilePath}`)
+      Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
       if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
         fse.mkdirpSync(path.dirname(this.absoluteFilePath));
       }
@@ -451,7 +451,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       //   // process.exit(0)
       // }
 
-      // console.log(`Written file: ${relativePath}`)
+      Helpers.log(`Written file: ${relativePath}`, 1)
       this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
     }
     // }
