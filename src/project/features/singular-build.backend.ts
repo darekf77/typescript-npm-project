@@ -9,18 +9,22 @@ import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
-export class SingularBuild extends FeatureForProject {
-  get isContainer() {
-    return this.project.type === 'container';
-  }
 
+export class SingularBuild extends FeatureForProject {
+  singularWatchProj: Project;
   async init(watch: boolean, prod: boolean) {
 
-    Helpers.log(`[singular build] for ${this.project.genericName}, type: ${this.project.type}`);
+    Helpers.log(`[singular build]
+    FOP: ${this.project.genericName},
+    TYPE: ${this.project.type},
+    LOCATION: ${this.project.location}
+    `);
 
     const children = this.project.children
-      .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersion !== 'v1')
+      .filter(c => c.location !== this.project.location)
       .filter(c => !c.name.startsWith('tnp'))
+      .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersion !== 'v1')
+      ;
 
     Helpers.log(`[singularbuild] children for build: \n\n${children.map(c => c.name)}\n\n`);
 
@@ -29,10 +33,10 @@ export class SingularBuild extends FeatureForProject {
     const tmpWorkspaceDirpath = path.join(this.project.location, config.folder.dist);
     const projjjj = path.join(tmpWorkspaceDirpath, tmpWorkspaceName);
     Helpers.log(`dist project: ${projjjj}`);
-    let singularWatchProj = Project.From(projjjj);
-    if (!singularWatchProj) {
+    this.singularWatchProj = Project.From(projjjj);
+    if (!this.singularWatchProj) {
       Helpers.removeFolderIfExists(projjjj);
-      singularWatchProj = await newFactory.create(
+      this.singularWatchProj = await newFactory.create(
         'isomorphic-lib',
         tmpWorkspaceName,
         tmpWorkspaceDirpath,
@@ -40,25 +44,25 @@ export class SingularBuild extends FeatureForProject {
         this.project.frameworkVersion,
         true
       );
-      Helpers.log(`[singular build] singularWatchProj: ${singularWatchProj && singularWatchProj.genericName}`);
+      Helpers.log(`[singular build] singularWatchProj: ${this.singularWatchProj && this.singularWatchProj.genericName}`);
       // console.log('this.this.project.node_modules.path', this.project.node_modules.path)
-      this.project.node_modules.linkToProject(singularWatchProj);
+      this.project.node_modules.linkToProject(this.singularWatchProj);
     }
 
-    const singularDistSrc = path.join(singularWatchProj.location, config.folder.src);
+    const singularDistSrc = path.join(this.singularWatchProj.location, config.folder.src);
     Helpers.removeFolderIfExists(singularDistSrc);
     Helpers.mkdirp(singularDistSrc);
 
     Helpers.log(`[singular build] init structure`);
 
-    await singularWatchProj.filesStructure.init('');
+    await this.singularWatchProj.filesStructure.init('');
     Helpers.copyFile(
       path.join(this.project.location, config.file.tnpEnvironment_json),
-      path.join(singularWatchProj.location, config.file.tnpEnvironment_json)
+      path.join(this.singularWatchProj.location, config.file.tnpEnvironment_json)
     );
 
-    singularWatchProj.packageJson.data.tnp.isGenerated = true;
-    await singularWatchProj.packageJson.writeToDisc();
+    this.singularWatchProj.packageJson.data.tnp.isGenerated = true;
+    await this.singularWatchProj.packageJson.writeToDisc();
 
     children.forEach(c => {
       const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
@@ -67,10 +71,11 @@ export class SingularBuild extends FeatureForProject {
         path.join(singularDistSrc, c.name));
     });
 
-    Helpers.log(`[singular build] symlink creation done`);
-    Helpers.log(`[singular build] singularWatchProjsingularWatchProj${singularWatchProj.genericName}, type: ${singularWatchProj.type}`);
+    Helpers.info(`[singular build] symlink creation done`);
+    Helpers.log(`[singular build] singularWatchProjsingularWatchProj` +
+      `${this.singularWatchProj.genericName}, type: $this.{singularWatchProj.type}`);
 
-    await singularWatchProj.buildProcess.startForLib({
+    await this.singularWatchProj.buildProcess.startForLib({
       watch,
       prod,
       outDir: 'dist',
@@ -80,13 +85,15 @@ export class SingularBuild extends FeatureForProject {
       .map(c => c.name);
 
 
-    if (this.isContainer) {
+    if (this.project.isContainer) {
       const db = await TnpDB.Instance(config.dbLocation);
-      var projectsToUpdate = db.getProjects()
-        .filter(c => c.locationOfProject !== this.project.location)
-        .filter(c => !c.locationOfProject.startsWith('tnp'))
-        .map(c => c.project as Project);
-      Helpers.log(`Statndalone projects to update:\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
+      var projectsToUpdate = db.getProjects().map(c => c.project as Project)
+        .filter(c => !c.name.startsWith('tnp'))
+        .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)
+        .filter(c => c.location !== this.project.location)
+        .filter(c => !c.isWorkspaceChildProject);
+      Helpers.info(`Statndalone projects to update:` +
+        `\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
       // process.exit(0)
     }
 
@@ -94,24 +101,29 @@ export class SingularBuild extends FeatureForProject {
     // console.log()
 
     children.forEach(c => {
-      if (this.isContainer) {
+      if (this.project.type === 'container') {
         // console.log(`Do something for ${c.genericName}`)
-        const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
+        const source = path.join(this.singularWatchProj.location, config.folder.dist, c.name);
+        const sourceBrowser = path.join(this.singularWatchProj.location, config.folder.dist, config.folder.browser, c.name);
+        const destBrowser = path.join(this.singularWatchProj.location, config.folder.dist, c.name, config.folder.browser);
+        Helpers.remove(destBrowser, true);
+        Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
+
         projectsToUpdate.forEach(projForUp => {
           const dest = path.join(projForUp.location, config.folder.node_modules, c.name);
-          console.log(`LINK: ${source} -> ${dest}`)
-          // Helpers.remove(dest, true);
-          // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+          Helpers.remove(dest, true);
+          Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+          console.log(`LINK: ${source} -> ${dest}`, 1);
         });
       } else if (this.project.type === 'workspace') {
-        const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
+        const source = path.join(this.singularWatchProj.location, config.folder.dist, c.name);
         const dest = path.join(c.location, config.folder.dist);
         Helpers.remove(dest, true);
         Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
 
         targets.forEach(targetName => {
           const sourceBrowser = path.join(
-            singularWatchProj.location, config.folder.dist,
+            this.singularWatchProj.location, config.folder.dist,
             `${config.folder.browser}-for-${targetName}`, c.name);
 
           const destBrowser = path.join(c.location, `${config.folder.browser}-for-${targetName}`);
@@ -120,7 +132,7 @@ export class SingularBuild extends FeatureForProject {
         });
       }
     });
-    if (this.isContainer) {
+    if (this.project.isContainer) {
       console.info(`All Projects are linked OK... watching...`)
     }
 
