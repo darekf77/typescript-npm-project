@@ -28,6 +28,14 @@ export abstract class TnpProject {
   }
 
   //#region @backend
+  public frameworkVersionAtLeast(this: Project, version: 'v1' | 'v2') {
+    const ver = Number(_.isString(version) && version.replace('v', ''));
+    const curr = Number(_.isString(this.version) && this.version.replace('v', ''))
+    return !isNaN(ver) && !isNaN(curr) && curr >= ver;
+  }
+  //#endregion
+
+  //#region @backend
   /**
    * available frameworks in project
    */

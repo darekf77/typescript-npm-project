@@ -233,6 +233,14 @@ inside generated projects...
     await db.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
 
     //#region handle build clients projects
+
+    Helpers.log(`
+
+    projec: ${this.project.genericName}
+    type: ${this.project.type}
+    generated: ${this.project.isGenerated}
+    `);
+
     if (this.project.isGenerated) {
       await selectClients(buildOptions, this.project, db);
     } else {

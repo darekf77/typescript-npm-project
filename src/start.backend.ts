@@ -160,8 +160,6 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   Helpers.log('in start')
   config.frameworkName = frameworkName;
 
-
-
   argsv = argsv.map(arg => {
     if (arg === 'baw') {
       return 'build:app:watch';

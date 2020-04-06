@@ -433,7 +433,8 @@
   },
   "main": "index.js",
   "bin": {
-    "tnp": "bin/tnp"
+    "tnp": "bin/tnp",
+    "tnp-ins": "bin/tnp-ins"
   },
   "preferGlobal": true,
   "devDependencies": {},

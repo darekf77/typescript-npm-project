@@ -10,10 +10,16 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 
 export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
+  const parent = currentProject.isStandaloneProject ? currentProject.grandpa : currentProject.parent;
   if (currentProject.isGenerated) {
+    if (parent.isContainer) {
+      debugger;
+      return;
+    }
+
+
     buildOptions.buildForAllClients = true;
     if (currentProject.isWorkspaceChildProject || currentProject.isStandaloneProject) {
-      const parent = currentProject.isStandaloneProject ? currentProject.grandpa : currentProject.parent;
       buildOptions.forClient = parent.children.
         filter(c => config.allowedTypes.app.includes(c.type))
         .filter(c => {

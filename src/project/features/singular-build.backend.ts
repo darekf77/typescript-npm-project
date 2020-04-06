@@ -23,7 +23,7 @@ export class SingularBuild extends FeatureForProject {
     const children = this.project.children
       .filter(c => c.location !== this.project.location)
       .filter(c => !c.name.startsWith('tnp'))
-      .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersion !== 'v1')
+      .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersionAtLeast('v2'))
       ;
 
     Helpers.log(`[singularbuild] children for build: \n\n${children.map(c => c.name)}\n\n`);
@@ -84,21 +84,20 @@ export class SingularBuild extends FeatureForProject {
     const targets = children
       .map(c => c.name);
 
+    // if (this.project.isContainer) {
+    //   const db = await TnpDB.Instance(config.dbLocation);
+    //   var projectsToUpdate = db.getProjects().map(c => c.project as Project)
+    //     .filter(c => !c.name.startsWith('tnp'))
+    //     .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)
+    //     .filter(c => c.location !== this.project.location)
+    //     .filter(c => !c.isWorkspaceChildProject);
+    //   Helpers.info(`Statndalone projects to update:` +
+    //     `\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
+    //   // process.exit(0)
+    // }
 
-    if (this.project.isContainer) {
-      const db = await TnpDB.Instance(config.dbLocation);
-      var projectsToUpdate = db.getProjects().map(c => c.project as Project)
-        .filter(c => !c.name.startsWith('tnp'))
-        .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)
-        .filter(c => c.location !== this.project.location)
-        .filter(c => !c.isWorkspaceChildProject);
-      Helpers.info(`Statndalone projects to update:` +
-        `\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
-      // process.exit(0)
-    }
+    let projectsToUpdate = [];
 
-
-    // console.log()
 
     children.forEach(c => {
       if (this.project.type === 'container') {
