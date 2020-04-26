@@ -44,6 +44,9 @@ function distRequredCondition(requiredWithBuilds: Project[], context: Condition,
 }
 
 export async function waitForRequiredDistsBuilds(db: TnpDB, project: Project, targets: Project[]) {
+  if (project.isGenerated) {
+    return;
+  }
   const conditionDist: Condition = {
     name: `Dist finsh buildProjectErr`,
     callback: async (context) => {

@@ -21,10 +21,11 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       if (_.isArray(this.buildOptions.forClient) && this.buildOptions.forClient.length > 0) {
         return (this.buildOptions.forClient as any[]).map((c: Project) => c.name)
       }
+      const parent = this.project.isStandaloneProject ? this.project.grandpa : this.project.parent;
 
-      return this.project.parent.children
+      return parent.children
         .filter(c => config.allowedTypes.app.includes(c.type))
-        .map(c => c.name)
+        .map(c => c.name);
     }
     return [];
   }

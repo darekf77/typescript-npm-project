@@ -16,7 +16,7 @@ import { handleProjectsPorts } from '../environment-config/environment-config-he
 import {
   waitForAppBuildToBePossible, waitForRequiredDistsBuilds
 } from './waiting-for-builds-conditions-helpers.backend';
-import { selectClients } from '../../project-specyfic/select-clients';
+import { selectClients } from '../../project-specyfic/select-clients.backend';
 
 const allowedForSelectingCLients = [
   'angular-lib',
@@ -241,19 +241,16 @@ inside generated projects...
     generated: ${this.project.isGenerated}
     `);
 
-    if (this.project.isGenerated) {
-      await selectClients(buildOptions, this.project, db);
-    } else {
-      if (buildOptions.appBuild) {
-        if (!singularBuildInParent) {
-          await waitForAppBuildToBePossible(db, this.project);
-        }
-      } else if (allowedForSelectingCLients.includes(this.project.type)) {
 
-        await selectClients(buildOptions, this.project, db);
-        await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
+    if (buildOptions.appBuild) {
+      if (!singularBuildInParent) {
+        await waitForAppBuildToBePossible(db, this.project);
       }
+    } else {
+      await selectClients(buildOptions, this.project, db);
+      await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
     }
+
     //#endregion
 
     //#region report start building message
@@ -287,3 +284,5 @@ inside generated projects...
   }
 
 }
+
+

@@ -64,8 +64,10 @@ export class NpmProject {
         return;
       }
 
-      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json`, true)
-      Helpers.error(path.join(this.location, config.file.package_json), false, true)
+      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      location: ${path.join(this.location, config.file.package_json)}
+
+      `, true, true);
     }
     const ver = this.version.split('.');
     if (ver.length > 0) {

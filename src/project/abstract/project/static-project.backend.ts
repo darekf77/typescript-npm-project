@@ -23,7 +23,10 @@ export abstract class StaticProject {
 
 
   /**
-   * Is generated for static build
+   * Project can be generated becouse it is a part of:
+   * 1. Static build -> bulding 'bundle; in workspace from all childrens
+   * 2. Standalone Container singular build -> watcg build in 'dist' of all standalone libs from container as one
+   * 3. [WIP] Workspace watch build of all childrens in 'dist'
    */
   get isGenerated(this: Project) {
     if (Helpers.isBrowser) {
@@ -52,7 +55,7 @@ export abstract class StaticProject {
     if (!this.isGenerated) {
       // console.log('global.tnp_normal_mode',global.tnp_normal_mode)
       if (global.tnp_normal_mode) {
-        Helpers.warn(`Trying to access origin of not static project`, true);
+        Helpers.warn(`Trying to access origin of not static project for ${this.location}`);
       }
       return;
     }
@@ -83,7 +86,9 @@ export abstract class StaticProject {
       if (!global.tnp_normal_mode) {
         return;
       }
-      Helpers.warn(`Trying to access bundle of bundle`, true);
+      Helpers.warn(`Trying to access bundle of bundle for project of location:
+        ${this.location}
+      `);
       return;
     }
     if (this.isWorkspace) {
