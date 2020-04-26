@@ -8,6 +8,7 @@ import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
+import { recreateTmpWorkspace } from '../../project/features/recreate-tmp-evenironment-config.backend';
 
 export class ProjectFactory {
 
@@ -122,42 +123,7 @@ export class ProjectFactory {
             Helpers.info(`[create] Path NOT removed from empty locations`);
           }
           if (baseline.isWorkspace) {
-            const projectsConfig = [];
-            baseline.children.forEach(c => {
-              const generatedChildLation = path.join(destinationPath, c.name)
-              c.copyManager.generateSourceCopyIn(generatedChildLation, {
-                markAsGenerated: false,
-              });
-              if (c.type === 'angular-lib') {
-                projectsConfig.push({
-                  baseUrl: `/${c.name}`,
-                  name: c.name,
-                  port: 6000 + projectsConfig.length,
-                });
-              }
-              if (c.type === 'isomorphic-lib') {
-                projectsConfig.push({
-                  baseUrl: `/api-${c.name}`,
-                  name: c.name,
-                  $db: {
-                    database: `tmp/db-for-${c.name}.sqlite3`,
-                    type: 'sqlite',
-                    synchronize: true,
-                    dropSchema: true,
-                    logging: false
-                  },
-                  port: 6000 + projectsConfig.length,
-                });
-              }
-            });
-
-            // replace environment.js placholder
-            const environmentJsFilePath = path.join(destinationPath, 'environment.js');
-            let file = Helpers.readFile(environmentJsFilePath);
-            const palaceHolderContent = JSON.stringify(projectsConfig, null, 2).replace(/^\[/g, '').replace(/\]$/g, '');
-            file = file.replace('// <PLACEHOLDER_FOR_PROJECTS>', palaceHolderContent);
-            Helpers.writeFile(environmentJsFilePath, file);
-            Helpers.remove(path.join(destinationPath, config.file.tnpEnvironment_json));
+            recreateTmpWorkspace(baseline, destinationPath, true);
           }
         } catch (err) {
           Helpers.error(`[create] Not able to create project`, false, true);

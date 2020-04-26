@@ -39,6 +39,7 @@ const file = {
   tnpBundle: 'tnp-bundle',
   tnpEnvironment_json: 'tmp-environment.json',
   environment: 'environment',
+  environment_js: 'environment.js',
   tnp_system_path_txt: 'tnp-system-path.txt',
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
   manifest_webmanifest: 'manifest.webmanifest',
@@ -142,6 +143,7 @@ export const config = {
     }
   },
   frameworkName: 'tnp',
+  startPort: 6001,
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   //#region @backend
   pathes: {
