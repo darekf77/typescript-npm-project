@@ -102,7 +102,6 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#region modular build
     const modularBuild = () => {
       if (parentProj.isContainer) {
-        Helpers.info(`SINULAR BUILD  - CONTAINER`);
         const moduleName = '';
         const envConfig = {} as any;
         let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
@@ -123,7 +122,6 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           )
         ];
       } else {
-        Helpers.info(`SINULAR BUILD  - WORKSPACE`);
         this.resolveModulesLocations
           .forEach(moduleName => {
             let browserOutFolder = Helpers.getBrowserVerPath(moduleName);

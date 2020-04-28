@@ -28,7 +28,11 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
   }
 
   await selectClientsMenu(buildOptions, currentProject, db);
+  Helpers.info(`
 
+  [selectClients] Selected Clients: ${(buildOptions.forClient as any as Project[]).map(c => c.name).join(',')}
+
+  `)
 }
 
 //#region [watch,normal build] automatic select of active client from db

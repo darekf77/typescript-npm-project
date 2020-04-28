@@ -175,7 +175,7 @@ export abstract class BuildableProject {
         await this.selectAllProjectCopyto();
       } else {
         if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-          if (this.isStandaloneProject && this.buildOptions.watch && !this.isContainerChild) {
+          if (this.isStandaloneProject && this.buildOptions.watch) {
             if (!this.isGenerated) {
               await BuildableProject.selectProjectToCopyTO(this.buildOptions, this);
             }

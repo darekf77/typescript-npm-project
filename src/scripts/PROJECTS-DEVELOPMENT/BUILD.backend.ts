@@ -180,16 +180,84 @@ const $BUILD_APP_WATCH_PROD = (args) => Project.Current.buildProcess.startForApp
 const $START_APP = async (args) => {
   await Project.Current.start(args);
 };
-// aliases
-const $BUILD = async (args) => {
 
-  if (config.allowedTypes.libs.includes(Project.Current.type)) {
-    await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+function resolveDeps(proj: Project, deps: Project[]) {
+  if (proj.workspaceDependencies.length > 0) {
+    proj.workspaceDependencies.forEach(d => {
+      if (_.isUndefined(deps.find(c => c.location === d.location))) {
+        deps.push(d);
+        resolveDeps(d, deps);
+      }
+    })
   }
-  if (config.allowedTypes.app.includes(Project.Current.type)) {
-    await Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args);
+}
+
+function prepareDeps(deps: Project[]) {
+
+  function swap(a: Project, b: Project) {
+    const tmp = a;
+    const bIndex = deps.indexOf(b);
+    deps[deps.indexOf(a)] = b;
+    deps[bIndex] = tmp;
   }
-  process.exit(0);
+
+  while (true) {
+    const depsArr = deps;
+    for (let index = 0; index < depsArr.length; index++) {
+      const proj = depsArr[index];
+      const isSwapped = !_.isUndefined(depsArr.find(d => {
+        const condit = proj.workspaceDependencies.includes(d) &&
+          (depsArr.indexOf(d) > depsArr.indexOf(proj));
+        if (condit) {
+          swap(proj, d);
+        }
+        return condit;
+      }));
+      if (isSwapped) {
+        break;
+      }
+      if (index === depsArr.length - 1) {
+        return deps;
+      }
+    }
+  }
+}
+
+
+/**
+ * CHAIN BUILD
+ */
+const $BUILD = async (args) => {
+  const allowedLibs = [
+    'angular-lib',
+    'isomorphic-lib'
+  ] as Models.libs.LibType[];
+  const project = Project.Current;
+  if (!allowedLibs.includes(project.type)) {
+    Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
+  }
+  const argsObj: Models.dev.IBuildOptions = require('minimist')(args.split(' '));
+  let clientName: string = ((argsObj.forClient) ? argsObj.forClient : project.name) as any;
+  clientName = Array.isArray(clientName) ? _.first(clientName) : clientName;
+
+  let deps: Project[] = [];
+  resolveDeps(project, deps);
+  deps = deps.reverse();
+  deps = prepareDeps(deps);
+
+
+  for (let index = 0; index < deps.length; index++) {
+    const proj = deps[index];
+    const argsForCmd = (args = ` --forClient=${clientName} `);
+    const command = `${config.frameworkName} bdw ${argsForCmd}`;
+    Helpers.info(`
+
+    Running command in dependency "${proj.name}" : ${command}
+
+    `);
+    await proj.run(command, { output: true, prefix: chalk.bold(`[${proj.name}]`) }).unitlOutputContains('Watching for file changes.');
+  }
+  await project.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
 const $BUILD_PROD = async (args) => {
   if (config.allowedTypes.libs.includes(Project.Current.type)) {

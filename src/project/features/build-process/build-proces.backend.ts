@@ -156,14 +156,19 @@ inside generated projects...
     const db = await TnpDB.Instance(config.dbLocation);
     const singularBuildInParent = await this.project.hasParentWithSingularBuild();
 
-    await db.checkBuildIfAllowed(
-      this.project as any,
-      buildOptions,
-      process.pid,
-      process.ppid,
-      true
-    );
-    Helpers.log(`[db][checkBuildIfAllowed] finish `);
+    if (buildOptions.appBuild) {
+      await db.checkBuildIfAllowed(
+        this.project as any,
+        buildOptions,
+        process.pid,
+        process.ppid,
+        true
+      );
+      Helpers.log(`[db][checkBuildIfAllowed] finish `);
+    } else {
+      Helpers.log(`[db][checkBuildIfAllowed] no needed for dist`);
+    }
+
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
@@ -229,8 +234,9 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
     //#endregion
-
-    await db.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
+    if (buildOptions.appBuild) {
+      await db.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
+    }
 
     //#region handle build clients projects
 
@@ -243,9 +249,9 @@ inside generated projects...
 
 
     if (buildOptions.appBuild) {
-      if (!singularBuildInParent) {
-        await waitForAppBuildToBePossible(db, this.project);
-      }
+      // if (!singularBuildInParent) { // TODO UNCOMMENT
+      //   await waitForAppBuildToBePossible(db, this.project);
+      // }
     } else {
       await selectClients(buildOptions, this.project, db);
       await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);

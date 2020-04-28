@@ -106,7 +106,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     location: ${location}
     backendOut: ${backendOut}
 
-    `);
+    `, 1);
 
     Helpers.log(`\n\nbuildOptions: ${JSON10.stringify(buildOptions)}\n\n`, 2)
 
@@ -161,7 +161,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     ${filesPathes.map(c => `${c}\n`)}
 
-    `)
+    `, 1)
 
     // console.log('inside')
     let env: Models.env.EnvConfig = this.ENV;
@@ -191,7 +191,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     ${filesPathes.map(c => `${c}\n`)}
 
-    `);
+    `, 1);
 
     this.codecut = new ExtendedCodeCut(
       this.compilationFolderPath,
