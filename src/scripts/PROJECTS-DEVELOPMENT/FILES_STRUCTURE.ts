@@ -35,9 +35,6 @@ export async function STRUCTURE(args: string, exit = true) {
 
 export async function INIT(args: string, exit = true) {
   const project = Project.Current;
-  if (!project.isGenerated) {
-    rimraf.sync(path.join(Project.Current.location, config.file.tnpEnvironment_json));
-  }
   await Project.Current.filesStructure.init(args);
   if (exit) {
     process.exit(0)

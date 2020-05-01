@@ -165,10 +165,10 @@ function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
   return _.isNumber(envPort) ? envPort : project.getDefaultPort();
 }
 
-
 export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
   workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
+  workspaceConfig.currentProjectLaunchConfiguration = project.temlateOfLaunchJSON(workspaceConfig);
   workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsSite = project.isSite;

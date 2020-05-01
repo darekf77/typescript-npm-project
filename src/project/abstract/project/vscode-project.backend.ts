@@ -78,5 +78,109 @@ export abstract class VscodeProject {
     }
   }
 
+  temlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
+    let configurations = [];
+
+    const startServerTemplate = {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/run.js",
+      "cwd": void 0,
+      "args": [],
+      "runtimeArgs": [
+        "--experimental-worker"
+      ]
+    };
+
+    const templateFor = (serverChild: Project, clientProject: Project) => {
+      const t = _.cloneDeep(startServerTemplate);
+      if (serverChild.name !== clientProject.name) {
+        const cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
+        t.program = cwd + '/run.js';
+        t.cwd = cwd;
+      }
+      t.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
+        clientProjectName: clientProject.name
+      } as Models.env.EnvConfig, null, 4))}`);
+      return t;
+    };
+
+    if (this.typeIs('angular-lib')) {
+      const servePort = getPort(this, currentWorkspaceConfig);
+      configurations = [{
+        "name": "ng serve",
+        "type": "chrome",
+        "request": "launch",
+        // "userDataDir": false,
+        "preLaunchTask": "ngserve",
+        "postDebugTask": "terminateall",
+        "sourceMaps": true,
+        "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
+        "webRoot": "${workspaceFolder}",
+        "sourceMapPathOverrides": {
+          "webpack:/*": "${webRoot}/*",
+          "/./*": "${webRoot}/*",
+          "/tmp-src/*": "${webRoot}/*",
+          "/*": "*",
+          "/./~/*": "${webRoot}/node_modules/*"
+        }
+      }];
+
+      if (this.isWorkspaceChildProject) {
+
+        this.parent.children
+          .filter(c => c.typeIs('isomorphic-lib'))
+          .forEach(c => {
+            configurations.push(templateFor(c, this));
+          })
+
+      }
+
+    }
+    if (this.typeIs('isomorphic-lib')) {
+      configurations = [
+        {
+          "type": "node",
+          "request": "attach",
+          "name": "Attach to global cli tool",
+          "port": 9229,
+          "skipFiles": [
+            "<node_internals>/**"
+          ]
+        },
+        templateFor(this, this)
+        // {
+        //   "type": "node",
+        //   "request": "launch",
+        //   "remoteRoot": "${workspaceRoot}",
+        //   "localRoot": "${workspaceRoot}",
+        //   "name": "Launch Nodemon server",
+        //   "runtimeExecutable": "nodemon",
+        //   "program": "${workspaceFolder}/run.js",
+        //   "restart": true,
+        //   "sourceMaps": true,
+        //   "console": "internalConsole",
+        //   "internalConsoleOptions": "neverOpen",
+        //   "runtimeArgs": [
+        //     "--experimental-worker"
+        //   ]
+        // },
+      ]
+
+    }
+    return JSON.stringify(configurations);
+  }
+  // export interface VscodeProject extends Partial<Project> { }
 }
-// export interface VscodeProject extends Partial<Project> { }
+
+function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
+  let env: Models.env.EnvConfigProject;
+  if (project.isWorkspace) {
+    env = workspaceConfig.workspace?.workspace;
+  } else {
+    env = workspaceConfig.workspace?.projects?.find(p => p.name === project.name);
+  }
+  const envPort = env?.port;
+  return _.isNumber(envPort) ? envPort : project.getDefaultPort();
+}

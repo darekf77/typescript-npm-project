@@ -6,6 +6,7 @@ import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
+import * as JSON5 from 'json5';
 
 export class FilesTemplatesBuilder extends FeatureForProject {
 
@@ -61,7 +62,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     reservedExpOne: any) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
     // Helpers.pressKeyAndContinue();
-    const newContent = content
+    let newContent = content
       .split('\n')
       .filter(line => !line.trimLeft().startsWith('#'))
       .map(line => {
@@ -98,6 +99,19 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       }).join('\n');
 
     Helpers.removeFileIfExists(filePath);
+    if (filePath.endsWith('.json')) {
+      try {
+        const jsonparsed = JSON5.parse(newContent);
+        newContent = JSON.stringify(jsonparsed, null, 2);
+      } catch (e) {
+        Helpers.log(e);
+        Helpers.info(newContent);
+        Helpers.error(`[filetemplate] Not able to parse new content` +
+          ` for json in ${path.basename(filePath)}
+
+          `, false, true);
+      }
+    }
     Helpers.writeFile(filePath, newContent);
 
 

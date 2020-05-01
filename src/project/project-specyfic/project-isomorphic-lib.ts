@@ -67,8 +67,9 @@ export class ProjectIsomorphicLib extends Project {
     ];
 
     if (this.frameworkVersionAtLeast('v2')) {
-      files.push('tsconfig.isomorphic.json.filetemplate')
-      files.push('tsconfig.browser.json.filetemplate')
+      files.push('tsconfig.isomorphic.json.filetemplate');
+      files.push('tsconfig.browser.json.filetemplate');
+      files.push('.vscode/launch.json.filetemplate');
     }
 
     return files;
