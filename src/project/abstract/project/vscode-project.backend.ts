@@ -99,6 +99,7 @@ export abstract class VscodeProject {
         const cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
         t.program = cwd + '/run.js';
         t.cwd = cwd;
+        t.name = t.name + ` for ${clientProject.name}`
       }
       t.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
         clientProjectName: clientProject.name
@@ -167,6 +168,16 @@ export abstract class VscodeProject {
         //   ]
         // },
       ]
+
+      if (this.isWorkspaceChildProject) {
+
+        this.parent.children
+          .filter(c => c.typeIs('angular-lib'))
+          .forEach(c => {
+            configurations.push(templateFor(this, c));
+          })
+
+      }
 
     }
     return JSON.stringify(configurations);
