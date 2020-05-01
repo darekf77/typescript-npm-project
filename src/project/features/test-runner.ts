@@ -29,18 +29,12 @@ export class TestRunner
 
   start(files?: string[], type: TestType = 'unit') {
     let command: string;
-    switch (this.project.type) {
-      case 'isomorphic-lib':
-
-        command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
-          + ` --timeout ${config.CONST.TEST_TIMEOUT}`
-        break;
-
-      default:
-        break;
+    if (this.project.typeIs('isomorphic-lib')) {
+      command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
+        + ` --timeout ${config.CONST.TEST_TIMEOUT}`
     }
     if (!command) {
-      Helpers.error(`Tests not impolemented for ${this.project.type}`, false, true)
+      Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }
@@ -48,17 +42,12 @@ export class TestRunner
 
   async startAndWatch(files?: string[], type: TestType = 'unit') {
     let command: string;
-    switch (this.project.type) {
-      case 'isomorphic-lib':
-        command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} `
-          + ` --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
-        break;
-
-      default:
-        break;
+    if (this.project.typeIs('isomorphic-lib')) {
+      command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} `
+        + ` --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
     }
     if (!command) {
-      Helpers.error(`Tests not impolemented for ${this.project.type}`, false, true)
+      Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
     this.project.run(command, { output: true }).sync()
   }

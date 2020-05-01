@@ -22,7 +22,7 @@ export abstract class SiteProject {
       return this.browser.isSite;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     let basedOn = '';
@@ -50,7 +50,7 @@ export abstract class SiteProject {
       return this.browser.isBasedOnOtherProject;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     if (this.isWorkspace) {
@@ -74,7 +74,7 @@ export abstract class SiteProject {
       return this.browser.baseline as any;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     if (this.isContainer) {

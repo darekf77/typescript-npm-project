@@ -66,7 +66,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject || this.project.isContainer) {
 
-      this.project.packageJson.showDeps(`${this.project.type} instalation before full insall [${triggeredMsg}]`);
+      this.project.packageJson.showDeps(`${this.project._type} instalation before full insall [${triggeredMsg}]`);
 
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.workspaceSymlinks.remove(triggeredMsg)
@@ -90,7 +90,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
       if (this.project.isContainerChild && this.project.isWorkspace) {
-        this.project.packageJson.hideDeps(`${this.project.type} hide deps for container child [${triggeredMsg}]`);
+        this.project.packageJson.hideDeps(`${this.project._type} hide deps for container child [${triggeredMsg}]`);
       }
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         this.project.node_modules.dedupe();
@@ -98,7 +98,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if (this.project.isWorkspace && smoothInstall === false) {
         this.project.tnpBundle.installAsPackage();
       }
-      this.project.packageJson.save(`${this.project.type} instalation after  [${triggeredMsg}]`);
+      this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation finish ok` });

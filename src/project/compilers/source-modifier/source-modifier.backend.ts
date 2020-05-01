@@ -21,7 +21,7 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
     folderPath = [
       path.join(project.location, config.folder.src),
     ]
-    if (project.type === 'angular-lib') {
+    if (project.typeIs('angular-lib')) {
       folderPath.push(path.join(project.location, config.folder.components));
     }
     if (project.isSite) {
@@ -52,16 +52,16 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     let pathToWatch: string;
     let prefixTmpFolder = `tmp-src-dist-browser-for-`;
 
-    if (this.project.type === 'angular-lib') {
+    if (this.project.typeIs('angular-lib')) {
       pathToWatch = config.folder.components;
-    } if (this.project.type === 'isomorphic-lib') {
+    } if (this.project.typeIs('isomorphic-lib')) {
       pathToWatch = config.folder.src;
     }
     const isStandalone = this.project.isStandaloneProject;
     if (isStandalone) {
-      if (this.project.type === 'angular-lib') {
+      if (this.project.typeIs('angular-lib')) {
         prefixTmpFolder = `tmp-src-dist`;
-      } if (this.project.type === 'isomorphic-lib') {
+      } if (this.project.typeIs('isomorphic-lib')) {
         prefixTmpFolder = `tmp-src-dist-browser`;
       }
     }
@@ -157,7 +157,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     // console.log(relativePathesToProject)
     // process.exit(0)
     if (!this.project.isStandaloneProject ||
-      (this.project.isStandaloneProject && this.project.type === 'angular-lib')) {
+      (this.project.isStandaloneProject && this.project.typeIs('angular-lib'))) {
 
       Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
       // console.log('for app replikator', relativePathesToProject)

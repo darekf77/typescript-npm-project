@@ -45,7 +45,7 @@ export abstract class RecreatableProject {
 
   //#region @backend
   public projectSourceFiles(this: Project): string[] {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     // should be abstract
@@ -76,9 +76,9 @@ export abstract class RecreatableProject {
   }
 
   public async __initProcedure(this: Project) {
-    Helpers.log(`Started init procedure of project (${this.type}) "${this.genericName}...`);
+    Helpers.log(`Started init procedure of project (${this._type}) "${this.genericName}...`);
     await this.initProcedure();
-    Helpers.log(`End init procedure of project (${this.type}) "${this.genericName}" started...`);
+    Helpers.log(`End init procedure of project (${this._type}) "${this.genericName}" started...`);
   }
   //#endregion
 
@@ -87,7 +87,7 @@ export abstract class RecreatableProject {
       return this.browser.customizableFilesAndFolders;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     const extraFolders = this.getFolders()
@@ -95,18 +95,22 @@ export abstract class RecreatableProject {
       .filter(f => !['src', 'backup'].includes(path.basename(f)))
       .map(f => path.basename(f))
 
-    if (this.type === 'workspace') return [
-      // 'environment.d.ts',
-      'environment.js',
-      'environment.dev.js',
-      'environment.prod.js',
-      'environment.test.js',
-      'environment.stage.js',
-      'environment.static.js',
-      'environment.online.js'
-    ].concat(!this.isSite ? extraFolders : [])
+    if (this.typeIs('workspace')) {
+      return [
+        // 'environment.d.ts',
+        'environment.js',
+        'environment.dev.js',
+        'environment.prod.js',
+        'environment.test.js',
+        'environment.stage.js',
+        'environment.static.js',
+        'environment.online.js'
+      ].concat(!this.isSite ? extraFolders : [])
+    }
     const files: string[] = ['src']
-    if (this.type === 'angular-lib') files.push('components');
+    if (this.typeIs('angular-lib')) {
+      files.push('components')
+    };
 
     return files;
     //#endregion

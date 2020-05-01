@@ -39,10 +39,10 @@ function $IS_CORE_PROJECT() {
 }
 
 function $OPEN_CORE_PROJECT() {
-  if (Project.Current.isCoreProject && Project.Current.frameworkVersion !== 'v1') {
-    Project.Current.run(`code ${Project.by(Project.Current.type, 'v1').location} &`).sync();
+  if (Project.Current.isCoreProject && Project.Current.frameworkVersionAtLeast('v2')) {
+    Project.Current.run(`code ${Project.by(Project.Current._type, Project.Current.frameworkVersionMinusOne).location} &`).sync();
   } else {
-    Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersion).location} &`).sync();
+    Project.Current.run(`code ${Project.by(Project.Current._type, Project.Current._frameworkVersion).location} &`).sync();
   }
   process.exit(0)
 }

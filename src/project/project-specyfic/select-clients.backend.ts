@@ -10,21 +10,20 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 //#endregion
 
-
-
-
+/**
+ * Resovle workspace child clients if needed
+ */
 export async function selectClients(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
 
-  if (!currentProject.isWorkspaceChildProject) {
+  if (!currentProject.isWorkspaceChildProject || buildOptions.forClient.length > 0) {
     return;
   }
 
-  if (
-    ((buildOptions.buildForAllClients && global.tnpNonInteractive) ||
-      (!buildOptions.buildForAllClients && !global.tnpNonInteractive)) &&
-    buildOptions.forClient.length === 0
-  ) {
-    await selectClientsAutomaticlyForWorksapceChild(buildOptions, currentProject, db);
+  if (!buildOptions.watch || buildOptions.buildForAllClients || global.tnpNonInteractive) {
+    buildOptions.forClient = currentProject.parent.children
+      .filter(c => c.typeIs(...config.allowedTypes.app))
+      .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name))) as any;
+    return;
   }
 
   await selectClientsMenu(buildOptions, currentProject, db);
@@ -32,38 +31,19 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
 
   [selectClients] Selected Clients: ${(buildOptions.forClient as any as Project[]).map(c => c.name).join(',')}
 
-  `)
+  `);
 }
-
-//#region [watch,normal build] automatic select of active client from db
-async function selectClientsAutomaticlyForWorksapceChild(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
-  const founded = await db.appBuildFoundedFor(currentProject as any);
-  if (founded.length > 0) {
-    buildOptions.forClient = founded.map(c => c.project);
-    Helpers.info(`
-
-    Automaticly assigne dist build target: ${founded.map(c => chalk.bold(c.project && c.project.name))}
-
-    `);
-
-    await db.updateCommandBuildOptions(currentProject.location, buildOptions);
-    await db.updateBuildOptions(buildOptions, process.pid);
-  }
-}
-//#endregion
 
 //#region clients autocomplete menu
 async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {
-  while (buildOptions.forClient.length === 0) {
-    if (!buildOptions.watch) {
-      buildOptions.forClient = currentProject.parent.children
-        .filter(c => config.allowedTypes.app.includes(c.type))
-        .filter(c => !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name))) as any;
-      // .filter(c => c.name !== currentProject.name)
-      return;
-    }
+  if (!currentProject.isWorkspaceChildProject) {
+    return;
+  }
+
+  const menu = async () => {
+
     const choices = currentProject.parent.children
-      .filter(c => config.allowedTypes.app.includes(c.type))
+      .filter(c => c.typeIs(...config.allowedTypes.app))
       .map(c => {
         const notIncludedInEnv = (!c || !c.env || !c.env.config) ? true :
           !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));
@@ -93,7 +73,10 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
 
     await db.updateCommandBuildOptions(currentProject.location, buildOptions);
     await db.updateBuildOptions(buildOptions, process.pid);
+  }
 
+  while (buildOptions.forClient.length === 0) {
+    menu();
   }
 
 }

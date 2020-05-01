@@ -20,7 +20,7 @@ export abstract class BuildableProject {
   public _buildOptions?: BuildOptions;
 
   private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
-    if (project.type === 'unknow') {
+    if (project.typeIs('unknow')) {
       return;
     }
     // clearConsole()
@@ -109,7 +109,7 @@ export abstract class BuildableProject {
       return this.browser.allowedEnvironments;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
@@ -143,7 +143,7 @@ export abstract class BuildableProject {
   //#region @backend
   async build(this: Project, buildOptions?: BuildOptions) {
     // Helpers.log(`BUILD OPTIONS: ${JSON10.stringify(buildOptions)}`)
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
 
@@ -156,7 +156,7 @@ export abstract class BuildableProject {
 
     let baseHref: string;
     // log('AM HERE')
-    if (this.type === 'workspace') {
+    if (this.typeIs('workspace')) {
       baseHref = this.env.config.workspace.workspace.baseUrl;
     } else if (this.isWorkspaceChildProject) {
       if (buildOptions.appBuild) {

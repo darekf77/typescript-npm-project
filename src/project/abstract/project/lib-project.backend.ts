@@ -27,7 +27,7 @@ export abstract class LibProject {
   }
 
   get isGeneratingControllerEntities(this: Project) {
-    return this.type === 'isomorphic-lib' && this.useFramework;
+    return this.typeIs('isomorphic-lib') && this.useFramework;
   }
 
   //#region @backend
@@ -220,7 +220,7 @@ export abstract class LibProject {
 
   public compileES5version(this: Project) {
 
-    if (this.frameworkVersion === 'v1') {
+    if (this.frameworkVersionEquals('v1')) {
       return;
     }
 
@@ -287,9 +287,9 @@ export abstract class LibProject {
       }
 
 
-      if (this.type === 'angular-lib') {
+      if (this.typeIs('angular-lib')) {
 
-        if (this.frameworkVersion === 'v1') {
+        if (this.frameworkVersionEquals('v1')) {
           Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
                 "use strict";
                 Object.defineProperty(exports, '__esModule', { value: true });
@@ -336,7 +336,7 @@ export abstract class LibProject {
       if (successPublis) {
         await this.bumpVersionInOtherProjects(newVersion);
 
-        if (this.type === 'angular-lib') {
+        if (this.typeIs('angular-lib')) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
             Helpers.log(`
 

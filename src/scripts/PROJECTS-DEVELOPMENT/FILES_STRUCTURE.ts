@@ -1,6 +1,11 @@
 //#region @backend
+import * as fse from 'fs-extra';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
+import { config } from '../../config';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 
@@ -10,10 +15,14 @@ export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 }
 
 export async function STRUCT(args: string, exit = true) {
+  const project = Project.Current;
   if (!args) {
     args = '';
   }
   args += ' --struct';
+  if (!project.isGenerated) {
+    rimraf.sync(path.join(Project.Current.location, config.file.tnpEnvironment_json));
+  }
   await Project.Current.filesStructure.init(args);
   if (exit) {
     process.exit(0)
@@ -25,6 +34,10 @@ export async function STRUCTURE(args: string, exit = true) {
 }
 
 export async function INIT(args: string, exit = true) {
+  const project = Project.Current;
+  if (!project.isGenerated) {
+    rimraf.sync(path.join(Project.Current.location, config.file.tnpEnvironment_json));
+  }
   await Project.Current.filesStructure.init(args);
   if (exit) {
     process.exit(0)

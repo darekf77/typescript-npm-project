@@ -17,14 +17,14 @@ export function recreateTmpWorkspace(baseline: Project, destinationPath: string,
         markAsGenerated: false,
       });
     }
-    if (c.type === 'angular-lib') {
+    if (c.typeIs('angular-lib')) {
       projectsConfig.push({
         baseUrl: `/${c.name}`,
         name: c.name,
         port: config.startPort + projectsConfig.length,
       });
     }
-    if (c.type === 'isomorphic-lib') {
+    if (c.typeIs('isomorphic-lib')) {
       projectsConfig.push({
         baseUrl: `/api-${c.name}`,
         name: c.name,

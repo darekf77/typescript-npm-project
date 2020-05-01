@@ -198,7 +198,7 @@ export class EnvironmentConfig
   }
   //#endregion
 
-  private static configs: { [location: string]: Models.env.EnvConfig } = {};
+  public static configs: { [location: string]: Models.env.EnvConfig } = {};
 
   public get configsFromJs(): Models.env.EnvConfig[] { // QUICK_FIX something if weird here
     //#region @backendFunc

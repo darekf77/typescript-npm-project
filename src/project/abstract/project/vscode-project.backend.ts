@@ -55,9 +55,9 @@ export abstract class VscodeProject {
     };
     fse.writeJSONSync(path.join(this.location,
       this.nameOfCodeWorkspace), codeWorkspace, {
-        encoding: 'utf8',
-        spaces: 2
-      });
+      encoding: 'utf8',
+      spaces: 2
+    });
 
   }
 
@@ -70,7 +70,7 @@ export abstract class VscodeProject {
     if (this.isStandaloneProject || this.isUnknowNpmProject) {
       this.run(`code ${this.location}`).sync()
     } else {
-      const isomorphicServers: Project[] = this.children.filter(c => c.type === 'isomorphic-lib');
+      const isomorphicServers: Project[] = this.children.filter(c => c.typeIs('isomorphic-lib'));
       this.run(`code ${this.location}/${this.nameOfCodeWorkspace}`).sync();
       isomorphicServers.forEach(s => {
         s.run(`code ${s.location}`).sync()

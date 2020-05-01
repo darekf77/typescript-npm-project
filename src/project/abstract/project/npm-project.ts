@@ -10,7 +10,9 @@ import { config } from '../../../config';
 import { Morphi } from 'morphi';
 
 export class NpmProject {
-
+  /**
+   * Version from package.json
+   */
   get version(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.version;
@@ -25,7 +27,7 @@ export class NpmProject {
       return this.browser.resources;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return []
     }
     return this.packageJson.resources;
@@ -40,7 +42,7 @@ export class NpmProject {
       return this.browser.isUnknowNpmProject;
     }
     //#region @backend
-    return this.type === 'unknow-npm-project';
+    return this.typeIs('unknow-npm-project');
     //#endregion
   }
 
@@ -55,7 +57,7 @@ export class NpmProject {
 
   //#region @backend
   get versionPatchedPlusOne(this: Project) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return '';
     }
     if (!this.version) {
@@ -82,7 +84,7 @@ export class NpmProject {
       return this.browser.name;
     }
     //#region @backendFunc
-    if (this.packageJson && this.type === 'unknow-npm-project') {
+    if (this.packageJson && this.typeIs('unknow-npm-project')) {
       if (this.packageJson.name !== path.basename(this.location)
         && path.basename(path.dirname(this.location)) === 'external') {
         return path.basename(this.location);
@@ -95,7 +97,7 @@ export class NpmProject {
   //#region @backend
   get hasNpmOrganization(this: Project) {
     // log('path.dirname(this.location)', path.dirname(this.location))
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     return path.basename(path.dirname(this.location)).startsWith('@');
@@ -111,7 +113,7 @@ export class NpmProject {
 
   //#region @backend
   public allPackageJsonDeps(this: Project, contextFolder?: string): Project[] {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     let projectsInNodeModules = [];
@@ -126,7 +128,7 @@ export class NpmProject {
   //#region @backend
   public getDepsAsProject(this: Project, type: Models.npm.NpmDependencyType | Models.npm.TnpNpmDependencyType,
     contextFolder?: string): Project[] {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     return this.getDepsAsPackage(type).map(packageObj => {
@@ -151,7 +153,7 @@ export class NpmProject {
 
   //#region @backend
   public getDepsAsPackage(this: Project, type: Models.npm.NpmDependencyType | Models.npm.TnpNpmDependencyType): Models.npm.Package[] {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     if (!this.packageJson.data) {
@@ -202,12 +204,12 @@ export class NpmProject {
 
   //#region @backend
   public checkIfReadyForNpm(this: Project) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     // log('TYPEEEEE', this.type)
     const libs: Models.libs.LibType[] = ['angular-lib', 'isomorphic-lib'];
-    if (!libs.includes(this.type)) {
+    if (this.typeIsNot(...libs)) {
       Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`)
     }
     return true;
@@ -220,7 +222,7 @@ export class NpmProject {
       return this.browser.childrenThatAreThirdPartyInNodeModules as any;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     return this.isomorphicPackages.map(c => {

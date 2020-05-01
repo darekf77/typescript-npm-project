@@ -24,7 +24,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       const parent = this.project.isStandaloneProject ? this.project.grandpa : this.project.parent;
 
       return parent.children
-        .filter(c => config.allowedTypes.app.includes(c.type))
+        .filter(c => c.typeIs(...config.allowedTypes.app))
         .map(c => c.name);
     }
     return [];
@@ -45,7 +45,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#region init variables
     this.compileOnce = !buildOptions.watch
     const outFolder = buildOptions.outDir;
-    const location = ((project.type === 'isomorphic-lib') ?
+    const location = ((project.typeIs('isomorphic-lib')) ?
       (project.isSite ? config.folder.tempSrc : config.folder.src)
       : config.folder.components);
     const cwd = project.location;
@@ -65,7 +65,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#endregion
 
     //#region int backend compilation
-    if (project.type === 'isomorphic-lib') {
+    if (project.typeIs('isomorphic-lib')) {
       if (project.isSite) {
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, config.folder.tempSrc, cwd);
       } else {

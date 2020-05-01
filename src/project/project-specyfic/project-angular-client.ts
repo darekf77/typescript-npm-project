@@ -19,7 +19,7 @@ export class ProjectAngularClient extends Project {
 
 
   get isEjectedProject() {
-    return this.type === 'angular-client'
+    return this.typeIs('angular-client')
   }
 
   filesTemplates() {
@@ -123,18 +123,17 @@ export class ProjectAngularClient extends Project {
           Helpers.info(`BUILDING PRODUCTION`)
         }
         let command: string;
+        const statsCommand = (!this.isStandaloneProject ? (
+          this.env.config.name === 'static' ? '--stats-json' : ''
+        ) : '');
+        const outPutPathCommand = `--output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`;
 
-        if (this.frameworkVersion === 'v1') {
-          command = `npm-run ng build  ${!this.isStandaloneProject ? (
-            this.env.config.name === 'static' ? '--stats-json' : ''
-          ) : ''} ${
-            this.frameworkVersion !== 'v1' ? '--serviceWorker=true' : ''
-            } --aot=false ${prod ? '-prod' : ''} - --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+        if (this.frameworkVersionEquals('v1')) {
+          command = `npm-run ng build  ${statsCommand}
+          --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
         } else {
-          command = `npm-run ng build  ${!this.isStandaloneProject ? (
-            this.env.config.name === 'static' ? '--stats-json' : ''
-          ) : ''} ${'--serviceWorker=true'
-            } --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} --output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`
+          command = `npm-run ng build  ${statsCommand} --serviceWorker=true'
+          --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
         }
 
         Helpers.info(`

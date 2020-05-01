@@ -98,7 +98,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     Helpers.log(`[BroswerForModuleCompilation][constructor]
 
     compilationProject.genericName: ${compilationProject?.genericName}
-    compilationProject.type: ${compilationProject?.type}
+    compilationProject.type: ${compilationProject?._type}
     ENV?: ${!!ENV}
 
     cwd: ${cwd}

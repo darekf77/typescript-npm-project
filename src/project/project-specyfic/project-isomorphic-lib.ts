@@ -19,7 +19,7 @@ export class ProjectIsomorphicLib extends Project {
   //#region @backend
 
   async initProcedure() {
-    if (this.isCoreProject && this.frameworkVersion !== 'v1') {
+    if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
       this.applyLinkedFiles();
     }
   }
@@ -46,7 +46,7 @@ export class ProjectIsomorphicLib extends Project {
         '.vscode/launch.json',
         'tsconfig.browser.json',
         'webpack.config.js',
-        ...(this.frameworkVersion === 'v1' ? ['webpack.backend-bundle-build.js'] : []),
+        ...(this.frameworkVersionEquals('v1') ? ['webpack.backend-bundle-build.js'] : []),
         'run.js',
         ...this.filesTemplates(),
       ]).concat(
@@ -54,7 +54,7 @@ export class ProjectIsomorphicLib extends Project {
           'src/typings.d.ts',
         ] : []);
 
-    if (this.frameworkVersion !== 'v1') {
+    if (this.frameworkVersionAtLeast('v2')) {
       files = files.filter(f => f !== 'tsconfig.browser.json');
     }
 
@@ -66,7 +66,7 @@ export class ProjectIsomorphicLib extends Project {
       'tsconfig.json.filetemplate',
     ];
 
-    if (this.frameworkVersion !== 'v1') {
+    if (this.frameworkVersionAtLeast('v2')) {
       files.push('tsconfig.isomorphic.json.filetemplate')
       files.push('tsconfig.browser.json.filetemplate')
     }
@@ -77,9 +77,9 @@ export class ProjectIsomorphicLib extends Project {
   projectLinkedFiles() {
     const files = super.projectLinkedFiles();
 
-    if (this.frameworkVersion !== 'v1') {
+    if (this.frameworkVersionAtLeast('v2')) {
       files.push({
-        sourceProject: Project.by(this.type, 'v1'),
+        sourceProject: Project.by(this._type, 'v1'),
         relativePath: 'webpack.backend-bundle-build.js'
       });
     }
@@ -108,7 +108,7 @@ export class ProjectIsomorphicLib extends Project {
               name: 'project',
               message: 'Which project do you wanna simulate ?',
               choices: this.parent.children
-                .filter(c => config.allowedTypes.app.includes(c.type))
+                .filter(c => c.typeIs(...config.allowedTypes.app))
                 .filter(c => c.name !== this.name)
                 .map(c => c.name),
               filter: function (val) {
@@ -294,14 +294,14 @@ export function getReservedClassNames(project = Project.Current) {
   //     .filter((p) => p.type === 'isomorphic-lib')
   //     .map(c => c.name))
   // );
-  if (project && project.parent && project.parent.type === 'workspace'
+  if (project && project.parent && project.parent.typeIs('workspace')
     && Array.isArray(project.parent.children)
     && project.parent.children.length > 0) {
 
 
     const names = []
     project.parent.children
-      .filter((p) => p.type === 'isomorphic-lib')
+      .filter((p) => p.typeIs('isomorphic-lib'))
       .forEach(p => {
 
         const controllers = Helpers.morphi.getControllers(path.join(

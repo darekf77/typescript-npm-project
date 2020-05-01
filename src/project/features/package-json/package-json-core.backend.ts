@@ -41,7 +41,7 @@ export class PackageJsonCore {
     return [];
   }
 
-  get frameworkVersion(): 'v1' | 'v2' {
+  get frameworkVersion(): Models.libs.FrameworkVersion {
     const res = this.data.tnp ? this.data.tnp.version : undefined;
     if (_.isString(res)) {
       return res;

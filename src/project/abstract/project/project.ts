@@ -204,7 +204,7 @@ export class Project {
     while (true) {
       project = Project.From(absoluteLocation);
       if (_.isString(type)) {
-        if (project && project.type === type) {
+        if (project?.typeIs(type)) {
           if (findGitRoot) {
             if (project.git.isGitRoot) {
               break;
@@ -303,7 +303,7 @@ export class Project {
   //#endregion
 
   //#region @backend
-  public static by(libraryType: Models.libs.NewFactoryType, version: 'v1' | 'v2' = config.defaultFrameworkVersion): Project {
+  public static by(libraryType: Models.libs.NewFactoryType, version: Models.libs.FrameworkVersion = config.defaultFrameworkVersion): Project {
 
     if (libraryType === 'workspace') {
       const workspaceProject = Project.From(config.pathes.projectsExamples(version).workspace);
@@ -346,7 +346,7 @@ export class Project {
 
     this.location = _.isString(location) ? location : '';
     this.packageJson = PackageJSON.fromProject(this);
-    this.type = this.packageJson ? this.packageJson.type : 'unknow';
+    this.setType(this.packageJson ? this.packageJson.type : 'unknow');
     this.defineProperty('quickFixes', QuickFixes);
     // this.quickFixes = new QuickFixes(this)
     this.quickFixes.missingSourceFolders()
@@ -382,7 +382,7 @@ export class Project {
     // this.requiredLibs = this.packageJson.requiredProjects;
 
 
-    this.__defaultPort = Project.DefaultPortByType(this.type);
+    this.__defaultPort = Project.DefaultPortByType(this._type);
     // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
 
     if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {

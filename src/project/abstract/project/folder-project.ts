@@ -47,7 +47,7 @@ export abstract class FolderProject {
       return this.browser.children as any;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     return this.getAllChildren()
@@ -157,14 +157,14 @@ export abstract class FolderProject {
       return this.browser.childrenThatAreLibs as any;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     return this.children.filter(c => {
-      return ([
+      return c.typeIs(...([
         'angular-lib',
         'isomorphic-lib'
-      ] as Models.libs.LibType[]).includes(c.type);
+      ] as Models.libs.LibType[]));
     });
     //#endregion
   }
@@ -174,23 +174,23 @@ export abstract class FolderProject {
       return this.browser.childrenThatAreClients as any;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     return this.children.filter(c => {
-      return ([
+      return c.typeIs(...([
         'angular-lib',
         'isomorphic-lib',
         'angular-client',
         'ionic-client',
-      ] as Models.libs.LibType[]).includes(c.type);
+      ] as Models.libs.LibType[]));
     });
     //#endregion
   }
 
   //#region @backend
   getAllChildren(this: Project, options?: { excludeUnknowProjects: boolean; }) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     if (_.isUndefined(options)) {
@@ -210,7 +210,7 @@ export abstract class FolderProject {
       .filter(c => !!c)
 
     if (excludeUnknowProjects) {
-      res = res.filter(c => c.type !== 'unknow-npm-project')
+      res = res.filter(c => c.typeIsNot('unknow-npm-project'))
     }
     return res;
   }
@@ -287,7 +287,7 @@ export abstract class FolderProject {
 
   //#region @backend
   public clear(this: Project) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     Helpers.log(`
@@ -378,7 +378,7 @@ export abstract class FolderProject {
     if (!this.isUnknowNpmProject && !this.isStandaloneProject) {
       Helpers.remove(path.join(this.location, config.folder.node_modules, config.file.tnpBundle))
     }
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     if (showMsg) {
@@ -438,7 +438,7 @@ export abstract class FolderProject {
 
   //#region @backend
   removeRecognizedIsomorphicLIbs(this: Project) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     try {
@@ -460,7 +460,7 @@ export abstract class FolderProject {
   //#region @backend
   notAllowedFiles() {
     return [
-      '.vscode/tasks.json'
+      // '.vscode/tasks.json'
     ]
   }
   //#endregion

@@ -19,19 +19,50 @@ import { config } from '../../../config';
 
 export abstract class TnpProject {
 
-  public type: Models.libs.LibType;
+  /**
+   * Do use this variable for comparatios
+   * ONLY FOR VIEWING
+   */
+  public readonly _type: Models.libs.LibType;
 
-  public get frameworkVersion(this: Project) {
+  public setType(this: Project, type: Models.libs.LibType) {
+    // @ts-ignore
+    this._type = type;
+  }
+  public typeIs(this: Project, ...types: Models.libs.LibType[]) {
+    return this._type && types.includes(this._type);
+  }
+
+  public typeIsNot(this: Project, ...types: Models.libs.LibType[]) {
+    return !this.typeIs(...types);
+  }
+
+  public get _frameworkVersion(this: Project) {
     //#region @backendFunc
     return this.packageJson.frameworkVersion
     //#endregion
   }
 
+  public get frameworkVersionMinusOne(this: Project): Models.libs.FrameworkVersion {
+    //#region @backendFunc
+    const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
+    if (!isNaN(curr) && curr >= 2) {
+      return `v${curr - 1}` as Models.libs.FrameworkVersion;
+    };
+    return 'v1';
+    //#endregion
+  }
+
   //#region @backend
-  public frameworkVersionAtLeast(this: Project, version: 'v1' | 'v2') {
+  public frameworkVersionEquals(this: Project, version: Models.libs.FrameworkVersion) {
     const ver = Number(_.isString(version) && version.replace('v', ''));
-    const curr = Number(_.isString(this.version) && this.version.replace('v', ''))
-    return !isNaN(ver) && !isNaN(curr) && curr >= ver;
+    const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
+    return !isNaN(ver) && !isNaN(curr) && (curr === ver);
+  }
+  public frameworkVersionAtLeast(this: Project, version: Models.libs.FrameworkVersion) {
+    const ver = Number(_.isString(version) && version.replace('v', ''));
+    const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
+    return !isNaN(ver) && !isNaN(curr) && (curr >= ver);
   }
   //#endregion
 
@@ -40,7 +71,7 @@ export abstract class TnpProject {
    * available frameworks in project
    */
   get frameworks(this: Project) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     return this.packageJson.frameworks;
@@ -52,7 +83,7 @@ export abstract class TnpProject {
       return this.browser.isTnp;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     return this.name === 'tnp';
@@ -64,7 +95,7 @@ export abstract class TnpProject {
       return this.browser.useFramework;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     if (!!this.baseline) {
@@ -92,7 +123,7 @@ export abstract class TnpProject {
   get isomorphicPackages(this: Project) {
     const isomorphicPackagesArr = this.linkedProjects.map(p => p.name)
 
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return isomorphicPackagesArr;
     }
     try {

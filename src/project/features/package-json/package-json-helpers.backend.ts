@@ -42,7 +42,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   const orgNewDeps = _.cloneDeep(Project.Tnp.packageJson.data.dependencies);
   let newDepsForProject = _.cloneDeep(Project.Tnp.packageJson.data.tnp.overrided.dependencies);
   if (project.isStandaloneProject && !project.isTnp) {
-    newDepsForProject = getAndTravelCoreDeps({ type: project.type });
+    newDepsForProject = getAndTravelCoreDeps({ type: project._type });
   } else if ((project.isWorkspace && project.isContainerChild) || project.isWorkspaceChildProject) {
     newDepsForProject = _.cloneDeep(project.parent.packageJson.data.dependencies);
     parentOverride = _.cloneDeep(project.parent.packageJson.data.tnp.overrided.dependencies);
@@ -180,10 +180,10 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     recrateInPackageJson = false;
   }
 
-  if (project.frameworkVersion !== 'v1' && !global.actionShowingDepsForContainer) {
-    const projForVer = Project.by('container', project.frameworkVersion);
+  if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
+    const projForVer = Project.by('container', project._frameworkVersion);
     global.actionShowingDepsForContainer = true;
-    projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project.frameworkVersion}`);
+    projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
     global.actionShowingDepsForContainer = false;
     const depsForVer = projForVer.packageJson.data;
     Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
@@ -199,7 +199,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   let dependencies = {};
 
-  if (project.frameworkVersion === 'v1') {
+  if (project.frameworkVersionEquals('v1')) {
     devDependencies = project.isStandaloneProject ?
       Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
       : {};
@@ -223,7 +223,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   const onlyAllowedInDependencies = project.packageJson.data.tnp.overrided.includeOnly || [];
-  if (project.frameworkVersion !== 'v1' && onlyAllowedInDependencies.length > 0) {
+  if (project.frameworkVersionAtLeast('v2') && onlyAllowedInDependencies.length > 0) {
 
     // Helpers.info(`Inlcude only: \n${onlyAllowedInDependencies.join('\n')}`);
 
@@ -263,7 +263,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (recrateInPackageJson) {
-    Helpers.log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`)
+    Helpers.log(`[package.json] save for install - ${project._type} project: "${project.name}" , [${reasonToShowPackages}]`)
     if (project.isTnp) {
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
@@ -276,7 +276,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.engines = engines;
     }
   } else {
-    Helpers.log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`)
+    Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`)
     project.packageJson.data.devDependencies = {};
     project.packageJson.data.dependencies = {};
     if (!project.isCoreProject) {
@@ -284,7 +284,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     }
   }
 
-  Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project.frameworkVersion}`);
+  Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project._frameworkVersion}`);
   project.packageJson.data.license = license;
   project.packageJson.data.private = prv;
   if (project.isTnp) {

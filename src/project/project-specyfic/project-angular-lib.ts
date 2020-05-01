@@ -24,11 +24,12 @@ export class ProjectAngularLib extends Project {
   }
 
   async initProcedure() {
-    if (this.frameworkVersion === 'v2' && this.isWorkspaceChildProject && this.parent.frameworkVersion !== 'v2') {
-      Helpers.error(`Please use angular-lib-v2 only in workspace-v2`, false, true);
+
+    if (this.frameworkVersionAtLeast('v2') && this.isWorkspaceChildProject && !this.parent.frameworkVersionAtLeast(this._frameworkVersion)) {
+      Helpers.error(`Please use angular-lib-${this._frameworkVersion} only in workspace-${this._frameworkVersion}`, false, true);
     }
 
-    if (this.frameworkVersion === 'v2') {
+    if (this.frameworkVersionAtLeast('v2')) {
       const styleCss = path.join(this.location, 'src/styles.css');
       const styleScss = path.join(this.location, 'src/styles.scss');
       if (!fse.existsSync(styleScss)) {
@@ -40,7 +41,7 @@ export class ProjectAngularLib extends Project {
       }
     }
 
-    if (this.isCoreProject && this.frameworkVersion !== 'v1') {
+    if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
       this.applyLinkedFiles();
     }
   }
@@ -68,10 +69,11 @@ export class ProjectAngularLib extends Project {
         .filesTemplates()
         .filter(f => !f.startsWith('webpack.config.'))
     ]
-    if (this.frameworkVersion === 'v2') {
+    if (this.frameworkVersionAtLeast('v2')) {
 
       config = config
         .concat([
+          '.vscode/launch.json.filetemplate',
           'angular.json.filetemplate',
           'browserslist.filetemplate',
           'ngsw-config.json.filetemplate',
@@ -101,14 +103,14 @@ export class ProjectAngularLib extends Project {
   projectLinkedFiles() {
     let files = super.projectLinkedFiles();
 
-    if (this.frameworkVersion !== 'v1') {
+    if (this.frameworkVersionAtLeast('v2')) {
       files = files.concat([
         {
-          sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),
+          sourceProject: Project.by('isomorphic-lib', this._frameworkVersion),
           relativePath: 'tsconfig.browser.json.filetemplate',
         },
         {
-          sourceProject: Project.by('isomorphic-lib', this.frameworkVersion),
+          sourceProject: Project.by('isomorphic-lib', this._frameworkVersion),
           relativePath: 'tsconfig.isomorphic.json.filetemplate'
         }
       ])
@@ -137,8 +139,10 @@ export class ProjectAngularLib extends Project {
         }));
 
 
-    if (this.frameworkVersion === 'v2') {
-      return config.filter(f => {
+    if (this.frameworkVersionAtLeast('v2')) {
+      return config.concat([
+        '.vscode/tasks.json',
+      ]).filter(f => {
         return ![
           'src/tsconfig.packages.json',
           'src/tsconfig.spec.json',
@@ -165,10 +169,10 @@ export class ProjectAngularLib extends Project {
 
     if (this.buildOptions.watch) {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .startAndWatch(`isomorphic ${this.type} compilation (watch mode)`);
+        .startAndWatch(`isomorphic ${this._type} compilation (watch mode)`);
     } else {
       await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .start(`isomorphic ${this.type} compilation`);
+        .start(`isomorphic ${this._type} compilation`);
     }
 
   }

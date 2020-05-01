@@ -11,7 +11,7 @@ import { Models } from 'tnp-models';
 export class QuickFixes extends FeatureForProject {
 
   updateTsconfigsInTmpSrcBrowserFolders() {
-    if (this.project.type === 'angular-lib' || this.project.type === 'isomorphic-lib') {
+    if (this.project.typeIs('angular-lib', 'isomorphic-lib')) {
       const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
       const tempDirs = fse.readdirSync(this.project.location).filter(dir => dir.startsWith('tmp-src-'));
       tempDirs.forEach(dirName => {
@@ -30,7 +30,7 @@ export class QuickFixes extends FeatureForProject {
       '.angular-cli.json'
     ]
 
-    if (this.project.frameworkVersion !== 'v1' && this.project.type === 'angular-lib') {
+    if (this.project.frameworkVersionAtLeast('v2') && this.project.typeIs('angular-lib')) {
       for (let index = 0; index < filesV1.length; index++) {
         const oldFile = path.join(this.project.location, filesV1[index]);
         Helpers.removeFileIfExists(oldFile)
@@ -39,7 +39,7 @@ export class QuickFixes extends FeatureForProject {
   }
 
   public missingAngularLibFiles() {
-    if (this.project.type === 'angular-lib') {
+    if (this.project.typeIs('angular-lib')) {
       const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
       if (!fse.existsSync(indexTs)) {
         Helpers.writeFile(indexTs, `
@@ -143,7 +143,7 @@ export default _default;
       }
       const componentsFolder = path.join(this.project.location, config.folder.components);
 
-      if (config.projectTypes.with.componetsAsSrc.includes(this.project.type) && !fse.existsSync(componentsFolder)) {
+      if (this.project.typeIs(...(config.projectTypes.with.componetsAsSrc as Models.libs.LibType[])) && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
         Helpers.mkdirp(componentsFolder);
       }

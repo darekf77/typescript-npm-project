@@ -33,7 +33,7 @@ export abstract class StaticProject {
       return this.browser.isGenerated;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     if (this.isStandaloneProject && this.packageJson.isGenerated) {
@@ -49,7 +49,7 @@ export abstract class StaticProject {
    * Only for generated projects
    */
   get origin(this: Project): Project {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     if (!this.isGenerated) {
@@ -77,7 +77,7 @@ export abstract class StaticProject {
    * ready for serving by  framework router/proxy
    */
   get bundledWorkspace(this: Project): Project {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     const outDir: Models.dev.BuildDir = 'bundle';
@@ -106,7 +106,7 @@ export abstract class StaticProject {
    * case that the does not exists
    */
   async StaticVersion(this: Project, regenerate = true): Promise<Project> {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     let staticVersion: Project;

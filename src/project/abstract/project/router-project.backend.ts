@@ -13,6 +13,16 @@ import { config } from '../../../config';
 
 export abstract class RouterProject {
   protected __defaultPort: number;
+  get port(this: Project) {
+    let env: Models.env.EnvConfigProject;
+    if (this.isWorkspace) {
+      env = this.env?.config?.workspace?.workspace;
+    } else {
+      env = this.env?.config?.workspace?.projects?.find(p => p.name === this.name);
+    }
+    const envPort = env?.port;
+    return _.isNumber(envPort) ? envPort : this.__defaultPort;
+  }
 
   //#region @backend
   protected startOnCommand(this: Project, args: string): string {
@@ -25,7 +35,7 @@ export abstract class RouterProject {
     if (Helpers.isBrowser) {
       return this.browser._routerTargetHttp;
     }
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     return `http://localhost:${this.getDefaultPort()}`;
@@ -52,7 +62,7 @@ export abstract class RouterProject {
   }
 
   public setDefaultPortByType(this: Project) {
-    this.setDefaultPort(Project.DefaultPortByType(this.type))
+    this.setDefaultPort(Project.DefaultPortByType(this._type))
   }
 
   /**
@@ -60,7 +70,7 @@ export abstract class RouterProject {
    * @param port
    */
   public async start(this: Project, args?: string) {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     if (this.isWorkspace && !this.isGenerated) {

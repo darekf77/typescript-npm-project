@@ -63,10 +63,10 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       ] as ModType[]).includes(modType)) {
 
         let sourceFolder: string;
-        if (child.type === 'angular-lib') {
+        if (child.typeIs('angular-lib')) {
           sourceFolder = config.folder.components;
         }
-        if (child.type === 'isomorphic-lib') {
+        if (child.typeIs('isomorphic-lib')) {
           sourceFolder = config.folder.src;
         }
 
@@ -93,7 +93,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
       }
 
-      if (modType === 'tmp-src' && this.project.type === 'angular-lib') {
+      if (modType === 'tmp-src' && this.project.typeIs('angular-lib')) {
 
         debug && Helpers.log(`Should be processed ${relativePath}`)
 
@@ -168,10 +168,10 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
 
         let sourceFolder: string;
-        if (child.type === 'angular-lib') {
+        if (child.typeIs('angular-lib')) {
           sourceFolder = config.folder.components;
         }
-        if (child.type === 'isomorphic-lib') {
+        if (child.typeIs('isomorphic-lib')) {
           sourceFolder = config.folder.src;
         }
 
@@ -252,13 +252,13 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       //   process(folders);
       // }
 
-      if (modType === 'tmp-src' && this.project.type === 'isomorphic-lib') {
+      if (modType === 'tmp-src' && this.project.typeIs('isomorphic-lib')) {
         // console.log('1', relativePath)
         let sourceFolder: string;
-        if (child.type === 'angular-lib') {
+        if (child.typeIs('angular-lib')) {
           sourceFolder = config.folder.components;
         }
-        if (child.type === 'isomorphic-lib') {
+        if (child.typeIs('isomorphic-lib')) {
           sourceFolder = config.folder.src;
         }
 
@@ -280,15 +280,15 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
       }
 
-      if (modType === 'tmp-src' && this.project.type !== 'isomorphic-lib') {
+      if (modType === 'tmp-src' && this.project.typeIsNot('isomorphic-lib')) {
 
         // console.log('2', relativePath)
         const process = (compiled: any[]) => {
-          if (child.type === 'angular-lib') {
+          if (child.typeIs('angular-lib')) {
             compiled = compiled.filter(f => f !== config.folder.src);
           };
 
-          if (libName === this.project.name && child.type === 'angular-lib') {
+          if (libName === this.project.name && child.typeIs('angular-lib')) {
             input = impReplace({
               name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${config.folder.components}`,
               project: this.project,

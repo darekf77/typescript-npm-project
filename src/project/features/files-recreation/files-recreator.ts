@@ -38,7 +38,7 @@ function getVscodeSettingsFrom(project: Project) {
 export class FilesRecreator extends FeatureForProject {
 
   public async init() {
-    if (this.project.type === 'container') {
+    if (this.project.typeIs('container')) {
       // console.log('GIGIIGIGII')
       this.gitignore();
       this.projectSpecyficFiles();
@@ -112,7 +112,7 @@ export class FilesRecreator extends FeatureForProject {
             path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
           ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
-          .concat(self.project.type === 'angular-lib' ? ['src/tsconfig.app.json'] : [])
+          .concat(self.project.typeIs('angular-lib') ? ['src/tsconfig.app.json'] : [])
           .concat( // for site ignore auto-generate scr
             self.project.isSite ? (
               self.project.customizableFilesAndFolders
@@ -141,7 +141,7 @@ export class FilesRecreator extends FeatureForProject {
       },
       get npmignore() {
         const allowedProject: Models.libs.LibType[] = ['isomorphic-lib', 'angular-lib']
-        const canBeUseAsNpmPackage = allowedProject.includes(self.project.type);
+        const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
         const npmignoreFiles = [
           '.vscode',
           'dist/',
@@ -182,7 +182,7 @@ export class FilesRecreator extends FeatureForProject {
       }
     } else {
       try {
-        const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
+        const settingFromCore = path.join(Project.by(this.project._type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
         settings = modifyFN(settings, this.project);
@@ -379,7 +379,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
 
   projectSpecyficFiles() {
-    const defaultProjectProptotype = Project.by(this.project.type, this.project.frameworkVersion);
+    const defaultProjectProptotype = Project.by(this.project._type, this.project._frameworkVersion);
     let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
       this.project.projectSpecyficFiles().forEach(f => {
@@ -395,7 +395,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
   }
 
   commonFiles() {
-    const wokrspace = Project.by('workspace');    
+    const wokrspace = Project.by('workspace');
     const files = this.commonFilesForAllProjects;
     files.map(file => {
       return {
@@ -439,7 +439,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
   get assetsRelativePathes() {
     const assetsFolders = [];
-    if (this.project.type !== 'angular-lib') {
+    if (this.project.typeIsNot('angular-lib')) {
       return [];
     }
     const assetsRelativeAngularLib = path.join(
@@ -467,7 +467,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
     }
     return this.project.parent.children
       .filter(f => {
-        return f.type === 'angular-lib';
+        return f.typeIs('angular-lib');
       })
       .map(a => a.recreate.assetsRelativePathes)
       .reduce((a, b) => {
@@ -488,7 +488,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
     this.project.parent.children
       .filter(f => {
-        return f.type === 'angular-lib';
+        return f.typeIs('angular-lib');
       })
       .forEach(p => {
         p.recreate.assetsRelativePathes

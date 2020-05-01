@@ -170,7 +170,7 @@ export const config = {
       allPattern: path.join(__dirname, `/${folder.scripts}/**/*.js`),
     },
 
-    projectsExamples: (version?: 'v1' | 'v2') => {
+    projectsExamples: (version?: Models.libs.FrameworkVersion) => {
       version = (!version || version === 'v1') ? '' : `-${version}` as any;
       return {
         workspace: pathResolved(__dirname, `../../firedev-projects/container${version}/workspace${version}`),

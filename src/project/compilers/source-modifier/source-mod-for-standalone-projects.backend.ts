@@ -111,9 +111,9 @@ export class SourceModForStandaloneProjects
       return 'tmp-src-for';
     }
     if (startFolder === 'src') {
-      return project.type === 'isomorphic-lib' ? 'lib' : 'app';
+      return project.typeIs('isomorphic-lib') ? 'lib' : 'app';
     }
-    if (project.type === 'angular-lib' && startFolder === 'components') {
+    if (project.typeIs('angular-lib') && startFolder === 'components') {
       return 'lib';
     }
     if (project.isSite && startFolder === 'custom') {
@@ -174,7 +174,7 @@ export class SourceModForStandaloneProjects
         });
       }
 
-      if(modType === 'tmp-src-for') {
+      if (modType === 'tmp-src-for') {
         input = impReplace({
           name: `${libName} -> ${libName}/${config.folder.browser}`,
           project: this.project,
@@ -199,7 +199,7 @@ export class SourceModForStandaloneProjects
         });
       }
 
-      if (modType === 'tmp-src' && this.project.type !== 'isomorphic-lib') {
+      if (modType === 'tmp-src' && this.project.typeIsNot('isomorphic-lib')) {
         input = impReplace({
           name: `${libName} -> ${libName}/${config.folder.browser}`,
           project: this.project,

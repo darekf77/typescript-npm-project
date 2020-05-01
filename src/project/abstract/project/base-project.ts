@@ -21,7 +21,7 @@ export abstract class BaseProject {
       return this.browser.genericName;
     }
     //#region @backendFunc
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     let result = [
@@ -84,7 +84,7 @@ export abstract class BaseProject {
       return this.browser.backupName;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return;
     }
     return `tmp-${this.name}`
@@ -107,7 +107,7 @@ export abstract class BaseProject {
       return this.browser.isWorkspace;
     }
     //#region @backend
-    return this.type === 'workspace';
+    return this.typeIs('workspace');
     //#endregion
   }
 
@@ -116,7 +116,7 @@ export abstract class BaseProject {
       return this.browser.isContainer;
     }
     //#region @backend
-    return this.type === 'container';
+    return this.typeIs('container');
     //#endregion
   }
 
@@ -134,7 +134,7 @@ export abstract class BaseProject {
       return this.browser.isContainerChild;
     }
     //#region @backend
-    return !!this.parent && this.parent.type === 'container';
+    return !!this.parent && this.parent.typeIs('container');
     //#endregion
   }
 
@@ -162,7 +162,7 @@ export abstract class BaseProject {
     if (!!this.parent && this.parent.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
       return true;
     }
-    return !!this.parent && this.parent.type === 'workspace';
+    return !!this.parent && this.parent.typeIs('workspace');
     //#endregion
   }
 
@@ -179,7 +179,7 @@ export abstract class BaseProject {
       return this.browser.isStandaloneProject;
     }
     //#region @backend
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return false;
     }
     return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && !this.isUnknowNpmProject);
@@ -189,7 +189,7 @@ export abstract class BaseProject {
 
   //#region @backend
   get workspaceDependencies(this: Project): Project[] {
-    if (this.type === 'unknow') {
+    if (this.typeIs('unknow')) {
       return [];
     }
     if (this.isWorkspaceChildProject) {

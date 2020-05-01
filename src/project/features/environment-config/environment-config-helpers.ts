@@ -154,25 +154,38 @@ function frontendCuttedVersion(workspaceConfig: Models.env.EnvConfig) {
   return c;
 }
 
+function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
+  let env: Models.env.EnvConfigProject;
+  if (project.isWorkspace) {
+    env = workspaceConfig.workspace?.workspace;
+  } else {
+    env = workspaceConfig.workspace?.projects?.find(p => p.name === project.name);
+  }
+  const envPort = env?.port;
+  return _.isNumber(envPort) ? envPort : project.getDefaultPort();
+}
+
+
 export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
-  workspaceConfig.currentProjectType = project.type;
+  workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
+  workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsSite = project.isSite;
   workspaceConfig.currentProjectIsStatic = project.isGenerated;
   workspaceConfig.isStandaloneProject = project.isStandaloneProject;
   workspaceConfig.frameworks = project.frameworks;
 
-  if (project.type === 'angular-lib') {
+  if (project.typeIs('angular-lib')) {
     const componentsFolder = `browser${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
     workspaceConfig.currentProjectComponentsFolder = componentsFolder;
   }
 
   let currentLibProjectSourceFolder: 'src' | 'components';
-  if (project.type === 'angular-lib') {
+  if (project.typeIs('angular-lib')) {
     currentLibProjectSourceFolder = 'components';
   }
-  if (project.type === 'isomorphic-lib') {
+  if (project.typeIs('isomorphic-lib')) {
     currentLibProjectSourceFolder = 'src';
   }
   workspaceConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
@@ -220,13 +233,13 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 
   } else if (project.isWorkspaceChildProject) {
 
-    if (project.type === 'angular-client' || project.type === 'angular-lib' || project.type === 'ionic-client') {
+    if (project.typeIs('angular-client', 'angular-lib', 'ionic-client')) {
       fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
         encoding: 'utf8',
         spaces: 2
       })
       Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
-    } else if (project.type === 'isomorphic-lib') {
+    } else if (project.typeIs('isomorphic-lib')) {
       fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
         encoding: 'utf8',
         spaces: 2
@@ -328,7 +341,7 @@ function createExampleConfigFor(proj: Project) {
     return JSON.stringify({
       baseUrl: `/${project.name}`,
       name: project.name,
-      $db: (project.type === 'isomorphic-lib') && {
+      $db: (project.typeIs('isomorphic-lib')) && {
         database: 'tmp/db.sqlite3',
         type: 'sqlite',
         synchronize: true,

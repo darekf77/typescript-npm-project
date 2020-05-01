@@ -37,7 +37,7 @@ function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClien
       folderPath = [
         path.join(project.location, config.folder.custom),
         path.join(project.baseline.location, config.folder.src),
-        (project.type === 'angular-lib' && path.join(project.baseline.location, config.folder.components))
+        (project.typeIs('angular-lib') && path.join(project.baseline.location, config.folder.components))
       ].filter(f => !!f);
     }
   }
@@ -76,7 +76,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
   private get syncActionAlreadyMergedFiles() {
     let files = [];
     files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.src)}/**/*.*`));
-    if (this.project.type === 'angular-lib') {
+    if (this.project.typeIs('angular-lib')) {
       files = files.concat(glob.sync(`${path.join(this.project.location, config.folder.components)}/**/*.*`));
     }
 

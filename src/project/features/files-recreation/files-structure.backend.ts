@@ -218,8 +218,8 @@ export class FilesStructure extends FeatureForProject {
         await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
       }
     } else {
-      if (this.project.isStandaloneProject && this.project.frameworkVersion !== 'v1') {
-        this.project.packageJson.showDeps(`Show new deps for ${this.project.frameworkVersion} `);
+      if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v2')) {
+        this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
       }
     }
     //#endregion
@@ -268,7 +268,7 @@ export class FilesStructure extends FeatureForProject {
     baseline.children.forEach(c => {
       const siteChild = path.join(this.project.location, c.name);
       if (!fse.existsSync(siteChild)) {
-        ProjectFactory.Instance.create(c.type, c.name, this.project.location, void 0);
+        ProjectFactory.Instance.create(c._type, c.name, this.project.location, void 0);
         const newChild = Project.From(siteChild);
         c.packageJson.copyTo(newChild);
         Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));

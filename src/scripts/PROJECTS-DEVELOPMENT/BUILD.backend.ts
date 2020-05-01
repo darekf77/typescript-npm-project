@@ -9,23 +9,66 @@ import { Models } from 'tnp-models';
 import chalk from 'chalk';
 
 
-async function buildWatch(args) {
+export async function chainBuild(args: string) {
+  const allowedLibs = [
+    'angular-lib',
+    'isomorphic-lib'
+  ] as Models.libs.LibType[];
 
-  const isLegitLib = config.allowedTypes.libs.includes(Project.Current.type);
-  const isLegitApp = config.allowedTypes.app.includes(Project.Current.type);
-
-  if (isLegitLib && isLegitApp) {
-    Helpers.terminal.runInNewInstance(`stmux -M [ 'tnp build:dist:watch' .. 'tnp build:app:watch' ]`);
-    return;
+  const project = Project.Current;
+  if (project.typeIsNot(...allowedLibs)) {
+    Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
   }
+  args += ` --forClient=${project.name} -verbose`;
 
-  if (isLegitLib) {
-    await Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+  let deps: Project[] = [];
+  resolveDeps(project, deps);
+  deps = deps.reverse();
+  deps = prepareDeps(deps);
+
+
+  for (let index = 0; index < deps.length; index++) {
+    const proj = deps[index];
+    const command = `${config.frameworkName} bdw ${args}`;
+    Helpers.info(`
+
+    Running command in dependency "${proj.name}" : ${command}
+
+    `);
+    await proj.run(command, { output: true, prefix: chalk.bold(`[${proj.name}]`) }).unitlOutputContains('Watching for file changes.');
   }
-  if (isLegitApp) {
-    await Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
+  await project.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+}
+
+
+/**
+ * CHAIN BUILD
+ */
+const $BUILD = async (args) => {
+  await chainBuild(args)
+};
+
+const $BUILDWATCH = async (args) => {
+  await chainBuild(args)
+};
+
+async function $DEFAULT_BUILD(args) {
+  const project = Project.Current;
+  if (project.isStandaloneProject) {
+    if (project.typeIs('angular-lib')) {
+      await BUILD_DIST_WATCH(args);
+      // await $BUILD_APP(args);
+    } else if (project.typeIs('isomorphic-lib')) {
+      await BUILD_DIST_WATCH(args);
+    }
+  } if (project.isWorkspaceChildProject) {
+    await $BUILD(args);
+  } else {
+    process.exit(0)
   }
 }
+
+
 const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
@@ -194,6 +237,10 @@ function resolveDeps(proj: Project, deps: Project[]) {
 
 function prepareDeps(deps: Project[]) {
 
+  if (deps.length === 0) {
+    return deps;
+  }
+
   function swap(a: Project, b: Project) {
     const tmp = a;
     const bIndex = deps.indexOf(b);
@@ -224,55 +271,14 @@ function prepareDeps(deps: Project[]) {
 }
 
 
-/**
- * CHAIN BUILD
- */
-const $BUILD = async (args) => {
-  const allowedLibs = [
-    'angular-lib',
-    'isomorphic-lib'
-  ] as Models.libs.LibType[];
-  const project = Project.Current;
-  if (!allowedLibs.includes(project.type)) {
-    Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
-  }
-  const argsObj: Models.dev.IBuildOptions = require('minimist')(args.split(' '));
-  let clientName: string = ((argsObj.forClient) ? argsObj.forClient : project.name) as any;
-  clientName = Array.isArray(clientName) ? _.first(clientName) : clientName;
-
-  let deps: Project[] = [];
-  resolveDeps(project, deps);
-  deps = deps.reverse();
-  deps = prepareDeps(deps);
-
-
-  for (let index = 0; index < deps.length; index++) {
-    const proj = deps[index];
-    const argsForCmd = (args = ` --forClient=${clientName} `);
-    const command = `${config.frameworkName} bdw ${argsForCmd}`;
-    Helpers.info(`
-
-    Running command in dependency "${proj.name}" : ${command}
-
-    `);
-    await proj.run(command, { output: true, prefix: chalk.bold(`[${proj.name}]`) }).unitlOutputContains('Watching for file changes.');
-  }
-  await project.buildProcess.startForLibFromArgs(false, true, 'dist', args);
-};
 const $BUILD_PROD = async (args) => {
-  if (config.allowedTypes.libs.includes(Project.Current.type)) {
+  if (Project.Current.typeIs(...config.allowedTypes.libs)) {
     await Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args);
   }
-  if (config.allowedTypes.app.includes(Project.Current.type)) {
+  if (Project.Current.typeIs(...config.allowedTypes.app)) {
     await Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
   }
   process.exit(0);
-};
-const $BUILDWATCH = (args) => {
-  buildWatch(args);
-};
-const $BUILD_WATCH = (args) => {
-  buildWatch(args);
 };
 
 const $STATIC_START = async (args) => $START(args);
@@ -333,21 +339,7 @@ async function $DB_BUILDS_UPDATE() {
 }
 
 
-async function $DEFAULT_BUILD(args) {
-  const project = Project.Current;
-  if (project.isStandaloneProject) {
-    if (project.type === 'angular-lib') {
-      await BUILD_DIST_WATCH(args);
-      // await $BUILD_APP(args);
-    } else if (project.type === 'isomorphic-lib') {
-      await BUILD_DIST_WATCH(args);
-    }
-  } else if (project.isWorkspace) {
-    await BUILD_DIST_WATCH(args);
-  } else if (project.isWorkspaceChildProject) {
-    await $BUILD_APP(args);
-  }
-}
+
 
 async function $ACTIVE_SINGULAR_BUILD(args) {
   await Project.Current.hasParentWithSingularBuild()
@@ -357,6 +349,8 @@ async function $ACTIVE_SINGULAR_BUILD(args) {
 
 
 export default {
+  $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
+  $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
   $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
   $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
@@ -396,10 +390,7 @@ export default {
   $BUILD_APP: Helpers.CLIWRAP($BUILD_APP, '$BUILD_APP'),
   $BUILD_APP_WATCH_PROD: Helpers.CLIWRAP($BUILD_APP_WATCH_PROD, '$BUILD_APP_WATCH_PROD'),
   $START_APP: Helpers.CLIWRAP($START_APP, '$START_APP'),
-  $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $BUILD_PROD: Helpers.CLIWRAP($BUILD_PROD, '$BUILD_PROD'),
-  $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
-  $BUILD_WATCH: Helpers.CLIWRAP($BUILD_WATCH, '$BUILD_WATCH'),
   $START: Helpers.CLIWRAP($START, '$START'),
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),

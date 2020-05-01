@@ -33,7 +33,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     try {
       const proj = Project.From(pjPath);
       if (proj) {
-        if (config.projectTypes.forNpmLibs.includes(proj.type)) {
+        if (proj.typeIs(...(config.projectTypes.forNpmLibs as Models.libs.LibType[]))) {
           // console.log(`Proj "${proj.genericName}" standalone`, proj.isStandaloneProject)
           res = proj.isStandaloneProject;
         } else {

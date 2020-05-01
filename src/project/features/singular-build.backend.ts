@@ -16,14 +16,14 @@ export class SingularBuild extends FeatureForProject {
 
     Helpers.log(`[singular build]
     FOP: ${this.project.genericName},
-    TYPE: ${this.project.type},
+    TYPE: ${this.project._type},
     LOCATION: ${this.project.location}
     `);
 
     const children = this.project.children
       .filter(c => c.location !== this.project.location)
       .filter(c => !c.name.startsWith('tnp'))
-      .filter(c => (c.type === 'isomorphic-lib' || c.type === 'angular-lib') && c.frameworkVersionAtLeast('v2'))
+      .filter(c => (c.typeIs('isomorphic-lib', 'angular-lib')) && c.frameworkVersionAtLeast('v2'))
       ;
 
     Helpers.log(`[singularbuild] children for build: \n\n${children.map(c => c.name)}\n\n`);
@@ -41,7 +41,7 @@ export class SingularBuild extends FeatureForProject {
         tmpWorkspaceName,
         tmpWorkspaceDirpath,
         void 0,
-        this.project.frameworkVersion,
+        this.project._frameworkVersion,
         true
       );
       Helpers.log(`[singular build] singularWatchProj: ${this.singularWatchProj && this.singularWatchProj.genericName}`);
@@ -65,7 +65,7 @@ export class SingularBuild extends FeatureForProject {
     await this.singularWatchProj.packageJson.writeToDisc();
 
     children.forEach(c => {
-      const source = (c.type === 'angular-lib' ? config.folder.components : config.folder.src);
+      const source = (c.typeIs('angular-lib') ? config.folder.components : config.folder.src);
       Helpers.createSymLink(
         path.join(c.location, source),
         path.join(singularDistSrc, c.name));
@@ -100,7 +100,7 @@ export class SingularBuild extends FeatureForProject {
 
 
     children.forEach(c => {
-      if (this.project.type === 'container') {
+      if (this.project.typeIs('container')) {
         // console.log(`Do something for ${c.genericName}`)
         const source = path.join(this.singularWatchProj.location, config.folder.dist, c.name);
         const sourceBrowser = path.join(this.singularWatchProj.location, config.folder.dist, config.folder.browser, c.name);
@@ -114,7 +114,7 @@ export class SingularBuild extends FeatureForProject {
           Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
           console.log(`LINK: ${source} -> ${dest}`, 1);
         });
-      } else if (this.project.type === 'workspace') {
+      } else if (this.project.typeIs('workspace')) {
         const source = path.join(this.singularWatchProj.location, config.folder.dist, c.name);
         const dest = path.join(c.location, config.folder.dist);
         Helpers.remove(dest, true);

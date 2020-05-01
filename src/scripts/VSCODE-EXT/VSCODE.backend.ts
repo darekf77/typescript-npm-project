@@ -100,11 +100,11 @@ function $VSCODE_GLOBAL() {
     },
     {
       'key': 'shift+cmd+c',
-      'command': 'extension.firedevstopwatchbuild'
+      'command': 'extension.firedevstopdefaultbuild'
     },
     {
       'key': 'shift+cmd+b',
-      'command': 'extension.firedevrunwatchbuild'
+      'command': 'extension.firedevrundefaultbuild'
     },
     {
       'key': 'ctrl+cmd+p',
@@ -213,7 +213,12 @@ const $FILES_HIDE_ALL = (args, exit = true) => {
   exit && process.exit(0);
 };
 
+export function $EXT(args, exit) {
+  return $VSCODE_EXT(args, exit);
+}
+
 export default {
+  $EXT: Helpers.CLIWRAP($EXT, '$EXT'),
   $VSCODE_EXT: Helpers.CLIWRAP($VSCODE_EXT, '$VSCODE_EXT'),
   $VSCODE_TEMP_SHOW: Helpers.CLIWRAP($VSCODE_TEMP_SHOW, '$VSCODE_TEMP_SHOW'),
   $FILES_SHOW: Helpers.CLIWRAP($FILES_SHOW, '$FILES_SHOW'),

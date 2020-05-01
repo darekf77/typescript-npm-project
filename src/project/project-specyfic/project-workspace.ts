@@ -53,12 +53,13 @@ export class ProjectWorkspace extends Project {
   //#region @backend
 
   async initProcedure() {
-    if (this.frameworkVersion === 'v2' && this.isWorkspace) {
+    if (this.frameworkVersionAtLeast('v2') && this.isWorkspace) {
       if (this.children.filter(c => {
-        // Helpers.log(`Checking child: ${c.name}`)
-        const isNotMatch = (c.frameworkVersion !== this.frameworkVersion);
+        Helpers.log(`Checking child: ${c.name}`, 1)
+        const isNotMatch = (c._frameworkVersion !== this._frameworkVersion);
         if (isNotMatch) {
-          Helpers.error(`Please match framework in ${chalk.bold(c.name)}/package.json/tnp/version`, true, true);
+          // TODO hmmm maybe change tnp to firedev in packagejson ?
+          Helpers.error(`Please match framework in ${chalk.bold(c.name)}/package.json/>>/${config.frameworkName}/version`, true, true);
         }
         return isNotMatch;
       }).length > 0) {
@@ -121,7 +122,7 @@ export class ProjectWorkspace extends Project {
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))
-      .filter(c => c.type === 'angular-lib')
+      .filter(c => c.typeIs('angular-lib'))
       .map(c => {
         return { project: c, appBuild: true };
       }) as any;

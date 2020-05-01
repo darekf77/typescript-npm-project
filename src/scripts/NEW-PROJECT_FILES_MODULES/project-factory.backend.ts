@@ -61,16 +61,16 @@ export class ProjectFactory {
     name: string,
     cwd: string,
     basedOn: string,
-    version: 'v1' | 'v2' = 'v1',
+    version: Models.libs.FrameworkVersion = 'v1',
     skipInit = false
   ): Promise<Project> {
 
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
-      version = cwdProj.frameworkVersion;
+      version = cwdProj._frameworkVersion;
     }
     if (cwdProj && cwdProj.isContainer) {
-      version = cwdProj.frameworkVersion;
+      version = cwdProj._frameworkVersion;
     }
 
     Helpers.log(`[create] version: ${version}`);
@@ -88,7 +88,7 @@ export class ProjectFactory {
     if (basedOn && !basedOnProject) {
       Helpers.error(`[create] Not able to find baseline project from relative path: ${basedOn} `, false, true);
     }
-    if (basedOn && basedOnProject && basedOnProject.type !== 'workspace') {
+    if (basedOn && basedOnProject && basedOnProject.typeIsNot('workspace')) {
       Helpers.error(`[create] Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
     const baseline = basedOn ? basedOnProject : Project.by(type, version);

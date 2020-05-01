@@ -126,7 +126,7 @@ inside generated projects...
 
   private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
 
-    Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project.type}`);
+    Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
     this.project.buildOptions = buildOptions;
 
     if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
@@ -143,7 +143,7 @@ inside generated projects...
     this.mergeNpmPorject();
 
     //#region make sure project allowed for build
-    if (_.isArray(allowedLibs) && !allowedLibs.includes(this.project.type)) {
+    if (_.isArray(allowedLibs) && this.project.typeIsNot(...allowedLibs)) {
       if (buildOptions.appBuild) {
         Helpers.error(`App build only for ${config.frameworkName} ${chalk.bold(allowedLibs.join(','))} project types`, false, true)
       } else {
@@ -223,7 +223,7 @@ inside generated projects...
     //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
       await this.project.env.updateData();
-      if (this.project.type === 'angular-lib') {
+      if (this.project.typeIs('angular-lib')) {
         this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
       }
     }
@@ -243,7 +243,7 @@ inside generated projects...
     Helpers.log(`
 
     projec: ${this.project.genericName}
-    type: ${this.project.type}
+    type: ${this.project._type}
     generated: ${this.project.isGenerated}
     `);
 
