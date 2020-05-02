@@ -73,7 +73,7 @@ export class ProjectAngularLib extends Project {
 
       config = config
         .concat([
-          '.vscode/launch.json.filetemplate',
+          ...this.vscodeFileTemplates,
           'angular.json.filetemplate',
           'browserslist.filetemplate',
           'ngsw-config.json.filetemplate',
@@ -141,7 +141,7 @@ export class ProjectAngularLib extends Project {
 
     if (this.frameworkVersionAtLeast('v2')) {
       return config.concat([
-        '.vscode/tasks.json',
+
       ]).filter(f => {
         return ![
           'src/tsconfig.packages.json',

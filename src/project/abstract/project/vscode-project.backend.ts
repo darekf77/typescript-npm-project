@@ -12,6 +12,13 @@ import { config } from '../../../config';
 
 export abstract class VscodeProject {
 
+  get vscodeFileTemplates(this: Project) {
+    return [
+      '.vscode/launch.json.filetemplate',
+      '.vscode/tasks.json.filetemplate',
+    ]
+  }
+
   //#region @backend
   public recreateCodeWorkspace(this: Project) {
     if (!this.isWorkspace) {
@@ -78,41 +85,113 @@ export abstract class VscodeProject {
     }
   }
 
+  temlateOfTasksJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
+    let tasks = [];
+    let inputs = [{
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    }];
+
+    const terminate = {
+      "label": "terminateall",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
+      "problemMatcher": []
+    };
+
+    const ngServeTask = {
+      "label": "ngserve",
+      "type": "shell",
+      "command": "tnp baw",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": [
+          "relative",
+          "${cwd}"
+        ],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "Compiled |Failed to compile."
+          }
+        }
+      }
+    };
+
+    tasks.push(terminate);
+
+    if (this.typeIs('angular-lib')) {
+      tasks.push(ngServeTask);
+    }
+
+    // {
+    //   "label": "postdebugkill",
+    //   "command": [
+    //     "${command:workbench.action.tasks.terminate}",
+    //     "${command:workbench.action.acceptSelectedQuickOpenItem}"
+    //   ],
+    //   "type": "process"
+    // },
+
+    return JSON.stringify({
+      "version": "2.0.0",
+      tasks,
+      inputs
+    })
+  }
+
+
   temlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let configurations = [];
 
-    const startServerTemplate = {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Server",
-      "program": "${workspaceFolder}/run.js",
-      "cwd": void 0,
-      "args": [],
-      "runtimeArgs": [
-        "--experimental-worker"
-      ]
-    };
+
 
     const templateFor = (serverChild: Project, clientProject: Project) => {
-      const t = _.cloneDeep(startServerTemplate);
+      const startServerTemplate = {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Server",
+        "program": "${workspaceFolder}/run.js",
+        "cwd": void 0,
+        "args": [],
+        "runtimeArgs": [
+          "--experimental-worker"
+        ]
+      };
       if (serverChild.name !== clientProject.name) {
         const cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
-        t.program = cwd + '/run.js';
-        t.cwd = cwd;
-        t.name = t.name + ` for ${clientProject.name}`
+        startServerTemplate.program = cwd + '/run.js';
+        startServerTemplate.cwd = cwd;
+        startServerTemplate.name = startServerTemplate.name + ` for ${clientProject.name}`
       }
-      t.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
+      startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
         clientProjectName: clientProject.name
       } as Models.env.EnvConfig, null, 4))}`);
-      return t;
+      return startServerTemplate;
     };
 
-    if (this.typeIs('angular-lib')) {
-      const servePort = getPort(this, currentWorkspaceConfig);
-      configurations = [{
+    function startNgServeTemplate(servePort: number, workspaceChild?: Project) {
+      const result = {
         "name": "ng serve",
         "type": "chrome",
         "request": "launch",
+        cwd: void 0,
         // "userDataDir": false,
         "preLaunchTask": "ngserve",
         "postDebugTask": "terminateall",
@@ -126,61 +205,86 @@ export abstract class VscodeProject {
           "/*": "*",
           "/./~/*": "${webRoot}/node_modules/*"
         }
-      }];
+      }
+      if (workspaceChild) {
+        result.cwd = "${workspaceFolder}" + `/${workspaceChild.name}`;
+        result.webRoot = "${workspaceFolder}" + `/${workspaceChild.name}`;
+        result.name = `${result.name} for ${workspaceChild.name}`
+      }
+      return result;
+    };
 
-      if (this.isWorkspaceChildProject) {
+    if (this.isWorkspace) {
+      configurations = this.children
+        .filter(c => c.typeIs('angular-lib'))
+        .map(c => {
+          const servePort = getPort(c, currentWorkspaceConfig);
+          return startNgServeTemplate(servePort, c);
+        })
+    } else {
+      if (this.typeIs('angular-lib')) {
+        const servePort = getPort(this, currentWorkspaceConfig);
+        configurations = [
+          startNgServeTemplate(servePort)
+        ];
 
-        this.parent.children
-          .filter(c => c.typeIs('isomorphic-lib'))
-          .forEach(c => {
-            configurations.push(templateFor(c, this));
-          })
+        if (this.isWorkspaceChildProject) {
 
+          this.parent.children
+            .filter(c => c.typeIs('isomorphic-lib'))
+            .forEach(c => {
+              configurations.push(templateFor(c, this));
+            })
+
+        }
+
+      }
+      if (this.typeIs('isomorphic-lib')) {
+        configurations = [
+          {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to global cli tool",
+            "port": 9229,
+            "skipFiles": [
+              "<node_internals>/**"
+            ]
+          },
+          templateFor(this, this)
+          // {
+          //   "type": "node",
+          //   "request": "launch",
+          //   "remoteRoot": "${workspaceRoot}",
+          //   "localRoot": "${workspaceRoot}",
+          //   "name": "Launch Nodemon server",
+          //   "runtimeExecutable": "nodemon",
+          //   "program": "${workspaceFolder}/run.js",
+          //   "restart": true,
+          //   "sourceMaps": true,
+          //   "console": "internalConsole",
+          //   "internalConsoleOptions": "neverOpen",
+          //   "runtimeArgs": [
+          //     "--experimental-worker"
+          //   ]
+          // },
+        ]
+
+        if (this.isWorkspaceChildProject) {
+
+          this.parent.children
+            .filter(c => c.typeIs('angular-lib'))
+            .forEach(c => {
+              configurations.push(templateFor(this, c));
+            })
+
+        }
       }
 
     }
-    if (this.typeIs('isomorphic-lib')) {
-      configurations = [
-        {
-          "type": "node",
-          "request": "attach",
-          "name": "Attach to global cli tool",
-          "port": 9229,
-          "skipFiles": [
-            "<node_internals>/**"
-          ]
-        },
-        templateFor(this, this)
-        // {
-        //   "type": "node",
-        //   "request": "launch",
-        //   "remoteRoot": "${workspaceRoot}",
-        //   "localRoot": "${workspaceRoot}",
-        //   "name": "Launch Nodemon server",
-        //   "runtimeExecutable": "nodemon",
-        //   "program": "${workspaceFolder}/run.js",
-        //   "restart": true,
-        //   "sourceMaps": true,
-        //   "console": "internalConsole",
-        //   "internalConsoleOptions": "neverOpen",
-        //   "runtimeArgs": [
-        //     "--experimental-worker"
-        //   ]
-        // },
-      ]
-
-      if (this.isWorkspaceChildProject) {
-
-        this.parent.children
-          .filter(c => c.typeIs('angular-lib'))
-          .forEach(c => {
-            configurations.push(templateFor(this, c));
-          })
-
-      }
-
-    }
-    return JSON.stringify(configurations);
+    return JSON.stringify({
+      version: "0.2.0",
+      configurations
+    });
   }
   // export interface VscodeProject extends Partial<Project> { }
 }

@@ -296,10 +296,14 @@ export class FilesRecreator extends FeatureForProject {
                   settings['files.exclude']["protractor.conf.js"] = true;
                   settings['files.exclude']["karma.conf.js"] = true;
                   settings['files.exclude'][".editorconfig"] = true;
+                  self.project.vscodeFileTemplates.forEach(f => {
+                    settings['files.exclude'][f.replace('.filetemplate', '')] = false;
+                  });
                 }
                 settings['files.exclude']['bin/db.json'] = false;
 
               }
+
               return settings
             });
           }

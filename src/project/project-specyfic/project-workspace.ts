@@ -93,7 +93,18 @@ export class ProjectWorkspace extends Project {
     return undefined;
   }
   projectSpecyficFiles(): string[] {
-    return ['environment.d.ts'];
+    return [
+      'environment.d.ts',
+      ...this.filesTemplates(),
+    ];
+  }
+
+  filesTemplates() {
+    const templates = super.filesTemplates();
+    return [
+      ...this.vscodeFileTemplates,
+      ...templates,
+    ]
   }
 
   projectSourceFiles() {

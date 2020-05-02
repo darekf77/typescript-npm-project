@@ -86,9 +86,23 @@ export class FilesTemplatesBuilder extends FeatureForProject {
             // `);
 
             try {
-              const toReplace = eval(exp);
+              var toReplace = eval(exp);
               line = line.replace(pattern, toReplace);
             } catch (err) {
+              Helpers.info(`
+
+              exp: ${exp}
+
+              pattern: ${pattern}
+
+              toReplace: ${toReplace}
+
+              line: ${line}
+
+              err: ${err}
+
+
+              `);
               Helpers.error(`Error during filtemplate parse: ${orgFilePath}`, true, true);
               Helpers.error(err, false, true);
             }

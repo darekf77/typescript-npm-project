@@ -43,7 +43,6 @@ export class ProjectIsomorphicLib extends Project {
   projectSpecyficFiles(): string[] {
     let files = super.projectSpecyficFiles()
       .concat([
-        '.vscode/launch.json',
         'tsconfig.browser.json',
         'webpack.config.js',
         ...(this.frameworkVersionEquals('v1') ? ['webpack.backend-bundle-build.js'] : []),
@@ -62,14 +61,17 @@ export class ProjectIsomorphicLib extends Project {
   }
 
   filesTemplates() {
-    const files = [
+    let files = [
       'tsconfig.json.filetemplate',
     ];
 
     if (this.frameworkVersionAtLeast('v2')) {
-      files.push('tsconfig.isomorphic.json.filetemplate');
-      files.push('tsconfig.browser.json.filetemplate');
-      files.push('.vscode/launch.json.filetemplate');
+      files = [
+        'tsconfig.isomorphic.json.filetemplate',
+        'tsconfig.browser.json.filetemplate',
+        ...this.vscodeFileTemplates,
+        ...files,
+      ];
     }
 
     return files;

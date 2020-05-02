@@ -169,6 +169,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectName = project.name;
   workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
   workspaceConfig.currentProjectLaunchConfiguration = project.temlateOfLaunchJSON(workspaceConfig);
+  workspaceConfig.currentProjectTasksConfiguration = project.temlateOfTasksJSON(workspaceConfig);
   workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsSite = project.isSite;
