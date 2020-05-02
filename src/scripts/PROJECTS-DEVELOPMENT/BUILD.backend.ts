@@ -19,13 +19,18 @@ export async function chainBuild(args: string) {
   if (project.typeIsNot(...allowedLibs)) {
     Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
   }
-  args += ` --forClient=${project.name} -verbose`;
+  const orgArgs = args;
+  if (project.isWorkspaceChildProject) {
+    args += ` --forClient=${project.name} -verbose`;
+  }
 
   let deps: Project[] = [];
-  resolveDeps(project, deps);
-  deps = deps.reverse();
-  deps = prepareDeps(deps);
-
+  if (project.isWorkspaceChildProject) {
+    resolveDeps(project, deps);
+    deps = deps.reverse();
+    deps = prepareDeps(deps);
+  }
+  deps.push(project);
 
   for (let index = 0; index < deps.length; index++) {
     const proj = deps[index];
@@ -35,9 +40,28 @@ export async function chainBuild(args: string) {
     Running command in dependency "${proj.name}" : ${command}
 
     `);
-    await proj.run(command, { output: true, prefix: chalk.bold(`[${proj.name}]`) }).unitlOutputContains('Watching for file changes.');
+    if (proj.isWorkspaceChildProject) {
+      await proj.run(command, {
+        output: true,
+        prefix: chalk.bold(`[${proj.name}]`)
+      }).unitlOutputContains('Watching for file changes.');
+    }
+    // if (proj.isStandaloneProject) {
+    //   proj.run(`${config.frameworkName} bd ${args}`).sync();
+    // }
   }
-  await project.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+  if (project.typeIs('angular-lib')) {
+    if (project.isWorkspaceChildProject) {
+      await project.buildProcess.startForAppFromArgs(false, true, 'dist', orgArgs)
+    }
+    // if (project.isStandaloneProject) {
+    //   const command = `${config.frameworkName} baw ${args}`
+    //   await project.run(command, {
+    //     output: true,
+    //     prefix: chalk.bold(`[${project.name}]`)
+    //   }).unitlOutputContains(': Compiled successfully.');
+    // }
+  }
 }
 
 

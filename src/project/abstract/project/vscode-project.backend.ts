@@ -104,7 +104,7 @@ export abstract class VscodeProject {
     const ngServeTask = {
       "label": "ngserve",
       "type": "shell",
-      "command": "tnp baw",
+      "command": "tnp build",
       "isBackground": true,
       "presentation": {
         "reveal": "always"
@@ -159,10 +159,19 @@ export abstract class VscodeProject {
 
   temlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let configurations = [];
+    let compounds: { name: string; configurations: any[] }[] = [];
 
+    const temlateAttachProcess = {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to global cli tool",
+      "port": 9229,
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    };
 
-
-    const templateFor = (serverChild: Project, clientProject: Project) => {
+    const templateForServer = (serverChild: Project, clientProject: Project) => {
       const startServerTemplate = {
         "type": "node",
         "request": "launch",
@@ -178,8 +187,8 @@ export abstract class VscodeProject {
         const cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
         startServerTemplate.program = cwd + '/run.js';
         startServerTemplate.cwd = cwd;
-        startServerTemplate.name = startServerTemplate.name + ` for ${clientProject.name}`
       }
+      startServerTemplate.name = startServerTemplate.name + ` for ${clientProject.name}`
       startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
         clientProjectName: clientProject.name
       } as Models.env.EnvConfig, null, 4))}`);
@@ -188,7 +197,7 @@ export abstract class VscodeProject {
 
     function startNgServeTemplate(servePort: number, workspaceChild?: Project) {
       const result = {
-        "name": "ng serve",
+        "name": "Debugger with ng serve",
         "type": "chrome",
         "request": "launch",
         cwd: void 0,
@@ -233,24 +242,30 @@ export abstract class VscodeProject {
           this.parent.children
             .filter(c => c.typeIs('isomorphic-lib'))
             .forEach(c => {
-              configurations.push(templateFor(c, this));
+              configurations.push(templateForServer(c, this));
             })
 
+          configurations.forEach(c => {
+            c.presentation = {
+              // "hidden": true
+              // "order": 1,
+              "group": "configs"
+            }
+          })
+
         }
+
+        compounds.push({
+          name: 'Debug backend/frontend',
+          configurations: [
+            ...configurations.map(c => c.name)
+          ]
+        })
 
       }
       if (this.typeIs('isomorphic-lib')) {
         configurations = [
-          {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach to global cli tool",
-            "port": 9229,
-            "skipFiles": [
-              "<node_internals>/**"
-            ]
-          },
-          templateFor(this, this)
+          //#region nodemon config maybe in future
           // {
           //   "type": "node",
           //   "request": "launch",
@@ -267,23 +282,33 @@ export abstract class VscodeProject {
           //     "--experimental-worker"
           //   ]
           // },
-        ]
-
+          //#endregion
+        ];
+        if (this.isStandaloneProject) {
+          configurations.push(temlateAttachProcess)
+        }
+        //#region start serve for each agnular-lib ?
         if (this.isWorkspaceChildProject) {
 
           this.parent.children
-            .filter(c => c.typeIs('angular-lib'))
+            .filter(c => c.typeIs('angular-lib', 'isomorphic-lib'))
             .forEach(c => {
-              configurations.push(templateFor(this, c));
+              const t = templateForServer(this, c);
+              t['presentation'] = {
+                group: 'workspaceServers'
+              }
+              configurations.push(t);
             })
 
         }
+        //#endregion
       }
 
     }
     return JSON.stringify({
       version: "0.2.0",
-      configurations
+      configurations,
+      compounds
     });
   }
   // export interface VscodeProject extends Partial<Project> { }
