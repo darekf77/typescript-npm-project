@@ -151,9 +151,7 @@ export class FilesStructure extends FeatureForProject {
     //#endregion
 
     //#region recretate forsite
-    if (this.project.isWorkspace) {
-      this.project.recreateCodeWorkspace();
-    }
+
     if (this.project.isWorkspace && this.project.isSite) {
       const recreated = this.recreateSiteChildren();
       for (let index = 0; index < recreated.length; index++) {
@@ -168,6 +166,7 @@ export class FilesStructure extends FeatureForProject {
         await workspaceChild.filesStructure.init(args, options);
       }
     }
+
     //#endregion
 
     if (this.project.baseline) {
@@ -238,6 +237,9 @@ export class FilesStructure extends FeatureForProject {
         Helpers.writeFile(coreWorkspaceEnvironmentJsPath, envBefore);
       }
       this.project.filesTemplatesBuilder.rebuild();
+    }
+    if (this.project.isWorkspace) {
+      this.project.recreateCodeWorkspace();
     }
 
     this.project.quickFixes.missingSourceFolders();

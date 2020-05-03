@@ -15,7 +15,16 @@ export async function chainBuild(args: string) {
     'isomorphic-lib'
   ] as Models.libs.LibType[];
 
-  const project = Project.Current;
+  let project = Project.Current;
+
+  const firstArg = _.first(args.split(' '));
+  if (project.isWorkspace) {
+    const selectedChild = project.children.find(c => c.name === firstArg);
+    if (selectedChild) {
+      project = selectedChild;
+    }
+  }
+
   if (project.typeIsNot(...allowedLibs)) {
     Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
   }

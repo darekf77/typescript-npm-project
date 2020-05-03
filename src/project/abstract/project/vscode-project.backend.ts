@@ -1,3 +1,4 @@
+//#region imports
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -9,18 +10,22 @@ import { Helpers } from 'tnp-helpers';
 import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
+//#endregion
 
 export abstract class VscodeProject {
 
+  //#region vscode *.filetemplae
   get vscodeFileTemplates(this: Project) {
     return [
       '.vscode/launch.json.filetemplate',
       '.vscode/tasks.json.filetemplate',
     ]
   }
+  //#endregion
 
   //#region @backend
   public recreateCodeWorkspace(this: Project) {
+    //#region  recreate tmp.code-workspace
     if (!this.isWorkspace) {
       return;
     }
@@ -46,7 +51,7 @@ export abstract class VscodeProject {
     if (!fse.existsSync(bundledChildrensFolder)) {
       Helpers.mkdirp(bundledChildrensFolder);
     }
-    configSettings['terminal.integrated.cwd'] = '.';
+    configSettings['terminal.integrated.cwd'] = '${workspaceFolder}';
 
     const codeWorkspace = {
       folders: [
@@ -58,14 +63,17 @@ export abstract class VscodeProject {
         { path: 'bundle' },
         { path: 'dist' }
       ],
-      settings: configSettings
+      settings: configSettings,
+      // tasks: JSON.parse(this.temlateOfTasksJSON(this.env.config)),
+      // launch: JSON.parse(this.temlateOfLaunchJSON(this.env.config))
     };
-    fse.writeJSONSync(path.join(this.location,
-      this.nameOfCodeWorkspace), codeWorkspace, {
-      encoding: 'utf8',
-      spaces: 2
-    });
-
+    const codeworkspacefilepath = path.join(this.location, this.nameOfCodeWorkspace);
+    Helpers.removeFileIfExists(codeworkspacefilepath)
+    // fse.writeJSONSync(codeworkspacefilepath, codeWorkspace, {
+    //   encoding: 'utf8',
+    //   spaces: 2
+    // });
+    //#endregion
   }
 
   get nameOfCodeWorkspace(this: Project) {
@@ -73,73 +81,26 @@ export abstract class VscodeProject {
   }
 
   openInVscode(this: Project) {
+    //#region open in vscode
     this.recreateCodeWorkspace()
     if (this.isStandaloneProject || this.isUnknowNpmProject) {
       this.run(`code ${this.location}`).sync()
     } else {
       const isomorphicServers: Project[] = this.children.filter(c => c.typeIs('isomorphic-lib'));
-      this.run(`code ${this.location}/${this.nameOfCodeWorkspace}`).sync();
+      // this.run(`code ${this.location}/${this.nameOfCodeWorkspace}`).sync();
+      this.run(`code ${this.location}`).sync();
       isomorphicServers.forEach(s => {
         s.run(`code ${s.location}`).sync()
       });
     }
+    //#endregion
   }
 
   temlateOfTasksJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let tasks = [];
-    let inputs = [{
-      "id": "terminate",
-      "type": "command",
-      "command": "workbench.action.tasks.terminate",
-      "args": "terminateAll"
-    }];
+    let inputs = [];
 
-    const terminate = {
-      "label": "terminateall",
-      "command": "echo ${input:terminate}",
-      "type": "shell",
-      "problemMatcher": []
-    };
-
-    const ngServeTask = {
-      "label": "ngserve",
-      "type": "shell",
-      "command": "tnp build",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": [
-          "relative",
-          "${cwd}"
-        ],
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
-          }
-        }
-      }
-    };
-
-    tasks.push(terminate);
-
-    if (this.typeIs('angular-lib')) {
-      tasks.push(ngServeTask);
-    }
-
+    //#region post debug kill task (not working now)
     // {
     //   "label": "postdebugkill",
     //   "command": [
@@ -148,6 +109,83 @@ export abstract class VscodeProject {
     //   ],
     //   "type": "process"
     // },
+    //#endregion
+
+    //#region tasks, input for terminating all tasks
+    const templateTerminalAllTasks = {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    };
+    inputs.push(templateTerminalAllTasks);
+
+    const terminate = {
+      "label": "terminateall",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
+      "problemMatcher": []
+    };
+    tasks.push(terminate);
+    //#endregion
+
+    //#region ng serve task
+    const templateNgServeTask = (project?: Project) => {
+      const ngServeTask = {
+        "label": "Ng Serve",
+        "type": "shell",
+        "command": "tnp build",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": {
+          "owner": "typescript",
+          "source": "ts",
+          "applyTo": "closedDocuments",
+          "fileLocation": [
+            "relative",
+            "${cwd}"
+          ],
+          "pattern": "$tsc",
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": {
+              "regexp": "(.*?)"
+            },
+            "endsPattern": {
+              "regexp": "Compiled |Failed to compile."
+            }
+          }
+        }
+      };
+      if (project) {
+        ngServeTask.label = `${ngServeTask.label} for ${project.name}`;
+        ngServeTask.command = `${ngServeTask.command} ${project.name}`;
+      }
+      return ngServeTask;
+    }
+    //#endregion
+
+    if (this.isWorkspace) {
+      //#region handle worksapce
+      this.children
+        .filter(c => c.typeIs('angular-lib'))
+        .forEach(c => {
+          tasks.push(templateNgServeTask(c))
+        })
+      //#endregion
+    } else {
+      //#region handle standalone and workspace childs
+      if (this.typeIs('angular-lib')) {
+        tasks.push(templateNgServeTask());
+      }
+      //#endregion
+    }
 
     return JSON.stringify({
       "version": "2.0.0",
@@ -161,6 +199,7 @@ export abstract class VscodeProject {
     let configurations = [];
     let compounds: { name: string; configurations: any[] }[] = [];
 
+    //#region template attach process
     const temlateAttachProcess = {
       "type": "node",
       "request": "attach",
@@ -170,8 +209,10 @@ export abstract class VscodeProject {
         "<node_internals>/**"
       ]
     };
+    //#endregion
 
-    const templateForServer = (serverChild: Project, clientProject: Project) => {
+    //#region tempalte start normal nodejs server
+    const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
       const startServerTemplate = {
         "type": "node",
         "request": "launch",
@@ -184,25 +225,52 @@ export abstract class VscodeProject {
         ]
       };
       if (serverChild.name !== clientProject.name) {
-        const cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
+        let cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
+        if (workspaceLevel) {
+          cwd = '${workspaceFolder}' + `/${serverChild.name}`;
+        }
         startServerTemplate.program = cwd + '/run.js';
         startServerTemplate.cwd = cwd;
       }
-      startServerTemplate.name = startServerTemplate.name + ` for ${clientProject.name}`
+      startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
       startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
         clientProjectName: clientProject.name
       } as Models.env.EnvConfig, null, 4))}`);
       return startServerTemplate;
     };
+    //#endregion
 
-    function startNgServeTemplate(servePort: number, workspaceChild?: Project) {
+    //#region tempalte start nodemon nodejs server
+    function startNodemonServer() {
+      const result = {
+        "type": "node",
+        "request": "launch",
+        "remoteRoot": "${workspaceRoot}",
+        "localRoot": "${workspaceRoot}",
+        "name": "Launch Nodemon server",
+        "runtimeExecutable": "nodemon",
+        "program": "${workspaceFolder}/run.js",
+        "restart": true,
+        "sourceMaps": true,
+        "console": "internalConsole",
+        "internalConsoleOptions": "neverOpen",
+        "runtimeArgs": [
+          "--experimental-worker"
+        ]
+      };
+      return result;
+    }
+    //#endregion
+
+    //#region  tempalte start ng serve
+    function startNgServeTemplate(servePort: number, workspaceChild: Project, workspaceLevel: boolean) {
       const result = {
         "name": "Debugger with ng serve",
         "type": "chrome",
         "request": "launch",
         cwd: void 0,
         // "userDataDir": false,
-        "preLaunchTask": "ngserve",
+        "preLaunchTask": "Ng Serve",
         "postDebugTask": "terminateall",
         "sourceMaps": true,
         "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
@@ -220,21 +288,75 @@ export abstract class VscodeProject {
         result.webRoot = "${workspaceFolder}" + `/${workspaceChild.name}`;
         result.name = `${result.name} for ${workspaceChild.name}`
       }
+      if (workspaceLevel) {
+        result.preLaunchTask = `${result.preLaunchTask} for ${workspaceChild.name}`;
+      }
       return result;
     };
+    //#endregion
 
     if (this.isWorkspace) {
-      configurations = this.children
-        .filter(c => c.typeIs('angular-lib'))
-        .map(c => {
-          const servePort = getPort(c, currentWorkspaceConfig);
-          return startNgServeTemplate(servePort, c);
+      //#region handle workspace
+      const servers = this.children
+        .filter(c => c.typeIs('isomorphic-lib'));
+      const clients = this.children
+        .filter(c => c.typeIs('angular-lib'));
+
+      const serverConfigs = [];
+      servers.forEach(server => {
+        clients.forEach(client => {
+          serverConfigs.push(templateForServer(server, client, true))
+        });
+      });
+
+      const clientConfigs = clients.map(c => {
+        const servePort = getPort(c, currentWorkspaceConfig);
+        return startNgServeTemplate(servePort, c, true);
+      });
+
+      configurations = [
+        ...clientConfigs,
+        ...serverConfigs,
+      ];
+
+      configurations.forEach(c => {
+        c.presentation = {
+          "hidden": true
+          // "order": 1,
+          // "group": "configs"
+        }
+      });
+
+
+      clients.forEach(c => {
+        const requiredServersForClient = c.workspaceDependencies
+          .filter(s => s.typeIs('isomorphic-lib'))
+          .map(s => s.name);
+
+        const serversForClient = serverConfigs
+          .filter(s => {
+            return requiredServersForClient.filter(r => {
+              return (s.name as string).endsWith(`${r} for ${c.name}`)
+            }).length > 0;
+          })
+          .map(s => s.name)
+
+        compounds.push({
+          name: `Debug backend/frontend - ${c.name} ( ${c.workspaceDependencies.map(d => d.name).join(', ')} )`,
+          configurations: [
+            `Debugger with ng serve for ${c.name}`,
+            ...serversForClient,
+          ]
         })
+      });
+
+      //#endregion
     } else {
+      //#region handle standalone or worksapce child
       if (this.typeIs('angular-lib')) {
         const servePort = getPort(this, currentWorkspaceConfig);
         configurations = [
-          startNgServeTemplate(servePort)
+          startNgServeTemplate(servePort, void 0, false)
         ];
 
         if (this.isWorkspaceChildProject) {
@@ -242,7 +364,7 @@ export abstract class VscodeProject {
           this.parent.children
             .filter(c => c.typeIs('isomorphic-lib'))
             .forEach(c => {
-              configurations.push(templateForServer(c, this));
+              configurations.push(templateForServer(c, this, false));
             })
 
           configurations.forEach(c => {
@@ -251,7 +373,7 @@ export abstract class VscodeProject {
               // "order": 1,
               "group": "configs"
             }
-          })
+          });
 
         }
 
@@ -265,24 +387,7 @@ export abstract class VscodeProject {
       }
       if (this.typeIs('isomorphic-lib')) {
         configurations = [
-          //#region nodemon config maybe in future
-          // {
-          //   "type": "node",
-          //   "request": "launch",
-          //   "remoteRoot": "${workspaceRoot}",
-          //   "localRoot": "${workspaceRoot}",
-          //   "name": "Launch Nodemon server",
-          //   "runtimeExecutable": "nodemon",
-          //   "program": "${workspaceFolder}/run.js",
-          //   "restart": true,
-          //   "sourceMaps": true,
-          //   "console": "internalConsole",
-          //   "internalConsoleOptions": "neverOpen",
-          //   "runtimeArgs": [
-          //     "--experimental-worker"
-          //   ]
-          // },
-          //#endregion
+          startNodemonServer()
         ];
         if (this.isStandaloneProject) {
           configurations.push(temlateAttachProcess)
@@ -293,7 +398,7 @@ export abstract class VscodeProject {
           this.parent.children
             .filter(c => c.typeIs('angular-lib', 'isomorphic-lib'))
             .forEach(c => {
-              const t = templateForServer(this, c);
+              const t = templateForServer(this, c, false);
               t['presentation'] = {
                 group: 'workspaceServers'
               }
@@ -303,7 +408,7 @@ export abstract class VscodeProject {
         }
         //#endregion
       }
-
+      //#endregion
     }
     return JSON.stringify({
       version: "0.2.0",
@@ -315,6 +420,9 @@ export abstract class VscodeProject {
 }
 
 function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
+  if (!workspaceConfig) {
+    console.log('not working !')
+  }
   let env: Models.env.EnvConfigProject;
   if (project.isWorkspace) {
     env = workspaceConfig.workspace?.workspace;

@@ -73,9 +73,9 @@ export class FilesRecreator extends FeatureForProject {
             '.npmrc',
             '.babelrc',
             'docs',
-            'logo.svg'
+            'logo.svg',
+            // ...(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           ])
-          .concat(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           .map(f => f.startsWith('/') ? f.slice(1) : f)
         // .filter(f => {
         //   // console.log('f',siteFiles)
@@ -270,40 +270,64 @@ export class FilesRecreator extends FeatureForProject {
           excludedFiles(hide: boolean = true) {
             self.modifyVscode(settings => {
               settings['files.exclude'] = {};
-              if (hide) {
-                if (self.project.isTnp) {
-                  self.project.node_modules.fixesForNodeModulesPackages.forEach(p => {
-                    settings['files.exclude'][p] = true;
+
+              const getSettingsFor = (project: Project, s = {}) => {
+
+                s['files.exclude'] = {};
+                if (project.isTnp) {
+                  project.node_modules.fixesForNodeModulesPackages.forEach(p => {
+                    s['files.exclude'][p] = true;
                   })
-                  settings['files.exclude']["*.js"] = true;
-                  settings['files.exclude']["*.sh"] = true;
-                  settings['files.exclude']["*.xlsx"] = true;
-                  settings['files.exclude']["scripts"] = true;
-                  settings['files.exclude']["bin"] = true;
+                  s['files.exclude']["*.js"] = true;
+                  s['files.exclude']["*.sh"] = true;
+                  s['files.exclude']["*.xlsx"] = true;
+                  s['files.exclude']["scripts"] = true;
+                  s['files.exclude']["bin"] = true;
                 }
-                self.project.projectLinkedFiles().forEach(({ relativePath }) => {
-                  settings['files.exclude'][relativePath] = true;
+                project.projectLinkedFiles().forEach(({ relativePath }) => {
+                  s['files.exclude'][relativePath] = true;
                 })
                 self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
-                  settings['files.exclude'][f] = true
+                  s['files.exclude'][f] = true
                 })
-                if (self.project.isCoreProject) {
-                  settings['files.exclude']["**/*.filetemplate"] = true;
-                  settings['files.exclude']["**/tsconfig.*"] = true;
-                  settings['files.exclude']["tslint.*"] = true;
-                  settings['files.exclude']["index.*"] = true;
-                  settings['files.exclude']["package-lock.json"] = true;
-                  settings['files.exclude']["protractor.conf.js"] = true;
-                  settings['files.exclude']["karma.conf.js"] = true;
-                  settings['files.exclude'][".editorconfig"] = true;
-                  self.project.vscodeFileTemplates.forEach(f => {
-                    settings['files.exclude'][f.replace('.filetemplate', '')] = false;
+                if (project.isCoreProject) {
+                  s['files.exclude']["**/*.filetemplate"] = true;
+                  s['files.exclude']["**/tsconfig.*"] = true;
+                  s['files.exclude']["tslint.*"] = true;
+                  s['files.exclude']["index.*"] = true;
+                  s['files.exclude']["package-lock.json"] = true;
+                  s['files.exclude']["protractor.conf.js"] = true;
+                  s['files.exclude']["karma.conf.js"] = true;
+                  s['files.exclude'][".editorconfig"] = true;
+                  project.vscodeFileTemplates.forEach(f => {
+                    s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
                 }
-                settings['files.exclude']['bin/db.json'] = false;
-
+                s['files.exclude']['bin/db.json'] = false;
+                return s;
               }
 
+              if (hide) {
+                settings = getSettingsFor(self.project, settings) as any;
+                if (self.project.isWorkspace) {
+                  self.project.children.forEach(c => {
+                    const childernSettings = getSettingsFor(c);
+                    Object.keys(childernSettings['files.exclude']).forEach(k => {
+                      settings['files.exclude'][`${c.name}/${k}`] = childernSettings['files.exclude'][k]
+                    })
+                    settings['files.exclude'][`${c.name}/tsconfig*`] = true;
+                    settings['files.exclude'][`${c.name}/webpack*`] = true;
+                    settings['files.exclude'][`${c.name}/index*`] = true;
+                    settings['files.exclude'][`${c.name}/run.js`] = true;
+                    settings['files.exclude'][`${c.name}/karma.conf.js*`] = true;
+                    settings['files.exclude'][`${c.name}/protractor.conf.js*`] = true;
+                    c.filesTemplates().forEach(t => {
+                      settings['files.exclude'][`${c.name}/${t}`] = true;
+                      settings['files.exclude'][`${c.name}/${t.replace('.filetemplate', '')}`] = true;
+                    });
+                  })
+                }
+              }
               return settings
             });
           }
