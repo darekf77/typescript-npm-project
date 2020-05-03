@@ -319,6 +319,8 @@ export class FilesRecreator extends FeatureForProject {
                     settings['files.exclude'][`${c.name}/webpack*`] = true;
                     settings['files.exclude'][`${c.name}/index*`] = true;
                     settings['files.exclude'][`${c.name}/run.js`] = true;
+                    settings['files.exclude'][`${c.name}/.vscode`] = true;
+                    settings['files.exclude'][`${c.name}/README.md`] = true;
                     settings['files.exclude'][`${c.name}/karma.conf.js*`] = true;
                     settings['files.exclude'][`${c.name}/protractor.conf.js*`] = true;
                     c.filesTemplates().forEach(t => {

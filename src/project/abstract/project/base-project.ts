@@ -210,6 +210,54 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  //#region @backend
+  get workspaceDependenciesServers(this: Project): Project[] {
+    if (this.typeIs('unknow')) {
+      return [];
+    }
+    let servers: Project[] = [];
+    if (this.isWorkspaceChildProject) {
+      if (this.isSite) {
+        servers = this.baseline.workspaceDependenciesServers.map(c => {
+          return this.parent.child(c.name);
+        });
+      } else {
+        servers = this.packageJson.workspaceDependenciesServers.map(name => {
+          const child = this.parent.child(name);
+          if (!child) {
+            Helpers.error(`Unknow child "${name}" inside ${this.packageJson.path}`, false, true);
+          }
+          return child;
+        }).filter(f => !!f);
+      }
+    }
+    let foundedBadServer: Project;
+    if (!_.isUndefined(servers.find(c => {
+      const res = this.workspaceDependencies.indexOf(c) !== -1;
+      if (res) {
+        foundedBadServer = c;
+      }
+      return res;
+    }))) {
+      Helpers.error(`
+
+Please put your server dependencies (in package.json) to :
+workspaceDependencies: ["${foundedBadServer.name}"]
+workspaceDependenciesServer: []
+or
+workspaceDependencies: []
+workspaceDependenciesServer: ["${foundedBadServer.name}"]
+
+NEVER like this:
+workspaceDependencies: ["${foundedBadServer.name}"]
+workspaceDependenciesServer: ["${foundedBadServer.name}"]
+
+      `)
+    }
+    return servers;
+  }
+  //#endregion
+
 
 
   //#region @backend

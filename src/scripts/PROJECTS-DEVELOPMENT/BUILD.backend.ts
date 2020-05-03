@@ -8,7 +8,10 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
 
-
+/**
+ * THIS FUNCTION CAN'T BE RECURIVE
+ * event in worksapce childs...
+ */
 export async function chainBuild(args: string) {
   const allowedLibs = [
     'angular-lib',
@@ -25,12 +28,14 @@ export async function chainBuild(args: string) {
     }
   }
 
+  project.removeFileByRelativePath(config.file.tnpEnvironment_json);
+
   if (project.typeIsNot(...allowedLibs)) {
     Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
   }
   const orgArgs = args;
   if (project.isWorkspaceChildProject) {
-    args += ` --forClient=${project.name} -verbose`;
+    args += ` --forClient=${project.name}`;
   }
 
   let deps: Project[] = [];
@@ -40,10 +45,14 @@ export async function chainBuild(args: string) {
     deps = prepareDeps(deps);
   }
   deps.push(project);
+  if (project.typeIs('angular-lib') && project.workspaceDependenciesServers.length > 0) {
+    deps = deps.concat(project.workspaceDependenciesServers);
+    // TODO handle deps of project.workspaceDependenciesServers
+  }
 
   for (let index = 0; index < deps.length; index++) {
     const proj = deps[index];
-    const command = `${config.frameworkName} bdw ${args}`;
+    const command = `${config.frameworkName} bdw ${args} ${!global.hideLog ? '-verbose' : ''}`;
     Helpers.info(`
 
     Running command in dependency "${proj.name}" : ${command}

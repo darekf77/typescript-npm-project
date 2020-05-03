@@ -193,6 +193,10 @@ inside generated projects...
           } else if (this.project.isWorkspaceChildProject) {
             if (this.project.env.config) {
               config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
+              if (!config) {
+                Helpers.error(`Please include this project (${this.project.genericName}) in your environment*.js.`,
+                  false, true)
+              }
             }
           } else {
             break;

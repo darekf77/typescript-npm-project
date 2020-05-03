@@ -83,6 +83,12 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
+  get workspaceDependenciesServers(): string[] {
+    const p = this.data.tnp && this.data.tnp.requiredServers;
+    // console.log(`${this.locationOfJson}`, p)
+    return Array.isArray(p) ? p : [];
+  }
+
   get path() {
     return path.join(this.cwd, config.file.package_json);
   }

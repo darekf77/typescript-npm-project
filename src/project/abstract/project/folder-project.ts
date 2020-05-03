@@ -346,6 +346,19 @@ export abstract class FolderProject {
     Project.projects = Project.projects.filter(p => p.location !== location);
     Helpers.tryRemoveDir(location);
   }
+
+  removeFileByRelativePath(this: Project, relativePathToFile: string) {
+    relativePathToFile = relativePathToFile.replace(/^\//, '')
+    const location = this.location;
+    const p = path.join(location, relativePathToFile);
+    Helpers.removeFileIfExists(p);
+  }
+  removeFolderByRelativePath(this: Project, relativePathToFolder: string) {
+    relativePathToFolder = relativePathToFolder.replace(/^\//, '')
+    const location = this.location;
+    const p = path.join(location, relativePathToFolder);
+    Helpers.removeFolderIfExists(p);
+  }
   //#endregion
 
   //#region @backend

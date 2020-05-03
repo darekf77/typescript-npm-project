@@ -329,8 +329,10 @@ export abstract class VscodeProject {
 
 
       clients.forEach(c => {
-        const requiredServersForClient = c.workspaceDependencies
-          .filter(s => s.typeIs('isomorphic-lib'))
+        const requiredServersForClient = [
+          ...c.workspaceDependencies,
+          ...c.workspaceDependenciesServers,
+        ].filter(s => s.typeIs('isomorphic-lib'))
           .map(s => s.name);
 
         const serversForClient = serverConfigs
@@ -342,7 +344,10 @@ export abstract class VscodeProject {
           .map(s => s.name)
 
         compounds.push({
-          name: `Debug backend/frontend - ${c.name} ( ${c.workspaceDependencies.map(d => d.name).join(', ')} )`,
+          name: `Debug backend/frontend - ${c.name} ( ${[
+            ...c.workspaceDependencies,
+            ...c.workspaceDependenciesServers,
+          ].map(d => d.name).join(', ')} )`,
           configurations: [
             `Debugger with ng serve for ${c.name}`,
             ...serversForClient,

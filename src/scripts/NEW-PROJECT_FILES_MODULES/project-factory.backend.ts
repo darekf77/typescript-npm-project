@@ -49,6 +49,8 @@ export class ProjectFactory {
     json.tnp.isCoreProject = false;
     json.tnp.isGenerated = false;
     json.tnp.useFramework = false;
+    json.tnp.required = [];
+    json.tnp.requiredServers = [];
     if (basedOn) {
       json.tnp.basedOn = `./${basedOn.replace(/\/$/, '')}`;
     }

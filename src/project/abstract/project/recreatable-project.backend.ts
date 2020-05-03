@@ -72,7 +72,7 @@ export abstract class RecreatableProject {
 
   //#region @backend
   async initProcedure(this: Project) {
-
+    return void 0;
   }
 
   public async __initProcedure(this: Project) {

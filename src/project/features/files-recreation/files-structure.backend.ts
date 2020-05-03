@@ -107,6 +107,8 @@ export class FilesStructure extends FeatureForProject {
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
       return;
+    } else {
+      Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location}`);
     }
 
     this.project.quickFixes.missingSourceFolders()
@@ -124,6 +126,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     alreadyInitedPorjects.push(this.project)
+    Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location}`)
 
     //#region handle init of container
     if (this.project.isContainer) {
