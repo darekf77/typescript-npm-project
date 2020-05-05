@@ -1,26 +1,67 @@
 const util = require('util');
 const vm = require('vm');
+const path = require('path');
 
 const fse = require('fs-extra');
 
+const pathToTmpEnv = path.join(process.cwd(), 'tmp-environment.json');
+const pathToDist = path.join(process.cwd(), 'dist');
+const pathToDistApp = path.join(pathToDist, 'app.js');
 
-let ENV = '{}';
-if (fse.existsSync('./tmp-environment.json')) {
-  ENV = fse.readFileSync('./tmp-environment.json', {
-    encoding: 'utf8'
-  });
-} else {
-  console.warn('ENV will be not available... tmp-environment.json missing... ')
+var sandbox = {
+  require,
+  global
+}
+
+function assignENV() {
+  let ENV = '{}';
+  if (fse.existsSync(pathToTmpEnv)) {
+    ENV = fse.readFileSync(pathToTmpEnv, {
+      encoding: 'utf8'
+    });
+  } else {
+    console.warn('ENV will be not available... tmp-environment.json missing... ')
+  }
+
+  let { ENVoverride } = require('minimist')(process.argv);
+  if (ENVoverride) {
+    ENVoverride = JSON.parse(decodeURIComponent(ENVoverride));
+    ENV = JSON.parse(ENV);
+    Object.assign(ENV, ENVoverride);
+    ENV = JSON.stringify(ENV, null, 4);
+  }
+  sandbox.ENV = ENV;
 }
 
 
-const sandbox = {
-  animal: 'cat',
-  count: 2,
-  ENV,
-  require,
-  global
-};
+const encoding = 'utf8';
+var secondsWaitAfterDistDetected = 5;
+
+function emptyDistFolder() {
+  return !(
+    fse.existsSync(pathToDist) &&
+    fse.lstatSync(pathToDist).isDirectory() &&
+    fse.existsSync(pathToDistApp) &&
+    fse.readFileSync(pathToDistApp, { encoding }).toString().search('default') !== -1
+  );
+}
+
+var messageWasShown = false;
+while (emptyDistFolder()) {
+  var seconds = 2;
+  if (!messageWasShown) {
+    messageWasShown = true;
+    console.log(`Waiting for build process...`);
+  }
+  var waitTill = new Date(new Date().getTime() + seconds * 1000);
+  while (waitTill > new Date()) { }
+}
+if (messageWasShown) {
+  var waitTill = new Date(new Date().getTime() + secondsWaitAfterDistDetected * 1000);
+  while (waitTill > new Date()) { }
+}
+
+assignENV();
 
 const script = new vm.Script(`
 global["ENV"] = JSON.parse(ENV);
