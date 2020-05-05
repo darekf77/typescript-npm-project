@@ -131,16 +131,17 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   tmpProject.packageJson.setNamFromContainingFolder();
   tmpProject.packageJson.hideDeps(`smooth instalation`);
   pkg.installType = '--save';
-  const command = prepareCommand(pkg, false, false);
+  const command = prepareCommand(pkg, false, false, this.project);
   executeCommand(command, tmpProject);
   return tmpProject;
 }
 
 
-export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean) {
+export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean, project: Project) {
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
-  const argsForFasterInstall = `--ignore-engines --no-progress --prefer-offline --no-audit`;
+  const noPackageLock = (project.isStandaloneProject) ? '--no-package-lock' : '';
+  const argsForFasterInstall = `--ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
   if (useYarn) {
     // --ignore-scripts
     // yarn install --prefer-offline
