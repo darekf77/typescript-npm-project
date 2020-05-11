@@ -23,6 +23,7 @@
         "rogalmic.bash-debug",
         "oic-pryv.automatic-terminal",
         "omoki1207.pdf",
-        "ryanlaws.toggle-case"
+        "ryanlaws.toggle-case",
+        "msjsdiag.debugger-for-chrome"
     ]
 }

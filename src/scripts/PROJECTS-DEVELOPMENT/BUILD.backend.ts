@@ -49,8 +49,9 @@ export async function chainBuild(args: string) {
     deps = deps.concat(project.workspaceDependenciesServers);
     // TODO handle deps of project.workspaceDependenciesServers
   }
-
-  for (let index = 0; index < deps.length; index++) {
+  let index = 0;
+  while (index < deps.length) {
+    // for (let index = 0; index < deps.length; index++) {
     const proj = deps[index];
     const command = `${config.frameworkName} bdw ${args} ${!global.hideLog ? '-verbose' : ''}`;
     Helpers.info(`
@@ -59,14 +60,20 @@ export async function chainBuild(args: string) {
 
     `);
     if (proj.isWorkspaceChildProject) {
-      await proj.run(command, {
-        output: true,
-        prefix: chalk.bold(`[${proj.name}]`)
-      }).unitlOutputContains('Watching for file changes.');
+      try {
+        await proj.run(command, {
+          output: true,
+          prefix: chalk.bold(`[${proj.name}]`)
+        }).unitlOutputContains('Watching for file changes.');
+      } catch (error) {
+        Helpers.pressKeyAndContinue(`Fix errors for project ${proj.genericName} and press ENTER to build again`);
+        continue;
+      }
     }
     // if (proj.isStandaloneProject) {
     //   proj.run(`${config.frameworkName} bd ${args}`).sync();
     // }
+    index++;
   }
   if (project.typeIs('angular-lib')) {
     if (project.isWorkspaceChildProject) {
