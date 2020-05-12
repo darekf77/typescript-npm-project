@@ -113,7 +113,7 @@ export class PackageJsonCore {
       }
       Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
-      pathToBaseline = this.data.tnp.basedOnAbsolutePath2;
+      // pathToBaseline = this.data.tnp.basedOnAbsolutePath2;
       if (fse.existsSync(pathToBaseline)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
         return pathToBaseline;

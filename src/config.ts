@@ -27,6 +27,7 @@ const filesNotAllowedToClean = {
   tslint_json: 'tslint.json',
   _editorconfig: '.editorconfig',
   _angularCli_json: '.angular-cli.json',
+  _vscode_launch_json: '.vscode/launch.json',
 }
 
 const file = {
