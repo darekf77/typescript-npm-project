@@ -150,7 +150,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
     });
 
     relativePathesToProject.forEach(relativePathToProject => {
-      Helpers.log('[sourceModifier][syn] relativePathToProject')
+      Helpers.log(`[sourceModifier][syn] ${relativePathToProject}`, 1)
       this.processFile(relativePathToProject, modifiedFiles);
     });
 

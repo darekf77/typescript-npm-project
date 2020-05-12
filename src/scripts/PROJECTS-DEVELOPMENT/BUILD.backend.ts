@@ -22,7 +22,16 @@ export async function chainBuild(args: string) {
 
   const firstArg = _.first(args.split(' '));
   if (project.isWorkspace) {
-    const selectedChild = project.children.find(c => c.name === firstArg);
+    let selectedChild = project.children.find(c => c.name === firstArg);
+    if (!selectedChild) {
+      selectedChild = project.children.find(c => {
+        const ok = (firstArg.search(c.name) !== -1);
+        if (ok) {
+          args = args.replace(firstArg, c.name);
+        };
+        return ok;
+      });
+    }
     if (selectedChild) {
       project = selectedChild;
     }
@@ -49,30 +58,56 @@ export async function chainBuild(args: string) {
     deps = deps.concat(project.workspaceDependenciesServers);
     // TODO handle deps of project.workspaceDependenciesServers
   }
+
+
   let index = 0;
+  const buildedOK = [];
   while (index < deps.length) {
     // for (let index = 0; index < deps.length; index++) {
-    const proj = deps[index];
-    const command = `${config.frameworkName} bdw ${args} ${!global.hideLog ? '-verbose' : ''}`;
-    Helpers.info(`
+    const projDep = deps[index];
 
-    Running command in dependency "${proj.name}" : ${command}
+    const action = async (proj: Project, baseline = false) => {
+      const command = `${config.frameworkName} bdw ${args} ${!global.hideLog ? '-verbose' : ''}`;
+      Helpers.info(`
 
-    `);
-    if (proj.isWorkspaceChildProject) {
-      try {
+      Running command in ${baseline ? 'baseline' : ''} dependency "${proj.genericName}" : ${command}
+
+      `);
+      if (proj.isWorkspaceChildProject) {
+
         await proj.run(command, {
           output: true,
-          prefix: chalk.bold(`[${proj.name}]`)
-        }).unitlOutputContains('Watching for file changes.');
+          prefix: chalk.bold(`${baseline ? '[baseline]' : ''}[${proj.name}]`)
+        }).unitlOutputContains('Watching for file changes.',
+          [
+            'Command failed:',
+            'Compilation error'
+          ]);
+
+      }
+      // if (proj.isStandaloneProject) {
+      //   proj.run(`${config.frameworkName} bd ${args}`).sync();
+      // }
+    };
+
+    if (projDep.isSite && !buildedOK.includes(projDep.baseline)) {
+      try {
+        await action(projDep.baseline, true);
+        buildedOK.push(projDep.baseline);
       } catch (error) {
-        Helpers.pressKeyAndContinue(`Fix errors for project ${proj.genericName} and press ENTER to build again`);
+        Helpers.pressKeyAndContinue(`Fix errors for baseline project ${projDep.baseline.genericName} and press ENTER to build again`);
         continue;
       }
     }
-    // if (proj.isStandaloneProject) {
-    //   proj.run(`${config.frameworkName} bd ${args}`).sync();
-    // }
+    if (!buildedOK.includes(projDep)) {
+      try {
+        await action(projDep);
+        buildedOK.push(projDep);
+      } catch (error) {
+        Helpers.pressKeyAndContinue(`Fix errors for project ${projDep.genericName} and press ENTER to build again`);
+        continue;
+      }
+    }
     index++;
   }
   if (project.typeIs('angular-lib')) {
@@ -89,6 +124,18 @@ export async function chainBuild(args: string) {
   }
 }
 
+export async function DEVB() {
+  const command = 'tnp bdw ss-common-ui --forClient=ss-common-ui -verbose';
+  await Project.Current.run(command, {
+    output: true,
+    prefix: chalk.bold(`[testowy prefix] `)
+  }).unitlOutputContains('Watching for file changes.',
+    [
+      'Command failed:',
+      'Compilation error'
+    ]);
+  process.exit(0)
+}
 
 /**
  * CHAIN BUILD
@@ -398,6 +445,7 @@ async function $ACTIVE_SINGULAR_BUILD(args) {
 
 
 export default {
+  DEVB: Helpers.CLIWRAP(DEVB, 'DEVB'),
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
   $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),

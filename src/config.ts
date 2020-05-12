@@ -199,7 +199,8 @@ export const config = {
     tnp_normal_mode: 'tnp_normal_mode'
   },
   names: {
-    env: allowedEnvironmentsObj
+    env: allowedEnvironmentsObj,
+    baseline: 'baseline'
   },
   extensions: {
     /**

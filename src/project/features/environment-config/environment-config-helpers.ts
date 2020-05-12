@@ -317,7 +317,13 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
       Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
     }
 
-    configWorkspaceEnv = Helpers.require(pathToProjectEnvironment).config as any;
+    try {
+      configWorkspaceEnv = Helpers.require(pathToProjectEnvironment).config as any;
+    } catch (err) {
+      console.log(err);
+      Helpers.error(`Error during reading workspace config file ${pathToProjectEnvironment}`, false, true);
+    }
+
     // try {
     // console.log('configWorkspaceEnv', configWorkspaceEnv)
     // } catch (error) {

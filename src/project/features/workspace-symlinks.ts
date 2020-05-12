@@ -14,7 +14,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
       .concat(this.project.baseline ? [this.project.baseline] : [])
 
     projectsToLink.forEach(c => {
-      if (path.basename(c.location) != c.name) {
+      if (path.basename(c.location) !== c.name) {
         Helpers.error(`Project "${c.location}" has different packaage.json name`
           + ` property than his own folder name "${path.basename(c.location)}"`, false, true)
       }
@@ -34,7 +34,11 @@ export class WorkspaceSymlinks extends FeatureForProject {
     this.project.children.forEach(c => {
       Helpers.log(`Remove child node_modules ${c.genericName} ${triggeredMsg}`)
       c.node_modules.remove();
-    })
+    });
+
+    // if (this.project.isSite) {
+    //   Helpers.removeFolderIfExists(path.join(this.project.location, config.folder.node_modules, config.names.baseline));
+    // }
   }
 
   add(triggeredMsg: string) {
@@ -50,7 +54,14 @@ export class WorkspaceSymlinks extends FeatureForProject {
     this.project.children.forEach(c => {
       Helpers.log(`Add parent '${this.project.genericName}' node_modules to child: ${c.name} ${triggeredMsg}`)
       this.project.node_modules.linkToProject(c)
-    })
+    });
+    // if (this.project.isSite) {
+    //   const baselineInNodeModules = path.join(this.project.location, config.folder.node_modules, this.project.baseline.name);
+    //   if (path.basename(baselineInNodeModules) !== config.names.baseline) {
+    //     const baselineInNodeModulesProperName = path.join(this.project.location, config.folder.node_modules, config.names.baseline);
+    //     Helpers.createSymLink(baselineInNodeModules, baselineInNodeModulesProperName);
+    //   }
+    // }
   }
 
 

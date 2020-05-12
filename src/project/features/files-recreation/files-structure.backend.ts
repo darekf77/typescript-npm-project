@@ -155,13 +155,13 @@ export class FilesStructure extends FeatureForProject {
 
     //#region recretate forsite
 
-    if (this.project.isWorkspace && this.project.isSite) {
-      const recreated = this.recreateSiteChildren();
-      for (let index = 0; index < recreated.length; index++) {
-        const newChild = recreated[index];
-        await newChild.filesStructure.init(args, options);
-      }
-    }
+    // if (this.project.isWorkspace && this.project.isSite) {
+    //   const recreated = this.recreateSiteChildren();
+    //   for (let index = 0; index < recreated.length; index++) {
+    //     const newChild = recreated[index];
+    //     await newChild.filesStructure.init(args, options);
+    //   }
+    // }
     if (this.project.isWorkspace && recrusive) {
       const workspaceChildren = this.project.children;
       for (let index = 0; index < workspaceChildren.length; index++) {
@@ -172,9 +172,9 @@ export class FilesStructure extends FeatureForProject {
 
     //#endregion
 
-    if (this.project.baseline) {
-      await this.project.baseline.filesStructure.init(args, options);
-    }
+    // if (this.project.isSite) {
+    //   await this.project.baseline.filesStructure.init(args, options);
+    // }
 
     if (this.project.isWorkspaceChildProject) {
       await this.project.parent.filesStructure.init(args, options);
