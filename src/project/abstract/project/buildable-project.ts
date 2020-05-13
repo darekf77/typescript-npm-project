@@ -193,7 +193,7 @@ export abstract class BuildableProject {
           const projectCurrent = this;
           const projectName = projectCurrent.isTnp ? config.file.tnpBundle : projectCurrent.name;
           const what = path.normalize(`${project.location}/node_module/${projectName}`)
-          Helpers.info(`After each build finish ${what} will be update.`)
+          Helpers.info(`After each build finish ${Helpers.formatPath(what)} will be update.`)
         });
       }
 
