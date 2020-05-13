@@ -81,7 +81,8 @@ export async function chainBuild(args: string) {
         }).unitlOutputContains('Watching for file changes.',
           [
             'Command failed:',
-            'Compilation error'
+            'Compilation error',
+            'Error: Please compile your'
           ]);
 
       }

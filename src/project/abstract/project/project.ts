@@ -338,7 +338,10 @@ export class Project {
           that[prefixedName] = new (classFn as any)(that);
         }
         return that[prefixedName];
-      }
+      },
+      set: function (v) {
+        that[prefixedName] = v;
+      },
     })
   }
 

@@ -137,7 +137,7 @@ inside generated projects...
       fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser));
 
     if (!this.project.isStandaloneProject && !checkIfGeneratedTnpBundle) {
-      Helpers.error(`Please compile your tsc-npm-project to tnp-bundle`, false, true)
+      Helpers.error(`Error: Please compile your ${config.frameworkName} to ${config.frameworkName}-bundle`, false, true)
     }
 
     this.mergeNpmPorject();
