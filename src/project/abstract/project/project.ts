@@ -226,7 +226,11 @@ export class Project {
       }
 
       previousLocation = absoluteLocation;
-      absoluteLocation = path.resolve(path.join(absoluteLocation, '..'))
+      const newAbsLocation = path.join(absoluteLocation, '..');
+      if (!path.isAbsolute(newAbsLocation)) {
+        return;
+      }
+      absoluteLocation = path.resolve(newAbsLocation);
       if (!fse.existsSync(absoluteLocation)) {
         return;
       }

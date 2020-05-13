@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import * as path from 'path';
 import { Helpers } from 'tnp-helpers';
+import { TnpDB } from 'tnp-db';
 //#endregion
 
 import * as _ from 'lodash';
@@ -9,6 +10,7 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
 import { CLASS } from 'typescript-class-helpers';
+
 
 @CLASS.NAME('BuildOptions')
 export class BuildOptions implements Models.dev.IBuildOptions {
@@ -150,12 +152,21 @@ export class BuildOptions implements Models.dev.IBuildOptions {
             argPath = (argPath as any).location;
           }
 
-          const project = Project.nearestTo(argPath);
+          let project = Project.nearestTo(argPath);
           if (!project) {
-            Helpers.error(`autobuild.json : Path doesn't contain ${config.frameworkName} type project: ${argPath}`, true, true)
-          } else {
-            return project;
+            const dbProjectsToCheck: Project[] = TnpDB.InstanceSync.getProjects().map(p => p.project);
+
+            project = dbProjectsToCheck.find(p => p.genericName === argPath);
+            if (!project) {
+              project = dbProjectsToCheck.find(p => p.name === argPath);
+            }
           }
+
+          if (!project) {
+            Helpers.error(`[build-options] Incorrect "copyto" values. Path doesn't contain ${config.frameworkName} type project: ${argPath}`, false, true)
+          }
+
+          return project;
 
         }).filter(p => !!p) as any;
     }
