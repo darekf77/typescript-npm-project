@@ -14,7 +14,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
   get files() {
     return this.project.filesTemplates();
   }
-  rebuild() {
+  rebuild(soft = false) {
     const files = this.files;
     // Helpers.info(`Files templates for project:
 
@@ -33,13 +33,13 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       }
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
       // Helpers.log(`Started for ${f}`);
-      this.processFile(filePath, fileContent, env, _);
+      this.processFile(filePath, fileContent, env, _, soft);
       // Helpers.log(`Processed DONE for ${f}`);
     }
     this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
   }
 
-  rebuildFile(filetemplateRelativePath) {
+  rebuildFile(filetemplateRelativePath, soft = false) {
     const filePath = path.join(this.project.location, filetemplateRelativePath);
     try {
       var fileContent = Helpers.readFile(filePath);
@@ -52,14 +52,15 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       return;
     }
     const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
-    this.processFile(filePath, fileContent, env, _);
+    this.processFile(filePath, fileContent, env, _, soft);
   }
 
   private processFile(
     orgFilePath: string,
     content: string,
     reservedExpSec: Models.env.EnvConfig,
-    reservedExpOne: any) { // lodash
+    reservedExpOne: any,
+    soft: boolean) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
     // Helpers.pressKeyAndContinue();
     let newContent = content
@@ -104,7 +105,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
 
               `);
               Helpers.error(`Error during filtemplate parse: ${orgFilePath}`, true, true);
-              Helpers.error(err, false, true);
+              Helpers.error(err, soft, true);
             }
             // console.log('toReplace', toReplace)
           });
@@ -123,7 +124,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         Helpers.error(`[filetemplate] Not able to parse new content` +
           ` for json in ${path.basename(filePath)}
 
-          `, false, true);
+          `, soft, true);
       }
     }
     Helpers.writeFile(filePath, newContent);

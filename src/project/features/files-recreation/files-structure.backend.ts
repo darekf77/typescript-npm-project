@@ -79,10 +79,13 @@ export class FilesStructure extends FeatureForProject {
     await this.project.__initProcedure();
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      if (this.project.isWorkspace && this.project.isCoreProject) {
+      if (this.project.isWorkspace) {
         var coreWorkspaceEnvironmentJsPath = path.join(this.project.location, config.file.environment_js);
         var envBefore = fse.existsSync(coreWorkspaceEnvironmentJsPath) && Helpers.readFile(coreWorkspaceEnvironmentJsPath);
-        recreateTmpWorkspace(this.project, this.project.location)
+        var environmentJsFileContainsTemplate = envBefore && (envBefore.search(config.placeholders.forProjectsInEnvironmentFile) !== -1);
+        if (environmentJsFileContainsTemplate) {
+          recreateTmpWorkspace(this.project, this.project.location)
+        }
       }
       if (env) {
         Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
@@ -236,7 +239,7 @@ export class FilesStructure extends FeatureForProject {
       }
 
       await this.project.env.init(args);
-      if (this.project.isWorkspace && this.project.isCoreProject && envBefore) {
+      if (this.project.isWorkspace && environmentJsFileContainsTemplate) {
         Helpers.writeFile(coreWorkspaceEnvironmentJsPath, envBefore);
       }
       this.project.filesTemplatesBuilder.rebuild();

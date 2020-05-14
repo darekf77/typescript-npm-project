@@ -83,14 +83,13 @@ export abstract class RouterProject {
 Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }
-
-      genWorkspace.run(`tnp start ${args}`).async()
+      await genWorkspace.start(args);
       return;
     }
 
 
     await this.env.init(args, true)
-    this.filesTemplatesBuilder.rebuild()
+    this.filesTemplatesBuilder.rebuild(true)
     Helpers.log(`Killing proces on port ${this.getDefaultPort()}`);
     await Helpers.killProcessByPort(this.getDefaultPort())
     Helpers.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);

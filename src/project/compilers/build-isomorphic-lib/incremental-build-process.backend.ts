@@ -174,15 +174,13 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       modularBuild();
     }
 
-    Helpers.log(`BROWSER COMPILATIONS (length: ${this.browserCompilations.length} )
+    const compilationsInfo = this.browserCompilations
+      .map(c => `compilationProject: ${c.compilationProject?.name}, location: ${c.location}`).join('\n');
 
-    ${this.browserCompilations.map(c => `compilationProject: ${c.compilationProject?.name}, location: ${c.location}`).join('\n')}
-
-    `);
+    Helpers.log(`BROWSER COMPILATIONS (length: ${this.browserCompilations.length} )`
+      + `\n\n` + compilationsInfo + `\n\n`);
 
   }
-
-
 
 
 }

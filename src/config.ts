@@ -120,6 +120,9 @@ export const config = {
   regexString: {
     pathPartStringRegex: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   },
+  placeholders: {
+    forProjectsInEnvironmentFile: '//<PLACEHOLDER_FOR_PROJECTS>'
+  },
   defaultFrameworkVersion: 'v1' as ('v1' | 'v2'),
   CONST: {
     TEST_TIMEOUT: 3600000

@@ -129,11 +129,11 @@ export class ProjectAngularClient extends Project {
         const outPutPathCommand = `--output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`;
 
         if (this.frameworkVersionEquals('v1')) {
-          command = `npm-run ng build  ${statsCommand}
-          --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
+          command = `npm-run ng build  ${statsCommand} `
+            + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
         } else {
-          command = `npm-run ng build  ${statsCommand} --serviceWorker=true'
-          --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
+          command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
+            + ` --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
         }
 
         Helpers.info(`

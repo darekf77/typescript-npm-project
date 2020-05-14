@@ -115,47 +115,47 @@ export class EnvironmentConfig
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
 
     if (this.project.isStandaloneProject) {
-      var config = await standaloneConfigBy(this.project, environmentName);
+      var configResult = await standaloneConfigBy(this.project, environmentName);
     } else {
-      var config = await workspaceConfigBy(this.project, environmentName);
+      var configResult = await workspaceConfigBy(this.project, environmentName);
     }
 
-    config.name = environmentName;
+    configResult.name = environmentName;
 
-    config.dynamicGenIps = (environmentWithGeneratedIps.includes(config.name)) || generateIps;
+    configResult.dynamicGenIps = (environmentWithGeneratedIps.includes(configResult.name)) || generateIps;
 
     if (this.project.isStandaloneProject) {
 
     } else {
-      await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: config })
-      await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: config });
-
-      if (overridePortsOnly) {
+      await overrideWorksapceRouterPort({ workspaceProjectLocation, workspaceConfig: configResult })
+      await overrideDefaultPortsAndWorkspaceConfig({ workspaceProjectLocation, workspaceConfig: configResult });
+      const envTempFileExists = fse.existsSync(path.join(this.project.location, config.file.tnpEnvironment_json));
+      if (overridePortsOnly && envTempFileExists) {
         Helpers.log('Only ports overriding.. ')
         return;
       }
     }
 
-    config.isCoreProject = this.project.isCoreProject;
+    configResult.isCoreProject = this.project.isCoreProject;
 
-    if (!config.ip) {
-      config.ip = 'localhost'
+    if (!configResult.ip) {
+      configResult.ip = 'localhost'
     } else {
-      if (_.isString(config.ip)) {
-        config.ip = config.ip.replace(/^https?:\/\//, '');
+      if (_.isString(configResult.ip)) {
+        configResult.ip = configResult.ip.replace(/^https?:\/\//, '');
       }
-      if (!Helpers.isValidIp(config.ip)) {
+      if (!Helpers.isValidIp(configResult.ip)) {
         Helpers.error(`Bad ip address in your environment .json config`, true)
-        err(config)
+        err(configResult)
       }
     }
 
-    if (_.isString(config.domain)) {
-      config.domain = config.domain.replace(/\/$/, '');
-      config.domain = config.domain.replace(/^https?:\/\//, '');
+    if (_.isString(configResult.domain)) {
+      configResult.domain = configResult.domain.replace(/\/$/, '');
+      configResult.domain = configResult.domain.replace(/^https?:\/\//, '');
     }
 
-    config.packageJSON = this.project.packageJson.data;
+    configResult.packageJSON = this.project.packageJson.data;
     // config.frameworks = this.project.frameworks;
     // console.log(`this.project.frameworks for ${this.project.genericName}`, this.project.frameworks)
     // process.exit(0)
@@ -165,28 +165,28 @@ export class EnvironmentConfig
 
     } else {
 
-      if (!config.workspace || !config.workspace.workspace) {
+      if (!configResult.workspace || !configResult.workspace.workspace) {
         Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
-        err(config)
+        err(configResult)
       }
 
-      if (config.name === 'local' || !config.domain) {
-        config.workspace.workspace.host =
-          `http://${config.ip}:${config.workspace.workspace.port}`;
+      if (configResult.name === 'local' || !configResult.domain) {
+        configResult.workspace.workspace.host =
+          `http://${configResult.ip}:${configResult.workspace.workspace.port}`;
       } else {
-        const workspaceBaseUrl = _.isString(config.workspace.workspace.baseUrl) ? config.workspace.workspace.baseUrl : ''
-        config.workspace.workspace.host =
-          `https://${config.domain}${workspaceBaseUrl}`;
+        const workspaceBaseUrl = _.isString(configResult.workspace.workspace.baseUrl) ? configResult.workspace.workspace.baseUrl : ''
+        configResult.workspace.workspace.host =
+          `https://${configResult.domain}${workspaceBaseUrl}`;
       }
 
-      config.workspace.workspace.host = config.workspace.workspace.host.replace(/\/$/, '');
+      configResult.workspace.workspace.host = configResult.workspace.workspace.host.replace(/\/$/, '');
 
-      config.workspace.projects.forEach(p => {
+      configResult.workspace.projects.forEach(p => {
 
-        if (config.name === 'local') {
-          p.host = `http://${config.ip}:${p.port}`;
+        if (configResult.name === 'local') {
+          p.host = `http://${configResult.ip}:${p.port}`;
         } else {
-          p.host = `${config.workspace.workspace.host}${p.baseUrl}`;
+          p.host = `${configResult.workspace.workspace.host}${p.baseUrl}`;
         }
 
       });
@@ -194,7 +194,7 @@ export class EnvironmentConfig
 
 
 
-    await this.updateData(config);
+    await this.updateData(configResult);
   }
   //#endregion
 

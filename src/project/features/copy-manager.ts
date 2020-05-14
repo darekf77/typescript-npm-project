@@ -124,8 +124,12 @@ export class CopyManager extends FeatureForProject {
       this.project.projectSourceFiles().forEach(f => {
         const source = path.join(this.project.location, f);
         if (fse.existsSync(source)) {
-          Helpers.log(`Copying env file to static build: ${path.basename(f)} `, 1)
-          Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
+          Helpers.log(`Copying file/folder to static build: ${f} `)
+          if (fse.lstatSync(source).isDirectory()) {
+            Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
+          } else {
+            Helpers.copyFile(source, path.join(destinationLocation, f));
+          }
         } else {
           Helpers.log(`[executeCopy] Doesn not exist source: ${source}`);
         }
@@ -180,6 +184,7 @@ export class CopyManager extends FeatureForProject {
       });
       if (this.project.isWorkspace && markAsGenerated) {
         packageJson.tnp.isGenerated = true;
+        packageJson.tnp.isCoreProject = false;
       }
     }
 

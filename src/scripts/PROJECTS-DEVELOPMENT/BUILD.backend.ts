@@ -197,7 +197,8 @@ ${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
 inside workspace children.
     `, false, true)
   }
-  (await Project.Current.StaticVersion()).buildProcess.startForLib({ args, staticBuildAllowed: true });
+  const staticVersionOfProject = await Project.Current.StaticVersion()
+  await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
 }
 
 const STATIC_BUILD_LIB = async (args) => {

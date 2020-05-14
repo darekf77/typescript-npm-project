@@ -44,7 +44,7 @@ export function recreateTmpWorkspace(baseline: Project, destinationPath: string,
   const environmentJsFilePath = path.join(destinationPath, 'environment.js');
   let file = Helpers.readFile(environmentJsFilePath);
   const palaceHolderContent = JSON.stringify(projectsConfig, null, 2).replace(/^\[/g, '').replace(/\]$/g, '');
-  file = file.replace('//<PLACEHOLDER_FOR_PROJECTS>', palaceHolderContent);
+  file = file.replace(config.placeholders.forProjectsInEnvironmentFile, palaceHolderContent);
   Helpers.writeFile(environmentJsFilePath, file);
   Helpers.remove(path.join(destinationPath, config.file.tnpEnvironment_json));
 }

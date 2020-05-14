@@ -122,8 +122,10 @@ export class Project {
     }
     location = path.resolve(location);
     if (Project.emptyLocations.includes(location)) {
-      // Helpers.log(`[project.from] empty location ${location}`)
-      return;
+      if (location.search(`/${config.folder.bundle}`) === -1) {
+        Helpers.log(`[project.from] empty location ${location}`, 1)
+        return;
+      }
     }
 
     const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
