@@ -87,7 +87,7 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
         // console.log('sitePath', sitePath)
         const site = Project.From(sitePath)
         expect(site).to.not.be.undefined
-        expect(site.isSite).to.be.true;
+        expect(site.isSiteInStrictMode).to.be.true;
 
       })
 

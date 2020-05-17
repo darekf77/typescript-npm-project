@@ -158,7 +158,7 @@ export class FilesStructure extends FeatureForProject {
 
     //#region recretate forsite
 
-    // if (this.project.isWorkspace && this.project.isSite) {
+    // if (this.project.isWorkspace && this.project.isSiteInStrictMode) {
     //   const recreated = this.recreateSiteChildren();
     //   for (let index = 0; index < recreated.length; index++) {
     //     const newChild = recreated[index];
@@ -175,7 +175,7 @@ export class FilesStructure extends FeatureForProject {
 
     //#endregion
 
-    // if (this.project.isSite) {
+    // if (this.project.isSiteInStrictMode) {
     //   await this.project.baseline.filesStructure.init(args, options);
     // }
 
@@ -230,7 +230,7 @@ export class FilesStructure extends FeatureForProject {
     //#endregion
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      if (this.project.isSite) {
+      if (this.project.isSiteInStrictMode) {
         if (watch) {
           await this.project.join.startAndWatch(this.taskNames.joinMerge)
         } else {

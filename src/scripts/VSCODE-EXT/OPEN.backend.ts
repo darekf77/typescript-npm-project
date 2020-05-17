@@ -53,7 +53,7 @@ function $OPEN_TNP_PROJECT() {
 }
 
 function $OPEN_BASELINE() {
-  if (Project.Current.isSite) {
+  if (Project.Current.isSiteInStrictMode) {
     if (Project.Current.isWorkspace) {
       Project.Current.baseline.run(`code ${Project.Current.baseline.nameOfCodeWorkspace} &`).sync();
     } else {

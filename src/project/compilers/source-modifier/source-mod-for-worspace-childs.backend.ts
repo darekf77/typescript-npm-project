@@ -153,7 +153,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
 
   protected modSiteChildrenLibsInClient(input: string, modType: ModType, relativePath: string): string {
     const method: CheckType = 'site';
-    if (!this.project.isSite) {
+    if (!this.project.isSiteInStrictMode) {
       // log(`Project is not site: ${this.project.genericName}`);
       return input;
     }
@@ -348,7 +348,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
   public replaceBaslieneFromSiteBeforeBrowserCodeCut(input: string) {
     // run before browser codecut/compilation
 
-    if (!this.project.isSite) {
+    if (!this.project.isSiteInStrictMode) {
       // log(`Project is not site: ${this.project.genericName}`);
       return input;
     }

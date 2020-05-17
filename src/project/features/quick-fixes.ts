@@ -78,7 +78,7 @@ export class QuickFixes extends FeatureForProject {
           Helpers.tryCopyFrom(source, dest);
         });
     }
-    if (this.project.isSite && this.project.isWorkspace) {
+    if (this.project.isSiteInStrictMode && this.project.isWorkspace) {
       this.project.baseline.node_modules.fixesForNodeModulesPackages
         .forEach(f => {
           const source = path.join(this.project.baseline.location, f);
@@ -157,7 +157,7 @@ export default _default;
       // }
 
       const customFolder = path.join(this.project.location, config.folder.custom);
-      if (this.project.isSite && !fse.existsSync(customFolder)) {
+      if (this.project.isSiteInStrictMode && !fse.existsSync(customFolder)) {
         // log('CUSTOM folder recreated');
         Helpers.mkdirp(customFolder);
       }
@@ -177,7 +177,7 @@ export default _default;
         Helpers.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
       }
 
-      if (this.project.isSite) {
+      if (this.project.isSiteInStrictMode) {
         if (this.project.isWorkspace) {
           const baselineFolderInNodeModule = path.join(
             this.project.location,

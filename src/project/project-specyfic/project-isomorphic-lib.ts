@@ -34,7 +34,7 @@ export class ProjectIsomorphicLib extends Project {
       `src/${config.file.entities_ts}`,
       `src/${config.file.controllers_ts}`,
     ];
-    if (this.isSite) {
+    if (this.isSiteInStrictMode) {
       toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
     }
     return toIgnore;

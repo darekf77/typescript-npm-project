@@ -24,7 +24,7 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
     if (project.typeIs('angular-lib')) {
       folderPath.push(path.join(project.location, config.folder.components));
     }
-    if (project.isSite) {
+    if (project.isSiteInStrictMode) {
       folderPath.push(path.join(project.location, config.folder.custom));
     }
   }
@@ -208,7 +208,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
-    if (this.project.isSite) {
+    if (this.project.isSiteInStrictMode) {
       // if(!this.project || !this.project.baseline) {
       //   console.trace('HERE')
       // }
@@ -219,7 +219,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
-    if (this.project.isSite) {
+    if (this.project.isSiteInStrictMode) {
       // if(!this.project || !this.project.baseline) {
       //   console.trace('HERE')
       // }

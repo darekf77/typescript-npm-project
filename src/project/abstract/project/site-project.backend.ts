@@ -17,9 +17,9 @@ import { Morphi } from 'morphi';
 export abstract class SiteProject {
 
 
-  get isSite(this: Project) {
+  get isSiteInStrictMode(this: Project) {
     if (Helpers.isBrowser) {
-      return this.browser.isSite;
+      return this.browser.isSiteInStrictMode;
     }
     //#region @backend
     if (this.typeIs('unknow')) {

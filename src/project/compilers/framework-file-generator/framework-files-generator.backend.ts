@@ -35,11 +35,11 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   async syncAction() {
     if (this.project.isGeneratingControllerEntities) {
-      const isSite = this.project.isSite;
+      const isSiteInStrictMode = this.project.isSiteInStrictMode;
       let cwd = path.join(this.project.location, config.folder.src);
       this.generateEntityTs(cwd);
       this.generateControllersTs(cwd);
-      if (isSite) {
+      if (isSiteInStrictMode) {
         cwd = path.join(this.project.location, config.folder.custom, config.folder.src);
         this.generateEntityTs(cwd, true);
         this.generateControllersTs(cwd, true);
@@ -50,14 +50,14 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
-    if (this.project.isSite) {
+    if (this.project.isSiteInStrictMode) {
       await this.project.baseline.frameworkFileGenerator.start(taskName, afterInitCallBack);
     }
     return super.start(taskName, afterInitCallBack);
   }
 
   async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
-    if (this.project.isSite) {
+    if (this.project.isSiteInStrictMode) {
       await this.project.baseline.frameworkFileGenerator.startAndWatch(taskName, afterInitCallBack);
     }
     return super.startAndWatch(taskName, afterInitCallBack);

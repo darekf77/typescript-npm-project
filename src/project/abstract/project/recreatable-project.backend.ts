@@ -105,7 +105,7 @@ export abstract class RecreatableProject {
         'environment.stage.js',
         'environment.static.js',
         'environment.online.js'
-      ].concat(!this.isSite ? extraFolders : [])
+      ].concat(!this.isSiteInStrictMode ? extraFolders : [])
     }
     const files: string[] = ['src']
     if (this.typeIs('angular-lib')) {

@@ -116,7 +116,7 @@ export class SourceModForStandaloneProjects
     if (project.typeIs('angular-lib') && startFolder === 'components') {
       return 'lib';
     }
-    if (project.isSite && startFolder === 'custom') {
+    if (project.isSiteInStrictMode && startFolder === 'custom') {
       return `custom/${this.getModType(project, relativePath.replace(`${startFolder}/`, '') as any)}` as any;
     }
   }

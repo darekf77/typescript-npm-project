@@ -99,13 +99,13 @@ export function impReplace(impReplaceOptions: ImpReplaceOptions) {
     const isMatch = regex.test(input);
     input = Helpers.tsCodeModifier.replace(input, regex, element.replacement);
     if (isMatch) {
-      debugMatch && Helpers.info(`(${modType})(${project.isSite ? 'SITE - ' :
+      debugMatch && Helpers.info(`(${modType})(${project.isSiteInStrictMode ? 'SITE - ' :
         ''}"${project.genericName}") (${element.description})` +
         `\nMATCH: ${element.regexSource}` +
         `\nREGEX: ${element.regexSource}`) +
         `\nFILE: ${relativePath}\n`;
     } else {
-      debugNotMatch && Helpers.log(`(${modType})(${project.isSite ? 'SITE - ' :
+      debugNotMatch && Helpers.log(`(${modType})(${project.isSiteInStrictMode ? 'SITE - ' :
         ''}"${project.genericName}") (${element.description})` +
         `\nDON'T MATCH: ${element.regexSource}` +
         `\nDON'T REGEX: ${element.regexSource}`) +

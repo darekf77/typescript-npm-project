@@ -36,7 +36,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
       c.node_modules.remove();
     });
 
-    // if (this.project.isSite) {
+    // if (this.project.isSiteInStrictMode) {
     //   Helpers.removeFolderIfExists(path.join(this.project.location, config.folder.node_modules, config.names.baseline));
     // }
   }
@@ -55,7 +55,7 @@ export class WorkspaceSymlinks extends FeatureForProject {
       Helpers.log(`Add parent '${this.project.genericName}' node_modules to child: ${c.name} ${triggeredMsg}`)
       this.project.node_modules.linkToProject(c)
     });
-    // if (this.project.isSite) {
+    // if (this.project.isSiteInStrictMode) {
     //   const baselineInNodeModules = path.join(this.project.location, config.folder.node_modules, this.project.baseline.name);
     //   if (path.basename(baselineInNodeModules) !== config.names.baseline) {
     //     const baselineInNodeModulesProperName = path.join(this.project.location, config.folder.node_modules, config.names.baseline);

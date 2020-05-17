@@ -109,7 +109,7 @@ export class ProjectWorkspace extends Project {
 
   projectSourceFiles() {
     let environmentFiles = [];
-    if (this.isSite) {
+    if (this.isSiteInStrictMode) {
       environmentFiles = environmentFiles.concat(glob
         .sync(`${config.folder.custom}/${config.file.environment}*`, { cwd: this.location }));
     } else {

@@ -43,7 +43,7 @@ async function regenerateBundledWorkspace(project: Project) {
 
   const locationOfGeneratedProject = getLocationOfGeneratedProject(project, outDir);
 
-  if (project.isWorkspace && project.isSite) {
+  if (project.isWorkspace && project.isSiteInStrictMode) {
     const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
     await initBaseline(project);
     generateBaselineSourceInDist(project, genLocationBaseline);

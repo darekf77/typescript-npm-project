@@ -79,7 +79,7 @@ export class FilesRecreator extends FeatureForProject {
           .map(f => f.startsWith('/') ? f.slice(1) : f)
         // .filter(f => {
         //   // console.log('f',siteFiles)
-        //   if (self.project.isSite && siteFiles.includes(f)) {
+        //   if (self.project.isSiteInStrictMode && siteFiles.includes(f)) {
         //     return false
         //   }
         //   return true;
@@ -107,14 +107,14 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
-          .concat((self.project.isSite && self.project.isGeneratingControllerEntities) ? [
+          .concat((self.project.isSiteInStrictMode && self.project.isGeneratingControllerEntities) ? [
             path.join(config.folder.custom, config.folder.src, config.file.entities_ts),
             path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
           ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
           .concat(self.project.typeIs('angular-lib') ? ['src/tsconfig.app.json'] : [])
           .concat( // for site ignore auto-generate scr
-            self.project.isSite ? (
+            self.project.isSiteInStrictMode ? (
               self.project.customizableFilesAndFolders
                 .concat(self.project.customizableFilesAndFolders.map(f => {
                   return HelpersMerge.PathHelper.PREFIX(f);
@@ -163,7 +163,7 @@ export class FilesRecreator extends FeatureForProject {
 
   private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
-    if (this.project.isSite) {
+    if (this.project.isSiteInStrictMode) {
       if (!fse.existsSync(pathSettingsVScode)) {
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
@@ -252,7 +252,7 @@ export class FilesRecreator extends FeatureForProject {
                 settings['workbench.colorCustomizations']['statusBar.debuggingBackground'] = statuBarColor;
 
                 // update background color
-                if (project.isSite) {
+                if (project.isSiteInStrictMode) {
                   const baselineColor = getVscodeSettingsFrom(project.baseline);
                   const activityBarBcg = baselineColor &&
                     baselineColor['workbench.colorCustomizations'] &&

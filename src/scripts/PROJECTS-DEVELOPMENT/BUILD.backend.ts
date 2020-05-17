@@ -91,7 +91,7 @@ export async function chainBuild(args: string) {
       // }
     };
 
-    if (projDep.isSite && !buildedOK.includes(projDep.baseline)) {
+    if (projDep.isSiteInStrictMode && !buildedOK.includes(projDep.baseline)) {
       try {
         await action(projDep.baseline, true);
         buildedOK.push(projDep.baseline);

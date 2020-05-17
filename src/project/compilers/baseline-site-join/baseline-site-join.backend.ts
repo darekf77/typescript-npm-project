@@ -20,7 +20,7 @@ import { HelpersMerge } from 'tnp-helpers';
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;
-  if (project.isSite) {
+  if (project.isSiteInStrictMode) {
     if (project.isWorkspace) {
       folderPath = [
         path.join(project.location, config.folder.custom),

@@ -172,7 +172,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectTasksConfiguration = project.temlateOfTasksJSON(workspaceConfig);
   workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentProjectLocation = project.location;
-  workspaceConfig.currentProjectIsSite = project.isSite;
+  workspaceConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
   workspaceConfig.currentProjectIsStatic = project.isGenerated;
   workspaceConfig.isStandaloneProject = project.isStandaloneProject;
   workspaceConfig.frameworks = project.frameworks;
@@ -296,11 +296,11 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
     var pathToProjectEnvironment = path.join(workspace.location, `${config.file.environment}${envSurfix}`);
     Helpers.log('pathToProjectEnvironment:' + pathToProjectEnvironment)
 
-    if (workspace.isSite) {
+    if (workspace.isSiteInStrictMode) {
       if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
         Helpers.log(`[SITE QUICKFIX] File doesnt exist: ${pathToProjectEnvironment}.js`)
         try {
-          if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
+          if (workspace.isSiteInStrictMode) { // QUICK_FIX to get in site child last worksapce changes
             Helpers.log('[SITE QUICKFIX] INIT WORKSPACE , BUT RECREATE IT FIRST')
             await workspace.join.start(`QuickFix basleine/site join for "${workspace.genericName}"`);
           }
@@ -327,7 +327,7 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
     // try {
     // console.log('configWorkspaceEnv', configWorkspaceEnv)
     // } catch (error) {
-    //   if (workspace.isSite) { // QUICK_FIX to get in site child last worksapce changes
+    //   if (workspace.isSiteInStrictMode) { // QUICK_FIX to get in site child last worksapce changes
     //     console.log('INIT WORKSPACE , BUT RECREATE IT FIRST')
     //     workspace.join.init() // fix for recreating site
     //   }

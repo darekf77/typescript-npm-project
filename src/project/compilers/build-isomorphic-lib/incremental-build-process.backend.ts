@@ -46,7 +46,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     this.compileOnce = !buildOptions.watch
     const outFolder = buildOptions.outDir;
     const location = ((project.typeIs('isomorphic-lib')) ?
-      (project.isSite ? config.folder.tempSrc : config.folder.src)
+      (project.isSiteInStrictMode ? config.folder.tempSrc : config.folder.src)
       : config.folder.components);
     const cwd = project.location;
     const projectIsFromSinglularBuild = (this.project.isStandaloneProject && this.project.isGenerated);
@@ -66,7 +66,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
     //#region int backend compilation
     if (project.typeIs('isomorphic-lib')) {
-      if (project.isSite) {
+      if (project.isSiteInStrictMode) {
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, config.folder.tempSrc, cwd);
       } else {
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);

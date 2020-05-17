@@ -193,7 +193,7 @@ export abstract class BaseProject {
       return [];
     }
     if (this.isWorkspaceChildProject) {
-      if (this.isSite) {
+      if (this.isSiteInStrictMode) {
         return this.baseline.workspaceDependencies.map(c => {
           return this.parent.child(c.name);
         });
@@ -217,7 +217,7 @@ export abstract class BaseProject {
     }
     let servers: Project[] = [];
     if (this.isWorkspaceChildProject) {
-      if (this.isSite) {
+      if (this.isSiteInStrictMode) {
         servers = this.baseline.workspaceDependenciesServers.map(c => {
           return this.parent.child(c.name);
         });

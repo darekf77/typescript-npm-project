@@ -121,7 +121,7 @@ export class PackageJsonCore {
       Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
       if (!global[config.message.tnp_normal_mode] && !global.testMode) {
-        Helpers.warn(`[tnp][isSite] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
+        Helpers.warn(`[tnp][isSiteInStrictMode] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
         return;
       }
       console.log('DATA TNP', this.data.tnp)
