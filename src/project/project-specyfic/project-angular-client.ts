@@ -153,7 +153,7 @@ Angular cli build command: ${command}
             }).sync()
         } catch (e) {
           Helpers.error(e, true, true);
-          Helpers.error(`Build app from lib command failed: ${command}`)
+          Helpers.error(`Build app from lib command failed: ${command}`, false, true);
         }
 
       }

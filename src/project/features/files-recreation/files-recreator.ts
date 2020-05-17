@@ -258,7 +258,7 @@ export class FilesRecreator extends FeatureForProject {
                     baselineColor['workbench.colorCustomizations'] &&
                     baselineColor['workbench.colorCustomizations']['activityBar.background'];
                   settings['workbench.colorCustomizations']['activityBar.background'] = activityBarBcg;
-
+                  settings['workbench.colorCustomizations']['statusBar.background'] = activityBarBcg;
                 }
 
               }

@@ -33,3 +33,14 @@ tnp new workspace name-for-workspace`
 ```
 tnp new:site name-of-site --basedOn relateivePathToWorkspace`
 ```
+
+
+## Crate new strict site
+```
+tnp new:strict:site name-of-site base-on-path-to-project`
+```
+
+## Crate new dependency site
+```
+tnp new:dependency:site name-of-site base-on-path-to-project`
+```

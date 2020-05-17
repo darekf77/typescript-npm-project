@@ -321,7 +321,7 @@ export abstract class VscodeProject {
 
       configurations.forEach(c => {
         c.presentation = {
-          "hidden": true
+          // "hidden": true
           // "order": 1,
           // "group": "configs"
         }

@@ -36,14 +36,14 @@ export class SingularBuild extends FeatureForProject {
     this.singularWatchProj = Project.From(projjjj);
     if (!this.singularWatchProj) {
       Helpers.removeFolderIfExists(projjjj);
-      this.singularWatchProj = await newFactory.create(
-        'isomorphic-lib',
-        tmpWorkspaceName,
-        tmpWorkspaceDirpath,
-        void 0,
-        this.project._frameworkVersion,
-        true
-      );
+      this.singularWatchProj = await newFactory.create({
+        type: 'isomorphic-lib',
+        name: tmpWorkspaceName,
+        cwd: tmpWorkspaceDirpath,
+        basedOn: void 0,
+        version: this.project._frameworkVersion,
+        skipInit: true
+      });
       Helpers.log(`[singular build] singularWatchProj: ${this.singularWatchProj && this.singularWatchProj.genericName}`);
       // console.log('this.this.project.node_modules.path', this.project.node_modules.path)
       this.project.node_modules.linkToProject(this.singularWatchProj);

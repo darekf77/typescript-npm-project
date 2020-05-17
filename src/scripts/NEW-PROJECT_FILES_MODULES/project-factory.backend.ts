@@ -10,6 +10,16 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { recreateTmpWorkspace } from '../../project/features/recreate-tmp-evenironment-config.backend';
 
+export type NewSiteOptions = {
+  type?: Models.libs.NewFactoryType,
+  name?: string,
+  cwd?: string,
+  basedOn?: string,
+  version?: Models.libs.FrameworkVersion,
+  skipInit?: boolean;
+  siteProjectMode?: 'strict' | 'dependency';
+};
+
 export class ProjectFactory {
 
   private static _instance: ProjectFactory;
@@ -37,11 +47,14 @@ export class ProjectFactory {
   }
 
   private errorMsgCreateSite() {
-    console.log(chalk.green(`Good examples: ${config.frameworkName} new site-project-name --basedOn baseline-workspace-project-name`));
+    console.log(chalk.green(`Good examples: ` +
+      `${config.frameworkName} new site:strict:site  path-to-baseline-project` +
+      `${config.frameworkName} new site:dependenct:site  path-to-baseline-project`
+    ));
     Helpers.error(`Please use example above.`, false, true);
   }
 
-  private pacakgeJsonNameFix(locationDest, basedOn?: string, name?: string) {
+  private pacakgeJsonFixAfterCreation(locationDest, basedOn?: string, name?: string) {
     const pkgJSONpath = path.join(locationDest, config.file.package_json);
     const json: Models.npm.IPackageJSON = fse.readJSONSync(pkgJSONpath)
     json.name = ((name === path.basename(locationDest)) ? name : _.kebabCase(path.basename(locationDest)));
@@ -52,20 +65,31 @@ export class ProjectFactory {
     json.tnp.required = [];
     json.tnp.requiredServers = [];
     if (basedOn) {
-      json.tnp.basedOn = `./${basedOn.replace(/\/$/, '')}`;
+      json.tnp.basedOn = basedOn;
     }
 
     Helpers.writeFile(pkgJSONpath, json);
   }
 
-  public async create(
-    type: Models.libs.NewFactoryType,
-    name: string,
-    cwd: string,
-    basedOn: string,
-    version: Models.libs.FrameworkVersion = 'v1',
-    skipInit = false
-  ): Promise<Project> {
+
+  private fixOptions_create(options: NewSiteOptions) {
+    if (_.isNil(options)) {
+      options = {} as any;
+    }
+
+    if (_.isNil(options.version)) {
+      options.version = 'v1';
+    }
+
+    if (_.isNil(options.skipInit)) {
+      options.skipInit = false;
+    }
+
+    return options;
+  }
+  public async create(options: NewSiteOptions): Promise<Project> {
+
+    let { type, name, cwd, basedOn, version, skipInit } = this.fixOptions_create(options);
 
     const cwdProj = Project.From(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
@@ -85,18 +109,23 @@ export class ProjectFactory {
       Helpers.info(`[craete] Project name renemed to: ${nameKebakCase} `);
       name = nameKebakCase;
     }
-
-    const basedOnProject = basedOn && Project.From(path.join(cwd, basedOn));
+    if (_.isString(basedOn)) {
+      basedOn = basedOn.replace(/\/$/, '');
+    }
+    const basedOnProject = basedOn && Project.nearestTo(path.join(cwd, basedOn));
     if (basedOn && !basedOnProject) {
       Helpers.error(`[create] Not able to find baseline project from relative path: ${basedOn} `, false, true);
     }
     if (basedOn && basedOnProject && basedOnProject.typeIsNot('workspace')) {
       Helpers.error(`[create] Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
+
     const baseline = basedOn ? basedOnProject : Project.by(type, version);
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
-    baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init`).sync();
+    await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
+      prefix: chalk.bold(`[ INITING BASELINE ${baseline.genericName} ]`)
+    }).asyncAsPromise();
 
     const destinationPath = this.getDestinationPath(name, cwd);
     Helpers.log(`[create] Destination path: ${destinationPath}`);
@@ -114,7 +143,7 @@ export class ProjectFactory {
             forceCopyPackageJSON: type === 'single-file-project'
           });
           // console.log(destinationPath)
-          this.pacakgeJsonNameFix(destinationPath, basedOn ? basedOn : void 0, name);
+          this.pacakgeJsonFixAfterCreation(destinationPath, basedOn ? basedOn : void 0, name);
           Helpers.info(`[create] project ${name} created from baseline projec ${baseline.name} success`);
           if (Project.emptyLocations.includes(destinationPath)) {
             Project.emptyLocations = Project.emptyLocations.filter(f => {
@@ -147,14 +176,14 @@ export class ProjectFactory {
       });
     }
     Helpers.log(`[create] destinationPath: ${destinationPath}`);
-    const destProje = Project.From(destinationPath);
-    if (!destProje) {
+    const newCreatedProject = Project.From(destinationPath);
+    if (!newCreatedProject) {
       Helpers.error(`Not able to crate project in ${destinationPath}`, false, true);
     }
-    Helpers.log(`[create] Project from create method: ${destProje && destProje.genericName} `)
-    if (destProje) {
-      destProje.recreate.vscode.settings.excludedFiles();
-      destProje.recreate.vscode.settings.colorsFromWorkspace();
+    Helpers.log(`[create] Project from create method: ${newCreatedProject && newCreatedProject.genericName} `)
+    if (newCreatedProject) {
+      newCreatedProject.recreate.vscode.settings.excludedFiles();
+      newCreatedProject.recreate.vscode.settings.colorsFromWorkspace();
       // console.log(`
 
       //   skip init ${skipInit}
@@ -162,10 +191,12 @@ export class ProjectFactory {
 
       // `)
       if (!skipInit) {
-        await destProje.filesStructure.init('')
+        const skipNodeModules = true;
+        const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')}`;
+        await newCreatedProject.filesStructure.init(argsForInit);
       }
     }
-    return destProje;
+    return newCreatedProject;
   }
 
 
@@ -196,23 +227,33 @@ export class ProjectFactory {
     const type = argv[0] as any;
     const name = argv[1];
 
-    await this.create(type, name, cwd, void 0,
-      (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
+    await this.create({
+      type,
+      name,
+      cwd,
+      basedOn: void 0,
+      version: (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
       skipInit
-    );
+    });
     if (exit) {
       process.exit(0)
     }
 
   }
 
-  public async workspaceSiteFromArgs(args: string, exit = true, cwd: string) {
+  public async workspaceSiteFromArgs(args: string, exit = true, cwd: string, strictSiteMode = true) {
     const argv = args.split(' ');
-    const { basedOn }: { basedOn: string; } = require('minimist')(args.split(' '));
-    if (!basedOn) {
+
+    if (args.length < 2) {
       this.errorMsgCreateSite()
     }
-    await this.create('workspace', argv[0] as any, cwd, basedOn);
+    await this.create({
+      type: 'workspace',
+      name: argv[0] as any,
+      cwd,
+      basedOn: argv[1] as any,
+      siteProjectMode: strictSiteMode ? 'strict' : 'dependency',
+    });
     if (exit) {
       process.exit(0)
     }
