@@ -7,33 +7,55 @@ import { ModType, CheckType } from './source-modifier.models';
 
 import { impReplace } from './source-modifier.helpers.backend';
 
-const debugFiles = [
-  // 'tmp-src/app/app.component.ts'
-]
-
 export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects {
 
 
   protected modWorkspaceChildrenLibsBetweenItself(
     input: string, modType: ModType, relativePath: string): string {
-
-    const debug = debugFiles.includes(relativePath);
-
     const method: CheckType = 'baseline';
     const childrenLibs = this.project.parent.childrenThatAreLibs;
-    debug && Helpers.log(`[modWorkspaceChildrenLibsBetweenItself]  childrenLibs: \n\n ${childrenLibs.map(c => c.name).join('\n')} \n\n`);
 
     childrenLibs.forEach(child => {
 
       const libName = child.name;
 
-      if (([
-        'tmp-src-for'
-      ] as ModType[]).includes(modType)) {
-        // if (relativePath === 'tmp-src-dist-browser-for-test-ui-lib/test-ui-mod/test-ui-mod.component.ts') {
-        //   console.log('PROCESSING!', JSON.stringify({ modType, libName }))
-        // }
+      if ((['lib', 'custom/lib', 'app', 'custom/app',] as ModType[]).includes(modType)) {
+        //#region  find propert source folder for lib
+        let sourceFolder: string;
+        if (child.typeIs('angular-lib')) {
+          sourceFolder = config.folder.components;
+        }
+        if (child.typeIs('isomorphic-lib')) {
+          sourceFolder = config.folder.src;
+        }
+        //#endregion
 
+        //#region replace libname/(dist|bundle|browser|browser-for..etc..) ->  libname/(src|components) for user visible code
+        const process = (compiledFolders: any[]) => {
+          input = impReplace({
+            name: `${libName}/${compiledFolders.join('|\n')} -> ${libName}/(${sourceFolder})`,
+            project: this.project,
+            input,
+            modType,
+            urlParts: [libName, compiledFolders],
+            partsReplacements: [libName, sourceFolder],
+            relativePath,
+            method
+          });
+        };
+        let folders = this.foldersCompiledJsDtsMap;
+        process(folders);
+        if (!this.project.isStandaloneProject) {
+          folders = this.project.parent.childrenThatAreClients.map(client => {
+            return Helpers.getBrowserVerPath(client.name);
+          });
+          process(folders);
+        }
+        //#endregion
+      }
+
+      if ((['tmp-src-for'] as ModType[]).includes(modType)) {
+        //#region fix for tmp-src-for when refering to browser-for-wrong-client-name
         let clientName = relativePath.split('/')[0]
         clientName = clientName.replace(`tmp-src-dist-browser-for-`, '');
         const browserForCurrentClient = Helpers.getBrowserVerPath(clientName);
@@ -50,57 +72,14 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
             method
           });
         };
-
         process(this.foldersSources);
-
+        //#endregion
       }
 
-      if (([
-        'lib',
-        'custom/lib',
-        'app',
-        'custom/app',
-      ] as ModType[]).includes(modType)) {
-
-        let sourceFolder: string;
-        if (child.typeIs('angular-lib')) {
-          sourceFolder = config.folder.components;
-        }
-        if (child.typeIs('isomorphic-lib')) {
-          sourceFolder = config.folder.src;
-        }
-
-        const process = (compiledFolders: any[]) => {
-          input = impReplace({
-            name: `
- ${libName}/${compiledFolders.join('|\n')} -> ${libName}/(${sourceFolder})`,
-            project: this.project,
-            input,
-            modType,
-            urlParts: [libName, compiledFolders],
-            partsReplacements: [libName, sourceFolder],
-            relativePath,
-            method
-          });
-        };
-
-        let folders = this.foldersCompiledJsDtsMap;
-        process(folders);
-
-        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(client => {
-          return Helpers.getBrowserVerPath(client.name);
-        });
-        process(folders);
-      }
-
-      if (modType === 'tmp-src' && this.project.typeIs('angular-lib')) {
-
-        debug && Helpers.log(`Should be processed ${relativePath}`)
-
+      if ((['tmp-src'] as ModType[]).includes(modType) && this.project.typeIs('angular-lib')) {
+        //#region replace libname/(<anything>) => libname/browser-for-<current-client-name>
         const process = (compiled: any[]) => {
-
           if (libName === this.project.name) {
-            debug && Helpers.log(`COMPONENTS TO BROWSER FOR ${relativePath}`)
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${config.folder.components}`,
               project: this.project,
@@ -111,11 +90,8 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
               relativePath,
               method
             });
-
           } else {
-
             const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
-
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
               project: this.project,
@@ -128,219 +104,23 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
             });
           }
         }
-
         let folders = [
           ...this.foldersSources,
           ...this.foldersCompiledJsDtsMap,
         ];
-
         process(folders);
-
         folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
             return Helpers.getBrowserVerPath(client.name)
           });
-
         process(folders);
-
-
+        //#endregion
       }
 
     });
     return input;
   }
-
-  protected modSiteChildrenLibsInClient(input: string, modType: ModType, relativePath: string): string {
-    const method: CheckType = 'site';
-    if (!this.project.isSiteInStrictMode) {
-      // log(`Project is not site: ${this.project.genericName}`);
-      return input;
-    }
-
-    const chidren = this.project.parent.childrenThatAreLibs;
-    const baselineName = this.project.parent.baseline.name;
-
-    chidren.forEach(child => {
-
-      const libName = child.name;
-
-      if (modType === 'lib' || modType === 'custom/lib' || modType === 'app' || modType === 'custom/app') {
-
-        let sourceFolder: string;
-        if (child.typeIs('angular-lib')) {
-          sourceFolder = config.folder.components;
-        }
-        if (child.typeIs('isomorphic-lib')) {
-          sourceFolder = config.folder.src;
-        }
-
-        const process = (compiled: any[]) => {
-
-          input = impReplace({
-            name: `
-      ${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
-            project: this.project,
-            input,
-            modType,
-            urlParts: [baselineName, libName, compiled],
-            partsReplacements: [baselineName, libName, sourceFolder],
-            relativePath,
-            method
-          });
-        };
-
-        let folders = this.foldersCompiledJsDtsMap;
-        process(folders);
-
-        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(client => {
-          return Helpers.getBrowserVerPath(client.name);
-        });
-        process(folders);
-
-      }
-
-      // TODO delete this ?
-      // Angulair lib and generala angular-clint...
-      // there is a problem with join for ${config.frameworkName} baw
-
-      // tnp-src should wokr for copy of app/src in clients
-
-      // if (modType === 'tmp-src') {
-      //   console.log(relativePath)
-      // }
-
-
-
-      // if (modType === 'custom/app') {
-      //   const process = (compiled: any[]) => {
-      //     // const browserForCurrentClient = IncrementalBuildProcessExtended
-      //     //   .getBrowserVerPath(this.project.name);
-
-      //     let sourceFolder: string;
-      //     if (child.type === 'angular-lib') {
-      //       sourceFolder = config.folder.components;
-      //     }
-      //     if (child.type === 'isomorphic-lib') {
-      //       sourceFolder = config.folder.src;
-      //     }
-
-      //     input = impReplace({
-      //       name: `${baselineName}/${libName}/${compiled.join('|\n')} -> ${baselineName}/${libName}/${sourceFolder}`,
-      //       project: this.project,
-      //       input,
-      //       modType,
-      //       urlParts: [baselineName, libName, compiled],
-      //       partsReplacements: [baselineName, libName, sourceFolder],
-      //       relativePath,
-      //       method
-      //     });
-      //   };
-
-      //   let folders = [
-      //     // ...this.foldersSources,
-      //     ...this.foldersCompiledJsDtsMap,
-      //   ];
-
-      //   process(folders);
-
-      //   folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
-      //     .map(client => {
-      //       return Helpers.getBrowserVerPath(client.name)
-      //     });
-
-      //   process(folders);
-      // }
-
-      if (modType === 'tmp-src' && this.project.typeIs('isomorphic-lib')) {
-        // console.log('1', relativePath)
-        let sourceFolder: string;
-        if (child.typeIs('angular-lib')) {
-          sourceFolder = config.folder.components;
-        }
-        if (child.typeIs('isomorphic-lib')) {
-          sourceFolder = config.folder.src;
-        }
-
-        const process = (compiled: any[]) => {
-
-          input = impReplace({
-            name: `
-      ${baselineName}/${libName}/${compiled.join('|\n')} -> ${libName}/${sourceFolder}`,
-            project: this.project,
-            input,
-            modType,
-            urlParts: [baselineName, libName, compiled],
-            partsReplacements: [libName, sourceFolder],
-            relativePath,
-            method
-          });
-        };
-        let folders = this.foldersSources;
-        process(folders);
-      }
-
-      if (modType === 'tmp-src' && this.project.typeIsNot('isomorphic-lib')) {
-
-        // console.log('2', relativePath)
-        const process = (compiled: any[]) => {
-          if (child.typeIs('angular-lib')) {
-            compiled = compiled.filter(f => f !== config.folder.src);
-          };
-
-          if (libName === this.project.name && child.typeIs('angular-lib')) {
-            input = impReplace({
-              name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${config.folder.components}`,
-              project: this.project,
-              input,
-              modType,
-              urlParts: [baselineName, libName, compiled],
-              partsReplacements: [config.folder.components],
-              partsReplacementsOptions: {
-                replaceWhole: true
-              },
-              relativePath,
-              method
-            });
-
-          } else {
-
-            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
-
-            input = impReplace({
-              name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${libName}/${browserForCurrentClient}`,
-              project: this.project,
-              input,
-              modType,
-              urlParts: [baselineName, libName, compiled],
-              partsReplacements: [libName, browserForCurrentClient],
-              relativePath,
-              method
-            });
-          }
-        }
-
-        let folders = [
-          ...this.foldersSources,
-          ...this.foldersCompiledJsDtsMap,
-        ];
-
-        process(folders);
-
-        folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
-          .map(client => {
-            return Helpers.getBrowserVerPath(client.name);
-          });
-
-        process(folders);
-
-      }
-
-    });
-
-    return input;
-  }
-
 
   /**
    * ONLY FOR BROWSER CODE CUT
@@ -348,15 +128,42 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
   public replaceBaslieneFromSiteBeforeBrowserCodeCut(input: string) {
     // run before browser codecut/compilation
 
-    if (!this.project.isSiteInStrictMode) {
-      // log(`Project is not site: ${this.project.genericName}`);
-      return input;
+    if (this.project.isSiteInStrictMode) {
+      const baselineName = this.project.parent.baseline.name;
+      const regexSource = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/`;
+      const regex = new RegExp(regexSource, 'g');
+      input = Helpers.tsCodeModifier.replace(input, regex, `'`);
     }
-
-    const baselineName = this.project.parent.baseline.name;
-    const regexSource = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/`;
-    const regex = new RegExp(regexSource, 'g');
-    input = Helpers.tsCodeModifier.replace(input, regex, `'`);
+    if (this.project.isSiteInDependencyMode) {
+      const baselineName = this.project.parent.baseline.name;
+      const libs = this.project.parent.childrenThatAreLibs
+        .map(c => Helpers.escapeStringForRegEx(c.name)).join('|');
+      const sourceFolders = [
+        config.folder.components,
+        config.folder.src,
+        config.folder.dist,
+        config.folder.bundle,
+      ].map(c => Helpers.escapeStringForRegEx(c)).join('|');
+      const regexSource = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/${libs}\\/${sourceFolders}`;
+      const regex = new RegExp(regexSource, 'g');
+      let libsDetected = input.match(regex);
+      libsDetected = (libsDetected ? (libsDetected
+        .map(part => {
+          part = part.slice(1);
+          const split = part.split('/');
+          if (split.length !== 3) {
+            return void 0;
+          }
+          return part[1];
+        }).filter(f => !!f)) : []);
+      libsDetected.forEach(libName => {
+        const libNamEscaped = Helpers.escapeStringForRegEx(libName);
+        const regexSourceForLib = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/${libNamEscaped}\\/${sourceFolders}`;
+        const regexForLib = new RegExp(regexSourceForLib, 'g');
+        const browserForClientName = Helpers.getBrowserVerPath(this.project.name);
+        input = Helpers.tsCodeModifier.replace(input, regexForLib, `'${baselineName}/${libName}/${browserForClientName}`);
+      });
+    }
 
     return input;
   }

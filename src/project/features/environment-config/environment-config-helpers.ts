@@ -173,6 +173,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
+  workspaceConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
   workspaceConfig.currentProjectIsStatic = project.isGenerated;
   workspaceConfig.isStandaloneProject = project.isStandaloneProject;
   workspaceConfig.frameworks = project.frameworks;

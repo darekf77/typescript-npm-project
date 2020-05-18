@@ -83,6 +83,12 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
+  get dependsOn(): string[] {
+    const p = this.data.tnp && this.data.tnp.dependsOn;
+    // console.log(`${this.locationOfJson}`, p)
+    return Array.isArray(p) ? p : [];
+  }
+
   get workspaceDependenciesServers(): string[] {
     const p = this.data.tnp && this.data.tnp.requiredServers;
     // console.log(`${this.locationOfJson}`, p)
@@ -95,41 +101,35 @@ export class PackageJsonCore {
 
   get pathToBaseline(): string {
     if (this.data && this.data.tnp &&
-      (
-        _.isString(this.data.tnp.basedOn)
-      )
+      (_.isString(this.data.tnp.basedOn) || _.isArray(this.data.tnp.dependsOn))
     ) {
 
-      let pathToBaseline = path.resolve(path.join(path.dirname(this.cwd), this.data.tnp.basedOn));
-      if (fse.existsSync(pathToBaseline)) {
-        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
-        return pathToBaseline;
-      }
-      Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
+      const pathToBaselineDependency = _.isString(_.first(this.data.tnp.dependsOn)) ?
+        path.resolve(path.join(path.dirname(this.cwd), _.first(this.data.tnp.dependsOn))) : '';
+      const pathToBaselineStricSite = _.isString(this.data.tnp.basedOn) ?
+        path.resolve(path.join(path.dirname(this.cwd), this.data.tnp.basedOn)) : '';
 
-      if (fse.existsSync(pathToBaseline)) {
-        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
-        return pathToBaseline;
+      if (fse.existsSync(pathToBaselineStricSite)) {
+        this.fixUnexistedBaselineInNOdeModules(pathToBaselineStricSite)
+        return pathToBaselineStricSite;
+      } else if (this.data.tnp.dependsOn?.length > 0 && fse.existsSync(pathToBaselineDependency)) {
+        this.fixUnexistedBaselineInNOdeModules(pathToBaselineDependency);
+        return pathToBaselineDependency;
+      } else {
+        if (_.isString(this.data.tnp.basedOn)) {
+          Helpers.error(`[pathToBaseline] Wron value for ${chalk.bold('basedOn')} in package.json  (${this.cwd})`);
+        } else {
+          Helpers.warn(`[pathToBaseline] path to baselien not exists:
+          strict-site: ${pathToBaselineStricSite}
+          dependency-site: ${pathToBaselineDependency}
+          `);
+        }
       }
-      Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
-
-      // pathToBaseline = this.data.tnp.basedOnAbsolutePath2;
-      if (fse.existsSync(pathToBaseline)) {
-        this.fixUnexistedBaselineInNOdeModules(pathToBaseline)
-        return pathToBaseline;
-      }
-      Helpers.warn(`pathToBaseline not exists: ${pathToBaseline}`)
 
       if (!global[config.message.tnp_normal_mode] && !global.testMode) {
-        Helpers.warn(`[tnp][isSiteInStrictMode] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
+        Helpers.warn(`[pathToBaseline] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
         return;
       }
-      console.log('DATA TNP', this.data.tnp)
-      Helpers.error(`Wron value for ${chalk.bold('basedOn')} in package.json  (${this.cwd})
-
-      path desn't exist: ${pathToBaseline}
-
-      `, false, true);
     }
   }
 

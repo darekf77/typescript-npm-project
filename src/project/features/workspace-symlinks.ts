@@ -39,6 +39,13 @@ export class WorkspaceSymlinks extends FeatureForProject {
     // if (this.project.isSiteInStrictMode) {
     //   Helpers.removeFolderIfExists(path.join(this.project.location, config.folder.node_modules, config.names.baseline));
     // }
+    if (this.project.isSiteInDependencyMode) {
+      this.project.workspaceDependencies.forEach(d => {
+        // const source = d.location;
+        const dest = path.join(this.project.location, config.folder.node_modules, d.name);
+        Helpers.removeFileIfExists(dest);
+      });
+    }
   }
 
   add(triggeredMsg: string) {
@@ -62,6 +69,14 @@ export class WorkspaceSymlinks extends FeatureForProject {
     //     Helpers.createSymLink(baselineInNodeModules, baselineInNodeModulesProperName);
     //   }
     // }
+
+    if (this.project.isSiteInDependencyMode) {
+      this.project.workspaceDependencies.forEach(d => {
+        const source = d.location;
+        const dest = path.join(this.project.location, config.folder.node_modules, d.name);
+        Helpers.createSymLink(source, dest);
+      });
+    }
   }
 
 

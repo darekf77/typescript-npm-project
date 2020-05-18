@@ -5,12 +5,9 @@ import * as fse from 'fs-extra';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from '../../../config';
 import { ModType, CheckType } from './source-modifier.models';
-import { IncCompiler } from 'incremental-compiler';
-import { Models, Helpers, HelpersMerge } from '../../../index';
+import { Models, Helpers } from '../../../index';
 import { impReplace } from './source-modifier.helpers.backend';
 import { optionsSourceModifier } from './source-modifier.backend';
-
-
 
 export class SourceModForStandaloneProjects
   extends FeatureCompilerForProject<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
@@ -20,13 +17,16 @@ export class SourceModForStandaloneProjects
   }
 
   protected get foldersSources() {
+    //#region folder with code visible to users
     return [
       config.folder.components,
       config.folder.src,
     ];
+    //#endregion
   };
 
   protected get foldersCompiledJsDtsMap() {
+    //#region folder with code invisible to user... compiler in backgroud
     return [
       config.folder.dist,
       config.folder.bundle,
@@ -34,8 +34,8 @@ export class SourceModForStandaloneProjects
       config.folder.client,
       config.folder.module,
     ];
+    //#endregion
   };
-
 
   protected process(input: string, relativePath: string): string {
     const modType = this.getModType(this.project, relativePath);
@@ -44,18 +44,15 @@ export class SourceModForStandaloneProjects
   }
 
   public processFile(relativePath: string, files: Models.other.ModifiedFiles, source?: 'tmp-src-for'): boolean {
+    //#region process file
     const absoluteFilePath = path.join(this.project.location, relativePath);
 
     if (!fse.existsSync(absoluteFilePath)) {
-      // if (source === 'tmp-src-for') {
-      //   console.log(`[not exist] Ignored ${relativePath}`)
-      // }
       return false;
     }
 
     if (source === 'tmp-src-for') {
       if (path.extname(relativePath) !== '.ts') {
-        // console.log(`[not ts] Ignored ${relativePath}`)
         return false;
       }
 
@@ -67,38 +64,17 @@ export class SourceModForStandaloneProjects
       }
     }
 
-    // if (this.project.isStandaloneProject) {
-    // TODO this would be good
-    //   // MAYBE_TODO someday make it work for site
-    //   // this is causing repeat same file watching problem
-    //   const input = Helpers.readFile(absoluteFilePath);
-    //   const trimedInput = input.trim();
-    //   const trimedInputWithEnd = `${trimedInput}\n`;
-    //   const modified = `${this.process(trimedInput, relativePath).trim()}\n`;
-    //   if (input !== trimedInputWithEnd || input !== modified) {
-    //     Helpers.writeFile(absoluteFilePath, modified);
-    //     files.modifiedFiles.push(absoluteFilePath);
-    //     return true;
-    //   }
-    // } else {
     const input = Helpers.readFile(absoluteFilePath);
     const modified = this.process(input, relativePath);
-
-    // if (source === 'tmp-src-for') {
-    //   console.log(`[finish proceess] ${relativePath}`)
-    // }
 
     if (input !== modified) {
       Helpers.writeFile(absoluteFilePath, modified);
       files.modifiedFiles.push(absoluteFilePath);
       return true;
     }
-    // Helpers.log(``)
-    // }
-
+    //#endregion
     return false;
   }
-
 
   //#region get source type lib - for libs, app - for clients
   protected getModType(project: Project, relativePath: string): ModType {
@@ -116,22 +92,18 @@ export class SourceModForStandaloneProjects
     if (project.typeIs('angular-lib') && startFolder === 'components') {
       return 'lib';
     }
-    if (project.isSiteInStrictMode && startFolder === 'custom') {
-      return `custom/${this.getModType(project, relativePath.replace(`${startFolder}/`, '') as any)}` as any;
+    if (project.isSiteInStrictMode && startFolder === config.folder.custom) {
+      return `${config.folder.custom}/${this.getModType(project, relativePath.replace(`${startFolder}/`, '') as any)}` as any;
     }
   }
   //#endregion
 
 
+  //#region handle isomorphi-lib and angular-lib in node_modules
   protected mod3rdPartyLibsReferces(
     input: string,
     modType: ModType,
     relativePath: string): string {
-
-    // if (relativePath === 'src/app/app.component.ts') {
-    //   console.log(`${modType}: ${relativePath}`)
-    //   console.log('input: \n' + input)
-    // }
 
     const method: CheckType = 'standalone';
     const folders = [
@@ -143,11 +115,8 @@ export class SourceModForStandaloneProjects
       this.project.parent.childrenThatAreThirdPartyInNodeModules
       : this.project.childrenThatAreThirdPartyInNodeModules;
 
-    // console.log(children.map(c => c.name).join(','))
-
     children.forEach(child => {
       const libName = child.name;
-
 
       input = impReplace({
         name: `'${libName}*whatever*' -> ${libName} strict solution for standalone libs`,
@@ -228,5 +197,6 @@ export class SourceModForStandaloneProjects
 
     return input;
   }
+  //#endregion
 
 }

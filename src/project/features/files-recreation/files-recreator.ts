@@ -163,7 +163,7 @@ export class FilesRecreator extends FeatureForProject {
 
   private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
-    if (this.project.isSiteInStrictMode) {
+    if (this.project.isSite) {
       if (!fse.existsSync(pathSettingsVScode)) {
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
@@ -252,7 +252,7 @@ export class FilesRecreator extends FeatureForProject {
                 settings['workbench.colorCustomizations']['statusBar.debuggingBackground'] = statuBarColor;
 
                 // update background color
-                if (project.isSiteInStrictMode) {
+                if (project.isSite) {
                   const baselineColor = getVscodeSettingsFrom(project.baseline);
                   const activityBarBcg = baselineColor &&
                     baselineColor['workbench.colorCustomizations'] &&

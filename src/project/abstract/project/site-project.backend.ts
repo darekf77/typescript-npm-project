@@ -16,6 +16,9 @@ import { Morphi } from 'morphi';
 
 export abstract class SiteProject {
 
+  get isSite(this: Project) {
+    return this.isSiteInStrictMode || this.isSiteInDependencyMode;
+  }
 
   get isSiteInStrictMode(this: Project) {
     if (Helpers.isBrowser) {
@@ -23,6 +26,9 @@ export abstract class SiteProject {
     }
     //#region @backend
     if (this.typeIs('unknow')) {
+      return false;
+    }
+    if (this.isSiteInDependencyMode) {
       return false;
     }
     let basedOn = '';
@@ -39,6 +45,24 @@ export abstract class SiteProject {
     return !!res;
     //#endregion
   }
+
+  get isSiteInDependencyMode(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isSiteInDependencyMode;
+    }
+    //#region @backend
+    if (this.typeIs('unknow') || this.isStandaloneProject) {
+      return false;
+    }
+    if (this.isWorkspace || this.isWorkspaceChildProject) {
+      const workspace = (this.isWorkspace ? this : this.parent)
+      return workspace.packageJson.dependsOn.length > 0;
+    }
+    return false;
+
+    //#endregion
+  }
+
 
 
   /**

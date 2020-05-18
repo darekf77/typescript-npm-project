@@ -12,6 +12,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { IncCompiler } from 'incremental-compiler';
+import { SourceModForSite } from './source-mod-for-site.backend';
 //#endregion
 
 export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
@@ -42,7 +43,7 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
 
 
 @IncCompiler.Class({ className: 'SourceModifier' })
-export class SourceModifier extends SourceModForWorkspaceChilds {
+export class SourceModifier extends SourceModForSite {
 
   async preAsyncAction() {
     if (!(this.project.isWorkspaceChildProject || this.project.isStandaloneProject)) {
@@ -208,7 +209,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
-    if (this.project.isSiteInStrictMode) {
+    if (this.project.isSite) {
       // if(!this.project || !this.project.baseline) {
       //   console.trace('HERE')
       // }
@@ -219,7 +220,7 @@ export class SourceModifier extends SourceModForWorkspaceChilds {
 
   async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
-    if (this.project.isSiteInStrictMode) {
+    if (this.project.isSite) {
       // if(!this.project || !this.project.baseline) {
       //   console.trace('HERE')
       // }

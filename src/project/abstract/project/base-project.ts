@@ -186,6 +186,20 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region @backend
+  get dependsOn(this: Project): Project[] {
+    if (this.isWorkspace) {
+      return this.packageJson.dependsOn.map(name => {
+        const child = this.parent.child(name);
+        if (!child) {
+          Helpers.error(`Unknow baseline project "${name}" inside ${this.packageJson.path}`, false, true);
+        }
+        return child;
+      }).filter(f => !!f);
+    }
+    return [];
+  }
+  //#endregion
 
   //#region @backend
   get workspaceDependencies(this: Project): Project[] {
@@ -193,7 +207,7 @@ export abstract class BaseProject {
       return [];
     }
     if (this.isWorkspaceChildProject) {
-      if (this.isSiteInStrictMode) {
+      if (this.isSite) {
         return this.baseline.workspaceDependencies.map(c => {
           return this.parent.child(c.name);
         });
@@ -217,7 +231,7 @@ export abstract class BaseProject {
     }
     let servers: Project[] = [];
     if (this.isWorkspaceChildProject) {
-      if (this.isSiteInStrictMode) {
+      if (this.isSite) {
         servers = this.baseline.workspaceDependenciesServers.map(c => {
           return this.parent.child(c.name);
         });
