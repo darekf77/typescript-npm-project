@@ -8,7 +8,6 @@ import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
-import { recreateTmpWorkspace } from '../../project/features/recreate-tmp-evenironment-config.backend';
 
 export type NewSiteOptions = {
   type?: Models.libs.NewFactoryType,
@@ -176,9 +175,6 @@ export class ProjectFactory {
             Helpers.info(`[create] Path removed from empty locations`);
           } else {
             Helpers.info(`[create] Path NOT removed from empty locations`);
-          }
-          if (baseline.isWorkspace) {
-            recreateTmpWorkspace(baseline, destinationPath, true);
           }
         } catch (err) {
           Helpers.error(`[create] Not able to create project`, false, true);

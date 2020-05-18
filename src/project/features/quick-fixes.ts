@@ -134,12 +134,13 @@ export default _default;
       // }
 
       const srcFolder = path.join(this.project.location, config.folder.src);
-      if (!this.project.isWorkspace) {
+      if (this.project.isWorkspace) {
+        Helpers.removeFolderIfExists(srcFolder);
+      } else {
         if (!fse.existsSync(srcFolder)) {
           Helpers.mkdirp(srcFolder);
         }
         // log('SRC folder recreated')
-
       }
       const componentsFolder = path.join(this.project.location, config.folder.components);
 

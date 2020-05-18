@@ -10,7 +10,6 @@ import { config } from '../../../config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from '../../../progress-output';
 import { Models } from '../../../index';
-import { recreateTmpWorkspace } from '../recreate-tmp-evenironment-config.backend';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -79,14 +78,6 @@ export class FilesStructure extends FeatureForProject {
     await this.project.__initProcedure();
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      if (this.project.isWorkspace) {
-        var coreWorkspaceEnvironmentJsPath = path.join(this.project.location, config.file.environment_js);
-        var envBefore = fse.existsSync(coreWorkspaceEnvironmentJsPath) && Helpers.readFile(coreWorkspaceEnvironmentJsPath);
-        var environmentJsFileContainsTemplate = envBefore && (envBefore.search(config.placeholders.forProjectsInEnvironmentFile) !== -1);
-        if (environmentJsFileContainsTemplate) {
-          recreateTmpWorkspace(this.project, this.project.location)
-        }
-      }
       if (env) {
         Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
       } else {
@@ -239,9 +230,6 @@ export class FilesStructure extends FeatureForProject {
       }
 
       await this.project.env.init(args);
-      if (this.project.isWorkspace && environmentJsFileContainsTemplate) {
-        Helpers.writeFile(coreWorkspaceEnvironmentJsPath, envBefore);
-      }
       this.project.filesTemplatesBuilder.rebuild();
     }
     if (this.project.isWorkspace) {
