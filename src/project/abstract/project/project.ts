@@ -31,6 +31,7 @@ import { PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks, TnpBundle, Npm
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
+import { DependencyProject } from './dependency-project.backend';
 //#endregion
 
 
@@ -440,7 +441,8 @@ export interface Project extends
   EntityProject,
   BuildableProject,
   SiteProject,
-  DbProcessProject
+  DbProcessProject,
+  DependencyProject
 //#endregion
 {
 
@@ -463,6 +465,7 @@ Helpers.applyMixins(Project, [
   EntityProject,
   BuildableProject,
   SiteProject,
-  DbProcessProject
+  DbProcessProject,
+  DependencyProject
   //#endregion
 ])

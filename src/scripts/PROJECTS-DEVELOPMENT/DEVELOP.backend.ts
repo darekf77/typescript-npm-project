@@ -188,7 +188,7 @@ async function $CHILDS_REQUIRED(args: string) {
   if (!Project.Current.isWorkspaceChildProject) {
     Helpers.error(`Not worksapce child`, false, true);
   }
-  console.log(Project.Current.sortedRequiredWorkspaceChilds.map(c => c.name));
+  console.log(Project.Current.sortedRequiredWorkspaceDependencies.map(c => c.name));
   process.exit(0)
 }
 

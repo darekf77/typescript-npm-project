@@ -27,7 +27,7 @@ function distRequredCondition(requiredWithBuilds: Project[], context: Condition,
 
     if (targetsAreNotReady) {
       const targetsString = targets.map(t => {
-        return `--forClient ${t.name}`; ''
+        return `--forClient ${t.name}`;
       }).join(' ');
       context.errorMessage = `
 
@@ -101,7 +101,7 @@ export async function waitForAppBuildToBePossible(db: TnpDB, project: Project) {
     const conditionDist: Condition = {
       name: `Dist finsh buildProjectErr`,
       callback: async (context) => {
-        const childs = project.sortedRequiredWorkspaceChilds;
+        const childs = project.sortedRequiredWorkspaceDependencies;
         return distRequredCondition(childs, context, project, [project]);
       },
       errorMessage: 'Please wait for dist build to finish... (workspace child project) '

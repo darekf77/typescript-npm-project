@@ -13,30 +13,6 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { Morphi } from 'morphi';
 
-
-//#region @backend
-function reorderResult(result = [], update: (result) => void): boolean {
-  let neededNextOrder = false;
-  result.some((res, index, arr) => {
-    return !_.isUndefined(result.find((res2, index2, arr2) => {
-      if (res.name === res2.name) {
-        return false;
-      }
-      if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
-        result = Helpers.arrays.arrayMoveElementBefore(result, res2, res);
-        update(result);
-        neededNextOrder = true;
-        return true;
-      }
-      return false;
-    }));
-  });
-  return neededNextOrder;
-}
-//#endregion
-
-
-
 export abstract class FolderProject {
 
   abstract location: string;
@@ -53,104 +29,6 @@ export abstract class FolderProject {
     return this.getAllChildren()
     //#endregion
   }
-
-  /**
-   * children by sorted
-   * example:
-   * - first child should be build first, other depends on it
-   * - next child depend on previous child (first child)
-   * - next child depend on previous child..
-   * etc......
-   */
-  //#region @backend
-  get sortedRequiredWorkspaceChilds(this: Project): Project[] {
-    if (!this.isWorkspaceChildProject) {
-      return [];
-    }
-    // const libs = this.parent.childrenThatAreLibs;
-    // console.log('this.parent.children', this.parent.children.map(c => c.name))
-    // console.log('this.parent.childrenThatAreLibs', this.parent.childrenThatAreLibs.map(c => c.name))
-    return this.libsForTraget(this).concat([this])
-  }
-  //#endregion
-
-
-  //#region @backend
-
-  libsForTraget(this: Project, project: Project) {
-    return this.libs([{ project: project as any, appBuild: false }]).map(c => c.project);
-  }
-
-  libs(this: Project, targetClients: Models.dev.ProjectBuild[], targetAsLibAlso = false) {
-    const existed = {};
-    const targetLibs = targetClients
-      .map(t => ((t.project as any) as Project).workspaceDependencies)
-      .reduce((a, b) => a.concat(b), [])
-      .map(d => {
-        if (!existed[d.name]) {
-          existed[d.name] = d;
-        }
-        return d;
-      })
-      .filter(c => {
-        if (existed[c.name]) {
-          existed[c.name] = void 0;
-          return true;
-        }
-        return false;
-      })
-      .sort((a, b) => {
-        return a.workspaceDependencies.filter(c => c === b).length;
-      });
-    // console.log('targetClients', targetClients.map(l => l.project.genericName))
-    // console.log('targetClients[0]', targetClients[0].project.workspaceDependencies.map(l => l.genericName))
-    // console.log('targetClients[1]', targetClients[1].project.workspaceDependencies.map(l => l.genericName))
-    // console.log('targetlibs', targetLibs.map(l => l.genericName))
-
-    let result: Project[] = [];
-
-
-    function recrusiveSearchForDependencies(lib: Project) {
-      if (_.isUndefined(result.find(r => r.name === lib.name))) {
-        result.push(lib);
-      }
-      if (lib.workspaceDependencies.length === 0) {
-        return;
-      }
-      lib.workspaceDependencies
-        .filter(f => {
-          return _.isUndefined(result.find(r => r.name === f.name))
-        })
-        .forEach(d => {
-          if (_.isUndefined(result.find(r => r.name === d.name))) {
-            result.unshift(d);
-          }
-          recrusiveSearchForDependencies(d);
-        });
-    }
-    targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
-
-    let count = 0;
-    let lastArr = [];
-    while (reorderResult(result, r => { result = r; })) {
-      // Helpers.log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `);
-      if (_.isEqual(lastArr, result.map(c => c.name))) {
-        break;
-      }
-      lastArr = result.map(c => c.name);
-    }
-
-    if (targetAsLibAlso) {
-      targetClients
-        .filter(f => _.isUndefined(result.find(p => p.location === f.project.location)))
-        .forEach(f => result.push(f.project as any))
-    }
-
-    return result.map(c => {
-      return { project: c, appBuild: false };
-    });
-  }
-  //#endregion
 
   get childrenThatAreLibs(this: Project): Project[] {
     if (Helpers.isBrowser) {
@@ -189,7 +67,7 @@ export abstract class FolderProject {
   }
 
   //#region @backend
-  getAllChildren(this: Project, options?: { excludeUnknowProjects: boolean; }) {
+  private getAllChildren(this: Project, options?: { excludeUnknowProjects: boolean; }) {
     if (this.typeIs('unknow')) {
       return [];
     }
@@ -368,7 +246,7 @@ export abstract class FolderProject {
     }
     Helpers.log(`Reseting symbolic links from node_mouels.. start..`);
     const node_modules = path.join(this.location, config.folder.node_modules);
-    const folders = fse.readdirSync(node_modules);
+    const folders = !fse.existsSync(node_modules) ? [] : fse.readdirSync(node_modules);
     folders
       .map(f => path.join(node_modules, f))
       .filter(f => fse.lstatSync(f).isSymbolicLink())

@@ -125,43 +125,6 @@ export class ProjectWorkspace extends Project {
     ];
   }
 
-  projectsInOrder(appBuilds: boolean): Models.dev.ProjectBuild[] {
-    if (!fse.existsSync(this.location)) {
-      return [];
-    }
-    const targetClients: Models.dev.ProjectBuild[] = (
-      this.children.filter(p => {
-        return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
-      }))
-      .filter(c => c.typeIs('angular-lib'))
-      .map(c => {
-        return { project: c, appBuild: true };
-      }) as any;
-
-    Helpers.log(`targetClients: ${targetClients.map(c => c.project.genericName).join('\n')}`)
-
-    const libs = this.libs(targetClients, true);
-
-    Helpers.log(`libs: ${libs.map(c => c.project.genericName).join('\n')}`)
-
-    const aloneServers = this.children
-      .filter(p => {
-        return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
-      })
-      .filter(c => c.typeIs('isomorphic-lib'))
-      .filter(c => _.isUndefined(libs.find(l => l.project === c)))
-      .map(c => {
-        return { project: c, appBuild: false };
-      }) as any;
-
-    return [
-      ...libs,
-      ...(this.isGenerated ? aloneServers : []),
-      // ...targetClients.map(c => c.appBuild = false),
-      ...(appBuilds ? targetClients : [])
-    ] as any;
-  }
-
 
   async buildSteps(buildOptions?: BuildOptions) {
     if (!fse.existsSync(this.location)) {
@@ -170,7 +133,7 @@ export class ProjectWorkspace extends Project {
     PROGRESS_DATA.log({ msg: 'Process started', value: 0 });
     const { prod, watch, outDir, args, appBuild } = buildOptions;
     Helpers.log(`build opt  ${JSON.stringify({ prod, watch, outDir, args, appBuild })}`)
-    const projects = this.projectsInOrder(this.isGenerated ? true : (watch));
+    const projects = this.projectsInOrderForBuild(this.isGenerated ? true : (watch));
     // console.log('project', projects.map(p => p.project.genericName))
 
 

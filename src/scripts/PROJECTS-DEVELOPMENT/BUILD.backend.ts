@@ -47,18 +47,7 @@ export async function chainBuild(args: string) {
     args += ` --forClient=${project.name}`;
   }
 
-  let deps: Project[] = [];
-  if (project.isWorkspaceChildProject) {
-    resolveDeps(project, deps);
-    deps = deps.reverse();
-    deps = prepareDeps(deps);
-  }
-  deps.push(project);
-  if (project.typeIs('angular-lib') && project.workspaceDependenciesServers.length > 0) {
-    deps = deps.concat(project.workspaceDependenciesServers);
-    // TODO handle deps of project.workspaceDependenciesServers
-  }
-
+  const deps: Project[] = project.projectsInOrderForChainBuild();
 
   let index = 0;
   const buildedOK = [];
@@ -345,51 +334,6 @@ const $START_APP = async (args) => {
   await Project.Current.start(args);
 };
 
-function resolveDeps(proj: Project, deps: Project[]) {
-  if (proj.workspaceDependencies.length > 0) {
-    proj.workspaceDependencies.forEach(d => {
-      if (_.isUndefined(deps.find(c => c.location === d.location))) {
-        deps.push(d);
-        resolveDeps(d, deps);
-      }
-    })
-  }
-}
-
-function prepareDeps(deps: Project[]) {
-
-  if (deps.length === 0) {
-    return deps;
-  }
-
-  function swap(a: Project, b: Project) {
-    const tmp = a;
-    const bIndex = deps.indexOf(b);
-    deps[deps.indexOf(a)] = b;
-    deps[bIndex] = tmp;
-  }
-
-  while (true) {
-    const depsArr = deps;
-    for (let index = 0; index < depsArr.length; index++) {
-      const proj = depsArr[index];
-      const isSwapped = !_.isUndefined(depsArr.find(d => {
-        const condit = proj.workspaceDependencies.includes(d) &&
-          (depsArr.indexOf(d) > depsArr.indexOf(proj));
-        if (condit) {
-          swap(proj, d);
-        }
-        return condit;
-      }));
-      if (isSwapped) {
-        break;
-      }
-      if (index === depsArr.length - 1) {
-        return deps;
-      }
-    }
-  }
-}
 
 
 const $BUILD_PROD = async (args) => {
