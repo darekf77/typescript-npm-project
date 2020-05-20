@@ -58,15 +58,12 @@ export class NodeModulesBase extends NodeModulesCore {
     this.project.node_modules.dedupe();
   }
 
-  /**
-   * copy .bin folder to destination project
-   */
   private get copyBin() {
     const self = this;
     return {
       to(destinationProject: Project, linkOnly = false) {
-        const source = path.join(self.project.location, config.folder.node_modules, '.bin')
-        const dest = path.join(destinationProject.location, config.folder.node_modules, '.bin')
+        const source = path.join(self.project.location, config.folder.node_modules, config.folder._bin)
+        const dest = path.join(destinationProject.location, config.folder.node_modules, config.folder._bin)
         if (fse.existsSync(source)) {
           if (linkOnly) {
             Helpers.createSymLink(source, dest)

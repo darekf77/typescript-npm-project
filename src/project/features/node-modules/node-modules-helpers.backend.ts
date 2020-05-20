@@ -130,8 +130,8 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 
 export function nodeModulesExists(project: Project) {
   if (project.isWorkspace || project.isStandaloneProject) {
-    const p = path.join(project.location, config.folder.node_modules, '.bin');
-    return fse.existsSync(p);
+    const p = path.join(project.location, config.folder.node_modules, config.folder._bin);
+    return fse.existsSync(p) && fse.readdirSync(p).length > 0;
   }
   if (project.isWorkspaceChildProject) {
     if (project.parent.node_modules.exist) {
