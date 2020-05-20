@@ -76,7 +76,7 @@ export abstract class VscodeProject {
     //#endregion
   }
 
-  get nameOfCodeWorkspace(this: Project) {
+  private get nameOfCodeWorkspace(this: Project) {
     return `tmp.code-workspace`;
   }
 

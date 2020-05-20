@@ -112,7 +112,12 @@ export abstract class StaticProject {
     let staticVersion: Project;
     if (this.isGenerated) {
       if (regenerate) {
-        await this.origin.staticBuild.regenerate();
+        if (this.origin) {
+          await this.origin.staticBuild.regenerate();
+        } else {
+          return void 0;
+        }
+
       }
       staticVersion = this as any;
     } else {

@@ -187,6 +187,7 @@ const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(
 const BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args);
 
 
+
 const STATIC_BUILD = async (args) => {
   if (!Project.Current.isWorkspace) {
     Helpers.error(`Please use:
@@ -198,15 +199,33 @@ inside workspace children.
     `, false, true)
   }
   const staticVersionOfProject = await Project.Current.StaticVersion()
-  await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
+  if (staticVersionOfProject) {
+    await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
+  } else {
+    Helpers.log(`No static version for project: ${Project.Current.name}`)
+  }
+
 }
 
 const STATIC_BUILD_LIB = async (args) => {
-  (await Project.Current.StaticVersion()).buildProcess.startForLib({ args, staticBuildAllowed: true });
+  const staticVersionOfProject = await Project.Current.StaticVersion();
+  if (staticVersionOfProject) {
+    await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
+  } else {
+    Helpers.log(`No static version for project: ${Project.Current.name}`)
+  }
+
 };
 
-const STATIC_BUILD_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
-  .startForLib({ prod: true, args, staticBuildAllowed: true })
+const STATIC_BUILD_PROD = async (args) => {
+  const staticVersionOfProject = await Project.Current.StaticVersion();
+  if (staticVersionOfProject) {
+    await staticVersionOfProject.buildProcess.startForLib({ prod: true, args, staticBuildAllowed: true })
+  } else {
+    Helpers.log(`No static version for project: ${Project.Current.name}`)
+  }
+
+}
 
 const STATIC_BUILD_LIB_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
   .startForLib({ prod: true, args, staticBuildAllowed: true })
@@ -270,7 +289,11 @@ const $SERVE = (args) => {
     const app = express()
     app.use(configServe.baseUrl, express.static(path.join(process.cwd(), configServe.outDir)))
     app.listen(configServe.port, () => {
-      console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}`)
+      console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}
+
+      Access project link: http://localhost:${proj.env.config.workspace.workspace.port}${configServe.baseUrl}
+
+      `)
     });
   }
 

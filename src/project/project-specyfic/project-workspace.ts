@@ -144,8 +144,19 @@ export class ProjectWorkspace extends Project {
 
     Helpers.log(`libs: ${libs.map(c => c.project.genericName).join('\n')}`)
 
+    const aloneServers = this.children
+      .filter(p => {
+        return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
+      })
+      .filter(c => c.typeIs('isomorphic-lib'))
+      .filter(c => _.isUndefined(libs.find(l => l.project === c)))
+      .map(c => {
+        return { project: c, appBuild: false };
+      }) as any;
+
     return [
       ...libs,
+      ...(this.isGenerated ? aloneServers : []),
       // ...targetClients.map(c => c.appBuild = false),
       ...(appBuilds ? targetClients : [])
     ] as any;
@@ -153,8 +164,6 @@ export class ProjectWorkspace extends Project {
 
 
   async buildSteps(buildOptions?: BuildOptions) {
-
-
     if (!fse.existsSync(this.location)) {
       return;
     }

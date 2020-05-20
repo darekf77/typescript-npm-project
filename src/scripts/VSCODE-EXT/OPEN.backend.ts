@@ -11,11 +11,11 @@ import chalk from 'chalk';
 
 
 function $OPEN_WORKSPACE() {
-  const workspacePath = path.join(Project.Current.location, Project.Current.nameOfCodeWorkspace);
+  const workspacePath = path.join(Project.Current.location);
   if (!fse.existsSync(workspacePath)) {
     Project.Current.recreateCodeWorkspace();
   }
-  Project.Current.run(`code ${Project.Current.nameOfCodeWorkspace} &`).sync();
+  Project.Current.run(`code ${Project.Current.location} &`).sync();
   process.exit(0)
 }
 
@@ -55,7 +55,7 @@ function $OPEN_TNP_PROJECT() {
 function $OPEN_BASELINE() {
   if (Project.Current.isSite) {
     if (Project.Current.isWorkspace) {
-      Project.Current.baseline.run(`code ${Project.Current.baseline.nameOfCodeWorkspace} &`).sync();
+      Project.Current.baseline.run(`code ${Project.Current.baseline.location} &`).sync();
     } else {
       Project.Current.baseline.run(`code . &`).sync();
     }

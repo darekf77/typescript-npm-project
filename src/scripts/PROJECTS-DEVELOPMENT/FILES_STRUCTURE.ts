@@ -73,7 +73,11 @@ export async function INIT_ALL(args: string, exit = true) {
 
 export async function STATIC_INIT(args: string, exit = true) {
   // process.exit(0)
-  await (await Project.Current.StaticVersion()).filesStructure.init(args);
+  const staticVersion = await Project.Current.StaticVersion();
+  if(staticVersion) {
+    await staticVersion.filesStructure.init(args);
+  }
+
   if (exit) {
     process.exit(0)
   }

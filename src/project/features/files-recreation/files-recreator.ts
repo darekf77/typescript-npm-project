@@ -128,7 +128,10 @@ export class FilesRecreator extends FeatureForProject {
           ).concat( // core files of projects types
             self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
           )
-          .concat(self.project.isWorkspaceChildProject ? self.assetsToIgnore : [])
+          .concat(self.project.isWorkspaceChildProject ? [
+            ...self.assetsToIgnore,
+            // 'src/assets/*/*'
+           ] : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
         // .concat(self.project.isContainer ? [

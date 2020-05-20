@@ -7,7 +7,7 @@ import { Helpers } from 'ng2-logger';
 import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 
-const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test'];
+const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test', 'qa', 'custom'];
 const allowedEnvironmentsObj = {};
 allowedEnvironments.forEach(s => {
   allowedEnvironmentsObj[s] = s
