@@ -17,7 +17,12 @@ import { Morphi } from 'morphi';
 export abstract class SiteProject {
 
   get isSite(this: Project) {
-    return this.isSiteInStrictMode || this.isSiteInDependencyMode;
+    if (_.isUndefined(config.cache['isSite'])) {
+      const result = this.isSiteInStrictMode || this.isSiteInDependencyMode;
+      config.cache['isSite'] = result;
+    } else {
+      return config.cache['isSite'];
+    }
   }
 
   get isSiteInStrictMode(this: Project) {
