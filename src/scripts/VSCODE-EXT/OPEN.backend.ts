@@ -7,7 +7,9 @@ import { Project } from '../../project';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
+import { TnpDB } from "tnp-db";
 import chalk from 'chalk';
+
 
 
 function $OPEN_WORKSPACE() {
@@ -64,7 +66,23 @@ function $OPEN_BASELINE() {
   Helpers.error(`This is not "site project"`, false, true);
 }
 
+async function $OPEN(args: string) {
+  const db = await TnpDB.Instance(config.dbLocation);
+  const name = _.first(args.split(' '));
+  const projects = db.getProjects().filter(p => {
+    return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
+  });
+  if (projects.length > 0) {
+    Helpers.run(`code ${projects.map(c => (c.project as Project).location).join(' ')}`).sync();
+  } else {
+    Helpers.log(`Projects not found`);
+    process.exit(0)
+  }
+
+}
+
 export default {
+  $OPEN: Helpers.CLIWRAP($OPEN, '$OPEN'),
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),

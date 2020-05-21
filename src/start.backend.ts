@@ -347,11 +347,9 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   } else {
     // Helpers.log("NOT RECOGNIZED !!")
     if (Array.isArray(argsv) && argsv.length == 3) {
-      Helpers.log(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`)
-      process.exit(1);
+      Helpers.error(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`, false, true);
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
-      Helpers.log(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`)
-      process.exit(1);
+      Helpers.error(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`, false, true);
     } else {
       const p = void 0; //Project.Current;
 
@@ -365,8 +363,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
         //   process.exit(1)
         // }
       } else {
-        Helpers.info(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`)
-        process.exit(1);
+        Helpers.error(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`, false, true);
       }
     }
   }
