@@ -174,7 +174,7 @@ inside generated projects...
 
       if (singularBuildInParent) {
         Helpers.info(`[build[ DETECTED SINGULAR in parent project: ${this.project.parent.name}`);
-        await this.project.filesStructure.init(buildOptions.args, { watch: true });
+        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
       } else {
         if (this.project.node_modules.exist) {
           Helpers.log(`NODE MODULE EXISTS`)
@@ -218,7 +218,7 @@ inside generated projects...
           Helpers.log(`Removing on purpose tmp-environment.json from wokspace, before init`);
           Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
         }
-        await this.project.filesStructure.init(buildOptions.args, { watch: true });
+        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
       } else {
         await this.project.filesStructure.init(buildOptions.args);
       }

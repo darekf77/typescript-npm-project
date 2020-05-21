@@ -208,19 +208,6 @@ export abstract class BuildableProject {
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       this.copyManager.initCopyingOnBuildFinish(buildOptions);
-      // if (this.linkedProjects.length > 0) {
-      //   const taskOutputModifer = `Output modifer for linkableProjects`
-      //   if (buildOptions.outDir === 'bundle') {
-      //     this.outputCodeModifier.copyBundleCompiledLinkedCodeToNodeModules();
-      //   } else {
-      //     if (buildOptions.watch) {
-      //       await this.outputCodeModifier.startAndWatch(taskOutputModifer)
-      //     } else {
-      //       await this.outputCodeModifier.start(taskOutputModifer)
-      //     }
-      //   }
-      // }
-
     }
   }
   //#endregion

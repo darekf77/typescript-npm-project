@@ -14,6 +14,7 @@ import { Models } from '../../../index';
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
   watch: boolean;
+  watchOnly?: boolean;
   alreadyInitedPorjects?: Project[];
   initiator?: Project;
   // initiator: Project;
@@ -64,7 +65,7 @@ export class FilesStructure extends FeatureForProject {
     if (!options.initiator) {
       options.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch } = options;
+    const { alreadyInitedPorjects, watch, watchOnly } = options;
     let { skipNodeModules, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
 
     if (struct) {
@@ -223,7 +224,11 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (this.project.isSiteInStrictMode) {
         if (watch) {
-          await this.project.join.startAndWatch(this.taskNames.joinMerge)
+          await this.project.join.startAndWatch(this.taskNames.joinMerge, {
+            watchOnly, afterInitCallBack: async () => {
+              await Project.setProjectAsValid(this.project, this.project.join);
+            }
+          })
         } else {
           await this.project.join.start(this.taskNames.joinMerge);
         }
@@ -240,11 +245,19 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
       if (watch) {
-        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator);
+        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
+          watchOnly, afterInitCallBack: async () => {
+            await Project.setProjectAsValid(this.project, this.project.frameworkFileGenerator);
+          }
+        });
         // if (!this.project) {
         //   console.trace('HERE')
         // }
-        await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir);
+        await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir, {
+          watchOnly, afterInitCallBack: async () => {
+            await Project.setProjectAsValid(this.project, this.project.sourceModifier);
+          }
+        });
       } else {
         await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
         // if (!this.project) {

@@ -221,7 +221,15 @@ export class ProjectIsomorphicLib extends Project {
           Helpers.error(`BUNDLE production build failsed`, false, true);
         }
       } else {
-        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).startAndWatch('isomorphic compilation (watch mode)')
+        const buildObj = new IncrementalBuildProcessExtended(this, this.buildOptions);
+
+        await buildObj.startAndWatch('isomorphic compilation (watch mode)',
+          {
+            watchOnly: this.buildOptions.watchOnly,
+            afterInitCallBack: async () => {
+              await Project.setProjectAsValid(this, buildObj);
+            }
+          })
       }
     } else {
       if (prod && outDir === 'bundle') {

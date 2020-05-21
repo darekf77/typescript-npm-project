@@ -51,16 +51,17 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
     if (this.project.isSiteInStrictMode) {
-      await this.project.baseline.frameworkFileGenerator.start(taskName, afterInitCallBack);
+      await this.project.baseline.frameworkFileGenerator.start(taskName);
     }
     return super.start(taskName, afterInitCallBack);
   }
 
-  async startAndWatch(taskName?: string, afterInitCallBack?: () => void) {
+  async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
+    const { watchOnly } = options || {};
     if (this.project.isSiteInStrictMode) {
-      await this.project.baseline.frameworkFileGenerator.startAndWatch(taskName, afterInitCallBack);
+      await this.project.baseline.frameworkFileGenerator.startAndWatch(taskName, { watchOnly });
     }
-    return super.startAndWatch(taskName, afterInitCallBack);
+    return super.startAndWatch(taskName, options);
   }
 
 

@@ -32,6 +32,7 @@ import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeMo
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
+import { CLASS } from 'morphi/decorators';
 //#endregion
 
 
@@ -102,6 +103,20 @@ export class Project {
   @Morphi.Orm.Column.Primary({ type: 'varchar', length: 400 })
   //#endregion
   public readonly location: string;
+
+  //#region @backend
+  public static async setProjectAsValid(project: Project, compilerObjec: object) {
+    Helpers.info(`
+
+
+
+    SET VALID ${CLASS.getNameFromObject(compilerObjec)} FOR ${chalk.bold(project.name)}
+
+
+
+    `)
+  }
+  //#endregion
 
   //#region @backend
   private static typeFrom(location: string): Models.libs.LibType {

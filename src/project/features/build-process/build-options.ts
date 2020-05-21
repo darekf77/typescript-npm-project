@@ -19,6 +19,8 @@ export class BuildOptions implements Models.dev.IBuildOptions {
   prod?: boolean;
   outDir?: Models.dev.BuildDir;
   watch?: boolean;
+  watchOnly?: boolean;
+
   args?: string;
   progressCallback?: (fractionValue: number) => any;
 

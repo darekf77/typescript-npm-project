@@ -167,12 +167,18 @@ export class ProjectAngularLib extends Project {
       return;
     }
 
+    const buildObj = new IncrementalBuildProcessExtended(this, this.buildOptions);
+
     if (this.buildOptions.watch) {
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .startAndWatch(`isomorphic ${this._type} compilation (watch mode)`);
+      await buildObj.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
+        {
+          watchOnly: this.buildOptions.watchOnly,
+          afterInitCallBack: async () => {
+            await Project.setProjectAsValid(this, buildObj);
+          }
+        });
     } else {
-      await (new IncrementalBuildProcessExtended(this, this.buildOptions))
-        .start(`isomorphic ${this._type} compilation`);
+      await buildObj.start(`isomorphic ${this._type} compilation`);
     }
 
   }
