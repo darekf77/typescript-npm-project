@@ -47,7 +47,28 @@ export async function chainBuild(args: string) {
     args += ` --forClient=${project.name}`;
   }
 
-  const deps: Project[] = project.projectsInOrderForChainBuild();
+  let deps: Project[] = project.projectsInOrderForChainBuild();
+
+  const baselineProjects = [];
+
+  if (project.isSite) {
+    const depsWithBaseline = [];
+    deps.forEach(d => {
+      if(!!d.baseline) {
+        depsWithBaseline.push(d.baseline);
+        baselineProjects.push(d.baseline)
+      }
+      depsWithBaseline.push(d);
+    });
+    deps = depsWithBaseline;
+  }
+
+  Helpers.info(`
+
+  CHAIN BUILD PLAN:
+${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
+
+  `)
 
   let index = 0;
   const buildedOK = [];
@@ -55,18 +76,28 @@ export async function chainBuild(args: string) {
     // for (let index = 0; index < deps.length; index++) {
     const projDep = deps[index];
 
-    const action = async (proj: Project, baseline = false) => {
-      const command = `${config.frameworkName} bdw ${args} ${!global.hideLog ? '-verbose' : ''}`;
+    const action = async (proj: Project) => {
+      const isBaselineForThisBuild = baselineProjects.includes(proj);
+      let argsForProjct = args;
+      const watchModeAvailable = await proj.compilerCache.isWatchModeAllowed;
+      if (watchModeAvailable) {
+        Helpers.info(`[chainbuild] watch mode added for ${proj.name}`);
+        argsForProjct += ` --watchOnly`;
+      } else {
+        Helpers.info(`[chainbuild] full compilation needed for ${proj.name}`);
+      }
+
+      const command = `${config.frameworkName} bdw ${argsForProjct} ${!global.hideLog ? '-verbose' : ''}`;
       Helpers.info(`
 
-      Running command in ${baseline ? 'baseline' : ''} dependency "${proj.genericName}" : ${command}
+      Running command in ${isBaselineForThisBuild ? 'baseline' : ''} dependency "${proj.genericName}" : ${command}
 
       `);
       if (proj.isWorkspaceChildProject) {
 
         await proj.run(command, {
           output: true,
-          prefix: chalk.bold(`${baseline ? '[baseline]' : ''}[${proj.name}]`)
+          prefix: chalk.bold(`${isBaselineForThisBuild ? '[baseline]' : ''}[${proj.name}]`)
         }).unitlOutputContains('Watching for file changes.',
           [
             'Command failed:',
@@ -80,15 +111,6 @@ export async function chainBuild(args: string) {
       // }
     };
 
-    if (projDep.isSite && !buildedOK.includes(projDep.baseline)) {
-      try {
-        await action(projDep.baseline, true);
-        buildedOK.push(projDep.baseline);
-      } catch (error) {
-        Helpers.pressKeyAndContinue(`Fix errors for baseline project ${projDep.baseline.genericName} and press ENTER to build again`);
-        continue;
-      }
-    }
     if (!buildedOK.includes(projDep)) {
       try {
         await action(projDep);

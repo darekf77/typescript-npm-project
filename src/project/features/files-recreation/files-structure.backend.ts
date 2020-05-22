@@ -226,7 +226,7 @@ export class FilesStructure extends FeatureForProject {
         if (watch) {
           await this.project.join.startAndWatch(this.taskNames.joinMerge, {
             watchOnly, afterInitCallBack: async () => {
-              await Project.setProjectAsValid(this.project, this.project.join);
+              await this.project.compilerCache.setUpdatoDate.join();
             }
           })
         } else {
@@ -247,7 +247,7 @@ export class FilesStructure extends FeatureForProject {
       if (watch) {
         await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
           watchOnly, afterInitCallBack: async () => {
-            await Project.setProjectAsValid(this.project, this.project.frameworkFileGenerator);
+            await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
           }
         });
         // if (!this.project) {
@@ -255,7 +255,7 @@ export class FilesStructure extends FeatureForProject {
         // }
         await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir, {
           watchOnly, afterInitCallBack: async () => {
-            await Project.setProjectAsValid(this.project, this.project.sourceModifier);
+            await this.project.compilerCache.setUpdatoDate.sourceModifier();
           }
         });
       } else {
@@ -294,28 +294,28 @@ export class FilesStructure extends FeatureForProject {
     return newChilds;
   }
 
-  private recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
+  private async recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
     if (type === 'clear') {
-      proj.clear()
+      await proj.clear()
     } else if (type === 'reset') {
-      proj.reset()
+      await proj.reset()
     }
     if (recrusive) {
       for (let index = 0; index < proj.children.length; index++) {
         const c = proj.children[index];
-        this.recrusiveOperation(c, recrusive, type)
+        await this.recrusiveOperation(c, recrusive, type)
       }
     }
   }
 
   public async reset(options?: { recrusive: boolean; }) {
     const { recrusive = false } = options || {};
-    this.recrusiveOperation(this.project, recrusive, 'reset')
+    await this.recrusiveOperation(this.project, recrusive, 'reset')
   }
 
   public async clear(options?: { recrusive: boolean; }) {
     const { recrusive = false } = options || {};
-    this.recrusiveOperation(this.project, recrusive, 'clear')
+    await this.recrusiveOperation(this.project, recrusive, 'clear')
   }
 
   private resolveArgs(args: string) {

@@ -106,7 +106,6 @@ const moduleNameIsomorphicLib = [
 ];
 
 export const config = {
-  cache: {} as any,
   //#region @backend
   get dbLocation() {
     let dbPath = `bin/db.json`;

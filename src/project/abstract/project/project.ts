@@ -16,6 +16,7 @@ import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
 import { TnpProject } from './tnp-project';
+import { TnpDB } from 'tnp-db';
 import { FolderProject } from './folder-project';
 //#region @backend
 import { LibProject } from './lib-project.backend';
@@ -29,12 +30,13 @@ import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
 import { PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks, TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory, FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
+import { IncrementalBuildProcessExtended } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
 import { CLASS } from 'morphi/decorators';
+import { CompilerCache } from '../../features/compiler-cache.backend';
 //#endregion
-
 
 @Morphi.Entity<Project>({
   className: 'Project',
@@ -93,6 +95,9 @@ import { CLASS } from 'morphi/decorators';
   //#endregion
 } as any)
 export class Project {
+  //#region @backend
+  incrementalBuildProcess: IncrementalBuildProcessExtended;
+  //#endregion
   public static projects: Project[] = [];
   /**
    * To speed up checking folder I am keeping pathes for alterdy checked folder
@@ -103,20 +108,6 @@ export class Project {
   @Morphi.Orm.Column.Primary({ type: 'varchar', length: 400 })
   //#endregion
   public readonly location: string;
-
-  //#region @backend
-  public static async setProjectAsValid(project: Project, compilerObjec: object) {
-    Helpers.info(`
-
-
-
-    SET VALID ${CLASS.getNameFromObject(compilerObjec)} FOR ${chalk.bold(project.name)}
-
-
-
-    `)
-  }
-  //#endregion
 
   //#region @backend
   private static typeFrom(location: string): Models.libs.LibType {
@@ -367,8 +358,9 @@ export class Project {
     })
   }
 
+  cache = {};
   constructor(location?: string) {
-
+    this.cache = {};
     this.location = _.isString(location) ? location : '';
     this.packageJson = PackageJSON.fromProject(this);
     this.setType(this.packageJson ? this.packageJson.type : 'unknow');
@@ -457,7 +449,8 @@ export interface Project extends
   BuildableProject,
   SiteProject,
   DbProcessProject,
-  DependencyProject
+  DependencyProject,
+  CompilerCache
 //#endregion
 {
 
@@ -481,6 +474,7 @@ Helpers.applyMixins(Project, [
   BuildableProject,
   SiteProject,
   DbProcessProject,
-  DependencyProject
+  DependencyProject,
+  CompilerCache
   //#endregion
 ])

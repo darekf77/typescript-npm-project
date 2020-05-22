@@ -164,7 +164,7 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
-  public clear(this: Project) {
+  public async clear(this: Project) {
     if (this.typeIs('unknow')) {
       return;
     }
@@ -174,7 +174,7 @@ export abstract class FolderProject {
 
     `);
     this.node_modules.remove();
-    this.reset(false)
+    await this.reset(false)
   }
   //#endregion
 
@@ -259,7 +259,8 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
-  public reset(this: Project, showMsg = true) {
+  public async reset(this: Project, showMsg = true) {
+    await this.compilerCache.unsetData()
     this.quickFixes.removeUncessesaryFiles();
 
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {

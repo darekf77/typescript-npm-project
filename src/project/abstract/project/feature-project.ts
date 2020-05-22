@@ -9,6 +9,7 @@ import {
   QuickFixes, NpmPackages, ProxyRouter
 } from '../../features';
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, OutputCodeModifier } from '../../compilers';
+import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 //#endregion
 import * as _ from 'lodash';
@@ -93,6 +94,9 @@ export abstract class FeatureProject {
 
   //#region @backend
   public copyManager: CopyManager;
+  //#endregion
+  //#region @backend
+  public compilerCache: CompilerCache;
   //#endregion
 
 }

@@ -213,7 +213,14 @@ export class ProjectIsomorphicLib extends Project {
         `);
     }
 
+
+    if (!this.buildOptions.watch && prod && outDir === 'bundle') {
+      this.buildOptions.genOnlyClientCode = true;
+    }
+    this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
+
     if (this.buildOptions.watch) {
+
       if (prod && outDir === 'bundle') {
         try {
           this.run('npm-run webpack --config webpack.backend-bundle-build.js --watch').async();
@@ -221,13 +228,11 @@ export class ProjectIsomorphicLib extends Project {
           Helpers.error(`BUNDLE production build failsed`, false, true);
         }
       } else {
-        const buildObj = new IncrementalBuildProcessExtended(this, this.buildOptions);
-
-        await buildObj.startAndWatch('isomorphic compilation (watch mode)',
+        await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
           {
             watchOnly: this.buildOptions.watchOnly,
             afterInitCallBack: async () => {
-              await Project.setProjectAsValid(this, buildObj);
+              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
             }
           })
       }
@@ -246,10 +251,10 @@ export class ProjectIsomorphicLib extends Project {
         } catch (er) {
           Helpers.error(`BUNDLE production build failsed`, false, true);
         }
-        this.buildOptions.genOnlyClientCode = true;
-        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation (only client) ')
+
+        await this.incrementalBuildProcess.start('isomorphic compilation (only client) ')
       } else {
-        await (new IncrementalBuildProcessExtended(this, this.buildOptions)).start('isomorphic compilation')
+        await this.incrementalBuildProcess.start('isomorphic compilation')
       }
     }
   }
