@@ -232,7 +232,11 @@ export abstract class VscodeProject {
         startServerTemplate.program = cwd + '/run.js';
         startServerTemplate.cwd = cwd;
       }
-      startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
+      if ((serverChild.location === clientProject.location) && serverChild.isStandaloneProject) {
+        startServerTemplate.name = `${startServerTemplate.name} standalone`
+      } else {
+        startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
+      }
       startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
         clientProjectName: clientProject.name
       } as Models.env.EnvConfig, null, 4))}`);
@@ -392,7 +396,7 @@ export abstract class VscodeProject {
       }
       if (this.typeIs('isomorphic-lib')) {
         configurations = [
-          startNodemonServer()
+          // startNodemonServer()
         ];
         if (this.isStandaloneProject) {
           configurations.push(temlateAttachProcess);

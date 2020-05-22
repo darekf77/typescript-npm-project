@@ -7,7 +7,7 @@ import { Project } from '../../project';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
-import { TnpDB } from "tnp-db";
+import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 
 

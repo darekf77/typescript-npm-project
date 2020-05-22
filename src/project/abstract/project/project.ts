@@ -16,7 +16,6 @@ import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
 import { TnpProject } from './tnp-project';
-import { TnpDB } from 'tnp-db';
 import { FolderProject } from './folder-project';
 //#region @backend
 import { LibProject } from './lib-project.backend';
@@ -34,7 +33,6 @@ import { IncrementalBuildProcessExtended } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
-import { CLASS } from 'morphi/decorators';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 //#endregion
 
