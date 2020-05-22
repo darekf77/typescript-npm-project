@@ -395,7 +395,8 @@ export abstract class VscodeProject {
           startNodemonServer()
         ];
         if (this.isStandaloneProject) {
-          configurations.push(temlateAttachProcess)
+          configurations.push(temlateAttachProcess);
+          configurations.push(templateForServer(this, this, false))
         }
         //#region start serve for each agnular-lib ?
         if (this.isWorkspaceChildProject) {

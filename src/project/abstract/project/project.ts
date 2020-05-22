@@ -360,6 +360,7 @@ export class Project {
 
   cache = {};
   constructor(location?: string) {
+    this.defineProperty('compilerCache', CompilerCache);
     this.cache = {};
     this.location = _.isString(location) ? location : '';
     this.packageJson = PackageJSON.fromProject(this);

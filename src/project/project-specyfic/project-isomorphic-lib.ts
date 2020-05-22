@@ -45,7 +45,7 @@ export class ProjectIsomorphicLib extends Project {
       .concat([
         'tsconfig.browser.json',
         'webpack.config.js',
-        ...(this.frameworkVersionEquals('v1') ? ['webpack.backend-bundle-build.js'] : []),
+        'webpack.backend-bundle-build.js',
         'run.js',
         ...this.filesTemplates(),
       ]).concat(
