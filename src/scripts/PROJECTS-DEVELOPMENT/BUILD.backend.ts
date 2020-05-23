@@ -397,7 +397,7 @@ const $STOP_BUILD_DIST_WATCH = async (args) => {
   const db = await TnpDB.Instance(config.dbLocation);
   const projectLocation = Project.Current.location;
   await db.updateProcesses();
-  const pidsToKill = db.getBuilds()
+  const pidsToKill = (await db.getBuilds())
     .filter(f =>
       f.location === projectLocation
       && f.buildOptions

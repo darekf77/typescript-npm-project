@@ -4,7 +4,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
 import { SingularBuild } from '../features/singular-build.backend';
 //#endregion

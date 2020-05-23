@@ -7,8 +7,6 @@ import { FeatureForProject, Project } from '../abstract';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-factory.backend';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
-import { TnpDB } from 'tnp-db';
-
 
 export class SingularBuild extends FeatureForProject {
   singularWatchProj: Project;
@@ -86,7 +84,7 @@ export class SingularBuild extends FeatureForProject {
 
     // if (this.project.isContainer) {
     //   const db = await TnpDB.Instance(config.dbLocation);
-    //   var projectsToUpdate = db.getProjects().map(c => c.project as Project)
+    //   var projectsToUpdate = (await db.getProjects()).map(c => c.project as Project)
     //     .filter(c => !c.name.startsWith('tnp'))
     //     .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)
     //     .filter(c => c.location !== this.project.location)

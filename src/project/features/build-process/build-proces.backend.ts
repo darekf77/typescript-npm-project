@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 
 import { FeatureForProject, Project } from '../../abstract';
-import { BuildOptions } from './build-options';
+import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
 import { Helpers, Condition } from 'tnp-helpers';
@@ -74,7 +74,7 @@ inside generated projects...
   async  startForLib(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = false;
-    const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options);
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
@@ -85,7 +85,7 @@ inside generated projects...
   async  startForApp(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = true;
-    const buildOptions: BuildOptions = BuildOptions.from(options.args, this.project, options);
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options);
     await this.build(buildOptions, config.allowedTypes.app, exit);
   }
   //#endregion

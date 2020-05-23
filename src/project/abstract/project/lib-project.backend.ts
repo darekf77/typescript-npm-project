@@ -142,13 +142,13 @@ export abstract class LibProject {
   }
 
   applyLinkedFiles(this: Project) {
-    const files = this.projectLinkedFiles();
-    files.forEach(({ sourceProject, relativePath }) => {
-      const source = path.join(sourceProject.location, relativePath);
-      let dest = path.join(this.location, relativePath);
-      Helpers.removeFileIfExists(dest);
-      Helpers.createSymLink(source, dest);
-    })
+    // const files = this.projectLinkedFiles();
+    // files.forEach(({ sourceProject, relativePath }) => {
+    //   const source = path.join(sourceProject.location, relativePath);
+    //   let dest = path.join(this.location, relativePath);
+    //   Helpers.removeFileIfExists(dest);
+    //   Helpers.createSymLink(source, dest);
+    // })
   }
 
   projectSpecyficFiles(this: Project) {

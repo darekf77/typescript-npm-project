@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import { Project } from '../abstract';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 import { Helpers } from 'tnp-helpers';
 import { SingularBuild } from '../features/singular-build.backend';
 import { PROGRESS_DATA } from '../../progress-output';

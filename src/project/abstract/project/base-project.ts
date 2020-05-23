@@ -24,28 +24,35 @@ export abstract class BaseProject {
     if (this.typeIs('unknow')) {
       return;
     }
+    if (!_.isNil(this.cache['genericName'])) {
+      this.cache['genericName'];
+    }
     let result = [
       (this.isWorkspace && this.isGenerated) ? `${(this.origin && this.origin.parent) ?
         this.origin.parent.name : ' - no origin - '}` : ''
     ];
-    result = result.concat(this.findPrentsNames(this));
+    result = result.concat(this.findParentsNames(this));
     if (this.isGenerated) {
       result.push(`((${chalk.bold('GENERATED')}))${this.name}`)
     } else {
       result.push(this.name);
     }
-    return result.filter(f => !!f).join('/').trim()
+    const res = result.filter(f => !!f).join('/').trim()
+    if (_.isNil(this.cache['genericName'])) {
+      this.cache['genericName'] = res;
+    }
+    return this.cache['genericName'];
     //#endregion
   }
 
-  private findPrentsNames(this: Project, project: Project, result = []): string[] {
+  private findParentsNames(this: Project, project: Project, result = []): string[] {
     if (!project) {
       return result.reverse();
     }
     if (project && project.parent) {
       result.push(project.parent.name)
     }
-    return this.findPrentsNames(project.parent, result);
+    return this.findParentsNames(project.parent, result);
   }
 
   get isPreviewFor(this: Project): Project {

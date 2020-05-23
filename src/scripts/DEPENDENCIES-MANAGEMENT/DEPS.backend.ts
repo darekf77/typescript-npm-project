@@ -107,7 +107,7 @@ export async function $RESET_NPM(args: string, exit = true) {
 
 export async function $RESET_NPM_ALL(args: string, exit = true) {
   const db = await TnpDB.Instance(config.dbLocation);
-  const projects = db.getProjects();
+  const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const project = projects[index];
     // console.log(project.project.genericName)

@@ -8,7 +8,7 @@ import { IncrementalBuildProcess } from 'morphi';
 import { config } from '../../../config';
 import { Project } from '../../../project';
 import { Helpers } from 'tnp-helpers';
-import { BuildOptions } from '../../features/build-process';
+import { BuildOptions } from 'tnp-db';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 

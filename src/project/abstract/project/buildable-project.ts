@@ -5,7 +5,8 @@ import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
 
 //#region @backend
-import { BuildOptions, PackagesRecognitionExtended } from '../../features';
+import { PackagesRecognitionExtended } from '../../features';
+import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import * as path from 'path';
 import { TnpDB } from 'tnp-db';
@@ -26,8 +27,7 @@ export abstract class BuildableProject {
     // clearConsole()
     const db = await TnpDB.Instance(config.dbLocation);
     if (!global.tnpNonInteractive) {
-      const existedProjects = db
-        .getProjects()
+      const existedProjects = (await db.getProjects())
         .map(p => p.project)
         .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
         .filter(p => p.location !== project.location)
@@ -123,8 +123,7 @@ export abstract class BuildableProject {
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
     const db = await TnpDB.Instance(config.dbLocation);
-    const projects = db
-      .getProjects()
+    const projects = (await db.getProjects())
       .map(p => p.project)
       .filter(p => p.location !== this.location)
 

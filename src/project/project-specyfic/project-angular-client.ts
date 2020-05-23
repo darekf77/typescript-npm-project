@@ -6,7 +6,7 @@ import * as child from 'child_process';
 import { Project } from '../abstract';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
 
 /**

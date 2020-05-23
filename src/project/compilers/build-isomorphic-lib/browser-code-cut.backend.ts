@@ -9,7 +9,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 
-import { BuildOptions } from '../../features/build-process';
+import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {

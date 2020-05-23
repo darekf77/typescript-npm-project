@@ -12,7 +12,7 @@ import { config } from '../../config';
 import { Project } from '../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
-import { BuildOptions } from './build-process';
+import { BuildOptions } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 
 export class CopyManager extends FeatureForProject {

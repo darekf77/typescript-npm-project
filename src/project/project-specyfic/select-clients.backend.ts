@@ -4,7 +4,7 @@ import * as path from 'path';
 import chalk from 'chalk';
 import { Project } from '../abstract/project';
 import { config } from '../../config';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';

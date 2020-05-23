@@ -36,20 +36,33 @@ export class TestRunner
     if (!command) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
-    this.project.run(command, { output: true }).sync()
+    Helpers.info(`Start of testing...`);
+    try {
+      this.project.run(command, { output: true }).sync()
+      Helpers.info(`End of testing...`);
+    } catch (err) {
+      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, false, true);
+    }
+
   }
 
 
   async startAndWatch(files?: string[], type: TestType = 'unit') {
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
-      command = `npm-run mocha  -r ts-node/register --watch   ${this.fileCommand(files)} `
+      command = `npm-run mocha  -r ts-node/register --watch ${this.fileCommand(files)} `
         + ` --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
     }
     if (!command) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
-    this.project.run(command, { output: true }).sync()
+    Helpers.info(`Start of testing...`);
+    try {
+      this.project.run(command, { output: true }).sync();
+      Helpers.info(`End of testing...`);
+    } catch (err) {
+      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, false, true);
+    }
   }
   //#endregion
 

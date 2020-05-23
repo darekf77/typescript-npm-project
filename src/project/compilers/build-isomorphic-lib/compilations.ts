@@ -7,7 +7,7 @@ import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi';
 import { Models } from 'tnp-models';
 import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
-import { BuildOptions } from '../../features/build-process';
+import { BuildOptions } from 'tnp-db';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';

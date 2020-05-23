@@ -135,7 +135,7 @@ export default _default;
 
       const srcFolder = path.join(this.project.location, config.folder.src);
       if (this.project.isWorkspace) {
-        Helpers.removeFolderIfExists(srcFolder);
+        // Helpers.removeFolderIfExists(srcFolder);
       } else {
         if (!fse.existsSync(srcFolder)) {
           Helpers.mkdirp(srcFolder);

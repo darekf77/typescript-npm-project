@@ -53,8 +53,8 @@ const $TEST_WATCH = async (args: string) => {
 }
 
 const $TEST = async (args: string) => {
-  Project.Current.filesStructure.init(args);
-  Project.Current.tests.start(args.trim().split(' '))
+  await Project.Current.filesStructure.init(args);
+  await Project.Current.tests.start(args.trim().split(' '))
   process.exit(0)
 }
 

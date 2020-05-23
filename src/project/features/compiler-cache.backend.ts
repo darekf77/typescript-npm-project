@@ -12,7 +12,6 @@ import { FeatureCompilerForProject } from '../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
-import { BuildOptions } from './build-process';
 import { FeatureForProject } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
 import { IncrementalBuildProcess } from 'morphi';
@@ -51,7 +50,7 @@ export class CompilerCache extends FeatureForProject {
   public static async checkIfPojectHasUpToDateCompiledData(project: Project) {
     const projectLocation = project.location;
     const db = await TnpDB.Instance(config.dbLocation);
-    let data = db.rawGet(compierEntityKey) as any[];
+    let data = await db.rawGet(compierEntityKey) as any[];
     if (!_.isArray(data)) {
       return false;
     }
@@ -95,7 +94,7 @@ export class CompilerCache extends FeatureForProject {
 
     `);
     const db = await TnpDB.Instance(config.dbLocation);
-    let data = db.rawGet(compierEntityKey) as any[];
+    let data = await db.rawGet(compierEntityKey) as any[];
     Helpers.log(`
 
     RAW: ${data && JSON.stringify(data)}
@@ -115,11 +114,11 @@ export class CompilerCache extends FeatureForProject {
       obj.compilersUpToDate[compilerName] = true;
       data.push(obj);
     }
-    db.rawSet(compierEntityKey, data);
+    await db.rawSet(compierEntityKey, data);
   }
   public static async unsetAllProjectsCompiledData() {
     const db = await TnpDB.Instance(config.dbLocation);
-    db.rawSet(compierEntityKey, []);
+    await db.rawSet(compierEntityKey, []);
   }
   public static async unsetProjectHasUpToDateCompiledData(project: Project) {
     const projectLocation = project.location;
@@ -133,7 +132,7 @@ export class CompilerCache extends FeatureForProject {
 
     `);
     const db = await TnpDB.Instance(config.dbLocation);
-    let data = db.rawGet(compierEntityKey) as any[];
+    let data = await db.rawGet(compierEntityKey) as any[];
     Helpers.log(`
 
     RAW: ${data && JSON.stringify(data)}
@@ -152,7 +151,7 @@ export class CompilerCache extends FeatureForProject {
       };
       data.push(obj);
     }
-    db.rawSet(compierEntityKey, data);
+    await db.rawSet(compierEntityKey, data);
   }
 
 

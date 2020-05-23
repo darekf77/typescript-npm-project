@@ -23,6 +23,10 @@ export abstract class FolderProject {
       return this.browser.children as any;
     }
     //#region @backend
+
+    if (this.isTnp && !global.tnp_normal_mode) {
+      return [];
+    }
     if (this.typeIs('unknow')) {
       return [];
     }

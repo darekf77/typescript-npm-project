@@ -1,6 +1,6 @@
 //#region @backend
 import { Project } from '../abstract';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 
 
 export class ProjectDocker extends Project {

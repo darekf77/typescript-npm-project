@@ -9,7 +9,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 //#endregion
 import { Project } from '../abstract';
 

@@ -52,9 +52,9 @@
 
 //   lastCmd: CommandInstance;
 //   get lastCommandAvailable(): Boolean {
-//     this.lastCmd = this.db.lastCommandFrom(this.project.location)
+//     this.lastCmd = await this.db.lastCommandFrom(this.project.location)
 //     // console.log('this.lastCmd',this.lastCmd)
-//     // this.db.commandsSet.
+//     //await  this.db.commandsSet.
 //     return !!this.lastCmd;
 //   }
 
@@ -143,28 +143,28 @@
 //     switch (res.command) {
 
 //       case CHOICE.INIT:
-//         this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`tnp ${res.command}`)
 //         await Project.Current.filesStructure.init('');
 //         process.exit(0)
 //         break;
 
 //       case CHOICE.BUILD_APP_WATCH:
-//         this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`tnp ${res.command}`)
 //         await Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST_WATCH:
-//         this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`tnp ${res.command}`)
 //         await Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_APP:
-//         this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`tnp ${res.command}`)
 //         await Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST:
-//         this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`tnp ${res.command}`)
 //         await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', '')
 //         break;
 

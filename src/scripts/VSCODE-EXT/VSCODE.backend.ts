@@ -46,7 +46,7 @@ export function $INIT_VSCODE() {
 
 export async function $VSCODE_INIT_ALL() {
   const db = await TnpDB.Instance(config.dbLocation);
-  const projects = db.getProjects();
+  const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project.recreate.vscode.settings.excludedFiles();
@@ -164,7 +164,7 @@ function $VSCODE_GLOBAL() {
 
 const $VSCODE_FIX = async () => {
   const db = await TnpDB.Instance(config.dbLocation);
-  const projects = db.getProjects();
+  const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project && proj.project.recreate.vscode.settings.changeColorTheme(false)

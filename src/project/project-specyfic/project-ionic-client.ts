@@ -3,7 +3,7 @@ import * as path from 'path';
 // local
 import { Project } from '../abstract';
 import { config } from '../../config';
-import { BuildOptions } from '../features';
+import { BuildOptions } from 'tnp-db';
 
 export class ProjectIonicClient extends Project {
   async buildLib() {

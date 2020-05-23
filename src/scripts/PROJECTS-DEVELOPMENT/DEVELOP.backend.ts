@@ -64,7 +64,7 @@ export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
   const db = await TnpDB.Instance(config.dbLocation);
-  let projects = db.getProjects()
+  let projects = (await db.getProjects())
     .map(p => p.project)
     .filter(p => !p.isGenerated);
 

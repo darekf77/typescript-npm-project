@@ -8,7 +8,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Project } from '../../abstract';
 import { BrowserCodeCutExtended } from './browser-code-cut.backend';
-import { BuildOptions } from '../../features/build-process';
+import { BuildOptions } from 'tnp-db';
 
 export class ExtendedCodeCut extends CodeCut {
 

@@ -69,7 +69,7 @@ function $OPEN_BASELINE() {
 async function $OPEN(args: string) {
   const db = await TnpDB.Instance(config.dbLocation);
   const name = _.first(args.split(' '));
-  const projects = db.getProjects().filter(p => {
+  const projects = (await db.getProjects()).filter(p => {
     return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
   });
   if (projects.length > 0) {
