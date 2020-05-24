@@ -181,7 +181,7 @@ export abstract class VscodeProject {
       //#endregion
     } else {
       //#region handle standalone and workspace childs
-      if (this.typeIs('angular-lib')) {
+      if (this.typeIs('angular-lib', 'isomorphic-lib')) {
         tasks.push(templateNgServeTask());
       }
       //#endregion
@@ -386,12 +386,14 @@ export abstract class VscodeProject {
 
         }
 
-        compounds.push({
-          name: 'Debug backend/frontend',
-          configurations: [
-            ...configurations.map(c => c.name)
-          ]
-        })
+        if (!(this.isStandaloneProject && this.typeIs('angular-lib'))) {
+          compounds.push({
+            name: 'Debug backend/frontend',
+            configurations: [
+              ...configurations.map(c => c.name)
+            ]
+          });
+        };
 
       }
       if (this.typeIs('isomorphic-lib')) {
@@ -399,8 +401,15 @@ export abstract class VscodeProject {
           // startNodemonServer()
         ];
         if (this.isStandaloneProject) {
+          configurations.push(templateForServer(this, this, false));
+          configurations.push(startNgServeTemplate(9000, void 0, false));
+          compounds.push({
+            name: 'Debug backend/frontend',
+            configurations: [
+              ...configurations.map(c => c.name)
+            ]
+          });
           configurations.push(temlateAttachProcess);
-          configurations.push(templateForServer(this, this, false))
         }
         //#region start serve for each agnular-lib ?
         if (this.isWorkspaceChildProject) {
