@@ -21,7 +21,7 @@ export async function chainBuild(args: string) {
   let project = Project.Current;
 
   const firstArg = _.first(args.split(' '));
-  if (project.isWorkspace) {
+  if (project.isWorkspace || project.isWorkspace) {
     let selectedChild = project.children.find(c => c.name === firstArg);
     if (!selectedChild) {
       selectedChild = project.children.find(c => {
@@ -37,7 +37,9 @@ export async function chainBuild(args: string) {
     }
   }
 
+
   project.removeFileByRelativePath(config.file.tnpEnvironment_json);
+
 
   if (project.typeIsNot(...allowedLibs)) {
     Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
@@ -47,14 +49,14 @@ export async function chainBuild(args: string) {
     args += ` --forClient=${project.name}`;
   }
 
-  let deps: Project[] = project.projectsInOrderForChainBuild();
+  let deps: Project[] = project.isStandaloneProject ? [project] : project.projectsInOrderForChainBuild();
 
   const baselineProjects = [];
 
   if (project.isSite) {
     const depsWithBaseline = [];
     deps.forEach(d => {
-      if(!!d.baseline) {
+      if (!!d.baseline) {
         depsWithBaseline.push(d.baseline);
         baselineProjects.push(d.baseline)
       }
@@ -87,13 +89,15 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
         Helpers.info(`[chainbuild] full compilation needed for ${proj.name}`);
       }
 
-      const command = `${config.frameworkName} bdw ${argsForProjct} ${!global.hideLog ? '-verbose' : ''}`;
+      const command = `${config.frameworkName} bdw ${argsForProjct} `
+        + ` ${project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
+        + ` ${!global.hideLog ? '-verbose' : ''}`;
       Helpers.info(`
 
       Running command in ${isBaselineForThisBuild ? 'baseline' : ''} dependency "${proj.genericName}" : ${command}
 
       `);
-      if (proj.isWorkspaceChildProject) {
+      if (proj.isWorkspaceChildProject || proj.isStandaloneProject) {
 
         await proj.run(command, {
           output: true,
@@ -122,18 +126,9 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
     }
     index++;
   }
-  if (project.typeIs('angular-lib')) {
-    if (project.isWorkspaceChildProject) {
-      await project.buildProcess.startForAppFromArgs(false, true, 'dist', orgArgs)
-    }
-    // if (project.isStandaloneProject) {
-    //   const command = `${config.frameworkName} baw ${args}`
-    //   await project.run(command, {
-    //     output: true,
-    //     prefix: chalk.bold(`[${project.name}]`)
-    //   }).unitlOutputContains(': Compiled successfully.');
-    // }
-  }
+
+  await project.buildProcess.startForAppFromArgs(false, true, 'dist', orgArgs);
+
 }
 
 export async function DEVB() {

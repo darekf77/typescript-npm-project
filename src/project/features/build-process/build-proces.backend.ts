@@ -154,7 +154,6 @@ inside generated projects...
 
     Helpers.log(`[db][checkBuildIfAllowed] started... `);
     const db = await TnpDB.Instance(config.dbLocation);
-    const singularBuildInParent = await this.project.hasParentWithSingularBuild();
 
     if (buildOptions.appBuild) {
       await db.checkBuildIfAllowed(
@@ -172,15 +171,10 @@ inside generated projects...
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
-      if (singularBuildInParent) {
-        Helpers.info(`[build[ DETECTED SINGULAR in parent project: ${this.project.parent.name}`);
-        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
+      if (this.project.node_modules.exist) {
+        Helpers.log(`NODE MODULE EXISTS`)
       } else {
-        if (this.project.node_modules.exist) {
-          Helpers.log(`NODE MODULE EXISTS`)
-        } else {
-          await this.project.filesStructure.init(buildOptions.args);
-        }
+        await this.project.filesStructure.init(buildOptions.args);
       }
 
       if (buildOptions.watch) {

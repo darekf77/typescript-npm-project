@@ -6,7 +6,7 @@ import * as glob from 'glob';
 import chalk from 'chalk';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
-  saveConfigWorkspca, tmpEnvironmentFileName, workspaceConfigBy,
+  saveConfigWorkspca as saveEnvironmentConfig, tmpEnvironmentFileName, workspaceConfigBy,
   overrideWorksapceRouterPort,
   standaloneConfigBy
 } from './environment-config-helpers';
@@ -61,7 +61,7 @@ export class EnvironmentConfig
         }
       }
     }
-    saveConfigWorkspca(this.project, config);
+    saveEnvironmentConfig(this.project, config);
   }
 
 
