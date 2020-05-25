@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
 
-import { Helpers } from '../../../index';
+import { Helpers } from 'tnp-helpers';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { config } from '../../../config';

@@ -8,10 +8,12 @@ import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
+import { CLASS } from 'morphi/decorators';
 
 /**
  * DO NOT USE environment variables in this project directly
  */
+@CLASS.NAME('ProjectAngularClient')
 export class ProjectAngularClient extends Project {
   async buildLib() {
     // throw new Error("Method not implemented.");

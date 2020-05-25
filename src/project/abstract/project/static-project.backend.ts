@@ -63,11 +63,11 @@ export abstract class StaticProject {
     if (this.isWorkspace) {
       const originPath = path.resolve(path.join(this.location, '..', '..'));
       // console.log('originPath', originPath)
-      project = Project.From(originPath);
+      project = Project.From<Project>(originPath);
     } else if (this.isWorkspaceChildProject) {
       const originChildPath = path.resolve(path.join(this.location, '..', '..', '..', this.name));
       // console.log('originChildPath', originChildPath)
-      project = Project.From(originChildPath);
+      project = Project.From<Project>(originChildPath);
     }
     return project;
   }
@@ -92,11 +92,11 @@ export abstract class StaticProject {
       return;
     }
     if (this.isWorkspace) {
-      projectToBuild = Project.From(path.join(this.location, outDir, this.name));
+      projectToBuild = Project.From<Project>(path.join(this.location, outDir, this.name));
     } else if (this.isWorkspaceChildProject) {
-      projectToBuild = Project.From(path.join(this.parent.location, outDir, this.parent.name, this.name));
+      projectToBuild = Project.From<Project>(path.join(this.parent.location, outDir, this.parent.name, this.name));
     } else if (this.isStandaloneProject) {
-      projectToBuild = Project.From(path.join(this.location, outDir));
+      projectToBuild = Project.From<Project>(path.join(this.location, outDir));
     }
     return projectToBuild;
   }

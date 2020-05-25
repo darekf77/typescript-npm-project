@@ -112,9 +112,9 @@ export abstract class SiteProject {
       }
       return;
     } else if (this.isWorkspace) {
-      return this.packageJson.pathToBaseline && Project.From(this.packageJson.pathToBaseline);
+      return this.packageJson.pathToBaseline && Project.From<Project>(this.packageJson.pathToBaseline);
     } else if (this.isWorkspaceChildProject) {
-      return this.parent && this.parent.baseline && Project.From(path.join(this.parent.baseline.location, this.name));
+      return this.parent && this.parent.baseline && Project.From<Project>(path.join(this.parent.baseline.location, this.name));
     }
     //#endregion
   }

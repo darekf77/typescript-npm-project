@@ -79,10 +79,10 @@ export abstract class LibProject {
         .map(pathOrName => {
           let proj: Project;
           if (path.isAbsolute(pathOrName)) {
-            proj = Project.From(pathOrName);
+            proj = Project.From<Project>(pathOrName);
           }
           if (!proj) {
-            proj = Project.From(path.join(this.location, pathOrName))
+            proj = Project.From<Project>(path.join(this.location, pathOrName))
           }
           if (!proj) {
             Helpers.warn(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`);
@@ -101,7 +101,7 @@ export abstract class LibProject {
   public applyLinkedPorjects(this: Project) {
     // TODO
     // this.linkedProjects.forEach(p => {
-    //   const sourceFolder = p.type === 'angular-lib' ? config.folder.components : config.folder.src;
+    //   const sourceFolder = p.typeIs('angular-lib') ? config.folder.components : config.folder.src;
     //   const folderInSource = `tmp-${p.name}`;
 
     //   Helpers.createSymLink(
@@ -185,7 +185,7 @@ export abstract class LibProject {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       updateChildrenVersion(this, newVersion, this.name);
     } else {
-      Project.Tnp.packageJson.setDependencyAndSave({
+      (Project.Tnp as Project).packageJson.setDependencyAndSave({
         name: this.name,
         version: newVersion,
       }, `Bump new version "${newVersion}" of ${this.name}`);
@@ -250,7 +250,7 @@ export abstract class LibProject {
     const { prod = false } = c;
 
     this.checkIfReadyForNpm()
-    const newVersion = Project.Current.versionPatchedPlusOne;
+    const newVersion = (Project.Current as Project).versionPatchedPlusOne;
     const self = this;
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true)

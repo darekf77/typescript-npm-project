@@ -13,7 +13,7 @@ import chalk from 'chalk';
 import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 
 import { IncCompiler } from 'incremental-compiler';
-import { Project } from '../../../index';
+import { Project } from '../../abstract/project';
 import { FilesJoinActions } from './files-join-actions.backend';
 import { HelpersMerge } from 'tnp-helpers';
 

@@ -12,8 +12,9 @@ import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-l
 import { BuildOptions } from 'tnp-db';
 //#endregion
 import { Project } from '../abstract';
+import { CLASS } from 'typescript-class-helpers';
 
-
+@CLASS.NAME('ProjectIsomorphicLib')
 export class ProjectIsomorphicLib extends Project {
 
   //#region @backend
@@ -82,7 +83,7 @@ export class ProjectIsomorphicLib extends Project {
 
     if (this.frameworkVersionAtLeast('v2')) {
       files.push({
-        sourceProject: Project.by(this._type, 'v1'),
+        sourceProject: Project.by<Project>(this._type, 'v1'),
         relativePath: 'webpack.backend-bundle-build.js'
       });
     }
@@ -120,7 +121,7 @@ export class ProjectIsomorphicLib extends Project {
             }
           ]) as any;
         // console.log('ANSWER', answer)
-        client = Project.From(path.join(this.location, '..', answer.project));
+        client = Project.From<Project>(path.join(this.location, '..', answer.project));
       }
     }
 
@@ -302,7 +303,7 @@ export class ProjectIsomorphicLib extends Project {
 
 
 //#region @backend
-export function getReservedClassNames(project = Project.Current) {
+export function getReservedClassNames(project = Project.Current as Project) {
   // console.log('get class names from : ' + project.name)
   // console.log('parent : ' + (project.parent && project.parent.name))
   // console.log('childeren' + (project.parent && project.parent.children.map(c => c.name)));

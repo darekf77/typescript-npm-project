@@ -5,7 +5,8 @@ import * as fse from 'fs-extra';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from '../../../config';
 import { ModType, CheckType } from './source-modifier.models';
-import { Models, Helpers } from '../../../index';
+import { Helpers } from 'tnp-helpers';
+import { Models } from 'tnp-models';
 import { impReplace } from './source-modifier.helpers.backend';
 import { optionsSourceModifier } from './source-modifier.backend';
 

@@ -12,8 +12,9 @@ import { SingularBuild } from '../features/singular-build.backend';
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
-import { PROGRESS_DATA } from '../../progress-output';
+import { PROGRESS_DATA } from 'tnp-models';
 import { Models } from 'tnp-models';
+import { CLASS } from 'typescript-class-helpers';
 
 
 
@@ -49,6 +50,7 @@ function checkForCircuralWorkspaceDeps(workspace: Project) {
 
 //#endregion
 
+@CLASS.NAME('ProjectWorkspace')
 export class ProjectWorkspace extends Project {
   //#region @backend
 
@@ -65,7 +67,7 @@ export class ProjectWorkspace extends Project {
       }).length > 0) {
         Helpers.error(`Please match framework version in workspace-v2 children`, false, true);
       }
-      checkForCircuralWorkspaceDeps(this);
+      // checkForCircuralWorkspaceDeps(this); // TODO UNCOMMENT
     }
   }
 

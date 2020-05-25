@@ -51,7 +51,7 @@ export abstract class BuildableProject {
             }
           ]) as any;
 
-        buildOptions.copyto = projects.map(p => Project.From(p)) as any;
+        buildOptions.copyto = projects.map(p => Project.From<Project>(p)) as any;
       }
 
     }

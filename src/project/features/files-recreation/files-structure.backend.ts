@@ -8,8 +8,9 @@ import { FeatureForProject, Project } from '../../abstract';
 import { TnpDB } from 'tnp-db';
 import { config } from '../../../config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
-import { PROGRESS_DATA } from '../../../progress-output';
+import { PROGRESS_DATA } from 'tnp-models';
 import { Models } from '../../../index';
+import { EnvironmentConfig } from '../environment-config';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -198,7 +199,7 @@ export class FilesStructure extends FeatureForProject {
       if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
         this.project.buildOptions = {};
       }
-      await this.project.env.init(args);
+      await (this.project.env as any as EnvironmentConfig).init(args);
       this.project.applyLinkedPorjects();
       this.project.filesTemplatesBuilder.rebuild();
     }
@@ -234,7 +235,7 @@ export class FilesStructure extends FeatureForProject {
         }
       }
 
-      await this.project.env.init(args);
+      await (this.project.env as any as EnvironmentConfig).init(args);
       this.project.filesTemplatesBuilder.rebuild();
     }
     if (this.project.isWorkspace) {
@@ -283,7 +284,7 @@ export class FilesStructure extends FeatureForProject {
           cwd: this.project.location,
           basedOn: void 0
         });
-        const newChild = Project.From(siteChild);
+        const newChild = Project.From<Project>(siteChild);
         c.packageJson.copyTo(newChild);
         Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));
         Helpers.tryRemoveDir(path.join(newChild.location, config.folder.components));

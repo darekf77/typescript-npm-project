@@ -18,7 +18,7 @@ export class BackendCompilationExtended extends BackendCompilation {
   async compile(watch = false) {
 
     // QUICK_FIX for backend in ${config.frameworkName} projects
-    const currentProject = Project.From(this.cwd);
+    const currentProject = Project.From<Project>(this.cwd);
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
     await this.tscCompilation(this.compilationFolderPath, watch, `../${this.outFolder}` as any, generatedDeclarations);
   }
@@ -176,7 +176,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     let project: Project;
     if (env) {
-      project = Project.From(env.currentProjectLocation);
+      project = Project.From<Project>(env.currentProjectLocation);
     }
 
     if (compilationProject.isStandaloneProject) {

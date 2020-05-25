@@ -51,7 +51,7 @@ export class NpmProject {
       return this.browser.preview as any;
     }
     //#region @backend
-    return _.isString(this.location) && Project.From(path.join(this.location, 'preview'));
+    return _.isString(this.location) && Project.From<Project>(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -135,14 +135,14 @@ export class NpmProject {
       if (type === 'tnp_required_workspace_child') {
         let p = path.resolve(path.join(this.location, '..', packageObj.name))
         if (this.isWorkspaceChildProject && fse.existsSync(p)) {
-          const project = Project.From(p);
+          const project = Project.From<Project>(p);
           return project;
         }
       }
 
       let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
       if (fse.existsSync(p)) {
-        const project = Project.From(p);
+        const project = Project.From<Project>(p);
         return project;
       }
       // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
@@ -227,7 +227,7 @@ export class NpmProject {
     }
     return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
-      return Project.From(p);
+      return Project.From<Project>(p);
     }).filter(f => !!f);
     //#endregion
   }

@@ -35,7 +35,7 @@ describe(wrap.describe('Tnp copy project'), async () => {
         const projectType: Models.libs.LibType = libTypeName;
         const projectName = `test-copy-${projectType}`;
 
-        Project.by(libTypeName).copyManager.generateSourceCopyIn(path.join(location, projectName));
+        Project.by<Project>(libTypeName).copyManager.generateSourceCopyIn(path.join(location, projectName));
         // console.log('location'+location)
         it(testName, () => {
 

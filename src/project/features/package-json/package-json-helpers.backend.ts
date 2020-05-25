@@ -39,8 +39,8 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   }
 
   let parentOverride = {};
-  const orgNewDeps = _.cloneDeep(Project.Tnp.packageJson.data.dependencies);
-  let newDepsForProject = _.cloneDeep(Project.Tnp.packageJson.data.tnp.overrided.dependencies);
+  const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
+  let newDepsForProject = _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
   if (project.isStandaloneProject && !project.isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project._type });
   } else if ((project.isWorkspace && project.isContainerChild) || project.isWorkspaceChildProject) {
@@ -143,7 +143,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
             }
           }
           if (!versionFrom && _.isString(versionTo)) {
-            // if (!Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
+            // if (!(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
             overrideMsg = `Added new package "${oldDepName}@${versionTo}"`;
             // }
           }
@@ -168,7 +168,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 //#region save action
 function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
-  const engines = Project.Tnp.packageJson.data.engines;
+  const engines = (Project.Tnp as Project).packageJson.data.engines;
   const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
   const prv = (project.isStandaloneProject || project.isUnknowNpmProject) ? false : true;
 
@@ -181,7 +181,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
-    const projForVer = Project.by('container', project._frameworkVersion);
+    const projForVer = Project.by<Project>('container', project._frameworkVersion);
     global.actionShowingDepsForContainer = true;
     projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
     global.actionShowingDepsForContainer = false;
@@ -309,7 +309,7 @@ export function getAndTravelCoreDeps(options?: {
   updateFn?: (obj: Object, pkgName: string) => string,
   type?: Models.libs.LibType,
 }) {
-  const project: Project = Project.Tnp;
+  const project: Project = Project.Tnp as any;
   if (_.isUndefined(options)) {
     options = {};
   }
@@ -331,7 +331,7 @@ export function getAndTravelCoreDeps(options?: {
 
 //#region deps filters
 function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
+  const devDeps = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.packageJson.data.tnp &&
     project.packageJson.data.tnp.overrided &&
     project.packageJson.data.tnp.overrided.includeAsDev) || [];
@@ -358,7 +358,7 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
 }
 
 function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = Project.Tnp.packageJson.data.tnp.core.dependencies.asDevDependencies;
+  const devDeps = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.packageJson.data.tnp
     && project.packageJson.data.tnp.overrided
     && project.packageJson.data.tnp.overrided.includeAsDev) || [];
@@ -394,8 +394,7 @@ function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFrom
 
     let onlyAllowed = project.packageJson.data.tnp.overrided.includeOnly;
 
-    onlyAllowed = onlyAllowed.concat(Project.Tnp
-      .packageJson.data.tnp.core.dependencies.always);
+    onlyAllowed = onlyAllowed.concat((Project.Tnp as Project).packageJson.data.tnp.core.dependencies.always);
 
     Object.keys(deps).forEach(depName => {
       if (!onlyAllowed.includes(depName)) {

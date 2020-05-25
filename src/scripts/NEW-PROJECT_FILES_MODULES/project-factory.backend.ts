@@ -95,7 +95,7 @@ export class ProjectFactory {
 
     let { type, name, cwd, basedOn, version, skipInit, siteProjectMode, alsoBasedOn } = this.fixOptions_create(options);
 
-    const cwdProj = Project.From(cwd);
+    const cwdProj = Project.From<Project>(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
       version = cwdProj._frameworkVersion;
     }
@@ -116,7 +116,7 @@ export class ProjectFactory {
     if (_.isString(basedOn)) {
       basedOn = basedOn.replace(/\/$/, '');
     }
-    const basedOnProject = basedOn && Project.nearestTo(path.join(cwd, basedOn));
+    const basedOnProject = basedOn && Project.nearestTo<Project>(path.join(cwd, basedOn));
     if (basedOn && !basedOnProject) {
       Helpers.error(`[create] Not able to find baseline project from relative path: ${basedOn} `, false, true);
     }
@@ -124,7 +124,7 @@ export class ProjectFactory {
       Helpers.error(`[create] Site project only can be workspace, wrong--basedOn param: ${basedOn} `, false, true);
     }
 
-    let baseline = basedOn ? basedOnProject : Project.by(type, version);
+    let baseline = basedOn ? basedOnProject : Project.by<Project>(type, version);
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
     await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
@@ -134,7 +134,7 @@ export class ProjectFactory {
     // TODO this requred source modifer changes
     // if (siteProjectMode === 'dependency') {
     //   const otherBaselines = alsoBasedOn.map(c => {
-    //     const dep = Project.From(path.join(cwd, c.replace(/\/$/, '')));
+    //     const dep = Project.From<Project>(path.join(cwd, c.replace(/\/$/, '')));
     //     if (!dep) {
     //       Helpers.error(`Unknow dependency for site: "${c}"`, false, true);
     //     }
@@ -185,7 +185,7 @@ export class ProjectFactory {
     }
     if (type === 'workspace') {
 
-      const workspacePrroject = Project.From(destinationPath);
+      const workspacePrroject = Project.From<Project>(destinationPath);
       if (basedOn && (siteProjectMode === 'strict')) {
         workspacePrroject.baseline.children.forEach(c => {
           Helpers.log(`[craete] Basleine Child project "${c.genericName}"`);
@@ -196,7 +196,7 @@ export class ProjectFactory {
       });
     }
     Helpers.log(`[create] destinationPath: ${destinationPath}`);
-    const newCreatedProject = Project.From(destinationPath);
+    const newCreatedProject = Project.From<Project>(destinationPath);
     if (!newCreatedProject) {
       Helpers.error(`Not able to crate project in ${destinationPath}`, false, true);
     }
@@ -226,7 +226,7 @@ export class ProjectFactory {
     const argv = args.split(' ');
     const name = argv[1]
     const relativePath = argv[2]
-    Project.From(cwd).filesFactory.createModel(relativePath, name);
+    Project.From<Project>(cwd).filesFactory.createModel(relativePath, name);
     if (exit) {
       process.exit(0)
     }

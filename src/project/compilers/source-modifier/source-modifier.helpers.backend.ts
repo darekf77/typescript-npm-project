@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { ImpReplaceOptions } from './source-modifier.models';
-import { Helpers } from '../../../index';
+import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 
 

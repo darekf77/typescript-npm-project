@@ -78,7 +78,7 @@ export class PackageJsonBase extends PackageJsonCore {
     }
 
     if (this.project.isStandaloneProject || this.project.isContainer || (this.project.isWorkspace && !this.project.isContainerChild)) {
-      Project.Tnp.packageJson.prepareForSave(action, Project.Tnp);
+      (Project.Tnp as Project).packageJson.prepareForSave(action, Project.Tnp as Project);
     }
 
     if ((this.project.isContainerChild && this.project.isWorkspace) || this.project.isWorkspaceChildProject) {
@@ -134,7 +134,7 @@ export class PackageJsonBase extends PackageJsonCore {
   public updateFrom(locations: string[]) {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
-      const otherProj = Project.From(location);
+      const otherProj = Project.From<Project>(location);
       Helpers.log(`Updating package.json from ${otherProj.name}`)
       updaPackage(this.project, otherProj.packageJson.data.dependencies, otherProj);
       updaPackage(this.project, otherProj.packageJson.data.devDependencies, otherProj);

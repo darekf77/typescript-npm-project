@@ -144,28 +144,28 @@
 
 //       case CHOICE.INIT:
 //         await this.db.transaction.setCommand(`tnp ${res.command}`)
-//         await Project.Current.filesStructure.init('');
+//         await (Project.Current as Project).filesStructure.init('');
 //         process.exit(0)
 //         break;
 
 //       case CHOICE.BUILD_APP_WATCH:
 //         await this.db.transaction.setCommand(`tnp ${res.command}`)
-//         await Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', '')
+//         await (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST_WATCH:
 //         await this.db.transaction.setCommand(`tnp ${res.command}`)
-//         await Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', '')
+//         await (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_APP:
 //         await this.db.transaction.setCommand(`tnp ${res.command}`)
-//         await Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', '')
+//         await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST:
 //         await this.db.transaction.setCommand(`tnp ${res.command}`)
-//         await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', '')
+//         await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', '')
 //         break;
 
 //       case CHOICE.LAST_USED_COMMAND:
@@ -175,11 +175,11 @@
 //         break;
 
 //       case CHOICE.CLEAR:
-//         await Project.Current.filesStructure.clearFromArgs('')
+//         await (Project.Current as Project).filesStructure.clearFromArgs('')
 //         break;
 
 //       case CHOICE.CLEAR_RECUSIVE_WITH_NODE_MODUELS:
-//         // await Project.Current.
+//         // await (Project.Current as Project).
 //         break;
 
 //       case CHOICE.KILL_ALL_ACTIVE_BUILD_INSTANES_FROM_CURRENT_WORKSPACE:

@@ -21,7 +21,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     }
     Helpers.log(`Searching isomorphic packages`);
     super.start(force);
-    const linked = Project.From(this.cwd);
+    const linked = Project.From<Project>(this.cwd);
     BrowserCodeCut.IsomorphicLibs = BrowserCodeCut.IsomorphicLibs
       .concat(linked.linkedProjects.map(p => p.name))
     Helpers.log(`Founded ${this.count} isomorphic packages`);
@@ -31,7 +31,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     const pjPath = fse.realpathSync(path.join(node_modules, packageName));
     let res = false;
     try {
-      const proj = Project.From(pjPath);
+      const proj = Project.From<Project>(pjPath);
       if (proj) {
         if (proj.typeIs(...(config.projectTypes.forNpmLibs as Models.libs.LibType[]))) {
           // console.log(`Proj "${proj.genericName}" standalone`, proj.isStandaloneProject)

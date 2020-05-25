@@ -28,7 +28,7 @@ export async function $NAME_TEST() {
 export async function killAll() {
   const db = await TnpDB.Instance(config.dbLocation);
   let projectsToKill = [];
-  let p = Project.Current;
+  let p = (Project.Current as Project);
   projectsToKill.push(p)
   let workspace = p.isWorkspaceChildProject ? p.parent : void 0;
   if (!!workspace) {
@@ -65,17 +65,17 @@ export async function $DEVELOP(args: string, exit = true) {
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
   const db = await TnpDB.Instance(config.dbLocation);
   let projects = (await db.getProjects())
-    .map(p => p.project)
+    .map(p => p.project as Project)
     .filter(p => !p.isGenerated);
 
-  const igt = path.join(Project.Tnp.location, '../..', 'igt');
+  const igt = path.join((Project.Tnp as Project).location, '../..', 'igt');
   // console.log('igt', igt)
   const unknowNPm: Project[] = [];
   if (fse.existsSync(igt)) {
     projects = projects.concat(fse.readdirSync(igt)
       .map(f => {
         f = path.join(igt, f);
-        const proj = Project.From(f)
+        const proj = Project.From<Project>(f)
         // console.log(`${f} proj name: ${proj && proj.name}`);
         if (proj) {
           unknowNPm.push(proj)
@@ -90,7 +90,7 @@ export async function $DEVELOP(args: string, exit = true) {
       projects = projects.concat(fse.readdirSync(external)
         .map(f => {
           f = path.join(external, f);
-          const proj = Project.From(f)
+          const proj = Project.From<Project>(f)
           // console.log(`external proj name: ${proj && proj.name}`);
           if (proj) {
             unknowNPm.push(proj)
@@ -161,7 +161,7 @@ const $KILLALLNODE = () => {
 }
 
 const CHOKI = () => {
-  this.project = Project.Current;
+  this.project = (Project.Current as Project);
   // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
   chokidar.watch([config.folder.src, config.folder.components], {
     ignoreInitial: true,
@@ -185,10 +185,10 @@ async function NOT(args: string) {
 }
 
 async function $CHILDS_REQUIRED(args: string) {
-  if (!Project.Current.isWorkspaceChildProject) {
+  if (!(Project.Current as Project).isWorkspaceChildProject) {
     Helpers.error(`Not worksapce child`, false, true);
   }
-  console.log(Project.Current.sortedRequiredWorkspaceDependencies.map(c => c.name));
+  console.log((Project.Current as Project).sortedRequiredWorkspaceDependencies.map(c => c.name));
   process.exit(0)
 }
 

@@ -72,7 +72,7 @@ export function copyMainProjectDependencies
       .forEach(otherDependenyInTemp => {
 
         const existedPkgPath = path.join(project.node_modules.path, otherDependenyInTemp.name)
-        const existedOtherDependency = Project.From(existedPkgPath);
+        const existedOtherDependency = Project.From<Project>(existedPkgPath);
         if (existedOtherDependency) {
           if (existedOtherDependency.version === otherDependenyInTemp.version) {
             Helpers.log(`[smoothInstallPrepare] nothing to do for same dependency version ${otherDependenyInTemp.name}`);
@@ -108,15 +108,15 @@ export function copyMainProjectDependencies
 }
 
 export function copyMainProject(tmpProject: Project, project: Project, pkg: Models.npm.Package) {
-  const mainProjectInTemp = Project.From(path.join(tmpProject.node_modules.path, pkg.name));
+  const mainProjectInTemp = Project.From<Project>(path.join(tmpProject.node_modules.path, pkg.name));
   const mainProjectExistedPath = path.join(project.node_modules.path, pkg.name)
-  let mainProjectExisted = Project.From(mainProjectExistedPath);
+  let mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
   if (mainProjectExisted) {
     mainProjectExisted.removeItself();
   }
   Helpers.tryCopyFrom(mainProjectInTemp.location, mainProjectExistedPath);
   Helpers.log(`[smoothInstallPrepare] main package copy ${mainProjectInTemp.name}`);
-  mainProjectExisted = Project.From(mainProjectExistedPath);
+  mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
   return { mainProjectExisted, mainProjectInTemp };
 }
 
@@ -127,7 +127,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   Helpers.remove(`${path.join(project.location, pathPart)}*`);
   Helpers.mkdirp(tmpFolder);
   project.packageJson.copyTo(tmpFolder);
-  const tmpProject = Project.From(tmpFolder);
+  const tmpProject = Project.From<Project>(tmpFolder);
   tmpProject.packageJson.setNamFromContainingFolder();
   tmpProject.packageJson.hideDeps(`smooth instalation`);
   pkg.installType = '--save';

@@ -1,8 +1,9 @@
 //#region @backend
 import { Project } from '../abstract';
 import { BuildOptions } from 'tnp-db';
+import { CLASS } from 'typescript-class-helpers';
 
-
+@CLASS.NAME('ProjectDocker')
 export class ProjectDocker extends Project {
   async buildLib() {
     // throw new Error("Method not implemented.");

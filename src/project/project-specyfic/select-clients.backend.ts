@@ -55,7 +55,7 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
     let selectedChoices = choices.map(c => c.value);
 
     if (buildOptions.buildForAllClients) {
-      buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
+      buildOptions.forClient = selectedChoices.map(p => Project.From<Project>(path.join(currentProject.location, '..', p))) as any;
     } else {
       Helpers.info('Please select at lease one client..')
       const { projects = [] }: { projects: string[] } = await inquirer
@@ -68,7 +68,7 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
           }
         ]) as any;
       selectedChoices = projects;
-      buildOptions.forClient = selectedChoices.map(p => Project.From(path.join(currentProject.location, '..', p))) as any;
+      buildOptions.forClient = selectedChoices.map(p => Project.From<Project>(path.join(currentProject.location, '..', p))) as any;
     }
 
     await db.updateCommandBuildOptions(currentProject.location, buildOptions);

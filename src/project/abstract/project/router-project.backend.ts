@@ -10,6 +10,7 @@ import { Helpers } from 'tnp-helpers';
 import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from '../../../config';
+import { EnvironmentConfig } from '../../features';
 
 export abstract class RouterProject {
   protected __defaultPort: number;
@@ -45,13 +46,6 @@ export abstract class RouterProject {
     this.__defaultPort = port;
   }
 
-  public run(this: Project, command: string, options?: Models.dev.RunOptions) {
-    if (!options) { options = {}; }
-    if (!options.cwd) { options.cwd = this.location; }
-    return Helpers.run(command, options);
-  }
-
-
   public getDefaultPort(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser && this.browser.defaultPort;
@@ -76,7 +70,7 @@ export abstract class RouterProject {
     if (this.isWorkspace && !this.isGenerated) {
 
       const genLocationWOrkspace = path.join(this.location, config.folder.bundle, this.name);
-      const genWorkspace = Project.From(genLocationWOrkspace)
+      const genWorkspace = Project.From<Project>(genLocationWOrkspace)
       if (!genWorkspace) {
         Helpers.error(`Workspace folder "${config.folder.bundle}" does not exists.`
           + ` Please run: ${chalk.bold('tnp static:build')} in this workspace.
@@ -88,7 +82,7 @@ Generated workspace should be here: ${genLocationWOrkspace}
     }
 
 
-    await this.env.init(args, true)
+    await (this.env as any as EnvironmentConfig).init(args, true)
     this.filesTemplatesBuilder.rebuild(true)
     Helpers.log(`Killing proces on port ${this.getDefaultPort()}`);
     await Helpers.killProcessByPort(this.getDefaultPort())

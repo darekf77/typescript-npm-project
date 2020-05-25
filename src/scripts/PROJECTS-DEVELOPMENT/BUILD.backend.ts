@@ -18,7 +18,7 @@ export async function chainBuild(args: string) {
     'isomorphic-lib'
   ] as Models.libs.LibType[];
 
-  let project = Project.Current;
+  let project = (Project.Current as Project);
 
   const firstArg = _.first(args.split(' '));
   if (project.isWorkspace || project.isWorkspace) {
@@ -133,7 +133,7 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
 
 export async function DEVB() {
   const command = 'tnp bdw ss-common-ui --forClient=ss-common-ui -verbose';
-  await Project.Current.run(command, {
+  await (Project.Current as Project).run(command, {
     output: true,
     prefix: chalk.bold(`[testowy prefix] `)
   }).unitlOutputContains('Watching for file changes.',
@@ -156,7 +156,7 @@ const $BUILDWATCH = async (args) => {
 };
 
 async function $DEFAULT_BUILD(args) {
-  const project = Project.Current;
+  const project = (Project.Current as Project);
   if (project.isStandaloneProject) {
     if (project.typeIs('angular-lib')) {
       await BUILD_DIST_WATCH(args);
@@ -172,30 +172,30 @@ async function $DEFAULT_BUILD(args) {
 }
 
 
-const BUILD_DIST_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+const BUILD_DIST_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
-  Project.Current.buildProcess.startForLibFromArgs(false, true, 'dist', args);
+  (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
 }
-const BUILD_APP_WATCH = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
+const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const BUILD_DIST = async (args) => {
-  // console.log('AM FUCKING HEre',Project.Current.isGenerated)
+  // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
   // process.exit(0)
-  await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+  await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 const BUILD_DIST_ALL = async (args) => {
-  // console.log('AM FUCKING HEre',Project.Current.isGenerated)
+  // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
   // process.exit(0)
   args += ' --buildForAllClients';
-  await Project.Current.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+  await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
-const BUILD_BUNDLE = (args) => Project.Current.buildProcess.startForLibFromArgs(false, false, 'bundle', args);
-const BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+const BUILD_BUNDLE = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'bundle', args);
+const BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
 
 
 
 const STATIC_BUILD = async (args) => {
-  if (!Project.Current.isWorkspace) {
+  if (!(Project.Current as Project).isWorkspace) {
     Helpers.error(`Please use:
 ${chalk.gray(`$ ${config.frameworkName} static:build:lib`)}
 or
@@ -204,48 +204,48 @@ ${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
 inside workspace children.
     `, false, true)
   }
-  const staticVersionOfProject = await Project.Current.StaticVersion()
+  const staticVersionOfProject = await (Project.Current as Project).StaticVersion()
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
   } else {
-    Helpers.log(`No static version for project: ${Project.Current.name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
   }
 
 }
 
 const STATIC_BUILD_LIB = async (args) => {
-  const staticVersionOfProject = await Project.Current.StaticVersion();
+  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
   } else {
-    Helpers.log(`No static version for project: ${Project.Current.name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
   }
 
 };
 
 const STATIC_BUILD_PROD = async (args) => {
-  const staticVersionOfProject = await Project.Current.StaticVersion();
+  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ prod: true, args, staticBuildAllowed: true })
   } else {
-    Helpers.log(`No static version for project: ${Project.Current.name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
   }
 
 }
 
-const STATIC_BUILD_LIB_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
+const STATIC_BUILD_LIB_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForLib({ prod: true, args, staticBuildAllowed: true })
 
-const STATIC_BUILD_APP = async (args) => (await Project.Current.StaticVersion()).buildProcess
+const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForApp({ args, staticBuildAllowed: true })
 
-const STATIC_BUILD_APP_PROD = async (args) => (await Project.Current.StaticVersion()).buildProcess
+const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true })
 
 const $SERVE = (args) => {
-  let proj = Project.Current;
+  let proj = (Project.Current as Project);
   if (!proj) {
-    proj = Project.nearestTo(process.cwd());
+    proj = Project.nearestTo<Project>(process.cwd());
   }
   if (proj && proj.isStandaloneProject) {
     if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
@@ -307,14 +307,14 @@ const $SERVE = (args) => {
 
 
 const $START = async (args) => {
-  if (Project.Current.isStandaloneProject) {
+  if ((Project.Current as Project).isStandaloneProject) {
     $SERVE(args);
     return;
   }
-  if (!Project.Current.isWorkspace) {
+  if (!(Project.Current as Project).isWorkspace) {
     Helpers.error(`Please use this command only on workspace level`, false, true)
   }
-  await Project.Current.start(args);
+  await (Project.Current as Project).start(args);
 };
 
 const SB = (args) => STATIC_BUILD(args);
@@ -340,25 +340,25 @@ async function BB(args) {
   await BUILD_BUNDLE(args);
 }
 
-const $BUILD_DIST_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args);
-const $BUILD_BUNDLE_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(false, true, 'bundle', args);
-const $BUILD_BUNDLE_PROD = (args) => Project.Current.buildProcess.startForLibFromArgs(true, false, 'bundle', args);
-const $BUILD_BUNDLE_PROD_WATCH = (args) => Project.Current.buildProcess.startForLibFromArgs(true, true, 'bundle', args);
-const $BUILD_APP_PROD = (args) => Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
-const $BUILD_APP = (args) => Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args);
-const $BUILD_APP_WATCH_PROD = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
+const $BUILD_DIST_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
+const $BUILD_BUNDLE_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'bundle', args);
+const $BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+const $BUILD_BUNDLE_PROD_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, true, 'bundle', args);
+const $BUILD_APP_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+const $BUILD_APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
+const $BUILD_APP_WATCH_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const $START_APP = async (args) => {
-  await Project.Current.start(args);
+  await (Project.Current as Project).start(args);
 };
 
 
 
 const $BUILD_PROD = async (args) => {
-  if (Project.Current.typeIs(...config.allowedTypes.libs)) {
-    await Project.Current.buildProcess.startForLibFromArgs(true, false, 'dist', args);
+  if ((Project.Current as Project).typeIs(...config.allowedTypes.libs)) {
+    await (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
   }
-  if (Project.Current.typeIs(...config.allowedTypes.app)) {
-    await Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
+  if ((Project.Current as Project).typeIs(...config.allowedTypes.app)) {
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
   }
   process.exit(0);
 };
@@ -369,8 +369,8 @@ const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
 const $RELEASE = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
-  Project.Current.checkIfReadyForNpm();
-  await Project.Current.release(argsObj)
+  (Project.Current as Project).checkIfReadyForNpm();
+  await (Project.Current as Project).release(argsObj)
 
   process.exit(0)
 };
@@ -379,8 +379,8 @@ const $RELEASE_PROD = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.prod = true;
   argsObj.args = args;
-  Project.Current.checkIfReadyForNpm();
-  await Project.Current.release(argsObj)
+  (Project.Current as Project).checkIfReadyForNpm();
+  await (Project.Current as Project).release(argsObj)
 
   process.exit(0)
 };
@@ -390,7 +390,7 @@ const $BAW = (args) => BUILD_APP_WATCH(args);
 
 const $STOP_BUILD_DIST_WATCH = async (args) => {
   const db = await TnpDB.Instance(config.dbLocation);
-  const projectLocation = Project.Current.location;
+  const projectLocation = (Project.Current as Project).location;
   await db.updateProcesses();
   const pidsToKill = (await db.getBuilds())
     .filter(f =>
@@ -424,7 +424,7 @@ async function $DB_BUILDS_UPDATE() {
 
 
 async function $ACTIVE_SINGULAR_BUILD(args) {
-  await Project.Current.hasParentWithSingularBuild()
+  await (Project.Current as Project).hasParentWithSingularBuild()
   // process.stdout.write();
   process.exit(0)
 }

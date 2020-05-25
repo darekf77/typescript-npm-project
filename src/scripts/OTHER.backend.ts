@@ -13,7 +13,7 @@ import { PackagesRecognitionExtended } from '../project/features/packages-recogn
 // console.log('hello')
 
 function $CONFIGS() {
-  Helpers.log(Project.Current.env.configsFromJs.map(c => c.domain).join('\n'));
+  Helpers.log((Project.Current as Project).env.configsFromJs.map(c => c.domain).join('\n'));
   process.exit(0)
 }
 
@@ -24,14 +24,14 @@ function CHECK_ENV() {
 
 
 function recreate() {
-  Project.Current.recreate.initAssets()
-  Project.Current.recreate.gitignore()
+  (Project.Current as Project).recreate.initAssets();
+  (Project.Current as Project).recreate.gitignore();
   process.exit(0)
 
 }
 
 function version() {
-  console.log(Project.Tnp.version);
+  console.log((Project.Tnp as Project).version);
   process.exit(0)
 }
 
@@ -66,7 +66,7 @@ function $COMMAND(args) {
 
 
 function NPM_FIXES() {
-  console.log(Project.Current.node_modules.fixesForNodeModulesPackages)
+  console.log((Project.Current as Project).node_modules.fixesForNodeModulesPackages)
   process.exit(0)
 }
 
@@ -77,7 +77,7 @@ function LN(args: string) {
 }
 
 function CIRCURAL_CHECK() {
-  Project.Current.run(`madge --circular --extensions ts ./src`).sync()
+  (Project.Current as Project).run(`madge --circular --extensions ts ./src`).sync()
   process.exit(0)
 }
 
@@ -94,7 +94,7 @@ const PSINFO = async (a) => {
 }
 
 function UPDATE_ISOMORPHIC() {
-  PackagesRecognitionExtended.fromProject(Project.Current).start(true);
+  PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true);
 }
 
 function $isbundlemode(args) {
@@ -105,13 +105,13 @@ function $isbundlemode(args) {
 const $ASSETS = () => recreate();
 const VERSION = () => version();
 const PATH = () => {
-  console.log(Project.Tnp.location);
+  console.log((Project.Tnp as Project).location);
   process.exit(0)
 };
 
 const COPY_RESOURCES = () => {
-  Project.Current.checkIfReadyForNpm();
-  Project.Current.bundleResources();
+  (Project.Current as Project).checkIfReadyForNpm();
+  (Project.Current as Project).bundleResources();
   process.exit(0)
 }
 
@@ -140,7 +140,7 @@ export default {
   LN: Helpers.CLIWRAP(LN, 'LN'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');
-  //   Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
+  //   Project.From<Project>(from).node_modules.copy(pkgName).to(Project.From<Project>(to))
   //   process.exit()
   // },
   $COMMAND: Helpers.CLIWRAP($COMMAND, '$COMMAND'),

@@ -9,7 +9,9 @@ import { config } from '../../config';
 import { Project } from '../abstract';
 import { BuildOptions } from 'tnp-db';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('ProjectAngularLib')
 export class ProjectAngularLib extends Project {
 
   private projectAngularClient: ProjectAngularClient;
@@ -106,11 +108,11 @@ export class ProjectAngularLib extends Project {
     if (this.frameworkVersionAtLeast('v2')) {
       files = files.concat([
         {
-          sourceProject: Project.by('isomorphic-lib', this._frameworkVersion),
+          sourceProject: Project.by<Project>('isomorphic-lib', this._frameworkVersion),
           relativePath: 'tsconfig.browser.json.filetemplate',
         },
         {
-          sourceProject: Project.by('isomorphic-lib', this._frameworkVersion),
+          sourceProject: Project.by<Project>('isomorphic-lib', this._frameworkVersion),
           relativePath: 'tsconfig.isomorphic.json.filetemplate'
         }
       ])

@@ -113,7 +113,7 @@ export function globalArgumentsParser(argsv: string[]) {
   if (_.isString(cwdFromArgs)) {
     if (findNearestProject || _.isString(findNearestProjectType)) {
       // Helpers.log('look for nearest')
-      var nearest = Project.nearestTo(cwdFromArgs, {
+      var nearest = Project.nearestTo<Project>(cwdFromArgs, {
         type: findNearestProjectType,
         findGitRoot: findProjectWithGitRoot,
       });
@@ -351,7 +351,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
       Helpers.error(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`, false, true);
     } else {
-      const p = void 0; //Project.Current;
+      const p = void 0; //(Project.Current as Project);
 
       if (p) {
         // TODO console ui

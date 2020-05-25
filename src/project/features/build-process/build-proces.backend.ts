@@ -11,12 +11,13 @@ import { Models } from 'tnp-models';
 import { config } from '../../../config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
-import { PROGRESS_DATA } from '../../../progress-output';
+import { PROGRESS_DATA } from 'tnp-models';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
 import {
   waitForAppBuildToBePossible, waitForRequiredDistsBuilds
 } from './waiting-for-builds-conditions-helpers.backend';
 import { selectClients } from '../../project-specyfic/select-clients.backend';
+import { EnvironmentConfig } from '../environment-config';
 
 const allowedForSelectingCLients = [
   'angular-lib',
@@ -133,8 +134,8 @@ inside generated projects...
       buildOptions.watch = false;
       Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
-    const checkIfGeneratedTnpBundle = Project.Current.isTnp ? true :
-      fse.existsSync(path.join(Project.Tnp.location, global.tnp_out_folder, config.folder.browser));
+    const checkIfGeneratedTnpBundle = (Project.Current as Project).isTnp ? true :
+      fse.existsSync(path.join((Project.Tnp as Project).location, global.tnp_out_folder, config.folder.browser));
 
     if (!this.project.isStandaloneProject && !checkIfGeneratedTnpBundle) {
       Helpers.error(`Error: Please compile your ${config.frameworkName} to ${config.frameworkName}-bundle`, false, true)
@@ -220,7 +221,7 @@ inside generated projects...
 
     //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
-      await this.project.env.updateData();
+      await (this.project.env as any as EnvironmentConfig).updateData();
       if (this.project.typeIs('angular-lib')) {
         this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
       }

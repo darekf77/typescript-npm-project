@@ -88,7 +88,7 @@ export class NodeModulesBase extends NodeModulesCore {
         const { override = false, linkOnly = false } = options || {};
 
         const packageName = (_.isObject(pkg) ? (pkg as Models.npm.Package).name : pkg) as string;
-        let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName))
+        let projToCopy = Project.From<Project>(path.join(self.project.location, config.folder.node_modules, packageName))
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules)
         if (!fse.existsSync(nodeModeulesPath)) {
           Helpers.mkdirp(nodeModeulesPath)
@@ -121,7 +121,7 @@ export class NodeModulesBase extends NodeModulesCore {
           // .filter(dep => dep !== self.project.name)
           .forEach(pkgName => {
             const pDestPathPackage = path.join(nodeModeulesPath, pkgName)
-            projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, pkgName))
+            projToCopy = Project.From<Project>(path.join(self.project.location, config.folder.node_modules, pkgName))
             if (projToCopy) {
               if (linkOnly) {
                 projToCopy.linkTo(pDestPathPackage);

@@ -13,8 +13,6 @@ import { config } from '../../../config';
 
 export abstract class BaseProject {
 
-  browser: Models.other.IProject = {} as any;
-
   public get genericName(this: Project): string {
 
     if (Helpers.isBrowser) {

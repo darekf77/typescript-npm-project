@@ -6,7 +6,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { NpmPackagesCore } from './npm-packages-core.backend';
 import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
-import { PROGRESS_DATA } from '../../../progress-output';
+import { PROGRESS_DATA } from 'tnp-models';
 //#endregion
 
 

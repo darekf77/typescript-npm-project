@@ -87,7 +87,7 @@ export abstract class FolderProject {
     let res = subdirectories
       .map(dir => {
         // log('child:', dir)
-        return Project.From(dir);
+        return Project.From<Project>(dir);
       })
       .filter(c => !!c)
 
@@ -116,7 +116,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const parent = Project.From(path.join(this.location, '..'));
+    const parent = Project.From<Project>(path.join(this.location, '..'));
     if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
       return parent.parent;
     }
@@ -132,7 +132,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const grandpa = Project.From(path.join(this.location, '..', '..'));
+    const grandpa = Project.From<Project>(path.join(this.location, '..', '..'));
     return grandpa;
     //#endregion
   }

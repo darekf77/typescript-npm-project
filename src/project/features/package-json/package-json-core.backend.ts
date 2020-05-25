@@ -181,7 +181,7 @@ export class PackageJsonCore {
     this.copyTo(projectOrPath);
     const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
       (projectOrPath as Project).location);
-    Project.From(dest)
+    Project.From<Project>(dest)
   }
 
   public copyTo(projectOrPath: Project | String) {

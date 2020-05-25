@@ -6,8 +6,9 @@ import { Project } from '../abstract';
 import { BuildOptions } from 'tnp-db';
 import { Helpers } from 'tnp-helpers';
 import { SingularBuild } from '../features/singular-build.backend';
-import { PROGRESS_DATA } from '../../progress-output';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('ProjectContainer')
 export class ProjectContainer extends Project {
 
   async initProcedure() {
@@ -18,7 +19,7 @@ export class ProjectContainer extends Project {
     // console.log('this.getFolders()', this.getFolders())
     const repoChilds = this.getFolders()
       .map(c => {
-        const proj = Project.From(c);
+        const proj = Project.From<Project>(c);
         if (!proj) {
           Helpers.info(`No project from ${c}`);
         }
@@ -31,7 +32,7 @@ export class ProjectContainer extends Project {
     repoChilds.forEach(name => {
       // console.log('name', name)
       if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
-        && Project.From(path.join(this.location, name))?.git.isGitRepo) {
+        && Project.From<Project>(path.join(this.location, name))?.git.isGitRepo) {
         chagned = true;
         // console.log('added', name)
         this.packageJson.linkedProjects.push(name);

@@ -14,7 +14,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
   protected s_onlyFor = 'onlyFor';
   protected s_common = 'common';
   private get all() {
-    return Project.Tnp.packageJson.data.tnp.core.dependencies;
+    return (Project.Tnp as Project).packageJson.data.tnp.core.dependencies;
   }
 
   private for(libType: Models.libs.LibType) {

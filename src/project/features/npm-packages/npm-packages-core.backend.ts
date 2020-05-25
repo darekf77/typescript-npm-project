@@ -35,9 +35,9 @@ export class NpmPackagesCore extends FeatureForProject {
       if (global.testMode) {
         Helpers.log(`Test mode: normal instalation`)
         if (pkg) {
-          Project.Tnp.node_modules.copy(pkg).to(this.project);
+          (Project.Tnp as Project).node_modules.copy(pkg).to(this.project);
         } else {
-          this.project.node_modules.copyFrom(Project.Tnp, `Test mode instalaltion`);
+          this.project.node_modules.copyFrom(Project.Tnp as Project, `Test mode instalaltion`);
         }
       } else {
         if (smoothInstall) {

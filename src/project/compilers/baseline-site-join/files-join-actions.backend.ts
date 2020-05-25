@@ -10,13 +10,14 @@ import { SourceModifier } from '../source-modifier';
 
 import { BaselineSiteJoin } from './baseline-site-join.backend';
 import { config } from '../../../config';
-import { Helpers } from '../../../index';
+import { Helpers } from 'tnp-helpers';
 import {
   HandlePrefixingFileToEasyOverride,
   HandleReferingToBaselinePathes,
   HandleReferingToAndularLibModuleName,
   HandleRefereingToNewFileOnlyAvailableInCustom,
 } from './modify-ts-file-action';
+import { Project } from '../../abstract';
 
 export class FilesJoinActions {
 
@@ -30,28 +31,28 @@ export class FilesJoinActions {
 
 
       _1___handlePrefixingFilesToEasyOverride() {
-        input = (new HandlePrefixingFileToEasyOverride(self.project, debuggin))
+        input = (new HandlePrefixingFileToEasyOverride(self.project as Project, debuggin))
           .action(relativeBaselineCustomPath, input);
         return input;
       },
 
 
       _2___handleReferingTOAngularLibModulesName() {
-        input = (new HandleReferingToAndularLibModuleName(self.project, debuggin))
+        input = (new HandleReferingToAndularLibModuleName(self.project as Project, debuggin))
           .action(relativeBaselineCustomPath, input);
         return input;
       },
 
 
       _3___handleReferingToBaselinePathes() {
-        input = (new HandleReferingToBaselinePathes(self.project))
+        input = (new HandleReferingToBaselinePathes(self.project as Project))
           .action(relativeBaselineCustomPath, input);
         return input;
       },
 
 
       _4___handleReferingToNewFilesOnlyAvailableInCustom() {
-        input = (new HandleRefereingToNewFileOnlyAvailableInCustom(self.project))
+        input = (new HandleRefereingToNewFileOnlyAvailableInCustom(self.project as Project))
           .action(relativeBaselineCustomPath, input);
         return input;
       },

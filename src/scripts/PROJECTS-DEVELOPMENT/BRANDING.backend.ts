@@ -15,7 +15,7 @@ import { FilesRenaming } from '../../project/features/files-recreation/files-ren
 
 export async function $BRANDING(args: string, exit = true) {
 
-  const proj = Project.Current;
+  const proj = (Project.Current as Project);
   const pathes = {
     favicondesc: 'tmp-fav-icon-description.json'
   };

@@ -2,7 +2,7 @@ import { FeatureForProject } from '../../abstract';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
-import { Helpers } from '../../../index';
+import { Helpers } from 'tnp-helpers';
 
 
 export class FilesFactory extends FeatureForProject {

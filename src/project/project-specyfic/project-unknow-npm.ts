@@ -5,12 +5,14 @@ import * as child from 'child_process';
 // third part
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';
+import { CLASS } from 'typescript-class-helpers';
 
 
 
 /**
  * DO NOT USE environment variables in this project directly
  */
+@CLASS.NAME('ProjectUnknowNpm')
 export class ProjectUnknowNpm extends Project {
   async buildLib() {
     // throw new Error("Method not implemented.");

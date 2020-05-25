@@ -4,7 +4,9 @@ import * as path from 'path';
 import { Project } from '../abstract';
 import { config } from '../../config';
 import { BuildOptions } from 'tnp-db';
+import { CLASS } from 'typescript-class-helpers';
 
+@CLASS.NAME('ProjectIonicClient')
 export class ProjectIonicClient extends Project {
   async buildLib() {
     // throw new Error("Method not implemented.");

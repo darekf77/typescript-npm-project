@@ -88,7 +88,7 @@ function getLocationOfGeneratedProject(project: Project, outDir: string) {
 
 async function initGeneratedBaselienInDist(generatedInDistBaselineWorkspaceLocation: string) {
 
-  const generateBaselineWorkspaceInDist: Project = Project.From(generatedInDistBaselineWorkspaceLocation);
+  const generateBaselineWorkspaceInDist: Project = Project.From<Project>(generatedInDistBaselineWorkspaceLocation);
 
   // prevent npm full instatalation
   const binInBasleine = path.join(

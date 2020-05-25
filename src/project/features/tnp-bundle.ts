@@ -21,12 +21,12 @@ export class TnpBundle extends FeatureForProject {
       console.trace(`** ERR Project.Tnp not available yet`)
     }
 
-    let pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.dist);
+    let pathTnpCompiledJS = path.join((Project.Tnp as Project).location, config.folder.dist);
     if (!fse.existsSync(pathTnpCompiledJS)) {
-      pathTnpCompiledJS = path.join(Project.Tnp.location, config.folder.bundle);
+      pathTnpCompiledJS = path.join((Project.Tnp as Project).location, config.folder.bundle);
     }
     const pathTnpPackageJSONData: Models.npm.IPackageJSON = fse
-      .readJsonSync(path.join(Project.Tnp.location, config.file.package_json)) as any;
+      .readJsonSync(path.join((Project.Tnp as Project).location, config.file.package_json)) as any;
 
     pathTnpPackageJSONData.name = config.file.tnpBundle;
     pathTnpPackageJSONData.tnp = undefined;
@@ -41,7 +41,7 @@ export class TnpBundle extends FeatureForProject {
 
 
   checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
-    const tnpDistCompiled = path.join(Project.Tnp.location, config.folder.dist)
+    const tnpDistCompiled = path.join((Project.Tnp as Project).location, config.folder.dist)
 
     return Helpers.getMostRecentFilesNames(tnpDistCompiled)
       .map(f => f.replace(tnpDistCompiled, ''))
@@ -100,7 +100,7 @@ export class TnpBundle extends FeatureForProject {
 
     for (let index = 0; index < toCopyTnpDeps.length; index++) {
       const depName = toCopyTnpDeps[index];
-      const sourceDep = path.join(Project.Tnp.location, config.folder.node_modules, depName);
+      const sourceDep = path.join((Project.Tnp as Project).location, config.folder.node_modules, depName);
       const destDep = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, depName);
       // Helpers.removeFolderIfExists(destDep);
       Helpers.copy(sourceDep, destDep);
@@ -131,7 +131,7 @@ export class TnpBundle extends FeatureForProject {
       spaces: 2
     })
 
-    const sourceTnpPath = path.join(Project.Tnp.location, config.file.tnp_system_path_txt);
+    const sourceTnpPath = path.join((Project.Tnp as Project).location, config.file.tnp_system_path_txt);
     const destTnpPath = path.join(workspaceOrStandaloneLocation, config.folder.node_modules,
       config.file.tnpBundle, config.file.tnp_system_path_txt)
 
@@ -146,7 +146,7 @@ export class TnpBundle extends FeatureForProject {
       ++this.notNeededReinstallationTnp[workspaceOrStandaloneLocation];
     }
 
-    Helpers.log(`Tnp-helper installed in ${project.name} from ${lastTwo} , `
+    Helpers.log(`Tnp-bundle installed in ${project.name} from ${lastTwo} , `
       + `installs counter:${this.notNeededReinstallationTnp[workspaceOrStandaloneLocation]} `)
 
   }

@@ -31,7 +31,7 @@ export class SingularBuild extends FeatureForProject {
     const tmpWorkspaceDirpath = path.join(this.project.location, config.folder.dist);
     const projjjj = path.join(tmpWorkspaceDirpath, tmpWorkspaceName);
     Helpers.log(`dist project: ${projjjj}`);
-    this.singularWatchProj = Project.From(projjjj);
+    this.singularWatchProj = Project.From<Project>(projjjj);
     if (!this.singularWatchProj) {
       Helpers.removeFolderIfExists(projjjj);
       this.singularWatchProj = await newFactory.create({

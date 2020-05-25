@@ -27,20 +27,20 @@ function hidefilesfor(project: Project) {
 }
 
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
-  showfilesfor(Project.Current);
+  showfilesfor((Project.Current as Project));
   // console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
-  hidefilesfor(Project.Current);
+  hidefilesfor((Project.Current as Project));
   console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 
 export function $INIT_VSCODE() {
-  Project.Current.recreate.vscode.settings.excludedFiles();
-  Project.Current.recreate.vscode.settings.colorsFromWorkspace()
+  (Project.Current as Project).recreate.vscode.settings.excludedFiles();
+  (Project.Current as Project).recreate.vscode.settings.colorsFromWorkspace();
   process.exit(0)
 };
 
@@ -49,8 +49,8 @@ export async function $VSCODE_INIT_ALL() {
   const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
-    proj.project.recreate.vscode.settings.excludedFiles();
-    proj.project.recreate.vscode.settings.colorsFromWorkspace()
+    (proj.project as Project).recreate.vscode.settings.excludedFiles();
+    (proj.project as Project).recreate.vscode.settings.colorsFromWorkspace();
   }
   process.exit(0);
 }
@@ -167,17 +167,17 @@ const $VSCODE_FIX = async () => {
   const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
-    proj.project && proj.project.recreate.vscode.settings.changeColorTheme(false)
+    proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme(false);
   }
   await new Promise(resolve => setTimeout(() => resolve(), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
-    proj.project && proj.project.recreate.vscode.settings.changeColorTheme()
+    proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme();
   }
   await new Promise(resolve => setTimeout(() => resolve(), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
-    proj.project && proj.project.recreate.vscode.settings.gitReset()
+    proj.project && (proj.project as Project).recreate.vscode.settings.gitReset();
   }
   process.exit(0)
 }
@@ -187,10 +187,10 @@ const $FILES_HIDE = (args, exit) => $VSCODE_TEMP_HIDE(args, exit);
 const $FILES_SHOW = (args, exit) => $VSCODE_TEMP_SHOW(args, exit);
 const $FILES_SHOW_ALL = (args, exit = true) => {
   let proj: Project;
-  if (Project.Current.isWorkspaceChildProject) {
-    proj = Project.Current.parent;
+  if ((Project.Current as Project).isWorkspaceChildProject) {
+    proj = (Project.Current as Project).parent;
   } else {
-    proj = Project.Current;
+    proj = (Project.Current as Project);
   }
   showfilesfor(proj);
   if (proj.isWorkspace) {
@@ -201,10 +201,10 @@ const $FILES_SHOW_ALL = (args, exit = true) => {
 
 const $FILES_HIDE_ALL = (args, exit = true) => {
   let proj: Project;
-  if (Project.Current.isWorkspaceChildProject) {
-    proj = Project.Current.parent;
+  if ((Project.Current as Project).isWorkspaceChildProject) {
+    proj = (Project.Current as Project).parent;
   } else {
-    proj = Project.Current;
+    proj = (Project.Current as Project);
   }
   hidefilesfor(proj);
   if (proj.isWorkspace) {

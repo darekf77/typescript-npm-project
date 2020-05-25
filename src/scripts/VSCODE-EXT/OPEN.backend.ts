@@ -13,20 +13,20 @@ import chalk from 'chalk';
 
 
 function $OPEN_WORKSPACE() {
-  const workspacePath = path.join(Project.Current.location);
+  const workspacePath = path.join((Project.Current as Project).location);
   if (!fse.existsSync(workspacePath)) {
-    Project.Current.recreateCodeWorkspace();
+    (Project.Current as Project).recreateCodeWorkspace();
   }
-  Project.Current.run(`code ${Project.Current.location} &`).sync();
+  (Project.Current as Project).run(`code ${(Project.Current as Project).location} &`).sync();
   process.exit(0)
 }
 
 function $OPEN_WORKSPACE_CHILDS() {
   let proj: Project;
-  if (Project.Current.isWorkspace) {
-    proj = Project.Current;
-  } else if (Project.Current.isWorkspaceChildProject) {
-    proj = Project.Current.parent;
+  if ((Project.Current as Project).isWorkspace) {
+    proj = Project.Current as Project;
+  } else if ((Project.Current as Project).isWorkspaceChildProject) {
+    proj = (Project.Current as Project).parent;
   }
   if (proj.isWorkspace) {
     proj.run(`${proj.children.map(c => `code ${c.name}`).join(' && ')}`).sync();
@@ -35,31 +35,31 @@ function $OPEN_WORKSPACE_CHILDS() {
 }
 
 function $IS_CORE_PROJECT() {
-  Helpers.info(`(${Project.Current.genericName})
-  - is core project: ${chalk.bold(String(Project.Current.isCoreProject))}`)
+  Helpers.info(`(${(Project.Current as Project).genericName})
+  - is core project: ${chalk.bold(String((Project.Current as Project).isCoreProject))}`)
   process.exit(0)
 }
 
 function $OPEN_CORE_PROJECT() {
-  if (Project.Current.isCoreProject && Project.Current.frameworkVersionAtLeast('v2')) {
-    Project.Current.run(`code ${Project.by(Project.Current._type, Project.Current.frameworkVersionMinusOne).location} &`).sync();
+  if ((Project.Current as Project).isCoreProject && (Project.Current as Project).frameworkVersionAtLeast('v2')) {
+    (Project.Current as Project).run(`code ${Project.by<Project>((Project.Current as Project)._type, (Project.Current as Project).frameworkVersionMinusOne).location} &`).sync();
   } else {
-    Project.Current.run(`code ${Project.by(Project.Current._type, Project.Current._frameworkVersion).location} &`).sync();
+    (Project.Current as Project).run(`code ${Project.by<Project>((Project.Current as Project)._type, (Project.Current as Project)._frameworkVersion).location} &`).sync();
   }
   process.exit(0)
 }
 
 function $OPEN_TNP_PROJECT() {
-  Project.Tnp.run(`code ${Project.Tnp.location} &`).sync();
+  (Project.Tnp as Project).run(`code ${(Project.Tnp as Project).location} &`).sync();
   process.exit(0)
 }
 
 function $OPEN_BASELINE() {
-  if (Project.Current.isSite) {
-    if (Project.Current.isWorkspace) {
-      Project.Current.baseline.run(`code ${Project.Current.baseline.location} &`).sync();
+  if ((Project.Current as Project).isSite) {
+    if ((Project.Current as Project).isWorkspace) {
+      (Project.Current as Project).baseline.run(`code ${(Project.Current as Project).baseline.location} &`).sync();
     } else {
-      Project.Current.baseline.run(`code . &`).sync();
+      (Project.Current as Project).baseline.run(`code . &`).sync();
     }
     process.exit(0)
   }

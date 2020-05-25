@@ -185,7 +185,7 @@ export class FilesRecreator extends FeatureForProject {
       }
     } else {
       try {
-        const settingFromCore = path.join(Project.by(this.project._type).location, '.vscode', 'settings.json');
+        const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
         settings = modifyFN(settings, this.project);
@@ -412,7 +412,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
 
   projectSpecyficFiles() {
-    const defaultProjectProptotype = Project.by(this.project._type, this.project._frameworkVersion);
+    const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion);
     let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
       this.project.projectSpecyficFiles().forEach(f => {
@@ -428,7 +428,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
   }
 
   commonFiles() {
-    const wokrspace = Project.by('workspace');
+    const wokrspace = Project.by<Project>('workspace');
     const files = this.commonFilesForAllProjects;
     files.map(file => {
       return {

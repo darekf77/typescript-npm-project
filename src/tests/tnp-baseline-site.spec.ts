@@ -59,8 +59,8 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
       NEW_SITE(`${SITE_NAME} --basedOn=${BASELINE_WORKSPACE_PROJECT_NAME}`, false)
 
       const project = {
-        baseline: Project.From(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)),
-        site: Project.From(path.join(location, SITE_NAME)),
+        baseline: Project.From<Project>(path.join(location, BASELINE_WORKSPACE_PROJECT_NAME)),
+        site: Project.From<Project>(path.join(location, SITE_NAME)),
       };
 
       const ins = BaselinSiteJoinTest.create(project.baseline, project.site);
@@ -85,7 +85,7 @@ describe(wrap.describe('Tnp Baseline Site'), async () => {
         });
         const sitePath = path.join(location, SITE_NAME);
         // console.log('sitePath', sitePath)
-        const site = Project.From(sitePath)
+        const site = Project.From<Project>(sitePath)
         expect(site).to.not.be.undefined
         expect(site.isSiteInStrictMode).to.be.true;
 

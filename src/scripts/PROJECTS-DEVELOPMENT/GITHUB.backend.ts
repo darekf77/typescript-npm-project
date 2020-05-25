@@ -8,7 +8,7 @@ import { Helpers } from 'tnp-helpers';
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
 const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH; // os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
-const NPM_PROJCETS_LOCATION = path.resolve(path.join(Project.Tnp.location, '..'));
+const NPM_PROJCETS_LOCATION = path.resolve(path.join((Project.Tnp as Project).location, '..'));
 const GITHUB_PROJECTS_NAMES = [
   'tnp',
   'tnp-helpers',
@@ -75,7 +75,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
         if (action === 'pull') {
           let proj: Project;
           while (!proj) {
-            proj = Project.From(dest);
+            proj = Project.From<Project>(dest);
             if (!proj) {
               Helpers.run(`code ${dest}`).async();
               Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
@@ -118,7 +118,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
     const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
     const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
-    const proj = Project.From(dest);
+    const proj = Project.From<Project>(dest);
     if (proj.git.thereAreSomeUncommitedChange) {
       Helpers.run(`code .`, { cwd: dest }).async();
       Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
@@ -155,7 +155,7 @@ function $GITHUB_LIST_ORIGINS() {
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
     const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
     const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
-    const proj = Project.From(dest);
+    const proj = Project.From<Project>(dest);
     if (proj) {
       Helpers.info(proj.git.originURL);
     }

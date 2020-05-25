@@ -19,24 +19,6 @@ import { config } from '../../../config';
 
 export abstract class TnpProject {
 
-  /**
-   * Do use this variable for comparatios
-   * ONLY FOR VIEWING
-   */
-  public readonly _type: Models.libs.LibType;
-
-  public setType(this: Project, type: Models.libs.LibType) {
-    // @ts-ignore
-    this._type = type;
-  }
-  public typeIs(this: Project, ...types: Models.libs.LibType[]) {
-    return this._type && types.includes(this._type);
-  }
-
-  public typeIsNot(this: Project, ...types: Models.libs.LibType[]) {
-    return !this.typeIs(...types);
-  }
-
   public get _frameworkVersion(this: Project) {
     //#region @backendFunc
     return this.packageJson.frameworkVersion

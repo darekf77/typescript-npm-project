@@ -7,10 +7,10 @@ import * as glob from 'glob';
 import * as watch from 'watch'
 
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
-import { Helpers } from '../../../../index';
+import { Helpers } from 'tnp-helpers';
 import { HelpersMerge } from 'tnp-helpers';
 import { config } from '../../../../config';
-import { Project } from '../../../index';
+import { Project } from '../../../abstract/project/project';
 
 /**
  * Replace imports/export

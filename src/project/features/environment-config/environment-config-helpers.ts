@@ -114,7 +114,7 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
     err(workspaceConfig);
   }
 
-  const project = Project.From(workspaceProjectLocation)
+  const project = Project.From<Project>(workspaceProjectLocation)
   if (project === undefined) {
     Helpers.error(`Router (worksapce) port is not defined in your environment.js `);
   }
@@ -135,7 +135,7 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
 
   for (let i = 0; i < workspaceConfig.workspace.projects.length; i++) {
     const configProject = workspaceConfig.workspace.projects[i];
-    const project = Project.From(path.join(workspaceProjectLocation, configProject.name))
+    const project = Project.From<Project>(path.join(workspaceProjectLocation, configProject.name))
     if (project === undefined) {
       Helpers.error(`Undefined project "${configProject.name}" inside environment.js workpace.projects`, false, true);
     }

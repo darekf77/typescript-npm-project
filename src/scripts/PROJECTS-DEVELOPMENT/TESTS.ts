@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
-import { PROGRESS_DATA } from '../../progress-output';
+import { PROGRESS_DATA } from 'tnp-models';
 
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -47,14 +47,14 @@ function $PROCESS_CWD() {
 }
 
 const $TEST_WATCH = async (args: string) => {
-  await Project.Current.filesStructure.init(args);
-  await Project.Current.tests.startAndWatch(args.trim().split(' '))
+  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '))
   process.exit(0)
 }
 
 const $TEST = async (args: string) => {
-  await Project.Current.filesStructure.init(args);
-  await Project.Current.tests.start(args.trim().split(' '))
+  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).tests.start(args.trim().split(' '))
   process.exit(0)
 }
 
