@@ -192,7 +192,15 @@ async function $CHILDS_REQUIRED(args: string) {
   process.exit(0)
 }
 
+export async function $ALL_PROJECTS(args: string) {
+  const db = await TnpDB.Instance(config.dbLocation);
+  const projects = (await db.getProjects()).map(p => p.project as Project);
+  console.log(projects.map(p => p.info).join('\n'));
+  process.exit(0)
+}
+
 export default {
+  $ALL_PROJECTS: Helpers.CLIWRAP($ALL_PROJECTS, '$ALL_PROJECTS'),
   $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
   $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),
   killvscode: Helpers.CLIWRAP(killvscode, 'killvscode'),

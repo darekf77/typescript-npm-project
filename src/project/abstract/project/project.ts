@@ -94,6 +94,10 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
 } as any)
 export class Project extends PorjectBase<Project> {
 
+  get info(this: Project) {
+    return `(${this._type}) ${this.genericName}`;
+  }
+
   constructor(location?: string) {
     super();
     this.defineProperty('compilerCache', CompilerCache);
