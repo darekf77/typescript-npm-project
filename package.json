@@ -128,6 +128,7 @@
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",
           "randomcolor": "^0.5.3",
+          "cheerio": "1.0.0-rc.3",
           "promises": {
             "@types/q": "^1.0.3",
             "q": "^1.5.1",
@@ -634,7 +635,8 @@
     "wait.for": "0.6.6",
     "watch": "~1.0.2",
     "webpack-cli": "3.3.11",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "cheerio": "1.0.0-rc.3"
   },
   "license": "MIT",
   "isomorphicPackages": [
