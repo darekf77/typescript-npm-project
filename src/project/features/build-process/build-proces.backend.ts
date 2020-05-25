@@ -253,7 +253,7 @@ inside generated projects...
       // }
     } else {
       await selectClients(buildOptions, this.project, db);
-      await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
+      // await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
     }
 
     //#endregion
