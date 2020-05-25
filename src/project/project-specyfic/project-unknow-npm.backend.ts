@@ -6,14 +6,18 @@ import * as child from 'child_process';
 import { Project } from '../abstract';
 import { BuildOptions } from '../features';
 import { CLASS } from 'typescript-class-helpers';
-
+//#endregion
 
 
 /**
  * DO NOT USE environment variables in this project directly
  */
 @CLASS.NAME('ProjectUnknowNpm')
-export class ProjectUnknowNpm extends Project {
+export class ProjectUnknowNpm
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() {
     // throw new Error("Method not implemented.");
   }
@@ -30,4 +34,4 @@ export class ProjectUnknowNpm extends Project {
 
 
 }
-//#endregion
+

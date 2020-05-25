@@ -6,8 +6,8 @@ import * as _ from 'lodash';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
-import { Project as PorjectBase } from 'tnp-helpers/project';
 //#endregion
+import { Project as PorjectBase } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
@@ -28,7 +28,11 @@ import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
-import { PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks, TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory, FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess } from '../../features';
+import {
+  PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks,
+  TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory,
+  FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess
+} from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
@@ -92,12 +96,14 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
   }
   //#endregion
 } as any)
-export class Project extends PorjectBase<Project> {
+export class Project extends PorjectBase<Project>
+{
 
   get info(this: Project) {
     return `(${this._type}) ${this.genericName}`;
   }
 
+  //#region @backend
   constructor(location?: string) {
     super();
     this.defineProperty('compilerCache', CompilerCache);
@@ -216,4 +222,3 @@ Helpers.applyMixins(Project, [
   CompilerCache
   //#endregion
 ])
-

@@ -514,6 +514,7 @@
     "chai": "^4.2.0",
     "chalk": "^2.3.2",
     "check-node-version": "^3.2.0",
+    "cheerio": "1.0.0-rc.3",
     "chokidar": "3.0.0",
     "circular-json": "^0.5.1",
     "codelyzer": "^5.1.2",
@@ -635,8 +636,7 @@
     "wait.for": "0.6.6",
     "watch": "~1.0.2",
     "webpack-cli": "3.3.11",
-    "zone.js": "~0.10.2",
-    "cheerio": "1.0.0-rc.3"
+    "zone.js": "~0.10.2"
   },
   "license": "MIT",
   "isomorphicPackages": [

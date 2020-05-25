@@ -9,7 +9,11 @@ import { SingularBuild } from '../features/singular-build.backend';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectContainer')
-export class ProjectContainer extends Project {
+export class ProjectContainer
+  //#region @backend
+  extends Project
+//#endregion
+{
 
   async initProcedure() {
     this.addGitReposAsLinkedProjects();

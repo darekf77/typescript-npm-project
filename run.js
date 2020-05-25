@@ -33,6 +33,8 @@ function assignENV() {
   sandbox.ENV = ENV;
 }
 
+let { port } = require('minimist')(process.argv);
+port = !isNaN(Number(port)) ? Number(port) : 4000;
 
 const encoding = 'utf8';
 var secondsWaitAfterDistDetected = 5;
@@ -66,7 +68,7 @@ assignENV();
 const script = new vm.Script(`
 global["ENV"] = JSON.parse(ENV);
 var app = require("./dist/app").default;
-app();
+app(${port});
 `);
 
 const context = vm.createContext(sandbox);

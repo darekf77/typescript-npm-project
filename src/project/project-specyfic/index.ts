@@ -1,10 +1,11 @@
-export * from './project-angular-client';
-export * from './project-angular-lib';
-export * from './project-container';
-export * from './project-docker';
-export * from './project-workspace';
-export * from './project-ionic-client';
-export * from './project-isomorphic-lib';
-export * from './project-unknow-npm';
-export * from './project-workspace';
-export * from './project-workspace';
+//#region @backend
+export * from './project-angular-client.backend';
+export * from './project-angular-lib.backend';
+export * from './project-container.backend';
+export * from './project-docker.backend';
+export * from './project-workspace.backend';
+export * from './project-ionic-client.backend';
+export * from './project-isomorphic-lib.backend';
+export * from './project-unknow-npm.backend';
+export * from './project-workspace.backend';
+//#endregion

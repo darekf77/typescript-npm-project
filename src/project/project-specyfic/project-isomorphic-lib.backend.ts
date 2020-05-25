@@ -15,7 +15,11 @@ import { Project } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectIsomorphicLib')
-export class ProjectIsomorphicLib extends Project {
+export class ProjectIsomorphicLib
+  //#region @backend
+  extends Project
+//#endregion
+{
 
   //#region @backend
 

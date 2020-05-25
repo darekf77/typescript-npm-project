@@ -51,7 +51,11 @@ function checkForCircuralWorkspaceDeps(workspace: Project) {
 //#endregion
 
 @CLASS.NAME('ProjectWorkspace')
-export class ProjectWorkspace extends Project {
+export class ProjectWorkspace
+  //#region @backend
+  extends Project
+//#endregion
+{
   //#region @backend
 
   async initProcedure() {

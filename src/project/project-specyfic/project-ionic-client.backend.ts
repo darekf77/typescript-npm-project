@@ -7,7 +7,11 @@ import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectIonicClient')
-export class ProjectIonicClient extends Project {
+export class ProjectIonicClient
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() {
     // throw new Error("Method not implemented.");
   }

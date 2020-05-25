@@ -13,7 +13,9 @@ export type IProject = Models.other.IProject;
 export * from './config';
 
 export * from './project';
+//#region @backend
 export * from './project/project-specyfic';
+//#endregion
 
 export * from 'tnp-models';
 

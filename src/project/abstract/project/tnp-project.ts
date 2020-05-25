@@ -16,7 +16,6 @@ import { Models } from 'tnp-models';
 import { config } from '../../../config';
 
 
-
 export abstract class TnpProject {
 
   public get _frameworkVersion(this: Project) {

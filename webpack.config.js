@@ -43,7 +43,7 @@ module.exports = (env) => {
   const srcDir = path.join(__dirname, srcDirRelative);
   const distDir = path.join(__dirname, distDirRelative);
 
-  let ENV = moduleName ? fse.readJSONSync('./tmp-environment.json', {
+  let ENV = fse.existsSync('./tmp-environment.json') ? fse.readJSONSync('./tmp-environment.json', {
     'encoding': 'utf8'
   }) : {}
 

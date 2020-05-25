@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { ProjectAngularClient } from './project-angular-client';
+import { ProjectAngularClient } from './project-angular-client.backend';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Project } from '../abstract';
@@ -12,7 +12,11 @@ import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-l
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectAngularLib')
-export class ProjectAngularLib extends Project {
+export class ProjectAngularLib
+  //#region @backend
+  extends Project
+//#endregion
+{
 
   private projectAngularClient: ProjectAngularClient;
 
