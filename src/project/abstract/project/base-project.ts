@@ -43,6 +43,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region @backend
   private findParentsNames(this: Project, project: Project, result = []): string[] {
     if (!project) {
       return result.reverse();
@@ -52,8 +53,10 @@ export abstract class BaseProject {
     }
     return this.findParentsNames(project.parent, result);
   }
+  //#endregion
 
   get isPreviewFor(this: Project): Project {
+    //#region @backendFunc
     let previewFor: Project;
 
     if (
@@ -82,6 +85,7 @@ export abstract class BaseProject {
       return;
     }
     return previewFor;
+    //#endregion
   }
 
   public get backupName(this: Project) {

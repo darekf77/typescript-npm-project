@@ -203,12 +203,6 @@ export class ProjectIsomorphicLib
       }
     }
 
-    const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
-    if (skipBuild) {
-      Helpers.log(`Skip build `);
-      return;
-    }
-
     if (prod && outDir === 'bundle') {
       this.quickFixes.badNpmPackages();
       Helpers.info(`

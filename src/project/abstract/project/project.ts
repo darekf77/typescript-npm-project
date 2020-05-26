@@ -96,93 +96,107 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
   }
   //#endregion
 } as any)
-export class Project extends PorjectBase<Project>
+export class Project
+  //#region @backend
+  extends PorjectBase<Project>
+//#endregion
 {
+  browser: any;
+  location: string;
 
   get info(this: Project) {
+    if (Morphi.IsBrowser) {
+      // @ts-ignore
+      return this.browser.info;
+    }
+    //#region @backend
     return `(${this._type}) ${this.genericName}`;
+    //#endregion
   }
 
   //#region @backend
   constructor(location?: string) {
     super();
-    this.defineProperty('compilerCache', CompilerCache);
-    this.cache = {};
     this.location = _.isString(location) ? location : '';
-    this.packageJson = PackageJSON.fromProject(this);
-    this.setType(this.packageJson ? this.packageJson.type : 'unknow');
-    this.defineProperty('quickFixes', QuickFixes);
-    // this.quickFixes = new QuickFixes(this)
-    this.quickFixes.missingSourceFolders()
-    this.defineProperty('staticBuild', StaticBuild);
-    // this.staticBuild = new StaticBuild(this)
-    this.defineProperty('workspaceSymlinks', WorkspaceSymlinks);
-    // this.workspaceSymlinks = new WorkspaceSymlinks(this);
-    this.defineProperty('tnpBundle', TnpBundle);
-    // this.tnpBundle = new TnpBundle(this);
-    this.defineProperty('node_modules', NodeModules);
-    // this.node_modules = new NodeModules(this);
-    this.defineProperty('npmPackages', NpmPackages);
-    // this.npmPackages = new NpmPackages(this)
-    this.defineProperty('recreate', FilesRecreator);
-    // this.recreate = new FilesRecreator(this);
-    this.defineProperty('filesFactory', FilesFactory);
-    // this.filesFactory = new FilesFactory(this);
-    this.defineProperty('sourceModifier', SourceModifier);
-    // this.sourceModifier = new SourceModifier(this);
+    if (global.tnp_normal_mode) {
+      this.defineProperty('compilerCache', CompilerCache);
+      this.cache = {};
+      this.packageJson = PackageJSON.fromProject(this);
+      this.setType(this.packageJson ? this.packageJson.type : 'unknow');
+      this.defineProperty('quickFixes', QuickFixes);
+      // this.quickFixes = new QuickFixes(this)
+      this.quickFixes.missingSourceFolders()
+      this.defineProperty('staticBuild', StaticBuild);
+      // this.staticBuild = new StaticBuild(this)
+      this.defineProperty('workspaceSymlinks', WorkspaceSymlinks);
+      // this.workspaceSymlinks = new WorkspaceSymlinks(this);
+      this.defineProperty('tnpBundle', TnpBundle);
+      // this.tnpBundle = new TnpBundle(this);
+      this.defineProperty('node_modules', NodeModules);
+      // this.node_modules = new NodeModules(this);
+      this.defineProperty('npmPackages', NpmPackages);
+      // this.npmPackages = new NpmPackages(this)
+      this.defineProperty('recreate', FilesRecreator);
+      // this.recreate = new FilesRecreator(this);
+      this.defineProperty('filesFactory', FilesFactory);
+      // this.filesFactory = new FilesFactory(this);
+      this.defineProperty('sourceModifier', SourceModifier);
+      // this.sourceModifier = new SourceModifier(this);
 
-    // this.outputCodeModifier = new OutputCodeModifier(this); //  NOT USED
-    this.defineProperty('frameworkFileGenerator', FrameworkFilesGenerator);
-    // this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
-    this.defineProperty('filesTemplatesBuilder', FilesTemplatesBuilder);
-    // this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
-    this.defineProperty('join', BaselineSiteJoin);
-    // this.join = new BaselineSiteJoin(this);
-    this.defineProperty('tests', TestRunner);
-    // this.tests = new TestRunner(this);
+      // this.outputCodeModifier = new OutputCodeModifier(this); //  NOT USED
+      this.defineProperty('frameworkFileGenerator', FrameworkFilesGenerator);
+      // this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
+      this.defineProperty('filesTemplatesBuilder', FilesTemplatesBuilder);
+      // this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
+      this.defineProperty('join', BaselineSiteJoin);
+      // this.join = new BaselineSiteJoin(this);
+      this.defineProperty('tests', TestRunner);
+      // this.tests = new TestRunner(this);
 
-    Project.projects.push(this);
+      Project.projects.push(this);
 
-    // this.requiredLibs = this.packageJson.requiredProjects;
+      // this.requiredLibs = this.packageJson.requiredProjects;
 
 
-    this.__defaultPort = Project.DefaultPortByType(this._type);
-    // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
+      this.__defaultPort = Project.DefaultPortByType(this._type);
+      // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
 
-    if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {
-      // this.defineProperty('env', EnvironmentConfig);
-      this.env = new EnvironmentConfig(this) as any;
+      if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {
+        // this.defineProperty('env', EnvironmentConfig);
+        this.env = new EnvironmentConfig(this) as any;
+      }
+
+      if (this.isWorkspace || this.isWorkspaceChildProject) {
+        this.defineProperty('proxyRouter', ProxyRouter);
+        // this.proxyRouter = new ProxyRouter(this);
+      }
+      this.copyManager = new CopyManager(this);
+      if (this.isStandaloneProject && this.packageJson) {
+        this.packageJson.updateHooks()
+      }
+      this.defineProperty('filesStructure', FilesStructure);
+      // this.filesStructure = new FilesStructure(this);
+      this.defineProperty('buildProcess', BuildProcess);
+      // this.buildProcess = new BuildProcess(this);
+
+      this.notAllowedFiles().forEach(f => {
+        Helpers.removeFileIfExists(path.join(this.location, f));
+      });
     }
-
-    if (this.isWorkspace || this.isWorkspaceChildProject) {
-      this.defineProperty('proxyRouter', ProxyRouter);
-      // this.proxyRouter = new ProxyRouter(this);
-    }
-    this.copyManager = new CopyManager(this);
-    if (this.isStandaloneProject && this.packageJson) {
-      this.packageJson.updateHooks()
-    }
-    this.defineProperty('filesStructure', FilesStructure);
-    // this.filesStructure = new FilesStructure(this);
-    this.defineProperty('buildProcess', BuildProcess);
-    // this.buildProcess = new BuildProcess(this);
-
-    this.notAllowedFiles().forEach(f => {
-      Helpers.removeFileIfExists(path.join(this.location, f));
-    });
   }
   //#endregion
 
 }
 
 // @ts-ignore
+//#region @backend
 export interface Project extends
   BaseProject,
   NpmProject,
   FeatureProject,
   TnpProject,
   FolderProject
-  //#region @backend
+
   ,
   LibProject,
   VscodeProject,
@@ -196,18 +210,20 @@ export interface Project extends
   DbProcessProject,
   DependencyProject,
   CompilerCache
-//#endregion
+
 {
 
 }
+//#endregion
 
+//#region @backend
 Helpers.applyMixins(Project, [
   BaseProject,
   NpmProject,
   FeatureProject,
   TnpProject,
   FolderProject,
-  //#region @backend
+
   LibProject,
   VscodeProject,
 
@@ -220,5 +236,5 @@ Helpers.applyMixins(Project, [
   DbProcessProject,
   DependencyProject,
   CompilerCache
-  //#endregion
 ])
+ //#endregion

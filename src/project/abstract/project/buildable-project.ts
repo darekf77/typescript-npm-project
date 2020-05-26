@@ -202,8 +202,14 @@ export abstract class BuildableProject {
     }
 
     PackagesRecognitionExtended.fromProject(this as any).start();
-    // console.log('before build steps')
-    await this.buildSteps(buildOptions);
+
+    const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
+    if (skipBuild) {
+      Helpers.log(`[buildable-project] Skip build for ${this.genericName}`);
+    } else {
+      // console.log('before build steps')
+      await this.buildSteps(buildOptions);
+    }
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       this.copyManager.initCopyingOnBuildFinish(buildOptions);

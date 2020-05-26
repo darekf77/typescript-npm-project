@@ -19,12 +19,6 @@ import {
 import { selectClients } from '../../project-specyfic/select-clients.backend';
 import { EnvironmentConfig } from '../environment-config';
 
-const allowedForSelectingCLients = [
-  'angular-lib',
-  'isomorphic-lib',
-  'angular-client',
-  'ionic-client',
-] as Models.libs.LibType[];
 
 //#endregion
 

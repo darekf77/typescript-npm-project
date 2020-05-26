@@ -91,7 +91,9 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
 
       const command = `${config.frameworkName} bdw ${argsForProjct} `
         + ` ${project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
-        + ` ${!global.hideLog ? '-verbose' : ''}`;
+        + ` ${!global.hideLog ? '-verbose' : ''}`
+        + ` ${isBaselineForThisBuild ? '--skipBuild=true' : ''}`
+        ;
       Helpers.info(`
 
       Running command in ${isBaselineForThisBuild ? 'baseline' : ''} dependency "${proj.genericName}" : ${command}
@@ -102,8 +104,10 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
         await proj.run(command, {
           output: true,
           prefix: chalk.bold(`${isBaselineForThisBuild ? '[baseline]' : ''}[${proj.name}]`)
-        }).unitlOutputContains('Watching for file changes.',
+        }).unitlOutputContains(isBaselineForThisBuild ? 'Skip build for ' : 'Waching files.. started.. please wait',
           [
+            'Error: Command failed',
+            ': error ',
             'Command failed:',
             'Compilation error',
             'Error: Please compile your'

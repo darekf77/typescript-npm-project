@@ -168,13 +168,6 @@ export class ProjectAngularLib
 
 
   async buildLib() {
-
-    const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
-    if (skipBuild) {
-      Helpers.log(`Skip build `);
-      return;
-    }
-
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
     if (this.buildOptions.watch) {
