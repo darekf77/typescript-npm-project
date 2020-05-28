@@ -4,47 +4,22 @@ import * as glob from 'glob';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { SingularBuild } from '../features/singular-build.backend';
+import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
-import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 
 //#region @backend
-/**
- * TODO Replace it with topological sorting
- */
-function checkForCircuralWorkspaceDeps(workspace: Project) {
-  const childs = workspace.children;
-  for (let index = 0; index < childs.length; index++) {
-    const c = childs[index];
-    const cWorkspaceDeps = c.workspaceDependencies.map(c => c.name);
-    // Helpers.log(`cWorkspaceDeps:
-    // ${cWorkspaceDeps.join('\n')}
-    // `);
-    const circural = c.workspaceDependencies.find(d => {
-      const dDeps = d.workspaceDependencies.map(aa => aa.name);
-      if (dDeps.includes(c.name)) {
-        return true;
-      }
-      return false;
-    });
-    if (!!circural) {
-      Helpers.error(`Circural dependency detected in workspace ${workspace.genericName}:
-
-        ${circural.name} => ${c.name}
-        ${c.name} => ${circural.name}
-
-      `, false, true);
-    }
-  }
-}
-//#endregion
-
 @CLASS.NAME('ProjectWorkspace')
-export class ProjectWorkspace extends Project {
+//#endregion
+export class ProjectWorkspace
+  //#region @backend
+  extends Project
+//#endregion
+{
 
   async initProcedure() {
     //#region @backend
@@ -195,5 +170,37 @@ export class ProjectWorkspace extends Project {
 //#region @backend
 function showProgress(type: 'app' | 'lib', name: string, precentFraction: number) {
   PROGRESS_DATA.log({ value: (precentFraction) * 100, msg: `In progress of building ${type} "${name}"` });
+}
+//#endregion
+
+
+//#region @backend
+/**
+ * TODO Replace it with topological sorting
+ */
+function checkForCircuralWorkspaceDeps(workspace: Project) {
+  const childs = workspace.children;
+  for (let index = 0; index < childs.length; index++) {
+    const c = childs[index];
+    const cWorkspaceDeps = c.workspaceDependencies.map(c => c.name);
+    // Helpers.log(`cWorkspaceDeps:
+    // ${cWorkspaceDeps.join('\n')}
+    // `);
+    const circural = c.workspaceDependencies.find(d => {
+      const dDeps = d.workspaceDependencies.map(aa => aa.name);
+      if (dDeps.includes(c.name)) {
+        return true;
+      }
+      return false;
+    });
+    if (!!circural) {
+      Helpers.error(`Circural dependency detected in workspace ${workspace.genericName}:
+
+        ${circural.name} => ${c.name}
+        ${c.name} => ${circural.name}
+
+      `, false, true);
+    }
+  }
 }
 //#endregion

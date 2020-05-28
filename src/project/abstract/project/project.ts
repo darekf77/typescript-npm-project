@@ -7,20 +7,19 @@ import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
 //#endregion
-import { Project as PorjectBase } from 'tnp-helpers';
+import { Project as $Project } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 
 import { Morphi, ModelDataConfig } from 'morphi';
+//#region @backend
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
 import { TnpProject } from './tnp-project';
 import { FolderProject } from './folder-project';
-//#region @backend
 import { LibProject } from './lib-project.backend';
-import { ProjectGit } from './git-project.backend';
 import { VscodeProject } from './vscode-project.backend';
 import { StaticProject } from './static-project.backend';
 import { RouterProject } from './router-project.backend';
@@ -96,7 +95,7 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
   }
   //#endregion
 } as any)
-export class Project extends PorjectBase<Project>
+export class Project extends $Project<Project>
 {
   browser: any;
   location: string;
@@ -109,6 +108,27 @@ export class Project extends PorjectBase<Project>
     //#region @backend
     return `(${this._type}) ${this.genericName}`;
     //#endregion
+  }
+
+
+  get TnpProject() {
+    return Project.Tnp as Project;
+  }
+
+  get CurrentProject() {
+    return Project.Current as Project;
+  }
+
+  get isBundleMode() {
+    return Project.isBundleMode;
+  }
+
+  removeItself(this: Project) {
+    //#region @backend
+    const location = this.location;
+    Project.projects = Project.projects.filter(p => p.location !== location);
+    Helpers.tryRemoveDir(location);
+    //#region
   }
 
   //#region @backend
@@ -149,8 +169,8 @@ export class Project extends PorjectBase<Project>
   //#endregion
 }
 
-// @ts-ignore
 //#region @backend
+// @ts-ignore
 export interface Project extends
   BaseProject,
   NpmProject,

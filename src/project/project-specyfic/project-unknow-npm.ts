@@ -2,21 +2,27 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as child from 'child_process';
-//#endregion
 import { Project } from '../abstract';
+//#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 
 /**
  * DO NOT USE environment variables in this project directly
  */
+//#region @backend
 @CLASS.NAME('ProjectUnknowNpm')
-export class ProjectUnknowNpm extends Project {
+//#endregion
+export class ProjectUnknowNpm
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() { }
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
     return []
-    //#region
+    //#endregion
   }
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backend

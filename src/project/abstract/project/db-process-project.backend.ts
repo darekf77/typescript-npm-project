@@ -1,10 +1,8 @@
-import { Project } from './project';
+import type { Project } from './project';
 import { TnpDB } from 'tnp-db';
-
 import { config } from '../../../config';
 
 export abstract class DbProcessProject {
-
   async hasParentWithSingularBuild(this: Project) {
     if (this.isWorkspaceChildProject || (this.isStandaloneProject && this.isContainerChild)) {
       const db = await TnpDB.Instance(config.dbLocation);
@@ -24,8 +22,3 @@ export abstract class DbProcessProject {
   }
 
 }
-
-// export interface DbProcessProject extends Partial<Project> { }
-
-
-// }

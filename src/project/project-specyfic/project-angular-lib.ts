@@ -2,16 +2,22 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
+import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import * as _ from 'lodash';
 import { ProjectAngularClient } from './project-angular-client';
 import { Helpers } from 'tnp-helpers';
-import { Project } from '../abstract';
 
+//#region @backend
 @CLASS.NAME('ProjectAngularLib')
-export class ProjectAngularLib extends Project {
+//#endregion
+export class ProjectAngularLib
+  //#region @backend
+  extends Project
+//#endregion
+{
   private projectAngularClient: ProjectAngularClient;
 
   //#region @backend

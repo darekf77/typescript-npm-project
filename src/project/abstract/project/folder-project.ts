@@ -1,17 +1,13 @@
 //#region @backend
-import chalk from 'chalk';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as inquirer from 'inquirer';
 import { config as configMorphi } from 'morphi';
 //#endregion
 import * as _ from 'lodash';
-import * as json5 from 'json5';
 import { config } from '../../../config';
-import { Project } from './project';
-import { Helpers } from 'tnp-helpers';
+import type { Project } from './project';
+import { Helpers, Project as $Project } from 'tnp-helpers';
 import { Models } from 'tnp-models';
-import { Morphi } from 'morphi';
 
 export abstract class FolderProject {
 
@@ -87,7 +83,7 @@ export abstract class FolderProject {
     let res = subdirectories
       .map(dir => {
         // log('child:', dir)
-        return Project.From<Project>(dir);
+        return $Project.From<Project>(dir);
       })
       .filter(c => !!c)
 
@@ -116,7 +112,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const parent = Project.From<Project>(path.join(this.location, '..'));
+    const parent = $Project.From<Project>(path.join(this.location, '..'));
     if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
       return parent.parent;
     }
@@ -132,7 +128,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const grandpa = Project.From<Project>(path.join(this.location, '..', '..'));
+    const grandpa = $Project.From<Project>(path.join(this.location, '..', '..'));
     return grandpa;
     //#endregion
   }
@@ -223,12 +219,6 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
-  removeItself(this: Project) {
-    const location = this.location;
-    Project.projects = Project.projects.filter(p => p.location !== location);
-    Helpers.tryRemoveDir(location);
-  }
-
   removeFileByRelativePath(this: Project, relativePathToFile: string) {
     relativePathToFile = relativePathToFile.replace(/^\//, '')
     const location = this.location;

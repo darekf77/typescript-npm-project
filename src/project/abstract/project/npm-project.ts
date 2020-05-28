@@ -1,13 +1,14 @@
-import { Project } from './project';
+//#region @backend
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
+//#endregion
 
+import type { Project } from './project';
 import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from '../../../config';
-import { Morphi } from 'morphi';
 
 export class NpmProject {
   /**
@@ -34,9 +35,6 @@ export class NpmProject {
     //#endregion
   }
 
-  /**
-   * Unknow npm project
-   */
   get isUnknowNpmProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isUnknowNpmProject;
@@ -51,7 +49,7 @@ export class NpmProject {
       return this.browser.preview as any;
     }
     //#region @backend
-    return _.isString(this.location) && Project.From<Project>(path.join(this.location, 'preview'));
+    return _.isString(this.location) && $Project.From<Project>(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -135,14 +133,14 @@ export class NpmProject {
       if (type === 'tnp_required_workspace_child') {
         let p = path.resolve(path.join(this.location, '..', packageObj.name))
         if (this.isWorkspaceChildProject && fse.existsSync(p)) {
-          const project = Project.From<Project>(p);
+          const project = $Project.From<Project>(p);
           return project;
         }
       }
 
       let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
       if (fse.existsSync(p)) {
-        const project = Project.From<Project>(p);
+        const project = $Project.From<Project>(p);
         return project;
       }
       // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
@@ -216,7 +214,6 @@ export class NpmProject {
   }
   //#endregion
 
-
   get childrenThatAreThirdPartyInNodeModules(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.childrenThatAreThirdPartyInNodeModules as any;
@@ -227,10 +224,9 @@ export class NpmProject {
     }
     return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
-      return Project.From<Project>(p);
+      return $Project.From<Project>(p);
     }).filter(f => !!f);
     //#endregion
   }
 
 }
-// export interface NpmProject extends Partial<Project> { }

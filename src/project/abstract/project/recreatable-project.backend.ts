@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import chalk from 'chalk';
 
-import { Project } from './project';
+import type { Project } from './project';
 import { Helpers } from 'tnp-helpers';
 import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';

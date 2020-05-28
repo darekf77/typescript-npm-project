@@ -3,16 +3,11 @@ import chalk from 'chalk';
 export { ChildProcess } from 'child_process';
 //#endregion
 import * as _ from 'lodash';
-
-import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { Morphi } from 'morphi';
-
-import { Project } from './project';
+import type { Project } from './project';
 import { config } from '../../../config';
 
 export abstract class BaseProject {
-
   public get genericName(this: Project): string {
 
     if (Helpers.isBrowser) {
@@ -43,8 +38,8 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  //#region @backend
   private findParentsNames(this: Project, project: Project, result = []): string[] {
+    //#region @backendFunc
     if (!project) {
       return result.reverse();
     }
@@ -52,8 +47,8 @@ export abstract class BaseProject {
       result.push(project.parent.name)
     }
     return this.findParentsNames(project.parent, result);
+    //#endregion
   }
-  //#endregion
 
   get isPreviewFor(this: Project): Project {
     //#region @backendFunc
@@ -100,8 +95,6 @@ export abstract class BaseProject {
     //#endregion
   }
 
-
-
   get isContainerWorkspaceRelated(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isForRecreation;
@@ -147,21 +140,21 @@ export abstract class BaseProject {
     //#endregion
   }
 
-
-  //#region @backend
   get labels(this: Project) {
     const self = this;
     return {
       get generated() {
-        return self.isGenerated ? '(generated)' : ''
+        //#region @backendFunc
+        return self.isGenerated ? '(generated)' : '';
+        //#endregion
       },
       get extendedBoldName() {
+        //#region @backendFunc
         return chalk.bold(`${self.labels.generated} ${self.parent ? (self.parent.name + '/') : ''}${self.name}`);
+        //#endregion
       }
-
     }
   }
-  //#endregion
 
   get isWorkspaceChildProject(this: Project) {
     if (Helpers.isBrowser) {
@@ -174,8 +167,6 @@ export abstract class BaseProject {
     return !!this.parent && this.parent.typeIs('workspace');
     //#endregion
   }
-
-
 
   /**
    * Standalone project ready for publish on npm
@@ -195,8 +186,8 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  //#region @backend
   get dependsOn(this: Project): Project[] {
+    //#region @backendFunc
     if (this.isWorkspace) {
       return this.packageJson.dependsOn.map(name => {
         const child = this.parent.child(name);
@@ -207,11 +198,11 @@ export abstract class BaseProject {
       }).filter(f => !!f);
     }
     return [];
+    //#endregion
   }
-  //#endregion
 
-  //#region @backend
   get workspaceDependencies(this: Project): Project[] {
+    //#region @backendFunc
     if (this.typeIs('unknow')) {
       return [];
     }
@@ -230,11 +221,10 @@ export abstract class BaseProject {
       }).filter(f => !!f);
     }
     return [];
+    //#endregion
   }
-  //#endregion
-
-  //#region @backend
   get workspaceDependenciesServers(this: Project): Project[] {
+    //#region @backendFunc
     if (this.typeIs('unknow')) {
       return [];
     }
@@ -278,18 +268,12 @@ workspaceDependenciesServer: ["${foundedBadServer.name}"]
       `)
     }
     return servers;
+    //#endregion
   }
-  //#endregion
 
-
-
-  //#region @backend
   linkTo(this: Project, destPackageLocation: string) {
+    //#region @backend
     Helpers.createSymLink(this.location, destPackageLocation);
+    //#endregion
   }
-  //#endregion
-
-
 }
-
-// export interface BaseProject extends Partial<Project> { };

@@ -7,8 +7,7 @@ import { PackageJsonBase } from './package-json-base.backend';
 
 import * as _ from 'lodash';
 import { Morphi } from 'morphi';
-
-import { Project } from '../../abstract';
+import type { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
 import { Models } from 'tnp-models';

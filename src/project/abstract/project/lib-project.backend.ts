@@ -1,13 +1,14 @@
-import { Project } from './project';
-import * as _ from 'lodash';
+//#region @backend
+import { BuildProcess } from '../../features';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as getDependents from 'npm-get-dependents';
-
+//#endregion
+import type { Project } from './project';
+import * as _ from 'lodash';
 import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from '../../../config';
-import { BuildProcess } from '../../features';
 
 /**
  * Project ready to be build/publish as npm package.
@@ -27,7 +28,9 @@ export abstract class LibProject {
   }
 
   get isGeneratingControllerEntities(this: Project) {
+    //#region @backendFunc
     return this.typeIs('isomorphic-lib') && this.useFramework;
+    //#endregion
   }
 
   //#region @backend
@@ -79,10 +82,10 @@ export abstract class LibProject {
         .map(pathOrName => {
           let proj: Project;
           if (path.isAbsolute(pathOrName)) {
-            proj = Project.From<Project>(pathOrName);
+            proj = $Project.From<Project>(pathOrName);
           }
           if (!proj) {
-            proj = Project.From<Project>(path.join(this.location, pathOrName))
+            proj = $Project.From<Project>(path.join(this.location, pathOrName))
           }
           if (!proj) {
             Helpers.warn(`[linkedProjects][${this.genericName}] Not able to find project by value: ${pathOrName}`);
@@ -185,7 +188,7 @@ export abstract class LibProject {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       updateChildrenVersion(this, newVersion, this.name);
     } else {
-      (Project.Tnp as Project).packageJson.setDependencyAndSave({
+      this.TnpProject.packageJson.setDependencyAndSave({
         name: this.name,
         version: newVersion,
       }, `Bump new version "${newVersion}" of ${this.name}`);
@@ -250,7 +253,7 @@ export abstract class LibProject {
     const { prod = false } = c;
 
     this.checkIfReadyForNpm()
-    const newVersion = (Project.Current as Project).versionPatchedPlusOne;
+    const newVersion = this.CurrentProject.versionPatchedPlusOne;
     const self = this;
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true)
@@ -313,7 +316,7 @@ export abstract class LibProject {
       this.bundleResources()
       this.commit(newVersion);
     }, () => {
-      if (Project.isBundleMode) {
+      if (this.isBundleMode) {
         Helpers.warn(`Project not in bundle mode return`)
         return;
       } else {

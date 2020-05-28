@@ -1,9 +1,3 @@
-import * as _ from 'lodash';
-import { JSON10 } from 'json10';
-import { config } from '../../../config';
-import { Project } from './project';
-import { Helpers } from 'tnp-helpers';
-
 //#region @backend
 import { PackagesRecognitionExtended } from '../../features';
 import { BuildOptions } from 'tnp-db';
@@ -12,6 +6,10 @@ import * as path from 'path';
 import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
+import * as _ from 'lodash';
+import { config } from '../../../config';
+import type { Project } from './project';
+import { Helpers, Project as $Project } from 'tnp-helpers';
 
 
 export abstract class BuildableProject {
@@ -51,7 +49,7 @@ export abstract class BuildableProject {
             }
           ]) as any;
 
-        buildOptions.copyto = projects.map(p => Project.From<Project>(p)) as any;
+        buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
       }
 
     }

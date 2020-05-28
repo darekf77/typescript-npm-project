@@ -1,4 +1,4 @@
-import { Project } from '../../index';
+import type { Project } from '../../abstract/project/project';
 
 /**
  * app - angular app

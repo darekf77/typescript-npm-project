@@ -9,7 +9,7 @@ import { TnpDB } from 'tnp-db';
 import { config } from '../../../config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from 'tnp-models';
-import { Models } from '../../../index';
+import { Models } from 'tnp-models';
 import { EnvironmentConfig } from '../environment-config';
 
 export type CleanType = 'all' | 'only_static_generated';

@@ -1,9 +1,17 @@
+//#region @backend
 import { Project } from '../abstract';
+//#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 
+//#region @backend
 @CLASS.NAME('ProjectDocker')
-export class ProjectDocker extends Project {
+//#endregion
+export class ProjectDocker
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() { }
 
   startOnCommand() {

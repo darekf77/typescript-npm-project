@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { config } from '../../config';
-//#endregion
 import { Project } from '../abstract';
+//#endregion
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
@@ -13,11 +13,17 @@ import { CLASS } from 'typescript-class-helpers';
 /**
  * DO NOT USE environment variables in this project directly
  */
+//#region @backend
 @CLASS.NAME('ProjectAngularClient')
-export class ProjectAngularClient extends Project {
+//#endregion
+export class ProjectAngularClient
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() { }
 
-  get isEjectedProject(this: Project) {
+  get isEjectedProject() {
     //#region @backendFunc
     return this.typeIs('angular-client')
     //#endregion

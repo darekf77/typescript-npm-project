@@ -4,16 +4,22 @@ import * as path from 'path';
 import * as inquirer from 'inquirer';
 import { config } from '../../config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
+import { Project } from '../abstract';
 //#endregion
 import * as _ from 'lodash';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
-import { Project } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
 
+//#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')
-export class ProjectIsomorphicLib extends Project {
+//#endregion
+export class ProjectIsomorphicLib
+  //#region @backend
+  extends Project
+//#endregion
+{
 
   async initProcedure() {
     //#region @backend

@@ -12,15 +12,10 @@ import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, OutputCodeMo
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
+import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
 import * as _ from 'lodash';
 
-import { Project } from './project';
-import { Helpers } from 'tnp-helpers';
-import { Morphi } from 'morphi';
-import { Models } from 'tnp-models';
-import { config } from '../../../config';
-import { PackageJSON, EnvironmentConfig } from '../../features';
 
 export abstract class FeatureProject {
 
@@ -28,7 +23,9 @@ export abstract class FeatureProject {
   public tests: TestRunner;
   //#endregion
 
+  //#region @backend
   public packageJson: PackageJSON;
+  //#endregion
 
   //#region @backend
   public tnpBundle: TnpBundle;
@@ -62,7 +59,6 @@ export abstract class FeatureProject {
   public filesFactory: FilesFactory;
   //#endregion
 
-
   //#region @backend
   public join: BaselineSiteJoin;
   //#endregion
@@ -87,7 +83,9 @@ export abstract class FeatureProject {
   public npmPackages: NpmPackages;
   //#endregion
 
+  //#region @backend
   public env: EnvironmentConfig;
+  //#endregion
 
   //#region @backend
   public proxyRouter: ProxyRouter;
@@ -101,8 +99,8 @@ export abstract class FeatureProject {
   public compilerCache: CompilerCache;
   //#endregion
 
-   //#region @backend
-   incrementalBuildProcess: IncrementalBuildProcessExtended;
-   //#endregion
+  //#region @backend
+  incrementalBuildProcess: IncrementalBuildProcessExtended;
+  //#endregion
 
 }

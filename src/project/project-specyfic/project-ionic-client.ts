@@ -1,9 +1,17 @@
+//#region @backend
 import { Project } from '../abstract';
+//#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 
+//#region @backend
 @CLASS.NAME('ProjectIonicClient')
-export class ProjectIonicClient extends Project {
+//#endregion
+export class ProjectIonicClient
+  //#region @backend
+  extends Project
+//#endregion
+{
   async buildLib() {
 
   }

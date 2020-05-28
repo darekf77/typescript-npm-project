@@ -2,19 +2,13 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
-import chalk from 'chalk';
-
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';
 //#endregion
-
-import { Project } from './project';
+import type { Project } from './project';
 import { Helpers } from 'tnp-helpers';
-import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
-import { config } from '../../../config';
-
 
 export abstract class TnpProject {
 
@@ -88,15 +82,6 @@ export abstract class TnpProject {
       return this.baseline.packageJson.useFramework;
     }
     return this.packageJson.useFramework;
-    //#endregion
-  }
-
-  get isBundleMode(this: Project) {
-    if (Helpers.isBrowser) {
-      return true;
-    }
-    //#region @backend
-    return Project.isBundleMode;
     //#endregion
   }
 
