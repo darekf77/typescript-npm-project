@@ -103,7 +103,7 @@ export class TnpBundle extends FeatureForProject {
       const sourceDep = path.join((Project.Tnp as Project).location, config.folder.node_modules, depName);
       const destDep = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, depName);
       // Helpers.removeFolderIfExists(destDep);
-      Helpers.copy(sourceDep, destDep);
+      Helpers.copy(sourceDep, destDep,{ overwrite: true, recursive: true });
     }
 
     const destCompiledJs = path.join(

@@ -63,11 +63,25 @@ export class FilesStructure extends FeatureForProject {
       args = '';
     }
     options = this.fixOptionsArgs(options);
+
+
+
     if (!options.initiator) {
       options.initiator = this.project;
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
     let { skipNodeModules, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+
+    // THIS IS SLOW... BUT I CAN AFORD IT HERE
+    if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
+      this.project.quickFixes.missingSourceFolders();
+      if (this.project.isStandaloneProject && this.project.packageJson) {
+        this.project.packageJson.updateHooks()
+      }
+      this.project.notAllowedFiles().forEach(f => {
+        Helpers.removeFileIfExists(path.join(this.project.location, f));
+      });
+    }
 
     if (struct) {
       skipNodeModules = true;

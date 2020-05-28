@@ -1,39 +1,36 @@
-//#region @backend
-import * as path from 'path';
-// local
 import { Project } from '../abstract';
-import { config } from '../../config';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectIonicClient')
-export class ProjectIonicClient
-  //#region @backend
-  extends Project
-//#endregion
-{
+export class ProjectIonicClient extends Project {
   async buildLib() {
-    // throw new Error("Method not implemented.");
+
   }
 
   startOnCommand(args: string) {
+    //#region @backendFunc
     const command = `echo "hello from ionic" ${args}`;
     return command;
+    //#endregion
   }
 
   projectSpecyficFiles(): string[] {
+    //#region @backendFunc
     return [
       'tsconfig.json'
     ];
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backend
     const { prod, watch, outDir } = buildOptions;
     if (watch) {
       this.run(`tnp npm-run ionic serve --no-open -p ${this.getDefaultPort()}`).async()
     } else {
       this.run(`tnp npm-run ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
     }
+    //#endregion
   }
 }
-//#endregion

@@ -10,6 +10,7 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 //#endregion
 
+//#region select clients
 /**
  * Resovle workspace child clients if needed
  */
@@ -33,6 +34,7 @@ export async function selectClients(buildOptions: BuildOptions, currentProject: 
 
   `);
 }
+//#endregion
 
 //#region clients autocomplete menu
 async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Project, db: TnpDB) {

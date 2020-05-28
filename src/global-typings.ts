@@ -15,6 +15,7 @@ declare global {
       hideWarnings: boolean;
       hideInfos: boolean;
       hideLog: boolean;
+      codePurposeBrowser: boolean;
       actionShowingDepsForContainer?: boolean;
       tnpShowProgress?: boolean;
       tnpNonInteractive?: boolean;

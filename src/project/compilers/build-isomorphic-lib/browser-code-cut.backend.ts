@@ -50,12 +50,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     private sourceOutBrowser?: string,
   ) {
     super(absoluteFilePath);
-    // console.log(`
-    // absoluteFilePath: ${absoluteFilePath},
-    // project: ${project && project.name},
-    // compilationProject: ${compilationProject && compilationProject.name},
-    // `)
-    // this.debug('PiesController.ts');
   }
   //#endregion
 
@@ -63,7 +57,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
     let absoluteFilePath = this.absoluteFilePath.replace(/\/$/, '');
-    // console.log('[afterRegionsReplacement] this.absoluteFilePath', this.absoluteFilePath)
 
     let useBackupFile = false;
     ['html', 'css', 'scss', 'sass']

@@ -1,22 +1,16 @@
 //#region @backend
 import * as _ from 'lodash';
 import * as glob from 'glob';
-import * as path from 'path';
 import * as fse from 'fs-extra';
 import chalk from 'chalk';
-import { BuildOptions } from 'tnp-db';
-import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES';
 import { SingularBuild } from '../features/singular-build.backend';
 //#endregion
-// local
+import { BuildOptions } from 'tnp-db';
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { PROGRESS_DATA } from 'tnp-models';
-import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
-
-
 
 //#region @backend
 /**
@@ -47,18 +41,13 @@ function checkForCircuralWorkspaceDeps(workspace: Project) {
     }
   }
 }
-
 //#endregion
 
 @CLASS.NAME('ProjectWorkspace')
-export class ProjectWorkspace
-  //#region @backend
-  extends Project
-//#endregion
-{
-  //#region @backend
+export class ProjectWorkspace extends Project {
 
   async initProcedure() {
+    //#region @backend
     if (this.frameworkVersionAtLeast('v2') && this.isWorkspace) {
       if (this.children.filter(c => {
         Helpers.log(`Checking child: ${c.name}`, 1)
@@ -73,16 +62,13 @@ export class ProjectWorkspace
       }
       // checkForCircuralWorkspaceDeps(this); // TODO UNCOMMENT
     }
+    //#endregion
   }
 
-
-  async buildLib() {
-    // throw new Error("Method not implemented.");
-  }
-
+  async buildLib() { }
 
   startOnCommand(args: string) {
-
+    //#region @backendFunc
     this.proxyRouter.activateServer((port) => {
       Helpers.log(`proxy server ready on port ${port}`)
     })
@@ -97,23 +83,30 @@ export class ProjectWorkspace
         child.start(args)
       });
     return undefined;
+    //#endregion
   }
+
   projectSpecyficFiles(): string[] {
+    //#region @backendFunc
     return [
       'environment.d.ts',
       ...this.filesTemplates(),
     ];
+    //#endregion
   }
 
   filesTemplates() {
+    //#region @backendFunc
     const templates = super.filesTemplates();
     return [
       ...this.vscodeFileTemplates,
       ...templates,
-    ]
+    ];
+    //#endregion
   }
 
   projectSourceFiles() {
+    //#region @backendFunc
     let environmentFiles = [];
     if (this.isSiteInStrictMode) {
       environmentFiles = environmentFiles.concat(glob
@@ -129,10 +122,11 @@ export class ProjectWorkspace
       ...(super.projectSourceFiles()),
       ...environmentFiles
     ];
+    //#endregion
   }
 
-
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backendFunc
     if (!fse.existsSync(this.location)) {
       return;
     }
@@ -193,11 +187,9 @@ export class ProjectWorkspace
       }
       PROGRESS_DATA.log({ value: 100, msg: `Process Complete` });
     }
-
-    // console.log('project length', projects.length)
-
+    //#endregion
   }
-  //#endregion
+
 }
 
 //#region @backend

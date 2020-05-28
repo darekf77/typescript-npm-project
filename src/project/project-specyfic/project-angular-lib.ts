@@ -1,26 +1,20 @@
 //#region @backend
-import chalk from 'chalk';
 import * as fse from 'fs-extra';
-import * as _ from 'lodash';
 import * as path from 'path';
-import { ProjectAngularClient } from './project-angular-client.backend';
-import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
-import { Project } from '../abstract';
-import { BuildOptions } from 'tnp-db';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
+//#endregion
+import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
+import * as _ from 'lodash';
+import { ProjectAngularClient } from './project-angular-client';
+import { Helpers } from 'tnp-helpers';
+import { Project } from '../abstract';
 
 @CLASS.NAME('ProjectAngularLib')
-export class ProjectAngularLib
-  //#region @backend
-  extends Project
-//#endregion
-{
-
+export class ProjectAngularLib extends Project {
   private projectAngularClient: ProjectAngularClient;
 
-
+  //#region @backend
   constructor(public location: string) {
     super(location);
     if (_.isString(location)) {
@@ -28,9 +22,10 @@ export class ProjectAngularLib
       this.projectAngularClient.env = this.env; // QUICK_FIX
     }
   }
+  //#endregion
 
   async initProcedure() {
-
+    //#region @backendFunc
     if (this.frameworkVersionAtLeast('v2') && this.isWorkspaceChildProject && !this.parent.frameworkVersionAtLeast(this._frameworkVersion)) {
       Helpers.error(`Please use angular-lib-${this._frameworkVersion} only in workspace-${this._frameworkVersion}`, false, true);
     }
@@ -50,24 +45,31 @@ export class ProjectAngularLib
     if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
       this.applyLinkedFiles();
     }
+    //#endregion
   }
 
-
   public setDefaultPort(port: number) {
+    //#region @backend
     this.projectAngularClient.setDefaultPort(port)
+    //#endregion
   }
 
   public getDefaultPort() {
+    //#region @backendFunc
     return this.projectAngularClient.getDefaultPort()
+    //#endregion
   }
 
   protected startOnCommand(args) {
+    //#region @backendFunc
     const command = this.projectAngularClient.startOnCommand(args);
     // console.log(`Command is running async: ${command}`)
     return command;
+    //#endregion
   }
 
   filesTemplates() {
+    //#region @backendFunc
     let config = [
       'tsconfig.isomorphic.json.filetemplate',
       'tsconfig.json.filetemplate',
@@ -97,16 +99,14 @@ export class ProjectAngularLib
         .map(({ relativePath }) => {
           return relativePath;
         }));
-      // console.log('config',config)
-      // process.exit(0)
     }
 
-
-
     return config;
+    //#endregion
   }
 
   projectLinkedFiles() {
+    //#region @backendFunc
     let files = super.projectLinkedFiles();
 
     if (this.frameworkVersionAtLeast('v2')) {
@@ -122,9 +122,11 @@ export class ProjectAngularLib
       ])
     }
     return files;
+    //#endregion
   }
 
   projectSpecyficFiles() {
+    //#region @backendFunc
     const config = super.projectSpecyficFiles()
       .concat([
         'tsconfig.browser.json',
@@ -158,16 +160,17 @@ export class ProjectAngularLib
       })
     }
     return config
+    //#endregion
   }
-
 
   sourceFilesToIgnore() {
+    //#region @backendFunc
     return this.projectSpecyficFiles();
+    //#endregion
   }
 
-
-
   async buildLib() {
+    //#region @backendFunc
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
     if (this.buildOptions.watch) {
@@ -181,10 +184,11 @@ export class ProjectAngularLib
     } else {
       await this.incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
     }
-
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backendFunc
     const { appBuild, onlyWatchNoBuild } = buildOptions;
 
     if (!onlyWatchNoBuild) {
@@ -194,10 +198,7 @@ export class ProjectAngularLib
         await this.buildLib();
       }
     }
-
+    //#endregion
   }
 
-
 }
-
-//#endregion

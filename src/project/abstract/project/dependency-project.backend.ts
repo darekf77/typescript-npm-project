@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, ProjectBuild } from 'tnp-helpers';
 import { Project } from './project';
 //#endregion
 
@@ -21,11 +21,11 @@ export abstract class DependencyProject {
     return deps;
   }
 
-  projectsInOrderForBuild(this: Project, buildAppsForProjects: boolean): Models.dev.ProjectBuild[] {
+  projectsInOrderForBuild(this: Project, buildAppsForProjects: boolean): ProjectBuild[] {
     if (!fse.existsSync(this.location)) {
       return [];
     }
-    const targetClients: Models.dev.ProjectBuild[] = (
+    const targetClients: ProjectBuild[] = (
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))
@@ -84,7 +84,7 @@ export abstract class DependencyProject {
 
 }
 
-function libs(targetClients: Models.dev.ProjectBuild[], targetAsLibAlso = false) {
+function libs(targetClients: ProjectBuild[], targetAsLibAlso = false) {
   const existed = {};
   const targetLibs = targetClients
     .map(t => ((t.project as any) as Project).workspaceDependencies)

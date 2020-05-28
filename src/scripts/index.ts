@@ -1,6 +1,7 @@
 //#region  @backend
+import BENCHMARKS from './BENCHMARK/BENCHMARK-TNP-PROJECTS.backend';
 import COMPILERS from './COMPILERS-TESTING/COMPILERS.backend';
-import {DB} from 'tnp-db';
+import { DB } from 'tnp-db';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
 import NEW from './NEW-PROJECT_FILES_MODULES/NEW.backend';
 import BUILD from './PROJECTS-DEVELOPMENT/BUILD.backend';
@@ -17,6 +18,7 @@ import HELP from './HELP.backend';
 import BASH_CONFIG from './BASH-CONFIG.backend';
 
 export default [
+  BENCHMARKS,
   COMPILERS,
   DB,
   DEPS,

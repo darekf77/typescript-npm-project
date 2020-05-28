@@ -1,40 +1,37 @@
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as _ from 'lodash';
-import chalk from 'chalk';
 import * as inquirer from 'inquirer';
-
-import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
-import { Models } from 'tnp-models';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
-import { BuildOptions } from 'tnp-db';
 //#endregion
+import * as _ from 'lodash';
+import { Helpers } from 'tnp-helpers';
+import { Models } from 'tnp-models';
+import { BuildOptions } from 'tnp-db';
 import { Project } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
 
 @CLASS.NAME('ProjectIsomorphicLib')
-export class ProjectIsomorphicLib
-  //#region @backend
-  extends Project
-//#endregion
-{
-
-  //#region @backend
+export class ProjectIsomorphicLib extends Project {
 
   async initProcedure() {
+    //#region @backend
     if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
       this.applyLinkedFiles();
     }
+    //#endregion
   }
 
   startOnCommand(args: string) {
+    //#region @backendFunc
     const command = `ts-node run.js ${args}`;
     return command;
+    //#endregion
   }
 
   sourceFilesToIgnore() {
+    //#region @backendFunc
     let toIgnore = [
       `src/${config.file.entities_ts}`,
       `src/${config.file.controllers_ts}`,
@@ -43,9 +40,11 @@ export class ProjectIsomorphicLib
       toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
     }
     return toIgnore;
+    //#endregion
   }
 
   projectSpecyficFiles(): string[] {
+    //#region @backendFunc
     let files = super.projectSpecyficFiles()
       .concat([
         'tsconfig.browser.json',
@@ -63,9 +62,11 @@ export class ProjectIsomorphicLib
     }
 
     return files;
+    //#endregion
   }
 
   filesTemplates() {
+    //#region @backendFunc
     let files = [
       'tsconfig.json.filetemplate',
     ];
@@ -80,9 +81,11 @@ export class ProjectIsomorphicLib
     }
 
     return files;
+    //#endregion
   }
 
   projectLinkedFiles() {
+    //#region @backendFunc
     const files = super.projectLinkedFiles();
 
     if (this.frameworkVersionAtLeast('v2')) {
@@ -92,16 +95,20 @@ export class ProjectIsomorphicLib
       });
     }
     return files;
+    //#endregion
   }
 
   projectSpecyficIgnoredFiles() {
+    //#region @backendFunc
     return [
       'src/entities.ts',
       'src/controllers.ts'
-    ].concat(this.projectSpecyficFiles())
+    ].concat(this.projectSpecyficFiles());
+    //#endregion
   }
 
   private async selectToSimulate(outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[]) {
+    //#region @backend
     let webpackEnvParams = `--env.outFolder=${outDir}`;
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
@@ -124,7 +131,6 @@ export class ProjectIsomorphicLib
               }
             }
           ]) as any;
-        // console.log('ANSWER', answer)
         client = Project.From<Project>(path.join(this.location, '..', answer.project));
       }
     }
@@ -136,14 +142,15 @@ export class ProjectIsomorphicLib
     }
 
     const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
-    // console.log(command)
 
     this.run(command).sync();
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backendFunc
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
-    // console.log({ buildOptions })
+
     if (!onlyWatchNoBuild) {
       if (appBuild) {
         if (!watch) {
@@ -156,27 +163,27 @@ export class ProjectIsomorphicLib
       }
     }
     return;
+    //#endregion
   }
 
   private copyWhenExist(source: string, outDir: string) {
+    //#region @backend
     const basename = source;
     source = path.join(this.location, source);
     outDir = path.join(this.location, outDir, basename);
-    // console.log(`Copy from ${source} to ${outDir}`)
     if (fse.existsSync(source)) {
       if (fse.lstatSync(source).isDirectory()) {
-        // console.log('copy folder')
         Helpers.tryCopyFrom(source, outDir)
       } else {
-        // console.log('copy copyfile')
-        // fse.copyFileSync(source, outDir);
         Helpers.copyFile(source, outDir)
       }
     } else {
-      // console.log('not exist', source)
+      Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);
     }
+    //#endregion
   }
   private linkWhenExist(source: string, outLInk: string) {
+    //#region @backend
     const basename = source;
     source = path.join(this.location, source);
     outLInk = path.join(this.location, outLInk, basename);
@@ -184,9 +191,11 @@ export class ProjectIsomorphicLib
     if (fse.existsSync(source)) {
       Helpers.createSymLink(source, outLInk)
     }
+    //#endregion
   }
 
   async buildLib() {
+    //#region @backend
     const { outDir, prod } = this.buildOptions;
     Helpers.log(`[buildLib] start of building`);
     this.copyWhenExist('bin', outDir);
@@ -256,12 +265,11 @@ export class ProjectIsomorphicLib
         await this.incrementalBuildProcess.start('isomorphic compilation')
       }
     }
+    //#endregion
   }
 
-  /**
-   * TODO why small bundle is from webpack loader ?
-   */
   uglifyCode(reservedNames: string[]) {
+    //#region @backendFunc
     const command = `uglifyjs bundle/index.js --output bundle/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
@@ -274,9 +282,11 @@ export class ProjectIsomorphicLib
 
       `)
     this.run(command).sync();
+    //#endregion
   }
 
   obscureCode(reservedNames: string[]) {
+    //#region @backendFunc
     const commnad = `javascript-obfuscator bundle/index.js `
       + ` --output bundle/index.js`
       + ` --target node`
@@ -294,11 +304,10 @@ export class ProjectIsomorphicLib
 
           `)
     this.run(commnad).sync();
+    //#endregion
   }
 
-  //#endregion
 }
-
 
 //#region @backend
 export function getReservedClassNames(project = Project.Current as Project) {

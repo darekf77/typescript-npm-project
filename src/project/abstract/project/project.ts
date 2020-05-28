@@ -96,10 +96,7 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
   }
   //#endregion
 } as any)
-export class Project
-  //#region @backend
-  extends PorjectBase<Project>
-//#endregion
+export class Project extends PorjectBase<Project>
 {
   browser: any;
   location: string;
@@ -115,77 +112,41 @@ export class Project
   }
 
   //#region @backend
+  /**
+   * DO NOT USE function isWorkspace, isWOrkspace child.. it is to expensive
+   */
   constructor(location?: string) {
     super();
     this.location = _.isString(location) ? location : '';
-    if (global.tnp_normal_mode) {
+    if (!global.codePurposeBrowser) {
       this.defineProperty('compilerCache', CompilerCache);
       this.cache = {};
       this.packageJson = PackageJSON.fromProject(this);
       this.setType(this.packageJson ? this.packageJson.type : 'unknow');
-      this.defineProperty('quickFixes', QuickFixes);
-      // this.quickFixes = new QuickFixes(this)
-      this.quickFixes.missingSourceFolders()
-      this.defineProperty('staticBuild', StaticBuild);
-      // this.staticBuild = new StaticBuild(this)
-      this.defineProperty('workspaceSymlinks', WorkspaceSymlinks);
-      // this.workspaceSymlinks = new WorkspaceSymlinks(this);
-      this.defineProperty('tnpBundle', TnpBundle);
-      // this.tnpBundle = new TnpBundle(this);
-      this.defineProperty('node_modules', NodeModules);
-      // this.node_modules = new NodeModules(this);
-      this.defineProperty('npmPackages', NpmPackages);
-      // this.npmPackages = new NpmPackages(this)
-      this.defineProperty('recreate', FilesRecreator);
-      // this.recreate = new FilesRecreator(this);
-      this.defineProperty('filesFactory', FilesFactory);
-      // this.filesFactory = new FilesFactory(this);
-      this.defineProperty('sourceModifier', SourceModifier);
-      // this.sourceModifier = new SourceModifier(this);
-
-      // this.outputCodeModifier = new OutputCodeModifier(this); //  NOT USED
-      this.defineProperty('frameworkFileGenerator', FrameworkFilesGenerator);
-      // this.frameworkFileGenerator = new FrameworkFilesGenerator(this);
-      this.defineProperty('filesTemplatesBuilder', FilesTemplatesBuilder);
-      // this.filesTemplatesBuilder = new FilesTemplatesBuilder(this);
-      this.defineProperty('join', BaselineSiteJoin);
-      // this.join = new BaselineSiteJoin(this);
-      this.defineProperty('tests', TestRunner);
-      // this.tests = new TestRunner(this);
-
+      this.defineProperty<Project>('quickFixes', QuickFixes);
+      this.defineProperty<Project>('staticBuild', StaticBuild);
+      this.defineProperty<Project>('workspaceSymlinks', WorkspaceSymlinks);
+      this.defineProperty<Project>('tnpBundle', TnpBundle);
+      this.defineProperty<Project>('node_modules', NodeModules);
+      this.defineProperty<Project>('npmPackages', NpmPackages);
+      this.defineProperty<Project>('recreate', FilesRecreator);
+      this.defineProperty<Project>('filesFactory', FilesFactory);
+      this.defineProperty<Project>('sourceModifier', SourceModifier);
+      this.defineProperty<Project>('frameworkFileGenerator', FrameworkFilesGenerator);
+      this.defineProperty<Project>('filesTemplatesBuilder', FilesTemplatesBuilder);
+      this.defineProperty<Project>('join', BaselineSiteJoin);
+      this.defineProperty<Project>('tests', TestRunner);
       Project.projects.push(this);
-
-      // this.requiredLibs = this.packageJson.requiredProjects;
-
-
       this.__defaultPort = Project.DefaultPortByType(this._type);
-      // log(`Default port by type ${this.name}, baseline ${this.baseline && this.baseline.name}`)
-
-      if (this.isWorkspace || this.isWorkspaceChildProject || this.isStandaloneProject) {
-        // this.defineProperty('env', EnvironmentConfig);
-        this.env = new EnvironmentConfig(this) as any;
-      }
-
-      if (this.isWorkspace || this.isWorkspaceChildProject) {
-        this.defineProperty('proxyRouter', ProxyRouter);
-        // this.proxyRouter = new ProxyRouter(this);
-      }
-      this.copyManager = new CopyManager(this);
-      if (this.isStandaloneProject && this.packageJson) {
-        this.packageJson.updateHooks()
-      }
-      this.defineProperty('filesStructure', FilesStructure);
-      // this.filesStructure = new FilesStructure(this);
-      this.defineProperty('buildProcess', BuildProcess);
-      // this.buildProcess = new BuildProcess(this);
-
-      this.notAllowedFiles().forEach(f => {
-        Helpers.removeFileIfExists(path.join(this.location, f));
-      });
+      this.defineProperty<Project>('env', EnvironmentConfig);
+      this.defineProperty<Project>('proxyRouter', ProxyRouter);
+      this.defineProperty<Project>('copyManager', CopyManager);
+      this.defineProperty<Project>('filesStructure', FilesStructure);
+      this.defineProperty<Project>('buildProcess', BuildProcess);
     }
+
   }
   //#endregion
-
 }
 
 // @ts-ignore
@@ -209,9 +170,7 @@ export interface Project extends
   SiteProject,
   DbProcessProject,
   DependencyProject,
-  CompilerCache
-
-{
+  CompilerCache {
 
 }
 //#endregion

@@ -2,9 +2,9 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
-// third part
-import { Project } from '../abstract';
 import { config } from '../../config';
+//#endregion
+import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
@@ -14,21 +14,17 @@ import { CLASS } from 'typescript-class-helpers';
  * DO NOT USE environment variables in this project directly
  */
 @CLASS.NAME('ProjectAngularClient')
-export class ProjectAngularClient
-  //#region @backend
-  extends Project
-//#endregion
-{
-  async buildLib() {
-    // throw new Error("Method not implemented.");
-  }
+export class ProjectAngularClient extends Project {
+  async buildLib() { }
 
-
-  get isEjectedProject() {
+  get isEjectedProject(this: Project) {
+    //#region @backendFunc
     return this.typeIs('angular-client')
+    //#endregion
   }
 
   filesTemplates() {
+    //#region @backendFunc
     return [
       'src/tsconfig.app.json.filetemplate',
       'webpack.config.build.aot.js.filetemplate',
@@ -37,9 +33,11 @@ export class ProjectAngularClient
       'webpack.config.js.filetemplate',
       '.angular-cli.json.filetemplate'
     ];
+    //#endregion
   }
 
   projectSpecyficFiles() {
+    //#region @backendFunc
     return [
       "tsconfig.json",
       ...(!this.isStandaloneProject ? [
@@ -58,22 +56,27 @@ export class ProjectAngularClient
       'webpack.config.build.js',
       'webpack.config.common.js',
       'webpack.config.js'
-    ] : [])
+    ] : []);
+    //#endregion
   }
 
   preventWarningTypescirptMismatch() {
+    //#region @backendFunc
     this.run('npm-run ng set warnings.typescriptMismatch=false').sync()
+    //#endregion
   }
 
   startOnCommand(args: string) {
-
+    //#region @backendFunc
     const baseUrl = this.env.config && this.env.config.workspace.projects.find(({ name }) => name === this.name).baseUrl;
     const command = `tnp serve --port ${this.getDefaultPort()} --outDir ${config.folder.previewDistApp} --baseUrl ${baseUrl} ${args}`;
     // console.log(`Angular command: ${command}`)
     return command;
+    //#endregion
   }
 
   async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
+    //#region @backendFunc
     const outDirApp = 'dist-app';
     if (watch) {
       const p = (port !== undefined ? `--port=${port}` : '');
@@ -164,10 +167,11 @@ Angular cli build command: ${command}
 
       }
     }
-
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backendFunc
     this.buildOptions = buildOptions;
     const { prod, watch, outDir, appBuild, args } = buildOptions;
     if (this.isEjectedProject) {
@@ -181,7 +185,7 @@ Angular cli build command: ${command}
       }
       await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref);
     }
+    //#endregion
   }
 
 }
-//#endregion
