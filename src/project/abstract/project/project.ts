@@ -128,7 +128,7 @@ export class Project extends $Project<Project>
     const location = this.location;
     Project.projects = Project.projects.filter(p => p.location !== location);
     Helpers.tryRemoveDir(location);
-    //#region
+    //#endregion
   }
 
   //#region @backend

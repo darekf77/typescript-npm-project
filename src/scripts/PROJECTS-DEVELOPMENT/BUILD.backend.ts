@@ -7,6 +7,7 @@ import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
+import { EnvironmentConfig } from '../../project/features';
 
 /**
  * THIS FUNCTION CAN'T BE RECURIVE
@@ -37,8 +38,10 @@ export async function chainBuild(args: string) {
     }
   }
 
-
-  project.removeFileByRelativePath(config.file.tnpEnvironment_json);
+  await Helpers.compilationWrapper(async () => {
+    project.removeFileByRelativePath(config.file.tnpEnvironment_json);
+    await (project.env as any as EnvironmentConfig).init(args);
+  }, `Reiniting environment for chaing build...`);
 
 
   if (project.typeIsNot(...allowedLibs)) {

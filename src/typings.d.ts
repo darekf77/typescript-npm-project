@@ -1,10 +1,11 @@
-import { EnvConfig } from 'tnp-bundle';
+import { Models } from 'tnp-models';
+
 
 declare global {
-    const ENV: EnvConfig;
+  const ENV: Models.env.EnvConfig;
 }
 
 declare module "*.json" {
-    const value: any;
-    export default value;
+  const value: any;
+  export default value;
 }
