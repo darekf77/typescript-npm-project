@@ -262,7 +262,7 @@ export class CopyManager extends FeatureForProject {
   public copyBuildedDistributionTo(destination: Project,
     options: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }, dontRemoveDestFolder: boolean) {
 
-    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
+    let { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
       Helpers.warn(`Invalid project: ${destination.name}`)
@@ -281,7 +281,30 @@ export class CopyManager extends FeatureForProject {
         namePackageName,
         specyficFileRelativePath));
 
-      Helpers.copyFile(sourceFile, destinationFile)
+
+      specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+
+      if (outDir === 'dist' && this.buildOptions.watch) {
+        if (destinationFile.endsWith('.js.map')) {
+          const folderToLink = [
+            `tmp-src-${outDir}`,
+            this.project.sourceFolder,
+          ];
+          let content = Helpers.readFile(sourceFile);
+          folderToLink.forEach(sourceFolder => {
+            content = content.replace(`"../${sourceFolder}`, `"./${sourceFolder}`);
+            content = content.replace(`../${sourceFolder}`, sourceFolder);
+          });
+          Helpers.writeFile(destinationFile, content);
+        } else if (specyficFileRelativePath !== config.file.index_d_ts) { // don't override index.d.ts
+          Helpers.copyFile(sourceFile, destinationFile);
+        }
+      } else {
+        Helpers.copyFile(sourceFile, destinationFile);
+      }
+      if (specyficFileRelativePath === config.file.package_json) {
+        Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+      }
     } else {
       const projectOudDirDest = path.join(destination.location,
         config.folder.node_modules,
@@ -299,7 +322,73 @@ export class CopyManager extends FeatureForProject {
         // console.info('[copyto] NORMAL INTSTALL')
         const monitoredOutDir: string = path.join(this.project.location, outDir)
 
-        Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest)
+        Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest);
+        const folderToLink = [
+          `tmp-src-${outDir}`,
+          this.project.sourceFolder,
+        ];
+        if (outDir === 'dist' && this.buildOptions.watch) {
+
+          folderToLink.forEach(sourceFolder => {
+            const srcOrComponents = path.join(this.project.location, sourceFolder);
+            const projectOudDirDest = path.join(destination.location,
+              config.folder.node_modules,
+              namePackageName,
+              sourceFolder
+            );
+            Helpers.removeFileIfExists(projectOudDirDest);
+            Helpers.removeFolderIfExists(projectOudDirDest);
+            Helpers.createSymLink(srcOrComponents, projectOudDirDest);
+          });
+
+          Helpers.writeFile(path.join(destination.location,
+            config.folder.node_modules,
+            namePackageName,
+            config.file.index_d_ts,
+          ), `export * from './${this.project.sourceFolder}';\n`);
+
+          glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/${config.folder.browser}/**/*.js.map`)
+            .forEach(f => {
+              const sourceFolder = `tmp-src-${outDir}`;
+              let content = Helpers.readFile(f);
+              content = content.replace(`../${sourceFolder}`, sourceFolder);
+              Helpers.writeFile(f, content);
+            });
+
+          if (this.project.typeIsNot('angular-lib')) {
+            glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/**/*.js.map`, { ignore: [`${config.folder.browser}/**/*.*`] })
+              .forEach(f => {
+                const sourceFolder = this.project.sourceFolder;
+                let content = Helpers.readFile(f);
+                content = content.replace(`"../${sourceFolder}`, `"./${sourceFolder}`);
+                content = content.replace(`../${sourceFolder}`, sourceFolder);
+                Helpers.writeFile(f, content);
+              });
+          }
+
+        } else {
+          folderToLink.forEach(sourceFolder => {
+            const projectOudDirDest = path.join(destination.location,
+              config.folder.node_modules,
+              namePackageName,
+              sourceFolder
+            );
+            Helpers.removeFileIfExists(projectOudDirDest);
+            Helpers.removeFolderIfExists(projectOudDirDest);
+          });
+        }
+        const projectOudBorwserSrc = path.join(destination.location,
+          config.folder.node_modules,
+          namePackageName,
+          config.file.package_json
+        );
+        const projectOudBorwserDest = path.join(destination.location,
+          config.folder.node_modules,
+          namePackageName,
+          config.folder.browser,
+          config.file.package_json
+        );
+        Helpers.copyFile(projectOudBorwserSrc, projectOudBorwserDest);
       }
     }
 

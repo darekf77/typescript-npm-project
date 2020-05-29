@@ -13,6 +13,12 @@ export abstract class FolderProject {
 
   abstract location: string;
 
+  //#region @backend
+  get sourceFolder(this: Project): 'src' | 'components' {
+    return (this.typeIs('angular-lib')
+      ? config.folder.components : config.folder.src) as any;
+  }
+  //#endregion
 
   get children(this: Project): Project[] {
     if (Helpers.isBrowser) {

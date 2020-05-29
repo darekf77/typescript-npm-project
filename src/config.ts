@@ -46,6 +46,9 @@ const file = {
   manifest_webmanifest: 'manifest.webmanifest',
   publicApi_ts: 'public_api.ts',
   _babelrc: '.babelrc',
+  index_d_ts: 'index.d.ts',
+  index_js: 'index.js',
+  index_js_map: 'index.js.map',
   ...filesNotAllowedToClean
 };
 
