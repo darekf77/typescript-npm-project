@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import chalk from 'chalk';
-import { FeatureForProject } from '../abstract';
+import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { Models } from 'tnp-models';
@@ -138,7 +138,13 @@ export default _default;
         // Helpers.removeFolderIfExists(srcFolder);
       } else {
         if (!fse.existsSync(srcFolder)) {
-          Helpers.mkdirp(srcFolder);
+          if (this.project.typeIs('angular-lib')) {
+            const coreProj = Project.by('angular-lib', this.project._frameworkVersion) as Project;
+            const coreSrcLocaion = path.join(coreProj.location, config.folder.src);
+            Helpers.copy(coreSrcLocaion, srcFolder, { recursive: true, overwrite: true });
+          } else {
+            Helpers.mkdirp(srcFolder);
+          }
         }
         // log('SRC folder recreated')
       }

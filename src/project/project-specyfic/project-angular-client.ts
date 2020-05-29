@@ -1,5 +1,6 @@
 //#region @backend
 import * as path from 'path';
+import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
 import { config } from '../../config';
@@ -81,7 +82,7 @@ export class ProjectAngularClient
     //#endregion
   }
 
-  async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string) {
+  async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string, flags: string[] = []) {
     //#region @backendFunc
     const outDirApp = 'dist-app';
     if (watch) {
@@ -147,8 +148,9 @@ export class ProjectAngularClient
           command = `npm-run ng build  ${statsCommand} `
             + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
         } else {
+          const aot = flags.includes('aot')
           command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
-            + ` --aot=${prod ? 'true' : 'false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
+            + ` --aot=${aot ? 'true' : 'false --build-optimizer=false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
         }
 
         Helpers.info(`
@@ -189,7 +191,10 @@ Angular cli build command: ${command}
         baseHref = `${baseHref}/`;
         baseHref = baseHref.replace(/\/\//g, '/')
       }
-      await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref);
+      let { flags } = require('minimist')(args.split(' '));
+      flags = (_.isString(flags) ? [flags] : []);
+      flags = (!_.isArray(flags) ? [] : flags);
+      await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref, flags);
     }
     //#endregion
   }

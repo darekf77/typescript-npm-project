@@ -269,6 +269,11 @@ const $SERVE = (args) => {
     const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
 
     app.get(`/${proj.name}/*`, (req, res) => {
+      // res.set('Service-Worker-Allowed',
+      //   [
+      //     '/bs4-breakpoint/',
+      //   ].join(', '))
+
       // console.log(`path: "${req.path}"`)
       // console.log(`ORIG: "${req.originalUrl}"`)
       let filePath = req.originalUrl
@@ -400,6 +405,22 @@ const BDW = (args) => BUILD_DIST_WATCH(args);
 const BLW = (args) => BUILD_DIST_WATCH(args);
 const $BAW = (args) => BUILD_APP_WATCH(args);
 
+async function $BUILD_DOCS(args) {
+  if ((Project.Current as Project).isStandaloneProject) {
+    await (Project.Current as Project).filesStructure.init('');
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
+  }
+  process.exit(0)
+}
+
+async function $BUILD_DOCS_PROD(args) {
+  if ((Project.Current as Project).isStandaloneProject) {
+    await (Project.Current as Project).filesStructure.init('');
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+  }
+  process.exit(0)
+}
+
 const $STOP_BUILD_DIST_WATCH = async (args) => {
   const db = await TnpDB.Instance(config.dbLocation);
   const projectLocation = (Project.Current as Project).location;
@@ -443,6 +464,8 @@ async function $ACTIVE_SINGULAR_BUILD(args) {
 
 
 export default {
+  $BUILD_DOCS: Helpers.CLIWRAP($BUILD_DOCS, '$BUILD_DOCS'),
+  $BUILD_DOCS_PROD: Helpers.CLIWRAP($BUILD_DOCS_PROD, '$BUILD_DOCS_PROD'),
   DEVB: Helpers.CLIWRAP(DEVB, 'DEVB'),
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),

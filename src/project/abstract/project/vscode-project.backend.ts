@@ -277,7 +277,7 @@ export abstract class VscodeProject {
         "preLaunchTask": "Ng Serve",
         "postDebugTask": "terminateall",
         "sourceMaps": true,
-        "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
+        // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
         "webRoot": "${workspaceFolder}",
         "sourceMapPathOverrides": {
           "webpack:/*": "${webRoot}/*",
