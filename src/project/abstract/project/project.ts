@@ -33,7 +33,7 @@ import {
   FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, OutputCodeModifier } from '../../compilers';
-import { CopyManager } from '../../features/copy-manager';
+import { CopyManager } from '../../features/copy-manager.backend';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';

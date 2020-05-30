@@ -1,26 +1,25 @@
-//#region @backend
-
+//#region imports
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import * as os from 'os';
-import { watch } from 'chokidar'
-
+import { watch } from 'chokidar';
 import { config } from '../../config';
 import { Project } from '../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
 import { BuildOptions } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
+//#endregion
 
 export class CopyManager extends FeatureForProject {
 
   private buildOptions: BuildOptions;
 
+  //#region init
   public initCopyingOnBuildFinish(buildOptions: BuildOptions) {
-    // console.log("INIT BUILD FINSH")
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
     if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
@@ -28,51 +27,67 @@ export class CopyManager extends FeatureForProject {
       return;
     }
     if (watch) {
-      this.copyToProjectsOnFinish(void 0, void 0, watch);
-      this.watchAndCopyToProjectOnFinish();
+      this.start(void 0, void 0, watch);
+      this.startAndWatch();
     } else {
-      this.copyToProjectsOnFinish();
+      this.start();
     }
   }
+  //#endregion
 
-  private filterDontCopy(basePathFoldersTosSkip: string[]) {
-
-    return (src: string, dest: string) => {
-      // console.log('src',src)
-      const baseFolder = _.first(src.replace(this.project.location, '')
-        .replace(/^\//, '').split('/'));
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = _.isUndefined(basePathFoldersTosSkip.find(f => baseFolder.startsWith(f)));
-      return isAllowed;
-    };
-
-  }
-
-  private filterOnlyCopy(basePathFoldersOnlyToInclude: string[]) {
-
-    return (src: string, dest: string) => {
-      const baseFolder = _.first(src.replace(this.project.location, '')
-        .replace(/^\//, '').split('/'));
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = !_.isUndefined(basePathFoldersOnlyToInclude.find(f => baseFolder.startsWith(f)));
-      return isAllowed;
-    };
+  //#region start
+  private start(event?: Models.other.FileEvent,
+    specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
+    const outDir = this.buildOptions.outDir;
+    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+      (this.buildOptions.copyto as any[]).forEach((p: Project) => {
+        // Helpers.log(`Copy to ${p.name}`)
+        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
+      })
+    }
 
   }
+  //#endregion
 
-  // genSourceFilesInside(destination: Project) {
-  //   this.project.projectSourceFiles()
-  //     .forEach(f => {
-  //       const source = path.join(this.project.location, f);
-  //       log(`Copying env file to static build: ${path.basename(f)} `)
-  //       tryCopyFrom(source, path.join(destination.location, f));
-  //     });
-  // }
+  //#region start and watch
+  private startAndWatch() {
+    const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
 
+    // Helpers.log(`watching folder for as copy source !! ${monitorDir}`)
+
+    if (fse.existsSync(monitorDir)) {
+      watch(monitorDir, {
+        followSymlinks: false
+      }).on('change', (f) => {
+        if (_.isString(f)) {
+          f = f.replace(monitorDir, '') as any
+          // console.log(f)
+        }
+        this.start('changed', f as any);
+      }).on('add', f => {
+        if (_.isString(f)) {
+          f = f.replace(monitorDir, '') as any
+          // console.log(f)
+        }
+        this.start('created', f as any);
+      }).on('unlink', f => {
+        if (_.isString(f)) {
+          f = f.replace(monitorDir, '') as any
+          // console.log(f)
+        }
+        this.start('removed', f as any);
+      })
+
+    } else {
+      console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir}`);
+      setTimeout(() => {
+        this.startAndWatch();
+      }, 1000)
+    }
+  }
+  //#endregion
+
+  //#region executre copy
   private executeCopy(sourceLocation: string, destinationLocation: string, options: Models.other.GenerateProjectCopyOpt) {
     const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
     let tempDestination: string;
@@ -108,7 +123,7 @@ export class CopyManager extends FeatureForProject {
 
     // console.log(foldersToSkip)
 
-    const filter = override ? this.filterOnlyCopy(sourceFolders) : this.filterDontCopy(foldersToSkip);
+    const filter = override ? filterOnlyCopy(sourceFolders, this.project) : filterDontCopy(foldersToSkip, this.project);
 
     Helpers.copy(`${sourceLocation}/`, tempDestination, { filter });
 
@@ -137,7 +152,9 @@ export class CopyManager extends FeatureForProject {
     }
 
   }
+  //#endregion
 
+  //#region generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
     options?: Models.other.GenerateProjectCopyOpt): boolean {
     // if (this.project.isWorkspace) {
@@ -257,8 +274,9 @@ export class CopyManager extends FeatureForProject {
 
     return true;
   }
+  //#endregion
 
-
+  //#region copy build distribution to
   public copyBuildedDistributionTo(destination: Project,
     options: { specyficFileRelativePath?: string, outDir?: 'dist' | 'bundle' }, dontRemoveDestFolder: boolean) {
 
@@ -391,63 +409,36 @@ export class CopyManager extends FeatureForProject {
     }
 
   }
-
-  // private __firstTimeWatchCopyTOFiles = [];
-  private copyToProjectsOnFinish(event?: Models.other.FileEvent,
-    specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
-    // Helpers.log(`[copyto] File cahnge: ${specyficFileRelativePath}, event: ${event}`)
-    // prevent first unnecesary copy after watch
-    // if (event && specificFile && !this.__firstTimeWatchCopyTOFiles.includes(specificFile)) {
-    //   this.__firstTimeWatchCopyTOFiles.push(specificFile)
-    //   return;
-    // }
-
-    const outDir = this.buildOptions.outDir;
-    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      (this.buildOptions.copyto as any[]).forEach((p: Project) => {
-        // Helpers.log(`Copy to ${p.name}`)
-        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
-      })
-    }
-
-  }
-
-  private watchAndCopyToProjectOnFinish() {
-    const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
-
-    // Helpers.log(`watching folder for as copy source !! ${monitorDir}`)
-
-    if (fse.existsSync(monitorDir)) {
-      watch(monitorDir, {
-        followSymlinks: false
-      }).on('change', (f) => {
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.copyToProjectsOnFinish('changed', f as any);
-      }).on('add', f => {
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.copyToProjectsOnFinish('created', f as any);
-      }).on('unlink', f => {
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.copyToProjectsOnFinish('removed', f as any);
-      })
-
-    } else {
-      console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir}`);
-      setTimeout(() => {
-        this.watchAndCopyToProjectOnFinish();
-      }, 1000)
-    }
-  }
-
+  //#endregion
 
 }
-//#endregion
+
+
+function filterDontCopy(basePathFoldersTosSkip: string[], project: Project) {
+
+  return (src: string, dest: string) => {
+    // console.log('src',src)
+    const baseFolder = _.first(src.replace(project.location, '')
+      .replace(/^\//, '').split('/'));
+    if (!baseFolder || baseFolder.trim() === '') {
+      return true;
+    }
+    const isAllowed = _.isUndefined(basePathFoldersTosSkip.find(f => baseFolder.startsWith(f)));
+    return isAllowed;
+  };
+
+}
+
+function filterOnlyCopy(basePathFoldersOnlyToInclude: string[], project: Project) {
+
+  return (src: string, dest: string) => {
+    const baseFolder = _.first(src.replace(project.location, '')
+      .replace(/^\//, '').split('/'));
+    if (!baseFolder || baseFolder.trim() === '') {
+      return true;
+    }
+    const isAllowed = !_.isUndefined(basePathFoldersOnlyToInclude.find(f => baseFolder.startsWith(f)));
+    return isAllowed;
+  };
+
+}

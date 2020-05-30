@@ -103,7 +103,11 @@ export class TnpBundle extends FeatureForProject {
       const sourceDep = path.join((Project.Tnp as Project).location, config.folder.node_modules, depName);
       const destDep = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, depName);
       // Helpers.removeFolderIfExists(destDep);
-      Helpers.copy(sourceDep, destDep,{ overwrite: true, recursive: true });
+      Helpers.copy(sourceDep, destDep, {
+        overwrite: true,
+        recursive: true,
+        dereference: true,
+      } as any);
     }
 
     const destCompiledJs = path.join(
@@ -119,6 +123,7 @@ export class TnpBundle extends FeatureForProject {
     );
 
     Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
+      dereference: true,
       filter: (src: string, dest: string) => {
         return !src.endsWith('/dist/bin') &&
           !src.endsWith('/bin') &&

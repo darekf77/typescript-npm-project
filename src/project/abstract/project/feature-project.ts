@@ -10,7 +10,7 @@ import {
 } from '../../features';
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, OutputCodeModifier } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
-import { CopyManager } from '../../features/copy-manager';
+import { CopyManager } from '../../features/copy-manager.backend';
 import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
