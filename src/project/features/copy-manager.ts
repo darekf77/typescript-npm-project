@@ -336,8 +336,7 @@ export class CopyManager extends FeatureForProject {
               namePackageName,
               sourceFolder
             );
-            Helpers.removeFileIfExists(projectOudDirDest);
-            Helpers.removeFolderIfExists(projectOudDirDest);
+            Helpers.removeIfExists(projectOudDirDest);
             Helpers.createSymLink(srcOrComponents, projectOudDirDest);
           });
 
@@ -373,8 +372,7 @@ export class CopyManager extends FeatureForProject {
               namePackageName,
               sourceFolder
             );
-            Helpers.removeFileIfExists(projectOudDirDest);
-            Helpers.removeFolderIfExists(projectOudDirDest);
+            Helpers.removeIfExists(projectOudDirDest);
           });
         }
         const projectOudBorwserSrc = path.join(destination.location,

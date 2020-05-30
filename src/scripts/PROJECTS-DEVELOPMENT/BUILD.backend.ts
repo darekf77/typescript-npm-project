@@ -93,7 +93,7 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
       }
 
       const command = `${config.frameworkName} bdw ${argsForProjct} `
-        + ` ${project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
+        + ` ${!project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
         + ` ${!global.hideLog ? '-verbose' : ''}`
         + ` ${isBaselineForThisBuild ? '--skipBuild=true' : ''}`
         ;

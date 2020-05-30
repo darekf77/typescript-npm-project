@@ -218,7 +218,9 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-    this.project.tnpBundle.installAsPackage()
+    if(!this.project.name.startsWith('tnp')) {
+      this.project.tnpBundle.installAsPackage()
+    }
 
     //#region handle node modules instalation
     if (!this.project.node_modules.exist) {
