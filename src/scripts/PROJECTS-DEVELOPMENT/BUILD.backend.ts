@@ -254,7 +254,7 @@ const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).Sta
 const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true })
 
-const $SERVE = (args) => {
+const $SERVE = async (args) => {
   let proj = (Project.Current as Project);
   if (!proj) {
     proj = Project.nearestTo<Project>(process.cwd());
@@ -263,47 +263,55 @@ const $SERVE = (args) => {
     if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
       Helpers.error(`Please build your project first`, false, true);
     }
-    const localUrl = `http://localhost:${8080}/${proj.name}/`;
-    const app = express()
-    const filesLocation = path.join(proj.location, config.folder.docs);
-    const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
+    if (proj.typeIs('angular-lib')) {
+      //#region serve angular lib
+      const localUrl = `http://localhost:${8080}/${proj.name}/`;
+      const app = express()
+      const filesLocation = path.join(proj.location, config.folder.docs);
+      const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
 
-    app.get(`/${proj.name}/*`, (req, res) => {
-      // res.set('Service-Worker-Allowed',
-      //   [
-      //     '/bs4-breakpoint/',
-      //   ].join(', '))
+      app.get(`/${proj.name}/*`, (req, res) => {
+        // res.set('Service-Worker-Allowed',
+        //   [
+        //     '/bs4-breakpoint/',
+        //   ].join(', '))
 
-      // console.log(`path: "${req.path}"`)
-      // console.log(`ORIG: "${req.originalUrl}"`)
-      let filePath = req.originalUrl
-        .replace(/\/$/, '')
-        .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
-        .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
-        .replace(/^\//, '')
-      // console.log(`path file: "${filePath}"`)
-      // res.send(filePath)
-      // res.end()
-      if (filePath.includes('?')) {
-        filePath = filePath.split('?')[0];
-      }
-      if (filePath === '') {
-        filePath = 'index.html';
-      }
+        // console.log(`path: "${req.path}"`)
+        // console.log(`ORIG: "${req.originalUrl}"`)
+        let filePath = req.originalUrl
+          .replace(/\/$/, '')
+          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
+          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
+          .replace(/^\//, '')
+        // console.log(`path file: "${filePath}"`)
+        // res.send(filePath)
+        // res.end()
+        if (filePath.includes('?')) {
+          filePath = filePath.split('?')[0];
+        }
+        if (filePath === '') {
+          filePath = 'index.html';
+        }
 
-      if (filePath === config.file.manifest_webmanifest) {
-        const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
-        const file = JSON.parse(Helpers.readFile(localMainfest));
-        file.start_url = localUrl;
-        // console.log('mainfest override')
-        res.json(file);
-      } else {
-        res.sendFile(filePath, { root: filesLocation });
-      }
-    })
-    app.listen(8080, () => {
-      console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`)
-    });
+        if (filePath === config.file.manifest_webmanifest) {
+          const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
+          const file = JSON.parse(Helpers.readFile(localMainfest));
+          file.start_url = localUrl;
+          // console.log('mainfest override')
+          res.json(file);
+        } else {
+          res.sendFile(filePath, { root: filesLocation });
+        }
+      })
+      app.listen(8080, () => {
+        console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`)
+      });
+      //#endregion
+    }
+    if (proj.typeIs('isomorphic-lib')) {
+      await proj.start(args);
+    }
+
   } else {
     const configServe: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
     if (!configServe.port && !configServe.baseUrl && !configServe.outDir) {
@@ -325,7 +333,7 @@ const $SERVE = (args) => {
 
 const $START = async (args) => {
   if ((Project.Current as Project).isStandaloneProject) {
-    $SERVE(args);
+    await $SERVE(args);
     return;
   }
   if (!(Project.Current as Project).isWorkspace) {

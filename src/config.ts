@@ -108,6 +108,24 @@ const moduleNameIsomorphicLib = [
   folder.browser,
 ];
 
+const argsReplacementsBuild = {
+  'baw': 'build:app:watch',
+  'ba': 'build:app',
+  'bap': 'build:app:prod',
+  'bdw': 'build:dist:watch',
+  'bdpw': 'build:dist:prod:watch',
+  'bd': 'build:dist',
+  'bb': 'build:bundle',
+  'bbp': 'build:bundle:prod',
+  'bbpw': 'build:bundle:prod:watch',
+  'bbw': 'build:bundle:watch',
+  'sb': 'static:build',
+  'sbp': 'static:build:prod',
+  'sbd': 'static:build:dist',
+  'sbl': 'static:build:lib',
+  'sba': 'static:build:app',
+};
+
 export const config = {
   //#region @backend
   get dbLocation() {
@@ -153,6 +171,29 @@ export const config = {
   startPort: 6001,
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   //#region @backend
+  argsReplacementsBuild,
+  argsReplacements: {
+    ...argsReplacementsBuild,
+    'ghpush': 'githubpush',
+    'ghpull': 'githubpull',
+    'l': 'last',
+    'sl': 'show:last',
+    'i': 'install',
+    'rp': 'release:prod',
+    'r': 'release',
+    'lb': 'last:build',
+  },
+  coreBuildFrameworkNames: [
+    'tnp',
+    'tnp-ins',
+    'tnp-debug',
+    'firedev',
+    'firedev-debug',
+    'firedev-ins',
+    'morphi',
+    'morphi-debug',
+    'morphi-ins',
+  ],
   pathes: {
 
     logoSvg: 'logo.svg',

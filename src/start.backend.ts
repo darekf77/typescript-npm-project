@@ -161,71 +161,9 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   config.frameworkName = frameworkName;
 
   argsv = argsv.map(arg => {
-    if (arg === 'baw') {
-      return 'build:app:watch';
-    }
-    if (arg === 'bdw') {
-      return 'build:dist:watch';
-    }
-    if (arg === 'bdwa') {
-      return 'build:dist:watch:all';
-    }
-    if (arg === 'blw') {
-      return 'build:lib:watch';
-    }
-    if (arg === 'bbw') {
-      return 'build:bundle:watch';
-    }
-    if (arg === 'bd') {
-      return 'build:dist';
-    }
-    if (arg === 'bda') {
-      return 'build:dist:all';
-    }
-    if (arg === 'bb') {
-      return 'build:bundle';
-    }
-    if (arg === 'bbp') {
-      return 'build:bundle:prod';
-    }
-    if (arg === 'bbpw') {
-      return 'build:bundle:prod:watch';
-    }
-    if (arg === 'sb') {
-      return 'static:build';
-    }
-    if (arg === 'sbl') {
-      return 'static:build:lib';
-    }
-    if (arg === 'sba') {
-      return 'static:build:app';
-    }
-    if (arg === 'ba') {
-      return 'build:app';
-    }
-    if (arg === 'bap') {
-      return 'build:app:prod';
-    }
-    if (arg === 'rp') {
-      return 'releaseprod';
-    }
-    if (arg === 'r') {
-      return 'releaseprod';
-    }
-    if (arg === 'ghpush') {
-      return 'githubpush';
-    }
-    if (arg === 'ghpull') {
-      return 'githubpull';
-    }
-    if (arg === 'l') {
-      return 'last';
-    }
-    if (arg === 'lb') {
-      return 'lastbuild';
-    }
-    if (arg === 'sl') {
-      return 'showlast';
+    const biggerRep = config.argsReplacements[arg];
+    if (biggerRep) {
+      return biggerRep;
     }
     return arg;
   });
@@ -256,28 +194,28 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   }
 
 
-  let recognized = false;
-  if (Array.isArray(argsv) && argsv.length >= 3) {
-    const localLib = argsv[2];
-    if (localLib === "i") {
-      argsv[2] = 'install'
-    }
-    if (localLib === "ui") {
-      argsv[2] = 'uninstall'
-    }
-    // if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
-    //   recognized = true;
-    //   const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
-    //   const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
-    //   try {
-    //     spinner && spinner.stop()
-    //     runCommand(commadnToRun).sync()
-    //   } catch (error) {
-    //     Helpers.log(`Command ${localLib} ERROR...`);
-    //   }
-    //   process.exit(0)
-    // }
-  }
+  //#region local libs run
+  // if (Array.isArray(argsv) && argsv.length >= 3) {
+  //   const localLib = argsv[2];
+  //   if (localLib === "i") {
+  //     argsv[2] = 'install'
+  //   }
+  //   if (localLib === "ui") {
+  //     argsv[2] = 'uninstall'
+  //   }
+  // if (!config.helpAlias.includes(localLib) && config.localLibs.includes(localLib)) {
+  //   recognized = true;
+  //   const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
+  //   const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
+  //   try {
+  //     spinner && spinner.stop()
+  //     runCommand(commadnToRun).sync()
+  //   } catch (error) {
+  //     Helpers.log(`Command ${localLib} ERROR...`);
+  //   }
+  //   process.exit(0)
+  // }
+  // }
 
   // await initWatcherDB();
   // process.stdin.resume();
@@ -287,9 +225,10 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   //   .concat(glob.sync(config.pathes.scripts.allPattern).filter(f => f !== helpFile));
 
   // Helpers.log(files);
+  //#endregion
 
+  let recognized = false;
   const functionsToCHeck: Function[] = []
-
   const files = scriptsFnArr;
 
   Helpers.log('checking commands... please wait')
