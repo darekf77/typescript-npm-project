@@ -20,7 +20,6 @@
       "preLaunchTask": "Ng Serve",
       "postDebugTask": "terminateall",
       "sourceMaps": true,
-      "url": "http://localhost:9000/#",
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
         "webpack:/*": "${webRoot}/*",

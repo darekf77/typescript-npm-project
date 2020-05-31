@@ -36,20 +36,25 @@ export abstract class BuildableProject {
       if (global.tnpNonInteractive) {
         buildOptions.copyto = [];
       } else {
-        const { projects = [] }: { projects: string[] } = await inquirer
-          .prompt([
-            {
-              type: 'checkbox',
-              name: 'projects',
-              message: 'Select projects where to copy bundle after finish: ',
-              choices: existedProjects
-                .map(c => {
-                  return { value: c.location, name: c.genericName }
-                })
-            }
-          ]) as any;
+        if (project.isTnp) {
+          buildOptions.copyto = [];
+        } else {
+          const { projects = [] }: { projects: string[] } = await inquirer
+            .prompt([
+              {
+                type: 'checkbox',
+                name: 'projects',
+                message: 'Select projects where to copy bundle after finish: ',
+                choices: existedProjects
+                  .map(c => {
+                    return { value: c.location, name: c.genericName }
+                  })
+              }
+            ]) as any;
 
-        buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
+          buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
+        }
+
       }
 
     }
@@ -210,7 +215,7 @@ export abstract class BuildableProject {
     }
     // console.log('after build steps')
     if (this.isStandaloneProject) {
-      this.copyManager.initCopyingOnBuildFinish(buildOptions);
+      await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }
   }
   //#endregion

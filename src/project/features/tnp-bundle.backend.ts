@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
-import { Project } from '../abstract';
+import { Project } from '../abstract/project/project';
 import { Models } from 'tnp-models';
 import { FeatureForProject } from '../abstract';
 
@@ -14,6 +14,13 @@ export class TnpBundle extends FeatureForProject {
   private notNeededReinstallationTnp = {};
 
   private reinstallCounter = 1;
+
+  public get projectIsAllowedForInstall() {
+    return ((this.project.isWorkspace || this.project.isStandaloneProject) &&
+      !this.project.isTnp &&
+      !this.project.name.startsWith('tnp')
+    )
+  }
 
   public installAsPackage() {
 
@@ -79,8 +86,6 @@ export class TnpBundle extends FeatureForProject {
     if (_.isUndefined(this.notNeededReinstallationTnp[workspaceOrStandaloneLocation])) {
       this.notNeededReinstallationTnp[workspaceOrStandaloneLocation] = 0;
     }
-
-
 
     if (project.isTnp) {
       return;

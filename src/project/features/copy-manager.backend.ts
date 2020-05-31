@@ -10,7 +10,7 @@ import { config } from '../../config';
 import { Project } from '../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
-import { BuildOptions } from 'tnp-db';
+import { BuildOptions, TnpDB } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 //#endregion
 
@@ -18,32 +18,64 @@ export class CopyManager extends FeatureForProject {
 
   private buildOptions: BuildOptions;
 
+  private db: TnpDB;
   //#region init
-  public initCopyingOnBuildFinish(buildOptions: BuildOptions) {
+  public async initCopyingOnBuildFinish(buildOptions: BuildOptions) {
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
+
     if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-      Helpers.info(`No need to copying on build finsh... `)
-      return;
+      if (this.project.isTnp) {
+        this.db = await TnpDB.Instance(config.dbLocation);
+        Helpers.info(`${chalk.bold(config.frameworkName)} project will be copied` +
+          ` to active builds automaticly... `);
+      } else {
+        Helpers.info(`No need to copying on build finsh... `)
+        return;
+      }
     }
     if (watch) {
-      this.start(void 0, void 0, watch);
-      this.startAndWatch();
+      await this.start(void 0, void 0, watch);
+      await this.startAndWatch();
     } else {
-      this.start();
+      await this.start();
     }
   }
   //#endregion
 
   //#region start
-  private start(event?: Models.other.FileEvent,
-    specyficFileRelativePath?: string, dontRemoveDestFolder = false) {
+  private async start(
+    event?: Models.other.FileEvent,
+    specyficFileRelativePath?: string,
+    dontRemoveDestFolder = false
+  ) {
     const outDir = this.buildOptions.outDir;
+    let projectToCopyTo: Project[] = [];
+
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      (this.buildOptions.copyto as any[]).forEach((p: Project) => {
-        // Helpers.log(`Copy to ${p.name}`)
-        this.copyBuildedDistributionTo(p, { specyficFileRelativePath: event && specyficFileRelativePath, outDir: outDir as any }, dontRemoveDestFolder)
-      })
+      projectToCopyTo = this.buildOptions.copyto as Project[];
+    } else if (this.project.isTnp) {
+      const activeBuilds = (await this.db.getBuilds())
+        .filter(b => {
+          return b.project && (b.project.isWorkspace || b.project.isStandaloneProject);
+        })
+        .filter(b => (b.project as Project).tnpBundle.projectIsAllowedForInstall)
+        .map(b => b.project as Project);
+      projectToCopyTo = activeBuilds;
+      activeBuilds.forEach(p => {
+        Helpers.info(`Update active build for ${p.genericName} ..`);
+      });
+    }
+
+    for (let index = 0; index < projectToCopyTo.length; index++) {
+      const p = projectToCopyTo[index];
+      this.copyBuildedDistributionTo(p,
+        {
+          specyficFileRelativePath: event && specyficFileRelativePath,
+          outDir: outDir as any
+        },
+        dontRemoveDestFolder
+      );
     }
 
   }
@@ -82,7 +114,7 @@ export class CopyManager extends FeatureForProject {
       console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir}`);
       setTimeout(() => {
         this.startAndWatch();
-      }, 1000)
+      }, 1000);
     }
   }
   //#endregion

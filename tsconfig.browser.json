@@ -5,8 +5,7 @@
     "module": "esnext",
     "rootDir": "./",
     "baseUrl": "./",
-    "inlineSourceMap": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "lib": [
       "dom",
       "es2018"
