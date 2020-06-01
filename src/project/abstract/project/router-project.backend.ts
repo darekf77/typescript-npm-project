@@ -81,7 +81,14 @@ Generated workspace should be here: ${genLocationWOrkspace}
       return;
     }
     if (this.isStandaloneProject) {
-
+      const command = this.startOnCommand(args);
+      try {
+        await this.run(command).asyncAsPromise();
+        Helpers.info(`Project instance ended normaly.`)
+        process.exit(0)
+      } catch (err) {
+        Helpers.error(`Project instance ended with error ${err} `, false, true);
+      }
     }
     if (this.isWorkspaceChildProject) {
       await (this.env as any as EnvironmentConfig).init(args, true)
@@ -89,13 +96,8 @@ Generated workspace should be here: ${genLocationWOrkspace}
       Helpers.log(`Killing proces on port ${this.getDefaultPort()}`);
       await Helpers.killProcessByPort(this.getDefaultPort())
       Helpers.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-    }
-    const command = this.startOnCommand(args);
-    if (_.isString(command)) {
-      const p = this.run(this.startOnCommand(args)).async()
-      // p.on('exit', (ee) => {
-      //   console.trace('exit !!!!', ee)
-      // })
+      const command = this.startOnCommand(args);
+      this.run(command).async();
     }
 
   }

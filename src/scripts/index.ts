@@ -15,6 +15,7 @@ import GIT from './VSCODE-EXT/GIT.backend';
 import OPEN from './VSCODE-EXT/OPEN.backend';
 import OTHER from './OTHER.backend';
 import HELP from './HELP.backend';
+import DAEMON from './DAEMON.backend';
 import BASH_CONFIG from './BASH-CONFIG.backend';
 
 export default [
@@ -34,6 +35,7 @@ export default [
   OPEN,
   OTHER,
   HELP,
+  DAEMON,
   BASH_CONFIG
 ]
 

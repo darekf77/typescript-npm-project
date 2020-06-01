@@ -55,7 +55,8 @@ export class CopyManager extends FeatureForProject {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       projectToCopyTo = this.buildOptions.copyto as Project[];
     } else if (this.project.isTnp) {
-      const activeBuilds = (await this.db.getBuilds())
+      const allBuilds = (await this.db.getBuilds());
+      const activeBuilds = allBuilds
         .filter(b => {
           return b.project && (b.project.isWorkspace || b.project.isStandaloneProject);
         })
@@ -63,8 +64,9 @@ export class CopyManager extends FeatureForProject {
         .map(b => b.project as Project);
       projectToCopyTo = activeBuilds;
       activeBuilds.forEach(p => {
-        Helpers.info(`Update active build for ${p.genericName} ..`);
+        Helpers.info(`Update active ${config.frameworkName} build for ${p.genericName} ..`);
       });
+      this.buildOptions.copyto = projectToCopyTo;
     }
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
