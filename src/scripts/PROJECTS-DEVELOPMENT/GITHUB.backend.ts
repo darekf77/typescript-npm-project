@@ -113,6 +113,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
 
 
 export async function $GITHUB_PUSH(args: string, exit = true) {
+  global.hideLog = false;
   for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
     const projectName = GITHUB_PROJECTS_NAMES[index];
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
@@ -129,6 +130,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
     }
     while (true) {
       try {
+        Helpers.log(`Pushing project  ${chalk.bold(projectName)}...`);
         proj.git.pushCurrentBranch();
         break;
       } catch (err) {
