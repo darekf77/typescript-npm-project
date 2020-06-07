@@ -78,7 +78,10 @@ function fixRemote(project: Project) {
 export async function $PUSH(args: string, exit = true) {
   const project = (Project.Current as Project);
   fixRemote(project);
-  project.run(`git add --all . && git commit -m "update" && git push origin ${project.git.currentBranchName}`).sync();
+  try {
+    project.run(`git add --all . && git commit -m "update"`).sync();
+  } catch (error) {  }
+  project.git.pushCurrentBranch();
   process.exit(0);
 }
 
@@ -88,7 +91,7 @@ export async function $PULL(args: string, exit = true) {
   try {
     project.run(`git add --all . && git commit -m "update"`).sync();
   } catch (error) { }
-  project.run(`git push origin ${project.git.currentBranchName}`).sync();
+  project.git.pushCurrentBranch();
   process.exit(0);
 }
 
