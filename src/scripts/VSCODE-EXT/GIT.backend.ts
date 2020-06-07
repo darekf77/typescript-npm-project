@@ -8,7 +8,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 import * as os from 'os';
 
 const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
-const USE_HTTPS_INSTEAD_SSH = os.userInfo().username === 'dfilipiak';
+const USE_HTTPS_INSTEAD_SSH = os.hostname().endsWith('igt.com');
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = (Project.Current as Project).recreate.filesIgnoredBy.gitignore
@@ -75,14 +75,22 @@ function fixRemote(project: Project) {
 }
 
 
-export async function $PUSH(args: string, exit = true) {
+export async function $PUSH(args: string, exit = true, force = false) {
   const project = (Project.Current as Project);
   fixRemote(project);
   try {
     project.run(`git add --all . && git commit -m "update"`).sync();
-  } catch (error) {  }
-  project.git.pushCurrentBranch();
-  process.exit(0);
+  } catch (error) { }
+  if (force) {
+    const branch = project.git.currentBranchName;
+    Helpers.info(`FORCE UPDATE OF BRANCH: ${branch}`);
+    project.run(`git push -f origin ${branch}`).sync();
+  } else {
+    project.git.pushCurrentBranch();
+  }
+  if (exit) {
+    process.exit(0);
+  }
 }
 
 export async function $PULL(args: string, exit = true) {
@@ -96,7 +104,7 @@ export async function $PULL(args: string, exit = true) {
 }
 
 
-export async function $RECOMMIT() {
+export async function $RECOMMIT(args: string, exit = true) {
   const p = Project.Current;
   const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false, cwd: p.location }).sync().toString().trim();
   p.run(`git reset --soft HEAD~1 && git add --all . && git commit -m "${lastMsg}"`).sync();
@@ -105,7 +113,15 @@ ${Helpers.terminalLine()}
   ${lastMsg}
 ${Helpers.terminalLine()}
   `);
-  process.exit(0)
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+
+export async function $REPUSH(args) {
+  await $RECOMMIT(args, false);
+  await $PUSH(args, true, true);
 }
 
 export default {
@@ -114,6 +130,7 @@ export default {
   $GIT_REMOVE_UNTRACKED: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
   $GIT_REMOVE_UNTRACKED_EVERYWHERE: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED_EVERYWHERE, '$GIT_REMOVE_UNTRACKED_EVERYWHERE'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
+  $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
   $RECOMMIT: Helpers.CLIWRAP($RECOMMIT, '$RECOMMIT'),
 }
