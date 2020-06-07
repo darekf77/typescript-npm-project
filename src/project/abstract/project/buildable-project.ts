@@ -47,7 +47,7 @@ export abstract class BuildableProject {
                 message: 'Select projects where to copy bundle after finish: ',
                 choices: existedProjects
                   .map(c => {
-                    return { value: c.location, name: c.genericName }
+                    return { value: c.location, name: `${chalk.bold(c.name)} (${c.genericName})` }
                   })
               }
             ]) as any;

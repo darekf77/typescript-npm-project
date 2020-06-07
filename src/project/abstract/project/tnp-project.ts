@@ -87,7 +87,7 @@ export abstract class TnpProject {
 
   //#region @backend
   get isomorphicPackages(this: Project) {
-    const isomorphicPackagesArr = this.linkedProjects.map(p => p.name)
+    const isomorphicPackagesArr = [];
 
     if (this.typeIs('unknow')) {
       return isomorphicPackagesArr;

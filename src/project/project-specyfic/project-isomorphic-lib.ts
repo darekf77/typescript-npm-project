@@ -24,7 +24,7 @@ export class ProjectIsomorphicLib
   async initProcedure() {
     //#region @backend
     if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
-      this.applyLinkedFiles();
+
     }
     //#endregion
   }

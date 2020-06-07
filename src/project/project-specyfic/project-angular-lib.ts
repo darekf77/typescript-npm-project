@@ -49,7 +49,7 @@ export class ProjectAngularLib
     }
 
     if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
-      this.applyLinkedFiles();
+
     }
     //#endregion
   }

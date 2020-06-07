@@ -122,14 +122,6 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  get isContainerWithLinkedProjects(this: Project) {
-    if (Helpers.isBrowser) {
-      return this.browser.isContainerWithLinkedProjects;
-    }
-    //#region @backend
-    return this.isContainer && this.linkedProjects.length > 0;
-    //#endregion
-  }
 
   get isContainerChild(this: Project) {
     if (Helpers.isBrowser) {

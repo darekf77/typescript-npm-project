@@ -8,7 +8,7 @@ import {
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter
 } from '../../features';
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, OutputCodeModifier } from '../../compilers';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager.backend';
 import { IncrementalBuildProcessExtended } from '../../compilers';
@@ -65,10 +65,6 @@ export abstract class FeatureProject {
 
   //#region @backend
   public sourceModifier: SourceModifier;
-  //#endregion
-
-  //#region @backend
-  public outputCodeModifier: OutputCodeModifier;
   //#endregion
 
   //#region @backend

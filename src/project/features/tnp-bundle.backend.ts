@@ -47,31 +47,6 @@ export class TnpBundle extends FeatureForProject {
   }
 
 
-  checkIfFileTnpFilesUpToDateInDest(destination: string): boolean {
-    const tnpDistCompiled = path.join((Project.Tnp as Project).location, config.folder.dist)
-
-    return Helpers.getMostRecentFilesNames(tnpDistCompiled)
-      .map(f => f.replace(tnpDistCompiled, ''))
-      .filter(f => {
-        const fileInDest = path.join(destination, f)
-        const fileInTnp = path.join(tnpDistCompiled, f);
-
-        if (!fse.existsSync(fileInDest)) {
-          // console.log(`File ${fileInDest} doesn't exist`)
-          return true;
-        }
-
-        const res = Helpers.readFile(fileInTnp).trim() !== Helpers.readFile(fileInDest).trim()
-        // console.log(`
-        //   compare: "${fileInDest}" ${Helpers.readFile(fileInDest).toString().length}
-        //   with : "${fileInTnp}" ${Helpers.readFile(fileInTnp).toString().length}
-        //   result: ${res}
-        // `)
-        return res;
-      }).length === 0;
-  }
-
-
   private reinstallTnp(project: Project,
     pathTnpCompiledJS: string,
     pathTnpPackageJSONData: Models.npm.IPackageJSON) {
@@ -103,11 +78,22 @@ export class TnpBundle extends FeatureForProject {
       'tnp-db',
     ];
 
+    function removeLinks(destNodeMOdulesPkgFolder: string) {
+      [
+        config.folder.src,
+        config.folder.components,
+        config.folder.tempSrcDist
+      ].map(p => path.join(destNodeMOdulesPkgFolder, p)).forEach(c => {
+        Helpers.removeIfExists(c);
+      });
+    }
+
     for (let index = 0; index < toCopyTnpDeps.length; index++) {
       const depName = toCopyTnpDeps[index];
       const sourceDep = path.join((Project.Tnp as Project).location, config.folder.node_modules, depName);
       const destDep = path.join(workspaceOrStandaloneLocation, config.folder.node_modules, depName);
       // Helpers.removeFolderIfExists(destDep);
+      removeLinks(destDep);
       Helpers.copy(sourceDep, destDep, {
         overwrite: true,
         recursive: true,
@@ -127,6 +113,7 @@ export class TnpBundle extends FeatureForProject {
       config.file.package_json
     );
 
+    removeLinks(destCompiledJs);
     Helpers.tryCopyFrom(`${pathTnpCompiledJS}/`, destCompiledJs, {
       dereference: true,
       filter: (src: string, dest: string) => {

@@ -21,9 +21,6 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     }
     Helpers.log(`Searching isomorphic packages`);
     super.start(force);
-    const linked = Project.From<Project>(this.cwd);
-    BrowserCodeCut.IsomorphicLibs = BrowserCodeCut.IsomorphicLibs
-      .concat(linked.linkedProjects.map(p => p.name))
     Helpers.log(`Founded ${this.count} isomorphic packages`);
   }
 

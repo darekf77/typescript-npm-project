@@ -121,73 +121,6 @@ export class CopyManager extends FeatureForProject {
   }
   //#endregion
 
-  //#region executre copy
-  private executeCopy(sourceLocation: string, destinationLocation: string, options: Models.other.GenerateProjectCopyOpt) {
-    const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
-    let tempDestination: string;
-    // console.log('useTempLocation',useTempLocation)
-    if (useTempLocation) {
-      tempDestination = `${os.platform() === 'darwin' ? '/private/tmp' : '/tmp'}/${_.camelCase(destinationLocation)}`;
-      if (fse.existsSync(tempDestination)) {
-        Helpers.remove(tempDestination);
-      }
-
-      Helpers.mkdirp(tempDestination);
-      // console.log(`tempDestination: "${tempDestination}"`);
-      // process.exit(0)
-    } else {
-      tempDestination = destinationLocation;
-    }
-
-    const sourceFolders = [
-      config.folder.src,
-      config.folder.components,
-      config.folder.custom,
-    ];
-
-    const foldersToSkip = [
-      ...(filterForBundle ? [
-        '.vscode',
-        ..._.values(config.tempFolders),
-      ] : []),
-      ...(this.project.projectLinkedFiles().map(c => c.relativePath)),
-      ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
-      ...(this.project.isWorkspace ? this.project.children.map(c => c.name) : [])
-    ];
-
-    // console.log(foldersToSkip)
-
-    const filter = override ? filterOnlyCopy(sourceFolders, this.project) : filterDontCopy(foldersToSkip, this.project);
-
-    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter });
-
-    if (useTempLocation) {
-      Helpers.copy(`${tempDestination}/`, destinationLocation);
-      Helpers.remove(tempDestination);
-    }
-
-    if (this.project.isContainerWorkspaceRelated) {
-      // console.log(`For project: ${this.project.genericName} files:
-      // ${this.project.projectSourceFiles()}
-      // `)
-      this.project.projectSourceFiles().forEach(f => {
-        const source = path.join(this.project.location, f);
-        if (fse.existsSync(source)) {
-          Helpers.log(`Copying file/folder to static build: ${f} `)
-          if (fse.lstatSync(source).isDirectory()) {
-            Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
-          } else {
-            Helpers.copyFile(source, path.join(destinationLocation, f));
-          }
-        } else {
-          Helpers.log(`[executeCopy] Doesn not exist source: ${source}`);
-        }
-      });
-    }
-
-  }
-  //#endregion
-
   //#region generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
     options?: Models.other.GenerateProjectCopyOpt): boolean {
@@ -307,6 +240,71 @@ export class CopyManager extends FeatureForProject {
     }
 
     return true;
+  }
+
+  private executeCopy(sourceLocation: string, destinationLocation: string, options: Models.other.GenerateProjectCopyOpt) {
+    const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
+    let tempDestination: string;
+    // console.log('useTempLocation',useTempLocation)
+    if (useTempLocation) {
+      tempDestination = `${os.platform() === 'darwin' ? '/private/tmp' : '/tmp'}/${_.camelCase(destinationLocation)}`;
+      if (fse.existsSync(tempDestination)) {
+        Helpers.remove(tempDestination);
+      }
+
+      Helpers.mkdirp(tempDestination);
+      // console.log(`tempDestination: "${tempDestination}"`);
+      // process.exit(0)
+    } else {
+      tempDestination = destinationLocation;
+    }
+
+    const sourceFolders = [
+      config.folder.src,
+      config.folder.components,
+      config.folder.custom,
+    ];
+
+    const foldersToSkip = [
+      ...(filterForBundle ? [
+        '.vscode',
+        ..._.values(config.tempFolders),
+      ] : []),
+      ...(this.project.projectLinkedFiles().map(c => c.relativePath)),
+      ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
+      ...(this.project.isWorkspace ? this.project.children.map(c => c.name) : [])
+    ];
+
+    // console.log(foldersToSkip)
+
+    const filter = override ? filterOnlyCopy(sourceFolders, this.project) : filterDontCopy(foldersToSkip, this.project);
+
+    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter });
+
+    if (useTempLocation) {
+      Helpers.copy(`${tempDestination}/`, destinationLocation);
+      Helpers.remove(tempDestination);
+    }
+
+    if (this.project.isContainerWorkspaceRelated) {
+      // console.log(`For project: ${this.project.genericName} files:
+      // ${this.project.projectSourceFiles()}
+      // `)
+      this.project.projectSourceFiles().forEach(f => {
+        const source = path.join(this.project.location, f);
+        if (fse.existsSync(source)) {
+          Helpers.log(`Copying file/folder to static build: ${f} `)
+          if (fse.lstatSync(source).isDirectory()) {
+            Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
+          } else {
+            Helpers.copyFile(source, path.join(destinationLocation, f));
+          }
+        } else {
+          Helpers.log(`[executeCopy] Doesn not exist source: ${source}`);
+        }
+      });
+    }
+
   }
   //#endregion
 

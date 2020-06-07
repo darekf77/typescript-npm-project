@@ -31,19 +31,6 @@ async function $COMPILER_SM_WATCH_ONLY() {
   await (Project.Current as Project).sourceModifier.startAndWatch(testTasks, { watchOnly: true });
 }
 
-async function $COMPILER_OSM() {
-  await (Project.Current as Project).outputCodeModifier.start(testTasks);
-  process.exit(0)
-}
-
-async function $COMPILER_OSM_WATCH() {
-  await (Project.Current as Project).outputCodeModifier.startAndWatch(testTasks);
-}
-
-async function $COMPILER_OSM_WATCH_ONLY() {
-  await (Project.Current as Project).outputCodeModifier.startAndWatch(testTasks, { watchOnly: true });
-}
-
 async function $COMPILER_FFG() {
   console.info('FRAMEWORK FILES FGENERATOR')
   await (Project.Current as Project).frameworkFileGenerator.start(testTasks);
@@ -71,7 +58,4 @@ export default {
   $COMPILER_SM: Helpers.CLIWRAP($COMPILER_SM, '$COMPILER_SM'),
   $COMPILER_SM_WATCH: Helpers.CLIWRAP($COMPILER_SM_WATCH, '$COMPILER_SM_WATCH'),
   $COMPILER_SM_WATCH_ONLY: Helpers.CLIWRAP($COMPILER_SM_WATCH_ONLY, '$COMPILER_SM_WATCH_ONLY'),
-  $COMPILER_OSM: Helpers.CLIWRAP($COMPILER_OSM, '$COMPILER_OSM'),
-  $COMPILER_OSM_WATCH: Helpers.CLIWRAP($COMPILER_OSM_WATCH, '$COMPILER_OSM_WATCH'),
-  $COMPILER_OSM_WATCH_ONLY: Helpers.CLIWRAP($COMPILER_OSM_WATCH_ONLY, '$COMPILER_OSM_WATCH_ONLY'),
 }

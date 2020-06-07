@@ -16,6 +16,20 @@ async function BENCH_PROJ_DB() {
   process.exit(0)
 }
 
+export async function BENCH_DAEMON(args, exit = true) {
+  const db = await TnpDB.Instance(config.dbLocation);
+  try {
+    const projs = await (await db.daemonInstance).allprojects().received;
+    console.log(projs);
+  } catch (error) {
+    console.log(error);
+  }
+  process.exit(0);
+}
+
+
+
 export default {
+  BENCH_DAEMON: Helpers.CLIWRAP(BENCH_DAEMON, 'BENCH_DAEMON'),
   BENCH_PROJ_DB: Helpers.CLIWRAP(BENCH_PROJ_DB, 'BENCH_PROJ_DB'),
 }

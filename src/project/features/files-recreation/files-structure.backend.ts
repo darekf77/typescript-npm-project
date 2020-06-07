@@ -214,12 +214,11 @@ export class FilesStructure extends FeatureForProject {
         this.project.buildOptions = {};
       }
       await (this.project.env as any as EnvironmentConfig).init(args);
-      this.project.applyLinkedPorjects();
       this.project.filesTemplatesBuilder.rebuild();
     }
 
     if (this.project.tnpBundle.projectIsAllowedForInstall) {
-      this.project.tnpBundle.installAsPackage()
+      this.project.tnpBundle.installAsPackage();
     }
 
     //#region handle node modules instalation

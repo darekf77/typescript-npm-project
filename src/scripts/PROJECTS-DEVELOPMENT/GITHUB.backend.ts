@@ -1,13 +1,12 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import * as os from 'os';
+
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 
 const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
-const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
-const USE_HTTPS_INSTEAD_SSH = os.userInfo().username === 'dfilipiak';
+
 const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH; // os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
 const NPM_PROJCETS_LOCATION = path.resolve(path.join((Project.Tnp as Project).location, '..'));
 const GITHUB_PROJECTS_NAMES = [
@@ -112,29 +111,6 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
   }
 }
 
-function fixRemote(project: Project) {
-  const originUrl = project.git.originURL;
-  if (originUrl.startsWith('git@github') && USE_HTTPS_INSTEAD_SSH) {
-    project.run(`git remote set-url origin ${originUrl.replace('git@github.com:', 'https://github.com/')}`).sync();
-  }
-}
-
-export async function $PUSH(args: string, exit = true) {
-  const project = (Project.Current as Project);
-  fixRemote(project);
-  project.run(`git add --all . && git commit -m "update" && git push origin ${project.git.currentBranchName}`).sync();
-  process.exit(0);
-}
-
-export async function $PULL(args: string, exit = true) {
-  const project = (Project.Current as Project);
-  fixRemote(project);
-  try {
-    project.run(`git add --all . && git commit -m "update"`).sync();
-  } catch (error) { }
-  project.run(`git push origin ${project.git.currentBranchName}`).sync();
-  process.exit(0);
-}
 
 export async function $GITHUB_PUSH(args: string, exit = true) {
   for (let index = 0; index < GITHUB_PROJECTS_NAMES.length; index++) {
@@ -193,7 +169,6 @@ export default {
   $GITHUB_LIST_ORIGINS: Helpers.CLIWRAP($GITHUB_LIST_ORIGINS, '$GITHUB_LIST_ORIGINS'),
   $GITHUB_DUMP: Helpers.CLIWRAP($GITHUB_DUMP, '$GITHUB_DUMP'),
   $GITHUB_PUSH: Helpers.CLIWRAP($GITHUB_PUSH, '$GITHUB_PUSH'),
-  $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
-  $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
+
   $GITHUB_PULL: Helpers.CLIWRAP($GITHUB_PULL, '$GITHUB_PULL'),
 }
