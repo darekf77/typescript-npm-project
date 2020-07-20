@@ -199,7 +199,24 @@ export async function $ALL_PROJECTS(args: string) {
   process.exit(0)
 }
 
+export async function $INFO() {
+  const proj = Project.Current as Project;
+  console.log(`
+
+  name: ${proj.name}
+  genericName: ${proj.genericName}
+  isGenerated: ${proj.isGenerated}
+  type: ${proj._type}
+  parent name: ${proj.parent && proj.parent.name}
+  grandpa name: ${proj.grandpa && proj.grandpa.name}
+
+
+  `)
+  process.exit(0)
+}
+
 export default {
+  $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $ALL_PROJECTS: Helpers.CLIWRAP($ALL_PROJECTS, '$ALL_PROJECTS'),
   $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
   $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),

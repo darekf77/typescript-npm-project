@@ -69,7 +69,7 @@ inside generated projects...
   async  startForLib(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = false;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options);
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
@@ -80,7 +80,7 @@ inside generated projects...
   async  startForApp(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = true;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options);
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
     await this.build(buildOptions, config.allowedTypes.app, exit);
   }
   //#endregion

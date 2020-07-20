@@ -77,6 +77,17 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
 
   let index = 0;
   const buildedOK = [];
+
+  if (project.isStandaloneProject) {
+    args += ` --skipCopyToSelection true`;
+    const copytoPathes = await project.selectProjectToCopyTO();
+    if (copytoPathes.length > 0) {
+      copytoPathes.forEach(pathToPorjectToCopy => {
+        args += ` --copyto=${pathToPorjectToCopy}`;
+      });
+    }
+  }
+
   while (index < deps.length) {
     // for (let index = 0; index < deps.length; index++) {
     const projDep = deps[index];

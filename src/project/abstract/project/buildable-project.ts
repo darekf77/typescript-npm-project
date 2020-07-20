@@ -18,8 +18,16 @@ export abstract class BuildableProject {
   //#region @backend
   public _buildOptions?: BuildOptions;
 
-  private static async selectProjectToCopyTO(buildOptions: BuildOptions, project: Project) {
-    if (project.typeIs('unknow')) {
+  /**
+   * return copyto array with absulute pathes
+   */
+  public async selectProjectToCopyTO(this: Project, buildOptions?: BuildOptions): Promise<string[]> {
+    let result = [] as Project[];
+    const project = this;
+    if (buildOptions && !_.isArray(buildOptions.copyto)) {
+      buildOptions.copyto = [];
+    }
+    if (project.typeIs('unknow') || (buildOptions && buildOptions.skipCopyToSelection)) {
       return;
     }
     // clearConsole()
@@ -34,10 +42,12 @@ export abstract class BuildableProject {
       // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
 
       if (global.tnpNonInteractive) {
-        buildOptions.copyto = [];
+        // buildOptions.copyto = [];
+        result = []
       } else {
         if (project.isTnp) {
-          buildOptions.copyto = [];
+          // buildOptions.copyto = [];
+          result = []
         } else {
           const { projects = [] }: { projects: string[] } = await inquirer
             .prompt([
@@ -52,22 +62,21 @@ export abstract class BuildableProject {
               }
             ]) as any;
 
-          buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
+          // buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
+          result = projects.map(p => $Project.From<Project>(p)) as any;
         }
 
       }
 
     }
 
-    if (!_.isArray(buildOptions.copyto)) {
-      buildOptions.copyto = []
+    if (buildOptions) {
+      buildOptions.copyto = result;
+      await db.updateCommandBuildOptions(project.location, buildOptions);
+      await db.updateBuildOptions(buildOptions, process.pid);
     }
 
-    // log(this.buildOptions)
-    // process.exit(0)
-
-    await db.updateCommandBuildOptions(project.location, buildOptions);
-    await db.updateBuildOptions(buildOptions, process.pid);
+    return (result as Project[]).map(p => (p as Project).location);
   }
   //#endregion
 
@@ -179,7 +188,7 @@ export abstract class BuildableProject {
         if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
           if (this.isStandaloneProject && this.buildOptions.watch) {
             if (!this.isGenerated) {
-              await BuildableProject.selectProjectToCopyTO(this.buildOptions, this);
+              await this.selectProjectToCopyTO(this.buildOptions);
             }
           }
         }

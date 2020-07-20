@@ -228,7 +228,7 @@ export const config = {
         projectByType(libType: Models.libs.NewFactoryType) {
           return pathResolved(__dirname, `../../firedev-projects/container${version}/workspace${version}/${libType}${version}`);
         },
-        singlefileproject: pathResolved(__dirname, `../../firedev-projects/single-file-project`)
+        singlefileproject: pathResolved(__dirname, `../../firedev-projects/container${version}/single-file-project${version}`)
       }
     }
   },
