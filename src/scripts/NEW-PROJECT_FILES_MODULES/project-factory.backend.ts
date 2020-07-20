@@ -200,6 +200,10 @@ export class ProjectFactory {
     if (!newCreatedProject) {
       Helpers.error(`Not able to crate project in ${destinationPath}`, false, true);
     }
+    if (!newCreatedProject.git.isGitRepo) {
+      Helpers.info(`[create] Git repository inited`);
+      newCreatedProject.run(`git init`).sync();
+    }
     Helpers.log(`[create] Project from create method: ${newCreatedProject && newCreatedProject.genericName} `)
     if (newCreatedProject) {
       newCreatedProject.recreate.vscode.settings.excludedFiles();
@@ -213,9 +217,7 @@ export class ProjectFactory {
         newCreatedProject.packageJson.save(`Update required for site dependency project`)
       }
 
-      if (!newCreatedProject.git.isGitRepo) {
-        newCreatedProject.run(`git init`).sync();
-      }
+
 
       if (!skipInit) {
         const skipNodeModules = true;
