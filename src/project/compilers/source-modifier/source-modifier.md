@@ -42,7 +42,7 @@ Client types  = 'angular-client'|'angular-lib'|'isomorphic-lib'|'ionic-client'|'
 
 
 # Standalone projects (not important yet)
-+ Prevent use of workspace projects (tnp-bundle)
++ Prevent use of workspace projects
 
 + Browser compilation for standalone project
   -   (third-party-(angular-lib|isomorphic-lib)-name)

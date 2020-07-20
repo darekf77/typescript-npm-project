@@ -128,12 +128,6 @@ inside generated projects...
       buildOptions.watch = false;
       Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
     }
-    const checkIfGeneratedTnpBundle = (Project.Current as Project).isTnp ? true :
-      fse.existsSync(path.join((Project.Tnp as Project).location, global.tnp_out_folder, config.folder.browser));
-
-    if (!this.project.isStandaloneProject && !checkIfGeneratedTnpBundle) {
-      Helpers.error(`Error: Please compile your ${config.frameworkName} to ${config.frameworkName}-bundle`, false, true)
-    }
 
     this.mergeNpmPorject();
 

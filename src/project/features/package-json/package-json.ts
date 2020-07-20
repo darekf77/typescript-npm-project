@@ -56,7 +56,7 @@ export class PackageJSON
           saveAtLoad = true;
         }
         if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
-          json.tnp.overrided.ignoreDepsPattern = [];
+          json.tnp.overrided.ignoreDepsPattern = ["*"];
           saveAtLoad = true;
         }
         if (_.isUndefined(json.tnp.overrided.includeAsDev)) {

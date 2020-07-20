@@ -78,7 +78,7 @@ export class ProjectFactory {
     }
 
     if (_.isNil(options.version)) {
-      options.version = 'v1';
+      options.version = 'v2';
     }
 
     if (_.isNil(options.skipInit)) {
@@ -211,6 +211,10 @@ export class ProjectFactory {
           // ...alsoBasedOn
         ];
         newCreatedProject.packageJson.save(`Update required for site dependency project`)
+      }
+
+      if (!newCreatedProject.git.isGitRepo) {
+        newCreatedProject.run(`git init`).sync();
       }
 
       if (!skipInit) {

@@ -61,7 +61,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#endregion
     Helpers.log(`[incremental-build-process]  this.project.grandpa: ${this.project.grandpa?.genericName} `);
     Helpers.log(`[incremental-build-process]  this.project.parent: ${this.project.parent?.genericName} `);
-    Helpers.log(`[incremental-build-process] parentProj: ${parentProj.genericName} `);
+    Helpers.log(`[incremental-build-process] parentProj: ${parentProj?.genericName} `);
     //#endregion
 
     //#region int backend compilation

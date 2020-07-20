@@ -32,6 +32,10 @@ export class PackageJsonCore {
     }
   }
 
+  /**
+   * Container only
+   * linked git project
+   */
   get linkedProjects() {
 
     const res = this.data.tnp ? this.data.tnp.linkedProjects : undefined;

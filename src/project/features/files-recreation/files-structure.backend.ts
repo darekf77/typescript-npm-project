@@ -217,10 +217,6 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-    if (this.project.tnpBundle.projectIsAllowedForInstall) {
-      this.project.tnpBundle.installAsPackage();
-    }
-
     //#region handle node modules instalation
     if (!this.project.node_modules.exist) {
       if (skipNodeModules) {
@@ -345,7 +341,7 @@ export class FilesStructure extends FeatureForProject {
     await this.reset({ recrusive })
   }
 
-  async  clearFromArgs(args) {
+  async clearFromArgs(args) {
     const { recrusive } = this.resolveArgs(args);
     await Helpers.questionYesNo(`Do you wanna delete node_modules and reset ${recrusive ? 'project recursively' : 'project'} ?`, async () => {
       await this.clear({ recrusive });

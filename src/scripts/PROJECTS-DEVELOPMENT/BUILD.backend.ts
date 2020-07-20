@@ -400,8 +400,10 @@ const $RELEASE = async (args) => {
   process.exit(0)
 };
 
-const $RELEASE_PROD = async (args) => {
+const $RELEASE_OBSCURED = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
+  argsObj.obscure = true;
+  argsObj.uglify = true;
   argsObj.prod = true;
   argsObj.args = args;
   (Project.Current as Project).checkIfReadyForNpm();
@@ -409,6 +411,7 @@ const $RELEASE_PROD = async (args) => {
 
   process.exit(0)
 };
+
 const BDW = (args) => BUILD_DIST_WATCH(args);
 const BLW = (args) => BUILD_DIST_WATCH(args);
 const $BAW = (args) => BUILD_APP_WATCH(args);
@@ -521,5 +524,5 @@ export default {
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
-  $RELEASE_PROD: Helpers.CLIWRAP($RELEASE_PROD, '$RELEASE_PROD'),
+  $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
 };

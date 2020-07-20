@@ -24,6 +24,7 @@ allowedEnvironments.forEach(s => {
 const filesNotAllowedToClean = {
   _gitignore: '.gitignore',
   _npmrc: '.npmrc',
+  _npmignore: '.npmignore',
   tslint_json: 'tslint.json',
   _editorconfig: '.editorconfig',
   _angularCli_json: '.angular-cli.json',
@@ -37,7 +38,6 @@ const file = {
   package_json: 'package.json',
   yarn_lock: 'yarn.lock',
   package_lock_json: 'package-lock.json',
-  tnpBundle: 'tnp-bundle',
   tnpEnvironment_json: 'tmp-environment.json',
   environment: 'environment',
   environment_js: 'environment.js',
@@ -86,6 +86,7 @@ const folder = {
   container: 'container',
   bin: 'bin',
   _bin: '.bin',
+  _vscode: '.vscode',
   tnp_db_for_tests_json: 'db-for-tests.json',
   ...tempFolders
 };
@@ -205,7 +206,6 @@ export const config = {
     tnp_vscode_ext_location: pathResolved(__dirname, '../../firedev-projects', 'plugins', 'tnp-vscode-ext'),
 
     tnp_system_path_txt: pathResolved(__dirname, '..', file.tnp_system_path_txt),
-    tnp_system_path_txt_tnp_bundle: pathResolved(__dirname, '..', file.tnpBundle, file.tnp_system_path_txt),
 
     tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
 

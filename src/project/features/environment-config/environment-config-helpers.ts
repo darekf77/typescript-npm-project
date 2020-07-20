@@ -26,7 +26,7 @@ ${chalk.bold(JSON.stringify(workspaceConfig, null, 4))}
 
   Helpers.error(`Please follow worksapce environment config schema:\n
 ${Helpers.terminalLine()}
-  let { config } = require('tnp-bundle').default;
+  let { config } = require('tnp').default;
 
   config = ${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
 
@@ -371,7 +371,7 @@ function createExampleConfigFor(proj: Project) {
   }
   `;
 
-  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp-bundle/index.js').default`;
+  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp/index.js').default`;
 
   return `
   const path = require('path')

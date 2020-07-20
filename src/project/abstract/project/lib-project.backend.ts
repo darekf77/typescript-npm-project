@@ -95,14 +95,17 @@ export abstract class LibProject {
   }
 
   private commit(this: Project, newVer) {
+    const gitRootProject = $Project.nearestTo(this.location, { findGitRoot: true });
     try {
-      this.run(`git add --all . `).sync()
+      Helpers.info(`[git][release] Adding current git changes...`)
+      gitRootProject.run(`git add --all . `).sync()
     } catch (error) {
       Helpers.warn(`Failed to git add --all .`);
     }
 
     try {
-      this.run(`git commit -m "new version ${newVer}"`).sync()
+      Helpers.info(`[git][release] Commiting automatic message`)
+      gitRootProject.run(`git commit -m "new version ${newVer}"`).sync()
     } catch (error) {
       Helpers.warn(`Failed to git commit -m "new vers...`);
     }
@@ -133,15 +136,51 @@ export abstract class LibProject {
 
   }
 
-  public async release(this: Project, c?: Models.dev.ReleaseOptions) {
+  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
+    if (_.isUndefined(releaseOptions.useTempFolder)) {
+      releaseOptions.useTempFolder = true;
+    }
 
-    this.checkIfLogginInToNpm()
+    if (this.isStandaloneProject) {
+      if (releaseOptions.useTempFolder) {
+        const baseFolder = path.join(this.location, 'tmp-bundle-release');
+        Helpers.removeFolderIfExists(baseFolder);
+        const relativeReleasePath = path.join(baseFolder, 'bundle', 'project', this.name);
+        Helpers.removeFolderIfExists(relativeReleasePath);
+        Helpers.mkdirp(relativeReleasePath);
+        this.copyManager.generateSourceCopyIn(relativeReleasePath, {
+          useTempLocation: true, // TODO not needed
+          markAsGenerated: false, // TODO not needed
+          forceCopyPackageJSON: true, // TODO not needed
+        });
 
-    const { prod = false } = c;
+        const generatedProject = $Project.From(relativeReleasePath) as Project;
+        this.allResources.forEach(relPathResource => {
+          const source = path.join(this.location, relPathResource);
+          const dest = path.join(relativeReleasePath, relPathResource);
+          if (Helpers.exists(source)) {
+            if (Helpers.isFolder(source)) {
+              Helpers.copy(source, dest);
+            } else {
+              Helpers.copyFile(source, dest);
+            }
+          }
+        })
+        this.packageJson.linkTo(relativeReleasePath);
+        this.node_modules.linkToProject(generatedProject as Project);
+        releaseOptions.useTempFolder = false;
+        await generatedProject.release(releaseOptions);
+        return;
+      }
+    }
+
+    this.checkIfLogginInToNpm();
+
+    const { prod = false } = releaseOptions;
 
     this.checkIfReadyForNpm()
     const newVersion = this.CurrentProject.versionPatchedPlusOne;
-    const self = this;
+
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true)
       if (!tagOnly) {
@@ -161,7 +200,7 @@ export abstract class LibProject {
         removeTagAndCommit(true);
       }
 
-      this.run(`tnp reset`).sync();
+      // this.run(`tnp reset`).sync();
 
       if (!this.node_modules.exist) {
         await this.npmPackages.installProcess(`release procedure`)
@@ -169,13 +208,14 @@ export abstract class LibProject {
       this.packageJson.save('show for release')
       this.run(`tnp init`).sync();
       await this.build(BuildProcess.prepareOptionsBuildProcess({
-        prod, outDir: config.folder.bundle as 'bundle', args: c.args
+        prod,
+        outDir: config.folder.bundle as 'bundle',
+        args: releaseOptions.args
       }, this));
 
       if (!this.isCommandLineToolOnly) {
         this.createClientVersionAsCopyOfBrowser()
       }
-
 
       if (this.typeIs('angular-lib')) {
 
@@ -228,12 +268,21 @@ export abstract class LibProject {
 
         if (this.typeIs('angular-lib')) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+
+            let appBuildOptions = { docsAppInProdMode: prod };
+
+            await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
+              appBuildOptions.docsAppInProdMode = true;
+            }, () => {
+              appBuildOptions.docsAppInProdMode = false;
+            });
+
             Helpers.log(`
 
           Building docs prevew - start
 
           `);
-            await this.run(`tnp build:app${prod ? 'prod' : ''}`).sync();
+            await this.run(`tnp build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
             Helpers.log(`
 
           Building docs prevew - done

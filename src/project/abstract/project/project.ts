@@ -29,11 +29,11 @@ import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
 import {
   PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks,
-  TnpBundle, NpmPackages, NodeModules, FilesRecreator, FilesFactory,
+  NpmPackages, NodeModules, FilesRecreator, FilesFactory,
   FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
-import { CopyManager } from '../../features/copy-manager.backend';
+import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
@@ -143,10 +143,10 @@ export class Project extends $Project<Project>
       this.cache = {};
       this.packageJson = PackageJSON.fromProject(this);
       this.setType(this.packageJson ? this.packageJson.type : 'unknow');
+
       this.defineProperty<Project>('quickFixes', QuickFixes);
       this.defineProperty<Project>('staticBuild', StaticBuild);
       this.defineProperty<Project>('workspaceSymlinks', WorkspaceSymlinks);
-      this.defineProperty<Project>('tnpBundle', TnpBundle);
       this.defineProperty<Project>('node_modules', NodeModules);
       this.defineProperty<Project>('npmPackages', NpmPackages);
       this.defineProperty<Project>('recreate', FilesRecreator);

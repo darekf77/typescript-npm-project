@@ -3,11 +3,6 @@
     "resources": [],
     "type": "isomorphic-lib",
     "version": "v2",
-    "linkedProjects": [
-      "../tnp-helpers",
-      "../tnp-models",
-      "../tnp-db"
-    ],
     "overrided": {
       "dependencies": {
         "@types/semver": "6.0.1",
@@ -17,7 +12,8 @@
         "@types/sharp": "0.23.1",
         "svg-png-converter": "0.0.9",
         "ng2-rest-swagger-generator": "6.0.4",
-        "cache-require-paths": "0.3.0"
+        "cache-require-paths": "0.3.0",
+        "base-model-wrap": "3.0.8"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -406,7 +402,8 @@
           }
         }
       }
-    }
+    },
+    "linkedProjects": []
   },
   "name": "tnp",
   "version": "0.0.3",
@@ -508,6 +505,7 @@
     "angular-tree-component": "^7.0.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "base-model-wrap": "3.0.8",
     "bcryptjs": "2.4.3",
     "body-parser": "^1.18.2",
     "bootstrap": "4.3.1",

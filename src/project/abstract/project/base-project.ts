@@ -148,6 +148,23 @@ export abstract class BaseProject {
     }
   }
 
+  //#region @backend
+  get allResources(this: Project) {
+    const resurces = [
+      config.file.package_json,
+      config.file._npmrc,
+      config.file._npmignore,
+      config.file._gitignore,
+      config.file.environment_js,
+      config.file.tnpEnvironment_json,
+      config.folder.bin,
+      config.folder._vscode,
+      ...this.resources
+    ];
+    return resurces;
+  }
+  //#endregion
+
   get isWorkspaceChildProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isWorkspaceChildProject;

@@ -1,6 +1,7 @@
 //#region @backend
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as glob from 'glob';
 import * as inquirer from 'inquirer';
 import { config } from '../../config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
@@ -11,6 +12,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
+import { watch } from 'fs-extra';
 
 //#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')
@@ -223,11 +225,18 @@ export class ProjectIsomorphicLib
       }
     }
 
+    const webpackCommandFn = (watchCommand: boolean) =>
+      `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
+
+    const webpackCommand = webpackCommandFn(this.buildOptions.watch);
+
     if (prod && outDir === 'bundle') {
       this.quickFixes.badNpmPackages();
       Helpers.info(`
 
         WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} PRODUCTION BACKEND BUILD started...
+
+        command: ${webpackCommand}
 
         `);
     }
@@ -238,13 +247,15 @@ export class ProjectIsomorphicLib
     }
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
+
+
     if (this.buildOptions.watch) {
 
       if (prod && outDir === 'bundle') {
         try {
-          this.run('npm-run webpack --config webpack.backend-bundle-build.js --watch').async();
+          this.run(webpackCommand).async();
         } catch (er) {
-          Helpers.error(`BUNDLE production build failsed`, false, true);
+          Helpers.error(`BUNDLE production build failed`, false, true);
         }
       } else {
         await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
@@ -258,19 +269,23 @@ export class ProjectIsomorphicLib
     } else {
       if (prod && outDir === 'bundle') {
         try {
-          this.run('npm-run webpack --config webpack.backend-bundle-build.js').sync();
+          this.run(webpackCommand).sync();
 
           const reservedNames = [
             'reservedExpOne',
             'reservedExpSec'
           ];
-          this.uglifyCode(reservedNames);
-          this.obscureCode(reservedNames);
+          const { obscure, uglify } = this.buildOptions;
+          if (obscure || uglify) {
+            this.compileToEs5();
+          }
+          uglify && this.uglifyCode(reservedNames);
+          obscure && this.obscureCode(reservedNames);
+          this.compilerDeclarationFiles();
           // process.exit(0)
         } catch (er) {
-          Helpers.error(`BUNDLE production build failsed`, false, true);
+          Helpers.error(`BUNDLE production build failed`, false, true);
         }
-
         await this.incrementalBuildProcess.start('isomorphic compilation (only client) ')
       } else {
         await this.incrementalBuildProcess.start('isomorphic compilation')
@@ -278,10 +293,37 @@ export class ProjectIsomorphicLib
     }
     //#endregion
   }
+  compilerDeclarationFiles() {
+    //#region @backend
+    this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
+    //#endregion
+  }
+
+  //#region @backend
+  compileToEs5() {
+    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
+      Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in bundle`)
+      return
+    }
+    const indexEs5js = `index-es5.js`;
+    Helpers.writeFile(path.join(this.location, config.folder.bundle, config.file._babelrc), '{ "presets": ["env"] }\n');
+    this.run(`npm-run babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
+    Helpers.writeFile(
+      path.join(this.location, config.folder.bundle, config.file.index_js),
+      Helpers.readFile(path.join(this.location, config.folder.bundle, indexEs5js))
+    );
+    Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, indexEs5js));
+    Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, config.file._babelrc));
+  }
+  //#endregion
 
   uglifyCode(reservedNames: string[]) {
     //#region @backendFunc
-    const command = `uglifyjs bundle/index.js --output bundle/index.js`
+    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
+      Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
+      return
+    }
+    const command = `npm-run uglifyjs bundle/index.js --output bundle/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
@@ -298,7 +340,11 @@ export class ProjectIsomorphicLib
 
   obscureCode(reservedNames: string[]) {
     //#region @backendFunc
-    const commnad = `javascript-obfuscator bundle/index.js `
+    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
+      Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
+      return
+    }
+    const commnad = `npm-run javascript-obfuscator bundle/index.js `
       + ` --output bundle/index.js`
       + ` --target node`
       + ` --rotate-string-array true`

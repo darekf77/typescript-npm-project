@@ -7,7 +7,6 @@ export * from './packages-recognition-extended';
 export * from './proxy-router';
 export * from './quick-fixes';
 export * from './test-runner';
-export * from './tnp-bundle.backend';
 export * from './workspace-symlinks';
 //#endregion
 export * from './environment-config';

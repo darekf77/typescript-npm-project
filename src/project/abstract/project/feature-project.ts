@@ -3,14 +3,14 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 import {
-  StaticBuild, TestRunner, TnpBundle,
+  StaticBuild, TestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter
 } from '../../features';
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
-import { CopyManager } from '../../features/copy-manager.backend';
+import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
@@ -25,10 +25,6 @@ export abstract class FeatureProject {
 
   //#region @backend
   public packageJson: PackageJSON;
-  //#endregion
-
-  //#region @backend
-  public tnpBundle: TnpBundle;
   //#endregion
 
   //#region @backend
