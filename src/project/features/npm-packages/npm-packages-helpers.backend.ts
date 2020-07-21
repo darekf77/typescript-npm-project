@@ -131,7 +131,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   tmpProject.packageJson.setNamFromContainingFolder();
   tmpProject.packageJson.hideDeps(`smooth instalation`);
   pkg.installType = '--save';
-  const command = prepareCommand(pkg, false, false, this.project);
+  const command = prepareCommand(pkg, false, false, project);
   executeCommand(command, tmpProject);
   return tmpProject;
 }
