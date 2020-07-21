@@ -247,11 +247,11 @@ export class ProjectIsomorphicLib
     }
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
-
+    const { obscure, uglify, nodts } = this.buildOptions;
 
     if (this.buildOptions.watch) {
 
-      if (prod && outDir === 'bundle') {
+      if ((prod || uglify || obscure) && outDir === 'bundle') {
         try {
           this.run(webpackCommand).async();
         } catch (er) {
@@ -267,7 +267,8 @@ export class ProjectIsomorphicLib
           })
       }
     } else {
-      if (prod && outDir === 'bundle') {
+
+      if ((prod || uglify || obscure) && outDir === 'bundle') {
         try {
           this.run(webpackCommand).sync();
 
@@ -275,7 +276,7 @@ export class ProjectIsomorphicLib
             'reservedExpOne',
             'reservedExpSec'
           ];
-          const { obscure, uglify, nodts } = this.buildOptions;
+
           if (obscure || uglify) {
             this.compileToEs5();
           }
