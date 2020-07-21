@@ -183,7 +183,7 @@ export abstract class FolderProject {
         return (notAllowed.filter(p => p.test(folderNam)).length === 0);
       })
 
-    if (this.isTnp) {
+    if (this.isTnp && fse.existsSync(path.join(this.location, '../firedev-projects'))) {
       subdirectories = subdirectories.concat(getDirectories(path.join(this.location, '../firedev-projects'))
         .filter(f => {
           const folderNam = path.basename(f);
