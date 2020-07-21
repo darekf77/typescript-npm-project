@@ -7,8 +7,8 @@ import { config } from '../../config';
 import { PROGRESS_DATA } from 'tnp-models';
 import * as os from 'os';
 
-const ADDRESS_GITHUB_HTTPS = 'https://github.com/darekf77/';
-const USE_HTTPS_INSTEAD_SSH = os.hostname().endsWith('igt.com');
+const ADDRESS_GITHUB_HTTPS = ''; // TODO @LAST FIX THISC
+const USE_HTTPS_INSTEAD_SSH = os.hostname().endsWith(''); // TODO @LAST FIX THISC
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = (Project.Current as Project).recreate.filesIgnoredBy.gitignore

@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 //#region @backend
 import * as path from 'path';
+import * as os from 'os';
 //#endregion
 import { Helpers } from 'ng2-logger';
 
@@ -49,6 +50,8 @@ const file = {
   index_d_ts: 'index.d.ts',
   index_js: 'index.js',
   index_js_map: 'index.js.map',
+  db_json: 'db.json',
+  db_for_tests_json: 'db-for-tests.json',
   ...filesNotAllowedToClean
 };
 
@@ -87,7 +90,6 @@ const folder = {
   bin: 'bin',
   _bin: '.bin',
   _vscode: '.vscode',
-  tnp_db_for_tests_json: 'db-for-tests.json',
   ...tempFolders
 };
 
@@ -131,12 +133,11 @@ const argsReplacementsBuild = {
 export const config = {
   //#region @backend
   get dbLocation() {
-    let dbPath = `bin/db.json`;
+    let dbFileName = config.file.db_json;
     if (global.testMode) {
-      dbPath = `bin/${config.folder.tnp_db_for_tests_json}`;
+      dbFileName = config.file.db_for_tests_json;
     }
-    const Project = CLASS.getBy('Project') as any;
-    const location = path.join(Project.Tnp.location, dbPath);
+    const location = path.join(os.homedir(), `${config.frameworkName}`, dbFileName);
     return location;
   },
   //#endregion
@@ -210,7 +211,7 @@ export const config = {
     tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
 
     tnp_tests_context: pathResolved(`/tmp/tnp/${folder.tnp_tests_context}`),
-    tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, folder.tnp_db_for_tests_json),
+    tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, file.db_for_tests_json),
 
     bin_in_node_modules: pathResolved(__dirname, '..', folder.node_modules, folder._bin),
 

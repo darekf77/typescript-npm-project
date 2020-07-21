@@ -5,55 +5,11 @@ import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 
-const ADDRESS_GITHUB_SSH = 'git@github.com:darekf77/';
+const ADDRESS_GITHUB_SSH = ''; // TODO @LAST FIX THISC
 
-const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH; // os.userInfo().username === 'dfilipiak' ? ADDRESS_GITHUB_HTTPS : ADDRESS_GITHUB_SSH;
+const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH;
 const NPM_PROJCETS_LOCATION = path.resolve(path.join((Project.Tnp as Project).location, '..'));
-const GITHUB_PROJECTS_NAMES = [
-  'tnp',
-  'tnp-helpers',
-  'tnp-models',
-  'tnp-db',
-  'firedev',
-  'firedev-projects',
-  'ng2-rest',
-  'ng2-logger',
-  'morphi',
-  'ng2-rest-swagger-generator',
-  'incremental-compiler',
-  'typescript-class-helpers',
-  'json10',
-  'lodash-walk-object',
-  'base-model-wrap',
-  'ng2-rest-docs-server',
-  'isomorphic-region-loader',
-  // 'aurora',
-
-  'static-columns',
-  'bs4-breakpoint',
-  'button-dropdown',
-  'ng2-scroll-slider',
-  'bs3-table',
-  'ng4-storage',
-  'ng2-button-loader',
-  'edit-table',
-  'ng2-tags',
-  'ng2-preloader',
-  'loading-info',
-  'ng2-accordions',
-  'bs3-breakpoint',
-
-
-  // 'IonicCoffeescript',
-  // 'angular2-example-http-login',
-  'http-socket-proxy-router',
-  'example-isomorphic-rest',
-  'my-old-js-tests',
-  'rebird-https-letsencrypt',
-  'pdf-in-browser-angular-nodejs',
-
-
-];
+const GITHUB_PROJECTS_NAMES = []; // TODO @LAST FIX THISC
 
 export type TAction = 'clone' | 'pull';
 

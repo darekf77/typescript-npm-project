@@ -138,7 +138,7 @@ export class FilesRecreator extends FeatureForProject {
             // 'src/assets/*/*'
           ] : [])
           .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
-          .concat(self.project.isTnp ? ['projects/tmp*', 'bin/db.json', `bin/${config.folder.tnp_db_for_tests_json}`] : [])
+          .concat(self.project.isTnp ? ['projects/tmp*'] : [])
         // .concat(self.project.isContainer ? [
         //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
         // ] : []);
@@ -311,7 +311,6 @@ export class FilesRecreator extends FeatureForProject {
                     s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
                 }
-                s['files.exclude']['bin/db.json'] = false;
                 return s;
               }
 
