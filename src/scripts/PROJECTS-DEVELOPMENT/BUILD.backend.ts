@@ -415,6 +415,9 @@ const $RELEASE = async (args) => {
   if(proj.packageJson.libReleaseOptions.ugly) {
     argsObj.uglify = true;
   }
+  if(proj.packageJson.libReleaseOptions.nodts) {
+    argsObj.nodts = true;
+  }
   await proj.release(argsObj)
 
   process.exit(0)
