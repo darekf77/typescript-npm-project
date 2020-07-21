@@ -279,9 +279,15 @@ export class ProjectIsomorphicLib
           if (obscure || uglify) {
             this.compileToEs5();
           }
-          uglify && this.uglifyCode(reservedNames);
-          obscure && this.obscureCode(reservedNames);
-          !nodts && this.compilerDeclarationFiles();
+          if (uglify) {
+            this.uglifyCode(reservedNames)
+          };
+          if (obscure) {
+            this.obscureCode(reservedNames);
+          }
+          if (!nodts) {
+            this.compilerDeclarationFiles()
+          };
           // process.exit(0)
         } catch (er) {
           Helpers.error(`BUNDLE production build failed`, false, true);
