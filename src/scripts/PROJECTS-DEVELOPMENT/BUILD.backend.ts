@@ -407,8 +407,15 @@ const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
 const $RELEASE = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
-  (Project.Current as Project).checkIfReadyForNpm();
-  await (Project.Current as Project).release(argsObj)
+  const proj = (Project.Current as Project);
+  proj.checkIfReadyForNpm();
+  if(proj.packageJson.libReleaseOptions.obscure) {
+    argsObj.obscure = true;
+  }
+  if(proj.packageJson.libReleaseOptions.ugly) {
+    argsObj.uglify = true;
+  }
+  await proj.release(argsObj)
 
   process.exit(0)
 };

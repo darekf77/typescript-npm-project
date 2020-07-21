@@ -55,6 +55,27 @@ export class PackageJSON
           json.tnp.linkedProjects = [];
           saveAtLoad = true;
         }
+        if (_.isUndefined(json.tnp.libReleaseOptions)) {
+          json.tnp.libReleaseOptions = {
+            nodts: false,
+            obscure: false,
+            ugly: false,
+          };
+          saveAtLoad = true;
+        }
+        if (_.isUndefined(json.tnp.libReleaseOptions.nodts)) {
+          json.tnp.libReleaseOptions.nodts = false;
+          saveAtLoad = true;
+        }
+        if (_.isUndefined(json.tnp.libReleaseOptions.obscure)) {
+          json.tnp.libReleaseOptions.obscure = false;
+          saveAtLoad = true;
+        }
+        if (_.isUndefined(json.tnp.libReleaseOptions.ugly)) {
+          json.tnp.libReleaseOptions.ugly = false;
+          saveAtLoad = true;
+        }
+
         if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
           json.tnp.overrided.ignoreDepsPattern = ["*"];
           saveAtLoad = true;

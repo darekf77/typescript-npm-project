@@ -44,8 +44,6 @@
     ".vscode/tasks.json.filetemplate": true,
     "tsconfig.json.filetemplate": true,
     "projects/tmp*": true,
-    "bin/db.json": false,
-    "bin/db-for-tests.json": true,
     ".gitignore": true,
     ".npmignore": true,
     ".babelrc": true,

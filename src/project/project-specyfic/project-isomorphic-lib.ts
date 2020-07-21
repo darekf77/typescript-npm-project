@@ -275,13 +275,13 @@ export class ProjectIsomorphicLib
             'reservedExpOne',
             'reservedExpSec'
           ];
-          const { obscure, uglify } = this.buildOptions;
+          const { obscure, uglify, nodts } = this.buildOptions;
           if (obscure || uglify) {
             this.compileToEs5();
           }
           uglify && this.uglifyCode(reservedNames);
           obscure && this.obscureCode(reservedNames);
-          this.compilerDeclarationFiles();
+          !nodts && this.compilerDeclarationFiles();
           // process.exit(0)
         } catch (er) {
           Helpers.error(`BUNDLE production build failed`, false, true);

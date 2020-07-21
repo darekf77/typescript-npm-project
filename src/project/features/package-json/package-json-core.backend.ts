@@ -45,6 +45,14 @@ export class PackageJsonCore {
     return [];
   }
 
+  get libReleaseOptions() {
+    const res = this.data.tnp ? this.data.tnp.libReleaseOptions : undefined;
+    if (_.isObject(res)) {
+      return res;
+    }
+    return {};
+  }
+
   get frameworkVersion(): Models.libs.FrameworkVersion {
     const res = this.data.tnp ? this.data.tnp.version : undefined;
     if (_.isString(res)) {

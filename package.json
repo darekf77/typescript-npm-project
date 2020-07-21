@@ -406,10 +406,15 @@
         }
       }
     },
-    "linkedProjects": []
+    "linkedProjects": [],
+    "libReleaseOptions": {
+      "nodts": true,
+      "obscure": true,
+      "ugly": true
+    }
   },
   "name": "tnp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "postinstall": "pwd > tnp-system-path.txt && npm link --no-package-lock --ignore-scripts --prefer-offline --no-audit && npm run dist"
   },

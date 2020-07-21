@@ -33,9 +33,8 @@ export abstract class LibProject {
     //#endregion
   }
 
+
   //#region @backend
-
-
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
     const files = [];
     return files;
@@ -176,7 +175,7 @@ export abstract class LibProject {
 
     this.checkIfLogginInToNpm();
 
-    const { prod = false } = releaseOptions;
+    const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
     this.checkIfReadyForNpm()
     const newVersion = this.CurrentProject.versionPatchedPlusOne;
@@ -191,7 +190,9 @@ export abstract class LibProject {
 
     await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
 
-      await this.bumpVersionInOtherProjects(newVersion, true)
+      if (!this.isTnp) {
+        await this.bumpVersionInOtherProjects(newVersion, true)
+      }
       this.commit(newVersion);
 
       try {
@@ -209,6 +210,9 @@ export abstract class LibProject {
       this.run(`tnp init`).sync();
       await this.build(BuildProcess.prepareOptionsBuildProcess({
         prod,
+        obscure,
+        nodts,
+        uglify,
         outDir: config.folder.bundle as 'bundle',
         args: releaseOptions.args
       }, this));
@@ -264,7 +268,9 @@ export abstract class LibProject {
         removeTagAndCommit()
       }
       if (successPublis) {
-        await this.bumpVersionInOtherProjects(newVersion);
+        if (!this.isTnp) {
+          await this.bumpVersionInOtherProjects(newVersion);
+        }
 
         if (this.typeIs('angular-lib')) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
