@@ -154,6 +154,7 @@ export abstract class LibProject {
         });
 
         const generatedProject = $Project.From(relativeReleasePath) as Project;
+        generatedProject.packageJson.showDeps(`bundle release`)
         this.allResources.forEach(relPathResource => {
           const source = path.join(this.location, relPathResource);
           const dest = path.join(relativeReleasePath, relPathResource);
@@ -255,6 +256,10 @@ export abstract class LibProject {
         process.exit(0)
       }
     });
+    if (this.isTnp) { // QUICK_FIX tnp release
+      this.packageJson.data.version = newVersion;
+      this.packageJson.save(`[release tnp]`);
+    }
 
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;
@@ -271,7 +276,6 @@ export abstract class LibProject {
         if (!this.isTnp) {
           await this.bumpVersionInOtherProjects(newVersion);
         }
-
         if (this.typeIs('angular-lib')) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
@@ -294,12 +298,12 @@ export abstract class LibProject {
           Building docs prevew - done
 
           `);
-            this.pushToGitRepo()
+            this.pushToGitRepo(newVersion)
           }, () => {
-            this.pushToGitRepo()
+            this.pushToGitRepo(newVersion)
           });
         } else {
-          this.pushToGitRepo()
+          this.pushToGitRepo(newVersion)
         }
       }
     }, () => {
@@ -308,7 +312,8 @@ export abstract class LibProject {
 
   }
 
-  pushToGitRepo(this: Project) {
+  pushToGitRepo(this: Project, newVersion: string) {
+
     console.log('Pushing to git repository... ')
     const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
     console.log(`Git branch: ${branchName}`)
