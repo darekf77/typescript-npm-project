@@ -101,6 +101,31 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
+  replaceSourceForStandalone(this: Project) {
+    [
+      config.folder.src,
+      config.folder.components,
+    ].forEach(folderName => {
+      const orgSource = path.join(this.location, folderName);
+      Helpers.removeFolderIfExists(orgSource);
+      const standalone = path.join(this.location, `${folderName}-for-standalone`);
+      if (Helpers.exists(standalone)) {
+        Helpers.move(standalone, orgSource)
+      }
+    })
+  }
+  removeStandaloneSources(this: Project) {
+    [
+      config.folder.src,
+      config.folder.components,
+    ].forEach(folderName => {
+      const standalone = path.join(this.location, `${folderName}-for-standalone`);
+      Helpers.removeFolderIfExists(standalone);
+    })
+  }
+  //#endregion
+
+  //#region @backend
   child(this: Project, name: string, errors = true): Project {
     const c = this.children.find(c => c.name === name);
     if (errors && !c) {

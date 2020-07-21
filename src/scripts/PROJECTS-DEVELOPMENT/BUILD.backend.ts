@@ -118,10 +118,12 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
         await proj.run(command, {
           output: true,
           prefix: chalk.bold(`${isBaselineForThisBuild ? '[baseline]' : ''}[${proj.name}]`)
-        }).unitlOutputContains(isBaselineForThisBuild ? 'Skip build for ' :
+        }).unitlOutputContains(isBaselineForThisBuild ?
+          'Skip build for ' :
           [
             'Waching files.. started.. please wait',
-            'No need to copying on build finsh' // angular lib
+            'No need to copying on build finsh', // angular lib,
+            'Build steps ended...',
           ]
           ,
           [

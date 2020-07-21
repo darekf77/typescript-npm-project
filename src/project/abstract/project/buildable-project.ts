@@ -222,10 +222,12 @@ export abstract class BuildableProject {
       // console.log('before build steps')
       await this.buildSteps(buildOptions);
     }
+    Helpers.info(`Build steps ended... `);
     // console.log('after build steps')
     if (this.isStandaloneProject) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }
+
   }
   //#endregion
 }

@@ -195,10 +195,26 @@ export class ProjectFactory {
         Helpers.log(`[create] Child project "${c.genericName}"`);
       });
     }
+
     Helpers.log(`[create] destinationPath: ${destinationPath}`);
     const newCreatedProject = Project.From<Project>(destinationPath);
     if (!newCreatedProject) {
       Helpers.error(`Not able to crate project in ${destinationPath}`, false, true);
+    }
+    if (type !== 'single-file-project' && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib')) {
+      newCreatedProject.replaceSourceForStandalone();
+    }
+    if (newCreatedProject.isWorkspace) {
+      newCreatedProject.children.forEach(c => c.removeStandaloneSources())
+    }
+    if (newCreatedProject.isContainer) {
+      newCreatedProject.children.forEach(c => {
+        if (c.isWorkspace) {
+          c.children.forEach(wc => wc.removeStandaloneSources());
+        } else {
+          c.removeStandaloneSources();
+        }
+      })
     }
     if (!newCreatedProject.git.isGitRepo) {
       Helpers.info(`[create] Git repository inited`);

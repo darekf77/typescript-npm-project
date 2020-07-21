@@ -30,7 +30,11 @@ export class CopyManager extends FeatureForProject {
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
 
-    if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
+    if(!Array.isArray(this.buildOptions.copyto)) {
+      this.buildOptions.copyto = [];
+    }
+
+    if (this.buildOptions.copyto.length === 0) {
       Helpers.info(`No need to copying on build finsh... `)
       return;
     }
