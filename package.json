@@ -118,7 +118,7 @@
         "common": {
           "tnp-models": "0.0.4",
           "tnp-helpers": "0.0.4",
-          "tnp-db": "0.0.3",
+          "tnp-db": "0.0.4",
           "@types/node": "10.12.30",
           "morphi": "3.1.5",
           "gulp": "^3.9.1",
@@ -610,7 +610,7 @@
     "svg-png-converter": "0.0.9",
     "systeminformation": "^3.45.7",
     "task.js": "^0.1.5",
-    "tnp-db": "0.0.3",
+    "tnp-db": "0.0.4",
     "tnp-helpers": "0.0.4",
     "tnp-models": "0.0.4",
     "ts-loader": "7.0.4",

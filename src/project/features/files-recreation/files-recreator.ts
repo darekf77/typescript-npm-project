@@ -154,7 +154,6 @@ export class FilesRecreator extends FeatureForProject {
           '.vscode',
           'dist/',
           'src/',
-          '/scripts',
           '/docs',
           '/preview',
           '/tests',
