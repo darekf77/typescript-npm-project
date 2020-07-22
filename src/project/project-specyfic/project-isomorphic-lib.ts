@@ -208,7 +208,8 @@ export class ProjectIsomorphicLib
 
   async buildLib() {
     //#region @backend
-    const { outDir, prod } = this.buildOptions;
+    const { outDir } = this.buildOptions;
+
     Helpers.log(`[buildLib] start of building`);
     this.copyWhenExist('bin', outDir);
     this.copyWhenExist('package.json', outDir);
@@ -229,12 +230,14 @@ export class ProjectIsomorphicLib
       `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
+    const { obscure, uglify, nodts } = this.buildOptions;
 
-    if (prod && outDir === 'bundle') {
+
+    if (outDir === 'bundle' && (obscure || uglify)) {
       this.quickFixes.badNpmPackages();
       Helpers.info(`
 
-        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} PRODUCTION BACKEND BUILD started...
+        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} BACKEND BUILD started...
 
         command: ${webpackCommand}
 
@@ -242,21 +245,17 @@ export class ProjectIsomorphicLib
     }
 
 
-    if (!this.buildOptions.watch && prod && outDir === 'bundle') {
+
+    if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
       this.buildOptions.genOnlyClientCode = true;
     }
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
-    const { obscure, uglify, nodts } = this.buildOptions;
 
     if (this.buildOptions.watch) {
 
-      if ((prod || uglify || obscure) && outDir === 'bundle') {
-        try {
-          this.run(webpackCommand).async();
-        } catch (er) {
-          Helpers.error(`BUNDLE production build failed`, false, true);
-        }
+      if (outDir === 'bundle') {
+        Helpers.error(`Watch build not available for bundle build`);
       } else {
         await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
           {
@@ -268,7 +267,7 @@ export class ProjectIsomorphicLib
       }
     } else {
 
-      if ((prod || uglify || obscure) && outDir === 'bundle') {
+      if (outDir === 'bundle' && (obscure || uglify || nodts)) {
         try {
           this.run(webpackCommand).sync();
 
