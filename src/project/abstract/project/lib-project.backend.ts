@@ -213,7 +213,7 @@ export abstract class LibProject {
       }
       this.packageJson.save('show for release')
       this.run(`tnp init`).sync();
-      this.run(`code .`).sync();
+
       await this.build(BuildProcess.prepareOptionsBuildProcess({
         prod,
         obscure,
@@ -266,7 +266,7 @@ export abstract class LibProject {
       this.packageJson.save(`[release tnp]`);
     }
 
-
+    this.run(`code .`).sync();
     Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
 
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {

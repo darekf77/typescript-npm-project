@@ -167,6 +167,17 @@ export class PackageJsonCore {
     return false;
   }
 
+  get isGeneratedForRelease() {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGeneratedForRelease)) {
+      if (_.isBoolean(this.data.tnp.isGeneratedForRelease)) {
+        return this.data.tnp.isGeneratedForRelease;
+      }
+      Helpers.error(`[isGeneratedForRelease] Bad value in package.json, tnp.isGenerated should be boolean.`, true, true);
+      Helpers.error(`[isGeneratedForRelease] Location of package.json: ${this.cwd}`, true, true)
+    }
+    return false;
+  }
+
   get isGenerated() {
     if (this.data.tnp && !_.isUndefined(this.data.tnp.isGenerated)) {
       if (_.isBoolean(this.data.tnp.isGenerated)) {
