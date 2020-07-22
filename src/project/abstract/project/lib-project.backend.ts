@@ -265,8 +265,7 @@ export abstract class LibProject {
       this.packageJson.save(`[release tnp]`);
     }
 
-    const generatedProject = $Project.From(absolutePathReleaseProject) as Project;
-    generatedProject.run(`code .`).sync();
+    this.run(`code .`).sync();
     Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
 
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
