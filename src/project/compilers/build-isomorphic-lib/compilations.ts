@@ -46,6 +46,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   CompilationWrapper = Helpers.compilationWrapper as any;
 
   @IncCompiler.methods.AsyncAction()
+  // @ts-ignore
   async asyncAction(event: IncCompiler.Change) {
     const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
     if (triggerTsEventExts
@@ -72,7 +73,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       changeAbsoluteFilePathExt(event, 'ts');
       // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
     }
-    await super.asyncAction(event);
+    await super.asyncAction(event as any);
   }
 
   constructor(

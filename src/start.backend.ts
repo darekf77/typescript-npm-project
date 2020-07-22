@@ -178,7 +178,7 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
   const arg = Helpers.cliTool.paramsFrom(argsv[2]);
   Helpers.log(`lastCmds: ${lastCmds}`)
   Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
-  Helpers.log(`Helpers.cliTool.paramsFrom(argsv[2]) ${Helpers.cliTool.paramsFrom(argsv[2])} `);
+  Helpers.log(`Helpers.cliTool.paramsFrom(argsv[2]) "${Helpers.cliTool.paramsFrom(argsv[2])}" `);
   // process.exit(0)
   if (
     (argsv.length === 2 && argsv[1].endsWith(`/bin/${config.frameworkName}`)) ||

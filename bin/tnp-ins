@@ -3,10 +3,6 @@
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
 
-if (!process.argv.includes('-verbose')) {
-  process.argv.push('-verbose');
-}
-
 global.hideLog = true;
 global.verboseLevel = 0;
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
@@ -24,11 +20,12 @@ if (process.argv.includes('-verbose')) {
   process.argv = process.argv.filter(a => a !== '-verbose');
 }
 
-var distOnly = (process.argv[process.argv.length - 1] === '-dist');
-var bundleOnly = (process.argv[process.argv.length - 1] === '-bundle');
+var distOnly = (process.argv.includes('-dist'));
+var bundleOnly = (process.argv.includes('-bundle'));
 if (distOnly) {
+  !global.hideLog && console.log('- dist only -');
   // =========================== only dist ============================
-  process.argv[process.argv.length - 1] = void 0;
+  process.argv = process.argv.filter(a => a !== '-dist');
   process.argv = process.argv.filter(f => !!f);
   var path = require('path');
   var pathToDistRun = path.join(__dirname, '../dist/index.js');
@@ -37,8 +34,9 @@ if (distOnly) {
   global.tnp_out_folder = 'dist';
   // =======================================================================
 } else if (bundleOnly) {
+  !global.hideLog && console.log('- bundle only -');
   // =========================== only dist ============================
-  process.argv[process.argv.length - 1] = void 0;
+  process.argv = process.argv.filter(a => a !== '-bundle');
   process.argv = process.argv.filter(f => !!f);
   var path = require('path');
   var pathToDistRun = path.join(__dirname, '../bundle/index.js');
@@ -71,21 +69,21 @@ if (distOnly) {
 
   if (bundleExist && distExist) {
     if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
-      // console.log('- firedev dist -> becouse is newer -');
+      !global.hideLog && console.log('- firedev dist -> becouse is newer -');
       global.tnp_out_folder = 'dist'
       start = require(pathToDistRun.replace(/\.js$/g, '')).start;
     } else {
-      // console.log('- firedev bundle -> becouse is newer -')
+      !global.hideLog && console.log('- firedev bundle -> becouse is newer -')
       global.tnp_out_folder = 'bundle'
       start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
     }
   } else {
     if (bundleExist) {
-      // console.log('- firedev bundle -');
+      !global.hideLog && console.log('- firedev bundle -');
       global.tnp_out_folder = 'bundle'
       start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
     } else {
-      // console.log('- firedev dist -');
+      !global.hideLog && console.log('- firedev dist -');
       global.tnp_out_folder = 'dist'
       start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 

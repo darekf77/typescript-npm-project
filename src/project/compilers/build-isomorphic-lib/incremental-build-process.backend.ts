@@ -12,6 +12,7 @@ import { BuildOptions } from 'tnp-db';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
+  // @ts-ignore
   protected browserCompilations: BroswerForModuleCompilation[];
 
   //#region resolve modules from Location
