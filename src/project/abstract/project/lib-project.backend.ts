@@ -154,7 +154,7 @@ export abstract class LibProject {
         });
 
         const generatedProject = $Project.From(relativeReleasePath) as Project;
-        generatedProject.recreate.vscode.settings.hideOrShowDeps();
+        Helpers.removeFolderIfExists(path.join(generatedProject.location, config.folder._vscode));
         this.allResources.forEach(relPathResource => {
           const source = path.join(this.location, relPathResource);
           const dest = path.join(relativeReleasePath, relPathResource);
