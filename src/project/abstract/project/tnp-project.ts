@@ -7,6 +7,7 @@ import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';
 //#endregion
 import type { Project } from './project';
+import { Project as $Project } from 'tnp-helpers';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 
@@ -61,7 +62,7 @@ export abstract class TnpProject {
     if (this.typeIs('unknow')) {
       return false;
     }
-    return this.name === 'tnp';
+    return this.location === $Project.Tnp.location;
     //#endregion
   }
 

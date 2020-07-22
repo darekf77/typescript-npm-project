@@ -49,6 +49,15 @@ function $OPEN_CORE_PROJECT() {
   process.exit(0)
 }
 
+function $LOCATION() {
+  Helpers.info(`
+
+  ${Project.Tnp.location}
+
+  `);
+  process.exit(0)
+}
+
 function $OPEN_TNP_PROJECT() {
   (Project.Tnp as Project).run(`code ${(Project.Tnp as Project).location} &`).sync();
   process.exit(0)
@@ -82,6 +91,7 @@ async function $OPEN(args: string) {
 }
 
 export default {
+  $LOCATION: Helpers.CLIWRAP($LOCATION, '$LOCATION'),
   $OPEN: Helpers.CLIWRAP($OPEN, '$OPEN'),
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
