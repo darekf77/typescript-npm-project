@@ -140,24 +140,26 @@ export abstract class LibProject {
       releaseOptions.useTempFolder = true;
     }
 
+    const baseFolder = path.join(this.location, 'tmp-bundle-release');
+    const absolutePathReleaseProject = path.join(baseFolder, 'bundle', 'project', this.name);
+
     if (this.isStandaloneProject) {
       if (releaseOptions.useTempFolder) {
-        const baseFolder = path.join(this.location, 'tmp-bundle-release');
+
         Helpers.removeFolderIfExists(baseFolder);
-        const relativeReleasePath = path.join(baseFolder, 'bundle', 'project', this.name);
-        Helpers.removeFolderIfExists(relativeReleasePath);
-        Helpers.mkdirp(relativeReleasePath);
-        this.copyManager.generateSourceCopyIn(relativeReleasePath, {
+
+        Helpers.removeFolderIfExists(absolutePathReleaseProject);
+        Helpers.mkdirp(absolutePathReleaseProject);
+        this.copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
           useTempLocation: true, // TODO not needed
           markAsGenerated: false, // TODO not needed
           forceCopyPackageJSON: true, // TODO not needed
         });
 
-        const generatedProject = $Project.From(relativeReleasePath) as Project;
-        Helpers.removeFolderIfExists(path.join(generatedProject.location, config.folder._vscode));
+        const generatedProject = $Project.From(absolutePathReleaseProject) as Project;
         this.allResources.forEach(relPathResource => {
           const source = path.join(this.location, relPathResource);
-          const dest = path.join(relativeReleasePath, relPathResource);
+          const dest = path.join(absolutePathReleaseProject, relPathResource);
           if (Helpers.exists(source)) {
             if (Helpers.isFolder(source)) {
               Helpers.copy(source, dest);
@@ -166,9 +168,11 @@ export abstract class LibProject {
             }
           }
         })
-        this.packageJson.linkTo(relativeReleasePath);
+        this.packageJson.linkTo(absolutePathReleaseProject);
         this.node_modules.linkToProject(generatedProject as Project);
         releaseOptions.useTempFolder = false;
+        const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
+        Helpers.removeFolderIfExists(vscodeFolder);
         await generatedProject.release(releaseOptions);
         return;
       }
@@ -260,6 +264,10 @@ export abstract class LibProject {
       this.packageJson.data.version = newVersion;
       this.packageJson.save(`[release tnp]`);
     }
+
+    const generatedProject = $Project.From(absolutePathReleaseProject) as Project;
+    generatedProject.run(`code .`).sync();
+    Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
 
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;

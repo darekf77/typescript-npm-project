@@ -415,7 +415,7 @@
     }
   },
   "name": "tnp",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "scripts": {
     "postinstall": "pwd > tnp-system-path.txt && npm link --no-package-lock --ignore-scripts --prefer-offline --no-audit"
   },
