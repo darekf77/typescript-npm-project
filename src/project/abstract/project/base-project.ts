@@ -113,6 +113,15 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  get isDocker(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isDocker;
+    }
+    //#region @backend
+    return this.typeIs('docker');
+    //#endregion
+  }
+
   get isContainer(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isContainer;

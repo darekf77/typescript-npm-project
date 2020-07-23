@@ -16,13 +16,14 @@ import { EnvironmentConfig } from '../../project/features';
 export async function chainBuild(args: string) {
   const allowedLibs = [
     'angular-lib',
-    'isomorphic-lib'
+    'isomorphic-lib',
+    'docker',
   ] as Models.libs.LibType[];
 
   let project = (Project.Current as Project);
 
   const firstArg = _.first(args.split(' '));
-  if (project.isWorkspace || project.isWorkspace) {
+  if (project.isWorkspace || project.isContainer) {
     let selectedChild = project.children.find(c => c.name === firstArg);
     if (!selectedChild) {
       selectedChild = project.children.find(c => {
@@ -78,7 +79,7 @@ ${deps.map((d, i) => (i + 1) + '. ' + d.genericName).join('\n')}
   let index = 0;
   const buildedOK = [];
 
-  if (project.isStandaloneProject) {
+  if (project.isStandaloneProject && !project.isDocker) {
     args += ` --skipCopyToSelection true`;
     const copytoPathes = await project.selectProjectToCopyTO();
     if (copytoPathes.length > 0) {
@@ -204,9 +205,8 @@ const BUILD_DIST_WATCH_ALL = async (args) => {
 }
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const BUILD_DIST = async (args) => {
-  // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
-  // process.exit(0)
-  await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 const BUILD_DIST_ALL = async (args) => {
   // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
@@ -409,13 +409,13 @@ const $RELEASE = async (args) => {
   argsObj.args = args;
   const proj = (Project.Current as Project);
   proj.checkIfReadyForNpm();
-  if(proj.packageJson.libReleaseOptions.obscure) {
+  if (proj.packageJson.libReleaseOptions.obscure) {
     argsObj.obscure = true;
   }
-  if(proj.packageJson.libReleaseOptions.ugly) {
+  if (proj.packageJson.libReleaseOptions.ugly) {
     argsObj.uglify = true;
   }
-  if(proj.packageJson.libReleaseOptions.nodts) {
+  if (proj.packageJson.libReleaseOptions.nodts) {
     argsObj.nodts = true;
   }
   await proj.release(argsObj)

@@ -1,4 +1,5 @@
 //#region @backend
+import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -34,8 +35,16 @@ export async function STRUCTURE(args: string, exit = true) {
 }
 
 export async function INIT(args: string, exit = true) {
-  const project = (Project.Current as Project);
-  await (Project.Current as Project).filesStructure.init(args);
+  let project = (Project.Current as Project);
+  let firstArg = _.first(args.split(' '));
+  if (!!(firstArg) && (project.isContainer || project.isWorkspace)) {
+    firstArg = firstArg.replace(/\/$/, '');
+    const child = project.children.find(c => c.name === firstArg);
+    if (child) {
+      project = child;
+    }
+  }
+  await project.filesStructure.init(args);
   if (exit) {
     process.exit(0)
   }
@@ -74,7 +83,7 @@ export async function INIT_ALL(args: string, exit = true) {
 export async function STATIC_INIT(args: string, exit = true) {
   // process.exit(0)
   const staticVersion = await (Project.Current as Project).StaticVersion();
-  if(staticVersion) {
+  if (staticVersion) {
     await staticVersion.filesStructure.init(args);
   }
 

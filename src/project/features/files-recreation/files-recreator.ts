@@ -27,9 +27,9 @@ interface VSCodeSettings {
 function getVscodeSettingsFrom(project: Project) {
   let settings: VSCodeSettings;
   const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
-  try {
+  if (Helpers.exists(pathSettingsVScode)) {
     settings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
-  } catch (e) { }
+  }
   return settings;
 }
 
@@ -179,23 +179,25 @@ export class FilesRecreator extends FeatureForProject {
         }
       }
     }
-    if (fse.existsSync(pathSettingsVScode)) {
+    if (Helpers.exists(pathSettingsVScode)) {
       try {
         let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
         settings = modifyFN(settings, this.project);
         Helpers.writeFile(pathSettingsVScode, settings);
       } catch (e) {
-        console.log(e)
+        Helpers.log(e)
       }
     } else {
       try {
         const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
-        let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
-        settings = modifyFN(settings, this.project);
-        Helpers.writeFile(pathSettingsVScode, settings)
+        if (Helpers.exists(settingFromCore)) {
+          var settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
+          settings = modifyFN(settings, this.project);
+          Helpers.writeFile(pathSettingsVScode, settings)
+        }
       } catch (e) {
-        console.log(e)
+        Helpers.log(e)
       }
     }
   }

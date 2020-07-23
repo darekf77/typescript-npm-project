@@ -52,6 +52,7 @@ const file = {
   index_js_map: 'index.js.map',
   db_json: 'db.json',
   db_for_tests_json: 'db-for-tests.json',
+  tmpDockerImageId: 'tmp-docker-image-id',
   ...filesNotAllowedToClean
 };
 
@@ -291,6 +292,7 @@ export const config = {
       Models.libs.GlobalLibTypeName.isomorphicLib,
       Models.libs.GlobalLibTypeName.workspace,
       Models.libs.GlobalLibTypeName.container,
+      Models.libs.GlobalLibTypeName.docker,
     ] as Models.libs.LibType[]
   },
   moduleNameAngularLib,

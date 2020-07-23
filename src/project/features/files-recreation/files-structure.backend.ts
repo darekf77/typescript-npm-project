@@ -218,23 +218,27 @@ export class FilesStructure extends FeatureForProject {
     }
 
     //#region handle node modules instalation
-    if (!this.project.node_modules.exist) {
-      if (skipNodeModules) {
-        if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
-          Helpers.mkdirp(path.join(this.project.location, config.folder.node_modules));
+    if (!this.project.isDocker) {
+      if (!this.project.node_modules.exist) {
+        if (skipNodeModules) {
+          if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
+            Helpers.mkdirp(path.join(this.project.location, config.folder.node_modules));
+          }
+        } else {
+          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
         }
       } else {
-        await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
-      }
-    } else {
-      if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v2')) {
-        this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
+        if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v2')) {
+          this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
+        }
       }
     }
+
     //#endregion
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      if (this.project.isSiteInStrictMode) {
+
+      if (this.project.isSiteInStrictMode && !this.project.isDocker) {
         if (watch) {
           await this.project.join.startAndWatch(this.taskNames.joinMerge, {
             watchOnly, afterInitCallBack: async () => {
@@ -255,31 +259,32 @@ export class FilesStructure extends FeatureForProject {
 
     this.project.quickFixes.missingSourceFolders();
 
-    if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
-      if (watch) {
-        await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
-          watchOnly, afterInitCallBack: async () => {
-            await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
-          }
-        });
-        // if (!this.project) {
-        //   console.trace('HERE')
-        // }
-        await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir, {
-          watchOnly, afterInitCallBack: async () => {
-            await this.project.compilerCache.setUpdatoDate.sourceModifier();
-          }
-        });
-      } else {
-        await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
-        // if (!this.project) {
-        //   console.trace('HERE')
-        // }
-        await this.project.sourceModifier.start(this.taskNames.sourceModifir);
+    if (!this.project.isDocker) {
+      if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
+        if (watch) {
+          await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
+            watchOnly, afterInitCallBack: async () => {
+              await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
+            }
+          });
+          // if (!this.project) {
+          //   console.trace('HERE')
+          // }
+          await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir, {
+            watchOnly, afterInitCallBack: async () => {
+              await this.project.compilerCache.setUpdatoDate.sourceModifier();
+            }
+          });
+        } else {
+          await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+          // if (!this.project) {
+          //   console.trace('HERE')
+          // }
+          await this.project.sourceModifier.start(this.taskNames.sourceModifir);
+        }
+        // process.exit(0)
       }
-      // process.exit(0)
     }
-
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 

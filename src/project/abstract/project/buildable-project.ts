@@ -27,7 +27,7 @@ export abstract class BuildableProject {
     if (buildOptions && !_.isArray(buildOptions.copyto)) {
       buildOptions.copyto = [];
     }
-    if (project.typeIs('unknow') || (buildOptions && buildOptions.skipCopyToSelection)) {
+    if (project.typeIs('unknow','docker') || (buildOptions && buildOptions.skipCopyToSelection)) {
       return;
     }
     // clearConsole()
