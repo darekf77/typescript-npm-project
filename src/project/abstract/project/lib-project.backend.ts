@@ -195,22 +195,22 @@ export abstract class LibProject {
 
     await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
 
-      if (!this.isTnp) {
-        await this.bumpVersionInOtherProjects(newVersion, true)
-      }
+      await this.bumpVersionInOtherProjects(newVersion, true)
+
       this.commit(newVersion);
 
-      try {
-        this.run(`npm version patch`).sync()
-      } catch (e) {
-        removeTagAndCommit(true);
-      }
+      // try {
+      //   this.run(`npm version patch`).sync()
+      // } catch (e) {
+      //   removeTagAndCommit(true);
+      // }
 
       // this.run(`tnp reset`).sync();
 
       if (!this.node_modules.exist) {
         await this.npmPackages.installProcess(`release procedure`)
       }
+      this.packageJson.data.version = newVersion;
       this.packageJson.save('show for release')
       this.run(`tnp init`).sync();
 
@@ -281,9 +281,8 @@ export abstract class LibProject {
         removeTagAndCommit()
       }
       if (successPublis) {
-        if (!this.isTnp) {
-          await this.bumpVersionInOtherProjects(newVersion);
-        }
+        await this.bumpVersionInOtherProjects(newVersion);
+
         if (this.typeIs('angular-lib')) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
