@@ -352,7 +352,7 @@ export abstract class LibProject {
     if (!fse.existsSync(bundleFolder)) {
       fse.mkdirSync(bundleFolder);
     }
-    ['package.json'].concat(this.resources).forEach(res => {
+    [].concat(this.resources).forEach(res => {
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);
       if (!fse.existsSync(file)) {
