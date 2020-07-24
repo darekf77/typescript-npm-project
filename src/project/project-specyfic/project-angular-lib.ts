@@ -177,6 +177,8 @@ export class ProjectAngularLib
 
   async buildLib() {
     //#region @backendFunc
+    const { outDir } = this.buildOptions;
+    this.beforeLibBuild(outDir);
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
     if (this.buildOptions.watch) {

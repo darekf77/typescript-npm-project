@@ -13,7 +13,7 @@
         "svg-png-converter": "0.0.9",
         "ng2-rest-swagger-generator": "6.0.4",
         "cache-require-paths": "0.3.0",
-        "base-model-wrap": "3.0.8"
+        "base-model-wrap": "3.0.9"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -249,7 +249,7 @@
             "essentials": {
               "element-resize-detector": "1.1.15",
               "static-columns": "1.0.4",
-              "bs4-breakpoint": "2.0.3",
+              "bs4-breakpoint": "2.0.5",
               "ngx-breadcrumbs": "0.0.3",
               "ngx-editor": "^3.3.0",
               "ngx-moment": "^3.0.1",
@@ -493,11 +493,11 @@
     "angular-tree-component": "^7.0.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "base-model-wrap": "3.0.8",
+    "base-model-wrap": "3.0.9",
     "bcryptjs": "2.4.3",
     "body-parser": "^1.18.2",
     "bootstrap": "4.3.1",
-    "bs4-breakpoint": "2.0.3",
+    "bs4-breakpoint": "2.0.5",
     "cache-require-paths": "0.3.0",
     "callsite-record": "4.1.3",
     "chai": "^4.2.0",

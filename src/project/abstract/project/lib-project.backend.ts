@@ -62,6 +62,52 @@ export abstract class LibProject {
     }
   }
 
+  protected beforeLibBuild(this: Project, outDir) {
+    this.copyWhenExist('bin', outDir);
+    this.linkWhenExist('package.json', outDir);
+    this.copyWhenExist('.npmrc', outDir);
+    this.copyWhenExist('.npmignore', outDir);
+    this.copyWhenExist('.gitignore', outDir);
+    if (outDir === 'bundle') {
+      this.linkWhenExist(config.folder.node_modules, outDir);
+      this.linkWhenExist('package.json', path.join(outDir, config.folder.browser));
+    }
+  }
+
+  protected copyWhenExist(this: Project, source: string, outDir: string) {
+    //#region @backend
+    const basename = source;
+    source = path.join(this.location, source);
+    outDir = path.join(this.location, outDir, basename);
+    if (fse.existsSync(source)) {
+      if (fse.lstatSync(source).isDirectory()) {
+        Helpers.tryCopyFrom(source, outDir)
+      } else {
+        Helpers.copyFile(source, outDir)
+      }
+    } else {
+      Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);
+    }
+    //#endregion
+  }
+  protected linkWhenExist(this: Project, source: string, outLInk: string) {
+    //#region @backend
+    const basename = source;
+    source = path.join(this.location, source);
+    outLInk = path.join(this.location, outLInk, basename);
+
+
+    if (Helpers.exists(source)) {
+      if (Helpers.isLink(source)) {
+        source = Helpers.pathFromLink(source);
+      }
+      if (Helpers.exists(source)) {
+        Helpers.createSymLink(source, outLInk)
+      }
+    }
+    //#endregion
+  }
+
 
   /**
    * Return how many projects has changed
