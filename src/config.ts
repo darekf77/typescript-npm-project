@@ -129,6 +129,7 @@ const argsReplacementsBuild = {
   'sbd': 'static:build:dist',
   'sbl': 'static:build:lib',
   'sba': 'static:build:app',
+  'cb': 'clean:build'
 };
 
 export const config = {

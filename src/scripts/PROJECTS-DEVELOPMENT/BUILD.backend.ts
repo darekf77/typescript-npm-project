@@ -178,6 +178,11 @@ const $BUILD = async (args) => {
   await chainBuild(args)
 };
 
+const $CLEAN_BUILD = async (args) => {
+  args += ' --nocache';
+  await chainBuild(args)
+};
+
 const $BUILDWATCH = async (args) => {
   await chainBuild(args)
 };
@@ -469,9 +474,9 @@ async function $BUILD_DOCS_PROD(args) {
   process.exit(0)
 }
 
-const $STOP = async (args)=> {
-  const proj = Helpers.cliTool.resolveChildProject(args,Project.Current);
-  if(proj) {
+const $STOP = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current);
+  if (proj) {
     (proj as ProjectDocker).stop();
   }
   process.exit(0)
@@ -524,6 +529,7 @@ export default {
   $BUILD_DOCS_PROD: Helpers.CLIWRAP($BUILD_DOCS_PROD, '$BUILD_DOCS_PROD'),
   DEVB: Helpers.CLIWRAP(DEVB, 'DEVB'),
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
+  $CLEAN_BUILD: Helpers.CLIWRAP($CLEAN_BUILD, '$CLEAN_BUILD'),
   $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
   $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
