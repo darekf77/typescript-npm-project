@@ -22,12 +22,15 @@ export class ProjectDocker
     if (!_.isString(imageId) || imageId.trim() === '') {
       Helpers.error(`Please build first image: ${config.frameworkName} build`, false, true);
     }
-    const containtersIds = Helpers.run(`docker ps | grep ${imageId}`, { output: false })
-      .sync().toString().trim().split('\n').map(line => {
-        const lines = line.split(' ').filter(f => !!f);
-        const containerID = _.first(lines);
-        return containerID;
-      });
+    let containtersIds = [];
+    try {
+      containtersIds = Helpers.run(`docker ps | grep ${imageId}`, { output: false })
+        .sync().toString().trim().split('\n').map(line => {
+          const lines = line.split(' ').filter(f => !!f);
+          const containerID = _.first(lines);
+          return containerID;
+        });
+    } catch (error) { }
 
     if (containtersIds.length > 0) {
       Helpers.info(`Stoping containters..`);
