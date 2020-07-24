@@ -17,6 +17,7 @@ export class ProjectDocker
 //#endregion
 {
   stop() {
+    //#region @backendFunc
     const imageId = this.dockerImageId;
     if (!_.isString(imageId) || imageId.trim() === '') {
       Helpers.error(`Please build first image: ${config.frameworkName} build`, false, true);
@@ -39,18 +40,22 @@ export class ProjectDocker
     } else {
       Helpers.warn(`No containers to stop by image id: ${imageId}`);
     }
-
+    //#endregion
   }
 
 
   public set dockerImageId(id: any) {
+    //#region @backend
     Helpers.writeFile(path.join(this.location,
       config.file.tmpDockerImageId), id);
+    //#endregion
   }
 
   public get dockerImageId() {
+    //#region @backendFunc
     return Helpers.readFile(path.join(this.location,
       config.file.tmpDockerImageId));
+    //#endregion
   }
   async buildLib() { }
 
@@ -75,11 +80,14 @@ export class ProjectDocker
   }
 
   public async saveToFile() {
+    //#region @backendFunc
     Helpers.info(`Exporting image..`);
     this.run(`docker save ${this.dockerImageId} > tmp-container-backup-${this.dockerImageId}.tar`).sync();
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backend
     const { nocache } = Helpers.cliTool.argsFrom<{ nocache: boolean; fast: boolean }>(buildOptions.args);
     Helpers.info(`building docker`);
     let dockerImageId: any;
@@ -92,6 +100,7 @@ export class ProjectDocker
     }).asyncAsPromise();
     Helpers.info(`DockerId: ${dockerImageId}`);
     this.dockerImageId = dockerImageId;
+    //#endregion
   }
 }
 
