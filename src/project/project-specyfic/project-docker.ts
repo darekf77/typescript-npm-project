@@ -61,6 +61,7 @@ export class ProjectDocker
     if (!_.isString(id) || id.trim() === '') {
       Helpers.error(`Please build first image: ${config.frameworkName} build`, false, true);
     }
+    // 'docker run -v /var/run/docker.sock:/var/run/docker.sock';
     return `docker run ${id} > ./tmp-docker-image-log-${id}.txt 2>&1`;
     //#endregion
   }
