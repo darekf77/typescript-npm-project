@@ -200,8 +200,14 @@ export class ProjectIsomorphicLib
     source = path.join(this.location, source);
     outLInk = path.join(this.location, outLInk, basename);
 
-    if (fse.existsSync(source)) {
-      Helpers.createSymLink(source, outLInk)
+
+    if (Helpers.exists(source)) {
+      if(Helpers.isLink(source)) {
+        source = Helpers.pathFromLink(source);
+      }
+      if (Helpers.exists(source)) {
+        Helpers.createSymLink(source, outLInk)
+      }
     }
     //#endregion
   }
