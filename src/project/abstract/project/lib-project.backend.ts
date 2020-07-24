@@ -74,22 +74,27 @@ export abstract class LibProject {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       updateChildrenVersion(this, newVersion, this.name);
     } else {
-      this.TnpProject.packageJson.setDependencyAndSave({
-        name: this.name,
-        version: newVersion,
-      }, `Bump new version "${newVersion}" of ${this.name}`);
-      await (new Promise((resolve, reject) => {
-        getDependents(this.name, function (err, packages: any[]) {
-          if (err) {
-            reject(`[lib-projecty] Can't get depended packages..`)
-          } else {
-            packages.forEach(pkg => {
-              Helpers.info(`Please update "${pkg}" depended on this package...`)
-            })
-            resolve()
-          }
-        });
-      }));
+      if (this.TnpProject.name === this.name) {
+        Helpers.info(`Ommiting version bump ${this.name}`)
+      } else {
+        this.TnpProject.packageJson.setDependencyAndSave({
+          name: this.name,
+          version: newVersion,
+        }, `Bump new version "${newVersion}" of ${this.name}`);
+        await (new Promise((resolve, reject) => {
+          getDependents(this.name, function (err, packages: any[]) {
+            if (err) {
+              reject(`[lib-projecty] Can't get depended packages..`)
+            } else {
+              packages.forEach(pkg => {
+                Helpers.info(`Please update "${pkg}" depended on this package...`)
+              })
+              resolve()
+            }
+          });
+        }));
+      }
+
     }
   }
 
