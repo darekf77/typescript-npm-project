@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as path from 'path';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
+import type { ProjectDocker } from '../../project';
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -268,7 +269,7 @@ const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project
   .startForApp({ prod: true, args, staticBuildAllowed: true })
 
 const $SERVE = async (args) => {
-  let proj = (Project.Current as Project);
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (!proj) {
     proj = Project.nearestTo<Project>(process.cwd());
   }
@@ -321,7 +322,7 @@ const $SERVE = async (args) => {
       });
       //#endregion
     }
-    if (proj.typeIs('isomorphic-lib')) {
+    if (proj.typeIs('isomorphic-lib', 'docker')) {
       await proj.start(args);
     }
 
@@ -345,15 +346,28 @@ const $SERVE = async (args) => {
 
 
 const $START = async (args) => {
-  if ((Project.Current as Project).isStandaloneProject) {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+
+  if (proj.isStandaloneProject) {
     await $SERVE(args);
     return;
   }
-  if (!(Project.Current as Project).isWorkspace) {
+  if (!proj.isWorkspace) {
     Helpers.error(`Please use this command only on workspace level`, false, true)
   }
-  await (Project.Current as Project).start(args);
+  await proj.start(args);
 };
+
+const $RUN = async (args) => {
+  await $START(args);
+};
+
+const $BACKUP = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as ProjectDocker;
+  await proj.saveToFile();
+  process.exit(0);
+};
+
 
 const SB = (args) => STATIC_BUILD(args);
 const SBP = (args) => STATIC_BUILD_PROD(args);
@@ -455,6 +469,14 @@ async function $BUILD_DOCS_PROD(args) {
   process.exit(0)
 }
 
+const $STOP = async (args)=> {
+  const proj = Helpers.cliTool.resolveChildProject(args,Project.Current);
+  if(proj) {
+    (proj as ProjectDocker).stop();
+  }
+  process.exit(0)
+};
+
 const $STOP_BUILD_DIST_WATCH = async (args) => {
   const db = await TnpDB.Instance(config.dbLocation);
   const projectLocation = (Project.Current as Project).location;
@@ -544,8 +566,11 @@ export default {
   $START_APP: Helpers.CLIWRAP($START_APP, '$START_APP'),
   $BUILD_PROD: Helpers.CLIWRAP($BUILD_PROD, '$BUILD_PROD'),
   $START: Helpers.CLIWRAP($START, '$START'),
+  $RUN: Helpers.CLIWRAP($RUN, '$RUN'),
+  $STOP: Helpers.CLIWRAP($STOP, '$STOP'),
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
+  $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
 };
