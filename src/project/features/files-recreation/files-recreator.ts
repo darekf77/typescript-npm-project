@@ -402,6 +402,7 @@ ${this.project.packageJson.linkedProjects.map(c => `/${c}`).join('\n')}
 ` : []}
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
+${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
 ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
             .map(({ relativePath }) => {
               return `/${relativePath}`;

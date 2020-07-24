@@ -79,6 +79,16 @@ export class ProjectDocker
     //#endregion
   }
 
+  filesTemplates() {
+    //#region @backendFunc
+    let files = super.filesTemplates();
+    return [
+      ...files,
+      'Dockerfile.filetemplate',
+    ]
+    //#endregion
+  }
+
   public async saveToFile() {
     //#region @backendFunc
     Helpers.info(`Exporting image..`);

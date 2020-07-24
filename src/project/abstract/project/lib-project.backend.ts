@@ -261,10 +261,10 @@ export abstract class LibProject {
         process.exit(0)
       }
     });
-    if (this.isTnp) { // QUICK_FIX tnp release
-      this.packageJson.data.version = newVersion;
-      this.packageJson.save(`[release tnp]`);
-    }
+
+    this.packageJson.data.version = newVersion;
+    this.packageJson.save(`[release tnp]`);
+
 
     this.run(`code .`).sync();
     Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)

@@ -171,6 +171,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.currentProjectLaunchConfiguration = project.temlateOfLaunchJSON(workspaceConfig);
   workspaceConfig.currentProjectTasksConfiguration = project.temlateOfTasksJSON(workspaceConfig);
   workspaceConfig.currentProjectType = project._type;
+  workspaceConfig.currentFrameworkVersion = Project.Tnp.version;
   workspaceConfig.currentProjectLocation = project.location;
   workspaceConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
   workspaceConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
