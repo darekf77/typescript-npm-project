@@ -262,8 +262,8 @@ export abstract class LibProject {
       }
     });
 
-    this.packageJson.data.version = newVersion;
-    this.packageJson.save(`[release tnp]`);
+    // this.packageJson.data.version = newVersion;
+    // this.packageJson.save(`[release tnp]`);
 
 
     this.run(`code .`).sync();

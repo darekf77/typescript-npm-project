@@ -212,13 +212,13 @@ export class ProjectIsomorphicLib
 
     Helpers.log(`[buildLib] start of building`);
     this.copyWhenExist('bin', outDir);
-    this.copyWhenExist('package.json', outDir);
+    this.linkWhenExist('package.json', outDir);
     this.copyWhenExist('.npmrc', outDir);
     this.copyWhenExist('.npmignore', outDir);
     this.copyWhenExist('.gitignore', outDir);
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
-      this.copyWhenExist('package.json', path.join(outDir, config.folder.browser));
+      this.linkWhenExist('package.json', path.join(outDir, config.folder.browser));
       if (this.isTnp) {
         // this.linkWhenExist('../firedev-projects', outDir);
         this.linkWhenExist('tests', outDir);
