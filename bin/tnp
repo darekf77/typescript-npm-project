@@ -31,7 +31,6 @@ if (distOnly) {
   var pathToDistRun = path.join(__dirname, '../dist/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   global.tnp_normal_mode = true;
-  global.tnp_out_folder = 'dist';
   // =======================================================================
 } else if (bundleOnly) {
   !global.hideLog && console.log('- bundle only -');
@@ -42,7 +41,6 @@ if (distOnly) {
   var pathToDistRun = path.join(__dirname, '../bundle/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
   global.tnp_normal_mode = true;
-  global.tnp_out_folder = 'bundle'
   // =======================================================================
 } else {
   // =========================== TODO speeding up! ============================
@@ -60,6 +58,7 @@ if (distOnly) {
 
   var pathToDistRun = path.join(__dirname, '../dist/index.js');
   var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
+  var pathToIndexRun = path.join(__dirname, '../index.js');
 
   var distExist = fs.existsSync(pathToDistRun);
   var bundleExist = fs.existsSync(pathToBundletRun);
@@ -70,23 +69,21 @@ if (distOnly) {
   if (bundleExist && distExist) {
     if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
       !global.hideLog && console.log('- firedev dist -> becouse is newer -');
-      global.tnp_out_folder = 'dist'
       start = require(pathToDistRun.replace(/\.js$/g, '')).start;
     } else {
-      !global.hideLog && console.log('- firedev bundle -> becouse is newer -')
-      global.tnp_out_folder = 'bundle'
+      !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
       start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
     }
   } else {
     if (bundleExist) {
       !global.hideLog && console.log('- firedev bundle -');
-      global.tnp_out_folder = 'bundle'
       start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-    } else {
+    } else if (bundleExist) {
       !global.hideLog && console.log('- firedev dist -');
-      global.tnp_out_folder = 'dist'
       start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-
+    } else {
+      !global.hideLog && console.log('- npm mode -');
+      start = require(pathToIndexRun.replace(/\.js$/g, '')).start;
     }
   }
   // =======================================================================

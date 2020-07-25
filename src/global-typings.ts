@@ -9,7 +9,6 @@ declare global {
   namespace NodeJS {
     interface Global {
       tnp_normal_mode: boolean;
-      tnp_out_folder: Models.dev.BuildDir;
       muteMessages: boolean;
       testMode: boolean;
       hideWarnings: boolean;
