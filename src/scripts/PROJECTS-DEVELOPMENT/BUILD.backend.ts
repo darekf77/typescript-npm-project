@@ -180,7 +180,7 @@ const $BUILD = async (args) => {
 
 const $CLEAN_BUILD = async (args) => {
   args += ' --nocache';
-  await chainBuild(args)
+  await BUILD_DIST(args);
 };
 
 const $BUILDWATCH = async (args) => {
