@@ -434,6 +434,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
   commonFiles() {
     const wokrspace = Project.by<Project>('workspace');
+    // @LAST this should be global workspace when ex. tnp release
     const files = this.commonFilesForAllProjects;
     files.map(file => {
       return {
