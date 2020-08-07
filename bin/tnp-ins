@@ -1,5 +1,4 @@
 #!/usr/bin/env node --inspect
 //#region @backend
-global.frameworkName = 'firedev'
 require('./start');
 //#endregion

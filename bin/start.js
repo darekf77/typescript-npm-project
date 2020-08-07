@@ -4,6 +4,12 @@
 
 global.hideLog = true;
 global.verboseLevel = 0;
+
+var frameworkName = process.argv.find(a => a.startsWith('-firedev'));
+if (typeof frameworkName !== 'undefined') {
+  global.frameworkName = 'firedev';
+}
+
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
 if (typeof verboseLevel !== 'undefined') {
   global.hideLog = false;
