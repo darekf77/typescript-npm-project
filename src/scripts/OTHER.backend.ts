@@ -31,6 +31,7 @@ function recreate() {
 }
 
 function version() {
+  !global.hideLog && console.log(`tnp location: ${Project.Tnp.location}`)
   console.log((Project.Tnp as Project).version);
   process.exit(0)
 }

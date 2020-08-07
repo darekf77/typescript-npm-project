@@ -13,7 +13,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   public async installProcess(triggeredMsg: string, options?: Models.npm.NpmInstallOptions) {
-    if (!global.tnp_normal_mode) {
+    if (!global.globalSystemToolMode) {
       return;
     }
     if (global.tnpNonInteractive) {
@@ -26,7 +26,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
     // process.exit(0)
 
     if (remove && fullInstall) {
-      Helpers.error(`[install process]] Please specify packages to remove`, false, true);
+      Helpers.error(`[install process] Please specify packages to remove`, false, true);
     }
 
     if (remove) {

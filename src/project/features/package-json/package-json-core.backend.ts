@@ -73,7 +73,7 @@ export class PackageJsonCore {
 
   get name() {
     if (!_.isString(this.data.name)) {
-      if (global.tnp_normal_mode) {
+      if (global.globalSystemToolMode) {
         Helpers.error(`Please define name for npm project in location: ${this.path}`, false, true)
       }
     }
@@ -138,7 +138,7 @@ export class PackageJsonCore {
         }
       }
 
-      if (!global[config.message.tnp_normal_mode] && !global.testMode) {
+      if (!global[config.message.globalSystemToolMode] && !global.testMode) {
         Helpers.warn(`[pathToBaseline] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
         return;
       }

@@ -107,7 +107,7 @@ export abstract class SiteProject {
       return;
     }
     if (this.isContainer) {
-      if (global.tnp_normal_mode) {
+      if (global.globalSystemToolMode) {
         Helpers.warn(`Baseline for container is not supported`)
       }
       return;

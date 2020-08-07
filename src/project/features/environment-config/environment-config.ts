@@ -239,7 +239,7 @@ export class EnvironmentConfig
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      global.tnp_normal_mode && Helpers.warn(`confg doesnt exist: ${configPath}`)
+      global.globalSystemToolMode && Helpers.warn(`confg doesnt exist: ${configPath}`)
       return EnvironmentConfig.configs[configPath]
     }
     //#endregion

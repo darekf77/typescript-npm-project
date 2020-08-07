@@ -53,8 +53,8 @@ export abstract class StaticProject {
       return;
     }
     if (!this.isGenerated) {
-      // console.log('global.tnp_normal_mode',global.tnp_normal_mode)
-      if (global.tnp_normal_mode) {
+      // console.log('global.globalSystemToolMode',global.globalSystemToolMode)
+      if (global.globalSystemToolMode) {
         Helpers.warn(`Trying to access origin of not static project for ${this.location}`);
       }
       return;
@@ -83,7 +83,7 @@ export abstract class StaticProject {
     const outDir: Models.dev.BuildDir = 'bundle';
     let projectToBuild: Project;
     if (this.isGenerated) {
-      if (!global.tnp_normal_mode) {
+      if (!global.globalSystemToolMode) {
         return;
       }
       Helpers.warn(`Trying to access bundle of bundle for project of location:

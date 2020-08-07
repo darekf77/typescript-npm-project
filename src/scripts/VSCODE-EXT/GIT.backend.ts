@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
+import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
@@ -7,8 +8,8 @@ import { config } from '../../config';
 import { PROGRESS_DATA } from 'tnp-models';
 import * as os from 'os';
 
-const ADDRESS_GITHUB_HTTPS = ''; // TODO @LAST FIX THISC
-const USE_HTTPS_INSTEAD_SSH = os.hostname().endsWith(''); // TODO @LAST FIX THISC
+export type TAction = 'clone' | 'pull';
+const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO @LAST FIX THISC
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = (Project.Current as Project).recreate.filesIgnoredBy.gitignore
@@ -75,8 +76,55 @@ function fixRemote(project: Project) {
 }
 
 
+async function PUSH_ORIGIN(container: Project, projects: Project[], exit = true) {
+  const projectsNames = projects.map(p => p.name);
+  const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
+    { output: false }).sync().toString();
+  global.hideLog = false;
+  for (let index = 0; index < projectsNames.length; index++) {
+    const projectName = projectsNames[index];
+    Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
+    const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+    const dest = path.join(container.location, projectName);
+    const proj = Project.From<Project>(dest);
+    if (proj.git.thereAreSomeUncommitedChange) {
+      Helpers.run(`code .`, { cwd: dest }).async();
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
+    }
+    if (proj.git.currentBranchName !== 'master') {
+      Helpers.run(`code .`, { cwd: dest }).async();
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
+    }
+    while (true) {
+      try {
+        Helpers.log(`Pushing project  ${chalk.bold(projectName)}...`);
+        proj.git.pushCurrentBranch();
+        break;
+      } catch (err) {
+        Helpers.error(`Not able to push brench... `, true, true);
+        Helpers.run(`code .`, { cwd: dest }).async();
+        Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - check your repository and press any key..`);
+      }
+    }
+
+    Helpers.info(`Success push of project ${chalk.bold(projectName)}.`)
+  }
+  if (exit) {
+    process.exit(0);
+  }
+}
+
+
+
 export async function $PUSH(args: string, exit = true, force = false) {
   const project = (Project.Current as Project);
+  if (project.isContainer && project.packageJson.linkedProjects.length > 0) {
+    await PUSH_ORIGIN(
+      project,
+      project.children.filter(c => project.packageJson.linkedProjects.includes(c.name))
+    )
+  }
+
   fixRemote(project);
   try {
     project.run(`git add --all . && git commit -m "update"`).sync();
@@ -96,6 +144,64 @@ export async function $PUSH(args: string, exit = true, force = false) {
 export async function $PULL(args: string, exit = true) {
   const project = (Project.Current as Project);
   fixRemote(project);
+  if (project.isContainer && project.packageJson.linkedProjects.length > 0) {
+    const container = project;
+    global.hideLog = false;
+    const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
+      { output: false }).sync().toString();
+    const projects = project.children
+      .filter(c => project.packageJson.linkedProjects.includes(c.name))
+      .map(c => c.name)
+
+    for (let index = 0; index < projects.length; index++) {
+      const projectName = projects[index];
+      const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+      let action: TAction = 'clone';
+      const dest = path.join(container.location, projectName);
+
+      const process = async (retry = false) => {
+        Helpers.info(`${retry ? '' : '\n\n'} --- ${retry ? 'Retrying' : 'Starting'
+          } dump of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
+        action = fse.existsSync(dest) ? 'pull' : 'clone';
+        try {
+          const dest = path.join(container.location, projectName);
+          if (action === 'pull') {
+            let proj: Project;
+            while (!proj) {
+              proj = Project.From<Project>(dest);
+              if (!proj) {
+                Helpers.run(`code ${dest}`).async();
+                Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
+                  chalk.bold(projectName)} to continue and press any key`)
+              }
+            }
+            if (proj.git.thereAreSomeUncommitedChange) {
+              Helpers.run(`code ${dest}`).async();
+              Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull ` +
+                `from git press any key to try again`)
+            }
+            proj.git.pullCurrentBranch();
+            Helpers.info(`Pull new origin for ${projectName}`);
+          } else {
+            Helpers.run(`git clone ${githubGitUrl}`, { cwd: container.location }).sync();
+            Helpers.info(`Cloned origin for ${projectName}`);
+          }
+        } catch (err) {
+          // Helpers.error(err, true);
+          Helpers.run(`code ${dest}`).async();
+          const tryAgain = await Helpers.questionYesNo(`Try again dump project ${projectName} ?`);
+          if (tryAgain) {
+            await process(true);
+          } else {
+            Helpers.info(`Skipping project ${chalk.underline(projectName)}`);
+          }
+        }
+      }
+      await process();
+    }
+    process.exit(0)
+  }
+
   try {
     project.run(`git add --all . && git commit -m "update"`).sync();
   } catch (error) { }

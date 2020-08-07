@@ -8,7 +8,7 @@ import { Helpers } from 'tnp-helpers';
 const ADDRESS_GITHUB_SSH = ''; // TODO @LAST FIX THISC
 
 const ADDRESS_GITHUB = ADDRESS_GITHUB_SSH;
-const NPM_PROJCETS_LOCATION = path.resolve(path.join((Project.Tnp as Project).location, '..'));
+const NPM_PROJCETS_LOCATION = () => path.resolve(path.join((Project.Tnp as Project).location, '..'));
 const GITHUB_PROJECTS_NAMES = []; // TODO @LAST FIX THISC
 
 export type TAction = 'clone' | 'pull';
@@ -20,14 +20,14 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
     const projectName = GITHUB_PROJECTS_NAMES[index];
     const githubGitUrl = `${ADDRESS_GITHUB}${projectName}`;
     let action: TAction = 'clone';
-    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+    const dest = path.join(NPM_PROJCETS_LOCATION(), projectName);
 
     const process = async (retry = false) => {
       Helpers.info(`${retry ? '' : '\n\n'} --- ${retry ? 'Retrying' : 'Starting'
         } dump of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
       action = fse.existsSync(dest) ? 'pull' : 'clone';
       try {
-        const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+        const dest = path.join(NPM_PROJCETS_LOCATION(), projectName);
         if (action === 'pull') {
           let proj: Project;
           while (!proj) {
@@ -46,7 +46,7 @@ export async function $GITHUB_DUMP(args: string, exit = true) {
           proj.git.pullCurrentBranch();
           Helpers.info(`Pull new origin for ${projectName}`);
         } else {
-          Helpers.run(`git clone ${githubGitUrl}`, { cwd: NPM_PROJCETS_LOCATION }).sync();
+          Helpers.run(`git clone ${githubGitUrl}`, { cwd: NPM_PROJCETS_LOCATION() }).sync();
           Helpers.info(`Cloned origin for ${projectName}`);
         }
       } catch (err) {
@@ -74,7 +74,7 @@ export async function $GITHUB_PUSH(args: string, exit = true) {
     const projectName = GITHUB_PROJECTS_NAMES[index];
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
     const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
-    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+    const dest = path.join(NPM_PROJCETS_LOCATION(), projectName);
     const proj = Project.From<Project>(dest);
     if (proj.git.thereAreSomeUncommitedChange) {
       Helpers.run(`code .`, { cwd: dest }).async();
@@ -112,7 +112,7 @@ function $GITHUB_LIST_ORIGINS() {
     const projectName = GITHUB_PROJECTS_NAMES[index];
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
     const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
-    const dest = path.join(NPM_PROJCETS_LOCATION, projectName);
+    const dest = path.join(NPM_PROJCETS_LOCATION(), projectName);
     const proj = Project.From<Project>(dest);
     if (proj) {
       Helpers.info(proj.git.originURL);

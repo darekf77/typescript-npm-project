@@ -33,7 +33,7 @@ export class PackageJSON
     if (!fse.existsSync(location)) {
       return void 0;
     }
-    const isTnpProject = (location === config.pathes.tnp_folder_location);
+
     const filePath = path.join(location, 'package.json');
     if (!fse.existsSync(filePath)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)
@@ -42,9 +42,7 @@ export class PackageJSON
     try {
       const file = Helpers.readFile(filePath);
       const json: Models.npm.IPackageJSON = JSON.parse(file) as any;
-      if (!json.tnp && !isTnpProject) {
-        // warn(`Unrecognized project type from location: ${location}`, false);
-      }
+
       var saveAtLoad = false;
       if (json.tnp) {
         if (!json.tnp.overrided) {

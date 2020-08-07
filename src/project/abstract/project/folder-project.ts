@@ -26,7 +26,7 @@ export abstract class FolderProject {
     }
     //#region @backend
 
-    if (this.isTnp && !global.tnp_normal_mode) {
+    if (this.isTnp && !global.globalSystemToolMode) {
       return [];
     }
     if (this.typeIs('unknow')) {

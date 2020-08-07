@@ -59,7 +59,7 @@ export abstract class TnpProject {
       return this.browser.isTnp;
     }
     //#region @backend
-    if (this.typeIs('unknow')) {
+    if (this.typeIsNot('isomorphic-lib')) {
       return false;
     }
     return this.location === $Project.Tnp.location;
@@ -109,7 +109,7 @@ export abstract class TnpProject {
       }
       // warn(`Isomorphic package file does not exists : ${p}`);
     } catch (e) {
-      if (global.tnp_normal_mode) {
+      if (global.globalSystemToolMode) {
         Helpers.log(e);
         Helpers.error(`Erro while reading ismorphic package file: ${p}`, true, true);
       }

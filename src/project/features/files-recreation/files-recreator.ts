@@ -88,7 +88,6 @@ export class FilesRecreator extends FeatureForProject {
       get gitignore() {
         const gitignoreFiles = [ // for sure ingored
           config.folder.node_modules,
-          config.file.tnp_system_path_txt,
           'tmp*',
           'dist*',
           'bundle*',

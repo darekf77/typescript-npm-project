@@ -60,7 +60,7 @@ export class NpmProject {
     }
     if (!this.version) {
 
-      if (!global[config.message.tnp_normal_mode]) {
+      if (!global[config.message.globalSystemToolMode]) {
         return;
       }
 

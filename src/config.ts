@@ -2,11 +2,12 @@ import * as _ from 'lodash';
 //#region @backend
 import * as path from 'path';
 import * as os from 'os';
+import * as fse from 'fs-extra';
+import * as child from 'child_process';
 //#endregion
 import { Helpers } from 'ng2-logger';
-
 import { Models } from 'tnp-models';
-import { CLASS } from 'typescript-class-helpers';
+
 
 const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test', 'qa', 'custom'];
 const allowedEnvironmentsObj = {};
@@ -18,6 +19,11 @@ allowedEnvironments.forEach(s => {
 // if (_.isString(env)) {
 //   environmentName = env;
 // }
+
+const firedev = 'firedev';
+const morphi = 'morphi';
+const urlMorphi = 'https://github.com/darekf77/morphi.git';
+
 
 // environmentName = _.isString(environmentName) && environmentName.toLowerCase() as any;
 // environmentName = allowedEnvironments.includes(environmentName) ? environmentName : 'local';
@@ -95,8 +101,35 @@ const folder = {
 };
 
 //#region @backend
+const tnp_folder_location =
+  (path.basename(path.dirname(__dirname)) === folder.node_modules) ?
+    __dirname : path.resolve(__dirname, '..');
+//#endregion
+
+//#region @backend
 function pathResolved(...partOfPath: string[]) {
-  return path.resolve(path.join(...partOfPath))
+  // console.log('pathResolved', partOfPath);
+  let result = [];
+  if (global['frameworkName'] && global['frameworkName'] === firedev) {
+    result = partOfPath.map(s => {
+      return s
+        .replace((__dirname + '../../firedev-projects'), path.join(os.homedir(), firedev, morphi))
+    });
+    const morphiPathUserInUserDir = path.join(os.homedir(), firedev, morphi);
+    if (!fse.existsSync(morphiPathUserInUserDir)) {
+      if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
+        fse.mkdirpSync(path.dirname(morphiPathUserInUserDir))
+      }
+      try {
+        child.execSync(`git clone ${urlMorphi}`,
+          { cwd: path.dirname(morphiPathUserInUserDir) });
+      } catch (error) {
+        console.error(`[config] Not able to clone repository: ${urlMorphi} in:
+         ${path.basename(morphiPathUserInUserDir)}`);
+      }
+    }
+  }
+  return path.resolve(path.join(...result))
 }
 //#endregion
 
@@ -172,7 +205,7 @@ export const config = {
       ]
     }
   },
-  frameworkName: 'tnp',
+  frameworkName: (global['frameworkName'] ? global['frameworkName'] : 'tnp'),
   startPort: 6001,
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   //#region @backend
@@ -205,17 +238,18 @@ export const config = {
     logoSvg: 'logo.svg',
     logoPng: 'logo.png',
 
-    tnp_folder_location: pathResolved(__dirname, '..'),
+    /**
+     * Location of compiled source code for tnp framework
+     * Can be in 3 places:
+     * - <..>/tnp/dist
+     * - <..>/tnp/bundle
+     * - <some-project>/node_modules/tnp
+    */
+    tnp_folder_location,
     tnp_vscode_ext_location: pathResolved(__dirname, '../../firedev-projects', 'plugins', 'tnp-vscode-ext'),
 
-    tnp_system_path_txt: pathResolved(__dirname, '..', file.tnp_system_path_txt),
-
-    tmp_transaction_pid_txt: pathResolved(__dirname, '..', file.tmp_transaction_pid_txt),
-
-    tnp_tests_context: pathResolved(`/tmp/tnp/${folder.tnp_tests_context}`),
-    tnp_db_for_tests_json: pathResolved(__dirname, '..', folder.bin, file.db_for_tests_json),
-
-    bin_in_node_modules: pathResolved(__dirname, '..', folder.node_modules, folder._bin),
+    tnp_tests_context: pathResolved(tnp_folder_location, folder.tnp_tests_context),
+    tnp_db_for_tests_json: pathResolved(tnp_folder_location, folder.bin, file.db_for_tests_json),
 
     scripts: {
       HELP_js: pathResolved(__dirname, folder.scripts, 'HELP.js'),
@@ -249,7 +283,7 @@ export const config = {
     }
   },
   message: {
-    tnp_normal_mode: 'tnp_normal_mode'
+    globalSystemToolMode: 'globalSystemToolMode'
   },
   names: {
     env: allowedEnvironmentsObj,

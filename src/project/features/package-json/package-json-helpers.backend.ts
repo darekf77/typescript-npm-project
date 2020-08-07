@@ -300,7 +300,19 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       delete project.packageJson.data.tnp.overrided.dependencies[key];
     });
   }
-
+  if (project.frameworkVersionAtLeast('v2')) {
+    if (_.isEqual(project.packageJson.data.dependencies, project.packageJson.data.devDependencies)) {
+      // TODO QUICK_FIX
+      const includeAsDev = (project.packageJson.data.tnp.overrided.includeAsDev);
+      const includeOnly = (project.packageJson.data.tnp.overrided.includeOnly);
+      if (
+        _.isArray(includeAsDev) && includeAsDev.length === 0 &&
+        _.isArray(includeOnly) && includeOnly.length === 0
+      ) {
+        project.packageJson.data.devDependencies = {};
+      }
+    }
+  }
 }
 //#endregion
 

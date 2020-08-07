@@ -1,4 +1,4 @@
-//#region @backend
+//#region imports
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { config } from './config';
@@ -18,146 +18,23 @@ import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
+//#endregion
 
-IncCompiler.init(async (asyncEvents) => {
-
-}, {
+//#region init incremental compiler
+IncCompiler.init(async (asyncEvents) => { }, {
   error: Helpers.error,
   log: Helpers.log,
   info: Helpers.info,
   warn: Helpers.warn
 } as any);
+//#endregion
 
-
-
-function removeArg(arg: string, argsv: string[]) {
-  argsv = argsv.filter((f, i) => {
-    const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
-    // Helpers.log(regexString)
-    if ((new RegExp(regexString)).test(f)) {
-      // Helpers.log(`true: ${f}`)
-      const nextParam = argsv[i + 1];
-      if (nextParam && !nextParam.startsWith(`--`)) {
-        argsv[i + 1] = '';
-      }
-      return false;
-    } else {
-      // Helpers.log(`false: ${f}`)
-    }
-    return true;
-  }).filter(f => !!f);
-  return argsv;
-}
-
-
-export function globalArgumentsParser(argsv: string[]) {
-
-  Helpers.log(`Fixing global arguments started...`)
-  let options = require('minimist')(argsv);
-  const toCheck = {
-    'tnpNonInteractive': void 0,
-    'findNearestProject': void 0,
-    'findNearestProjectWithGitRoot': void 0,
-    'findNearestProjectType': void 0,
-    'findNearestProjectTypeWithGitRoot': void 0,
-    'cwd': void 0
-  };
-  Object.keys(toCheck).forEach(key => {
-    toCheck[key] = options[key];
-  });
-  options = _.cloneDeep(toCheck);
-  let {
-    tnpNonInteractive,
-    findNearestProject,
-    findNearestProjectWithGitRoot,
-    findNearestProjectType,
-    findNearestProjectTypeWithGitRoot,
-    cwd
-  } = options;
-
-  Object
-    .keys(options)
-    .filter(key => key.startsWith('tnp'))
-    .forEach(key => {
-      options[key] = !!options[key];
-      global[key] = options[key];
-      // Helpers.log(`[start.backend] assigned to global: ${key}:${global[key]}`)
-    });
-
-
-
-  if (global.tnpNoColorsMode) {
-    chalk.level = 0;
-  }
-
-  let cwdFromArgs = cwd;
-  const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
-    !!findNearestProjectTypeWithGitRoot;
-
-  if (_.isBoolean(findNearestProjectType)) {
-    Helpers.error(`argument --findNearestProjectType needs to be library type:\n ${
-      Models.libs.LibTypeArr.join(', ')}`, false, true);
-  }
-  if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
-    Helpers.error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${
-      Models.libs.LibTypeArr.join(', ')}`, false, true);
-  }
-
-  if (!!findNearestProjectWithGitRoot) {
-    findNearestProject = findNearestProjectWithGitRoot;
-  }
-  if (_.isString(findNearestProjectTypeWithGitRoot)) {
-    findNearestProjectType = findNearestProjectTypeWithGitRoot;
-  }
-
-  if (_.isString(cwdFromArgs)) {
-    if (findNearestProject || _.isString(findNearestProjectType)) {
-      // Helpers.log('look for nearest')
-      var nearest = Project.nearestTo<Project>(cwdFromArgs, {
-        type: findNearestProjectType,
-        findGitRoot: findProjectWithGitRoot,
-      });
-      if (!nearest) {
-        Helpers.error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
-      }
-    }
-    if (nearest) {
-      cwdFromArgs = nearest.location;
-    }
-    if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
-      cwdFromArgs = path.dirname(cwdFromArgs);
-    }
-    if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
-      process.chdir(cwdFromArgs);
-    } else {
-      Helpers.error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
-    }
-
-  }
-  argsv = removeArg('findNearestProjectType', argsv);
-
-  // process.exit(0)
-  Object.keys(toCheck).forEach(argName => {
-    argsv = removeArg(argName, argsv);
-  });
-
-  // Object
-  //   .keys(global)
-  //   .filter(key => key.startsWith('tnp'))
-  //   .forEach(key => {
-  //     Helpers.log(`globa.${key} = ${global[key]}`)
-  //   })
-  // Helpers.log('after remove', argsv)
-  // process.exit(0)
-  Helpers.log(`Fixing global arguments finish.`)
-  return argsv.join(' ');
-}
-
-
-
-
-export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 'tnp') {
-  Helpers.log('in start')
+export async function start(
+  argsv: string[],
+  frameworkName: 'tnp' | 'firedev' = 'tnp',
+  mode: 'dist' | 'bundle' | 'npm' = 'dist'
+) {
+  Helpers.log(`in start, mode: "${mode}"`);
   config.frameworkName = frameworkName;
 
   argsv = argsv.map(arg => {
@@ -310,9 +187,128 @@ export async function start(argsv: string[], frameworkName: 'tnp' | 'firedev' = 
 
 }
 
+//#region remove non interactive mode args
+export function removeArg(arg: string, argsv: string[]) {
+  argsv = argsv.filter((f, i) => {
+    const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
+    // Helpers.log(regexString)
+    if ((new RegExp(regexString)).test(f)) {
+      // Helpers.log(`true: ${f}`)
+      const nextParam = argsv[i + 1];
+      if (nextParam && !nextParam.startsWith(`--`)) {
+        argsv[i + 1] = '';
+      }
+      return false;
+    } else {
+      // Helpers.log(`false: ${f}`)
+    }
+    return true;
+  }).filter(f => !!f);
+  return argsv;
+}
+//#endregion
+
+//#region parse global arguments
+export function globalArgumentsParser(argsv: string[]) {
+
+  Helpers.log(`Fixing global arguments started...`)
+  let options = require('minimist')(argsv);
+  const toCheck = {
+    'tnpNonInteractive': void 0,
+    'findNearestProject': void 0,
+    'findNearestProjectWithGitRoot': void 0,
+    'findNearestProjectType': void 0,
+    'findNearestProjectTypeWithGitRoot': void 0,
+    'cwd': void 0
+  };
+  Object.keys(toCheck).forEach(key => {
+    toCheck[key] = options[key];
+  });
+  options = _.cloneDeep(toCheck);
+  let {
+    tnpNonInteractive,
+    findNearestProject,
+    findNearestProjectWithGitRoot,
+    findNearestProjectType,
+    findNearestProjectTypeWithGitRoot,
+    cwd
+  } = options;
+
+  Object
+    .keys(options)
+    .filter(key => key.startsWith('tnp'))
+    .forEach(key => {
+      options[key] = !!options[key];
+      global[key] = options[key];
+      // Helpers.log(`[start.backend] assigned to global: ${key}:${global[key]}`)
+    });
 
 
 
+  if (global.tnpNoColorsMode) {
+    chalk.level = 0;
+  }
 
+  let cwdFromArgs = cwd;
+  const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
+    !!findNearestProjectTypeWithGitRoot;
 
+  if (_.isBoolean(findNearestProjectType)) {
+    Helpers.error(`argument --findNearestProjectType needs to be library type:\n ${
+      Models.libs.LibTypeArr.join(', ')}`, false, true);
+  }
+  if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
+    Helpers.error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${
+      Models.libs.LibTypeArr.join(', ')}`, false, true);
+  }
+
+  if (!!findNearestProjectWithGitRoot) {
+    findNearestProject = findNearestProjectWithGitRoot;
+  }
+  if (_.isString(findNearestProjectTypeWithGitRoot)) {
+    findNearestProjectType = findNearestProjectTypeWithGitRoot;
+  }
+
+  if (_.isString(cwdFromArgs)) {
+    if (findNearestProject || _.isString(findNearestProjectType)) {
+      // Helpers.log('look for nearest')
+      var nearest = Project.nearestTo<Project>(cwdFromArgs, {
+        type: findNearestProjectType,
+        findGitRoot: findProjectWithGitRoot,
+      });
+      if (!nearest) {
+        Helpers.error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
+      }
+    }
+    if (nearest) {
+      cwdFromArgs = nearest.location;
+    }
+    if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
+      cwdFromArgs = path.dirname(cwdFromArgs);
+    }
+    if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
+      process.chdir(cwdFromArgs);
+    } else {
+      Helpers.error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
+    }
+
+  }
+  argsv = removeArg('findNearestProjectType', argsv);
+
+  // process.exit(0)
+  Object.keys(toCheck).forEach(argName => {
+    argsv = removeArg(argName, argsv);
+  });
+
+  // Object
+  //   .keys(global)
+  //   .filter(key => key.startsWith('tnp'))
+  //   .forEach(key => {
+  //     Helpers.log(`globa.${key} = ${global[key]}`)
+  //   })
+  // Helpers.log('after remove', argsv)
+  // process.exit(0)
+  Helpers.log(`Fixing global arguments finish.`)
+  return argsv.join(' ');
+}
 //#endregion

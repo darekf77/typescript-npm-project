@@ -16,7 +16,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
   }
 
   start(force = false) {
-    if (!global.tnp_normal_mode) {
+    if (!global.globalSystemToolMode) {
       return;
     }
     Helpers.log(`Searching isomorphic packages`);
