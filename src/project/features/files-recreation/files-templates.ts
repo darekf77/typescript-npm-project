@@ -28,7 +28,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         var fileContent = Helpers.readFile(filePath);
       }
       if (!fileContent) {
-        Helpers.warn(`[filesTemplats][rebuild] Not able to read file: ${filePath}`);
+        Helpers.warn(`[filesTemplats][rebuild] Not able to read file: ${filePath} - missing content`);
         continue;
       }
       const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
@@ -44,11 +44,11 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     try {
       var fileContent = Helpers.readFile(filePath);
       if (!fileContent) {
-        Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath}`);
+        Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath} - no content of file`);
         return;
       }
     } catch (error) {
-      Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath}`);
+      Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath} - problem with reading file`);
       return;
     }
     const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;

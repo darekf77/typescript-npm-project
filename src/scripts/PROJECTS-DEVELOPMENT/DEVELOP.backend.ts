@@ -8,7 +8,6 @@ import { TnpDB } from 'tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
-import { async } from 'rxjs/internal/scheduler/async';
 
 
 

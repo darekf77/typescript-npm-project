@@ -2,6 +2,7 @@
   "files.exclude": {
     "lowdb": true,
     "misc-utils-of-mine-generic": true,
+    "morphi": true,
     "*.js": true,
     "*.sh": true,
     "*.xlsx": true,
@@ -9,7 +10,6 @@
     "bin": true,
     "webpack.backend-bundle-build.js": true,
     "node_modules": true,
-    "tnp-system-path.txt": true,
     "tmp*": true,
     "dist*": true,
     "bundle*": true,

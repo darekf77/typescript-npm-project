@@ -221,7 +221,23 @@ async function $LINK() {
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {
+    const glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
+    const globalNodeModules = path.join(glboalBinFolderPath, '../lib/node_modules');
+    const packageInGlobalNodeModules = path.resolve(path.join(globalNodeModules, project.name));
+    // packageInGlobalNodeModules
+    Helpers.removeIfExists(packageInGlobalNodeModules);
+    project.linkTo(packageInGlobalNodeModules);
+    if (_.isObject(project.packageJson.data.bin)) {
+      Object.keys(project.packageJson.data.bin).forEach(globalName => {
+        const localPath = path.join(project.location, project.packageJson.data.bin[globalName]);
+        const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
+        Helpers.removeIfExists(destinationGlobalLink);
+        Helpers.createSymLink(localPath, destinationGlobalLink);
+        Helpers.info(`Global link created for: ${chalk.bold(globalName)}`);
+      });
+    }
 
+    process.exit(0);
   } else {
     if (project.isWorkspaceChildProject) {
       project = project.parent;

@@ -15,7 +15,7 @@ import { TnpDB } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
 import { IncrementalBuildProcess } from 'morphi';
-import { async } from 'rxjs/internal/scheduler/async';
+
 const compierEntityKey = 'compilers';
 
 export class CompilerCache extends FeatureForProject {
