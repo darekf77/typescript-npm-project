@@ -57,13 +57,8 @@ export async function start(
   Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
   Helpers.log(`Helpers.cliTool.paramsFrom(argsv[2]) "${Helpers.cliTool.paramsFrom(argsv[2])}" `);
   // process.exit(0)
-  if (
-    (argsv.length === 2 && argsv[1].endsWith(`/bin/${config.frameworkName}`)) ||
-    (argsv.length === 3 && argsv[1].endsWith(`/bin/${config.frameworkName}`)
-      && lastCmds.includes(arg)
-    )
-  ) {
-    // info(`DO NOTHIGN`);
+  if (lastCmds.includes(arg)) {
+    Helpers.log(`DO NOTHIGN`);
   } else {
     Helpers.log('[db] staring setting command...')
     await db.setCommand(argsv.join(' '));

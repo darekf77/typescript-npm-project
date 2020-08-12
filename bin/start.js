@@ -112,6 +112,7 @@ if (distOnly) {
   // =======================================================================
 }
 global.start = start;
+global.frameworkMode = mode;
 // console.log('before start')
 start(process.argv, 'tnp', mode);
 //#endregion
