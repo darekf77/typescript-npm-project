@@ -234,7 +234,7 @@ export abstract class LibProject {
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
     this.checkIfReadyForNpm()
-    const newVersion = this.project.versionPatchedPlusOne;
+    const newVersion = this.versionPatchedPlusOne;
 
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true)
