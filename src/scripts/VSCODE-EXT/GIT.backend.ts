@@ -9,7 +9,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 import * as os from 'os';
 
 export type TAction = 'clone' | 'pull';
-const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO @LAST FIX THISC
+const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
 
 function $GIT_REMOVE_UNTRACKED() {
   const gitginoredfiles = (Project.Current as Project).recreate.filesIgnoredBy.gitignore

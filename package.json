@@ -13,7 +13,8 @@
         "svg-png-converter": "0.0.9",
         "ng2-rest-swagger-generator": "6.0.4",
         "cache-require-paths": "0.3.0",
-        "base-model-wrap": "3.0.9"
+        "base-model-wrap": "3.0.9",
+        "firedev": "2.0.66"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -530,6 +531,7 @@
     "express-fileupload": "^0.4.0",
     "fbgraph": "^1.4.1",
     "file-loader": "^1.1.5",
+    "firedev": "2.0.66",
     "fkill": "6.1.0",
     "font-awesome": "^4.7.0",
     "fs-extra": "8.1.0",

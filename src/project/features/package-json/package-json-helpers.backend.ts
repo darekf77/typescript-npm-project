@@ -182,14 +182,17 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
     const projForVer = Project.by<Project>('container', project._frameworkVersion);
-    global.actionShowingDepsForContainer = true;
-    projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
-    global.actionShowingDepsForContainer = false;
-    const depsForVer = projForVer.packageJson.data;
-    Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
-      // Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
-      newDeps[pkgNameInNewVer] = depsForVer.dependencies[pkgNameInNewVer];
-    });
+    // @LAST firedev release fails here
+    if (projForVer) { // QUICK_FIX
+      global.actionShowingDepsForContainer = true;
+      projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
+      global.actionShowingDepsForContainer = false;
+      const depsForVer = projForVer.packageJson.data;
+      Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
+        // Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
+        newDeps[pkgNameInNewVer] = depsForVer.dependencies[pkgNameInNewVer];
+      });
+    }
 
   } else {
     cleanForIncludeOnly(project, newDeps, toOverride);
