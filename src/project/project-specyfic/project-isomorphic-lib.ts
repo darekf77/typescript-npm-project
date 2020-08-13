@@ -315,7 +315,7 @@ export class ProjectIsomorphicLib
       + ` --output bundle/index.js`
       + ` --target node`
       + ` --rotate-string-array true`
-      + ` --stringArray true`
+      // + ` --stringArray true`
       + ` --string-array-encoding base64`
       + ` --reserved-names '${reservedNames.join(',')}'`
       + ` --reserved-strings '${reservedNames.join(',')}'`
