@@ -115,10 +115,6 @@ export class Project extends $Project<Project>
     return Project.Tnp as Project;
   }
 
-  get CurrentProject() {
-    return Project.Current as Project;
-  }
-
   get isBundleMode() {
     return Project.isBundleMode;
   }

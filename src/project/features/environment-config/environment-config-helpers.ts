@@ -16,7 +16,7 @@ export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
 
-export function err(workspaceConfig: Models.env.EnvConfig, fileContent?: string) {
+export function err(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
 
   let configString = fileContent ? fileContent : `
   ...
@@ -33,7 +33,7 @@ ${Helpers.terminalLine()}
   module.exports = exports = { config };
 ${Helpers.terminalLine()}
 
-Your config:
+Your config (${pathToConfig}) :
 ${Helpers.terminalLine()}
 ${configString}
 ${Helpers.terminalLine()}
@@ -42,18 +42,18 @@ ${Helpers.terminalLine()}
 
 export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePath: string, isStandalone = false) {
   if (!_.isObject(workspaceConfig)) {
-    err(undefined, Helpers.readFile(filePath));
+    err(undefined, Helpers.readFile(filePath), filePath);
   }
 
   if (isStandalone) {
 
   } else {
-    if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig);
-    if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig)
+    if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig, void 0, filePath);
+    if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig, void 0, filePath)
     workspaceConfig.workspace.projects.forEach(p => {
-      if (_.isUndefined(p.name)) err(workspaceConfig)
-      if (_.isUndefined(p.port)) err(workspaceConfig)
-      if (_.isUndefined(p.baseUrl)) err(workspaceConfig)
+      if (_.isUndefined(p.name)) err(workspaceConfig, void 0, filePath)
+      if (_.isUndefined(p.port)) err(workspaceConfig, void 0, filePath)
+      if (_.isUndefined(p.baseUrl)) err(workspaceConfig, void 0, filePath)
     });
 
     if (_.isUndefined(_.get(workspaceConfig, 'workspace.build'))) {
@@ -70,7 +70,7 @@ export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePat
       }
     }
     if (!_.isObject(_.get(workspaceConfig, 'workspace.build'))) {
-      err(workspaceConfig)
+      err(workspaceConfig, void 0, filePath)
     }
   }
 
@@ -111,7 +111,7 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
   const { workspaceProjectLocation, workspaceConfig } = options;
 
   if (!workspaceConfig || !workspaceConfig.workspace || !workspaceConfig.workspace.workspace) {
-    err(workspaceConfig);
+    err(workspaceConfig, void 0, `overrideWorksapceRouterPort - ${options.workspaceProjectLocation}`);
   }
 
   const project = Project.From<Project>(workspaceProjectLocation)
@@ -217,7 +217,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 
   } else if (project.isWorkspaceChildProject) {
 
-    if (project.typeIs('angular-client', 'angular-lib', 'ionic-client')) {
+    if (project.typeIs('angular-client', 'angular-lib', 'ionic-client', 'docker')) {
       fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
         encoding: 'utf8',
         spaces: 2

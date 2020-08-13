@@ -146,7 +146,7 @@ export class EnvironmentConfig
       }
       if (!Helpers.isValidIp(configResult.ip)) {
         Helpers.error(`Bad ip address in your environment .json config`, true)
-        err(configResult)
+        err(configResult, void 0, this.project.location);
       }
     }
 
@@ -167,7 +167,7 @@ export class EnvironmentConfig
 
       if (!configResult.workspace || !configResult.workspace.workspace) {
         Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
-        err(configResult)
+        err(configResult, void 0, this.project.location)
       }
 
       if (configResult.name === 'local' || !configResult.domain) {

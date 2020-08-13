@@ -45,6 +45,14 @@ export class PackageJsonCore {
     return [];
   }
 
+  get linkedFolders() {
+    const res = this.data?.tnp?.overrided?.linkedFolders;
+    if (_.isArray(res)) {
+      return res;
+    }
+    return [];
+  }
+
   get libReleaseOptions() {
     const res = this.data.tnp ? this.data.tnp.libReleaseOptions : undefined;
     if (_.isObject(res)) {

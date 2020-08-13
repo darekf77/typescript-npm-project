@@ -417,13 +417,40 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
 
   projectSpecyficFiles() {
+
+    const linkedFolder = this.project.linkedFolders;
+    linkedFolder.forEach((c) => {
+      const from = path.resolve(path.join(this.project.location, c.from));
+      const to = path.resolve(path.join(this.project.location, c.to));
+      if (Helpers.exists(from) && (to.search(this.project.location) !== -1)) {
+        Helpers.removeIfExists(to);
+        Helpers.createSymLink(from, to);
+        Helpers.info(`Linked folder ${path.basename(from)} to ./${to.replace(this.project.location, '')}`);
+      } else {
+        Helpers.warn(`Not able to link folders:
+        from: ${from}
+        to: ${to}
+
+        `)
+      }
+
+    });
+
     const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion);
     let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
       projectSpecyficFiles.forEach(f => {
+        let from = path.join(defaultProjectProptotype.location, f);
+        // @LAST SOMEHOW I NEED TO RECRETE ALLL CORE PACKAGES FROM BOTTOM
+        // firedev-debug new isomorphic-lib test-fire7
+
+        if (!Helpers.exists(from) && defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
+          const core = Project.by<Project>(this.project._type); // TODO this can be recrusive
+          from = path.join(core.location, f);
+        }
         files.push({
-          from: path.join(defaultProjectProptotype.location, f),
+          from,
           where: path.join(this.project.location, f)
         });
       });

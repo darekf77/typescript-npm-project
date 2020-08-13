@@ -219,7 +219,7 @@ const $SINSTALL = (args) => {
 
 async function $LINK() {
   let project = (Project.Current as Project);
-
+  project.dependsOn
   if (project.isStandaloneProject) {
     const glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
     const globalNodeModules = path.join(glboalBinFolderPath, '../lib/node_modules');
@@ -233,6 +233,15 @@ async function $LINK() {
         const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
         Helpers.removeIfExists(destinationGlobalLink);
         Helpers.createSymLink(localPath, destinationGlobalLink);
+        const command = `sudo chmod +x ${destinationGlobalLink}`;
+        Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
+
+        command: ${command}
+
+        Please enter your admin password:
+
+        `)
+        Helpers.run(command).sync();
         Helpers.info(`Global link created for: ${chalk.bold(globalName)}`);
       });
     }

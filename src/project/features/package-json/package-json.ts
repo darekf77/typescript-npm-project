@@ -73,7 +73,10 @@ export class PackageJSON
           json.tnp.libReleaseOptions.ugly = false;
           saveAtLoad = true;
         }
-
+        if (_.isUndefined(json.tnp.overrided.linkedFolders)) {
+          json.tnp.overrided.linkedFolders = [];
+          saveAtLoad = true;
+        }
         if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
           json.tnp.overrided.ignoreDepsPattern = ["*"];
           saveAtLoad = true;

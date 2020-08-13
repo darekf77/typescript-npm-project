@@ -234,7 +234,7 @@ export abstract class LibProject {
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
     this.checkIfReadyForNpm()
-    const newVersion = this.CurrentProject.versionPatchedPlusOne;
+    const newVersion = this.project.versionPatchedPlusOne;
 
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true)
@@ -304,13 +304,7 @@ export abstract class LibProject {
       this.bundleResources()
       this.commit(newVersion);
     }, () => {
-      if (this.isBundleMode) {
-        Helpers.warn(`Project not in bundle mode return`)
-        return;
-      } else {
-        Helpers.warn(`Project not in bundle mode exit`);
-        process.exit(0)
-      }
+      process.exit(0);
     });
 
     // this.packageJson.data.version = newVersion;

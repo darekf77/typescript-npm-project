@@ -127,9 +127,12 @@ export class ProjectFactory {
     let baseline = basedOn ? basedOnProject : Project.by<Project>(type, version);
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
-    await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
-      prefix: chalk.bold(`[ INITING BASELINE ${baseline.genericName} ]`)
-    }).asyncAsPromise();
+    await baseline.reset();
+    await baseline.filesStructure.init(` --recrusive `);
+    // @LAST may break somethin
+    // await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
+    //   prefix: chalk.bold(`[ INITING BASELINE ${baseline.genericName} ]`)
+    // }).asyncAsPromise();
 
     // TODO this requred source modifer changes
     // if (siteProjectMode === 'dependency') {

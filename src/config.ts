@@ -109,27 +109,42 @@ const tnp_folder_location =
 //#region @backend
 function pathResolved(...partOfPath: string[]) {
   // console.log('pathResolved', partOfPath);
-  let result = partOfPath;
+
   if (global['frameworkName'] && global['frameworkName'] === firedev) {
-    result = partOfPath.map(s => {
-      return s
-        .replace((__dirname + '../../firedev-projects'), path.join(os.homedir(), firedev, morphi))
-    });
+    const joined = partOfPath.join('/');
+    const projectsInUserFolder = path.join(os.homedir(), firedev, morphi, 'projects')
+    let pathResult = joined.replace((__dirname + '/' + '../../firedev-projects'), projectsInUserFolder);
+
+    pathResult = path.resolve(pathResult);
     const morphiPathUserInUserDir = path.join(os.homedir(), firedev, morphi);
-    if (!fse.existsSync(morphiPathUserInUserDir)) {
-      if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
-        fse.mkdirpSync(path.dirname(morphiPathUserInUserDir))
+    if (pathResolved.prototype.resolved) {
+      console.info(`Firedev base projects in are ok.`);
+    } else {
+      if (!fse.existsSync(morphiPathUserInUserDir)) {
+        if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
+          fse.mkdirpSync(path.dirname(morphiPathUserInUserDir))
+        }
+        try {
+          child.execSync(`git clone ${urlMorphi}`,
+            { cwd: path.dirname(morphiPathUserInUserDir) });
+        } catch (error) {
+          console.error(`[config] Not able to clone repository: ${urlMorphi} in:
+           ${morphiPathUserInUserDir}`);
+        }
+      } else {
+        try {
+          child.execSync(`git reset --hard && git pull origin master`,
+            { cwd: morphiPathUserInUserDir });
+        } catch (error) {
+          console.error(`[config] Not pull origin of morphi: ${urlMorphi} in:
+          ${morphiPathUserInUserDir}`);
+        }
       }
-      try {
-        child.execSync(`git clone ${urlMorphi}`,
-          { cwd: path.dirname(morphiPathUserInUserDir) });
-      } catch (error) {
-        console.error(`[config] Not able to clone repository: ${urlMorphi} in:
-         ${path.basename(morphiPathUserInUserDir)}`);
-      }
+      pathResolved.prototype.resolved = true;
     }
+    return pathResult;
   }
-  return path.resolve(path.join(...result))
+  return path.resolve(path.join(...partOfPath))
 }
 //#endregion
 

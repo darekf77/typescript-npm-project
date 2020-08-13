@@ -204,6 +204,12 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  //#region @backend
+  get linkedFolders(this: Project) {
+    return this.packageJson.linkedFolders;
+  }
+  //#endregion
+
   get dependsOn(this: Project): Project[] {
     //#region @backendFunc
     if (this.isWorkspace) {
