@@ -46,7 +46,7 @@ export class ProjectAngularClient
   projectSpecyficFiles() {
     //#region @backendFunc
     return [
-      "tsconfig.json",
+      'tsconfig.json',
       ...(!this.isStandaloneProject ? [
         'src/typings.d.ts',
       ] : []),

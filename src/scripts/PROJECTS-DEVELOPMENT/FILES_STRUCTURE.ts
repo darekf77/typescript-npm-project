@@ -16,15 +16,12 @@ export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 }
 
 export async function $STRUCT(args: string, exit = true) {
-  const project = (Project.Current as Project);
-  if (!args) {
-    args = '';
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+
+  if (proj) {
+    await proj.filesStructure.struct(args);
   }
-  args += ' --struct';
-  if (!project.isGenerated) {
-    rimraf.sync(path.join((Project.Current as Project).location, config.file.tnpEnvironment_json));
-  }
-  await (Project.Current as Project).filesStructure.init(args);
+
   if (exit) {
     process.exit(0)
   }
@@ -35,26 +32,24 @@ export async function STRUCTURE(args: string, exit = true) {
 }
 
 export async function $INIT(args: string, exit = true) {
-  let project = (Project.Current as Project);
-  let firstArg = _.first(args.split(' '));
-  if (!!(firstArg) && (project.isContainer || project.isWorkspace)) {
-    firstArg = firstArg.replace(/\/$/, '');
-    const child = project.children.find(c => c.name === firstArg);
-    if (child) {
-      project = child;
-    }
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj) {
+    await proj.filesStructure.init(args);
   }
-  await project.filesStructure.init(args);
   if (exit) {
     process.exit(0)
   }
 }
 export async function INIT_ALL(args: string, exit = true) {
-  if (!args) {
-    args = ''
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj) {
+    if (!args) {
+      args = '';
+    }
+    args += ` --recrusive`;
+    await proj.filesStructure.init(args);
   }
-  args += ` --recrusive`;
-  await (Project.Current as Project).filesStructure.init(args);
+
   if (exit) {
     process.exit(0)
   }

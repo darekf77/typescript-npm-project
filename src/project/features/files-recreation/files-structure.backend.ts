@@ -58,6 +58,17 @@ export class FilesStructure extends FeatureForProject {
     };
   }
 
+  public async struct(args?: string) {
+    if (!args) {
+      args = '';
+    }
+    args += ' --struct';
+    if (!this.project.isGenerated) {
+      Helpers.removeIfExists(path.join(this.project.location, config.file.tnpEnvironment_json));
+    }
+    await this.init(args);
+  }
+
   public async init(args: string, options?: InitOptions) {
     if (!args) {
       args = '';

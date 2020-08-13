@@ -16,10 +16,13 @@ export abstract class VscodeProject {
 
   //#region vscode *.filetemplae
   get vscodeFileTemplates(this: Project) {
-    return [
-      '.vscode/launch.json.filetemplate',
-      '.vscode/tasks.json.filetemplate',
-    ]
+    if (this.frameworkVersionAtLeast('v2')) {
+      return [
+        '.vscode/launch.json.filetemplate',
+        '.vscode/tasks.json.filetemplate',
+      ];
+    }
+    return [];
   }
   //#endregion
 

@@ -5,8 +5,10 @@ import * as os from 'os';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
 //#endregion
-import { Helpers } from 'ng2-logger';
+import { Helpers as Ng2LoggerHelpers } from 'ng2-logger';
 import { Models } from 'tnp-models';
+import type { Helpers as TnpHelpers } from 'tnp-helpers'
+import type { Project as AbstractProject } from './project/abstract/project';
 
 
 const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test', 'qa', 'custom'];
@@ -118,15 +120,15 @@ function pathResolved(...partOfPath: string[]) {
     pathResult = path.resolve(pathResult);
     const morphiPathUserInUserDir = path.join(os.homedir(), firedev, morphi);
     if (pathResolved.prototype.resolved) {
-      console.info(`Firedev base projects in are ok.`);
+      // console.info(`Firedev base projects in are ok.`);
     } else {
       if (!fse.existsSync(morphiPathUserInUserDir)) {
         if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
           fse.mkdirpSync(path.dirname(morphiPathUserInUserDir))
         }
         try {
-          child.execSync(`git clone ${urlMorphi}`,
-            { cwd: path.dirname(morphiPathUserInUserDir) });
+          child.execSync(`git clone ${urlMorphi}`, { cwd: path.dirname(morphiPathUserInUserDir) });
+          fse.removeSync(path.join(path.dirname(morphiPathUserInUserDir), 'morphi/.vscode'));
         } catch (error) {
           console.error(`[config] Not able to clone repository: ${urlMorphi} in:
            ${morphiPathUserInUserDir}`);
@@ -135,6 +137,7 @@ function pathResolved(...partOfPath: string[]) {
         try {
           child.execSync(`git reset --hard && git pull origin master`,
             { cwd: morphiPathUserInUserDir });
+            fse.removeSync(path.join(path.dirname(morphiPathUserInUserDir), 'morphi/.vscode'));
         } catch (error) {
           console.error(`[config] Not pull origin of morphi: ${urlMorphi} in:
           ${morphiPathUserInUserDir}`);
@@ -190,7 +193,36 @@ export const config = {
     const location = path.join(os.homedir(), `${config.frameworkName}`, dbFileName);
     return location;
   },
+  async initCoreProjects(Project: typeof AbstractProject, Helpers: typeof TnpHelpers) {
+    let allCoreProject: AbstractProject[] = [];
+    (config.coreProjectVersions as Models.libs.FrameworkVersion[]).forEach(v => {
+      const corePorjectsTypes: Models.libs.LibType[] = ['angular-lib', 'isomorphic-lib'];
+      const projects = corePorjectsTypes.map(t => Project.by(t, v));
+      allCoreProject = [
+        ...projects,
+        ...allCoreProject,
+      ] as any;
+    });
+
+    for (let index = 0; index < allCoreProject.length; index++) {
+      const p = allCoreProject[index];
+      console.log(`${p.genericName} ${p.location}`);
+      const linkedFiles = p.projectLinkedFiles();
+      for (let index2 = 0; index2 < linkedFiles.length; index2++) {
+        const l = linkedFiles[index2];
+        const source = path.join(l.sourceProject.location, l.relativePath);
+        const dest = path.join(p.location, l.relativePath);
+        if (!Helpers.exists(source)) {
+          Helpers.error(`[config] Core source do not exists: ${source}`, false, true);
+        }
+        Helpers.info(`link from: ${source} to ${dest}`);
+        Helpers.createSymLink(source, dest);
+      }
+      await p.filesStructure.struct();
+    }
+  },
   //#endregion
+  coreProjectVersions: ['v1', 'v2'],
   regexString: {
     pathPartStringRegex: `(\/([a-zA-Z0-9]|\\-|\\_|\\+|\\.)*)`
   },
@@ -454,7 +486,7 @@ export const config = {
 
 
 
-if (Helpers.isNode) {
+if (Ng2LoggerHelpers.isNode) {
   //#region @backend
   if (!global['ENV']) {
     global['ENV'] = {};

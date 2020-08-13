@@ -129,7 +129,6 @@ export class ProjectFactory {
 
     await baseline.reset();
     await baseline.filesStructure.init(` --recrusive `);
-    // @LAST may break somethin
     // await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
     //   prefix: chalk.bold(`[ INITING BASELINE ${baseline.genericName} ]`)
     // }).asyncAsPromise();

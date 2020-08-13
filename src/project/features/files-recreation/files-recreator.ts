@@ -9,7 +9,6 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../../config';
-import { BaselineSiteJoin } from '../../compilers/baseline-site-join';
 import { HelpersMerge } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 
@@ -41,12 +40,12 @@ export class FilesRecreator extends FeatureForProject {
     if (this.project.typeIs('container')) {
       // console.log('GIGIIGIGII')
       this.gitignore();
-      this.projectSpecyficFiles();
+      this.handleProjectSpecyficFiles();
       return;
     }
     this.initAssets();
     this.commonFiles();
-    this.projectSpecyficFiles();
+    this.handleProjectSpecyficFiles();
 
     this.gitignore();
     this.npmignore();
@@ -136,7 +135,7 @@ export class FilesRecreator extends FeatureForProject {
             ...self.assetsToIgnore,
             // 'src/assets/*/*'
           ] : [])
-          .concat(!self.project.isStandaloneProject ? self.project.projectSpecyficIgnoredFiles() : [])
+          .concat((!self.project.isStandaloneProject && !self.project.isCoreProject) ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
         // .concat(self.project.isContainer ? [
         //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
@@ -366,6 +365,23 @@ export class FilesRecreator extends FeatureForProject {
   }
 
   gitignore() {
+
+    const coreFiles = !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
+      .map(({ relativePath }) => {
+        return `/${relativePath}`;
+      })
+      .join('\n');
+
+    const ignoredByGit = this.filesIgnoredBy
+      .gitignore
+      .filter(f => {
+        if (this.project.isCoreProject && f.endsWith('.filetemplate')) {
+          return false;
+        }
+        return true;
+      }).join('\n').concat('\n');
+    // console.log(ignoredByGit)
+
     Helpers.writeFile(path.join(this.project.location, '.gitignore'),
       `# profiling files
 chrome-profiler-events*.json
@@ -384,15 +400,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-`+ this.filesIgnoredBy
-        .gitignore
-        .filter(f => {
-          if (this.project.isCoreProject && f.endsWith('.filetemplate')) {
-            return false;
-          }
-          return true;
-        })
-        .join('\n').concat('\n') + `
+`+ ignoredByGit + `
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${ this.project.isContainer ? `
@@ -402,12 +410,7 @@ ${this.project.packageJson.linkedProjects.map(c => `/${c}`).join('\n')}
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
-${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
-            .map(({ relativePath }) => {
-              return `/${relativePath}`;
-            })
-            .join('\n')
-          }
+${ coreFiles}
 
 `.trimRight() + '\n');
 
@@ -416,7 +419,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
 
 
-  projectSpecyficFiles() {
+  handleProjectSpecyficFiles() {
 
     const linkedFolder = this.project.linkedFolders;
     linkedFolder.forEach((c) => {
@@ -436,17 +439,18 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
 
     });
 
-    const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion);
-    let files: Models.other.RecreateFile[] = [];
+    const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
+    const files: Models.other.RecreateFile[] = [];
+
     if (this.project.location !== defaultProjectProptotype.location) {
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
       projectSpecyficFiles.forEach(f => {
         let from = path.join(defaultProjectProptotype.location, f);
-        // @LAST SOMEHOW I NEED TO RECRETE ALLL CORE PACKAGES FROM BOTTOM
-        // firedev-debug new isomorphic-lib test-fire7
-
         if (!Helpers.exists(from) && defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
-          const core = Project.by<Project>(this.project._type); // TODO this can be recrusive
+          const core = Project.by<Project>(
+            defaultProjectProptotype._type,
+            defaultProjectProptotype.frameworkVersionMinusOne
+          );
           from = path.join(core.location, f);
         }
         files.push({
@@ -458,6 +462,7 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
         Helpers.copyFile(file.from, file.where)
       });
     }
+
   }
 
   commonFiles() {

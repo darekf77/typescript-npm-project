@@ -205,6 +205,7 @@ export async function $INFO() {
   name: ${proj.name}
   genericName: ${proj.genericName}
   isGenerated: ${proj.isGenerated}
+  isCoreProject: ${proj.isCoreProject}
   type: ${proj._type}
   parent name: ${proj.parent && proj.parent.name}
   grandpa name: ${proj.grandpa && proj.grandpa.name}
