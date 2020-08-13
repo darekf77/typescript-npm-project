@@ -109,7 +109,7 @@ const tnp_folder_location =
 //#region @backend
 function pathResolved(...partOfPath: string[]) {
   // console.log('pathResolved', partOfPath);
-  let result = [];
+  let result = partOfPath;
   if (global['frameworkName'] && global['frameworkName'] === firedev) {
     result = partOfPath.map(s => {
       return s

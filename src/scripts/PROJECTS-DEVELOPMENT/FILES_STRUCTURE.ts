@@ -15,7 +15,7 @@ export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
   }
 }
 
-export async function STRUCT(args: string, exit = true) {
+export async function $STRUCT(args: string, exit = true) {
   const project = (Project.Current as Project);
   if (!args) {
     args = '';
@@ -31,10 +31,10 @@ export async function STRUCT(args: string, exit = true) {
 }
 
 export async function STRUCTURE(args: string, exit = true) {
-  await STRUCT(args, exit);
+  await $STRUCT(args, exit);
 }
 
-export async function INIT(args: string, exit = true) {
+export async function $INIT(args: string, exit = true) {
   let project = (Project.Current as Project);
   let firstArg = _.first(args.split(' '));
   if (!!(firstArg) && (project.isContainer || project.isWorkspace)) {
@@ -206,8 +206,8 @@ const SRST = (args, exit) => STATIC_RESET(args, exit);
 const SRSTA = (args, exit) => STATIC_RESET_ALL(args, exit);
 
 export default {
-  INIT: Helpers.CLIWRAP(INIT, 'INIT'),
-  STRUCT: Helpers.CLIWRAP(STRUCT, 'STRUCT'),
+  $INIT: Helpers.CLIWRAP($INIT, '$INIT'),
+  $STRUCT: Helpers.CLIWRAP($STRUCT, '$STRUCT'),
   INIT_ALL: Helpers.CLIWRAP(INIT_ALL, 'INIT_ALL'),
   STATIC_INIT: Helpers.CLIWRAP(STATIC_INIT, 'STATIC_INIT'),
   STATIC_INIT_ALL: Helpers.CLIWRAP(STATIC_INIT_ALL, 'STATIC_INIT_ALL'),

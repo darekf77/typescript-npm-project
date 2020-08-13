@@ -420,7 +420,8 @@ ${ !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
     const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion);
     let files: Models.other.RecreateFile[] = [];
     if (this.project.location !== defaultProjectProptotype.location) {
-      this.project.projectSpecyficFiles().forEach(f => {
+      const projectSpecyficFiles = this.project.projectSpecyficFiles();
+      projectSpecyficFiles.forEach(f => {
         files.push({
           from: path.join(defaultProjectProptotype.location, f),
           where: path.join(this.project.location, f)
