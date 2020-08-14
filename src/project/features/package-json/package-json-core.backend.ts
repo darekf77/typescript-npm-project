@@ -109,6 +109,14 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
+  hasDependency(dependencyName: string) {
+    const deps = [
+      ...Object.keys(this.data.dependencies || {}),
+      ...Object.keys(this.data.devDependencies || {})
+    ];
+    return deps.includes(dependencyName);
+  }
+
   get workspaceDependenciesServers(): string[] {
     const p = this.data.tnp && this.data.tnp.requiredServers;
     // console.log(`${this.locationOfJson}`, p)

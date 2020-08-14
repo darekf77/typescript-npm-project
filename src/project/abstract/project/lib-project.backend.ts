@@ -121,7 +121,9 @@ export abstract class LibProject {
       updateChildrenVersion(this, newVersion, this.name);
     } else {
       if (this.TnpProject.name === this.name) {
-        Helpers.info(`Ommiting version bump ${this.name}`)
+        Helpers.info(`Ommiting version bump ${this.name} - for tnp itself`)
+      } else if (this.packageJson.hasDependency(this.TnpProject.name)) {
+        Helpers.info(`Ommiting version bump ${this.name} - has tnp as dependency`)
       } else {
         this.TnpProject.packageJson.setDependencyAndSave({
           name: this.name,
@@ -425,7 +427,7 @@ export abstract class LibProject {
 //#region @backend
 export function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
   if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
-    Helpers.log(`[release - ${name}][updateChildrenVersion] Alredy update ${project.genericName}`)
+    Helpers.log(`[release - ${name}][lib-proj] Alredy update ${project.genericName}`)
     return;
   }
   if (project.name !== name) {
@@ -435,10 +437,10 @@ export function updateChildrenVersion(project: Project, newVersion, name, update
     }, `Bump versoin of library ${name}`);
   } else {
     project.packageJson.data.version = newVersion;
-    project.packageJson.save(`[updateChildrenVersion] set version`);
+    project.packageJson.save(`[lib-proj] set version`);
   }
   updatedProjectw.push(project);
-  Helpers.log(`[release - ${name}][updateChildrenVersion] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
+  Helpers.log(`[release - ${name}][lib-proj] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
   project.children.forEach(childProject => updateChildrenVersion(childProject, newVersion, name, updatedProjectw));
 }
 //#endregion

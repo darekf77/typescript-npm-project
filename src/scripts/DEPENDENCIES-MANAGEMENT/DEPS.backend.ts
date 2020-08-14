@@ -219,7 +219,7 @@ const $SINSTALL = (args) => {
 
 async function $LINK() {
   let project = (Project.Current as Project);
-  project.dependsOn
+
   if (project.isStandaloneProject) {
     const glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
     const globalNodeModules = path.join(glboalBinFolderPath, '../lib/node_modules');
