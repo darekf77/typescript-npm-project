@@ -30,7 +30,7 @@ export class CopyManager extends FeatureForProject {
     this.buildOptions = buildOptions;
     const { watch } = buildOptions;
 
-    if(!Array.isArray(this.buildOptions.copyto)) {
+    if (!Array.isArray(this.buildOptions.copyto)) {
       this.buildOptions.copyto = [];
     }
 
@@ -272,7 +272,7 @@ export class CopyManager extends FeatureForProject {
 
       specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
 
-      if (outDir === 'dist' && this.buildOptions.watch) {
+      if (outDir === 'dist' && this.buildOptions?.watch) {
         if (destinationFile.endsWith('.js.map')) {
           const folderToLink = [
             `tmp-src-${outDir}`,
@@ -311,7 +311,7 @@ export class CopyManager extends FeatureForProject {
         `tmp-src-${outDir}`,
         this.project.sourceFolder,
       ];
-      if (outDir === 'dist' && this.buildOptions.watch) {
+      if (outDir === 'dist' && this.buildOptions?.watch) {
 
         folderToLink.forEach(sourceFolder => {
           const srcOrComponents = path.join(this.project.location, sourceFolder);
