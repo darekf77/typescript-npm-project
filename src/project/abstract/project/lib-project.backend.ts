@@ -324,6 +324,29 @@ export abstract class LibProject {
           output: true
         }).sync()
         successPublis = true;
+
+        // release other version:
+        this.packageJson.additionalNpmNames.forEach(c => {
+          const existedBundle = path.join(this.location, 'bundle')
+          const additionBase = path.resolve(path.join(this.location, `../../../additional-bundle-${c}`));
+          Helpers.mkdirp(additionBase);
+          Helpers.copy(existedBundle, additionBase, {
+            copySymlinksAsFiles: true,
+            omitFolders: [config.folder.node_modules],
+            omitFoldersBaseFolder: existedBundle
+          });
+          const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
+          packageJsonAdd.name = c;
+          const keys = Object.keys(packageJsonAdd.bin || {});
+          keys.forEach(k => {
+            const v = packageJsonAdd.bin[k] as string;
+            packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
+            delete packageJsonAdd.bin[k];
+          })
+          // @LAST
+          Helpers.info('log addtional bunmdle created');
+        })
+
       } catch (e) {
         removeTagAndCommit()
       }
