@@ -137,7 +137,7 @@ function pathResolved(...partOfPath: string[]) {
         try {
           child.execSync(`git reset --hard && git pull origin master`,
             { cwd: morphiPathUserInUserDir });
-            fse.removeSync(path.join(path.dirname(morphiPathUserInUserDir), 'morphi/.vscode'));
+          fse.removeSync(path.join(path.dirname(morphiPathUserInUserDir), 'morphi/.vscode'));
         } catch (error) {
           console.error(`[config] Not pull origin of morphi: ${urlMorphi} in:
           ${morphiPathUserInUserDir}`);
@@ -306,7 +306,7 @@ export const config = {
 
     projectsExamples: (version?: Models.libs.FrameworkVersion) => {
       version = (!version || version === 'v1') ? '' : `-${version}` as any;
-      return {
+      const result = {
         workspace: pathResolved(__dirname, `../../firedev-projects/container${version}/workspace${version}`),
         container: pathResolved(__dirname, `../../firedev-projects/container${version}`),
         projectByType(libType: Models.libs.NewFactoryType) {
@@ -314,6 +314,7 @@ export const config = {
         },
         singlefileproject: pathResolved(__dirname, `../../firedev-projects/container${version}/single-file-project${version}`)
       }
+      return result;
     }
   },
   //#endregion

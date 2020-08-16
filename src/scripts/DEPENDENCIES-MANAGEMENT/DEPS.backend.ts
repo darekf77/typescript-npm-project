@@ -194,6 +194,31 @@ function $SHOW_CHILDREN() {
   process.exit(0)
 }
 
+function $SHOW_CORE_MODULES() {
+  const container = Project.by('container', 'v1');
+  const workspace = Project.by('workspace', 'v1');
+  const al = Project.by('angular-lib', 'v1');
+  const il = Project.by('isomorphic-lib', 'v1');
+
+  const containerv2 = Project.by('container', 'v2');
+  const workspacev2 = Project.by('workspace', 'v2');
+  const alv2 = Project.by('angular-lib', 'v2');
+  const ilv2 = Project.by('isomorphic-lib', 'v2');
+  console.log(`
+v1 Container core:\t    ${container.location}
+v1 Workspace core:\t    ${workspace.location}
+v1 Angular-lib core:\t  ${al.location}
+v1 Isomorphic-lib core:\t  ${il.location}
+
+v2 Container core:\t    ${containerv2.location}
+v2 Workspace core:\t    ${workspacev2.location}
+v2 Angular-lib core:\t  ${alv2.location}
+v2 Isomorphic-lib core:\t  ${ilv2.location}
+  `)
+
+  process.exit(0);
+}
+
 function DEPS_SHOW_IF_STANDALONE(args: string) {
   Helpers.log(`Hook update start`)
   if ((Project.Current as Project).isStandaloneProject) {
@@ -358,6 +383,7 @@ export default {
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
+  $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
   $DEPS_CLEAN: Helpers.CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
