@@ -268,6 +268,7 @@ export const config = {
     'rp': 'release:prod',
     'r': 'release',
     'lb': 'last:build',
+    'scm': 'showcoremodules'
   },
   coreBuildFrameworkNames: [
     'tnp',
