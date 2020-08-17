@@ -180,9 +180,9 @@ export class ProjectIsomorphicLib
 
   //#region @backend
   cutReleaseCode() {
-    const relaseCutFolderName = `${config.folder.tempSrc}-release-cut`;
+    const relaseCutFolderName = `${config.folder.src}-release-cut`;
     const releaseSrcLocation = path.join(this.location, relaseCutFolderName)
-    Helpers.copy(path.join(this.location, config.folder.tempSrc), releaseSrcLocation);
+    Helpers.copy(path.join(this.location, config.folder.src), releaseSrcLocation);
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton.forEach(absolutePath => {
       let rawContent = Helpers.readFile(absolutePath);
