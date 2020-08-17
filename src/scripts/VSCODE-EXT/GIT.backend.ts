@@ -77,23 +77,51 @@ function fixRemote(project: Project) {
 
 
 async function PUSH_ORIGIN(container: Project, projects: Project[], exit = true) {
-  const projectsNames = projects.map(p => p.name);
+
   const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
     { output: false }).sync().toString();
   global.hideLog = false;
-  for (let index = 0; index < projectsNames.length; index++) {
-    const projectName = projectsNames[index];
+  for (let index = 0; index < projects.length; index++) {
+    const project = projects[index];
+    const projectName = project.name;
     Helpers.log(`Checking project ${chalk.bold(projectName)}.`);
-    const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+
     const dest = path.join(container.location, projectName);
-    const proj = Project.From<Project>(dest);
+    let proj = Project.From<Project>(dest);
+    const projBylocation = Project
+      .From<Project>(path.join(container.location, path.basename(project.location)));
+    if (!proj && projBylocation) {
+      Helpers.warn(`Please use same na name as project basename and in package.json name`);
+    }
+    if (!proj && !!projBylocation) {
+      try {
+        const cloneCommand = `git clone` +
+          ` ${ADDRESS_GITHUB_SSH.replace(`${container.name}.git`, `${project.name}.git`)}`
+        container.run(cloneCommand)
+          .sync()
+      } catch (error) {
+        Helpers.error(`Please use same na for:
+     1. Project folder
+     2. Porject name property in package.json
+     3. Project <name>.git in git remote url
+
+
+Fix this in location: ${path.join(container.location, path.basename(project.location))}
+        `, false, true)
+      }
+    }
+    proj = Project.From<Project>(dest);
+
+    if (!proj) {
+      Helpers.error(`Not able to find project ${chalk.bold(projectName)} `, false, true)
+    }
     if (proj.git.thereAreSomeUncommitedChange) {
-      Helpers.run(`code .`, { cwd: dest }).async();
-      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes.. please commit and press any key..`);
+      Helpers.run(`code.`, { cwd: dest }).async();
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes..please commit and press any key..`);
     }
     if (proj.git.currentBranchName !== 'master') {
-      Helpers.run(`code .`, { cwd: dest }).async();
-      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master.. please commit and press any key..`);
+      Helpers.run(`code.`, { cwd: dest }).async();
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master..please commit and press any key..`);
     }
     while (true) {
       try {
@@ -102,7 +130,7 @@ async function PUSH_ORIGIN(container: Project, projects: Project[], exit = true)
         break;
       } catch (err) {
         Helpers.error(`Not able to push brench... `, true, true);
-        Helpers.run(`code .`, { cwd: dest }).async();
+        Helpers.run(`code.`, { cwd: dest }).async();
         Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - check your repository and press any key..`);
       }
     }
@@ -121,18 +149,26 @@ export async function $PUSH(args: string, exit = true, force = false) {
   if (project.isContainer && project.packageJson.linkedProjects.length > 0) {
     await PUSH_ORIGIN(
       project,
-      project.children.filter(c => project.packageJson.linkedProjects.includes(c.name))
+      project.children.filter(c => {
+        const ok = project.packageJson.linkedProjects.includes(c.name);
+        // if (ok) {
+        //   Helpers.warn(`OK FOR ${ c.name }`)
+        // } else {
+        //   Helpers.warn(`NOT OK FOR ${ c.name }`)
+        // }
+        return ok;
+      })
     )
   }
 
   fixRemote(project);
   try {
-    project.run(`git add --all . && git commit -m "update"`).sync();
+    project.run(`git add--all. && git commit - m "update"`).sync();
   } catch (error) { }
   if (force) {
     const branch = project.git.currentBranchName;
     Helpers.info(`FORCE UPDATE OF BRANCH: ${branch}`);
-    project.run(`git push -f origin ${branch}`).sync();
+    project.run(`git push - f origin ${branch}`).sync();
   } else {
     project.git.pushCurrentBranch();
   }
@@ -147,7 +183,7 @@ export async function $PULL(args: string, exit = true) {
   if (project.isContainer && project.packageJson.linkedProjects.length > 0) {
     const container = project;
     global.hideLog = false;
-    const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
+    const ADDRESS_GITHUB_SSH = container.run(`git config--get remote.origin.url`,
       { output: false }).sync().toString();
     const projects = project.children
       .filter(c => project.packageJson.linkedProjects.includes(c.name))
@@ -160,8 +196,9 @@ export async function $PULL(args: string, exit = true) {
       const dest = path.join(container.location, projectName);
 
       const process = async (retry = false) => {
-        Helpers.info(`${retry ? '' : '\n\n'} --- ${retry ? 'Retrying' : 'Starting'
-          } dump of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
+        Helpers.info(`${retry ? '' : '\n\n'} -- - ${
+          retry ? 'Retrying' : 'Starting'
+          } dump of ${chalk.underline(projectName)} -- - ${retry ? '' : '\n\n'}`)
         action = fse.existsSync(dest) ? 'pull' : 'clone';
         try {
           const dest = path.join(container.location, projectName);
@@ -171,29 +208,30 @@ export async function $PULL(args: string, exit = true) {
               proj = Project.From<Project>(dest);
               if (!proj) {
                 Helpers.run(`code ${dest}`).async();
-                Helpers.pressKeyAndContinue(`Fix metadata/package.json of project ${
-                  chalk.bold(projectName)} to continue and press any key`)
+                Helpers.pressKeyAndContinue(`Fix metadata / package.json of project ${
+                  chalk.bold(projectName)
+                  } to continue and press any key`)
               }
             }
             if (proj.git.thereAreSomeUncommitedChange) {
-              Helpers.run(`code ${dest}`).async();
-              Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull ` +
+              Helpers.run(`code ${dest} `).async();
+              Helpers.pressKeyAndContinue(`Prepare project ${chalk.bold(projectName)} to pull` +
                 `from git press any key to try again`)
             }
             proj.git.pullCurrentBranch();
             Helpers.info(`Pull new origin for ${projectName}`);
           } else {
-            Helpers.run(`git clone ${githubGitUrl}`, { cwd: container.location }).sync();
+            Helpers.run(`git clone ${githubGitUrl} `, { cwd: container.location }).sync();
             Helpers.info(`Cloned origin for ${projectName}`);
           }
         } catch (err) {
           // Helpers.error(err, true);
-          Helpers.run(`code ${dest}`).async();
+          Helpers.run(`code ${dest} `).async();
           const tryAgain = await Helpers.questionYesNo(`Try again dump project ${projectName} ?`);
           if (tryAgain) {
             await process(true);
           } else {
-            Helpers.info(`Skipping project ${chalk.underline(projectName)}`);
+            Helpers.info(`Skipping project ${chalk.underline(projectName)} `);
           }
         }
       }
@@ -203,7 +241,7 @@ export async function $PULL(args: string, exit = true) {
   }
 
   try {
-    project.run(`git add --all . && git commit -m "update"`).sync();
+    project.run(`git add--all. && git commit - m "update"`).sync();
   } catch (error) { }
   project.git.pushCurrentBranch();
   process.exit(0);
@@ -212,13 +250,13 @@ export async function $PULL(args: string, exit = true) {
 
 export async function $RECOMMIT(args: string, exit = true) {
   const p = Project.Current;
-  const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false, cwd: p.location }).sync().toString().trim();
-  p.run(`git reset --soft HEAD~1 && git add --all . && git commit -m "${lastMsg}"`).sync();
-  Helpers.info(`Recomit done.. msg:
-${Helpers.terminalLine()}
-  ${lastMsg}
-${Helpers.terminalLine()}
-  `);
+  const lastMsg = p.run(`git log - 1 --pretty =% B`, { output: false, cwd: p.location }).sync().toString().trim();
+  p.run(`git reset--soft HEAD~1 && git add--all. && git commit - m "${lastMsg}"`).sync();
+  Helpers.info(`Recomit done..msg:
+        ${ Helpers.terminalLine()}
+        ${ lastMsg}
+        ${ Helpers.terminalLine()}
+        `);
   if (exit) {
     process.exit(0);
   }

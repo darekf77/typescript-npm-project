@@ -94,7 +94,13 @@ export abstract class FolderProject {
       .filter(c => !!c)
 
     if (excludeUnknowProjects) {
-      res = res.filter(c => c.typeIsNot('unknow-npm-project'))
+      res = res.filter(c => {
+        const isNot = c.typeIsNot('unknow');
+        // if (!isNot) {
+        //   console.log(`KURWA ${isNot}`)
+        // }
+        return isNot;
+      })
     }
     return res;
   }
