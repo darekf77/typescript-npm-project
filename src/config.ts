@@ -99,6 +99,7 @@ const folder = {
   bin: 'bin',
   _bin: '.bin',
   _vscode: '.vscode',
+  project: 'project',
   ...tempFolders
 };
 

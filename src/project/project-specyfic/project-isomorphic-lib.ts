@@ -180,16 +180,21 @@ export class ProjectIsomorphicLib
 
   //#region @backend
   cutReleaseCode() {
-    const relaseCutFolderName = `${config.folder.src}-release-cut`;
-    const releaseSrcLocation = path.join(this.location, relaseCutFolderName)
-    Helpers.copy(path.join(this.location, config.folder.src), releaseSrcLocation);
+    if (!(path.basename(path.dirname(path.dirname(this.location))) === config.folder.bundle &&
+      path.basename(path.dirname(this.location)) === config.folder.project)) {
+      Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
+      return;
+    }
+    // const relaseCutFolderName = `${config.folder.src}-release-cut`;
+    const releaseSrcLocation = path.join(this.location, config.folder.src)
+    // Helpers.copy(path.join(this.location, config.folder.src), releaseSrcLocation);
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
-        const relativePath = absolutePath.replace(releaseSrcLocation, '');
+        // const relativePath = absolutePath.replace(releaseSrcLocation, '');
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = this.sourceModifier.process(rawContent, relativePath);
+        // rawContent = this.sourceModifier.process(rawContent, relativePath);
         rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
