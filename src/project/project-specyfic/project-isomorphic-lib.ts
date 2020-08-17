@@ -184,11 +184,13 @@ export class ProjectIsomorphicLib
     const releaseSrcLocation = path.join(this.location, relaseCutFolderName)
     Helpers.copy(path.join(this.location, config.folder.src), releaseSrcLocation);
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
-    filesForModyficaiton.forEach(absolutePath => {
-      let rawContent = Helpers.readFile(absolutePath);
-      rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
-      Helpers.writeFile(absolutePath, rawContent);
-    });
+    filesForModyficaiton
+      .filter(absolutePath => !Helpers.isFolder(absolutePath))
+      .forEach(absolutePath => {
+        let rawContent = Helpers.readFile(absolutePath);
+        rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
+        Helpers.writeFile(absolutePath, rawContent);
+      });
   }
 
   private REGEX_REGION(word) {
