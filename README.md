@@ -8,6 +8,9 @@ META COMMENTS:
 - @QUICK_FIX
 - TODO UNCOMMENT  temporrary fix
 
+#region @notForNpm
+This way I will keep secrets 
+#endregion
 
 # good class structure
  - feature-core // very basic functions that I will never change

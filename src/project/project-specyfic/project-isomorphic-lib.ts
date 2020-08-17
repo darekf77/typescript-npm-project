@@ -185,16 +185,13 @@ export class ProjectIsomorphicLib
       Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
       return;
     }
-    // const relaseCutFolderName = `${config.folder.src}-release-cut`;
-    const releaseSrcLocation = path.join(this.location, config.folder.src)
-    // Helpers.copy(path.join(this.location, config.folder.src), releaseSrcLocation);
+
+    const releaseSrcLocation = path.join(this.location, config.folder.src);
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
-        // const relativePath = absolutePath.replace(releaseSrcLocation, '');
         let rawContent = Helpers.readFile(absolutePath);
-        // rawContent = this.sourceModifier.process(rawContent, relativePath);
         rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
