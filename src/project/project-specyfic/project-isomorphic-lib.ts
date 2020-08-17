@@ -188,6 +188,7 @@ export class ProjectIsomorphicLib
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
         let rawContent = Helpers.readFile(absolutePath);
+        rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(rawContent);
         rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
@@ -224,6 +225,7 @@ export class ProjectIsomorphicLib
     const { obscure, uglify, nodts } = this.buildOptions;
 
     if (outDir === 'bundle' && (obscure || uglify)) {
+      // @LAST
       this.cutReleaseCode();
       this.quickFixes.badNpmPackages();
       Helpers.info(`
