@@ -182,8 +182,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
     const projForVer = Project.by<Project>('container', project._frameworkVersion);
-    // @LAST firedev release fails here
-    if (projForVer) { // QUICK_FIX
+    if (projForVer) { // QUICK_FIX?
       global.actionShowingDepsForContainer = true;
       projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
       global.actionShowingDepsForContainer = false;

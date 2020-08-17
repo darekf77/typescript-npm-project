@@ -76,7 +76,7 @@ function fixRemote(project: Project) {
 }
 
 
-async function PUSH_ORIGIN(container: Project, projects: Project[], exit = true) {
+async function PUSH_ORIGIN(container: Project, projects: Project[], comitMessage: string, exit = true) {
 
   const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
     { output: false }).sync().toString();
@@ -115,14 +115,32 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
     if (!proj) {
       Helpers.error(`Not able to find project ${chalk.bold(projectName)} `, false, true)
     }
-    if (proj.git.thereAreSomeUncommitedChange) {
-      Helpers.run(`code.`, { cwd: dest }).async();
-      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes..please commit and press any key..`);
-    }
+
     if (proj.git.currentBranchName !== 'master') {
       Helpers.run(`code.`, { cwd: dest }).async();
       Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - default branch is not master..please commit and press any key..`);
     }
+
+    let commitSuccess = false;
+    if (_.isString(comitMessage) && comitMessage.length > 1) {
+      if (proj.git.thereAreSomeUncommitedChange) {
+        Helpers.info(`Comminting changes automaticly with message: "${chalk.bold(comitMessage)}"`)
+        try {
+          proj.run(`git add --all .`).sync();
+        } catch (error) { }
+        try {
+          proj.run(`git commit -m "${comitMessage}"`).sync();
+          commitSuccess = true;
+        } catch (error) { }
+      }
+    }
+
+    if (!commitSuccess && proj.git.thereAreSomeUncommitedChange) {
+      Helpers.run(`code .`, { cwd: dest }).async();
+      Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - there are some uncommited changes..please commit and press any key..`);
+    }
+
+
     while (true) {
       try {
         Helpers.log(`Pushing project  ${chalk.bold(projectName)}...`);
@@ -130,7 +148,7 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
         break;
       } catch (err) {
         Helpers.error(`Not able to push brench... `, true, true);
-        Helpers.run(`code.`, { cwd: dest }).async();
+        Helpers.run(`code .`, { cwd: dest }).async();
         Helpers.pressKeyAndContinue(`${chalk.bold(projectName)} - check your repository and press any key..`);
       }
     }
@@ -144,7 +162,7 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
 
 
 
-export async function $PUSH(args: string, exit = true, force = false) {
+export async function $PUSH(comitMessage: string, exit = true, force = false) {
   const project = (Project.Current as Project);
   if (project.isContainer && project.packageJson.linkedProjects.length > 0) {
     await PUSH_ORIGIN(
@@ -157,7 +175,8 @@ export async function $PUSH(args: string, exit = true, force = false) {
         //   Helpers.warn(`NOT OK FOR ${ c.name }`)
         // }
         return ok;
-      })
+      }),
+      comitMessage
     )
   }
 

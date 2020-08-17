@@ -3,12 +3,14 @@ import { BuildProcess } from '../../features';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as getDependents from 'npm-get-dependents';
+import chalk from 'chalk';
 //#endregion
 import type { Project } from './project';
 import * as _ from 'lodash';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from '../../../config';
+
 
 /**
  * Project ready to be build/publish as npm package.
@@ -322,11 +324,16 @@ export abstract class LibProject {
         this.run('npm publish', {
           cwd: path.join(this.location, config.folder.bundle),
           output: true
-        }).sync()
+        }).sync();
         successPublis = true;
-
+      } catch (e) {
+        removeTagAndCommit()
+      }
+      if (successPublis) {
         // release other version:
-        this.packageJson.additionalNpmNames.forEach(c => {
+        const names = this.packageJson.additionalNpmNames;
+        for (let index = 0; index < names.length; index++) {
+          const c = names[index];
           const existedBundle = path.join(this.location, 'bundle')
           const additionBase = path.resolve(path.join(this.location, `../../../additional-bundle-${c}`));
           Helpers.mkdirp(additionBase);
@@ -335,21 +342,30 @@ export abstract class LibProject {
             omitFolders: [config.folder.node_modules],
             omitFoldersBaseFolder: existedBundle
           });
+          const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
           const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
           packageJsonAdd.name = c;
-          const keys = Object.keys(packageJsonAdd.bin || {});
-          keys.forEach(k => {
-            const v = packageJsonAdd.bin[k] as string;
-            packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
-            delete packageJsonAdd.bin[k];
-          })
+          // const keys = Object.keys(packageJsonAdd.bin || {});
+          // keys.forEach(k => {
+          //   const v = packageJsonAdd.bin[k] as string;
+          //   packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
+          //   delete packageJsonAdd.bin[k];
+          // });
+          Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
           // @LAST
-          Helpers.info('log addtional bunmdle created');
-        })
-
-      } catch (e) {
-        removeTagAndCommit()
+          Helpers.info('log addtional bundle created');
+          try {
+            Helpers.run(`code ${additionBase}`).sync();
+            Helpers.info(`Check you additional bundle for ${chalk.bold(c)} and press any key to publish...`);
+            Helpers.pressKeyAndContinue();
+            Helpers.run('npm publish', { cwd: additionBase }).sync();
+          } catch (error) {
+            Helpers.warn(`No able to push additional bundle for name: ${c}`)
+          }
+        }
       }
+
+
       if (successPublis) {
         await this.bumpVersionInOtherProjects(newVersion);
 
