@@ -178,7 +178,35 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
+  //#region @backend
+  cutReleaseCode() {
+    const relaseCutFolderName = `${config.folder.tempSrc}-release-cut`;
+    const releaseSrcLocation = path.join(this.location, relaseCutFolderName)
+    Helpers.copy(path.join(this.location, config.folder.tempSrc), releaseSrcLocation);
+    const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
+    filesForModyficaiton.forEach(absolutePath => {
+      let rawContent = Helpers.readFile(absolutePath);
+      rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
+      Helpers.writeFile(absolutePath, rawContent);
+    });
+  }
 
+  private REGEX_REGION(word) {
+    return new RegExp("[\\t ]*\\/\\/\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\/\\/\\s*#?endregion ?[\\t ]*\\n?", "g")
+  }
+  private replaceRegionsWith(stringContent = '', words = []) {
+    if (words.length === 0) { return stringContent; }
+    let word = words.shift();
+    let replacement = ''
+    if (Array.isArray(word) && word.length === 2) {
+      replacement = word[1];
+      word = word[0]
+    }
+
+    stringContent = stringContent.replace(this.REGEX_REGION(word), replacement);
+    return this.replaceRegionsWith(stringContent, words);
+  }
+  //#endregion
 
   async buildLib() {
     //#region @backend
@@ -193,8 +221,8 @@ export class ProjectIsomorphicLib
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
     const { obscure, uglify, nodts } = this.buildOptions;
 
-
     if (outDir === 'bundle' && (obscure || uglify)) {
+      this.cutReleaseCode();
       this.quickFixes.badNpmPackages();
       Helpers.info(`
 

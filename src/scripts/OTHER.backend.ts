@@ -31,6 +31,9 @@ function recreate() {
 }
 
 function version() {
+  //#region @notForNpm
+  console.log(`I am secret project!`);
+  //#endregion
   !global.hideLog && console.log(`tnp location: ${Project.Tnp.location}`)
   Helpers.info((Project.Tnp as Project).version);
   process.exit(0)
@@ -104,7 +107,7 @@ function $isbundlemode(args) {
 }
 
 const $ASSETS = () => recreate();
-const VERSION = () => version();
+const $VERSION = () => version();
 const PATH = () => {
   console.log((Project.Tnp as Project).location);
   process.exit(0)
@@ -152,7 +155,7 @@ export default {
   UPDATE_ISOMORPHIC: Helpers.CLIWRAP(UPDATE_ISOMORPHIC, 'UPDATE_ISOMORPHIC'),
   $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
-  VERSION: Helpers.CLIWRAP(VERSION, 'VERSION'),
+  $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   PATH: Helpers.CLIWRAP(PATH, 'PATH'),
   COPY_RESOURCES: Helpers.CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
   $CHECK_ENV: Helpers.CLIWRAP($CHECK_ENV, '$CHECK_ENV'),
