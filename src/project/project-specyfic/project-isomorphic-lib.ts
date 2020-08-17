@@ -187,8 +187,9 @@ export class ProjectIsomorphicLib
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
+        const relativePath = absolutePath.replace(releaseSrcLocation, '');
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(rawContent);
+        rawContent = this.sourceModifier.process(rawContent, relativePath);
         rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
