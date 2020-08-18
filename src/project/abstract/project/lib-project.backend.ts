@@ -83,22 +83,14 @@ export abstract class LibProject {
     //#region @backend
     const basename = source;
     source = path.join(this.location, source);
-    outDir = path.join(this.location, outDir, basename);
+    const dest = path.join(this.location, outDir, basename);
     if (Helpers.exists(source)) {
       if (Helpers.isFolder(source)) {
-        Helpers.tryCopyFrom(source, outDir);
+        Helpers.tryCopyFrom(source, dest);
       } else {
+        Helpers.copyFile(source, dest);
         if (path.basename(source) === config.file.tnpEnvironment_json) {
-          Helpers.copyFile(source, outDir, {
-            transformTextFn: (input) => {
-              const json = JSON.parse(input) as Models.env.EnvConfig;
-              delete json.currentProjectLocation;
-              return Helpers.stringify(json);
-            },
-            fast: false
-          });
-        } else {
-          Helpers.copyFile(source, outDir)
+          Helpers.setValueToJSON(dest, 'currentProjectLocation', void 0);
         }
       }
     } else {

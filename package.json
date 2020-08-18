@@ -419,7 +419,7 @@
     }
   },
   "name": "tnp",
-  "version": "0.0.61",
+  "version": "0.0.62",
   "scripts": {
     "postinstall": "pwd > tnp-system-path.txt"
   },
