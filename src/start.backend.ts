@@ -47,8 +47,8 @@ import { CLASS } from 'typescript-class-helpers';
 import e from 'express';
 //#endregion
 
-const ENV = global['ENV'] as Models.env.EnvConfig;
-console.log(ENV.domain)
+// const ENV = global['ENV'] as Models.env.EnvConfig;
+// console.log(ENV.domain)
 
 //#region init incremental compiler
 IncCompiler.init(async (asyncEvents) => { }, {

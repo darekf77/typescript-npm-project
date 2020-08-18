@@ -94,7 +94,8 @@ export abstract class LibProject {
               const json = JSON.parse(input) as Models.env.EnvConfig;
               delete json.currentProjectLocation;
               return Helpers.stringify(json);
-            }
+            },
+            fast: false
           });
         } else {
           Helpers.copyFile(source, outDir)
