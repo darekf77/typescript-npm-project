@@ -70,7 +70,9 @@ export abstract class LibProject {
     this.copyWhenExist('.npmrc', outDir);
     this.copyWhenExist('.npmignore', outDir);
     this.copyWhenExist('.gitignore', outDir);
-    this.copyWhenExist(config.file.tnpEnvironment_json, outDir);
+    if (this.typeIs('isomorphic-lib')) {
+      this.copyWhenExist(config.file.tnpEnvironment_json, outDir);
+    }
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
       this.linkWhenExist('package.json', path.join(outDir, config.folder.browser));
@@ -82,11 +84,21 @@ export abstract class LibProject {
     const basename = source;
     source = path.join(this.location, source);
     outDir = path.join(this.location, outDir, basename);
-    if (fse.existsSync(source)) {
-      if (fse.lstatSync(source).isDirectory()) {
-        Helpers.tryCopyFrom(source, outDir)
+    if (Helpers.exists(source)) {
+      if (Helpers.isFolder(source)) {
+        Helpers.tryCopyFrom(source, outDir);
       } else {
-        Helpers.copyFile(source, outDir)
+        if (source === config.file.tnpEnvironment_json) {
+          Helpers.copyFile(source, outDir, {
+            transformTextFn: (input) => {
+              const json = JSON.parse(input) as Models.env.EnvConfig;
+              delete json.currentProjectLocation;
+              return Helpers.stringify(json);
+            }
+          });
+        } else {
+          Helpers.copyFile(source, outDir)
+        }
       }
     } else {
       Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);

@@ -130,7 +130,6 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       } else {
         // console.log({
         //   currentProjectName: e.currentProjectName,
-        //   currentProjectLocation: e.currentProjectLocation
         // } as EnvConfig);
         const exp = `(function(ENV){
           // console.log(typeof ENV)
