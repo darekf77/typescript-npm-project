@@ -19,9 +19,6 @@ function assignENV() {
     ENV = fse.readFileSync(pathToTmpEnv, {
       encoding: 'utf8'
     });
-    // if (ENV.config) { /// QUICK_FIX
-    ENV = ENV.config;
-    // }
   } else {
     console.warn('ENV will be not available... tmp-environment.json missing... ')
   }

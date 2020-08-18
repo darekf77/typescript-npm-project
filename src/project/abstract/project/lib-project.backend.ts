@@ -70,6 +70,7 @@ export abstract class LibProject {
     this.copyWhenExist('.npmrc', outDir);
     this.copyWhenExist('.npmignore', outDir);
     this.copyWhenExist('.gitignore', outDir);
+    this.copyWhenExist(config.file.tnpEnvironment_json, outDir);
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
       this.linkWhenExist('package.json', path.join(outDir, config.folder.browser));
