@@ -420,9 +420,7 @@
   },
   "name": "tnp",
   "version": "0.0.62",
-  "scripts": {
-    "postinstall": "pwd > tnp-system-path.txt"
-  },
+  "scripts": {},
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp",
