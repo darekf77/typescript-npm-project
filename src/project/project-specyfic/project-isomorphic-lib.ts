@@ -220,7 +220,7 @@ export class ProjectIsomorphicLib
 
     Helpers.log(`[buildLib] start of building`);
     this.beforeLibBuild(outDir);
-
+    process.exit(0)
     const webpackCommandFn = (watchCommand: boolean) =>
       `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
 

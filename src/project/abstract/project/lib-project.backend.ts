@@ -88,7 +88,7 @@ export abstract class LibProject {
       if (Helpers.isFolder(source)) {
         Helpers.tryCopyFrom(source, outDir);
       } else {
-        if (source === config.file.tnpEnvironment_json) {
+        if (path.basename(source) === config.file.tnpEnvironment_json) {
           Helpers.copyFile(source, outDir, {
             transformTextFn: (input) => {
               const json = JSON.parse(input) as Models.env.EnvConfig;
