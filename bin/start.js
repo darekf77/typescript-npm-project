@@ -4,6 +4,7 @@
 
 global.hideLog = true;
 global.verboseLevel = 0;
+global.globalSystemToolMode = true;
 
 var frameworkName = process.argv.find(a => a.startsWith('-firedev'));
 if (typeof frameworkName !== 'undefined') {
@@ -37,7 +38,7 @@ if (distOnly) {
   var path = require('path');
   var pathToDistRun = path.join(__dirname, '../dist/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-  global.globalSystemToolMode = true;
+
   // =======================================================================
 } else if (bundleOnly) {
   mode = 'bundle';
@@ -48,7 +49,7 @@ if (distOnly) {
   var path = require('path');
   var pathToDistRun = path.join(__dirname, '../bundle/index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-  global.globalSystemToolMode = true;
+
   // =======================================================================
 } else if (npmOnly) {
   mode = 'npm';
@@ -59,7 +60,7 @@ if (distOnly) {
   var path = require('path');
   var pathToDistRun = path.join(__dirname, '../index.js');
   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-  global.globalSystemToolMode = true;
+
 } else {
   // =========================== TODO speeding up! ============================
   var fs = require('fs');
@@ -82,7 +83,6 @@ if (distOnly) {
   var bundleExist = fs.existsSync(pathToBundletRun);
 
   var start;
-  global.globalSystemToolMode = true;
 
   if (bundleExist && distExist) {
     if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {

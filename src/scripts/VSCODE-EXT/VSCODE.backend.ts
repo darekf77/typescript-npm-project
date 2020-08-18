@@ -34,7 +34,7 @@ export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
   hidefilesfor((Project.Current as Project));
-  console.log('proce cwd', process.cwd())
+  // console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 

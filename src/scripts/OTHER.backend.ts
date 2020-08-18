@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import { config } from '../config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-
+declare const ENV: any;
 // console.log('hello')
 
 function $CONFIGS() {
@@ -32,7 +32,9 @@ function recreate() {
 
 function version() {
   //#region @notForNpm
-  console.log(`I am secret project!`);
+  if (ENV.notForNpm) {
+    console.log(`I am secret project!`);
+  }
   //#endregion
   !global.hideLog && console.log(`tnp location: ${Project.Tnp.location}`)
   Helpers.info((Project.Tnp as Project).version);

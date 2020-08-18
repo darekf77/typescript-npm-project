@@ -285,7 +285,8 @@ export class FilesRecreator extends FeatureForProject {
                   project.node_modules.fixesForNodeModulesPackages.forEach(p => {
                     s['files.exclude'][p] = true;
                   })
-                  s['files.exclude']["*.js"] = true;
+                  // s['files.exclude']["*.js"] = true;
+                  // s['files.exclude']["environment.js"] = false;
                   s['files.exclude']["*.sh"] = true;
                   s['files.exclude']["*.xlsx"] = true;
                   s['files.exclude']["scripts"] = true;

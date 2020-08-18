@@ -50,7 +50,6 @@ const file = {
   tnpEnvironment_json: 'tmp-environment.json',
   environment: 'environment',
   environment_js: 'environment.js',
-  tnp_system_path_txt: 'tnp-system-path.txt',
   tmp_transaction_pid_txt: 'tmp-transaction-pid.txt',
   manifest_webmanifest: 'manifest.webmanifest',
   publicApi_ts: 'public_api.ts',

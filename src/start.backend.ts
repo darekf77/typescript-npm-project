@@ -1,11 +1,37 @@
+import * as path from 'path';
+import * as fse from 'fs-extra';
+declare const global: any;
+if (global.globalSystemToolMode) {
+  const tmpEnv = path.join(__dirname, 'tmp-environment.json');
+  const tmpEnv2 = path.join(__dirname, '../tmp-environment.json');
+  const tmpEnv3 = path.join(__dirname, '../../tmp-environment.json');
+  try {
+    global['ENV'] = fse.existsSync(tmpEnv) && fse.readJSONSync(tmpEnv);
+    if (!global['ENV']) {
+      global['ENV'] = fse.existsSync(tmpEnv2) && fse.readJSONSync(tmpEnv2);
+    }
+    if (!global['ENV']) {
+      global['ENV'] = fse.existsSync(tmpEnv3) && fse.readJSONSync(tmpEnv3);
+    }
+  } catch (error) {
+    console.error(`Not able to read tmp-environment.json config`);
+    process.exit(1)
+  }
+}
+if (!global['ENV']) {
+  console.error(`ENVIRONMENT CONFIG IS NOT DEFINED`);
+  process.exit(1);
+}
+
+
 //#region imports
 import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+
 import { config } from './config';
 // import glob = require('glob')
 import scriptsFnArr from './scripts/index';
 
-import * as path from 'path';
+
 import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { Project } from './project';
@@ -18,7 +44,11 @@ import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
+import e from 'express';
 //#endregion
+
+const ENV = global['ENV'] as Models.env.EnvConfig;
+console.log(ENV.domain)
 
 //#region init incremental compiler
 IncCompiler.init(async (asyncEvents) => { }, {
