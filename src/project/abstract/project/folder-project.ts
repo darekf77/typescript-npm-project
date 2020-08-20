@@ -205,7 +205,7 @@ export abstract class FolderProject {
     if (this.typeIs('unknow')) {
       return;
     }
-    Helpers.log(`
+    Helpers.info(`
 
     Cleaning project: ${this.genericName}
 
@@ -302,7 +302,7 @@ export abstract class FolderProject {
       return;
     }
     if (showMsg) {
-      Helpers.log(`
+      Helpers.info(`
 
       Reseting project: ${this.genericName}
 

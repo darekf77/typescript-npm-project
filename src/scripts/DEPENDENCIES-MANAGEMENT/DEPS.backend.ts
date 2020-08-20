@@ -238,6 +238,13 @@ const $I = (args) => {
   $INSTALL(args);
 }
 
+const $REINSTALL = async (args) => {
+  const proj = Project.Current as Project;
+  await proj.clear();
+  await proj.filesStructure.init(args)
+  process.exit(0);
+};
+
 const $SINSTALL = (args) => {
   $INSTALL(args, true);
 }
@@ -391,6 +398,7 @@ export default {
   $UNINSTALL: Helpers.CLIWRAP($UNINSTALL, 'UNINSTALL'),
   $I: Helpers.CLIWRAP($I, '$I'),
   $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
+  $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
