@@ -111,6 +111,10 @@ export class FilesRecreator extends FeatureForProject {
           ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
           .concat(self.project.typeIs('angular-lib') ? ['src/tsconfig.app.json'] : [])
+          .concat(self.project.linkedFolders
+            .map(l => l.to?.replace(/^\.\//, ''))
+            .filter(f => !!f)
+          )
           .concat( // for site ignore auto-generate scr
             self.project.isSiteInStrictMode ? (
               self.project.customizableFilesAndFolders
