@@ -5,7 +5,7 @@ import { config } from '../../../config';
 export abstract class DbProcessProject {
   async hasParentWithSingularBuild(this: Project) {
     if (this.isWorkspaceChildProject || (this.isStandaloneProject && this.isContainerChild)) {
-      const db = await TnpDB.Instance(config.dbLocation);
+      const db = await TnpDB.Instance();
       const builds = await db.getBuildsBy({ location: this.parent.location, watch: true });
       return builds.length > 0;
     }
@@ -14,7 +14,7 @@ export abstract class DbProcessProject {
 
   async isSingularBuild(this: Project) {
     if (this.isWorkspace || this.isContainer) {
-      const db = await TnpDB.Instance(config.dbLocation);
+      const db = await TnpDB.Instance();
       const builds = await db.getBuildsBy({ location: this.location, watch: true });
       return builds.length > 0;
     }

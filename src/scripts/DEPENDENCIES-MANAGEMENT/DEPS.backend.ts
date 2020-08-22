@@ -106,7 +106,7 @@ export async function $RESET_NPM(args: string, exit = true) {
 }
 
 export async function $RESET_NPM_ALL(args: string, exit = true) {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const project = projects[index];
@@ -191,6 +191,11 @@ function $DEPS_RECREATE(args: string) {
 
 function $SHOW_CHILDREN() {
   console.log((Project.Current as Project).children.map(c => c.genericName).join('\n'))
+  process.exit(0)
+}
+
+function $SHOW_DB() {
+  Helpers.run(`code --goto ${config.dbLocation}`).sync();
   process.exit(0)
 }
 
@@ -389,6 +394,7 @@ export default {
   $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
+  $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
   $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),

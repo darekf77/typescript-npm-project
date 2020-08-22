@@ -121,7 +121,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     Helpers.log(`[init] adding project is not exists...`)
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
     await db.addProjectIfNotExist(this.project as any);
     Helpers.log(`[init] adding project is not exists...done`)
 

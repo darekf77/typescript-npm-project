@@ -142,7 +142,7 @@ inside generated projects...
     //#endregion
 
     Helpers.log(`[db][checkBuildIfAllowed] started... `);
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
 
     if (buildOptions.appBuild) {
       await db.checkBuildIfAllowed(

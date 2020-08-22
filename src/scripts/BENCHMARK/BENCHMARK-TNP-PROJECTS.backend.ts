@@ -5,7 +5,7 @@ import { config } from '../../config';
 
 async function BENCH_PROJ_DB() {
   global.hideLog = false;
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
 
   await Helpers.mesureExectionInMs('get project from db and stringigy', async () => {
     // global.codePurposeBrowser = true;
@@ -17,7 +17,7 @@ async function BENCH_PROJ_DB() {
 }
 
 export async function BENCH_DAEMON(args, exit = true) {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   try {
     const projs = await (await db.daemonInstance).allprojects().received;
     console.log(projs);

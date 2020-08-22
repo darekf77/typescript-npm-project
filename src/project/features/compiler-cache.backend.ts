@@ -49,7 +49,7 @@ export class CompilerCache extends FeatureForProject {
 
   public static async checkIfPojectHasUpToDateCompiledData(project: Project) {
     const projectLocation = project.location;
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
     let data = await db.rawGet(compierEntityKey) as any[];
     if (!_.isArray(data)) {
       return false;
@@ -93,7 +93,7 @@ export class CompilerCache extends FeatureForProject {
 
 
     `);
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
     let data = await db.rawGet(compierEntityKey) as any[];
     Helpers.log(`
 
@@ -117,7 +117,7 @@ export class CompilerCache extends FeatureForProject {
     await db.rawSet(compierEntityKey, data);
   }
   public static async unsetAllProjectsCompiledData() {
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
     await db.rawSet(compierEntityKey, []);
   }
   public static async unsetProjectHasUpToDateCompiledData(project: Project) {
@@ -131,7 +131,7 @@ export class CompilerCache extends FeatureForProject {
 
 
     `);
-    const db = await TnpDB.Instance(config.dbLocation);
+    const db = await TnpDB.Instance();
     let data = await db.rawGet(compierEntityKey) as any[];
     Helpers.log(`
 

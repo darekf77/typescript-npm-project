@@ -82,7 +82,7 @@ export class ProjectFactory {
     }
 
     if (_.isNil(options.skipInit)) {
-      options.skipInit = false;
+      options.skipInit = true;
     }
 
     if (!_.isArray(options.alsoBasedOn)) {

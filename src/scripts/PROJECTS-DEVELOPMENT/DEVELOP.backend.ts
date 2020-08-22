@@ -25,7 +25,7 @@ export async function $NAME_TEST() {
 }
 
 export async function killAll() {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   let projectsToKill = [];
   let p = (Project.Current as Project);
   projectsToKill.push(p)
@@ -62,7 +62,7 @@ function killvscode(args: string, exit = true) {
 export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   let projects = (await db.getProjects())
     .map(p => p.project as Project)
     .filter(p => !p.isGenerated);
@@ -192,7 +192,7 @@ async function $CHILDS_REQUIRED(args: string) {
 }
 
 export async function $ALL_PROJECTS(args: string) {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   const projects = (await db.getProjects()).map(p => p.project as Project);
   console.log(projects.map(p => p.info).join('\n'));
   process.exit(0)

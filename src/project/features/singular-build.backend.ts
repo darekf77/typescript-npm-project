@@ -83,7 +83,7 @@ export class SingularBuild extends FeatureForProject {
       .map(c => c.name);
 
     // if (this.project.isContainer) {
-    //   const db = await TnpDB.Instance(config.dbLocation);
+    //   const db = await TnpDB.Instance();
     //   var projectsToUpdate = (await db.getProjects()).map(c => c.project as Project)
     //     .filter(c => !c.name.startsWith('tnp'))
     //     .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)

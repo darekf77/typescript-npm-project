@@ -483,7 +483,7 @@ const $STOP = async (args) => {
 };
 
 const $STOP_BUILD_DIST_WATCH = async (args) => {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   const projectLocation = (Project.Current as Project).location;
   await db.updateProcesses();
   const pidsToKill = (await db.getBuilds())
@@ -509,7 +509,7 @@ const $STOP_BUILD_DIST_WATCH = async (args) => {
 };
 
 async function $DB_BUILDS_UPDATE() {
-  const db = await TnpDB.Instance(config.dbLocation);
+  const db = await TnpDB.Instance();
   await db.updateProcesses();
   process.exit(0)
 }
