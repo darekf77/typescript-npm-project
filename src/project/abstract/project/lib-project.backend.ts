@@ -447,7 +447,7 @@ export abstract class LibProject {
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);
       if (!fse.existsSync(file)) {
-        Helpers.error(`Resource file ${file} does not exist in ${this.location}`)
+        Helpers.error(`Resource file (package.json > tnp.resources[]) : \n ${file} \n does not exist in: \n ${this.location}`, false, true)
       }
       if (fse.lstatSync(file).isDirectory()) {
         // console.log('IS DIRECTORY', file)

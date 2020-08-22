@@ -23,6 +23,22 @@ export class NpmProject {
     //#endregion
   }
 
+  get lastNpmVersion(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.lastNpmVersion;
+    }
+    //#region @backend
+    let lastNpmVersion = void 0 as string;
+    try {
+      const ver = this.run(`npm show ${this.name} version`, { output: false }).sync().toString();
+      if (ver) {
+        lastNpmVersion = ver.trim();
+      }
+    } catch (error) { }
+    return lastNpmVersion;
+    //#endregion
+  }
+
   get resources(this: Project): string[] {
     if (Helpers.isBrowser) {
       return this.browser.resources;

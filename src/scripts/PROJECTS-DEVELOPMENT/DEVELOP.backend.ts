@@ -200,23 +200,35 @@ export async function $ALL_PROJECTS(args: string) {
 
 export async function $INFO() {
   const proj = Project.Current as Project;
-  console.log(`
+  console.clear()
+  console.info(`
 
   name: ${proj.name}
+  version: ${proj.version}
+  last npm version: ${proj.lastNpmVersion}
+  frameworkVersion: ${proj._frameworkVersion}
   genericName: ${proj.genericName}
+  isStandaloneProject: ${proj.isStandaloneProject}
   isGenerated: ${proj.isGenerated}
   isCoreProject: ${proj.isCoreProject}
   type: ${proj._type}
   parent name: ${proj.parent && proj.parent.name}
   grandpa name: ${proj.grandpa && proj.grandpa.name}
-
+  git origin: ${proj.git.originURL}
+  git branch name: ${proj.git.currentBranchName}
+  git commits number: ${proj.git.countComits()}
 
   `)
   process.exit(0)
 }
 
+const $CHECK = async () => {
+  await $INFO();
+}
+
 export default {
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
+  $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
   $ALL_PROJECTS: Helpers.CLIWRAP($ALL_PROJECTS, '$ALL_PROJECTS'),
   $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
   $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),

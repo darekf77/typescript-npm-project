@@ -287,11 +287,22 @@ export async function $REPUSH(args) {
   await $PUSH(args, true, true);
 }
 
+export async function $RENAME_ORIGIN(newOriginNameOrUrl: string) {
+  const proj = Project.Current;
+  if (proj && proj.git.isGitRepo) {
+    proj.git.renameOrigin(newOriginNameOrUrl);
+  } else {
+    Helpers.error(`This folder is not a git repo... `, false, true);
+  }
+  process.exit(0)
+}
+
 export default {
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
   $GIT_REMOVE_UNTRACKED: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
   $GIT_REMOVE_UNTRACKED_EVERYWHERE: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED_EVERYWHERE, '$GIT_REMOVE_UNTRACKED_EVERYWHERE'),
+  $RENAME_ORIGIN: Helpers.CLIWRAP($RENAME_ORIGIN, '$RENAME_ORIGIN'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),

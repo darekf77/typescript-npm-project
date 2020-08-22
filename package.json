@@ -37,6 +37,7 @@
           "json10",
           "lodash-walk-object",
           "typescript-class-helpers",
+          "background-worker-process",
           "morphi",
           "rxjs",
           "@ngtools/webpack",
@@ -315,6 +316,7 @@
             "typescript-formatter": "7.2.2",
             "callsite-record": "4.1.3",
             "@types/vinyl": "^2.0.2",
+            "background-worker-process": "0.0.5",
             "terminal-ui": {
               "progress": "^2.0.3",
               "@types/progress": "^2.0.3",
@@ -495,6 +497,7 @@
     "angular-tree-component": "^7.0.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "background-worker-process": "0.0.5",
     "base-model-wrap": "3.0.9",
     "bcryptjs": "2.4.3",
     "body-parser": "^1.18.2",
