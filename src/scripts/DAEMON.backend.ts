@@ -1,16 +1,17 @@
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
-import { config } from '../config';
+
+// TODO this will be done with background-worker-process
 
 export async function DAEMON_TEST(args, exit = true) {
   const db = await TnpDB.Instance();
-  await db.DaemonTest()
+  // await db.DaemonTest()
   process.exit(0);
 }
 
 export async function DAEMON_KILL(args, exit = true) {
   const db = await TnpDB.Instance();
-  await Helpers.killProcessByPort(await db.getDaemonPort());
+  // await Helpers.killProcessByPort(await db.getDaemonPort());
   process.exit(0);
 }
 
