@@ -426,7 +426,8 @@
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp",
-    "tnp-ins": "bin/tnp-ins"
+    "tnp-ins": "bin/tnp-ins",
+    "tnp-debug": "bin/tnp-debug"
   },
   "preferGlobal": true,
   "devDependencies": {},

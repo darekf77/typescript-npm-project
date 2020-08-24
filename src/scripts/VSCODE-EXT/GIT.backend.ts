@@ -297,6 +297,40 @@ export async function $RENAME_ORIGIN(newOriginNameOrUrl: string) {
   process.exit(0)
 }
 
+export async function $DIFF(newOriginNameOrUrl: string) {
+  const proj = Project.Current as Project;
+
+  function cmd(p: Project) {
+
+    const out = p.run(`git diff --name-only`, { output: false }).sync().toString();
+    if (out.trim() !== '' && out.trim().split('\n').length > 0) {
+      Helpers.info(`${chalk.bold(p.genericName)}`);
+      console.log(`${out.trim().split('\n').map(l => `${[p.location]}/${l}`).join('\n')}`);
+    } else {
+      Helpers.info(`${chalk.bold(p.genericName)} - nothing has changed...`);
+    }
+  }
+
+  if (proj) {
+    if (proj.isContainer) {
+      if (proj.git.isGitRepo) {
+        cmd(proj);
+      }
+      (proj.children as Project[]).forEach(c => {
+        cmd(c);
+      })
+    } else if (proj.git.isGitRepo) {
+      cmd(proj);
+    }
+
+  } else {
+    Helpers.error(`This folder is not a git repo... `, false, true);
+  }
+  process.exit(0)
+}
+
+
+
 export default {
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
@@ -306,5 +340,6 @@ export default {
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
+  $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $RECOMMIT: Helpers.CLIWRAP($RECOMMIT, '$RECOMMIT'),
 }

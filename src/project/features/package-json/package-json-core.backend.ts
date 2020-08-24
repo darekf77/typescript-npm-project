@@ -46,7 +46,7 @@ export class PackageJsonCore {
   }
 
   get linkedFolders() {
-    const res = this.data ?.tnp ?.overrided ?.linkedFolders;
+    const res = this.data?.tnp?.overrided?.linkedFolders;
     if (_.isArray(res)) {
       return res;
     }
@@ -109,10 +109,10 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
-  hasDependency(dependencyName: string) {
+  hasDependency(dependencyName: string, searchOnlyDependencies = false) {
     const deps = [
       ...Object.keys(this.data.dependencies || {}),
-      ...Object.keys(this.data.devDependencies || {})
+      ...(searchOnlyDependencies ? [] : Object.keys(this.data.devDependencies || {}))
     ];
     return deps.includes(dependencyName);
   }
@@ -145,7 +145,7 @@ export class PackageJsonCore {
       if (fse.existsSync(pathToBaselineStricSite)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaselineStricSite)
         return pathToBaselineStricSite;
-      } else if (this.data.tnp.dependsOn ?.length > 0 && fse.existsSync(pathToBaselineDependency)) {
+      } else if (this.data.tnp.dependsOn?.length > 0 && fse.existsSync(pathToBaselineDependency)) {
         this.fixUnexistedBaselineInNOdeModules(pathToBaselineDependency);
         return pathToBaselineDependency;
       } else {

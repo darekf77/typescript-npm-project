@@ -8,6 +8,9 @@ import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-
 import { config } from '../../config';
 import { Helpers } from 'tnp-helpers';
 
+/**
+ * DEPRAECATED
+ */
 export class SingularBuild extends FeatureForProject {
   singularWatchProj: Project;
   async init(watch: boolean, prod: boolean) {

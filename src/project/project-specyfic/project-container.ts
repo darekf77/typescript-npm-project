@@ -74,7 +74,7 @@ export class ProjectContainer
     }
     const { prod, watch, outDir, args, appBuild } = buildOptions;
 
-    await (new SingularBuild(this)).init(watch, prod);
+
     //#endregion
   }
 }
