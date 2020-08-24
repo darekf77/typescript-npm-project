@@ -1,5 +1,8 @@
 # tsc-npm-project (alpha)
 
+# copy script for dependencies
+rimraf ../tnp/node_modules/`basename \`pwd\`` && cp -R `pwd`/dist ../tnp/node_modules/`basename \`pwd\``
+
 META COMMENTS:
 - @LAST
 - @REMOVE_THIS
