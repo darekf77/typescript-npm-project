@@ -218,7 +218,7 @@ export async function $PULL(args: string, exit = true) {
           } pull of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
         action = fse.existsSync(dest) ? 'pull' : 'clone';
         try {
-          const dest = path.join(container.location, projectName);
+
           if (action === 'pull') {
             let proj: Project;
             while (!proj) {
