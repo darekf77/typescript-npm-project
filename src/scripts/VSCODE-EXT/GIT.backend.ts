@@ -204,9 +204,7 @@ export async function $PULL(args: string, exit = true) {
     global.hideLog = false;
     const ADDRESS_GITHUB_SSH = container.run(`git config --get remote.origin.url`,
       { output: false }).sync().toString();
-    const projects = project.children
-      .filter(c => project.packageJson.linkedProjects.includes(c.name))
-      .map(c => c.name)
+    const projects = project.packageJson.linkedProjects;
 
     for (let index = 0; index < projects.length; index++) {
       const projectName = projects[index];
@@ -217,7 +215,7 @@ export async function $PULL(args: string, exit = true) {
       const process = async (retry = false) => {
         Helpers.info(`${retry ? '' : '\n\n'} -- - ${
           retry ? 'Retrying' : 'Starting'
-          } dump of ${chalk.underline(projectName)} -- - ${retry ? '' : '\n\n'}`)
+          } pull of ${chalk.underline(projectName)} --- ${retry ? '' : '\n\n'}`)
         action = fse.existsSync(dest) ? 'pull' : 'clone';
         try {
           const dest = path.join(container.location, projectName);
