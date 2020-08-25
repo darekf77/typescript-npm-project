@@ -93,6 +93,9 @@ export class QuickFixes extends FeatureForProject {
   }
 
   public missingLibs(missingLibsNames: string[] = []) {
+    if (this.project.isContainer) {
+      return;
+    }
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
