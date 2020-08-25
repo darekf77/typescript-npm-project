@@ -122,7 +122,7 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
     }
 
     let commitSuccess = false;
-    if (_.isString(comitMessage) && comitMessage.length > 1) {
+    if (_.isString(comitMessage) && comitMessage.length >= 1) {
       if (proj.git.thereAreSomeUncommitedChange) {
         Helpers.info(`Comminting changes automaticly with message: "${chalk.bold(comitMessage)}"`)
         try {
