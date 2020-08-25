@@ -254,6 +254,12 @@ const $SINSTALL = (args) => {
   $INSTALL(args, true);
 }
 
+async function $LINKCORE() {
+  Project.linkCoreFolders();
+  Helpers.info('Done linking core folders');
+  process.exit(0);
+}
+
 async function $LINK() {
   let project = (Project.Current as Project);
 
@@ -405,6 +411,7 @@ export default {
   $I: Helpers.CLIWRAP($I, '$I'),
   $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
+  $LINKCORE: Helpers.CLIWRAP($LINKCORE,'$LINKCORE'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),

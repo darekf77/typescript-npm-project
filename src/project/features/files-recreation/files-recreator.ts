@@ -44,8 +44,8 @@ export class FilesRecreator extends FeatureForProject {
       return;
     }
     this.initAssets();
-    this.commonFiles();
     this.handleProjectSpecyficFiles();
+    this.commonFiles();
 
     this.gitignore();
     this.npmignore();
@@ -472,6 +472,7 @@ ${ coreFiles}
 
   commonFiles() {
     const wokrspace = Project.by<Project>('workspace');
+
     const files = this.commonFilesForAllProjects;
     files.map(file => {
       return {

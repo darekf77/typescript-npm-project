@@ -95,9 +95,9 @@ export async function chainBuild(args: string) {
 ${deps.map((d, i) => {
     const s = _.isArray(copyto[d.location]) ? ` copy to: ${
       (copyto[d.location].length === 0) ? '-' : copyto[d.location]
-      .map(p => chalk.italic(p.name)
-      // + '(' + p.location + ')'
-      ).join(', ')
+        .map(p => chalk.italic(p.name)
+          // + '(' + p.location + ')'
+        ).join(', ')
       }` : '';
     return (i + 1) + '. ' + chalk.bold(d.genericName) + s;
   }).join('\n')}

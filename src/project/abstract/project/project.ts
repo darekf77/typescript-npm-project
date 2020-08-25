@@ -100,6 +100,15 @@ export class Project extends $Project<Project>
   browser: any;
   location: string;
 
+  //#region @backend
+  public static linkCoreFolders() {
+    config.coreProjectVersions.forEach(v => {
+      const continer = Project.by('container', v as any) as Project;
+      continer.recreate.handleProjectSpecyficFiles();
+    });
+  }
+  //#endregion
+
   get info(this: Project) {
     if (Morphi.IsBrowser) {
       // @ts-ignore
