@@ -208,7 +208,7 @@ export async function $PULL(args: string, exit = true) {
 
     for (let index = 0; index < projects.length; index++) {
       const projectName = projects[index];
-      const githubGitUrl = `${ADDRESS_GITHUB_SSH}${projectName}`;
+      const githubGitUrl = ADDRESS_GITHUB_SSH.replace(`${container.name}.git`, `${projectName}.git`);
       let action: TAction = 'clone';
       const dest = path.join(container.location, projectName);
 
