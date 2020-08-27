@@ -226,10 +226,12 @@ export class ProjectIsomorphicLib
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
     const { obscure, uglify, nodts } = this.buildOptions;
+    if (outDir === 'bundle') {
+      this.cutReleaseCode();
+    }
 
     if (outDir === 'bundle' && (obscure || uglify)) {
-      // @LAST
-      this.cutReleaseCode();
+
       this.quickFixes.badNpmPackages();
       Helpers.info(`
 
