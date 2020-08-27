@@ -64,7 +64,16 @@ export abstract class LibProject {
     }
   }
 
-  protected beforeLibBuild(this: Project, outDir) {
+  private linkSourceOfItselfToNodeModules(this: Project, ) {
+    const pathToSelf = path.join(this.location, config.folder.node_modules, this.name);
+    const pathToSrc = path.join(this.location, this.typeIs('angular-lib') ? config.folder.components : config.folder.src);
+    Helpers.removeIfExists(pathToSelf);
+    Helpers.createSymLink(pathToSrc, pathToSelf);
+  }
+
+  protected beforeLibBuild(this: Project, outDir: Models.dev.BuildDir) {
+
+    this.linkSourceOfItselfToNodeModules();
     this.copyWhenExist('bin', outDir);
     this.linkWhenExist('package.json', outDir);
     this.copyWhenExist('.npmrc', outDir);
