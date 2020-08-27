@@ -169,6 +169,7 @@ const argsReplacementsBuild = {
   'ba': 'build:app',
   'bap': 'build:app:prod',
   'bdw': 'build:dist:watch',
+  'bw': 'build:watch',
   'bdpw': 'build:dist:prod:watch',
   'bd': 'build:dist',
   'bb': 'build:bundle',

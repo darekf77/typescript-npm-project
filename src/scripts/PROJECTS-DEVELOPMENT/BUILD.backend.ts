@@ -35,8 +35,14 @@ const $CLEAN_BUILD = async (args) => {
   await BUILD_DIST(args);
 };
 
+const BUILD_DIST_WATCH = async (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
+
 const $BUILDWATCH = async (args) => {
-  await chainBuild(args)
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isStandaloneProject) {
+    args = `${args} --skipCopyToSelection`;
+  }
+  await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
 
 async function $DEFAULT_BUILD(args) {
@@ -56,7 +62,7 @@ async function $DEFAULT_BUILD(args) {
 }
 
 
-const BUILD_DIST_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
+
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
   (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);

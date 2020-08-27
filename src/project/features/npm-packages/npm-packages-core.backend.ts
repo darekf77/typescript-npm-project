@@ -31,7 +31,10 @@ export class NpmPackagesCore extends FeatureForProject {
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
-    Helpers.log(`[actualNpmProcess] command: ${command} in folder: <...>/${this.project.location}`)
+    Helpers.info(`[actualNpmProcess] npm instalation:
+    ${command} in folder: <...>/${this.project.location}
+
+    `)
     if (remove) {
       executeCommand(command, this.project);
     } else {
