@@ -111,8 +111,7 @@ export class Project extends $Project<Project>
 
   get info(this: Project) {
     if (Morphi.IsBrowser) {
-      // @ts-ignore
-      return this.browser.info;
+      return this.browser.info as any;
     }
     //#region @backend
     return `(${this._type}) ${this.genericName}`;

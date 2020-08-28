@@ -5,7 +5,7 @@ import { TnpDB } from 'tnp-db';
 
 export async function DAEMON_TEST(args, exit = true) {
   const db = await TnpDB.Instance();
-  // await db.DaemonTest()
+  await db.daemonTest();
   process.exit(0);
 }
 
