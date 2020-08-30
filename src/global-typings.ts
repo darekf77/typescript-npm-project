@@ -43,6 +43,8 @@ declare global {
       tnpNonInteractive?: boolean;
       //#region @backend
       tnpNoColorsMode?: boolean;
+      useWorker?: boolean;
+      reinitDb?: boolean;
       spinner: Ora;
       //#endregion
 

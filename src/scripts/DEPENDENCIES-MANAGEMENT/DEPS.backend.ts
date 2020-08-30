@@ -199,6 +199,13 @@ function $SHOW_DB() {
   process.exit(0)
 }
 
+async function $SHOW_PROJECTS() {
+  const db = await TnpDB.Instance();
+  const projects = (await db.getProjects())
+  console.log(projects.map(p => p.locationOfProject));
+  process.exit(0)
+}
+
 function $SHOW_CORE_MODULES() {
   const container = Project.by('container', 'v1');
   const workspace = Project.by('workspace', 'v1');
@@ -400,6 +407,7 @@ export default {
   $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
+  $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
   $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
   $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
@@ -411,7 +419,7 @@ export default {
   $I: Helpers.CLIWRAP($I, '$I'),
   $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
-  $LINKCORE: Helpers.CLIWRAP($LINKCORE,'$LINKCORE'),
+  $LINKCORE: Helpers.CLIWRAP($LINKCORE, '$LINKCORE'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),

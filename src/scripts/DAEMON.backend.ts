@@ -5,7 +5,8 @@ import { TnpDB } from 'tnp-db';
 
 export async function DAEMON_TEST(args, exit = true) {
   const db = await TnpDB.Instance();
-  await db.daemonTest();
+  const projs = await db.getProjects();
+  console.log(projs.map(c => c.project.name));
   process.exit(0);
 }
 

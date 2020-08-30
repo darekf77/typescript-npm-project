@@ -11,6 +11,27 @@ if (typeof frameworkName !== 'undefined') {
   global.frameworkName = 'firedev';
 }
 
+var reinitDb= false;
+var reinitDb = process.argv.find(a => a.startsWith('-reinitDb'));
+if (typeof reinitDb !== 'undefined') {
+  global.reinitDb = true;
+}
+
+global.useWorker = true;
+var useWorker = process.argv.find(a => a.startsWith('-useWorker'));
+if (typeof useWorker !== 'undefined') {
+  var useWorkerArr = useWorker.split('=');
+  if(useWorkerArr.length === 2) {
+    if(useWorkerArr[1] === 'false') {
+      global.useWorker = false;
+    } else {
+      global.useWorker = true;
+    }
+  } else {
+    global.useWorker = true;
+  }
+}
+
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
 if (typeof verboseLevel !== 'undefined') {
   global.hideLog = false;
