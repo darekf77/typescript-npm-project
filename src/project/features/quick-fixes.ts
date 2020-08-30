@@ -124,6 +124,19 @@ export default _default;
     })
   }
 
+  public linkSourceOfItselfToNodeModules() {
+    const pathToSelf = path.join(this.project.location, config.folder.node_modules, this.project.name);
+    const pathToSrc = path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src);
+    Helpers.removeIfExists(pathToSelf);
+    glob.sync(`${pathToSrc}/**/*.*`)
+      .filter(f => !Helpers.isFolder(f))
+      .forEach(f => {
+        const relative = f.replace(`${pathToSrc}/`, '');
+        Helpers.createSymLink(f, path.join(pathToSelf, relative));
+        Helpers.createSymLink(f, path.join(pathToSelf, config.folder.browser, relative));
+      });
+  }
+
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
     if (!fse.existsSync(this.project.location)) {
       return;
