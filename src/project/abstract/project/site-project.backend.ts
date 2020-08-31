@@ -20,6 +20,7 @@ export abstract class SiteProject {
     if (_.isUndefined(this.cache['isSite'])) {
       const result = this.isSiteInStrictMode || this.isSiteInDependencyMode;
       this.cache['isSite'] = result;
+      return result;
     } else {
       return this.cache['isSite'];
     }

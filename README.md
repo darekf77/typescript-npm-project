@@ -1,5 +1,8 @@
 # tsc-npm-project (alpha)
 
+# mesure script time
+time tnp build ss-ui
+
 # copy script for dependencies
 rimraf ../tnp/node_modules/`basename \`pwd\`` && cp -R `pwd`/dist ../tnp/node_modules/`basename \`pwd\``
 

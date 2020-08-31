@@ -125,6 +125,9 @@ export default _default;
   }
 
   public linkSourceOfItselfToNodeModules() {
+    if (!this.project.isStandaloneProject) {
+      return;
+    }
     const pathToSelf = path.join(this.project.location, config.folder.node_modules, this.project.name);
     const pathToSrc = path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src);
     Helpers.removeIfExists(pathToSelf);
