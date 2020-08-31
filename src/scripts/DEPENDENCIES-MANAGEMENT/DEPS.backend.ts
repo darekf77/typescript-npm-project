@@ -1,12 +1,15 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as open from 'open';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
-import { TnpDB } from 'tnp-db';
+import { TnpDB, DbDaemonController } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
+import { CLASS } from 'typescript-class-helpers';
+import { WorkerProcessClass } from 'background-worker-process';
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -194,8 +197,15 @@ function $SHOW_CHILDREN() {
   process.exit(0)
 }
 
-function $SHOW_DB() {
-  Helpers.run(`code --goto ${config.dbLocation}`).sync();
+async function $SHOW_DB() {
+  const db = await TnpDB.Instance();
+  const port = await db.getWokerPort();
+  if (_.isNumber(port)) {
+    const addressToShow = `http://localhost:${port}/${CLASS.getName(WorkerProcessClass)}/${CLASS.getName(DbDaemonController)}/info`;
+    await open(addressToShow);
+  } else {
+    Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
+  }
   process.exit(0)
 }
 

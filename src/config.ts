@@ -265,6 +265,7 @@ export const config = {
     'l': 'last',
     'sl': 'show:last',
     'i': 'install',
+    'si': 'sinstall',
     'rc': 'recommit',
     'rp': 'release:prod',
     'r': 'release',

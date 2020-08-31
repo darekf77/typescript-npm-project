@@ -159,6 +159,13 @@ const $KILLALLNODE = () => {
   killallnode()
 }
 
+const $KILLWORKER = async () => {
+  const db = await TnpDB.Instance();
+  await db.killWorker();
+  Helpers.info(`Done killing worker`);
+  process.exit(0)
+}
+
 const CHOKI = () => {
   this.project = (Project.Current as Project);
   // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
@@ -239,6 +246,7 @@ export default {
   $KILLONPORT: Helpers.CLIWRAP($KILLONPORT, '$KILLONPORT'),
   $KILLALL: Helpers.CLIWRAP($KILLALL, '$KILLALL'),
   $KILLALLNODE: Helpers.CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
+  $KILLWORKER: Helpers.CLIWRAP($KILLWORKER, '$KILLWORKER'),
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
 }
