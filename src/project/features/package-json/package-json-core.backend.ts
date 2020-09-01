@@ -188,15 +188,18 @@ export class PackageJsonCore {
     return false;
   }
 
-  get isGeneratedForRelease() {
-    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGeneratedForRelease)) {
-      if (_.isBoolean(this.data.tnp.isGeneratedForRelease)) {
-        return this.data.tnp.isGeneratedForRelease;
-      }
-      Helpers.error(`[isGeneratedForRelease] Bad value in package.json, tnp.isGenerated should be boolean.`, true, true);
-      Helpers.error(`[isGeneratedForRelease] Location of package.json: ${this.cwd}`, true, true)
+  get isGeneratedForRelease(this: Project) {
+    const p = path.basename(path.join(this.location, '../../..'))
+    if (p !== config.folder.tmpBundleRelease) {
+      return false;
     }
-    return false;
+    const orgProjPath = path.resolve(path.join(this.location, '../../../..'));
+    const proj = Project.From(orgProjPath);
+    const res = proj && (proj.name === this.name && proj.version === this.version);
+    // if (res) {
+    //   console.log('fond', this.location)
+    // }
+    return res;
   }
 
   get isGenerated() {

@@ -69,6 +69,7 @@ const tempFolders = {
   docs: 'docs',
   dist: 'dist',
   tmp: 'tmp',
+  tmpBundleRelease: 'tmp-bundle-release',
   tempSrc: 'tmp-src',
   tempSrcDist: 'tmp-src-dist',
   previewDistApp: 'dist-app',

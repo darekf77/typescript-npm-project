@@ -8,6 +8,7 @@ import { TnpDB } from 'tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
+import chalk from 'chalk';
 
 
 
@@ -65,7 +66,7 @@ export async function $DEVELOP(args: string, exit = true) {
   const db = await TnpDB.Instance();
   let projects = (await db.getProjects())
     .map(p => p.project as Project)
-    .filter(p => !p.isGenerated);
+    .filter(p => !p.isGenerated && !p.isGeneratedForRelease);
 
   const igt = path.join((Project.Tnp as Project).location, '../..', 'igt');
   // console.log('igt', igt)
@@ -126,6 +127,12 @@ export async function $DEVELOP(args: string, exit = true) {
 
   });
 
+  Helpers.info(`
+
+  TO OPEN:
+  ${projectForAction.map(p => `${chalk.bold(p.name)} (${p.location})`).join('\n')}
+
+  `)
   killvscode('', false);
   for (let index = 0; index < projectForAction.length; index++) {
     const projectToOpen = projectForAction[index];

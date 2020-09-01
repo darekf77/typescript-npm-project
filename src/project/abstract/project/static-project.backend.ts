@@ -45,6 +45,10 @@ export abstract class StaticProject {
   }
 
 
+  get isGeneratedForRelease(this: Project) {
+    return this.packageJson.isGeneratedForRelease;
+  }
+
   /**
    * Only for generated projects
    */
