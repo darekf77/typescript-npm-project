@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
-import { TnpDB, DbDaemonController } from 'tnp-db';
+import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { CLASS } from 'typescript-class-helpers';
 import { WorkerProcessClass } from 'background-worker-process';
@@ -332,6 +332,41 @@ async function $UNLINK() {
   process.exit(0)
 }
 
+async function $COPY_TO_REMOVE(args) {
+  const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
+  if (proj) {
+    const db = await TnpDB.Instance();
+    const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
+    if (cmd) {
+      const b = await BuildOptions.from(cmd.command, Project.Current);
+      (b.copyto as Project[]) = (b.copyto as Project[]).filter(p => p !== proj);
+      await db.updateCommandBuildOptions(Project.Current.location, b);
+      Helpers.info(`Build option update done.. removed ${chalk.bold(proj.genericName)}`);
+    }
+  }
+  process.exit(0);
+}
+
+async function $COPY_TO_ADD(args) {
+  const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
+  if (proj) {
+    const db = await TnpDB.Instance();
+    const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
+    if (cmd) {
+      const b = await BuildOptions.from(cmd.command, Project.Current);
+      (b.copyto as Project[]).push(proj);
+      await db.updateCommandBuildOptions(Project.Current.location, b);
+      Helpers.info(`Build option update done.. added ${chalk.bold(proj.genericName)}`);
+    }
+  }
+  process.exit(0);
+}
+
+async function $COPY_TO_LIST(args) {
+
+}
+
+
 const $copytoproject = (args) => {
   copyToHandleArgs(args)
 }
@@ -435,6 +470,9 @@ export default {
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
   $copyto: Helpers.CLIWRAP($copyto, '$copyto'),
+  $COPY_TO_LIST: Helpers.CLIWRAP($COPY_TO_LIST, '$COPY_TO_LIST'),
+  $COPY_TO_ADD: Helpers.CLIWRAP($COPY_TO_ADD, '$COPY_TO_ADD'),
+  $COPY_TO_REMOVE: Helpers.CLIWRAP($COPY_TO_REMOVE, '$COPY_TO_REMOVE'),
   $copymoduletoproject: Helpers.CLIWRAP($copymoduletoproject, '$copymoduletoproject'),
   $copy_module_to_project: Helpers.CLIWRAP($copy_module_to_project, '$copy_module_to_project'),
 }
