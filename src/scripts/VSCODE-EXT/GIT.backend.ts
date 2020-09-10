@@ -111,7 +111,7 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
       }
     }
     proj = Project.From<Project>(dest);
-
+    proj.removeFolderByRelativePath('node_modules/husky');
     if (!proj) {
       Helpers.error(`Not able to find project ${chalk.bold(projectName)} `, false, true)
     }
