@@ -10,6 +10,7 @@ import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { CLASS } from 'typescript-class-helpers';
 import { WorkerProcessClass } from 'background-worker-process';
+import { Morphi } from 'morphi';
 
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
@@ -201,12 +202,16 @@ async function $SHOW_DB() {
   const db = await TnpDB.Instance();
   const port = await db.getWokerPort();
   if (_.isNumber(port)) {
-    const addressToShow = `http://localhost:${port}/${CLASS.getName(WorkerProcessClass)}/${CLASS.getName(DbDaemonController)}/info`;
+    const addressToShow = Morphi.getHttpPathBy<DbDaemonController>(DbDaemonController, port, 'info');
     await open(addressToShow);
   } else {
     Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
   }
   process.exit(0)
+}
+
+async function $SHOW_WORKER() {
+  await $SHOW_DB();
 }
 
 async function $SHOW_PROJECTS() {
@@ -215,6 +220,7 @@ async function $SHOW_PROJECTS() {
   console.log(projects.map(p => p.locationOfProject));
   process.exit(0)
 }
+
 
 function $SHOW_CORE_MODULES() {
   const container = Project.by('container', 'v1');
@@ -454,6 +460,7 @@ export default {
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
   $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
+  $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
   $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),

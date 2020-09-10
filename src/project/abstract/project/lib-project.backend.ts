@@ -360,7 +360,6 @@ export abstract class LibProject {
           //   delete packageJsonAdd.bin[k];
           // });
           Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
-          // @LAST
           Helpers.info('log addtional bundle created');
           try {
             Helpers.run(`code ${additionBase}`).sync();

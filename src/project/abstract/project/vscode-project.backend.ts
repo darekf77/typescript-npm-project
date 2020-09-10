@@ -224,6 +224,7 @@ export abstract class VscodeProject {
         "cwd": void 0,
         "args": [],
         "runtimeArgs": [
+          "--nolazy", "-r", "ts-node/register",
           "--experimental-worker"
         ]
       };
@@ -262,6 +263,7 @@ export abstract class VscodeProject {
         "console": "internalConsole",
         "internalConsoleOptions": "neverOpen",
         "runtimeArgs": [
+          // "--nolazy", "-r", "ts-node/register",
           "--experimental-worker"
         ]
       };
