@@ -203,7 +203,7 @@
             "typescript-class-helpers": "1.0.4",
             "tslib": "^1.8.1",
             "ts-node": "^7.0.1",
-            "typescript": "2.6.2",
+            "typescript": "3.8.3",
             "tslint": "^5.9.1",
             "eslint": "^4.15.0",
             "nodemon": "^1.14.11",
@@ -422,7 +422,7 @@
     }
   },
   "name": "tnp",
-  "version": "0.0.63",
+  "version": "0.0.64",
   "scripts": {},
   "main": "index.js",
   "bin": {
