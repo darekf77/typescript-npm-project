@@ -8,8 +8,6 @@ import { Helpers } from 'tnp-helpers';
 import { config } from '../../config';
 import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
-import { CLASS } from 'typescript-class-helpers';
-import { WorkerProcessClass } from 'background-worker-process';
 import { Morphi } from 'morphi';
 
 async function copyModuleto(args: string) {
