@@ -41,9 +41,11 @@ export class CopyManager extends FeatureForProject {
     if (watch) {
       await this.start(void 0, void 0, watch);
       await this.startAndWatch();
+
     } else {
       await this.start();
     }
+
   }
   //#endregion
 
