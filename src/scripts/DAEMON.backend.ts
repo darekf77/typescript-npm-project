@@ -18,12 +18,12 @@ export async function DAEMON_KILL(args, exit = true) {
 
 export async function DAEMON_LISTEN() {
   const db = await TnpDB.Instance();
-  db.listenToChannel(Project.Current, 'tnp-copyto-add')
+  // db.listenToChannel(Project.Current, 'tnp-copyto-add')
 }
 
 export async function DAEMON_TRIGGER() {
   const db = await TnpDB.Instance();
-  await db.triggerChangeForProject(Project.Current, 'tnp-copyto-add');
+  // await db.triggerChangeForProject(Project.Current, 'tnp-copyto-add');
 }
 
 
