@@ -77,7 +77,7 @@ export async function start(
   // Helpers.log(argsv)
   // process.exit(0)
   Helpers.log(`[start] accesing db..please wait`)
-  const db = await TnpDB.Instance();
+
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
 
@@ -90,6 +90,7 @@ export async function start(
   if (lastCmds.includes(arg)) {
     Helpers.log(`DO NOTHIGN`);
   } else {
+    const db = await TnpDB.Instance();
     Helpers.log('[db] staring setting command...')
     await db.setCommand(argsv.join(' '));
     Helpers.log('[db] finish setting command')
