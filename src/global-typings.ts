@@ -44,6 +44,7 @@ declare global {
       //#region @backend
       tnpNoColorsMode?: boolean;
       useWorker?: boolean;
+      restartWorker?: boolean;
       reinitDb?: boolean;
       dbAlreadyRecreated?: boolean;
       spinner: Ora;

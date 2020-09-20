@@ -11,18 +11,24 @@ if (typeof frameworkName !== 'undefined') {
   global.frameworkName = 'firedev';
 }
 
-var reinitDb= false;
+var reinitDb = false;
 var reinitDb = process.argv.find(a => a.startsWith('-reinitDb'));
 if (typeof reinitDb !== 'undefined') {
   global.reinitDb = true;
+}
+
+global.restartWorker = false;
+var restartWorkerString = process.argv.find(a => a.startsWith('-restartWorker'));
+if (typeof restartWorkerString !== 'undefined') {
+  global.restartWorker = true;
 }
 
 global.useWorker = true;
 var useWorker = process.argv.find(a => a.startsWith('-useWorker'));
 if (typeof useWorker !== 'undefined') {
   var useWorkerArr = useWorker.split('=');
-  if(useWorkerArr.length === 2) {
-    if(useWorkerArr[1] === 'false') {
+  if (useWorkerArr.length === 2) {
+    if (useWorkerArr[1] === 'false') {
       global.useWorker = false;
     } else {
       global.useWorker = true;

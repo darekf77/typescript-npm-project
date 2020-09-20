@@ -233,7 +233,7 @@ export class PackageJsonCore {
 
   public copyTo(projectOrPath: Project | String) {
     if (!(_.isObject(projectOrPath) || _.isString(projectOrPath))) {
-      Helpers.error(`[packagejson][copyto] Incorrect project of path`);
+      Helpers.error(`[packagejson][copyTo] Incorrect project of path`);
     }
     const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
       (projectOrPath as Project).location, config.file.package_json);

@@ -41,6 +41,36 @@ export class CopyManager extends FeatureForProject {
     if (watch) {
       await this.start(void 0, void 0, watch);
       await this.startAndWatch();
+      const db = await TnpDB.Instance();
+
+      const updateFromDbLastCommand = (channel: string) => async () => {
+        Helpers.log(`TRigger of updateFromDbLastCommand`); // @LAST WHAT THE FUCK
+        const db = await TnpDB.Instance();
+        const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
+        if (cmd) {
+          const b = await BuildOptions.from(cmd.command, Project.Current);
+          Helpers.log(`
+
+          COPYTO UPDATED: "${channel}"
+
+          from: ${(this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')}
+
+          to: ${(b.copyto as Project[]).map(c => c.name).join(', ')}
+
+      `)
+          this.buildOptions.copyto = b.copyto;
+        }
+      }
+
+      db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
+        Helpers.log(`[copytomanager] realtime update add`);
+        await updateFromDbLastCommand('tnp-copyto-add')();
+      });
+
+      db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
+        Helpers.log(`[copytomanager] realtime update remove`);
+        await updateFromDbLastCommand('tnp-copyto-remove')();
+      });
 
     } else {
       await this.start();
@@ -80,7 +110,7 @@ export class CopyManager extends FeatureForProject {
   private startAndWatch() {
     const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
 
-    // Helpers.log(`watching folder for as copy source !! ${monitorDir}`)
+    // Helpers.log(`watching folder for as copy source!! ${ monitorDir } `)
 
     if (fse.existsSync(monitorDir)) {
       watch(monitorDir, {
@@ -106,7 +136,7 @@ export class CopyManager extends FeatureForProject {
       })
 
     } else {
-      console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir}`);
+      console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir} `);
       setTimeout(() => {
         this.startAndWatch();
       }, 1000);
@@ -182,22 +212,22 @@ export class CopyManager extends FeatureForProject {
 
     if (this.project.isContainerWorkspaceRelated || options.forceCopyPackageJSON) {
       const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
-      // console.log(`packageJsonLocation: ${packageJsonLocation}`)
+      // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
       // console.log('packageJson', packageJson)
       fse.writeJsonSync(packageJsonLocation, packageJson, {
         spaces: 2,
         encoding: 'utf8'
       });
-      // console.log(`packageJsonLocation saved: ${packageJsonLocation}`)
+      // console.log(`packageJsonLocation saved: ${ packageJsonLocation } `)
     }
     if (this.project.isWorkspace) {
       if (options.markAsGenerated) {
         Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-        This workspace is generated.
+      This workspace is generated.
       `);
       } else {
         Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-        This is container for workspaces.
+      This is container for workspaces.
       `);
       }
     }
@@ -205,9 +235,9 @@ export class CopyManager extends FeatureForProject {
     if (showInfo) {
       let dir = path.basename(path.dirname(destinationLocation));
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
-        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
+        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))} / ${dir} `
       }
-      Helpers.info(`Source of project "${this.project.genericName})" generated in ${dir}/(< here >) `)
+      Helpers.info(`Source of project "${this.project.genericName})" generated in ${dir} /(< here >) `)
     }
 
 

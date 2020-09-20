@@ -336,34 +336,43 @@ async function $UNLINK() {
   process.exit(0)
 }
 
-async function $COPY_TO_REMOVE(args) {
+async function ACTION_COPYTO(action: 'add' | 'remove', args) {
   const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
   if (proj) {
+    Helpers.info(`[copyto] ${action.toUpperCase()} project: ${proj.name}`);
     const db = await TnpDB.Instance();
+    Helpers.log(`instance ok`);
     const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
     if (cmd) {
-      const b = await BuildOptions.from(cmd.command, Project.Current);
-      (b.copyto as Project[]) = (b.copyto as Project[]).filter(p => p !== proj);
+      try {
+        var b = await BuildOptions.from(cmd.command, Project.Current);
+      } catch (error) {
+        console.log(error);
+      }
+      if (action === 'add') {
+        (b.copyto as Project[]).push(proj)
+      }
+      if (action === 'remove') {
+        (b.copyto as Project[]) = (b.copyto as Project[]).filter(p => p !== proj);
+      }
+      Helpers.info(`Updating command`);
       await db.updateCommandBuildOptions(Project.Current.location, b);
-      Helpers.info(`Build option update done.. removed ${chalk.bold(proj.genericName)}`);
+      Helpers.info(`Build option update done.. ${action}ed ${chalk.bold(proj.genericName)}`);
+      await db.triggerChangeForProject(Project.Current, `tnp-copyto-${action}` as any);
+    } else {
+      Helpers.warn(`No command to update`)
     }
   }
+  Helpers.info(`DONE`);
   process.exit(0);
 }
 
+async function $COPY_TO_REMOVE(args) {
+  await ACTION_COPYTO('remove', args);
+}
+
 async function $COPY_TO_ADD(args) {
-  const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
-  if (proj) {
-    const db = await TnpDB.Instance();
-    const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
-    if (cmd) {
-      const b = await BuildOptions.from(cmd.command, Project.Current);
-      (b.copyto as Project[]).push(proj);
-      await db.updateCommandBuildOptions(Project.Current.location, b);
-      Helpers.info(`Build option update done.. added ${chalk.bold(proj.genericName)}`);
-    }
-  }
-  process.exit(0);
+  await ACTION_COPYTO('add', args);
 }
 
 async function $COPY_TO_LIST(args) {
