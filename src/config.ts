@@ -259,6 +259,15 @@ export const config = {
   frameworks: ['bootstrap', 'ionic', 'material'] as Models.env.UIFramework[],
   //#region @backend
   argsReplacementsBuild,
+  argsGlobalFlags: [ // TODO do I need this ?
+    '-verbose',
+    '-firedev',
+    '-reinitDb',
+    '-restartWorker',
+    '-useWorker',
+    '-dist',
+    '-bundle',
+  ],
   argsReplacements: {
     ...argsReplacementsBuild,
     'ghpush': 'githubpush',

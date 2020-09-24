@@ -417,7 +417,11 @@ export abstract class LibProject {
     console.log('Pushing to git repository... ')
     const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
     console.log(`Git branch: ${branchName}`)
-    this.run(`git push origin ${branchName}`, { output: false }).sync()
+    try {
+      this.run(`git push origin ${branchName}`, { output: false }).sync()
+    } catch (error) {
+      Helpers.warn(`NOT ABLE TO PUSH CHANGES TO MASTER`)
+    }
     Helpers.info('Pushing to git repository done.')
   }
 

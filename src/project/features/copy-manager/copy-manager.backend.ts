@@ -44,12 +44,12 @@ export class CopyManager extends FeatureForProject {
       const db = await TnpDB.Instance();
 
       const updateFromDbLastCommand = (channel: string) => async () => {
-        Helpers.log(`TRigger of updateFromDbLastCommand`); // @LAST WHAT THE FUCK
+        Helpers.log(`Trigger of updateFromDbLastCommand`);
         const db = await TnpDB.Instance();
         const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
         if (cmd) {
           const b = await BuildOptions.from(cmd.command, Project.Current);
-          Helpers.log(`
+          Helpers.info(`
 
           COPYTO UPDATED: "${channel}"
 
@@ -58,7 +58,8 @@ export class CopyManager extends FeatureForProject {
           to: ${(b.copyto as Project[]).map(c => c.name).join(', ')}
 
       `)
-          this.buildOptions.copyto = b.copyto;
+          this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
+          await db.updateCommandBuildOptions(cmd.location, this.buildOptions);
         }
       }
 
@@ -80,17 +81,21 @@ export class CopyManager extends FeatureForProject {
   //#endregion
 
   //#region start
+  get projectToCopyTo() {
+    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+      return this.buildOptions.copyto as Project[];
+    }
+    return [];
+  }
   private async start(
     event?: Models.other.FileEvent,
     specyficFileRelativePath?: string,
     dontRemoveDestFolder = false
   ) {
     const outDir = this.buildOptions.outDir;
-    let projectToCopyTo: Project[] = [];
 
-    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      projectToCopyTo = this.buildOptions.copyto as Project[];
-    }
+
+    const projectToCopyTo = this.projectToCopyTo;
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const p = projectToCopyTo[index];
