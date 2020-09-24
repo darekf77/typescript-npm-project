@@ -422,7 +422,7 @@
     }
   },
   "name": "tnp",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "scripts": {},
   "main": "index.js",
   "bin": {
