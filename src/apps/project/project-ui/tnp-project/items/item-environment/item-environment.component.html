@@ -1,0 +1,22 @@
+<!-- <app-process-logger [model]="model"></app-process-logger> -->
+<!-- <ul>
+  <li *ngFor="let env of model.envionments">{{env}} </li>
+</ul>
+{{ data | json }} -->
+
+
+<ng-template #loading>
+  ...loading environments
+</ng-template>
+<app-list-wrapper *ngIf="data; else loading"
+                  [data]="data"></app-list-wrapper>
+
+<form [formGroup]="formGroup"
+      style="visibility: hidden;">
+
+  <input matInput
+         [(ngModel)]="model.selectedEnv"
+         formControlName="hidden"
+         required>
+
+</form>

@@ -1,0 +1,11 @@
+<!-- <button (click)="scrollDown()" >Scroll down</button> -->
+<mat-list *ngIf="model" >
+  <mat-list-item *ngFor="let message of messages">
+    {{ message.type }}
+    <mat-icon matListIcon>{{message.type}}</mat-icon>
+    <h3 matLine> {{message.msg}} </h3>
+    <p matLine>
+      <span> {{message.date | amDateFormat: 'YYYY-MM-DD HH:mm'}} </span>
+    </p>
+  </mat-list-item>
+</mat-list>

@@ -1,0 +1,104 @@
+<!-- {{selectedIndex}} -->
+<mat-accordion *ngIf="model">
+  <mat-expansion-panel [expanded]="expanded"
+                       (opened)="opened.next(model.name)"
+                       (closed)="closed.next(model.name)">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{model.name}}
+      </mat-panel-title>
+      <mat-panel-description>
+        <!-- Type your name and age -->
+        <!-- <app-process-logger *ngIf="model.procClear"
+                            [model]="model.procClear"
+                            size="compact"
+                            >
+        </app-process-logger> -->
+
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <!-- {{ model.selectedIndex }} -->
+
+
+    <mat-horizontal-stepper [linear]="true"
+                            *ngIf="model"
+                            [selectedIndex]="model.selectedIndex"
+                            (selectionChange)="selectionChange($event)"
+                            #stepper="matHorizontalStepper">
+      <mat-step [stepControl]="releaseFormGroup"
+                *ngIf="model.isStandaloneProject">
+        <ng-template matStepLabel>
+          <span>
+            RELEASE
+          </span>
+        </ng-template>
+      </mat-step>
+
+
+      <mat-step [stepControl]="environmentFormGroup"
+                *ngIf="model.isWorkspace">
+
+        <ng-template matStepLabel>
+          <span [ngClass]="ngClass(TnpProjectTabIndex.ENV)">
+            ENVIRONMENT {{model.selectedEnv ? ('('+model.selectedEnv+')'):''  }}
+          </span>
+        </ng-template>
+        <app-item-environment [model]="model"
+                              [formGroup]="environmentFormGroup"></app-item-environment>
+
+
+      </mat-step>
+
+      <mat-step [stepControl]="buildFormGroup"
+                *ngIf="model.isWorkspace">
+        <ng-template matStepLabel> <span [ngClass]="ngClass(TnpProjectTabIndex.BUILD)">BUILD</span></ng-template>
+        <app-item-build [model]="model"
+                        [formGroup]="buildFormGroup"></app-item-build>
+        <!-- <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar> -->
+
+
+      </mat-step>
+
+      <mat-step [stepControl]="testFormGroup"
+                *ngIf="model.isWorkspace"
+                disabled="true">
+        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.TEST)">TEST</span></ng-template>
+        test
+        <!-- <app-item-test [model]="model"
+                       [formGroup]="testFormGroup"></app-item-test> -->
+
+      </mat-step>
+
+      <mat-step [stepControl]="serveFormGroup"
+                *ngIf="model.isWorkspace">
+        <ng-template matStepLabel><span [ngClass]="ngClass(TnpProjectTabIndex.SERVE)">SERVE</span></ng-template>
+        <app-item-serve [model]="model"
+                        [formGroup]="serveFormGroup"></app-item-serve>
+        <!--
+        <mat-progress-bar mode="determinate"
+                          value="45"></mat-progress-bar> -->
+
+      </mat-step>
+
+    </mat-horizontal-stepper>
+
+    <a href="javascript:void(0)"
+       *ngIf="model.children && model.children.length > 0"
+       (click)="toogleChildren()">Toogle children of {{model.name}} </a>
+
+    <mat-card *ngIf="showChildren">
+
+      <app-tnp-project *ngFor="let item of model.children"
+                       [model]="item"
+                       (opened)="expandedChild = $event"
+                       (closed)="closeChild($event)"
+                       [expanded]="item.name === expandedChild"
+                       [isChild]="true"></app-tnp-project>
+
+    </mat-card>
+
+
+  </mat-expansion-panel>
+
+</mat-accordion>

@@ -1,0 +1,80 @@
+<p [attr.disabled]="!process">
+  <!-- <span *ngIf="process._allProgressData">
+    {{process._allProgressData | json}}
+  </span> -->
+
+  <mat-expansion-panel *ngIf="size === 'normal'"
+                       [expanded]=[isExpanded]
+                       (closed)="onExpand(false)"
+                       (opened)="onExpand(true)">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{process && process.name}}
+      </mat-panel-title>
+      <mat-panel-description [style.color]="color">
+        {{ progress }}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-button-icon [icon]="icon"
+                     [color]="color"
+                     (action)="action()"
+                     [label]="label"></app-button-icon>
+    <app-button-icon [icon]="'info'"
+                     [color]="color"
+                     [label]="''"
+                     (dblclick)="reset()"
+                     (action)="isOpen = !isOpen"></app-button-icon>
+  </mat-expansion-panel>
+
+  <span *ngIf="size === 'compact'" class="compact" >
+    <app-button-icon [icon]="icon"
+                     [color]="color"
+                     (action)="action()"
+                     [label]="label"></app-button-icon>
+    <app-button-icon [icon]="'info'"
+                     [color]="color"
+                     [label]="''"
+                     (dblclick)="reset()"
+                     (action)="isOpen = !isOpen"></app-button-icon>
+  </span>
+
+</p>
+<!-- <standalone-popup [id]="id"
+
+
+                  (close)="onClose()"
+                  [pinned]="pinned"
+                  (pin)="onPin($event)"
+                  *ngIf="process && isOpen"
+                  [contentComponent]="popupContent"></standalone-popup> -->
+
+<app-moveable-popup [id]="id"
+                    [title]="title"
+                    (close)="onClose()"
+                    [pinned]="pinned"
+                    *ngIf="process && isOpen"
+                    (pin)="onPin($event)">
+  <code>{{process.cmd}}</code>
+
+  <mat-tab-group>
+
+    <mat-tab label="Messages">
+
+      <app-process-info-message [model]="model"
+                                [changes]="changes"></app-process-info-message>
+
+    </mat-tab>
+    <mat-tab label="Console Output">
+
+      <app-process-console-info [model]="model"
+                                [changes]="changes"></app-process-console-info>
+
+    </mat-tab>
+    <mat-tab label="Console Errors">
+      <app-process-console-info [model]="model"
+                                [changes]="changes"
+                                outputType="stder"></app-process-console-info>
+
+    </mat-tab>
+  </mat-tab-group>
+</app-moveable-popup>
