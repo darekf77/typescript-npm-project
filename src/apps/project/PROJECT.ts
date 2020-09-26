@@ -1,13 +1,14 @@
+//#region isomorphic
 import * as _ from 'lodash';
 import { Models } from 'tnp-models';
-import { Project } from '../../project/abstract';
-
 import { Morphi, ModelDataConfig } from 'morphi';
-import { IProjectController } from './ProjectController';
+import { Project } from '../../project/abstract';
+import { CLASS } from 'typescript-class-helpers';
 import { PROCESS } from '../process/PROCESS';
 import { Log } from 'ng2-logger';
+//#endregion
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { CLASS } from 'typescript-class-helpers';
+import type { ProjectController } from './ProjectController';
 const log = Log.create('PROJECT');
 
 export interface IPROJECT extends Project {
@@ -103,12 +104,12 @@ export class PROJECT extends Project {
   procInitEnv?: PROCESS;
   procServeStatic?: PROCESS;
   procClear?: PROCESS;
-  ctrl: IProjectController;
+  ctrl: ProjectController;
   browser: PROJECT;
 
   envionments: Models.env.EnvironmentName[] = [];
 
-  static ctrl: IProjectController;
+  static ctrl: ProjectController;
   static async getAll(config?: ModelDataConfig) {
     const data = await this.ctrl.getAll(config).received;
     return data.body.json;

@@ -14,14 +14,9 @@ import { TnpDB } from 'tnp-db';
 import { PROCESS } from '../process/PROCESS';
 
 
-export interface TNP_PROJECT_ALIASES {
-  project: string;
-  projects: string;
-}
 
 @Morphi.Repository(PROJECT)
-export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJECT_ALIASES> {
-  globalAliases: (keyof TNP_PROJECT_ALIASES)[] = ['project', 'projects']
+export class PROJECT_REPOSITORY {
 
   async getAllProjects() {
     const db = await TnpDB.Instance(config.dbLocation);
@@ -158,13 +153,13 @@ export class PROJECT_REPOSITORY extends Morphi.Base.Repository<PROJECT, TNP_PROJ
         let toSave = { metaInfo, relation1TO1entityId };
         relation1TO1entityId = proc.relation1TO1entityId;
         if (_.isNumber(relation1TO1entityId)) {
-          processInDB = await PROCESS.getByID(relation1TO1entityId)
+          processInDB = await PROCESS.db.findOne({ id: relation1TO1entityId })
         }
         if (processInDB) {
           toSave = void 0;
         } else {
           processInDB = new PROCESS(processOptions);
-          processInDB = await PROCESS.save(processInDB);
+          processInDB = await PROCESS.db.save(processInDB);
           relation1TO1entityId = processInDB.id;
           toSave.relation1TO1entityId = relation1TO1entityId;
         }

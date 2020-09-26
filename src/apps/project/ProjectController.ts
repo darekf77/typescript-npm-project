@@ -8,7 +8,6 @@ import { Project } from '../../project/abstract/project';
 import { TnpDB } from 'tnp-db';
 //#endregion
 
-export interface IProjectController extends ProjectController { }
 
 @Morphi.Controller({
   className: 'ProjectController',
