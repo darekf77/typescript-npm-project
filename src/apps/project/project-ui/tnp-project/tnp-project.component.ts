@@ -1,13 +1,15 @@
-import * as _ from 'lodash';
+//#region angular
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-
-import { TnpProjectTabIndex } from './tabs-menu-tnp-project';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+//#endregion
 
-import type { PROJECT } from '../../PROJECT';
+//#region isomorphic
+import * as _ from 'lodash';
+import { TnpProjectTabIndex } from './tabs-menu-tnp-project';
+import { PROJECT } from '../../PROJECT';
 import { BaseComponent } from 'tnp-helpers';
-console.log('asdasdad')
+//#endregion
 
 @Component({
   selector: 'app-tnp-project',

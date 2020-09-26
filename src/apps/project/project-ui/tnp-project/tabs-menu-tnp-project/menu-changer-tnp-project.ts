@@ -18,7 +18,7 @@ export class MenuChangerTnpProject {
 
   resolveStep() {
     if (this.showDefaultStepForProject) {
-      // @LAST implement htis
+
     } else {
 
     }

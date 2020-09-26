@@ -1,49 +1,41 @@
-import { Morphi, MDC } from 'morphi';
+//#region isomorphic
 import * as _ from 'lodash';
-
-import type { PROJECT } from './PROJECT';
+import { Morphi, MDC } from 'morphi';
+import { PROJECT } from './PROJECT';
 import { Models } from 'tnp-models';
-import { Project } from '../../project/abstract/project';
-//#region @backend
-import { TnpDB } from 'tnp-db';
 //#endregion
-
 
 @Morphi.Controller({
   className: 'ProjectController',
-  additionalEntities: [Project]
+  entity: PROJECT
 })
 export class ProjectController extends Morphi.Base.Controller<PROJECT> {
 
-
   @Morphi.Http.GET()
-  getAll(
+  public getAll(
     @Morphi.Http.Param.Header(Morphi.MDC_KEY) configCrud?: Morphi.CRUD.ModelDataConfig)
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async () => {
-      return [];
-      // const res = await this.db.PROJECT.getAllProjects()
-      // return () => res;
+      const res = await PROJECT.getAllProjects()
+      return () => res;
     }
     //#endregion
   }
 
   @Morphi.Http.GET()
-  getAllStandalone()
+  public getAllStandalone()
     : Morphi.Response<PROJECT[]> {
     //#region @backendFunc
     return async (req: any, res) => {
-      return [];
-      // req.headers[Morphi.MDC_KEY] = MDC.create({ include: ['name'] }).toString()
-      // const menuPorojects = await this.db.PROJECT.getAllProjects() as PROJECT[];
-      // return () => menuPorojects.filter(f => !f || !f.isGenerated);
+      req.headers[Morphi.MDC_KEY] = MDC.create({ include: ['name'] }).toString()
+      const menuPorojects = await PROJECT.getAllProjects() as PROJECT[];
+      return () => menuPorojects.filter(f => !f || !f.isGenerated);
     }
     //#endregion
   }
 
-
-  getByLocation(
+  public getByLocation(
     location: string) {
     const config = MDC.create({
       exclude: ['children', 'parent']
@@ -59,39 +51,32 @@ export class ProjectController extends Morphi.Base.Controller<PROJECT> {
     : Morphi.Response<PROJECT> {
     //#region @backendFunc
     return async (req: any) => {
-      // req.headers[Morphi.MDC_KEY] = configCrud.toString()
-      // const res = await this.db.PROJECT.getByLocation(decodeURIComponent(location)) as PROJECT;
-      return () => void 0;
+      req.headers[Morphi.MDC_KEY] = configCrud.toString()
+      const res = await PROJECT.getByLocation(decodeURIComponent(location)) as PROJECT;
+      return () => res;
     }
     //#endregion
   }
 
 
-  public getEnvironments(location: string) {
-    return this._getEnvironments(encodeURIComponent(location))
-  }
-
-
   @Morphi.Http.GET('/environments/:location')
-  private _getEnvironments(@Morphi.Http.Param.Path('location') location: string)
+  public getEnvironments(@Morphi.Http.Param.Path('location') location: string)
     : Morphi.Response<Models.env.EnvironmentName[]> {
     //#region @backendFunc
     return async (req) => {
-      return [];
-      // location = decodeURIComponent(location);
-      // return this.db.PROJECT.namesFrom(await this.db.PROJECT.getByLocation(location))
+      location = decodeURIComponent(location);
+      const proj = await PROJECT.getByLocation(location);
+      return !proj ? [] : proj.namesFrom();
     }
     //#endregion
   }
 
   //#region @backend
-
-
   async initExampleDbData() {
     // console.log('Don not init this! OK ')
     // const db = await TnpDB.Instance();
     // await db.resetProcessess() // TODO WHAT THE FuCK
-    console.log('Done clearing processes');
+    console.log('Ininting projects !');
   }
   //#endregion
 

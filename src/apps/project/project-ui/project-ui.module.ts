@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 // other
 import { CLASS } from 'typescript-class-helpers';
-import { FormlyModule } from '@ngx-formly/core';
+
 // material
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -23,8 +23,9 @@ import {
   ItemEnvironmentComponent, ItemBuildComponent,
   ItemServeComponent, ItemTestComponent
 } from './tnp-project/items';
+import { FormlyModule } from '@ngx-formly/core';
 import { ProcessLoggerModule } from '../../process/process-logger';
-// import { ListWrapperModule } from 'baseline-v2/ss-components/components/list';
+import { ListWrapperModule } from 'tnp-ui';
 
 const angularModules = [
   CommonModule,
@@ -60,7 +61,7 @@ const componentsLocal = [
 
 const baselineModules = [
   ProcessLoggerModule,
-  // ListWrapperModule // TODO
+  ListWrapperModule,
 ]
 
 @NgModule({

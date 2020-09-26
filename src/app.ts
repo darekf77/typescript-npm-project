@@ -14,41 +14,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MatCardModule } from '@angular/material/card';
 
 const host = 'http://localhost:3333';
+import { PROCESS, ProcessModule } from './apps/process';
+import { PROJECT, ProjectModule } from './apps/project';
 
-
-
-@Morphi.Entity({ className: 'Book' })
-class Book extends Morphi.Base.Entity<any> {
-  static from(name: string) {
-    const b = new Book();
-    b.name = name;
-    return b;
-  }
-
-  //#region @backend
-  @Morphi.Orm.Column.Custom('varchar')
-  //#endregion
-  public name: string
-
-  //#region @backend
-  @Morphi.Orm.Column.Generated()
-  //#endregion
-  public id: number
-
-}
-
-
-
-@Morphi.Controller({ className: 'BookCtrl', entity: Book })
-class BookCtrl extends Morphi.Base.Controller<any> {
-  //#region @backend
-  async initExampleDbData() {
-    const db = await this.connection.getRepository(Book);
-    await db.save(Book.from('alice in wonderland'));
-    await db.save(Book.from('cryptography'));
-  }
-  //#endregion
-}
 
 @Component({
   selector: 'my-app', // <my-app></my-app>
@@ -58,14 +26,10 @@ class BookCtrl extends Morphi.Base.Controller<any> {
   `,
 })
 export class AppComponent {
-  constructor(
-    public ctrl: BookCtrl
-  ) {
 
-  }
   async ngOnInit() {
-    const data = (await this.ctrl.getAll().received).body.json as Book[];
-    console.log(data);
+
+    console.log('hell on init');
   }
 }
 
@@ -76,13 +40,15 @@ export class AppComponent {
     FormsModule,
     ...[
       MatCardModule,
-    ]
+    ],
+    ProjectModule,
+    ProcessModule,
   ],
   declarations: [
     AppComponent,
   ],
   providers: [
-    BookCtrl
+
   ],
   bootstrap: [AppComponent]
 })
@@ -114,8 +80,12 @@ async function start() {
 
   const context = await Morphi.init({
     host,
-    controllers: [BookCtrl],
-    entities: [Book],
+    controllers: [
+      ...Morphi.Providers
+    ],
+    entities: [
+      PROJECT, PROCESS
+    ],
     //#region @backend
     config: config as any
     //#endregion

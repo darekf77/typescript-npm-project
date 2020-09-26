@@ -1,33 +1,28 @@
-// angular
+//#region angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-// material
+//#endregion
+//#region material
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-// other
-import { MomentModule } from 'ngx-moment';
-// local
+//#endregion
+//#region local
 import { ProcessLoggerComponent } from './process-logger.component';
 import { ProcessConsoleInfoModule } from './process-console-info/process-console-info.module';
 import { ProcessInfoMessageComponent } from './process-info-message/process-info-message.component';
-
-// TODO
-// import { ButtonIconModule } from 'ss-components/components';
-// import { MoveablePopupModule } from 'ss-components/components';
-
-import {
-  BaseFormlyComponent, DualComponentController,
-  BaseComponent, ResizeService
-} from 'tnp-helpers';
-
-import { FormlyModule } from '@ngx-formly/core';
+//#endregion
+//#region isomorphic
+import { ButtonIconModule } from 'tnp-ui';
+import { MoveablePopupModule } from 'tnp-ui';
+import { ResizeService } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
-
-
+//#endregion
+import { MomentModule } from 'ngx-moment';
+import { FormlyModule } from '@ngx-formly/core';
 
 const angularModules = [
   CommonModule,
@@ -49,8 +44,8 @@ const otherModules = [
 
 const localModules = [
   // StandalonePopupModule,
-  // MoveablePopupModule,
-  // ButtonIconModule,
+  MoveablePopupModule,
+  ButtonIconModule,
   ProcessConsoleInfoModule,
   FormlyModule.forRoot({
     types: [

@@ -10,6 +10,8 @@ import { Models } from 'tnp-models';
 import type { Helpers as TnpHelpers } from 'tnp-helpers'
 import type { Project as AbstractProject } from './project/abstract/project';
 
+ // @LAST move this to tnp-config
+
 
 const allowedEnvironments: Models.env.EnvironmentName[] = ['static', 'dev', 'prod', 'stage', 'online', 'test', 'qa', 'custom'];
 const allowedEnvironmentsObj = {};

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Component, OnInit, Input } from '@angular/core';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 
-import type { PROJECT } from '../../../../PROJECT';
+import { PROJECT } from '../../../../PROJECT';
 import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
 
 

@@ -1,12 +1,14 @@
+//#region angular
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+//#endregion
+//#region isomorphic
 import { Morphi } from 'morphi';
 import { PROJECT } from '../PROJECT';
 import { BaseFormlyComponent, DualComponentController } from 'tnp-helpers';
+//#endregion
 
-export class DualComponentControllerExtended extends DualComponentController {
-
-}
+export class DualComponentControllerExtended extends DualComponentController { }
 
 @Morphi.Formly.RegisterComponentForEntity(PROJECT)
 @Component({

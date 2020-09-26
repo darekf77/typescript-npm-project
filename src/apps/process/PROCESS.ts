@@ -1,34 +1,32 @@
 //#region isomorphic
+import * as _ from 'lodash';
 import { PROGRESS_DATA } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
 import { Morphi, ModelDataConfig } from 'morphi';
 import { ProcessDescriptor } from 'ps-list';
-import { Project } from '../../project/abstract/project'
+import { Project } from 'tnp-helpers';
 //#endregion
 
 //#region @backend
 import * as path from 'path';
 import * as fse from 'fs-extra';
-import * as _ from 'lodash';
 import * as rimraf from 'rimraf';
 import * as child from 'child_process';
 import * as psList from 'ps-list';
 //#endregion
 
+//#region types
 import type { ProcessController } from './ProcessController';
 
 export interface IPROCESS extends PROCESS {
   state: PROCESS_STATE;
   stderLog: string;
   stderLogPath: string;
-
   stdoutLog: string;
   stdoutLogPath: string;
-
   exitCode: number;
   exitCodePath: string;
-
   allProgressData: PROGRESS_DATA[];
   progress: PROGRESS_DATA;
   id: number;
@@ -41,7 +39,7 @@ export type PROCESS_STATE =
   'inProgressOfStopping' |
   'exitedWithSuccess' |
   'exitedWithError'
-
+//#endregion
 
 export class PROCESS_ENTITY extends Morphi.Base.Entity<PROCESS, IPROCESS, ProcessController> {
 
@@ -310,6 +308,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     this._stdout = void 0;
     _.merge(this, data.body.json);
     this.tempState = null;
+    return this;
   }
 
   async stop() {
@@ -340,6 +339,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     let data = await this.ctrl.stop(this.id, this.modelDataConfig).received;
     _.merge(this, data.body.json);
     this.tempState = null;
+    return this;
   }
 
   get context() {

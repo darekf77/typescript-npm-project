@@ -4,16 +4,18 @@ import {
   OnDestroy, AfterViewInit, HostBinding
 } from '@angular/core';
 
-import { Log } from 'ng2-logger';
 
 import { PROCESS } from '../../PROCESS';
-import { Subscription } from 'rxjs';
+
 import 'rxjs/add/observable/fromEvent';
 import { BehaviorSubject } from 'rxjs';
 import {
   BaseComponent, ResizeService
 } from 'tnp-helpers';
 
+
+import { Log } from 'ng2-logger';
+import { Subscription } from 'rxjs';
 
 
 @Component({

@@ -59,7 +59,6 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
       return () => res;
     }
     //#endregion
-
   }
 
   @Morphi.Http.GET('/progress/:id')
@@ -75,7 +74,6 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
     }
     //#endregion
   }
-
 
   @Morphi.Http.GET()
   getAll(@Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS[]> {
@@ -116,18 +114,16 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
     //#endregion
   }
 
-  // //#region @backend
-  // get ctrl() {
-  //   return  Morphi.FrameworkContext
-  // }
-
+  //#region @backend
   private removeProcesesfolder() {
     const folder = path.join(Project.Tnp.location, 'tmp-processes-logs');
     if (fse.existsSync(folder)) {
       rimraf.sync(folder)
     }
   }
+  //#endregion
 
+  //#region @backend
   async initExampleDbData() {
     this.removeProcesesfolder()
 
@@ -137,7 +133,5 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
     await PROCESS.db.save(new PROCESS({ name: 'Messages async', cmd: 'tnp show:loop:messages', cwd: process.cwd(), async: true }))
     // await this.db.PROCESS.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: process.cwd() }))
   }
-
   //#endregion
-
 }

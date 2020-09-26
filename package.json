@@ -15,6 +15,7 @@
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.9",
         "open": "7.2.1"
+
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -32,6 +33,8 @@
           "tnp-models",
           "tnp-helpers",
           "tnp-db",
+          "tnp-ui",
+          "tnp-config",
           "fs-extra",
           "ng2-rest",
           "ng2-logger",
@@ -125,6 +128,7 @@
           "tnp-models": "0.0.9",
           "tnp-helpers": "0.0.8",
           "tnp-db": "0.0.10",
+          "tnp-ui": "0.0.2",
           "@types/node": "10.12.30",
           "morphi": "4.0.2",
           "gulp": "^3.9.1",
@@ -621,6 +625,7 @@
     "tnp-db": "0.0.10",
     "tnp-helpers": "0.0.8",
     "tnp-models": "0.0.9",
+    "tnp-ui": "0.0.2",
     "ts-loader": "7.0.4",
     "ts-node": "~8.3.0",
     "tsickle": "^0.26.0",

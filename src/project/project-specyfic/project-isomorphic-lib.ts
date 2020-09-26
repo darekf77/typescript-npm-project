@@ -12,7 +12,6 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
-import { watch } from 'fs-extra';
 
 //#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')

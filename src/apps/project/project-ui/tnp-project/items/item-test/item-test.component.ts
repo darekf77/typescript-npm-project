@@ -1,8 +1,12 @@
+//#region angular
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
+//#endregion
 
+//#region isomorphic
+import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { TnpProjectTabIndex } from '../../tabs-menu-tnp-project';
+//#endregion
 
 
 @Component({

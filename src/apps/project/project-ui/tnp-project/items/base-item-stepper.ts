@@ -3,7 +3,7 @@ import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { MatDialog } from '@angular/material/dialog';
-import type { PROJECT } from '../../../PROJECT';
+import { PROJECT } from '../../../PROJECT';
 import { BaseComponent } from 'tnp-helpers';
 import { TnpProjectTabIndex } from '../tabs-menu-tnp-project';
 
