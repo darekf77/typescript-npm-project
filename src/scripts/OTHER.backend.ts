@@ -7,7 +7,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
 import * as path from 'path';
-import { config } from '../config';
+import { config } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 declare const ENV: any;
 // console.log('hello')

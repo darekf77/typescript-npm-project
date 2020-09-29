@@ -8,7 +8,7 @@ import * as TerminalProgressBar from 'progress';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { FeatureForProject } from '../../abstract';
 
 export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {

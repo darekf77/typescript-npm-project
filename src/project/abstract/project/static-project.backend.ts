@@ -7,7 +7,7 @@ import * as json5 from 'json5';
 
 import { config as configMorphi } from 'morphi';
 
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';

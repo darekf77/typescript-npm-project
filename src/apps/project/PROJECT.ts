@@ -6,7 +6,7 @@ import { Project } from '../../project/abstract';
 import { CLASS } from 'typescript-class-helpers';
 import { PROCESS } from '../process/PROCESS';
 import { Log } from 'ng2-logger';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import type { ProjectController } from './ProjectController';
 //#endregion
 //#region @backend

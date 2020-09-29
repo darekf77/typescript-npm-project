@@ -5,7 +5,7 @@ import glob = require('glob')
 import * as path from 'path';
 import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
-import { config } from '../config';
+import { config } from 'tnp-config';
 
 
 const generalHelp = `

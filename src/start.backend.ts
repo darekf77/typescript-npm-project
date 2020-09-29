@@ -27,7 +27,7 @@ if (!global['ENV']) {
 //#region imports
 import * as _ from 'lodash';
 
-import { config } from './config';
+import { config } from 'tnp-config';
 // import glob = require('glob')
 import scriptsFnArr from './scripts/index';
 

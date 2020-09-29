@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { SpecWrap } from './_helpers.spec';
 import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
 import { Models } from 'tnp-models';
-import { config } from '../config';
+import { config } from 'tnp-config';
 import { Project } from '../project';
 
 const wrap = SpecWrap.create();

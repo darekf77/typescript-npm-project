@@ -8,7 +8,7 @@ import * as watch from 'watch'
 // local
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import chalk from 'chalk';
 import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';

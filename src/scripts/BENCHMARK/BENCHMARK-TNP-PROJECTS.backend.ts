@@ -2,7 +2,7 @@ import * as  _ from 'lodash';
 import * as TerminalProgressBar from 'progress';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 
 
 // TODO this will be done with background-worker-process

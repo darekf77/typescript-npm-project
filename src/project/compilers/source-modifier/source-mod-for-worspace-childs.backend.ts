@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { ModType, CheckType } from './source-modifier.models';
 

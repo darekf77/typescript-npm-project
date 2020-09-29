@@ -6,7 +6,7 @@ import * as glob from 'glob';
 import { Helpers } from 'tnp-helpers';
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { optionsFrameworkFileGen } from './framework-files-generator.backend';
 
 

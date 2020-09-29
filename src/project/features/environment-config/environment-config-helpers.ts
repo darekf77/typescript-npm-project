@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProxyRouter } from '../proxy-router';

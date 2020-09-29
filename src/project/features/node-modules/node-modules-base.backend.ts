@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';
 
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';

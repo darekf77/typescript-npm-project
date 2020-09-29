@@ -4,7 +4,7 @@ import * as path from 'path';
 import { FeatureForProject } from '../abstract';
 //#endregion
 
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 
 export type TestType = 'unit' | 'integration' | 'e2e';

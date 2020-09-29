@@ -8,7 +8,7 @@ import { png2svg } from 'svg-png-converter';
 
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { FilesRenaming } from '../../project/features/files-recreation/files-renaming.backend';
 
 

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { Models } from 'tnp-models';
-import { config } from '../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import '../global-typings';
 

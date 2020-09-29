@@ -3,7 +3,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as inquirer from 'inquirer';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract';
 //#endregion

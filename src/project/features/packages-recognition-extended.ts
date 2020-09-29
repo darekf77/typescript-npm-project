@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 

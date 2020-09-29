@@ -5,7 +5,7 @@ import * as glob from 'glob';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 export class QuickFixes extends FeatureForProject {

@@ -5,7 +5,7 @@ export { ChildProcess } from 'child_process';
 import * as _ from 'lodash';
 import { Helpers } from 'tnp-helpers';
 import type { Project } from './project';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 
 export abstract class BaseProject {
   public get genericName(this: Project): string {

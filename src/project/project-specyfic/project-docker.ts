@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import { Project } from '../abstract';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';

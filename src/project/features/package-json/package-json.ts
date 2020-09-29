@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 @Morphi.Entity<PackageJSON>({

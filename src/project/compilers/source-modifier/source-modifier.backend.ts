@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as chokidar from 'chokidar';
 
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { FeatureCompilerForProject, Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';

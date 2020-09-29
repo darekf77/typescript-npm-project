@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 
 import { Project } from '../../abstract';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 

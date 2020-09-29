@@ -5,7 +5,7 @@ import * as open from 'open';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { Morphi } from 'morphi';

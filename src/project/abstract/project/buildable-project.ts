@@ -7,7 +7,7 @@ import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
 import * as _ from 'lodash';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import type { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 

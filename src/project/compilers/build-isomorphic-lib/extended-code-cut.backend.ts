@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { BrowserCodeCutExtended } from './browser-code-cut.backend';
 import { BuildOptions } from 'tnp-db';

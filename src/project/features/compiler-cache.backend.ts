@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import * as os from 'os';
 import { watch } from 'chokidar'
 
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Project } from '../abstract';
 import { FeatureCompilerForProject } from '../abstract';
 import { Models } from 'tnp-models';

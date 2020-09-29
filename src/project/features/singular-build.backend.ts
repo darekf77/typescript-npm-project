@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-factory.backend';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 
 /**

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as child from 'child_process';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Project } from '../abstract';
 //#endregion
 import { Helpers } from 'tnp-helpers';

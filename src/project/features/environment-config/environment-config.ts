@@ -14,7 +14,7 @@ import { FeatureForProject } from '../../abstract';
 //#endregion
 
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 

@@ -9,7 +9,7 @@ import * as watch from 'watch'
 import { SourceModifier } from '../source-modifier';
 
 import { BaselineSiteJoin } from './baseline-site-join.backend';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import {
   HandlePrefixingFileToEasyOverride,

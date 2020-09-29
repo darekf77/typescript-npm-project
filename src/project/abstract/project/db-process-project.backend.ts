@@ -1,6 +1,6 @@
 import type { Project } from './project';
 import { TnpDB } from 'tnp-db';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 
 export abstract class DbProcessProject {
   async hasParentWithSingularBuild(this: Project) {

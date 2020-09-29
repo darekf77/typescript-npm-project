@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { HelpersMerge } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { Project } from '../../project';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { TnpDB } from 'tnp-db';

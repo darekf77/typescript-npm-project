@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import { Project, FeatureForProject } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 export class StaticBuild extends FeatureForProject {

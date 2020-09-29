@@ -5,7 +5,7 @@ import * as JSON5 from 'json5';
 import * as glob from 'glob';
 
 import { Project } from '../../abstract';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';

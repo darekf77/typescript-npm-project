@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { ImpReplaceOptions } from './source-modifier.models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 
 
 export function impReplace(impReplaceOptions: ImpReplaceOptions) {

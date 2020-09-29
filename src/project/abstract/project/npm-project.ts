@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import type { Project } from './project';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 
 export class NpmProject {
   /**

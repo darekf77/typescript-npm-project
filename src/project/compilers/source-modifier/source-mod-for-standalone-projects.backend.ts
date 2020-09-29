@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 
 import { Project, FeatureCompilerForProject } from '../../abstract';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { ModType, CheckType } from './source-modifier.models';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';

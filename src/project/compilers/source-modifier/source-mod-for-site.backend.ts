@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { ModType, CheckType } from './source-modifier.models';
 

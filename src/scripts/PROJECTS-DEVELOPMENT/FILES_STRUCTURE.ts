@@ -6,7 +6,7 @@ import * as rimraf from 'rimraf';
 
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 

@@ -33,6 +33,7 @@ export class AppComponent {
   }
 }
 
+//#region angular module
 @NgModule({
   imports: [
     BrowserModule,
@@ -63,6 +64,7 @@ export function main() {
   return platformBrowserDynamic().bootstrapModule(AppModule);
 }
 
+//#endregion
 
 
 async function start() {

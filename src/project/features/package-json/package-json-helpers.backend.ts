@@ -7,7 +7,7 @@ import * as semver from 'semver';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 //#endregion
 
 //#region find npm version range

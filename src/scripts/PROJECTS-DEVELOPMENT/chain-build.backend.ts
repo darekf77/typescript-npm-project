@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Models } from 'tnp-models';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { EnvironmentConfig } from '../../project/features/environment-config';
 import chalk from 'chalk';
 

@@ -9,7 +9,7 @@ import * as TerminalProgressBar from 'progress';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { FeatureForProject } from '../../abstract';
 import { dedupePackages, nodeModulesExists } from './node-modules-helpers.backend';
 import { NodeModulesBase } from './node-modules-base.backend';

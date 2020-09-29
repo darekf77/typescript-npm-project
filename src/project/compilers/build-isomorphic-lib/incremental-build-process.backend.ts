@@ -5,7 +5,7 @@ import chalk from 'chalk';
 
 import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
 import { IncrementalBuildProcess } from 'morphi';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Project } from '../../../project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';

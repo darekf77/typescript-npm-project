@@ -15,7 +15,6 @@
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.9",
         "open": "7.2.1"
-
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],

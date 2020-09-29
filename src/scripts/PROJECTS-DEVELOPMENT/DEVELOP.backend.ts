@@ -3,7 +3,7 @@ import * as fse from 'fs-extra';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';

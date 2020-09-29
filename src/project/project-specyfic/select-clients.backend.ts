@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import chalk from 'chalk';
 import { Project } from '../abstract/project';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { Helpers } from 'tnp-helpers';

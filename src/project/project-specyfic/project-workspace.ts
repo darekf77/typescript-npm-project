@@ -8,7 +8,7 @@ import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { Helpers } from 'tnp-helpers';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { PROGRESS_DATA } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 

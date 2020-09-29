@@ -8,7 +8,7 @@ import * as glob from 'glob';
 import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
-import { config } from '../../../config';
+import { config } from 'tnp-config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { PROGRESS_DATA } from 'tnp-models';

@@ -1,6 +1,6 @@
 import { Helpers } from 'tnp-helpers';
 import * as path from 'path';
-import { config } from '../../config';
+import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
 
