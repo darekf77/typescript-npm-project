@@ -73,7 +73,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
       }
     } else {
-      this.backendCompilation = void 0;
+      this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
     }
     Helpers.log(`[incremental-build-process] this.backendCompilation exists: ${!!this.backendCompilation}`);
 

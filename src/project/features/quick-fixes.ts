@@ -18,6 +18,58 @@ export class QuickFixes extends FeatureForProject {
         const dest = path.join(this.project.location, dirName, 'tsconfig.json');
         Helpers.copyFile(tsconfigBrowserPath, dest);
       })
+
+      const componentsFolder = path.join(this.project.location, config.folder.components)
+      if (fse.existsSync(componentsFolder)) {
+        Helpers.writeFile(path.join(componentsFolder, config.file.tsconfig_json), {
+          "compileOnSave": true,
+          "compilerOptions": {
+            "declaration": true,
+            "experimentalDecorators": true,
+            "emitDecoratorMetadata": true,
+            "allowSyntheticDefaultImports": true,
+            'importHelpers': true,
+            "moduleResolution": "node",
+            "module": "commonjs",
+            "skipLibCheck": true,
+            "sourceMap": true,
+            "target": "es5",
+            "lib": [
+              "es2015",
+              "es2015.promise",
+              "es2015.generator",
+              "es2015.collection",
+              "es2015.core",
+              "es2015.reflect",
+              "es2016",
+              "dom"
+            ],
+            "types": [
+              "node"
+            ],
+          },
+          "include": [
+            "./**/*"
+          ],
+          "exclude": [
+            "node_modules",
+            "preview",
+            "projects",
+            "docs",
+            "dist",
+            "bundle",
+            "example",
+            "examples",
+            "browser",
+            "module",
+            "tmp-src",
+            "src/tests",
+            "src/**/*.spec.ts",
+            "tmp-site-src",
+            "tmp-tests-context"
+          ]
+        })
+      }
     }
   }
 

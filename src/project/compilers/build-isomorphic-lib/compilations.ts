@@ -11,6 +11,7 @@ import { BuildOptions } from 'tnp-db';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';
+import { config } from 'tnp-config';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -20,7 +21,18 @@ export class BackendCompilationExtended extends BackendCompilation {
     // QUICK_FIX for backend in ${config.frameworkName} projects
     const currentProject = Project.From<Project>(this.cwd);
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
-    await this.tscCompilation(this.compilationFolderPath, watch, `../${this.outFolder}` as any, generatedDeclarations);
+
+    const hideErrorsForBackend = currentProject.typeIs('angular-lib')
+      && this.compilationFolderPath.endsWith(config.folder.components);
+
+    await this.tscCompilation
+      ({
+        cwd: this.compilationFolderPath,
+        watch,
+        outDir: (`../${this.outFolder}` as any),
+        generateDeclarations: generatedDeclarations,
+        hideErrors: hideErrorsForBackend,
+      });
   }
 
 
