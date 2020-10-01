@@ -155,6 +155,18 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
 
     Helpers.info(`Success push of project ${chalk.bold(projectName)}.`)
   }
+
+  if (_.isString(comitMessage) && comitMessage.length >= 1) {
+    if (container.git.thereAreSomeUncommitedChange) {
+      Helpers.info(`[container][${container.genericName}] Comminting changes automaticly with message: "${chalk.bold(comitMessage)}"`)
+      try {
+        container.run(`git add --all .`).sync();
+        container.run(`git commit -m "${comitMessage}"`).sync();
+        container.git.pushCurrentBranch();
+      } catch (error) { }
+    }
+  }
+
   if (exit) {
     process.exit(0);
   }
