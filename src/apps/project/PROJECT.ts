@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { Models } from 'tnp-models';
 import { Morphi, ModelDataConfig } from 'morphi';
-import { Project } from '../../project/abstract';
+import { Project } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
 import { PROCESS } from '../process/PROCESS';
 import { Log } from 'ng2-logger';

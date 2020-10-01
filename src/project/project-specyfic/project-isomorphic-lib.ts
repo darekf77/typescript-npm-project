@@ -5,7 +5,7 @@ import * as glob from 'glob';
 import * as inquirer from 'inquirer';
 import { config } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
-import { Project } from '../abstract';
+import { Project } from '../abstract/project/project';
 //#endregion
 import * as _ from 'lodash';
 import { Helpers } from 'tnp-helpers';
