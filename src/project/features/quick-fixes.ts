@@ -21,6 +21,7 @@ export class QuickFixes extends FeatureForProject {
 
       const componentsFolder = path.join(this.project.location, config.folder.components)
       if (fse.existsSync(componentsFolder)) {
+        // TODO join isomorphic part with tsconfig.isomorphic.json
         Helpers.writeFile(path.join(componentsFolder, config.file.tsconfig_json), {
           "compileOnSave": true,
           "compilerOptions": {

@@ -110,7 +110,10 @@ export class FilesRecreator extends FeatureForProject {
             path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
           ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
-          .concat(self.project.typeIs('angular-lib') ? ['src/tsconfig.app.json'] : [])
+          .concat(self.project.typeIs('angular-lib') ? [
+            'components/tsconfig.json',
+            'src/tsconfig.app.json'
+          ] : [])
           .concat(self.project.linkedFolders
             .map(l => l.to?.replace(/^\.\//, ''))
             .filter(f => !!f)
