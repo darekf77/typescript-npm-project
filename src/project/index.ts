@@ -3,7 +3,6 @@ export * from './project-specyfic/project-isomorphic-lib';
 //#endregion
 export * from './features/package-json';
 export * from './abstract';
-// @LAST fixthis references
 
 //#region @backend
 export * from './compilers/baseline-site-join';

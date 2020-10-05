@@ -1,10 +1,18 @@
+//#region isomorphic imports
 import { Morphi } from 'morphi';
-// import 'core-js/client/shim';
-// import 'reflect-metadata';
+import { Log, Logger } from 'ng2-logger';
+const log = Log.create(`app`);
+//#endregion
+
+//#region browser imports
+import 'core-js/client/shim';
+import 'reflect-metadata';
 if (Morphi.isBrowser) {
   require('zone.js/dist/zone');
 }
+//#endregion
 
+//#region angular
 import { Component, NgModule, ApplicationRef } from '@angular/core';
 import { enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -12,11 +20,19 @@ import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MatCardModule } from '@angular/material/card';
+//#endregion
+
+//#region local imports
+import { PROCESS, ProcessModule, ProcessController } from './apps/process';
+import { PROJECT, ProjectModule, ProjectController } from './apps/project';
+//#endregion
+
+const controllers = [
+  ProjectController,
+  ProcessController
+];
 
 const host = 'http://localhost:3333';
-import { PROCESS, ProcessModule } from './apps/process';
-import { PROJECT, ProjectModule } from './apps/project';
-
 
 @Component({
   selector: 'my-app', // <my-app></my-app>
@@ -28,8 +44,9 @@ import { PROJECT, ProjectModule } from './apps/project';
 export class AppComponent {
 
   async ngOnInit() {
-
     console.log('hell on init');
+    const processes = await PROCESS.getAll();
+    console.log(processes);
   }
 }
 
@@ -49,7 +66,7 @@ export class AppComponent {
     AppComponent,
   ],
   providers: [
-
+    ...controllers
   ],
   bootstrap: [AppComponent]
 })
@@ -82,9 +99,7 @@ async function start() {
 
   const context = await Morphi.init({
     host,
-    controllers: [
-      ...Morphi.Providers
-    ],
+    controllers,
     entities: [
       PROJECT, PROCESS
     ],

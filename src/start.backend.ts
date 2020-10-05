@@ -1,3 +1,5 @@
+// @LAST path var core_2 = require("@ngx-formly/core");
+
 import * as path from 'path';
 import * as fse from 'fs-extra';
 declare const global: any;

@@ -1,6 +1,12 @@
 //#region @backend
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
+Error.stackTraceLimit = 100;
+// console.log(global.i0);
+// process.exit(0)
+global.i0 = {
+  defineInjectable: function() {}
+}
 
 global.hideLog = true;
 global.verboseLevel = 0;

@@ -1,3 +1,4 @@
+// console.log('INITING PROCESS')
 //#region isomorphic
 import * as _ from 'lodash';
 import { PROGRESS_DATA } from 'tnp-models';
@@ -373,7 +374,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
 
 
   public static async getAll(config?: ModelDataConfig) {
-    let data = await this.ctrl.getAll(config).received;
+    let data = await PROCESS.ctrl.getAll(config).received;
     // console.log('BACKENDDATA', data)
     return data.body.json;
   }
