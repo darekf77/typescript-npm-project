@@ -186,49 +186,181 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
 }
 //#endregion
 
+//#region stuberize frontend package for backedn
 const regexForClassFunctinoInLine = new RegExp(`[a-zA-Z]+\\(`)
 const regexForClassStaticFunctinoInLine = new RegExp(`static\ +[a-zA-Z]+\\(`)
 const regexForFunctinoInLine = new RegExp(`function [a-zA-Z]+\\(`)
 const regexForGenericFunctinoInLine = new RegExp(`function [a-zA-Z]+\\<`)
 const regexIsExportedConst = new RegExp(`export\\ +const `)
 const specialFunctionEnd = `//<replace>`;
+const notAllowedFolderToCopy = [
+  'browser',
+  'bundles',
+  'esm5',
+  'esm2015',
+  'fesm5',
+  'fesm2015',
+  'dist',
+  'bundle'
+];
+
+function fixPackageJson(pathToPacakgeJson: string) {
+  const file = Helpers.readJson(pathToPacakgeJson) as Models.npm.IPackageJSON;
+  const newFile = _.pick(file, [
+    'name',
+    'version',
+    'tnp',
+    'dependencies',
+    'devDependencies',
+    'license',
+    'bin',
+  ] as (keyof Models.npm.IPackageJSON)[]);
+  newFile.tnp = {
+    version: 'v2',
+    type: 'angular-lib',
+  } as any;
+  Helpers.writeFile(pathToPacakgeJson, newFile);
+}
 
 function generatedFileWrap(content: string) {
   return `${content}
-// [${config.frameworkName}] GENERATED CONTENT FOR BACKEDN VERSION
-// [${config.frameworkName}] GENERATED CONTENT FOR BACKEDN VERSION
+// [${config.frameworkName}] GENERATED CONTENT FOR BACKEND VERSION
+// [${config.frameworkName}] GENERATED CONTENT FOR BACKEND VERSION
         `.trim()
 }
 
-export function stuberizeFrontendPackages(project: Project, packages?: string[]) {
+const SUBERIZED_PREFIX = `---stuberized`
 
-  for (let index = 0; index < packages.length; index++) {
-    const packageName = packages[index];
-    Helpers.info(`[tnp][node_modueles] Creating stub for package ${chalk.bold(packageName)}`);
+function createSubVersion(proj: Project, symlinkFolderFromSrcToRcreate: string[]) {
+  const projLocation = (proj.location);
+  const newStuberizedName = `${path.basename(projLocation)}${SUBERIZED_PREFIX}`;
+  const newProjStubLocaiton = path.join(
+    path.dirname(projLocation),
+    newStuberizedName
+  );
+  const filesAndFolderToCopy = fse
+    .readdirSync(projLocation)
+    .filter(f => ![
+      config.folder.browser,
+      config.folder._browser,
+    ].includes(f))
+
+  Helpers.removeFolderIfExists(newProjStubLocaiton);
+  filesAndFolderToCopy.forEach(fileOrFolderName => {
+    const source = path.join(projLocation, fileOrFolderName);
+    const dest = path.join(newProjStubLocaiton, fileOrFolderName);
+    if (Helpers.isFolder(source)) {
+      Helpers.copy(source, dest);
+    } else {
+      Helpers.copyFile(source, dest);
+    }
+  });
+
+  symlinkFolderFromSrcToRcreate.forEach(folderLinkName => {
+    const source = path.join(newProjStubLocaiton, config.folder.dist, folderLinkName);
+    const dest = path.join(newProjStubLocaiton, folderLinkName);
+    Helpers.createSymLink(source, dest);
+  })
+
+  Helpers.removeExcept(projLocation, [
+    config.folder._browser,
+    config.folder.browser,
+  ]);
+
+  fse.readdirSync(path.join(projLocation, config.folder.browser))
+    .forEach(fileOrFolderName => {
+      const source = path.join(path.join(projLocation, config.folder.browser, fileOrFolderName));
+      const dest = path.join(path.join(projLocation, fileOrFolderName));
+      Helpers.removeIfExists(dest);
+      if (Helpers.isFolder(source)) {
+        Helpers.copy(source, dest);
+      } else {
+        Helpers.copyFile(source, dest);
+      }
+    });
+  Helpers.removeFolderIfExists(path.join(projLocation, config.folder.browser));
+}
+
+// @LAST repalce all dist reference on backend
+// stuberization should can  run almost without tnp
+export function stuberizeFrontendPackages(project: Project, packages?: string[]) {
+  const tnp = Project.Tnp as Project;
+  let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
+    tnp.packageJson.data.tnp.core.dependencies.stubForBackend;
+
+  Helpers.info(`Suberization of packages: \n${packagesNames.map(p => `- ${p}`).join(',\n')}\n\n`)
+
+  for (let index = 0; index < packagesNames.length; index++) {
+    const packageName = packagesNames[index];
+    Helpers.info(`[tnp][node_modueles] Stuberization of package ${chalk.bold(packageName)}`);
+
+    const packageJsonPath = path.join(project.node_modules.path, packageName, config.file.package_json);
+    const packageJsonInBrowser = path.join(project.node_modules.path, packageName, config.folder._browser, config.file.package_json);
+
+    if (!Helpers.exists(packageJsonPath) && Helpers.exists(packageJsonInBrowser)) {
+      Helpers.copyFile(packageJsonInBrowser, packageJsonPath);
+    }
+
+    fixPackageJson(packageJsonPath);
+
     const proj = Project.From(path.join(project.node_modules.path, packageName)) as Project;
     // Helpers.run(`cp -r ${proj.location}`)
+
+    const orginalBrowserPackage = path.join(proj.location, config.folder._browser);
     const browserDataLocation = path.join(proj.location, config.folder.browser);
-    if (!Helpers.exists(browserDataLocation)) {
-      Helpers.copy(proj.location, path.join(proj.location, config.folder.browser),
-        { useTempFolder: true });
+
+    if (Helpers.exists(orginalBrowserPackage)) {
       Helpers.removeExcept(proj.location, [
-        config.folder.browser,
+        config.folder._browser,
         config.file.package_json,
       ]);
     }
-    const srcToProcess = path.join(proj.location, config.folder.src, 'lib');
-    Helpers.removeFolderIfExists(srcToProcess);
-    Helpers.copy( // @LAST copy not only lib !
-      path.join(proj.location, config.folder.browser, 'lib'),
-      srcToProcess
-    );
-    Helpers.copyFile(
-      path.join(proj.location, config.folder.browser, config.file.publicApi_d_ts),
-      path.join(proj.location, config.folder.src, config.file.index_d_ts),
-    );
+
+    if (!Helpers.exists(orginalBrowserPackage) && Helpers.exists(browserDataLocation)) {
+      Helpers.copy(browserDataLocation, orginalBrowserPackage);
+    }
+
+    if (!Helpers.exists(orginalBrowserPackage)) {
+      Helpers.copy(proj.location, orginalBrowserPackage, { useTempFolder: true });
+    }
+
+
+    Helpers.removeFolderIfExists(browserDataLocation);
+    Helpers.copy(orginalBrowserPackage, browserDataLocation);
+    Helpers.removeExcept(proj.location, [
+      config.folder.browser,
+      config.folder._browser,
+      config.file.package_json,
+    ]);
+
+
+    const browserFolders = fse
+      .readdirSync(path.join(proj.location, config.folder.browser))
+      .filter(f => {
+        const fileOrFoler = path.join(proj.location, config.folder.browser, f);
+        return fse.lstatSync(fileOrFoler).isDirectory();
+      })
+      .filter(folderName => !notAllowedFolderToCopy.includes(folderName));
+
+    browserFolders.forEach(folderName => {
+      const source = path.join(proj.location, config.folder.browser, folderName);
+      const dest = path.join(proj.location, config.folder.src, folderName);
+      Helpers.removeFolderIfExists(dest);
+      Helpers.copy(source, dest);
+    })
+
+    const mainPublicApi = path.join(proj.location, config.folder.browser, config.file.publicApi_d_ts);
+
+    if (Helpers.exists(mainPublicApi)) {
+      Helpers.copyFile(
+        mainPublicApi,
+        path.join(proj.location, config.folder.src, config.file.index_d_ts),
+      );
+    }
+
     const files = glob.sync(`${proj.location}/src/**/*.d.ts`);
     // console.log(files);
-
+    // process.exit(0)
     for (let index = 0; index < files.length; index++) {
       const f = files[index];
       // console.log(`processing: ${f}`)
@@ -328,10 +460,35 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       Helpers.removeFileIfExists(f);
     }
 
+    //#region handle absolute referenes
+    const tsFoldersInSrc = fse
+      .readdirSync(path.join(proj.location, config.folder.src))
+      .filter(f => {
+        const fileOrFoler = path.join(proj.location, config.folder.src, f);
+        return fse.lstatSync(fileOrFoler).isDirectory();
+      })
+    Helpers.mkdirp(path.join(proj.location, config.folder.node_modules));
+
+    tsFoldersInSrc.concat([config.file.index_ts]).forEach(folderName => {
+      const source = path.join(proj.location, config.folder.src, folderName);
+      const dest = path.join(proj.location, config.folder.node_modules, proj.name, folderName);
+      Helpers.createSymLink(source, dest);
+    });
+    //#endregion
+
+
+    const allPublicApis = glob.sync(`${proj.location}/src/**/public_api.ts`);
+    allPublicApis.forEach(source => {
+      const dest = path.join(path.dirname(source), config.file.index_ts);
+      Helpers.copyFile(source, dest);
+      // Helpers.createSymLink(source,dest);
+    })
+
     Helpers.writeFile(path.join(proj.location, config.file.tsconfig_json),
       {
         "compilerOptions": {
           "module": "commonjs",
+          "declaration": true,
           "removeComments": false,
           "preserveConstEnums": true,
           "sourceMap": true,
@@ -342,25 +499,36 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
         ]
       });
 
+    Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
+    try {
+      proj.run('npm-run tsc').sync();
+      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
+      tsFoldersInSrc.forEach(folderLinkName => {
+        // console.log(`folderLinkName: ${folderLinkName}`)
+        Helpers.removeFileIfExists(path.join(proj.location, folderLinkName));
+        // const source = path.join(proj.location, config.folder.dist, folderLinkName);
+        // const dest = path.join(proj.location, folderLinkName);
+        // Helpers.createSymLink(source, dest);
+      })
+      Helpers.removeFileIfExists(path.join(proj.location, config.file.tsconfig_json));
+      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.node_modules));
+      Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
+        generatedFileWrap(`export * from './dist';`));
 
-
-    Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
-      generatedFileWrap(`export * from './browser/public_api';`));
-
-    Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
+      Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
     "use strict";
     Object.defineProperty(exports, '__esModule', { value: true });
     var tslib_1 = require('tslib');
     tslib_1.__exportStar(require('./dist'), exports);
             `.trim()));
-    Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
-    try {
-      proj.run('npm-run tsc').sync();
-      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
-      Helpers.removeFileIfExists(path.join(proj.location, config.file.tsconfig_json));
+
+      createSubVersion(proj, tsFoldersInSrc);
+
+
     } catch (er) {
-      Helpers.error(`Not able to suberize pacakge "${packageName}"`);
+      Helpers.error(`Not able to suberize pacakge "${packageName}"`, false, true);
     }
   }
 
 }
+//#endregion

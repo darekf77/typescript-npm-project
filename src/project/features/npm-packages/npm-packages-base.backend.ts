@@ -94,6 +94,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         this.project.node_modules.dedupe();
+        this.project.node_modules.stuberizeFrontendPackages();
       }
       this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);
     }

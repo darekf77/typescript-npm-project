@@ -85,6 +85,12 @@
           "@ngx-formly/ionic",
           "@ngx-formly/material"
         ],
+        "stubForBackend": [
+          "@ngx-formly/core",
+          "@ngx-formly/bootstrap",
+          "@ngx-formly/ionic",
+          "@ngx-formly/material"
+        ],
         "trusted": [],
         "dedupe-for-testing": [
           "@types/jasmine",

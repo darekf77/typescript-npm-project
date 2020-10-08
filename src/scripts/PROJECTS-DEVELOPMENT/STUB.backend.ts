@@ -11,13 +11,20 @@ import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
 import chalk from 'chalk';
 
-async function $stub(args: string) {
+function $stub(args: string) {
   const proj = Project.Current as Project;
-  proj.node_modules.stuberizeFrontendPackages(args.split(' '));
+  proj.node_modules.stuberizeFrontendPackages(args.split(' ').filter(f => !!f));
   // console.log(files);
   process.exit(0)
 }
 
+function $stuberize(args: string) {
+  $stub(args);
+}
+
+
+
 export default {
-  $stub: Helpers.CLIWRAP($stub, '$stub')
+  $stub: Helpers.CLIWRAP($stub, '$stub'),
+  $stuberize: Helpers.CLIWRAP($stuberize, '$stuberize'),
 }
