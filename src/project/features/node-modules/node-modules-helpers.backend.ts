@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as _ from 'lodash';
 import chalk from 'chalk';
+import * as glob from 'glob';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
@@ -11,6 +12,7 @@ import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { FeatureForProject } from '../../abstract';
 
+//#region dedupe packages
 export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {
   let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
     (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
@@ -127,7 +129,9 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 
   });
 }
+//#endregion
 
+//#region node module exists
 export function nodeModulesExists(project: Project) {
   if (project.isWorkspace || project.isStandaloneProject) {
     const p = path.join(project.location, config.folder.node_modules, config.folder._bin);
@@ -144,7 +148,9 @@ export function nodeModulesExists(project: Project) {
   const p = path.join(project.location, config.folder.node_modules);
   return fse.existsSync(p);
 }
+//#endregion
 
+//#region add dependencies
 export function addDependenceis(project: Project, context: string, allNamesBefore: string[] = []) {
   let newNames = []
   if (!allNamesBefore.includes(project.name)) {
@@ -177,4 +183,184 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
   });
 
   return allNamesBefore;
+}
+//#endregion
+
+const regexForClassFunctinoInLine = new RegExp(`[a-zA-Z]+\\(`)
+const regexForClassStaticFunctinoInLine = new RegExp(`static\ +[a-zA-Z]+\\(`)
+const regexForFunctinoInLine = new RegExp(`function [a-zA-Z]+\\(`)
+const regexForGenericFunctinoInLine = new RegExp(`function [a-zA-Z]+\\<`)
+const regexIsExportedConst = new RegExp(`export\\ +const `)
+const specialFunctionEnd = `//<replace>`;
+
+function generatedFileWrap(content: string) {
+  return `${content}
+// [${config.frameworkName}] GENERATED CONTENT FOR BACKEDN VERSION
+// [${config.frameworkName}] GENERATED CONTENT FOR BACKEDN VERSION
+        `.trim()
+}
+
+export function stuberizeFrontendPackages(project: Project, packages?: string[]) {
+
+  for (let index = 0; index < packages.length; index++) {
+    const packageName = packages[index];
+    Helpers.info(`[tnp][node_modueles] Creating stub for package ${chalk.bold(packageName)}`);
+    const proj = Project.From(path.join(project.node_modules.path, packageName)) as Project;
+    // Helpers.run(`cp -r ${proj.location}`)
+    const browserDataLocation = path.join(proj.location, config.folder.browser);
+    if (!Helpers.exists(browserDataLocation)) {
+      Helpers.copy(proj.location, path.join(proj.location, config.folder.browser),
+        { useTempFolder: true });
+      Helpers.removeExcept(proj.location, [
+        config.folder.browser,
+        config.file.package_json,
+      ]);
+    }
+    const srcToProcess = path.join(proj.location, config.folder.src, 'lib');
+    Helpers.removeFolderIfExists(srcToProcess);
+    Helpers.copy( // @LAST copy not only lib !
+      path.join(proj.location, config.folder.browser, 'lib'),
+      srcToProcess
+    );
+    Helpers.copyFile(
+      path.join(proj.location, config.folder.browser, config.file.publicApi_d_ts),
+      path.join(proj.location, config.folder.src, config.file.index_d_ts),
+    );
+    const files = glob.sync(`${proj.location}/src/**/*.d.ts`);
+    // console.log(files);
+
+    for (let index = 0; index < files.length; index++) {
+      const f = files[index];
+      // console.log(`processing: ${f}`)
+      const newFile = f.replace(`.d.ts`, '.ts');
+      let mode: 'class' | 'interface' | 'function';
+      const rawContent = Helpers.readFile(f);
+      const splitLength = rawContent.split(`\n`);
+      let newContent = splitLength
+        .map((l, i) => {
+
+          if (l.search(' class ') !== -1) {
+            mode = 'class';
+          }
+          if (l.search(' interface ') !== -1) {
+            mode = 'interface';
+          }
+
+          l = l.replace(new RegExp(Helpers.escapeStringForRegEx('declare '), 'g'), ' ');
+          if (mode !== 'interface') {
+            l = l.replace(new RegExp(Helpers.escapeStringForRegEx('): void;'), 'g'), '):any { }');
+          }
+
+          const org = l;
+          l = l.trim()
+
+          if (regexIsExportedConst.test(l)) {
+            const res = `// @ts-ignore\n${l}`;
+            if (mode === 'function') {
+              mode = void 0;
+              return `${specialFunctionEnd}\n${res}`;
+            }
+            return res;
+          }
+          if (regexForGenericFunctinoInLine.test(l)) {
+            if (l.endsWith('{')) {
+              mode = 'function';
+              return org;
+            } else {
+              const begin = l.match(regexForGenericFunctinoInLine)[0];
+              const after = `<(any?):any {};`;
+              if (mode === 'function') {
+                mode = void 0;
+                return `${specialFunctionEnd}\nexport ${begin}${after}`;
+              }
+              return `export ${begin}${after}`;
+            }
+          }
+          if (regexForFunctinoInLine.test(l)) {
+            if (l.endsWith('{')) {
+              mode = 'function';
+              return org;
+            } else {
+              const begin = l.match(regexForFunctinoInLine)[0];
+              const after = `any?):any {};`;
+              if (mode === 'function') {
+                mode = void 0;
+                return `${specialFunctionEnd}\nexport ${begin}${after}`;
+              }
+              return `export ${begin}${after}`;
+            }
+          }
+          if (regexForClassStaticFunctinoInLine.test(l)) {
+            if (l.endsWith('{')) {
+              return `// @ts-ignore\n` + org;
+            } else if (l.endsWith(');')) { // constructor
+              return `// @ts-ignore\n` + `${l.replace(/\)\;$/, ') { };')}`;
+            } else if (l.endsWith('>;')) { // generic end
+              return `// @ts-ignore\n` + `${l.replace(/\>\;$/, '> { };')}`;
+            } else {
+              return `// @ts-ignore\n` + org;
+            }
+          }
+          if (regexForClassFunctinoInLine.test(l)) {
+            if (l.endsWith('{')) {
+              return `// @ts-ignore\n` + org;
+            } else if (l.endsWith(');')) { // constructor
+              return `// @ts-ignore\n` + `${l.replace(/\)\;$/, ') { };')}`
+            } else if (l.endsWith('>;')) { // generic end
+              return `// @ts-ignore\n` + `${l.replace(/\>\;$/, '> { };')}`;
+            } else {
+              return `// @ts-ignore\n` + org;
+            }
+          }
+          // if(mode === 'function' && l.endsWith(';')) {
+          //   mode = void 0;
+          //   return l.replace(/\;$/,' { return void 0; }');
+          // }
+          return org;
+        })
+        .join('\n');
+
+      // post processing
+      newContent = newContent.replace(
+        new RegExp(`\;\\n${Helpers.escapeStringForRegEx(specialFunctionEnd)}`, 'g'),
+        ' { return void 0; }\n')
+      Helpers.writeFile(newFile, generatedFileWrap(newContent));
+      Helpers.removeFileIfExists(f);
+    }
+
+    Helpers.writeFile(path.join(proj.location, config.file.tsconfig_json),
+      {
+        "compilerOptions": {
+          "module": "commonjs",
+          "removeComments": false,
+          "preserveConstEnums": true,
+          "sourceMap": true,
+          "outDir": "dist"
+        },
+        "include": [
+          "./src"
+        ]
+      });
+
+
+
+    Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
+      generatedFileWrap(`export * from './browser/public_api';`));
+
+    Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
+    "use strict";
+    Object.defineProperty(exports, '__esModule', { value: true });
+    var tslib_1 = require('tslib');
+    tslib_1.__exportStar(require('./dist'), exports);
+            `.trim()));
+    Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
+    try {
+      proj.run('npm-run tsc').sync();
+      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
+      Helpers.removeFileIfExists(path.join(proj.location, config.file.tsconfig_json));
+    } catch (er) {
+      Helpers.error(`Not able to suberize pacakge "${packageName}"`);
+    }
+  }
+
 }
