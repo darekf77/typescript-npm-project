@@ -229,11 +229,9 @@ function generatedFileWrap(content: string) {
         `.trim()
 }
 
-const SUBERIZED_PREFIX = `---stuberized`
-
 function createSubVersion(proj: Project, symlinkFolderFromSrcToRcreate: string[]) {
   const projLocation = (proj.location);
-  const newStuberizedName = `${path.basename(projLocation)}${SUBERIZED_PREFIX}`;
+  const newStuberizedName = `${path.basename(projLocation)}${config.SUBERIZED_PREFIX}`;
   const newProjStubLocaiton = path.join(
     path.dirname(projLocation),
     newStuberizedName
@@ -281,12 +279,13 @@ function createSubVersion(proj: Project, symlinkFolderFromSrcToRcreate: string[]
   Helpers.removeFolderIfExists(path.join(projLocation, config.folder.browser));
 }
 
-// @LAST repalce all dist reference on backend
-// stuberization should can  run almost without tnp
+
 export function stuberizeFrontendPackages(project: Project, packages?: string[]) {
   const tnp = Project.Tnp as Project;
   let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
     tnp.packageJson.data.tnp.core.dependencies.stubForBackend;
+
+  project.quickFixes.badTypesInNodeModules();
 
   Helpers.info(`Suberization of packages: \n${packagesNames.map(p => `- ${p}`).join(',\n')}\n\n`)
 
@@ -499,30 +498,26 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
         ]
       });
 
-    Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
-    try {
-      proj.run('npm-run tsc').sync();
-      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
-      tsFoldersInSrc.forEach(folderLinkName => {
-        // console.log(`folderLinkName: ${folderLinkName}`)
-        Helpers.removeFileIfExists(path.join(proj.location, folderLinkName));
-        // const source = path.join(proj.location, config.folder.dist, folderLinkName);
-        // const dest = path.join(proj.location, folderLinkName);
-        // Helpers.createSymLink(source, dest);
-      })
-      Helpers.removeFileIfExists(path.join(proj.location, config.file.tsconfig_json));
-      Helpers.removeFolderIfExists(path.join(proj.location, config.folder.node_modules));
-      Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
-        generatedFileWrap(`export * from './dist';`));
+    Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
+      generatedFileWrap(`export * from './dist';`));
 
-      Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
+    Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
     "use strict";
     Object.defineProperty(exports, '__esModule', { value: true });
     var tslib_1 = require('tslib');
     tslib_1.__exportStar(require('./dist'), exports);
             `.trim()));
 
-      createSubVersion(proj, tsFoldersInSrc);
+    Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
+    try {
+      proj.run('npm-run tsc').sync(); // @LAST bette algorith for stubs + npm pacakge firedev-tsc + release of all packages
+      // Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
+      // tsFoldersInSrc.forEach(folderLinkName => {
+      //   Helpers.removeFileIfExists(path.join(proj.location, folderLinkName));
+      // })
+      // Helpers.removeFileIfExists(path.join(proj.location, config.file.tsconfig_json));
+      // Helpers.removeFolderIfExists(path.join(proj.location, config.folder.node_modules));
+      // createSubVersion(proj, tsFoldersInSrc);
 
 
     } catch (er) {

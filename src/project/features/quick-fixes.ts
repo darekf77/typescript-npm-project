@@ -110,7 +110,20 @@ export class QuickFixes extends FeatureForProject {
     }
   }
 
-  public badNpmPackages() {
+  badTypesInNodeModules() {
+
+    if (this.project.frameworkVersionAtLeast('v2')) {
+      [
+        '@types/mocha',
+        '@types/jasminewd2',
+        '@types/jasmine'
+      ].forEach(name => {
+        Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
+      });
+    }
+  }
+
+  public overritenBadNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
     if (this.project.isTnp) {
       this.project.node_modules.fixesForNodeModulesPackages

@@ -231,7 +231,7 @@ export class ProjectIsomorphicLib
 
     if (outDir === 'bundle' && (obscure || uglify)) {
 
-      this.quickFixes.badNpmPackages();
+      this.quickFixes.overritenBadNpmPackages();
       Helpers.info(`
 
         WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} BACKEND BUILD started...
