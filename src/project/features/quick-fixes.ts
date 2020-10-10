@@ -125,7 +125,7 @@ export class QuickFixes extends FeatureForProject {
 
   public overritenBadNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
-    if (this.project.isTnp) {
+    if (this.project.isTnp) { // TODO for all packages ???
       this.project.node_modules.fixesForNodeModulesPackages
         .forEach(f => {
           const source = path.join(this.project.location, f);
@@ -133,28 +133,32 @@ export class QuickFixes extends FeatureForProject {
           Helpers.tryCopyFrom(source, dest);
         });
     }
-    if (this.project.isGenerated && this.project.isWorkspace) {
-      this.project.origin.node_modules.fixesForNodeModulesPackages
-        .forEach(f => {
-          const source = path.join(this.project.origin.location, f);
-          const dest = path.join(this.project.location, f);
-          if (fse.existsSync(dest)) {
-            Helpers.tryRemoveDir(dest);
-          }
-          Helpers.tryCopyFrom(source, dest);
-        });
+
+    if (this.project.isWorkspace) {
+      if (this.project.isGenerated) {
+        this.project.origin.node_modules.fixesForNodeModulesPackages
+          .forEach(f => {
+            const source = path.join(this.project.origin.location, f);
+            const dest = path.join(this.project.location, f);
+            if (fse.existsSync(dest)) {
+              Helpers.tryRemoveDir(dest);
+            }
+            Helpers.tryCopyFrom(source, dest);
+          });
+      }
+      if (this.project.isSite) {
+        this.project.baseline.node_modules.fixesForNodeModulesPackages
+          .forEach(f => {
+            const source = path.join(this.project.baseline.location, f);
+            const dest = path.join(this.project.location, f);
+            if (fse.existsSync(dest)) {
+              Helpers.tryRemoveDir(dest);
+            }
+            Helpers.tryCopyFrom(source, dest);
+          });
+      }
     }
-    if (this.project.isSite && this.project.isWorkspace) {
-      this.project.baseline.node_modules.fixesForNodeModulesPackages
-        .forEach(f => {
-          const source = path.join(this.project.baseline.location, f);
-          const dest = path.join(this.project.location, f);
-          if (fse.existsSync(dest)) {
-            Helpers.tryRemoveDir(dest);
-          }
-          Helpers.tryCopyFrom(source, dest);
-        });
-    }
+
     Helpers.log(`Fixing bad npm packages - COMPLETE`);
   }
 
