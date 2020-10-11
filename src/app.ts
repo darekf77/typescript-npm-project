@@ -1,3 +1,5 @@
+import 'core-js/proposals/reflect-metadata';
+import 'core-js/es';
 //#region isomorphic imports
 import { Morphi } from 'morphi';
 import { Log, Logger } from 'ng2-logger';
@@ -5,12 +7,13 @@ const log = Log.create(`app`);
 //#endregion
 
 //#region browser imports
-import 'core-js/client/shim';
-import 'reflect-metadata';
+
 if (Morphi.isBrowser) {
   require('zone.js/dist/zone');
 }
 //#endregion
+
+import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 //#region angular
 import { Component, NgModule, ApplicationRef } from '@angular/core';

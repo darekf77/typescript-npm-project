@@ -55,7 +55,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
+import '@angular/material/prebuilt-themes/indigo-pink.cs'
 
 @Component({
   selector: 'my-app', // <my-app></my-app>
