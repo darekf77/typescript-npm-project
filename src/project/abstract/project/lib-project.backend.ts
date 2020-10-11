@@ -294,18 +294,18 @@ export abstract class LibProject {
 
       if (this.typeIs('angular-lib')) {
 
-        if (this.frameworkVersionEquals('v1')) {
-          Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
+        // if (this.frameworkVersionEquals('v1')) {
+        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
                 "use strict";
                 Object.defineProperty(exports, '__esModule', { value: true });
                 var tslib_1 = require('tslib');
-                tslib_1.__exportStar(require('./browser'), exports);
+                tslib_1.__exportStar(require('./public_api'), exports);
                         `.trim());
-        } else {
-          Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-                export * from './browser';
-              `.trim());
-        }
+        // } else {
+        //   Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
+        //         export * from './browser';
+        //       `.trim());
+        // }
 
 
 
