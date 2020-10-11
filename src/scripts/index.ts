@@ -17,6 +17,7 @@ import OTHER from './OTHER.backend';
 import HELP from './HELP.backend';
 import DAEMON from './DAEMON.backend';
 import BASH_CONFIG from './BASH-CONFIG.backend';
+import UPDATE from './UPDATE.backend';
 
 export default [
   BENCHMARKS,
@@ -36,7 +37,8 @@ export default [
   OTHER,
   HELP,
   DAEMON,
-  BASH_CONFIG
+  BASH_CONFIG,
+  UPDATE
 ]
 
 //#endregion

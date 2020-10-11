@@ -175,7 +175,9 @@ export abstract class LibProject {
 
   public compileES5version(this: Project) {
 
-    if (this.frameworkVersionEquals('v1')) {
+    // TODO fix this for angular-lib
+
+    if (this.frameworkVersionEquals('v1') || this.typeIsNot('isomorphic-lib')) {
       return;
     }
 

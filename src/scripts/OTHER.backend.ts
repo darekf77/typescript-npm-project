@@ -99,9 +99,6 @@ const PSINFO = async (a) => {
   await $PSINFO(a)
 }
 
-function UPDATE_ISOMORPHIC() {
-  PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true);
-}
 
 function $isbundlemode(args) {
   console.log('IS BUNDLE MODE? ', Project.isBundleMode)
@@ -154,7 +151,6 @@ export default {
   $FILEINFO: Helpers.CLIWRAP($FILEINFO, '$FILEINFO'),
   RUN_PROCESS: Helpers.CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
   PSINFO: Helpers.CLIWRAP(PSINFO, 'PSINFO'),
-  UPDATE_ISOMORPHIC: Helpers.CLIWRAP(UPDATE_ISOMORPHIC, 'UPDATE_ISOMORPHIC'),
   $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),

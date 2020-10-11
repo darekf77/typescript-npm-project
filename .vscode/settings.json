@@ -1,7 +1,9 @@
 {
   "files.exclude": {
+    "@ngx-formly": true,
     "lowdb": true,
     "misc-utils-of-mine-generic": true,
+    "morphi": true,
     "*.sh": true,
     "*.xlsx": true,
     "scripts": true,

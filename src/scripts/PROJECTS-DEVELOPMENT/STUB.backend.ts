@@ -13,7 +13,7 @@ import chalk from 'chalk';
 
 function $stub(args: string) {
   const proj = Project.Current as Project;
-  proj.node_modules.stuberizeFrontendPackages(args.split(' ').filter(f => !!f));
+  // proj.node_modules.stuberizeFrontendPackages(args.split(' ').filter(f => !!f));
   // console.log(files);
   process.exit(0)
 }
