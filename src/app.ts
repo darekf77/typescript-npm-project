@@ -2,6 +2,7 @@ import 'core-js/proposals/reflect-metadata';
 import 'core-js/es';
 //#region isomorphic imports
 import { Morphi } from 'morphi';
+import { DraggablePopupComponent, DraggablePopupModule } from 'tnp-ui';
 import { Log, Logger } from 'ng2-logger';
 const log = Log.create(`app`);
 //#endregion
@@ -10,10 +11,9 @@ const log = Log.create(`app`);
 
 if (Morphi.isBrowser) {
   require('zone.js/dist/zone');
+  require('@angular/material/prebuilt-themes/indigo-pink.css');
 }
 //#endregion
-
-import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 //#region angular
 import { Component, NgModule, ApplicationRef } from '@angular/core';
@@ -23,10 +23,9 @@ import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MatCardModule } from '@angular/material/card';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+// import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 //#endregion
-
-// import '../node_modules/@angular/material/prebuilt-themes/indigo-pink.css';
 
 //#region local imports
 import { PROCESS, ProcessModule, ProcessController } from './apps/process';
@@ -54,6 +53,12 @@ const host = 'http://localhost:3333';
     ...loading
   </mat-card-subtitle>
   <mat-card-content>
+
+  <ng-template #popupContent>
+  Hello content
+  </ng-template>
+
+  <app-draggable-popup [popupContent]="popupContent" ></app-draggable-popup>
   processes preview
   <div *ngFor="let p of processes" >
     <app-process-logger [model]="p"></app-process-logger>
@@ -81,13 +86,14 @@ export class AppComponent {
   imports: [
     BrowserModule,
     HttpModule,
-    NoopAnimationsModule,
+    BrowserAnimationsModule,
     FormsModule,
     ...[
       MatCardModule,
     ],
     ProjectModule,
     ProcessModule,
+    DraggablePopupModule,
   ],
   declarations: [
     AppComponent,
@@ -143,7 +149,17 @@ async function start() {
       `<link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet">`
     const body: HTMLElement = document.getElementsByTagName('body')[0];
     body.innerHTML = `
+    <style>
 
+    [mat-dialog-title] {
+      margin: -24px -24px 0px -24px !important;
+      padding: 10px 24px;
+      background: #369;
+      color: #fff;
+      cursor: move;
+    }
+
+    </style>
     <my-app>Loading...</my-app>`;
     if (document.readyState === 'complete') {
       main();
