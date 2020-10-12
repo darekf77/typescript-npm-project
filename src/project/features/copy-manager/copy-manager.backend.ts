@@ -296,8 +296,24 @@ export class CopyManager extends FeatureForProject {
         : this.project.name
     );
 
+    const folderToLink = [
+      `tmp-src-${outDir}`,
+      this.project.sourceFolder,
+    ];
 
-    if (specyficFileRelativePath) {
+    const isSourceMapsDistBuild = (outDir === 'dist' && this.buildOptions?.watch);
+    const allFolderLinksExists = !isSourceMapsDistBuild ? true : _.isUndefined(folderToLink.find(sourceFolder => {
+      const projectOudDirDest = path.join(destination.location,
+        config.folder.node_modules,
+        namePackageName,
+        sourceFolder
+      );
+      return !Helpers.exists(projectOudDirDest);
+    }));
+
+
+    if (specyficFileRelativePath && allFolderLinksExists) {
+      //#region handle single file
       const sourceFile = path.normalize(path.join(this.project.location,
         outDir, specyficFileRelativePath));
 
@@ -309,7 +325,8 @@ export class CopyManager extends FeatureForProject {
 
       specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
 
-      if (outDir === 'dist' && this.buildOptions?.watch) {
+      if (isSourceMapsDistBuild) {
+        //#region handle dist copyto with source maps
         if (destinationFile.endsWith('.js.map')) {
           const folderToLink = [
             `tmp-src-${outDir}`,
@@ -324,13 +341,21 @@ export class CopyManager extends FeatureForProject {
         } else if (specyficFileRelativePath !== config.file.index_d_ts) { // don't override index.d.ts
           Helpers.copyFile(sourceFile, destinationFile);
         }
+        //#endregion
       } else {
         Helpers.copyFile(sourceFile, destinationFile);
       }
+
+      //#region copy package json to browser folder
       if (specyficFileRelativePath === config.file.package_json) {
+
         Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
       }
+      //#endregion
+
+      //#endregion
     } else {
+      //#region handle whole folder at begin
       const projectOudDirDest = path.join(destination.location,
         config.folder.node_modules,
         namePackageName
@@ -344,11 +369,8 @@ export class CopyManager extends FeatureForProject {
       const monitoredOutDir: string = path.join(this.project.location, outDir)
 
       Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest);
-      const folderToLink = [
-        `tmp-src-${outDir}`,
-        this.project.sourceFolder,
-      ];
-      if (outDir === 'dist' && this.buildOptions?.watch) {
+
+      if (isSourceMapsDistBuild) {
 
         folderToLink.forEach(sourceFolder => {
           const srcOrComponents = path.join(this.project.location, sourceFolder);
@@ -408,7 +430,7 @@ export class CopyManager extends FeatureForProject {
         config.file.package_json
       );
       Helpers.copyFile(projectOudBorwserSrc, projectOudBorwserDest);
-
+      //#endregion
     }
 
   }
