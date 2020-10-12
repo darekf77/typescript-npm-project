@@ -58,7 +58,7 @@ const host = 'http://localhost:3333';
   Hello content
   </ng-template>
 
-  <app-draggable-popup [popupContent]="popupContent" ></app-draggable-popup>
+  <app-draggable-popup [title]="'awesome'" [popupContent]="popupContent" ></app-draggable-popup>
   processes preview
   <div *ngFor="let p of processes" >
     <app-process-logger [model]="p"></app-process-logger>
