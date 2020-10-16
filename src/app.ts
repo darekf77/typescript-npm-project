@@ -1,19 +1,48 @@
 import 'core-js/proposals/reflect-metadata';
 import 'core-js/es';
-//#region isomorphic imports
 import { Morphi } from 'morphi';
+
+//#region @backend
+/**
+ * This quick fix if somhow I am using on backend document and localstorage
+ */
+Morphi.setIsBackend();
+if (typeof localStorage === "undefined" || localStorage === null) {
+  const LocalStorage = require('node-localstorage').LocalStorage;
+  global['localStorage'] = new LocalStorage('./tmp-local-storage');
+  global['sessionStorage'] = new LocalStorage('./tmp-session-storage');
+}
+
+if (typeof document === "undefined" || document === null) {
+  const jsdom = require('jsdom');
+  const { JSDOM } = jsdom;
+  const window = (new JSDOM(``)).window;
+  global['window'] = window;
+  const { document } = window;
+  global['document'] = document;
+}
+
+if (typeof global['Zone'] === "undefined" || global['Zone'] === null) {
+  global['Zone'] = {
+    __load_patch: () => { },
+    __symbol__: () => { }
+  };
+}
+//#endregion
+
+//#region isomorphic imports
 import { DraggablePopupComponent, DraggablePopupModule } from 'tnp-ui';
 import { Log, Logger } from 'ng2-logger';
 const log = Log.create(`app`);
 //#endregion
 
-//#region browser imports
+console.log(`Morphi.isBrowser: ${Morphi.isBrowser}, Morphi.isNode: ${Morphi.isNode}`)
 
 if (Morphi.isBrowser) {
   require('zone.js/dist/zone');
   require('@angular/material/prebuilt-themes/indigo-pink.css');
 }
-//#endregion
+
 
 //#region angular
 import { Component, NgModule, ApplicationRef } from '@angular/core';
@@ -24,7 +53,7 @@ import { FormsModule } from '@angular/forms';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MatCardModule } from '@angular/material/card';
 // import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //#endregion
 
 //#region local imports
@@ -58,7 +87,10 @@ const host = 'http://localhost:3333';
   Hello content
   </ng-template>
 
-  <app-draggable-popup [title]="'awesome'" id="test" [popupContent]="popupContent" ></app-draggable-popup>
+  <app-draggable-popup
+  [title]="'awesome'" >
+
+  </app-draggable-popup>
   processes preview
   <div *ngFor="let p of processes" >
     <app-process-logger [model]="p"></app-process-logger>
@@ -157,6 +189,13 @@ async function start() {
       background: #369;
       color: #fff;
       cursor: move;
+    }
+
+
+    .resizable-modal {
+      mat-dialog-container {
+        resize: both;
+      }
     }
 
     </style>

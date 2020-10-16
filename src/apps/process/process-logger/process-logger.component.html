@@ -48,10 +48,10 @@
                   *ngIf="process && isOpen"
                   [contentComponent]="popupContent"></standalone-popup> -->
 
+
 <app-draggable-popup [id]="id"
                     [title]="title"
                     (close)="onClose()"
-                    [pinned]="pinned"
                     *ngIf="process && isOpen"
                     (pin)="onPin($event)">
   <code>{{process.cmd}}</code>
