@@ -186,7 +186,7 @@ async function start() {
     [mat-dialog-title] {
       margin: -24px -24px 0px -24px !important;
       padding: 10px 24px;
-      background: #369;
+      background: gray;
       color: #fff;
       cursor: move;
     }

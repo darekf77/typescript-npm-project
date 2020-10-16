@@ -4,9 +4,7 @@
   </span> -->
 
   <mat-expansion-panel *ngIf="size === 'normal'"
-                       [expanded]=[isExpanded]
-                       (closed)="onExpand(false)"
-                       (opened)="onExpand(true)">
+                       [(expanded)]="isExpanded">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{process && process.name}}
@@ -26,7 +24,8 @@
                      (action)="isOpen = !isOpen"></app-button-icon>
   </mat-expansion-panel>
 
-  <span *ngIf="size === 'compact'" class="compact" >
+  <span *ngIf="size === 'compact'"
+        class="compact">
     <app-button-icon [icon]="icon"
                      [color]="color"
                      (action)="action()"
@@ -35,7 +34,9 @@
                      [color]="color"
                      [label]="''"
                      (dblclick)="reset()"
-                     (action)="isOpen = !isOpen"></app-button-icon>
+                     (action)="openOrClose()"></app-button-icon>
+                     <hr>
+                     {{isOpen}}
   </span>
 
 </p>
@@ -49,11 +50,13 @@
                   [contentComponent]="popupContent"></standalone-popup> -->
 
 
-<app-draggable-popup [id]="id"
-                    [title]="title"
-                    (close)="onClose()"
-                    *ngIf="process && isOpen"
-                    (pin)="onPin($event)">
+<app-draggable-popup #popup
+                     [id]="id"
+                     [title]="title"
+                     [(pinned)]="isOpenOnStart"
+                     [(isOpen)]="isOpen"
+                     (onPin)="onPin($event)"
+                     *ngIf="process && isOpen">
   <code>{{process.cmd}}</code>
 
   <mat-tab-group>

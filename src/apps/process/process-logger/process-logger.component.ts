@@ -1,8 +1,8 @@
+//#region imports
 import { Morphi, ModelDataConfig, MDC } from 'morphi';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
-  OnDestroy,
-  OnChanges, SimpleChange
+  OnDestroy, OnChanges, SimpleChange, AfterViewInit
 } from '@angular/core';
 import * as _ from 'lodash';
 
@@ -14,6 +14,9 @@ import {
 // logger
 import { Log, Level } from 'ng2-logger';
 import { BehaviorSubject } from 'rxjs';
+import { DraggablePopupComponent } from 'tnp-ui';
+import { LocalStorage } from 'ngx-store';
+//#endregion
 
 const log = Log.create('process loger');
 
@@ -31,15 +34,55 @@ export class DualComponentControllerExtended extends DualComponentController {
   templateUrl: './process-logger.component.html',
   styleUrls: ['./process-logger.component.scss']
 })
-export class ProcessLoggerComponent extends BaseFormlyComponent implements OnInit, OnDestroy {
+export class ProcessLoggerComponent extends BaseFormlyComponent implements OnInit, OnDestroy, AfterViewInit {
 
   DualComponentController = DualComponentControllerExtended;
+
+  changes = new BehaviorSubject(void 0);
+  actionClicked = false;
+  @Input() public config: ModelDataConfig;
   @Input() size: 'compact' | 'normal' = 'normal';
-  isExpanded = false;
+  @ViewChild(DraggablePopupComponent) popup: DraggablePopupComponent;
+  @LocalStorage() expandedById: {
+    [key: string]: boolean;
+  } & { save: () => void; };
+
+  @LocalStorage() openOnStartById: {
+    [key: string]: boolean;
+  } & { save: () => void; };
+
+  //#region getters
+  public isOpen = false;
+  get isOpenOnStart() {
+    if (_.isNil(this.id)) {
+      return;
+    }
+    return this.openOnStartById[this.id];
+  }
+  set isOpenOnStart(v) {
+    if (_.isNil(this.id)) {
+      return;
+    }
+    this.openOnStartById = this.openOnStartById;
+    this.openOnStartById[this.id] = v;
+    this.openOnStartById.save();
+  }
+
+
+  get isExpanded() {
+    return this.expandedById[this.id];
+  }
+  set isExpanded(v) {
+    if (this.id) {
+      this.expandedById = this.expandedById;
+      this.expandedById[this.id] = v;
+      this.expandedById.save();
+    }
+  }
+
   get process() {
     return this.ctrl && this.ctrl.value;
   }
-
 
   get title() {
     return this.process && `${this.process.name} - process ID: ${this.process.id}`;
@@ -93,49 +136,6 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
     return 'restart';
   }
 
-  get nameForLC() {
-    return this.process && `pinProcess${this.process.id}`;
-  }
-
-  get nameForExpand() {
-    return this.process && `expandProcess${this.process.id}`;
-  }
-
-  constructor() {
-    super();
-  }
-
-  get id() {
-    return !!this.process && `process${this.process && this.process.id}`;
-  }
-
-  @Input() public config: ModelDataConfig;
-
-  isOpen = false;
-
-  changes = new BehaviorSubject(void 0);
-
-  pinned = false;
-  actionClicked = false;
-  async action() {
-    // log.i('some action')
-    // if (this.actionClicked) {
-    //   log.i('ommiting click')
-    //   return
-    // }
-    // this.actionClicked = true;
-    // setTimeout(() => {
-    //   this.actionClicked = false;
-    // }, 1000)
-    if (this.process.state === 'running') {
-      await this.process.stop();
-    } else {
-      await this.process.start();
-    }
-    this.changes.next(void 0);
-
-  }
-
   get progress() {
     if (!this.process) {
       return '.... loading process'
@@ -151,39 +151,74 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
         this.process.state === 'running') ? '...loading' : '';
   }
 
-  isNumber(v) {
-    return _.isNumber(v);
+  get id() {
+    return !!this.process ? `process${this.process && this.process.id}` : void 0;
   }
 
-  reset() {
+  //#endregion
+
+  constructor() {
+    super();
+  }
+
+  //#region angular hooks
+  ngOnInit() {
+    super.ngOnInit();
+    if (_.isNil(this.expandedById[this.id])) {
+      this.isExpanded = true;
+    }
+    if (_.isNil(this.openOnStartById[this.id])) {
+      this.isOpenOnStart = false;
+    }
+    this.subscribe();
+    if (this.isOpenOnStart) {
+      this.isOpen = true;
+    }
+  }
+
+  ngAfterViewInit() {
+
+  }
+
+  ngOnDestroy() {
+    if (this.model instanceof PROCESS) {
+      this.model.unsubscribeRealtimeUpdates();
+    }
+  }
+
+  onChange(v) {
+    this.formControl.setValue(v);
+    console.log(this.model);
+  }
+  //#endregion
+
+  onPin(v: boolean) {
+    this.isOpenOnStart = v;
+  }
+
+  openOrClose() {
+    this.isOpen = !this.isOpen;
+  }
+
+  public async action() {
+    if (this.process.state === 'running') {
+      await this.process.stop();
+    } else {
+      await this.process.start();
+    }
+    this.changes.next(void 0);
+  }
+
+
+  public reset() {
     this.isOpen = false;
     setTimeout(() => {
       this.isOpen = true;
     });
   }
 
-  onClose() {
-    this.isOpen = false;
-    localStorage.removeItem(this.nameForLC);
-  }
 
-  onPin(value: boolean) {
-    if (value) {
-      localStorage.setItem(this.nameForLC, 'true');
-    } else {
-      localStorage.removeItem(this.nameForLC);
-    }
-  }
-
-  onExpand(value: boolean) {
-    if (value) {
-      localStorage.setItem(this.nameForExpand, 'true');
-    } else {
-      localStorage.removeItem(this.nameForExpand);
-    }
-  }
-
-  subscribe() {
+  private subscribe() {
     if (this.process && !this.process.isSync) {
       if (!(this.process instanceof PROCESS)) {
         console.error('[processLogger] Process in not instance of PROCESS')
@@ -198,28 +233,6 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
       });
 
     }
-  }
-
-  ngOnInit() {
-    super.ngOnInit()
-    log.i('ON INIT PROCESS');
-    this.isExpanded = _.isString(localStorage.getItem(this.nameForExpand));
-    this.pinned = _.isString(localStorage.getItem(this.nameForLC));
-    this.isOpen = this.pinned;
-    console.log(`should be piinned ${this.process && this.process.id}`, this.pinned);
-    // log.i('this.formControl.value', this.formControl.value);
-    this.subscribe();
-  }
-
-  ngOnDestroy() {
-    if (this.model instanceof PROCESS) {
-      this.model.unsubscribeRealtimeUpdates();
-    }
-
-  }
-  onChange(v) {
-    this.formControl.setValue(v);
-    console.log(this.model);
   }
 
 
