@@ -13,6 +13,10 @@
         {{ progress }}
       </mat-panel-description>
     </mat-expansion-panel-header>
+    <code>
+       {{ process.cmd }}
+    </code>
+    <br>
     <app-button-icon [icon]="icon"
                      [color]="color"
                      (action)="action()"
@@ -35,8 +39,8 @@
                      [label]="''"
                      (dblclick)="reset()"
                      (action)="openOrClose()"></app-button-icon>
-                     <hr>
-                     {{isOpen}}
+    <hr>
+    {{isOpen}}
   </span>
 
 </p>
@@ -57,7 +61,7 @@
                      [(isOpen)]="isOpen"
                      (onPin)="onPin($event)"
                      *ngIf="process && isOpen">
-  <code>{{process.cmd}}</code>
+  <code>{{cmd}}</code>
 
   <mat-tab-group>
 
@@ -70,7 +74,8 @@
     <mat-tab label="Console Output">
 
       <app-process-console-info [model]="model"
-                                [changes]="changes"></app-process-console-info>
+                                [changes]="changes"
+                                outputType="stdout"></app-process-console-info>
 
     </mat-tab>
     <mat-tab label="Console Errors">

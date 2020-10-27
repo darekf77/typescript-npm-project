@@ -124,6 +124,10 @@ export class PROCESS_ENTITY extends Morphi.Base.Entity<PROCESS, IPROCESS, Proces
 })
 export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
   public static ctrl: ProcessController;
+  static LOADING_STATE = [
+    'inProgressOfStarting',
+    'inProgressOfStopping',
+  ] as PROCESS_STATE[];
   public parameters: PARAMS;
   public browser: IPROCESS = {} as any;
   private cmdOrg?: string = undefined;
@@ -192,6 +196,9 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     return _.last(this.allProgressData);
   }
 
+  get isInLoadingState() {
+    return PROCESS.LOADING_STATE.includes(this.state);
+  }
 
   get allProgressData(): PROGRESS_DATA[] {
 
@@ -205,19 +212,18 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
 
   get stder() {
     let res: string;
-    if (_.isString(this._stder)) {
+    if (_.isString(this._stder) && this._stder.trim() !== '') {
       res = this._stder;
     } else {
-      res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
+      res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : '';
     }
-    // console.log(`stder: "${res}"`)
     return res;
   }
 
   _stdout: string;
   get stdout() {
     let res: string;
-    if (_.isString(this._stdout)) {
+    if (_.isString(this._stdout) && this._stdout.trim() !== '') {
       res = this._stdout;
     } else {
       res = _.isString(this.stdoutLog) ? this.stdoutLog.replace(/\[\[\[.*\]\]\]/g, '') : ''
@@ -281,7 +287,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
           fse.writeFileSync(this.exitCodePath, (0).toString())
         } catch (err) {
           fse.writeFileSync(this.exitCodePath, (((err && _.isNumber(err.status)) ? err.status : 1)).toString())
-          var stderr = err;
+          var stderr = err.stack;
         }
 
         fse.writeFileSync(this.stdoutLogPath, !stdout ? '' : stdout);
@@ -455,7 +461,7 @@ function attachListeners(childProcess: child.ChildProcess, actions: {
   })
 
   childProcess.stderr.on('data', (m) => {
-    msgAction(m.toString());
+    errorAction(m.toString());
   })
 
   childProcess.stderr.on('error', (m) => {

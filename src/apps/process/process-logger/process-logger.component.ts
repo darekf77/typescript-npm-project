@@ -2,7 +2,7 @@
 import { Morphi, ModelDataConfig, MDC } from 'morphi';
 import {
   Component, OnInit, Input, ViewChild, ElementRef,
-  OnDestroy, OnChanges, SimpleChange, AfterViewInit
+  OnDestroy, OnChanges, SimpleChange, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import * as _ from 'lodash';
 
@@ -32,7 +32,7 @@ export class DualComponentControllerExtended extends DualComponentController {
 @Component({
   selector: 'app-process-logger',
   templateUrl: './process-logger.component.html',
-  styleUrls: ['./process-logger.component.scss']
+  styleUrls: ['./process-logger.component.scss'],
 })
 export class ProcessLoggerComponent extends BaseFormlyComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -80,8 +80,12 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
     }
   }
 
-  get process() {
+  get process(): PROCESS {
     return this.ctrl && this.ctrl.value;
+  }
+
+  get cmd() {
+    return this.process?.cmd;
   }
 
   get title() {
@@ -138,17 +142,22 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
 
   get progress() {
     if (!this.process) {
-      return '.... loading process'
+      return '...loading process';
     }
-    return (this.process &&
-      this.process.progress) ?
-      ((!this.process.isSync &&
-        _.isNumber(this.process.progress.value))
-        ? (this.process.progress.value + '%') :
-        this.process.progress.msg) :
-      (this.process.state === 'inProgressOfStarting' ||
-        this.process.state === 'inProgressOfStopping' ||
-        this.process.state === 'running') ? '...loading' : '';
+
+    if (!this.process.progress) {
+      return '-';
+    }
+
+    if (this.process.isSync) {
+      return this.process.progress.msg;
+    }
+
+    if (this.process.isInLoadingState) {
+      return '...in loading state';
+    }
+
+    return this.process.progress.value + '%';
   }
 
   get id() {
@@ -157,7 +166,9 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
 
   //#endregion
 
-  constructor() {
+  constructor(
+    private changeDetectionRef: ChangeDetectorRef,
+  ) {
     super();
   }
 
@@ -228,7 +239,9 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
       this.process.subscribeRealtimeUpdates({
         modelDataConfig: this.config as any,
         callback: () => {
+          log.d(`update callback `);
           this.changes.next(void 0);
+          this.changeDetectionRef.detectChanges();
         }
       });
 

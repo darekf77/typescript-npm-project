@@ -127,11 +127,11 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
   async initExampleDbData() {
     this.removeProcesesfolder()
 
-    // await this.db.PROCESS.save(new PROCESS({ name: 'Test async', cmd: 'tnp test:async:proc --max 1 ', cwd: process.cwd(), async: true }))
-    // await this.db.PROCESS.save(new PROCESS({ name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err', cwd: process.cwd() }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test async', cmd: 'tnp test:async:proc --max 1 ', cwd: process.cwd(), async: true }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err', cwd: process.cwd() }))
     await PROCESS.db.save(new PROCESS({ name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6', cwd: process.cwd() }))
     await PROCESS.db.save(new PROCESS({ name: 'Messages async', cmd: 'tnp show:loop:messages', cwd: process.cwd(), async: true }))
-    // await this.db.PROCESS.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: process.cwd() }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: process.cwd() }))
   }
   //#endregion
 }

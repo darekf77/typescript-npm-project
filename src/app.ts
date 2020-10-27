@@ -52,6 +52,7 @@ import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MatCardModule } from '@angular/material/card';
+import { WebStorageModule } from 'ngx-store';
 // import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //#endregion
@@ -126,6 +127,7 @@ export class AppComponent {
     ProjectModule,
     ProcessModule,
     DraggablePopupModule,
+    WebStorageModule,
   ],
   declarations: [
     AppComponent,

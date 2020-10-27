@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import {
   EventEmitter, Component, OnInit, Input,
-  Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy
+  Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy, ChangeDetectorRef
 } from '@angular/core';
 import { PROCESS } from '../../PROCESS';
 import { BehaviorSubject } from 'rxjs';
@@ -30,7 +30,10 @@ export class ProcessConsoleInfoComponent extends BaseComponent
 
 
   public resizeService: ResizeService = new ResizeService();
-  constructor(private elemetRef: ElementRef) {
+  constructor(
+    private elemetRef: ElementRef,
+    private changeDetectionRef: ChangeDetectorRef,
+  ) {
     super();
   }
 
@@ -68,10 +71,9 @@ export class ProcessConsoleInfoComponent extends BaseComponent
       bufforProperty: `_${this.outputType}` as any,
       callback: () => {
         this.changes.next(void 0);
+        this.changeDetectionRef.detectChanges();
       }
     });
-
-
 
 
   }
