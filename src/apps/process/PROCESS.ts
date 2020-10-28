@@ -132,7 +132,16 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
   public browser: IPROCESS = {} as any;
   private cmdOrg?: string = undefined;
   private _allProgressData: PROGRESS_DATA[];
-  private _stder: string;
+  private __stder: string;
+
+  get _stder() {
+    return this.__stder;
+  }
+  set _stder(v) {
+    debugger
+    this.__stder = v;
+  }
+  // private _stder: string;
   private tempState: PROCESS_STATE = null;
   //#region @backend
   private starting = {};
@@ -213,9 +222,9 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
   get stder() {
     let res: string;
     if (_.isString(this._stder) && this._stder.trim() !== '') {
-      res = this._stder;
+      res = this._stder + 'pizda';
     } else {
-      res = _.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : '';
+      res = (_.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : '') + 'dupa';
     }
     return res;
   }

@@ -1,4 +1,12 @@
 outputType: {{ outputType }}
+<hr>
+{{ model | json }}
+<hr>
+stdout:
+{{ model['stdout'] }}
+stder:
+{{ model['stder'] }}
+
 <code *ngIf="model && model[outputType] && model[outputType].trim() !== ''"
       [innerHTML]="clear(model[outputType])">
 </code>
