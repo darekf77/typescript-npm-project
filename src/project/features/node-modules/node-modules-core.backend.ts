@@ -24,7 +24,12 @@ export class NodeModulesCore extends FeatureForProject {
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
   public dedupeCount = (packages?: string[]) => dedupePackages(this.project.location, packages, true);
   public remove = () => Helpers.tryRemoveDir(this.path);
-  public linkToProject = (target: Project) => Helpers.createSymLink(this.path, target.node_modules.path);
+  public linkToProject = (target: Project) => {
+    if (!this.project.node_modules.exist) {
+      this.project.run(`${config.frameworkName} install`).sync();
+    }
+    Helpers.createSymLink(this.path, target.node_modules.path)
+  };
 
   /**
    * Just create folder... without npm instalation

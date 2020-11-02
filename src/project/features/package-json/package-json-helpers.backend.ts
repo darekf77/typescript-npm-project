@@ -273,28 +273,29 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     } else {
       project.packageJson.data.devDependencies = devDependencies;
       project.packageJson.data.dependencies = dependencies;
-
-      //#region  install latest version of package
-      const isomorphicPackages = (Project.Tnp as Project).availableIsomorphicPackagesInNodeModules;
-      Object.keys(project.packageJson.data.devDependencies)
-        .filter(key => isomorphicPackages.includes(key))
-        .forEach(packageIsomorphicName => {
-          const v = project.packageJson.data.devDependencies[packageIsomorphicName];
-          if (!v.startsWith('~') && !v.startsWith('^')) {
-            project.packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
-          }
-        });
-
-      Object.keys(project.packageJson.data.dependencies)
-        .filter(key => isomorphicPackages.includes(key))
-        .forEach(packageIsomorphicName => {
-          const v = project.packageJson.data.dependencies[packageIsomorphicName];
-          if (!v.startsWith('~') && !v.startsWith('^')) {
-            project.packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
-          }
-        });
-      //#endregion
     }
+    //#region  install latest version of package
+    const isomorphicPackages = (Project.Tnp as Project).availableIsomorphicPackagesInNodeModules;
+    // TODO firedev should be handled here
+    Object.keys(project.packageJson.data.devDependencies)
+      .filter(key => isomorphicPackages.includes(key))
+      .forEach(packageIsomorphicName => {
+        const v = project.packageJson.data.devDependencies[packageIsomorphicName];
+        if (!v.startsWith('~') && !v.startsWith('^')) {
+          project.packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
+        }
+      });
+
+    Object.keys(project.packageJson.data.dependencies)
+      .filter(key => isomorphicPackages.includes(key))
+      .forEach(packageIsomorphicName => {
+        const v = project.packageJson.data.dependencies[packageIsomorphicName];
+        if (!v.startsWith('~') && !v.startsWith('^')) {
+          project.packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
+        }
+      });
+    //#endregion
+
     if (!project.isCoreProject) {
       project.packageJson.data.engines = engines;
     }
