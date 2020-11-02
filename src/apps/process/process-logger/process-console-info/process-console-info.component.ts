@@ -10,6 +10,9 @@ import {
   ResizeService, BaseComponent
 } from 'tnp-helpers';
 
+import { Log } from 'ng2-logger';
+const log = Log.create('process console info');
+
 @Component({
   selector: 'app-process-console-info',
   templateUrl: './process-console-info.component.html',
@@ -70,6 +73,7 @@ export class ProcessConsoleInfoComponent extends BaseComponent
       property: this.outputType,
       bufforProperty: `_${this.outputType}` as any,
       callback: () => {
+        // log.d(`callback, outputType: "${this.outputType}"`)
         this.changes.next(void 0);
         this.changeDetectionRef.detectChanges();
       }

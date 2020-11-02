@@ -138,7 +138,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     return this.__stder;
   }
   set _stder(v) {
-    debugger
+    // debugger
     this.__stder = v;
   }
   // private _stder: string;
@@ -222,9 +222,9 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
   get stder() {
     let res: string;
     if (_.isString(this._stder) && this._stder.trim() !== '') {
-      res = this._stder + 'pizda';
+      res = this._stder;
     } else {
-      res = (_.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : '') + 'dupa';
+      res = (_.isString(this.stderLog) ? this.stderLog.replace(/\[\[\[.*\]\]\]/g, '') : '');
     }
     return res;
   }

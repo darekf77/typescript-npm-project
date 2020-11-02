@@ -18,6 +18,16 @@ export abstract class BuildableProject {
   //#region @backend
   public _buildOptions?: BuildOptions;
 
+  get availableIsomorphicPackagesInNodeModules(this: Project): string[] {
+    const jsonPath = path.join(this.location, PackagesRecognitionExtended.FILE_NAME_ISOMORPHIC_PACKAGES);
+    try {
+      const json = Helpers.readJson(jsonPath) as { isomorphicPackages: string[]; };
+      return (json && _.isArray(json.isomorphicPackages)) ? json.isomorphicPackages : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   /**
    * return copyto array with absulute pathes
    */

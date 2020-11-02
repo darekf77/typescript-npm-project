@@ -32,11 +32,11 @@ if (typeof global['Zone'] === "undefined" || global['Zone'] === null) {
 
 //#region isomorphic imports
 import { DraggablePopupComponent, DraggablePopupModule } from 'tnp-ui';
-import { Log, Logger } from 'ng2-logger';
-const log = Log.create(`app`);
+import { Log, Level } from 'ng2-logger';
+const log = Log.create(`app`, Level.__NOTHING);
 //#endregion
 
-console.log(`Morphi.isBrowser: ${Morphi.isBrowser}, Morphi.isNode: ${Morphi.isNode}`)
+log.d(`Morphi.isBrowser: ${Morphi.isBrowser}, Morphi.isNode: ${Morphi.isNode}`)
 
 if (Morphi.isBrowser) {
   require('zone.js/dist/zone');
@@ -60,6 +60,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //#region local imports
 import { PROCESS, ProcessModule, ProcessController } from './apps/process';
 import { PROJECT, ProjectModule, ProjectController } from './apps/project';
+import { Subscriber } from 'rxjs/internal/Subscriber';
 //#endregion
 
 
@@ -107,9 +108,8 @@ export class AppComponent {
 
   processes: PROCESS[];
   async ngOnInit() {
-    console.log('hell on init');
     const processes = await PROCESS.getAll();
-    console.log(processes);
+    log.d(`processes`, processes);
     this.processes = processes;
   }
 }
@@ -152,7 +152,6 @@ export function main() {
 
 
 async function start() {
-  console.log('hello')
 
   //#region @backend
   const config = {
@@ -174,7 +173,7 @@ async function start() {
     config: config as any
     //#endregion
   });
-  console.log(context);
+  log.d(`context`, context);
 
   if (Morphi.isBrowser) {
 

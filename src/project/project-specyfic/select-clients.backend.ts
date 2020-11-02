@@ -78,7 +78,7 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
   }
 
   while (buildOptions.forClient.length === 0) {
-    menu();
+    await menu();
   }
 
 }

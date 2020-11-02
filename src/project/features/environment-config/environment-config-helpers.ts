@@ -303,8 +303,7 @@ export async function workspaceConfigBy(workspace: Project, environment: Models.
     try {
       configWorkspaceEnv = Helpers.require(pathToProjectEnvironment).config as any;
     } catch (err) {
-      console.log(err);
-      Helpers.error(`Error during reading workspace config file ${pathToProjectEnvironment}`, false, true);
+      Helpers.error(`Error during reading workspace config file ${pathToProjectEnvironment}.js`, false, true);
     }
 
     // try {

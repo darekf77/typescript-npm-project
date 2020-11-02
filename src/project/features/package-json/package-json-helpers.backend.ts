@@ -8,6 +8,7 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
+import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
 //#region find npm version range
@@ -270,9 +271,29 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
     } else {
-
       project.packageJson.data.devDependencies = devDependencies;
       project.packageJson.data.dependencies = dependencies;
+
+      //#region  install latest version of package
+      const isomorphicPackages = (Project.Tnp as Project).availableIsomorphicPackagesInNodeModules;
+      Object.keys(project.packageJson.data.devDependencies)
+        .filter(key => isomorphicPackages.includes(key))
+        .forEach(packageIsomorphicName => {
+          const v = project.packageJson.data.devDependencies[packageIsomorphicName];
+          if (!v.startsWith('~') && !v.startsWith('^')) {
+            project.packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
+          }
+        });
+
+      Object.keys(project.packageJson.data.dependencies)
+        .filter(key => isomorphicPackages.includes(key))
+        .forEach(packageIsomorphicName => {
+          const v = project.packageJson.data.dependencies[packageIsomorphicName];
+          if (!v.startsWith('~') && !v.startsWith('^')) {
+            project.packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
+          }
+        });
+      //#endregion
     }
     if (!project.isCoreProject) {
       project.packageJson.data.engines = engines;

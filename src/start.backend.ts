@@ -44,7 +44,6 @@ import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
-import e from 'express';
 //#endregion
 
 // const ENV = global['ENV'] as Models.env.EnvConfig;

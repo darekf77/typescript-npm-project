@@ -84,8 +84,16 @@ export class NpmPackagesCore extends FeatureForProject {
     console.log(pkg)
 
     const tmpProject = prepareTempProject(this.project, pkg);
-    const mainProjects = copyMainProject(tmpProject, this.project, pkg);
-    copyMainProjectDependencies(mainProjects, tmpProject, this.project, pkg);
+    const { mainProjectExisted, mainProjectInTemp } = copyMainProject(tmpProject, this.project, pkg);
+    if (!mainProjectExisted) {
+      Helpers.error(`Something went wrong...mainProjectExisted `);
+    }
+    if (!mainProjectInTemp) {
+      Helpers.error(`Something went wrong... mainProjectInTemp`);
+    }
+    copyMainProjectDependencies({
+      mainProjectExisted, mainProjectInTemp
+    }, tmpProject, this.project, pkg)
     tmpProject.removeItself();
   }
 

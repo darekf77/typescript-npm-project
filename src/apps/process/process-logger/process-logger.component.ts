@@ -18,7 +18,7 @@ import { DraggablePopupComponent } from 'tnp-ui';
 import { LocalStorage } from 'ngx-store';
 //#endregion
 
-const log = Log.create('process loger');
+const log = Log.create('process loger', Level.__NOTHING);
 
 export class DualComponentControllerExtended extends DualComponentController {
 
@@ -174,6 +174,8 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
 
   //#region angular hooks
   ngOnInit() {
+    this.expandedById = this.expandedById ? this.expandedById : {} as any;
+    this.openOnStartById = this.openOnStartById ? this.openOnStartById : {} as any;
     super.ngOnInit();
     if (_.isNil(this.expandedById[this.id])) {
       this.isExpanded = true;
@@ -233,9 +235,9 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
     if (this.process && !this.process.isSync) {
       if (!(this.process instanceof PROCESS)) {
         console.error('[processLogger] Process in not instance of PROCESS')
-        return
+        return;
       }
-      console.log(`SUBSCRIBE ENTITY: ${this.process.id}`);
+      // log.d(`SUBSCRIBE ENTITY: ${this.process.id}`);
       this.process.subscribeRealtimeUpdates({
         modelDataConfig: this.config as any,
         callback: () => {

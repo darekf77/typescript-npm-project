@@ -242,7 +242,7 @@ export class CopyManager extends FeatureForProject {
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
         dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))} / ${dir} `
       }
-      Helpers.info(`Source of project "${this.project.genericName})" generated in ${dir} /(< here >) `)
+      Helpers.info(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `)
     }
 
 

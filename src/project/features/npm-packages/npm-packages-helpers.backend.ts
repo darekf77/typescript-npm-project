@@ -51,11 +51,13 @@ export function executeCommand(command: string, project: Project) {
 }
 
 
-export function copyMainProjectDependencies
-  (projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
-    tmpProject: Project, project: Project, pkg: Models.npm.Package) {
+export function copyMainProjectDependencies(projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
+  tmpProject: Project, project: Project, pkg: Models.npm.Package) {
 
   const { mainProjectInTemp, mainProjectExisted } = projects;
+  // if (!mainProjectExisted) {
+  //   debugger;
+  // }
   const alreadyChecked = [];
   function copyOtherProcess(parent: Project) {
     const otherDepsInTemp: Project[] = parent
@@ -110,13 +112,10 @@ export function copyMainProjectDependencies
 export function copyMainProject(tmpProject: Project, project: Project, pkg: Models.npm.Package) {
   const mainProjectInTemp = Project.From<Project>(path.join(tmpProject.node_modules.path, pkg.name));
   const mainProjectExistedPath = path.join(project.node_modules.path, pkg.name)
-  let mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
-  if (mainProjectExisted) {
-    mainProjectExisted.removeItself();
-  }
-  Helpers.tryCopyFrom(mainProjectInTemp.location, mainProjectExistedPath);
+  Helpers.removeFolderIfExists(mainProjectExistedPath);
+  Helpers.copy(mainProjectInTemp.location, mainProjectExistedPath);
   Helpers.log(`[smoothInstallPrepare] main package copy ${mainProjectInTemp.name}`);
-  mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
+  const mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
   return { mainProjectExisted, mainProjectInTemp };
 }
 
