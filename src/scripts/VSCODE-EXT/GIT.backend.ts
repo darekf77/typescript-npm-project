@@ -297,6 +297,19 @@ export async function $REPUSH(args) {
   await $PUSH(args, true, true);
 }
 
+export async function $SET_ORIGIN(newOriginNameOrUrl: string) {
+  const proj = Project.Current;
+  if (proj && proj.git.isGitRepo) {
+    proj.run(`git remote rm origin`).sync();
+    proj.run(`git remote add origin ${newOriginNameOrUrl}`).sync();
+    Helpers.info(`Done`);
+  } else {
+    Helpers.error(`This folder is not a git repo... `, false, true);
+  }
+
+  process.exit(0)
+}
+
 export async function $RENAME_ORIGIN(newOriginNameOrUrl: string) {
   const proj = Project.Current;
   if (proj && proj.git.isGitRepo) {
@@ -347,6 +360,7 @@ export default {
   $GIT_REMOVE_UNTRACKED: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
   $GIT_REMOVE_UNTRACKED_EVERYWHERE: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED_EVERYWHERE, '$GIT_REMOVE_UNTRACKED_EVERYWHERE'),
   $RENAME_ORIGIN: Helpers.CLIWRAP($RENAME_ORIGIN, '$RENAME_ORIGIN'),
+  $SET_ORIGIN: Helpers.CLIWRAP($SET_ORIGIN, '$SET_ORIGIN'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),

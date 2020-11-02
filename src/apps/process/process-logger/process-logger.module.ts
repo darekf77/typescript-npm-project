@@ -23,6 +23,7 @@ import { CLASS } from 'typescript-class-helpers';
 //#endregion
 import { MomentModule } from 'ngx-moment';
 import { FormlyModule } from '@ngx-formly/core';
+import { LongPress } from 'tnp-helpers';
 
 const angularModules = [
   CommonModule,
@@ -72,6 +73,7 @@ const localComponents = [
   entryComponents: [ProcessLoggerComponent],
   exports: [ProcessLoggerComponent, MomentModule],
   declarations: [
+    LongPress,
     ...localComponents
   ],
   providers: [ResizeService]

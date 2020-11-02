@@ -141,6 +141,7 @@ export abstract class FolderProject {
   }
   //#endregion
 
+
   get parent(this: Project): Project {
     if (Helpers.isBrowser) {
       return this.browser.parent as any;
@@ -243,7 +244,17 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
-  containsFile(this: Project, filePaht: string) {
+  containsFile(this: Project, fileRelativeToProjectPath: string) {
+    const fullPath = path.resolve(path.join(this.location, fileRelativeToProjectPath));
+    return Helpers.exists(fullPath);
+  }
+
+  removeFile(this: Project, fileRelativeToProjectPath: string) {
+    const fullPath = path.resolve(path.join(this.location, fileRelativeToProjectPath));
+    return Helpers.removeFileIfExists(fullPath);
+  }
+
+  containsFolder(this: Project, filePaht: string) {
     let fullPath = path.resolve(path.join(this.location, filePaht));
     let res = fse.existsSync(fullPath)
     // if (!res && process.platform === 'darwin') {

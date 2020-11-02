@@ -75,7 +75,10 @@ const host = 'http://localhost:3333';
   selector: 'my-app', // <my-app></my-app>
   template: `
   <h1> Hello from component! </h1>
-  <mat-card>Simple card</mat-card>
+  <mat-card>
+  Simple card
+  <span class="iconify" data-icon="ic-baseline-pin" data-inline="false"></span>
+  </mat-card>
   <mat-card>
   <mat-card-title>
   Processes

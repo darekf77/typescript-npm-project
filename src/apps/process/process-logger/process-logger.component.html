@@ -24,7 +24,8 @@
     <app-button-icon [icon]="'info'"
                      [color]="color"
                      [label]="''"
-                     (dblclick)="reset()"
+                     long-press
+                     (onLongPressEnd)="onLongPressEnd()"
                      (action)="isOpen = !isOpen"></app-button-icon>
   </mat-expansion-panel>
 

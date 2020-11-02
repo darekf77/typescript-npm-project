@@ -240,6 +240,38 @@ const $CHECK = async () => {
   await $INFO();
 }
 
+const $FORK = async (args: string) => {
+  const argv = args.trim().split(' ');
+  const githubUrl = _.first(argv);
+  let projectName = _.last(githubUrl.replace('.git', '').split('/'));
+  if (argv.length > 1) {
+    projectName = argv[1];
+  }
+  Helpers.info(`Forking ${githubUrl} with name ${projectName}`);
+  Project.Current.run(`git clone ${githubUrl} ${projectName}`).sync();
+  let newProj = Project.From(path.join(Project.Current.location, projectName)) as Project;
+  Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'name', projectName);
+  Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'version', '0.0.0');
+  if (newProj.containsFile('angular.json')) {
+    Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'tnp.type', 'angular-lib');
+    Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'tnp.version', 'v2');
+    Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'scripts', {});
+    // const dependencies = Helpers.readValueFromJson(path.join(newProj.location, config.file.package_json), 'dependencies') as Object;
+    newProj.run(`tnp init`).sync();
+    newProj = Project.From(path.join(Project.Current.location, projectName)) as Project;
+    newProj.removeFile('.browserslistrc');
+  }
+  Helpers.writeFile(path.join(newProj.location, config.file.README_MD), `
+# ${projectName}
+
+based on ${githubUrl}
+
+  `);
+  Helpers.run(`code ${newProj.location}`).sync();
+  Helpers.info(`Done`);
+  process.exit(0);
+}
+
 export default {
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
@@ -256,4 +288,5 @@ export default {
   $KILLWORKER: Helpers.CLIWRAP($KILLWORKER, '$KILLWORKER'),
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
+  $FORK: Helpers.CLIWRAP($FORK, '$FORK'),
 }

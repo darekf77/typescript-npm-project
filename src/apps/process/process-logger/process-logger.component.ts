@@ -18,7 +18,9 @@ import { DraggablePopupComponent } from 'tnp-ui';
 import { LocalStorage } from 'ngx-store';
 //#endregion
 
-const log = Log.create('process loger', Level.__NOTHING);
+const log = Log.create('process loger'
+  // , Level.__NOTHING
+);
 
 export class DualComponentControllerExtended extends DualComponentController {
 
@@ -42,7 +44,19 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
   actionClicked = false;
   @Input() public config: ModelDataConfig;
   @Input() size: 'compact' | 'normal' = 'normal';
-  @ViewChild(DraggablePopupComponent) popup: DraggablePopupComponent;
+  @ViewChild('popup') popup: DraggablePopupComponent;
+
+  onLongPressEnd() {
+    log.d('long presss ended')
+    this.isOpen = true;
+    setTimeout(() => {
+      log.d(`this.popup`, this.popup)
+      if (this.popup) {
+        this.popup.reset();
+      }
+    });
+  }
+
   @LocalStorage() expandedById: {
     [key: string]: boolean;
   } & { save: () => void; };
@@ -221,15 +235,6 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
     }
     this.changes.next(void 0);
   }
-
-
-  public reset() {
-    this.isOpen = false;
-    setTimeout(() => {
-      this.isOpen = true;
-    });
-  }
-
 
   private subscribe() {
     if (this.process && !this.process.isSync) {
