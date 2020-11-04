@@ -19,8 +19,8 @@ if (global.globalSystemToolMode) {
   }
 }
 if (!global['ENV']) {
-  console.error(`ENVIRONMENT CONFIG IS NOT DEFINED`);
-  process.exit(1);
+  console.warn(`ENVIRONMENT CONFIG IS NOT DEFINED`);
+  global['ENV'] = {};
 }
 
 
