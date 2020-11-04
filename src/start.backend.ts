@@ -2,31 +2,62 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 declare const global: any;
 if (global.globalSystemToolMode) {
-  const tmpEnv = path.join(__dirname, 'tmp-environment.json');
-  const tmpEnv2 = path.join(__dirname, '../tmp-environment.json');
-  const tmpEnv3 = path.join(__dirname, '../../tmp-environment.json');
-  try {
-    global['ENV'] = fse.existsSync(tmpEnv) && fse.readJSONSync(tmpEnv);
-    if (!global['ENV']) {
-      global['ENV'] = fse.existsSync(tmpEnv2) && fse.readJSONSync(tmpEnv2);
-    }
-    if (!global['ENV']) {
-      global['ENV'] = fse.existsSync(tmpEnv3) && fse.readJSONSync(tmpEnv3);
-    }
-  } catch (error) {
-    console.error(`Not able to read tmp-environment.json config`);
-    process.exit(1)
-  }
-}
-if (!global['ENV']) {
-  console.warn(`ENVIRONMENT CONFIG IS NOT DEFINED`);
-  global['ENV'] = {};
-}
 
+  const frameworkName = global.frameworkName ? global.frameworkName : 'tnp';
+  // console.log(`frameworkName: ${frameworkName}`)
+  /*
+  Explanation of this:
+firedev
+[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tnp/tmp-environment.json
+[tnp][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tmp-environment.json
+[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/tmp-environment.json
+tnp
+[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/dist/tmp-environment.json
+[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/tmp-environment.json
+[tnp][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/tmp-environment.json
+   */
+  const configFileName = 'tmp-environment.json';
+  const possiblePathes = [
+    path.join(__dirname, configFileName),
+    path.join(__dirname, `../${configFileName}`),
+    path.join(__dirname, `../../${configFileName}`),
+  ].map(p => path.resolve(p))
+    .filter(p => {
+      return p.search(`${frameworkName}/${configFileName}`) !== -1;
+    })
+    .sort((a, b) => {
+      // ASC  -> a.length - b.length
+      // DESC -> b.length - a.length
+      return a.length - b.length;
+    });
+
+  let newENV = {} as any;
+  possiblePathes.find(envPath => {
+    if (fse.existsSync(envPath)) {
+      try {
+        newENV = fse.readJSONSync(envPath);
+        console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
+        return true;
+      } catch (er) {
+        console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
+      }
+      console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
+    } else {
+      console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+    }
+    return false;
+  });
+  global['ENV'] = newENV;
+}
+if (Object.keys(global['ENV']).length === 0) {
+  console.warn(`[tnp][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
+}
+// console.log(`DOMAIN: ${ENV.domain}`)
+// console.log(`DOMAIN: ${ENV.domain}`)
+// process.exit(0)
 
 //#region imports
 import * as _ from 'lodash';
-
 import { config } from 'tnp-config';
 // import glob = require('glob')
 import scriptsFnArr from './scripts/index';
@@ -46,8 +77,6 @@ import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
-// const ENV = global['ENV'] as Models.env.EnvConfig;
-// console.log(ENV.domain)
 
 //#region init incremental compiler
 IncCompiler.init(async (asyncEvents) => { }, {
