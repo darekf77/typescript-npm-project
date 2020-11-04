@@ -437,7 +437,7 @@
     }
   },
   "name": "tnp",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "scripts": {},
   "main": "index.js",
   "bin": {
