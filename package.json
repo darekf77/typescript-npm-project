@@ -431,13 +431,13 @@
     },
     "linkedProjects": [],
     "libReleaseOptions": {
-      "nodts": true,
+      "nodts": false,
       "obscure": false,
       "ugly": false
     }
   },
   "name": "tnp",
-  "version": "0.0.72",
+  "version": "0.0.73",
   "scripts": {},
   "main": "index.js",
   "bin": {
