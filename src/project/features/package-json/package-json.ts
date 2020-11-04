@@ -34,14 +34,33 @@ export class PackageJSON
       return void 0;
     }
 
-    const filePath = path.join(location, 'package.json');
+    const filePath = path.join(location, config.file.package_json);
+    const filePathSplitTnp = path.join(location, config.file.package_json__tnp_json);
     if (!fse.existsSync(filePath)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)
       return;
     }
+    let existedTnp = void 0;
+    if (Helpers.exists(filePathSplitTnp)) {
+      try {
+        const tnp = Helpers.readJson(filePathSplitTnp, void 0);
+        if (_.isObject(tnp) && Object.keys(tnp).length > 0) {
+          existedTnp = tnp as any;
+        } else {
+          // Helpers.warn(`[package-json] wrong content of ${config.file.package_json__tnp_json}
+
+          // in ${filePathSplitTnp}`)
+        }
+      } catch (error) {
+        // Helpers.warn(`[package-json] not able to read: ${config.file.package_json__tnp_json}`)
+      }
+    }
     try {
-      const file = Helpers.readFile(filePath);
-      const json: Models.npm.IPackageJSON = JSON.parse(file) as any;
+      var json: Models.npm.IPackageJSON = Helpers.readJson(filePath) as any;
+      if (existedTnp) {
+        Helpers.log(`Assign existed ${config.file.package_json__tnp_json} for ${filePath}`)
+        json.tnp = existedTnp as any;
+      }
 
       var saveAtLoad = false;
       if (json.tnp) {
@@ -112,6 +131,11 @@ export class PackageJSON
       Helpers.error(`Error while parsing package.json in: ${filePath}`, false, true);
       return;
     }
+    // if (!existedTnp && _.isObject(json.tnp) && Object.keys(json.tnp).length > 0) {
+    //   Helpers.log(`[package-json] recreating ${config.file.package_json__tnp_json}...`)
+    //   Helpers.writeFile(filePathSplitTnp, json.tnp);
+    // }
+
     if (saveAtLoad) {
       Helpers.log(`Saving fixed package.json structure in ${location}`);
       pkgJson.writeToDisc()

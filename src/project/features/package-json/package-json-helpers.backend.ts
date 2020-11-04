@@ -41,7 +41,11 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
 
   let parentOverride = {};
   const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
-  let newDepsForProject = _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
+  let newDepsForProject = {};
+  // if ((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies) { // TODO QUICK_FIX
+    _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
+  // }
+
   if (project.isStandaloneProject && !project.isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project._type });
   } else if ((project.isWorkspace && project.isContainerChild) || project.isWorkspaceChildProject) {
@@ -352,15 +356,18 @@ export function getAndTravelCoreDeps(options?: {
   const { updateFn, type } = options;
   const constantTnpDeps = {};
 
-  const core = project.packageJson.data.tnp.core.dependencies;
-  travelObject(core.common, constantTnpDeps, void 0, updateFn);
-  if (_.isString(type)) {
-    travelObject(core.onlyFor[type], constantTnpDeps, core.onlyFor, updateFn);
-  } else {
-    Object.keys(core.onlyFor).forEach(libType => {
-      travelObject(core.onlyFor[libType], constantTnpDeps, void 0, updateFn);
-    });
-  }
+  // if (project?.packageJson?.data?.tnp?.core?.dependencies) { // TODO QUICK FIX
+    const core = project.packageJson.data.tnp.core.dependencies;
+    travelObject(core.common, constantTnpDeps, void 0, updateFn);
+    if (_.isString(type)) {
+      travelObject(core.onlyFor[type], constantTnpDeps, core.onlyFor, updateFn);
+    } else {
+      Object.keys(core.onlyFor).forEach(libType => {
+        travelObject(core.onlyFor[libType], constantTnpDeps, void 0, updateFn);
+      });
+    }
+  // }
+
   return constantTnpDeps;
 }
 //#endregion

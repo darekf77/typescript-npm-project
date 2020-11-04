@@ -247,24 +247,41 @@ export class PackageJsonCore {
     this.writeToDisc();
   }
 
-  public async writeToDisc() {
-    // console.log(this.data)
-    fse.writeJSONSync(this.path, this.data, {
+  private splitAndWriteToDisc(removeFromPj = false) {
+    const tnp = this.data.tnp;
+    const splitPath = path.join(path.dirname(this.path), config.file.package_json__tnp_json);
+    fse.writeJSONSync(splitPath, tnp, {
       encoding: 'utf8',
       spaces: 2
     });
 
+    if (removeFromPj) {
+      const dataToWrite = _.cloneDeep(this.data);
+      delete dataToWrite.tnp;
+
+      fse.writeJSONSync(this.path, dataToWrite, {
+        encoding: 'utf8',
+        spaces: 2
+      });
+    } else {
+      fse.writeJSONSync(this.path, this.data, {
+        encoding: 'utf8',
+        spaces: 2
+      });
+    }
+
+  }
+
+  public async writeToDisc(removeFromPj = false) {
+    // console.log(this.data)
+    this.splitAndWriteToDisc(removeFromPj);
     // Helpers.log(`Press any key`)
     // await Helpers.pressKeyAndContinue()
   }
 
-  public writeToDiscSync() {
+  public writeToDiscSync(removeFromPj = false) {
     // console.log(this.data)
-    fse.writeJSONSync(this.path, this.data, {
-      encoding: 'utf8',
-      spaces: 2
-    });
-
+    this.splitAndWriteToDisc(removeFromPj);
     // Helpers.log(`Press any key`)
     // await Helpers.pressKeyAndContinue()
   }

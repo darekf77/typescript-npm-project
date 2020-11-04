@@ -432,12 +432,12 @@
     "linkedProjects": [],
     "libReleaseOptions": {
       "nodts": false,
-      "obscure": false,
-      "ugly": false
+      "obscure": true,
+      "ugly": true
     }
   },
   "name": "tnp",
-  "version": "0.0.73",
+  "version": "0.0.74",
   "scripts": {},
   "main": "index.js",
   "bin": {

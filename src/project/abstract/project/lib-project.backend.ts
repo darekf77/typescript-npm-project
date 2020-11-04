@@ -68,7 +68,8 @@ export abstract class LibProject {
   protected beforeLibBuild(this: Project, outDir: Models.dev.BuildDir) {
 
     this.copyWhenExist('bin', outDir);
-    this.linkWhenExist('package.json', outDir);
+    this.linkWhenExist(config.file.package_json, outDir);
+    this.linkWhenExist(config.file.package_json__tnp_json, outDir);
     this.copyWhenExist('.npmrc', outDir);
     this.copyWhenExist('.npmignore', outDir);
     this.copyWhenExist('.gitignore', outDir);

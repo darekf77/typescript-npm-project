@@ -54,7 +54,7 @@ export class PackageJsonBase extends PackageJsonCore {
   public hideDeps(reasonToHidePackages: string) {
     this.reasonToHidePackages = `\n${reasonToHidePackages}`;
     this.prepareForSave('hide');
-    this.writeToDisc();
+    this.writeToDisc(true);
   }
 
   public updateHooks() {
