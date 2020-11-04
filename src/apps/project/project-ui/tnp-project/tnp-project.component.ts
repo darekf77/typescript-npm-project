@@ -111,10 +111,10 @@ export class TnpProjectComponent extends BaseComponent implements OnInit {
       if (this.expanded) {
         await this.updateModel();
       }
-    }));
+    }) as any);
     this.handlers.push(this.closed.subscribe(() => {
       window.localStorage.removeItem(this.keyForProject);
-    }));
+    }) as any);
   }
 
   async updateModel() {
