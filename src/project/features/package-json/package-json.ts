@@ -35,34 +35,47 @@ export class PackageJSON
     }
 
     const filePath = path.join(location, config.file.package_json);
-    const filePathSplitTnp = path.join(location, config.file.package_json__tnp_json);
+    let saveAtLoad = false;
     if (!fse.existsSync(filePath)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)
       return;
     }
-    let existedTnp = void 0;
-    if (Helpers.exists(filePathSplitTnp)) {
-      try {
-        const tnp = Helpers.readJson(filePathSplitTnp, void 0);
-        if (_.isObject(tnp) && Object.keys(tnp).length > 0) {
-          existedTnp = tnp as any;
-        } else {
-          // Helpers.warn(`[package-json] wrong content of ${config.file.package_json__tnp_json}
+    const existed = {};
+    config.packageJsonSplit.forEach(c => {
+      const filePathSplitTnp = path.join(location, c);
 
-          // in ${filePathSplitTnp}`)
+      // let existedTnp = void 0;
+      if (fse.existsSync(filePathSplitTnp)) {
+        try {
+          const additionalSplitValue = Helpers.readJson(filePathSplitTnp, void 0);
+          if (_.isObject(additionalSplitValue) && Object.keys(additionalSplitValue).length > 0) {
+            existed[c] = additionalSplitValue as any;
+          } else {
+            // Helpers.warn(`[package-json] wrong content of ${c} in ${filePathSplitTnp}`)
+          }
+        } catch (error) {
+          // Helpers.warn(`[package-json] not able to read: ${c}`)
         }
-      } catch (error) {
-        // Helpers.warn(`[package-json] not able to read: ${config.file.package_json__tnp_json}`)
+      } else {
+        saveAtLoad = true;
       }
-    }
+    })
+
+
     try {
       var json: Models.npm.IPackageJSON = Helpers.readJson(filePath) as any;
-      if (existedTnp) {
-        Helpers.log(`Assign existed ${config.file.package_json__tnp_json} for ${filePath}`)
-        json.tnp = existedTnp as any;
-      }
 
-      var saveAtLoad = false;
+      config.packageJsonSplit.forEach(c => {
+
+        if (_.isObject(existed[c])) {
+          Helpers.log(`Assign existed ${c} for ${filePath}`);
+          const property = c
+            .replace(`${config.file.package_json}_`, '')
+            .replace(`.json`, '');
+          json[property] = existed[c] as any;
+        }
+      });
+
       if (json.tnp) {
         if (!json.tnp.overrided) {
           json.tnp.overrided = {};
@@ -131,10 +144,6 @@ export class PackageJSON
       Helpers.error(`Error while parsing package.json in: ${filePath}`, false, true);
       return;
     }
-    // if (!existedTnp && _.isObject(json.tnp) && Object.keys(json.tnp).length > 0) {
-    //   Helpers.log(`[package-json] recreating ${config.file.package_json__tnp_json}...`)
-    //   Helpers.writeFile(filePathSplitTnp, json.tnp);
-    // }
 
     if (saveAtLoad) {
       Helpers.log(`Saving fixed package.json structure in ${location}`);

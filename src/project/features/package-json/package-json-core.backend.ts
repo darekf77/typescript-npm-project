@@ -248,16 +248,26 @@ export class PackageJsonCore {
   }
 
   private splitAndWriteToDisc(removeFromPj = false) {
-    const tnp = this.data.tnp;
-    const splitPath = path.join(path.dirname(this.path), config.file.package_json__tnp_json);
-    fse.writeJSONSync(splitPath, tnp, {
-      encoding: 'utf8',
-      spaces: 2
+    config.packageJsonSplit.forEach(c => {
+      const property = c
+        .replace(`${config.file.package_json}_`, '')
+        .replace(`.json`, '');
+      const obj = this.data[property];
+      const splitPath = path.join(path.dirname(this.path), c);
+      fse.writeJSONSync(splitPath, obj, {
+        encoding: 'utf8',
+        spaces: 2
+      });
     });
 
     if (removeFromPj) {
       const dataToWrite = _.cloneDeep(this.data);
-      delete dataToWrite.tnp;
+      config.packageJsonSplit.forEach(c => {
+        const property = c
+          .replace(`${config.file.package_json}_`, '')
+          .replace(`.json`, '');
+        delete dataToWrite[property];
+      });
 
       fse.writeJSONSync(this.path, dataToWrite, {
         encoding: 'utf8',

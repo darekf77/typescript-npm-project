@@ -69,7 +69,9 @@ export abstract class LibProject {
 
     this.copyWhenExist('bin', outDir);
     this.linkWhenExist(config.file.package_json, outDir);
-    this.linkWhenExist(config.file.package_json__tnp_json, outDir);
+    config.packageJsonSplit.forEach(c => {
+      this.copyWhenExist(c, outDir);
+    });
     this.copyWhenExist('.npmrc', outDir);
     this.copyWhenExist('.npmignore', outDir);
     this.copyWhenExist('.gitignore', outDir);
@@ -325,6 +327,26 @@ export abstract class LibProject {
     // this.packageJson.data.version = newVersion;
     // this.packageJson.save(`[release tnp]`);
 
+    config.packageJsonSplit.forEach(c => {
+      const property = c
+        .replace(`${config.file.package_json}_`, '')
+        .replace(`.json`, '');
+      Helpers.setValueToJSON(
+        path.join(this.location, config.folder.bundle, config.file.package_json),
+        property, void 0);
+    });
+
+    [
+      config.folder.browser,
+      config.folder.client,
+      '',
+    ].forEach(c => {
+      const pjPath = path.join(this.location, config.folder.bundle, c, config.file.package_json);
+      const content = Helpers.readJson(pjPath);
+      Helpers.remove(pjPath);
+      Helpers.writeFile(pjPath, content);
+    });
+    this.packageJson.showDeps(`after release show when ok`);
 
     this.run(`code .`).sync();
     Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
@@ -340,6 +362,7 @@ export abstract class LibProject {
       } catch (e) {
         removeTagAndCommit()
       }
+
       if (successPublis) {
         // release other version:
         const names = this.packageJson.additionalNpmNames;
