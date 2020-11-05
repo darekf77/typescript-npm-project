@@ -71,6 +71,8 @@ export class FilesRecreator extends FeatureForProject {
             '.npmignore',
             '.npmrc',
             '.babelrc',
+            'package.json_devDependencies.json',
+            'package.json',
             'docs',
             'logo.svg',
             // ...(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
