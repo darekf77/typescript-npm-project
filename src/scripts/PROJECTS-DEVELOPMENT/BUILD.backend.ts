@@ -284,19 +284,47 @@ const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
 const $RELEASE = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
-  const proj = (Project.Current as Project);
-  proj.checkIfReadyForNpm();
-  if (proj.packageJson.libReleaseOptions.obscure) {
-    argsObj.obscure = true;
-  }
-  if (proj.packageJson.libReleaseOptions.ugly) {
-    argsObj.uglify = true;
-  }
-  if (proj.packageJson.libReleaseOptions.nodts) {
-    argsObj.nodts = true;
-  }
-  await proj.release(argsObj)
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
+  if (proj.isContainer) {
+    // const projects = proj.childrenThatAreLibs;
+    // // const allProjectToConsider = projects.find(d => d.frameworkVersionAtLeast('v2'));
+    // const allProjectToConsider = Helpers.arrays.uniqArray<Project>(projects, 'location') as Project[];
+
+    // const result = projects.map(p => {
+    //   let copyto = Helpers.deps.recrusiveFind<Project>(p, allProjectToConsider);
+    //   // proj.name.startsWith('tnp') && Helpers.log(`copyto for ${proj.genericName}
+
+    //   // ${copyto.sort().map(c => c.name).join('\n')}
+
+    //   // `);
+    //   // process.stdin.resume()
+    //   copyto = copyto.filter(c => !_.isUndefined(projects.find(a => a.name === c.name)));
+    //   copyto = Helpers.arrays.uniqArray<Project>(copyto, 'location');
+    //   return { project: p, copyto }
+    // });
+    // // process.exit(0)
+    // const deps = result; // Helpers.deps.sort<Project>(result);
+
+    // Helpers.info(`deps: ${deps.map(p => `
+
+    // ${p.project.name} - ${p.copyto.map( c => c.name ).join(',')}
+
+    // `).join(',\n')}`);
+
+  } else {
+    proj.checkIfReadyForNpm();
+    if (proj.packageJson.libReleaseOptions.obscure) {
+      argsObj.obscure = true;
+    }
+    if (proj.packageJson.libReleaseOptions.ugly) {
+      argsObj.uglify = true;
+    }
+    if (proj.packageJson.libReleaseOptions.nodts) {
+      argsObj.nodts = true;
+    }
+    await proj.release(argsObj);
+  }
   process.exit(0)
 };
 
