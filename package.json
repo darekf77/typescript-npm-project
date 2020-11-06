@@ -135,7 +135,7 @@
           "tnp-models": "0.0.15",
           "tnp-helpers": "0.0.12",
           "tnp-db": "0.0.15",
-          "tnp-ui": "0.0.10",
+          "tnp-ui": "0.0.14",
           "@types/node": "10.12.30",
           "morphi": "4.0.6",
           "gulp": "^3.9.1",
@@ -439,7 +439,9 @@
   },
   "name": "tnp",
   "version": "0.0.76",
-  "scripts": {},
+  "scripts": {
+    "postinstall": "npm i -g npm-run@4.1.2 && npm-run tsc && npm link && tnp bd && tnp link"
+  },
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp",
@@ -646,7 +648,7 @@
     "tnp-db": "~0.0.15",
     "tnp-helpers": "~0.0.12",
     "tnp-models": "~0.0.15",
-    "tnp-ui": "~0.0.10",
+    "tnp-ui": "~0.0.14",
     "ts-loader": "7.0.4",
     "ts-node": "~8.3.0",
     "tsickle": "^0.26.0",

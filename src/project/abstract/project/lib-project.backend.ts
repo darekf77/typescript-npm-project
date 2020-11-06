@@ -310,11 +310,20 @@ export abstract class LibProject {
         //       `.trim());
         // }
 
-
-
         Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.d.ts')}`, `
-      export * from './browser';
+      export * from './public_api';
               `.trim());
+
+        const public_api_dts_browser = path.join(
+          this.location,
+          config.folder.bundle,
+          config.folder.browser,
+          'public_api.d.ts');
+        const public_api_dts_for_backend = path.join(
+          this.location,
+          config.folder.bundle,
+          'public_api.d.ts');
+        Helpers.copyFile(public_api_dts_browser, public_api_dts_for_backend);
       }
       this.compileES5version();
 
