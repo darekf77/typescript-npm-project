@@ -23,8 +23,6 @@ git config --global core.editor code --wait
 # git config --global core.editor "nano"
 echo "Client configuration done"
 
-
-
 # ==================== set password for ssh server ====================
 # locale: Cannot set LC_CTYPE to default locale: No such file or directory
 # locale: Cannot set LC_ALL to default locale: No such file or directory
