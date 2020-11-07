@@ -155,6 +155,9 @@ function $VSCODE_GLOBAL() {
     'debug.node.showUseWslIsDeprecatedWarning': false,
     'explorer.compactFolders': false,
     'workbench.colorTheme': 'Default Light+',
+    "update.mode": "none",
+    "debug.onTaskErrors": "abort",
+    "terminal.integrated.shell.osx": "/bin/bash"
   };
   let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');
   Helpers.writeFile(settingspath, settings);

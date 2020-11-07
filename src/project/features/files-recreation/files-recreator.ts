@@ -413,14 +413,14 @@ Thumbs.db
 `+ ignoredByGit + `
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
-${ this.project.isContainer ? `
+${this.project.isContainer ? `
 # container git projects
 ${this.project.packageJson.linkedProjects.map(c => `/${c}`).join('\n')}
 ` : []}
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
-${ coreFiles}
+${coreFiles}
 
 `.trimRight() + '\n');
 
@@ -456,13 +456,26 @@ ${ coreFiles}
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
       projectSpecyficFiles.forEach(f => {
         let from = path.join(defaultProjectProptotype.location, f);
-        if (!Helpers.exists(from) && defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
-          const core = Project.by<Project>(
-            defaultProjectProptotype._type,
-            defaultProjectProptotype.frameworkVersionMinusOne
-          );
-          from = path.join(core.location, f);
+
+        if (!Helpers.exists(from)) {
+
+          const linked = defaultProjectProptotype.projectLinkedFiles().find(a => a.relativePath === f);
+          if (linked) {
+            Helpers.info(`FIXING LINKED`);
+            Helpers.createSymLink(
+              path.join(linked.sourceProject.location, linked.relativePath),
+              path.join(defaultProjectProptotype.location, f));
+          } else if (defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
+            const core = Project.by<Project>(
+              defaultProjectProptotype._type,
+              defaultProjectProptotype.frameworkVersionMinusOne
+            );
+            from = path.join(core.location, f);
+          }
+
         }
+
+
         files.push({
           from,
           where: path.join(this.project.location, f)

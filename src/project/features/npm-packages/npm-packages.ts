@@ -12,7 +12,7 @@ export class NpmPackages extends NpmPackagesBase {
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      await project.npmPackages.installProcess(`tnp install`);
+      await project.npmPackages.installProcess(`tnp install`, { smoothInstall });
     } else {
       const packages = resolvePacakgesFromArgs(args);
       await project.npmPackages.installProcess(`tnp install ${packages

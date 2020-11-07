@@ -30,9 +30,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (remove) {
-      Helpers.log(`Package [${
-        npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
-          .join(',')
+      Helpers.log(`Package [${npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
+        .join(',')
         }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
       npmPackages.forEach(p => {
         this.project.packageJson.removeDependencyAndSave(p, `package ${p && p.name} instalation`);
@@ -41,9 +40,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if (fullInstall) {
         Helpers.log(`Packages full installation for ${this.project.genericName}`)
       } else {
-        Helpers.log(`Package [${
-          npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
-            .join(',')
+        Helpers.log(`Package [${npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
+          .join(',')
           }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
         npmPackages.forEach(p => {
           this.project.packageJson.setDependencyAndSave(p, `package ${p && p.name} instalation`);
@@ -76,7 +74,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
       if (installAllowed) {
         if (fullInstall) {
-          this.actualNpmProcess({ reason: triggeredMsg })
+          this.actualNpmProcess({ reason: triggeredMsg, smoothInstall })
         } else {
           npmPackages.forEach(pkg => {
             this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
@@ -93,7 +91,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.packageJson.hideDeps(`${this.project._type} hide deps for container child [${triggeredMsg}]`);
       }
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
-        this.project.node_modules.dedupe();
+        if (!this.project.node_modules.isLink) {
+          this.project.node_modules.dedupe();
+        }
         // this.project.node_modules.stuberizeFrontendPackages();
       }
       this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);

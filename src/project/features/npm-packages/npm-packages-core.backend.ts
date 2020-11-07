@@ -27,12 +27,14 @@ export class NpmPackagesCore extends FeatureForProject {
     if (this.project.isDocker) {
       return;
     }
+
     const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
-    Helpers.info(`[actualNpmProcess] npm instalation:
-    ${command} in folder: <...>/${this.project.location}
+    Helpers.info(`
+
+    [actualNpmProcess][${smoothInstall ? 'smooth' : 'normal'}] npm instalation...
 
     `)
     if (remove) {
@@ -47,13 +49,31 @@ export class NpmPackagesCore extends FeatureForProject {
         }
       } else {
         if (smoothInstall) {
-          this.smoothInstallPrepare(pkg);
+          if (pkg) {
+            this.smoothInstallPrepare(pkg);
+          } else if (this.project.isStandaloneProject && !this.project.isTnp) {
+            if (this.project.node_modules.exist && !this.project.node_modules.isLink && !global.tnpNonInteractive) {
+              Helpers.pressKeyAndContinue(`
+              [smooth-npm-installation]
+              You are going to remove node_modules folder from ${this.project.node_modules.path}
+
+              Press any key to continue.. `);
+            }
+            Helpers.removeFolderIfExists(this.project.node_modules.path);
+            const workspaceForVersion = (Project.by(this.project._type, this.project._frameworkVersion) as Project).parent;
+            if (!workspaceForVersion.node_modules.exist) {
+              workspaceForVersion.run(`${config.frameworkName} init`).sync();
+            }
+            workspaceForVersion.node_modules.linkToProject(this.project)
+          } else {
+            Helpers.error(`Smooth install not supported here: ${this.project.location}`, false, true);
+          }
         } else {
           try {
             executeCommand(command, this.project);
           } catch (err) {
             Helpers.error(err, true, true);
-            Helpers.error(`Error durinf npm instalation`, false, true);
+            Helpers.error(`Error during npm instalation`, false, true);
           }
 
         }

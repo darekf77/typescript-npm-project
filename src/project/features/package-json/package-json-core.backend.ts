@@ -254,6 +254,7 @@ export class PackageJsonCore {
         .replace(`.json`, '');
       const obj = this.data[property];
       const splitPath = path.join(path.dirname(this.path), c);
+      Helpers.log(`splitPath: ${splitPath}`);
       fse.writeJSONSync(splitPath, obj, {
         encoding: 'utf8',
         spaces: 2

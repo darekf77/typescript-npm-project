@@ -174,13 +174,13 @@ const $KILLWORKER = async () => {
 }
 
 const CHOKI = () => {
-  this.project = (Project.Current as Project);
+  const project = (Project.Current as Project);
   // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
   chokidar.watch([config.folder.src, config.folder.components], {
     ignoreInitial: true,
     followSymlinks: false,
     ignorePermissionErrors: true,
-    cwd: this.project.location
+    cwd: project.location
   }).on('unlinkDir', (relativeDir) => {
 
   })

@@ -20,6 +20,7 @@ export class NodeModulesCore extends FeatureForProject {
 
   public get path() { return path.join(this.project.location, config.folder.node_modules); }
   public get exist() { return nodeModulesExists(this.project); }
+  public get isLink() { return Helpers.isLink(this.path); }
   public dedupe = (packages?: string[]) => dedupePackages(this.project.location, packages);
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
   public dedupeCount = (packages?: string[]) => dedupePackages(this.project.location, packages, true);

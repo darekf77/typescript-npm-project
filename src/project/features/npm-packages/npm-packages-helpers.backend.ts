@@ -47,6 +47,11 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
 
 
 export function executeCommand(command: string, project: Project) {
+  Helpers.info(`
+
+   ${command} in folder: <...>/${this.project.location}
+
+   `)
   project.run(command, { output: true, biggerBuffer: true }).sync();
 }
 
@@ -192,9 +197,6 @@ export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
     options.remove = false;
   }
   if (_.isUndefined(options.smoothInstall)) {
-    options.smoothInstall = false;
-  }
-  if (options.npmPackages.length === 0) {
     options.smoothInstall = false;
   }
   return options;

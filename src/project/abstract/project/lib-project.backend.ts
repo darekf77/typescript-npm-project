@@ -296,34 +296,16 @@ export abstract class LibProject {
       }
 
       if (this.typeIs('angular-lib')) {
-
-        // if (this.frameworkVersionEquals('v1')) {
-        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-                "use strict";
-                Object.defineProperty(exports, '__esModule', { value: true });
-                var tslib_1 = require('tslib');
-                tslib_1.__exportStar(require('./public_api'), exports);
-                        `.trim());
-        // } else {
-        //   Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.js')}`, `
-        //         export * from './browser';
-        //       `.trim());
-        // }
-
-        Helpers.writeFile(`${path.join(this.location, config.folder.bundle, 'index.d.ts')}`, `
-      export * from './public_api';
-              `.trim());
-
-        const public_api_dts_browser = path.join(
-          this.location,
+        // copy all dts from browser to backend angular-lib files
+        glob.sync(`${path.join(this.location,
           config.folder.bundle,
-          config.folder.browser,
-          'public_api.d.ts');
-        const public_api_dts_for_backend = path.join(
-          this.location,
-          config.folder.bundle,
-          'public_api.d.ts');
-        Helpers.copyFile(public_api_dts_browser, public_api_dts_for_backend);
+          config.folder.browser)}/**/*.d.ts`)
+          .forEach(f => {
+            const newDest = f.replace(
+              `${path.join(this.location, config.folder.bundle, config.folder.browser)}/`,
+              `${path.join(this.location, config.folder.bundle)}/`);
+            Helpers.copyFile(f, newDest);
+          });
       }
       this.compileES5version();
 

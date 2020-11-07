@@ -203,23 +203,34 @@ export abstract class BuildableProject {
           }
         }
       }
+
+      if (this.node_modules.isLink && buildOptions.outDir === 'dist') {
+        if (!_.isArray(this.buildOptions.copyto)) {
+          this.buildOptions.copyto = [];
+        }
+        this.buildOptions.copyto.push(this as any);
+      }
+
       if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
 
         // const unique = {};
         // (this.buildOptions.copyto as any[]).forEach((p: Project) => unique[p.location] = p);
         // this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
-        if ((this.buildOptions.copyto as Project[]).includes(this)) {
-          Helpers.info(`
+        if (!(this.isStandaloneProject && this.node_modules.isLink)) {
+          if ((this.buildOptions.copyto as Project[]).includes(this)) {
+            Helpers.info(`
 
-          Please don't use ${chalk.bold('--copyto')} for project itself.
-          node_modules/${this.name} will be reaplce with folder:
-          - src (for isomorphic lib)
-          or
-          - componetnts (for angular-lib)
+            Please don't use ${chalk.bold('--copyto')} for project itself.
+            node_modules/${this.name} will be reaplce with folder:
+            - src (for isomorphic lib)
+            or
+            - componetnts (for angular-lib)
 
-          `);
-          (this.buildOptions.copyto as Project[]) = (this.buildOptions.copyto as Project[]).filter(p => p !== this);
+            `);
+            (this.buildOptions.copyto as Project[]) = (this.buildOptions.copyto as Project[]).filter(p => p !== this);
+          }
         }
+
         this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(this.buildOptions.copyto, 'location');
 
         (this.buildOptions.copyto as any[]).forEach((proj: Project) => {

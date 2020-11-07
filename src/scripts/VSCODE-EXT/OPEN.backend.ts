@@ -3,12 +3,11 @@ import * as express from 'express';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 
-import { Project } from '../../project';
-import { config } from 'tnp-config';
+import {  Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
 import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
+import { RecentFilesForContainer } from '../../project/features/recent-files.backend';
 
 
 
@@ -90,9 +89,48 @@ async function $OPEN(args: string) {
 
 }
 
+
+
+function $RECENT_SET(args) {
+  RecentFilesForContainer.for(Project.Current as Project).setRecent(args);
+  process.exit(0);
+}
+
+
+function $OPEN_RECENT() {
+  RecentFilesForContainer.for(Project.Current as Project).openRecent();
+  process.exit(0);
+}
+
+function $CLOSE_RECENT() {
+
+}
+
+function $SET_RECENT(args) {
+  $RECENT_SET(args);
+}
+
+function $RECENT_OPEN() {
+  $OPEN_RECENT();
+}
+
+function $RECENT_CLOSE() {
+  $CLOSE_RECENT();
+}
+
+
+
 export default {
   $LOCATION: Helpers.CLIWRAP($LOCATION, '$LOCATION'),
   $OPEN: Helpers.CLIWRAP($OPEN, '$OPEN'),
+
+  $RECENT_SET: Helpers.CLIWRAP($RECENT_SET, '$RECENT_SET'),
+  $OPEN_RECENT: Helpers.CLIWRAP($OPEN_RECENT, '$OPEN_RECENT'),
+  $CLOSE_RECENT: Helpers.CLIWRAP($CLOSE_RECENT, '$CLOSE_RECENT'),
+  $RECENT_CLOSE: Helpers.CLIWRAP($RECENT_CLOSE, '$RECENT_CLOSE'),
+  $RECENT_OPEN: Helpers.CLIWRAP($RECENT_OPEN, '$RECENT_OPEN'),
+  $SET_RECENT: Helpers.CLIWRAP($SET_RECENT, '$SET_RECENT'),
+
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
