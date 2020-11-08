@@ -4,6 +4,8 @@
 Error.stackTraceLimit = 100;
 // console.log(global.i0);
 // process.exit(0)
+
+// TODO QUIK_FIX
 global.i0 = {
   defineInjectable: function() {}
 }

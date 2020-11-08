@@ -355,7 +355,7 @@ export abstract class LibProject {
       }
 
       if (successPublis) {
-        // release other version:
+        //#region release additional packages names
         const names = this.packageJson.additionalNpmNames;
         for (let index = 0; index < names.length; index++) {
           const c = names[index];
@@ -387,10 +387,8 @@ export abstract class LibProject {
             Helpers.warn(`No able to push additional bundle for name: ${c}`)
           }
         }
-      }
+        //#endregion
 
-
-      if (successPublis) {
         await this.bumpVersionInOtherProjects(newVersion);
 
         if (this.typeIs('angular-lib')) {
@@ -429,8 +427,26 @@ export abstract class LibProject {
 
   }
 
-  pushToGitRepo(this: Project, newVersion: string) {
 
+  private async tagVersion(this: Project, newVersion: string) {
+    try {
+      this.run(`git tag -a v${newVersion} -m "version v${newVersion}"`, { output: false }).sync()
+    } catch (error) {
+      Helpers.warn(`NOT ABLE TO CREATE A TAG "${newVersion}"`);
+      const ver = newVersion.split('.');
+      if (ver.length > 0) {
+        ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
+      }
+      newVersion = ver.join('.')
+      await Helpers.questionYesNo(`Do you wanna try to create tag v${newVersion} ?`, async () => {
+        await this.tagVersion(newVersion);
+      });
+    }
+  }
+
+  async pushToGitRepo(this: Project, newVersion: string) {
+
+    await this.tagVersion(newVersion);
     console.log('Pushing to git repository... ')
     const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
     console.log(`Git branch: ${branchName}`)
