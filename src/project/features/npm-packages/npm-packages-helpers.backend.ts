@@ -49,7 +49,7 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
 export function executeCommand(command: string, project: Project) {
   Helpers.info(`
 
-   ${command} in folder: <...>/${this.project.location}
+   ${command} in folder: <...>/${project.location}
 
    `)
   project.run(command, { output: true, biggerBuffer: true }).sync();

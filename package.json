@@ -285,7 +285,7 @@
               "@swimlane/ngx-datatable": "^13.0.0",
               "angular-tree-component": "^7.0.0",
               "ng-modal-lib": "0.0.6",
-              "ng4-modal": "0.0.10",
+              "ng4-modal": "0.0.11",
               "ng4-icons": "0.0.6"
             },
             "build-tools": {
@@ -599,7 +599,7 @@
     "ng2-rest": "~11.0.7",
     "ng2-rest-swagger-generator": "~6.0.5",
     "ng4-icons": "~0.0.6",
-    "ng4-modal": "~0.0.10",
+    "ng4-modal": "~0.0.11",
     "ngx-bootstrap": "^5.2.0",
     "ngx-breadcrumbs": "0.0.3",
     "ngx-editor": "^4.1.0",

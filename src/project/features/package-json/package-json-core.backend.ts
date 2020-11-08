@@ -255,10 +255,7 @@ export class PackageJsonCore {
       const obj = this.data[property];
       const splitPath = path.join(path.dirname(this.path), c);
       Helpers.log(`splitPath: ${splitPath}`);
-      fse.writeJSONSync(splitPath, obj, {
-        encoding: 'utf8',
-        spaces: 2
-      });
+      Helpers.writeFile(splitPath, _.isObject(obj) ? obj : {});
     });
 
     if (removeFromPj) {
@@ -269,16 +266,9 @@ export class PackageJsonCore {
           .replace(`.json`, '');
         delete dataToWrite[property];
       });
-
-      fse.writeJSONSync(this.path, dataToWrite, {
-        encoding: 'utf8',
-        spaces: 2
-      });
+      Helpers.writeFile(this.path, _.isObject(dataToWrite) ? dataToWrite : {});
     } else {
-      fse.writeJSONSync(this.path, this.data, {
-        encoding: 'utf8',
-        spaces: 2
-      });
+      Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
     }
 
   }

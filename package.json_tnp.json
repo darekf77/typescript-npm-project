@@ -284,7 +284,7 @@
             "@swimlane/ngx-datatable": "^13.0.0",
             "angular-tree-component": "^7.0.0",
             "ng-modal-lib": "0.0.6",
-            "ng4-modal": "0.0.10",
+            "ng4-modal": "0.0.11",
             "ng4-icons": "0.0.6"
           },
           "build-tools": {
