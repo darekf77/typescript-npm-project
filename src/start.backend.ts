@@ -87,6 +87,65 @@ IncCompiler.init(async (asyncEvents) => { }, {
 } as any);
 //#endregion
 
+const SPECIAL_ARGS = [
+  '--copyto',
+  '--copyTo'
+];
+export function handleSpecialArgs(argsv: string[]) {
+  let tmpArgsv = _.cloneDeep(argsv);
+  let startSarchFromIndex: number;
+  do {
+    if (_.isNumber(startSarchFromIndex) && startSarchFromIndex >= tmpArgsv.length) {
+      break;
+    }
+    var rebuildStructure = false;
+    let indexRebuild: number;
+    tmpArgsv.find((a, i) => {
+      if (_.isNumber(startSarchFromIndex) && i < startSarchFromIndex) {
+        return false;
+      }
+      if (SPECIAL_ARGS.includes(a)) {
+        rebuildStructure = true;
+        indexRebuild = i;
+        return true;
+      }
+      return false;
+    });
+    if (rebuildStructure) {
+      let newArgs = tmpArgsv.slice(0, indexRebuild);
+      const cmd = tmpArgsv[indexRebuild];
+      const firstArgs = tmpArgsv[indexRebuild + 1];
+      newArgs.push(cmd);
+      newArgs.push(firstArgs);
+
+      let endIndex: number;
+      tmpArgsv.find((a, i) => {
+        if ((i - 2) >= indexRebuild) {
+          if (a.startsWith('-')) {
+            endIndex = i;
+            return true;
+          }
+          newArgs.push(cmd);
+          newArgs.push(a);
+        }
+        return false;
+      });
+      const lenBefore = newArgs.length;
+      if (_.isNumber(endIndex)) {
+        newArgs = [
+          ...newArgs,
+          ...tmpArgsv.slice(endIndex),
+        ];
+
+      }
+      startSarchFromIndex = lenBefore;
+      tmpArgsv = newArgs;
+    }
+
+  } while (rebuildStructure);
+  return tmpArgsv;
+}
+
 export async function start(
   argsv: string[],
   frameworkName: 'tnp' | 'firedev' = 'tnp',
@@ -95,15 +154,16 @@ export async function start(
   Helpers.log(`in start, mode: "${mode}"`);
   config.frameworkName = frameworkName;
 
-  argsv = argsv.map(arg => {
+
+  argsv = handleSpecialArgs(argsv);
+  argsv = argsv.map((arg, i) => {
     const biggerRep = config.argsReplacements[arg];
-    if (biggerRep) {
+    if (biggerRep && arg[i - 1] && !arg[i - 1].startsWith('-')) {
       return biggerRep;
     }
     return arg;
   });
-  // Helpers.log(argsv)
-  // process.exit(0)
+
   Helpers.log(`[start] accesing db..please wait`)
 
   Helpers.log(`[start] instance access granted`)
@@ -240,6 +300,8 @@ export async function start(
 
 
 }
+
+
 
 //#region remove non interactive mode args
 export function removeArg(arg: string, argsv: string[]) {

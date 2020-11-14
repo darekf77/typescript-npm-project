@@ -68,7 +68,7 @@ export class PackageJSON
       config.packageJsonSplit.forEach(c => {
 
         if (_.isObject(existed[c])) {
-          Helpers.log(`Assign existed ${c} for ${filePath}`);
+          // Helpers.log(`Assign existed ${c} for ${filePath}`);
           const property = c
             .replace(`${config.file.package_json}_`, '')
             .replace(`.json`, '');
