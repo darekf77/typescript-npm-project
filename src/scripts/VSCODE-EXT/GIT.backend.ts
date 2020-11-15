@@ -165,6 +165,8 @@ Fix this in location: ${path.join(container.location, path.basename(project.loca
         container.git.pushCurrentBranch();
       } catch (error) { }
     }
+  } else {
+    Helpers.info(`[container][${container.genericName}] up to date with git changes.`);
   }
 
   if (exit) {
