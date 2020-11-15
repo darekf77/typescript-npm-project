@@ -21,7 +21,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     }
     Helpers.info(`[package-recognition] Searching isomorphic packages... force=${force} `);
     Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`,()=> {
-      super.start(force); // TODO QUICK_FIX
+      super.start(true); // TODO QUICK_FIX
     })
     Helpers.info(`[package-recognition] Founded ${this.count} isomorphic packages`);
   }
