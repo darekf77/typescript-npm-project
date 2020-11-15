@@ -247,6 +247,25 @@ export abstract class BuildableProject {
       }
     }
 
+    const withoutNodeModules: Project[] = [];
+    if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
+      (this.buildOptions.copyto as Project[]).forEach((c) => {
+        Helpers.info(`Checking node_modules for ${c.genericName}`)
+        if (!c.node_modules.exist) {
+          withoutNodeModules.push(c);
+        }
+      })
+    }
+
+    if (withoutNodeModules.length > 0) {
+      Helpers.error(`[--copyto] Please install node_modules for projects:
+
+${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
+
+      `, false, true);
+    }
+
+
     PackagesRecognitionExtended.fromProject(this as any).start();
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));

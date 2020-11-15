@@ -19,9 +19,11 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     if (!global.globalSystemToolMode) {
       return;
     }
-    Helpers.log(`Searching isomorphic packages`);
-    super.start(force);
-    Helpers.log(`Founded ${this.count} isomorphic packages`);
+    Helpers.info(`[package-recognition] Searching isomorphic packages... force=${force} `);
+    Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`,()=> {
+      super.start(force); // TODO QUICK_FIX
+    })
+    Helpers.info(`[package-recognition] Founded ${this.count} isomorphic packages`);
   }
 
   checkIsomorphic(node_modules: string, packageName: string) {
