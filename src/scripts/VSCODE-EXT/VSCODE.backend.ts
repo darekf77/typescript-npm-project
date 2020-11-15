@@ -146,7 +146,7 @@ function $VSCODE_GLOBAL() {
     'explorer.confirmDelete': false,
     'typescript.updateImportsOnFileMove.enabled': 'never',
     'javascript.updateImportsOnFileMove.enabled': 'never',
-    'window.restoreWindows': 'all',
+    'window.restoreWindows': 'one', // all sucks
     'search.searchOnType': false,
     'scm.alwaysShowProviders': false,
     'breadcrumbs.enabled': true,
