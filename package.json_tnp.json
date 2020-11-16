@@ -136,7 +136,7 @@
         "tnp-models": "0.0.15",
         "tnp-helpers": "0.0.12",
         "tnp-db": "0.0.16",
-        "tnp-ui": "0.0.12",
+        "tnp-ui": "0.0.13",
         "@types/node": "10.12.30",
         "morphi": "4.0.6",
         "gulp": "^3.9.1",
@@ -286,8 +286,8 @@
             "@swimlane/ngx-datatable": "^13.0.0",
             "angular-tree-component": "^7.0.0",
             "ng-modal-lib": "0.0.6",
-            "ng4-modal": "0.0.11",
-            "ng4-icons": "0.0.7"
+            "ng4-modal": "0.0.12",
+            "ng4-icons": "0.0.8"
           },
           "build-tools": {
             "concurrently": "^3.5.1",
