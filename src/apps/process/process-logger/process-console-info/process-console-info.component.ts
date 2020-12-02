@@ -11,6 +11,7 @@ import {
 } from 'tnp-helpers';
 
 import { Log } from 'ng2-logger';
+import { ProcessLoggerBaseClass } from '../../process-logger-base.class';
 const log = Log.create('process console info');
 
 @Component({
@@ -18,7 +19,7 @@ const log = Log.create('process console info');
   templateUrl: './process-console-info.component.html',
   styleUrls: ['./process-console-info.component.scss']
 })
-export class ProcessConsoleInfoComponent extends BaseComponent
+export class ProcessConsoleInfoComponent extends ProcessLoggerBaseClass
   implements OnInit, AfterViewInit, OnDestroy {
 
 
@@ -29,15 +30,15 @@ export class ProcessConsoleInfoComponent extends BaseComponent
   get process() {
     return this.model;
   }
-  @HostBinding('style.height.px') height = 190;
+
 
 
   public resizeService: ResizeService = new ResizeService();
   constructor(
-    private elemetRef: ElementRef,
+    elemetRef: ElementRef,
     private changeDetectionRef: ChangeDetectorRef,
   ) {
-    super();
+    super(elemetRef);
   }
 
 
@@ -54,12 +55,6 @@ export class ProcessConsoleInfoComponent extends BaseComponent
   }
 
   ngOnInit() {
-
-    this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, (elem) => {
-      const height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
-      // console.log('set new height',height)
-      localStorage.setItem(this.lsKey, height.toString());
-    });
 
     this.handlers.push(this.changes.subscribe(() => {
       // console.log('CHANGES PROCESS INFO')
@@ -82,20 +77,15 @@ export class ProcessConsoleInfoComponent extends BaseComponent
 
   }
 
-  get lsKey() {
-    return `process-console-info-model-${this.outputType}-height-${this.model.id}`;
-  }
 
   ngAfterViewInit() {
 
     // const savedHeight = Number(localStorage.getItem(this.lsKey));
     // console.log('from local storage height', savedHeight)
-    // setTimeout(() => {
-    //   if (!isNaN(savedHeight) && savedHeight > 0) {
-    //     this.height = savedHeight;
-    //   }
-    //   this.scrollDown();
-    // });
+    setTimeout(() => {
+      // this.elemetRef.nativeElement.style.height = `${this.height}px`;
+      this.scrollDown();
+    });
   }
   ngOnDestroy(): void {
     this.handlers.forEach(h => h.unsubscribe());

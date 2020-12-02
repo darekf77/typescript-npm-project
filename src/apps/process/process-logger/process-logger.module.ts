@@ -17,7 +17,7 @@ import { ProcessInfoMessageComponent } from './process-info-message/process-info
 //#endregion
 //#region isomorphic
 import { ButtonIconModule } from 'tnp-ui';
-import { MoveablePopupModule, DraggablePopupModule } from 'tnp-ui';
+import {  DraggablePopupModule } from 'tnp-ui';
 import { ResizeService } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
@@ -44,7 +44,6 @@ const otherModules = [
 ];
 
 const localModules = [
-  MoveablePopupModule,
   DraggablePopupModule,
   ButtonIconModule,
   ProcessConsoleInfoModule,

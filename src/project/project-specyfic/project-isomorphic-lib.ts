@@ -116,7 +116,7 @@ export class ProjectIsomorphicLib
 
   private async selectToSimulate(
     //#region @backend
-    outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[]
+    outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[], args: string
     //#endregion
   ) {
     //#region @backend
@@ -146,14 +146,27 @@ export class ProjectIsomorphicLib
       }
     }
 
+    let port: number;
     if (client) {
-      const port = client.getDefaultPort()
-      await Helpers.killProcessByPort(port)
-      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name} --env.port=${port}`
+      port = client.getDefaultPort();
+      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
+    }
+
+    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
+    if (_.isNumber(argsAdditionalParams.port)) {
+      port = argsAdditionalParams.port;
+    }
+    if (_.isNumber(port)) {
+      await Helpers.killProcessByPort(port);
+      webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
     }
 
     const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+    Helpers.info(`
 
+    WEBPACK COMMAND: ${command}
+
+    `)
     this.run(command).sync();
     //#endregion
   }
@@ -168,7 +181,7 @@ export class ProjectIsomorphicLib
           Helpers.log(`App build not possible for isomorphic-lib in static build mode`)
           return;
         }
-        await this.selectToSimulate(outDir, watch, forClient as any);
+        await this.selectToSimulate(outDir, watch, forClient as any, buildOptions.args);
       } else {
         await this.buildLib();
       }

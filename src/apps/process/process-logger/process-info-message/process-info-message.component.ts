@@ -1,81 +1,36 @@
+//#region imports
 import * as _ from 'lodash';
 import {
   Component, OnInit, Input, ElementRef,
   OnDestroy, AfterViewInit, HostBinding
 } from '@angular/core';
-
-
 import { PROCESS } from '../../PROCESS';
-
 import 'rxjs/add/observable/fromEvent';
-import { BehaviorSubject } from 'rxjs';
-import {
-  BaseComponent, ResizeService
-} from 'tnp-helpers';
-
-
-import { Log } from 'ng2-logger';
-import { Subscription } from 'rxjs';
-
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ProcessLoggerBaseClass } from '../../process-logger-base.class';
+//#endregion
 
 @Component({
   selector: 'app-process-info-message',
   templateUrl: './process-info-message.component.html',
   styleUrls: ['process-info-message.component.scss'],
 })
-export class ProcessInfoMessageComponent extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProcessInfoMessageComponent extends ProcessLoggerBaseClass implements OnInit, OnDestroy {
 
   get process() {
     return this.model;
   }
-
-  constructor(private elemetRef: ElementRef, public resizeService: ResizeService) {
-    super();
-
-  }
-
 
   get lsKey() {
     return `process-info-message-model-height-${this.model.id}`;
   }
 
   @Input() public model: PROCESS;
-
   @Input() public changes: BehaviorSubject<void>;
-
   messPrev: number;
   messages = [];
 
-  @HostBinding('style.height.px') height = 190;
-
-  scrollDown() {
-    setTimeout(() => {
-      if (this.elemetRef && this.elemetRef.nativeElement) {
-        this.elemetRef.nativeElement.scrollTop = this.elemetRef.nativeElement.scrollHeight;
-      }
-    }, 100);
-  }
-
-  ngAfterViewInit() {
-    // this.messages = this.model.allProgressData;
-
-    // const savedHeight = Number(localStorage.getItem(this.lsKey));
-    // // console.log('from local storage height', savedHeight)
-    // setTimeout(() => {
-    //   if (!isNaN(savedHeight) && savedHeight > 0) {
-    //     this.height = savedHeight;
-    //   }
-    //   this.scrollDown();
-    // });
-  }
-
   ngOnInit() {
-
-    this.resizeService.addResizeEventListener(this.elemetRef.nativeElement, () => {
-      const height = Number((this.elemetRef.nativeElement as HTMLElement).style.height.replace('px', ''));
-      // console.log('set new height',height)
-      localStorage.setItem(this.lsKey, height.toString());
-    });
 
     this.handlers.push(this.changes.subscribe(() => {
       // console.log('CHANGES PROCESS INFO')
@@ -94,8 +49,6 @@ export class ProcessInfoMessageComponent extends BaseComponent implements OnInit
     //     this.changes.next(void 0);
     //   }
     // });
-
-
 
 
   }

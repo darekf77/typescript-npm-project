@@ -82,15 +82,19 @@ export class ProjectAngularClient
     //#endregion
   }
 
-  async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string, flags: string[] = []) {
+  async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string, flags: string[] = [], args?: string) {
     //#region @backendFunc
     const outDirApp = 'dist-app';
+    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
     if (watch) {
-      const p = (port !== undefined ? `--port=${port}` : '');
+      const portNumber = (argsAdditionalParams.port && this.isStandaloneProject)
+        ? argsAdditionalParams.port : (port !== undefined ? port : void 0);
+
+      const p = _.isNumber(portNumber) ? `--port=${argsAdditionalParams.port}` : '';
       let command: string;
       if (this.isEjectedProject) {
         await Helpers.killProcessByPort(port)
-        command = `npm-run webpack-dev-server ${p} `;
+        command = `npm-run webpack-dev-server  --host 0.0.0.0 ${p} `;
       } else {
         command = `npm-run ng serve ${p} --aot=false`;
       }
@@ -194,7 +198,7 @@ Angular cli build command: ${command}
       let { flags } = require('minimist')(args.split(' '));
       flags = (_.isString(flags) ? [flags] : []);
       flags = (!_.isArray(flags) ? [] : flags);
-      await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref, flags);
+      await this.buildApp(watch, prod, this.getDefaultPort(), baseHref && baseHref, flags, buildOptions.args);
     }
     //#endregion
   }

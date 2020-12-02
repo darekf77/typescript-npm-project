@@ -63,27 +63,33 @@
                      (onPin)="onPin($event)"
                      *ngIf="process && isOpen">
   <code>{{cmd}}</code>
-
+  popup.height: {{ popup.height }}
   <mat-tab-group>
 
     <mat-tab label="Messages">
 
       <app-process-info-message [model]="model"
+                                [height]="popup.height - 100"
                                 [changes]="changes"></app-process-info-message>
 
     </mat-tab>
     <mat-tab label="Console Output">
 
       <app-process-console-info [model]="model"
+                                [height]="popup.height - 100"
                                 [changes]="changes"
                                 outputType="stdout"></app-process-console-info>
 
     </mat-tab>
     <mat-tab label="Console Errors">
       <app-process-console-info [model]="model"
+                                [height]="popup.height - 100"
                                 [changes]="changes"
                                 outputType="stder"></app-process-console-info>
 
     </mat-tab>
   </mat-tab-group>
+  <!-- <ng-container class="app-custom-footer">
+    <h1>Hello</h1>
+   </ng-container> -->
 </app-draggable-popup>
