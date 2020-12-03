@@ -155,7 +155,7 @@ export class ProjectAngularLib
 
     if (this.frameworkVersionAtLeast('v2')) {
       return config.concat([
-
+        'src/index.html'
       ]).filter(f => {
         return ![
           'src/tsconfig.packages.json',

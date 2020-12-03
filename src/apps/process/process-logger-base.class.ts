@@ -11,7 +11,7 @@ export abstract class ProcessLoggerBaseClass extends BaseFormlyComponent impleme
     protected elemetRef: ElementRef) {
     super();
   }
-  @Input() @HostBinding('style.height.px') height = 190;
+  // @Input() @HostBinding('style.height.px') height = 190;
 
   ngAfterViewInit() {
     // this.messages = this.model.allProgressData;
