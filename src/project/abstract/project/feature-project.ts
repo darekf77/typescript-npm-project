@@ -6,8 +6,9 @@ import {
   StaticBuild, TestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
-  QuickFixes, NpmPackages, ProxyRouter
+  QuickFixes, NpmPackages, ProxyRouter, TargetProject
 } from '../../features';
+
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
@@ -15,6 +16,7 @@ import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
 import * as _ from 'lodash';
+
 
 
 export abstract class FeatureProject {
@@ -41,6 +43,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public workspaceSymlinks: WorkspaceSymlinks;
+  //#endregion
+
+  //#region @backend
+  public targetProject: TargetProject;
   //#endregion
 
   //#region @backend

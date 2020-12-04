@@ -109,6 +109,12 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
+  get targetProjects(): Models.npm.TargetProject[] {
+    const p = this.data.tnp && this.data.tnp.targetProjects;
+    // console.log('asdasd',this.data.tnp.targetProjects)
+    return Array.isArray(p) ? p : [];
+  };
+
   hasDependency(dependencyName: string, searchOnlyDependencies = false) {
     const deps = [
       ...Object.keys(this.data.dependencies || {}),

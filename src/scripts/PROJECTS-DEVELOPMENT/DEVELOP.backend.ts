@@ -272,7 +272,13 @@ based on ${githubUrl}
   process.exit(0);
 }
 
+async function $TARGET_PROJ_UPDATE() {
+  (Project.Current as Project).targetProject.update();
+  process.exit(0)
+}
+
 export default {
+  $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
   $ALL_PROJECTS: Helpers.CLIWRAP($ALL_PROJECTS, '$ALL_PROJECTS'),

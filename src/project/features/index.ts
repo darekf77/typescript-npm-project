@@ -8,6 +8,7 @@ export * from './proxy-router';
 export * from './quick-fixes';
 export * from './test-runner';
 export * from './workspace-symlinks';
+export * from './target-project.backend';
 //#endregion
 export * from './environment-config';
 export * from './package-json';

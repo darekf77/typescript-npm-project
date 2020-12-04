@@ -1,0 +1,119 @@
+import * as _ from 'lodash';
+import * as glob from 'glob';
+import * as path from 'path';
+import * as fse from 'fs-extra';
+import chalk from 'chalk';
+import { Models } from 'tnp-models';
+import { config } from 'tnp-config';
+import { FeatureForProject } from '../abstract/feature-for-project';
+import { Helpers, Project } from 'tnp-helpers';
+// import type { Project } from '../abstract/project/project';
+
+const DEFAULT_PATH_GENERATED = 'tmp-target-projects/generated';
+const DEFAULT_PATH_ORIGINS = 'tmp-target-projects/origins';
+
+export class TargetProject extends FeatureForProject {
+  //#region @backend
+
+
+  private get all() {
+    return this.project.packageJson.targetProjects.map(p => {
+      if (!_.isString(p.path)) {
+        p.path = path.join(this.project.location, DEFAULT_PATH_GENERATED, this.project.name);
+      }
+      if (!path.isAbsolute(p.path)) {
+        p.path = path.resolve(path.join(this.project.location, p.path));
+      }
+      return p;
+    })
+  }
+
+  async update() {
+    console.log('update target project', this.all)
+    this.all.forEach(a => generate(this.project, a));
+  }
+
+  //#endregion
+}
+
+
+function generate(project: Project, t: Models.npm.TargetProject, beforePush = false) {
+  if (!Helpers.exists(path.dirname(t.path))) {
+    Helpers.mkdirp(path.dirname(t.path));
+  }
+  const originDefaultPath = path.join(project.location, DEFAULT_PATH_ORIGINS, _.kebabCase(t.origin));
+  if (!Helpers.exists(path.dirname(originDefaultPath))) {
+    Helpers.mkdirp(path.dirname(originDefaultPath));
+  }
+  if (!Helpers.exists(originDefaultPath)) {
+    Helpers.run(`git clone ${t.origin} ${_.kebabCase(t.origin)}`,
+      { cwd: path.dirname(originDefaultPath) }).sync();
+  }
+
+  while (true) {
+    try {
+      Helpers.git.checkoutDefaultBranch(originDefaultPath);
+      Helpers.git.pullCurrentBranch(originDefaultPath);
+      break;
+    } catch (error) {
+      Helpers.run(`code ${originDefaultPath}`).sync();
+      Helpers.pressKeyAndContinue(`Fix project for origin: ${t.origin} and press any key....`);
+    }
+  }
+
+  if (!Helpers.exists(t.path)) {
+    Helpers.copy(originDefaultPath, t.path);
+  }
+  try {
+    Helpers.run(`git checkout ${t.branch} && git pull origin ${t.branch}`, { cwd: t.path }).sync();
+  } catch (e) {
+    Helpers.error(`[target-project] Not able create target project `
+      + `${chalk.bold(project.name)} from origin ${t.origin}...`);
+  }
+
+  [
+    ...(_.isArray(t.links) ? t.links : []),
+    config.folder.components,
+    config.folder.src,
+    ...project.resources,
+    config.file.index_js,
+    config.file.index_js_map,
+    config.file.index_d_ts,
+    ...(
+      beforePush ? [
+        config.folder.bin,
+      ] : []
+    )
+  ].forEach(l => {
+    const source = path.join(project.location, l);
+    const dest = path.join(t.path, l);
+    if (Helpers.exists(source)) {
+      if (Helpers.isFolder(source)) {
+        Helpers.copy(source, dest);
+      } else {
+        Helpers.copyFile(source, dest);
+      }
+    }
+  });
+
+  [
+    config.folder.node_modules,
+    config.folder.dist,
+    config.folder.browser,
+    ...(
+      beforePush ? [] : [
+        config.folder.bin,
+      ]
+    )
+  ].forEach(l => {
+    const source = path.join(project.location, l);
+    const dest = path.join(t.path, l);
+    Helpers.removeIfExists(dest);
+    Helpers.createSymLink(source, dest,
+      { continueWhenExistedFolderDoesntExists: true });
+  });
+
+  if (beforePush) {
+    Helpers.run(`code ${t.path}`).sync();
+  }
+}

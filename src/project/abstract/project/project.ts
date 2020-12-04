@@ -30,7 +30,8 @@ import { SiteProject } from './site-project.backend';
 import {
   PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks,
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,
-  FilesTemplatesBuilder, TestRunner, EnvironmentConfig, ProxyRouter, FilesStructure, BuildProcess
+  FilesTemplatesBuilder, TestRunner, EnvironmentConfig,
+  ProxyRouter, FilesStructure, BuildProcess, TargetProject,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -167,6 +168,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('copyManager', CopyManager);
       this.defineProperty<Project>('filesStructure', FilesStructure);
       this.defineProperty<Project>('buildProcess', BuildProcess);
+      this.defineProperty<Project>('targetProject', TargetProject);
     }
 
   }
