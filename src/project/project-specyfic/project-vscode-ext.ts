@@ -45,9 +45,14 @@ export class ProjectVscodeExt
   }
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backend
-
-    Helpers.error(`HUHUHUHUHUHUHUHUHUH`)
-
+    if (buildOptions.watch) {
+      this.run(`npm-run tsc -p ./`).sync();
+      this.run(`node update-proj.js --watch`).async();
+      this.run(`npm-run tsc -watch -p ./`).async();
+    } else {
+      this.run(`npm-run tsc -p ./`).sync();
+      this.run(`node update-proj.js`).sync();
+    }
     //#endregion
   }
   protected startOnCommand(args: string): string {

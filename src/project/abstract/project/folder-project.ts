@@ -222,6 +222,10 @@ export abstract class FolderProject {
       currentProjectLocation = this.location;
     }
     return {
+      /**
+       * Normal path as you expect
+       * <absolute path to project> / < relative path from param >
+       */
       normal: path.join(currentProjectLocation, relativePath),
       custom: path.join(currentProjectLocation, config.folder.custom, relativePath),
       __prefixed: path.join(currentProjectLocation, path.dirname(relativePath), `__${path.basename(relativePath)}`),

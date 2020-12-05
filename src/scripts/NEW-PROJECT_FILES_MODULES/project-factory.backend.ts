@@ -244,6 +244,10 @@ export class ProjectFactory {
       }
 
       if (newCreatedProject.isVscodeExtension) {
+        Helpers.setValueToJSON(newCreatedProject.path('.vscode/settings.json').absolute.normal,
+          `['workbench.colorCustomizations']['statusBar.background']`, void 0);
+        Helpers.setValueToJSON(newCreatedProject.path('.vscode/settings.json').absolute.normal,
+          `['workbench.colorCustomizations']['statusBar.debuggingBackground']`, void 0);
         await newCreatedProject.filesStructure.init('');
       } else {
         if (!skipInit) {

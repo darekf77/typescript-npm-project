@@ -102,6 +102,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
       this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);
     }
+
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation finish ok` });
     }

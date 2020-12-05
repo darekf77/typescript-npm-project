@@ -268,8 +268,10 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       `, false, true);
     }
 
+    if (!this.isVscodeExtension) {
+      PackagesRecognitionExtended.fromProject(this as any).start();
+    }
 
-    PackagesRecognitionExtended.fromProject(this as any).start();
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     if (skipBuild) {
