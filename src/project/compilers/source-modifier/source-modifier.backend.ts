@@ -55,7 +55,7 @@ export class SourceModifier extends SourceModForSite {
 
     if (this.project.typeIs('angular-lib')) {
       pathToWatch = config.folder.components;
-    } if (this.project.typeIs('isomorphic-lib')) {
+    } if (this.project.typeIs('isomorphic-lib', 'vscode-ext')) { // TODO all projects with src ?
       pathToWatch = config.folder.src;
     }
     const isStandalone = this.project.isStandaloneProject;

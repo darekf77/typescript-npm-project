@@ -37,7 +37,7 @@ export class TargetProject extends FeatureForProject {
 }
 
 
-function generate(project: Project, t: Models.npm.TargetProject, beforePush = false) {
+function generate(project: Project, t: Models.npm.TargetProject) {
   if (!Helpers.exists(path.dirname(t.path))) {
     Helpers.mkdirp(path.dirname(t.path));
   }
@@ -79,11 +79,7 @@ function generate(project: Project, t: Models.npm.TargetProject, beforePush = fa
     config.file.index_js,
     config.file.index_js_map,
     config.file.index_d_ts,
-    ...(
-      beforePush ? [
-        config.folder.bin,
-      ] : []
-    )
+    config.folder.bin,
   ].forEach(l => {
     const source = path.join(project.location, l);
     const dest = path.join(t.path, l);
@@ -98,13 +94,6 @@ function generate(project: Project, t: Models.npm.TargetProject, beforePush = fa
 
   [
     config.folder.node_modules,
-    config.folder.dist,
-    config.folder.browser,
-    ...(
-      beforePush ? [] : [
-        config.folder.bin,
-      ]
-    )
   ].forEach(l => {
     const source = path.join(project.location, l);
     const dest = path.join(t.path, l);
@@ -113,7 +102,6 @@ function generate(project: Project, t: Models.npm.TargetProject, beforePush = fa
       { continueWhenExistedFolderDoesntExists: true });
   });
 
-  if (beforePush) {
-    Helpers.run(`code ${t.path}`).sync();
-  }
+  Helpers.run(`code ${t.path}`).sync();
+
 }

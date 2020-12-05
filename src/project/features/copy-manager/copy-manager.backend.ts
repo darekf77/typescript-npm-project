@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import * as os from 'os';
-import { watch } from 'chokidar';
+import * as chokidar from 'chokidar';
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
@@ -118,7 +118,7 @@ export class CopyManager extends FeatureForProject {
     // Helpers.log(`watching folder for as copy source!! ${ monitorDir } `)
 
     if (fse.existsSync(monitorDir)) {
-      watch(monitorDir, {
+      chokidar.watch(monitorDir, {
         followSymlinks: false
       }).on('change', (f) => {
         if (_.isString(f)) {
@@ -215,7 +215,7 @@ export class CopyManager extends FeatureForProject {
 
     CopyMangerHelpers.executeCopy(sourceLocation, destinationLocation, options, this.project);
 
-    if (this.project.isContainerWorkspaceRelated || options.forceCopyPackageJSON) {
+    if (this.project.isContainerWorkspaceRelated || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
       const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
       // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
       // console.log('packageJson', packageJson)

@@ -19,9 +19,13 @@ export class NpmPackagesBase extends NpmPackagesCore {
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation for "${this.project.genericName}" started..` });
     }
-    const { remove, npmPackages, smoothInstall } = fixOptionsNpmInstall(options, this.project);
-    const fullInstall = (npmPackages.length === 0);
+    options = fixOptionsNpmInstall(options, this.project);
 
+    const fullInstall = (options.npmPackages.length === 0);
+    if (fullInstall && this.project.isVscodeExtension && !this.project.isCoreProject) {
+      options.smoothInstall = true;
+    }
+    const { remove, npmPackages, smoothInstall } = options;
     // console.log(npmPackages)
     // process.exit(0)
 

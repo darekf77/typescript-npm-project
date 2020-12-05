@@ -104,6 +104,15 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  get isVscodeExtension(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isForRecreation;
+    }
+    //#region @backend
+    return this.typeIs('vscode-ext');
+    //#endregion
+  }
+
   get isWorkspace(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isWorkspace;

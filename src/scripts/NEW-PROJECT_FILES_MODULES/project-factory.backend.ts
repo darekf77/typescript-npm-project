@@ -179,6 +179,14 @@ export class ProjectFactory {
             Helpers.info(`[create] Path NOT removed from empty locations`);
           }
         } catch (err) {
+          // console.log(require('callsite-record')({
+          //   forError: err
+          // }).renderSync({
+          //   // stackFilter(frame) {
+          //   //   return !frame.getFileName().includes('node_modules');
+          //   // }
+          // }))
+          Helpers.error(err, true, true);
           Helpers.error(`[create] Not able to create project`, false, true);
         }
       } else {
@@ -235,12 +243,14 @@ export class ProjectFactory {
         newCreatedProject.packageJson.save(`Update required for site dependency project`)
       }
 
-
-
-      if (!skipInit) {
-        const skipNodeModules = true;
-        const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')}`;
-        await newCreatedProject.filesStructure.init(argsForInit);
+      if (newCreatedProject.isVscodeExtension) {
+        await newCreatedProject.filesStructure.init('');
+      } else {
+        if (!skipInit) {
+          const skipNodeModules = true;
+          const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')}`;
+          await newCreatedProject.filesStructure.init(argsForInit);
+        }
       }
     }
     return newCreatedProject;

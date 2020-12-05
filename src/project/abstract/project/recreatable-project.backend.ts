@@ -21,7 +21,13 @@ export abstract class RecreatableProject {
     //#region @backend
     if (this.isWorkspaceChildProject || (this.isContainerChild && this.isWorkspace)) {
       if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
-        this.packageJson.data.tnp.isCoreProject = void 0;
+        this.packageJson.data.tnp.isCoreProject = void 0; // TODO why is that
+        this.packageJson.writeToDisc();
+      }
+    }
+    if (this.isVscodeExtension && this.parent?.packageJson.isCoreProject) {
+      if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
+        this.packageJson.data.tnp.isCoreProject = true;
         this.packageJson.writeToDisc();
       }
     }

@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import * as os from 'os';
-import { watch } from 'chokidar'
+
 
 import { config } from 'tnp-config';
 import { Project } from '../abstract';

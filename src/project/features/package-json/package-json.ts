@@ -12,6 +12,19 @@ import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { Models } from 'tnp-models';
 
+const OVERRIDE_FROM_TNP = [ // TODO put in config ?
+  'scripts',
+  'description',
+  'license',
+  'private',
+  'author',
+  'homepage',
+  'main',
+  'engines',
+  'categories',
+  'activationEvents'
+];
+
 @Morphi.Entity<PackageJSON>({
   className: 'PackageJSON',
   //#region @backend
@@ -34,9 +47,39 @@ export class PackageJSON
       return void 0;
     }
 
-    const filePath = path.join(location, config.file.package_json);
+    const filePath = {
+      packgeJson: path.join(location, config.file.package_json),
+      tnpJson: path.join(location, config.file.package_json__tnp_json),
+    };
+
     let saveAtLoad = false;
-    if (!fse.existsSync(filePath)) {
+    if (!fse.existsSync(filePath.packgeJson) && fse.existsSync(filePath.tnpJson)) {
+      const tnpData = Helpers.readJson(filePath.tnpJson, void 0) as Models.npm.TnpData;
+      if (!tnpData) {
+        // warn(`No package.json (and bad package.json_tnp) in folder: ${path.basename(location)}`)
+        return;
+      }
+      Helpers.info(`Recreating package.json from ${config.file.package_json__tnp_json} and npm registry...`);
+      const nameFromFolder = path.basename(filePath.packgeJson);
+      let lastVersionFromNpm: string;
+      try {
+        lastVersionFromNpm = Helpers.run(`npm show ${nameFromFolder} version`
+          , { output: false }).sync().toString().trim();
+      } catch (error) {
+        Helpers.warn(`Not able to get last version of project: ${nameFromFolder} from npm registry...`)
+      }
+      const newPackageJson: Models.npm.IPackageJSON = {
+        version: lastVersionFromNpm,
+        name: nameFromFolder
+      } as any;
+      OVERRIDE_FROM_TNP.forEach(key => {
+        newPackageJson[key] = tnpData[key];
+      });
+      Helpers.writeFile(filePath.packgeJson, newPackageJson);
+    }
+
+
+    if (!fse.existsSync(filePath.packgeJson)) {
       // warn(`No package.json in folder: ${path.basename(location)}`)
       return;
     }
@@ -63,7 +106,7 @@ export class PackageJSON
 
 
     try {
-      var json: Models.npm.IPackageJSON = Helpers.readJson(filePath) as any;
+      var json: Models.npm.IPackageJSON = Helpers.readJson(filePath.packgeJson) as any;
 
       config.packageJsonSplit.forEach(c => {
 
@@ -75,6 +118,8 @@ export class PackageJSON
           json[property] = existed[c] as any;
         }
       });
+
+      json.name = path.basename(location);
 
       if (json.tnp) {
         if (!json.tnp.overrided) {
@@ -137,6 +182,23 @@ export class PackageJSON
           json.tnp.resources = [];
           saveAtLoad = true;
         }
+
+        (OVERRIDE_FROM_TNP as (any
+          // keyof Models.npm.TnpIPackageJSONOverride
+        )[]
+        ).forEach(key => {
+          const inPckageJson = json[key];
+          const inTnp = json.tnp[key];
+          if (_.isNil(inPckageJson) && !_.isNil(inTnp)) {
+            json[key] = json.tnp[key];
+          } else if (!_.isNil(inPckageJson) && _.isNil(inTnp)) {
+            json.tnp[key] = json[key];
+          }
+          if (!_.isEqual(json[key], json.tnp[key])) {
+            json[key] = json.tnp[key];
+            saveAtLoad = true;
+          }
+        });
       }
       var pkgJson = new PackageJSON({ data: json, location, project });
 
@@ -151,18 +213,6 @@ export class PackageJSON
     }
     return pkgJson;
   }
-
-  private restrictVersions(obj: Models.npm.DependenciesFromPackageJsonStyle) {
-    Object.keys(obj).forEach(name => {
-      if (obj[name].startsWith('^')) {
-        obj[name] = obj[name].slice(1)
-      }
-      if (obj[name].startsWith('~')) {
-        obj[name] = obj[name].slice(1)
-      }
-    });
-  }
-
 
 
   //#endregion

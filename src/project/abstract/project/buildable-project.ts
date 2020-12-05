@@ -195,10 +195,12 @@ export abstract class BuildableProject {
       if (this.buildOptions.copytoAll) {
         await this.selectAllProjectCopyto();
       } else {
-        if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-          if (this.isStandaloneProject && this.buildOptions.watch) {
-            if (!this.isGenerated) {
-              await this.selectProjectToCopyTO(this.buildOptions);
+        if (!this.isVscodeExtension) {
+          if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
+            if (this.isStandaloneProject && this.buildOptions.watch) {
+              if (!this.isGenerated) {
+                await this.selectProjectToCopyTO(this.buildOptions);
+              }
             }
           }
         }
@@ -247,6 +249,7 @@ export abstract class BuildableProject {
       }
     }
 
+
     const withoutNodeModules: Project[] = [];
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
       (this.buildOptions.copyto as Project[]).forEach((c) => {
@@ -257,7 +260,7 @@ export abstract class BuildableProject {
       })
     }
 
-    if (withoutNodeModules.length > 0) {
+    if (withoutNodeModules.length > 0 && !this.isVscodeExtension) {
       Helpers.error(`[--copyto] Please install node_modules for projects:
 
 ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}

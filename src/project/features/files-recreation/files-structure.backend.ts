@@ -29,7 +29,7 @@ export class FilesStructure extends FeatureForProject {
     } else {
       return baselines;
     }
-    return this.findBaselines(proj.baseline)
+    return this.findBaselines(proj.baseline);
   }
 
   private fixOptionsArgs(options: InitOptions) {

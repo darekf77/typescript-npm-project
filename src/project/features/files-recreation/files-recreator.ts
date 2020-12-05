@@ -133,7 +133,9 @@ export class FilesRecreator extends FeatureForProject {
           )).concat( // common files for all project
             self.project.isCoreProject ? [] : self.commonFilesForAllProjects
           ).concat( // core files of projects types
-            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles()
+            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles().filter(f => {
+              return !self.project.recreateIfNotExists().includes(f);
+            })
           ).concat( // core files of projects types
             !self.project.isCoreProject ? [] : [
               config.folder.src,
@@ -475,10 +477,15 @@ ${coreFiles}
 
         }
 
+        const where = path.join(this.project.location, f);
+
+        if (this.project.recreateIfNotExists().includes(f) && Helpers.exists(where)) {
+          return;
+        }
 
         files.push({
           from,
-          where: path.join(this.project.location, f)
+          where,
         });
       });
       files.forEach(file => {

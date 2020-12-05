@@ -43,6 +43,10 @@ export abstract class LibProject {
     return files;
   }
 
+  recreateIfNotExists() {
+    return [];
+  }
+
   projectSpecyficFiles(this: Project) {
     const files = [
       'index.js',

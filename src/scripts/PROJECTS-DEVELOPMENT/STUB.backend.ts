@@ -6,7 +6,6 @@ import * as path from 'path';
 import * as glob from 'glob';
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
-import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
 import chalk from 'chalk';
