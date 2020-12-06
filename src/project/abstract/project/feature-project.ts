@@ -6,7 +6,7 @@ import {
   StaticBuild, TestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
-  QuickFixes, NpmPackages, ProxyRouter, TargetProject
+  QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
@@ -47,6 +47,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public targetProject: TargetProject;
+  //#endregion
+
+  //#region @backend
+  public gitActions: GitActions;
   //#endregion
 
   //#region @backend

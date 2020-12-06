@@ -20,6 +20,16 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  //#region @backend
+  get linkedProjects(this: Project): Project[] {
+    return this.packageJson.linkedProjects
+      .map(f => {
+        return $Project.From(path.join(this.location, f)) as Project;
+      })
+      .filter(f => !f);
+  }
+  //#endregion
+
   get children(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.children as any;

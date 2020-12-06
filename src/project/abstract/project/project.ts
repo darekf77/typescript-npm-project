@@ -32,6 +32,7 @@ import {
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,
   FilesTemplatesBuilder, TestRunner, EnvironmentConfig,
   ProxyRouter, FilesStructure, BuildProcess, TargetProject,
+  GitActions,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -169,6 +170,8 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('filesStructure', FilesStructure);
       this.defineProperty<Project>('buildProcess', BuildProcess);
       this.defineProperty<Project>('targetProject', TargetProject);
+      this.defineProperty<Project>('gitActions', GitActions);
+
     }
 
   }

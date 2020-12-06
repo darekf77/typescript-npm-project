@@ -1,16 +1,11 @@
-
-import * as fs from 'fs';
+//#region imports
 import * as _ from 'lodash';
-import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as glob from 'glob';
-import * as watch from 'watch'
-
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';
 import { HelpersMerge } from 'tnp-helpers';
-import { config } from 'tnp-config';
 import { Project } from '../../../abstract/project/project';
+//#endregion
 
 /**
  * Replace imports/export
@@ -33,7 +28,9 @@ export class HandlePrefixingFileToEasyOverride extends ModifyTsFileActionBase {
   action(relativeBaselineCustomPath, input) {
 
     const baselineFilePathNoExit = HelpersMerge.PathHelper.removeExtension(relativeBaselineCustomPath);
-    if (this.debuggin) Helpers.log(`[replace][1] baselineFilePathNoExit: ${baselineFilePathNoExit}`)
+    if (this.debuggin) {
+      Helpers.log(`[replace][1] baselineFilePathNoExit: ${baselineFilePathNoExit}`);
+    }
 
     const toReplaceImportPath =
       Helpers.escapeStringForRegEx(
@@ -45,7 +42,7 @@ export class HandlePrefixingFileToEasyOverride extends ModifyTsFileActionBase {
     const replacement = `./${HelpersMerge.getPrefixedBasename(baselineFilePathNoExit)}`;
 
     // if (debuggin) Helpers.log(`toReplaceImportPath: ${toReplaceImportPath}`)
-    if (this.debuggin) Helpers.log(`[replace][1] replacement: ${replacement}`)
+    if (this.debuggin) { Helpers.log(`[replace][1] replacement: ${replacement}`); }
 
     const replaceRegex = new RegExp(`(\"|\')${toReplaceImportPath}(\"|\')`, 'g')
 
@@ -54,12 +51,14 @@ export class HandlePrefixingFileToEasyOverride extends ModifyTsFileActionBase {
     }
 
     input = input.replace(replaceRegex, `'${replacement}'`);
-    if (this.debuggin) Helpers.log(`
+    if (this.debuggin) {
+      Helpers.log(`
 [replace][1] result input:
 ${Helpers.terminalLine()}
     ${input}
 ${Helpers.terminalLine()}
-    `)
+    `);
+    }
 
     return input;
   }
