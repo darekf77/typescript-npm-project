@@ -194,6 +194,17 @@ export class PackageJsonCore {
     return false;
   }
 
+  get isGlobalSystemTool() {
+    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGlobalSystemTool)) {
+      if (_.isBoolean(this.data.tnp.isGlobalSystemTool)) {
+        return this.data.tnp.isGlobalSystemTool;
+      }
+      Helpers.error(`Bad value in package.json, tnp.isGlobalSystemTool should be boolean.`, true);
+      Helpers.error(`Location of package.json: ${this.cwd}`)
+    }
+    return false;
+  }
+
   get isCommandLineToolOnly() {
     if (this.data.tnp && !_.isUndefined(this.data.tnp.isCommandLineToolOnly)) {
       if (_.isBoolean(this.data.tnp.isCommandLineToolOnly)) {

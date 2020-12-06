@@ -46,7 +46,7 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public targetProject: TargetProject;
+  public targetProjects: TargetProject;
   //#endregion
 
   //#region @backend

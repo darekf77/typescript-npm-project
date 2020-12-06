@@ -22,6 +22,7 @@ const OVERRIDE_FROM_TNP = [ // TODO put in config ?
   'main',
   'engines',
   'categories',
+  'keywords',
   'activationEvents'
 ];
 

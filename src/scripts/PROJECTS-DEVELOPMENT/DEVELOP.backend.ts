@@ -273,7 +273,7 @@ based on ${githubUrl}
 }
 
 async function $TARGET_PROJ_UPDATE() {
-  (Project.Current as Project).targetProject.update();
+  (Project.Current as Project).targetProjects.update();
   process.exit(0)
 }
 

@@ -418,7 +418,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-/*.vsix
+${this.project.isVscodeExtension ? '/*.vsix' : ''}
 ${this.project.isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
 ${this.project.isTnp ? '!tsconfig*' : ''}

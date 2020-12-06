@@ -21,6 +21,15 @@ import { config } from 'tnp-config';
  */
 export abstract class LibProject {
 
+  get isGlobalSystemTool(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isGlobalSystemTool;
+    }
+    //#region @backend
+    return this.packageJson && this.packageJson.isGlobalSystemTool;
+    //#endregion
+  }
+
   get isCommandLineToolOnly(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isCommandLineToolOnly;
@@ -311,7 +320,7 @@ export abstract class LibProject {
       }, this));
 
       if (!this.isCommandLineToolOnly) {
-        this.createClientVersionAsCopyOfBrowser()
+        this.createClientVersionAsCopyOfBrowser();
       }
 
       if (this.typeIs('angular-lib')) {

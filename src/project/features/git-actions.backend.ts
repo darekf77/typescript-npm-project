@@ -35,6 +35,13 @@ export class GitActions extends FeatureForProject {
     }
     fixRemote(this.project);
     this.project.removeFolderByRelativePath('node_modules/husky');
+    if (this.project.targetProjects.exists) {
+      Helpers.warn(`
+
+      Don't forget to push target projects for project ${chalk.bold(this.project.name)}
+
+      `);
+    }
   }
   //#endregion
 

@@ -15,6 +15,9 @@ const DEFAULT_PATH_ORIGINS = 'tmp-target-projects/origins';
 export class TargetProject extends FeatureForProject {
   //#region @backend
 
+  public get exists() {
+    return this.all.length > 0;
+  }
 
   private get all() {
     return this.project.packageJson.targetProjects.map(p => {

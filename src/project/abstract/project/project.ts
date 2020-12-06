@@ -169,7 +169,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('copyManager', CopyManager);
       this.defineProperty<Project>('filesStructure', FilesStructure);
       this.defineProperty<Project>('buildProcess', BuildProcess);
-      this.defineProperty<Project>('targetProject', TargetProject);
+      this.defineProperty<Project>('targetProjects', TargetProject);
       this.defineProperty<Project>('gitActions', GitActions);
 
     }
