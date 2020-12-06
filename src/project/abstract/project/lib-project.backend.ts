@@ -62,6 +62,9 @@ export abstract class LibProject {
   }
 
   checkIfLogginInToNpm(this: Project) {
+    // if (!this.canBePublishToNpmRegistry) {
+    //   return;
+    // }
     try {
       this.run('npm whoami').sync();
     } catch (e) {
@@ -207,6 +210,18 @@ export abstract class LibProject {
 
   }
 
+  public async installLocaly(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
+    const packageName = this.extensionVsixName;
+    if (this.isVscodeExtension) {
+      if (!this.containsFile(packageName)) {
+        Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
+      }
+      Helpers.info(`Installing extension: ${packageName} `
+        + `with creation date: ${fse.lstatSync(this.path(packageName).absolute.normal).birthtime}...`);
+      this.run(`npm install -g vsce && code --install-extension ${packageName}`).sync();
+    }
+  }
+
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
     if (_.isUndefined(releaseOptions.useTempFolder)) {
       releaseOptions.useTempFolder = true;
@@ -254,7 +269,7 @@ export abstract class LibProject {
 
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
-    this.checkIfReadyForNpm()
+    this.checkIfReadyForNpm();
     const newVersion = this.versionPatchedPlusOne;
 
     function removeTagAndCommit(tagOnly = false) {

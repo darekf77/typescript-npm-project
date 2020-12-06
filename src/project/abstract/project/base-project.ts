@@ -8,6 +8,11 @@ import type { Project } from './project';
 import { config } from 'tnp-config';
 
 export abstract class BaseProject {
+
+  public get extensionVsixName(this: Project) {
+    return `${this.name}-${this.version}.vsix`;
+  }
+
   public get genericName(this: Project): string {
 
     if (Helpers.isBrowser) {

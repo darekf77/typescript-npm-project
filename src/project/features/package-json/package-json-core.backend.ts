@@ -53,6 +53,17 @@ export class PackageJsonCore {
     return [];
   }
 
+
+  get canBePublishToNpmRegistry(): boolean {
+    if (!this.data) {
+      return false;
+    }
+    if (_.isBoolean(this.data.private)) {
+      return !this.data.private;
+    }
+    return false;
+  }
+
   get libReleaseOptions() {
     const res = this.data.tnp ? this.data.tnp.libReleaseOptions : undefined;
     if (_.isObject(res)) {

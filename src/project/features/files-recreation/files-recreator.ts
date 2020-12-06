@@ -296,6 +296,7 @@ export class FilesRecreator extends FeatureForProject {
                   s['files.exclude']["out"] = true;
                   s['files.exclude']["update-proj.js"] = true;
                   s['files.exclude'][".vscodeignore"] = true;
+                  s['files.exclude']["*.vsix"] = true;
                 }
                 if (project.isTnp) {
                   project.node_modules.fixesForNodeModulesPackages.forEach(p => {
@@ -417,6 +418,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/*.vsix
 ${this.project.isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
 ${this.project.isTnp ? '!tsconfig*' : ''}

@@ -281,6 +281,16 @@ const $BUILD_PROD = async (args) => {
 const $STATIC_START = async (args) => $START(args);
 const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
 
+const $INSTALL_LOCALLY = async (args) => {
+  const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
+  argsObj.args = args;
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isVscodeExtension) {
+    await proj.installLocaly(argsObj);
+  }
+  process.exit(0);
+};
+
 const $RELEASE = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
@@ -463,6 +473,7 @@ export default {
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
+  $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
 };

@@ -32,6 +32,7 @@ export class ProjectVscodeExt
       '.vscode/launch.json',
       '.vscode/tasks.json',
       '.vscodeignore',
+      'vsc-extension-quickstart.md',
       'tsconfig.json',
       'update-proj.js',
       'src/extension.ts',

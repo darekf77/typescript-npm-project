@@ -43,7 +43,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
   let newDepsForProject = {};
   // if ((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies) { // TODO QUICK_FIX
-    _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
+  _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
   // }
 
   if (project.isStandaloneProject && !project.isTnp) {
@@ -300,14 +300,14 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
     //#endregion
 
-    if (!project.isCoreProject) {
+    if (!project.isCoreProject && !project.isVscodeExtension) {
       project.packageJson.data.engines = engines;
     }
   } else {
     Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`)
     project.packageJson.data.devDependencies = {};
     project.packageJson.data.dependencies = {};
-    if (!project.isCoreProject) {
+    if (!project.isCoreProject && !project.isVscodeExtension) {
       project.packageJson.data.engines = void 0;
     }
   }
@@ -357,15 +357,15 @@ export function getAndTravelCoreDeps(options?: {
   const constantTnpDeps = {};
 
   // if (project?.packageJson?.data?.tnp?.core?.dependencies) { // TODO QUICK FIX
-    const core = project.packageJson.data.tnp.core.dependencies;
-    travelObject(core.common, constantTnpDeps, void 0, updateFn);
-    if (_.isString(type)) {
-      travelObject(core.onlyFor[type], constantTnpDeps, core.onlyFor, updateFn);
-    } else {
-      Object.keys(core.onlyFor).forEach(libType => {
-        travelObject(core.onlyFor[libType], constantTnpDeps, void 0, updateFn);
-      });
-    }
+  const core = project.packageJson.data.tnp.core.dependencies;
+  travelObject(core.common, constantTnpDeps, void 0, updateFn);
+  if (_.isString(type)) {
+    travelObject(core.onlyFor[type], constantTnpDeps, core.onlyFor, updateFn);
+  } else {
+    Object.keys(core.onlyFor).forEach(libType => {
+      travelObject(core.onlyFor[libType], constantTnpDeps, void 0, updateFn);
+    });
+  }
   // }
 
   return constantTnpDeps;

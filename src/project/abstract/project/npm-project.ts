@@ -11,6 +11,16 @@ import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
 
 export class NpmProject {
+
+  get canBePublishToNpmRegistry(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.canBePublishToNpmRegistry;
+    }
+    //#region @backend
+    return this.packageJson && this.packageJson.canBePublishToNpmRegistry;
+    //#endregion
+  }
+
   /**
    * Version from package.json
    */
@@ -222,7 +232,7 @@ export class NpmProject {
       return false;
     }
     // log('TYPEEEEE', this.type)
-    const libs: Models.libs.LibType[] = ['angular-lib', 'isomorphic-lib'];
+    const libs: Models.libs.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
       Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`)
     }
