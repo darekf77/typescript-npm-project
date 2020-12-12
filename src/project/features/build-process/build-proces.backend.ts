@@ -273,7 +273,7 @@ inside generated projects...
       const vsixPackageName = this.project.extensionVsixName;
       try {
         await Helpers.actionWrapper(() => {
-          this.project.run(`npm install -g vsce && vsce package`).sync();
+          this.project.run(`vsce package`).sync();
         }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
         const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
         Helpers.info(`

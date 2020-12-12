@@ -29,7 +29,7 @@ export class HandleRefereingToNewFileOnlyAvailableInCustom extends ModifyTsFileA
   action(relativeBaselineCustomPath, input) {
     HelpersMerge.relativePathesCustom(this.project).forEach(relativePthInCustom => {
       if (relativePthInCustom !== relativeBaselineCustomPath) {
-        let baselineFilePathNoExit = HelpersMerge.PathHelper.removeExtension(relativePthInCustom);
+        let baselineFilePathNoExit = Helpers.path.removeExtension(relativePthInCustom);
 
         const pathToSiteeFile = path.join(this.project.location, baselineFilePathNoExit)
         const pathToBaselineFile = path.join(HelpersMerge.pathToBaselineAbsolute(this.project), baselineFilePathNoExit)
@@ -38,9 +38,9 @@ export class HandleRefereingToNewFileOnlyAvailableInCustom extends ModifyTsFileA
           let toReplace = HelpersMerge.getPrefixedBasename(baselineFilePathNoExit);
 
           baselineFilePathNoExit = Helpers.escapeStringForRegEx(baselineFilePathNoExit);
-          baselineFilePathNoExit = `\.${HelpersMerge.PathHelper.removeRootFolder(baselineFilePathNoExit)}`
+          baselineFilePathNoExit = `\.${Helpers.path.removeRootFolder(baselineFilePathNoExit)}`
           const dirPath = path.dirname(relativePthInCustom);
-          toReplace = HelpersMerge.PathHelper.removeRootFolder(path.join(dirPath, toReplace))
+          toReplace = Helpers.path.removeRootFolder(path.join(dirPath, toReplace))
           toReplace = `.${toReplace}`
           // Helpers.log(`Replace: ${baselineFilePathNoExit} on self: ${toReplace}`)
           input = input.replace(new RegExp(baselineFilePathNoExit, 'g'), toReplace)

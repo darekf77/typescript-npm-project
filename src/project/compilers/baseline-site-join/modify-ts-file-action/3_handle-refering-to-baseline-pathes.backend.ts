@@ -58,7 +58,7 @@ export class HandleReferingToBaselinePathes extends ModifyTsFileActionBase {
         if (debuggin) Helpers.log(`[replace][3] PATTERN WITHOUT BASELINE:${patternWithoutBaselinePart}`)
         if (debuggin) Helpers.log(`[replace][3] pathPart = ${config.regexString.pathPartStringRegex}`)
 
-        patternWithoutBaselinePart = HelpersMerge.PathHelper.removeRootFolder(patternWithoutBaselinePart);
+        patternWithoutBaselinePart = Helpers.path.removeRootFolder(patternWithoutBaselinePart);
 
         if (debuggin) Helpers.log(`[replace][3] PATTERN WITHOUT BASELINE no path part : ${patternWithoutBaselinePart}`)
         const toReplace = `${levelBackPath}${patternWithoutBaselinePart}`

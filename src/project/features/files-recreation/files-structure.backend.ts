@@ -270,9 +270,8 @@ export class FilesStructure extends FeatureForProject {
     }
 
     this.project.quickFixes.missingSourceFolders();
-    if (this.project.isVscodeExtension) {
-      this.project.quickFixes.badTypesInNodeModules();
-    }
+
+    this.project.quickFixes.badTypesInNodeModules();
 
     if (!this.project.isDocker && !this.project.isVscodeExtension) {
       if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {

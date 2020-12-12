@@ -65,6 +65,12 @@ export abstract class LibProject {
     return files;
   }
 
+  projectSpecyficFilesLinked(this: Project) {
+    const files = [
+    ];
+    return files;
+  }
+
 
   async buildLib() {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
@@ -222,12 +228,12 @@ export abstract class LibProject {
   public async installLocaly(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
     const packageName = this.extensionVsixName;
     if (this.isVscodeExtension) {
-      if (!this.containsFile(packageName)) {
+      if (!this.containsFile(config.folder.out)) {
         Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
       }
       Helpers.info(`Installing extension: ${packageName} `
         + `with creation date: ${fse.lstatSync(this.path(packageName).absolute.normal).birthtime}...`);
-      this.run(`npm install -g vsce && code --install-extension ${packageName}`).sync();
+      this.run(`npm-run vsce package && code --install-extension ${packageName}`).sync();
     }
   }
 

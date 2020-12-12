@@ -35,24 +35,36 @@ export class ProjectVscodeExt
       'vsc-extension-quickstart.md',
       'tsconfig.json',
       'update-proj.js',
+      ...this.projectSpecyficFilesLinked(),
+      ...this.recreateIfNotExists(),
+    ];
+    //#endregion
+  }
+
+  projectSpecyficFilesLinked() {
+    return [
       'src/extension.ts',
       'src/helpers.ts',
       'src/models.ts',
       'src/execute-command.ts',
       'src/progress-output.ts',
-      ...this.recreateIfNotExists(),
-    ];
-    //#endregion
+    ]
   }
+
+
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backend
-    if (buildOptions.watch) {
-      this.run(`npm-run tsc -p ./`).sync();
-      this.run(`node update-proj.js --watch`).async();
-      this.run(`npm-run tsc -watch -p ./`).async();
-    } else {
-      this.run(`npm-run tsc -p ./`).sync();
-      this.run(`node update-proj.js`).sync();
+    try {
+      if (buildOptions.watch) {
+        this.run(`npm-run tsc -p ./`).sync();
+        this.run(`node update-proj.js --watch`).async();
+        this.run(`npm-run tsc -watch -p ./`).async();
+      } else {
+        this.run(`npm-run tsc -p ./`).sync();
+        this.run(`node update-proj.js`).sync();
+      }
+    } catch (error) {
+      Helpers.error(`Not able to build extension...`, false, true);
     }
     //#endregion
   }

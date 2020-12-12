@@ -15,7 +15,7 @@ import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { Project } from '../../abstract/project';
 import { FilesJoinActions } from './files-join-actions.backend';
-import { HelpersMerge } from 'tnp-helpers';
+import { BaselineSiteJoinprefix, HelpersMerge } from 'tnp-helpers';
 
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
@@ -92,7 +92,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('generated files', genratedFiles);
 
     return files.filter(f => {
-      if (path.basename(f).startsWith(HelpersMerge.BaselineSiteJoinprefix)) {
+      if (path.basename(f).startsWith(BaselineSiteJoinprefix)) {
         return false;
       }
       const relativePath = f.replace(this.project.location).replace(/^\//, '');

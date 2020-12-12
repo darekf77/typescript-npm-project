@@ -27,7 +27,7 @@ export class HandlePrefixingFileToEasyOverride extends ModifyTsFileActionBase {
 
   action(relativeBaselineCustomPath, input) {
 
-    const baselineFilePathNoExit = HelpersMerge.PathHelper.removeExtension(relativeBaselineCustomPath);
+    const baselineFilePathNoExit = Helpers.path.removeExtension(relativeBaselineCustomPath);
     if (this.debuggin) {
       Helpers.log(`[replace][1] baselineFilePathNoExit: ${baselineFilePathNoExit}`);
     }

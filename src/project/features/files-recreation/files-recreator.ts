@@ -124,7 +124,7 @@ export class FilesRecreator extends FeatureForProject {
             self.project.isSiteInStrictMode ? (
               self.project.customizableFilesAndFolders
                 .concat(self.project.customizableFilesAndFolders.map(f => {
-                  return HelpersMerge.PathHelper.PREFIX(f);
+                  return Helpers.path.PREFIX(f);
                 }))
                 .concat(self.project.customizableFilesAndFolders.map(f => {
                   return `!${path.join(config.folder.custom, f)}`
@@ -463,6 +463,7 @@ ${coreFiles}
     const files: Models.other.RecreateFile[] = [];
 
     if (this.project.location !== defaultProjectProptotype.location) {
+      const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
       projectSpecyficFiles.forEach(f => {
         let from = path.join(defaultProjectProptotype.location, f);
@@ -492,12 +493,18 @@ ${coreFiles}
         }
 
         files.push({
+          linked: projectSpecyficFilesLinked.includes(f),
           from,
           where,
         });
       });
       files.forEach(file => {
-        Helpers.copyFile(file.from, file.where)
+        if(file.linked) {
+          Helpers.info(`Linking: ${file.from}`)
+          Helpers.createSymLink(file.from, file.where);
+        } else {
+          Helpers.copyFile(file.from, file.where);
+        }
       });
     }
 
