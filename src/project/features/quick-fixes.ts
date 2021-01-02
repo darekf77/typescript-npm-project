@@ -5,7 +5,7 @@ import * as glob from 'glob';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 export class QuickFixes extends FeatureForProject {
@@ -239,7 +239,7 @@ export default _default;
       }
       const componentsFolder = path.join(this.project.location, config.folder.components);
 
-      if (this.project.typeIs(...(config.projectTypes.with.componetsAsSrc as Models.libs.LibType[])) && !fse.existsSync(componentsFolder)) {
+      if (this.project.typeIs(...(config.projectTypes.with.componetsAsSrc as ConfigModels.LibType[])) && !fse.existsSync(componentsFolder)) {
         // log('COMPONENTS folder recreated');
         Helpers.mkdirp(componentsFolder);
       }

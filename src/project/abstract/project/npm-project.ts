@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import type { Project } from './project';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 
 export class NpmProject {
 
@@ -232,7 +232,7 @@ export class NpmProject {
       return false;
     }
     // log('TYPEEEEE', this.type)
-    const libs: Models.libs.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
+    const libs: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
       Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`)
     }

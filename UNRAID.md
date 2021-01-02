@@ -1,3 +1,7 @@
+# override iommiu
+```
+pcie_acs_override=downstream 
+```
 
 # instalation of macos vm (macinabox)
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import { config as configMorphi } from 'morphi';
 //#endregion
 import * as _ from 'lodash';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import type { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -58,7 +58,7 @@ export abstract class FolderProject {
       return c.typeIs(...([
         'angular-lib',
         'isomorphic-lib'
-      ] as Models.libs.LibType[]));
+      ] as ConfigModels.LibType[]));
     });
     //#endregion
   }
@@ -77,7 +77,7 @@ export abstract class FolderProject {
         'isomorphic-lib',
         'angular-client',
         'ionic-client',
-      ] as Models.libs.LibType[]));
+      ] as ConfigModels.LibType[]));
     });
     //#endregion
   }

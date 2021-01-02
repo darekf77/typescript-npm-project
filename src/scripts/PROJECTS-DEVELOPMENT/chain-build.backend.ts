@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Models } from 'tnp-models';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { EnvironmentConfig } from '../../project/features/environment-config';
 import chalk from 'chalk';
 
@@ -15,7 +15,7 @@ export async function chainBuild(args: string) {
     'angular-lib',
     'isomorphic-lib',
     'docker',
-  ] as Models.libs.LibType[];
+  ] as ConfigModels.LibType[];
 
   let project = (Project.Current as Project);
 

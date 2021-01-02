@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 
@@ -32,7 +32,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     try {
       const proj = Project.From<Project>(pjPath);
       if (proj) {
-        if (proj.typeIs(...(config.projectTypes.forNpmLibs as Models.libs.LibType[]))) {
+        if (proj.typeIs(...(config.projectTypes.forNpmLibs as ConfigModels.LibType[]))) {
           // console.log(`Proj "${proj.genericName}" standalone`, proj.isStandaloneProject)
           res = proj.isStandaloneProject;
         } else {

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import { ConfigModels, LibTypeArr } from 'tnp-config';
 declare const global: any;
 if (global.globalSystemToolMode) {
 
@@ -371,11 +372,11 @@ export function globalArgumentsParser(argsv: string[]) {
 
   if (_.isBoolean(findNearestProjectType)) {
     Helpers.error(`argument --findNearestProjectType needs to be library type:\n ${
-      Models.libs.LibTypeArr.join(', ')}`, false, true);
+      LibTypeArr.join(', ')}`, false, true);
   }
   if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
     Helpers.error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${
-      Models.libs.LibTypeArr.join(', ')}`, false, true);
+      LibTypeArr.join(', ')}`, false, true);
   }
 
   if (!!findNearestProjectWithGitRoot) {

@@ -8,7 +8,7 @@ import * as glob from 'glob';
 import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { PROGRESS_DATA } from 'tnp-models';
@@ -119,7 +119,7 @@ inside generated projects...
   }
   //#endregion
 
-  private async  build(buildOptions: BuildOptions, allowedLibs: Models.libs.LibType[], exit = true) {
+  private async  build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
 
     Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
     this.project.buildOptions = buildOptions;

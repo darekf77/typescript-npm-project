@@ -7,7 +7,7 @@ import * as semver from 'semver';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
@@ -170,6 +170,15 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 }
 //#endregion
 
+function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
+  const depsByType = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.onlyFor[libType];
+  const names = depsByType ? Object.keys(depsByType) : [];
+  names.forEach(key => {
+    delete deps[key];
+  });
+  return deps;
+}
+
 //#region before save action
 function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
@@ -222,6 +231,19 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       : Helpers.arrays.sortKeys(newDeps);
   }
 
+  if (!project.isTnp) {
+    const specyficPacakges = [
+      'electron-client',
+      'vscode-ext',
+      'chrome-ext',
+    ] as ConfigModels.LibType[];
+    specyficPacakges.forEach(s => {
+      if (project.typeIsNot(s)) {
+        devDependencies = removeDepsByType(devDependencies, s);
+        dependencies = removeDepsByType(dependencies, s);
+      }
+    });
+  }
 
   if ((project.packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
     devDependencies = _.merge(devDependencies, dependencies);
@@ -347,7 +369,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 //#region get deps by
 export function getAndTravelCoreDeps(options?: {
   updateFn?: (obj: Object, pkgName: string) => string,
-  type?: Models.libs.LibType,
+  type?: ConfigModels.LibType,
 }) {
   const project: Project = Project.Tnp as any;
   if (_.isUndefined(options)) {

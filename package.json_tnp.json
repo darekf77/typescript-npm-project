@@ -221,7 +221,10 @@
           "ts-node": "^7.0.1",
           "typescript": "3.8.3",
           "tslint": "^5.9.1",
-          "eslint": "^4.15.0",
+          "eslint": "7.13.0",
+          "eslint-plugin-import": "2.22.1",
+          "eslint-plugin-jsdoc": "30.7.8",
+          "eslint-plugin-prefer-arrow": "1.2.2",
           "nodemon": "^1.14.11",
           "enum-values": "1.2.1"
         },
@@ -252,6 +255,16 @@
       "onlyFor": {
         "vscode-ext": {
           "vscode": "^1.1.37"
+        },
+        "electron-client": {
+          "cross-env": "7.0.2",
+          "electron": "11.0.3",
+          "electron-builder": "22.9.1",
+          "electron-reload": "1.5.0",
+          "conventional-changelog-cli": "2.1.1",
+          "wait-on": "5.0.1",
+          "webdriver-manager": "12.1.7",
+          "spectron": "13.0.0"
         },
         "angular-lib": {
           "@1": "angular-client"

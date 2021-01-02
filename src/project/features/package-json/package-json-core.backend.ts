@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as semver from 'semver';
 import chalk from 'chalk';
 
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
@@ -22,7 +22,7 @@ export class PackageJsonCore {
 
   }
 
-  get type(): Models.libs.LibType {
+  get type(): ConfigModels.LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
     if (_.isString(res)) {
       return res;
@@ -72,7 +72,7 @@ export class PackageJsonCore {
     return {};
   }
 
-  get frameworkVersion(): Models.libs.FrameworkVersion {
+  get frameworkVersion(): ConfigModels.FrameworkVersion {
     const res = this.data.tnp ? this.data.tnp.version : undefined;
     if (_.isString(res)) {
       return res;

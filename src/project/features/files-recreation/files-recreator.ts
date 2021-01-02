@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { HelpersMerge } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 
@@ -157,7 +157,7 @@ export class FilesRecreator extends FeatureForProject {
         return gitignoreFiles.map(f => `/${f}`)
       },
       get npmignore() {
-        const allowedProject: Models.libs.LibType[] = ['isomorphic-lib', 'angular-lib']
+        const allowedProject: ConfigModels.LibType[] = ['isomorphic-lib', 'angular-lib']
         const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
         const npmignoreFiles = [
           '.vscode',

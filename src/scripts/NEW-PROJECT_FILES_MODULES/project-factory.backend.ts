@@ -4,17 +4,17 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { JSON10 } from 'json10';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 
 export type NewSiteOptions = {
-  type?: Models.libs.NewFactoryType,
+  type?: ConfigModels.NewFactoryType,
   name?: string,
   cwd?: string,
   basedOn?: string,
-  version?: Models.libs.FrameworkVersion,
+  version?: ConfigModels.FrameworkVersion,
   skipInit?: boolean;
   alsoBasedOn?: string[];
   siteProjectMode?: 'strict' | 'dependency';

@@ -9,7 +9,7 @@ import { config as configMorphi } from 'morphi';
 import type { Project } from './project';
 import { Project as $Project } from 'tnp-helpers';
 import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { ConfigModels } from 'tnp-config';
 
 export abstract class TnpProject {
 
@@ -19,23 +19,23 @@ export abstract class TnpProject {
     //#endregion
   }
 
-  public get frameworkVersionMinusOne(this: Project): Models.libs.FrameworkVersion {
+  public get frameworkVersionMinusOne(this: Project): ConfigModels.FrameworkVersion {
     //#region @backendFunc
     const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
     if (!isNaN(curr) && curr >= 2) {
-      return `v${curr - 1}` as Models.libs.FrameworkVersion;
+      return `v${curr - 1}` as ConfigModels.FrameworkVersion;
     };
     return 'v1';
     //#endregion
   }
 
   //#region @backend
-  public frameworkVersionEquals(this: Project, version: Models.libs.FrameworkVersion) {
+  public frameworkVersionEquals(this: Project, version: ConfigModels.FrameworkVersion) {
     const ver = Number(_.isString(version) && version.replace('v', ''));
     const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
     return !isNaN(ver) && !isNaN(curr) && (curr === ver);
   }
-  public frameworkVersionAtLeast(this: Project, version: Models.libs.FrameworkVersion) {
+  public frameworkVersionAtLeast(this: Project, version: ConfigModels.FrameworkVersion) {
     const ver = Number(_.isString(version) && version.replace('v', ''));
     const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
     return !isNaN(ver) && !isNaN(curr) && (curr >= ver);
