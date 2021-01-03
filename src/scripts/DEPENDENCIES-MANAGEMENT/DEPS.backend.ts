@@ -208,6 +208,9 @@ async function $SHOW_DB() {
   process.exit(0)
 }
 
+const $OPEN_DB = async () => await $SHOW_DB();
+const $DB_OPEN = async () => await $SHOW_DB();
+
 async function $SHOW_WORKER() {
   await $SHOW_DB();
 }
@@ -467,6 +470,8 @@ export default {
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
   $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
+  $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
+  $DB_OPEN: Helpers.CLIWRAP($DB_OPEN, '$DB_OPEN'),
   $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
   $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
