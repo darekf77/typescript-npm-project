@@ -120,7 +120,7 @@ export class PackageJSON
         }
       });
 
-      json.name = path.basename(location);
+
 
       if (json.tnp) {
         if (!json.tnp.overrided) {
@@ -184,22 +184,28 @@ export class PackageJSON
           saveAtLoad = true;
         }
 
-        (OVERRIDE_FROM_TNP as (any
-          // keyof Models.npm.TnpIPackageJSONOverride
-        )[]
-        ).forEach(key => {
-          const inPckageJson = json[key];
-          const inTnp = json.tnp[key];
-          if (_.isNil(inPckageJson) && !_.isNil(inTnp)) {
-            json[key] = json.tnp[key];
-          } else if (!_.isNil(inPckageJson) && _.isNil(inTnp)) {
-            json.tnp[key] = json[key];
-          }
-          if (!_.isEqual(json[key], json.tnp[key])) {
-            json[key] = json.tnp[key];
-            saveAtLoad = true;
-          }
-        });
+        if(json.tnp.type !== 'navi') {
+          (OVERRIDE_FROM_TNP as (any
+            // keyof Models.npm.TnpIPackageJSONOverride
+          )[]
+          ).forEach(key => {
+            const inPckageJson = json[key];
+            const inTnp = json.tnp[key];
+            if (_.isNil(inPckageJson) && !_.isNil(inTnp)) {
+              json[key] = json.tnp[key];
+            } else if (!_.isNil(inPckageJson) && _.isNil(inTnp)) {
+              json.tnp[key] = json[key];
+            }
+            if (!_.isEqual(json[key], json.tnp[key])) {
+              json[key] = json.tnp[key];
+              saveAtLoad = true;
+            }
+          });
+        }
+      }
+
+      if(json.tnp && json.tnp.type !== 'navi') {
+        json.name = path.basename(location);
       }
       var pkgJson = new PackageJSON({ data: json, location, project });
 

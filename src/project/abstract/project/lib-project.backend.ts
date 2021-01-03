@@ -164,20 +164,28 @@ export abstract class LibProject {
           name: this.name,
           version: newVersion,
         }, `Bump new version "${newVersion}" of ${this.name}`);
-        await (new Promise((resolve, reject) => {
-          getDependents(this.name, function (err, packages: any[]) {
-            if (err) {
-              reject(`[lib-projecty] Can't get depended packages..`)
-            } else {
-              packages.forEach(pkg => {
-                Helpers.info(`Please update "${pkg}" depended on this package...`)
-              })
-              resolve()
-            }
-          });
-        }));
+        // try { /// TODO FIX THIS broken getDependents
+        //   await (new Promise((resolve, reject) => {
+        //     try {
+        //       getDependents(this.name, (err, packages: any[]) => {
+        //         if (err) {
+        //           reject(`[${config.frameworkName}] Can't get depended packages..`)
+        //         } else {
+        //           packages.forEach(pkg => {
+        //             Helpers.info(`Please update "${pkg}" depended on this package...`)
+        //           })
+        //           resolve()
+        //         }
+        //       });
+        //     } catch (error) {
+        //       reject(`[${config.frameworkName}] Error while getting depended packages.. `)
+        //     }
+        //   }));
+        // } catch (error) {
+        //   Helpers.warn(`[${config.frameworkName}] `
+        //     + `Not able to show dependent packages for ${chalk.bold(this.name)}`)
+        // }
       }
-
     }
   }
 

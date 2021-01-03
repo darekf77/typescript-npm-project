@@ -218,7 +218,14 @@ async function $SHOW_WORKER() {
 async function $SHOW_PROJECTS() {
   const db = await TnpDB.Instance();
   const projects = (await db.getProjects())
-  console.log(projects.map(p => p.locationOfProject));
+  console.log(projects.map(p => p.locationOfProject).join('\n'));
+  process.exit(0)
+}
+
+async function $SHOW_PROJECTS_NAVI() {
+  const db = await TnpDB.Instance();
+  const projects = (await db.getProjects())
+  console.log(projects.filter(p => p.project.typeIs('navi')).map(p => p.locationOfProject).join('\n'));
   process.exit(0)
 }
 
@@ -469,6 +476,7 @@ export default {
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
+  $SHOW_PROJECTS_NAVI: Helpers.CLIWRAP($SHOW_PROJECTS_NAVI, '$SHOW_PROJECTS_NAVI'),
   $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
   $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
   $DB_OPEN: Helpers.CLIWRAP($DB_OPEN, '$DB_OPEN'),

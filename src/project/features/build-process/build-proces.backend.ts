@@ -269,7 +269,7 @@ inside generated projects...
     } else {
       Helpers.info(msg);
     }
-    if (!buildOptions.watch) {
+    if (!buildOptions.watch && this.project.isVscodeExtension) {
       const vsixPackageName = this.project.extensionVsixName;
       try {
         await Helpers.actionWrapper(() => {

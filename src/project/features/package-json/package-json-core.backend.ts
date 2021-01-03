@@ -276,6 +276,11 @@ export class PackageJsonCore {
   }
 
   private splitAndWriteToDisc(removeFromPj = false) {
+    if(this.type === 'navi') {
+      Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
+      return;
+    }
+
     config.packageJsonSplit.forEach(c => {
       const property = c
         .replace(`${config.file.package_json}_`, '')
@@ -285,7 +290,7 @@ export class PackageJsonCore {
       Helpers.log(`splitPath: ${splitPath}`);
       Helpers.writeFile(splitPath, _.isObject(obj) ? obj : {});
     });
-
+    Helpers.log(`Split done..`)
     if (removeFromPj) {
       const dataToWrite = _.cloneDeep(this.data);
       config.packageJsonSplit.forEach(c => {

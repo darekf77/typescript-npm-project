@@ -13,10 +13,7 @@
       "ng2-rest-swagger-generator": "6.0.5",
       "cache-require-paths": "0.3.0",
       "base-model-wrap": "3.0.9",
-      "open": "7.2.1",
-      "button-dropdown": "1.0.14",
-      "@iconify/react": "1.1.3",
-      "@mdi/js": "5.8.55"
+      "open": "7.2.1"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],
@@ -200,7 +197,7 @@
           "fs-extra": "8.1.0",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": "1.1.6"
+          "incremental-compiler": "1.1.19"
         },
         "sockets": {
           "@types/socket.io-client": "^1.4.32",
@@ -281,6 +278,9 @@
             "ngx-bootstrap": "^2.0.2"
           },
           "icons": {
+            "button-dropdown": "1.0.14",
+            "@iconify/react": "1.1.3",
+            "@mdi/js": "5.8.55",
             "font-awesome": "^4.7.0",
             "material-design-icons": "3.0.1"
           },
