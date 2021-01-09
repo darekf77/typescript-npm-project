@@ -276,7 +276,7 @@ export class PackageJsonCore {
   }
 
   private splitAndWriteToDisc(removeFromPj = false) {
-    if(this.type === 'navi') {
+    if ((['navi', 'scenario'] as ConfigModels.LibType[]).includes(this.type)) {
       Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
       return;
     }

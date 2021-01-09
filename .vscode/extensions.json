@@ -25,6 +25,7 @@
         "omoki1207.pdf",
         "ryanlaws.toggle-case",
         "msjsdiag.debugger-for-chrome",
-        "ms-vscode-remote.remote-containers"
+        "ms-vscode-remote.remote-containers",
+        "mrmlnc.vscode-json5"
     ]
 }

@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 const OVERRIDE_FROM_TNP = [ // TODO put in config ?
@@ -184,7 +184,7 @@ export class PackageJSON
           saveAtLoad = true;
         }
 
-        if(json.tnp.type !== 'navi') {
+        if (!(['navi', 'scenario'] as ConfigModels.LibType[]).includes(json.tnp.type)) {
           (OVERRIDE_FROM_TNP as (any
             // keyof Models.npm.TnpIPackageJSONOverride
           )[]
@@ -204,7 +204,7 @@ export class PackageJSON
         }
       }
 
-      if(json.tnp && json.tnp.type !== 'navi') {
+      if (json.tnp && !(['navi'] as ConfigModels.LibType[]).includes(json.tnp.type)) {
         json.name = path.basename(location);
       }
       var pkgJson = new PackageJSON({ data: json, location, project });

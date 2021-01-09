@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as open from 'open';
+import * as glob from 'glob';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
@@ -301,6 +302,22 @@ async function $LINK() {
     // packageInGlobalNodeModules
     Helpers.removeIfExists(packageInGlobalNodeModules);
     project.linkTo(packageInGlobalNodeModules);
+
+    const pattern = `${project.path('bin').absolute.normal}/*`;
+    const countLinkInPackageJsonBin = glob
+      .sync(pattern)
+      .filter(f => {
+        return (Helpers.readFile(f) || '').startsWith('#!/usr/bin/env');
+      });
+
+    if (!_.isObject(project.packageJson.data.bin) && countLinkInPackageJsonBin.length > 0) {
+      project.packageJson.data.bin = {};
+      countLinkInPackageJsonBin.forEach(p => {
+        project.packageJson.data.bin[path.basename(p)] = `bin/${path.basename(p)}`;
+      });
+      project.packageJson.save(`update bin data`);
+    }
+
     if (_.isObject(project.packageJson.data.bin)) {
       Object.keys(project.packageJson.data.bin).forEach(globalName => {
         const localPath = path.join(project.location, project.packageJson.data.bin[globalName]);
