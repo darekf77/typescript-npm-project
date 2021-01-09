@@ -1,3 +1,10 @@
+# git - remove submodule without deleting it
+```
+git rm --cached path_to_submodule (no trailing slash).
+```
+
+
+
 # dynamic getter 
 ```ts
 if (isUndefined(Object.getOwnPropertyDescriptor(model, 'locationOidView'))) {
