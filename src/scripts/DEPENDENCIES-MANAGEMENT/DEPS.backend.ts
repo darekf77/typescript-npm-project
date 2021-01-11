@@ -310,13 +310,12 @@ async function $LINK() {
         return (Helpers.readFile(f) || '').startsWith('#!/usr/bin/env');
       });
 
-    if (!_.isObject(project.packageJson.data.bin) && countLinkInPackageJsonBin.length > 0) {
-      project.packageJson.data.bin = {};
-      countLinkInPackageJsonBin.forEach(p => {
-        project.packageJson.data.bin[path.basename(p)] = `bin/${path.basename(p)}`;
-      });
-      project.packageJson.save(`update bin data`);
-    }
+
+    project.packageJson.data.bin = {};
+    countLinkInPackageJsonBin.forEach(p => {
+      project.packageJson.data.bin[path.basename(p)] = `bin/${path.basename(p)}`;
+    });
+    project.packageJson.save(`update bin data`);
 
     if (_.isObject(project.packageJson.data.bin)) {
       Object.keys(project.packageJson.data.bin).forEach(globalName => {

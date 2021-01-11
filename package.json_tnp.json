@@ -12,8 +12,8 @@
       "svg-png-converter": "0.0.9",
       "ng2-rest-swagger-generator": "6.0.5",
       "cache-require-paths": "0.3.0",
-      "base-model-wrap": "3.0.9"
-
+      "base-model-wrap": "3.0.9",
+      "ng-talkback": "2.4.1"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],

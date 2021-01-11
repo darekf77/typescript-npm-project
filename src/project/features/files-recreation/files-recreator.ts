@@ -354,6 +354,7 @@ export class FilesRecreator extends FeatureForProject {
                   })
                 }
               }
+
               return settings
             });
           }
