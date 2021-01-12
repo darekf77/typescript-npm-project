@@ -12,8 +12,7 @@
       "svg-png-converter": "0.0.9",
       "ng2-rest-swagger-generator": "6.0.5",
       "cache-require-paths": "0.3.0",
-      "base-model-wrap": "3.0.9",
-      "ng-talkback": "2.4.1"
+      "base-model-wrap": "3.0.9"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],
@@ -140,9 +139,13 @@
         "gulp": "^3.9.1",
         "ng2-logger": "4.0.7",
         "ng2-rest": "11.0.9",
-        "record-replay-req-res-scenario": "0.0.3",
+        "record-replay-req-res-scenario": "0.0.4",
         "randomcolor": "^0.5.3",
-        "talkback": "~2.4.0",
+        "uuid": "^8.3.2",
+        "buffer-shims": "^1.0.0",
+        "content-type": "^1.0.4",
+        "axios": "^0.17.1",
+        "ng-talkback": "2.4.2",
         "strings": {
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",
