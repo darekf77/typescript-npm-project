@@ -209,6 +209,20 @@ async function $SHOW_DB() {
   process.exit(0)
 }
 
+async function $DB_SHOW() {
+  await $SHOW_DB();
+}
+async function $DB_CODE() {
+  const db = await TnpDB.Instance();
+  Helpers.run(`code ${db.location}`).sync();
+  process.exit(0)
+}
+
+async function $CODE_DB() {
+  await $DB_CODE();
+}
+
+
 const $OPEN_DB = async () => await $SHOW_DB();
 const $DB_OPEN = async () => await $SHOW_DB();
 
@@ -493,7 +507,10 @@ export default {
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
   $SHOW_PROJECTS_NAVI: Helpers.CLIWRAP($SHOW_PROJECTS_NAVI, '$SHOW_PROJECTS_NAVI'),
+  $DB_CODE: Helpers.CLIWRAP($DB_CODE, '$DB_CODE'),
+  $CODE_DB: Helpers.CLIWRAP($CODE_DB, '$CODE_DB'),
   $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
+  $DB_SHOW: Helpers.CLIWRAP($DB_SHOW, '$DB_SHOW'),
   $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
   $DB_OPEN: Helpers.CLIWRAP($DB_OPEN, '$DB_OPEN'),
   $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
