@@ -199,7 +199,7 @@
 //       // default:
 //       //   const fn = functions.find(f => f.name === res.command);
 //       //   if (_.isFunction(fn)) {
-//       //     this.db.commands.setCommand(process.cwd(), `tnp ${paramsFrom(fn.name)}`)
+//       //     this.db.commands.setCommand(process.cwd(), `tnp ${simplifiedCmd(fn.name)}`)
 //       //     await runSyncOrAsync(fn)
 //       //   } else {
 //       //     throw `Command not implemented: ${res.command}`

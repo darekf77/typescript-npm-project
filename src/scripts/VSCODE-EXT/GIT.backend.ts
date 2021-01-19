@@ -63,7 +63,7 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
 
 const $GIT_REMOVE_UNTRACKED_EVERYWHERE = () => {
   Project.projects.forEach(p => {
-    Helpers.run(`tnp ${Helpers.cliTool.paramsFrom($GIT_REMOVE_UNTRACKED.name)}`, { cwd: p.location }).sync()
+    Helpers.run(`tnp ${Helpers.cliTool.simplifiedCmd($GIT_REMOVE_UNTRACKED.name)}`, { cwd: p.location }).sync()
   });
   process.exit(0);
 }

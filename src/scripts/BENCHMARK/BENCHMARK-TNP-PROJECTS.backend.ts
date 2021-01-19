@@ -66,14 +66,14 @@ export async function $BENCHMARK_WORKER(args, exit = true) {
     WORKER = false
 
     `)
-    Helpers.run(`time ${config.frameworkName} ${Helpers.cliTool.paramsFromFn($BENCHMARK_DB_TEST)} ${workerArgs}`).sync();
+    Helpers.run(`time ${config.frameworkName} ${Helpers.cliTool.simplifiedCmd($BENCHMARK_DB_TEST)} ${workerArgs}`).sync();
     Helpers.info(Helpers.terminalLine())
     Helpers.info(`
 
     WORKER = true
 
     `)
-    Helpers.run(`time ${config.frameworkName} ${Helpers.cliTool.paramsFromFn($BENCHMARK_DB_TEST)} ${workerArgs}`).sync();
+    Helpers.run(`time ${config.frameworkName} ${Helpers.cliTool.simplifiedCmd($BENCHMARK_DB_TEST)} ${workerArgs}`).sync();
   });
   process.exit(0);
 }

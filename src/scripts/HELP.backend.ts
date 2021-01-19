@@ -32,11 +32,11 @@ export function getHelpFor(command: string, warnings = false) {
           const tsFile = file.replace(path.basename(file), path.basename(file).replace('.js', '.ts'));
           console.log(`WARN: No documentation for: ${v.name}  in ${tsFile.replace('dist', 'src')} `)
         }
-        if (Helpers.cliTool.paramsFrom(k) === Helpers.cliTool.paramsFrom(command)) {
+        if (Helpers.cliTool.simplifiedCmd(k) === Helpers.cliTool.simplifiedCmd(command)) {
           commandNameFit = true;
         }
         const res = Array.isArray(v) && v.length == 2 && _.isString(v[1]) && command !== undefined
-          && Helpers.cliTool.paramsFrom(k) === Helpers.cliTool.paramsFrom(command);
+          && Helpers.cliTool.simplifiedCmd(k) === Helpers.cliTool.simplifiedCmd(command);
         if (res) {
           docs = v[1];
         }

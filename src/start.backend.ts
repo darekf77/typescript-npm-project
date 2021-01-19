@@ -170,11 +170,11 @@ export async function start(
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
 
-  const lastCmds = CLI_FUNCTIONS.map(f => Helpers.cliTool.paramsFrom(CLASS.getName(f)));
-  const arg = Helpers.cliTool.paramsFrom(argsv[2]);
+  const lastCmds = CLI_FUNCTIONS.map(f => Helpers.cliTool.simplifiedCmd(CLASS.getName(f)));
+  const arg = Helpers.cliTool.simplifiedCmd(argsv[2]);
   Helpers.log(`lastCmds: ${lastCmds}`)
   Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
-  Helpers.log(`Helpers.cliTool.paramsFrom(argsv[2]) "${Helpers.cliTool.paramsFrom(argsv[2])}" `);
+  Helpers.log(`Helpers.cliTool.simplifiedCmd(argsv[2]) "${Helpers.cliTool.simplifiedCmd(argsv[2])}" `);
   // process.exit(0)
   if (lastCmds.includes(arg)) {
     Helpers.log(`DO NOTHIGN`);
