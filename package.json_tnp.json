@@ -145,7 +145,7 @@
         "buffer-shims": "^1.0.0",
         "content-type": "^1.0.4",
         "axios": "^0.17.1",
-        "ng-talkback": "2.4.2",
+        "ng-talkback": "2.4.3",
         "strings": {
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",
