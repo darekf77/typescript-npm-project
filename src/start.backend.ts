@@ -37,14 +37,14 @@ tnp
     if (fse.existsSync(envPath)) {
       try {
         newENV = fse.readJSONSync(envPath);
-        console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
+        // console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
         return true;
       } catch (er) {
-        console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
+        // console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
       }
-      console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
+      // console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
     } else {
-      console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+      // console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
     }
     return false;
   });
