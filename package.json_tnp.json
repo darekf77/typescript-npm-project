@@ -398,7 +398,9 @@
             "@types/systeminformation": "^3.23.0",
             "systeminformation": "^3.45.7",
             "ps-node": "^0.1.6",
-            "npm-get-dependents": "^1.0.1"
+            "npm-get-dependents": "^1.0.1",
+            "is-elevated": "~3.0.0",
+            "sudo-block": "~3.0.0"
           },
           "npm": {
             "sort-package-json": "^1.11.0",
@@ -430,7 +432,8 @@
             "cors": "^2.8.4",
             "http-proxy-middleware": "0.19.1",
             "@types/http-proxy-middleware": "0.19.2",
-            "compression": "1.7.4"
+            "compression": "1.7.4",
+            "hostile": "~1.3.3"
           },
           "validators": {
             "validator": "^9.2.0"
