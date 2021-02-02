@@ -3,7 +3,10 @@
 git rm --cached path_to_submodule (no trailing slash).
 ```
 
-
+# ip of interface from cmd linke
+```
+ ipconfig getifaddr en0
+```
 
 # dynamic getter 
 ```ts
