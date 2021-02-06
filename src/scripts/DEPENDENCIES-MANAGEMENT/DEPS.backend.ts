@@ -306,6 +306,34 @@ async function $LINKCORE() {
   process.exit(0);
 }
 
+function templateBin(debug = false) {
+  return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
+var path = require('path')
+var fs = require('fs')
+var path = {
+  dist: path.join(__dirname, '../dist/start.backend.js'),
+  bundle: path.join(__dirname, '../start.backend.js')
+}
+var p = fs.existsSync(path.dist) ? path.dist : path.bundle;
+global.globalSystemToolMode = true;
+var run = require(p).run;
+run(process.argv.slice(2));
+  `
+}
+
+function templateStartBackedn() {
+  return `import { Helpers } from 'tnp-helpers';
+
+export async function run(args: string[]) {
+    const command = args.shift() as any;
+    if (command === 'test') {
+      Helpers.clearConsole();
+    }
+    process.stdin.resume();
+  }`
+}
+
+
 async function $LINK() {
   let project = (Project.Current as Project);
 
@@ -317,13 +345,36 @@ async function $LINK() {
     Helpers.removeIfExists(packageInGlobalNodeModules);
     project.linkTo(packageInGlobalNodeModules);
 
-    const pattern = `${project.path('bin').absolute.normal}/*`;
+    if (!Helpers.exists(project.path(config.folder.bin).absolute.normal)) {
+      Helpers.mkdirp(project.path(config.folder.bin).absolute.normal);
+    }
+
+    const pattern = `${project.path(config.folder.bin).absolute.normal}/*`;
     const countLinkInPackageJsonBin = glob
       .sync(pattern)
       .filter(f => {
         return (Helpers.readFile(f) || '').startsWith('#!/usr/bin/env');
       });
 
+    if (countLinkInPackageJsonBin.length === 0) {
+      const pathNormalLink = Helpers.path.create(project.location, config.folder.bin, `${project.name}`);
+      Helpers.writeFile(pathNormalLink, templateBin());
+      countLinkInPackageJsonBin.push(pathNormalLink);
+
+      const pathDebugLink = Helpers.path.create(project.location, config.folder.bin, `${project.name}-debug`);
+      Helpers.writeFile(pathDebugLink, templateBin(true));
+      countLinkInPackageJsonBin.push(pathDebugLink);
+
+      const startBackendFile = Helpers.path.create(
+        project.location,
+        config.folder.src,
+        config.file.start_backend_ts
+      );
+      if (!Helpers.exists(startBackendFile)) {
+        Helpers.writeFile(startBackendFile, templateStartBackedn());
+      }
+
+    }
 
     project.packageJson.data.bin = {};
     countLinkInPackageJsonBin.forEach(p => {
