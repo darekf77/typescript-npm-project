@@ -13,7 +13,8 @@
       "ng2-rest-swagger-generator": "6.0.7",
       "cache-require-paths": "0.3.0",
       "base-model-wrap": "3.0.11",
-      "magic-renamer": "0.0.4"
+      "magic-renamer": "0.0.4",
+      "vpn-split": "0.0.1"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],

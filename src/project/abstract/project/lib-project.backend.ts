@@ -250,7 +250,8 @@ export abstract class LibProject {
       this.checkIfReadyForNpm();
       if (this.targetProjects.exists) {
         if (global.tnpNonInteractive) {
-          Helpers.warn(`Ommiting relese for project with "target projects"`)
+          Helpers.warn(`Ommiting relese for project with "target projects"`);
+          Helpers.sleep(3);
           return;
         }
         Helpers.error(`You can't release project with target projects`, false, true);
@@ -438,9 +439,11 @@ export abstract class LibProject {
           Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
           Helpers.info('log addtional bundle created');
           try {
-            Helpers.run(`code ${additionBase}`).sync();
-            Helpers.info(`Check you additional bundle for ${chalk.bold(c)} and press any key to publish...`);
-            Helpers.pressKeyAndContinue();
+            if (!global.tnpNonInteractive) {
+              Helpers.run(`code ${additionBase}`).sync();
+              Helpers.info(`Check you additional bundle for ${chalk.bold(c)} and press any key to publish...`);
+              Helpers.pressKeyAndContinue();
+            }
             Helpers.run('npm publish', { cwd: additionBase }).sync();
           } catch (error) {
             Helpers.warn(`No able to push additional bundle for name: ${c}`)

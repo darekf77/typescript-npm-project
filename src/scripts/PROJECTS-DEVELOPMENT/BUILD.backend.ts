@@ -315,6 +315,14 @@ processing...
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
+    try {
+      proj.git.commit(`Update after release`, true);
+      proj.git.pushCurrentBranch();
+    } catch (error) { }
+    try {
+      Project.Tnp.git.commit(`Update after release`, true)
+      Project.Tnp.git.pushCurrentBranch();
+    } catch (error) { }
     process.exit(0)
 
   } else {

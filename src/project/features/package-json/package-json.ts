@@ -109,6 +109,11 @@ export class PackageJSON
     try {
       var json: Models.npm.IPackageJSON = Helpers.readJson(filePath.packgeJson) as any;
 
+      if (!json.version) {
+        json.version = '0.0.0';
+        saveAtLoad = true;
+      }
+
       config.packageJsonSplit.forEach(c => {
 
         if (_.isObject(existed[c])) {
