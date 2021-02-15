@@ -336,7 +336,7 @@ export abstract class LibProject {
       prod=${!!prod},
       obscure=${!!obscure},
       nodts=${!!nodts},
-      uglify=${!!nodts}
+      uglify=${!!uglify}
       `)
 
       await this.build(BuildProcess.prepareOptionsBuildProcess({
@@ -450,7 +450,7 @@ export abstract class LibProject {
 
         await this.bumpVersionInOtherProjects(newVersion);
 
-        if (this.typeIs('angular-lib')) {
+        if (this.typeIs('angular-lib') && !global.tnpNonInteractive) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
             let appBuildOptions = { docsAppInProdMode: prod };

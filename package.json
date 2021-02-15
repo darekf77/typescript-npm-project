@@ -477,7 +477,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.77",
+  "version": "0.0.78",
   "scripts": {
     "postinstall": "npm i -g npm-run@4.1.2 --ignore-scripts && npm-run tsc && npm link --ignore-scripts && tnp dedupe && tnp bd"
   },
