@@ -214,7 +214,13 @@ export abstract class BaseProject {
     if (this.typeIs('unknow')) {
       return false;
     }
-    return (!this.isWorkspaceChildProject && !this.isWorkspace && !this.isContainer && !this.isUnknowNpmProject);
+    return (
+      !this.isWorkspaceChildProject
+      && !this.isWorkspace
+      && !this.isContainer
+      && !this.isUnknowNpmProject
+      && !this.isDocker
+    );
     //#endregion
   }
 
@@ -239,6 +245,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  __cacheStandaloneDependencies: Project[];
   get workspaceDependencies(this: Project): Project[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
@@ -257,7 +264,19 @@ export abstract class BaseProject {
         }
         return child;
       }).filter(f => !!f);
+    } else if (this.isStandaloneProject) {
+      if (!_.isUndefined(this.__cacheStandaloneDependencies)) {
+        return this.__cacheStandaloneDependencies;
+      }
+      const dependenciesNames = this.packageJson.dependencies();
+      const res = dependenciesNames.map(d => {
+        const child = this.parent.children.find(f => f.name === d);
+        return child;
+      }).filter(f => !!f);
+      this.__cacheStandaloneDependencies = res;
+      return res;
     }
+
     return [];
     //#endregion
   }

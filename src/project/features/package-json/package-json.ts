@@ -60,7 +60,7 @@ export class PackageJSON
         // warn(`No package.json (and bad package.json_tnp) in folder: ${path.basename(location)}`)
         return;
       }
-      Helpers.info(`Recreating package.json from ${config.file.package_json__tnp_json} and npm registry...`);
+      Helpers.info(`Recreating ${chalk.bold(path.basename(location))}/package.json from ${config.file.package_json__tnp_json} and npm registry...`);
       const nameFromFolder = path.basename(filePath.packgeJson);
       let lastVersionFromNpm: string;
       try {

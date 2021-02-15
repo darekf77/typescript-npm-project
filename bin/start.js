@@ -7,7 +7,7 @@ Error.stackTraceLimit = 100;
 
 // TODO QUIK_FIX
 global.i0 = {
-  defineInjectable: function() {}
+  defineInjectable: function () { }
 }
 
 global.hideLog = true;
@@ -49,7 +49,7 @@ if (typeof useWorker !== 'undefined') {
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
 if (typeof verboseLevel !== 'undefined') {
   global.hideLog = false;
-  verboseLevel = Number(verboseLevel);
+  verboseLevel = Number(verboseLevel.replace('-verbose=', ''));
   if (!isNaN(verboseLevel)) {
     global.verboseLevel = verboseLevel;
   }

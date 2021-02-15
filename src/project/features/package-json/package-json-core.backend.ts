@@ -114,6 +114,12 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
+  dependencies(): string[] {
+    const p = _.keys(this.data?.dependencies);
+    // console.log(`${this.locationOfJson}`, p)
+    return Array.isArray(p) ? p : [];
+  }
+
   get dependsOn(): string[] {
     const p = this.data.tnp && this.data.tnp.dependsOn;
     // console.log(`${this.locationOfJson}`, p)
@@ -125,6 +131,14 @@ export class PackageJsonCore {
     // console.log('asdasd',this.data.tnp.targetProjects)
     return Array.isArray(p) ? p : [];
   };
+
+  setBuildHash(hash: string) {
+    this.data.lastBuildTagHash = hash;
+  }
+
+  getBuildHash() {
+    return this.data.lastBuildTagHash;
+  }
 
   hasDependency(dependencyName: string, searchOnlyDependencies = false) {
     const deps = [

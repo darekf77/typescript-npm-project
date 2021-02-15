@@ -12,15 +12,47 @@ import chalk from 'chalk';
 
 export abstract class DependencyProject {
 
-  projectsInOrderForChainBuild(this: Project) {
-    if (!this.isWorkspaceChildProject) {
+  projectsInOrderForChainBuild(this: Project, targets: Project[] = []): Project[] {
+    if (this.isContainer) {
+
+      if (targets.length > 0) {
+        let allToConsider = [];
+        targets.forEach(t => {
+          allToConsider = [
+            t,
+            ...t.projectsInOrderForChainBuild(),
+            ...allToConsider,
+          ];
+        });
+        allToConsider = Helpers.arrays.uniqArray<Project>(allToConsider, 'location');
+        const reordered = reorderResult(allToConsider);
+        return reordered;
+      } else {
+        const children = (this.children)
+          .filter(f => f.frameworkVersionAtLeast('v2'))
+          .map(proj => {
+            return { proj, deps: proj.projectsInOrderForChainBuild() };
+          });
+
+        const allDeps = children.map(d => d.proj);
+        const reordered = reorderResult(allDeps);
+        return reordered;
+      }
+
+    }
+
+
+    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
       return [];
     }
     let deps: Project[] = this.sortedRequiredWorkspaceDependencies;
 
-    if (this.typeIs('angular-lib') && this.workspaceDependenciesServers.length > 0) {
+    if (this.isWorkspaceChildProject && this.typeIs('angular-lib') && this.workspaceDependenciesServers.length > 0) {
       deps = deps.concat(this.workspaceDependenciesServers);
       // TODO handle deps of project.workspaceDependenciesServers
+    }
+    if (this.isStandaloneProject) {
+      deps = deps.filter(d => d.name !== this.name);
     }
     return deps;
   }
@@ -120,7 +152,7 @@ export abstract class DependencyProject {
 
 
   public get sortedRequiredWorkspaceDependencies(this: Project): Project[] {
-    if (!this.isWorkspaceChildProject) {
+    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
       return [];
     }
     return this.libsForTraget(this).concat([this])
@@ -128,7 +160,7 @@ export abstract class DependencyProject {
 
 
   libsForTraget(this: Project, project: Project) {
-    if (!this.isWorkspaceChildProject) {
+    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
       return [];
     }
     return libs([{ project: project as any, appBuild: false }]).map(c => c.project);
@@ -183,14 +215,16 @@ function libs(targetClients: ProjectBuild[], targetAsLibAlso = false) {
   targetLibs.forEach(lib => recrusiveSearchForDependencies(lib));
 
   let count = 0;
-  let lastArr = [];
-  while (reorderResult(result, r => { result = r; })) {
-    Helpers.log(`Sort(${++count}) \n ${result.map(c => c.genericName).join('\n')}\n `, 1);
-    if (_.isEqual(lastArr, result.map(c => c.name))) {
-      break;
-    }
-    lastArr = result.map(c => c.name);
-  }
+  let lastArr = [] as string[];
+  result = reorderResult(result);
+  // while (reorderResult(result, r => { result = r; })) {
+  //   Helpers.log(`Sort(${++count})\n${result.map(c => c.genericName).join('\n')}\n `, 1);
+  //   if (_.isEqual(lastArr, result.map(c => c.name))) {
+  //     console.log(`EQUAL ARRAY:\n` + lastArr.map(a => '-' + a).join('\n'))
+  //     break;
+  //   }
+  //   lastArr = result.map(c => c.name);
+  // }
 
   if (targetAsLibAlso) {
     targetClients
@@ -204,21 +238,42 @@ function libs(targetClients: ProjectBuild[], targetAsLibAlso = false) {
 }
 
 
-function reorderResult(result = [], update: (result) => void): boolean {
-  let neededNextOrder = false;
-  result.some((res, index, arr) => {
-    return !_.isUndefined(result.find((res2, index2, arr2) => {
+function reorderResult(result = [] as Project[]) {
+  let i = 0;
+  let maxNoup = 0;
+  let MAX_NO_UPDATE_IN_ROW = (result.length + 1);
+  let count = 1;
+  while (true) {
+    const res = result[i];
+    const updateTriggered = !_.isUndefined(result.slice(i + 1).find((res2) => {
       if (res.name === res2.name) {
         return false;
       }
       if (!_.isUndefined(res.workspaceDependencies.find(wd => wd.name === res2.name))) {
-        result = Helpers.arrays.arrayMoveElementBefore(result, res2, res);
-        update(result);
-        neededNextOrder = true;
+        Helpers.log(`+ ${res.name} has no dependency ${res2.name}`, 1)
+        result = Helpers.arrays.arrayMoveElementBefore<Project>(result, res2, res, 'location');
         return true;
       }
       return false;
     }));
-  });
-  return neededNextOrder;
+    if (i === (result.length - 1)) {
+      i = 0;
+    } else {
+      i++;
+    }
+
+    if (updateTriggered) {
+      Helpers.log(`Sort(${++count})\n${result.map(c => c.genericName).join('\n')}\n `, 1);
+      maxNoup = 0;
+      continue;
+    } else {
+      maxNoup++;
+      Helpers.log(`SORT NO UPDATE..`)
+    }
+    if (maxNoup === MAX_NO_UPDATE_IN_ROW) {
+      break;
+    }
+  }
+
+  return result;
 }

@@ -1,3 +1,4 @@
+//#region imports
 import * as _ from 'lodash';
 import * as express from 'express';
 import * as path from 'path';
@@ -9,23 +10,9 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
 import { chainBuild } from './chain-build.backend';
+//#endregion
 
-export async function DEVB() {
-  const command = 'tnp bdw ss-common-ui --forClient=ss-common-ui -verbose';
-  await (Project.Current as Project).run(command, {
-    output: true,
-    prefix: chalk.bold(`[testowy prefix] `)
-  }).unitlOutputContains('Watching for file changes.',
-    [
-      'Command failed:',
-      'Compilation error'
-    ]);
-  process.exit(0)
-}
-
-/**
- * CHAIN BUILD
- */
+//#region BUILD
 const $BUILD = async (args) => {
   await chainBuild(args)
 };
@@ -61,8 +48,6 @@ async function $DEFAULT_BUILD(args) {
   }
 }
 
-
-
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
   (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
@@ -80,9 +65,9 @@ const BUILD_DIST_ALL = async (args) => {
 };
 const BUILD_BUNDLE = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'bundle', args);
 const BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+//#endregion
 
-
-
+//#region STATIC BUILD
 const STATIC_BUILD = async (args) => {
   if (!(Project.Current as Project).isWorkspace) {
     Helpers.error(`Please use:
@@ -119,7 +104,6 @@ const STATIC_BUILD_PROD = async (args) => {
   } else {
     Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
   }
-
 }
 
 const STATIC_BUILD_LIB_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
@@ -129,8 +113,17 @@ const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).Sta
   .startForApp({ args, staticBuildAllowed: true })
 
 const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForApp({ prod: true, args, staticBuildAllowed: true })
+  .startForApp({ prod: true, args, staticBuildAllowed: true });
 
+const SB = (args) => STATIC_BUILD(args);
+const SBP = (args) => STATIC_BUILD_PROD(args);
+const SBL = (args) => STATIC_BUILD_LIB(args);
+const SBLP = (args) => STATIC_BUILD_LIB_PROD(args);
+const SBA = (args) => STATIC_BUILD_APP(args);
+const SBAP = (args) => STATIC_BUILD_APP_PROD(args);
+//#endregion
+
+//#region SERVE
 const $SERVE = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (!proj) {
@@ -207,7 +200,6 @@ const $SERVE = async (args) => {
 
 };
 
-
 const $START = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
@@ -224,21 +216,9 @@ const $START = async (args) => {
 const $RUN = async (args) => {
   await $START(args);
 };
+//#endregion
 
-const $BACKUP = async (args) => {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as ProjectDocker;
-  await proj.saveToFile();
-  process.exit(0);
-};
-
-
-const SB = (args) => STATIC_BUILD(args);
-const SBP = (args) => STATIC_BUILD_PROD(args);
-const SBL = (args) => STATIC_BUILD_LIB(args);
-const SBLP = (args) => STATIC_BUILD_LIB_PROD(args);
-const SBA = (args) => STATIC_BUILD_APP(args);
-const SBAP = (args) => STATIC_BUILD_APP_PROD(args);
-
+//#region BUILD
 async function BUILD_LIB(args) {
   await BUILD_DIST(args);
 }
@@ -267,7 +247,6 @@ const $START_APP = async (args) => {
 };
 
 
-
 const $BUILD_PROD = async (args) => {
   if ((Project.Current as Project).typeIs(...config.allowedTypes.libs)) {
     await (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
@@ -277,67 +256,89 @@ const $BUILD_PROD = async (args) => {
   }
   process.exit(0);
 };
-
-const $STATIC_START = async (args) => $START(args);
 const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
+//#endregion
 
-const $INSTALL_LOCALLY = async (args) => {
+//#region RELEASE
+
+//#region RELEASE NORMAL
+const $RELEASE = async (args: string) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isVscodeExtension) {
-    await proj.installLocaly(argsObj);
-  }
-  process.exit(0);
-};
-
-const $RELEASE = async (args) => {
-  const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
-  argsObj.args = args;
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  const proj = Project.Current as Project;
+  //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   if (proj.isContainer) {
-    // const projects = proj.childrenThatAreLibs;
-    // // const allProjectToConsider = projects.find(d => d.frameworkVersionAtLeast('v2'));
-    // const allProjectToConsider = Helpers.arrays.uniqArray<Project>(projects, 'location') as Project[];
+    global.tnpNonInteractive = true;
 
-    // const result = projects.map(p => {
-    //   let copyto = Helpers.deps.recrusiveFind<Project>(p, allProjectToConsider);
-    //   // proj.name.startsWith('tnp') && Helpers.log(`copyto for ${proj.genericName}
+    const { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
+      return Project.From(path.join(proj.location, a));
+    })
+    args = commandString;
 
-    //   // ${copyto.sort().map(c => c.name).join('\n')}
+    const deps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name)
 
-    //   // `);
-    //   // process.stdin.resume()
-    //   copyto = copyto.filter(c => !_.isUndefined(projects.find(a => a.name === c.name)));
-    //   copyto = Helpers.arrays.uniqArray<Project>(copyto, 'location');
-    //   return { project: p, copyto }
-    // });
-    // // process.exit(0)
-    // const deps = result; // Helpers.deps.sort<Project>(result);
 
-    // Helpers.info(`deps: ${deps.map(p => `
+    for (let index = 0; index < deps.length; index++) {
+      Helpers.clearConsole();
+      const child = deps[index] as Project;
 
-    // ${p.project.name} - ${p.copyto.map( c => c.name ).join(',')}
+      Helpers.info(`
 
-    // `).join(',\n')}`);
+    PROJECTS FOR RELEASE CHAIN:
+
+${deps.map((p, i) => {
+        const bold = (child.name === p.name);
+        const index = i + 1;
+        return `${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name}`
+      }).join('\n')}
+
+
+${Helpers.terminalLine()}
+processing...
+    `)
+
+
+      const lastBuildHash = child.packageJson.getBuildHash();
+      const lastTagHash = child.git.lastTagHash();
+      if (lastBuildHash !== lastTagHash) {
+        await child.release(handleStandalone(child, {}));
+      } else {
+        Helpers.warn(`
+
+        RELEASE SKIP
+        No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
+
+        `); // hash in package.json to check
+        child.git.pushCurrentBranch();
+      }
+      // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
+
+    }
+    process.exit(0)
 
   } else {
-    proj.checkIfReadyForNpm();
-    if (proj.packageJson.libReleaseOptions.obscure) {
-      argsObj.obscure = true;
-    }
-    if (proj.packageJson.libReleaseOptions.ugly) {
-      argsObj.uglify = true;
-    }
-    if (proj.packageJson.libReleaseOptions.nodts) {
-      argsObj.nodts = true;
-    }
-    await proj.release(argsObj);
+    await proj.release(handleStandalone(proj, argsObj));
   }
   process.exit(0)
 };
 
+function handleStandalone(proj: Project, argsObj: any) {
+  if (proj.packageJson.libReleaseOptions.obscure) {
+    argsObj.obscure = true;
+  }
+  if (proj.packageJson.libReleaseOptions.ugly) {
+    argsObj.uglify = true;
+  }
+  if (proj.packageJson.libReleaseOptions.nodts) {
+    argsObj.nodts = true;
+  }
+  return argsObj;
+}
+
+//#endregion
+
+//#region RELEASE OBSCURE
 const $RELEASE_OBSCURED = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.obscure = true;
@@ -349,10 +350,53 @@ const $RELEASE_OBSCURED = async (args) => {
 
   process.exit(0)
 };
+//#endregion
 
+//#endregion
+
+//#region OTHER
 const BDW = (args) => BUILD_DIST_WATCH(args);
 const BLW = (args) => BUILD_DIST_WATCH(args);
 const $BAW = (args) => BUILD_APP_WATCH(args);
+
+const $RECREATE = () => {
+  const proj = Project.Current;
+  if (proj.isContainer) {
+    const childs = (proj.children as Project[])
+      .filter(c => c.frameworkVersionAtLeast('v2') && !c.isTnp);
+    for (let index = 0; index < childs.length; index++) {
+      const c = childs[index];
+      c.git.restoreLastVersion(config.file.package_json);
+    }
+    Project.projects = [];
+    for (let index = 0; index < childs.length; index++) {
+      let c = childs[index];
+      childs[index] = Project.From(c.location);
+      c = childs[index];
+      Helpers.info(`Saving package for ${c.location}`)
+      c.packageJson.save(`rereating container`)
+    }
+  }
+  process.exit(0)
+}
+
+const $BACKUP = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as ProjectDocker;
+  await proj.saveToFile();
+  process.exit(0);
+};
+
+const $STATIC_START = async (args) => $START(args);
+
+const $INSTALL_LOCALLY = async (args) => {
+  const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
+  argsObj.args = args;
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isVscodeExtension) {
+    await proj.installLocaly(argsObj);
+  }
+  process.exit(0);
+};
 
 async function $BUILD_DOCS(args) {
   if ((Project.Current as Project).isStandaloneProject) {
@@ -418,12 +462,13 @@ async function $ACTIVE_SINGULAR_BUILD(args) {
   // process.stdout.write();
   process.exit(0)
 }
-
+//#endregion
 
 export default {
+  //#region export default
+  $RECREATE: Helpers.CLIWRAP($RECREATE, '$RECREATE'),
   $BUILD_DOCS: Helpers.CLIWRAP($BUILD_DOCS, '$BUILD_DOCS'),
   $BUILD_DOCS_PROD: Helpers.CLIWRAP($BUILD_DOCS_PROD, '$BUILD_DOCS_PROD'),
-  DEVB: Helpers.CLIWRAP(DEVB, 'DEVB'),
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $CLEAN_BUILD: Helpers.CLIWRAP($CLEAN_BUILD, '$CLEAN_BUILD'),
   $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
@@ -476,4 +521,5 @@ export default {
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
+  //#endregion
 };

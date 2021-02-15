@@ -189,7 +189,7 @@ export abstract class LibProject {
     }
   }
 
-  private commit(this: Project, newVer) {
+  private commit(this: Project, newVer: string, message = 'new version') {
     const gitRootProject = $Project.nearestTo(this.location, { findGitRoot: true });
     try {
       Helpers.info(`[git][release] Adding current git changes...`)
@@ -200,7 +200,7 @@ export abstract class LibProject {
 
     try {
       Helpers.info(`[git][release] Commiting automatic message`)
-      gitRootProject.run(`git commit -m "new version ${newVer}"`).sync()
+      gitRootProject.run(`git commit -m "${message} ${newVer}"`).sync()
     } catch (error) {
       Helpers.warn(`Failed to git commit -m "new vers...`);
     }
@@ -247,6 +247,14 @@ export abstract class LibProject {
 
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
     if (_.isUndefined(releaseOptions.useTempFolder)) {
+      this.checkIfReadyForNpm();
+      if (this.targetProjects.exists) {
+        if (global.tnpNonInteractive) {
+          Helpers.warn(`Ommiting relese for project with "target projects"`)
+          return;
+        }
+        Helpers.error(`You can't release project with target projects`, false, true);
+      }
       releaseOptions.useTempFolder = true;
     }
 
@@ -324,6 +332,13 @@ export abstract class LibProject {
       this.packageJson.save('show for release')
       this.run(`tnp init`).sync();
 
+      Helpers.info(`BUILD OPTION (${this.name}):
+      prod=${!!prod},
+      obscure=${!!obscure},
+      nodts=${!!nodts},
+      uglify=${!!nodts}
+      `)
+
       await this.build(BuildProcess.prepareOptionsBuildProcess({
         prod,
         obscure,
@@ -381,8 +396,10 @@ export abstract class LibProject {
     });
     this.packageJson.showDeps(`after release show when ok`);
 
-    this.run(`code .`).sync();
-    Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
+    if (!global.tnpNonInteractive) {
+      this.run(`code .`).sync();
+      Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
+    }
 
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
       let successPublis = false;
@@ -462,6 +479,7 @@ export abstract class LibProject {
         } else {
           this.pushToGitRepo(newVersion)
         }
+
       }
     }, () => {
       removeTagAndCommit()
@@ -487,8 +505,10 @@ export abstract class LibProject {
   }
 
   async pushToGitRepo(this: Project, newVersion: string) {
-
     await this.tagVersion(newVersion);
+    this.packageJson.setBuildHash(this.git.lastCommitHash());
+    this.packageJson.save('updating hash');
+    this.commit(newVersion, `build hash update`);
     console.log('Pushing to git repository... ')
     const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
     console.log(`Git branch: ${branchName}`)

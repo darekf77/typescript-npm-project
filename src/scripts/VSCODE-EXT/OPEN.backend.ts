@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 import * as express from 'express';
 import * as path from 'path';
 import * as fse from 'fs-extra';
-
-import {  Project } from '../../project';
+import { config } from 'tnp-config';
+import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
@@ -77,11 +77,20 @@ function $OPEN_BASELINE() {
 async function $OPEN(args: string) {
   const db = await TnpDB.Instance();
   const name = _.first(args.split(' '));
-  const projects = (await db.getProjects()).filter(p => {
-    return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
-  });
+  let projects = []
+  if (config.coreProjectVersions.includes(name) && Project.Current.isContainer) {
+    projects = (Project.Current.children as Project[]).filter(c => c.frameworkVersionAtLeast(name as any));
+  } else {
+    projects = (await db.getProjects()).filter(p => {
+      return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
+    }).map(c => c.project);
+  }
   if (projects.length > 0) {
-    Helpers.run(`code ${projects.map(c => (c.project as Project).location).join(' ')}`).sync();
+    for (let index = 0; index < projects.length; index++) {
+      const p = projects[index];
+      Helpers.run(`code ${p.location}`, { biggerBuffer: false }).sync();
+    }
+    process.exit(0);
   } else {
     Helpers.log(`Projects not found`);
     process.exit(0)
