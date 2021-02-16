@@ -190,7 +190,7 @@ export abstract class LibProject {
   }
 
   private commit(this: Project, newVer: string, message = 'new version') {
-    this.git.commit(`${message} ${newVer}`, true);
+    this.git.commit(`${message} ${newVer}`);
   }
 
   public compileES5version(this: Project) {

@@ -469,7 +469,9 @@
     "obscure": true,
     "ugly": true
   },
-  "scripts": {},
+  "scripts": {
+    "activate": "firedev bd && firedev link"
+  },
   "license": "MIT",
   "private": false,
   "main": "index.js"

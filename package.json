@@ -470,21 +470,24 @@
       "obscure": true,
       "ugly": true
     },
-    "scripts": {},
+    "scripts": {
+      "activate": "firedev bd && firedev link"
+    },
     "license": "MIT",
     "private": false,
     "main": "index.js"
   },
   "name": "tnp",
   "version": "0.0.79",
-  "scripts": {},
+  "scripts": {
+    "activate": "firedev bd && firedev link"
+  },
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp",
-    "tnp-ins": "bin/tnp-ins",
-    "tnp-debug": "bin/tnp-debug"
+    "tnp-debug": "bin/tnp-debug",
+    "tnp-ins": "bin/tnp-ins"
   },
-  "preferGlobal": true,
   "devDependencies": {},
   "dependencies": {
     "@angular-devkit/build-angular": "~0.901.3",
@@ -579,14 +582,19 @@
     "compression": "1.7.4",
     "concurrently": "^3.5.1",
     "content-type": "^1.0.4",
+    "conventional-changelog-cli": "2.1.1",
     "cookie-parser": "^1.4.3",
     "copy-paste": "~1.3.0",
     "core-js-compat": "3.4.0",
     "cors": "^2.8.4",
     "cpr": "^3.0.1",
     "cpuid": "^0.1.3",
+    "cross-env": "7.0.2",
     "dateformat": "^3.0.3",
     "diff": "^3.2.0",
+    "electron": "11.0.3",
+    "electron-builder": "22.9.1",
+    "electron-reload": "1.5.0",
     "element-resize-detector": "1.1.15",
     "enquirer": "^2.3.0",
     "enum-values": "1.2.1",
@@ -632,7 +640,7 @@
     "lodash": "^4.17.4",
     "lodash-walk-object": "~1.0.7",
     "lowdb": "^1.0.0",
-    "magic-renamer": "0.0.4",
+    "magic-renamer": "~0.0.4",
     "material-design-icons": "3.0.1",
     "method-override": "^2.3.10",
     "minimist": "^1.2.0",
@@ -642,7 +650,7 @@
     "morphi": "~4.0.8",
     "ng-modal-lib": "0.0.6",
     "ng-packagr": "^5.7.1",
-    "ng-talkback": "2.4.5",
+    "ng-talkback": "~2.4.5",
     "ng2-file-upload": "^1.3.0",
     "ng2-logger": "~4.0.12",
     "ng2-rest": "~11.0.11",
@@ -689,6 +697,7 @@
     "sloc": "^0.2.0",
     "socket.io": "^2.0.4",
     "sort-package-json": "^1.11.0",
+    "spectron": "13.0.0",
     "sqlite3": "4.0.9",
     "static-columns": "~1.0.11",
     "string-similarity": "~4.0.2",
@@ -715,24 +724,15 @@
     "uuid": "^8.3.2",
     "validator": "^9.2.0",
     "vpn-split": "~0.0.1",
+    "vscode": "^1.1.37",
+    "wait-on": "5.0.1",
     "wait.for": "0.6.6",
     "watch": "~1.0.2",
+    "webdriver-manager": "12.1.7",
     "webpack-cli": "3.3.11",
     "zone.js": "~0.10.2"
   },
   "license": "MIT",
-  "isomorphicPackages": [
-    "browserify-sign",
-    "json10",
-    "lodash-walk-object",
-    "morphi",
-    "ng2-logger",
-    "ng2-rest",
-    "timespan",
-    "typeorm",
-    "typescript-class-helpers",
-    "incremental-compiler"
-  ],
   "private": false,
   "husky": {
     "hooks": {

@@ -321,9 +321,9 @@ processing...
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
 
-    proj.git.commit(`Update after release`, true);
+    proj.git.commit(`Update after release`);
     proj.git.pushCurrentBranch();
-    Project.Tnp.git.commit(`Update after release`, true)
+    Project.Tnp.git.commit(`Update after release`)
     Project.Tnp.git.pushCurrentBranch();
     process.exit(0)
 

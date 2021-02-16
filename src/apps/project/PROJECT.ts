@@ -9,8 +9,8 @@ import { Log } from 'ng2-logger';
 import { config } from 'tnp-config';
 import type { ProjectController } from './ProjectController';
 //#endregion
-//#region @backend
 import { TnpDB } from 'tnp-db';
+//#region @backend
 import * as fse from 'fs-extra';
 import * as glob from 'glob';
 import * as path from 'path';

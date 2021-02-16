@@ -1,12 +1,5 @@
 {
   "files.exclude": {
-    "@ngx-formly": true,
-    "lowdb": true,
-    "misc-utils-of-mine-generic": true,
-    "*.sh": true,
-    "*.xlsx": true,
-    "scripts": true,
-    "bin": true,
     "webpack.backend-bundle-build.js": true,
     "node_modules": true,
     "tmp*": true,
@@ -42,7 +35,6 @@
     ".vscode/launch.json.filetemplate": true,
     ".vscode/tasks.json.filetemplate": true,
     "tsconfig.json.filetemplate": true,
-    "projects/tmp*": true,
     ".gitignore": true,
     ".npmignore": true,
     ".babelrc": true,
