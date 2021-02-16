@@ -469,9 +469,7 @@
     "obscure": true,
     "ugly": true
   },
-  "scripts": {
-    "postinstall": "npm i -g npm-run@4.1.2 --ignore-scripts && npm-run tsc && npm link --ignore-scripts && tnp dedupe && tnp bd"
-  },
+  "scripts": {},
   "license": "MIT",
   "private": false,
   "main": "index.js"
