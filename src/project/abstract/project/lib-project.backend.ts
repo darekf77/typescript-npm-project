@@ -102,7 +102,7 @@ export abstract class LibProject {
     }
     if (outDir === 'bundle') {
       this.linkWhenExist(config.folder.node_modules, outDir);
-      this.linkWhenExist('package.json', path.join(outDir, config.folder.browser));
+      this.linkWhenExist('package.json', path.join(outDir, config.folder.client));
     }
   }
 
@@ -373,7 +373,7 @@ export abstract class LibProject {
     });
 
     [
-      config.folder.browser,
+      // config.folder.browser, /// TODO FIX for typescript
       config.folder.client,
       '',
     ].forEach(c => {
