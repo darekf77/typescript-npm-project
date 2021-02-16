@@ -26,6 +26,8 @@
         "ryanlaws.toggle-case",
         "msjsdiag.debugger-for-chrome",
         "ms-vscode-remote.remote-containers",
-        "mrmlnc.vscode-json5"
+        "mrmlnc.vscode-json5",
+        "dnicolson.binary-plist",
+        "ivangabriele.vscode-git-add-and-commit"
     ]
 }
