@@ -296,28 +296,28 @@ processing...
     };
     //#endregion
 
-    // for (let index = 0; index < deps.length; index++) {
-    //   Helpers.clearConsole();
-    //   const child = deps[index] as Project;
+    for (let index = 0; index < deps.length; index++) {
+      Helpers.clearConsole();
+      const child = deps[index] as Project;
 
-    //   Helpers.info(projsTemplate(child));
+      Helpers.info(projsTemplate(child));
 
-    //   const lastBuildHash = child.packageJson.getBuildHash();
-    //   const lastTagHash = child.git.lastTagHash();
-    //   if (lastBuildHash !== lastTagHash) {
-    //     await child.release(handleStandalone(child, {}));
-    //   } else {
-    //     Helpers.warn(`
+      const lastBuildHash = child.packageJson.getBuildHash();
+      const lastTagHash = child.git.lastTagHash();
+      if (lastBuildHash !== lastTagHash) {
+        await child.release(handleStandalone(child, {}));
+      } else {
+        Helpers.warn(`
 
-    //     RELEASE SKIP
-    //     No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
+        RELEASE SKIP
+        No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
 
-    //     `); // hash in package.json to check
-    //     child.git.pushCurrentBranch();
-    //   }
-    //   // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
+        `); // hash in package.json to check
+        child.git.pushCurrentBranch();
+      }
+      // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
-    // }
+    }
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
 
