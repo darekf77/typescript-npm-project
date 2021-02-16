@@ -190,20 +190,7 @@ export abstract class LibProject {
   }
 
   private commit(this: Project, newVer: string, message = 'new version') {
-    const gitRootProject = $Project.nearestTo(this.location, { findGitRoot: true });
-    try {
-      Helpers.info(`[git][release] Adding current git changes...`)
-      gitRootProject.run(`git add --all . `).sync()
-    } catch (error) {
-      Helpers.warn(`Failed to git add --all .`);
-    }
-
-    try {
-      Helpers.info(`[git][release] Commiting automatic message`)
-      gitRootProject.run(`git commit -m "${message} ${newVer}"`).sync()
-    } catch (error) {
-      Helpers.warn(`Failed to git commit -m "new vers...`);
-    }
+    this.git.commit(`${message} ${newVer}`, true);
   }
 
   public compileES5version(this: Project) {

@@ -276,19 +276,15 @@ const $RELEASE = async (args: string) => {
     })
     args = commandString;
 
-    const deps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name)
-
-
-    for (let index = 0; index < deps.length; index++) {
-      Helpers.clearConsole();
-      const child = deps[index] as Project;
-
-      Helpers.info(`
+    const deps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name);
+    //#region projs tempalte
+    const projsTemplate = (child?: Project) => {
+      return `
 
     PROJECTS FOR RELEASE CHAIN:
 
 ${deps.map((p, i) => {
-        const bold = (child.name === p.name);
+        const bold = (child?.name === p.name);
         const index = i + 1;
         return `${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name}`
       }).join('\n')}
@@ -296,33 +292,39 @@ ${deps.map((p, i) => {
 
 ${Helpers.terminalLine()}
 processing...
-    `)
+    `
+    };
+    //#endregion
 
+    // for (let index = 0; index < deps.length; index++) {
+    //   Helpers.clearConsole();
+    //   const child = deps[index] as Project;
 
-      const lastBuildHash = child.packageJson.getBuildHash();
-      const lastTagHash = child.git.lastTagHash();
-      if (lastBuildHash !== lastTagHash) {
-        await child.release(handleStandalone(child, {}));
-      } else {
-        Helpers.warn(`
+    //   Helpers.info(projsTemplate(child));
 
-        RELEASE SKIP
-        No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
+    //   const lastBuildHash = child.packageJson.getBuildHash();
+    //   const lastTagHash = child.git.lastTagHash();
+    //   if (lastBuildHash !== lastTagHash) {
+    //     await child.release(handleStandalone(child, {}));
+    //   } else {
+    //     Helpers.warn(`
 
-        `); // hash in package.json to check
-        child.git.pushCurrentBranch();
-      }
-      // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
+    //     RELEASE SKIP
+    //     No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
 
-    }
-    try {
-      proj.git.commit(`Update after release`, true);
-      proj.git.pushCurrentBranch();
-    } catch (error) { }
-    try {
-      Project.Tnp.git.commit(`Update after release`, true)
-      Project.Tnp.git.pushCurrentBranch();
-    } catch (error) { }
+    //     `); // hash in package.json to check
+    //     child.git.pushCurrentBranch();
+    //   }
+    //   // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
+
+    // }
+    Helpers.clearConsole();
+    Helpers.info(projsTemplate());
+
+    proj.git.commit(`Update after release`, true);
+    proj.git.pushCurrentBranch();
+    Project.Tnp.git.commit(`Update after release`, true)
+    Project.Tnp.git.pushCurrentBranch();
     process.exit(0)
 
   } else {
