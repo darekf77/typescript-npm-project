@@ -16,6 +16,7 @@ import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
 import * as _ from 'lodash';
+import { SmartNodeModules } from '../../features/smart-node-modules.backend';
 
 
 
@@ -75,6 +76,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public quickFixes: QuickFixes;
+  //#endregion
+
+  //#region @backend
+  public smartNodeModules: SmartNodeModules;
   //#endregion
 
   //#region @backend

@@ -13,7 +13,7 @@ import { config } from 'tnp-config';
 import { FeatureForProject } from '../../abstract';
 
 //#region dedupe packages
-export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false) {
+export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false, warnings = true) {
   let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
     (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
   // console.log('(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe)
@@ -57,7 +57,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
     const current = Project.From<Project>(pathToCurrent);
 
     if (!current) {
-      Helpers.warn(`Project with name ${f} not founded`);
+      warnings && Helpers.warn(`Project with name ${f} not founded`);
       return
     }
     Helpers.log(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)

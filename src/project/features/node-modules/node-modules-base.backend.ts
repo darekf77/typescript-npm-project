@@ -30,9 +30,22 @@ export class NodeModulesBase extends NodeModulesCore {
    * @param triggerMsg reason to copy packages
    */
   public async copyFrom(source: Project, triggerMsg: string) {
-    source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
+
     Helpers.log(`[node_modules] Copy instalation of npm packages from ` +
       `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
+
+    if (source.smartNodeModules.exists) {
+      this.project.node_modules.remove();
+      Helpers.mkdirp(this.project.node_modules.path);
+      Helpers.foldersFrom(source.smartNodeModules.path).forEach(f => {
+        const dest = path.join(this.project.node_modules.path, path.basename(f));
+        Helpers.createSymLink(f, dest);
+      })
+      return;
+    }
+
+    source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg}`);
+
 
     // global.spinner.start()
 

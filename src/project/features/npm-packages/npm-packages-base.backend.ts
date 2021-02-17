@@ -12,12 +12,18 @@ import { PROGRESS_DATA } from 'tnp-models';
 
 export class NpmPackagesBase extends NpmPackagesCore {
 
+  get useSmartInstall() {
+    return this.project.isStandaloneProject
+      || this.project.isWorkspace
+      || this.project.isWorkspaceChildProject
+  }
+
   public async installProcess(triggeredMsg: string, options?: Models.npm.NpmInstallOptions) {
     if (!global.globalSystemToolMode) {
       return;
     }
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `npm instalation for "${this.project.genericName}" started..` });
+      PROGRESS_DATA.log({ msg: `${this.useSmartInstall ? 'SMART ' : ''}npm instalation for "${this.project.genericName}" started..` });
     }
     options = fixOptionsNpmInstall(options, this.project);
 
@@ -53,7 +59,6 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
     }
 
-
     if (!this.emptyNodeModuls) {
       if (this.project.isContainer) {
         this.project.node_modules.remove();
@@ -74,15 +79,19 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      const installAllowed = (!this.project.isContainer || this.project.isContainerWithLinkedProjects);
+      const installAllowed = (!this.project.isContainer || this.project.isContainerWithLinkedProjects || this.project.isContainerCoreProject);
 
       if (installAllowed) {
-        if (fullInstall) {
-          this.actualNpmProcess({ reason: triggeredMsg, smoothInstall })
+        if (this.useSmartInstall) {
+          this.project.smartNodeModules.install(remove ? 'uninstall' : 'install', ...npmPackages);
         } else {
-          npmPackages.forEach(pkg => {
-            this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
-          });
+          if (fullInstall) {
+            this.actualNpmProcess({ reason: triggeredMsg, smoothInstall })
+          } else {
+            npmPackages.forEach(pkg => {
+              this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
+            });
+          }
         }
       } else {
         Helpers.log(`Dont install node_modules - project is container`)

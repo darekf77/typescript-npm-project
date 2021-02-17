@@ -86,6 +86,9 @@
         "@ngx-formly/ionic",
         "@ngx-formly/material"
       ],
+      "neverAsLink":[
+
+      ],
       "stubForBackend": [
         "@ngx-formly/core",
         "@ngx-formly/bootstrap",

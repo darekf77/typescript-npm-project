@@ -348,8 +348,8 @@ export class CopyManager extends FeatureForProject {
 
       //#region copy package json to browser folder
       if (specyficFileRelativePath === config.file.package_json) {
-
-        Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+        // TODO this is VSCODE/typescirpt new fucking issue
+        // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
       }
       //#endregion
 

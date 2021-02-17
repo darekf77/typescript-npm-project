@@ -145,6 +145,15 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  get isContainerCoreProject(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isContainerCoreProject;
+    }
+    //#region @backend
+    return this.isContainer && this.isCoreProject;
+    //#endregion
+  }
+
 
   get isContainerChild(this: Project) {
     if (Helpers.isBrowser) {

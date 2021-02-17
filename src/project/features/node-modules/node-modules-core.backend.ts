@@ -19,12 +19,25 @@ import {
 export class NodeModulesCore extends FeatureForProject {
 
   public get path() { return path.join(this.project.location, config.folder.node_modules); }
+  public pathFor(packageName: string) {
+    return path.join(this.path, packageName);
+  }
   public get exist() { return nodeModulesExists(this.project); }
   public get isLink() { return Helpers.isLink(this.path); }
-  public dedupe = (packages?: string[]) => dedupePackages(this.project.location, packages);
+  public dedupe = (packages?: string[]) => {
+    dedupePackages(this.project.location, packages, false, !this.project.npmPackages.useSmartInstall)
+  };
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
-  public dedupeCount = (packages?: string[]) => dedupePackages(this.project.location, packages, true);
-  public remove = () => Helpers.tryRemoveDir(this.path);
+  public dedupeCount = (packages?: string[]) => {
+    dedupePackages(this.project.location, packages, true, !this.project.npmPackages.useSmartInstall)
+  };
+  public remove = (packageInside?: string) => {
+    if (packageInside) {
+      Helpers.removeIfExists(path.join(this.path, packageInside))
+      return;
+    }
+    Helpers.tryRemoveDir(this.path)
+  };
   public linkToProject = (target: Project) => {
     if (!this.project.node_modules.exist) {
       this.project.run(`${config.frameworkName} install`).sync();
