@@ -307,7 +307,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       .filter(key => isomorphicPackages.includes(key))
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.devDependencies[packageIsomorphicName];
-        if (!v.startsWith('~') && !v.startsWith('^')) {
+        if (!v?.startsWith('~') && !v?.startsWith('^')) {
           project.packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
         }
       });
