@@ -335,6 +335,13 @@ processing...
     proj.git.pushCurrentBranch();
     Project.Tnp.git.commit(`Update after release`)
     Project.Tnp.git.pushCurrentBranch();
+    Helpers.info(`
+
+
+    R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(proj.genericName)}  D O N E
+
+
+    `)
     process.exit(0)
 
   } else {
