@@ -237,13 +237,16 @@ export class NpmProject {
   //#endregion
 
   //#region @backend
-  public checkIfReadyForNpm(this: Project) {
+  public checkIfReadyForNpm(this: Project,soft = false) {
     if (this.typeIs('unknow')) {
       return false;
     }
     // log('TYPEEEEE', this.type)
     const libs: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
+      if(soft) {
+        return false;
+      }
       Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`, false, true);
     }
     return true;

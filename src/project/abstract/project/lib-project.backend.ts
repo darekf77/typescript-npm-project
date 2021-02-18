@@ -234,7 +234,10 @@ export abstract class LibProject {
 
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
     if (_.isUndefined(releaseOptions.useTempFolder)) {
-      this.checkIfReadyForNpm();
+      if (!this.checkIfReadyForNpm(true)) {
+        Helpers.warn(`Project "${this.name}" is not ready for npm release`)
+        return;
+      }
       if (this.isPrivate) {
         Helpers.warn(`Cannot release private project ${chalk.bold(this.genericName)}`)
         return;
