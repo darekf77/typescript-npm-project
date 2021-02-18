@@ -111,7 +111,7 @@ export class SmartNodeModules extends FeatureForProject {
               tempProj.npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
             ) {
               const verrrr = tempProj.npmPackages.package(dedupePkgName);
-              Helpers.warn(`[override package][dedupe] ${chalk.bold(dedupePkgName)}@${verrrr} won't be satisfy`
+              Helpers.warn(`[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy`
                 + ` in this repository by version "${existedVersionInMainNodeModules}"`);
             }
           });
@@ -124,7 +124,7 @@ export class SmartNodeModules extends FeatureForProject {
         Helpers.createSymLink(overrideFrom, overrideDest);
 
         Helpers.foldersFrom(tempProj.node_modules.path)
-          .filter(depName => depName !== packageName)
+          .filter(depName => path.basename(depName) !== packageName)
           .forEach(depName => {
             depName = path.basename(depName);
             const verrr = tempProj.npmPackages.package(depName).version;
@@ -132,10 +132,10 @@ export class SmartNodeModules extends FeatureForProject {
             const destProj = this.project.npmPackages.package(depName);
             if (Helpers.exists(destProj.location)) {
               if (fromProj.isNotSatisfyBy(destProj.version)) {
-                Helpers.warn(`[override package][link] ${chalk.bold(depName)}@${verrr} won't be satisfy`
+                Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
                   + ` in this repository by version "${destProj.version}"`);
               } else {
-                Helpers.log(`[override package][link] copying new package ${chalk.bold(depName)} to main node_modules`)
+                Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
               }
             } else {
               Helpers.createSymLink(fromProj.location, destProj.location);
