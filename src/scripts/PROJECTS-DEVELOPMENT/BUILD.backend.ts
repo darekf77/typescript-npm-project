@@ -276,7 +276,16 @@ const $RELEASE = async (args: string) => {
     })
     args = commandString;
 
-    const deps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name);
+
+    const npmDeps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name);
+    const otherDeps = proj.children.filter(c => {
+      return !npmDeps.includes(c);
+    })
+
+    const deps = [
+      ...npmDeps,
+      ...otherDeps,
+    ]
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
       return `
@@ -313,6 +322,7 @@ processing...
         No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
 
         `); // hash in package.json to check
+        child.git.commit();
         child.git.pushCurrentBranch();
       }
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);

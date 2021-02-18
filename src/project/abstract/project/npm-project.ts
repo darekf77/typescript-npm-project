@@ -33,6 +33,16 @@ export class NpmProject {
     //#endregion
   }
 
+  get isPrivate(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isPrivate;
+    }
+    //#region @backend
+    return this.packageJson && this.packageJson.isPrivate;
+    //#endregion
+  }
+
+
   get lastNpmVersion(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.lastNpmVersion;
@@ -234,7 +244,7 @@ export class NpmProject {
     // log('TYPEEEEE', this.type)
     const libs: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
-      Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`)
+      Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`, false, true);
     }
     return true;
   }

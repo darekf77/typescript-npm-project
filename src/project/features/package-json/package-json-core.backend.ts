@@ -103,6 +103,10 @@ export class PackageJsonCore {
     return this.data.version;
   }
 
+  get isPrivate() {
+    return this.data.private;
+  }
+
   get resources(): string[] {
     const p = this.data.tnp;
     return Array.isArray(p.resources) ? p.resources : [];
