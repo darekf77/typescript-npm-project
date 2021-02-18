@@ -150,7 +150,7 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
   const noPackageLock = (project.isStandaloneProject) ? '--no-package-lock' : '';
-  const argsForFasterInstall = `--ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
+  const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
   if (useYarn) {
     // --ignore-scripts
     // yarn install --prefer-offline
