@@ -583,14 +583,19 @@
     "compression": "1.7.4",
     "concurrently": "^3.5.1",
     "content-type": "^1.0.4",
+    "conventional-changelog-cli": "2.1.1",
     "cookie-parser": "^1.4.3",
     "copy-paste": "~1.3.0",
     "core-js-compat": "3.4.0",
     "cors": "^2.8.4",
     "cpr": "^3.0.1",
     "cpuid": "^0.1.3",
+    "cross-env": "7.0.2",
     "dateformat": "^3.0.3",
     "diff": "^3.2.0",
+    "electron": "11.0.3",
+    "electron-builder": "22.9.1",
+    "electron-reload": "1.5.0",
     "element-resize-detector": "1.1.15",
     "enquirer": "^2.3.0",
     "enum-values": "1.2.1",
@@ -694,6 +699,7 @@
     "sloc": "^0.2.0",
     "socket.io": "^2.0.4",
     "sort-package-json": "^1.11.0",
+    "spectron": "13.0.0",
     "sqlite3": "4.0.9",
     "static-columns": "~1.0.12",
     "string-similarity": "~4.0.2",
@@ -720,8 +726,11 @@
     "uuid": "^8.3.2",
     "validator": "^9.2.0",
     "vpn-split": "~0.0.2",
+    "vscode": "^1.1.37",
+    "wait-on": "5.0.1",
     "wait.for": "0.6.6",
     "watch": "~1.0.2",
+    "webdriver-manager": "12.1.7",
     "webpack-cli": "3.3.11",
     "zone.js": "~0.10.2"
   },
@@ -732,5 +741,6 @@
       "pre-push": "tnp deps:show:if:standalone"
     }
   },
-  "lastBuildTagHash": "56e7662684a4dd366023c637bd878e70046d8a15"
+  "lastBuildTagHash": "56e7662684a4dd366023c637bd878e70046d8a15",
+  "devDependencies": {}
 }
