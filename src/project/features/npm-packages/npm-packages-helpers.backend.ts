@@ -140,7 +140,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
     executeCommand(command, tmpProject);
   } catch (error) {
     Helpers.error(`[${config.frameworkName}] `
-    +`not able to install package... try again with exact version or check package name.`, false, true);
+      + `not able to install package... try again with exact version or check package name.`, false, true);
   }
   return tmpProject;
 }

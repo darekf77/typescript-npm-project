@@ -472,7 +472,7 @@
     "ugly": true
   },
   "scripts": {
-    "activate": "firedev bd && firedev link && tnp link:core"
+    "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
   },
   "license": "MIT",
   "private": false,
