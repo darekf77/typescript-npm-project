@@ -134,8 +134,15 @@ export class GitActions extends FeatureForProject {
   public async pull() {
     this.before();
     if (this.project.git.thereAreSomeUncommitedChange) {
-      this.project.run(`code .`).async();
-      Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
+      Helpers.warn(`
+
+
+    [WARNING]  Stashing uncommit changes... in ${this.project.genericName}
+
+
+      `)
+      // this.project.run(`code .`).async();
+      // Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
     }
 
     await this.repeatMenu('pull');
