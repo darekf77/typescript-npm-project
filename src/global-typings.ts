@@ -1,9 +1,6 @@
 //#region @backend
 import { Ora } from 'ora';
 //#endregion
-import { Models } from 'tnp-models';
-
-
 
 declare global {
   namespace NodeJS {

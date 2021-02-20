@@ -11,6 +11,45 @@ import { CLASS } from 'typescript-class-helpers';
 import chalk from 'chalk';
 
 
+function $SYNC_TO(args) {
+  const { resolved: destinaitonProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
+    return Project.From(location)
+  });
+
+  args = commandString;
+  const currentProj = (Project.Current as Project);
+  const toSync = currentProj.typeIs('angular-lib') ? [
+    config.folder.components,
+    config.folder.src,
+  ] : [
+      config.folder.src,
+    ]
+  if (destinaitonProjects.length === 0) {
+    Helpers.error(`No project to sync`, false, true);
+  }
+  for (let index = 0; index < destinaitonProjects.length; index++) {
+    const destProj = destinaitonProjects[index];
+    for (let j = 0; j < toSync.length; j++) {
+      const source = path.join(currentProj.location, toSync[j]);
+      Helpers.info(`
+      source: ${source}
+      location: ${destProj.location}
+    `);
+      chokidar.watch([source], {
+        ignoreInitial: false,
+        followSymlinks: false,
+        ignorePermissionErrors: true,
+      }).on('all', async (event, f) => {
+        if (event !== 'addDir' && event !== 'unlinkDir') {
+          const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
+          Helpers.copyFile(f, dest)
+        }
+      });
+    }
+
+  }
+}
+
 
 function killallnode() {
   Helpers.run(`fkill -f node`).sync()
@@ -295,4 +334,6 @@ export default {
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),
+  $SYNC_TO: Helpers.CLIWRAP($SYNC_TO, '$SYNC_TO'),
+
 }

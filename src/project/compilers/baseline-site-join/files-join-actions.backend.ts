@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
-import * as watch from 'watch'
 // local
 import { SourceModifier } from '../source-modifier';
 
