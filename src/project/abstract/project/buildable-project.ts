@@ -250,7 +250,7 @@ export abstract class BuildableProject {
     }
 
 
-    const withoutNodeModules: Project[] = [];
+    let withoutNodeModules: Project[] = [];
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
       (this.buildOptions.copyto as Project[]).forEach((c) => {
         Helpers.info(`Checking node_modules for ${c.genericName}`)
@@ -260,12 +260,27 @@ export abstract class BuildableProject {
       })
     }
 
+    const smartInstall = withoutNodeModules.filter(p => p.npmPackages.useSmartInstall);
+
+    withoutNodeModules = withoutNodeModules.filter(p => !smartInstall.includes(p));
+
     if (withoutNodeModules.length > 0 && !this.isVscodeExtension) {
+
       Helpers.error(`[--copyto] Please install node_modules for projects:
 
 ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
       `, false, true);
+    }
+
+    for (let index = 0; index < smartInstall.length; index++) {
+      const p = smartInstall[index];
+      Helpers.warn(`
+
+      [copyto] Smart npm instalation for ${p.name}
+
+      `)
+      await p.npmPackages.installFromArgs('')
     }
 
     if (!this.isVscodeExtension) {

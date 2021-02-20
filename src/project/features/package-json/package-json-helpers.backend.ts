@@ -316,7 +316,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       .filter(key => isomorphicPackages.includes(key))
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.dependencies[packageIsomorphicName];
-        if (!v.startsWith('~') && !v.startsWith('^')) {
+        if (!v?.startsWith('~') && !v?.startsWith('^')) {
           project.packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
         }
       });
@@ -475,8 +475,9 @@ function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFrom
     const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
     patterns.forEach(p => {
       Object.keys(deps).forEach(depName => {
-        // log(`check patter: ${p} agains ${depName}`)
-        if ((new RegExp(p)).test(depName) && !overrided[depName]) {
+        Helpers.log(`check patter: ${p} agains ${depName}`);
+        const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(p)));
+        if (patternRegex.test(depName) && !overrided[depName]) {
           deps[depName] = undefined;
         }
       })

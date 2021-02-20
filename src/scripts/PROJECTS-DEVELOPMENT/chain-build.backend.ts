@@ -102,7 +102,8 @@ ${deps.map((d, i) => {
     return (i + 1) + '. ' + chalk.bold(d.genericName) + s;
   }).join('\n')}
 
-  `)
+  `);
+  // process.exit(0)
 
   let index = 0;
   const buildedOK = [];
