@@ -141,6 +141,10 @@ export class GitActions extends FeatureForProject {
 
 
       `)
+      try {
+        this.project.run(`add --all .`).sync();
+      } catch (error) { }
+      this.project.run(`git stah`).sync();
       // this.project.run(`code .`).async();
       // Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
     }
