@@ -19,7 +19,7 @@ function $SYNC_TO(args) {
   args = commandString;
   const currentProj = (Project.Current as Project);
   const toSync = [
-    ...(currentProj.git.isGitRepo && currentProj.git.isGitRoot ? ['.git'] : []),
+    // ...(currentProj.git.isGitRepo && currentProj.git.isGitRoot ? ['.git'] : []),
     ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
     ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
   ];
