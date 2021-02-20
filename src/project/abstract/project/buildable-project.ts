@@ -144,12 +144,26 @@ export abstract class BuildableProject {
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
-    const db = await TnpDB.Instance();
-    const projects = (await db.getProjects())
-      .map(p => p.project)
-      .filter(p => p.location !== this.location)
-
-    this.buildOptions.copyto = projects as any;
+    if (this.parent.isContainer && this.parent.frameworkVersionAtLeast('v2')) {
+      const projects = this.parent.projectsInOrderForChainBuild([])
+        .filter(d => d.name !== this.parent.name && d.frameworkVersionAtLeast('v2')
+          && d.typeIs(
+            'isomorphic-lib',
+            'angular-lib',
+            'vscode-ext',
+            'workspace',
+            'scenario',
+            'electron-client',
+            'ionic-client'
+          ));
+      this.buildOptions.copyto = projects as any;
+    } else {
+      const db = await TnpDB.Instance();
+      const projects = (await db.getProjects())
+        .map(p => p.project)
+        .filter(p => p.location !== this.location)
+      this.buildOptions.copyto = projects as any;
+    }
   }
   //#endregion
 

@@ -418,18 +418,19 @@ export class CopyManager extends FeatureForProject {
           Helpers.removeIfExists(projectOudDirDest);
         });
       }
-      const projectOudBorwserSrc = path.join(destination.location,
-        config.folder.node_modules,
-        namePackageName,
-        config.file.package_json
-      );
-      const projectOudBorwserDest = path.join(destination.location,
-        config.folder.node_modules,
-        namePackageName,
-        config.folder.browser,
-        config.file.package_json
-      );
-      Helpers.copyFile(projectOudBorwserSrc, projectOudBorwserDest);
+      // TODO not working werid tsc issue with browser/index
+      // {const projectOudBorwserSrc = path.join(destination.location,
+      //   config.folder.node_modules,
+      //   namePackageName,
+      //   config.file.package_json
+      // );
+      // const projectOudBorwserDest = path.join(destination.location,
+      //   config.folder.node_modules,
+      //   namePackageName,
+      //   config.folder.browser,
+      //   config.file.package_json
+      // );
+      // Helpers.copyFile(projectOudBorwserSrc, projectOudBorwserDest);}
       //#endregion
     }
 

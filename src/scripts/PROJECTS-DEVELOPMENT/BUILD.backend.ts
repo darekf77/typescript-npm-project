@@ -27,7 +27,8 @@ const BUILD_DIST_WATCH = async (args) => (Project.Current as Project).buildProce
 const $BUILDWATCH = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isStandaloneProject) {
-    args = `${args} --skipCopyToSelection`;
+    // TODO skipCopyToSelection no loger ipmortant
+    args = `${args} --skipCopyToSelection --copytoAll`;
   }
   await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
@@ -50,6 +51,7 @@ async function $DEFAULT_BUILD(args) {
 
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
+
   (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
 }
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);

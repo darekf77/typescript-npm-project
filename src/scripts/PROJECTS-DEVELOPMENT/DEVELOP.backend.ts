@@ -18,12 +18,12 @@ function $SYNC_TO(args) {
 
   args = commandString;
   const currentProj = (Project.Current as Project);
-  const toSync = currentProj.typeIs('angular-lib') ? [
-    config.folder.components,
-    config.folder.src,
-  ] : [
-      config.folder.src,
-    ]
+  const toSync = [
+    ...(currentProj.git.isGitRepo && currentProj.git.isGitRoot ? ['.git'] : []),
+    ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
+    ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
+  ];
+  Helpers.info(`Folder to sync: ${toSync.join(',')}`)
   if (destinaitonProjects.length === 0) {
     Helpers.error(`No project to sync`, false, true);
   }
@@ -32,8 +32,8 @@ function $SYNC_TO(args) {
     for (let j = 0; j < toSync.length; j++) {
       const source = path.join(currentProj.location, toSync[j]);
       Helpers.info(`
-      source: ${source}
-      location: ${destProj.location}
+      source: ${currentProj.genericName}
+      destination:${destProj.genericName}
     `);
       chokidar.watch([source], {
         ignoreInitial: false,
@@ -42,7 +42,8 @@ function $SYNC_TO(args) {
       }).on('all', async (event, f) => {
         if (event !== 'addDir' && event !== 'unlinkDir') {
           const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
-          Helpers.copyFile(f, dest)
+          Helpers.copyFile(f, dest);
+          Helpers.log(`Copy: ${dest}`);
         }
       });
     }
