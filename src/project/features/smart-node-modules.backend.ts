@@ -89,6 +89,7 @@ export class SmartNodeModules extends FeatureForProject {
         Helpers.removeFolderIfExists(additonalFolderToRemove);
       });
 
+    // Helpers.log('OVERRRIDE', _.keys(toOverride).join('/'))
     _.keys(toOverride).map(packageName => {
       const packageVersion = toOverride[packageName];
       if (packageVersion === null) {
@@ -103,7 +104,10 @@ export class SmartNodeModules extends FeatureForProject {
         const Tnp = (Project.Tnp as Project);
         const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
         toDedupe
-          .filter(dedupePkgName => _.isString(dedupePkgName))
+          .filter(dedupePkgName => {
+            Helpers.log('dedupePkgName', dedupePkgName)
+            return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
+          })
           .forEach(dedupePkgName => {
             const existedVersionInMainNodeModules = this.project.npmPackages.package(dedupePkgName).version;
             if (
@@ -120,6 +124,8 @@ export class SmartNodeModules extends FeatureForProject {
         //#region link to main repo
         const overrideFrom = tempProj.npmPackages.package(packageName).location;
         const overrideDest = this.project.npmPackages.package(packageName).location;
+        // console.log(`overrideFrom: ${overrideFrom}`)
+        // console.log(`overrideDest: ${overrideDest}`)
         Helpers.removeIfExists(overrideDest);
         Helpers.createSymLink(overrideFrom, overrideDest);
 
