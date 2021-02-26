@@ -105,7 +105,7 @@ export class SmartNodeModules extends FeatureForProject {
         const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
         toDedupe
           .filter(dedupePkgName => {
-            Helpers.log('dedupePkgName', dedupePkgName)
+            // Helpers.log(`dedupePkgName: ${dedupePkgName}`)
             return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
           })
           .forEach(dedupePkgName => {
