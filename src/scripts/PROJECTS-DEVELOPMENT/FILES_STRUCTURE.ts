@@ -6,7 +6,8 @@ import * as rimraf from 'rimraf';
 
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 
@@ -15,7 +16,35 @@ export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
   }
 }
 
+async function askForWhenEmpty(): Promise<Project> {
+  if (Helpers.exists(path.join(process.cwd(), config.file.package_json))) {
+    return;
+  }
+  let proj: Project;
+  const yesNewProj = await Helpers.questionYesNo(`Do you wanna init project in this folder ?`);
+  if (yesNewProj) {
+    const response = await Helpers.autocompleteAsk<ConfigModels.LibType>(`Choose type of project`, [
+      { name: 'Container', value: 'container' },
+      { name: 'Workspace', value: 'workspace' },
+      { name: 'Isomorphic Lib', value: 'isomorphic-lib' },
+      { name: 'Angular Lib', value: 'angular-lib' }
+    ]);
+    Helpers.writeFile([process.cwd(), config.file.package_json], {
+      name: path.basename(process.cwd()),
+      version: '0.0.0',
+      tnp: {
+        type: response,
+        version: 'v2'
+      }
+    });
+    proj = Project.From(path.join(process.cwd())) as Project;
+    return proj;
+  }
+  return proj;
+}
+
 export async function $STRUCT(args: string, exit = true) {
+  await askForWhenEmpty();
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   if (proj) {
@@ -32,6 +61,7 @@ export async function STRUCTURE(args: string, exit = true) {
 }
 
 export async function $INIT(args: string, exit = true) {
+  await askForWhenEmpty();
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj) {
     await proj.filesStructure.init(args);

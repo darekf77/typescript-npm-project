@@ -2,8 +2,8 @@ export { config } from 'tnp-config';
 //#region @backend
 export { start } from './start.backend';
 import { start } from './start.backend';
-//#endregion
 export * from './global-typings';
+//#endregion
 export * from './project';
 //#region @backend
 export * from './project/project-specyfic';

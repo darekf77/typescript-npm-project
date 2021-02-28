@@ -18,11 +18,11 @@ export class GitActions extends FeatureForProject {
   private before() {
     if (!this.project.git.isGitRepo) {
       Helpers.error(`Project ${chalk.bold(this.project.name)} is not a git repository
-      locaiton: ${this.project.location}`);
+      locaiton: ${this.project.location}`, false, true);
     }
     if (!this.project.git.isGitRoot) {
       Helpers.error(`Project ${chalk.bold(this.project.name)} is not a git root
-      locaiton: ${this.project.location}`);
+      locaiton: ${this.project.location}`, false, true);
     }
     if (this.project.git.currentBranchName !== 'master') {
       this.project.run(`code .`).async();
@@ -45,7 +45,7 @@ export class GitActions extends FeatureForProject {
   }
   //#endregion
 
-  //#region clone unexisted projects
+  //#region get unexisted projects
   private async cloneUnexistedProjects() {
     const shouldBeProjectArr = this.project.packageJson.linkedProjects.map(relativePath => {
       if (!Project.From(path.join(this.project.location, relativePath))) {
@@ -58,15 +58,24 @@ export class GitActions extends FeatureForProject {
     ${shouldBeProjectArr.map(p => `-${p}`).join('\n')}
 
       press any key to clone each above project..`);
-      const ADDRESS_GITHUB_SSH = this.project.run(`git config --get remote.origin.url`,
-        { output: false }).sync().toString();
       for (let index = 0; index < shouldBeProjectArr.length; index++) {
         const relativePath = shouldBeProjectArr[index];
         const projectNameFromPackageJson = path.basename(relativePath);
-        const githubGitUrl = ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
-        await Helpers.actionWrapper(() => {
-          this.project.run(`git clone ${githubGitUrl}`).sync();
-        }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
+        if (Helpers.isValidGitRepuUrl(relativePath)) {
+          const p = path.join(this.project.location, relativePath);
+          if (!Helpers.exists(p)) {
+            await Helpers.actionWrapper(() => {
+              this.project.git.clone(relativePath);
+            }, `Cloning unexisted project from url ${chalk.bold(relativePath)}`);
+          }
+        } else {
+          const ADDRESS_GITHUB_SSH = this.project.git.originURL;
+          const githubGitUrl = ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
+          await Helpers.actionWrapper(() => {
+            this.project.git.clone(githubGitUrl);
+          }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
+        }
+
       }
     }
   }
@@ -82,6 +91,8 @@ export class GitActions extends FeatureForProject {
       }),
       ...this.project.linkedProjects,
     ];
+
+    childrenToPush = childrenToPush.filter(f => !!f);
     return Helpers.arrays.uniqArray<Project>(childrenToPush, 'location') as any;
   }
   //#endregion

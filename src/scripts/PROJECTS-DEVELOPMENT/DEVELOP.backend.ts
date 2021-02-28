@@ -287,7 +287,7 @@ const $FORK = async (args: string) => {
     projectName = argv[1];
   }
   Helpers.info(`Forking ${githubUrl} with name ${projectName}`);
-  Project.Current.run(`git clone ${githubUrl} ${projectName}`).sync();
+  Project.Current.git.clone(githubUrl, projectName);
   let newProj = Project.From(path.join(Project.Current.location, projectName)) as Project;
   Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'name', projectName);
   Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'version', '0.0.0');

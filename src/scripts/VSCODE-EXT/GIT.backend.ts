@@ -79,6 +79,14 @@ export async function $PULL(args: string, exit = true) {
 }
 
 
+export async function $CLONE(args: string, exit = true) {
+  const argsss = args.split(' ');
+  const url = argsss.shift();
+  const newName = argsss.shift()
+  await (Project.Current as Project).git.clone(url, newName);
+  process.exit(0);
+}
+
 export async function $RECOMMIT(args: string, exit = true) {
   const p = Project.Current;
   const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false, cwd: p.location }).sync().toString().trim();
@@ -168,4 +176,5 @@ export default {
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $RECOMMIT: Helpers.CLIWRAP($RECOMMIT, '$RECOMMIT'),
+  $CLONE: Helpers.CLIWRAP($CLONE, '$CLONE'),
 }

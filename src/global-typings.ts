@@ -1,6 +1,6 @@
 //#region @backend
 import { Ora } from 'ora';
-//#endregion
+
 
 declare global {
   namespace NodeJS {
@@ -38,15 +38,15 @@ declare global {
        * when vscode plugin is running
        */
       tnpNonInteractive?: boolean;
-      //#region @backend
+
       tnpNoColorsMode?: boolean;
       useWorker?: boolean;
       restartWorker?: boolean;
       reinitDb?: boolean;
       dbAlreadyRecreated?: boolean;
       spinner: Ora;
-      //#endregion
 
     }
   }
 }
+//#endregion

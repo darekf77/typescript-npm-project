@@ -23,6 +23,7 @@ export abstract class FolderProject {
   //#region @backend
   get linkedProjects(this: Project): Project[] {
     return this.packageJson.linkedProjects
+      .filter(f => !Helpers.isValidGitRepuUrl(f))
       .map(f => {
         return $Project.From(path.join(this.location, f)) as Project;
       })

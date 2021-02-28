@@ -6,6 +6,12 @@ type in chrome conole
 ```
 sendCommand(SecurityInterstitialCommandId.CMD_PROCEED)
 ```
+## git vpn-split
+```
+git config --global url."git://".insteadOf https://
+git config --global http.sslVerify false
+# hmmmmmmmmm git remote ls suck
+```
 
 ## - Inspect angular js element
 

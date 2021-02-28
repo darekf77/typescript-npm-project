@@ -333,6 +333,7 @@ export async function run(args: string[]) {
 
 
 async function $LINK() {
+  await Helpers.isElevated();
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {
@@ -386,13 +387,10 @@ async function $LINK() {
         const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
         Helpers.removeIfExists(destinationGlobalLink);
         Helpers.createSymLink(localPath, destinationGlobalLink);
-        const command = `sudo chmod +x ${destinationGlobalLink}`;
+        const command = `chmod +x ${destinationGlobalLink}`;
         Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
 
         command: ${command}
-
-        Please enter your admin password:
-
         `)
         Helpers.run(command).sync();
         Helpers.info(`Global link created for: ${chalk.bold(globalName)}`);
