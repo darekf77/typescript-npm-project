@@ -1,3 +1,4 @@
+//#region imports
 import * as _ from 'lodash';
 import * as fse from 'fs-extra';
 import { Project } from '../../project';
@@ -9,31 +10,62 @@ import * as chokidar from 'chokidar';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
 import chalk from 'chalk';
+import { URL } from 'url';
+//#endregion
 
-
-function $SYNC_TO(args) {
-  const { resolved: destinaitonProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
-    return Project.From(location)
+//#region sync to/from
+async function $SYNC_TO(args) {
+  const { resolved: destinationIps } = Helpers.cliTool.argsFromBegin<URL>(args, ip => {
+    return Helpers.urlParse(ip);
   });
 
-  args = commandString;
-  const currentProj = (Project.Current as Project);
-  const toSync = [
-    ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
-    ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
-  ];
-  Helpers.info(`Folder to sync: ${toSync.join(',')}`)
-  if (destinaitonProjects.length === 0) {
-    Helpers.error(`No project to sync`, false, true);
-  }
-  for (let index = 0; index < destinaitonProjects.length; index++) {
-    const destProj = destinaitonProjects[index];
+  if (destinationIps.length > 0) {
+    //#region notify sync server
+    // const db = await TnpDB.Instance();
+    // const projects = (await db.getProjects()).map(p => p.project) as Project[];
+    // const res = await Helpers.autocompleteAsk(`Select project to sync notify`,
+    //   projects.map(p => {
+    //     return { name: p.genericName, value: p.genericName }
+    //   })
+    // )
+    // for (let index = 0; index < destinationIps.length; index++) {
+    //   const server = destinationIps[index];
+
+    // }
+    //#endregion
+  } else {
+    //#region sync to destination location
+    const { resolved: destinaitonProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
+      return Project.From(location);
+    });
+
+    args = commandString;
+    const currentProj = (Project.Current as Project);
+    const toSync = [
+      ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
+      ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
+    ];
+    Helpers.info(`Folder to sync: ${toSync.join(',')}`)
+    if (destinaitonProjects.length === 0) {
+      Helpers.error(`No project to sync`, false, true);
+    }
+
+    let destProj = _.first(destinaitonProjects);
+    if (destProj.isContainer) {
+      const properContainerChild = destProj.children.find(c => c.name === currentProj.name);
+      destProj = properContainerChild;
+    }
+
+    if (!destProj || destProj.name !== currentProj.name) {
+      Helpers.error(`You can only sync projects with same name`, false, true);
+    }
+
     for (let j = 0; j < toSync.length; j++) {
       const source = path.join(currentProj.location, toSync[j]);
       Helpers.info(`
-      source: ${currentProj.genericName}
-      destination:${destProj.genericName}
-    `);
+        source: ${currentProj.genericName}
+        destination:${destProj.genericName}
+      `);
       chokidar.watch([source], {
         ignoreInitial: false,
         followSymlinks: false,
@@ -41,29 +73,82 @@ function $SYNC_TO(args) {
       }).on('all', async (event, f) => {
         if (event !== 'addDir' && event !== 'unlinkDir') {
           const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
+          if (!Helpers.exists(path.dirname(dest))) {
+            Helpers.mkdirp(path.dirname(dest));
+          }
           Helpers.copyFile(f, dest);
           Helpers.log(`Copy: ${dest}`);
         }
       });
     }
 
+    //#endregion
   }
-}
-
-
-function killallnode() {
-  Helpers.run(`fkill -f node`).sync()
-  //   run(`killall -9 node`).sync();
 
 }
 
+function $SYNC_FROM(args) {
+  // //#region resolve projects
+  // const { resolved: sourceProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
+  //   return Project.From(location)
+  // });
 
+  // args = commandString;
+  // const currentProj = (Project.Current as Project);
+  // const toSync = [
+  //   ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
+  //   ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
+  //   config.folder.dist,
+  // ];
+  // Helpers.info(`Folder to sync: ${toSync.join(',')}`)
+  // if (sourceProjects.length === 0) {
+  //   Helpers.error(`No project to sync`, false, true);
+  // }
+  // const sourceProject = _.first(sourceProjects);
+  // if (sourceProject.name !== currentProj.name) {
+  //   Helpers.error(`Projects are not with the same name:
+  //   source:  ${sourceProject.name}
+  //   current: ${currentProj.name}
+  //   `, false, true);
+  // }
+  // //#endregion
+  // const projects = {
+  //   current: currentProj,
+  //   source: sourceProject,
+  // };
 
-export async function $NAME_TEST() {
-  // CLASS.getConfig($NAME_TEST)[0].
-  console.log(CLASS.getName($NAME_TEST))
+  // const foldersToSyncFromSource = toSync.map(folder => {
+  //   return `${sourceProject.location}/`;
+  // });
+
+  // for (let index = 0; index < foldersToSyncFromSource.length; index++) {
+  //   const destProj = foldersToSyncFromSource[index];
+
+  //   // for (let j = 0; j < toSync.length; j++) {
+  //   //   const source = path.join(currentProj.location, toSync[j]);
+  //   //   Helpers.info(`
+  //   //   source: ${currentProj.genericName}
+  //   //   destination:${destProj.genericName}
+  //   // `);
+  //   //   chokidar.watch([source], {
+  //   //     ignoreInitial: false,
+  //   //     followSymlinks: false,
+  //   //     ignorePermissionErrors: true,
+  //   //   }).on('all', async (event, f) => {
+  //   //     if (event !== 'addDir' && event !== 'unlinkDir') {
+  //   //       const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
+  //   //       Helpers.copyFile(f, dest);
+  //   //       Helpers.log(`Copy: ${dest}`);
+  //   //     }
+  //   //   });
+  //   // }
+
+  // }
+
 }
+//#endregion
 
+//#region kill
 export async function killAll() {
   const db = await TnpDB.Instance();
   let projectsToKill = [];
@@ -85,20 +170,31 @@ export async function killonport(args, noExit = false) {
   }
 }
 
-
-
-function killvscode(args: string, exit = true) {
-  try {
-    Helpers.run(`kill -9 $(pgrep Electron)`).sync();
-    Helpers.info(`Killled`)
-  } catch (error) {
-    Helpers.warn(`kill not needed`)
-  }
-  if (exit) {
-    process.exit(0)
-  }
+const $KILL_ON_PORT = async (args: string) => {
+  await killonport(args);
 }
 
+const $KILLONPORT = async (args: string) => {
+  await killonport(args);
+}
+
+const $KILLALL = () => {
+  killAll()
+}
+
+const $KILLALLNODE = () => {
+  Helpers.run(`fkill -f node`).sync();
+}
+
+const $KILLWORKER = async () => {
+  const db = await TnpDB.Instance();
+  await db.killWorker();
+  Helpers.info(`Done killing worker`);
+  process.exit(0)
+}
+//#endregion
+
+//#region develop
 export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
@@ -180,6 +276,17 @@ export async function $DEVELOP(args: string, exit = true) {
   process.exit(0)
 }
 
+function killvscode(args: string, exit = true) {
+  try {
+    Helpers.run(`kill -9 $(pgrep Electron)`).sync();
+    Helpers.info(`Killled`)
+  } catch (error) {
+    Helpers.warn(`kill not needed`)
+  }
+  if (exit) {
+    process.exit(0)
+  }
+}
 
 function vscodekill(args) {
   killvscode(args);
@@ -188,30 +295,9 @@ function vscodekill(args) {
 function close(args) {
   killvscode(args);
 }
+//#endregion
 
-const $KILL_ON_PORT = async (args: string) => {
-  await killonport(args);
-}
-
-const $KILLONPORT = async (args: string) => {
-  await killonport(args);
-}
-
-const $KILLALL = () => {
-  killAll()
-}
-
-const $KILLALLNODE = () => {
-  killallnode()
-}
-
-const $KILLWORKER = async () => {
-  const db = await TnpDB.Instance();
-  await db.killWorker();
-  Helpers.info(`Done killing worker`);
-  process.exit(0)
-}
-
+//#region choki
 const CHOKI = () => {
   const project = (Project.Current as Project);
   // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
@@ -224,33 +310,9 @@ const CHOKI = () => {
 
   })
 }
+//#endregion
 
-async function NOT(args: string) {
-  _.times(10, (n) => {
-    notify({
-      message: 'hey' + args + n.toString(),
-      sound: true
-    })
-  })
-
-  process.exit(0)
-}
-
-async function $CHILDS_REQUIRED(args: string) {
-  if (!(Project.Current as Project).isWorkspaceChildProject) {
-    Helpers.error(`Not worksapce child`, false, true);
-  }
-  console.log((Project.Current as Project).sortedRequiredWorkspaceDependencies.map(c => c.name));
-  process.exit(0)
-}
-
-export async function $ALL_PROJECTS(args: string) {
-  const db = await TnpDB.Instance();
-  const projects = (await db.getProjects()).map(p => p.project as Project);
-  console.log(projects.map(p => p.info).join('\n'));
-  process.exit(0)
-}
-
+//#region info / check
 export async function $INFO() {
   const proj = Project.Current as Project;
   console.clear()
@@ -278,7 +340,9 @@ export async function $INFO() {
 const $CHECK = async () => {
   await $INFO();
 }
+//#endregion
 
+//#region fork
 const $FORK = async (args: string) => {
   const argv = args.trim().split(' ');
   const githubUrl = _.first(argv);
@@ -310,6 +374,42 @@ based on ${githubUrl}
   Helpers.info(`Done`);
   process.exit(0);
 }
+//#endregion
+
+//#region childs requried
+async function $CHILDS_REQUIRED(args: string) {
+  if (!(Project.Current as Project).isWorkspaceChildProject) {
+    Helpers.error(`Not worksapce child`, false, true);
+  }
+  console.log((Project.Current as Project).sortedRequiredWorkspaceDependencies.map(c => c.name));
+  process.exit(0)
+}
+//#endregion
+
+//#region all projects
+export async function $ALL_PROJECTS(args: string) {
+  const db = await TnpDB.Instance();
+  const projects = (await db.getProjects()).map(p => p.project as Project);
+  console.log(projects.map(p => p.info).join('\n'));
+  process.exit(0)
+}
+//#endregion
+
+export async function $NAME_TEST() {
+  // CLASS.getConfig($NAME_TEST)[0].
+  console.log(CLASS.getName($NAME_TEST))
+}
+
+async function NOT(args: string) {
+  _.times(10, (n) => {
+    notify({
+      message: 'hey' + args + n.toString(),
+      sound: true
+    })
+  })
+
+  process.exit(0)
+}
 
 async function $TARGET_PROJ_UPDATE() {
   (Project.Current as Project).targetProjects.update();
@@ -317,6 +417,7 @@ async function $TARGET_PROJ_UPDATE() {
 }
 
 export default {
+  //#region export default
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
@@ -335,5 +436,6 @@ export default {
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),
   $SYNC_TO: Helpers.CLIWRAP($SYNC_TO, '$SYNC_TO'),
-
+  $SYNC_FROM: Helpers.CLIWRAP($SYNC_FROM, '$SYNC_FROM'),
+  //#endregion
 }

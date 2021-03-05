@@ -143,6 +143,11 @@ export class GitActions extends FeatureForProject {
 
   //#region pull
   public async pull() {
+    if (this.project.typeIs('navi')) {
+      this.project.git.pullCurrentBranch();
+      return;
+    }
+
     this.before();
     if (this.project.git.thereAreSomeUncommitedChange) {
       Helpers.warn(`
