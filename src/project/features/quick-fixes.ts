@@ -116,7 +116,9 @@ export class QuickFixes extends FeatureForProject {
       [
         '@types/mocha',
         '@types/jasminewd2',
-        '@types/jasmine'
+        '@types/jasmine',
+        '@types/puppeteer-core',
+        '@types/puppeteer',
       ].forEach(name => {
         Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
       });
@@ -205,8 +207,8 @@ export default _default;
       .filter(f => !Helpers.isFolder(f))
       .forEach(f => {
         const relative = f.replace(`${pathToSrc}/`, '');
-        Helpers.createSymLink(f, path.join(pathToSelf, relative));
-        Helpers.createSymLink(f, path.join(pathToSelf, config.folder.browser, relative));
+        Helpers.createSymLink(f, path.join(pathToSelf, relative), { continueWhenExistedFolderDoesntExists: true });
+        Helpers.createSymLink(f, path.join(pathToSelf, config.folder.browser, relative), { continueWhenExistedFolderDoesntExists: true });
       });
   }
 

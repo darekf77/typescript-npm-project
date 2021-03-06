@@ -125,6 +125,8 @@ function DEPS_SHOW(args: string) {
   process.exit(0)
 }
 
+const SHOW_DEPS = (args) => DEPS_SHOW(args);
+
 function DEPS_HIDE(args: string) {
   if ((Project.Current as Project).isCoreProject) {
     (Project.Current as Project).packageJson.showDeps('deps show')
@@ -133,6 +135,8 @@ function DEPS_HIDE(args: string) {
   }
   process.exit(0)
 }
+
+const HIDE_DEPS = (args) => DEPS_HIDE(args);
 
 function $INSTALL_IN_TNP() {
   const inTnp = path.join((Project.Tnp as Project).location, config.folder.node_modules, (Project.Current as Project).name);
@@ -551,6 +555,7 @@ export default {
   $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
   $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
+  SHOW_DEPS: Helpers.CLIWRAP(SHOW_DEPS, 'SHOW_DEPS'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
   $SHOW_PROJECTS_NAVI: Helpers.CLIWRAP($SHOW_PROJECTS_NAVI, '$SHOW_PROJECTS_NAVI'),
@@ -565,6 +570,7 @@ export default {
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
+  HIDE_DEPS: Helpers.CLIWRAP(HIDE_DEPS, 'HIDE_DEPS'),
   $DEPS_CLEAN: Helpers.CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
   $INSTALL: Helpers.CLIWRAP($INSTALL, '$INSTALL'),
   $UNINSTALL: Helpers.CLIWRAP($UNINSTALL, 'UNINSTALL'),

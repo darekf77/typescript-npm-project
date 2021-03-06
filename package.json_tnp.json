@@ -125,7 +125,8 @@
         "typescript",
         "ts-node",
         "gulp",
-        "tslint"
+        "tslint",
+        "vscode"
       ],
       "common": {
         "tnp-config": "0.0.33",

@@ -221,14 +221,38 @@ export abstract class LibProject {
   }
 
   public async installLocaly(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
-    const packageName = this.extensionVsixName;
     if (this.isVscodeExtension) {
+      const vsixPackageName = this.extensionVsixName;
       if (!this.containsFile(config.folder.out)) {
         Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
       }
-      Helpers.info(`Installing extension: ${packageName} `
-        + `with creation date: ${fse.lstatSync(this.path(packageName).absolute.normal).birthtime}...`);
-      this.run(`npm-run vsce package && code --install-extension ${packageName}`).sync();
+      if (!Helpers.exists(this.path(vsixPackageName).absolute.normal)) {
+        await this.createVscePackage(false);
+      }
+      Helpers.info(`Installing extension: ${vsixPackageName} `
+        + `with creation date: ${fse.lstatSync(this.path(vsixPackageName).absolute.normal).birthtime}...`);
+      this.run(`code --install-extension ${vsixPackageName}`).sync();
+    }
+  }
+
+  public async createVscePackage(this: Project, showInfo = true) {
+    const vsixPackageName = this.extensionVsixName;
+    try {
+      await Helpers.actionWrapper(() => {
+        this.run(`npm-run vsce package --yarn`).sync();
+      }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
+      if (showInfo) {
+        const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
+        Helpers.info(`
+
+        Please use command: ${commandInstall} # or ${config.frameworkName} il
+        to install this package in local vscode instance.
+
+        `)
+      }
+    } catch (error) {
+      Helpers.error(error, true, true);
+      Helpers.error(`Not able to build ${vsixPackageName} package `);
     }
   }
 

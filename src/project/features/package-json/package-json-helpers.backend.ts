@@ -231,7 +231,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       : Helpers.arrays.sortKeys(newDeps);
   }
 
-  if (!project.isTnp) {
+  if (!project.isTnp && !project.isContainerCoreProject) {
     const specyficPacakges = [
       'electron-client',
       'vscode-ext',
@@ -360,6 +360,10 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         _.isArray(includeOnly) && includeOnly.length === 0
       ) {
         project.packageJson.data.devDependencies = {};
+      }
+      if (project.isVscodeExtension) {
+        project.packageJson.data.devDependencies['vscode'] = project.packageJson.data.dependencies['vscode'];
+        delete project.packageJson.data.dependencies['vscode']
       }
     }
   }

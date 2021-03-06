@@ -269,23 +269,9 @@ inside generated projects...
     } else {
       Helpers.info(msg);
     }
+
     if (!buildOptions.watch && this.project.isVscodeExtension) {
-      const vsixPackageName = this.project.extensionVsixName;
-      try {
-        await Helpers.actionWrapper(() => {
-          this.project.run(`vsce package`).sync();
-        }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
-        const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
-        Helpers.info(`
-
-        Please use command: ${commandInstall} # or ${config.frameworkName} il
-        to install this package in local vscode instance.
-
-        `)
-      } catch (error) {
-        Helpers.error(error, true, true);
-        Helpers.error(`Not able to build ${vsixPackageName} package `);
-      }
+      await this.project.createVscePackage()
     }
 
     if (exit && !buildOptions.watch) {
