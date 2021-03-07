@@ -256,6 +256,21 @@ export class ProjectFactory {
           await newCreatedProject.filesStructure.init(argsForInit);
         }
       }
+      if (newCreatedProject.parent.isContainer && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
+        newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
+        newCreatedProject.parent.packageJson.save('updating container linked projects');
+        if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
+          const parentOrigin = newCreatedProject.parent.git.originURL;
+          const projOrigin = parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git');
+          Helpers.info(`Adding git origin: ${projOrigin}
+          to project ${newCreatedProject.name} ...`);
+          newCreatedProject.run(`git init `
+          +`&& git remote add origin ${projOrigin} `+
+          `&& git branch -M master `+
+          `&& git push --set-upstream origin master`).sync();
+        }
+        await newCreatedProject.parent.filesStructure.struct('');
+      }
     }
     return newCreatedProject;
   }
