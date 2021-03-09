@@ -155,7 +155,6 @@ export async function $DIFF(newOriginNameOrUrl: string) {
     } else if (proj.git.isGitRepo) {
       cmd(proj);
     }
-
   } else {
     Helpers.error(`This folder is not a git repo... `, false, true);
   }

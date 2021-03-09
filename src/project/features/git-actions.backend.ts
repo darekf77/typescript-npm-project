@@ -167,6 +167,10 @@ export class GitActions extends FeatureForProject {
 
     await this.repeatMenu('pull');
 
+    const location =  this.project.location;
+    Project.unload(this.project);
+    this.project = Project.From(location) as Project;
+
     if (this.project.isContainer && this.project.packageJson.linkedProjects.length > 0) {
       const childrenToPull = await this.getLinkedPorjectsAndChildrens('pull');
       for (let index = 0; index < childrenToPull.length; index++) {
