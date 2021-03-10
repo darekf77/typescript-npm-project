@@ -103,7 +103,9 @@ export class GitActions extends FeatureForProject {
       try {
         await Helpers.actionWrapper(() => {
           if (action === 'pull') {
-            this.project.git.pullCurrentBranch(force);
+            this.project.git.pullCurrentBranch(
+              // force
+              );
           }
           if (action === 'push') {
             this.project.git.pushCurrentBranch(force);
