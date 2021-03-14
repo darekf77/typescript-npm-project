@@ -49,11 +49,11 @@ function generate(project: Project, t: Models.npm.TargetProject) {
     Helpers.mkdirp(path.dirname(originDefaultPath));
   }
   if (!Helpers.exists(originDefaultPath)) {
-    Helpers.git.clone(
-      path.dirname(originDefaultPath),
-      t.origin,
-      _.kebabCase(t.origin)
-    );
+    Helpers.git.clone({
+      cwd: path.dirname(originDefaultPath),
+      url: t.origin,
+      destinationFolderName: _.kebabCase(t.origin)
+    });
   }
 
   while (true) {
