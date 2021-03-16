@@ -1,3 +1,4 @@
+//#region imports / exports
 import * as _ from 'lodash';
 import * as path from 'path';
 
@@ -5,38 +6,52 @@ import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../abstract/feature-for-project';
 import { Project } from '../abstract/project';
+import { TnpDB } from 'tnp-db';
 
 export type RecentFilesJson = {
   recentOpenProjects: string[];
 }
+//#endregion
+
 export class RecentFilesForContainer extends FeatureForProject {
-
-  private static location: { [location: string]: RecentFilesForContainer; }
-  public static for(project: Project) {
-    if (!project || !project.isContainer) {
-      Helpers.error(`[RecentFilesForContainer] this is not container : ${project.location}`, true, false);
-    }
-    if (!RecentFilesForContainer.location) {
-      RecentFilesForContainer.location = {} as any;
-    }
-    if (!RecentFilesForContainer.location[project.location]) {
-      RecentFilesForContainer.location[project.location] = new RecentFilesForContainer(project);
-    }
-    return RecentFilesForContainer.location[project.location];
-  }
-
   private constructor(project: Project) {
-    super(project);
+    super(project)
     this.readConfig();
   }
 
+  //#region template for recent.json file
   private get defaultValue() {
     return {
       recentOpenProjects: []
     } as RecentFilesJson
   }
+  //#endregion
 
+  async saveActiveProjects(override = true) {
+    if (!this.project.isContainer) {
+      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
+    }
+    const db = await TnpDB.Instance();
+
+    // let projects = (await db.getProjects())
+    //   .map(p => p.project)
+    //   .filter(p => p.typeIsNot(...config.notFiredevProjects));
+
+    const builds = await db.getBuildsBy({
+      watch: true,
+    });
+    const container = this.project;
+    const onlyChildren = builds.map(c => c.project as Project).filter(p => p.location.startsWith(container.location));
+    this.setFrom(onlyChildren.map(c => {
+      return c.location.replace(`${container.location}/`, '');
+    }).join(' '), override);
+  }
+
+  //#region read config
   private readConfig(): RecentFilesJson {
+    if (!this.project.isContainer) {
+      return;
+    }
     const recentConfigPath = path.join(this.project.location, config.file.tmp_recent_json);
     if (!Helpers.exists(recentConfigPath)) {
       Helpers.writeFile(recentConfigPath, this.defaultValue);
@@ -52,8 +67,10 @@ export class RecentFilesForContainer extends FeatureForProject {
     }
     return configJson;
   }
+  //#endregion
 
-  private get recentProjects(): Project[] {
+  //#region get local recent project
+  private get localRecentProjects(): Project[] {
     return this.readConfig()
       .recentOpenProjects
       .map(c => {
@@ -68,16 +85,37 @@ export class RecentFilesForContainer extends FeatureForProject {
         return !!f;
       });
   }
+  //#endregion
 
+  //#region open local recent projects
   public openRecent() {
-    this.recentProjects.forEach(p => p.openInVscode());
+    if (!this.project.isContainer) {
+      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
+    }
+    this.localRecentProjects.forEach(p => p.openInVscode());
     Helpers.info('Done')
   }
+  //#endregion
 
-  public setRecent(args: string) {
-    const recentOpenProjects = Helpers.cliTool
-      .resolveProjectsFromArgs(args, this.project, Project as any)
-      .map(c => c.location.replace(`${this.project.location}/`, ''))
+  //#region set local recent projects
+  public setFrom(args: string, override = true) {
+    if (!this.project.isContainer) {
+      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
+    }
+    let recentOpenProjects = [];
+    if (override) {
+      recentOpenProjects = Helpers.cliTool
+        .resolveProjectsFromArgs(args, this.project, Project as any)
+        .map(c => c.location.replace(`${this.project.location}/`, ''));
+    } else {
+      recentOpenProjects = Helpers.arrays.uniqArray([
+        ...this.localRecentProjects
+          .map(c => c.location.replace(`${this.project.location}/`, '')),
+        ...Helpers.cliTool
+          .resolveProjectsFromArgs(args, this.project, Project as any)
+          .map(c => c.location.replace(`${this.project.location}/`, '')),
+      ]);
+    }
 
     const recentConfigPath = path.join(this.project.location, config.file.tmp_recent_json);
     Helpers.writeFile(recentConfigPath, {
@@ -85,4 +123,5 @@ export class RecentFilesForContainer extends FeatureForProject {
     } as RecentFilesJson);
     Helpers.info('Done')
   }
+  //#endregion
 }

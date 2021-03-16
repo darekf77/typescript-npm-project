@@ -6,6 +6,12 @@ type in chrome conole
 ```
 sendCommand(SecurityInterstitialCommandId.CMD_PROCEED)
 ```
+
+## vscode termianl big sur fix
+```
+codesign --remove-signature /Applications/Visual\ Studio\ Code.app/Contents/Frameworks/Code\ Helper\ \(Renderer\).app
+```
+
 ## git vpn-split
 ```
 git config --global url."git://".insteadOf https://

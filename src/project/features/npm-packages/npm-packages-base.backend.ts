@@ -60,7 +60,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (!this.emptyNodeModuls) {
-      if (this.project.isContainer) {
+      if (this.project.isContainer && !this.project.isContainerCoreProject) {
         this.project.node_modules.remove();
       } else {
         this.project.node_modules.recreateFolder();
@@ -82,7 +82,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
       const installAllowed = (!this.project.isContainer || this.project.isContainerWithLinkedProjects || this.project.isContainerCoreProject);
 
       if (installAllowed) {
-        if (this.useSmartInstall) {
+        if (this.useSmartInstall
+          || (this.project.isContainerCoreProject && this.project.frameworkVersionAtLeast('v2')) && !options.smartInstallPreparing) {
           this.project.smartNodeModules.install(remove ? 'uninstall' : 'install', ...npmPackages);
         } else {
           if (fullInstall) {

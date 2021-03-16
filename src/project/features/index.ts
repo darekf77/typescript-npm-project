@@ -11,6 +11,7 @@ export * from './workspace-symlinks';
 export * from './target-project.backend';
 export * from './git-actions.backend';
 export * from './smart-node-modules.backend';
+export * from './recent-files.backend';
 //#endregion
 export * from './environment-config';
 export * from './package-json';

@@ -31,6 +31,10 @@ export abstract class FolderProject {
   }
   //#endregion
 
+  hasChild(this: Project, child: Project) {
+    return !_.isUndefined(this.children.find(c => c.name === child?.name));
+  }
+
   get children(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.children as any;

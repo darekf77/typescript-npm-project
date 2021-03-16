@@ -98,16 +98,21 @@ async function $OPEN(args: string) {
 
 }
 
+async function $RECENT_SAVE_ACTIVE(args) {
+  await (Project.Current as Project).recent.saveActiveProjects();
+  process.exit(0);
+}
 
+const $RECENT_ACTIVE_SAVE = (args) => $RECENT_SAVE_ACTIVE(args)
 
 function $RECENT_SET(args) {
-  RecentFilesForContainer.for(Project.Current as Project).setRecent(args);
+  (Project.Current as Project).recent.setFrom(args);
   process.exit(0);
 }
 
 
 function $OPEN_RECENT() {
-  RecentFilesForContainer.for(Project.Current as Project).openRecent();
+  (Project.Current as Project).recent.openRecent();
   process.exit(0);
 }
 
@@ -123,6 +128,10 @@ function $RECENT_OPEN() {
   $OPEN_RECENT();
 }
 
+function $RECENT() {
+  $OPEN_RECENT();
+}
+
 function $RECENT_CLOSE() {
   $CLOSE_RECENT();
 }
@@ -133,11 +142,14 @@ export default {
   $LOCATION: Helpers.CLIWRAP($LOCATION, '$LOCATION'),
   $OPEN: Helpers.CLIWRAP($OPEN, '$OPEN'),
 
+  $RECENT_SAVE_ACTIVE: Helpers.CLIWRAP($RECENT_SAVE_ACTIVE, '$RECENT_SAVE_ACTIVE'),
   $RECENT_SET: Helpers.CLIWRAP($RECENT_SET, '$RECENT_SET'),
   $OPEN_RECENT: Helpers.CLIWRAP($OPEN_RECENT, '$OPEN_RECENT'),
   $CLOSE_RECENT: Helpers.CLIWRAP($CLOSE_RECENT, '$CLOSE_RECENT'),
   $RECENT_CLOSE: Helpers.CLIWRAP($RECENT_CLOSE, '$RECENT_CLOSE'),
   $RECENT_OPEN: Helpers.CLIWRAP($RECENT_OPEN, '$RECENT_OPEN'),
+  $RECENT: Helpers.CLIWRAP($RECENT, '$RECENT'),
+  $RECENT_ACTIVE_SAVE: Helpers.CLIWRAP($RECENT_ACTIVE_SAVE, '$RECENT_ACTIVE_SAVE'),
   $SET_RECENT: Helpers.CLIWRAP($SET_RECENT, '$SET_RECENT'),
 
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),

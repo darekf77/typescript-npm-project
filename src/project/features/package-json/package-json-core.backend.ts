@@ -305,10 +305,10 @@ export class PackageJsonCore {
         .replace(`.json`, '');
       const obj = this.data[property];
       const splitPath = path.join(path.dirname(this.path), c);
-      Helpers.log(`splitPath: ${splitPath}`);
+      Helpers.log(`splitPath: ${splitPath}`, 2);
       Helpers.writeFile(splitPath, _.isObject(obj) ? obj : {});
     });
-    Helpers.log(`Split done..`)
+    Helpers.log(`Split done..`, 2)
     if (removeFromPj) {
       const dataToWrite = _.cloneDeep(this.data);
       config.packageJsonSplit.forEach(c => {

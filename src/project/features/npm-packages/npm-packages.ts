@@ -7,17 +7,17 @@ import { config } from 'tnp-config';
 
 export class NpmPackages extends NpmPackagesBase {
 
-  public async installFromArgs(packagesNamesSpaceSeparated: string, smoothInstall = false) {
+  public async installFromArgs(packagesNamesSpaceSeparated: string, smoothInstall = false, smartInstallPreparing = false) {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      await project.npmPackages.installProcess(`tnp install`, { smoothInstall });
+      await project.npmPackages.installProcess(`tnp install`, { smoothInstall, smartInstallPreparing });
     } else {
       const packages = resolvePacakgesFromArgs(args);
       await project.npmPackages.installProcess(`tnp install ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
-        .join(', ')} `, { npmPackages: packages, smoothInstall });
+        .join(', ')} `, { npmPackages: packages, smoothInstall, smartInstallPreparing });
     }
   }
 

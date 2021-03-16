@@ -105,7 +105,7 @@ export class GitActions extends FeatureForProject {
           if (action === 'pull') {
             this.project.git.pullCurrentBranch(
               // force
-              );
+            );
           }
           if (action === 'push') {
             this.project.git.pushCurrentBranch(force);
@@ -126,6 +126,9 @@ export class GitActions extends FeatureForProject {
   public async push(commitMessage?: string, force = false) {
     if (!commitMessage) {
       commitMessage = 'update';
+    }
+    if (this.project.isContainer) {
+      await this.project.recent.saveActiveProjects(false);
     }
     this.before();
     const childrenToPush = await this.getLinkedPorjectsAndChildrens('push');
@@ -169,7 +172,7 @@ export class GitActions extends FeatureForProject {
 
     await this.repeatMenu('pull');
 
-    const location =  this.project.location;
+    const location = this.project.location;
     Project.unload(this.project);
     this.project = Project.From(location) as Project;
 
@@ -180,6 +183,10 @@ export class GitActions extends FeatureForProject {
         await childProj.gitActions.pull();
       }
     }
+
+    // if (this.project.isContainer) {
+    //   this.project.recent.openRecent();
+    // }
   }
   //#endregion
 

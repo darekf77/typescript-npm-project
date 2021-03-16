@@ -40,6 +40,7 @@ import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
+import { RecentFilesForContainer } from '../../features/recent-files.backend';
 //#endregion
 
 @Morphi.Entity<Project>({
@@ -173,6 +174,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('targetProjects', TargetProject);
       this.defineProperty<Project>('gitActions', GitActions);
       this.defineProperty<Project>('smartNodeModules', SmartNodeModules);
+      this.defineProperty<Project>('recent', RecentFilesForContainer);
 
     }
 

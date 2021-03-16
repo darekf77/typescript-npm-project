@@ -7,7 +7,7 @@ import {
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
-  SmartNodeModules
+  SmartNodeModules, RecentFilesForContainer
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
@@ -17,6 +17,7 @@ import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
 import * as _ from 'lodash';
+
 
 
 
@@ -48,6 +49,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public targetProjects: TargetProject;
+  //#endregion
+
+  //#region @backend
+  public recent: RecentFilesForContainer;
   //#endregion
 
   //#region @backend

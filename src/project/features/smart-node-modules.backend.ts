@@ -33,11 +33,13 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region container core project for this project
   private get containerCore() {
-
     const frameworkVersion = this.project._frameworkVersion;
     const container = Project.by('container', frameworkVersion) as Project;
+    if (this.project.location === container?.location) {
+      Helpers.log(`Smart node modules instalation for container core..`)
+    }
     if (!SmartNodeModules._prepared[container.location]) {
-      prepare(container);
+      prepare(container, this.project);
     }
     SmartNodeModules._prepared[container.location] = container;
     return container;
@@ -172,9 +174,11 @@ export class SmartNodeModules extends FeatureForProject {
       `);
     }
     const c = this.containerCore;
-    this.project.node_modules.remove();
-    this.project.node_modules.copyFrom(c, 'smart node_modules instalation');
-    this.handlePackagesOverride();
+    if (c.location !== this.project.location) {
+      this.project.node_modules.remove();
+      this.project.node_modules.copyFrom(c, 'smart node_modules instalation');
+      this.handlePackagesOverride();
+    }
     Helpers.info(`DONE SMART INSTALL`);
   }
   //#endregion
@@ -185,7 +189,7 @@ export class SmartNodeModules extends FeatureForProject {
 //#region helpers
 
 //#region prepare
-function prepare(project: Project) {
+function prepare(project: Project, currentProject: Project) {
 
   project.packageJson.save(`prepare for smart node_modules`)
   if (!Helpers.exists(project.smartNodeModules.path)) {
@@ -196,8 +200,9 @@ function prepare(project: Project) {
     );
   }
   const tmpProj = Project.From(path.dirname(project.smartNodeModules.path)) as Project;
-  if (!tmpProj.node_modules.exist) {
-    tmpProj.npmPackages.installFromArgs('');
+  const reinstallForceSmartNodeModules = (project.isContainerCoreProject && (project.location === currentProject.location));
+  if (!tmpProj.node_modules.exist || reinstallForceSmartNodeModules) {
+    tmpProj.npmPackages.installFromArgs('', false, true);
   }
 
   Helpers.actionWrapper(() => {
