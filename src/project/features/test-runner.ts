@@ -2,6 +2,8 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import { FeatureForProject } from '../abstract';
+import * as chokidar from 'chokidar';
+import * as child from 'child_process';
 //#endregion
 
 import { config } from 'tnp-config';
@@ -27,7 +29,7 @@ export class TestRunner
   }
 
 
-  start(files?: string[], type: TestType = 'unit') {
+  async start(files?: string[], watchMode = false) {
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
       command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
@@ -36,33 +38,56 @@ export class TestRunner
     if (!command) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
-    Helpers.info(`Start of testing...`);
-    try {
-      this.project.run(command, { output: true }).sync()
-      Helpers.info(`End of testing...`);
-    } catch (err) {
-      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, false, true);
-    }
 
+    try {
+      if (watchMode) {
+        Helpers.clearConsole()
+        Helpers.info(`Start of testing... for watch mode`);
+        const result = child.execSync(command, {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          env: { ...process.env, FORCE_COLOR: '1' },
+          cwd: this.project.location
+        } as any);
+        console.log(result.toString());
+      } else {
+        console.info(`Start of testing...`);
+        this.project.run(command, { output: true }).sync()
+        console.info(`End of testing...`);
+      }
+    } catch (err) {
+      let errorMessage = err?.output[2]?.toString();
+      errorMessage = (errorMessage || '')
+      errorMessage = errorMessage.replace(_.first(errorMessage.split('TSError:')), '');
+      const toWrite = errorMessage.split('\n').map(l => {
+        if (l.trim().startsWith('at ')) {
+          return void 0;
+        }
+        return l;
+      }).filter(l => !_.isUndefined(l)).join('\n').trim();
+      Helpers.error(toWrite, true, true);
+      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, true, true);
+    }
   }
 
-
-  async startAndWatch(files?: string[], type: TestType = 'unit') {
-    let command: string;
-    if (this.project.typeIs('isomorphic-lib')) {
-      command = `npm-run mocha  -r ts-node/register --watch ${this.fileCommand(files)} `
-        + ` --watch-extensions ts --timeout ${config.CONST.TEST_TIMEOUT}`
-    }
-    if (!command) {
+  async startAndWatch(files?: string[]) {
+    if (this.project.typeIsNot('isomorphic-lib')) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
-    Helpers.info(`Start of testing...`);
-    try {
-      this.project.run(command, { output: true }).sync();
-      Helpers.info(`End of testing...`);
-    } catch (err) {
-      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, false, true);
-    }
+
+    const execture = _.debounce(async () => {
+      await this.start(files, true);
+    }, 500, {
+      // leading: true
+    });
+    const pathToWatch = `${this.project.path('src').absolute.normal}/**/*.ts`;
+    chokidar.watch([
+      pathToWatch,
+    ]).on('all', async () => {
+      // console.log('EVENT!')
+      // await this.start(files, true);
+      execture()
+    });
+    process.stdin.resume();
   }
   //#endregion
 

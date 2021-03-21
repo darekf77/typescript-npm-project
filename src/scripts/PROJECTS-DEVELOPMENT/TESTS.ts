@@ -49,7 +49,6 @@ function $PROCESS_CWD() {
 const $TEST_WATCH = async (args: string) => {
   await (Project.Current as Project).filesStructure.init(args);
   await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '))
-  process.exit(0)
 }
 
 const $TEST = async (args: string) => {
