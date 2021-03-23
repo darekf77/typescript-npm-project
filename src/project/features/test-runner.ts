@@ -56,15 +56,11 @@ export class TestRunner
       }
     } catch (err) {
       let errorMessage = err?.output[2]?.toString();
+      let errorMessage2 = err?.output[1]?.toString();
       errorMessage = (errorMessage || '')
       errorMessage = errorMessage.replace(_.first(errorMessage.split('TSError:')), '');
-      const toWrite = errorMessage.split('\n').map(l => {
-        if (l.trim().startsWith('at ')) {
-          return void 0;
-        }
-        return l;
-      }).filter(l => !_.isUndefined(l)).join('\n').trim();
-      Helpers.error(toWrite, true, true);
+      Helpers.error(remoteAtFromCallStack(errorMessage), true, true);
+      Helpers.error(remoteAtFromCallStack(errorMessage2), true, true);
       Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, true, true);
     }
   }
@@ -93,3 +89,20 @@ export class TestRunner
 
 
 }
+
+//#region @backend
+function remoteAtFromCallStack(s) {
+  // let oneExPass = false;
+  return s.split('\n').map(l => {
+    // if (l.trim().startsWith('at ')) { // TODO hmmm i think I don't need this.. long call stack ok when no fail
+    //   if (oneExPass) {
+    //     return void 0;
+    //   } else {
+    //     oneExPass = true;
+    //   }
+    // }
+    return l;
+  }).filter(l => !_.isUndefined(l)).join('\n').trim();
+}
+
+//#endregion
