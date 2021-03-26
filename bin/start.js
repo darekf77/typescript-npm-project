@@ -10,8 +10,6 @@ global.i0 = {
   defineInjectable: function () { }
 }
 
-global.hideLog = true;
-global.verboseLevel = 0;
 global.globalSystemToolMode = true;
 
 var frameworkName = process.argv.find(a => a.startsWith('-firedev'));
@@ -46,6 +44,8 @@ if (typeof useWorker !== 'undefined') {
   }
 }
 
+global.hideLog = true;
+global.verboseLevel = 0;
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
 if (typeof verboseLevel !== 'undefined') {
   global.hideLog = false;

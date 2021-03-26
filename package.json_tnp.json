@@ -129,7 +129,7 @@
         "vscode"
       ],
       "common": {
-        "tnp-config": "0.0.33",
+        "tnp-config": "0.0.34",
         "tnp-models": "0.0.19",
         "tnp-helpers": "0.0.22",
         "tnp-db": "0.0.20",
@@ -137,7 +137,7 @@
         "@types/node": "10.12.30",
         "morphi": "4.0.10",
         "gulp": "^3.9.1",
-        "ng2-logger": "4.0.14",
+        "ng2-logger": "4.0.15",
         "ng2-rest": "11.0.13",
         "record-replay-req-res-scenario": "0.0.9",
         "randomcolor": "^0.5.3",
@@ -226,7 +226,7 @@
         "typescript": {
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": "1.0.14",
+          "typescript-class-helpers": "1.0.15",
           "tslib": "^1.8.1",
           "ts-node": "^7.0.1",
           "typescript": "3.8.3",
@@ -291,7 +291,7 @@
             "ngx-bootstrap": "^2.0.2"
           },
           "icons": {
-            "button-dropdown": "1.0.18",
+            "button-dropdown": "1.0.19",
             "@iconify/react": "1.1.3",
             "@mdi/js": "5.8.55",
             "font-awesome": "^4.7.0",
@@ -300,7 +300,7 @@
           "essentials": {
             "element-resize-detector": "1.1.15",
             "static-columns": "1.0.13",
-            "bs4-breakpoint": "2.0.10",
+            "bs4-breakpoint": "2.0.11",
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
             "ngx-moment": "^3.0.1",
