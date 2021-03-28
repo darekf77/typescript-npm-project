@@ -21,13 +21,14 @@
         "aeschli.vscode-css-formatter",
         "shakram02.bash-beautify",
         "rogalmic.bash-debug",
-        "oic-pryv.automatic-terminal",
-        "omoki1207.pdf",
+        // "oic-pryv.automatic-terminal",
+        // "omoki1207.pdf",
         "ryanlaws.toggle-case",
         "msjsdiag.debugger-for-chrome",
         "ms-vscode-remote.remote-containers",
         "mrmlnc.vscode-json5",
         "dnicolson.binary-plist",
-        "ivangabriele.vscode-git-add-and-commit"
+        "ivangabriele.vscode-git-add-and-commit",
+        "mrmlnc.vscode-json5"
     ]
 }

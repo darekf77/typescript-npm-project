@@ -66,6 +66,18 @@ export abstract class TnpProject {
     //#endregion
   }
 
+  get isNaviCli(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isNaviCli;
+    }
+    //#region @backend
+    if (this.typeIsNot('isomorphic-lib')) {
+      return false;
+    }
+    return this.location === $Project.NaviCliLocation;
+    //#endregion
+  }
+
   get useFramework(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.useFramework;

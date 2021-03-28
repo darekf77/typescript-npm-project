@@ -55,7 +55,7 @@ export abstract class BuildableProject {
         // buildOptions.copyto = [];
         result = []
       } else {
-        if (project.isTnp) {
+        if (project.isTnp || project.isNaviCli) {
           // buildOptions.copyto = [];
           result = []
         } else {

@@ -9,13 +9,15 @@ import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
 import { PROGRESS_DATA } from 'tnp-models';
 //#endregion
 
-
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
-    return this.project.isStandaloneProject
+    if (Helpers.osIsMacOs('big-sur') && !this.project.isNaviCli) {
+      return false;
+    }
+    return (this.project.isStandaloneProject
       || this.project.isWorkspace
-      || this.project.isWorkspaceChildProject
+      || this.project.isWorkspaceChildProject)
   }
 
   public async installProcess(triggeredMsg: string, options?: Models.npm.NpmInstallOptions) {

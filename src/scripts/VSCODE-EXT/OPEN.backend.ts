@@ -136,6 +136,10 @@ function $RECENT_CLOSE() {
   $CLOSE_RECENT();
 }
 
+function $OPEN_NAVI_CLI() {
+  Helpers.run(`code ${Project.NaviCliLocation}`, { biggerBuffer: false }).sync();
+}
+
 
 
 export default {
@@ -154,6 +158,7 @@ export default {
 
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
+  $OPEN_NAVI_CLI: Helpers.CLIWRAP($OPEN_NAVI_CLI, '$OPEN_NAVI_CLI'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
   $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
   $OPEN_TNP_PROJECT: Helpers.CLIWRAP($OPEN_TNP_PROJECT, '$OPEN_TNP_PROJECT'),
