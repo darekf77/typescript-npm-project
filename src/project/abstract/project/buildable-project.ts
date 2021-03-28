@@ -144,7 +144,7 @@ export abstract class BuildableProject {
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
-    if (this.parent.isContainer && this.parent.frameworkVersionAtLeast('v2')) {
+    if (this.parent?.isContainer && this.parent.frameworkVersionAtLeast('v2')) {
       const projects = this.parent.projectsInOrderForChainBuild([])
         .filter(d => d.name !== this.parent.name && d.frameworkVersionAtLeast('v2')
           && d.typeIs(

@@ -26,7 +26,7 @@ const BUILD_DIST_WATCH = async (args) => (Project.Current as Project).buildProce
 
 const $BUILDWATCH = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isStandaloneProject) {
+  if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
     // TODO skipCopyToSelection no loger ipmortant
     args = `${args} --skipCopyToSelection --copytoAll`;
   }
