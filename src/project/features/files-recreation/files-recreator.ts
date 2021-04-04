@@ -354,6 +354,7 @@ export class FilesRecreator extends FeatureForProject {
                   })
                 }
               }
+              // settings['files.exclude'][config.folder.tmpTestsEnvironments] = false;
 
               return settings
             });
@@ -500,7 +501,7 @@ ${coreFiles}
         });
       });
       files.forEach(file => {
-        if(file.linked) {
+        if (file.linked) {
           Helpers.info(`Linking: ${file.from}`)
           Helpers.createSymLink(file.from, file.where);
         } else {

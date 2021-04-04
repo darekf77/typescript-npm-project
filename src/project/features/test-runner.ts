@@ -59,9 +59,20 @@ export class TestRunner
       let errorMessage2 = err?.output[1]?.toString();
       errorMessage = (errorMessage || '')
       errorMessage = errorMessage.replace(_.first(errorMessage.split('TSError:')), '');
-      Helpers.error(remoteAtFromCallStack(errorMessage), true, true);
-      Helpers.error(remoteAtFromCallStack(errorMessage2), true, true);
+
+      if (!errorMessage && !errorMessage2 && err.message) {
+        let first = _.first((err.message as string).split('\n'))
+        Helpers.error(first, true, true);
+      } else {
+        Helpers.error(remoteAtFromCallStack(errorMessage), true, true);
+        Helpers.error(remoteAtFromCallStack(errorMessage2), true, true);
+      }
       Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, true, true);
+      //       Helpers.pressKeyAndContinue(`
+
+      // Fix your code and press any key...
+
+      //       `)
     }
   }
 
