@@ -416,6 +416,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 
 # System Files
 .DS_Store
