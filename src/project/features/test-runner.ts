@@ -33,7 +33,7 @@ export class TestRunner
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
       command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
-        + ` --timeout ${config.CONST.TEST_TIMEOUT}`
+        + ` --timeout ${config.CONST.UNIT_TEST_TIMEOUT}`
     }
     if (!command) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
@@ -67,7 +67,7 @@ export class TestRunner
         Helpers.error(remoteAtFromCallStack(errorMessage), true, true);
         Helpers.error(remoteAtFromCallStack(errorMessage2), true, true);
       }
-      Helpers.error(`Error during testing files: ${this.fileCommand(files)}`, true, true);
+      Helpers.error(`Error during testing files *${this.fileCommand(files)}*`, true, true);
       //       Helpers.pressKeyAndContinue(`
 
       // Fix your code and press any key...
