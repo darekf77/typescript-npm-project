@@ -51,9 +51,20 @@ const $TEST_WATCH = async (args: string) => {
   await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '))
 }
 
+const $TEST_WATCH_DEBUG = async (args: string) => {
+  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '), true)
+}
+
 const $TEST = async (args: string) => {
   await (Project.Current as Project).filesStructure.init(args);
   await (Project.Current as Project).tests.start(args.trim().split(' '))
+  process.exit(0)
+}
+
+const $TEST_DEBUG = async (args: string) => {
+  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).tests.start(args.trim().split(' '), false, true)
   process.exit(0)
 }
 
@@ -116,7 +127,9 @@ function $SHOW_LOOP_MESSAGES(args) {
 export default {
   $PROCESS_CWD: Helpers.CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
   $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
+  $TEST_WATCH_DEBUG: Helpers.CLIWRAP($TEST_WATCH_DEBUG, '$TEST_WATCH_DEBUG'),
   $TEST: Helpers.CLIWRAP($TEST, '$TEST'),
+  $TEST_DEBUG: Helpers.CLIWRAP($TEST_DEBUG, '$TEST_DEBUG'),
   $READLAST: Helpers.CLIWRAP($READLAST, '$READLAST'),
   TEST_ASYNC_PROC: Helpers.CLIWRAP(TEST_ASYNC_PROC, 'TEST_ASYNC_PROC'),
   TEST_SYNC_PROC: Helpers.CLIWRAP(TEST_SYNC_PROC, 'TEST_SYNC_PROC'),

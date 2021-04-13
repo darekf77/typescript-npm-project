@@ -29,20 +29,27 @@ export class TestRunner
   }
 
 
-  async start(files?: string[], watchMode = false) {
+  async start(files?: string[], watchMode = false, debugMode = false) {
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
-      command = `npm-run mocha -r ts-node/register ${this.fileCommand(files)}`
+      command = `npm-run mocha ${debugMode ? '--debug --inspect' : ''} -r ts-node/register ${this.fileCommand(files)}`
         + ` --timeout ${config.CONST.UNIT_TEST_TIMEOUT}`
     }
     if (!command) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
 
+
+
     try {
       if (watchMode) {
         Helpers.clearConsole()
         Helpers.info(`Start of testing... for watch mode`);
+        // Helpers.info(`
+
+        // Running command: ${command}
+
+        // `)
         const result = child.execSync(command, {
           stdio: ['pipe', 'pipe', 'pipe'],
           env: { ...process.env, FORCE_COLOR: '1' },
@@ -76,13 +83,13 @@ export class TestRunner
     }
   }
 
-  async startAndWatch(files?: string[]) {
+  async startAndWatch(files?: string[], debug = false) {
     if (this.project.typeIsNot('isomorphic-lib')) {
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
 
     const execture = _.debounce(async () => {
-      await this.start(files, true);
+      await this.start(files, true, debug);
     }, 500, {
       // leading: true
     });
