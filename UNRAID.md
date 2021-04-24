@@ -1,6 +1,16 @@
+# GENERAL RULES
+ - single pci passthrough -> super problem, igpu is best solution
+ - (windwo vm) Q35 better for instalation
+ - be aware of unstable things
+      - usb ports
+      - sata ports
+      - pendrive
+      - hot chipset
+
+
 # override iommiu
 ```
-pcie_acs_override=downstream 
+pcie_acs_override=downstream,multifunction 
 ```
 
 # instalation of macos vm (macinabox)
@@ -19,7 +29,7 @@ virsh net-start default
 nerd pack plugin and then install netcat-openbsd.
 
 
-
+ONLY FOR ERROR: error: Cannot get interface MTU on 'br0': No such device
 <source bridge='br0'/>
 to 
 <source bridge='virbr0'/>
@@ -30,7 +40,6 @@ to
 # restart amd graphic card
 
 ```
-#!/bin/bash
 
 virsh shutdown "Ubuntu (gaming)"
 echo "sleeping 15s"
@@ -55,3 +64,36 @@ virsh start "Ubuntu (gaming)"
 ```
 qemu-img create -f raw -o preallocation=full /mnt/user/steam-ubuntu/steam-ubuntu.ing 150G
 ```
+
+
+# passthrough whole disk
+```
+/dev/disk/by-id/ata-CT1000P1SSD8_1946E227AC55
+/dev/disk/by-id/ata-Samsung_SSD_870_QVO_1TB_S5SVNG0NB06963M
+/dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S21PNSAG621562Z
+```
+
+# shrink vdisk
+```
+qemu-img resize my.img 74G
+
+```
+
+# nvme crucial passthrough
+```xml
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+...
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+      </source>
+      <alias name='ua-sm2262'/> 
+      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
+    </hostdev>
+...
+  <qemu:commandline>
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.ua-sm2262.x-msix-relocation=bar2'/>
+  </qemu:commandline>
+```
+

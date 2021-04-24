@@ -44,3 +44,10 @@ sudo pmset restoredefaults
 pmset -g
 ```
 
+# BIG SUR brew
+```
+/usr/sbin/softwareupdate --install-rosetta --agree-to-license
+arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+arch -x86_64 brew install <package>
+```
+
