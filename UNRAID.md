@@ -71,6 +71,8 @@ qemu-img create -f raw -o preallocation=full /mnt/user/steam-ubuntu/steam-ubuntu
 /dev/disk/by-id/ata-CT1000P1SSD8_1946E227AC55
 /dev/disk/by-id/ata-Samsung_SSD_870_QVO_1TB_S5SVNG0NB06963M
 /dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S21PNSAG621562Z
+/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3Z2NB0M704344P
+
 ```
 
 # shrink vdisk
