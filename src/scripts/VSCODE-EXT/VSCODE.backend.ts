@@ -88,6 +88,7 @@ function $FIX_WSL() {
 }
 
 function $VSCODE_GLOBAL() {
+  let keybindingPathLinxu = Helpers.resolve('~/.config/Code/User/keybindings.json');
   let keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
   const keys = [
     {
@@ -115,7 +116,9 @@ function $VSCODE_GLOBAL() {
       'command': 'default:redo'
     },
   ];
-  Helpers.writeFile(keybindingPath, keys);
+  Helpers.writeFile(
+     process.platform === 'linux' ? keybindingPathLinxu: keybindingPath
+     , keys);
 
   const settings = {
     'git.enableSmartCommit': true,
@@ -160,7 +163,10 @@ function $VSCODE_GLOBAL() {
     "terminal.integrated.shell.osx": "/bin/bash",
     "typescript.tsdk": "node_modules/typescript/lib"
   };
-  let settingspath = Helpers.resolve('~/Library/Application Support/Code/User/settings.json');
+  let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
+  let settingspath = Helpers.resolve(
+    process.platform === 'linux' ? settingspathLinux: '~/Library/Application Support/Code/User/settings.json'
+    );
   Helpers.writeFile(settingspath, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
@@ -173,12 +179,12 @@ const $VSCODE_FIX = async () => {
     const proj = projects[index];
     proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme(false);
   }
-  await new Promise(resolve => setTimeout(() => resolve(), 1000));
+  await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme();
   }
-  await new Promise(resolve => setTimeout(() => resolve(), 1000));
+  await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
     proj.project && (proj.project as Project).recreate.vscode.settings.gitReset();
