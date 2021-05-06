@@ -65,6 +65,15 @@ virsh start "Ubuntu (gaming)"
 qemu-img create -f raw -o preallocation=full /mnt/user/steam-ubuntu/steam-ubuntu.ing 150G
 ```
 
+# converting disk
+```
+# copy vdisk to physical disk.   
+dd if="location/of/vdisk" of=/dev/sdX
+
+# copy physical disk to vdisk.   
+qemu-img convert -p -O raw /dev/sdx "/mnt/user/domains/test/vdisk1.img"
+```
+
 
 # passthrough whole disk
 ```
