@@ -161,9 +161,24 @@ export async function $DIFF(newOriginNameOrUrl: string) {
   process.exit(0)
 }
 
+function $GIT_INFO() {
+  Helpers.info(`
+  Global settings:
 
+  username: ${Helpers.commnadOutputAsString('git config --global user.name')}
+  email: ${Helpers.commnadOutputAsString('git config --global user.email')}
+
+  Local settings:
+
+  username: ${Helpers.commnadOutputAsString('git config user.name')}
+  email: ${Helpers.commnadOutputAsString('git config user.email')}
+
+  `);
+  process.exit(0);
+}
 
 export default {
+  $GIT_INFO: Helpers.CLIWRAP($GIT_INFO, '$GIT_INFO'),
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
   $GIT_REMOVE_UNTRACKED: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
