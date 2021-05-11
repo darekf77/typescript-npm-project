@@ -81,7 +81,7 @@ qemu-img convert -p -O raw /dev/sdx "/mnt/user/domains/test/vdisk1.img"
 /dev/disk/by-id/ata-Samsung_SSD_870_QVO_1TB_S5SVNG0NB06963M
 /dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S21PNSAG621562Z
 /dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3Z2NB0M704344P
-
+/dev/disk/by-id/ata-5AS_20150626
 ```
 
 # shrink vdisk
