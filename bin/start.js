@@ -12,6 +12,14 @@ global.i0 = {
 
 global.globalSystemToolMode = true;
 
+if (process.argv.find((a, i) => {
+  if (a.startsWith('-installintnp') || a.startsWith('-iintnp')) {
+    installInTnp(process.argv.slice(i + 1));
+  }
+})) {
+
+}
+
 var frameworkName = process.argv.find(a => a.startsWith('-firedev'));
 if (typeof frameworkName !== 'undefined') {
   global.frameworkName = 'firedev';
@@ -151,3 +159,158 @@ global.frameworkMode = mode;
 // console.log('before start')
 start(process.argv, 'tnp', mode);
 //#endregion
+
+function installInTnp(arr = []) {
+  arr.push('tnp')
+  const path = require('path');
+  const child_process = require('child_process');
+  const fse = require('fs-extra');
+  const rimraf = require('rimraf');
+  fse.readlinkSync
+  const projectName = path.basename(process.cwd());
+  for (let index = 0; index < arr.length; index++) {
+    const proj = arr[index];
+    if (proj === projectName) {
+      console.log(`Ommiting ${proj}`)
+      continue;
+    }
+    if (!fse.existsSync(`./dist`)) {
+      fse.mkdirpSync('./dist');
+    }
+    if (proj !== 'tnp') {
+      try {
+        const linkP = fse.readlinkSync(`./node_modules`);
+        if((typeof linkP === 'string') && crossPlatofrmPath(linkP).endsWith('/tnp/node_modules') ) {
+          console.info(`DONE already linked tnp/node_modules for (${proj})..`);
+          continue;
+        }
+      } catch (error) {}
+    }
+    
+    if (proj !== 'tnp') {
+      try {
+        rimraf.sync('./node_modules')
+        child_process.execSync('lnk ../tnp/node_modules ./', { cwd: process.cwd() });
+        console.info(`DONE Link only (${proj})..`);
+        continue;
+      } catch (error) {
+        console.error(`Not able to link in ${proj}`)
+      }
+    }
+    
+    child_process.execSync(`rimraf ../${proj}/node_modules/${projectName} && lnk ./dist/ ../${proj}/node_modules/${projectName} && lnk ./src/ ../${proj}/node_modules/${projectName}`, { cwd: process.cwd() });
+    fse.writeFileSync(`../${proj}/node_modules/${projectName}/index.js`, `
+    "use strict";
+  Object.defineProperty(exports, "__esModule", { value: true });
+  var tslib_1 = require("tslib");
+  tslib_1.__exportStar(require("./dist"), exports);
+   
+    `)
+    fse.writeFileSync(`../${proj}/node_modules/${projectName}/index.d.ts`, `
+    export * from './src';
+    `)
+    fse.writeFileSync(`./tsconfig.json`,tsconfig())
+  fse.writeFileSync(`./tsconfig.isomorphic.json`,tsconfigIso())
+    console.info(`DONE all for ${proj}`)
+  }
+  
+
+  console.info(`DONE`)
+  process.exit(0)
+}
+
+
+function crossPlatofrmPath(p) {
+
+  // const isExtendedLengthPath = /^\\\\\?\\/.test(p);
+  // const hasNonAscii = /[^\u0000-\u0080]+/.test(p); // eslint-disable-line no-control-regex
+
+  // if (isExtendedLengthPath || hasNonAscii) {
+  //   return p;
+  // }
+
+  // return path.replace(/\\/g, '/');
+
+  if (process.platform === 'win32') {
+    return p.replace(/\\/g, '/');
+  }
+  return p;
+}
+
+
+
+
+function tsconfig() {
+  return `
+  {
+    "extends": "./tsconfig.isomorphic.json",
+    "compilerOptions": {
+        "rootDir": "./src"
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
+
+  `
+}
+
+function tsconfigIso() {
+  return `
+  {
+    "compileOnSave": true,
+    "compilerOptions": {
+      "declaration": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "allowSyntheticDefaultImports": true,
+      "importHelpers": true,
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "skipLibCheck": true,
+      "sourceMap": true,
+      "target": "es5",
+      "typeRoots": [
+        "node_modules/@types"
+      ],
+      "lib": [
+        "es2015",
+        "es2015.promise",
+        "es2015.generator",
+        "es2015.collection",
+        "es2015.core",
+        "es2015.reflect",
+        "es2016",
+        "dom"
+      ],
+      "types": [
+        "node"
+      ],
+      "rootDir": "./tmp-src",
+      "outDir": "dist"
+    },
+    "include": [
+      "tmp-src/**/*"
+    ],
+    "exclude": [
+      "node_modules",
+      "preview",
+      "projects",
+      "docs",
+      "dist",
+      "bundle",
+      "example",
+      "examples",
+      "browser",
+      "module",
+      "tmp-src",
+      "src/tests",
+      "src/**/*.spec.ts",
+      "tmp-site-src",
+      "tmp-tests-context"
+    ]
+  }
+  
+
+  `
+}

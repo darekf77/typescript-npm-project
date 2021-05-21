@@ -10,8 +10,7 @@ export function $VSCODE_EXT(args: string, exit = true) {
     output: true
   }).sync();
   if (Helpers.isWsl) {
-    Helpers.warn(`MANUALL INSTALL NEEDED FOR EXTENSION ${
-      path.join(config.pathes.tnp_vscode_ext_location, 'tnp-vscode-ext-0.0.1.vsix')}`)
+    Helpers.warn(`MANUALL INSTALL NEEDED FOR EXTENSION ${path.join(config.pathes.tnp_vscode_ext_location, 'tnp-vscode-ext-0.0.1.vsix')}`)
   }
   exit && process.exit(0)
 }
@@ -117,8 +116,21 @@ function $VSCODE_GLOBAL() {
     },
   ];
   Helpers.writeFile(
-     process.platform === 'linux' ? keybindingPathLinxu: keybindingPath
-     , keys);
+    process.platform === 'linux' ? keybindingPathLinxu : keybindingPath
+    , keys);
+
+  const windowsSettings = {
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "terminal.integrated.shellArgs.windows": [
+      "--login"
+    ],
+    "window.customMenuBarAltFocus": false,
+    "window.enableMenuBarMnemonics": false,
+  };
+
+  const settingsMacOS = {
+    "terminal.integrated.shell.osx": "/bin/bash",
+  }
 
   const settings = {
     'git.enableSmartCommit': true,
@@ -159,14 +171,13 @@ function $VSCODE_GLOBAL() {
     'explorer.compactFolders': false,
     'workbench.colorTheme': 'Default Light+',
     "update.mode": "none",
-    "debug.onTaskErrors": "abort",
-    "terminal.integrated.shell.osx": "/bin/bash",
+    "debug.onTaskErrors": "abort",   
     "typescript.tsdk": "node_modules/typescript/lib"
   };
   let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
   let settingspath = Helpers.resolve(
-    process.platform === 'linux' ? settingspathLinux: '~/Library/Application Support/Code/User/settings.json'
-    );
+    process.platform === 'linux' ? settingspathLinux : '~/Library/Application Support/Code/User/settings.json'
+  );
   Helpers.writeFile(settingspath, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
