@@ -1,10 +1,10 @@
 //#region @backend
 import chalk from 'chalk';
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProxyRouter } from '../proxy-router';
@@ -243,7 +243,8 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
 export const existedConfigs = {} as { [workspacePath in string]: Models.env.EnvConfig; }
 
 
-export async function standaloneConfigBy(standaloneProject: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
+export async function standaloneConfigBy(standaloneProject: Project,
+  environment: ConfigModels.EnvironmentName): Promise<Models.env.EnvConfig> {
   let configStandaloneEnv: Models.env.EnvConfig;
   const envSurfix = (environment === 'local') ? '' : `.${environment}`;
   var pathToProjectEnvironment = path.join(standaloneProject.location, `${config.file.environment}${envSurfix}`);
@@ -259,7 +260,8 @@ export async function standaloneConfigBy(standaloneProject: Project, environment
   return configStandaloneEnv;
 }
 
-export async function workspaceConfigBy(workspace: Project, environment: Models.env.EnvironmentName): Promise<Models.env.EnvConfig> {
+export async function workspaceConfigBy(workspace: Project,
+  environment: ConfigModels.EnvironmentName): Promise<Models.env.EnvConfig> {
   let configWorkspaceEnv: Models.env.EnvConfig;
 
   const alreadyExistProject = (workspace && workspace.isWorkspace) ? existedConfigs[workspace.location] : null;

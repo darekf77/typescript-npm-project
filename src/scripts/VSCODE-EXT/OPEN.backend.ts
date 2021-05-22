@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as express from 'express';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import { config } from 'tnp-config';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';

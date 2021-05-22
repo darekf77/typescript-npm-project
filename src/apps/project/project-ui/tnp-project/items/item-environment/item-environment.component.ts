@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 import { PROJECT } from '../../../../PROJECT';
 import { Log, Level } from 'ng2-logger';

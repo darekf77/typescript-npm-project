@@ -1,8 +1,8 @@
 //#region imports
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as semver from 'semver';
 import chalk from 'chalk';
 
@@ -80,7 +80,7 @@ export class PackageJsonCore {
     return config.defaultFrameworkVersion;
   }
 
-  get frameworks(): Models.env.UIFramework[] {
+  get frameworks(): ConfigModels.UIFramework[] {
     const res = this.data.tnp &&
       _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
     if (res.filter(f => !config.frameworks.includes(f)).length > 0) {

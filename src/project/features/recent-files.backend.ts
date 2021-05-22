@@ -1,6 +1,6 @@
 //#region imports / exports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
 
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';

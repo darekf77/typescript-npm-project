@@ -1,6 +1,6 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import chalk from 'chalk';
 import {
   StaticBuild, TestRunner,
@@ -16,7 +16,7 @@ import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 //#endregion
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 
 
 

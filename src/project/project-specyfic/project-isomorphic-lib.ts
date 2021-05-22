@@ -1,13 +1,13 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as glob from 'glob';
 import * as inquirer from 'inquirer';
 import { config } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract/project/project';
 //#endregion
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';

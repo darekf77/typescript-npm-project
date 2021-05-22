@@ -1,5 +1,5 @@
 import { Helpers } from 'tnp-helpers';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
@@ -156,6 +156,7 @@ function $VSCODE_GLOBAL() {
     },
     'search.followSymlinks': false,
     'javascript.implicitProjectConfig.experimentalDecorators': true,
+    "js/ts.implicitProjectConfig.experimentalDecorators": true,
     'gitlens.historyExplorer.enabled': true,
     'diffEditor.ignoreTrimWhitespace': true,
     'explorer.confirmDelete': false,
@@ -171,7 +172,7 @@ function $VSCODE_GLOBAL() {
     'explorer.compactFolders': false,
     'workbench.colorTheme': 'Default Light+',
     "update.mode": "none",
-    "debug.onTaskErrors": "abort",   
+    "debug.onTaskErrors": "abort",
     "typescript.tsdk": "node_modules/typescript/lib"
   };
   let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');

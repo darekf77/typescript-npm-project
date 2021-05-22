@@ -1,9 +1,9 @@
 //#region imports
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import * as chokidar from 'chokidar';

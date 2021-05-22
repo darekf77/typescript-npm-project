@@ -1,5 +1,5 @@
 //#region @backend
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { NpmPackagesBase } from './npm-packages-base.backend';
 import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';

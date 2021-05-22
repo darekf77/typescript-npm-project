@@ -1,7 +1,7 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as _ from 'lodash';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import {
@@ -14,12 +14,12 @@ import { FeatureForProject } from '../../abstract';
 //#endregion
 
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 
 
 //#region @backend
-const environmentWithGeneratedIps: Models.env.EnvironmentName[] = ['prod', 'stage'];
+const environmentWithGeneratedIps: ConfigModels.EnvironmentName[] = ['prod', 'stage'];
 //#endregion
 
 export interface IEnvironmentConfig {
@@ -109,7 +109,7 @@ export class EnvironmentConfig
     }
 
 
-    const { generateIps, env }: { generateIps: boolean, env: Models.env.EnvironmentName } =
+    const { generateIps, env }: { generateIps: boolean, env: ConfigModels.EnvironmentName } =
       _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
 
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'

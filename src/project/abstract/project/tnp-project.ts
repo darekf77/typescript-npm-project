@@ -1,7 +1,7 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as _ from 'lodash';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
 import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';

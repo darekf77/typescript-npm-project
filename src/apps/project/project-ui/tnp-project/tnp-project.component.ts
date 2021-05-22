@@ -5,7 +5,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 //#endregion
 
 //#region isomorphic
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { TnpProjectTabIndex } from './tabs-menu-tnp-project';
 import { PROJECT } from '../../PROJECT';
 import { BaseComponent } from 'tnp-helpers';

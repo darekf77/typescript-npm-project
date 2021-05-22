@@ -1,8 +1,8 @@
 //#region @backend
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as rimraf from 'rimraf';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
+import { rimraf } from 'tnp-core'
 
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';

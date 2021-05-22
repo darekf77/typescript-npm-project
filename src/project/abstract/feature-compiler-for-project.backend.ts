@@ -1,6 +1,6 @@
 //#region imports
-import * as path from 'path';
-import * as _ from 'lodash';
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
 import { IncCompiler } from 'incremental-compiler';

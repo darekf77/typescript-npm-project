@@ -1,7 +1,4 @@
 //#region @backend
-import * as path from 'path';
-import * as fs from 'fs';
-import * as child from 'child_process';
 import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';

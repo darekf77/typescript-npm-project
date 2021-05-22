@@ -1,8 +1,9 @@
 //#region isomorphic
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Morphi, MDC } from 'morphi';
 import { PROJECT } from './PROJECT';
 import { Models } from 'tnp-models';
+import { ConfigModels } from 'tnp-config';
 //#endregion
 
 @Morphi.Controller({
@@ -61,7 +62,7 @@ export class ProjectController extends Morphi.Base.Controller<PROJECT> {
 
   @Morphi.Http.GET('/environments/:location')
   public getEnvironments(@Morphi.Http.Param.Path('location') location: string)
-    : Morphi.Response<Models.env.EnvironmentName[]> {
+    : Morphi.Response<ConfigModels.EnvironmentName[]> {
     //#region @backendFunc
     return async (req) => {
       location = decodeURIComponent(location);

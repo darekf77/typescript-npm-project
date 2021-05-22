@@ -1,6 +1,6 @@
 //#region imports
 import chalk from 'chalk';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';

@@ -1,8 +1,8 @@
 //#region @backend
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as fs from 'fs';
 import glob = require('glob')
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { config } from 'tnp-config';

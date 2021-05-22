@@ -1,9 +1,9 @@
 //#region @backend
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
 import { FeatureForProject } from '../abstract';
 import * as chokidar from 'chokidar';
-import * as child from 'child_process';
+import { child_process } from 'tnp-core';
 //#endregion
 
 import { config } from 'tnp-config';
@@ -50,7 +50,7 @@ export class TestRunner
         // Running command: ${command}
 
         // `)
-        const result = child.execSync(command, {
+        const result = child_process.execSync(command, {
           stdio: ['pipe', 'pipe', 'pipe'],
           env: { ...process.env, FORCE_COLOR: '1' },
           cwd: this.project.location

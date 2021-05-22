@@ -1,7 +1,7 @@
-import * as path from 'path';
-import * as _ from 'lodash';
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import chalk from 'chalk';
-import * as fse from 'fs-extra';
+import { fse } from 'tnp-core'
 
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject, Project } from '../../abstract';

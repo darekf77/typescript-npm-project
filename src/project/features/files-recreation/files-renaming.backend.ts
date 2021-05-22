@@ -1,8 +1,8 @@
 import chalk from 'chalk';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import * as glob from 'glob';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as sharp from 'sharp';
 import { png2svg } from 'svg-png-converter';
 import { Helpers } from 'tnp-helpers';

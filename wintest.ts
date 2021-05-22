@@ -1,7 +1,7 @@
 
-import * as path from 'path';
+import { path } from 'tnp-core'
 
-import * as fse from 'fs-extra';
+import { fse } from 'tnp-core'
 
 export default function slash(p) {
     if (process.platform === 'win32') {
@@ -25,7 +25,7 @@ export default function slash(p) {
 	return p.replace(/\\/g, '/');
 }
 
-import * as os from 'os';
+import { os } from 'tnp-core';
 
 const v = os.homedir();
 

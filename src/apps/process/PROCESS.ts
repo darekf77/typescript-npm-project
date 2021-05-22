@@ -1,6 +1,6 @@
 // console.log('INITING PROCESS')
 //#region isomorphic
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { PROGRESS_DATA } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
@@ -10,10 +10,10 @@ import { Project } from 'tnp-helpers';
 //#endregion
 
 //#region @backend
-import * as path from 'path';
-import * as fse from 'fs-extra';
-import * as rimraf from 'rimraf';
-import * as child from 'child_process';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
+import { rimraf } from 'tnp-core'
+import { child_process } from 'tnp-core';
 import * as psList from 'ps-list';
 //#endregion
 
@@ -292,7 +292,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
       if (this.isSync) {
 
         try {
-          var stdout = child.execSync(COMMAND_TO_EXECUTE, { cwd: this.cwd })
+          var stdout = child_process.execSync(COMMAND_TO_EXECUTE, { cwd: this.cwd })
           fse.writeFileSync(this.exitCodePath, (0).toString())
         } catch (err) {
           fse.writeFileSync(this.exitCodePath, (((err && _.isNumber(err.status)) ? err.status : 1)).toString())
@@ -331,7 +331,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     //#region @backend
     if (Morphi.isNode) {
       try {
-        child.execSync(`pkill -9 -P ${this.pid}`)
+        child_process.execSync(`pkill -9 -P ${this.pid}`)
         console.log(`Process (pid: ${this.pid}) childs killed successfully`)
       } catch (err) {
         console.log(err)
@@ -339,7 +339,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
       }
 
       try {
-        child.execSync(`kill -9 ${this.pid}`)
+        child_process.execSync(`kill -9 ${this.pid}`)
         console.log(`Process (pid: ${this.pid}) killed successfully`)
       } catch (error) {
         console.log(`Process (pid: ${this.pid}) NOT KILLED`)
@@ -422,7 +422,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
 
 
 //#region @backend
-function attach(p: child.ChildProcess, proc: PROCESS, resolve?: (any?) => any) {
+function attach(p: child_process.ChildProcess, proc: PROCESS, resolve?: (any?) => any) {
 
   attachListeners(p, {
     msgAction: (chunk) => {
@@ -453,7 +453,7 @@ function attach(p: child.ChildProcess, proc: PROCESS, resolve?: (any?) => any) {
   })
 }
 
-function attachListeners(childProcess: child.ChildProcess, actions: {
+function attachListeners(childProcess: child_process.ChildProcess, actions: {
   msgAction: (message: string) => void;
   endAction: (exitCode: number) => void;
   errorAction: (message: string) => void

@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';

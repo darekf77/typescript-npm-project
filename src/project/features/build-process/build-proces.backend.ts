@@ -1,8 +1,8 @@
 //#region imports
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import chalk from 'chalk';
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as glob from 'glob';
 
 import { FeatureForProject, Project } from '../../abstract';

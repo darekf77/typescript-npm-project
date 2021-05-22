@@ -1,8 +1,8 @@
 import { describe } from 'mocha';
 import { expect, use } from 'chai';
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as _ from 'lodash';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 
 import { SpecWrap } from './_helpers.spec';
 import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';

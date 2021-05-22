@@ -1,5 +1,5 @@
 //#region @backend
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProjectFactory } from './project-factory.backend';

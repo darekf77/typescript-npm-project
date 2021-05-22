@@ -1,5 +1,5 @@
 //#region imports
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import {
   Component, OnInit, Input, ElementRef,
   OnDestroy, AfterViewInit, HostBinding

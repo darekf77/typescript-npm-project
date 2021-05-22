@@ -1,5 +1,5 @@
 // //#region @backend
-// import * as path from 'path';
+// import { path } from 'tnp-core'
 // import { CLASS } from 'typescript-class-helpers';
 // import { IncCompiler } from 'incremental-compiler';
 // import { Helpers } from 'tnp-helpers';

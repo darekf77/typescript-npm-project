@@ -1,6 +1,6 @@
 //#region @backend
 import chalk from 'chalk';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as portfinder from 'portfinder';
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';

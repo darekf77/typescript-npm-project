@@ -7,10 +7,10 @@ import { PROCESS } from './PROCESS';
 //#region @backend
 import { authenticate } from 'passport'
 import * as  psList from 'ps-list';
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as rimraf from 'rimraf';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { rimraf } from 'tnp-core'
+import { fse } from 'tnp-core'
 //#endregion
 
 @Morphi.Controller({

@@ -1,6 +1,6 @@
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import * as open from 'open';
 import * as glob from 'glob';
 import chalk from 'chalk';

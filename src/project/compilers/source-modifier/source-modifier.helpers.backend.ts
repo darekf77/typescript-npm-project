@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { ImpReplaceOptions } from './source-modifier.models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';

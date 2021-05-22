@@ -1,7 +1,7 @@
 //#region imports
-import * as fse from 'fs-extra';
-import * as path from 'path';
-import * as _ from 'lodash';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import chalk from 'chalk';
 import * as json5 from 'json5';
 

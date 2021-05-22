@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';

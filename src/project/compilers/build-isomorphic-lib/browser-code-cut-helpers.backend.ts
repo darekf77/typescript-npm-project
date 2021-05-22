@@ -1,6 +1,6 @@
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import * as sass from 'node-sass';
 
 import { Models } from 'tnp-models';

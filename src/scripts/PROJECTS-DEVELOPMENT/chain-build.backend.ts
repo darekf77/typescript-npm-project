@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';

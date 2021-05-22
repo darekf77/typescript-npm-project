@@ -4,7 +4,7 @@ import {
   Component, OnInit, Input, ViewChild, ElementRef,
   OnDestroy, OnChanges, SimpleChange, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 
 // formly
 import { PROCESS } from '../PROCESS';

@@ -1,5 +1,5 @@
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import { ConfigModels, LibTypeArr } from 'tnp-config';
 declare const global: any;
 if (global.globalSystemToolMode) {
@@ -58,7 +58,7 @@ if (Object.keys(global['ENV']).length === 0) {
 // process.exit(0)
 
 //#region imports
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 // import glob = require('glob')
 import scriptsFnArr from './scripts/index';

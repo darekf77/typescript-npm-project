@@ -1,7 +1,7 @@
 //#region imports
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as express from 'express';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';

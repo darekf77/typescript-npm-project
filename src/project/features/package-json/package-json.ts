@@ -1,11 +1,11 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import chalk from 'chalk';
 import { PackageJsonBase } from './package-json-base.backend';
 //#endregion
 
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';

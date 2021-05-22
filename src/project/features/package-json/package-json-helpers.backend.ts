@@ -1,5 +1,5 @@
 //#region imports
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as JSON5 from 'json5';
 import { JSON10 } from 'json10';
 import chalk from 'chalk';

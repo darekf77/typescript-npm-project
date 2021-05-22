@@ -1,6 +1,6 @@
-import * as path from 'path';
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
 
 import { Project, FeatureCompilerForProject } from '../../abstract';
 import { config } from 'tnp-config';

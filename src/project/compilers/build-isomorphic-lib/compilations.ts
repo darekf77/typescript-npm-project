@@ -1,9 +1,9 @@
 //#region @backend
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 
-import { BroswerCompilation, OutFolder, BackendCompilation } from 'morphi';
+import { BroswerCompilation, BackendCompilation } from 'morphi';
 import { Models } from 'tnp-models';
 import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
@@ -11,7 +11,7 @@ import { BuildOptions } from 'tnp-db';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -99,7 +99,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     /**
      * browser-for-(dist|bundle|projectName)
      */
-    outFolder: OutFolder,
+    outFolder: ConfigModels.OutFolder,
     location: string,
     cwd: string,
     backendOut: string,

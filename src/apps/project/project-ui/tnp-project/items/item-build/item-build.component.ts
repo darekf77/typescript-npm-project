@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Component, OnInit, Input } from '@angular/core';
 import { BaseItemStepperProcessBuildComponent } from '../base-item-stepper';
 

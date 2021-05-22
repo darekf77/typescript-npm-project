@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import chalk from 'chalk';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 
 import { JSON10 } from 'json10';
 import { config, ConfigModels } from 'tnp-config';

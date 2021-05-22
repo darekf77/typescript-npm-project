@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import {
   EventEmitter, Component, OnInit, Input,
   Output, OnChanges, ElementRef, AfterViewInit, HostBinding, OnDestroy, ChangeDetectorRef

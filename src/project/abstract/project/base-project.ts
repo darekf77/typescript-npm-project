@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 export { ChildProcess } from 'child_process';
 //#endregion
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import type { Project } from './project';
 import { config } from 'tnp-config';

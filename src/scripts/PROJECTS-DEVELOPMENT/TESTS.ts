@@ -1,5 +1,5 @@
 //#region @backend
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from 'tnp-models';

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import * as semver from 'semver';
 import chalk from 'chalk';
@@ -10,7 +10,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';

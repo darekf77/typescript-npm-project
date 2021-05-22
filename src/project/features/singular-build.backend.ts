@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as glob from 'glob';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-factory.backend';

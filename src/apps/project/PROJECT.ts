@@ -1,21 +1,21 @@
 //#region isomorphic
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Morphi, ModelDataConfig } from 'morphi';
 import { Project } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
 import { PROCESS } from '../process/PROCESS';
 import { Log } from 'ng2-logger';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import type { ProjectController } from './ProjectController';
 //#endregion
 
 //#region @backend
 import { TnpDB } from 'tnp-db';
-import * as fse from 'fs-extra';
+import { fse } from 'tnp-core'
 import * as glob from 'glob';
-import * as path from 'path';
-import * as child from 'child_process';
+import { path } from 'tnp-core'
+import { child_process } from 'tnp-core';
 import axios from 'axios';
 //#endregion
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -68,7 +68,7 @@ export class PROJECT extends Project {
   public procServeStatic?: PROCESS;
   public procClear?: PROCESS;
   public selectedTabChanged = new BehaviorSubject<number>(0);
-  public readonly envionments: Models.env.EnvironmentName[] = [];
+  public readonly envionments: ConfigModels.EnvironmentName[] = [];
   private _selectedIndex = 0;
 
   public static async getAllProjects() {
@@ -108,7 +108,7 @@ export class PROJECT extends Project {
     return data.body.json;
   }
 
-  public static async getByLocation(location: string, config?: ModelDataConfig): Promise<PROJECT> {
+  public static async getByLocation(location: string, pconfig?: ModelDataConfig): Promise<PROJECT> {
     //#region @backend
     if (Morphi.isNode) {
       const res = Project.From(decodeURIComponent(location));
@@ -168,7 +168,7 @@ export class PROJECT extends Project {
   }
 
 
-  public namesFrom(): Models.env.EnvironmentName[] {
+  public namesFrom(): ConfigModels.EnvironmentName[] {
     //#region @backendFunc
     const patter = `${this.location}/${config.file.environment}.*`;
     let names = glob

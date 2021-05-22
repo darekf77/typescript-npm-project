@@ -1,13 +1,13 @@
 //#region @backend
 import { BuildProcess } from '../../features';
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as glob from 'glob';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
 //#endregion
 import type { Project } from './project';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from 'tnp-config';

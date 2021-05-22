@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as JSON5 from 'json5';
 import * as inquirer from 'inquirer';
 

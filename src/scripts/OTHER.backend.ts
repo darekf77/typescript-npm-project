@@ -1,12 +1,12 @@
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
 import { Project } from '../project';
 import * as  psList from 'ps-list';
 import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 declare const ENV: any;

@@ -1,6 +1,6 @@
 //#region imports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';
 import { HelpersMerge } from 'tnp-helpers';

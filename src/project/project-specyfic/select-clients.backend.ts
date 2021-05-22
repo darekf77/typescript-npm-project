@@ -1,6 +1,6 @@
 //#region imports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
 import chalk from 'chalk';
 import { Project } from '../abstract/project';
 import { config } from 'tnp-config';

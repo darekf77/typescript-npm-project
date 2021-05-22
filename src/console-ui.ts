@@ -1,9 +1,9 @@
 // //#region @backend
 // import { Project } from './project';
 // import { prompt } from 'enquirer';
-// import * as _ from 'lodash';
-// import * as fse from 'fs-extra';
-// import * as path from 'path';
+// import { _ } from 'tnp-core';
+// import { fse } from 'tnp-core'
+// import { path } from 'tnp-core'
 // import { EnumValues } from 'enum-values'
 // import { CommandInstance } from './tnp-db/entites';
 // import { Helpers } from 'tnp-helpers';

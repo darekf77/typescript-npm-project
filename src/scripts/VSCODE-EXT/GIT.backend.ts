@@ -1,12 +1,12 @@
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
 import chalk from 'chalk';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { PROGRESS_DATA } from 'tnp-models';
-import * as os from 'os';
+import { os } from 'tnp-core';
 
 export type TAction = 'clone' | 'pull';
 const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
@@ -70,6 +70,11 @@ const $GIT_REMOVE_UNTRACKED_EVERYWHERE = () => {
 
 export async function $PUSH(comitMessage: string, exit = true, force = false) {
   await (Project.Current as Project).gitActions.push(comitMessage, force);
+  process.exit(0);
+}
+
+export async function $FORCE_PUSH(comitMessage: string, exit = true, force = false) {
+  await (Project.Current as Project).gitActions.push(comitMessage, true);
   process.exit(0);
 }
 
@@ -186,6 +191,7 @@ export default {
   $RENAME_ORIGIN: Helpers.CLIWRAP($RENAME_ORIGIN, '$RENAME_ORIGIN'),
   $SET_ORIGIN: Helpers.CLIWRAP($SET_ORIGIN, '$SET_ORIGIN'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
+  $FORCE_PUSH: Helpers.CLIWRAP($FORCE_PUSH, '$FORCE_PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),

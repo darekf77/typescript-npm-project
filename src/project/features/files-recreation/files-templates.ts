@@ -1,7 +1,7 @@
 //#region @backend
-import * as path from 'path';
-import * as fse from 'fs-extra';
-import * as _ from 'lodash';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
+import { _ } from 'tnp-core';
 import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';

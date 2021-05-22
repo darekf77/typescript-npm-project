@@ -1,7 +1,7 @@
 //#region @backend
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import { SingularBuild } from '../features/singular-build.backend';
 import { Project } from '../abstract';
 //#endregion

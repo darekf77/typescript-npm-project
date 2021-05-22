@@ -1,5 +1,5 @@
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
 
@@ -47,7 +47,7 @@ export class ControllersGenerator extends EntitesGenerator {
       //#${'region'} @backend
 
       import { CLASS } from 'typescript-class-helpers';
-      import * as _ from 'lodash'
+      import { _ } from 'tnp-core'
 
       export function controllers<ADDITIONAL={}>(decoratorsControllers?: ADDITIONAL) {
         return _.merge(${isSiteInStrictMode ? 'controllersBaseline.controllers(),' : ''} {

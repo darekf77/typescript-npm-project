@@ -1,6 +1,6 @@
 //#region @backend
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import * as glob from 'glob';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';

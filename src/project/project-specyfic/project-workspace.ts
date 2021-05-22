@@ -1,7 +1,7 @@
 //#region @backend
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import * as glob from 'glob';
-import * as fse from 'fs-extra';
+import { fse } from 'tnp-core'
 import chalk from 'chalk';
 import { SingularBuild } from '../features/singular-build.backend';
 import { Project } from '../abstract';

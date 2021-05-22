@@ -1,7 +1,7 @@
 //#region @backend
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import chalk from 'chalk';
 //#endregion
 

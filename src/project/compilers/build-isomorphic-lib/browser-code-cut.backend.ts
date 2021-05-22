@@ -1,9 +1,9 @@
-import * as _ from 'lodash';
-import * as path from 'path';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { path } from 'tnp-core'
+import { fse } from 'tnp-core'
 import * as sass from 'node-sass';
 
-import { CodeCut, BrowserCodeCut, TsUsage } from 'morphi';
+import { CodeCut, BrowserCodeCut } from 'morphi';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';

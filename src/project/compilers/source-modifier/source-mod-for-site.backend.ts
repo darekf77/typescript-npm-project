@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { ModType, CheckType } from './source-modifier.models';

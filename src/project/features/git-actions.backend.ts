@@ -1,12 +1,12 @@
 //#region imports
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
 import chalk from 'chalk';
 import { Helpers } from 'tnp-helpers';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { PROGRESS_DATA } from 'tnp-models';
-import * as os from 'os';
+import { os } from 'tnp-core';
 import { FeatureForProject, Project } from '../abstract';
 //#endregion
 
@@ -134,7 +134,7 @@ export class GitActions extends FeatureForProject {
     const childrenToPush = await this.getLinkedPorjectsAndChildrens('push');
     for (let index = 0; index < childrenToPush.length; index++) {
       const childProj = childrenToPush[index];
-      await childProj.gitActions.push(commitMessage);
+      await childProj.gitActions.push(commitMessage, force);
     }
 
     if (this.project.git.thereAreSomeUncommitedChange) {

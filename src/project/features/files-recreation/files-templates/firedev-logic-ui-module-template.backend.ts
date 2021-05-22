@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { BaseFiredevFileTemplate } from './base-firedev-file-template.backend';
 import { FileTmpForSave } from './file-tmp-for-save.backend';
 

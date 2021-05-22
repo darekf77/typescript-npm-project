@@ -1,11 +1,9 @@
 //#region @backend
-import * as path from 'path';
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
-import * as child from 'child_process';
-import { config } from 'tnp-config';
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import { Project } from '../abstract';
 //#endregion
+import { config, ConfigModels } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
@@ -164,7 +162,7 @@ Angular cli build command: ${command}
         `)
 
         try {
-          const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as Models.env.EnvironmentName[])
+          const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as ConfigModels.EnvironmentName[])
             .includes(this.env.config.name);
           this.run(command,
             {

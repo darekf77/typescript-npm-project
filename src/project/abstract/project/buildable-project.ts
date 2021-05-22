@@ -2,11 +2,11 @@
 import { PackagesRecognitionExtended } from '../../features';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
-import * as path from 'path';
+import { path } from 'tnp-core'
 import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import type { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';

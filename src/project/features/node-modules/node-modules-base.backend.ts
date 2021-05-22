@@ -1,8 +1,8 @@
 //#region imports
-import * as path from 'path';
+import { path } from 'tnp-core'
 import * as fs from 'fs';
-import * as fse from 'fs-extra';
-import * as _ from 'lodash';
+import { fse } from 'tnp-core'
+import { _ } from 'tnp-core';
 import * as glob from 'glob';
 import chalk from 'chalk';
 import * as TerminalProgressBar from 'progress';

@@ -1,11 +1,11 @@
 
 //#region imports
-import * as _ from 'lodash';
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { _ } from 'tnp-core';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as glob from 'glob';
 import chalk from 'chalk';
-import * as os from 'os';
+import { os } from 'tnp-core';
 
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';

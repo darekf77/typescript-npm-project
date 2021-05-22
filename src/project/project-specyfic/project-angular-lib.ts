@@ -1,12 +1,12 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { ProjectAngularClient } from './project-angular-client';
 import { Helpers } from 'tnp-helpers';
 

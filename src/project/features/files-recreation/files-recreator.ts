@@ -1,9 +1,9 @@
 //#region @backend
-import * as fse from 'fs-extra';
-import * as path from 'path';
+import { fse } from 'tnp-core'
+import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import * as glob from 'glob';
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 // local
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';

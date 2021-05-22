@@ -1,6 +1,6 @@
 //#region @backend
-import * as path from 'path';
-import * as _ from 'lodash';
+import { path } from 'tnp-core'
+import { _ } from 'tnp-core';
 import { Project } from '../abstract';
 import { config } from 'tnp-config';
 //#endregion
