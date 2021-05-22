@@ -1,10 +1,9 @@
 //#region imports
 import { _ } from 'tnp-core';
-import * as fs from 'fs';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as glob from 'glob';
-import * as chokidar from 'chokidar';
+import { glob } from 'tnp-core';
+import { chokidar } from 'tnp-core';
 
 import { config } from 'tnp-config';
 import { FeatureCompilerForProject, Project } from '../../abstract';

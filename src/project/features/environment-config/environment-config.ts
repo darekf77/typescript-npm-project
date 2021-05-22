@@ -2,7 +2,7 @@
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { _ } from 'tnp-core';
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import {
   err, overrideDefaultPortsAndWorkspaceConfig,
@@ -94,7 +94,7 @@ export class EnvironmentConfig
       if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
         await (this.project.parent.env as any as EnvironmentConfig).init(args, overridePortsOnly);
         this.project.parent.filesTemplatesBuilder.rebuild();
-        // error(`[${path.basename(__filename)}] Please override parent config first`);
+        // error(`[${path.basename(crossPlartformPath(__filename))}] Please override parent config first`);
       }
 
       if (this.project.isWorkspaceChildProject) {

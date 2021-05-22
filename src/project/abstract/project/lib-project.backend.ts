@@ -2,7 +2,7 @@
 import { BuildProcess } from '../../features';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
 //#endregion

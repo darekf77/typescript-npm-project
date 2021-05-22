@@ -1,9 +1,5 @@
-import * as fs from 'fs';
-import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as JSON5 from 'json5';
 import * as semver from 'semver';
-import chalk from 'chalk';
 
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';

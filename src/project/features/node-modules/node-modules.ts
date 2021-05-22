@@ -1,17 +1,7 @@
 //#region @backend
 import { path } from 'tnp-core'
-import * as fs from 'fs';
-import { fse } from 'tnp-core'
 import { _ } from 'tnp-core';
-import chalk from 'chalk';
-import * as TerminalProgressBar from 'progress';
-
-import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { FeatureForProject } from '../../abstract';
-import { dedupePackages, nodeModulesExists } from './node-modules-helpers.backend';
 import { NodeModulesBase } from './node-modules-base.backend';
 
 export class NodeModules extends NodeModulesBase {
@@ -37,9 +27,5 @@ export class NodeModules extends NodeModulesBase {
       .filter(f => !notAllowedNames.includes(f))
       ;
   }
-
-
-
-
 }
 //#endregion

@@ -1,14 +1,9 @@
 //#region imports
-import { path } from 'tnp-core'
-import * as fs from 'fs';
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core';
+import { fse } from 'tnp-core';
 import { _ } from 'tnp-core';
-import chalk from 'chalk';
-import * as TerminalProgressBar from 'progress';
-
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import {

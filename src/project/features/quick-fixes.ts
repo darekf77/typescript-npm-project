@@ -1,7 +1,7 @@
 //#region @backend
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';

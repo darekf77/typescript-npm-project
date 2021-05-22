@@ -1,10 +1,9 @@
 //#region imports
-import { path } from 'tnp-core'
-import * as fs from 'fs';
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core';
+import { fse } from 'tnp-core';
 import { _ } from 'tnp-core';
-import * as glob from 'glob';
-import chalk from 'chalk';
+import { glob } from 'tnp-core';
+import { CLI } from 'tnp-cli';
 import * as TerminalProgressBar from 'progress';
 
 import { config } from 'tnp-config';
@@ -32,7 +31,7 @@ export class NodeModulesBase extends NodeModulesCore {
   public async copyFrom(source: Project, triggerMsg: string) {
 
     Helpers.log(`[node_modules] Copy instalation of npm packages from ` +
-      `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`)
+      `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`)
 
     if (source.smartNodeModules.exists) {
       this.project.node_modules.remove();

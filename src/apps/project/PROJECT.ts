@@ -13,7 +13,7 @@ import type { ProjectController } from './ProjectController';
 //#region @backend
 import { TnpDB } from 'tnp-db';
 import { fse } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import { path } from 'tnp-core'
 import { child_process } from 'tnp-core';
 import axios from 'axios';

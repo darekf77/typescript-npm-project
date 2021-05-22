@@ -2,7 +2,7 @@
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
 // local
 import { Project } from '../../abstract';

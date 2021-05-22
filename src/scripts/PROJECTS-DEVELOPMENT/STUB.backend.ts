@@ -3,7 +3,7 @@ import { fse } from 'tnp-core'
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { notify } from 'node-notifier';

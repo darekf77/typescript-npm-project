@@ -1,7 +1,7 @@
 //#region @backend
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import { config } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';

@@ -1,10 +1,8 @@
 //#region @backend
 import { _ } from 'tnp-core';
-import * as fs from 'fs';
-import glob = require('glob')
-import { path } from 'tnp-core'
+import { path, glob } from 'tnp-core'
 import { Helpers } from 'tnp-helpers';
-import chalk from 'chalk';
+import { CLI } from 'tnp-cli';
 import { config } from 'tnp-config';
 
 
@@ -68,10 +66,10 @@ function help(argsString: string) {
     const docs = getHelpFor(command);
     if (docs) {
       Helpers.clearConsole()
-      console.log(`\nHelp for command "${chalk.green(command)}":\n`)
+      console.log(`\nHelp for command "${CLI.chalk.green(command)}":\n`)
       console.log(docs)
     } else {
-      Helpers.error(`No documentation for ${chalk.bold(command)}`)
+      Helpers.error(`No documentation for ${CLI.chalk.bold(command)}`)
     }
   }
   process.exit(0);

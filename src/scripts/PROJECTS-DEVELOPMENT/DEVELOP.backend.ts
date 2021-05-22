@@ -6,7 +6,7 @@ import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
-import * as chokidar from 'chokidar';
+import { chokidar } from 'tnp-core';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
 import chalk from 'chalk';

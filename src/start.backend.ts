@@ -1,5 +1,5 @@
 import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core'
 import { ConfigModels, LibTypeArr } from 'tnp-config';
 declare const global: any;
 if (global.globalSystemToolMode) {
@@ -19,10 +19,11 @@ tnp
    */
   const configFileName = 'tmp-environment.json';
   const possiblePathes = [
-    path.join(__dirname, configFileName),
-    path.join(__dirname, `../${configFileName}`),
-    path.join(__dirname, `../../${configFileName}`),
-  ].map(p => path.resolve(p))
+    path.join(crossPlatformPath(__dirname) , configFileName),
+    path.join(crossPlatformPath(__dirname), `../${configFileName}`),
+    path.join(crossPlatformPath(__dirname), `../../${configFileName}`),
+  ];
+  possiblePathes.map(p => path.resolve(p))
     .filter(p => {
       return p.search(`${frameworkName}/${configFileName}`) !== -1;
     })
@@ -37,14 +38,14 @@ tnp
     if (fse.existsSync(envPath)) {
       try {
         newENV = fse.readJSONSync(envPath);
-        // console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
+        console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
         return true;
       } catch (er) {
-        // console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
+        console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
       }
-      // console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
+      console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
     } else {
-      // console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+      console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
     }
     return false;
   });
@@ -60,7 +61,6 @@ if (Object.keys(global['ENV']).length === 0) {
 //#region imports
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
-// import glob = require('glob')
 import scriptsFnArr from './scripts/index';
 
 

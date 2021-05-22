@@ -2,7 +2,7 @@
 import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { FeatureForProject } from '../abstract';
-import * as chokidar from 'chokidar';
+import { chokidar } from 'tnp-core';
 import { child_process } from 'tnp-core';
 //#endregion
 

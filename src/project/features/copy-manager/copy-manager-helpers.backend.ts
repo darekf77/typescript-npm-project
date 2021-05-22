@@ -3,7 +3,7 @@
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import { os } from 'tnp-core';
 

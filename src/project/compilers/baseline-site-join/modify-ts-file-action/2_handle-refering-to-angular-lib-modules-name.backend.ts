@@ -1,8 +1,7 @@
-import * as fs from 'fs';
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';

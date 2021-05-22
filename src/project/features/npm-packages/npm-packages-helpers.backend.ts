@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
 
 import { Project } from '../../abstract';

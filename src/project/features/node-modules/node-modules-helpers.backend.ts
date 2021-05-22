@@ -1,9 +1,8 @@
 import { path } from 'tnp-core'
-import * as fs from 'fs';
 import { fse } from 'tnp-core'
 import { _ } from 'tnp-core';
-import chalk from 'chalk';
-import * as glob from 'glob';
+import { CLI } from 'tnp-cli';
+import { glob } from 'tnp-core';
 import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
@@ -85,7 +84,7 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
           // Helpers.warn(`Not able to identyfy project in ${p}`)
         } else {
           p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
-          Helpers.log(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
+          Helpers.log(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${CLI.chalk.bold(p)}\n`);
         }
       });
       if (duplicates.length === 0) {
@@ -113,17 +112,17 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
         if (rules[current.name]) {
           const r = rules[current.name];
           if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName) || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
-            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
+            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
-            Helpers.warn(`[not included] Ommiting duplicate of ${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
+            Helpers.warn(`[not included] Ommiting duplicate of ${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
         }
 
         Helpers.remove(p, true)
-        Helpers.info(`Duplicate of ${current.name}@${versionRem} removed from ${chalk.bold(parentName)}`)
+        Helpers.info(`Duplicate of ${current.name}@${versionRem} removed from ${CLI.chalk.bold(parentName)}`)
       });
     }
 
@@ -291,7 +290,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
 
   for (let index = 0; index < packagesNames.length; index++) {
     const packageName = packagesNames[index];
-    Helpers.info(`[tnp][node_modueles] Stuberization of package ${chalk.bold(packageName)}`);
+    Helpers.info(`[tnp][node_modueles] Stuberization of package ${CLI.chalk.bold(packageName)}`);
 
     const packageJsonPath = path.join(project.node_modules.path, packageName, config.file.package_json);
     const packageJsonInBrowser = path.join(project.node_modules.path, packageName, config.folder._browser, config.file.package_json);

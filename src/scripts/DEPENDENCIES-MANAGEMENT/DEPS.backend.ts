@@ -2,7 +2,7 @@ import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import * as open from 'open';
-import * as glob from 'glob';
+import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
@@ -310,13 +310,12 @@ async function $LINKCORE() {
 
 function templateBin(debug = false) {
   return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
-var path = require('path')
-var fs = require('fs')
+var { fse, crossPlatformPath, path } = require('tnp-core');
 var path = {
-  dist: path.join(__dirname, '../dist/start.backend.js'),
-  bundle: path.join(__dirname, '../start.backend.js')
+  dist: path.join(crossPlatformPath(__dirname), '../dist/start.backend.js'),
+  bundle: path.join(crossPlatformPath(__dirname), '../start.backend.js')
 }
-var p = fs.existsSync(path.dist) ? path.dist : path.bundle;
+var p = fse.existsSync(path.dist) ? path.dist : path.bundle;
 global.globalSystemToolMode = true;
 var run = require(p).run;
 run(process.argv.slice(2));
