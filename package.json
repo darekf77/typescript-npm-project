@@ -198,6 +198,7 @@
             "typeorm": "0.2.7"
           },
           "files-operations": {
+            "lnk": "~1.0.1",
             "copy-paste": "~1.3.0",
             "chokidar": "3.0.0",
             "@types/chokidar": "2.1.3",
@@ -734,7 +735,8 @@
     "watch": "~1.0.2",
     "webdriver-manager": "12.1.7",
     "webpack-cli": "3.3.11",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "lnk": "~1.0.1"
   },
   "license": "MIT",
   "private": false,

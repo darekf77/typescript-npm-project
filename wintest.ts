@@ -1,7 +1,7 @@
 
 import { path } from 'tnp-core'
 
-import { fse } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core'
 
 export default function slash(p) {
     if (process.platform === 'win32') {
@@ -27,7 +27,7 @@ export default function slash(p) {
 
 import { os } from 'tnp-core';
 
-const v = os.homedir();
+const v = crossPlatformPath( os.homedir());
 
 console.log(fse.existsSync(path.resolve('C:/Users/Dariusz/projects/npm/tnp')))
 console.log(fse.existsSync('/c/Users/Dariusz/projects/npm/tnp'))
