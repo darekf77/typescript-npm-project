@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import { glob } from 'tnp-core';
@@ -154,7 +154,7 @@ export class FilesRecreator extends FeatureForProject {
 
         // console.log('self.project:', self.project.name);
         // console.log(gitignoreFiles)
-        return gitignoreFiles.map(f => `/${f}`)
+        return gitignoreFiles.map(f => `/${crossPlatformPath(f)}`)
       },
       get npmignore() {
         const allowedProject: ConfigModels.LibType[] = ['isomorphic-lib', 'angular-lib']
@@ -170,7 +170,7 @@ export class FilesRecreator extends FeatureForProject {
           'npm-debug.log*'
         ].concat(self.commonFilesForAllProjects)
 
-        return npmignoreFiles;
+        return npmignoreFiles.map(f => crossPlatformPath(f))
       }
     }
   }
@@ -428,7 +428,7 @@ ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isContainer ? `
 # container git projects
-${this.project.packageJson.linkedProjects.map(c => `/${c}`).join('\n')}
+${this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
@@ -594,7 +594,7 @@ ${coreFiles}
         return a.concat(b);
       }, [])
       .map(asset => {
-        return path.join(config.folder.src, asset.replace(new RegExp(`^${config.folder.components}\/`), ''));
+        return crossPlatformPath(path.join(config.folder.src, asset.replace(new RegExp(`^${config.folder.components}\/`), '')));
       })
   }
 
@@ -612,7 +612,7 @@ ${coreFiles}
       })
       .forEach(p => {
         p.recreate.assetsRelativePathes
-          .map(rp => path.join(p.location, rp))
+          .map(rp => crossPlatformPath(path.join(p.location, rp)))
           .filter(ap => fse.existsSync(ap))
           .forEach(ap => {
             const dest = path.join(
