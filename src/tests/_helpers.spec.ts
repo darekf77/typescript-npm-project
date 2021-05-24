@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { Models } from 'tnp-models';
@@ -90,7 +90,7 @@ export class SpecWrap {
 
   private cwdChange(location) {
     return async (relativePath: string, callback) => {
-      const oldCwd = process.cwd()
+      const oldCwd = crossPlatformPath(process.cwd())
       const newCWD = path.join(location, relativePath);
       if (!fse.existsSync(newCWD)) {
         Helpers.error(`[cwdChange] cannot change cwd to unexisted location: ${newCWD}`)
@@ -115,7 +115,7 @@ export class SpecWrap {
     }
 
 
-    const oldCwd = process.cwd()
+    const oldCwd = crossPlatformPath(process.cwd())
     process.chdir(location);
 
     await Helpers.runSyncOrAsync(() => {

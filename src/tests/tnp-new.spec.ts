@@ -25,7 +25,6 @@ describe(wrap.describe('Tnp init'), async () => {
       //   p.dependencies = {}
       //   p.tnp.core = void 0;
       // })
-      // console.log(process.cwd())
       it(testName, async () => {
         await cwdChange('test1', async () => {
           // await INIT(' --skipNodeModules', false) // TODO

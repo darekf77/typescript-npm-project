@@ -536,6 +536,12 @@ async function $DEPS_TREE2() {
 
 }
 
+async function $LN(args: string) {
+  const [source, dest] = args.split(' ');
+  Helpers.createSymLink(source, dest);
+  process.exit(0);
+}
+
 export default {
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
   $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),
@@ -578,6 +584,7 @@ export default {
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
   $LINKCORE: Helpers.CLIWRAP($LINKCORE, '$LINKCORE'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
+  $LN: Helpers.CLIWRAP($LN, '$LN'),
   $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),

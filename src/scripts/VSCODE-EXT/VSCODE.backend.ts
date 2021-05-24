@@ -27,13 +27,11 @@ function hidefilesfor(project: Project) {
 
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
   showfilesfor((Project.Current as Project));
-  // console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
   hidefilesfor((Project.Current as Project));
-  // console.log('proce cwd', process.cwd())
   exit && process.exit(0)
 }
 
@@ -126,6 +124,7 @@ function $VSCODE_GLOBAL() {
     ],
     "window.customMenuBarAltFocus": false,
     "window.enableMenuBarMnemonics": false,
+    "terminal.integrated.rightClickBehavior": "selectWord",
   };
 
   const settingsMacOS = {

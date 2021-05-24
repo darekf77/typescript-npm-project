@@ -1,13 +1,11 @@
 //#region @backend
-import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { rimraf } from 'tnp-core'
+import { _, crossPlatformPath } from 'tnp-core';
+import { fse } from 'tnp-core';
+import { path } from 'tnp-core';
 
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 
@@ -17,7 +15,7 @@ export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 }
 
 async function askForWhenEmpty(): Promise<Project> {
-  if (Helpers.exists(path.join(process.cwd(), config.file.package_json))) {
+  if (Helpers.exists(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), config.file.package_json)))) {
     return;
   }
   let proj: Project;
@@ -29,15 +27,15 @@ async function askForWhenEmpty(): Promise<Project> {
       { name: 'Isomorphic Lib', value: 'isomorphic-lib' },
       { name: 'Angular Lib', value: 'angular-lib' }
     ]);
-    Helpers.writeFile([process.cwd(), config.file.package_json], {
-      name: path.basename(process.cwd()),
+    Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
+      name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
       version: '0.0.0',
       tnp: {
         type: response,
         version: 'v2'
       }
     });
-    proj = Project.From(path.join(process.cwd())) as Project;
+    proj = Project.From(crossPlatformPath(process.cwd())) as Project;
     return proj;
   }
   return proj;

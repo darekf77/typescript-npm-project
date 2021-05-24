@@ -57,7 +57,7 @@ export namespace CopyMangerHelpers {
     let tempDestination: string;
     // console.log('useTempLocation',useTempLocation)
     if (useTempLocation) {
-      tempDestination = `${os.platform() === 'darwin' ? '/private/tmp' : '/tmp'}/${_.camelCase(destinationLocation)}`;
+      tempDestination = `${Helpers.getTempFolder()}/${_.camelCase(destinationLocation)}`;
       if (fse.existsSync(tempDestination)) {
         Helpers.remove(tempDestination);
       }

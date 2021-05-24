@@ -1,7 +1,7 @@
 //#region @backend
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
-import { glob } from 'tnp-core';
+import { glob, crossPlatformPath } from 'tnp-core';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
@@ -200,11 +200,12 @@ export default _default;
     if (!this.project.isStandaloneProject) {
       return;
     }
-    const pathToSelf = path.join(this.project.location, config.folder.node_modules, this.project.name);
-    const pathToSrc = path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src);
+    const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
+    const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
     Helpers.removeIfExists(pathToSelf);
     glob.sync(`${pathToSrc}/**/*.*`)
       .filter(f => !Helpers.isFolder(f))
+      .map(f => crossPlatformPath(f))
       .forEach(f => {
         const relative = f.replace(`${pathToSrc}/`, '');
         Helpers.createSymLink(f, path.join(pathToSelf, relative), { continueWhenExistedFolderDoesntExists: true });

@@ -1,6 +1,6 @@
 // console.log('INITING PROCESS')
 //#region isomorphic
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { PROGRESS_DATA } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
@@ -164,7 +164,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     }
     //#region @backend
     if (!this.cwd) {
-      this.cwd = process.cwd()
+      this.cwd = crossPlatformPath(process.cwd())
     }
     //#endregion
   }

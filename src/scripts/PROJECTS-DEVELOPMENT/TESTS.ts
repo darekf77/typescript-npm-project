@@ -1,5 +1,5 @@
 //#region @backend
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from 'tnp-models';
@@ -42,7 +42,7 @@ function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false) {
 }
 
 function $PROCESS_CWD() {
-  console.log(process.cwd());
+  console.log(crossPlatformPath(process.cwd()));
   process.exit(0)
 }
 

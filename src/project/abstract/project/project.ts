@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
@@ -145,7 +145,7 @@ export class Project extends $Project<Project>
    */
   constructor(location?: string) {
     super();
-    this.location = _.isString(location) ? location : '';
+    this.location = crossPlatformPath(_.isString(location) ? location : '');
     if (!global.codePurposeBrowser) {
       this.defineProperty('compilerCache', CompilerCache);
       this.cache = {};

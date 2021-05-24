@@ -1,12 +1,8 @@
-import chalk from 'chalk';
-import { path } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
-import * as sharp from 'sharp';
-import { png2svg } from 'svg-png-converter';
 import { Helpers } from 'tnp-helpers';
-import index from 'chalk';
 
 export class RenameRule {
   public from: string;
@@ -104,7 +100,7 @@ export class FilesRenaming {
     // console.log(this.rules);
     // process.exit(0)
 
-    let folder = path.join(process.cwd(), relativePath);
+    let folder = crossPlatformPath(path.join(crossPlatformPath(process.cwd()), relativePath));
     // Helpers.info(folder)
     let files = getAllFilesFoldersRecusively(folder);
     // Helpers.info(`files:\n ${files.map(f => f.replace(folder, '')).join('\n')}`);

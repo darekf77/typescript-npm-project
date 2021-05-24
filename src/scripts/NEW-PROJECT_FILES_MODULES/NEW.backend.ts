@@ -1,5 +1,5 @@
 //#region @backend
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProjectFactory } from './project-factory.backend';
@@ -7,7 +7,7 @@ import { ConfigModels } from 'tnp-config';
 
 
 export async function NEW(args: string, exit = true) {
-  const cwd = process.cwd();
+  const cwd = crossPlatformPath(process.cwd());
   const argv = args.split(' ');
   const type = argv[0] as ConfigModels.NewFactoryType;
   if (type === 'model') {
@@ -17,17 +17,17 @@ export async function NEW(args: string, exit = true) {
   }
 }
 export function NEW_SITE(args: string, exit = true) {
-  const cwd = process.cwd();
+  const cwd = crossPlatformPath(process.cwd());
   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
 }
 
 export function $NEW_STRICT_SITE(args: string, exit = true) {
-  const cwd = process.cwd();
+  const cwd = crossPlatformPath(process.cwd());
   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
 }
 
 export function $NEW_DEPENDENCY_SITE(args: string, exit = true) {
-  const cwd = process.cwd();
+  const cwd = crossPlatformPath(process.cwd());
   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, false);
 }
 

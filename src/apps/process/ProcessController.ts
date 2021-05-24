@@ -7,7 +7,7 @@ import { PROCESS } from './PROCESS';
 //#region @backend
 import { authenticate } from 'passport'
 import * as  psList from 'ps-list';
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { rimraf } from 'tnp-core'
 import { fse } from 'tnp-core'
@@ -127,11 +127,11 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
   async initExampleDbData() {
     this.removeProcesesfolder()
 
-    await PROCESS.db.save(new PROCESS({ name: 'Test async', cmd: 'tnp test:async:proc --max 1 ', cwd: process.cwd(), async: true }))
-    await PROCESS.db.save(new PROCESS({ name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err', cwd: process.cwd() }))
-    await PROCESS.db.save(new PROCESS({ name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6', cwd: process.cwd() }))
-    await PROCESS.db.save(new PROCESS({ name: 'Messages async', cmd: 'tnp show:loop:messages', cwd: process.cwd(), async: true }))
-    await PROCESS.db.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: process.cwd() }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test async', cmd: 'tnp test:async:proc --max 1 ', cwd: crossPlatformPath(process.cwd()), async: true }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err', cwd: crossPlatformPath(process.cwd()) }))
+    await PROCESS.db.save(new PROCESS({ name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6', cwd: crossPlatformPath(process.cwd()) }))
+    await PROCESS.db.save(new PROCESS({ name: 'Messages async', cmd: 'tnp show:loop:messages', cwd: crossPlatformPath(process.cwd()), async: true }))
+    await PROCESS.db.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: crossPlatformPath(process.cwd()) }))
   }
   //#endregion
 }

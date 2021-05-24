@@ -1,5 +1,5 @@
 import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
+import { crossPlatformPath } from 'tnp-core'
 import { Project } from '../project';
 import * as  psList from 'ps-list';
 import { CLASS } from 'typescript-class-helpers';
@@ -88,7 +88,7 @@ function CIRCURAL_CHECK() {
 }
 
 const $FILEINFO = (args) => {
-  console.log(Helpers.getMostRecentFilesNames(process.cwd()))
+  console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(process.cwd())))
 
   process.exit(0)
 }

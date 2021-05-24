@@ -1,5 +1,5 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import * as express from 'express';
 import { path } from 'tnp-core'
 import { TnpDB } from 'tnp-db';
@@ -129,7 +129,7 @@ const SBAP = (args) => STATIC_BUILD_APP_PROD(args);
 const $SERVE = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (!proj) {
-    proj = Project.nearestTo<Project>(process.cwd());
+    proj = Project.nearestTo<Project>(crossPlatformPath(process.cwd()));
   }
   if (proj && proj.isStandaloneProject) {
     if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
@@ -190,7 +190,7 @@ const $SERVE = async (args) => {
       Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`)
     }
     const app = express()
-    app.use(configServe.baseUrl, express.static(path.join(process.cwd(), configServe.outDir)))
+    app.use(configServe.baseUrl, express.static(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), configServe.outDir))))
     app.listen(configServe.port, () => {
       console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}
 

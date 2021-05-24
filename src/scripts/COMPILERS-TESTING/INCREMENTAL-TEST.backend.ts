@@ -66,11 +66,11 @@
 
 //   async COMPILER() {
 //     const c1 = await (new ClientCompiler1())
-//       .set({ folderPath: path.join(process.cwd(), 'tmp-test1') })
+//       .set({ folderPath: path.join(crossPlatformPath(process.cwd()), 'tmp-test1') })
 //       .startAndWatch();
 
 //     const c2 = await (new ClientCompiler1())
-//       .set({ folderPath: path.join(process.cwd(), 'tmp-test1'), executeOutsideScenario: false })
+//       .set({ folderPath: path.join(crossPlatformPath(process.cwd()), 'tmp-test1'), executeOutsideScenario: false })
 //       .startAndWatch();
 //   }
 

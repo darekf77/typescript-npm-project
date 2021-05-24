@@ -1,6 +1,6 @@
 //#region @backend
 import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import chalk from 'chalk';
 import { PackageJsonBase } from './package-json-base.backend';
 //#endregion
@@ -49,10 +49,10 @@ export class PackageJSON
     }
 
     const filePath = {
-      packgeJson: path.join(location, config.file.package_json),
-      tnpJson: path.join(location, config.file.package_json__tnp_json),
+      packgeJson: crossPlatformPath(path.join(location, config.file.package_json)),
+      tnpJson: crossPlatformPath(path.join(location, config.file.package_json__tnp_json)),
     };
-
+    
     let saveAtLoad = false;
     if (!fse.existsSync(filePath.packgeJson) && fse.existsSync(filePath.tnpJson)) {
       const tnpData = Helpers.readJson(filePath.tnpJson, void 0) as Models.npm.TnpData;
@@ -215,7 +215,11 @@ export class PackageJSON
       var pkgJson = new PackageJSON({ data: json, location, project });
 
     } catch (err) {
-      Helpers.error(`Error while parsing package.json in: ${filePath}`, false, true);
+      Helpers.error(`[package-json] Error while parsing files:
+      - ${filePath.packgeJson}      
+      - ${filePath.tnpJson}
+       
+       `, false, true);
       return;
     }
 

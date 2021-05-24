@@ -1,5 +1,5 @@
 //#region imports
-import { path } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
@@ -36,6 +36,7 @@ function checkFolderCompiler(project: Project, options: IncCompiler.Models.BaseC
   }
   const folders = _.isArray(options.folderPath) ? options.folderPath : [options.folderPath];
   options.folderPath = folders.map(f => {
+    f = crossPlatformPath(f);
     if (!dontCheck) {
       if (f.startsWith(path.join(project.location, config.folder.node_modules))) {
         Helpers.error(`[checkFolderCompiler] Please don't watch node_module folder for ${project.location}`, false, true);

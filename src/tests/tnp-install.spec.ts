@@ -7,6 +7,7 @@ import { _ } from 'tnp-core';
 import { SpecWrap } from './_helpers.spec';
 import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
 import { $INSTALL as INSTALL } from '../scripts/DEPENDENCIES-MANAGEMENT/DEPS.backend';
+import { Helpers } from 'tnp-helpers';
 
 
 
@@ -25,7 +26,6 @@ describe(wrap.describe('Tnp install'), async () => {
         p.dependencies = {}
         p.tnp.core = void 0;
       })
-      // console.log(process.cwd())
 
       Helpers.mkdirp(path.join(location, 'test1', 'node_modules', '.bin'))
 
