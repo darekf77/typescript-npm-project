@@ -197,6 +197,9 @@ export default _default;
   }
 
   public linkSourceOfItselfToNodeModules() {
+    if(process.platform  === 'win32') { // TODO QUICKFIX
+      return;
+    }
     if (!this.project.isStandaloneProject) {
       return;
     }
