@@ -1,6 +1,6 @@
 // console.log('INITING PROCESS')
 //#region isomorphic
-import { _, crossPlatformPath } from 'tnp-core';
+import { _ } from 'tnp-core';
 import { PROGRESS_DATA } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
@@ -10,7 +10,7 @@ import { Project } from 'tnp-helpers';
 //#endregion
 
 //#region @backend
-import { path } from 'tnp-core'
+import { path,crossPlatformPath } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { rimraf } from 'tnp-core'
 import { child_process } from 'tnp-core';
