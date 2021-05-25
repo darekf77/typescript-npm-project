@@ -12,7 +12,8 @@
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.11",
         "http-socket-proxy-router": "0.0.1",
-        "tnp-core": "0.0.2"
+        "tnp-core": "0.0.2",
+        "tnp-cli": "0.0.2"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -714,6 +715,7 @@
     "svg-png-converter": "0.0.9",
     "systeminformation": "^3.45.7",
     "task.js": "^0.1.5",
+    "tnp-cli": "~0.0.2",
     "tnp-config": "~0.0.34",
     "tnp-core": "~0.0.2",
     "tnp-db": "~0.0.21",
