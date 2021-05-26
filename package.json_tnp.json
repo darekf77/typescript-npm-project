@@ -10,7 +10,8 @@
       "ng2-rest-swagger-generator": "6.0.10",
       "cache-require-paths": "0.3.0",
       "base-model-wrap": "3.0.11",
-      "http-socket-proxy-router": "0.0.1"
+      "http-socket-proxy-router": "0.0.1",
+      "tnp-tools": "0.0.35"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],
