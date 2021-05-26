@@ -136,7 +136,7 @@
         "tnp-helpers": "0.0.26",
         "tnp-db": "0.0.21",
         "tnp-ui": "0.0.19",
-        "tnp-core": "0.0.5",
+        "tnp-core": "0.0.6",
         "tnp-cli": "0.0.6",
         "@types/node": "10.12.30",
         "morphi": "4.0.13",
