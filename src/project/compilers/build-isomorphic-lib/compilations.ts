@@ -1,5 +1,5 @@
 //#region @backend
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 
@@ -64,9 +64,9 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     if (triggerTsEventExts
       .includes(path.extname(event.fileAbsolutePath))) {
 
-      const absoluteFilePath = event.fileAbsolutePath;
-      const relativeFilePath = absoluteFilePath.replace(path.join(this.cwd, this.location), '');
-      const destinationFilePath = path.join(this.cwd, this.sourceOutBrowser, relativeFilePath);
+      const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+      const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(path.join(this.cwd, this.location), ''));
+      const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
       if (event.eventName === 'unlink') {
         Helpers.removeFileIfExists(destinationFilePath);
         // console.log('FILE UNLINKED')
@@ -196,7 +196,8 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     }
 
     filesPathes = filesPathes.map(f => {
-      return f.replace(path.join(this.cwd, this.location), '').replace(/^\//, '');
+      f = crossPlatformPath(f);
+      return f.replace(crossPlatformPath(path.join(this.cwd, this.location)), '').replace(/^\//, '');
     });
 
     Helpers.log(`[initCodeCut] filesPathes after:

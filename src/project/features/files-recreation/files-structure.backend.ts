@@ -140,7 +140,7 @@ export class FilesStructure extends FeatureForProject {
 
     }
     if (this.project.isWorkspace || this.project.isStandaloneProject || this.project.isContainer) {
-      this.project.quickFixes.missingLibs(['react-native-sqlite-storage'])
+      this.project.quickFixes.missingLibs(config.quickFixes.missingLibs)
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {

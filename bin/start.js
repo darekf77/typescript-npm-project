@@ -13,7 +13,7 @@ global.i0 = {
 global.globalSystemToolMode = true;
 
 if (process.argv.find((a, i) => {
-  if (a.startsWith('-installintnp') || a.startsWith('-iintnp')) {
+  if (a.startsWith('-manuallink')) {
     installInTnp(process.argv.slice(i + 1));
   }
 })) {
@@ -160,60 +160,93 @@ global.frameworkMode = mode;
 start(process.argv, 'tnp', mode);
 //#endregion
 
-function installInTnp(arr = []) {
-  arr.push('tnp')
+function installInTnp() {
+
   const path = require('path');
   const child_process = require('child_process');
   const fse = require('fs-extra');
   const rimraf = require('rimraf');
-  fse.readlinkSync
-  const projectName = path.basename(process.cwd());
-  for (let index = 0; index < arr.length; index++) {
-    const proj = arr[index];
-    if (proj === projectName) {
-      console.log(`Ommiting ${proj}`)
-      continue;
-    }
-    if (!fse.existsSync(`./dist`)) {
-      fse.mkdirpSync('./dist');
-    }
-    if (proj !== 'tnp') {
+  const { Helpers } = require('tnp-helpers');
+
+  const parentPath = path.join(process.cwd());
+  const tnpNodeModulesPath = path.join(parentPath, 'tnp', 'node_modules');
+  try {
+    var projType = fse.readJSONSync(path.join(parentPath, 'package.json'), { encoding: 'utf8' }).tnp.type;
+  } catch (error) {
+    console.error('This is not tnp type project')
+    process.exit(1)
+  }
+
+  if (projType !== 'container') {
+    console.error('Manual linking only for container')
+    process.exit(1)
+  }
+  const allProjects = fse.readdirSync(parentPath)
+    .filter(f => fse.lstatSync(path.join(parentPath, f)).isDirectory() && !f.startsWith('tmp'))
+    .filter(f => !['.git', 'tnp', 'node_modules', 'src', '.vscode'].includes(f))
+
+  for (let i = 0; i < allProjects.length; i++) {
+    const currentProjectName = allProjects[i];
+
+    const nodeModulesPath = path.join(parentPath, currentProjectName, 'node_modules');
+
+    let isLinked = false;
+    try {
+      const linkP = fse.readlinkSync(nodeModulesPath);
+      if ((typeof linkP === 'string') && crossPlatofrmPath(linkP).endsWith('/tnp/node_modules')) {
+        console.info(`DONE already linked tnp/node_modules for (${currentProjectName})..`);
+        isLinked = true;
+      }
+    } catch (error) { }
+
+    if (!isLinked) {
       try {
-        const linkP = fse.readlinkSync(`./node_modules`);
-        if((typeof linkP === 'string') && crossPlatofrmPath(linkP).endsWith('/tnp/node_modules') ) {
-          console.info(`DONE already linked tnp/node_modules for (${proj})..`);
-          continue;
-        }
-      } catch (error) {}
-    }
-    
-    if (proj !== 'tnp') {
-      try {
-        rimraf.sync('./node_modules')
-        child_process.execSync('lnk ../tnp/node_modules ./', { cwd: process.cwd() });
-        console.info(`DONE Link only (${proj})..`);
-        continue;
+        rimraf.sync(nodeModulesPath)
+        Helpers.createSymLink(tnpNodeModulesPath, nodeModulesPath)
+        console.info(`DONE Link only (${currentProjectName})..`);
       } catch (error) {
-        console.error(`Not able to link in ${proj}`)
+        console.error(`Not able to link in ${currentProjectName}`);
+        process.exit(0)
       }
     }
-    
-    child_process.execSync(`rimraf ../${proj}/node_modules/${projectName} && lnk ./dist/ ../${proj}/node_modules/${projectName} && lnk ./src/ ../${proj}/node_modules/${projectName}`, { cwd: process.cwd() });
-    fse.writeFileSync(`../${proj}/node_modules/${projectName}/index.js`, `
+
+    const tsconfigPath = path.join(parentPath, currentProjectName, 'tsconfig.json')
+    fse.writeFileSync(tsconfigPath, tsconfig())
+
+    // const tsconfigIsomorphicPath = path.join(parentPath, currentProjectName, 'tsconfig.json')
+    // fse.writeFileSync(tsconfigIsomorphicPath, tsconfigIso())
+
+    const distPath = path.join(parentPath, currentProjectName, 'dist')
+    const srcPath = path.join(parentPath, currentProjectName, 'src')
+    if (!fse.existsSync(distPath)) {
+      fse.mkdirpSync(distPath);
+    }
+
+    const destinationPath = path.join(parentPath, 'tnp', 'node_modules');
+    rimraf.sync(path.join(destinationPath, currentProjectName));
+
+    fse.existsSync(distPath) && Helpers.createSymLink(distPath, path.join(destinationPath, currentProjectName, 'dist'));
+    fse.existsSync(srcPath) && Helpers.createSymLink(srcPath, path.join(destinationPath, currentProjectName, 'src'));
+
+    const indexPath = path.join(destinationPath, currentProjectName, 'index.js')
+
+    fse.writeFileSync(indexPath, `
     "use strict";
   Object.defineProperty(exports, "__esModule", { value: true });
   var tslib_1 = require("tslib");
   tslib_1.__exportStar(require("./dist"), exports);
-   
+
     `)
-    fse.writeFileSync(`../${proj}/node_modules/${projectName}/index.d.ts`, `
+
+    const indexDtsPath = path.join(destinationPath, currentProjectName, 'index.d.ts')
+    fse.writeFileSync(indexDtsPath, `
     export * from './src';
     `)
-    fse.writeFileSync(`./tsconfig.json`,tsconfig())
-  fse.writeFileSync(`./tsconfig.isomorphic.json`,tsconfigIso())
-    console.info(`DONE all for ${proj}`)
+
+
+    console.info(`DONE all for ${currentProjectName}`)
+
   }
-  
 
   console.info(`DONE`)
   process.exit(0)
@@ -239,26 +272,9 @@ function crossPlatofrmPath(p) {
 
 
 
-
 function tsconfig() {
   return `
   {
-    "extends": "./tsconfig.isomorphic.json",
-    "compilerOptions": {
-        "rootDir": "./src"
-    },
-    "include": [
-        "src/**/*"
-    ]
-}
-
-  `
-}
-
-function tsconfigIso() {
-  return `
-  {
-    "compileOnSave": true,
     "compilerOptions": {
       "declaration": true,
       "experimentalDecorators": true,
@@ -286,31 +302,12 @@ function tsconfigIso() {
       "types": [
         "node"
       ],
-      "rootDir": "./tmp-src",
       "outDir": "dist"
     },
     "include": [
-      "tmp-src/**/*"
-    ],
-    "exclude": [
-      "node_modules",
-      "preview",
-      "projects",
-      "docs",
-      "dist",
-      "bundle",
-      "example",
-      "examples",
-      "browser",
-      "module",
-      "tmp-src",
-      "src/tests",
-      "src/**/*.spec.ts",
-      "tmp-site-src",
-      "tmp-tests-context"
+      "src/"
     ]
   }
-  
 
   `
 }

@@ -5,6 +5,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
+import { CLI } from 'tnp-cli';
 
 export type OverridePacakge = { [name: string]: string | null; };
 export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
@@ -211,7 +212,7 @@ function prepare(project: Project, currentProject: Project) {
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(from, dest);
     });
-  }, 'updating node_modules links');
+  }, `updating node_modules links for ${CLI.chalk.bold(project.genericName)} `);
 }
 //#endregion
 

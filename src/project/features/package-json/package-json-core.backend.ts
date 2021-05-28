@@ -1,5 +1,5 @@
 //#region imports
-import { fse } from 'tnp-core'
+import { fse, CoreConfig } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import { _ } from 'tnp-core';
@@ -194,7 +194,7 @@ export class PackageJsonCore {
         }
       }
 
-      if (!global[config.message.globalSystemToolMode] && !global.testMode) {
+      if (!global[CoreConfig.message.globalSystemToolMode] && !global.testMode) {
         Helpers.warn(`[pathToBaseline] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
         return;
       }

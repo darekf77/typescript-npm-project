@@ -197,10 +197,11 @@ export default _default;
   }
 
   public linkSourceOfItselfToNodeModules() {
-    if(process.platform  === 'win32' && this.project.isTnp) { // TODO QUICKFIX
+    if (!this.project.isStandaloneProject) {
       return;
     }
-    if (!this.project.isStandaloneProject) {
+    if(process.platform  === 'win32') { // TODO QUICKFIX
+      Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
       return;
     }
     const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));

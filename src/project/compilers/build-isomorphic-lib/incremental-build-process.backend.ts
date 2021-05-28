@@ -1,4 +1,4 @@
-import { path } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import chalk from 'chalk';
@@ -107,7 +107,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
         const envConfig = {} as any;
         let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
         if (outFolder === 'bundle') {
-          browserOutFolder = path.join(outFolder, browserOutFolder);
+          browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
         }
         this.browserCompilations = [
           new BroswerForModuleCompilation(
@@ -127,7 +127,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           .forEach(moduleName => {
             let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
             if (outFolder === 'bundle') {
-              browserOutFolder = path.join(outFolder, browserOutFolder);
+              browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
             }
 
             const proj = parentProj.child(moduleName);

@@ -105,7 +105,7 @@ export class NpmPackagesCore extends FeatureForProject {
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognitionExtended.fromProject(this.project).start(true);
+    PackagesRecognitionExtended.fromProject(this.project).start(true,'[actualNpmProcess] after npm i');
 
     if (!generatLockFiles) {
       if (useYarn) {

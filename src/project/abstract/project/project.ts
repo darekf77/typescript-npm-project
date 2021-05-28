@@ -8,7 +8,7 @@ export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
 //#endregion
 import { Project as $Project } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 
@@ -106,9 +106,17 @@ export class Project extends $Project<Project>
 
   //#region @backend
   public static linkCoreFolders() {
+    const essentialToLink = [
+      'container',
+      'angular-lib',
+      'isomorphic-lib',
+      // TODO add this automaticly in futere
+    ] as ConfigModels.LibType[];
     config.coreProjectVersions.forEach(v => {
-      const continer = Project.by('container', v as any) as Project;
-      continer.recreate.handleProjectSpecyficFiles();
+      essentialToLink.forEach(t => {
+        const continer = Project.by(t, v as any) as Project;
+        continer.recreate.handleProjectSpecyficFiles();
+      });
     });
   }
   //#endregion
@@ -118,7 +126,7 @@ export class Project extends $Project<Project>
       return this.browser.info as any;
     }
     //#region @backend
-    return `(${this._type}) ${this.genericName}`;
+    return `(${this._type}) ${this.genericName} `;
     //#endregion
   }
 

@@ -298,7 +298,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     }
 
     if (!this.isVscodeExtension) {
-      PackagesRecognitionExtended.fromProject(this as any).start();
+      PackagesRecognitionExtended.fromProject(this as any).start(void 0,'[buildable-project]');
     }
 
 

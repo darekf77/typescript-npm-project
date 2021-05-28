@@ -14,7 +14,7 @@ function $UPDATE(args: string) {
   switch (file) {
     case config.file.tmpIsomorphicPackagesJson:
       processing();
-      PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true);
+      PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true,'[update process]');
       break;
     default:
       Helpers.error(`Not recognized file for update`, false, true);

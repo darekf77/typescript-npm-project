@@ -76,11 +76,6 @@ function NPM_FIXES() {
   process.exit(0)
 }
 
-function LN(args: string) {
-  let [target, link] = args.split(' ');
-  Helpers.createSymLink(target, link)
-  process.exit(0)
-}
 
 function CIRCURAL_CHECK() {
   (Project.Current as Project).run(`madge --circular --extensions ts ./src`).sync()
@@ -140,7 +135,6 @@ async function $AA() {
 export default {
   $AA: Helpers.CLIWRAP($AA, '$AA'),
   NPM_FIXES: Helpers.CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
-  LN: Helpers.CLIWRAP(LN, 'LN'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');
   //   Project.From<Project>(from).node_modules.copy(pkgName).to(Project.From<Project>(to))

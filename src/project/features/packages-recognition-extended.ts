@@ -15,13 +15,20 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     return new PackagesRecognitionExtended(project.location);
   }
 
-  start(force = false) {
+  // @ts-ignore
+  start(force: boolean, reasonToSearch: string) {
+    Helpers.log(`[morphi] ${reasonToSearch}`);
+    if (typeof force !== 'boolean') {
+      force = false;
+    }
     if (!global.globalSystemToolMode) {
       return;
     }
-    Helpers.info(`[package-recognition] Searching isomorphic packages... force=${force} `);
-    Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`,()=> {
-      super.start(true); // TODO QUICK_FIX
+    Helpers.info(`[package-recognition] Searching isomorphic packages... force=${force}
+    in ${this.cwd}
+    `);
+    Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`, () => {
+      super.start(true,reasonToSearch); // TODO QUICK_FIX
     })
     Helpers.info(`[package-recognition] Founded ${this.count} isomorphic packages`);
   }

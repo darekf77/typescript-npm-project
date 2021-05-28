@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
@@ -106,13 +106,11 @@ export abstract class TnpProject {
       return isomorphicPackagesArr;
     }
     try {
-      var p = path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES)
+      var p = crossPlatformPath(path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES))
       if (!fse.existsSync(p)) {
-        PackagesRecognitionExtended.fromProject(this as any).start();
+        PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
       }
-      const f = fse.readJSONSync(p, {
-        encoding: 'utf8'
-      });
+      const f = Helpers.readJson(p);
       const arr = f[configMorphi.array.isomorphicPackages];
       if (_.isArray(arr)) {
         return isomorphicPackagesArr.concat(arr);

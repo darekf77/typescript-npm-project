@@ -3,13 +3,11 @@ import { fse } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { CLI } from 'tnp-cli';
 import { glob } from 'tnp-core';
-import * as TerminalProgressBar from 'progress';
 
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { FeatureForProject } from '../../abstract';
 
 //#region dedupe packages
 export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false, warnings = true) {
@@ -133,8 +131,13 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 //#region node module exists
 export function nodeModulesExists(project: Project) {
   if (project.isWorkspace || project.isStandaloneProject) {
-    const p = path.join(project.location, config.folder.node_modules, config.folder._bin);
-    return fse.existsSync(p) && fse.readdirSync(p).length > 0;
+    const nodeModulesPath = path.join(project.location, config.folder.node_modules);
+    const pathBin = path.join(nodeModulesPath, config.folder._bin);
+    const howManyFoldersInNodeModules = Helpers.foldersFrom(nodeModulesPath).length;
+    const howManyFilesInNodeModulesBin = Helpers.filesFrom(pathBin).length;
+    const dummyPackages = config.quickFixes.missingLibs.length + 1;
+    const res = Helpers.exists(pathBin) && howManyFilesInNodeModulesBin > 0 && (howManyFoldersInNodeModules > dummyPackages);
+    return res;
   }
   if (project.isWorkspaceChildProject) {
     if (project.parent.node_modules.exist) {

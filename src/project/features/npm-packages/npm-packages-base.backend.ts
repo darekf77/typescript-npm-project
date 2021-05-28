@@ -12,7 +12,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
-    if (Helpers.osIsMacOs('big-sur') && !this.project.isNaviCli) {
+    if (this.project.isTnp) {
       return false;
     }
     return (this.project.isStandaloneProject

@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
@@ -91,6 +91,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('generated files', genratedFiles);
 
     return files.filter(f => {
+      f = crossPlatformPath(f);
       if (path.basename(f).startsWith(BaselineSiteJoinprefix)) {
         return false;
       }

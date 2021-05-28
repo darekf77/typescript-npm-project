@@ -1,6 +1,6 @@
 
 //#region imports
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
@@ -68,6 +68,9 @@ export namespace CopyMangerHelpers {
     } else {
       tempDestination = destinationLocation;
     }
+    sourceLocation = crossPlatformPath(sourceLocation);
+    tempDestination = crossPlatformPath(tempDestination);
+    destinationLocation = crossPlatformPath(destinationLocation);
 
     const sourceFolders = [
       config.folder.src,
@@ -102,7 +105,7 @@ export namespace CopyMangerHelpers {
       // ${this.project.projectSourceFiles()}
       // `)
       project.projectSourceFiles().forEach(f => {
-        const source = path.join(project.location, f);
+        const source = crossPlatformPath(path.join(project.location, f));
         if (fse.existsSync(source)) {
           Helpers.log(`Copying file/folder to static build: ${f} `)
           if (fse.lstatSync(source).isDirectory()) {

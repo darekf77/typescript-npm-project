@@ -336,7 +336,10 @@ export async function run(args: string[]) {
 
 
 async function $LINK() {
-  await Helpers.isElevated();
+  if(process.platform !== 'win32') {
+    await Helpers.isElevated();
+  }
+
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {

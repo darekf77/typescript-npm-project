@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import * as sass from 'node-sass';
@@ -131,7 +131,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   //#region replace html
   private replaceHtmlTemplateInComponent(dir, base, content, orginalFileExists: boolean = true) {
-    const htmlTemplatePath = path.join(dir, `${base}.component.html`);
+    const htmlTemplatePath = crossPlatformPath(path.join(dir, `${base}.component.html`));
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
     if (fse.existsSync(htmlTemplatePath)) {
 
@@ -160,7 +160,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   //#region replace css
   private replaceCssInComponent(dir, base, content, orginalFileExists: boolean = true) {
-    const cssFilePath = path.join(dir, `${base}.component.css`);
+    const cssFilePath = crossPlatformPath(path.join(dir, `${base}.component.css`));
     // console.log('cssFilePath', cssFilePath)
     let replacement = `
       /* file ${base}.component.css does not exist */
@@ -198,7 +198,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath,
     orginalFileExists: boolean = true) {
 
-    const scssFilePath = path.join(dir, `${base}.component.${ext}`);
+    const scssFilePath = crossPlatformPath(path.join(dir, `${base}.component.${ext}`));
     // this.debugging && console.log(`(${ext}) scssFilePath`, scssFilePath)
     let replacement = `
     /* file ${path.basename(scssFilePath)} does not exist */

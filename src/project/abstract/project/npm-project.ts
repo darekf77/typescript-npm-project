@@ -1,5 +1,5 @@
 //#region @backend
-import { _ } from 'tnp-core';
+import { _, CoreConfig } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import chalk from 'chalk';
@@ -96,7 +96,7 @@ export class NpmProject {
     }
     if (!this.version) {
 
-      if (!global[config.message.globalSystemToolMode]) {
+      if (!global[CoreConfig.message.globalSystemToolMode]) {
         return;
       }
 

@@ -1,5 +1,5 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
@@ -313,32 +313,54 @@ const CHOKI = () => {
 //#endregion
 
 //#region info / check
-export async function $INFO() {
-  const proj = Project.Current as Project;
-  console.clear()
-  console.info(`
+export async function $INFO(args: string) {
+  if (args?.trim() !== '') {
+    if (!path.isAbsolute(args)) {
+      args = path.join(process.cwd(), args);
+    }
+    const exists = Helpers.exists(args);
+    const isFolder = Helpers.isFolder(args);
+    const isFile = Helpers.isFile(args);
+    const isLink = Helpers.isLink(args);
+    const size = Helpers.size(args);
+    Helpers.info(`
+    path: ${args}
+    cross platforma path: ${crossPlatformPath(args)}
+    exists: ${exists}
+    isFolder: ${isFolder}
+    isFile: ${isFile}
+    isLink: ${isLink}
+    size: ${size} bytes
 
-  name: ${proj.name}
-  version: ${proj.version}
-  last npm version: ${proj.lastNpmVersion}
-  frameworkVersion: ${proj._frameworkVersion}
-  genericName: ${proj.genericName}
-  isStandaloneProject: ${proj.isStandaloneProject}
-  isGenerated: ${proj.isGenerated}
-  isCoreProject: ${proj.isCoreProject}
-  type: ${proj._type}
-  parent name: ${proj.parent && proj.parent.name}
-  grandpa name: ${proj.grandpa && proj.grandpa.name}
-  git origin: ${proj.git.originURL}
-  git branch name: ${proj.git.currentBranchName}
-  git commits number: ${proj.git.countComits()}
+    `)
+  } else {
+    const proj = Project.Current as Project;
+    console.clear()
+    console.info(`
 
-  `)
+    name: ${proj.name}
+    version: ${proj.version}
+    last npm version: ${proj.lastNpmVersion}
+    frameworkVersion: ${proj._frameworkVersion}
+    genericName: ${proj.genericName}
+    isStandaloneProject: ${proj.isStandaloneProject}
+    isGenerated: ${proj.isGenerated}
+    isCoreProject: ${proj.isCoreProject}
+    type: ${proj._type}
+    parent name: ${proj.parent && proj.parent.name}
+    grandpa name: ${proj.grandpa && proj.grandpa.name}
+    git origin: ${proj.git.originURL}
+    git branch name: ${proj.git.currentBranchName}
+    git commits number: ${proj.git.countComits()}
+
+    `)
+  }
+
   process.exit(0)
 }
 
-const $CHECK = async () => {
-  await $INFO();
+const $CHECK = async (args) => {
+  await $INFO(args);
 }
 //#endregion
 
