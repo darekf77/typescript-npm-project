@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import * as open from 'open';
@@ -336,16 +336,23 @@ export async function run(args: string[]) {
 
 
 async function $LINK() {
-  if(process.platform !== 'win32') {
+  if (process.platform !== 'win32') {
     await Helpers.isElevated();
   }
 
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {
-    const glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
-    const globalNodeModules = path.join(glboalBinFolderPath, '../lib/node_modules');
-    const packageInGlobalNodeModules = path.resolve(path.join(globalNodeModules, project.name));
+    let glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
+    if (process.platform === 'win32') {
+      glboalBinFolderPath = crossPlatformPath(glboalBinFolderPath);
+      if (/^\/[a-z]\//.test(glboalBinFolderPath)) {
+        glboalBinFolderPath = glboalBinFolderPath.replace(/^\/[a-z]\//, `${glboalBinFolderPath.charAt(1).toUpperCase()}:/`);
+      }
+    }
+    const globalNodeModules = crossPlatformPath(path.join(glboalBinFolderPath,
+      (process.platform === 'win32') ? config.folder.node_modules : `../lib/${config.folder.node_modules}`));
+    const packageInGlobalNodeModules = crossPlatformPath(path.resolve(path.join(globalNodeModules, project.name)));
     // packageInGlobalNodeModules
     Helpers.removeIfExists(packageInGlobalNodeModules);
     project.linkTo(packageInGlobalNodeModules);
@@ -357,6 +364,7 @@ async function $LINK() {
     const pattern = `${project.path(config.folder.bin).absolute.normal}/*`;
     const countLinkInPackageJsonBin = glob
       .sync(pattern)
+      .map(f => crossPlatformPath(f))
       .filter(f => {
         return (Helpers.readFile(f) || '').startsWith('#!/usr/bin/env');
       });
@@ -393,12 +401,15 @@ async function $LINK() {
         const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
         Helpers.removeIfExists(destinationGlobalLink);
         Helpers.createSymLink(localPath, destinationGlobalLink);
-        const command = `chmod +x ${destinationGlobalLink}`;
-        Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
+        if (process.platform !== 'win32') {
+          const command = `chmod +x ${destinationGlobalLink}`;
+          Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
 
-        command: ${command}
-        `)
-        Helpers.run(command).sync();
+          command: ${command}
+          `)
+          Helpers.run(command).sync();
+        }
+
         Helpers.info(`Global link created for: ${chalk.bold(globalName)}`);
       });
     }

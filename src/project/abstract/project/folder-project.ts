@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import { config as configMorphi } from 'morphi';
 //#endregion
@@ -241,9 +241,10 @@ export abstract class FolderProject {
        * Normal path as you expect
        * <absolute path to project> / < relative path from param >
        */
-      normal: path.join(currentProjectLocation, relativePath),
-      custom: path.join(currentProjectLocation, config.folder.custom, relativePath),
-      __prefixed: path.join(currentProjectLocation, path.dirname(relativePath), `__${path.basename(relativePath)}`),
+      normal: crossPlatformPath(path.join(currentProjectLocation, relativePath)),
+      custom: crossPlatformPath(path.join(currentProjectLocation, config.folder.custom, relativePath)),
+      __prefixed: crossPlatformPath(path.join(currentProjectLocation, path.dirname(relativePath),
+        `__${path.basename(relativePath)}`)),
     }
   }
 
