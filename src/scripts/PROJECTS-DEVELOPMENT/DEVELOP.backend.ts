@@ -183,6 +183,10 @@ const $KILLALL = () => {
 }
 
 const $KILLALLNODE = () => {
+  if(process.platform === 'win32') {
+    Helpers.run(`taskkill /f /im node.exe`).sync();
+    return;
+  }
   Helpers.run(`fkill -f node`).sync();
 }
 

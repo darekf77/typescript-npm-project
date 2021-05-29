@@ -400,8 +400,72 @@ async function $LINK() {
         const localPath = path.join(project.location, project.packageJson.data.bin[globalName]);
         const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
         Helpers.removeIfExists(destinationGlobalLink);
-        Helpers.createSymLink(localPath, destinationGlobalLink);
-        if (process.platform !== 'win32') {
+
+        if (process.platform === 'win32') {
+          Helpers.writeFile(destinationGlobalLink, `
+#!/bin/sh
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
+
+case \`uname\` in
+    *CYGWIN*|*MINGW*|*MSYS*) basedir=\`cygpath -w "$basedir"\`;;
+esac
+
+if [ -x "$basedir/node" ]; then
+  "$basedir/node"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+  ret=$?
+else
+  node  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+  ret=$?
+fi
+exit $ret
+          `.trim() + '\n');
+
+
+          const destinationGlobalLinkPS1File = path.join(glboalBinFolderPath, `${globalName}.ps1`);
+          Helpers.writeFile(destinationGlobalLinkPS1File, `
+#!/usr/bin/env pwsh
+$basedir=Split-Path $MyInvocation.MyCommand.Definition -Parent
+
+$exe=""
+if ($PSVersionTable.PSVersion -lt "6.0" -or $IsWindows) {
+  # Fix case when both the Windows and Linux builds of Node
+  # are installed in the same directory
+  $exe=".exe"
+}
+$ret=0
+if (Test-Path "$basedir/node$exe") {
+  & "$basedir/node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+  $ret=$LASTEXITCODE
+} else {
+  & "node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+  $ret=$LASTEXITCODE
+}
+exit $ret
+          `.trim() + '\n');
+          const destinationGlobalLinkCmdFile = path.join(glboalBinFolderPath, `${globalName}.cmd`);
+          Helpers.writeFile(destinationGlobalLinkCmdFile, `
+@ECHO off
+SETLOCAL
+CALL :find_dp0
+
+IF EXIST "%dp0%\\node.exe" (
+  SET "_prog=%dp0%\\node.exe"
+) ELSE (
+  SET "_prog=node"
+  SET PATHEXT=%PATHEXT:;.JS;=;%
+)
+
+"%_prog%"  "%dp0%\\node_modules\\${path.basename(project.location)}\\bin\\${globalName}" %*
+ENDLOCAL
+EXIT /b %errorlevel%
+:find_dp0
+SET dp0=%~dp0
+EXIT /b
+
+          `.trim() + '\n');
+
+        } else {
+          Helpers.createSymLink(localPath, destinationGlobalLink);
           const command = `chmod +x ${destinationGlobalLink}`;
           Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
 

@@ -76,6 +76,10 @@ function $OPEN_BASELINE() {
 
 async function $OPEN(args: string) {
   const db = await TnpDB.Instance();
+  if(args.length === 0) {
+    Helpers.openFolderInFileExploer(process.cwd());
+    process.exit(0)
+  }
   const name = _.first(args.split(' '));
   let projects = []
   if (config.coreProjectVersions.includes(name) && Project.Current.isContainer) {
