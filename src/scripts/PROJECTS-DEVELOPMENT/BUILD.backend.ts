@@ -315,8 +315,16 @@ processing...
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
-      if (lastBuildHash !== lastTagHash) {
-        await child.release(handleStandalone(child, {}));
+      const sameHashes = false; // (lastBuildHash !== lastTagHash); // TODO QUICK FIX
+      if (!sameHashes) {
+        while (true) {
+          try {
+            await child.release(handleStandalone(child, {}), true);
+            break;
+          } catch (error) {
+            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`)
+          }
+        }
       } else {
         Helpers.warn(`
 
@@ -324,6 +332,7 @@ processing...
         No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
 
         `); // hash in package.json to check
+        Helpers.pressKeyAndContinue();
         child.git.commit();
         child.git.pushCurrentBranch();
       }

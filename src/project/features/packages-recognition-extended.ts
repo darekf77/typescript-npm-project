@@ -1,5 +1,5 @@
 //#region @backend
-import { path } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
@@ -28,25 +28,28 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     in ${this.cwd}
     `);
     Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`, () => {
-      super.start(true,reasonToSearch); // TODO QUICK_FIX
-    })
-    Helpers.info(`[package-recognition] Founded ${this.count} isomorphic packages`);
+      super.start(true, reasonToSearch); // TODO QUICK_FIX
+    });
+    Helpers.info(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
   }
 
   checkIsomorphic(node_modules: string, packageName: string) {
-    const pjPath = fse.realpathSync(path.join(node_modules, packageName));
+    const pjPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
     let res = false;
     try {
+      Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${pjPath}`)
       const proj = Project.From<Project>(pjPath);
       if (proj) {
+        Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`)
         if (proj.typeIs(...(config.projectTypes.forNpmLibs as ConfigModels.LibType[]))) {
-          // console.log(`Proj "${proj.genericName}" standalone`, proj.isStandaloneProject)
           res = proj.isStandaloneProject;
         } else {
           res = super.checkIsomorphic(node_modules, packageName);
         }
       }
-    } catch (error) { }
+    } catch (error) {
+      Helpers.log(`[${config.frameworkName}][pacakge-recognition] Not able to check ${pjPath}`)
+    }
     // console.log(`checkIsomorphic: "${packageName}"`, res)
     return res;
   }

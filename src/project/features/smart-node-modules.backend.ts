@@ -86,9 +86,9 @@ export class SmartNodeModules extends FeatureForProject {
 
     const mainSmartNodeModulesFolder = path.dirname(path.dirname(this.project.smartNodeModules.path));
     Helpers.foldersFrom(mainSmartNodeModulesFolder)
-      .filter(f => f !== this.project.name)
+      .filter(f => path.basename(f) !== this.project.name)
       .forEach(f => {
-        const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(f))
+        const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(path.basename(f)))
         Helpers.removeFolderIfExists(additonalFolderToRemove);
       });
 
@@ -206,6 +206,14 @@ function prepare(project: Project, currentProject: Project) {
     tmpProj.npmPackages.installFromArgs('', false, true);
   }
 
+  if (!reinstallForceSmartNodeModules) {
+    Helpers.info(`
+
+    No need for update of node_modules links for ${CLI.chalk.bold(project.genericName)}
+
+    `);
+    return;
+  }
   Helpers.actionWrapper(() => {
     Helpers.foldersFrom(tmpProj.node_modules.path).forEach(from => {
       const dest = path.join(project.node_modules.path, path.basename(from));

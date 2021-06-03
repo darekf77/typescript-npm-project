@@ -1,16 +1,13 @@
 //#region imports
 import chalk from 'chalk';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import { glob } from 'tnp-core';
+import { path } from 'tnp-core';
+import { fse } from 'tnp-core';
 import { _ } from 'tnp-core';
 
 import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
-import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
-import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
 
@@ -127,7 +124,7 @@ export function copyMainProject(tmpProject: Project, project: Project, pkg: Mode
 
 export function prepareTempProject(project: Project, pkg: Models.npm.Package): Project {
   const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of`;
-  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}`);
+  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}-${_.snakeCase(pkg.version ? pkg.version : '')}`);
 
   Helpers.remove(`${path.join(project.location, pathPart)}*`);
   Helpers.mkdirp(tmpFolder);

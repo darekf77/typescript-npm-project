@@ -129,14 +129,55 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
 //#endregion
 
 //#region node module exists
+
+function nodeMOdulesOK(pathToFolder: string | string[], moreThan = 1) {
+  if (_.isArray(pathToFolder)) {
+    pathToFolder = path.join(...pathToFolder) as string;
+  }
+  let res = false;
+  Helpers.log(`[node-modules] checking if exists in: ${pathToFolder}`)
+  if (Helpers.exists(pathToFolder)) {
+    const count = {
+      files: 0,
+      folders: 0,
+      links: 0
+    };
+    res = !_.isUndefined(fse.readdirSync(pathToFolder)
+      .map(f => path.join(pathToFolder as string, f))
+      .find(f => {
+        if (count.files > moreThan) {
+          return true;
+        }
+        if (count.folders > moreThan) {
+          return true;
+        }
+        if (count.links > moreThan) {
+          return true;
+        }
+        if (Helpers.isLink(f)) {
+          count.links++;
+        } else if (Helpers.isFolder(f)) {
+          count.folders++;
+        } else if (Helpers.isFile(f)) {
+          count.files++;
+        }
+        return false;
+      })
+    );
+  }
+  Helpers.log(`[node-modules] checking done: ${res}`)
+  return res;
+}
+
 export function nodeModulesExists(project: Project) {
   if (project.isWorkspace || project.isStandaloneProject) {
+
     const nodeModulesPath = path.join(project.location, config.folder.node_modules);
+
     const pathBin = path.join(nodeModulesPath, config.folder._bin);
-    const howManyFoldersInNodeModules = Helpers.foldersFrom(nodeModulesPath).length;
-    const howManyFilesInNodeModulesBin = Helpers.filesFrom(pathBin).length;
     const dummyPackages = config.quickFixes.missingLibs.length + 1;
-    const res = Helpers.exists(pathBin) && howManyFilesInNodeModulesBin > 0 && (howManyFoldersInNodeModules > dummyPackages);
+    const fullOfPackages = nodeMOdulesOK(nodeModulesPath, dummyPackages);
+    const res = Helpers.exists(pathBin) && fullOfPackages;
     return res;
   }
   if (project.isWorkspaceChildProject) {

@@ -166,7 +166,7 @@ function installInTnp() {
   const child_process = require('child_process');
   const fse = require('fs-extra');
   const rimraf = require('rimraf');
-  const { Helpers } = require('tnp-helpers');
+  const { Helpers } = require('tnp-core');
 
   const parentPath = path.join(process.cwd());
   const tnpNodeModulesPath = path.join(parentPath, 'tnp', 'node_modules');
@@ -242,6 +242,10 @@ function installInTnp() {
     fse.writeFileSync(indexDtsPath, `
     export * from './src';
     `)
+
+    const pacakgeJsonSource = path.join(parentPath, currentProjectName, 'package.json');
+    const pacakgeJsonDestLink = path.join(destinationPath, currentProjectName, 'package.json');
+    Helpers.createSymLink(pacakgeJsonSource, pacakgeJsonDestLink)
 
 
     console.info(`DONE all for ${currentProjectName}`)

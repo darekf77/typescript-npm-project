@@ -200,10 +200,10 @@ export default _default;
     if (!this.project.isStandaloneProject) {
       return;
     }
-    if(process.platform  === 'win32') { // TODO QUICKFIX
-      Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
-      return;
-    }
+    // if(process.platform  === 'win32') { // TODO QUICKFIX
+    Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
+    return;
+    // }
     const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
     const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
     Helpers.removeIfExists(pathToSelf);

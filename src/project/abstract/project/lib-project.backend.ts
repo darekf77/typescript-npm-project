@@ -76,14 +76,14 @@ export abstract class LibProject {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
 
-  checkIfLogginInToNpm(this: Project) {
+  checkIfLogginInToNpm(this: Project, noExitOnError: boolean) {
     // if (!this.canBePublishToNpmRegistry) {
     //   return;
     // }
     try {
       this.run('npm whoami').sync();
     } catch (e) {
-      Helpers.error(`Please login in to npm.`, false, true)
+      Helpers.error(`Please login in to npm.`, noExitOnError, true)
     }
   }
 
@@ -256,7 +256,7 @@ export abstract class LibProject {
     }
   }
 
-  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
+  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
     if (_.isUndefined(releaseOptions.useTempFolder)) {
       if (!this.checkIfReadyForNpm(true)) {
         Helpers.warn(`Project "${this.name}" is not ready for npm release`)
@@ -310,12 +310,12 @@ export abstract class LibProject {
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
-        await generatedProject.release(releaseOptions);
+        await generatedProject.release(releaseOptions,automaticRelease);
         return;
       }
     }
 
-    this.checkIfLogginInToNpm();
+    this.checkIfLogginInToNpm(automaticRelease);
 
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
@@ -323,11 +323,14 @@ export abstract class LibProject {
     const newVersion = this.versionPatchedPlusOne;
 
     function removeTagAndCommit(tagOnly = false) {
-      Helpers.error(`PLEASE RUN: `, true, true)
+      Helpers.error(`PLEASE RUN: `, true, true);
       if (!tagOnly) {
-        Helpers.error(`git reset --hard HEAD~1`, true, true)
+        Helpers.error(`git reset --hard HEAD~1`, true, true);
       }
-      Helpers.error(`git tag --delete v${newVersion}`, false, true)
+      Helpers.error(`git tag --delete v${newVersion}`, automaticRelease, true);
+      if (automaticRelease) {
+        throw 'release problem...';
+      }
     }
 
     await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {

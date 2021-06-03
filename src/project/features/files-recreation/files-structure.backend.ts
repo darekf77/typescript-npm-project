@@ -204,7 +204,7 @@ export class FilesStructure extends FeatureForProject {
 
     //#region report progress initing project
     if (this.project.isWorkspaceChildProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+      Helpers.info(`Initing project (workspace child): ${chalk.bold(this.project.genericName)}`);
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
