@@ -34,6 +34,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region container core project for this project
   private get containerCore() {
+    Helpers.info('Preparing cointainer core ...')
     const frameworkVersion = this.project._frameworkVersion;
     const container = Project.by('container', frameworkVersion) as Project;
     if (this.project.location === container?.location) {
@@ -43,6 +44,7 @@ export class SmartNodeModules extends FeatureForProject {
       prepare(container, this.project);
     }
     SmartNodeModules._prepared[container.location] = container;
+    Helpers.info('Preparing cointainer core ... done')
     return container;
   }
   //#endregion
@@ -131,6 +133,9 @@ export class SmartNodeModules extends FeatureForProject {
         // console.log(`overrideDest: ${overrideDest}`)
         Helpers.removeIfExists(overrideDest);
         Helpers.createSymLink(overrideFrom, overrideDest);
+        // @LAST
+        // faster link
+        // smart node modules - copy whole folder of links from container
 
         Helpers.foldersFrom(tempProj.node_modules.path)
           .filter(depName => path.basename(depName) !== packageName)
@@ -162,6 +167,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region install/reinstall all packages
   public install(action: 'install' | 'uninstall' = 'install', ...packages: PackageType[]) {
+    Helpers.info(`START SMART INSTALL...  for ${this.project.genericName}`);
     if (packages.length > 0) {
       packages.forEach(p => {
         this.project.packageJson.data.tnp.overrided.dependencies[p.name] = (action === 'uninstall')
@@ -180,7 +186,7 @@ export class SmartNodeModules extends FeatureForProject {
       this.project.node_modules.copyFrom(c, 'smart node_modules instalation');
       this.handlePackagesOverride();
     }
-    Helpers.info(`DONE SMART INSTALL`);
+    Helpers.info(`DONE SMART INSTALL  for ${this.project.genericName}`);
   }
   //#endregion
 

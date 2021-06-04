@@ -16,6 +16,9 @@ if (process.argv.find((a, i) => {
   if (a.startsWith('-manuallink')) {
     installInTnp(process.argv.slice(i + 1));
   }
+  if (a.startsWith('-removelinks')) {
+    removeLinks(process.argv.slice(i + 1));
+  }
 })) {
 
 }
@@ -314,4 +317,21 @@ function tsconfig() {
   }
 
   `
+}
+
+
+function removeLinks() {
+
+  const path = require('path');
+  const parentPath = path.join(process.cwd());
+  const fse = require('fs-extra');
+  const rimraf = require('rimraf');
+  fse.readdirSync(parentPath)
+    .filter(f => fse.lstatSync(path.join(parentPath, f)).isDirectory() && !f.startsWith('tmp'))
+    .filter(f => !['.git', 'tnp', 'node_modules', 'src', '.vscode'].includes(f))
+    .map(f => path.join(f, 'node_modules'))
+    .filter(f => fse.existsSync(f) && fse.lstatSync(f).isSymbolicLink())
+    .filter(f => rimraf.sync(f))
+  console.info(`DONE`);
+  process.exit(0)
 }

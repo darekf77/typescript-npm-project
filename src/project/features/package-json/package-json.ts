@@ -52,15 +52,18 @@ export class PackageJSON
       packgeJson: crossPlatformPath(path.join(location, config.file.package_json)),
       tnpJson: crossPlatformPath(path.join(location, config.file.package_json__tnp_json)),
     };
-    
+
     let saveAtLoad = false;
-    if (!fse.existsSync(filePath.packgeJson) && fse.existsSync(filePath.tnpJson)) {
+    if (!Helpers.exists(filePath.packgeJson) && Helpers.exists(filePath.tnpJson)) {
       const tnpData = Helpers.readJson(filePath.tnpJson, void 0) as Models.npm.TnpData;
       if (!tnpData) {
         // warn(`No package.json (and bad package.json_tnp) in folder: ${path.basename(location)}`)
         return;
       }
       Helpers.info(`Recreating ${chalk.bold(path.basename(location))}/package.json from ${config.file.package_json__tnp_json} and npm registry...`);
+      if (Helpers.isLink(filePath.packgeJson)) {
+        Helpers.error('pizda')
+      }
       const nameFromFolder = path.basename(filePath.packgeJson);
       let lastVersionFromNpm: string;
       try {
@@ -216,9 +219,9 @@ export class PackageJSON
 
     } catch (err) {
       Helpers.error(`[package-json] Error while parsing files:
-      - ${filePath.packgeJson}      
+      - ${filePath.packgeJson}
       - ${filePath.tnpJson}
-       
+
        `, false, true);
       return;
     }
