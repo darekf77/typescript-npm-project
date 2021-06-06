@@ -270,6 +270,8 @@ const $RELEASE = async (args: string) => {
   const proj = Project.Current as Project;
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
+  proj.packageJson.showDeps('Release');
+
   if (proj.isContainer) {
     global.tnpNonInteractive = true;
 
@@ -383,8 +385,10 @@ const $RELEASE_OBSCURED = async (args) => {
   argsObj.uglify = true;
   argsObj.prod = true;
   argsObj.args = args;
-  (Project.Current as Project).checkIfReadyForNpm();
-  await (Project.Current as Project).release(argsObj)
+  const proj = (Project.Current as Project);
+  proj.checkIfReadyForNpm();
+  proj.packageJson.showDeps('Release');
+  await proj.release(argsObj);
 
   process.exit(0)
 };

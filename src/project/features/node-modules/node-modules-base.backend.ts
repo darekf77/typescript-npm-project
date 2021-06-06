@@ -41,9 +41,9 @@ export class NodeModulesBase extends NodeModulesCore {
         if (path.basename(f) === '.bin') {
           Helpers.copy(f, dest);
         } else {
-          Helpers.createSymLink(f, dest);
+          Helpers.createSymLink(f, dest, { speedUpProcess: true });
         }
-      })
+      });
       return;
     }
 

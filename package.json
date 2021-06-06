@@ -11,7 +11,8 @@
         "ng2-rest-swagger-generator": "6.0.10",
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.11",
-        "http-socket-proxy-router": "0.0.1"
+        "http-socket-proxy-router": "0.0.1",
+        "isomorphic-storage": "0.0.2"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -639,6 +640,7 @@
     "inquirer": "~7.3.3",
     "inquirer-autocomplete-prompt": "~1.3.0",
     "is-elevated": "~3.0.0",
+    "isomorphic-storage": "0.0.2",
     "istanbul-instrumenter-loader": "^2.0.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",

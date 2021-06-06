@@ -175,7 +175,7 @@ export class ProjectAngularLib
     //#endregion
   }
 
-  async buildLib() { // @LAST fixing angular build, fix node_MOdules eixsit() links are insread folders!
+  async buildLib() {
     //#region @backendFunc
     const { outDir } = this.buildOptions;
     this.beforeLibBuild(outDir);

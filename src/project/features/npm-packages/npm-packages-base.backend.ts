@@ -81,7 +81,11 @@ export class NpmPackagesBase extends NpmPackagesCore {
         this.project.workspaceSymlinks.remove(triggeredMsg)
       }
 
-      const installAllowed = (!this.project.isContainer || this.project.isContainerWithLinkedProjects || this.project.isContainerCoreProject);
+      const installAllowed = (
+        !this.project.isContainer
+        || this.project.isContainerWithLinkedProjects
+        || this.project.isContainerCoreProject
+      );
 
       if (installAllowed) {
         if (this.useSmartInstall
@@ -108,7 +112,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         if (!this.project.node_modules.isLink) {
-          this.project.node_modules.dedupe();
+          this.project.node_modules.dedupe(); // TODO this does not apply for smartInstalation..
+                                              // but how to check if smart installation is smart not normal ?
         }
         // this.project.node_modules.stuberizeFrontendPackages();
       }

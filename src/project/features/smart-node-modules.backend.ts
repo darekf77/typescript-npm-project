@@ -133,9 +133,6 @@ export class SmartNodeModules extends FeatureForProject {
         // console.log(`overrideDest: ${overrideDest}`)
         Helpers.removeIfExists(overrideDest);
         Helpers.createSymLink(overrideFrom, overrideDest);
-        // @LAST
-        // faster link
-        // smart node modules - copy whole folder of links from container
 
         Helpers.foldersFrom(tempProj.node_modules.path)
           .filter(depName => path.basename(depName) !== packageName)
@@ -180,10 +177,10 @@ export class SmartNodeModules extends FeatureForProject {
       }).join('\n')}
       `);
     }
-    const c = this.containerCore;
-    if (c.location !== this.project.location) {
+    const containerCore = this.containerCore;
+    if (containerCore.location !== this.project.location) {
       this.project.node_modules.remove();
-      this.project.node_modules.copyFrom(c, 'smart node_modules instalation');
+      this.project.node_modules.copyFrom(containerCore, 'smart node_modules instalation');
       this.handlePackagesOverride();
     }
     Helpers.info(`DONE SMART INSTALL  for ${this.project.genericName}`);
