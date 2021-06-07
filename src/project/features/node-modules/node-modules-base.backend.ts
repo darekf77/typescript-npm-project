@@ -36,14 +36,16 @@ export class NodeModulesBase extends NodeModulesCore {
     if (source.smartNodeModules.exists) {
       this.project.node_modules.remove();
       Helpers.mkdirp(this.project.node_modules.path);
-      Helpers.foldersFrom(source.smartNodeModules.path).forEach(f => {
-        const dest = path.join(this.project.node_modules.path, path.basename(f));
-        if (path.basename(f) === '.bin') {
-          Helpers.copy(f, dest);
-        } else {
-          Helpers.createSymLink(f, dest, { speedUpProcess: true });
-        }
-      });
+      Helpers.foldersFrom(source.smartNodeModules.path)
+        .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
+        .forEach(f => {
+          const dest = path.join(this.project.node_modules.path, path.basename(f));
+          if (path.basename(f) === '.bin') {
+            Helpers.copy(f, dest);
+          } else {
+            Helpers.createSymLink(f, dest, { speedUpProcess: true });
+          }
+        });
       return;
     }
 

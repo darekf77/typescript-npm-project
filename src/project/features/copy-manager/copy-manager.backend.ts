@@ -287,7 +287,7 @@ export class CopyManager extends FeatureForProject {
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
       Helpers.warn(`Invalid project: ${destination.name}`)
-      return
+      return;
     }
 
     const namePackageName = (

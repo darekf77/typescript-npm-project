@@ -336,13 +336,13 @@ export async function run(args: string[]) {
 
 
 async function $LINK() {
-  if (process.platform !== 'win32') {
-    await Helpers.isElevated();
-  }
-
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {
+    if (process.platform !== 'win32') {
+      await Helpers.isElevated();
+    }
+    //#region linking to global/local bin
     let glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
     if (process.platform === 'win32') {
       glboalBinFolderPath = crossPlatformPath(glboalBinFolderPath);
@@ -479,6 +479,34 @@ EXIT /b
     }
 
     process.exit(0);
+    //#endregion
+  } else if (project.isContainer) {
+    const childrens = project.children.filter(p => p.frameworkVersionAtLeast('v2'));
+    Helpers.info(`Installing pacakge / Removing own pacakge..`);
+    for (let index = 0; index < childrens.length; index++) {
+      const c = childrens[index];
+      Helpers.log(`Processing ${c.genericName}`);
+      if (!c.node_modules.exist) {
+        await c.npmPackages.installFromArgs('');
+      }
+      const ownPackage = c.path(`${config.folder.node_modules}/${c.name}`).absolute.normal;
+      Helpers.removeIfExists(ownPackage);
+    }
+    Helpers.info(`Removing own pacakge..done`);
+    Helpers.info(`Linking pacakges...`);
+    for (let index = 0; index < childrens.length; index++) {
+      const c = childrens[index];
+      const childGenericName = c.genericName;
+      const copyToChildrens = childrens.filter(ic => c.name !== ic.name);
+      const copyToChildrensNames = copyToChildrens.map(ic => ic.name);
+      Helpers.log(`Linking ${childGenericName} for every package in container... `);
+      const opt = await BuildOptions.from(`${config.frameworkName} bd`,
+        c, { copyto: copyToChildrens });
+      await c.copyManager.initCopyingOnBuildFinish(opt);
+      Helpers.log(`Linking ${childGenericName} for every package in container... DONE`);
+    }
+    Helpers.info(`Linking pacakges...DONE`);
+    process.exit(0)
   } else {
     if (project.isWorkspaceChildProject) {
       project = project.parent;
