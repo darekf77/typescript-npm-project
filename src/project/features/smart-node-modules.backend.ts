@@ -41,7 +41,7 @@ export class SmartNodeModules extends FeatureForProject {
       Helpers.log(`Smart node modules instalation for container core..`)
     }
     if (!SmartNodeModules._prepared[container.location]) {
-      prepare(container, this.project);
+      prepareContainerProject(container, this.project);
     }
     SmartNodeModules._prepared[container.location] = container;
     Helpers.info('Preparing cointainer core ... done')
@@ -193,37 +193,64 @@ export class SmartNodeModules extends FeatureForProject {
 //#region helpers
 
 //#region prepare
-function prepare(project: Project, currentProject: Project) {
+function prepareContainerProject(containerCoreProject: Project, currentProject: Project) {
+  const currentContainerCorePackages = _.cloneDeep(containerCoreProject.packageJson.dependencies);
 
-  project.packageJson.save(`prepare for smart node_modules`)
-  if (!Helpers.exists(project.smartNodeModules.path)) {
-    Helpers.mkdirp(path.dirname(project.smartNodeModules.path));
+  // containerCoreProject.packageJson.save(`prepare for smart node_modules`);
+  // const updartedContainerCorePackages = _.cloneDeep(containerCoreProject.packageJson.dependencies);
+  // const packgesHasChanges = !_.isEqual(currentContainerCorePackages, updartedContainerCorePackages);
+
+  if (!Helpers.exists(containerCoreProject.smartNodeModules.path)) {
+    Helpers.mkdirp(path.dirname(containerCoreProject.smartNodeModules.path));
     Helpers.createSymLink(
-      project.packageJson.path,
-      path.join(path.dirname(project.smartNodeModules.path), config.file.package_json),
+      containerCoreProject.packageJson.path,
+      path.join(path.dirname(containerCoreProject.smartNodeModules.path), config.file.package_json),
     );
   }
-  const tmpProj = Project.From(path.dirname(project.smartNodeModules.path)) as Project;
-  const reinstallForceSmartNodeModules = (project.isContainerCoreProject && (project.location === currentProject.location));
+  const tmpProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
+  const reinstallForceSmartNodeModules = (
+    containerCoreProject.isContainerCoreProject
+    && (containerCoreProject.location === currentProject.location)
+  );
+  // || packgesHasChanges;
+
+  // if (packgesHasChanges) {
+  //   Helpers.info(`
+  //   [smart-node_modules]
+
+  //   Container core "${containerCoreProject.genericName}" packges has CHAGNED
+  //   reinstalling....
+
+  //   `)
+  // } else {
+  //   Helpers.info(`
+  //   [smart-node_modules]
+
+  //   Container core "${containerCoreProject.genericName}" UP TO DATE..
+
+  //   `);
+  // }
+
   if (!tmpProj.node_modules.exist || reinstallForceSmartNodeModules) {
     tmpProj.npmPackages.installFromArgs('', false, true);
+    tmpProj.node_modules.dedupe(); // TODO QUICK FIX
   }
 
   if (!reinstallForceSmartNodeModules) {
     Helpers.info(`
 
-    No need for update of node_modules links for ${CLI.chalk.bold(project.genericName)}
+    No need for update of node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)}
 
     `);
     return;
   }
   Helpers.actionWrapper(() => {
     Helpers.foldersFrom(tmpProj.node_modules.path).forEach(from => {
-      const dest = path.join(project.node_modules.path, path.basename(from));
+      const dest = path.join(containerCoreProject.node_modules.path, path.basename(from));
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(from, dest);
     });
-  }, `updating node_modules links for ${CLI.chalk.bold(project.genericName)} `);
+  }, `updating node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)} `);
 }
 //#endregion
 

@@ -42,9 +42,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   let parentOverride = {};
   const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
   let newDepsForProject = {};
-  // if ((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies) { // TODO QUICK_FIX
-  _.cloneDeep((Project.Tnp as Project).packageJson.data.tnp.overrided.dependencies);
-  // }
+
 
   if (project.isStandaloneProject && !project.isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project._type });
@@ -202,7 +200,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       global.actionShowingDepsForContainer = false;
       const depsForVer = projForVer.packageJson.data;
       Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
-        // Helpers.log(`Change "${chalk.bold(pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
+        // Helpers.log(`Change "${chalk.bold(
+        // pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
         newDeps[pkgNameInNewVer] = depsForVer.dependencies[pkgNameInNewVer];
       });
     }
@@ -366,6 +365,22 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         delete project.packageJson.data.dependencies['vscode']
       }
     }
+  }
+  if (project.isContainerCoreProject) { // TODO TESTING
+    _.keys(project.packageJson.data.dependencies)
+      .forEach(depName => {
+        const v = project.packageJson.data.dependencies[depName];
+        if (v) {
+          project.packageJson.data.dependencies[depName] = v.replace('~', '').replace(`^`, '');
+        }
+      });
+    _.keys(project.packageJson.data.devDependencies)
+      .forEach(depName => {
+        const v = project.packageJson.data.devDependencies[depName];
+        if (v) {
+          project.packageJson.data.devDependencies[depName] = v.replace('~', '').replace(`^`, '');
+        }
+      });
   }
 }
 //#endregion

@@ -49,7 +49,7 @@ export function executeCommand(command: string, project: Project) {
    ${command} in folder:
    ${project.location}
 
-   `)
+   `);
   project.run(command, { output: true, biggerBuffer: true }).sync();
 }
 

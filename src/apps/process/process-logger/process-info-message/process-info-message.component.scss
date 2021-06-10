@@ -1,6 +1,5 @@
 :host {
   display: block;
-  background-color: lightgrey;
   overflow: scroll;
   padding: 2px 2px 20px;
   resize: vertical;
@@ -8,7 +7,6 @@
   ul {
     list-style: none;
   }
-  color: gray;
 
   mat-list-item {
     height: 40px;

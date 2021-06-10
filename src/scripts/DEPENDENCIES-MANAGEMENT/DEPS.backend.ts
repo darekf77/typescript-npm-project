@@ -648,6 +648,32 @@ async function $LN(args: string) {
   process.exit(0);
 }
 
+export function $DEPS_JSON() {
+  const node_moduels = path.join(process.cwd(), config.folder.node_modules);
+  const result = {};
+  Helpers
+    .foldersFrom(node_moduels)
+    .filter(f => path.basename(f) !== '.bin')
+    .forEach(f => {
+      const packageName = path.basename(f);
+      if (packageName.startsWith('@')) {
+        const orgName = packageName;
+        Helpers.foldersFrom(f).forEach(f2 => {
+          try {
+            result[`${orgName}/${path.basename(f2)}`] = Helpers.readValueFromJson(path.join(f2, config.file.package_json), 'version', '');
+          } catch (error) { }
+        });
+      } else {
+        try {
+          result[packageName] = Helpers.readValueFromJson(path.join(f, config.file.package_json), 'version', '');
+        } catch (error) { }
+      }
+
+    });
+  Helpers.writeJson(path.join(process.cwd(), config.file.result_packages_json), result);
+  process.exit(0);
+}
+
 export default {
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
   $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),
@@ -681,6 +707,7 @@ export default {
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
+  $DEPS_JSON: Helpers.CLIWRAP($DEPS_JSON, '$DEPS_JSON'),
   HIDE_DEPS: Helpers.CLIWRAP(HIDE_DEPS, 'HIDE_DEPS'),
   $DEPS_CLEAN: Helpers.CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
   $INSTALL: Helpers.CLIWRAP($INSTALL, '$INSTALL'),

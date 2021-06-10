@@ -207,7 +207,7 @@ export class PackageJsonCore {
         return this.data.tnp.isCoreProject;
       }
       Helpers.error(`Bad value in package.json, tnp.isCoreProject should be boolean.`, true);
-      Helpers.error(`Location of package.json: ${this.cwd}`)
+      Helpers.error(`Location of package.json: ${this.cwd}`);
     }
     return false;
   }

@@ -88,7 +88,7 @@ export class ProjectAngularClient
       const portNumber = (argsAdditionalParams.port && this.isStandaloneProject)
         ? argsAdditionalParams.port : (port !== undefined ? port : void 0);
 
-      const p = _.isNumber(portNumber) ? `--port=${argsAdditionalParams.port}` : '';
+      const p = _.isNumber(portNumber) ? `--port=${portNumber}` : '';
       let command: string;
       if (this.isEjectedProject) {
         await Helpers.killProcessByPort(port)
@@ -100,7 +100,7 @@ export class ProjectAngularClient
 
       ANGULAR SERVE COMMAND: ${command}
 
-      `)
+      `);
       this.run(command, { biggerBuffer: true }).async()
     } else {
       baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '')
@@ -150,14 +150,14 @@ export class ProjectAngularClient
           command = `npm-run ng build  ${statsCommand} `
             + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
         } else {
-          const aot = flags.includes('aot')
+          const aot = flags.includes('aot');
           command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
             + ` --aot=${aot ? 'true' : 'false --build-optimizer=false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
         }
 
         Helpers.info(`
 
-Angular cli build command: ${command}
+Angular cli build command: "${command}"
 
         `)
 

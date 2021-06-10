@@ -12,10 +12,9 @@ import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';
 
 export class PackageJsonBase extends PackageJsonCore {
-
   public readonly project: Project;
-  private reasonToHidePackages: string = ''
-  private reasonToShowPackages: string = '';
+  private reasonToHidePackages = '';
+  private reasonToShowPackages = '';
   private readonly coreCategories: PackageJsonDepsCoreCategories;
 
   constructor(options: { data: Object, location?: string; project?: Project; }) {
