@@ -228,7 +228,7 @@
           },
           "sockets": {
             "@types/socket.io-client": "^1.4.32",
-            "socket.io": "^2.0.4",
+            "socket.io": "4.1.2",
             "@types/socket.io": "^1.4.31"
           },
           "tests": {
@@ -720,7 +720,7 @@
     "sort-package-json": "1.11.0",
     "spectron": "13.0.0",
     "sqlite3": "4.0.9",
-    "static-columns": "1.0.17",
+    "static-columns": "~1.0.17",
     "string-similarity": "4.0.2",
     "sudo-block": "3.0.0",
     "svg-png-converter": "0.0.9",
