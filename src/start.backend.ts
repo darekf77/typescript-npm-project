@@ -1,4 +1,4 @@
-import { path } from 'tnp-core'
+import { path, Helpers } from 'tnp-core';
 import { fse, crossPlatformPath } from 'tnp-core'
 import { ConfigModels, LibTypeArr } from 'tnp-config';
 declare const global: any;
@@ -38,21 +38,21 @@ tnp
     if (fse.existsSync(envPath)) {
       try {
         newENV = fse.readJSONSync(envPath);
-        console.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
+        Helpers.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
         return true;
       } catch (er) {
-        console.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
+        Helpers.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
       }
-      console.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
+      Helpers.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
     } else {
-      console.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+      Helpers.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
     }
     return false;
   });
   global['ENV'] = newENV;
 }
 if (Object.keys(global['ENV']).length === 0) {
-  console.warn(`[tnp][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
+  Helpers.warn(`[tnp][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
 }
 // console.log(`DOMAIN: ${ENV.domain}`)
 // console.log(`DOMAIN: ${ENV.domain}`)
@@ -64,13 +64,13 @@ import { config } from 'tnp-config';
 import scriptsFnArr from './scripts/index';
 
 
-import { Helpers } from 'tnp-helpers';
 import chalk from 'chalk';
 import { Project } from './project';
 // import { Ora } from 'ora';
 
 
 // import { ConsoleUi } from './console-ui';
+import { Helpers as TnpHelpers } from 'tnp-helpers';
 import { CLI_FUNCTIONS } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 import { Models } from 'tnp-models';
@@ -170,11 +170,11 @@ export async function start(
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
 
-  const lastCmds = CLI_FUNCTIONS.map(f => Helpers.cliTool.simplifiedCmd(CLASS.getName(f)));
-  const arg = Helpers.cliTool.simplifiedCmd(argsv[2]);
+  const lastCmds = CLI_FUNCTIONS.map(f => TnpHelpers.cliTool.simplifiedCmd(CLASS.getName(f)));
+  const arg = TnpHelpers.cliTool.simplifiedCmd(argsv[2]);
   Helpers.log(`lastCmds: ${lastCmds}`)
   Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
-  Helpers.log(`Helpers.cliTool.simplifiedCmd(argsv[2]) "${Helpers.cliTool.simplifiedCmd(argsv[2])}" `);
+  Helpers.log(`Helpers.cliTool.simplifiedCmd(argsv[2]) "${TnpHelpers.cliTool.simplifiedCmd(argsv[2])}" `);
   // process.exit(0)
   if (lastCmds.includes(arg)) {
     Helpers.log(`DO NOTHIGN`);
@@ -250,7 +250,7 @@ export async function start(
             const vFnName = CLASS.getName(vFn);
             functionsToCHeck.push(vFn)
             if (_.isFunction(vFn)) {
-              const check = Helpers.cliTool.match(vFnName, argsv);
+              const check = TnpHelpers.cliTool.match(vFnName, argsv);
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner.stop()

@@ -1,22 +1,22 @@
-<p [attr.disabled]="!process">
-  <!-- <span *ngIf="process._allProgressData">
-    {{process._allProgressData | json}}
-  </span> -->
+<div [attr.disabled]="!process">
 
   <mat-expansion-panel *ngIf="size === 'normal'"
                        [(expanded)]="isExpanded">
     <mat-expansion-panel-header>
+      <!-- #region headers-->
       <mat-panel-title>
         {{process && process.name}}
       </mat-panel-title>
       <mat-panel-description [style.color]="color">
         {{ progress }}
       </mat-panel-description>
+      <!-- #endregion -->
     </mat-expansion-panel-header>
     <code>
        {{ process.cmd }}
     </code>
     <br>
+    <!-- #region buttons normal view-->
     <app-button-icon [icon]="icon"
                      [color]="color"
                      (action)="action()"
@@ -27,70 +27,54 @@
                      long-press
                      (onLongPressEnd)="onLongPressEnd()"
                      (action)="isOpen = !isOpen"></app-button-icon>
-  </mat-expansion-panel>
-
-  <span *ngIf="size === 'compact'"
-        class="compact">
-    <app-button-icon [icon]="icon"
-                     [color]="color"
-                     (action)="action()"
-                     [label]="label"></app-button-icon>
-    <app-button-icon [icon]="'info'"
-                     [color]="color"
-                     [label]="''"
-                     (dblclick)="reset()"
-                     (action)="openOrClose()"></app-button-icon>
+    <!-- #endregion -->
+    <span *ngIf="size === 'compact'"
+          class="compact">
+      <!-- #region buttons compact-->
+      <app-button-icon [icon]="icon"
+                       [color]="color"
+                       (action)="action()"
+                       [label]="label"></app-button-icon>
+      <app-button-icon [icon]="'info'"
+                       [color]="color"
+                       [label]="''"
+                       (dblclick)="reset()"
+                       (action)="openOrClose()"></app-button-icon>
+      <!-- #endregion -->
+    </span>
     <hr>
-    {{isOpen}}
-  </span>
+    <app-draggable-popup #popup
+                         [id]="id"
+                         [title]="title"
+                         [(pinned)]="isOpenOnStart"
+                         [(isOpen)]="isOpen"
+                         (onPin)="onPin($event)"
+                         *ngIf="process && isOpen">
+      <code>{{cmd}}</code>
+      <!-- #region tabs-->
+      <mat-tab-group>
 
-</p>
-<!-- <standalone-popup [id]="id"
+        <mat-tab label="Messages">
 
+          <app-process-info-message [model]="model"
+                                    [changes]="changes"></app-process-info-message>
 
-                  (close)="onClose()"
-                  [pinned]="pinned"
-                  (pin)="onPin($event)"
-                  *ngIf="process && isOpen"
-                  [contentComponent]="popupContent"></standalone-popup> -->
+        </mat-tab>
+        <mat-tab label="Console Output">
 
+          <app-process-console-info [model]="model"
+                                    [changes]="changes"
+                                    outputType="stdout"></app-process-console-info>
 
-<app-draggable-popup #popup
-                     [id]="id"
-                     [title]="title"
-                     [(pinned)]="isOpenOnStart"
-                     [(isOpen)]="isOpen"
-                     (onPin)="onPin($event)"
-                     *ngIf="process && isOpen">
+        </mat-tab>
+        <mat-tab label="Console Errors">
+          <app-process-console-info [model]="model"
+                                    [changes]="changes"
+                                    outputType="stder"></app-process-console-info>
 
-  <!-- <ng-container class="app-custom-header">
-
-  </ng-container> -->
-  <code>{{cmd}}</code>
-  <!-- popup.height: {{ popup.height }} -->
-  <mat-tab-group>
-
-    <mat-tab label="Messages">
-
-      <app-process-info-message [model]="model"
-                                [changes]="changes"></app-process-info-message>
-
-    </mat-tab>
-    <mat-tab label="Console Output">
-
-      <app-process-console-info [model]="model"
-                                [changes]="changes"
-                                outputType="stdout"></app-process-console-info>
-
-    </mat-tab>
-    <mat-tab label="Console Errors">
-      <app-process-console-info [model]="model"
-                                [changes]="changes"
-                                outputType="stder"></app-process-console-info>
-
-    </mat-tab>
-  </mat-tab-group>
-  <!-- <ng-container class="app-custom-footer">
-    <h1>Hello</h1>
-   </ng-container> -->
-</app-draggable-popup>
+        </mat-tab>
+      </mat-tab-group>
+      <!-- #endregion -->
+    </app-draggable-popup>
+  </mat-expansion-panel>
+</div>

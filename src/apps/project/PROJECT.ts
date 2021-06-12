@@ -91,7 +91,7 @@ export class PROJECT extends Project {
   public static async getAll(config?: ModelDataConfig) {
     //#region @backend
     if (Morphi.isNode) {
-      return await PROCESS.db.find();
+      return await PROCESS.db.getAll();
     }
     //#endregion
     const data = await this.ctrl.getAll(config).received;
@@ -302,13 +302,13 @@ async function assignProc(
       let toSave = { metaInfo, relation1TO1entityId };
       relation1TO1entityId = proc.relation1TO1entityId;
       if (_.isNumber(relation1TO1entityId)) {
-        processInDB = await PROCESS.db.findOne({ id: relation1TO1entityId })
+        var { model: processInDB } = await PROCESS.db.getBy(relation1TO1entityId)
       }
       if (processInDB) {
         toSave = void 0;
       } else {
         processInDB = new PROCESS(processOptions);
-        processInDB = await PROCESS.db.save(processInDB);
+        processInDB = await PROCESS.db.create(processInDB);
         relation1TO1entityId = processInDB.id;
         toSave.relation1TO1entityId = relation1TO1entityId;
       }

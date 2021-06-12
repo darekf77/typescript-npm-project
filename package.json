@@ -228,7 +228,7 @@
           },
           "sockets": {
             "@types/socket.io-client": "^1.4.32",
-            "socket.io": "4.1.2",
+            "socket.io": "2.4.1",
             "@types/socket.io": "^1.4.31"
           },
           "tests": {
@@ -716,7 +716,7 @@
     "sharp": "0.23.3",
     "simple-git": "1.96.0",
     "sloc": "0.2.0",
-    "socket.io": "4.1.2",
+    "socket.io": "2.4.1",
     "sort-package-json": "1.11.0",
     "spectron": "13.0.0",
     "sqlite3": "4.0.9",

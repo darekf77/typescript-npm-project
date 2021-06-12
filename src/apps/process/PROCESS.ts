@@ -10,7 +10,7 @@ import { Project } from 'tnp-helpers';
 //#endregion
 
 //#region @backend
-import { path,crossPlatformPath } from 'tnp-core'
+import { path, crossPlatformPath } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { rimraf } from 'tnp-core'
 import { child_process } from 'tnp-core';
@@ -64,6 +64,11 @@ export class PROCESS_ENTITY extends Morphi.Base.Entity<PROCESS, IPROCESS, Proces
   @Morphi.Orm.Column.Custom('varchar', { length: 500, nullable: true })
   //#endregion
   cmd: string = undefined;
+
+  //#region @backend
+  @Morphi.Orm.Column.Custom('varchar', { length: 500, nullable: true })
+  //#endregion
+  cmdOrg?: string = undefined;
 
   //#region @backend
   @Morphi.Orm.Column.Custom('varchar', { length: 2000, nullable: true })
@@ -130,7 +135,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
   ] as PROCESS_STATE[];
   public parameters: PARAMS;
   public browser: IPROCESS = {} as any;
-  private cmdOrg?: string = undefined;
+
   private _allProgressData: PROGRESS_DATA[];
   private __stder: string;
 
@@ -149,8 +154,11 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
 
   //#region @backend
   public static get db() {
-    const repo = this.ctrl.connection.getRepository(PROCESS);
-    return repo;
+    return Morphi.CRUD.DB.from(this.ctrl.connection, PROCESS);
+    // this.ctrl.getBy()
+    // const repos = this.ctrl.
+    // const repo = this.ctrl.connection.getRepository(PROCESS);
+    // return repo;
   }
   //#endregion
 
@@ -307,7 +315,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
         this.pid = p.pid;
         this.previousPid = p.pid;
 
-        await PROCESS.db.update(this.id, this);
+        await PROCESS.db.updateById(this.id, this);
         fse.writeFileSync(this.stdoutLogPath, '');
         fse.writeFileSync(this.stderLogPath, '');
         attach(p, this)
@@ -346,7 +354,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
       }
       fse.writeFileSync(this.exitCodePath, 0)
       this.pid = void 0;
-      await PROCESS.db.update(this.id, this);
+      await PROCESS.db.updateById(this.id, this);
       return this;
     }
 
@@ -411,7 +419,7 @@ export class PROCESS<PARAMS = any> extends PROCESS_ENTITY {
     let p = processOrProcesses as PROCESS;
     if (_.isNumber(p.pid) && !activeProcesses.find(ap => ap.pid == p.pid)) {
       p.pid = undefined;
-      await PROCESS.db.update(p.id, p);
+      await PROCESS.db.updateById(p.id, p);
     }
 
   }
@@ -439,10 +447,11 @@ function attach(p: child_process.ChildProcess, proc: PROCESS, resolve?: (any?) =
     },
     endAction: async (exitCode) => {
       // console.log('END:')
-      proc = await PROCESS.db.findOne(proc.id)
+      const { model } = await PROCESS.db.getBy(proc.id)
+      proc = model;
       proc.pid = void 0;
       fse.writeFileSync(proc.exitCodePath, (_.isNumber(exitCode) ? exitCode : '-111'))
-      await PROCESS.db.update(proc.id, proc);
+      await PROCESS.db.updateById(proc.id, proc);
       Morphi.Realtime.Server.TrigggerEntityChanges(proc)
       Morphi.Realtime.Server.TrigggerEntityPropertyChanges<PROCESS>(proc, ['stderLog', 'stdoutLog', 'allProgressData'])
 

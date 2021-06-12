@@ -32,7 +32,7 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
   ): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      const proc = await PROCESS.db.findOne(id);
+      const { model: proc } = await PROCESS.db.getBy(id);
       if (_.isObject(parameters) && !_.isArray(parameters)) {
         proc.parameters = parameters;
         console.log(`[process] Parameters are set ${parameters}`)
@@ -53,8 +53,8 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
   ): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async () => {
-      const proc = await PROCESS.db.findOne(id);
-      let res = await proc.stop();
+      const { model: proc } = await PROCESS.db.getBy(id);
+      const res = await proc.stop();
       res.modelDataConfig = config as any;
       return () => res;
     }
@@ -68,7 +68,7 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
 
     //#region @backendFunc
     return async () => {
-      const proc = await PROCESS.db.findOne(id);
+      const { model: proc } = await PROCESS.db.getBy(id);
       let res = await proc.start();
       return () => res.allProgressData.slice(alreadyInFE)
     }
@@ -126,12 +126,28 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
   //#region @backend
   async initExampleDbData() {
     this.removeProcesesfolder()
-
-    await PROCESS.db.save(new PROCESS({ name: 'Test async', cmd: 'tnp test:async:proc --max 1 ', cwd: crossPlatformPath(process.cwd()), async: true }))
-    await PROCESS.db.save(new PROCESS({ name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err', cwd: crossPlatformPath(process.cwd()) }))
-    await PROCESS.db.save(new PROCESS({ name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6', cwd: crossPlatformPath(process.cwd()) }))
-    await PROCESS.db.save(new PROCESS({ name: 'Messages async', cmd: 'tnp show:loop:messages', cwd: crossPlatformPath(process.cwd()), async: true }))
-    await PROCESS.db.save(new PROCESS({ name: 'Test sync proc', cmd: 'echo "siema"', cwd: crossPlatformPath(process.cwd()) }))
+    await PROCESS.db.bulkCreate([
+      new PROCESS({
+        name: 'Test async', cmd: 'tnp test:async:proc --max 1 ',
+        cwd: crossPlatformPath(process.cwd()), async: true
+      }),
+      new PROCESS({
+        name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err',
+        cwd: crossPlatformPath(process.cwd())
+      }),
+      new PROCESS({
+        name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6',
+        cwd: crossPlatformPath(process.cwd())
+      }),
+      new PROCESS({
+        name: 'Messages async', cmd: 'tnp show:loop:messages',
+        cwd: crossPlatformPath(process.cwd()), async: true
+      }),
+      new PROCESS({
+        name: 'Test sync proc', cmd: 'echo "siema"',
+        cwd: crossPlatformPath(process.cwd())
+      }),
+    ]);
   }
   //#endregion
 }
