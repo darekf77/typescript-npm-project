@@ -9,10 +9,12 @@ import { config } from 'tnp-config';
 
 export abstract class BaseProject {
 
+  // @ts-ignore
   public get extensionVsixName(this: Project) {
     return `${this.name}-${this.version}.vsix`;
   }
 
+  // @ts-ignore
   public get genericName(this: Project): string {
 
     if (Helpers.isBrowser) {
@@ -55,6 +57,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isPreviewFor(this: Project): Project {
     //#region @backendFunc
     let previewFor: Project;
@@ -88,6 +91,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   public get backupName(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.backupName;
@@ -100,6 +104,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isContainerWorkspaceRelated(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isForRecreation;
@@ -109,6 +114,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isVscodeExtension(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isForRecreation;
@@ -118,6 +124,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isWorkspace(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isWorkspace;
@@ -127,6 +134,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isDocker(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isDocker;
@@ -136,6 +144,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isContainer(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isContainer;
@@ -145,6 +154,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isContainerCoreProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isContainerCoreProject;
@@ -154,7 +164,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
-
+  // @ts-ignore
   get isContainerChild(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isContainerChild;
@@ -164,6 +174,7 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
   get labels(this: Project) {
     const self = this;
     return {
@@ -181,6 +192,7 @@ export abstract class BaseProject {
   }
 
   //#region @backend
+  // @ts-ignore
   get allResources(this: Project) {
     const resurces = [
       config.file.package_json,
@@ -197,6 +209,7 @@ export abstract class BaseProject {
   }
   //#endregion
 
+  // @ts-ignore
   get isWorkspaceChildProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isWorkspaceChildProject;
@@ -215,6 +228,7 @@ export abstract class BaseProject {
    * - isomorphic-lib : backend/fronded ts library with server,app preview
    * - angular-lib: frontend ui lib with angular preview
    */
+  // @ts-ignore
   get isStandaloneProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isStandaloneProject;
@@ -234,11 +248,12 @@ export abstract class BaseProject {
   }
 
   //#region @backend
+  // @ts-ignore
   get linkedFolders(this: Project) {
     return this.packageJson.linkedFolders;
   }
   //#endregion
-
+  // @ts-ignore
   get dependsOn(this: Project): Project[] {
     //#region @backendFunc
     if (this.isWorkspace) {
@@ -255,6 +270,8 @@ export abstract class BaseProject {
   }
 
   __cacheStandaloneDependencies: Project[];
+
+  // @ts-ignore
   get workspaceDependencies(this: Project): Project[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
@@ -289,6 +306,8 @@ export abstract class BaseProject {
     return [];
     //#endregion
   }
+
+  // @ts-ignore
   get workspaceDependenciesServers(this: Project): Project[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {

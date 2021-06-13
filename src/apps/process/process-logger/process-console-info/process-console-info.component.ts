@@ -25,6 +25,7 @@ export class ProcessConsoleInfoComponent extends ProcessLoggerBaseClass
 
   @Input() public changes: BehaviorSubject<void>;
   @Input() public outputType: 'stdout' | 'stder' = 'stdout';
+  // @ts-ignore
   @Input() public model: PROCESS;
 
   get process() {

@@ -21,6 +21,7 @@ import { config } from 'tnp-config';
  */
 export abstract class LibProject {
 
+  // @ts-ignore
   get isGlobalSystemTool(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isGlobalSystemTool;
@@ -30,6 +31,7 @@ export abstract class LibProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isCommandLineToolOnly(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isCommandLineToolOnly;
@@ -39,6 +41,7 @@ export abstract class LibProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isGeneratingControllerEntities(this: Project) {
     //#region @backendFunc
     return this.typeIs('isomorphic-lib') && this.useFramework;
@@ -310,7 +313,7 @@ export abstract class LibProject {
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
-        await generatedProject.release(releaseOptions,automaticRelease);
+        await generatedProject.release(releaseOptions, automaticRelease);
         return;
       }
     }

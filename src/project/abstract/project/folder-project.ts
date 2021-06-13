@@ -14,6 +14,8 @@ export abstract class FolderProject {
   abstract location: string;
 
   //#region @backend
+
+  // @ts-ignore
   get sourceFolder(this: Project): 'src' | 'components' {
     return (this.typeIs('angular-lib')
       ? config.folder.components : config.folder.src) as any;
@@ -21,6 +23,8 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
+
+  // @ts-ignore
   get linkedProjects(this: Project): Project[] {
     return this.packageJson.linkedProjects
       .filter(f => !Helpers.isValidGitRepuUrl(f))
@@ -35,6 +39,7 @@ export abstract class FolderProject {
     return !_.isUndefined(this.children.find(c => c.name === child?.name));
   }
 
+  // @ts-ignore
   get children(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.children as any;
@@ -51,6 +56,7 @@ export abstract class FolderProject {
     //#endregion
   }
 
+  // @ts-ignore
   get childrenThatAreLibs(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.childrenThatAreLibs as any;
@@ -68,6 +74,7 @@ export abstract class FolderProject {
     //#endregion
   }
 
+  // @ts-ignore
   get childrenThatAreClients(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.childrenThatAreClients as any;
@@ -156,7 +163,7 @@ export abstract class FolderProject {
   }
   //#endregion
 
-
+  // @ts-ignore
   get parent(this: Project): Project {
     if (Helpers.isBrowser) {
       return this.browser.parent as any;
@@ -169,10 +176,11 @@ export abstract class FolderProject {
     if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
       return parent.parent;
     }
-    return parent
+    return parent;
     //#endregion
   }
 
+  // @ts-ignore
   get grandpa(this: Project): Project {
     if (Helpers.isBrowser) {
       return this.browser.grandpa as any;

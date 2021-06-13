@@ -174,6 +174,7 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
     return this.process.progress.value + '%';
   }
 
+  // @ts-ignore
   get id() {
     return !!this.process ? `process${this.process && this.process.id}` : void 0;
   }

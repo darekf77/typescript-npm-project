@@ -17,9 +17,9 @@ export abstract class BaseItemStepperProcessBuildComponent extends BaseComponent
   @Input() model: PROJECT;
 
   abstract tabNumber(): TnpProjectTabIndex;
-
+  // @ts-ignore
   abstract async tabSelectedAction(tabIndex?: number);
-
+  // @ts-ignore
   abstract async formValueChanged();
 
   fields: FormlyFieldConfig[];

@@ -149,8 +149,7 @@ export abstract class DependencyProject {
     ] as any;
   }
 
-
-
+  // @ts-ignore
   public get sortedRequiredWorkspaceDependencies(this: Project): Project[] {
     if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
       return [];

@@ -24,7 +24,7 @@ export class ProcessInfoMessageComponent extends ProcessLoggerBaseClass implemen
   get lsKey() {
     return `process-info-message-model-height-${this.model.id}`;
   }
-
+  // @ts-ignore
   @Input() public model: PROCESS;
   @Input() public changes: BehaviorSubject<void>;
   messPrev: number;

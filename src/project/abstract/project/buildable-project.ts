@@ -18,6 +18,7 @@ export abstract class BuildableProject {
   //#region @backend
   public _buildOptions?: BuildOptions;
 
+  // @ts-ignore
   get availableIsomorphicPackagesInNodeModules(this: Project): string[] {
     const jsonPath = path.join(this.location, PackagesRecognitionExtended.FILE_NAME_ISOMORPHIC_PACKAGES);
     try {
@@ -100,6 +101,8 @@ export abstract class BuildableProject {
     }
     return this._buildOptions;
   }
+
+  // @ts-ignore
   set buildOptions(this: Project, v) {
     if (!v) {
       Helpers.log(`Trying to assign empty buildOption for ${chalk.bold(this.name)}`)
@@ -125,7 +128,7 @@ export abstract class BuildableProject {
   }
   //#endregion
 
-
+  // @ts-ignore
   get allowedEnvironments(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.allowedEnvironments;
@@ -298,7 +301,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     }
 
     if (!this.isVscodeExtension) {
-      PackagesRecognitionExtended.fromProject(this as any).start(void 0,'[buildable-project]');
+      PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[buildable-project]');
     }
 
 

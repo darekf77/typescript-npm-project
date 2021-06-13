@@ -19,6 +19,7 @@ export class DualComponentControllerExtended extends DualComponentController { }
 export class BuildTnpProcessComponent extends BaseFormlyComponent {
 
   DualComponentController = DualComponentControllerExtended;
+  // @ts-ignore
   @Input() model: PROJECT;
 
   isLinear = false;
