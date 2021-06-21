@@ -171,6 +171,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     `, 1);
 
+    // @ts-ignore
     this.codecut = new ExtendedCodeCut(
       this.compilationFolderPath,
       filesPathes,

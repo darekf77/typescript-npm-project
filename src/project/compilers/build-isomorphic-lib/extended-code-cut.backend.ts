@@ -12,6 +12,7 @@ import { BuildOptions } from 'tnp-db';
 
 export class ExtendedCodeCut extends CodeCut {
 
+  // @ts-ignore
   browserCodeCut: typeof BrowserCodeCutExtended;
 
   constructor(
