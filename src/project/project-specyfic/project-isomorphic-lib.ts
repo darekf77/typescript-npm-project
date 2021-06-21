@@ -206,7 +206,7 @@ export class ProjectIsomorphicLib
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm']).output;
+        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm'], this.project).output;
         // rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });

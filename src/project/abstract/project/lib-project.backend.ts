@@ -260,6 +260,9 @@ export abstract class LibProject {
   }
 
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
+    // @ts-ignore
+    Helpers.log(`LIB: automaticRelease=${automaticRelease}`);
+    Helpers.log(`LIB: global.tnpNonInteractive=${global.tnpNonInteractive}`);
     if (_.isUndefined(releaseOptions.useTempFolder)) {
       if (!this.checkIfReadyForNpm(true)) {
         Helpers.warn(`Project "${this.name}" is not ready for npm release`)
@@ -332,7 +335,7 @@ export abstract class LibProject {
       }
       Helpers.error(`git tag --delete v${newVersion}`, automaticRelease, true);
       if (automaticRelease) {
-        throw 'release problem...';
+        Helpers.error('release problem...', false, true);
       }
     }
 

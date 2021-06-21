@@ -130,10 +130,13 @@ export class Region {
               ) {
                 const fn = out as any as ReturnType<typeof codeCuttFn>;
                 let expressionToExecute = regionOrString.titleString;
-                // Helpers.info(`LINE: "${regionOrString.lineStart}"`);
+                // Helpers.log(`LINE: "${regionOrString.lineStart}"`);
                 expressionToExecute = expressionToExecute.replace(regionTag, '');
-                // Helpers.info(`Expresion to evaluate "${expressionToExecute}"`);
-                const cutCode = fn(expressionToExecute, this.project && this.project.env.config, this.absoluteFilePath);
+                // Helpers.log(`Expresion to evaluate "${expressionToExecute}"`);
+                // Helpers.log(`this.project "${this.project.name}"`);
+                const configForProject = this.project && this.project.env.config;
+                // Helpers.log(`configForProject "${configForProject}"`);
+                const cutCode = fn(expressionToExecute, configForProject, this.absoluteFilePath);
                 // Helpers.info(`Cut code: "${cutCode}"`);
                 if (cutCode === null) {
                   continue;

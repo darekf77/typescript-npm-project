@@ -148,7 +148,7 @@ function CROP(args: string) {
   if (!path.isAbsolute(filePath)) {
     filePath = path.join(process.cwd(), filePath);
   }
-  const rm = RegionRemover.from(filePath, Helpers.readFile(filePath), replacements);
+  const rm = RegionRemover.from(filePath, Helpers.readFile(filePath), replacements, Project.Current as Project);
   const output = rm.output;
   Helpers.writeFile(path.join(process.cwd(), `output-${path.basename(filePath)}`), output);
   Helpers.info('DONE');

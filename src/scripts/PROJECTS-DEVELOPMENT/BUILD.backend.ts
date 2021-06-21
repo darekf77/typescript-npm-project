@@ -1,7 +1,7 @@
 //#region imports
 import { _, crossPlatformPath } from 'tnp-core';
 import * as express from 'express';
-import { path } from 'tnp-core'
+import { path } from 'tnp-core';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
@@ -14,7 +14,7 @@ import { chainBuild } from './chain-build.backend';
 
 //#region BUILD
 const $BUILD = async (args) => {
-  await chainBuild(args)
+  await chainBuild(args);
 };
 
 const $CLEAN_BUILD = async (args) => {
@@ -45,7 +45,7 @@ async function $DEFAULT_BUILD(args) {
   } if (project.isWorkspaceChildProject) {
     await $BUILD(args);
   } else {
-    process.exit(0)
+    process.exit(0);
   }
 }
 
@@ -53,7 +53,7 @@ const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
 
   (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
-}
+};
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const BUILD_DIST = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -78,23 +78,23 @@ or
 ${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
 
 inside workspace children.
-    `, false, true)
+    `, false, true);
   }
-  const staticVersionOfProject = await (Project.Current as Project).StaticVersion()
+  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
   } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
   }
 
-}
+};
 
 const STATIC_BUILD_LIB = async (args) => {
   const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
   } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
   }
 
 };
@@ -102,17 +102,17 @@ const STATIC_BUILD_LIB = async (args) => {
 const STATIC_BUILD_PROD = async (args) => {
   const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
   if (staticVersionOfProject) {
-    await staticVersionOfProject.buildProcess.startForLib({ prod: true, args, staticBuildAllowed: true })
+    await staticVersionOfProject.buildProcess.startForLib({ prod: true, args, staticBuildAllowed: true });
   } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`)
+    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
   }
-}
+};
 
 const STATIC_BUILD_LIB_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForLib({ prod: true, args, staticBuildAllowed: true })
+  .startForLib({ prod: true, args, staticBuildAllowed: true });
 
 const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForApp({ args, staticBuildAllowed: true })
+  .startForApp({ args, staticBuildAllowed: true });
 
 const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true });
@@ -138,7 +138,7 @@ const $SERVE = async (args) => {
     if (proj.typeIs('angular-lib')) {
       //#region serve angular lib
       const localUrl = `http://localhost:${8080}/${proj.name}/`;
-      const app = express()
+      const app = express();
       const filesLocation = path.join(proj.location, config.folder.docs);
       const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
 
@@ -154,7 +154,7 @@ const $SERVE = async (args) => {
           .replace(/\/$/, '')
           .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
           .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
-          .replace(/^\//, '')
+          .replace(/^\//, '');
         // console.log(`path file: "${filePath}"`)
         // res.send(filePath)
         // res.end()
@@ -174,9 +174,9 @@ const $SERVE = async (args) => {
         } else {
           res.sendFile(filePath, { root: filesLocation });
         }
-      })
+      });
       app.listen(8080, () => {
-        console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`)
+        console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`);
       });
       //#endregion
     }
@@ -187,16 +187,16 @@ const $SERVE = async (args) => {
   } else {
     const configServe: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
     if (!configServe.port && !configServe.baseUrl && !configServe.outDir) {
-      Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`)
+      Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`);
     }
-    const app = express()
-    app.use(configServe.baseUrl, express.static(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), configServe.outDir))))
+    const app = express();
+    app.use(configServe.baseUrl, express.static(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), configServe.outDir))));
     app.listen(configServe.port, () => {
       console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}
 
       Access project link: http://localhost:${proj.env.config.workspace.workspace.port}${configServe.baseUrl}
 
-      `)
+      `);
     });
   }
 
@@ -210,7 +210,7 @@ const $START = async (args) => {
     return;
   }
   if (!proj.isWorkspace) {
-    Helpers.error(`Please use this command only on workspace level`, false, true)
+    Helpers.error(`Please use this command only on workspace level`, false, true);
   }
   await proj.start(args);
 };
@@ -263,33 +263,45 @@ const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
 
 //#region RELEASE
 
+
 //#region RELEASE NORMAL
 const $RELEASE = async (args: string) => {
+
+  //#region prepare relase args
+  // Helpers.log(`ARR ARGS "${args}"`)
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
+  // Helpers.log(`ARGS RELEASE
+
+  // ${Helpers.stringify(argsObj)}
+
+  // `)
+
   const proj = Project.Current as Project;
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   proj.packageJson.showDeps('Release');
+  //#endregion
 
   if (proj.isContainer) {
+    //#region container release
     global.tnpNonInteractive = true;
 
     const { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
       return Project.From(path.join(proj.location, a));
-    })
+    });
     args = commandString;
 
 
     const npmDeps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name);
     const otherDeps = proj.children.filter(c => {
       return !npmDeps.includes(c);
-    })
+    });
 
     const deps = [
       ...npmDeps,
       ...otherDeps,
-    ]
+    ];
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
       return `
@@ -299,13 +311,13 @@ const $RELEASE = async (args: string) => {
 ${deps.map((p, i) => {
         const bold = (child?.name === p.name);
         const index = i + 1;
-        return `${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name}`
+        return `${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name}`;
       }).join('\n')}
 
 
 ${Helpers.terminalLine()}
 processing...
-    `
+    `;
     };
     //#endregion
 
@@ -317,14 +329,17 @@ processing...
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
-      const sameHashes = false; // (lastBuildHash !== lastTagHash); // TODO QUICK FIX
+      const sameHashes = (lastBuildHash !== lastTagHash); // TODO QUICK FIX
       if (!sameHashes) {
         while (true) {
           try {
-            await child.release(handleStandalone(child, {}), true);
+            await child.run(`${config.frameworkName} release `
+              + ` --automaticRelease=true --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`
+              , { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
+            // await child.release(handleStandalone(child, {}), true);
             break;
           } catch (error) {
-            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`)
+            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
           }
         }
       } else {
@@ -346,7 +361,7 @@ processing...
 
     proj.git.commit(`Update after release`);
     proj.git.pushCurrentBranch();
-    Project.Tnp.git.commit(`Update after release`)
+    Project.Tnp.git.commit(`Update after release`);
     Project.Tnp.git.pushCurrentBranch();
     Helpers.info(`
 
@@ -354,13 +369,15 @@ processing...
     R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(proj.genericName)}  D O N E
 
 
-    `)
-    process.exit(0)
+    `);
+    process.exit(0);
 
+    //#endregion
   } else {
-    await proj.release(handleStandalone(proj, argsObj));
+    Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease}`)
+    await proj.release(handleStandalone(proj, argsObj), !!argsObj.automaticRelease);
   }
-  process.exit(0)
+  process.exit(0);
 };
 
 function handleStandalone(proj: Project, argsObj: any) {
@@ -390,7 +407,7 @@ const $RELEASE_OBSCURED = async (args) => {
   proj.packageJson.showDeps('Release');
   await proj.release(argsObj);
 
-  process.exit(0)
+  process.exit(0);
 };
 //#endregion
 
@@ -415,12 +432,12 @@ const $RECREATE = () => {
       let c = childs[index];
       childs[index] = Project.From(c.location);
       c = childs[index];
-      Helpers.info(`Saving package for ${c.location}`)
-      c.packageJson.save(`rereating container`)
+      Helpers.info(`Saving package for ${c.location}`);
+      c.packageJson.save(`rereating container`);
     }
   }
-  process.exit(0)
-}
+  process.exit(0);
+};
 
 const $BACKUP = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as ProjectDocker;
@@ -445,7 +462,7 @@ async function $BUILD_DOCS(args) {
     await (Project.Current as Project).filesStructure.init('');
     await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
   }
-  process.exit(0)
+  process.exit(0);
 }
 
 async function $BUILD_DOCS_PROD(args) {
@@ -453,7 +470,7 @@ async function $BUILD_DOCS_PROD(args) {
     await (Project.Current as Project).filesStructure.init('');
     await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
   }
-  process.exit(0)
+  process.exit(0);
 }
 
 const $STOP = async (args) => {
@@ -461,7 +478,7 @@ const $STOP = async (args) => {
   if (proj) {
     (proj as ProjectDocker).stop();
   }
-  process.exit(0)
+  process.exit(0);
 };
 
 const $STOP_BUILD_DIST_WATCH = async (args) => {
@@ -486,23 +503,23 @@ const $STOP_BUILD_DIST_WATCH = async (args) => {
       Helpers.warn(`Not able to kill process on pid ${pid}`);
     }
   }
-  Helpers.info('Done')
+  Helpers.info('Done');
   process.exit(0);
 };
 
 async function $DB_BUILDS_UPDATE() {
   const db = await TnpDB.Instance();
   await db.updateProcesses();
-  process.exit(0)
+  process.exit(0);
 }
 
 
 
 
 async function $ACTIVE_SINGULAR_BUILD(args) {
-  await (Project.Current as Project).hasParentWithSingularBuild()
+  await (Project.Current as Project).hasParentWithSingularBuild();
   // process.stdout.write();
-  process.exit(0)
+  process.exit(0);
 }
 //#endregion
 

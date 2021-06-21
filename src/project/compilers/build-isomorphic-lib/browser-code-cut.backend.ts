@@ -384,14 +384,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-  //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
-  //       Helpers.log(`
-  //       INPUT ${path.basename(this.absoluteFilePath)}:
-  // ************************************************************
-  //       ${this.rawContent}
-  // ************************************************************
-  //       `);
-  //     }
+      //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
+      //       Helpers.log(`
+      //       INPUT ${path.basename(this.absoluteFilePath)}:
+      // ************************************************************
+      //       ${this.rawContent}
+      // ************************************************************
+      //       `);
+      //     }
 
 
 
@@ -399,16 +399,16 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       // this.rawContent = this.replaceRegionsWith(rrr, options.replacements, '', ext);
       // Helpers.info(`PROCESING WITH DEEP region`)
-      this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements).output;
+      this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements, this.project).output;
 
-  //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
-  //       Helpers.log(`
-  //       OUTPUT ${path.basename(this.absoluteFilePath)}:
-  // ************************************************************
-  //       ${this.rawContent}
-  // ************************************************************
-  //       `);
-  //     }
+      //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
+      //       Helpers.log(`
+      //       OUTPUT ${path.basename(this.absoluteFilePath)}:
+      // ************************************************************
+      //       ${this.rawContent}
+      // ************************************************************
+      //       `);
+      //     }
 
 
     }
