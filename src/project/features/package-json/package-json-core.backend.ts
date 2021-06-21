@@ -234,6 +234,7 @@ export class PackageJsonCore {
     return false;
   }
 
+  // @ts-ignore
   get isGeneratedForRelease(this: Project) {
     const p = path.basename(path.join(this.location, '../../..'))
     if (p !== config.folder.tmpBundleRelease) {

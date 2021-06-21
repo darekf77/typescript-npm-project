@@ -12,6 +12,7 @@ import { ExtendedCodeCut } from './extended-code-cut.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';
 import { config, ConfigModels } from 'tnp-config';
+import { codeCuttFn } from './cutCodeFn.backend';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -130,43 +131,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     // console.log(Helpers.terminalLine())
   }
 
-  codeCuttFn(cutIftrue: boolean) {
-    return function (expression: string, reservedExpOne: Models.env.EnvConfig, absoluteFilePath?: string) {
 
-      let result = false;
-
-      // console.log(`------------------------`)
-      // console.log('cutIftrue', cutIftrue)
-      if (!reservedExpOne) {
-        // console.log(`No environment`, e)
-      } else {
-        // console.log({
-        //   currentProjectName: e.currentProjectName,
-        // } as EnvConfig);
-        const exp = `(function(ENV){
-          // console.log(typeof ENV)
-          return ${expression.trim()}
-        })(reservedExpOne)`;
-        // console.log(`Eval expre
-
-        // ${exp}
-
-        // `);
-
-        try {
-          const res = eval(exp);
-          // console.log(`[${path.basename(absoluteFilePath)}] Eval (${expression}) => ${res}`)
-          result = cutIftrue ? res : !res;
-        } catch (err) {
-          // console.log(`Expression Failed`, err)
-          Helpers.error(`[codecutFn] Eval failed `);
-          Helpers.error(err, true, true);
-        }
-      }
-      // console.log(`Finally cut code  ? ${result} for ${path.basename(absoluteFilePath)}`)
-      return result;
-    }
-  }
 
   initCodeCut(filesPathes: string[]) {
     Helpers.log(`[initCodeCut] filesPathes:
@@ -211,10 +176,10 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       filesPathes,
       {
         replacements: [
-          ['@backendFunc', `return undefined;`],
+          ['@backendFunc', `return (void 0);`],
           '@backend' as any,
-          ['@cutCodeIfTrue', this.codeCuttFn(true)],
-          ['@cutCodeIfFalse', this.codeCuttFn(false)]
+          ['@cutCodeIfTrue', codeCuttFn(true)],
+          ['@cutCodeIfFalse', codeCuttFn(false)]
         ].filter(f => !!f),
         env
       },

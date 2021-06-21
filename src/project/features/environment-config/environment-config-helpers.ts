@@ -168,8 +168,8 @@ function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
 export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
   workspaceConfig.currentProjectName = project.name;
   workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
-  workspaceConfig.currentProjectLaunchConfiguration = project.temlateOfLaunchJSON(workspaceConfig);
-  workspaceConfig.currentProjectTasksConfiguration = project.temlateOfTasksJSON(workspaceConfig);
+  workspaceConfig.currentProjectLaunchConfiguration = project.getTemlateOfLaunchJSON(workspaceConfig);
+  workspaceConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(workspaceConfig);
   workspaceConfig.currentProjectType = project._type;
   workspaceConfig.currentFrameworkVersion = Project.Tnp.version;
   workspaceConfig.currentProjectLocation = project.location;

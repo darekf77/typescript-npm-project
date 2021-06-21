@@ -6,12 +6,14 @@ import * as inquirer from 'inquirer';
 import { config } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract/project/project';
+import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remover.backend';
 //#endregion
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
+
 
 //#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')
@@ -204,7 +206,8 @@ export class ProjectIsomorphicLib
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
+        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm']).output;
+        // rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
   }

@@ -1,19 +1,20 @@
-//#region isomorphic
+//#region imports
 import { Morphi } from 'morphi';
 import { Project } from 'tnp-helpers';
-import { PROGRESS_DATA } from 'tnp-models'
+import { PROGRESS_DATA } from 'tnp-models';
 import { PROCESS } from './PROCESS';
-//#endregion
 //#region @backend
-import { authenticate } from 'passport'
+import { authenticate } from 'passport';
 import * as  psList from 'ps-list';
 import { _, crossPlatformPath } from 'tnp-core';
-import { path } from 'tnp-core'
-import { rimraf } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core';
+import { rimraf } from 'tnp-core';
+import { fse } from 'tnp-core';
+//#endregion
 //#endregion
 
 @Morphi.Controller({
+  //#region controller options
   className: 'ProcessController',
   entity: PROCESS,
   //#region @backend
@@ -21,8 +22,11 @@ import { fse } from 'tnp-core'
   //   return authenticate('bearer', { session: false });
   // }
   //#endregion
+  //#endregion
 })
 export class ProcessController extends Morphi.Base.Controller<PROCESS> {
+
+  //#region start
 
   @Morphi.Http.GET('/start/:id')
   start(
@@ -35,17 +39,19 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
       const { model: proc } = await PROCESS.db.getBy(id);
       if (_.isObject(parameters) && !_.isArray(parameters)) {
         proc.parameters = parameters;
-        console.log(`[process] Parameters are set ${parameters}`)
+        console.log(`[process] Parameters are set ${parameters}`);
       } else {
-        console.log(`[process] Parameters is not a object ${parameters}`)
+        console.log(`[process] Parameters is not a object ${parameters}`);
       }
-      let res = await proc.start()
+      const res = await proc.start();
       res.modelDataConfig = config as any;
       return () => res;
-    }
+    };
     //#endregion
   }
+  //#endregion
 
+  //#region stop
   @Morphi.Http.GET('/stop/:id')
   stop(
     @Morphi.Http.Param.Path('id') id: number,
@@ -57,10 +63,12 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
       const res = await proc.stop();
       res.modelDataConfig = config as any;
       return () => res;
-    }
+    };
     //#endregion
   }
+  //#endregion
 
+  //#region progress message
   @Morphi.Http.GET('/progress/:id')
   progressMessages(
     @Morphi.Http.Param.Path('id') id: number,
@@ -69,38 +77,47 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
     //#region @backendFunc
     return async () => {
       const { model: proc } = await PROCESS.db.getBy(id);
-      let res = await proc.start();
-      return () => res.allProgressData.slice(alreadyInFE)
-    }
+      const res = await proc.start();
+      return () => res.allProgressData.slice(alreadyInFE);
+    };
     //#endregion
   }
+  //#endregion
 
+  //#region get all
   @Morphi.Http.GET()
   getAll(@Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS[]> {
     //#region @backendFunc
     return async (req, res) => {
-      const s = super.getAll(config)
+      const s = super.getAll(config);
       const processes = await Morphi.getResponseValue(s, req, res) as PROCESS[];
-      await PROCESS.updateActive(processes)
-      processes.forEach(p => p.modelDataConfig = config)
+      await PROCESS.updateActive(processes);
+      processes.forEach(p => p.modelDataConfig = config);
       return () => processes;
-    }
+    };
     //#endregion
   }
+  //#endregion
 
+  //#region get by
   @Morphi.Http.GET()
-  getBy(@Morphi.Http.Param.Path('id') id: number, @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig): Morphi.Response<PROCESS> {
+  getBy(
+    @Morphi.Http.Param.Path('id') id: number,
+    @Morphi.Http.Param.Query('config') config?: Morphi.CRUD.ModelDataConfig
+  ): Morphi.Response<PROCESS> {
     //#region @backendFunc
     return async (req, res) => {
-      const s = super.getBy(id, config)
+      const s = super.getBy(id, config);
       const process = await Morphi.getResponseValue(s, req, res) as PROCESS;
       await PROCESS.updateActive(process);
       process.modelDataConfig = config;
       return () => process;
-    }
+    };
     //#endregion
   }
+  //#endregion
 
+  //#region example
   @Morphi.Http.GET()
   example(): Morphi.Response<any> {
     //#region @backendFunc
@@ -110,22 +127,15 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
 
       // const d:any = { dupa: 'dupa' };
       return (() => p) as any;
-    }
+    };
     //#endregion
-  }
-
-  //#region @backend
-  private removeProcesesfolder() {
-    const folder = path.join(Project.Tnp.location, 'tmp-processes-logs');
-    if (fse.existsSync(folder)) {
-      rimraf.sync(folder)
-    }
   }
   //#endregion
 
+  //#region init example data
   //#region @backend
   async initExampleDbData() {
-    this.removeProcesesfolder()
+    PROCESS.removeProcesesfolder();
     await PROCESS.db.bulkCreate([
       new PROCESS({
         name: 'Test async', cmd: 'tnp test:async:proc --max 1 ',
@@ -149,5 +159,6 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
       }),
     ]);
   }
+  //#endregion
   //#endregion
 }

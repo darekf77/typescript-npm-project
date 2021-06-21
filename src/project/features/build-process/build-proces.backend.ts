@@ -247,10 +247,10 @@ inside generated projects...
     //#endregion
 
     //#region report start building message
-    Helpers.info(`\n\n\t${chalk.bold('Start of Building')} ${this.project.genericName} `
+    Helpers.info(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
       + `(${buildOptions.appBuild ? 'app' : 'lib'})\n\n`);
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `Start of building ${this.project.genericName}` })
+      PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName}` })
     }
     //#endregion
 
@@ -268,10 +268,6 @@ inside generated projects...
       PROGRESS_DATA.log({ msg });
     } else {
       Helpers.info(msg);
-    }
-
-    if (!buildOptions.watch && this.project.isVscodeExtension) {
-      await this.project.createVscePackage()
     }
 
     if (exit && !buildOptions.watch) {

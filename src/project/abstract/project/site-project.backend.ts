@@ -16,6 +16,7 @@ import { Morphi } from 'morphi';
 
 export abstract class SiteProject {
 
+  // @ts-ignore
   get isSite(this: Project) {
     if (_.isUndefined(this.cache['isSite'])) {
       const result = this.isSiteInStrictMode || this.isSiteInDependencyMode;
@@ -26,6 +27,7 @@ export abstract class SiteProject {
     }
   }
 
+  // @ts-ignore
   get isSiteInStrictMode(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isSiteInStrictMode;
@@ -52,6 +54,7 @@ export abstract class SiteProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isSiteInDependencyMode(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isSiteInDependencyMode;
@@ -72,9 +75,10 @@ export abstract class SiteProject {
 
 
   /**
-     * Check if project is based on baseline ( in package json workspace )
-     * (method works from any level)
-     */
+   * Check if project is based on baseline ( in package json workspace )
+   * (method works from any level)
+   */
+  // @ts-ignore
   get isBasedOnOtherProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isBasedOnOtherProject;
@@ -99,6 +103,7 @@ export abstract class SiteProject {
    * For site worksapce is baseline worksapace
    * For child site worksapce is baseline worksapce child
    */
+  // @ts-ignore
   get baseline(this: Project): Project {
     if (Helpers.isBrowser) {
       return this.browser.baseline as any;

@@ -12,10 +12,12 @@ import { BuildOptions } from 'tnp-db';
 
 export class ExtendedCodeCut extends CodeCut {
 
-  browserCodeCut: any;
+  browserCodeCut: typeof BrowserCodeCutExtended;
 
   constructor(
-    protected cwd: string, filesPathes: string[], options: Models.dev.ReplaceOptionsExtended,
+    protected cwd: string,
+    filesPathes: string[],
+    options: Models.dev.ReplaceOptionsExtended,
     /**
      * it may be not available for global, for all compilatoin
      */
@@ -36,10 +38,9 @@ export class ExtendedCodeCut extends CodeCut {
       this.compilationProject,
       this.buildOptions,
       this.sourceOutBrowser
-    )
+    ).replaceRegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
       .flatTypescriptImportExport('import')
       .flatTypescriptImportExport('export')
-      .replaceRegionsForIsomorphicLib(_.cloneDeep(this.options))
       .replaceRegionsFromTsImportExport('import')
       .replaceRegionsFromTsImportExport('export')
       .replaceRegionsFromJSrequire()

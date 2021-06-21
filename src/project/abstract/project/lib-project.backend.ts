@@ -229,16 +229,16 @@ export abstract class LibProject {
       if (!this.containsFile(config.folder.out)) {
         Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
       }
-      if (!Helpers.exists(this.path(vsixPackageName).absolute.normal)) {
-        await this.createVscePackage(false);
-      }
+      // if (!Helpers.exists(this.path(vsixPackageName).absolute.normal)) {
+      await this.createVscePackage(false);
+      // }
       Helpers.info(`Installing extension: ${vsixPackageName} `
         + `with creation date: ${fse.lstatSync(this.path(vsixPackageName).absolute.normal).birthtime}...`);
       this.run(`code --install-extension ${vsixPackageName}`).sync();
     }
   }
 
-  public async createVscePackage(this: Project, showInfo = true) {
+  private async createVscePackage(this: Project, showInfo = true) {
     const vsixPackageName = this.extensionVsixName;
     try {
       await Helpers.actionWrapper(() => {

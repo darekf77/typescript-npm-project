@@ -12,6 +12,7 @@ import { config, ConfigModels } from 'tnp-config';
 
 export class NpmProject {
 
+  // @ts-ignore
   get canBePublishToNpmRegistry(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.canBePublishToNpmRegistry;
@@ -24,6 +25,7 @@ export class NpmProject {
   /**
    * Version from package.json
    */
+  // @ts-ignore
   get version(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.version;
@@ -33,6 +35,7 @@ export class NpmProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isPrivate(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isPrivate;
@@ -42,7 +45,7 @@ export class NpmProject {
     //#endregion
   }
 
-
+  // @ts-ignore
   get lastNpmVersion(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.lastNpmVersion;
@@ -59,6 +62,7 @@ export class NpmProject {
     //#endregion
   }
 
+  // @ts-ignore
   get resources(this: Project): string[] {
     if (Helpers.isBrowser) {
       return this.browser.resources;
@@ -71,6 +75,7 @@ export class NpmProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isUnknowNpmProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isUnknowNpmProject;
@@ -80,6 +85,7 @@ export class NpmProject {
     //#endregion
   }
 
+  // @ts-ignore
   get preview(this: Project): Project {
     if (Helpers.isBrowser) {
       return this.browser.preview as any;
@@ -90,6 +96,7 @@ export class NpmProject {
   }
 
   //#region @backend
+  // @ts-ignore
   get versionPatchedPlusOne(this: Project) {
     if (this.typeIs('unknow')) {
       return '';
@@ -113,6 +120,7 @@ export class NpmProject {
   }
   //#endregion
 
+  // @ts-ignore
   public get name(this: Project): string {
     if (Helpers.isBrowser) {
       return this.browser.name;
@@ -129,6 +137,8 @@ export class NpmProject {
   }
 
   //#region @backend
+
+  // @ts-ignore
   get hasNpmOrganization(this: Project) {
     // log('path.dirname(this.location)', path.dirname(this.location))
     if (this.typeIs('unknow')) {
@@ -137,6 +147,7 @@ export class NpmProject {
     return path.basename(path.dirname(this.location)).startsWith('@');
   }
 
+  // @ts-ignore
   get npmOrganization(this: Project) {
     if (!this.hasNpmOrganization) {
       return;
@@ -253,6 +264,7 @@ export class NpmProject {
   }
   //#endregion
 
+  // @ts-ignore
   get childrenThatAreThirdPartyInNodeModules(this: Project): Project[] {
     if (Helpers.isBrowser) {
       return this.browser.childrenThatAreThirdPartyInNodeModules as any;

@@ -123,6 +123,16 @@ export class QuickFixes extends FeatureForProject {
         Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
       });
     }
+    if (this.project.isVscodeExtension) {
+      [
+        '@types/oauth2orize',
+        '@types/lowdb',
+        '@types/lowdb',
+
+      ].forEach(name => {
+        Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
+      });
+    }
   }
 
   public overritenBadNpmPackages() {

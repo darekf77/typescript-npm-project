@@ -2,7 +2,7 @@
 import { PackagesRecognitionExtended } from '../../features';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
-import { path } from 'tnp-core'
+import { path } from 'tnp-core';
 import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
@@ -47,18 +47,18 @@ export abstract class BuildableProject {
       const existedProjects = (await db.getProjects())
         .map(p => p.project)
         .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
-        .filter(p => p.location !== project.location)
+        .filter(p => p.location !== project.location);
 
       _.sortBy(existedProjects, ['genericName']);
       // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
 
       if (global.tnpNonInteractive) {
         // buildOptions.copyto = [];
-        result = []
+        result = [];
       } else {
         if (project.isTnp || project.isNaviCli) {
           // buildOptions.copyto = [];
-          result = []
+          result = [];
         } else {
           const { projects = [] }: { projects: string[] } = await inquirer
             .prompt([
@@ -68,7 +68,7 @@ export abstract class BuildableProject {
                 message: 'Select projects where to copy bundle after finish: ',
                 choices: existedProjects
                   .map(c => {
-                    return { value: c.location, name: `${chalk.bold(c.name)} (${c.genericName})` }
+                    return { value: c.location, name: `${chalk.bold(c.name)} (${c.genericName})` };
                   })
               }
             ]) as any;
@@ -105,7 +105,7 @@ export abstract class BuildableProject {
   // @ts-ignore
   set buildOptions(this: Project, v) {
     if (!v) {
-      Helpers.log(`Trying to assign empty buildOption for ${chalk.bold(this.name)}`)
+      Helpers.log(`Trying to assign empty buildOption for ${chalk.bold(this.name)}`);
       return;
     }
 
@@ -138,7 +138,7 @@ export abstract class BuildableProject {
       return [];
     }
     if (this.packageJson.data.tnp && _.isArray(this.packageJson.data.tnp.allowedEnv)) {
-      return this.packageJson.data.tnp.allowedEnv.concat('local')
+      return this.packageJson.data.tnp.allowedEnv.concat('local');
     }
     return config.allowedEnvironments.concat('local');
     //#endregion
@@ -164,7 +164,7 @@ export abstract class BuildableProject {
       const db = await TnpDB.Instance();
       const projects = (await db.getProjects())
         .map(p => p.project)
-        .filter(p => p.location !== this.location)
+        .filter(p => p.location !== this.location);
       this.buildOptions.copyto = projects as any;
     }
   }
@@ -199,9 +199,9 @@ export abstract class BuildableProject {
     } else if (this.isWorkspaceChildProject) {
       if (buildOptions.appBuild) {
         const proj = this.env.config && this.env.config.workspace.projects.find(p => {
-          return p.name === this.name
+          return p.name === this.name;
         });
-        baseHref = proj ? proj.baseUrl : void 0
+        baseHref = proj ? proj.baseUrl : void 0;
       }
     }
 
@@ -256,13 +256,13 @@ export abstract class BuildableProject {
           const project = proj;
           const projectCurrent = this;
           const projectName = projectCurrent.name;
-          const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`)
-          Helpers.info(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`)
+          const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`);
+          Helpers.info(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
         });
       }
 
       if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
-        this.packageJson.save('show before build')
+        this.packageJson.save('show before build');
       }
     }
 
@@ -270,11 +270,11 @@ export abstract class BuildableProject {
     let withoutNodeModules: Project[] = [];
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
       (this.buildOptions.copyto as Project[]).forEach((c) => {
-        Helpers.info(`Checking node_modules for ${c.genericName}`)
+        Helpers.info(`Checking node_modules for ${c.genericName}`);
         if (!c.node_modules.exist) {
           withoutNodeModules.push(c);
         }
-      })
+      });
     }
 
     const smartInstall = withoutNodeModules.filter(p => p.npmPackages.useSmartInstall);
@@ -296,8 +296,8 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
       [copyto] Smart npm instalation for ${p.name}
 
-      `)
-      await p.npmPackages.installFromArgs('')
+      `);
+      await p.npmPackages.installFromArgs('');
     }
 
     if (!this.isVscodeExtension) {

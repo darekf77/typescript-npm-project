@@ -12,7 +12,8 @@
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.11",
         "http-socket-proxy-router": "0.0.1",
-        "isomorphic-storage": "0.0.2"
+        "isomorphic-storage": "0.0.2",
+        "nodemailer": "6.6.1"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -689,6 +690,7 @@
     "node-localstorage": "2.1.6",
     "node-notifier": "6.0.0",
     "node-sass": "4.7.2",
+    "nodemailer": "6.6.1",
     "nodemon": "1.14.11",
     "npm-get-dependents": "1.0.1",
     "npm-run": "4.1.2",

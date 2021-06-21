@@ -14,6 +14,7 @@ export abstract class RecreatableProject {
   /**
    * Core project with basic tested functionality
    */
+  // @ts-ignore
   get isCoreProject(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isCoreProject;
@@ -88,6 +89,7 @@ export abstract class RecreatableProject {
   }
   //#endregion
 
+  // @ts-ignore
   get customizableFilesAndFolders(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.customizableFilesAndFolders;

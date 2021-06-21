@@ -15,6 +15,8 @@ import type { ProjectDocker } from '../../project-specyfic';
 
 export abstract class RouterProject {
   protected __defaultPort: number;
+
+  // @ts-ignore
   get port(this: Project) {
     let env: Models.env.EnvConfigProject;
     if (this.isWorkspace) {

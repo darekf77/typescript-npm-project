@@ -1,20 +1,29 @@
 import { Models } from "tnp-models";
 
 
+//#region it will disapperr!
+
+//#endregion
+
+//#region @cutCodeIfTrue false
+console.log('hellooo')
+//#endregion
+
+
+
+//#region @cutCodeIfFalse true
+console.log('hellooo')
+//#endregion
+
 
 
 //#region npm
 console.log('fsdf');
 console.log('dsfg');
-export namespace As {
-  //#region @notForNpm
-  function a() {
-    console.log('csdfsdf');
-  }
-
-}
-
 //#endregion
+
+export namespace As {
+
 export class AA {
   //#region body class
 

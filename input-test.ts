@@ -3,6 +3,24 @@ import { Models } from "tnp-models";
 console.log('siema')
 //#endregion
 
+//#region it will disapperr!
+//#region @cutCodeIfTrue true
+console.log('hellooo')
+//#endregion
+//#endregion
+
+//#region @cutCodeIfTrue false
+console.log('hellooo')
+//#endregion
+
+//#region @cutCodeIfFalse false
+console.log('hellooo')
+//#endregion
+
+//#region @cutCodeIfFalse true
+console.log('hellooo')
+//#endregion
+
 //#region @backend
 console.log('aaa');
 console.log('bbb');
@@ -12,6 +30,8 @@ console.log('ccc');
 //#region npm
 console.log('fsdf');
 console.log('dsfg');
+//#endregion
+
 export namespace As {
   //#region @notForNpm
   function a() {

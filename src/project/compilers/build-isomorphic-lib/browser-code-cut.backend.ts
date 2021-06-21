@@ -11,11 +11,16 @@ import { Project } from '../../abstract';
 
 import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
+import { RegionRemover } from './region-remover.backend';
+
+const depbugFiles = [
+  // 'decorators-endpoint-class.ts'
+];
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   get allowedToReplace() {
-    return ['ts', 'html', 'css', 'sass', 'scss'] as Models.other.CutableFileExt[];
+    return Models.other.CutableFileExtArr;
   }
   debug(fileName: string) {
     // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
@@ -146,8 +151,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     } else if (!orginalFileExists) {
       return content;
     }
-    const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      Helpers.escapeStringForRegEx(path.basename(htmlTemplatePath))
+    const regex = `(templateUrl)\\s*\\:\\s*(\\'|\\")?\\s*(\\.\\/)?${Helpers.escapeStringForRegEx(path.basename(htmlTemplatePath))
       }\\s*(\\'|\\")`;
     content = content.replace(
       new RegExp(regex,
@@ -182,8 +186,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       /* css file does not exists: ${path.basename(cssFilePath)} */
       `;
     }
-    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      Helpers.escapeStringForRegEx(path.basename(cssFilePath))
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${Helpers.escapeStringForRegEx(path.basename(cssFilePath))
       }\s*(\\'|\\")\\s*\\]`;
     content = content.replace(
       new RegExp(regex,
@@ -234,8 +237,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       return content;
     }
 
-    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${
-      Helpers.escapeStringForRegEx(path.basename(scssFilePath))
+    const regex = `(styleUrls)\\s*\\:\\s*\\[\\s*(\\'|\\")?\\s*(\\.\\/)?${Helpers.escapeStringForRegEx(path.basename(scssFilePath))
       }\s*(\\'|\\")\\s*\\]`;
     // console.log(`regex: ${regex}`)
     content = content.replace(
@@ -374,6 +376,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region replace regions for isomorphic-lib/angular-lib
+  // @ts-ignore
   replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
     options = _.clone(options);
@@ -381,8 +384,33 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
+  //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
+  //       Helpers.log(`
+  //       INPUT ${path.basename(this.absoluteFilePath)}:
+  // ************************************************************
+  //       ${this.rawContent}
+  // ************************************************************
+  //       `);
+  //     }
+
+
+
       this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
-      this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements, '', ext);
+
+      // this.rawContent = this.replaceRegionsWith(rrr, options.replacements, '', ext);
+      // Helpers.info(`PROCESING WITH DEEP region`)
+      this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements).output;
+
+  //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
+  //       Helpers.log(`
+  //       OUTPUT ${path.basename(this.absoluteFilePath)}:
+  // ************************************************************
+  //       ${this.rawContent}
+  // ************************************************************
+  //       `);
+  //     }
+
+
     }
     this.rawContent = this.afterRegionsReplacement(this.rawContent);
     return this;

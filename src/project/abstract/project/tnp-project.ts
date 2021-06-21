@@ -13,12 +13,14 @@ import { ConfigModels } from 'tnp-config';
 
 export abstract class TnpProject {
 
+  // @ts-ignore
   public get _frameworkVersion(this: Project) {
     //#region @backendFunc
-    return this.packageJson.frameworkVersion
+    return this.packageJson.frameworkVersion;
     //#endregion
   }
 
+  // @ts-ignore
   public get frameworkVersionMinusOne(this: Project): ConfigModels.FrameworkVersion {
     //#region @backendFunc
     const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
@@ -46,6 +48,7 @@ export abstract class TnpProject {
   /**
    * available frameworks in project
    */
+  // @ts-ignore
   get frameworks(this: Project) {
     if (this.typeIs('unknow')) {
       return [];
@@ -54,6 +57,7 @@ export abstract class TnpProject {
   }
   //#endregion
 
+  // @ts-ignore
   get isTnp(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isTnp;
@@ -66,6 +70,7 @@ export abstract class TnpProject {
     //#endregion
   }
 
+  // @ts-ignore
   get isNaviCli(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isNaviCli;
@@ -78,6 +83,7 @@ export abstract class TnpProject {
     //#endregion
   }
 
+  // @ts-ignore
   get useFramework(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.useFramework;
@@ -99,6 +105,7 @@ export abstract class TnpProject {
   }
 
   //#region @backend
+  // @ts-ignore
   get isomorphicPackages(this: Project) {
     const isomorphicPackagesArr = [];
 

@@ -28,6 +28,7 @@ export abstract class StaticProject {
    * 2. Standalone Container singular build -> watcg build in 'dist' of all standalone libs from container as one
    * 3. [WIP] Workspace watch build of all childrens in 'dist'
    */
+  // @ts-ignore
   get isGenerated(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isGenerated;
@@ -44,7 +45,7 @@ export abstract class StaticProject {
     //#endregion
   }
 
-
+  // @ts-ignore
   get isGeneratedForRelease(this: Project) {
     return this.packageJson.isGeneratedForRelease;
   }
@@ -52,6 +53,7 @@ export abstract class StaticProject {
   /**
    * Only for generated projects
    */
+  // @ts-ignore
   get origin(this: Project): Project {
     if (this.typeIs('unknow')) {
       return;
@@ -80,6 +82,7 @@ export abstract class StaticProject {
    * generated version of workspace/worskpace-childs project
    * ready for serving by  framework router/proxy
    */
+  // @ts-ignore
   get bundledWorkspace(this: Project): Project {
     if (this.typeIs('unknow')) {
       return;

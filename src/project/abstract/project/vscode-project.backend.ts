@@ -14,7 +14,9 @@ import { config } from 'tnp-config';
 
 export abstract class VscodeProject {
 
-  //#region vscode *.filetemplae
+  //#region getters
+  //#region getters / vscode *.filetemplae
+  // @ts-ignore
   get vscodeFileTemplates(this: Project) {
     if (this.frameworkVersionAtLeast('v2')) {
       return [
@@ -26,9 +28,20 @@ export abstract class VscodeProject {
   }
   //#endregion
 
-  //#region @backend
+  //#region getters / name of workspace
+  // @ts-ignore
+  private get nameOfCodeWorkspace(this: Project) {
+    return `tmp.code-workspace`;
+  }
+  //#endregion
+
+  //#endregion
+
+  //#region public api
+
+  //#region public api / recreate settings worksapce
   public recreateCodeWorkspace(this: Project) {
-    //#region  recreate tmp.code-workspace
+
     if (!this.isWorkspace) {
       return;
     }
@@ -76,15 +89,13 @@ export abstract class VscodeProject {
     //   encoding: 'utf8',
     //   spaces: 2
     // });
-    //#endregion
+
   }
 
-  private get nameOfCodeWorkspace(this: Project) {
-    return `tmp.code-workspace`;
-  }
+  //#endregion
 
-  openInVscode(this: Project) {
-    //#region open in vscode
+  //#region public api / open in vscode
+  public openInVscode(this: Project) {
     this.recreateCodeWorkspace()
     if (this.isStandaloneProject || this.isUnknowNpmProject) {
       this.run(`code ${this.location}`).sync()
@@ -96,10 +107,11 @@ export abstract class VscodeProject {
         s.run(`code ${s.location}`).sync()
       });
     }
-    //#endregion
   }
+  //#endregion
 
-  temlateOfTasksJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
+  //#region public api /  get template pf tasls json
+  getTemlateOfTasksJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let tasks = [];
     let inputs = [];
 
@@ -116,18 +128,18 @@ export abstract class VscodeProject {
 
     //#region tasks, input for terminating all tasks
     const templateTerminalAllTasks = {
-      "id": "terminate",
-      "type": "command",
-      "command": "workbench.action.tasks.terminate",
-      "args": "terminateAll"
+      'id': 'terminate',
+      'type': 'command',
+      'command': 'workbench.action.tasks.terminate',
+      'args': 'terminateAll'
     };
     inputs.push(templateTerminalAllTasks);
 
     const terminate = {
-      "label": "terminateall",
-      "command": "echo ${input:terminate}",
-      "type": "shell",
-      "problemMatcher": []
+      'label': 'terminateall',
+      'command': 'echo ${input:terminate}',
+      'type': 'shell',
+      'problemMatcher': []
     };
     tasks.push(terminate);
     //#endregion
@@ -135,33 +147,33 @@ export abstract class VscodeProject {
     //#region ng serve task
     const templateNgServeTask = (project?: Project) => {
       const ngServeTask = {
-        "label": "Ng Serve",
-        "type": "shell",
-        "command": "tnp build",
-        "isBackground": true,
-        "presentation": {
-          "reveal": "always"
+        'label': 'Ng Serve',
+        'type': 'shell',
+        'command': 'tnp build',
+        'isBackground': true,
+        'presentation': {
+          'reveal': 'always'
         },
-        "group": {
-          "kind": "build",
-          "isDefault": true
+        'group': {
+          'kind': 'build',
+          'isDefault': true
         },
-        "problemMatcher": {
-          "owner": "typescript",
-          "source": "ts",
-          "applyTo": "closedDocuments",
-          "fileLocation": [
-            "relative",
-            "${cwd}"
+        'problemMatcher': {
+          'owner': 'typescript',
+          'source': 'ts',
+          'applyTo': 'closedDocuments',
+          'fileLocation': [
+            'relative',
+            '${cwd}'
           ],
-          "pattern": "$tsc",
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": {
-              "regexp": "(.*?)"
+          'pattern': '$tsc',
+          'background': {
+            'activeOnStart': true,
+            'beginsPattern': {
+              'regexp': '(.*?)'
             },
-            "endsPattern": {
-              "regexp": "Compiled |Failed to compile."
+            'endsPattern': {
+              'regexp': 'Compiled |Failed to compile.'
             }
           }
         }
@@ -191,25 +203,26 @@ export abstract class VscodeProject {
     }
 
     return JSON.stringify({
-      "version": "2.0.0",
+      'version': '2.0.0',
       tasks,
       inputs
     })
   }
+  //#endregion
 
-
-  temlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
+  //#region public api / get template of launch.json
+  getTemlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let configurations = [];
     let compounds: { name: string; configurations: any[] }[] = [];
 
     //#region template attach process
     const temlateAttachProcess = {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach to global cli tool",
-      "port": 9229,
-      "skipFiles": [
-        "<node_internals>/**"
+      'type': 'node',
+      'request': 'attach',
+      'name': 'Attach to global cli tool',
+      'port': 9229,
+      'skipFiles': [
+        '<node_internals>/**'
       ]
     };
     //#endregion
@@ -217,15 +230,15 @@ export abstract class VscodeProject {
     //#region tempalte start normal nodejs server
     const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
       const startServerTemplate = {
-        "type": "node",
-        "request": "launch",
-        "name": "Launch Server",
-        "program": "${workspaceFolder}/run.js",
-        "cwd": void 0,
-        "args": [],
-        "runtimeArgs": [
-          "--nolazy", "-r", "ts-node/register",
-          "--experimental-worker"
+        'type': 'node',
+        'request': 'launch',
+        'name': 'Launch Server',
+        'program': '${workspaceFolder}/run.js',
+        'cwd': void 0,
+        'args': [],
+        'runtimeArgs': [
+          '--nolazy', '-r', 'ts-node/register',
+          '--experimental-worker'
         ]
       };
       if (serverChild.name !== clientProject.name) {
@@ -251,20 +264,20 @@ export abstract class VscodeProject {
     //#region tempalte start nodemon nodejs server
     function startNodemonServer() {
       const result = {
-        "type": "node",
-        "request": "launch",
-        "remoteRoot": "${workspaceRoot}",
-        "localRoot": "${workspaceRoot}",
-        "name": "Launch Nodemon server",
-        "runtimeExecutable": "nodemon",
-        "program": "${workspaceFolder}/run.js",
-        "restart": true,
-        "sourceMaps": true,
-        "console": "internalConsole",
-        "internalConsoleOptions": "neverOpen",
-        "runtimeArgs": [
+        'type': 'node',
+        'request': 'launch',
+        'remoteRoot': '${workspaceRoot}',
+        'localRoot': '${workspaceRoot}',
+        'name': 'Launch Nodemon server',
+        'runtimeExecutable': 'nodemon',
+        'program': '${workspaceFolder}/run.js',
+        'restart': true,
+        'sourceMaps': true,
+        'console': 'internalConsole',
+        'internalConsoleOptions': 'neverOpen',
+        'runtimeArgs': [
           // "--nolazy", "-r", "ts-node/register",
-          "--experimental-worker"
+          '--experimental-worker'
         ]
       };
       return result;
@@ -274,27 +287,27 @@ export abstract class VscodeProject {
     //#region  tempalte start ng serve
     function startNgServeTemplate(servePort: number, workspaceChild: Project, workspaceLevel: boolean) {
       const result = {
-        "name": "Debugger with ng serve",
-        "type": "chrome",
-        "request": "launch",
+        'name': 'Debugger with ng serve',
+        'type': 'chrome',
+        'request': 'launch',
         cwd: void 0,
         // "userDataDir": false,
-        "preLaunchTask": "Ng Serve",
-        "postDebugTask": "terminateall",
-        "sourceMaps": true,
+        'preLaunchTask': 'Ng Serve',
+        'postDebugTask': 'terminateall',
+        'sourceMaps': true,
         // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
-        "webRoot": "${workspaceFolder}",
-        "sourceMapPathOverrides": {
-          "webpack:/*": "${webRoot}/*",
-          "/./*": "${webRoot}/*",
-          "/tmp-src/*": "${webRoot}/*",
-          "/*": "*",
-          "/./~/*": "${webRoot}/node_modules/*"
+        'webRoot': '${workspaceFolder}',
+        'sourceMapPathOverrides': {
+          'webpack:/*': '${webRoot}/*',
+          '/./*': '${webRoot}/*',
+          '/tmp-src/*': '${webRoot}/*',
+          '/*': '*',
+          '/./~/*': '${webRoot}/node_modules/*'
         }
       }
       if (workspaceChild) {
-        result.cwd = "${workspaceFolder}" + `/${workspaceChild.name}`;
-        result.webRoot = "${workspaceFolder}" + `/${workspaceChild.name}`;
+        result.cwd = '${workspaceFolder}' + `/${workspaceChild.name}`;
+        result.webRoot = '${workspaceFolder}' + `/${workspaceChild.name}`;
         result.name = `${result.name} for ${workspaceChild.name}`
       }
       if (workspaceLevel) {
@@ -385,7 +398,7 @@ export abstract class VscodeProject {
             c.presentation = {
               // "hidden": true
               // "order": 1,
-              "group": "configs"
+              'group': 'configs'
             }
           });
 
@@ -435,12 +448,14 @@ export abstract class VscodeProject {
       //#endregion
     }
     return JSON.stringify({
-      version: "0.2.0",
+      version: '0.2.0',
       configurations,
       compounds
     });
   }
-  // export interface VscodeProject extends Partial<Project> { }
+  //#endregion
+
+  //#endregion
 }
 
 function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {

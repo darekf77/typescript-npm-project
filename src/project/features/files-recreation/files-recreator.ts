@@ -521,7 +521,7 @@ ${coreFiles}
   }
 
   commonFiles() {
-    const wokrspace = Project.by<Project>('workspace');
+    const wokrspace = Project.by<Project>('workspace', this.project._frameworkVersion);
 
     const files = this.commonFilesForAllProjects;
     files.map(file => {
@@ -530,7 +530,7 @@ ${coreFiles}
         where: path.join(this.project.location, file)
       }
     }).forEach(file => {
-      Helpers.copyFile(file.from, file.where)
+      Helpers.copyFile(file.from, file.where);
     })
   }
 
