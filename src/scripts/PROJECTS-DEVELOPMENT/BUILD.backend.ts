@@ -349,7 +349,7 @@ processing...
         No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
 
         `); // hash in package.json to check
-        Helpers.pressKeyAndContinue();
+        // Helpers.pressKeyAndContinue();
         child.git.commit();
         child.git.pushCurrentBranch();
       }
