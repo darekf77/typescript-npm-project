@@ -60,6 +60,7 @@ Helper project for my typescript npm libraries.
 
 
 # TO REMEBER
+- dont use _.lodash function: values or other that may not be supported across all lodash version
 - dont override symlink with fs
 - node_modules/link_from_another_project_dir is resolving packges not from this node_modules !!! 
       -> dont use links in node_modules
