@@ -81,7 +81,7 @@ export namespace CopyMangerHelpers {
     const foldersToSkip = [
       ...(filterForBundle ? [
         '.vscode',
-        ..._.values(config.tempFolders),
+        ...Helpers.values(config.tempFolders),
       ] : []),
       ...(project.projectLinkedFiles().map(c => c.relativePath)),
       ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
