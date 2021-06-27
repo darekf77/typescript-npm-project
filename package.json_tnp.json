@@ -485,7 +485,7 @@
   "linkedProjects": [],
   "libReleaseOptions": {
     "nodts": false,
-    "obscure": true,
+    "obscure": false,
     "ugly": true
   },
   "scripts": {

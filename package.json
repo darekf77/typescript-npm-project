@@ -486,7 +486,7 @@
     "linkedProjects": [],
     "libReleaseOptions": {
       "nodts": false,
-      "obscure": true,
+      "obscure": false,
       "ugly": true
     },
     "scripts": {
@@ -497,7 +497,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.87",
+  "version": "0.0.88",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
   },
