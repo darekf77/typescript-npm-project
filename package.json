@@ -486,7 +486,7 @@
     "linkedProjects": [],
     "libReleaseOptions": {
       "nodts": false,
-      "obscure": false,
+      "obscure": true,
       "ugly": true
     },
     "scripts": {
@@ -497,7 +497,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.88",
+  "version": "0.0.89",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
   },
@@ -733,7 +733,7 @@
     "ts-loader": "7.0.4",
     "ts-node": "8.3.0",
     "tsickle": "0.26.0",
-    "tslib": "1.10.0",
+    "tslib": "2.2.0",
     "tslint": "6.1.0",
     "typeorm": "~0.2.7",
     "typescript": "3.8.3",
