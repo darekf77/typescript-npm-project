@@ -172,7 +172,8 @@ function $VSCODE_GLOBAL() {
     'workbench.colorTheme': 'Default Light+',
     "update.mode": "none",
     "debug.onTaskErrors": "abort",
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "terminal.integrated.tabs.enabled": false
   };
   let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
   let settingspath = Helpers.resolve(

@@ -12,7 +12,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
-    if (this.project.isTnp || this.project.isNaviCli) {
+    if (this.project.isTnp || this.project.isNaviCli) { 
       return false;
     }
     return (this.project.isStandaloneProject

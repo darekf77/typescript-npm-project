@@ -1,3 +1,4 @@
+//#region @notForNpm
 import 'core-js/proposals/reflect-metadata';
 import 'core-js/es';
 import { Morphi } from 'morphi';
@@ -217,3 +218,4 @@ if (Morphi.isBrowser) {
 }
 
 export default start;
+//#endregion
