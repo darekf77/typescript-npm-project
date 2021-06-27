@@ -19,7 +19,7 @@ tnp
    */
   const configFileName = 'tmp-environment.json';
   const possiblePathes = [
-    path.join(crossPlatformPath(__dirname) , configFileName),
+    path.join(crossPlatformPath(__dirname), configFileName),
     path.join(crossPlatformPath(__dirname), `../${configFileName}`),
     path.join(crossPlatformPath(__dirname), `../../${configFileName}`),
   ];
@@ -328,7 +328,7 @@ export function removeArg(arg: string, argsv: string[]) {
 //#region parse global arguments
 export function globalArgumentsParser(argsv: string[]) {
 
-  Helpers.log(`Fixing global arguments started...`)
+  Helpers.log(`[${config.frameworkName}] Fixing global arguments started...`)
   let options = require('minimist')(argsv);
   const toCheck = {
     'tnpNonInteractive': void 0,
@@ -371,12 +371,12 @@ export function globalArgumentsParser(argsv: string[]) {
     !!findNearestProjectTypeWithGitRoot;
 
   if (_.isBoolean(findNearestProjectType)) {
-    Helpers.error(`argument --findNearestProjectType needs to be library type:\n ${
-      LibTypeArr.join(', ')}`, false, true);
+    Helpers.error(`argument --findNearestProjectType `
+      + `needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
   }
   if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
-    Helpers.error(`argument --findNearestProjectTypeWithGitRoot needs to be library type:\n ${
-      LibTypeArr.join(', ')}`, false, true);
+    Helpers.error(`argument --findNearestProjectTypeWithGitRoot `
+      + `needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
   }
 
   if (!!findNearestProjectWithGitRoot) {
@@ -406,7 +406,8 @@ export function globalArgumentsParser(argsv: string[]) {
     if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
       process.chdir(cwdFromArgs);
     } else {
-      Helpers.error(`Incorrect --cwd argument for args: [\n ${argsv.join(',\n')}\n]`, false, true)
+      Helpers.error(`[${config.frameworkName}] Incorrect --cwd argument `
+        + `for args: [\n ${argsv.join(',\n')}\n]`, false, true)
     }
 
   }
