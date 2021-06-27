@@ -158,7 +158,7 @@
           "content-type": "^1.0.4",
           "axios": "^0.17.1",
           "ng-talkback": "2.4.13",
-          "magic-renamer": "0.0.6",
+          "magic-renamer": "0.0.7",
           "vpn-split": "0.0.6",
           "node-cli-tester": "0.0.4",
           "strings": {
@@ -660,7 +660,7 @@
     "lodash": "4.17.4",
     "lodash-walk-object": "~1.0.17",
     "lowdb": "1.0.0",
-    "magic-renamer": "0.0.6",
+    "magic-renamer": "0.0.7",
     "material-design-icons": "3.0.1",
     "method-override": "2.3.10",
     "minimist": "1.2.0",
