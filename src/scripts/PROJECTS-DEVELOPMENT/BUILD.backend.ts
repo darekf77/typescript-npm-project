@@ -351,7 +351,7 @@ processing...
         `); // hash in package.json to check
         // Helpers.pressKeyAndContinue();
         child.git.commit();
-        child.git.pushCurrentBranch();
+        await child.git.pushCurrentBranch();
       }
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
@@ -360,9 +360,9 @@ processing...
     Helpers.info(projsTemplate());
 
     proj.git.commit(`Update after release`);
-    proj.git.pushCurrentBranch();
+    await proj.git.pushCurrentBranch();
     Project.Tnp.git.commit(`Update after release`);
-    Project.Tnp.git.pushCurrentBranch();
+    await Project.Tnp.git.pushCurrentBranch();
     Helpers.info(`
 
 

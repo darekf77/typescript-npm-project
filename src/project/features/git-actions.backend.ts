@@ -99,26 +99,16 @@ export class GitActions extends FeatureForProject {
 
   //#region repeat menu push,pull
   private async repeatMenu(action: keyof GitActions, force = false) {
-    while (true) {
-      try {
-        await Helpers.actionWrapper(() => {
-          if (action === 'pull') {
-            this.project.git.pullCurrentBranch(
-              // force
-            );
-          }
-          if (action === 'push') {
-            this.project.git.pushCurrentBranch(force);
-          }
-        }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.name)}...`);
-        break;
-      } catch (err) {
-        Helpers.error(`Not able to ${action} brench... `, true, true);
-        this.project.run(`code .`).async();
-        Helpers.pressKeyAndContinue(`${chalk.bold(this.project.name)} `
-          + `- check your repository and press any key to repeat ${action}..`);
+    await Helpers.actionWrapper(async () => {
+      if (action === 'pull') {
+        await this.project.git.pullCurrentBranch(
+          // force
+        );
       }
-    }
+      if (action === 'push') {
+        await this.project.git.pushCurrentBranch(force);
+      }
+    }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.name)}...`);
   }
   //#endregion
 
@@ -149,7 +139,7 @@ export class GitActions extends FeatureForProject {
   //#region pull
   public async pull() {
     if (this.project.typeIs('navi')) {
-      this.project.git.pullCurrentBranch();
+      await this.project.git.pullCurrentBranch();
       return;
     }
 

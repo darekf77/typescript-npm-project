@@ -40,7 +40,7 @@ export class TargetProject extends FeatureForProject {
 }
 
 
-function generate(project: Project, t: Models.npm.TargetProject) {
+async function generate(project: Project, t: Models.npm.TargetProject) {
   if (!Helpers.exists(path.dirname(t.path))) {
     Helpers.mkdirp(path.dirname(t.path));
   }
@@ -56,16 +56,7 @@ function generate(project: Project, t: Models.npm.TargetProject) {
     });
   }
 
-  while (true) {
-    try {
-      Helpers.git.checkoutDefaultBranch(originDefaultPath);
-      Helpers.git.pullCurrentBranch(originDefaultPath);
-      break;
-    } catch (error) {
-      Helpers.run(`code ${originDefaultPath}`).sync();
-      Helpers.pressKeyAndContinue(`Fix project for origin: ${t.origin} and press any key....`);
-    }
-  }
+  await Helpers.git.pullCurrentBranch(originDefaultPath);
 
   if (!Helpers.exists(t.path)) {
     Helpers.copy(originDefaultPath, t.path);

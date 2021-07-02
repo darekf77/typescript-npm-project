@@ -32,7 +32,7 @@ function $GIT_REMOVE_UNTRACKED() {
   process.exit(0)
 }
 
-export function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
+export async function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
   if ((Project.Current as Project).git.isGitRepo) {
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Quick push start` })
     try {
@@ -41,7 +41,7 @@ export function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
     } catch (e) {
       Helpers.warn(`Error adding/commiting git ${e}`, false);
     }
-    (Project.Current as Project).git.pushCurrentBranch();
+    await (Project.Current as Project).git.pushCurrentBranch();
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Pushing to repository success` })
   } else {
     Helpers.warn(`This is not a git repo: ${process.cwd()}`, false)
