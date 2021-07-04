@@ -13,7 +13,12 @@
       "http-socket-proxy-router": "0.0.4",
       "isomorphic-storage": "0.0.2",
       "nodemailer": "6.6.1",
-      "angular2-example-http-login": "5.0.6"
+      "angular2-example-http-login": "5.0.6",
+      "edit-table": "0.0.8",
+      "loading-info": "0.0.5",
+      "ng2-accordions": "0.0.9",
+      "ng2-button-loader": "0.0.7",
+      "ng2-preloader": "0.0.3"
     },
     "ignoreDepsPattern": [],
     "includeAsDev": [],
