@@ -97,9 +97,9 @@ export async function $RECOMMIT(args: string, exit = true) {
   const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false, cwd: p.location }).sync().toString().trim();
   p.run(`git reset --soft HEAD~1 && git add --all . && git commit -m "${lastMsg}"`).sync();
   Helpers.info(`Recomit done..msg:
-        ${ Helpers.terminalLine()}
-        ${ lastMsg}
-        ${ Helpers.terminalLine()}
+        ${Helpers.terminalLine()}
+        ${lastMsg}
+        ${Helpers.terminalLine()}
         `);
   if (exit) {
     process.exit(0);
@@ -182,7 +182,25 @@ function $GIT_INFO() {
   process.exit(0);
 }
 
+function $GIT_LAST_TAG_HASH() {
+  Helpers.info(Project.Current.git.lastTagHash());
+  process.exit(0);
+}
+
+function $PUSH_TAG(args: string) {
+  const proj = Project.Current as Project;
+  const commitMessage = args ? args.trim() : ('new version ' + proj.versionPatchedPlusOne);
+  proj.git.commit(commitMessage);
+  proj.run(`git tag -a v${proj.versionPatchedPlusOne} `
+    + `-m "${commitMessage}"`,
+    { output: false }).sync();
+  process.exit(0);
+}
+
+
 export default {
+  $PUSH_TAG: Helpers.CLIWRAP($PUSH_TAG, '$PUSH_TAG'),
+  $GIT_LAST_TAG_HASH: Helpers.CLIWRAP($GIT_LAST_TAG_HASH, '$GIT_LAST_TAG_HASH'),
   $GIT_INFO: Helpers.CLIWRAP($GIT_INFO, '$GIT_INFO'),
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
