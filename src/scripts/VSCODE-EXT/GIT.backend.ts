@@ -190,7 +190,7 @@ function $GIT_LAST_TAG_HASH() {
 function $PUSH_TAG(args: string) {
   const proj = Project.Current as Project;
   let currentPathNum = proj.versionPathAsNumber + 1;
-  const commitMessage = args ? args.trim() : ('new version ' + proj.versionPatchedPlusOne);
+  let commitMessage = args ? args.trim() : ('new version ' + proj.versionPatchedPlusOne);
   proj.git.commit(commitMessage);
   let tagName = `v${proj.versionPatchedPlusOne}`;
 
@@ -199,6 +199,8 @@ function $PUSH_TAG(args: string) {
       Helpers.warn(`[${config.frameworkName}] tag taken: ${tagName}.. looking for new...`);
       proj.updateVersionPath(++currentPathNum);
       tagName = `v${proj.versionPatchedPlusOne}`;
+      commitMessage = args ? args.trim() : ('new version ' + proj.versionPatchedPlusOne);
+      proj.git.commit(commitMessage);
     } else {
       break;
     }
