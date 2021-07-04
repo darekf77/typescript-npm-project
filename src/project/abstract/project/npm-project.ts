@@ -114,10 +114,27 @@ export class NpmProject {
     }
     const ver = this.version.split('.');
     if (ver.length > 0) {
-      ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
+      ver[ver.length - 1] = (parseInt(_.last(ver)) + 1).toString();
     }
     return ver.join('.')
   }
+
+  updateVersionPath(this: Project, versionPath: number) {
+    const ver = this.version.split('.');
+    if (ver.length > 0) {
+      ver[ver.length - 1] = versionPath.toString();
+    }
+    const versionToUpdate = ver.join('.');
+    this.packageJson.data.version = versionToUpdate.toString();
+    this.packageJson.save(`[npm-project] updating version path`);
+  }
+
+  get versionPathAsNumber() {
+    const ver = this.version.split('.');
+    const res = Number(_.last(ver));
+    return isNaN(res) ? 0 : res;
+  }
+
   //#endregion
 
   // @ts-ignore

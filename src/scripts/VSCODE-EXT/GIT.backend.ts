@@ -189,9 +189,22 @@ function $GIT_LAST_TAG_HASH() {
 
 function $PUSH_TAG(args: string) {
   const proj = Project.Current as Project;
+  let currentPathNum = proj.versionPathAsNumber + 1;
   const commitMessage = args ? args.trim() : ('new version ' + proj.versionPatchedPlusOne);
   proj.git.commit(commitMessage);
-  proj.run(`git tag -a v${proj.versionPatchedPlusOne} `
+  let tagName = `v${proj.versionPatchedPlusOne}`;
+
+  while (true) {
+    if (proj.git.checkTagExists(tagName)) {
+      Helpers.warn(`[${config.frameworkName}] tag taken: ${tagName}.. looking for new...`);
+      proj.updateVersionPath(++currentPathNum);
+      tagName = `v${proj.versionPatchedPlusOne}`;
+    } else {
+      break;
+    }
+  }
+
+  proj.run(`git tag -a ${tagName} `
     + `-m "${commitMessage}"`,
     { output: false }).sync();
   proj.git.pushCurrentBranch();
