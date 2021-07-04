@@ -194,6 +194,7 @@ function $PUSH_TAG(args: string) {
   proj.run(`git tag -a v${proj.versionPatchedPlusOne} `
     + `-m "${commitMessage}"`,
     { output: false }).sync();
+  proj.git.pushCurrentBranch();
   process.exit(0);
 }
 
