@@ -212,8 +212,16 @@ function $PUSH_TAG(args: string) {
 }
 
 
+function $GIT_CHECK_TAG_EXISTS(args) {
+  Helpers.info(`tag "${args}":
+     exits = ${Helpers.git.checkTagExists(args)}
+     `);
+  process.exit(0)
+}
+
 export default {
   $PUSH_TAG: Helpers.CLIWRAP($PUSH_TAG, '$PUSH_TAG'),
+  $GIT_CHECK_TAG_EXISTS: Helpers.CLIWRAP($GIT_CHECK_TAG_EXISTS, '$GIT_CHECK_TAG_EXISTS'),
   $GIT_LAST_TAG_HASH: Helpers.CLIWRAP($GIT_LAST_TAG_HASH, '$GIT_LAST_TAG_HASH'),
   $GIT_INFO: Helpers.CLIWRAP($GIT_INFO, '$GIT_INFO'),
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
