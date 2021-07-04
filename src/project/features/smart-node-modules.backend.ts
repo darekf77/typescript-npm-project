@@ -11,6 +11,18 @@ export type OverridePacakge = { [name: string]: string | null; };
 export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
 
 export class SmartNodeModules extends FeatureForProject {
+  updateFromReleaseBundle(destination: Project) {
+    if (destination.npmPackages.useSmartInstall) {
+      const source = path.join(destination.location, 'tmp-bundle-release', 'bundle', 'project', destination.name, config.folder.bundle);
+      const dest = path.join(this.project.node_modules.path, destination.name);
+      Helpers.removeIfExists(dest);
+      Helpers.copy(source, dest, {
+        copySymlinksAsFiles: true,
+        omitFolders: [config.folder.node_modules],
+        omitFoldersBaseFolder: source
+      });
+    }
+  }
   private static _prepared = {};
 
   //#region getters/private methods

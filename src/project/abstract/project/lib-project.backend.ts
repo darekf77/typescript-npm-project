@@ -11,6 +11,7 @@ import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
+import { CLASS } from 'typescript-class-helpers';
 
 
 /**
@@ -446,7 +447,7 @@ export abstract class LibProject {
         const names = this.packageJson.additionalNpmNames;
         for (let index = 0; index < names.length; index++) {
           const c = names[index];
-          const existedBundle = path.join(this.location, 'bundle')
+          const existedBundle = path.join(this.location, 'bundle');
           const additionBase = path.resolve(path.join(this.location, `../../../additional-bundle-${c}`));
           Helpers.mkdirp(additionBase);
           Helpers.copy(existedBundle, additionBase, {
@@ -512,9 +513,22 @@ export abstract class LibProject {
 
       }
     }, () => {
-      removeTagAndCommit()
-    })
+      removeTagAndCommit();
+    });
 
+    const PorjectClass = CLASS.getBy('Project') as typeof Project;
+
+    const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
+      path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
+    const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
+
+    [
+      PorjectClass.Tnp as Project,
+      PorjectClass.From(PorjectClass.NaviCliLocation) as Project,
+      PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
+    ].forEach(c => {
+      c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+    });
   }
 
 
