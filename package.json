@@ -19,7 +19,8 @@
         "loading-info": "0.0.5",
         "ng2-accordions": "0.0.9",
         "ng2-button-loader": "0.0.7",
-        "ng2-preloader": "0.0.3"
+        "ng2-preloader": "0.0.3",
+        "rebird-https-letsencrypt": "0.0.1"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -720,6 +721,7 @@
     "ps-node": "0.1.6",
     "q": "1.5.1",
     "randomcolor": "0.5.3",
+    "rebird-https-letsencrypt": "0.0.1",
     "record-replay-req-res-scenario": "~0.0.15",
     "redbird": "0.7.0",
     "reflect-metadata": "0.1.10",
