@@ -335,7 +335,9 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project._frameworkVersion}`);
   project.packageJson.data.license = license;
-  project.packageJson.data.private = prv;
+  if (_.isNil(project.packageJson.data.private)) {
+    project.packageJson.data.private = prv;
+  }
   if (project.isTnp) {
     Helpers.info(`Execute ${config.frameworkName} action`)
     const keysToDelete = [];
@@ -540,7 +542,7 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 //#endregion
 
 //#region set dependency and save
-export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project, ) {
+export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project,) {
   // console.log('set DEPS', p)
   // process.exit(0)
   if (!p || !p.name) {
@@ -596,8 +598,7 @@ export function setDependencyAndSave(p: Models.npm.Package, reason: string, proj
       }
     }
   }
-  project.packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${
-    project && project.genericName
+  project.packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${project && project.genericName
     }`);
 }
 //#endregion
@@ -641,8 +642,7 @@ export function removeDependencyAndSave(p: Models.npm.Package, reason: string, p
     }
   }
 
-  project.packageJson.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${
-    project && project.genericName
+  project.packageJson.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${project && project.genericName
     }`);
 }
 

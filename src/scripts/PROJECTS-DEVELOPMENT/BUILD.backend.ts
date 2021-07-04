@@ -293,7 +293,8 @@ const $RELEASE = async (args: string) => {
     args = commandString;
 
 
-    const npmDeps = proj.projectsInOrderForChainBuild(resolved).filter(d => d.name !== proj.name);
+    const npmDeps = proj.projectsInOrderForChainBuild(resolved)
+      .filter(d => d.name !== proj.name && !d.isPrivate);
     const otherDeps = proj.children.filter(c => {
       return !npmDeps.includes(c);
     });
