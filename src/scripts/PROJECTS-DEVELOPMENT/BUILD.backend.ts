@@ -311,8 +311,8 @@ const $RELEASE = async (args: string) => {
 ${deps.map((p, i) => {
         const bold = (child?.name === p.name);
         const index = i + 1;
-        return `${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name}`;
-      }).join('\n')}
+        return `(${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name})`;
+      }).join(', ')}
 
 
 ${Helpers.terminalLine()}
@@ -329,7 +329,7 @@ processing...
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
-      const sameHashes = (lastBuildHash !== lastTagHash); // TODO QUICK FIX
+      const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
       if (!sameHashes) {
         while (true) {
           try {
@@ -359,7 +359,7 @@ processing...
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
 
-    proj.git.commit(`Update after release`);
+    proj.git.commit(`Up4date after release`);
     await proj.git.pushCurrentBranch();
     Project.Tnp.git.commit(`Update after release`);
     await Project.Tnp.git.pushCurrentBranch();
