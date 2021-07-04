@@ -533,35 +533,18 @@ export abstract class LibProject {
 
 
   private async tagVersion(this: Project, newVersion: string) {
-    try {
-      this.run(`git tag -a v${newVersion} -m "version v${newVersion}"`, { output: false }).sync()
-    } catch (error) {
-      Helpers.warn(`NOT ABLE TO CREATE A TAG "${newVersion}"`);
-      const ver = newVersion.split('.');
-      if (ver.length > 0) {
-        ver[ver.length - 1] = (parseInt(ver[ver.length - 1]) + 1).toString()
-      }
-      newVersion = ver.join('.')
-      await Helpers.questionYesNo(`Do you wanna try to create tag v${newVersion} ?`, async () => {
-        await this.tagVersion(newVersion);
-      });
-    }
+    return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
   }
 
   async pushToGitRepo(this: Project, newVersion: string) {
-    await this.tagVersion(newVersion);
+    newVersion = await this.tagVersion(newVersion);
     this.packageJson.setBuildHash(this.git.lastCommitHash());
     this.packageJson.save('updating hash');
     this.commit(newVersion, `build hash update`);
-    console.log('Pushing to git repository... ')
-    const branchName = this.run('git symbolic-ref --short HEAD', { output: false }).sync().toString();
-    console.log(`Git branch: ${branchName}`)
-    try {
-      this.run(`git push origin ${branchName}`, { output: false }).sync()
-    } catch (error) {
-      Helpers.warn(`NOT ABLE TO PUSH CHANGES TO MASTER`)
-    }
-    Helpers.info('Pushing to git repository done.')
+    Helpers.log('Pushing to git repository... ')
+    Helpers.log(`Git branch: ${this.git.currentBranchName}`);
+    this.git.pushCurrentBranch();
+    Helpers.info('Pushing to git repository done.');
   }
 
   private createClientVersionAsCopyOfBrowser(this: Project) {

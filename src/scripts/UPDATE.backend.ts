@@ -10,22 +10,22 @@ function $UPDATE_ISOMORPHIC() {
 }
 
 function $UPDATE(args: string) {
-
-  const file = path.basename(args.trim());
-  function processing() {
-    Helpers.info(`processing file...`);
-  }
-  switch (file) {
-    case config.file.tmpIsomorphicPackagesJson:
-      processing();
-      PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true, '[update process]');
-      break;
-    default:
-      Helpers.error(`Not recognized file for update`, false, true);
-      break;
-  }
-  Helpers.info(`Update of ${file} done.`);
-  process.exit(0);
+  Helpers.error(`Nothing here yet.`)
+  // const file = path.basename(args.trim());
+  // function processing() {
+  //   Helpers.info(`processing file...`);
+  // }
+  // switch (file) {
+  //   case config.file.tmpIsomorphicPackagesJson:
+  //     processing();
+  //     PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true, '[update process]');
+  //     break;
+  //   default:
+  //     Helpers.error(`Not recognized file for update`, false, true);
+  //     break;
+  // }
+  // Helpers.info(`Update of ${file} done.`);
+  // process.exit(0);
 }
 
 export default {

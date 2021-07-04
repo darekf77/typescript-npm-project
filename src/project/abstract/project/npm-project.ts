@@ -119,7 +119,7 @@ export class NpmProject {
     return ver.join('.')
   }
 
-  updateVersionPath(this: Project, versionPath: number) {
+  private updateVersionPathRelease(this: Project, versionPath: number) {
     const ver = this.version.split('.');
     if (ver.length > 0) {
       ver[ver.length - 1] = versionPath.toString();
@@ -133,6 +133,37 @@ export class NpmProject {
     const ver = this.version.split('.');
     const res = Number(_.last(ver));
     return isNaN(res) ? 0 : res;
+  }
+
+  //@ts-ignore
+  get createNewVersionWithTagFor(this: Project) {
+    const that = this;
+    return {
+      pathRelease(commitMsg?: string) {
+        const proj = that as Project;
+        let currentPathNum = proj.versionPathAsNumber + 1;
+        let commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.versionPatchedPlusOne);
+        proj.git.commit(commitMessage);
+        let tagName = `v${proj.versionPatchedPlusOne}`;
+
+        while (true) {
+          if (proj.git.checkTagExists(tagName)) {
+            Helpers.warn(`[${config.frameworkName}] tag taken: ${tagName}.. looking for new...`);
+            proj.updateVersionPathRelease(++currentPathNum);
+            tagName = `v${proj.versionPatchedPlusOne}`;
+            commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.versionPatchedPlusOne);
+            proj.git.commit(commitMessage);
+          } else {
+            break;
+          }
+        }
+
+        proj.run(`git tag -a ${tagName} `
+          + `-m "${commitMessage}"`,
+          { output: false }).sync();
+        return { newVersion: proj.versionPatchedPlusOne };
+      }
+    };
   }
 
   //#endregion
