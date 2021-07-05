@@ -242,7 +242,8 @@
           "@types/chai": "^4.1.2",
           "chai": "^4.2.0",
           "mocha": "^5.2.0",
-          "@types/mocha": "^5.2.5"
+          "@types/mocha": "^5.2.5",
+          "detect-mocha": "0.1.0"
         },
         "typescript": {
           "node-cli-test": "0.0.2",

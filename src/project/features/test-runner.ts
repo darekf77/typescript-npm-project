@@ -20,7 +20,7 @@ export class TestRunner
 
   //#region @backend
   fileCommand(files: string[]) {
-    files = files.map(f => path.basename(f))
+    files = files.map(f => path.basename(f));
     // console.log('files',files)
     const useFiles = (_.isArray(files) && files.length > 0);
     const ext = (files.length > 1 || (!_.first(files).endsWith('.spec.ts'))) ? '*.spec.ts' : ''

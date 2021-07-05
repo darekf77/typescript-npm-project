@@ -221,8 +221,8 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   }
   const tmpProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
   const reinstallForceSmartNodeModules = (
-    containerCoreProject.isContainerCoreProject
-    && (containerCoreProject.location === currentProject.location)
+    (containerCoreProject.isContainerCoreProject
+      && (containerCoreProject.location === currentProject.location))
   );
   // || packgesHasChanges;
 

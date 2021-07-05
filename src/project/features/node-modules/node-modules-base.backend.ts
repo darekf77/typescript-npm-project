@@ -102,7 +102,7 @@ export class NodeModulesBase extends NodeModulesCore {
   public copy(pkg: string | Models.npm.Package, options?: { override?: boolean; linkOnly?: boolean; }) {
     const self = this;
     return {
-      async to(destination: Project, ) {
+      async to(destination: Project) {
 
         const { override = false, linkOnly = false } = options || {};
 
