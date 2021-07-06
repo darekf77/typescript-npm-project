@@ -44,6 +44,7 @@ export class ProjectVscodeExt
     return [
       'src/extension.ts',
       'src/helpers.ts',
+      'src/helpers-vscode.ts',
       'src/models.ts',
       'src/execute-command.ts',
       'src/progress-output.ts',

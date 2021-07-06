@@ -39,6 +39,18 @@ function $IS_CORE_PROJECT() {
   process.exit(0)
 }
 
+
+function $OPEN_CORE_CONTAINER() {
+  const proj = Project.Current as Project;
+  const container = Project.by('container', proj._frameworkVersion);
+  if (container) {
+    container.run(`code .`).sync();
+  } else {
+    Helpers.error(`Core container not found...`, false, true);
+  }
+  process.exit(0)
+}
+
 function $OPEN_CORE_PROJECT() {
   if ((Project.Current as Project).isCoreProject && (Project.Current as Project).frameworkVersionAtLeast('v2')) {
     (Project.Current as Project).run(`code ${Project.by<Project>((Project.Current as Project)._type, (Project.Current as Project).frameworkVersionMinusOne).location} &`).sync();
@@ -76,7 +88,7 @@ function $OPEN_BASELINE() {
 
 async function $OPEN(args: string) {
   const db = await TnpDB.Instance();
-  if(args.length === 0) {
+  if (args.length === 0) {
     Helpers.openFolderInFileExploer(process.cwd());
     process.exit(0)
   }
@@ -165,6 +177,8 @@ export default {
   $OPEN_NAVI_CLI: Helpers.CLIWRAP($OPEN_NAVI_CLI, '$OPEN_NAVI_CLI'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
   $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
+  $OPEN_CORE_CONTAINER: Helpers.CLIWRAP($OPEN_CORE_CONTAINER, '$OPEN_CORE_CONTAINER'),
   $OPEN_TNP_PROJECT: Helpers.CLIWRAP($OPEN_TNP_PROJECT, '$OPEN_TNP_PROJECT'),
   $OPEN_BASELINE: Helpers.CLIWRAP($OPEN_BASELINE, '$OPEN_BASELINE'),
+
 }

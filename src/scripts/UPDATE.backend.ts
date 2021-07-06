@@ -9,8 +9,14 @@ function $UPDATE_ISOMORPHIC() {
   process.exit(0)
 }
 
+
+function $UPDATE_GLOBAL_DEPS_CACHE(args: string) {
+
+}
+
+
 function $UPDATE(args: string) {
-  Helpers.error(`Nothing here yet.`)
+
   // const file = path.basename(args.trim());
   // function processing() {
   //   Helpers.info(`processing file...`);
@@ -27,6 +33,8 @@ function $UPDATE(args: string) {
   // Helpers.info(`Update of ${file} done.`);
   // process.exit(0);
 }
+
+
 
 export default {
   $UPDATE_ISOMORPHIC: Helpers.CLIWRAP($UPDATE_ISOMORPHIC, '$UPDATE_ISOMORPHIC'),
