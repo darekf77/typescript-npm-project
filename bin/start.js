@@ -82,6 +82,7 @@ global.frameworkMode = mode;
 var spinnerIsDefault = !tnpNonInteractive;
 // var spinnerIsDefault = false;
  // TODO ther is issue with double '-' when executing child process
+ // and probaly fix here : https://stackoverflow.com/questions/34967278/nodejs-child-process-spawn-custom-stdio
 var startSpinner = spinnerIsDefault ?
   (!process.argv.includes('-spinner'))
   : process.argv.includes('-spinner');
