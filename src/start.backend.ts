@@ -54,9 +54,6 @@ tnp
 if (Object.keys(global['ENV']).length === 0) {
   Helpers.warn(`[tnp][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
 }
-// console.log(`DOMAIN: ${ENV.domain}`)
-// console.log(`DOMAIN: ${ENV.domain}`)
-// process.exit(0)
 
 //#region imports
 import { _ } from 'tnp-core';
@@ -78,7 +75,6 @@ import { IncCompiler } from 'incremental-compiler';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
-
 //#region init incremental compiler
 IncCompiler.init(async (asyncEvents) => { }, {
   error: Helpers.error,
@@ -88,6 +84,7 @@ IncCompiler.init(async (asyncEvents) => { }, {
 } as any);
 //#endregion
 
+//#region handle special args
 const SPECIAL_ARGS = [
   '--copyto',
   '--copyTo'
@@ -146,6 +143,7 @@ export function handleSpecialArgs(argsv: string[]) {
   } while (rebuildStructure);
   return tmpArgsv;
 }
+//#endregion
 
 export async function start(
   argsv: string[],
@@ -257,6 +255,7 @@ export async function start(
                 // Helpers.log('FNNAME',vFn.name)
                 // process.exit(0)
                 Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
+                global.spinner.stop();
                 vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
                 breakLoop = true;
                 break;

@@ -42,7 +42,6 @@ Thumbs.db
 /.npmrc
 /tslint.json
 /.editorconfig
-/tslint.json
 /index.js
 /index.d.ts
 /index.js.map

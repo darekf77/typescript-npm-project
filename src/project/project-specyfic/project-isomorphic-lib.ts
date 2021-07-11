@@ -163,7 +163,7 @@ export class ProjectIsomorphicLib
       webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
     }
 
-    const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+    const command = `npx webpack-dev-server ${webpackEnvParams}`;
     Helpers.info(`
 
     WEBPACK COMMAND: ${command}
@@ -237,7 +237,7 @@ export class ProjectIsomorphicLib
     this.beforeLibBuild(outDir);
 
     const webpackCommandFn = (watchCommand: boolean) =>
-      `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
+      `npx webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
     const { obscure, uglify, nodts } = this.buildOptions;
@@ -314,7 +314,7 @@ export class ProjectIsomorphicLib
   }
   compilerDeclarationFiles() {
     //#region @backend
-    this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
+    this.run(`npx tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
     //#endregion
   }
 
@@ -326,7 +326,7 @@ export class ProjectIsomorphicLib
     }
     const indexEs5js = `index-es5.js`;
     Helpers.writeFile(path.join(this.location, config.folder.bundle, config.file._babelrc), '{ "presets": ["env"] }\n');
-    this.run(`npm-run babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
+    this.run(`npx babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
     Helpers.writeFile(
       path.join(this.location, config.folder.bundle, config.file.index_js),
       Helpers.readFile(path.join(this.location, config.folder.bundle, indexEs5js))
@@ -342,7 +342,7 @@ export class ProjectIsomorphicLib
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
       return
     }
-    const command = `npm-run uglifyjs bundle/index.js --output bundle/index.js`
+    const command = `npx uglifyjs bundle/index.js --output bundle/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
@@ -363,7 +363,7 @@ export class ProjectIsomorphicLib
       Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
       return
     }
-    const commnad = `npm-run javascript-obfuscator bundle/index.js `
+    const commnad = `npx javascript-obfuscator bundle/index.js `
       + ` --output bundle/index.js`
       + ` --target node`
       + ` --rotate-string-array true`

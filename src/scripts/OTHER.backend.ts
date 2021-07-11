@@ -8,7 +8,7 @@ import { Models } from 'tnp-models';
 import chalk from 'chalk';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
-import * as nodemailer from 'nodemailer';
+// import * as nodemailer from 'nodemailer';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { RegionRemover } from '../project/compilers/build-isomorphic-lib/region-remover.backend';
 import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/cutCodeFn.backend';
@@ -33,13 +33,20 @@ function recreate() {
 
 }
 
-function version() {
+async function version() {
   //#region @notForNpm
   if (ENV.notForNpm) {
-    console.log(`I am secret project!`);
+    console.log(`I am secret project!!!`);
   }
   //#endregion
-  !global.hideLog && console.log(`tnp location: ${Project.Tnp.location}`)
+  Helpers.log(`tnp location: ${Project.Tnp.location}`)
+  // global.spinner.stop();
+  // Helpers.info('waiting...');
+  // Helpers.sleep(5);
+  // global.spinner.start();
+  // Helpers.info('waiting next time!!. ..');
+  // Helpers.sleep(5);
+  // global.spinner.stop();
   Helpers.info((Project.Tnp as Project).version);
   process.exit(0)
 }
@@ -156,42 +163,59 @@ function CROP(args: string) {
 }
 
 async function $SEND_EMAIL(args: string) {
-  Helpers.info('Send email');
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  let testAccount = await nodemailer.createTestAccount();
+  // Helpers.info('Send email');
+  // // Generate test SMTP service account from ethereal.email
+  // // Only needed if you don't have a real mail account for testing
+  // let testAccount = await nodemailer.createTestAccount();
 
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
+  // // create reusable transporter object using the default SMTP transport
+  // let transporter = nodemailer.createTransport({
+  //   host: "smtp.ethereal.email",
+  //   port: 587,
+  //   secure: false, // true for 465, false for other ports
+  //   auth: {
+  //     user: testAccount.user, // generated ethereal user
+  //     pass: testAccount.pass, // generated ethereal password
+  //   },
+  // });
 
-  // send mail with defined transport object
-  let info = await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
-    to: "darekf77@gmai.com, dariusz.filipiak@igt.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
+  // // send mail with defined transport object
+  // let info = await transporter.sendMail({
+  //   from: '"Fred Foo 👻" <foo@example.com>', // sender address
+  //   to: "darekf77@gmai.com, dariusz.filipiak@igt.com", // list of receivers
+  //   subject: "Hello ✔", // Subject line
+  //   text: "Hello world?", // plain text body
+  //   html: "<b>Hello world?</b>", // html body
+  // });
 
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  // console.log("Message sent: %s", info.messageId);
+  // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-  process.exit(0);
+  // // Preview only available when sending through an Ethereal account
+  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  // // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  // process.exit(0);
 }
 
+async function $THROW_ERR() {
+  Helpers.error(`Erororoororo here`, false, true);
+}
+
+async function $OUTPUT_TEST_ASCII() {
+
+  // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
+  // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
+  // console.log(`"${Helpers.commnadOutputAsString('tnp version')}"`);
+  // console.log(`version "${Helpers.commnadOutputAsString('tnp version')}"`);
+  // console.log(`version "${Helpers.commnadOutputAsString('navi version')}"`);
+  // console.log(`version "${await Helpers.run(`tnp version`, { output: true }).asyncAsPromise()}`)
+
+  process.exit(0)
+}
 
 export default {
+  $OUTPUT_TEST_ASCII: Helpers.CLIWRAP($OUTPUT_TEST_ASCII, '$OUTPUT_TEST_ASCII'),
+  $THROW_ERR: Helpers.CLIWRAP($THROW_ERR, '$THROW_ERR'),
   $SEND_EMAIL: Helpers.CLIWRAP($SEND_EMAIL, '$SEND_EMAIL'),
   $AA: Helpers.CLIWRAP($AA, '$AA'),
   CROP: Helpers.CLIWRAP(CROP, 'CROP'),

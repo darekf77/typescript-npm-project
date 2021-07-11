@@ -60,6 +60,7 @@ export abstract class BuildableProject {
           // buildOptions.copyto = [];
           result = [];
         } else {
+          // global.spinner?.stop();
           const { projects = [] }: { projects: string[] } = await inquirer
             .prompt([
               {
@@ -72,7 +73,7 @@ export abstract class BuildableProject {
                   })
               }
             ]) as any;
-
+          // global.spinner?.start();
           // buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
           result = projects.map(p => $Project.From<Project>(p)) as any;
         }

@@ -99,7 +99,7 @@ export class CopyManager extends FeatureForProject {
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const p = projectToCopyTo[index];
-      this.copyBuildedDistributionTo(p,
+      this._copyBuildedDistributionTo(p,
         {
           specyficFileRelativePath: event && specyficFileRelativePath,
           outDir: outDir as any
@@ -274,13 +274,17 @@ export class CopyManager extends FeatureForProject {
   //#endregion
 
   //#region copy build distribution to
-  public copyBuildedDistributionTo(
+  public copyBuildedDistributionTo(destination: Project) {
+    return this._copyBuildedDistributionTo(destination);
+  }
+
+  private _copyBuildedDistributionTo(
     destination: Project,
-    options: {
+    options?: {
       specyficFileRelativePath?: string,
       outDir?: 'dist'
     },
-    dontRemoveDestFolder: boolean
+    dontRemoveDestFolder = false
   ) {
 
     let { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
@@ -301,7 +305,13 @@ export class CopyManager extends FeatureForProject {
       this.project.sourceFolder,
     ];
 
-    const isSourceMapsDistBuild = (outDir === 'dist' && this.buildOptions?.watch);
+    /**
+     * 3 typese of sition
+     * dist build
+     * dist build but link sourcea - when no buildOptions
+     * watch build with linked source
+     */
+    const isSourceMapsDistBuild = (outDir === 'dist' && (_.isUndefined(this.buildOptions) || this.buildOptions?.watch));
     const allFolderLinksExists = !isSourceMapsDistBuild ? true : _.isUndefined(folderToLink.find(sourceFolder => {
       const projectOudDirDest = path.join(destination.location,
         config.folder.node_modules,

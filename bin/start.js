@@ -1,3 +1,4 @@
+
 //#region @backend
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
@@ -9,6 +10,9 @@ Error.stackTraceLimit = 100;
 global.i0 = {
   defineInjectable: function () { }
 }
+
+let orgArgv = JSON.parse(JSON.stringify(process.argv));
+const tnpNonInteractive = process.argv.find(a => a.startsWith('--tnpNonInteractive'));
 
 global.globalSystemToolMode = true;
 
@@ -71,98 +75,193 @@ if (process.argv.includes('-verbose')) {
   global.hideLog = false;
   process.argv = process.argv.filter(a => a !== '-verbose');
 }
-var mode;
-var distOnly = (process.argv.includes('-dist'));
-var bundleOnly = (process.argv.includes('-bundle'));
-var npmOnly = (process.argv.includes('-npm'));
-if (distOnly) {
-  mode = 'dist';
-  !global.hideLog && console.log('- dist only -');
-  // =========================== only dist ============================
-  process.argv = process.argv.filter(a => a !== '-dist');
-  process.argv = process.argv.filter(f => !!f);
-  var path = require('path');
-  var pathToDistRun = path.join(__dirname, '../dist/index.js');
-  var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 
-  // =======================================================================
-} else if (bundleOnly) {
-  mode = 'bundle';
-  !global.hideLog && console.log('- bundle only -');
-  // =========================== only dist ============================
-  process.argv = process.argv.filter(a => a !== '-bundle');
-  process.argv = process.argv.filter(f => !!f);
-  var path = require('path');
-  var pathToDistRun = path.join(__dirname, '../bundle/index.js');
-  var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-
-  // =======================================================================
-} else if (npmOnly) {
-  mode = 'npm';
-  !global.hideLog && console.log('- npm global only -');
-  // =========================== only dist ============================
-  process.argv = process.argv.filter(a => a !== '-npm');
-  process.argv = process.argv.filter(f => !!f);
-  var path = require('path');
-  var pathToDistRun = path.join(__dirname, '../index.js');
-  var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-
-} else {
-  // =========================== TODO speeding up! ============================
-  var fs = require('fs');
-  var path = require('path');
-  var ora = require('ora');
-  var spinner = ora();
-
-  global.spinner = spinner;
-  // if (!isNaN(process.ppid)) {
-  //   spinner.start();
-  // }
-  var pathToDistFolder = path.join(__dirname, '../dist');
-  var pathToBundleFolder = path.join(__dirname, '../bundle');
-
-  var pathToDistRun = path.join(__dirname, '../dist/index.js');
-  var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
-  var pathToIndexRun = path.join(__dirname, '../index.js');
-
-  var distExist = fs.existsSync(pathToDistRun);
-  var bundleExist = fs.existsSync(pathToBundletRun);
-
-  var start;
-
-  if (bundleExist && distExist) {
-    if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
-      mode = 'dist';
-      !global.hideLog && console.log('- firedev dist -> becouse is newer -');
-      start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-    } else {
-      mode = 'bundle';
-      !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
-      start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-    }
-  } else {
-    if (distExist) {
-      mode = 'dist';
-      !global.hideLog && console.log('- firedev dist -');
-      start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-    } else if (bundleExist) {
-      mode = 'bundle';
-      !global.hideLog && console.log('- firedev bundle -');
-      start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-    } else {
-      mode = 'npm';
-      !global.hideLog && console.log('- npm mode -');
-      start = require(pathToIndexRun.replace(/\.js$/g, '')).start;
-    }
-  }
-  // =======================================================================
-}
 global.start = start;
 global.frameworkMode = mode;
-// console.log('before start')
-start(process.argv, 'tnp', mode);
-//#endregion
 
+var spinnerIsDefault = !tnpNonInteractive;
+// var spinnerIsDefault = false;
+ // TODO ther is issue with double '-' when executing child process
+var startSpinner = spinnerIsDefault ?
+  (!process.argv.includes('-spinner'))
+  : process.argv.includes('-spinner');
+var isNodeDebuggerEnabled = false;
+if (startSpinner) {
+  const inspector = require('inspector');
+  isNodeDebuggerEnabled = (inspector.url() !== undefined);
+  startSpinner = !isNodeDebuggerEnabled;
+}
+if(startSpinner && isNaN(process.ppid)) {
+  startSpinner = false;
+}
+
+if (startSpinner) {
+  var ora = require('ora');
+  var spinner = ora();
+  spinner.start();
+  // process.on('message', message => {
+
+  // });
+} else {
+  global.spinner = {
+    start() {
+      process.send && process.send('start-spinner')
+    },
+    stop() {
+      process.send && process.send('stop-spinner')
+    }
+  }
+  process.on("SIGINT", function () {
+    process.exit(1);
+  });
+}
+process.argv = process.argv.filter(a => a !== '-spinner');
+process.argv = process.argv.filter(f => !!f);
+
+if (startSpinner) {
+  //#region spinner
+  spinner.start();
+  const spawn = require('cross-spawn');
+  // const child_process = require('child_process')
+  orgArgv = orgArgv.filter(a => a !== '-spinner');
+  // var start = new Date();
+  const env = {
+    ...process.env,
+    FORCE_COLOR: '1'
+  };
+
+
+  const command = `${!!frameworkName ? frameworkName : 'tnp'}${isNodeDebuggerEnabled ? '-debug' : ''}`;
+  const argsToCHildProc = `${orgArgv.slice(2).join(' ')} ${spinnerIsDefault ? '-spinner' : ''}`.split(' ');
+  // !global.hideLog && console.log(`worker command: ${command} ${argsToCHildProc.join(' ')}`);
+  const proc = spawn(command,
+    argsToCHildProc
+    , {
+      env,
+      stdio: [0, 1, 2, 'ipc'],
+      cwd: process.cwd(),
+    });
+  proc.on('message', message => {
+    if (message === 'start-spinner') {
+      spinner.start();
+    }
+    if (message === 'stop-spinner') {
+      spinner.stop();
+    }
+  });
+  // process.stdin.pipe(proc.stdin);
+  // proc.stdin.setEncoding = 'utf-8';
+  // proc.stdout.pipe(process.stdout);
+  // proc.stdio = [0, 1, 2];
+  // proc.stdout.on('data', (data) => {
+  //   process.stdout.write(data)
+  // })
+  // proc.stdout.on('error', (data) => {
+  //   process.stderr.write(data);
+  // })
+  // proc.stderr.on('data', (data) => {
+  //   process.stderr.write(data)
+  // })
+  // proc.stderr.on('error', (data) => {
+  //   process.stderr.write(data);
+  // })
+  proc.on('exit', (code) => {
+    // const end = new Date() - start
+    // console.info('Execution time: %dms', end)
+    process.exit(code);
+  })
+  //#endregion
+  // process.stdin.resume();
+} else {
+  //#region mode
+  var mode;
+  var distOnly = (process.argv.includes('-dist'));
+  var bundleOnly = (process.argv.includes('-bundle'));
+  var npmOnly = (process.argv.includes('-npm'));
+  if (distOnly) {
+    mode = 'dist';
+    !global.hideLog && console.log('- dist only -');
+    // =========================== only dist ============================
+    process.argv = process.argv.filter(a => a !== '-dist');
+    process.argv = process.argv.filter(f => !!f);
+    var path = require('path');
+    var pathToDistRun = path.join(__dirname, '../dist/index.js');
+    var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+
+    // =======================================================================
+  } else if (bundleOnly) {
+    mode = 'bundle';
+    !global.hideLog && console.log('- bundle only -');
+    // =========================== only dist ============================
+    process.argv = process.argv.filter(a => a !== '-bundle');
+    process.argv = process.argv.filter(f => !!f);
+    var path = require('path');
+    var pathToDistRun = path.join(__dirname, '../bundle/index.js');
+    var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+
+    // =======================================================================
+  } else if (npmOnly) {
+    mode = 'npm';
+    !global.hideLog && console.log('- npm global only -');
+    // =========================== only dist ============================
+    process.argv = process.argv.filter(a => a !== '-npm');
+    process.argv = process.argv.filter(f => !!f);
+    var path = require('path');
+    var pathToDistRun = path.join(__dirname, '../index.js');
+    var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+
+  } else {
+    var fs = require('fs');
+    var path = require('path');
+
+    //#region choose right version of js to run
+    var pathToDistFolder = path.join(__dirname, '../dist');
+    var pathToBundleFolder = path.join(__dirname, '../bundle');
+
+    var pathToDistRun = path.join(__dirname, '../dist/index.js');
+    var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
+    var pathToIndexRun = path.join(__dirname, '../index.js');
+
+    var distExist = fs.existsSync(pathToDistRun);
+    var bundleExist = fs.existsSync(pathToBundletRun);
+
+
+    var start;
+
+    if (bundleExist && distExist) {
+      if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
+        mode = 'dist';
+        !global.hideLog && console.log('- firedev dist -> becouse is newer -');
+        start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+      } else {
+        mode = 'bundle';
+        !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
+        start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
+      }
+    } else {
+      if (distExist) {
+        mode = 'dist';
+        !global.hideLog && console.log('- firedev dist -');
+        // TOOOO MUCH TIME !!!!!!
+        start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+      } else if (bundleExist) {
+        mode = 'bundle';
+        !global.hideLog && console.log('- firedev bundle -');
+        start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
+      } else {
+        mode = 'npm';
+        !global.hideLog && console.log('- npm mode -');
+        start = require(pathToIndexRun.replace(/\.js$/g, '')).start;
+      }
+    }
+
+    //#endregion
+  }
+  //#endregion
+  start(process.argv, 'tnp', mode, !!spinner ? spinner : void 0);
+}
+
+//#region manula linking
 function installInTnp() {
 
   const path = require('path');
@@ -258,8 +357,9 @@ function installInTnp() {
   console.info(`DONE`)
   process.exit(0)
 }
+//#endregion
 
-
+//#region templates
 function crossPlatofrmPath(p) {
 
   // const isExtendedLengthPath = /^\\\\\?\\/.test(p);
@@ -276,7 +376,6 @@ function crossPlatofrmPath(p) {
   }
   return p;
 }
-
 
 
 function tsconfig() {
@@ -335,3 +434,6 @@ function removeLinks() {
   console.info(`DONE`);
   process.exit(0)
 }
+//#endregion
+
+//#endregion

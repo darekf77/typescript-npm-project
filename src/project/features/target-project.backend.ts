@@ -62,7 +62,8 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
     Helpers.copy(originDefaultPath, t.path);
   }
   try {
-    Helpers.run(`git checkout ${t.branch} && git pull origin ${t.branch}`, { cwd: t.path }).sync();
+    Helpers.run(`git checkout ${t.branch}`, { cwd: t.path }).sync();
+    await Helpers.git.pullBranch(t.path, t.branch);
   } catch (e) {
     Helpers.error(`[target-project] Not able create target project `
       + `${chalk.bold(project.name)} from origin ${t.origin}...`);

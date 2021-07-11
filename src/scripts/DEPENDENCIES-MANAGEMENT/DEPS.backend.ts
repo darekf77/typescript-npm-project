@@ -1,3 +1,4 @@
+//#region imports
 import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
@@ -10,7 +11,11 @@ import { config } from 'tnp-config';
 import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { Morphi } from 'morphi';
+//#endregion
 
+//#region copyto
+
+//#region copy module to
 async function copyModuleto(args: string) {
   let [packageName, project]: [string, (Project | string)] = args.split(' ') as any;
   if (_.isString(packageName) && packageName.trim() !== '' && _.isString(project) && project.trim() !== '') {
@@ -30,7 +35,9 @@ async function copyModuleto(args: string) {
   }
   process.exit(0)
 }
+//#endregion
 
+//#region copy to destination
 
 function copyToDestination(destLocaiton) {
 
@@ -39,10 +46,12 @@ function copyToDestination(destLocaiton) {
   if (!destination) {
     Helpers.error(`Incorect project in: ${destLocaiton}`)
   }
-  currentLib.copyManager.copyBuildedDistributionTo(destination, void 0, false);
+  currentLib.copyManager.copyBuildedDistributionTo(destination);
   Helpers.info(`Project "${chalk.bold(currentLib.name)}" successfully installed in "${destination.name}"`);
 }
+//#endregion
 
+//#region copyto handle args
 function copyToHandleArgs(args: string) {
 
   const destLocaitons = args.split(' ').filter(a => a.trim() !== '');
@@ -52,21 +61,67 @@ function copyToHandleArgs(args: string) {
 
   process.exit(0)
 }
+//#endregion
 
+//#endregion
+
+//#region install / uninstall npm pacakges
 export async function $INSTALL(args, smooth = false, exit = true) {
-  await (Project.Current as Project).npmPackages.installFromArgs(args, smooth);
+  const proj = Project.Current as Project;
+
+  if (proj.isContainer && !proj.isContainerCoreProject) {
+    const children = proj.children.filter(c => c.npmPackages.useSmartInstall);
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i];
+      c.npmPackages.installFromArgs(args, smooth);
+    }
+  } else {
+    await proj.npmPackages.installFromArgs(args, smooth);
+  }
   if (exit) {
     process.exit(0);
   }
 }
 
-export async function $UNINSTALL(args, exit = true) {
-  await (Project.Current as Project).npmPackages.uninstallFromArgs(args);
+export async function $UNINSTALL(args: string, exit = true) {
+  const proj = Project.Current as Project;
+
+  if (proj.isContainer && !proj.isContainerCoreProject) {
+    const children = proj.children.filter(c => c.npmPackages.useSmartInstall);
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i];
+      if (args.trim() === '') {
+        c.node_modules.remove(`container uninstall npm`);
+      } else {
+        await c.npmPackages.uninstallFromArgs(args);
+      }
+    }
+  } else {
+    await proj.npmPackages.uninstallFromArgs(args);
+  }
   if (exit) {
     process.exit(0);
   }
 }
+const $I = (args) => {
+  $INSTALL(args);
+};
 
+const $SINSTALL = (args) => {
+  $INSTALL(args, true);
+}
+
+
+const $REINSTALL = async (args) => {
+  const proj = Project.Current as Project;
+  await proj.clear();
+  await proj.filesStructure.init(args)
+  process.exit(0);
+};
+
+//#endregion
+
+//#region deps
 export async function $DEPS_SET_CATEGORY(args: string, exit = true) {
   let argumn: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;
   process.chdir((Project.Tnp as Project).location);
@@ -98,6 +153,22 @@ export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
     process.exit(0);
   }
 }
+
+function DEPS_SHOW_IF_STANDALONE(args: string) {
+  Helpers.log(`Hook update start`)
+  if ((Project.Current as Project).isStandaloneProject) {
+    Helpers.info(`Showing deps for standalone project`);
+    (Project.Current as Project).packageJson.save('is standalone show')
+  }
+  Helpers.git.commitWhatIs(`show package.json dependencies`)
+  Helpers.log(`Hook update ended`)
+  process.exit(0)
+}
+
+function $DEPS_CLEAN(args: string) {
+  DEPS_HIDE(args)
+}
+
 
 export async function $RESET_NPM(args: string, exit = true) {
   await (Project.Current as Project).packageJson.reset();
@@ -194,146 +265,105 @@ function $DEPS_RECREATE(args: string) {
   DEPS_SHOW(args)
 }
 
-function $SHOW_CHILDREN() {
-  console.log((Project.Current as Project).children.map(c => c.genericName).join('\n'))
-  process.exit(0)
-}
 
-async function $SHOW_DB() {
-  const db = await TnpDB.Instance();
-  const port = await db.getWokerPort();
-  if (_.isNumber(port)) {
-    const addressToShow = Morphi.getHttpPathBy<DbDaemonController>(DbDaemonController, port, 'info');
-    await open(addressToShow);
-  } else {
-    Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
+async function $DEPS_TREE() {
+  const proj = (Project.Current as Project);
+  if (proj.isWorkspaceChildProject) {
+    const c = proj;
+    Helpers.info(`child: ${c.name}`);
+    const libs = c.libsForTraget(c);
+    if (libs.length === 0) {
+      Helpers.log(`-- no deps --`);
+    } else {
+      libs.forEach(d => {
+        Helpers.log(`dep ${d.name}`);
+      })
+    }
+  } else if (proj.isWorkspace) {
+    proj.children.forEach(c => {
+      Helpers.info(`child: ${c.name}`);
+      const libs = c.libsForTraget(c);
+      if (libs.length === 0) {
+        Helpers.log(`-- no deps --`);
+      } else {
+        libs.forEach(d => {
+          Helpers.log(`dep ${d.name}`);
+        })
+      }
+
+    });
   }
+
   process.exit(0)
+
 }
 
-async function $DB_SHOW() {
-  await $SHOW_DB();
-}
-async function $DB_CODE() {
-  const db = await TnpDB.Instance();
-  Helpers.run(`code ${db.location}`).sync();
+async function $DEPS_TREE2() {
+  const proj = (Project.Current as Project);
+  proj.children.forEach(c => {
+    Helpers.info(`child: ${c.name}`);
+    if (c.workspaceDependencies.length === 0) {
+      Helpers.log(`-- no deps --`);
+    } else {
+      c.workspaceDependencies.forEach(d => {
+        Helpers.log(`dep ${d.name}`);
+      })
+    }
+
+  });
   process.exit(0)
+
 }
 
-async function $CODE_DB() {
-  await $DB_CODE();
-}
+export function $DEPS_JSON() {
+  const node_moduels = path.join(process.cwd(), config.folder.node_modules);
+  const result = {};
+  Helpers
+    .foldersFrom(node_moduels)
+    .filter(f => path.basename(f) !== '.bin')
+    .forEach(f => {
+      const packageName = path.basename(f);
+      if (packageName.startsWith('@')) {
+        const orgName = packageName;
+        Helpers.foldersFrom(f).forEach(f2 => {
+          try {
+            result[`${orgName}/${path.basename(f2)}`] = Helpers.readValueFromJson(path.join(f2, config.file.package_json), 'version', '');
+          } catch (error) { }
+        });
+      } else {
+        try {
+          result[packageName] = Helpers.readValueFromJson(path.join(f, config.file.package_json), 'version', '');
+        } catch (error) { }
+      }
 
-
-const $OPEN_DB = async () => await $SHOW_DB();
-const $DB_OPEN = async () => await $SHOW_DB();
-
-async function $SHOW_WORKER() {
-  await $SHOW_DB();
-}
-
-async function $SHOW_PROJECTS() {
-  const db = await TnpDB.Instance();
-  const projects = (await db.getProjects())
-  console.log(projects.map(p => p.locationOfProject).join('\n'));
-  process.exit(0)
-}
-
-async function $SHOW_PROJECTS_NAVI() {
-  const db = await TnpDB.Instance();
-  const projects = (await db.getProjects())
-  console.log(projects.filter(p => p.project.typeIs('navi')).map(p => p.locationOfProject).join('\n'));
-  process.exit(0)
-}
-
-
-function $SHOW_CORE_MODULES() {
-  const container = Project.by('container', 'v1');
-  const workspace = Project.by('workspace', 'v1');
-  const al = Project.by('angular-lib', 'v1');
-  const il = Project.by('isomorphic-lib', 'v1');
-
-  const containerv2 = Project.by('container', 'v2');
-  const workspacev2 = Project.by('workspace', 'v2');
-  const alv2 = Project.by('angular-lib', 'v2');
-  const ilv2 = Project.by('isomorphic-lib', 'v2');
-  console.log(`
-v1 Container core:\t    ${container.location}
-v1 Workspace core:\t    ${workspace.location}
-v1 Angular-lib core:\t  ${al.location}
-v1 Isomorphic-lib core:\t  ${il.location}
-
-v2 Container core:\t    ${containerv2.location}
-v2 Workspace core:\t    ${workspacev2.location}
-v2 Angular-lib core:\t  ${alv2.location}
-v2 Isomorphic-lib core:\t  ${ilv2.location}
-  `)
-
+    });
+  Helpers.writeJson(path.join(process.cwd(), config.file.result_packages_json), result);
   process.exit(0);
 }
 
-function DEPS_SHOW_IF_STANDALONE(args: string) {
-  Helpers.log(`Hook update start`)
-  if ((Project.Current as Project).isStandaloneProject) {
-    Helpers.info(`Showing deps for standalone project`);
-    (Project.Current as Project).packageJson.save('is standalone show')
-  }
-  Helpers.git.commitWhatIs(`show package.json dependencies`)
-  Helpers.log(`Hook update ended`)
-  process.exit(0)
-}
 
-function $DEPS_CLEAN(args: string) {
-  DEPS_HIDE(args)
-}
+//#endregion
 
-const $I = (args) => {
-  $INSTALL(args);
-}
+//#region link / unlink
 
-const $REINSTALL = async (args) => {
-  const proj = Project.Current as Project;
-  await proj.clear();
-  await proj.filesStructure.init(args)
-  process.exit(0);
-};
-
-const $SINSTALL = (args) => {
-  $INSTALL(args, true);
-}
-
+//#region core link
 async function $LINK_CORE() {
   Project.linkCoreFolders();
   Helpers.info('Done linking core folders');
   process.exit(0);
 }
+//#endregion
 
-function templateBin(debug = false) {
-  return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
-var { fse, crossPlatformPath, path } = require('tnp-core');
-var path = {
-  dist: path.join(crossPlatformPath(__dirname), '../dist/start.backend.js'),
-  bundle: path.join(crossPlatformPath(__dirname), '../start.backend.js')
+//#region ln
+async function $LN(args: string) {
+  const [source, dest] = args.split(' ');
+  Helpers.createSymLink(source, dest);
+  process.exit(0);
 }
-var p = fse.existsSync(path.dist) ? path.dist : path.bundle;
-global.globalSystemToolMode = true;
-var run = require(p).run;
-run(process.argv.slice(2));
-  `
-}
+//#endregion
 
-function templateStartBackedn() {
-  return `import { Helpers } from 'tnp-helpers';
-
-export async function run(args: string[]) {
-    const command = args.shift() as any;
-    if (command === 'test') {
-      Helpers.clearConsole();
-    }
-    process.stdin.resume();
-  }`
-}
-
+//#region global deps
+//#region global link
 
 async function $LINK() {
   let project = (Project.Current as Project);
@@ -520,6 +550,34 @@ EXIT /b
   process.exit(0)
 }
 
+function templateBin(debug = false) {
+  return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
+var { fse, crossPlatformPath, path } = require('tnp-core');
+var path = {
+  dist: path.join(crossPlatformPath(__dirname), '../dist/start.backend.js'),
+  bundle: path.join(crossPlatformPath(__dirname), '../start.backend.js')
+}
+var p = fse.existsSync(path.dist) ? path.dist : path.bundle;
+global.globalSystemToolMode = true;
+var run = require(p).run;
+run(process.argv.slice(2));
+  `
+}
+
+function templateStartBackedn() {
+  return `import { Helpers } from 'tnp-helpers';
+
+export async function run(args: string[]) {
+    const command = args.shift() as any;
+    if (command === 'test') {
+      Helpers.clearConsole();
+    }
+    process.stdin.resume();
+  }`
+}
+//#endregion
+
+//#region global unlink
 async function $UNLINK() {
   let project = (Project.Current as Project);
   if (project.isWorkspaceChildProject) {
@@ -531,7 +589,12 @@ async function $UNLINK() {
   project.workspaceSymlinks.remove(`Remove workspace symlinks`);
   process.exit(0)
 }
+//#endregion
+//#endregion
 
+//#endregion
+
+//#region copyto
 async function ACTION_COPYTO(action: 'add' | 'remove', args) {
   const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
   if (proj) {
@@ -571,11 +634,6 @@ async function $COPY_TO_ADD(args) {
   await ACTION_COPYTO('add', args);
 }
 
-async function $COPY_TO_LIST(args) {
-
-}
-
-
 const $copytoproject = (args) => {
   copyToHandleArgs(args)
 }
@@ -592,87 +650,84 @@ const $copymoduletoproject = async (args) => {
 const $copy_module_to_project = async (args) => {
   await copyModuleto(args)
 }
+//#endregion
 
-async function $DEPS_TREE() {
-  const proj = (Project.Current as Project);
-  if (proj.isWorkspaceChildProject) {
-    const c = proj;
-    Helpers.info(`child: ${c.name}`);
-    const libs = c.libsForTraget(c);
-    if (libs.length === 0) {
-      Helpers.log(`-- no deps --`);
-    } else {
-      libs.forEach(d => {
-        Helpers.log(`dep ${d.name}`);
-      })
-    }
-  } else if (proj.isWorkspace) {
-    proj.children.forEach(c => {
-      Helpers.info(`child: ${c.name}`);
-      const libs = c.libsForTraget(c);
-      if (libs.length === 0) {
-        Helpers.log(`-- no deps --`);
-      } else {
-        libs.forEach(d => {
-          Helpers.log(`dep ${d.name}`);
-        })
-      }
-
-    });
+//#region db
+async function $SHOW_DB() {
+  const db = await TnpDB.Instance();
+  const port = await db.getWokerPort();
+  if (_.isNumber(port)) {
+    const addressToShow = Morphi.getHttpPathBy<DbDaemonController>(DbDaemonController, port, 'info');
+    await open(addressToShow);
+  } else {
+    Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
   }
-
   process.exit(0)
-
 }
 
-async function $DEPS_TREE2() {
-  const proj = (Project.Current as Project);
-  proj.children.forEach(c => {
-    Helpers.info(`child: ${c.name}`);
-    if (c.workspaceDependencies.length === 0) {
-      Helpers.log(`-- no deps --`);
-    } else {
-      c.workspaceDependencies.forEach(d => {
-        Helpers.log(`dep ${d.name}`);
-      })
-    }
-
-  });
+async function $DB_SHOW() {
+  await $SHOW_DB();
+}
+async function $DB_CODE() {
+  const db = await TnpDB.Instance();
+  Helpers.run(`code ${db.location}`).sync();
   process.exit(0)
-
 }
 
-async function $LN(args: string) {
-  const [source, dest] = args.split(' ');
-  Helpers.createSymLink(source, dest);
+async function $CODE_DB() {
+  await $DB_CODE();
+}
+
+
+const $OPEN_DB = async () => await $SHOW_DB();
+const $DB_OPEN = async () => await $SHOW_DB();
+
+async function $SHOW_WORKER() {
+  await $SHOW_DB();
+}
+
+//#region db / show projects
+async function $SHOW_PROJECTS() {
+  const db = await TnpDB.Instance();
+  const projects = (await db.getProjects())
+  console.log(projects.map(p => p.locationOfProject).join('\n'));
+  process.exit(0)
+}
+
+async function $SHOW_PROJECTS_NAVI() {
+  const db = await TnpDB.Instance();
+  const projects = (await db.getProjects())
+  console.log(projects.filter(p => p.project.typeIs('navi')).map(p => p.locationOfProject).join('\n'));
+  process.exit(0)
+}
+//#endregion
+
+function $SHOW_CORE_MODULES() {
+  const container = Project.by('container', 'v1');
+  const workspace = Project.by('workspace', 'v1');
+  const al = Project.by('angular-lib', 'v1');
+  const il = Project.by('isomorphic-lib', 'v1');
+
+  const containerv2 = Project.by('container', 'v2');
+  const workspacev2 = Project.by('workspace', 'v2');
+  const alv2 = Project.by('angular-lib', 'v2');
+  const ilv2 = Project.by('isomorphic-lib', 'v2');
+  console.log(`
+v1 Container core:\t    ${container.location}
+v1 Workspace core:\t    ${workspace.location}
+v1 Angular-lib core:\t  ${al.location}
+v1 Isomorphic-lib core:\t  ${il.location}
+
+v2 Container core:\t    ${containerv2.location}
+v2 Workspace core:\t    ${workspacev2.location}
+v2 Angular-lib core:\t  ${alv2.location}
+v2 Isomorphic-lib core:\t  ${ilv2.location}
+  `)
+
   process.exit(0);
 }
+//#endregion
 
-export function $DEPS_JSON() {
-  const node_moduels = path.join(process.cwd(), config.folder.node_modules);
-  const result = {};
-  Helpers
-    .foldersFrom(node_moduels)
-    .filter(f => path.basename(f) !== '.bin')
-    .forEach(f => {
-      const packageName = path.basename(f);
-      if (packageName.startsWith('@')) {
-        const orgName = packageName;
-        Helpers.foldersFrom(f).forEach(f2 => {
-          try {
-            result[`${orgName}/${path.basename(f2)}`] = Helpers.readValueFromJson(path.join(f2, config.file.package_json), 'version', '');
-          } catch (error) { }
-        });
-      } else {
-        try {
-          result[packageName] = Helpers.readValueFromJson(path.join(f, config.file.package_json), 'version', '');
-        } catch (error) { }
-      }
-
-    });
-  Helpers.writeJson(path.join(process.cwd(), config.file.result_packages_json), result);
-  process.exit(0);
-}
 
 export default {
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
@@ -703,7 +758,6 @@ export default {
   $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
   $DB_OPEN: Helpers.CLIWRAP($DB_OPEN, '$DB_OPEN'),
   $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
-  $SHOW_CHILDREN: Helpers.CLIWRAP($SHOW_CHILDREN, '$SHOW_CHILDREN'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
@@ -722,7 +776,6 @@ export default {
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
   $copyto: Helpers.CLIWRAP($copyto, '$copyto'),
-  $COPY_TO_LIST: Helpers.CLIWRAP($COPY_TO_LIST, '$COPY_TO_LIST'),
   $COPY_TO_ADD: Helpers.CLIWRAP($COPY_TO_ADD, '$COPY_TO_ADD'),
   $COPY_TO_REMOVE: Helpers.CLIWRAP($COPY_TO_REMOVE, '$COPY_TO_REMOVE'),
   $copymoduletoproject: Helpers.CLIWRAP($copymoduletoproject, '$copymoduletoproject'),

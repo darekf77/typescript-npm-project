@@ -32,7 +32,7 @@ export class TestRunner
   async start(files?: string[], watchMode = false, debugMode = false) {
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
-      command = `npm-run mocha ${debugMode ? '--debug --inspect' : ''} -r ts-node/register ${this.fileCommand(files)}`
+      command = `npx mocha ${debugMode ? '--debug --inspect' : ''} -r ts-node/register ${this.fileCommand(files)}`
         + ` --timeout ${config.CONST.UNIT_TEST_TIMEOUT}`
     }
     if (!command) {
@@ -62,6 +62,7 @@ export class TestRunner
         console.info(`End of testing...`);
       }
     } catch (err) {
+      console.log(err)
       let errorMessage = err?.output[2]?.toString();
       let errorMessage2 = err?.output[1]?.toString();
       errorMessage = (errorMessage || '')

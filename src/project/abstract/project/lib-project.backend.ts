@@ -243,7 +243,7 @@ export abstract class LibProject {
     const vsixPackageName = this.extensionVsixName;
     try {
       await Helpers.actionWrapper(() => {
-        this.run(`npm-run vsce package --yarn`).sync();
+        this.run(`npx vsce package --yarn`).sync();
       }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
       if (showInfo) {
         const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
@@ -526,9 +526,10 @@ export abstract class LibProject {
       PorjectClass.Tnp as Project,
       PorjectClass.From(PorjectClass.NaviCliLocation) as Project,
       PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
-    ].forEach(c => {
-      c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
-    });
+    ].filter(f => !!f)
+      .forEach(c => {
+        c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+      });
   }
 
 

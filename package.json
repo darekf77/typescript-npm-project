@@ -20,8 +20,7 @@
         "ng2-accordions": "0.0.9",
         "ng2-button-loader": "0.0.7",
         "ng2-preloader": "0.0.3",
-        "rebird-https-letsencrypt": "0.0.1",
-        "detect-mocha": "0.1.0"
+        "rebird-https-letsencrypt": "0.0.1"
       },
       "ignoreDepsPattern": [],
       "includeAsDev": [],
@@ -146,12 +145,12 @@
           "vscode"
         ],
         "common": {
-          "tnp-config": "0.0.64",
+          "tnp-config": "0.0.65",
           "tnp-models": "0.0.26",
           "tnp-helpers": "0.0.34",
           "tnp-db": "0.0.25",
           "tnp-ui": "0.0.23",
-          "tnp-core": "0.0.33",
+          "tnp-core": "0.0.34",
           "tnp-cli": "0.0.14",
           "tnp-tools": "0.0.36",
           "@types/node": "10.12.30",
@@ -244,7 +243,8 @@
             "@types/chai": "^4.1.2",
             "chai": "^4.2.0",
             "mocha": "^5.2.0",
-            "@types/mocha": "^5.2.5"
+            "@types/mocha": "^5.2.5",
+            "detect-mocha": "0.1.0"
           },
           "typescript": {
             "node-cli-test": "0.0.2",
@@ -745,8 +745,8 @@
     "systeminformation": "3.45.7",
     "task.js": "0.1.5",
     "tnp-cli": "~0.0.14",
-    "tnp-config": "~0.0.64",
-    "tnp-core": "~0.0.33",
+    "tnp-config": "~0.0.65",
+    "tnp-core": "~0.0.34",
     "tnp-db": "~0.0.25",
     "tnp-helpers": "~0.0.34",
     "tnp-models": "~0.0.26",

@@ -553,7 +553,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
 
     Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));
     try {
-      proj.run('npm-run tsc').sync(); // TODO bette algorith for stubs + npm pacakge firedev-tsc + release of all packages
+      proj.run('npx tsc').sync(); // TODO bette algorith for stubs + npm pacakge firedev-tsc + release of all packages
       // Helpers.removeFolderIfExists(path.join(proj.location, config.folder.src));
       // tsFoldersInSrc.forEach(folderLinkName => {
       //   Helpers.removeFileIfExists(path.join(proj.location, folderLinkName));

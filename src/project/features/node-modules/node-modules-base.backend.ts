@@ -36,7 +36,12 @@ export class NodeModulesBase extends NodeModulesCore {
     if (source.smartNodeModules.exists) {
       this.project.node_modules.remove();
       Helpers.mkdirp(this.project.node_modules.path);
-      Helpers.foldersFrom(source.smartNodeModules.path)
+      const packagesToLinkOrCopy = [
+        ...Helpers.foldersFrom(source.node_modules.path),
+        ...Helpers.linksToFoldersFrom(source.node_modules.path)
+      ];
+
+      packagesToLinkOrCopy
         .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
         .forEach(f => {
           const dest = path.join(this.project.node_modules.path, path.basename(f));
