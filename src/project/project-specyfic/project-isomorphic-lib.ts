@@ -237,7 +237,7 @@ export class ProjectIsomorphicLib
     this.beforeLibBuild(outDir);
 
     const webpackCommandFn = (watchCommand: boolean) =>
-      `npx webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch' : ''}`;
+      `npx webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
     const { obscure, uglify, nodts } = this.buildOptions;
@@ -250,7 +250,8 @@ export class ProjectIsomorphicLib
       this.quickFixes.overritenBadNpmPackages();
       Helpers.info(`
 
-        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''} BACKEND BUILD started...
+        WEBPACK ${this.buildOptions.watch ? 'WATCH (ONLY FOR CLI FUNCTIONS) ' : ''
+        } BACKEND BUILD started...
 
         command: ${webpackCommand}
 
@@ -268,7 +269,13 @@ export class ProjectIsomorphicLib
     if (this.buildOptions.watch) {
 
       if (outDir === 'bundle') {
-        Helpers.error(`Watch build not available for bundle build`);
+        // Helpers.error(`Watch build not available for bundle build`, false, true);
+        Helpers.info(`Starting watch bundle build for fast cli..`);
+        try {
+          this.run(webpackCommand).async();
+        } catch (er) {
+          Helpers.error(`WATCH BUNDLE build failed`, false, true);
+        }
       } else {
         await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
           {
@@ -276,7 +283,7 @@ export class ProjectIsomorphicLib
             afterInitCallBack: async () => {
               await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
             }
-          })
+          });
       }
     } else {
 
@@ -284,19 +291,14 @@ export class ProjectIsomorphicLib
         try {
           this.run(webpackCommand).sync();
 
-          const reservedNames = [
-            'reservedExpOne',
-            'reservedExpSec'
-          ];
-
           if (obscure || uglify) {
             this.compileToEs5();
           }
           if (uglify) {
-            this.uglifyCode(reservedNames)
+            this.uglifyCode(config.reservedArgumentsNamesUglify)
           };
           if (obscure) {
-            this.obscureCode(reservedNames);
+            this.obscureCode(config.reservedArgumentsNamesUglify);
           }
           if (!nodts) {
             this.compilerDeclarationFiles()

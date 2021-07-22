@@ -13,16 +13,24 @@ import { chainBuild } from './chain-build.backend';
 //#endregion
 
 //#region BUILD
+
 const $BUILD = async (args) => {
   await chainBuild(args);
 };
+
+const BUILD_DIST = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+};
+
+const BUILD_DIST_WATCH = async (args) => (Project.Current as Project)
+  .buildProcess
+  .startForLibFromArgs(false, true, 'dist', args);
 
 const $CLEAN_BUILD = async (args) => {
   args += ' --nocache';
   await BUILD_DIST(args);
 };
-
-const BUILD_DIST_WATCH = async (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
 
 const $BUILDWATCH = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -33,6 +41,7 @@ const $BUILDWATCH = async (args) => {
   await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
 
+//#region BUILD / DEFAULT
 async function $DEFAULT_BUILD(args) {
   const project = (Project.Current as Project);
   if (project.isStandaloneProject) {
@@ -48,25 +57,122 @@ async function $DEFAULT_BUILD(args) {
     process.exit(0);
   }
 }
+//#endregion
 
+//#region BUILD / ALIASES
 const BUILD_DIST_WATCH_ALL = async (args) => {
   args += ' --buildForAllClients';
 
   (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
-const BUILD_DIST = async (args) => {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
-};
+
 const BUILD_DIST_ALL = async (args) => {
   // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
   // process.exit(0)
   args += ' --buildForAllClients';
   await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
+
 const BUILD_BUNDLE = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'bundle', args);
 const BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+
+async function BUILD_LIB(args) {
+  await BUILD_DIST(args);
+}
+
+async function BD(args) {
+  await BUILD_DIST(args);
+}
+
+async function BL(args) {
+  await BUILD_DIST(args);
+}
+
+async function BB(args) {
+  await BUILD_BUNDLE(args);
+}
+
+const $BUILD_DIST_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
+const $BUILD_BUNDLE_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'bundle', args);
+const $BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+const $BUILD_BUNDLE_PROD_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, true, 'bundle', args);
+const $BUILD_APP_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+const $BUILD_APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
+const $BUILD_APP_WATCH_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
+const $START_APP = async (args) => {
+  await (Project.Current as Project).start(args);
+};
+
+const $BUILD_PROD = async (args) => {
+  if ((Project.Current as Project).typeIs(...config.allowedTypes.libs)) {
+    await (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
+  }
+  if ((Project.Current as Project).typeIs(...config.allowedTypes.app)) {
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+  }
+  process.exit(0);
+};
+const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
+const BDW = (args) => BUILD_DIST_WATCH(args);
+const BLW = (args) => BUILD_DIST_WATCH(args);
+const $BAW = (args) => BUILD_APP_WATCH(args);
+//#endregion
+
+//#region BUILD / DOCS
+async function $BUILD_DOCS(args) {
+  if ((Project.Current as Project).isStandaloneProject) {
+    await (Project.Current as Project).filesStructure.init('');
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
+  }
+  process.exit(0);
+}
+
+async function $BUILD_DOCS_PROD(args) {
+  if ((Project.Current as Project).isStandaloneProject) {
+    await (Project.Current as Project).filesStructure.init('');
+    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+  }
+  process.exit(0);
+}
+//#endregion
+
+//#region BUILD / STOP BUILD WATCH
+const $STOP_BUILD_DIST_WATCH = async (args) => {
+  const db = await TnpDB.Instance();
+  const projectLocation = (Project.Current as Project).location;
+  await db.updateProcesses();
+  const pidsToKill = (await db.getBuilds())
+    .filter(f =>
+      f.location === projectLocation
+      && f.buildOptions
+      && f.buildOptions.watch
+      && !f.buildOptions.appBuild
+    )
+    .map(f => f.pid);
+  Helpers.info(`Killing build dist process in ${projectLocation}`);
+  for (let index = 0; index < pidsToKill.length; index++) {
+    const pid = pidsToKill[index];
+    try {
+      Helpers.killProcess(pid);
+      Helpers.info(`Process killed on pid ${pid}`);
+    } catch (error) {
+      Helpers.warn(`Not able to kill process on pid ${pid}`);
+    }
+  }
+  Helpers.info('Done');
+  process.exit(0);
+};
+//#endregion
+
+//#region BUILD / SINGLUAR (deprecated)
+async function $ACTIVE_SINGULAR_BUILD(args) {
+  await (Project.Current as Project).hasParentWithSingularBuild();
+  // process.stdout.write();
+  process.exit(0);
+}
+//#endregion
+
 //#endregion
 
 //#region STATIC BUILD
@@ -220,51 +326,9 @@ const $RUN = async (args) => {
 };
 //#endregion
 
-//#region BUILD
-async function BUILD_LIB(args) {
-  await BUILD_DIST(args);
-}
-
-async function BD(args) {
-  await BUILD_DIST(args);
-}
-
-async function BL(args) {
-  await BUILD_DIST(args);
-}
-
-async function BB(args) {
-  await BUILD_BUNDLE(args);
-}
-
-const $BUILD_DIST_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
-const $BUILD_BUNDLE_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'bundle', args);
-const $BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
-const $BUILD_BUNDLE_PROD_WATCH = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, true, 'bundle', args);
-const $BUILD_APP_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
-const $BUILD_APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
-const $BUILD_APP_WATCH_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
-const $START_APP = async (args) => {
-  await (Project.Current as Project).start(args);
-};
-
-
-const $BUILD_PROD = async (args) => {
-  if ((Project.Current as Project).typeIs(...config.allowedTypes.libs)) {
-    await (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'dist', args);
-  }
-  if ((Project.Current as Project).typeIs(...config.allowedTypes.app)) {
-    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
-  }
-  process.exit(0);
-};
-const BUILD_LIB_WATCH = async (args) => BUILD_DIST_WATCH(args);
-//#endregion
-
 //#region RELEASE
 
-
-//#region RELEASE NORMAL
+//#region RELEASE / NORMAL
 const $RELEASE = async (args: string) => {
 
   //#region prepare relase args
@@ -396,7 +460,7 @@ function handleStandalone(proj: Project, argsObj: any) {
 
 //#endregion
 
-//#region RELEASE OBSCURE
+//#region RELEASE / OBSCURE
 const $RELEASE_OBSCURED = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.obscure = true;
@@ -415,10 +479,6 @@ const $RELEASE_OBSCURED = async (args) => {
 //#endregion
 
 //#region OTHER
-const BDW = (args) => BUILD_DIST_WATCH(args);
-const BLW = (args) => BUILD_DIST_WATCH(args);
-const $BAW = (args) => BUILD_APP_WATCH(args);
-
 const $RECREATE = () => {
   const proj = Project.Current;
   if (proj.isContainer) {
@@ -458,22 +518,6 @@ const $INSTALL_LOCALLY = async (args) => {
   process.exit(0);
 };
 
-async function $BUILD_DOCS(args) {
-  if ((Project.Current as Project).isStandaloneProject) {
-    await (Project.Current as Project).filesStructure.init('');
-    await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
-  }
-  process.exit(0);
-}
-
-async function $BUILD_DOCS_PROD(args) {
-  if ((Project.Current as Project).isStandaloneProject) {
-    await (Project.Current as Project).filesStructure.init('');
-    await (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
-  }
-  process.exit(0);
-}
-
 const $STOP = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current);
   if (proj) {
@@ -482,31 +526,7 @@ const $STOP = async (args) => {
   process.exit(0);
 };
 
-const $STOP_BUILD_DIST_WATCH = async (args) => {
-  const db = await TnpDB.Instance();
-  const projectLocation = (Project.Current as Project).location;
-  await db.updateProcesses();
-  const pidsToKill = (await db.getBuilds())
-    .filter(f =>
-      f.location === projectLocation
-      && f.buildOptions
-      && f.buildOptions.watch
-      && !f.buildOptions.appBuild
-    )
-    .map(f => f.pid);
-  Helpers.info(`Killing build dist process in ${projectLocation}`);
-  for (let index = 0; index < pidsToKill.length; index++) {
-    const pid = pidsToKill[index];
-    try {
-      Helpers.killProcess(pid);
-      Helpers.info(`Process killed on pid ${pid}`);
-    } catch (error) {
-      Helpers.warn(`Not able to kill process on pid ${pid}`);
-    }
-  }
-  Helpers.info('Done');
-  process.exit(0);
-};
+
 
 async function $DB_BUILDS_UPDATE() {
   const db = await TnpDB.Instance();
@@ -514,14 +534,6 @@ async function $DB_BUILDS_UPDATE() {
   process.exit(0);
 }
 
-
-
-
-async function $ACTIVE_SINGULAR_BUILD(args) {
-  await (Project.Current as Project).hasParentWithSingularBuild();
-  // process.stdout.write();
-  process.exit(0);
-}
 //#endregion
 
 export default {

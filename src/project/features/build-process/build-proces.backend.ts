@@ -167,7 +167,7 @@ inside generated projects...
       }
 
       if (buildOptions.watch) {
-        let config;
+        let config = void 0;
         while (true) {
           if (this.project.isWorkspace) {
             if (this.project.env.config) {

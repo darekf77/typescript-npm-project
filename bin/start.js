@@ -3,6 +3,7 @@
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
 Error.stackTraceLimit = 100;
+// require('cache-require-paths');
 // console.log(global.i0);
 // process.exit(0)
 
@@ -81,8 +82,8 @@ global.frameworkMode = mode;
 
 var spinnerIsDefault = !tnpNonInteractive;
 // var spinnerIsDefault = false;
- // TODO ther is issue with double '-' when executing child process
- // and probaly fix here : https://stackoverflow.com/questions/34967278/nodejs-child-process-spawn-custom-stdio
+// TODO ther is issue with double '-' when executing child process
+// and probaly fix here : https://stackoverflow.com/questions/34967278/nodejs-child-process-spawn-custom-stdio
 var startSpinner = spinnerIsDefault ?
   (!process.argv.includes('-spinner'))
   : process.argv.includes('-spinner');
@@ -92,7 +93,7 @@ if (startSpinner) {
   isNodeDebuggerEnabled = (inspector.url() !== undefined);
   startSpinner = !isNodeDebuggerEnabled;
 }
-if(startSpinner && isNaN(process.ppid)) {
+if (startSpinner && isNaN(process.ppid)) {
   startSpinner = false;
 }
 
@@ -216,8 +217,8 @@ if (startSpinner) {
     var path = require('path');
 
     //#region choose right version of js to run
-    var pathToDistFolder = path.join(__dirname, '../dist');
-    var pathToBundleFolder = path.join(__dirname, '../bundle');
+    // var pathToDistFolder = path.join(__dirname, '../dist');
+    // var pathToBundleFolder = path.join(__dirname, '../bundle');
 
     var pathToDistRun = path.join(__dirname, '../dist/index.js');
     var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
@@ -226,19 +227,18 @@ if (startSpinner) {
     var distExist = fs.existsSync(pathToDistRun);
     var bundleExist = fs.existsSync(pathToBundletRun);
 
-
     var start;
 
     if (bundleExist && distExist) {
-      if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
-        mode = 'dist';
-        !global.hideLog && console.log('- firedev dist -> becouse is newer -');
-        start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-      } else {
-        mode = 'bundle';
-        !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
-        start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-      }
+      // if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
+      //   mode = 'dist';
+      //   !global.hideLog && console.log('- firedev dist -> becouse is newer -');
+      //   start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+      // } else {
+      mode = 'bundle'; // bundle is default
+      !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
+      start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
+      // }
     } else {
       if (distExist) {
         mode = 'dist';
