@@ -101,9 +101,7 @@ export class GitActions extends FeatureForProject {
   private async repeatMenu(action: keyof GitActions, force = false) {
     await Helpers.actionWrapper(async () => {
       if (action === 'pull') {
-        await this.project.git.pullCurrentBranch(
-          // force
-        );
+        await this.project.git.pullCurrentBranch(true)
       }
       if (action === 'push') {
         await this.project.git.pushCurrentBranch(force);
@@ -139,7 +137,7 @@ export class GitActions extends FeatureForProject {
   //#region pull
   public async pull() {
     if (this.project.typeIs('navi')) {
-      await this.project.git.pullCurrentBranch();
+      await this.project.git.pullCurrentBranch(true);
       return;
     }
 
