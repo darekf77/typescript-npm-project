@@ -382,7 +382,7 @@ const $RELEASE = async (args: string) => {
 ${deps.map((p, i) => {
         const bold = (child?.name === p.name);
         const index = i + 1;
-        return `(${bold ? chalk.underline(chalk.bold(index.toString()))  : index}. ${bold ? chalk.bold(p.name) : p.name})`;
+        return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${bold ? chalk.bold(p.name) : p.name})`;
       }).join(', ')}
 
 
@@ -401,8 +401,23 @@ processing...
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
       const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
+
+      const init = async () => {
+        while (true) {
+          try {
+            await child.run(`${config.frameworkName} init`
+              + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
+              { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
+            break;
+          } catch (error) {
+            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
+          }
+        }
+      };
+
       if (!sameHashes || releaseAll) {
         while (true) {
+          await init();
           try {
             await child.run(`${config.frameworkName} release `
               + ` --automaticRelease=true --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`
@@ -420,17 +435,7 @@ processing...
 
         `); // hash in package.json to check
 
-        while (true) {
-          try {
-            await child.run(`${config.frameworkName} init`
-              + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
-              { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
-            break;
-          } catch (error) {
-            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
-          }
-        }
-
+        await init();
         // Helpers.pressKeyAndContinue();
         child.git.commit();
         await child.git.pushCurrentBranch();
