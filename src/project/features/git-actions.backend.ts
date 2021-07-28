@@ -142,7 +142,8 @@ export class GitActions extends FeatureForProject {
     }
 
     this.before();
-    if (this.project.git.thereAreSomeUncommitedChange) {
+    let uncommitedChanges = this.project.git.thereAreSomeUncommitedChange;
+    if (uncommitedChanges) {
       Helpers.warn(`
 
 
@@ -153,12 +154,21 @@ export class GitActions extends FeatureForProject {
       try {
         this.project.run(`add --all .`).sync();
       } catch (error) { }
-      this.project.run(`git stash`).sync();
+      try {
+        this.project.run(`git stash`).sync();
+      } catch (error) {
+        uncommitedChanges = false;
+      }
       // this.project.run(`code .`).async();
       // Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
     }
 
     await this.repeatMenu('pull');
+    if (uncommitedChanges) {
+      try {
+        this.project.run(`git stash apply`).sync();
+      } catch (error) { }
+    }
 
     const location = this.project.location;
     Project.unload(this.project);
