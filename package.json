@@ -511,7 +511,8 @@
   "main": "index.js",
   "bin": {
     "tnp": "bin/tnp",
-    "tnp-debug": "bin/tnp-debug"
+    "tnp-debug": "bin/tnp-debug",
+    "tnp-debug-brk": "bin/tnp-debug-brk"
   },
   "dependencies": {
     "@angular-devkit/build-angular": "0.901.3",

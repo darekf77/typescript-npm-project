@@ -497,7 +497,7 @@ EXIT /b
         } else {
           Helpers.createSymLink(localPath, destinationGlobalLink);
           const command = `chmod +x ${destinationGlobalLink}`;
-          Helpers.info(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
+          Helpers.log(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
 
           command: ${command}
           `)

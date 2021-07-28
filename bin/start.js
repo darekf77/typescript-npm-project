@@ -80,7 +80,10 @@ if (process.argv.includes('-verbose')) {
 global.start = start;
 global.frameworkMode = mode;
 
-var spinnerIsDefault = !tnpNonInteractive;
+debug = typeof v8debug === 'object'
+|| /--debug|--inspect/.test(process.execArgv.join(' '));
+console.log('debug',debug)
+var spinnerIsDefault = !debug && !tnpNonInteractive;
 // var spinnerIsDefault = false;
 // TODO ther is issue with double '-' when executing child process
 // and probaly fix here : https://stackoverflow.com/questions/34967278/nodejs-child-process-spawn-custom-stdio
