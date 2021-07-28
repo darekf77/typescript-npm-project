@@ -346,6 +346,7 @@ const $RELEASE = async (args: string) => {
 
   // `)
   const releaseAll = !!argsObj.all;
+  // const autoRelease = !!argsObj.auto;
 
   const proj = Project.Current as Project;
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -462,7 +463,11 @@ processing...
     //#endregion
   } else {
     Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease}`)
-    await proj.release(handleStandalone(proj, argsObj), !!argsObj.automaticRelease);
+    const autoRelease = !!argsObj.automaticRelease;
+    if (autoRelease) {
+      global.tnpNonInteractive = true;
+    }
+    await proj.release(handleStandalone(proj, argsObj), autoRelease);
   }
   process.exit(0);
 };
@@ -497,6 +502,11 @@ const $RELEASE_OBSCURED = async (args) => {
   process.exit(0);
 };
 //#endregion
+
+const $AUTO_RELEASE = async (args) => {
+  const auto = `--automaticRelease`
+  await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--all`), 'g'), '') + ' ' + auto);
+};
 
 //#endregion
 
@@ -611,6 +621,7 @@ export default {
   $STOP: Helpers.CLIWRAP($STOP, '$STOP'),
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
+  $AUTO_RELEASE: Helpers.CLIWRAP($AUTO_RELEASE, '$AUTO_RELEASE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
   $RELEASE_ALL: Helpers.CLIWRAP($RELEASE_ALL, '$RELEASE_ALL'),
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
