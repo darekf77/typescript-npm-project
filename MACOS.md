@@ -43,3 +43,8 @@ killall PowerChime
 chsh -s /bin/bash
 
 ```
+
+# NODE 12
+brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
+arch -x86_64 brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
+

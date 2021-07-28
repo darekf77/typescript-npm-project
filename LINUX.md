@@ -96,7 +96,3 @@ useradd dariusz
  xdg-open "$1" &> /dev/null &
 
 ```
-
-
-# NODE 12
-brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
