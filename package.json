@@ -231,8 +231,7 @@
             "incremental-compiler": "1.1.29",
             "open": "7.2.1",
             "sharp": "0.23.3",
-            "@types/sharp": "0.23.1",
-            "svg-png-converter": "0.0.9"
+            "@types/sharp": "0.23.1"
           },
           "sockets": {
             "@types/socket.io-client": "^1.4.32",
@@ -348,7 +347,7 @@
             },
             "build-tools": {
               "concurrently": "^3.5.1",
-              "node-sass": "^4.7.2",
+              "node-sass": "^4.12.0",
               "gulp-inline-ng2-template": "^4.1.0",
               "autoprefixer": "^6.5.3",
               "babel-cli": "^6.26.0",
@@ -704,7 +703,7 @@
     "node-cli-tester": "~0.0.5",
     "node-localstorage": "2.1.6",
     "node-notifier": "6.0.0",
-    "node-sass": "4.7.2",
+    "node-sass": "^4.14.1",
     "nodemailer": "6.6.1",
     "nodemon": "1.14.11",
     "npm-get-dependents": "1.0.1",
@@ -741,7 +740,6 @@
     "static-columns": "~1.0.20",
     "string-similarity": "4.0.2",
     "sudo-block": "3.0.0",
-    "svg-png-converter": "0.0.9",
     "systeminformation": "3.45.7",
     "task.js": "0.1.5",
     "tnp-cli": "~0.0.14",

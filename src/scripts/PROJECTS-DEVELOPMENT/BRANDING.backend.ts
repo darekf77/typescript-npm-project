@@ -4,7 +4,7 @@ import { fse } from 'tnp-core'
 import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
 import * as sharp from 'sharp';
-import { png2svg } from 'svg-png-converter';
+// import { png2svg } from 'svg-png-converter';
 
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
@@ -21,15 +21,19 @@ export async function $BRANDING(args: string, exit = true) {
   };
 
   Helpers.log('Generation svg...');
-
-  let { content } = await png2svg({
-    tracer: 'imagetracer',
-    optimize: true,
-    input: fse.readFileSync(path.join(proj.location, config.pathes.logoPng)),
-    numberofcolors: 24,
-    pathomit: 1,
-  } as any)
-  fse.writeFileSync(config.pathes.logoSvg, content)
+  // TODO  node 12 problem on M1
+  /**
+   *  Symbol not found: _cairo_fill
+  Referenced from: /Users/dfilipiak/projects/npm/tnp/node_modules/canvas/build/Release/canvas.node
+   */
+  // let { content } = await png2svg({
+  //   tracer: 'imagetracer',
+  //   optimize: true,
+  //   input: fse.readFileSync(path.join(proj.location, config.pathes.logoPng)),
+  //   numberofcolors: 24,
+  //   pathomit: 1,
+  // } as any)
+  // fse.writeFileSync(config.pathes.logoSvg, content)
 
   Helpers.log('Generation favicons...');
   Helpers.writeFile(path.join(proj.location, pathes.favicondesc), faviconsDesc());

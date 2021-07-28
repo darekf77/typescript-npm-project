@@ -6,7 +6,9 @@ wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh |
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-nvm install 9.4 && npm install -g npm
+nvm install 9.4
+nvm alias default node
+npm install -g npm
 npm install -g check-node-version npm-run@4.1.2 rimraf cpr renamer nodemon typescript@3.8.3
 npm link
 ssh-keygen -t rsa -b 4096 -C "darekf77@gmail.com" && cat ~/.ssh/id_rsa.pub
@@ -94,3 +96,7 @@ useradd dariusz
  xdg-open "$1" &> /dev/null &
 
 ```
+
+
+# NODE 12
+brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
