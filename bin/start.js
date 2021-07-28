@@ -80,22 +80,28 @@ if (process.argv.includes('-verbose')) {
 global.start = start;
 global.frameworkMode = mode;
 
-debug = typeof v8debug === 'object'
-|| /--debug|--inspect/.test(process.execArgv.join(' '));
+// debug = typeof v8debug === 'object'
+// || /--debug|--inspect/.test(process.execArgv.join(' '));
 // console.log('debug',debug)
-var spinnerIsDefault = !debug && !tnpNonInteractive;
+var spinnerIsDefault = !tnpNonInteractive;
+
+var isNodeDebuggerEnabled = false;
+if (spinnerIsDefault) {
+  const inspector = require('inspector');
+  isNodeDebuggerEnabled = (inspector.url() !== undefined);
+  spinnerIsDefault = !isNodeDebuggerEnabled;
+}
+// console.log(`spinnerIsDefault: ${spinnerIsDefault}`)
+// console.log(`isNodeDebuggerEnabled: ${isNodeDebuggerEnabled}`)
 // var spinnerIsDefault = false;
 // TODO ther is issue with double '-' when executing child process
 // and probaly fix here : https://stackoverflow.com/questions/34967278/nodejs-child-process-spawn-custom-stdio
 var startSpinner = spinnerIsDefault ?
   (!process.argv.includes('-spinner'))
   : process.argv.includes('-spinner');
-var isNodeDebuggerEnabled = false;
-if (startSpinner) {
-  const inspector = require('inspector');
-  isNodeDebuggerEnabled = (inspector.url() !== undefined);
-  startSpinner = !isNodeDebuggerEnabled;
-}
+
+// TODO
+
 if (startSpinner && isNaN(process.ppid)) {
   startSpinner = false;
 }
@@ -136,7 +142,7 @@ if (startSpinner) {
   };
 
 
-  const command = `${!!frameworkName ? frameworkName : 'tnp'}${isNodeDebuggerEnabled ? '-debug' : ''}`;
+  const command = `${!!frameworkName ? frameworkName : 'tnp'}`;
   const argsToCHildProc = `${orgArgv.slice(2).join(' ')} ${spinnerIsDefault ? '-spinner' : ''}`.split(' ');
   // !global.hideLog && console.log(`worker command: ${command} ${argsToCHildProc.join(' ')}`);
   const proc = spawn(command,
