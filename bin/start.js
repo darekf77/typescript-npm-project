@@ -82,7 +82,7 @@ global.frameworkMode = mode;
 
 debug = typeof v8debug === 'object'
 || /--debug|--inspect/.test(process.execArgv.join(' '));
-console.log('debug',debug)
+// console.log('debug',debug)
 var spinnerIsDefault = !debug && !tnpNonInteractive;
 // var spinnerIsDefault = false;
 // TODO ther is issue with double '-' when executing child process
