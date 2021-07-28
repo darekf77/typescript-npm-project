@@ -328,6 +328,11 @@ const $RUN = async (args) => {
 
 //#region RELEASE
 
+const $RELEASE_ALL = async (args: string) => {
+  const all = `--all`
+  await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--all`), 'g'), '') + ' ' + all);
+};
+
 //#region RELEASE / NORMAL
 const $RELEASE = async (args: string) => {
 
@@ -340,6 +345,7 @@ const $RELEASE = async (args: string) => {
   // ${Helpers.stringify(argsObj)}
 
   // `)
+  const releaseAll = !!argsObj.all;
 
   const proj = Project.Current as Project;
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -376,7 +382,7 @@ const $RELEASE = async (args: string) => {
 ${deps.map((p, i) => {
         const bold = (child?.name === p.name);
         const index = i + 1;
-        return `(${bold ? chalk.bold(index.toString()) : index}. ${bold ? chalk.bold(p.name) : p.name})`;
+        return `(${bold ? chalk.underline(chalk.bold(index.toString()))  : index}. ${bold ? chalk.bold(p.name) : p.name})`;
       }).join(', ')}
 
 
@@ -395,12 +401,12 @@ processing...
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
       const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
-      if (!sameHashes) {
+      if (!sameHashes || releaseAll) {
         while (true) {
           try {
             await child.run(`${config.frameworkName} release `
               + ` --automaticRelease=true --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`
-              , { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
+              , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).asyncAsPromise();
             // await child.release(handleStandalone(child, {}), true);
             break;
           } catch (error) {
@@ -410,10 +416,21 @@ processing...
       } else {
         Helpers.warn(`
 
-        RELEASE SKIP
-        No realase needed for ${chalk.bold(child.name)} ..just pushing to git...
+        No realase needed for ${chalk.bold(child.name)} ..just initing and pushing to git...
 
         `); // hash in package.json to check
+
+        while (true) {
+          try {
+            await child.run(`${config.frameworkName} init`
+              + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
+              { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
+            break;
+          } catch (error) {
+            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
+          }
+        }
+
         // Helpers.pressKeyAndContinue();
         child.git.commit();
         await child.git.pushCurrentBranch();
@@ -590,6 +607,7 @@ export default {
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
+  $RELEASE_ALL: Helpers.CLIWRAP($RELEASE_ALL, '$RELEASE_ALL'),
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
