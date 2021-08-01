@@ -24,7 +24,7 @@ export class TestRunner
     // console.log('files',files)
     const useFiles = (_.isArray(files) && files.length > 0);
     const ext = (files.length > 1 || (!_.first(files).endsWith('.spec.ts'))) ? '*.spec.ts' : ''
-    const res = `${useFiles ? `src/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}` : 'src/**/*.spec.ts'}`
+    const res = `${useFiles ? `src/tests/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}` : 'src/**/*.spec.ts'}`
     return res;
   }
 
@@ -65,6 +65,8 @@ export class TestRunner
       console.log(err)
       let errorMessage = err?.output[2]?.toString();
       let errorMessage2 = err?.output[1]?.toString();
+      // Helpers.error(errorMessage, true, false);
+      // Helpers.error(errorMessage2, true, false);
       errorMessage = (errorMessage || '')
       errorMessage = errorMessage.replace(_.first(errorMessage.split('TSError:')), '');
 
