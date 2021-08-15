@@ -496,7 +496,7 @@
     "ugly": true
   },
   "scripts": {
-    "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
+    "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
   "license": "MIT",
   "private": false,

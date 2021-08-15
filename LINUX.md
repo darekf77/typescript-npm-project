@@ -1,3 +1,8 @@
+# mount samba share as disk
+```
+sudo mount -t cifs -o username=myUsername,password=myPassword,uid=$(id -u),gid=$(id -g),forceuid,forcegid //192.168.10.100/public /media/sharename
+```
+
 ```
 sudo apt-get update && sudo apt-get upgrade
 
