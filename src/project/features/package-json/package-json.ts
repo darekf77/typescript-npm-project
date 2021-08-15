@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { fse, json5 } from 'tnp-core'
 import { path, crossPlatformPath } from 'tnp-core'
 import chalk from 'chalk';
 import { PackageJsonBase } from './package-json-base.backend';
@@ -51,35 +51,45 @@ export class PackageJSON
     const filePath = {
       packgeJson: crossPlatformPath(path.join(location, config.file.package_json)),
       tnpJson: crossPlatformPath(path.join(location, config.file.package_json__tnp_json)),
+      tnpJson5: crossPlatformPath(path.join(location, config.file.package_json__tnp_json5)),
     };
 
     let saveAtLoad = false;
-    if (!Helpers.exists(filePath.packgeJson) && Helpers.exists(filePath.tnpJson)) {
-      const tnpData = Helpers.readJson(filePath.tnpJson, void 0) as Models.npm.TnpData;
-      if (!tnpData) {
-        // warn(`No package.json (and bad package.json_tnp) in folder: ${path.basename(location)}`)
-        return;
+    if (!Helpers.exists(filePath.packgeJson)) {
+      if (Helpers.exists(filePath.tnpJson5)) {
+        const currentJSON5jsontnp = Helpers.readJson(filePath.tnpJson5, void 0, true);
+        if (currentJSON5jsontnp) {
+          Helpers.writeJson(filePath.tnpJson, currentJSON5jsontnp);
+        }
       }
-      Helpers.info(`Recreating ${chalk.bold(path.basename(location))}/package.json from ${config.file.package_json__tnp_json} and npm registry...`);
-      if (Helpers.isLink(filePath.packgeJson)) {
-        Helpers.error('pizda')
+      if (Helpers.exists(filePath.tnpJson)) {
+        const tnpData = Helpers.readJson(filePath.tnpJson, void 0) as Models.npm.TnpData;
+        if (!tnpData) {
+          // warn(`No package.json (and bad package.json_tnp) in folder: ${path.basename(location)}`)
+          return;
+        }
+        Helpers.info(`Recreating ${chalk.bold(path.basename(location))}/package.json from ${config.file.package_json__tnp_json} and npm registry...`);
+        if (Helpers.isLink(filePath.packgeJson)) {
+          Helpers.error('pizda')
+        }
+        const nameFromFolder = path.basename(filePath.packgeJson);
+        let lastVersionFromNpm: string;
+        try {
+          lastVersionFromNpm = Helpers.run(`npm show ${nameFromFolder} version`
+            , { output: false }).sync().toString().trim();
+        } catch (error) {
+          Helpers.warn(`Not able to get last version of project: ${nameFromFolder} from npm registry...`)
+        }
+        const newPackageJson: Models.npm.IPackageJSON = {
+          version: lastVersionFromNpm,
+          name: nameFromFolder
+        } as any;
+        OVERRIDE_FROM_TNP.forEach(key => {
+          newPackageJson[key] = tnpData[key];
+        });
+        Helpers.writeFile(filePath.packgeJson, newPackageJson);
       }
-      const nameFromFolder = path.basename(filePath.packgeJson);
-      let lastVersionFromNpm: string;
-      try {
-        lastVersionFromNpm = Helpers.run(`npm show ${nameFromFolder} version`
-          , { output: false }).sync().toString().trim();
-      } catch (error) {
-        Helpers.warn(`Not able to get last version of project: ${nameFromFolder} from npm registry...`)
-      }
-      const newPackageJson: Models.npm.IPackageJSON = {
-        version: lastVersionFromNpm,
-        name: nameFromFolder
-      } as any;
-      OVERRIDE_FROM_TNP.forEach(key => {
-        newPackageJson[key] = tnpData[key];
-      });
-      Helpers.writeFile(filePath.packgeJson, newPackageJson);
+
     }
 
 
@@ -88,25 +98,35 @@ export class PackageJSON
       return;
     }
     const existed = {};
-    config.packageJsonSplit.forEach(c => {
-      const filePathSplitTnp = path.join(location, c);
+    config.packageJsonSplit
+      .filter(f => !f.endsWith('.json5'))
+      .forEach(c => {
+        const filePathSplitTnp = path.join(location, c);
 
-      // let existedTnp = void 0;
-      if (fse.existsSync(filePathSplitTnp)) {
-        try {
-          const additionalSplitValue = Helpers.readJson(filePathSplitTnp, void 0);
-          if (_.isObject(additionalSplitValue) && Object.keys(additionalSplitValue).length > 0) {
-            existed[c] = additionalSplitValue as any;
-          } else {
-            // Helpers.warn(`[package-json] wrong content of ${c} in ${filePathSplitTnp}`)
+        // let existedTnp = void 0;
+        if (fse.existsSync(filePathSplitTnp)) {
+          try {
+            const filePathSplitTnpJSON5 = `${filePathSplitTnp}5`;
+            const json5VersionExists = fse.existsSync(filePathSplitTnpJSON5);
+
+            const additionalSplitValue = Helpers.readJson(
+              json5VersionExists ? filePathSplitTnpJSON5 : filePathSplitTnp,
+              void 0,
+              json5VersionExists
+            );
+
+            if (_.isObject(additionalSplitValue) && Object.keys(additionalSplitValue).length > 0) {
+              existed[c] = additionalSplitValue as any;
+            } else {
+              // Helpers.warn(`[package-json] wrong content of ${c} in ${filePathSplitTnp}`)
+            }
+          } catch (error) {
+            // Helpers.warn(`[package-json] not able to read: ${c}`)
           }
-        } catch (error) {
-          // Helpers.warn(`[package-json] not able to read: ${c}`)
+        } else {
+          saveAtLoad = true;
         }
-      } else {
-        saveAtLoad = true;
-      }
-    })
+      })
 
 
     try {
@@ -164,7 +184,7 @@ export class PackageJSON
           saveAtLoad = true;
         }
         if (!_.isArray(json.tnp.overrided.ignoreDepsPattern)) {
-          json.tnp.overrided.ignoreDepsPattern = ["*"];
+          json.tnp.overrided.ignoreDepsPattern = ['*'];
           saveAtLoad = true;
         }
         if (_.isUndefined(json.tnp.overrided.includeAsDev)) {

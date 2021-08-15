@@ -11,6 +11,21 @@ import { config, ConfigModels } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
+function clenIgnored(project: Project, deps: Object, overrided = {}) {
+  if (_.isArray(project.packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
+    const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
+    patterns.forEach(p => {
+      Object.keys(deps).forEach(depName => {
+        Helpers.log(`check patter: ${p} agains ${depName}`);
+        const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(p)));
+        if (patternRegex.test(depName) && !overrided[depName]) {
+          delete deps[depName];
+        }
+      })
+    });
+  }
+}
+
 //#region find npm version range
 export function findVersionRange(rootProject: Project, dependency: Project | string) {
   let result: string;
@@ -295,6 +310,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     if (project.isTnp) {
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
+      clenIgnored(project, project.packageJson.data.dependencies, {});
     } else {
       project.packageJson.data.devDependencies = devDependencies;
       project.packageJson.data.dependencies = dependencies;
@@ -489,22 +505,9 @@ function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFrom
     });
     return;
   }
+  clenIgnored(project, deps, overrided);
 
-  if (project.packageJson.data.tnp &&
-    project.packageJson.data.tnp.overrided &&
-    _.isArray(project.packageJson.data.tnp.overrided.ignoreDepsPattern)) {
-    const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
-    patterns.forEach(p => {
-      Object.keys(deps).forEach(depName => {
-        Helpers.log(`check patter: ${p} agains ${depName}`);
-        const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(p)));
-        if (patternRegex.test(depName) && !overrided[depName]) {
-          deps[depName] = undefined;
-        }
-      })
-    })
 
-  }
 }
 //#endregion
 

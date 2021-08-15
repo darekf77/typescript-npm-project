@@ -19,9 +19,22 @@
       "ng2-accordions": "1.0.14",
       "ng2-button-loader": "0.0.10",
       "ng2-preloader": "1.0.8",
-      "rebird-https-letsencrypt": "0.0.4"
+      "rebird-https-letsencrypt": "0.0.4",
+      "node-sass": "^4.7.2"
     },
-    "ignoreDepsPattern": [],
+    "ignoreDepsPattern": [
+      "base-model-wrap",
+      "http-socket-proxy-router",
+      "angular2-example-http-login",
+      "edit-table",
+      "loading-info",
+      "ng2-preloader",
+      "ng2-accordions",
+      "ng2-button-loader",
+      "ng2-rest-swagger-generator",
+      "isomorphic-storage",
+      "rebird-https-letsencrypt"
+    ],
     "includeAsDev": [],
     "includeOnly": [],
     "linkedFolders": []
@@ -346,7 +359,6 @@
           },
           "build-tools": {
             "concurrently": "^3.5.1",
-            "node-sass": "^4.7.2",
             "gulp-inline-ng2-template": "^4.1.0",
             "autoprefixer": "^6.5.3",
             "babel-cli": "^6.26.0",

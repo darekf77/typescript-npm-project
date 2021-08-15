@@ -311,10 +311,17 @@ export class FilesRecreator extends FeatureForProject {
                 }
                 project.projectLinkedFiles().forEach(({ relativePath }) => {
                   s['files.exclude'][relativePath] = true;
-                })
-                self.filesIgnoredBy.vscodeSidebarFilesView.map(f => {
-                  s['files.exclude'][f] = true
-                })
+                }),
+                  [
+                    ...self.filesIgnoredBy.vscodeSidebarFilesView,
+                    ...(
+                      Helpers.exists([self.project.location, config.file.package_json__tnp_json5])
+                        ? [config.file.package_json__tnp_json]
+                        : []
+                    )
+                  ].map(f => {
+                    s['files.exclude'][f] = true;
+                  })
                 if (project.isCoreProject) {
                   s['files.exclude']["**/*.filetemplate"] = true;
                   s['files.exclude']["**/tsconfig.*"] = true;

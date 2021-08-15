@@ -2,6 +2,7 @@
 import { fse, CoreConfig } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
+import * as json5Write from 'json5-writer';
 import { _ } from 'tnp-core';
 import * as semver from 'semver';
 import chalk from 'chalk';
@@ -300,24 +301,42 @@ export class PackageJsonCore {
       return;
     }
 
-    config.packageJsonSplit.forEach(c => {
-      const property = c
+    config.packageJsonSplit.forEach(resultFileName => {
+
+      const property = resultFileName
         .replace(`${config.file.package_json}_`, '')
+        .replace(`.json5`, '')
         .replace(`.json`, '');
+
       const obj = this.data[property];
-      const splitPath = path.join(path.dirname(this.path), c);
+      const splitPath = path.join(path.dirname(this.path), resultFileName);
       Helpers.log(`splitPath: ${splitPath}`, 2);
-      Helpers.writeFile(splitPath, _.isObject(obj) ? obj : {});
+      const dataToWrite = _.isObject(obj) ? obj : {};
+      if (resultFileName.endsWith('.json5')) {
+        if (Helpers.exists(splitPath)) {
+          const current = Helpers.readJson(splitPath, void 0, true);
+          if (current) {
+            const writer = json5Write.load(Helpers.readFile(splitPath));
+            writer.write(dataToWrite);
+            Helpers.writeFile(splitPath, writer.toSource());
+          }
+        }
+      } else {
+        Helpers.writeJson(splitPath, dataToWrite);
+      }
+
     });
-    Helpers.log(`Split done..`, 2)
+    Helpers.log(`Split done..`, 2);
     if (removeFromPj) {
       const dataToWrite = _.cloneDeep(this.data);
-      config.packageJsonSplit.forEach(c => {
-        const property = c
-          .replace(`${config.file.package_json}_`, '')
-          .replace(`.json`, '');
-        delete dataToWrite[property];
-      });
+      config.packageJsonSplit
+        .filter(c => c.endsWith('.json5'))
+        .forEach(c => {
+          const property = c
+            .replace(`${config.file.package_json}_`, '')
+            .replace(`.json`, '');
+          delete dataToWrite[property];
+        });
       Helpers.writeFile(this.path, _.isObject(dataToWrite) ? dataToWrite : {});
     } else {
       Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});

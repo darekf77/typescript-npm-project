@@ -11,6 +11,7 @@ import { config } from 'tnp-config';
 import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { Morphi } from 'morphi';
+import { $VSCODE_TEMP_HIDE, $VSCODE_TEMP_SHOW } from '../VSCODE-EXT/VSCODE.backend';
 //#endregion
 
 //#region copyto
@@ -197,6 +198,11 @@ function DEPS_SHOW(args: string) {
 }
 
 const SHOW_DEPS = (args) => DEPS_SHOW(args);
+const SHOW = (args) => {
+  DEPS_SHOW(args);
+  $VSCODE_TEMP_SHOW(args);
+  Helpers.info('Done')
+};
 
 function DEPS_HIDE(args: string) {
   if ((Project.Current as Project).isCoreProject) {
@@ -208,6 +214,12 @@ function DEPS_HIDE(args: string) {
 }
 
 const HIDE_DEPS = (args) => DEPS_HIDE(args);
+
+const HIDE = (args) => {
+  DEPS_HIDE(args);
+  $VSCODE_TEMP_HIDE(args);
+  Helpers.info('Done')
+};
 
 function $INSTALL_IN_TNP() {
   const inTnp = path.join((Project.Tnp as Project).location, config.folder.node_modules, (Project.Current as Project).name);
@@ -747,6 +759,8 @@ export default {
   $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
   $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
+  SHOW: Helpers.CLIWRAP(SHOW, 'SHOW'),
+  HIDE: Helpers.CLIWRAP(HIDE, 'HIDE'),
   SHOW_DEPS: Helpers.CLIWRAP(SHOW_DEPS, 'SHOW_DEPS'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
   $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
