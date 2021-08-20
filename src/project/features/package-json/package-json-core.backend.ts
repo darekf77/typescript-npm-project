@@ -313,13 +313,11 @@ export class PackageJsonCore {
       Helpers.log(`splitPath: ${splitPath}`, 2);
       const dataToWrite = _.isObject(obj) ? obj : {};
       if (resultFileName.endsWith('.json5')) {
-        if (Helpers.exists(splitPath)) {
-          const current = Helpers.readJson(splitPath, void 0, true);
-          if (current) {
-            const writer = json5Write.load(Helpers.readFile(splitPath));
-            writer.write(dataToWrite);
-            Helpers.writeFile(splitPath, writer.toSource());
-          }
+        const current = Helpers.exists(splitPath) && Helpers.readJson(splitPath, void 0, true);
+        if (current && _.keys(current).length > 0) {
+          const writer = json5Write.load(Helpers.readFile(splitPath));
+          writer.write(dataToWrite);
+          Helpers.writeFile(splitPath, writer.toSource());
         }
       } else {
         Helpers.writeJson(splitPath, dataToWrite);

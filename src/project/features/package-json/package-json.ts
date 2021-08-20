@@ -58,8 +58,10 @@ export class PackageJSON
     if (!Helpers.exists(filePath.packgeJson)) {
       if (Helpers.exists(filePath.tnpJson5)) {
         const currentJSON5jsontnp = Helpers.readJson(filePath.tnpJson5, void 0, true);
-        if (currentJSON5jsontnp) {
+        if (currentJSON5jsontnp && _.keys(currentJSON5jsontnp).length > 0) {
           Helpers.writeJson(filePath.tnpJson, currentJSON5jsontnp);
+        } else {
+          Helpers.removeFileIfExists(filePath.tnpJson5);
         }
       }
       if (Helpers.exists(filePath.tnpJson)) {
@@ -109,11 +111,15 @@ export class PackageJSON
             const filePathSplitTnpJSON5 = `${filePathSplitTnp}5`;
             const json5VersionExists = fse.existsSync(filePathSplitTnpJSON5);
 
-            const additionalSplitValue = Helpers.readJson(
-              json5VersionExists ? filePathSplitTnpJSON5 : filePathSplitTnp,
-              void 0,
-              json5VersionExists
-            );
+            let additionalSplitValue: any;
+            const json5AdditionaValue = json5VersionExists && Helpers.readJson(filePathSplitTnpJSON5, void 0, true);
+
+            if (json5AdditionaValue && _.keys(json5AdditionaValue).length > 0) {
+              additionalSplitValue = json5AdditionaValue;
+            } else {
+              Helpers.removeFileIfExists(filePathSplitTnpJSON5);
+              additionalSplitValue = Helpers.readJson(filePathSplitTnp, void 0);
+            }
 
             if (_.isObject(additionalSplitValue) && Object.keys(additionalSplitValue).length > 0) {
               existed[c] = additionalSplitValue as any;
