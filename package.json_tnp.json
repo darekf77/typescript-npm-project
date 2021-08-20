@@ -177,7 +177,7 @@
         "content-type": "^1.0.4",
         "axios": "^0.17.1",
         "ng-talkback": "2.4.16",
-        "magic-renamer": "0.0.9",
+        "magic-renamer": "0.0.11",
         "vpn-split": "0.0.9",
         "node-cli-tester": "0.0.9",
         "strings": {
