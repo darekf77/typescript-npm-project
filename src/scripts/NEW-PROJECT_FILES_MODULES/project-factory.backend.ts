@@ -256,7 +256,7 @@ export class ProjectFactory {
           await newCreatedProject.filesStructure.init(argsForInit);
         }
       }
-      if (newCreatedProject.parent.isContainer && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
+      if (newCreatedProject.parent?.isContainer && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
         newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
         newCreatedProject.parent.packageJson.save('updating container linked projects');
         if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
