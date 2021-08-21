@@ -155,7 +155,7 @@ export class Project extends $Project<Project>
   constructor(location?: string) {
     super();
     this.location = crossPlatformPath(_.isString(location) ? location : '');
-    if (!global.codePurposeBrowser) {
+    if (!global.codePurposeBrowser) { // TODO when on weird on node 12
       this.defineProperty('compilerCache', CompilerCache);
       this.cache = {};
       this.packageJson = PackageJSON.fromProject(this);

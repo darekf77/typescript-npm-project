@@ -53,6 +53,7 @@ export class PackageJsonBase extends PackageJsonCore {
   }
 
   public updateHooks() {
+    Helpers.log('[package json] updating hooks')
     if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks['pre-push']))) {
       this.data.husky = {
         hooks: {
@@ -61,6 +62,7 @@ export class PackageJsonBase extends PackageJsonCore {
       };
       this.save('Update hooks');
     }
+    Helpers.log('[package json] updating hooks done')
   }
 
   private prepareForSave(action: 'save' | 'show' | 'hide' = 'save', caller?: Project) {

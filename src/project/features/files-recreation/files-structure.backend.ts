@@ -90,6 +90,7 @@ export class FilesStructure extends FeatureForProject {
         this.project.packageJson.updateHooks()
       }
       this.project.notAllowedFiles().forEach(f => {
+        // Helpers.log(`[init] removing not allowed ${path.basename(f)}`)
         Helpers.removeFileIfExists(path.join(this.project.location, f));
       });
     }
@@ -102,7 +103,9 @@ export class FilesStructure extends FeatureForProject {
       recrusive = true;
     }
 
+    Helpers.log(`[init] __initProcedure start for  ${this.project.genericName} `)
     await this.project.__initProcedure();
+    Helpers.log(`[init] __initProcedure end for  ${this.project.genericName} `)
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (env) {
@@ -120,10 +123,11 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    Helpers.log(`[init] adding project is not exists...`)
+    Helpers.log(`[init] adding project is not exists... (${this.project.genericName}) `)
     const db = await TnpDB.Instance();
+    // Helpers.log(`[init] db initined... `)
     await db.addProjectIfNotExist(this.project as any);
-    Helpers.log(`[init] adding project is not exists...done`)
+    Helpers.log(`[init] adding project is not exists...done (${this.project.genericName})  `)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);

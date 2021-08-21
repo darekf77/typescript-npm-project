@@ -128,7 +128,9 @@ export class ProjectFactory {
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
     await baseline.reset();
+    Helpers.log('[create] Baseline reset done')
     await baseline.filesStructure.init(` --recrusive `);
+    Helpers.log('[create] Baseline init done')
     // await baseline.run(`${config.frameworkName} reset && ${config.frameworkName} init --recrusive`, {
     //   prefix: chalk.bold(`[ INITING BASELINE ${baseline.genericName} ]`)
     // }).asyncAsPromise();

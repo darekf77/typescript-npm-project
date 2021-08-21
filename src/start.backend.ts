@@ -60,6 +60,11 @@ import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import scriptsFnArr from './scripts/index';
 
+import axios from 'axios';
+/**
+ * ISSUE larget http request sometime are failing ... but with second try everying is OK
+ */
+axios.defaults.timeout = config.CONST.BACKEND_HTTP_REQUEST_TIMEOUT; // TODO QUICK_FIX
 
 import chalk from 'chalk';
 import { Project } from './project';

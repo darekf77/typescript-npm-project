@@ -92,6 +92,7 @@ export class QuickFixes extends FeatureForProject {
   }
 
   public missingAngularLibFiles() {
+    Helpers.log(`[quick fixes] missing angular lib fles start`)
     if (this.project.typeIs('angular-lib')) {
       const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
       if (!fse.existsSync(indexTs)) {
@@ -108,6 +109,7 @@ export class QuickFixes extends FeatureForProject {
         `.trimLeft())
       }
     }
+    Helpers.log(`[quick fixes] missing angular lib fles end`)
   }
 
   badTypesInNodeModules() {
@@ -229,6 +231,7 @@ export default _default;
   }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
+    Helpers.log(`[quick fixes] missing source folder start`)
     if (!fse.existsSync(this.project.location)) {
       return;
     }
@@ -309,6 +312,7 @@ export default _default;
       }
 
     }
+    Helpers.log(`[quick fixes] missing source folder end`)
   }
 
   public get nodeModulesReplacementsZips() {
