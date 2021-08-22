@@ -87,7 +87,9 @@ export class Region {
       line.slice(0, indexOfRegion + regionWord.length),
       ''
     );
-    return line.replace('-->', '');
+    return line
+      .replace('-->', '')
+      .replace('<!--', ''); // TODO not necessery ?
   }
 
   public toString() {

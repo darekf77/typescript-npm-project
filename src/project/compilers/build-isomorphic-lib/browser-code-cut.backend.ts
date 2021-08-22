@@ -140,12 +140,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
     if (fse.existsSync(htmlTemplatePath)) {
 
+      replacement = RegionRemover.from(htmlTemplatePath, Helpers.readFile(htmlTemplatePath), this.options.replacements, this.project).output;
       // console.log(`regex: ${regex}`)
-      replacement = Helpers.readFile(htmlTemplatePath);
+      // replacement = Helpers.readFile(htmlTemplatePath);
 
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
-        <!-- html tmeplate is empty: ${path.basename(htmlTemplatePath)} -->
+        <!-- html template is empty: ${path.basename(htmlTemplatePath)} -->
         `;
       }
     } else if (!orginalFileExists) {
@@ -172,7 +173,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (fse.existsSync(cssFilePath)) {
 
       // console.log(`regex: ${regex}`)
-      replacement = Helpers.readFile(cssFilePath);
+      replacement = RegionRemover.from(cssFilePath, Helpers.readFile(cssFilePath), this.options.replacements, this.project).output;
       if (!_.isString(replacement) || replacement.trim() === '') {
         replacement = `
         /* css file is empty: ${path.basename(cssFilePath)} */
@@ -207,7 +208,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     /* file ${path.basename(scssFilePath)} does not exist */
   `;
     if (fse.existsSync(scssFilePath)) {
-      const contentScss = Helpers.readFile(scssFilePath);
+      const contentScss = RegionRemover.from(scssFilePath, Helpers.readFile(scssFilePath), this.options.replacements, this.project).output;
       // this.debugging && console.log(`content of file:\n${contentScss}`)
 
       if (contentScss.trim() !== '') {
@@ -376,10 +377,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region replace regions for isomorphic-lib/angular-lib
+  private options: Models.dev.ReplaceOptionsExtended;
   // @ts-ignore
   replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
-
     options = _.clone(options);
+    this.options = options;
     // console.log('options.replacements', options.replacements)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
