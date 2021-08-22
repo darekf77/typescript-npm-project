@@ -25,9 +25,10 @@ export abstract class FolderProject {
   //#region @backend
 
   // @ts-ignore
-  get linkedProjects(this: Project): Project[] {
+  get linkedProjectsExisted(this: Project): Project[] {
     return this.packageJson.linkedProjects
-      .map(f => { // // .filter(f => !Helpers.isValidGitRepuUrl(f))
+      .filter(f => !Helpers.isValidGitRepuUrl(f))
+      .map(f => {
         const p = path.join(this.location, f);
         const proj = $Project.From(p) as Project;
         return proj;

@@ -179,7 +179,7 @@
         "ng-talkback": "2.4.17",
         "magic-renamer": "0.0.12",
         "vpn-split": "0.0.10",
-        "node-cli-tester": "0.0.12",
+        "node-cli-tester": '0.0.15',
         "strings": {
           "@types/diff": "^3.2.2",
           "diff": "^3.2.0",

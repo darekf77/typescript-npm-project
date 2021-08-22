@@ -294,6 +294,11 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         }
       });
 
+    if (project.packageJson.data.tnp.overrided.includeOnly.includes('tnp')) {
+      dependencies['tnp'] = `~${Project.Tnp?.version}`;
+    }
+
+
     keyToDeleteDeps.forEach(key => {
       delete dependencies[key];
     });

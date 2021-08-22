@@ -89,7 +89,7 @@ export class GitActions extends FeatureForProject {
       ...this.project.children.filter(c => {
         return this.project.packageJson.linkedProjects.includes(c.name);
       }),
-      ...this.project.linkedProjects,
+      ...this.project.linkedProjectsExisted,
     ];
 
     childrenToPush = childrenToPush.filter(f => !!f);
