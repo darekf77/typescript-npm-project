@@ -35,7 +35,7 @@ export class NodeModulesCore extends FeatureForProject {
     Helpers.tryRemoveDir(this.path)
   };
   public linkToProject = (target: Project) => {
-    if (!this.project.node_modules.exist) {
+    if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
       this.project.run(`${config.frameworkName} install`).sync();
     }
     Helpers.createSymLink(this.path, target.node_modules.path)

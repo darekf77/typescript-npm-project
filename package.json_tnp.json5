@@ -447,6 +447,7 @@
             "npm-run": "^4.1.2"
           },
           "database": {
+            // "sqlite3": "4.0.9", dependencies suck
             "lowdb": "^1.0.0",
             "@types/lowdb": "^1.0.6",
             "lockfile": "^1.0.4",
