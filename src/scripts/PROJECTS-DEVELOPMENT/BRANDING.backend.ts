@@ -3,7 +3,7 @@ import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
-import * as sharp from 'sharp';
+// import * as sharp from 'sharp';
 // import { png2svg } from 'svg-png-converter';
 
 import { Helpers } from 'tnp-helpers';
