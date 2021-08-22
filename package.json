@@ -516,7 +516,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.101",
+  "version": "0.0.103",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
