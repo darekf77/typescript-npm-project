@@ -167,7 +167,7 @@
           "tnp-cli": "0.0.17",
           "tnp-tools": "0.0.39",
           "@types/node": "10.12.30",
-          "morphi": "4.0.28",
+          "morphi": "4.0.29",
           "gulp": "^3.9.1",
           "ng2-logger": "5.0.17",
           "ng2-rest": "11.0.28",
@@ -302,13 +302,8 @@
           },
           "electron-client": {
             "cross-env": "7.0.2",
-            "electron": "11.0.3",
-            "electron-builder": "22.9.1",
-            "electron-reload": "1.5.0",
             "conventional-changelog-cli": "2.1.1",
-            "wait-on": "5.0.1",
-            "webdriver-manager": "12.1.7",
-            "spectron": "13.0.0"
+            "wait-on": "5.0.1"
           },
           "angular-lib": {
             "@1": "angular-client"
@@ -451,7 +446,6 @@
               "@types/lockfile": "^1.0.0"
             },
             "proxy": {
-              "redbird": "^0.7.0",
               "@types/http-proxy": "^1.16.0",
               "http-proxy": "^1.16.2"
             },
@@ -512,7 +506,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.108",
+  "version": "0.0.109",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
@@ -681,7 +675,7 @@
     "mkdirp": "0.5.1",
     "mocha": "5.2.0",
     "moment": "2.22.2",
-    "morphi": "~4.0.28",
+    "morphi": "~4.0.29",
     "ng-modal-lib": "0.0.6",
     "ng-packagr": "5.7.1",
     "ng-talkback": "~2.4.17",
@@ -726,7 +720,6 @@
     "randomcolor": "0.5.3",
     "rebird-https-letsencrypt": "~0.0.5",
     "record-replay-req-res-scenario": "~0.0.19",
-    "redbird": "0.7.0",
     "reflect-metadata": "0.1.10",
     "rimraf": "2.6.2",
     "rxjs": "6.5.4",

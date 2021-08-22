@@ -166,7 +166,7 @@
         "tnp-cli": "0.0.17",
         "tnp-tools": "0.0.39",
         "@types/node": "10.12.30",
-        "morphi": '4.0.28',
+        "morphi": '4.0.29',
         "gulp": "^3.9.1",
         "ng2-logger": "5.0.17",
         "ng2-rest": "11.0.28",
@@ -303,13 +303,13 @@
         },
         "electron-client": {
           "cross-env": "7.0.2",
-          "electron": "11.0.3",
-          "electron-builder": "22.9.1",
-          "electron-reload": "1.5.0",
+          // "electron": "11.0.3",
+          // "electron-builder": "22.9.1",
+          // "electron-reload": "1.5.0",
           "conventional-changelog-cli": "2.1.1",
           "wait-on": "5.0.1",
-          "webdriver-manager": "12.1.7",
-          "spectron": "13.0.0"
+          // "webdriver-manager": "12.1.7",
+          // "spectron": "13.0.0"
         },
         "angular-lib": {
           "@1": "angular-client"
@@ -454,7 +454,7 @@
             "@types/lockfile": "^1.0.0"
           },
           "proxy": {
-            "redbird": "^0.7.0",
+            // "redbird": "^0.7.0",
             "@types/http-proxy": "^1.16.0",
             "http-proxy": "^1.16.2"
           },
