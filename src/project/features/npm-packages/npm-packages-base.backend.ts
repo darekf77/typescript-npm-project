@@ -12,7 +12,7 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
-    if (this.project.isTnp || this.project.isNaviCli) { 
+    if (this.project.isTnp || this.project.isNaviCli) {
       return false;
     }
     return (this.project.isStandaloneProject
@@ -83,7 +83,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
       const installAllowed = (
         !this.project.isContainer
-        || this.project.isContainerWithLinkedProjects
+        || this.project.isContainerOrWorkspaceWithLinkedProjects
         || this.project.isContainerCoreProject
       );
 

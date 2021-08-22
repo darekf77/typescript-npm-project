@@ -59,25 +59,25 @@ inside generated projects...
   //#endregion
 
   //#region start for ...
-  async  startForLibFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
+  async startForLibFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
     return this.startForLib({ prod, watch, outDir, args });
   }
 
   /**
    * prod, watch, outDir, args, overrideOptions
    */
-  async  startForLib(options: Models.dev.StartForOptions, exit = true) {
+  async startForLib(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = false;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
-  async  startForAppFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
+  async startForAppFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
     return this.startForApp({ prod, watch, outDir, args });
   }
 
-  async  startForApp(options: Models.dev.StartForOptions, exit = true) {
+  async startForApp(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = true;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
@@ -119,7 +119,14 @@ inside generated projects...
   }
   //#endregion
 
-  private async  build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
+  private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
+
+    Helpers.log(`
+
+    BUILD PID: ${process.pid}
+    BUILD PPID: ${process.ppid}
+
+    `)
 
     Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
     this.project.buildOptions = buildOptions;
@@ -141,10 +148,11 @@ inside generated projects...
     }
     //#endregion
 
-    Helpers.log(`[db][checkBuildIfAllowed] started... `);
+    Helpers.log(`[db] chekcking started... `);
     const db = await TnpDB.Instance();
 
     if (buildOptions.appBuild) {
+      Helpers.log('FIST check if build allowed')
       await db.checkBuildIfAllowed(
         this.project as any,
         buildOptions,
@@ -152,9 +160,9 @@ inside generated projects...
         process.ppid,
         true
       );
-      Helpers.log(`[db][checkBuildIfAllowed] finish `);
+      Helpers.log(`[db]] finish `);
     } else {
-      Helpers.log(`[db][checkBuildIfAllowed] no needed for dist`);
+      Helpers.log(`[db] no needed for dist`);
     }
 
 
@@ -222,7 +230,14 @@ inside generated projects...
     }
     //#endregion
     if (buildOptions.appBuild) {
-      await db.checkBuildIfAllowed(this.project as any, buildOptions, process.pid, process.ppid, false)
+      Helpers.log('Second check if build allowed')
+      await db.checkBuildIfAllowed(
+        this.project as any,
+        buildOptions,
+        process.pid,
+        process.ppid,
+        false
+      )
     }
 
     //#region handle build clients projects

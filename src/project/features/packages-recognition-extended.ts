@@ -37,7 +37,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     const pjPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
     let res = false;
     try {
-      Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${pjPath}`)
+      Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${pjPath}`, 1)
       const proj = Project.From<Project>(pjPath);
       if (proj) {
         Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`)

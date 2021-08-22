@@ -238,7 +238,7 @@ export abstract class BuildableProject {
         // this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
         if (!(this.isStandaloneProject && this.node_modules.isLink)) {
           if ((this.buildOptions.copyto as Project[]).includes(this)) {
-            Helpers.info(`
+            Helpers.log(`
 
             Please don't use ${chalk.bold('--copyto')} for project itself.
             node_modules/${this.name} will be reaplce with folder:

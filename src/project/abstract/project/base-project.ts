@@ -115,6 +115,12 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
+  get isContainerOrWorkspaceWithLinkedProjects(this: Project) {
+    // @ts-ignore
+    return (this.isContainer || this.isWorkspace) && this.linkedProjects.length > 0;
+  }
+
+  // @ts-ignore
   get isVscodeExtension(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isForRecreation;

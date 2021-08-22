@@ -84,7 +84,7 @@ export class CompilerCache extends FeatureForProject {
     compilerObject: FeatureCompilerForProject | IncrementalBuildProcess) {
     const compilerName = CLASS.getNameFromObject(compilerObject);
     const projectLocation = project.location;
-    Helpers.info(`
+    Helpers.log(`
 
 
 
@@ -122,7 +122,7 @@ export class CompilerCache extends FeatureForProject {
   }
   public static async unsetProjectHasUpToDateCompiledData(project: Project) {
     const projectLocation = project.location;
-    Helpers.info(`
+    Helpers.log(`
 
 
 

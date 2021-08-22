@@ -258,9 +258,11 @@ export class ProjectFactory {
           await newCreatedProject.filesStructure.init(argsForInit);
         }
       }
-      if (newCreatedProject.parent?.isContainer && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
+      if (
+        (newCreatedProject.parent?.isContainer || newCreatedProject.parent?.isWorkspace)
+        && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
         newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
-        newCreatedProject.parent.packageJson.save('updating container linked projects');
+        newCreatedProject.parent.packageJson.save(`updating "${newCreatedProject.parent._type}" or work linked projects`);
         if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
           const parentOrigin = newCreatedProject.parent.git.originURL;
           const projOrigin = parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git');
@@ -268,8 +270,7 @@ export class ProjectFactory {
           to project ${newCreatedProject.name} ...`);
           newCreatedProject.run(`git init `
           +`&& git remote add origin ${projOrigin} `+
-          `&& git branch -M master `+
-          `&& git push --set-upstream origin master`).sync();
+          `&& git branch -M master `).sync();
         }
         await newCreatedProject.parent.filesStructure.struct('');
       }

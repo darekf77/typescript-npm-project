@@ -434,7 +434,7 @@ ${this.project.isVscodeExtension ? '/out' : ''}
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isContainer ? `
-# container git projects
+# container/workspace git projects
 ${this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================

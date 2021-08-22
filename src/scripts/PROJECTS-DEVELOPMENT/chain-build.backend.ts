@@ -177,7 +177,7 @@ ${deps.map((d, i) => {
         await action(projDep);
         buildedOK.push(projDep);
       } catch (error) {
-        Helpers.pressKeyAndContinue(`Fix errors for project ${projDep.genericName} and press ENTER to build again`);
+        Helpers.pressKeyAndContinue(`Fix errors for project ${projDep.genericName} and press ENTER to build again.. and wait 10s`);
         continue;
       }
     }
