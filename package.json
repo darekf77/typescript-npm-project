@@ -167,7 +167,7 @@
           "tnp-cli": "0.0.17",
           "tnp-tools": "0.0.39",
           "@types/node": "10.12.30",
-          "morphi": "4.0.27",
+          "morphi": "4.0.28",
           "gulp": "^3.9.1",
           "ng2-logger": "5.0.17",
           "ng2-rest": "11.0.28",
@@ -189,8 +189,7 @@
           },
           "promises": {
             "@types/q": "^1.0.3",
-            "q": "^1.5.1",
-            "wait.for": "0.6.6"
+            "q": "^1.5.1"
           },
           "multithread": {
             "task.js": "^0.1.5"
@@ -513,7 +512,7 @@
     "main": "index.js"
   },
   "name": "tnp",
-  "version": "0.0.107",
+  "version": "0.0.108",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
@@ -682,7 +681,7 @@
     "mkdirp": "0.5.1",
     "mocha": "5.2.0",
     "moment": "2.22.2",
-    "morphi": "~4.0.27",
+    "morphi": "~4.0.28",
     "ng-modal-lib": "0.0.6",
     "ng-packagr": "5.7.1",
     "ng-talkback": "~2.4.17",
@@ -764,7 +763,6 @@
     "uuid": "8.3.2",
     "validator": "9.2.0",
     "vpn-split": "~0.0.10",
-    "wait.for": "0.6.6",
     "watch": "1.0.2",
     "webpack-cli": "3.3.11",
     "zone.js": "0.10.2"
