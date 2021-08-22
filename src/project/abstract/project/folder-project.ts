@@ -27,11 +27,12 @@ export abstract class FolderProject {
   // @ts-ignore
   get linkedProjects(this: Project): Project[] {
     return this.packageJson.linkedProjects
-      .filter(f => !Helpers.isValidGitRepuUrl(f))
-      .map(f => {
-        return $Project.From(path.join(this.location, f)) as Project;
+      .map(f => { // // .filter(f => !Helpers.isValidGitRepuUrl(f))
+        const p = path.join(this.location, f);
+        const proj = $Project.From(p) as Project;
+        return proj;
       })
-      .filter(f => !f);
+      .filter(f => !!f);
   }
   //#endregion
 

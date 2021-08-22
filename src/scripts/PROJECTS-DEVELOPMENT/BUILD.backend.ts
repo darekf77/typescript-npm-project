@@ -348,16 +348,31 @@ const $RELEASE = async (args: string) => {
   const releaseAll = !!argsObj.all;
   // const autoRelease = !!argsObj.auto;
 
+
+
+
+  // @LAST
+  // startr release from last question
+  //rowser-code-dut] There are errors in your sass file: /Users/dfilipiak/projects/npm/tnp/tmp-src-dist/apps/project/project-ui/tnp-project/tnp-project.component.ts
+
   const proj = Project.Current as Project;
+  const lastReleaseProjFilePath = path.join(proj.location, 'tmp-last-released-proj')
+  const lastReleaseProjContent = Helpers.readFile(lastReleaseProjFilePath);
+  const lastRelased = !!lastReleaseProjContent && Project.From(path.join(proj.location, lastReleaseProjContent))
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  // Helpers.info(`
+  // lastReleaseProjFilePath: ${lastReleaseProjFilePath}
+  // lastRelased: ${lastRelased?.name}
+  // `)
+  if (!lastRelased) {
+    Helpers.removeFileIfExists(lastReleaseProjContent);
+  }
 
   proj.packageJson.showDeps('Release');
   //#endregion
 
   if (proj.isContainer) {
     //#region container release
-    global.tnpNonInteractive = true;
-
     const { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
       return Project.From(path.join(proj.location, a));
     });
@@ -393,11 +408,28 @@ processing...
     };
     //#endregion
 
-    for (let index = 0; index < deps.length; index++) {
-      Helpers.clearConsole();
-      const child = deps[index] as Project;
 
+
+    for (let index = 0; index < deps.length; index++) {
+
+      const child = deps[index] as Project;
+      Helpers.writeFile(lastReleaseProjFilePath, child.name);
+      Helpers.clearConsole();
       Helpers.info(projsTemplate(child));
+      if (index === 0) {
+        if (lastRelased && lastRelased.name !== child.name) {
+          var startFromLast = await Helpers.questionYesNo(`Start release from last project: ${chalk.bold(lastRelased.genericName)} ?`)
+          if (!startFromLast) {
+            Helpers.removeFileIfExists(lastReleaseProjFilePath);
+          }
+        }
+        global.tnpNonInteractive = true;
+      }
+
+      if (startFromLast && child.name !== lastRelased.name) {
+        continue;
+      }
+
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
@@ -406,9 +438,9 @@ processing...
       const init = async () => {
         while (true) {
           try {
-            await child.run(`${config.frameworkName} init`
+            child.run(`${config.frameworkName} init`
               + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
-              { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).asyncAsPromise();
+              { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).sync();
             break;
           } catch (error) {
             Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
@@ -416,14 +448,23 @@ processing...
         }
       };
 
-      if (!sameHashes || releaseAll) {
+      const shouldRelease = (!sameHashes || releaseAll);
+      Helpers.log(`FORCE RELEASE: ${shouldRelease}
+
+      releaseAll: ${releaseAll}
+      sameHashes: ${sameHashes}
+      `)
+      // Helpers.pressKeyAndContinue(`press any key`);
+
+      if (shouldRelease) {
         while (true) {
           await init();
           try {
-            await child.run(`${config.frameworkName} release `
+            child.run(`${config.frameworkName} release `
               + ` --automaticRelease=true --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`
-              , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).asyncAsPromise();
+              , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).sync();
             // await child.release(handleStandalone(child, {}), true);
+            // Helpers.pressKeyAndContinue(`Release done`);
             break;
           } catch (error) {
             Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
@@ -444,6 +485,7 @@ processing...
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
+    Helpers.removeFileIfExists(lastReleaseProjFilePath);
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
 

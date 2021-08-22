@@ -433,7 +433,7 @@ ${this.project.isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
 ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
-${this.project.isContainer ? `
+${this.project.isContainerOrWorkspaceWithLinkedProjects ? `
 # container/workspace git projects
 ${this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}

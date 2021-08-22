@@ -80,14 +80,14 @@ export abstract class LibProject {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
 
-  checkIfLogginInToNpm(this: Project, noExitOnError: boolean) {
+  checkIfLogginInToNpm(this: Project) {
     // if (!this.canBePublishToNpmRegistry) {
     //   return;
     // }
     try {
       this.run('npm whoami').sync();
     } catch (e) {
-      Helpers.error(`Please login in to npm.`, noExitOnError, true)
+      Helpers.error(`Please login in to npm.`, false, true)
     }
   }
 
@@ -322,7 +322,7 @@ export abstract class LibProject {
       }
     }
 
-    this.checkIfLogginInToNpm(automaticRelease);
+    this.checkIfLogginInToNpm();
 
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
