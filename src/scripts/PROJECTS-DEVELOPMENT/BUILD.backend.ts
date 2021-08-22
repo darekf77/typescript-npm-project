@@ -381,6 +381,7 @@ const $RELEASE = async (args: string) => {
 
     const npmDeps = proj.projectsInOrderForChainBuild(resolved)
       .filter(d => d.name !== proj.name && !d.isPrivate);
+
     const otherDeps = proj.children.filter(c => {
       return !npmDeps.includes(c);
     });
@@ -413,6 +414,7 @@ processing...
     for (let index = 0; index < deps.length; index++) {
 
       const child = deps[index] as Project;
+
       Helpers.writeFile(lastReleaseProjFilePath, child.name);
       Helpers.clearConsole();
       Helpers.info(projsTemplate(child));
@@ -434,7 +436,9 @@ processing...
         }
 
       }
-
+      if(child.isPrivate) {
+        continue;
+      }
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
