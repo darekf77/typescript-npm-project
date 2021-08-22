@@ -19,8 +19,7 @@
       "ng2-accordions": "1.0.14",
       "ng2-button-loader": "0.0.10",
       "ng2-preloader": "1.0.8",
-      "rebird-https-letsencrypt": "0.0.4",
-      "node-sass": "^4.7.2"
+      "rebird-https-letsencrypt": "0.0.4"
     },
     "ignoreDepsPattern": [
       "base-model-wrap",

@@ -1,7 +1,7 @@
 import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
-import * as sass from 'node-sass';
+import * as sass from 'sass';
 
 import { CodeCut, BrowserCodeCut } from 'morphi';
 import { Models } from 'tnp-models';
