@@ -352,7 +352,7 @@ const $RELEASE = async (args: string) => {
 
 
   // @LAST
-  // startr release from last question
+  // firedev release update tnp version
   //rowser-code-dut] There are errors in your sass file: /Users/dfilipiak/projects/npm/tnp/tmp-src-dist/apps/project/project-ui/tnp-project/tnp-project.component.ts
 
   const proj = Project.Current as Project;
