@@ -162,7 +162,7 @@
         "tnp-helpers": "0.0.58",
         "tnp-db": "0.0.30",
         "tnp-ui": "0.0.26",
-        "tnp-core": "0.0.47",
+        "tnp-core": "0.0.51",
         "tnp-cli": "0.0.17",
         "tnp-tools": "0.0.39",
         "@types/node": "10.12.30",
