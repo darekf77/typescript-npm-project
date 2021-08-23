@@ -479,10 +479,12 @@ processing...
 
         `); // hash in package.json to check
 
-        try {
-          await child.filesStructure.init('')
-        } catch (error) {
-          Helpers.info(`Not able to init fully...`)
+        if (child.typeIs('angular-lib', 'isomorphic-lib')) {
+          try {
+            await child.filesStructure.init('')
+          } catch (error) {
+            Helpers.info(`Not able to init fully...`)
+          }
         }
 
         // Helpers.pressKeyAndContinue();
