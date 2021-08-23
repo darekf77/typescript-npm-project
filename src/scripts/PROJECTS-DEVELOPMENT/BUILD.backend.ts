@@ -383,6 +383,11 @@ const $RELEASE = async (args: string) => {
       ...npmDeps,
       ...otherDeps,
     ];
+
+    const depsOnlyToPush = proj.children.filter(c => {
+      return !deps.includes(c);
+    });
+
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
       return `
@@ -427,7 +432,7 @@ processing...
         }
 
       }
-      if(child.isPrivate) {
+      if (child.isPrivate) {
         continue;
       }
 
@@ -488,6 +493,12 @@ processing...
     Helpers.removeFileIfExists(lastReleaseProjFilePath);
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
+
+    for (let index = 0; index < depsOnlyToPush.length; index++) {
+      const depForPush = depsOnlyToPush[index];
+      depForPush.git.commit(`release push`);
+      await depForPush.git.pullCurrentBranch()
+    }
 
     proj.git.commit(`Up4date after release`);
     await proj.git.pushCurrentBranch();
