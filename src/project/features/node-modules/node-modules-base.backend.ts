@@ -41,12 +41,18 @@ export class NodeModulesBase extends NodeModulesCore {
         ...Helpers.linksToFoldersFrom(source.node_modules.path)
       ];
 
+      Helpers.info(`
+
+      UPDATING node_moduels packages from smar folder ${packagesToLinkOrCopy.length}
+
+      `);
+
       packagesToLinkOrCopy
         .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
         .forEach(f => {
           const dest = path.join(this.project.node_modules.path, path.basename(f));
           if (path.basename(f) === '.bin') {
-            Helpers.copy(f, dest);
+            Helpers.copy(fse.realpathSync(f), dest);
           } else {
             Helpers.createSymLink(f, dest, { speedUpProcess: true });
           }
