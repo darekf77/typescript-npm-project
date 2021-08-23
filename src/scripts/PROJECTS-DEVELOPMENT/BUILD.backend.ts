@@ -351,7 +351,7 @@ const $RELEASE = async (args: string) => {
   const proj = Project.Current as Project;
   const lastReleaseProjFilePath = path.join(proj.location, 'tmp-last-released-proj')
   const lastReleaseProjContent = Helpers.readFile(lastReleaseProjFilePath);
-  const lastRelased = releaseAll && !!lastReleaseProjContent && Project.From(path.join(proj.location, lastReleaseProjContent))
+  const lastRelased = !!lastReleaseProjContent && Project.From(path.join(proj.location, lastReleaseProjContent))
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   // Helpers.info(`
   // lastReleaseProjFilePath: ${lastReleaseProjFilePath}
