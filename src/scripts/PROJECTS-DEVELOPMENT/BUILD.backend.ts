@@ -490,6 +490,7 @@ processing...
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
+    Helpers.pressKeyAndContinue(`wasdasdasd`)
     Helpers.removeFileIfExists(lastReleaseProjFilePath);
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
