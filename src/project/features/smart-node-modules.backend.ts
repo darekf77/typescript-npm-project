@@ -230,10 +230,11 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
       path.join(path.dirname(containerCoreProject.smartNodeModules.path), config.file.package_json),
     );
   }
-  const tmpProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
+  const smartTempContainerCorePackagesProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
   const reinstallForceSmartNodeModules = (
-    (containerCoreProject.isContainerCoreProject
-      && (containerCoreProject.location === currentProject.location))
+    (
+      containerCoreProject.isContainerCoreProject && (containerCoreProject.location === currentProject.location)
+    )
   );
   // || packgesHasChanges;
 
@@ -254,12 +255,12 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   //   `);
   // }
 
-  if (!tmpProj.node_modules.exist || reinstallForceSmartNodeModules) {
-    tmpProj.npmPackages.installFromArgs('', false, true);
-    tmpProj.node_modules.dedupe(); // TODO QUICK FIX
+  if (!smartTempContainerCorePackagesProj.node_modules.exist || reinstallForceSmartNodeModules) {
+    smartTempContainerCorePackagesProj.npmPackages.installFromArgs('', false, true);
+    smartTempContainerCorePackagesProj.node_modules.dedupe(); // TODO QUICK FIX
   }
 
-  if (!reinstallForceSmartNodeModules) {
+  if (!reinstallForceSmartNodeModules && containerCoreProject.node_modules.exist) {
     Helpers.info(`
 
     No need for update of node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)}
@@ -268,7 +269,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     return;
   }
   Helpers.actionWrapper(() => {
-    Helpers.foldersFrom(tmpProj.node_modules.path).forEach(from => {
+    Helpers.foldersFrom(smartTempContainerCorePackagesProj.node_modules.path).forEach(from => {
       const dest = path.join(containerCoreProject.node_modules.path, path.basename(from));
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(from, dest);
