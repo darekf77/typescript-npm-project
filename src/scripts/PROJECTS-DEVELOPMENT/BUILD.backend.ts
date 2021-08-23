@@ -358,7 +358,7 @@ const $RELEASE = async (args: string) => {
   // lastRelased: ${lastRelased?.name}
   // `)
   if (!lastRelased) {
-    Helpers.removeFileIfExists(lastReleaseProjContent);
+    Helpers.removeFileIfExists(lastReleaseProjFilePath);
   }
 
   proj.packageJson.showDeps('Release');
@@ -382,7 +382,6 @@ const $RELEASE = async (args: string) => {
     const deps = [
       ...npmDeps,
       ...otherDeps,
-      Project.Tnp,
     ];
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
