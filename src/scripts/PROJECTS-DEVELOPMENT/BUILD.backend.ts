@@ -432,9 +432,6 @@ processing...
         }
 
       }
-      if (child.isPrivate) {
-        continue;
-      }
 
       const lastBuildHash = child.packageJson.getBuildHash();
       const lastTagHash = child.git.lastTagHash();
@@ -453,7 +450,7 @@ processing...
         }
       };
 
-      const shouldRelease = (!sameHashes || releaseAll);
+      const shouldRelease = (!child.isPrivate && (!sameHashes || releaseAll));
       Helpers.log(`FORCE RELEASE: ${shouldRelease}
 
       releaseAll: ${releaseAll}
@@ -482,7 +479,12 @@ processing...
 
         `); // hash in package.json to check
 
-        await init();
+        try {
+          await child.filesStructure.init('')
+        } catch (error) {
+          Helpers.info(`Not able to init fully...`)
+        }
+
         // Helpers.pressKeyAndContinue();
         child.git.commit();
         await child.git.pushCurrentBranch();
@@ -490,7 +492,7 @@ processing...
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
-    Helpers.pressKeyAndContinue(`wasdasdasd`)
+
     Helpers.removeFileIfExists(lastReleaseProjFilePath);
     Helpers.clearConsole();
     Helpers.info(projsTemplate());
