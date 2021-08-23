@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
-import { PROGRESS_DATA } from 'tnp-models';
+import { Models, PROGRESS_DATA } from 'tnp-models';
 import { os } from 'tnp-core';
 import { FeatureForProject, Project } from '../abstract';
 //#endregion
@@ -125,11 +125,48 @@ export class GitActions extends FeatureForProject {
       await childProj.gitActions.push(commitMessage, force);
     }
 
+
+    //#region update containers package.json
+    if ( // TODO QUICK_FIX
+      (config.frameworkName === 'tnp')
+      && (this.project.name === 'morphi')
+    ) {
+      config.coreProjectVersions
+        .map(v => {
+          return { v, c: Project.by('container', v as any) }
+        })
+        .filter(({ c }) => !!c)
+        .forEach(({ v, c }) => {
+          (c as Project).packageJson.save('Updating morphi container');
+          const morphiEqivalentPath = path.join(this.project.location, 'projects', `container${(v === 'v1') ? '' : `-${v}`}`);
+          [
+            config.file.package_json,
+            config.file.package_json__tnp_json,
+          ].forEach(pj => {
+            const pathPjOrg = path.join(c.location, pj);
+            if (Helpers.exists(pathPjOrg)) {
+              const currentContent = Helpers.readJson(pathPjOrg);
+
+              if (pj === config.file.package_json) {
+                (currentContent as Models.npm.IPackageJSON).tnp.overrided.linkedFolders = []
+              }
+              if (pj === config.file.package_json__tnp_json) {
+                currentContent.overrided.linkedFolders = [];
+              }
+              const destPathPj = path.join(morphiEqivalentPath, pj);
+              Helpers.writeJson(destPathPj, currentContent);
+
+            }
+          });
+        });
+    }
+
     if (this.project.git.thereAreSomeUncommitedChange) {
       try {
         this.project.run(`git add --all . && git commit -m "${commitMessage}"`).sync();
       } catch (error) { }
     }
+
     await this.repeatMenu('push', force);
   }
   //#endregion

@@ -348,13 +348,6 @@ const $RELEASE = async (args: string) => {
   const releaseAll = !!argsObj.all;
   // const autoRelease = !!argsObj.auto;
 
-
-
-
-  // @LAST
-  // firedev release update tnp version
-  //rowser-code-dut] There are errors in your sass file: /Users/dfilipiak/projects/npm/tnp/tmp-src-dist/apps/project/project-ui/tnp-project/tnp-project.component.ts
-
   const proj = Project.Current as Project;
   const lastReleaseProjFilePath = path.join(proj.location, 'tmp-last-released-proj')
   const lastReleaseProjContent = Helpers.readFile(lastReleaseProjFilePath);
@@ -389,6 +382,7 @@ const $RELEASE = async (args: string) => {
     const deps = [
       ...npmDeps,
       ...otherDeps,
+      Project.Tnp,
     ];
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
@@ -408,8 +402,6 @@ processing...
     `;
     };
     //#endregion
-
-
 
     for (let index = 0; index < deps.length; index++) {
 

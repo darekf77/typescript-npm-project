@@ -17,6 +17,14 @@ function $UPDATE_GLOBAL_DEPS_CACHE(args: string) {
 
 function $UPDATE(args: string) {
 
+  const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
+  try {
+    Helpers.run(`git reset --hard && git pull origin master`,
+      { cwd: morphiPathUserInUserDir }).sync()
+  } catch (error) {
+    Helpers.error(`[config] Not pull origin of morphi: ${config.urlMorphi} in:    ${morphiPathUserInUserDir}`);
+  }
+
   // const file = path.basename(args.trim());
   // function processing() {
   //   Helpers.info(`processing file...`);
@@ -30,8 +38,8 @@ function $UPDATE(args: string) {
   //     Helpers.error(`Not recognized file for update`, false, true);
   //     break;
   // }
-  // Helpers.info(`Update of ${file} done.`);
-  // process.exit(0);
+  Helpers.info(`Update of ${config.frameworkName} name done.`);
+  process.exit(0);
 }
 
 
