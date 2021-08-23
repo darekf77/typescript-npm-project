@@ -54,7 +54,12 @@ export class NodeModulesBase extends NodeModulesCore {
           if (path.basename(f) === '.bin') {
             Helpers.copy(fse.realpathSync(f), dest);
           } else {
-            Helpers.createSymLink(f, dest, { speedUpProcess: true });
+            if (process.platform === 'win32') {
+              // TODO QUICK_FIX on windows you can't create link to link
+              Helpers.createSymLink(fse.realpathSync(f), dest, { speedUpProcess: true });
+            } else {
+              Helpers.createSymLink(f, dest, { speedUpProcess: true });
+            }
           }
         });
       return;
