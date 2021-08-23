@@ -16,7 +16,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return false;
     }
     return (this.project.isStandaloneProject
-      || this.project.isWorkspace
+      || (this.project.isWorkspace && (process.platform !== 'win32')) // TODO QUICK_FIX creation of many symlinks not allowedo on vdi
       || this.project.isWorkspaceChildProject)
   }
 
