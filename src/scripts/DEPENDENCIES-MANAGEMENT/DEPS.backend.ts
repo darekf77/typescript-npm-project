@@ -245,6 +245,10 @@ async function $DEPS_FROM(args) {
   await $DEPS_UPDATE_FROM(args)
 }
 
+async function $DEPS_COPY_FROM(args) {
+  await $DEPS_UPDATE_FROM(args)
+}
+
 function $DEPS_RESET(args) {
   $RESET_NPM(args)
 }
@@ -749,6 +753,7 @@ export default {
   $DEPS_SET_CATEGORY: Helpers.CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),
   $DEPS_SET_CAT: Helpers.CLIWRAP($DEPS_SET_CAT, '$DEPS_SET_CAT'),
   $DEPS_UPDATE_FROM: Helpers.CLIWRAP($DEPS_UPDATE_FROM, '$DEPS_UPDATE_FROM'),
+  $DEPS_COPY_FROM: Helpers.CLIWRAP($DEPS_COPY_FROM, '$DEPS_COPY_FROM'),
   $DEPS_FROM: Helpers.CLIWRAP($DEPS_FROM, '$DEPS_FROM'),
   $RESET_NPM: Helpers.CLIWRAP($RESET_NPM, '$RESET_NPM'),
   $RESET_NPM_ALL: Helpers.CLIWRAP($RESET_NPM_ALL, '$RESET_NPM_ALL'),
