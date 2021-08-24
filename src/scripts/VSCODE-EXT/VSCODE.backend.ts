@@ -1,5 +1,5 @@
 import { Helpers } from 'tnp-helpers';
-import { path } from 'tnp-core'
+import { path, _ } from 'tnp-core'
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
@@ -131,7 +131,7 @@ function $VSCODE_GLOBAL() {
     "terminal.integrated.shell.osx": "/bin/bash",
   }
 
-  const settings = {
+  let settings = {
     'git.enableSmartCommit': true,
     'terminal.integrated.scrollback': 10000,
     // 'files.insertFinalNewline': true,
@@ -175,10 +175,21 @@ function $VSCODE_GLOBAL() {
     "typescript.tsdk": "node_modules/typescript/lib",
     "terminal.integrated.tabs.enabled": false
   };
+  let settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json')
   let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
-  let settingspath = Helpers.resolve(
-    process.platform === 'linux' ? settingspathLinux : '~/Library/Application Support/Code/User/settings.json'
-  );
+  let settingspath = '~/Library/Application Support/Code/User/settings.json';
+
+  if (process.platform === 'darwin') {
+    settings = _.merge(settings, settingsMacOS);
+  }
+  if (process.platform === 'win32') {
+    settingspath = settingspathWindows;
+    settings = _.merge(settings, windowsSettings);
+  }
+  if (process.platform === 'linux') {
+    settingspath = settingspathLinux;
+  }
+
   Helpers.writeFile(settingspath, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
