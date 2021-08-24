@@ -118,7 +118,7 @@ function $VSCODE_GLOBAL() {
     , keys);
 
   const windowsSettings = {
-    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
     "terminal.integrated.shellArgs.windows": [
       "--login"
     ],
