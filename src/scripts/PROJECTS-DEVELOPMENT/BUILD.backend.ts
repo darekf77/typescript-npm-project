@@ -437,6 +437,7 @@ processing...
       const lastTagHash = child.git.lastTagHash();
       const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
 
+
       const init = async () => {
         while (true) {
           try {
@@ -450,7 +451,11 @@ processing...
         }
       };
 
-      const shouldRelease = (!child.isPrivate && (!sameHashes || releaseAll));
+      const shouldRelease = (
+        !child.isPrivate
+        && !child.targetProjects.exists
+        && (!sameHashes || releaseAll)
+      );
       Helpers.log(`FORCE RELEASE: ${shouldRelease}
 
       releaseAll: ${releaseAll}
@@ -483,7 +488,7 @@ processing...
           try {
             await child.filesStructure.init('')
           } catch (error) {
-            Helpers.info(`Not able to init fully...`)
+            Helpers.info(`Not able to init fully...`);
           }
         }
 
