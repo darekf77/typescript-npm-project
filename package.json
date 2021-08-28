@@ -8,21 +8,34 @@
         "@types/semver": "6.0.1",
         "semver": "6.3.0",
         "husky": "^1.3.1",
-        "ng2-rest-swagger-generator": "6.0.10",
+        "ng2-rest-swagger-generator": "6.0.18",
         "cache-require-paths": "0.3.0",
         "base-model-wrap": "3.0.13",
-        "http-socket-proxy-router": "0.0.4",
+        "http-socket-proxy-router": "0.0.8",
         "isomorphic-storage": "0.0.2",
         "nodemailer": "6.6.1",
-        "angular2-example-http-login": "5.0.6",
-        "edit-table": "0.0.8",
-        "loading-info": "0.0.5",
-        "ng2-accordions": "0.0.9",
-        "ng2-button-loader": "0.0.7",
-        "ng2-preloader": "0.0.3",
-        "rebird-https-letsencrypt": "0.0.1"
+        "angular2-example-http-login": "5.0.11",
+        "edit-table": "0.0.13",
+        "loading-info": "0.0.10",
+        "ng2-accordions": "1.0.16",
+        "ng2-button-loader": "0.0.12",
+        "ng2-preloader": "1.0.10",
+        "rebird-https-letsencrypt": "0.0.6",
+        "bs3-breakpoint": "0.0.4"
       },
-      "ignoreDepsPattern": [],
+      "ignoreDepsPattern": [
+        "base-model-wrap",
+        "http-socket-proxy-router",
+        "angular2-example-http-login",
+        "edit-table",
+        "loading-info",
+        "ng2-preloader",
+        "ng2-accordions",
+        "ng2-button-loader",
+        "ng2-rest-swagger-generator",
+        "isomorphic-storage",
+        "rebird-https-letsencrypt"
+      ],
       "includeAsDev": [],
       "includeOnly": [],
       "linkedFolders": []
@@ -145,29 +158,29 @@
           "vscode"
         ],
         "common": {
-          "tnp-config": "0.0.64",
-          "tnp-models": "0.0.26",
-          "tnp-helpers": "0.0.34",
-          "tnp-db": "0.0.25",
-          "tnp-ui": "0.0.23",
-          "tnp-core": "0.0.33",
-          "tnp-cli": "0.0.14",
-          "tnp-tools": "0.0.36",
+          "tnp-config": "0.0.89",
+          "tnp-models": "0.0.30",
+          "tnp-helpers": "0.0.59",
+          "tnp-db": "0.0.31",
+          "tnp-ui": "0.0.27",
+          "tnp-core": "0.0.60",
+          "tnp-cli": "0.0.23",
+          "tnp-tools": "0.0.40",
           "@types/node": "10.12.30",
-          "morphi": "4.0.18",
+          "morphi": "4.0.39",
           "gulp": "^3.9.1",
-          "ng2-logger": "5.0.14",
-          "ng2-rest": "11.0.24",
-          "record-replay-req-res-scenario": "0.0.15",
+          "ng2-logger": "5.0.23",
+          "ng2-rest": "11.0.34",
+          "record-replay-req-res-scenario": "0.0.20",
           "randomcolor": "^0.5.3",
           "uuid": "^8.3.2",
           "buffer-shims": "^1.0.0",
           "content-type": "^1.0.4",
           "axios": "^0.17.1",
-          "ng-talkback": "2.4.14",
-          "magic-renamer": "0.0.9",
-          "vpn-split": "0.0.7",
-          "node-cli-tester": "0.0.5",
+          "ng-talkback": "2.4.18",
+          "magic-renamer": "0.0.13",
+          "vpn-split": "0.0.11",
+          "node-cli-tester": "0.0.16",
           "strings": {
             "@types/diff": "^3.2.2",
             "diff": "^3.2.0",
@@ -176,8 +189,7 @@
           },
           "promises": {
             "@types/q": "^1.0.3",
-            "q": "^1.5.1",
-            "wait.for": "0.6.6"
+            "q": "^1.5.1"
           },
           "multithread": {
             "task.js": "^0.1.5"
@@ -202,8 +214,8 @@
           },
           "json": {
             "underscore": "^1.9.1",
-            "json10": "1.0.17",
-            "lodash-walk-object": "1.0.18",
+            "json10": "1.0.26",
+            "lodash-walk-object": "1.0.27",
             "json-stringify-safe": "^5.0.1",
             "@types/json-stringify-safe": "^5.0.0",
             "circular-json": "^0.5.1",
@@ -228,11 +240,9 @@
             "fs-extra": "8.1.0",
             "@types/fs-extra": "^7.0.0",
             "@types/rimraf": "^2.0.2",
-            "incremental-compiler": "1.1.29",
+            "incremental-compiler": "1.1.45",
             "open": "7.2.1",
-            "sharp": "0.23.3",
-            "@types/sharp": "0.23.1",
-            "svg-png-converter": "0.0.9"
+            "@types/sharp": "0.23.1"
           },
           "sockets": {
             "@types/socket.io-client": "^1.4.32",
@@ -250,7 +260,7 @@
             "node-cli-test": "0.0.2",
             "reflect-metadata": "^0.1.10",
             "ts-loader": "^2.3.1",
-            "typescript-class-helpers": "1.0.25",
+            "typescript-class-helpers": "1.0.34",
             "tslib": "2.2.0",
             "ts-node": "^7.0.1",
             "typescript": "4.1.5",
@@ -292,13 +302,8 @@
           },
           "electron-client": {
             "cross-env": "7.0.2",
-            "electron": "11.0.3",
-            "electron-builder": "22.9.1",
-            "electron-reload": "1.5.0",
             "conventional-changelog-cli": "2.1.1",
-            "wait-on": "5.0.1",
-            "webdriver-manager": "12.1.7",
-            "spectron": "13.0.0"
+            "wait-on": "5.0.1"
           },
           "angular-lib": {
             "@1": "angular-client"
@@ -315,7 +320,7 @@
               "ngx-bootstrap": "^2.0.2"
             },
             "icons": {
-              "button-dropdown": "1.0.28",
+              "button-dropdown": "1.0.37",
               "@iconify/react": "1.1.3",
               "@mdi/js": "5.8.55",
               "font-awesome": "^4.7.0",
@@ -323,8 +328,8 @@
             },
             "essentials": {
               "element-resize-detector": "1.1.15",
-              "static-columns": "1.0.20",
-              "bs4-breakpoint": "2.0.23",
+              "static-columns": "1.0.29",
+              "bs4-breakpoint": "2.0.32",
               "ngx-breadcrumbs": "0.0.3",
               "ngx-editor": "^3.3.0",
               "ngx-moment": "^3.0.1",
@@ -343,12 +348,11 @@
               "@swimlane/ngx-datatable": "^13.0.0",
               "angular-tree-component": "^7.0.0",
               "ng-modal-lib": "0.0.6",
-              "ng4-modal": "0.0.20",
-              "ng4-icons": "0.0.19"
+              "ng4-modal": "0.0.24",
+              "ng4-icons": "0.0.23"
             },
             "build-tools": {
               "concurrently": "^3.5.1",
-              "node-sass": "^4.7.2",
               "gulp-inline-ng2-template": "^4.1.0",
               "autoprefixer": "^6.5.3",
               "babel-cli": "^6.26.0",
@@ -391,7 +395,7 @@
             "typescript-formatter": "7.2.2",
             "callsite-record": "4.1.3",
             "@types/vinyl": "^2.0.2",
-            "background-worker-process": "0.0.25",
+            "background-worker-process": "0.0.29",
             "terminal-ui": {
               "progress": "^2.0.3",
               "@types/progress": "^2.0.3",
@@ -421,7 +425,6 @@
               "fkill": "6.1.0"
             },
             "system-informations": {
-              "cpuid": "^0.1.3",
               "ps-list": "6.1.0",
               "check-node-version": "^3.2.0",
               "command-exists": "^1.2.2",
@@ -437,14 +440,12 @@
               "npm-run": "^4.1.2"
             },
             "database": {
-              "sqlite3": "4.0.9",
               "lowdb": "^1.0.0",
               "@types/lowdb": "^1.0.6",
               "lockfile": "^1.0.4",
               "@types/lockfile": "^1.0.0"
             },
             "proxy": {
-              "redbird": "^0.7.0",
               "@types/http-proxy": "^1.16.0",
               "http-proxy": "^1.16.2"
             },
@@ -498,7 +499,7 @@
       "ugly": true
     },
     "scripts": {
-      "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
+      "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
     },
     "license": "MIT",
     "private": false,
@@ -507,7 +508,7 @@
   "name": "tnp",
   "version": "0.0.144",
   "scripts": {
-    "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp link:core && tnp bd"
+    "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
   "main": "index.js",
   "bin": {
