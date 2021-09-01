@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { fse, json5 } from 'tnp-core'
 import { path } from 'tnp-core'
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract';
@@ -9,6 +9,8 @@ import { CLASS } from 'typescript-class-helpers';
 import { _ } from 'tnp-core';
 import { ProjectAngularClient } from './project-angular-client';
 import { Helpers } from 'tnp-helpers';
+import { config } from 'tnp-config';
+import { Models } from 'tnp-models';
 
 //#region @backend
 @CLASS.NAME('ProjectAngularLib')
@@ -133,7 +135,7 @@ export class ProjectAngularLib
 
   projectSpecyficFiles() {
     //#region @backendFunc
-    const config = super.projectSpecyficFiles()
+    let config = super.projectSpecyficFiles()
       .concat([
         'tsconfig.browser.json',
         'karma.conf.js.filetemplate',
@@ -154,7 +156,7 @@ export class ProjectAngularLib
 
 
     if (this.frameworkVersionAtLeast('v2')) {
-      return config.concat([
+      config = config.concat([
         'src/index.html'
       ]).filter(f => {
         return ![
@@ -165,8 +167,20 @@ export class ProjectAngularLib
         ].includes(f);
       })
     }
-    return config
+    return config;
     //#endregion
+  }
+
+  private get coreLibFiles() {
+    return [
+      'projects/my-lib/tsconfig.spec.json',
+      'projects/my-lib/tsconfig.lib.prod.json',
+      'projects/my-lib/tsconfig.lib.json',
+      'projects/my-lib/README.md',
+      'projects/my-lib/package.json',
+      'projects/my-lib/ng-package.json',
+      'projects/my-lib/karma.conf.js',
+    ]
   }
 
   sourceFilesToIgnore() {
@@ -191,6 +205,30 @@ export class ProjectAngularLib
         });
     } else {
       await this.incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
+      if (outDir === 'bundle') {
+
+        const angularLibCOre = Project.by(this._type, this._frameworkVersion);
+        const projectsLocation = path.join(this.location, `tmp-projects/${this.name}`);
+        Helpers.removeFolderIfExists(projectsLocation);
+        this.coreLibFiles.forEach(f => {
+          const orgPath = path.join(angularLibCOre.location, f);
+          const destPath = path.join(this.location, f.replace('projects/my-lib', `tmp-projects/${this.name}`));
+          Helpers.copy(orgPath, destPath);
+        });
+        const from = path.join(this.location, config.folder.components);
+        const dest = path.join(projectsLocation, config.folder.src);
+        Helpers.remove(dest);
+        Helpers.createSymLink(from, dest);
+        const jsonPath = path.join(projectsLocation, config.file.package_json);
+        const json = Helpers.readJson(jsonPath) as Models.npm.IPackageJSON;
+        json.name = this.name;
+        json.version = this.version;
+        json.peerDependencies = void 0;
+        json.devDependencies = {};
+        json.dependencies = {};
+        Helpers.writeJson(jsonPath, json);
+        this.run(`npx ng build ${this.name}`).sync();
+      }
     }
     //#endregion
   }
