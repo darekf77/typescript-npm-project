@@ -51,3 +51,8 @@ arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebr
 arch -x86_64 brew install <package>
 ```
 
+# set origin name
+```
+git remote set-url orgin <my-new-origin-name>
+```
+
