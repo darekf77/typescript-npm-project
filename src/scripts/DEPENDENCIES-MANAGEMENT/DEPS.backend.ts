@@ -678,7 +678,7 @@ async function $SHOW_DB() {
   } else {
     Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
   }
-  process.exit(0)
+  process.exit(0);
 }
 
 async function $DB_SHOW() {

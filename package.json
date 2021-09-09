@@ -95,7 +95,6 @@
           "codelyzer",
           "ts-node",
           "tslint",
-          "prettier",
           "typescript",
           "@types/node",
           "record-replay-req-res-scenario",
@@ -139,7 +138,6 @@
           "typescript",
           "ts-node",
           "tslint",
-          "prettier",
           "enum-values",
           "babel-cli",
           "babel-core",
@@ -157,7 +155,6 @@
           "ts-node",
           "gulp",
           "tslint",
-          "prettier",
           "vscode"
         ],
         "common": {
@@ -268,7 +265,6 @@
             "ts-node": "^7.0.1",
             "typescript": "4.1.5",
             "tslint": "^5.9.1",
-            "prettier": "~2.3.2",
             "eslint": "7.13.0",
             "eslint-plugin-import": "2.22.1",
             "eslint-plugin-jsdoc": "30.7.8",
@@ -332,7 +328,7 @@
             },
             "essentials": {
               "element-resize-detector": "1.1.15",
-              "static-columns": "2.0.1",
+              "static-columns": "1.0.29",
               "bs4-breakpoint": "2.0.32",
               "ngx-breadcrumbs": "0.0.3",
               "ngx-editor": "^3.3.0",
