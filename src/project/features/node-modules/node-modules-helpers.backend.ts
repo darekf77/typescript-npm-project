@@ -247,7 +247,7 @@ const notAllowedFolderToCopy = [
   'bundle'
 ];
 
-function fixPackageJson(pathToPacakgeJson: string) {
+function fixPackageJson(pathToPacakgeJson: string, project: Project) {
   const file = Helpers.readJson(pathToPacakgeJson) as Models.npm.IPackageJSON;
   const newFile = _.pick(file, [
     'name',
@@ -259,7 +259,7 @@ function fixPackageJson(pathToPacakgeJson: string) {
     'bin',
   ] as (keyof Models.npm.IPackageJSON)[]);
   newFile.tnp = {
-    version: 'v2',
+    version: project._frameworkVersion,
     type: 'angular-lib',
   } as any;
   Helpers.writeFile(pathToPacakgeJson, newFile);
@@ -343,7 +343,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       Helpers.copyFile(packageJsonInBrowser, packageJsonPath);
     }
 
-    fixPackageJson(packageJsonPath);
+    fixPackageJson(packageJsonPath, project);
 
     const proj = Project.From(path.join(project.node_modules.path, packageName)) as Project;
     // Helpers.run(`cp -r ${proj.location}`)

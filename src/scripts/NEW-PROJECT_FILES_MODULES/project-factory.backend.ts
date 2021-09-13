@@ -78,7 +78,7 @@ export class ProjectFactory {
     }
 
     if (_.isNil(options.version)) {
-      options.version = 'v2';
+      options.version = config.defaultFrameworkVersion;
     }
 
     if (_.isNil(options.skipInit)) {
@@ -269,8 +269,8 @@ export class ProjectFactory {
           Helpers.info(`Adding git origin: ${projOrigin}
           to project ${newCreatedProject.name} ...`);
           newCreatedProject.run(`git init `
-          +`&& git remote add origin ${projOrigin} `+
-          `&& git branch -M master `).sync();
+            + `&& git remote add origin ${projOrigin} ` +
+            `&& git branch -M master `).sync();
         }
         await newCreatedProject.parent.filesStructure.struct('');
       }
@@ -295,11 +295,16 @@ export class ProjectFactory {
       Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
-    const { basedOn, version, skipInit }: { basedOn: string; version: 'v1' | 'v2'; skipInit?: boolean } = require('minimist')(args.split(' '));
+    const { basedOn, version, skipInit }: {
+      basedOn: string;
+      version: ConfigModels.FrameworkVersion;
+      skipInit?: boolean
+    } = require('minimist')(args.split(' '));
 
 
     if (basedOn) {
-      Helpers.error(`To create workspace site use command: ${config.frameworkName} new: site name - of - workspace - site`
+      Helpers.error(`To create workspace site use command: `
+        + `${config.frameworkName} new: site name - of - workspace - site`
         + `--basedOn relativePathToBaselineWorkspace`, false, true);
     }
     const type = argv[0] as any;

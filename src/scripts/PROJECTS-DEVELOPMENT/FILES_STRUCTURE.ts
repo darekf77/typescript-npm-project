@@ -32,7 +32,7 @@ async function askForWhenEmpty(): Promise<Project> {
       version: '0.0.0',
       tnp: {
         type: response,
-        version: 'v2'
+        version: config.defaultFrameworkVersion,
       }
     });
     proj = Project.From(crossPlatformPath(process.cwd())) as Project;
