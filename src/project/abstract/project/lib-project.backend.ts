@@ -6,7 +6,7 @@ import { glob } from 'tnp-core';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
 //#endregion
-import type { Project } from './project';
+import { Project } from './project';
 import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
@@ -535,6 +535,42 @@ export abstract class LibProject {
 
   private async tagVersion(this: Project, newVersion: string) {
     return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
+  }
+
+  get coreLibFiles() {
+    return [
+      'projects/my-lib/tsconfig.spec.json',
+      'projects/my-lib/tsconfig.lib.prod.json',
+      'projects/my-lib/tsconfig.lib.json',
+      'projects/my-lib/README.md',
+      'projects/my-lib/package.json',
+      'projects/my-lib/ng-package.json',
+      'projects/my-lib/karma.conf.js',
+    ]
+  }
+
+  protected buildAngularVer(this: Project) {
+    const angularLibCOre = Project.by('angular-lib', this._frameworkVersion);
+    const projectsLocation = path.join(this.location, `tmp-projects/${this.name}`);
+    Helpers.removeFolderIfExists(projectsLocation);
+    this.coreLibFiles.forEach(f => {
+      const orgPath = path.join(angularLibCOre.location, f);
+      const destPath = path.join(this.location, f.replace('projects/my-lib', `tmp-projects/${this.name}`));
+      Helpers.copy(orgPath, destPath);
+    });
+    const from = path.join(this.location, this.typeIs('angular-lib') ? config.folder.components : config.folder.src);
+    const dest = path.join(projectsLocation, config.folder.src);
+    Helpers.remove(dest);
+    Helpers.createSymLink(from, dest);
+    const jsonPath = path.join(projectsLocation, config.file.package_json);
+    const json = Helpers.readJson(jsonPath) as Models.npm.IPackageJSON;
+    json.name = this.name;
+    json.version = this.version;
+    json.peerDependencies = void 0;
+    json.devDependencies = {};
+    json.dependencies = {};
+    Helpers.writeJson(jsonPath, json);
+    this.run(`npx ng build ${this.name}`).sync();
   }
 
   async pushToGitRepo(this: Project, newVersion: string) {

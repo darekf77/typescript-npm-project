@@ -310,6 +310,9 @@ export class ProjectIsomorphicLib
         await this.incrementalBuildProcess.start('isomorphic compilation (only client) ')
       } else {
         await this.incrementalBuildProcess.start('isomorphic compilation')
+        if (outDir === 'bundle') {
+          this.buildAngularVer();   
+        }
       }
     }
     //#endregion
