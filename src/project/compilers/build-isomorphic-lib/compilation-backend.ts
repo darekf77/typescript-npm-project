@@ -155,6 +155,24 @@ export class BackendCompilation extends IncCompiler.Base {
         j.dependencies = {};
         j.devDependencies = {};
         j.peerDependencies = {};
+        [
+          'module',
+          'fesm5',
+          'fesm2015',
+          'es2015',
+          'bundles',
+          'main'
+        ].forEach(k => {
+          if (k === 'main') {
+            j[k] = 'esm2015/index.js';
+          } else {
+            j[k] = void 0;
+            Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.browser, k));
+            Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.client, k));
+          }
+
+        });
+
         // j.scripts = {};
         Helpers.writeJson(p, j);
       });
