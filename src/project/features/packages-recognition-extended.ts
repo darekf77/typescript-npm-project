@@ -1,11 +1,11 @@
 //#region @backend
 import { path, crossPlatformPath } from 'tnp-core'
 import { fse } from 'tnp-core'
-import { PackagesRecognition, BrowserCodeCut } from 'morphi';
 import { Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
+import { PackagesRecognition } from '../compilers/build-isomorphic-lib/packages-recognition';
 
 
 export class PackagesRecognitionExtended extends PackagesRecognition {

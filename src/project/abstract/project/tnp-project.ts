@@ -3,13 +3,12 @@ import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
-import { FILE_NAME_ISOMORPHIC_PACKAGES } from 'morphi';
 import { config as configMorphi } from 'morphi';
 //#endregion
 import type { Project } from './project';
 import { Project as $Project } from 'tnp-helpers';
 import { Helpers } from 'tnp-helpers';
-import { ConfigModels } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 
 export abstract class TnpProject {
 
@@ -113,7 +112,7 @@ export abstract class TnpProject {
       return isomorphicPackagesArr;
     }
     try {
-      var p = crossPlatformPath(path.join(this.location, FILE_NAME_ISOMORPHIC_PACKAGES))
+      var p = crossPlatformPath(path.join(this.location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
       if (!fse.existsSync(p)) {
         PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
       }

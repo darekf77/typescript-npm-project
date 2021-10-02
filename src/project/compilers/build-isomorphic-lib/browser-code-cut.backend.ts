@@ -3,7 +3,7 @@ import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import * as sass from 'sass';
 
-import { CodeCut, BrowserCodeCut } from 'morphi';
+import { BrowserCodeCut } from './browser-code-cut';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';

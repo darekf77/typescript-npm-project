@@ -119,6 +119,32 @@ export class NpmProject {
     return ver.join('.')
   }
 
+  // @ts-ignore
+  get versionMajorPlusWithZeros(this: Project) {
+    if (this.typeIs('unknow')) {
+      return '';
+    }
+    if (!this.version) {
+
+      if (!global[CoreConfig.message.globalSystemToolMode]) {
+        return;
+      }
+
+      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      location: ${path.join(this.location, config.file.package_json)}
+
+      `, true, true);
+    }
+    const ver = this.version.split('.');
+    if (ver.length > 0) {
+      ver[0] = (parseInt(_.first(ver)) + 1).toString();
+      for (let index = 1; index < ver.length; index++) {
+        ver[index] = '0';
+      }
+    }
+    return ver.join('.');
+  }
+
   private updateVersionPathRelease(this: Project, versionPath: number) {
     const ver = this.version.split('.');
     if (ver.length > 0) {

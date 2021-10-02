@@ -2,13 +2,13 @@ import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 
-import { CodeCut, BrowserCodeCut } from 'morphi';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { BrowserCodeCutExtended } from './browser-code-cut.backend';
 import { BuildOptions } from 'tnp-db';
+import { CodeCut } from './browser-code-cut';
 
 export class ExtendedCodeCut extends CodeCut {
 

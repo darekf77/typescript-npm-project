@@ -202,6 +202,9 @@ export abstract class BaseProject {
   get allResources(this: Project) {
     const resurces = [
       config.file.package_json,
+      'tsconfig.json',
+      'tsconfig.browser.json',
+      'tsconfig.isomorphic.json',
       config.file._npmrc,
       config.file._npmignore,
       config.file._gitignore,

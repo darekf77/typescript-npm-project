@@ -52,7 +52,43 @@ export class NodeModulesBase extends NodeModulesCore {
         .forEach(f => {
           const dest = path.join(this.project.node_modules.path, path.basename(f));
           if (path.basename(f) === '.bin') {
-            Helpers.copy(fse.realpathSync(f), dest);
+            const linkFromBin = fse.realpathSync(f);
+            if (Helpers.exists(linkFromBin)) {
+              if (Helpers.isFile(linkFromBin)) {
+                Helpers.copyFile(linkFromBin, dest);
+              }
+              if (Helpers.isFolder(linkFromBin)) {
+                Helpers.removeFolderIfExists(dest);
+                // Helpers.copy(linkFromBin, dest, {
+                //   errorOnExist: false,
+                //   filter: (f) => {
+                //     return
+                //   }
+                // });
+                // try {
+                //   Helpers.copy(linkFromBin)
+                // } catch (error) {
+
+                // }
+                const all = Helpers.filesFrom(linkFromBin);
+                all.forEach(f => {
+                  Helpers.removeFileIfExists(path.join(dest, path.basename(f)));
+                  if (Helpers.exists(f, false)) {
+                    f = fse.realpathSync(f);
+                    // const file = Helpers.readFile(f);
+                    // file.replace( new RegExp(),`require('../${path.basename(f)}/lib` )
+                    // `require('../lib`
+                    Helpers.createSymLink(f, path.join(dest, path.basename(f)));
+                  } else {
+                    Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed file from bin `
+                      + `${path.basename(f)}`, false);
+                  }
+                });
+              }
+            } else {
+              Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `
+                + `${path.basename(f)}`, false);
+            }
           } else {
             if (process.platform === 'win32') {
               // TODO QUICK_FIX on windows you can't create link to link

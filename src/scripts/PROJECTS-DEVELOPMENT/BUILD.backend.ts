@@ -67,6 +67,16 @@ const BUILD_DIST_WATCH_ALL = async (args) => {
 };
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 
+const BUILD_NG = (args) => {
+  args += ' --ngbuildonly';
+  return (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
+};
+
+const BUILD_NG_WATCH = (args) => {
+  args += ' --ngbuildonly';
+  return (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', args);
+};
+
 const BUILD_DIST_ALL = async (args) => {
   // console.log('AM FUCKING HEre',(Project.Current as Project).isGenerated)
   // process.exit(0)
@@ -340,6 +350,9 @@ const $RELEASE = async (args: string) => {
   // Helpers.log(`ARR ARGS "${args}"`)
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
+  if (!argsObj.releaseType) {
+    argsObj.releaseType = 'patch';
+  }
   // Helpers.log(`ARGS RELEASE
 
   // ${Helpers.stringify(argsObj)}
@@ -359,6 +372,12 @@ const $RELEASE = async (args: string) => {
   // `)
   if (!lastRelased) {
     Helpers.removeFileIfExists(lastReleaseProjFilePath);
+  }
+
+  if(argsObj.releaseType === 'major') {
+    const newVersion = proj.versionMajorPlusWithZeros;
+    proj.packageJson.data.version = newVersion;
+    proj.packageJson.save(`Major version up`);
   }
 
   proj.packageJson.showDeps('Release');
@@ -535,6 +554,15 @@ processing...
   process.exit(0);
 };
 
+const $RELEASE_MAJOR = async (args: string) => {
+  args = (args || '') + ' --releaseType=major';
+  return await $RELEASE(args);
+}
+
+const $MAJOR_RELEASE = async (args: string) => {
+  return await $RELEASE_MAJOR(args);
+};
+
 function handleStandalone(proj: Project, argsObj: any) {
   if (proj.packageJson.libReleaseOptions.obscure) {
     argsObj.obscure = true;
@@ -633,6 +661,8 @@ async function $DB_BUILDS_UPDATE() {
 
 export default {
   //#region export default
+  BUILD_NG: Helpers.CLIWRAP(BUILD_NG, 'BUILD_NG'),
+  BUILD_NG_WATCH: Helpers.CLIWRAP(BUILD_NG_WATCH, 'BUILD_NG_WATCH'),
   $RECREATE: Helpers.CLIWRAP($RECREATE, '$RECREATE'),
   $BUILD_DOCS: Helpers.CLIWRAP($BUILD_DOCS, '$BUILD_DOCS'),
   $BUILD_DOCS_PROD: Helpers.CLIWRAP($BUILD_DOCS_PROD, '$BUILD_DOCS_PROD'),
@@ -686,6 +716,8 @@ export default {
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $AUTO_RELEASE: Helpers.CLIWRAP($AUTO_RELEASE, '$AUTO_RELEASE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
+  $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),
+  $MAJOR_RELEASE: Helpers.CLIWRAP($MAJOR_RELEASE, '$MAJOR_RELEASE'),
   $RELEASE_ALL: Helpers.CLIWRAP($RELEASE_ALL, '$RELEASE_ALL'),
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),

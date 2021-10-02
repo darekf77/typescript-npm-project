@@ -43,6 +43,11 @@ export class FilesRecreator extends FeatureForProject {
       this.handleProjectSpecyficFiles();
       return;
     }
+    const project = this.project as Project;
+    if (project.frameworkVersionAtLeast('v3') && project.typeIs('angular-lib', 'isomorphic-lib')) {
+      this.initAngularLibStructure();
+    }
+
     this.initAssets();
     this.handleProjectSpecyficFiles();
     this.commonFiles();
@@ -50,6 +55,71 @@ export class FilesRecreator extends FeatureForProject {
     this.gitignore();
     this.npmignore();
     this.customFolder();
+
+
+  }
+
+  // tslint:disable-next-line: member-ordering
+  public initAngularLibStructure(outFolder: ConfigModels.OutFolder = 'dist') {
+    const project: Project = this.project;
+    const tmpProjects = `tmp-projects-for-${outFolder}/${project.name}`;
+    const projectsLocation = path.join(project.location, tmpProjects);
+    Helpers.removeFolderIfExists(projectsLocation);
+    const angularLibCore = Project.by('angular-lib', project._frameworkVersion) as Project;
+
+    [
+      ...angularLibCore.coreLibFiles,
+      ...(project.typeIs('isomorphic-lib') ? ['angular.json.filetemplate'] : [])
+    ].forEach(f => {
+      const orgPath = path.join(angularLibCore.location, f);
+      const destPath = path.join(
+        project.location,
+        f.replace('projects/my-lib',
+          tmpProjects));
+      Helpers.copy(orgPath, destPath);
+    });
+    const from = path.join(project.location, project.typeIs('angular-lib')
+      ? config.folder.components : config.folder.tmpFor(outFolder));
+    const dest = path.join(projectsLocation, config.folder.src);
+
+    Helpers.remove(dest);
+    Helpers.createSymLink(from, dest, { continueWhenExistedFolderDoesntExists: true });
+
+    const sourceFolder = project.typeIs('angular-lib') ? config.folder.components : config.folder.src;
+    const publicApi = path.join(project.location, sourceFolder, config.file.publicapi_ts);
+    const indexTs = path.join(project.location, sourceFolder, config.file.index_ts);
+    if (!Helpers.exists(publicApi) && Helpers.exists(indexTs)) {
+      Helpers.copyFile(indexTs, publicApi);
+    }
+
+    //#region fix out
+    if (outFolder !== 'dist') {
+      const ngPackgeJsonPath = path.join(projectsLocation, 'ng-package.json');
+      const jsonNgPackgage = Helpers.readJson(ngPackgeJsonPath);
+      jsonNgPackgage.dest = jsonNgPackgage.dest.replace('dist', outFolder);
+      Helpers.writeJson(ngPackgeJsonPath, jsonNgPackgage);
+
+      // TODO QUCIK_FIX
+      const angularJsPath = path.join(project.location, config.file.angular_json);
+      const angularJs = Helpers.readFile(angularJsPath);
+      const modifiedAngularJson = angularJs
+        .replace(new RegExp(Helpers.escapeStringForRegEx('tmp-projects-for-dist'), 'g'),
+          `tmp-projects-for-${outFolder}`);
+      Helpers.writeFile(angularJsPath, modifiedAngularJson);
+    }
+
+
+    //#endregion
+    // //#region handle package json
+    const jsonPath = path.join(projectsLocation, config.file.package_json);
+    const json = Helpers.readJson(jsonPath) as Models.npm.IPackageJSON;
+    json.name = project.name; //
+    json.version = project.version;
+    json.peerDependencies = void 0;
+    json.devDependencies = {};
+    json.dependencies = {};
+    Helpers.writeJson(jsonPath, json);
+    //#endregion
   }
 
   private get commonFilesForAllProjects() {

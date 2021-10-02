@@ -14,7 +14,7 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
-import { IncrementalBuildProcess } from 'morphi';
+import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/incremental-build-process';
 
 const compierEntityKey = 'compilers';
 
@@ -47,6 +47,7 @@ export class CompilerCache extends FeatureForProject {
     }
   }
 
+  // tslint:disable-next-line: member-ordering
   public static async checkIfPojectHasUpToDateCompiledData(project: Project) {
     const projectLocation = project.location;
     const db = await TnpDB.Instance();
@@ -80,6 +81,7 @@ export class CompilerCache extends FeatureForProject {
     return false;
   }
 
+  // tslint:disable-next-line: member-ordering
   public static async setProjectHasUpToDateCompiledData(project: Project,
     compilerObject: FeatureCompilerForProject | IncrementalBuildProcess) {
     const compilerName = CLASS.getNameFromObject(compilerObject);

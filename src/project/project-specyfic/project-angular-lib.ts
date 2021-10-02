@@ -34,7 +34,11 @@ export class ProjectAngularLib
 
   async initProcedure() {
     //#region @backendFunc
-    if (this.frameworkVersionAtLeast('v2') && this.isWorkspaceChildProject && !this.parent.frameworkVersionAtLeast(this._frameworkVersion)) {
+    if (
+      this.frameworkVersionAtLeast('v2')
+      && this.isWorkspaceChildProject
+      && !this.parent.frameworkVersionAtLeast(this._frameworkVersion)
+    ) {
       Helpers.error(`Please use angular-lib-${this._frameworkVersion} only in workspace-${this._frameworkVersion}`, false, true);
     }
 
@@ -109,6 +113,13 @@ export class ProjectAngularLib
         }));
     }
 
+    if (this.frameworkVersionAtLeast('v3')) {
+      config = [
+        'tsconfig.ng.json.filetemplate',
+        ...config,
+      ];
+    }
+
     return config;
     //#endregion
   }
@@ -181,23 +192,27 @@ export class ProjectAngularLib
 
   async buildLib() {
     //#region @backendFunc
-    const { outDir } = this.buildOptions;
+    const { outDir, ngbuildonly, watch } = this.buildOptions;
     this.beforeLibBuild(outDir);
-    this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
-
-    if (this.buildOptions.watch) {
-      await this.incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
-        {
-          watchOnly: this.buildOptions.watchOnly,
-          afterInitCallBack: async () => {
-            await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-          }
-        });
+    if (ngbuildonly) {
+      // await this.buildAngularVer(watch);
     } else {
-      await this.incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
-      if (outDir === 'bundle') {
+      this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
-       this.buildAngularVer();
+      if (this.buildOptions.watch) {
+        await this.incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
+          {
+            watchOnly: this.buildOptions.watchOnly,
+            afterInitCallBack: async () => {
+              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+            }
+          });
+      } else {
+        await this.incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
+        // if (outDir === 'bundle') {
+
+        //   this.buildAngularVer();
+        // }
       }
     }
     //#endregion

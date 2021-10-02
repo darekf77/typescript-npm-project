@@ -1,11 +1,10 @@
 //#region @backend
 import { _, crossPlatformPath } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core';
+import { fse } from 'tnp-core';
 
-import { BroswerCompilation, BackendCompilation } from 'morphi';
 import { Models } from 'tnp-models';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { ExtendedCodeCut } from './extended-code-cut.backend';
@@ -13,6 +12,8 @@ import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';
 import { config, ConfigModels } from 'tnp-config';
 import { codeCuttFn } from './cutCodeFn.backend';
+import { BackendCompilation } from './compilation-backend';
+import { BroswerCompilation } from './compilation-browser';
 
 export class BackendCompilationExtended extends BackendCompilation {
 
@@ -33,6 +34,8 @@ export class BackendCompilationExtended extends BackendCompilation {
         outDir: (`../${this.outFolder}` as any),
         generateDeclarations: generatedDeclarations,
         hideErrors: hideErrorsForBackend,
+        locationOfMainProject: this.location,
+        buildType: this.outFolder as any
       });
   }
 
@@ -53,7 +56,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     if (this.ENV) {
       return `Browser Extended compilation for ${this.ENV.currentProjectName}`;
     }
-    return `Browser Extended compilation`
+    return `Browser Extended compilation`;
   }
 
   CompilationWrapper = Helpers.compilationWrapper as any;
@@ -106,7 +109,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     backendOut: string,
     public buildOptions: BuildOptions
   ) {
-    super(sourceOut, outFolder, location, cwd, backendOut)
+    super(sourceOut, outFolder, location, cwd, backendOut);
     this.compilerName = this.customCompilerName;
 
     Helpers.log(`[BroswerForModuleCompilation][constructor]
@@ -122,7 +125,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     `, 1);
 
-    Helpers.log(`\n\nbuildOptions: ${JSON10.stringify(buildOptions)}\n\n`, 2)
+    Helpers.log(`\n\nbuildOptions: ${JSON10.stringify(buildOptions)}\n\n`, 2);
 
     // console.log('SOURCE OUT', sourceOut)
     // console.log('OUT FOLDER', outFolder)
@@ -138,7 +141,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
 
     ${filesPathes.map(c => `${c}\n`)}
 
-    `, 1)
+    `, 1);
 
     // console.log('inside')
     let env: Models.env.EnvConfig = this.ENV;
