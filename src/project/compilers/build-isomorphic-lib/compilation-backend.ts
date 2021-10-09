@@ -119,7 +119,9 @@ export class BackendCompilation extends IncCompiler.Base {
       (project.packageJson.data.tnp.overrided.includeOnly || []).forEach(p => {
         const verTnp = (Project.by('container', project._frameworkVersion) as Project)
           .packageJson.data.dependencies[p];
-        bepj.dependencies[p] = `~${verTnp}`;
+        if (!!verTnp) {
+          bepj.dependencies[p] = `~${verTnp}`;
+        }
       });
       Helpers.writeJson(bePjPath, bepj);
     }
