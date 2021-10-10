@@ -77,7 +77,14 @@ export class BackendCompilation extends IncCompiler.Base {
     # inside: ${cwd}`)
     const project = Project.From(locationOfMainProject) as Project;
     // console.log(`project from ${locationOfMainProject}`, project)
-    if (!!project && !!isBrowserBuild && buildType === 'bundle' && project.frameworkVersionAtLeast('v3') && project.typeIs('angular-lib', 'isomorphic-lib')) {
+    if (!!project
+      && !!isBrowserBuild
+      && buildType === 'bundle'
+      && project.frameworkVersionAtLeast('v3')
+      && project.typeIs(
+        'angular-lib',
+        // 'isomorphic-lib' TODO angular circural deps in new js sucks
+      )) {
       await this.buildAngularVer(project, buildType, watch);
     } else {
       //#region normal js build
@@ -166,7 +173,7 @@ export class BackendCompilation extends IncCompiler.Base {
           'main'
         ].forEach(k => {
           if (k === 'main') {
-            j[k] = 'esm2015/index.js';
+            j[k] = `esm2015/${project.name}.js`;
           } else {
             j[k] = void 0;
             Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.browser, k));

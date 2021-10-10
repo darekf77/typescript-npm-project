@@ -5,6 +5,7 @@ import { DB } from 'tnp-db';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
 import NEW from './NEW-PROJECT_FILES_MODULES/NEW.backend';
 import BUILD from './PROJECTS-DEVELOPMENT/BUILD.backend';
+import RELEASE from './PROJECTS-DEVELOPMENT/RELEASE.backend';
 import BRANDING from './PROJECTS-DEVELOPMENT/BRANDING.backend';
 import DEVELOP from './PROJECTS-DEVELOPMENT/DEVELOP.backend';
 import STUB from './PROJECTS-DEVELOPMENT/STUB.backend';
@@ -26,6 +27,7 @@ export default [
   DEPS,
   NEW,
   BUILD,
+  RELEASE,
   BRANDING,
   DEVELOP,
   STUB,

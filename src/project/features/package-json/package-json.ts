@@ -241,6 +241,8 @@ export class PackageJSON
       if (json.tnp && !(['navi'] as ConfigModels.LibType[]).includes(json.tnp.type)) {
         json.name = path.basename(location);
       }
+      delete json.husky; // TODO annyoning shit
+
       var pkgJson = new PackageJSON({ data: json, location, project });
 
     } catch (err) {
