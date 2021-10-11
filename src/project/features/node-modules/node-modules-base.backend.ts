@@ -41,9 +41,9 @@ export class NodeModulesBase extends NodeModulesCore {
         ...Helpers.linksToFoldersFrom(source.node_modules.path)
       ];
 
-      Helpers.info(`
+      Helpers.log(`
 
-      UPDATING node_moduels packages from smar folder ${packagesToLinkOrCopy.length}
+      UPDATING node_moduels packages from smart installation ${packagesToLinkOrCopy.length}
 
       `);
 
