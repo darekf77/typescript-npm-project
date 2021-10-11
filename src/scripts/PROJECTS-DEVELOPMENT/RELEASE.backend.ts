@@ -1,9 +1,8 @@
-
-import { config } from "tnp-config";
-import { chalk, path, _ } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
-import { Project } from "../../project/abstract/project";
+import { config } from 'tnp-config';
+import { chalk, path, _ } from 'tnp-core';
+import { Helpers } from 'tnp-helpers';
+import { Models } from 'tnp-models';
+import { Project } from '../../project/abstract/project';
 
 const $RELEASE_ALL = async (args: string) => {
   const all = `--all`

@@ -131,10 +131,10 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
-  get targetProjects(): Models.npm.TargetProject[] {
+  get targetProjects(): (Omit<Models.npm.TargetProject, 'path'>)[] {
     const p = this.data.tnp && this.data.tnp.targetProjects;
     // console.log('asdasd',this.data.tnp.targetProjects)
-    return Array.isArray(p) ? p : [];
+    return (Array.isArray(p) ? p : []);
   };
 
   setBuildHash(hash: string) {

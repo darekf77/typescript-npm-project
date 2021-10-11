@@ -6,11 +6,9 @@ import chalk from 'chalk';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
 import { FeatureForProject } from '../abstract/feature-for-project';
-import { Helpers, Project } from 'tnp-helpers';
-// import type { Project } from '../abstract/project/project';
+import { Helpers } from 'tnp-helpers';
+import { Project } from '../abstract/project/project';
 
-const DEFAULT_PATH_GENERATED = 'tmp-target-projects/generated';
-const DEFAULT_PATH_ORIGINS = 'tmp-target-projects/origins';
 
 export class TargetProject extends FeatureForProject {
   //#region @backend
@@ -20,14 +18,21 @@ export class TargetProject extends FeatureForProject {
   }
 
   private get all() {
-    return this.project.packageJson.targetProjects.map(p => {
-      if (!_.isString(p.path)) {
-        p.path = path.join(this.project.location, DEFAULT_PATH_GENERATED, this.project.name);
-      }
-      if (!path.isAbsolute(p.path)) {
-        p.path = path.resolve(path.join(this.project.location, p.path));
-      }
-      return p;
+    return _.cloneDeep(this.project.packageJson.targetProjects).map((p: any) => {
+      const res = p as Models.npm.TargetProject;
+      res.path = path.join(
+        this.project.location,
+        config.folder.targetProjects.DEFAULT_PATH_GENERATED,
+        _.kebabCase(res.origin),
+        _.kebabCase(res.branch)
+      );
+      // if (!_.isString(p.path)) {
+      //   p.path = path.join(this.project.location, DEFAULT_PATH_GENERATED, this.project.name);
+      // }
+      // if (!path.isAbsolute(p.path)) {
+      //   p.path = path.resolve(path.join(this.project.location, p.path));
+      // }
+      return res;
     })
   }
 
@@ -41,10 +46,16 @@ export class TargetProject extends FeatureForProject {
 
 
 async function generate(project: Project, t: Models.npm.TargetProject) {
+  project.packageJson.showDeps('taget project generation');
   if (!Helpers.exists(path.dirname(t.path))) {
     Helpers.mkdirp(path.dirname(t.path));
   }
-  const originDefaultPath = path.join(project.location, DEFAULT_PATH_ORIGINS, _.kebabCase(t.origin));
+  const originDefaultPath = path.join(
+    project.location,
+    config.folder.targetProjects.DEFAULT_PATH_ORIGINS,
+    _.kebabCase(t.origin)
+  );
+
   if (!Helpers.exists(path.dirname(originDefaultPath))) {
     Helpers.mkdirp(path.dirname(originDefaultPath));
   }
@@ -56,23 +67,30 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
     });
   }
 
-  await Helpers.git.pullCurrentBranch(originDefaultPath);
+  // Helpers.git.pullCurrentBranch(originDefaultPath);
 
-  if (!Helpers.exists(t.path)) {
-    Helpers.copy(originDefaultPath, t.path);
+  if (Helpers.exists(t.path)) {
+    Helpers.removeFolderIfExists(t.path);
   }
+  Helpers.copy(originDefaultPath, t.path);
   try {
     Helpers.run(`git checkout ${t.branch}`, { cwd: t.path }).sync();
-    await Helpers.git.pullBranch(t.path, t.branch);
+    // Helpers.git.pullCurrentBranch( t.path);
   } catch (e) {
-    Helpers.error(`[target-project] Not able create target project `
-      + `${chalk.bold(project.name)} from origin ${t.origin}...`);
+    try {
+      Helpers.run(`git checkout -b ${t.branch}`, { cwd: t.path }).sync();
+      // Helpers.git.pullCurrentBranch( t.path);
+    } catch (error) {
+      Helpers.error(`[target-project] Not able create target project (git checkout -b failed)`
+        + `${chalk.bold(project.name)} from origin ${t.origin}...`);
+    }
   }
 
   [
     ...(_.isArray(t.links) ? t.links : []),
     config.folder.components,
     config.folder.src,
+    config.file.package_json,
     ...project.resources,
     config.file.index_js,
     config.file.index_js_map,
@@ -81,15 +99,29 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
   ].forEach(l => {
     const source = path.join(project.location, l);
     const dest = path.join(t.path, l);
+    // Helpers.info(`
+    // copy;
+    // source: ${source}
+    // dest: ${dest}
+    // `)
     if (Helpers.exists(source)) {
       if (Helpers.isFolder(source)) {
-        Helpers.copy(source, dest);
+        Helpers.copy(source, dest, {
+          asSeparatedFiles: true,
+          asSeparatedFilesAllowNotCopied: true,
+          omitFolders: [
+            config.folder.node_modules,
+            config.folder.dist,
+            config.folder.bundle,
+            config.folder.out,
+          ],
+        });
       } else {
         Helpers.copyFile(source, dest);
       }
     }
   });
-
+  Helpers.info('COPY DONE');
   [
     config.folder.node_modules,
   ].forEach(l => {
@@ -100,6 +132,16 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
       { continueWhenExistedFolderDoesntExists: true });
   });
 
+  _.values(config.frameworkNames).forEach(f => {
+    Helpers.setValueToJSON(path.join(t.path, config.file.package_json), `${f}.targetProjects`, void 0);
+  });
+  [
+    config.file.yarn_lock,
+    config.file.package_json5
+  ].forEach(dumbFiles => {
+    Helpers.removeFileIfExists(path.join(t.path, dumbFiles));
+  });
   Helpers.run(`code ${t.path}`).sync();
+  Helpers.info("DONE")
 
 }

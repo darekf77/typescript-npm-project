@@ -162,7 +162,8 @@ export async function start(
   argsv = handleSpecialArgs(argsv);
   argsv = argsv.map((arg, i) => {
     const biggerRep = config.argsReplacements[arg];
-    if (biggerRep && arg[i - 1] && !arg[i - 1].startsWith('-')) {
+    const minus = argsv[i - 1];
+    if (biggerRep && minus && !minus.startsWith('-')) {
       return biggerRep;
     }
     return arg;
