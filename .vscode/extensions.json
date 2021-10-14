@@ -32,5 +32,7 @@
         "mrmlnc.vscode-json5",
         "maximus136.change-string-case",
         "mikebovenlander.formate",
+        "vespa-dev-works.jestrunit",
+        "marinhobrandao.angular2tests"
     ]
 }
