@@ -48,6 +48,13 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
     try {
       await super.compile(watch);
     } catch (e) {
+      console.log(require('callsite-record')({
+        forError: e
+      }).renderSync({
+        // stackFilter(frame) {
+        //   return !frame.getFileName().includes('node_modules');
+        // }
+      }))
       Helpers.error(`Browser compilation fail: ${e}`, false, true);
     }
   }
