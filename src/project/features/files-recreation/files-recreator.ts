@@ -76,7 +76,17 @@ export class FilesRecreator extends FeatureForProject {
         project.location,
         f.replace('projects/my-lib',
           tmpProjects));
-      Helpers.copy(orgPath, destPath);
+      if (orgPath !== destPath) {
+        if(Helpers.isFolder(orgPath)) {
+          Helpers.copy(orgPath, destPath);
+        } else {
+          Helpers.copyFile(orgPath, destPath);
+        }
+      } else {
+        Helpers.warn(`${config.frameworkName} [initAngularLibStructure] trying to copy same thing:
+        ${orgPath}
+        `)
+      }
     });
     const from = path.join(project.location, project.typeIs('angular-lib')
       ? config.folder.components : config.folder.tmpFor(outFolder));
