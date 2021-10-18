@@ -259,11 +259,16 @@ processing...
     //#endregion
   } else {
     //#region standalone project release
-
-    await proj.release(handleStandalone(proj, argsObj), automaticRelease);
+    if (proj.targetProjects.exists) {
+      await proj.targetProjects.update();
+      process.exit(0);
+    } else {
+      await proj.release(handleStandalone(proj, argsObj), automaticRelease);
+      process.exit(0);
+    }
     //#endregion
   }
-  process.exit(0);
+
 };
 
 const $RELEASE_MAJOR = async (args: string) => {

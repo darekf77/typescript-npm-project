@@ -37,8 +37,10 @@ export class TargetProject extends FeatureForProject {
   }
 
   async update() {
-    console.log('update target project', this.all)
-    this.all.forEach(a => generate(this.project, a));
+    for (let index = 0; index < this.all.length; index++) {
+      const a = this.all[index];
+      await generate(this.project, a);
+    }
   }
 
   //#endregion
@@ -66,25 +68,31 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
       destinationFolderName: _.kebabCase(t.origin)
     });
   }
-
-  // Helpers.git.pullCurrentBranch(originDefaultPath);
+  Helpers.log('PULLLING BRANCH')
+  await Helpers.git.pullCurrentBranch(originDefaultPath);
 
   if (Helpers.exists(t.path)) {
     Helpers.removeFolderIfExists(t.path);
   }
   Helpers.copy(originDefaultPath, t.path);
+  let switched = true;
   try {
     Helpers.run(`git checkout ${t.branch}`, { cwd: t.path }).sync();
-    // Helpers.git.pullCurrentBranch( t.path);
+    await Helpers.git.pullCurrentBranch(t.path);
   } catch (e) {
+    switched = false;
+  }
+  if (!switched) {
     try {
       Helpers.run(`git checkout -b ${t.branch}`, { cwd: t.path }).sync();
-      // Helpers.git.pullCurrentBranch( t.path);
+      await Helpers.git.pullCurrentBranch(t.path);
     } catch (error) {
       Helpers.error(`[target-project] Not able create target project (git checkout -b failed)`
         + `${chalk.bold(project.name)} from origin ${t.origin}...`);
     }
   }
+
+  Helpers.log('UPDATING SHIT');
 
   [
     ...(_.isArray(t.links) ? t.links : []),
