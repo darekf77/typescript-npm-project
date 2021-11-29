@@ -16,7 +16,7 @@ export class StaticBuild extends FeatureForProject {
       Helpers.log(`Already regenrated workspace ${this.project.genericName}`)
       return;
     } else {
-      // console.log(`NOT YET GENERATED ${this.project.genericName}`)
+      Helpers.log(`NOT YET GENERATED ${this.project.genericName}`)
     }
     if (this.project.isWorkspaceChildProject) {
       if (!this.project.parent.bundledWorkspace) {
@@ -43,22 +43,28 @@ async function regenerateBundledWorkspace(project: Project) {
 
   const locationOfGeneratedProject = getLocationOfGeneratedProject(project, outDir);
 
-  if (project.isWorkspace && project.isSite) {
-    const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
-    await initBaseline(project);
-    generateBaselineSourceInDist(project, genLocationBaseline);
-    await initGeneratedBaselienInDist(genLocationBaseline);
+  if (project.isStandaloneProject) {
+    // project.copyManager.generateSourceCopyIn(locationOfGeneratedProject);
+  } else {
+    if (project.isWorkspace && project.isSite) {
+      const genLocationBaseline = path.join(project.location, outDir, project.baseline.name);
+      await initBaseline(project);
+      generateBaselineSourceInDist(project, genLocationBaseline);
+      await initGeneratedBaselienInDist(genLocationBaseline);
+    }
+
+    if (project.isWorkspace) {
+      if (project.bundledWorkspace) {
+        project.copyManager.generateSourceCopyIn(project.bundledWorkspace.location, { override: false, });
+      } else {
+        project.copyManager.generateSourceCopyIn(locationOfGeneratedProject);
+      }
+    } else if (project.isWorkspaceChildProject) {
+      project.copyManager.generateSourceCopyIn(locationOfGeneratedProject, { override: false });
+    }
   }
 
-  if (project.isWorkspace) {
-    if (project.bundledWorkspace) {
-      project.copyManager.generateSourceCopyIn(project.bundledWorkspace.location, { override: false, });
-    } else {
-      project.copyManager.generateSourceCopyIn(locationOfGeneratedProject);
-    }
-  } else if (project.isWorkspaceChildProject) {
-    project.copyManager.generateSourceCopyIn(locationOfGeneratedProject, { override: false });
-  }
+
 
 }
 
@@ -80,7 +86,9 @@ async function initBaseline(project: Project) {
 }
 
 function getLocationOfGeneratedProject(project: Project, outDir: string) {
-  return project.isWorkspace ?
+  return (project.isWorkspace
+    // || project.isStandaloneProject
+  ) ?
     path.join(project.location, outDir, project.name) :
     path.join(project.parent.location, outDir, project.parent.name, project.name);
 }

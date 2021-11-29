@@ -213,10 +213,10 @@ export default _default;
     if (!this.project.isStandaloneProject) {
       return;
     }
-    // if(process.platform  === 'win32') { // TODO QUICKFIX
-    Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
-    return;
-    // }
+    if (process.platform === 'win32') { // TODO QUICKFIX
+      Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
+      return;
+    }
     const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
     const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
     Helpers.removeIfExists(pathToSelf);
@@ -225,8 +225,22 @@ export default _default;
       .map(f => crossPlatformPath(f))
       .forEach(f => {
         const relative = f.replace(`${pathToSrc}/`, '');
-        Helpers.createSymLink(f, path.join(pathToSelf, relative), { continueWhenExistedFolderDoesntExists: true });
-        Helpers.createSymLink(f, path.join(pathToSelf, config.folder.browser, relative), { continueWhenExistedFolderDoesntExists: true });
+        const from = f;
+        const to1 = path.join(pathToSelf, relative);
+        const to2 = path.join(pathToSelf, config.folder.browser, relative)
+        try {
+          Helpers.createSymLink(f, to1, { continueWhenExistedFolderDoesntExists: true });
+          Helpers.createSymLink(f, to2, { continueWhenExistedFolderDoesntExists: true });
+        } catch (error) {
+          Helpers.warn(`[${config.frameworkName}][linkSourceOfItselfToNodeModules]
+          Not able to link "${from}"
+          to:
+          ${to1}
+          and
+          ${to2}
+          `)
+        }
+
       });
   }
 

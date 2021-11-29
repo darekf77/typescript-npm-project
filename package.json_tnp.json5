@@ -2,6 +2,7 @@
   "resources": [],
   "type": "isomorphic-lib",
   "version": "v2",
+
   "overrided": {
     "dependencies": {
       "@types/semver": "6.0.1",
@@ -46,11 +47,13 @@
     "includeOnly": [],
     "linkedFolders": []
   },
+
   "libs-with-issues": {
     "ts-sinon": "1.0.12",
     "@types/jasmine": "~2.8.0",
     "@types/jasminewd2": "~2.0.2"
   },
+
   "core": {
     "dependencies": {
       "dedupe": [
@@ -514,16 +517,21 @@
       }
     }
   },
+
   "linkedProjects": [],
+
   "libReleaseOptions": {
     "nodts": false,
     "obscure": true,
     "ugly": true
   },
+
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
   },
+
   "license": "MIT",
   "private": false,
-  "main": "index.js"
+  "main": "index.js",
+  'workerPlugins': {},
 }

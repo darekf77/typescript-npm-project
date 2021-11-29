@@ -66,7 +66,9 @@ export abstract class StaticProject {
       return;
     }
     let project: Project;
-    if (this.isWorkspace) {
+    if (this.isWorkspace
+      // || this.isStandaloneProject TODO this will gaterh all bundles worker ??
+    ) {
       const originPath = path.resolve(path.join(this.location, '..', '..'));
       // console.log('originPath', originPath)
       project = Project.From<Project>(originPath);

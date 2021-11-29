@@ -510,7 +510,8 @@
     },
     "license": "MIT",
     "private": false,
-    "main": "index.js"
+    "main": "index.js",
+    "workerPlugins": {}
   },
   "name": "tnp",
   "version": "0.0.159",

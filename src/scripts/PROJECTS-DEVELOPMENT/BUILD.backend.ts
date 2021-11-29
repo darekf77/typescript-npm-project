@@ -187,16 +187,20 @@ async function $ACTIVE_SINGULAR_BUILD(args) {
 
 //#region STATIC BUILD
 const STATIC_BUILD = async (args) => {
-  if (!(Project.Current as Project).isWorkspace) {
+  const project = (Project.Current as Project);
+  if
+    (!project.isWorkspace
+    // && !project.isStandaloneProject
+  ) {
     Helpers.error(`Please use:
 ${chalk.gray(`$ ${config.frameworkName} static:build:lib`)}
 or
 ${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
 
-inside workspace children.
+inside workspace children or inside standalone project.
     `, false, true);
   }
-  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
+  const staticVersionOfProject = await project.StaticVersion();
   if (staticVersionOfProject) {
     await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
   } else {

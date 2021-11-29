@@ -509,5 +509,6 @@
   },
   "license": "MIT",
   "private": false,
-  "main": "index.js"
+  "main": "index.js",
+  "workerPlugins": {}
 }
