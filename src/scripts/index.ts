@@ -3,6 +3,7 @@ import BENCHMARKS from './BENCHMARK/BENCHMARK-TNP-PROJECTS.backend';
 import COMPILERS from './COMPILERS-TESTING/COMPILERS.backend';
 import { DB } from 'tnp-db';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
+import CLOUD from './CLOUD/CLOUD.backend';
 import NEW from './NEW-PROJECT_FILES_MODULES/NEW.backend';
 import BUILD from './PROJECTS-DEVELOPMENT/BUILD.backend';
 import RELEASE from './PROJECTS-DEVELOPMENT/RELEASE.backend';
@@ -26,6 +27,7 @@ export default [
   DB,
   DEPS,
   NEW,
+  CLOUD,
   BUILD,
   RELEASE,
   BRANDING,

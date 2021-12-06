@@ -41,6 +41,8 @@ import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
 import { RecentFilesForContainer } from '../../features/recent-files.backend';
+import { CloudProject } from './cloud-project';
+import { GlobalWorkerApps } from '../../features/global-worker-apps';
 //#endregion
 
 @Morphi.Entity<Project>({
@@ -184,6 +186,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('gitActions', GitActions);
       this.defineProperty<Project>('smartNodeModules', SmartNodeModules);
       this.defineProperty<Project>('recent', RecentFilesForContainer);
+      this.defineProperty<Project>('workerApps', GlobalWorkerApps);
 
     }
 
@@ -198,8 +201,8 @@ export interface Project extends
   NpmProject,
   FeatureProject,
   TnpProject,
-  FolderProject
-
+  FolderProject,
+  CloudProject
   ,
   LibProject,
   VscodeProject,
@@ -224,6 +227,7 @@ Helpers.applyMixins(Project, [
   FeatureProject,
   TnpProject,
   FolderProject,
+  CloudProject,
 
   LibProject,
   VscodeProject,
