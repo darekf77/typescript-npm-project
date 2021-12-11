@@ -8,7 +8,13 @@ async function $UPATE_CLOUD() {
 }
 
 async function $DETECT_GLOBAL_LIBS() {
-  (Project.Current as Project).workerApps.detectGlobal();
+  const proj = (Project.Current as Project);
+  const libs = proj.workerApps.detectGlobal;
+  Helpers.info(`
+OUTPUT:
+  ${libs.join('\n')}
+
+  ` )
   process.exit(0)
 }
 
