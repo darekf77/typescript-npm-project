@@ -156,6 +156,16 @@ function $OPEN_NAVI_CLI() {
   Helpers.run(`code ${Project.NaviCliLocation}`, { biggerBuffer: false }).sync();
 }
 
+async function $OPEN_UNSTAGE() {
+  const proj = (Project.Current as Project);
+  const libs = proj.childrenThatAreLibs.filter(f => f.git.thereAreSomeUncommitedChangeExcept([
+    config.file.package_json,
+    config.file.package_json5,
+    config.file.package_json__tnp_json5,
+  ]));
+  libs.forEach(l => l.openInVscode());
+  process.exit(0)
+}
 
 
 export default {
@@ -172,6 +182,7 @@ export default {
   $RECENT_ACTIVE_SAVE: Helpers.CLIWRAP($RECENT_ACTIVE_SAVE, '$RECENT_ACTIVE_SAVE'),
   $SET_RECENT: Helpers.CLIWRAP($SET_RECENT, '$SET_RECENT'),
 
+  $OPEN_UNSTAGE: Helpers.CLIWRAP($OPEN_UNSTAGE, '$OPEN_UNSTAGE'),
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
   $OPEN_NAVI_CLI: Helpers.CLIWRAP($OPEN_NAVI_CLI, '$OPEN_NAVI_CLI'),

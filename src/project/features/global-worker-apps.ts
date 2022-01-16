@@ -11,9 +11,10 @@ export class GlobalWorkerApps extends FeatureForProject {
     try {
       const command = `ls -al "\`npm root -g\`"`;
       const result = Helpers.run(command, { output: false }).sync().toString();
-      return result.split('\n').map(f => {
-        return _.last(f.split(' ')).trim()
-      })
+      return result.split('\n')
+        .map(f => {
+          return _.last(f.split(' ')).trim();
+        })
         .map(f => {
           if (f.search('\/') !== -1) {
             if (isWin) {
@@ -26,7 +27,7 @@ export class GlobalWorkerApps extends FeatureForProject {
         })
         .filter(f => {
           return !!f && f !== '.' && f !== '..' && !f.startsWith('@') && f.length > 1;
-        })
+        });
     } catch (error) {
       return [];
     }

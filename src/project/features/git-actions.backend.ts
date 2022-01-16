@@ -1,9 +1,9 @@
 //#region imports
 import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
+import { fse } from 'tnp-core';
 import chalk from 'chalk';
 import { Helpers } from 'tnp-helpers';
-import { path } from 'tnp-core'
+import { path } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Models, PROGRESS_DATA } from 'tnp-models';
 import { os } from 'tnp-core';
@@ -28,6 +28,7 @@ export class GitActions extends FeatureForProject {
       this.project.run(`code .`).async();
       Helpers.warn(`
 
+      Project: ${this.project.genericName}
       WARNGING default branch is not master...
 
       `);
@@ -101,7 +102,7 @@ export class GitActions extends FeatureForProject {
   private async repeatMenu(action: keyof GitActions, force = false) {
     await Helpers.actionWrapper(async () => {
       if (action === 'pull') {
-        await this.project.git.pullCurrentBranch(true)
+        await this.project.git.pullCurrentBranch(true);
       }
       if (action === 'push') {
         await this.project.git.pushCurrentBranch(force);
@@ -133,7 +134,7 @@ export class GitActions extends FeatureForProject {
     ) {
       config.coreProjectVersions
         .map(v => {
-          return { v, c: Project.by('container', v as any) }
+          return { v, c: Project.by('container', v as any) };
         })
         .filter(({ c }) => !!c)
         .forEach(({ v, c }) => {
@@ -148,7 +149,7 @@ export class GitActions extends FeatureForProject {
               const currentContent = Helpers.readJson(pathPjOrg);
 
               if (pj === config.file.package_json) {
-                (currentContent as Models.npm.IPackageJSON).tnp.overrided.linkedFolders = []
+                (currentContent as Models.npm.IPackageJSON).tnp.overrided.linkedFolders = [];
               }
               if (pj === config.file.package_json__tnp_json) {
                 currentContent.overrided.linkedFolders = [];
@@ -187,7 +188,7 @@ export class GitActions extends FeatureForProject {
     [WARNING]  Stashing uncommit changes... in ${this.project.genericName}
 
 
-      `)
+      `);
       try {
         this.project.run(`add --all .`).sync();
       } catch (error) { }

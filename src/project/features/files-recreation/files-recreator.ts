@@ -77,7 +77,7 @@ export class FilesRecreator extends FeatureForProject {
         f.replace('projects/my-lib',
           tmpProjects));
       if (orgPath !== destPath) {
-        if(Helpers.isFolder(orgPath)) {
+        if (Helpers.isFolder(orgPath)) {
           Helpers.copy(orgPath, destPath);
         } else {
           Helpers.copyFile(orgPath, destPath);
@@ -137,7 +137,7 @@ export class FilesRecreator extends FeatureForProject {
       '.npmrc',
       'tslint.json',
       '.editorconfig'
-    ]
+    ];
   }
 
   get filesIgnoredBy() {

@@ -1,5 +1,5 @@
 import { Helpers } from 'tnp-helpers';
-import { path, _ } from 'tnp-core'
+import { path, _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
@@ -10,36 +10,42 @@ export function $VSCODE_EXT(args: string, exit = true) {
     output: true
   }).sync();
   if (Helpers.isWsl) {
-    Helpers.warn(`MANUALL INSTALL NEEDED FOR EXTENSION ${path.join(config.pathes.tnp_vscode_ext_location, 'tnp-vscode-ext-0.0.1.vsix')}`)
+    Helpers.warn(`MANUALL INSTALL NEEDED FOR EXTENSION ${path.join(config.pathes.tnp_vscode_ext_location, 'tnp-vscode-ext-0.0.1.vsix')}`);
   }
-  exit && process.exit(0)
+  if (exit) {
+    process.exit(0);
+  }
 }
 
 function showfilesfor(project: Project) {
   project.recreate.vscode.settings.excludedFiles(false);
-  project.recreate.vscode.settings.colorsFromWorkspace()
+  project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
 function hidefilesfor(project: Project) {
   project.recreate.vscode.settings.excludedFiles(true);
-  project.recreate.vscode.settings.colorsFromWorkspace()
+  project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
   showfilesfor((Project.Current as Project));
-  exit && process.exit(0)
+  if (exit) {
+    process.exit(0);
+  }
 }
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
   hidefilesfor((Project.Current as Project));
-  exit && process.exit(0)
+  if (exit) {
+    process.exit(0);
+  }
 }
 
 export function $INIT_VSCODE() {
   (Project.Current as Project).recreate.vscode.settings.excludedFiles();
   (Project.Current as Project).recreate.vscode.settings.colorsFromWorkspace();
-  process.exit(0)
-};
+  process.exit(0);
+}
 
 export async function $VSCODE_INIT_ALL() {
   const db = await TnpDB.Instance();
@@ -54,7 +60,7 @@ export async function $VSCODE_INIT_ALL() {
 
 function $WSL_FIX() {
   Helpers.run(`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`).sync();
-  process.exit(0)
+  process.exit(0);
 }
 
 function $VSCODE() {
@@ -76,7 +82,7 @@ async function PROJECT_KILL_ALL() {
     command = `kill -9 $(pgrep 'Code Helper') && kill -9 $(pgrep 'Code')`;
   }
   // run(`kill§ `).sync()
-  process.exit(0)
+  process.exit(0);
 }
 
 
@@ -85,8 +91,8 @@ function $FIX_WSL() {
 }
 
 function $VSCODE_GLOBAL() {
-  let keybindingPathLinxu = Helpers.resolve('~/.config/Code/User/keybindings.json');
-  let keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
+  const keybindingPathLinxu = Helpers.resolve('~/.config/Code/User/keybindings.json');
+  const keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
   const keys = [
     {
       'key': 'shift+cmd+s',
@@ -118,18 +124,18 @@ function $VSCODE_GLOBAL() {
     , keys);
 
   const windowsSettings = {
-    "terminal.integrated.defaultProfile.windows": "Git Bash",
-    "terminal.integrated.shellArgs.windows": [
-      "--login"
+    'terminal.integrated.defaultProfile.windows': 'Git Bash',
+    'terminal.integrated.shellArgs.windows': [
+      '--login'
     ],
-    "window.customMenuBarAltFocus": false,
-    "window.enableMenuBarMnemonics": false,
-    "terminal.integrated.rightClickBehavior": "selectWord",
+    'window.customMenuBarAltFocus': false,
+    'window.enableMenuBarMnemonics': false,
+    'terminal.integrated.rightClickBehavior': 'selectWord',
   };
 
   const settingsMacOS = {
-    "terminal.integrated.shell.osx": "/bin/bash",
-  }
+    'terminal.integrated.shell.osx': '/bin/bash',
+  };
 
   let settings = {
     'git.enableSmartCommit': true,
@@ -155,7 +161,7 @@ function $VSCODE_GLOBAL() {
     },
     'search.followSymlinks': false,
     'javascript.implicitProjectConfig.experimentalDecorators': true,
-    "js/ts.implicitProjectConfig.experimentalDecorators": true,
+    'js/ts.implicitProjectConfig.experimentalDecorators': true,
     'gitlens.historyExplorer.enabled': true,
     'diffEditor.ignoreTrimWhitespace': true,
     'explorer.confirmDelete': false,
@@ -170,13 +176,16 @@ function $VSCODE_GLOBAL() {
     'debug.node.showUseWslIsDeprecatedWarning': false,
     'explorer.compactFolders': false,
     'workbench.colorTheme': 'Default Light+',
-    "update.mode": "none",
-    "debug.onTaskErrors": "abort",
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "terminal.integrated.tabs.enabled": false
+    'update.mode': 'none',
+    'debug.onTaskErrors': 'abort',
+    'typescript.tsdk': 'node_modules/typescript/lib',
+    'terminal.integrated.tabs.enabled': false,
+    'tslint.autoFixOnSave': true,
+    'tslint.enable': true,
+    'tslint.alwaysShowRuleFailuresAsWarnings': true,
   };
-  let settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json')
-  let settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
+  const settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json');
+  const settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
   let settingspath = '~/Library/Application Support/Code/User/settings.json';
 
   if (process.platform === 'darwin') {
@@ -212,8 +221,8 @@ const $VSCODE_FIX = async () => {
     const proj = projects[index];
     proj.project && (proj.project as Project).recreate.vscode.settings.gitReset();
   }
-  process.exit(0)
-}
+  process.exit(0);
+};
 
 
 const $FILES_HIDE = (args, exit) => $VSCODE_TEMP_HIDE(args, exit);
@@ -269,4 +278,4 @@ export default {
   $FIX_WSL: Helpers.CLIWRAP($FIX_WSL, '$FIX_WSL'),
   $VSCODE_GLOBAL: Helpers.CLIWRAP($VSCODE_GLOBAL, '$VSCODE_GLOBAL'),
   $VSCODE_FIX: Helpers.CLIWRAP($VSCODE_FIX, '$VSCODE_FIX'),
-}
+};
