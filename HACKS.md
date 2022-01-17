@@ -56,3 +56,8 @@ arch -x86_64 brew install <package>
 git remote set-url orgin <my-new-origin-name>
 ```
 
+
+# node_modules files size
+```
+du -sh ./node_modules/* | sort -nr | grep '\dM.*'
+```

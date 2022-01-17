@@ -15,6 +15,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
     if (this.project.isTnp || this.project.isNaviCli) {
       return false;
     }
+
     return (this.project.isStandaloneProject
       || (this.project.isWorkspace && (process.platform !== 'win32')) // TODO QUICK_FIX creation of many symlinks not allowedo on vdi
       || this.project.isWorkspaceChildProject)
@@ -113,7 +114,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         if (!this.project.node_modules.isLink) {
           this.project.node_modules.dedupe(); // TODO this does not apply for smartInstalation..
-                                              // but how to check if smart installation is smart not normal ?
+          // but how to check if smart installation is smart not normal ?
         }
         // this.project.node_modules.stuberizeFrontendPackages();
       }

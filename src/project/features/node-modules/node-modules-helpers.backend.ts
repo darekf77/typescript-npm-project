@@ -10,9 +10,8 @@ import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 
 //#region dedupe packages
-export function dedupePackages(projectLocation: string, packages?: string[], countOnly = false, warnings = true) {
-  let packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
-    (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
+export function dedupePackages(projectLocation: string, packagesNames?: string[], countOnly = false, warnings = true) {
+
   // console.log('(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe)
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
@@ -100,27 +99,31 @@ export function dedupePackages(projectLocation: string, packages?: string[], cou
             .replace(/\/$/, '')
         );
 
-
-
         const org = path.basename(path.dirname(path.dirname(path.dirname(p))));
-        if (org.startsWith('\@')) {
+        if (org.startsWith('\@') || org.startsWith('@')) {
           parentName = `${org}/${parentName}`
         }
 
+        const parentLabel = parentName ? `${parentName}/` : ''; // TODO not working !
+
         if (rules[current.name]) {
           const r = rules[current.name];
-          if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName) || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
-            Helpers.warn(`[excluded] Ommiting duplicate of ${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
+          if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName)
+            || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
+            Helpers.warn(`[excluded] Ommiting duplicate of `
+              + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
-            Helpers.warn(`[not included] Ommiting duplicate of ${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
+            Helpers.warn(`[not included] Ommiting duplicate of `
+              + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
         }
 
         Helpers.remove(p, true)
-        Helpers.info(`Duplicate of ${current.name}@${versionRem} removed from ${CLI.chalk.bold(parentName)}`)
+        Helpers.warn(`Duplicate of ${parentLabel}${current.name}@${versionRem}`
+          + ` removed from ${CLI.chalk.bold(parentName)}`)
       });
     }
 

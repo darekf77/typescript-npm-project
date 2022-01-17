@@ -165,12 +165,12 @@ export class BackendCompilation extends IncCompiler.Base {
         j.devDependencies = {};
         j.peerDependencies = {};
         [
-          'module',
-          'fesm5',
-          'fesm2015',
-          'es2015',
-          'bundles',
-          'main'
+          // 'module',
+          // 'fesm5',
+          // 'fesm2015',
+          // 'es2015',
+          // 'bundles',
+          // 'main'
         ].forEach(k => {
           if (k === 'main') {
             j[k] = `esm2015/${project.name}.js`;

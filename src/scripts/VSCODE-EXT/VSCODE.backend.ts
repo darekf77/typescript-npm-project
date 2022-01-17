@@ -180,8 +180,8 @@ function $VSCODE_GLOBAL() {
     'debug.onTaskErrors': 'abort',
     'typescript.tsdk': 'node_modules/typescript/lib',
     'terminal.integrated.tabs.enabled': false,
-    'tslint.autoFixOnSave': true,
-    'tslint.enable': true,
+    'tslint.autoFixOnSave': false, // TODO
+    'tslint.enable': false, // TODO
     'tslint.alwaysShowRuleFailuresAsWarnings': true,
   };
   const settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json');

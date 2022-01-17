@@ -10,9 +10,12 @@ import { PackagesRecognition } from '../compilers/build-isomorphic-lib/packages-
 
 export class PackagesRecognitionExtended extends PackagesRecognition {
 
+  constructor(protected cwd: string, protected project: Project) {
+    super(cwd);
+  }
 
   public static fromProject(project: Project) {
-    return new PackagesRecognitionExtended(project.location);
+    return new PackagesRecognitionExtended(project.location, project);
   }
 
   // @ts-ignore

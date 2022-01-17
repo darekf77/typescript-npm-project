@@ -69,6 +69,7 @@ Helper project for my typescript npm libraries.
   @@@@ RESOLVE WITH NEW ANGULAR IMPORT SYSTEM
 
 # ISSUES
+- sometime too much dedupe is a BAD THING
 - dont put Class Componentts to input @Input() 
 - maximulat call stack exceeded for lazy loading routing -> include router module
 - dont us getters in for loop, assign value firt

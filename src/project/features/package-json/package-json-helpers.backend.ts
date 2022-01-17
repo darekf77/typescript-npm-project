@@ -21,7 +21,7 @@ function clenIgnored(project: Project, deps: Object, overrided = {}) {
         if (patternRegex.test(depName) && !overrided[depName]) {
           delete deps[depName];
         }
-      })
+      });
     });
   }
 }
@@ -119,7 +119,7 @@ export function reolveAndSaveDeps(project: Project, action: Models.npm.SaveActio
 //#region override info
 function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: any }
   , toOverrideDependencies, newDepsForProject) {
-  let { orginalDependencies, orginalDevDependencies } = deps;
+  const { orginalDependencies, orginalDevDependencies } = deps;
 
   function check(orgDeps, checkinDev: boolean) {
     Object.keys(orgDeps).forEach(oldDepName => {
@@ -270,7 +270,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
     // Helpers.info(`Inlcude only: \n${onlyAllowedInDependencies.join('\n')}`);
 
-    const keyToDeleteDevDeps = []
+    const keyToDeleteDevDeps = [];
     Object.keys(devDependencies)
       .filter(key => !!devDependencies[key])
       .forEach(key => {
@@ -282,7 +282,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         }
       });
 
-    const keyToDeleteDeps = []
+    const keyToDeleteDeps = [];
     Object.keys(dependencies)
       .filter(key => !!dependencies[key])
       .forEach(key => {
@@ -311,7 +311,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (recrateInPackageJson) {
-    Helpers.log(`[package.json] save for install - ${project._type} project: "${project.name}" , [${reasonToShowPackages}]`)
+    Helpers.log(`[package.json] save for install - ${project._type} project: "${project.name}" , [${reasonToShowPackages}]`);
     if (project.isTnp) {
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
@@ -346,7 +346,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.engines = engines;
     }
   } else {
-    Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`)
+    Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`);
     project.packageJson.data.devDependencies = {};
     project.packageJson.data.dependencies = {};
     if (!project.isCoreProject && !project.isVscodeExtension) {
@@ -360,7 +360,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     project.packageJson.data.private = prv;
   }
   if (project.isTnp) {
-    Helpers.info(`Execute ${config.frameworkName} action`)
+    Helpers.info(`Execute ${config.frameworkName} action`);
     const keysToDelete = [];
     Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
       const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];
@@ -385,25 +385,40 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       }
       if (project.isVscodeExtension) {
         project.packageJson.data.devDependencies['vscode'] = project.packageJson.data.dependencies['vscode'];
-        delete project.packageJson.data.dependencies['vscode']
+        delete project.packageJson.data.dependencies['vscode'];
       }
     }
   }
   if (project.isContainerCoreProject) { // TODO TESTING
+    //#region handle container core bulk deps instatlation for all other packages
     _.keys(project.packageJson.data.dependencies)
       .forEach(depName => {
         const v = project.packageJson.data.dependencies[depName];
         if (v) {
-          project.packageJson.data.dependencies[depName] = v.replace('~', '').replace(`^`, '');
+          if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
+            return depName.startsWith(s);
+          }))) {
+            project.packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
+          } else {
+            project.packageJson.data.dependencies[depName] = v.replace('~', '').replace(`^`, '');
+          }
+
         }
       });
     _.keys(project.packageJson.data.devDependencies)
       .forEach(depName => {
         const v = project.packageJson.data.devDependencies[depName];
         if (v) {
-          project.packageJson.data.devDependencies[depName] = v.replace('~', '').replace(`^`, '');
+          if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
+            return depName.startsWith(s);
+          }))) {
+            project.packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
+          } else {
+            project.packageJson.data.devDependencies[depName] = v.replace('~', '').replace(`^`, '');
+          }
         }
       });
+    //#endregion
   }
 }
 //#endregion
@@ -458,7 +473,7 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
 
   Object.keys(allDeps).forEach(name => {
     if (onlyAsDevAllowed.includes(name) || (onlyAsDevAllowed as any[]).filter(d => (new RegExp(d)).test(name)).length > 0) {
-      deps[name] = allDeps[name]
+      deps[name] = allDeps[name];
     }
   });
   return deps;
@@ -481,7 +496,7 @@ function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackag
       (onlyAsDevAllowed as any[]).filter(f => (new RegExp(f)).test(name)).length > 0) {
       deps[name] = undefined;
     }
-  })
+  });
   return deps;
 }
 //#endregion
@@ -536,21 +551,21 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
           if (_.isFunction(updateFn)) {
             out[key] = updateFn(obj, key);
           } else {
-            out[key] = obj[key]
+            out[key] = obj[key];
           }
         }
       }
     } else if (!!parent) {
       // console.log('parent!11')
       // console.log(`parent[${key}]`, parent[key])
-      travelObject(parent[obj[key]], out, parent, updateFn)
+      travelObject(parent[obj[key]], out, parent, updateFn);
     }
   });
 }
 //#endregion
 
 //#region set dependency and save
-export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project,) {
+export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project, ) {
   // console.log('set DEPS', p)
   // process.exit(0)
   if (!p || !p.name) {

@@ -1,6 +1,7 @@
 //#region @backend
 import chalk from 'chalk';
 export { ChildProcess } from 'child_process';
+import { path } from 'tnp-core';
 //#endregion
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
@@ -167,6 +168,18 @@ export abstract class BaseProject {
     }
     //#region @backend
     return this.isContainer && this.isCoreProject;
+    //#endregion
+  }
+
+  // @ts-ignore
+  get isContainerCoreProjectTempProj(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.isContainerCoreProjectTempProj;
+    }
+    //#region @backend
+    const dirpar = path.dirname(path.dirname(this.location));
+    const isTemp = path.basename(dirpar) === 'tmp-smart-node_modules'; // TODO QUICK_FIX
+    return this.isContainerCoreProject && isTemp;
     //#endregion
   }
 

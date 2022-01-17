@@ -148,13 +148,17 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
   const noPackageLock = (project.isStandaloneProject) ? '--no-package-lock' : '';
-  const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
-  if (useYarn) {
+
+  if (useYarn
+    // || project.frameworkVersionEquals('v3')
+    ) {
     // --ignore-scripts
     // yarn install --prefer-offline
-    command = `yarn ${pkg ? 'add' : install} ${argsForFasterInstall} ${pkg ? pkg.name : ''} `
+    const argsForFasterInstall = `--prefer-offline --no-audit`;
+    command = `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''}  ${argsForFasterInstall}`
       + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
   } else {
+    const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
     command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} ${argsForFasterInstall} `;
   }
   return command;

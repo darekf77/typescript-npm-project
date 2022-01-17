@@ -20,7 +20,48 @@ export class NodeModulesCore extends FeatureForProject {
   public get exist() { return nodeModulesExists(this.project); }
   public get isLink() { return Helpers.isLink(this.path); }
   public dedupe = (packages?: string[]) => {
-    dedupePackages(this.project.location, packages, false, !this.project.npmPackages.useSmartInstall)
+
+    const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
+      (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
+
+    if (this.project.frameworkVersionEquals('v3')) { // TODO QUICK_FIX
+      const onlyDedpupeForV3 = [
+        "@angular/animations",
+        "@angular/cdk",
+        "@angular/common",
+        "@angular/compiler",
+        "@angular/http",
+        "@angular/core",
+        "@angular/forms",
+        "@angular/material",
+        "@angular/platform-browser",
+        "@angular/platform-browser-dynamic",
+        "@angular/pwa",
+        "@angular/router",
+        "@angular/service-worker",
+        "zone.js",
+        "typescript",
+      ]
+
+      const isomorphicPkgs = [
+        ...this.project.isomorphicPackages,
+        ...onlyDedpupeForV3,
+      ];
+      // console.log(`isomorphicPkgs ${this.project.name} ${this.project.location} `, isomorphicPkgs)
+      dedupePackages(
+        this.project.location,
+        packagesNames.filter(f => isomorphicPkgs.includes(f)),
+        false,
+        !this.project.npmPackages.useSmartInstall
+      );
+    } else {
+      dedupePackages(
+        this.project.location,
+        packagesNames,
+        false,
+        !this.project.npmPackages.useSmartInstall
+      );
+    }
   };
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
   public dedupeCount = (packages?: string[]) => {

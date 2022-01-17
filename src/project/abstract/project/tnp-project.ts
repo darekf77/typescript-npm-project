@@ -105,14 +105,23 @@ export abstract class TnpProject {
 
   //#region @backend
   // @ts-ignore
-  get isomorphicPackages(this: Project) {
+  get isomorphicPackages(this: Project): string[] {
     const isomorphicPackagesArr = [];
 
     if (this.typeIs('unknow')) {
       return isomorphicPackagesArr;
     }
     try {
-      var p = crossPlatformPath(path.join(this.location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
+      let location = this.location;
+      if (this.isContainerCoreProject) {
+        location = path.dirname(this.smartNodeModules.path);
+      }
+      if (this.isContainerCoreProjectTempProj) {
+        const origin = $Project.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
+        location = path.dirname(origin.smartNodeModules.path);
+      }
+
+      var p = crossPlatformPath(path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
       if (!fse.existsSync(p)) {
         PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
       }
