@@ -41,7 +41,7 @@ export class BackendCompilation extends IncCompiler.Base {
     watch = false,
     outDir,
     generateDeclarations = false,
-    tsExe = 'npx tsc',
+    tsExe = 'npm-run tsc',
     diagnostics = false,
     hideErrors = false,
     locationOfMainProject,
@@ -139,7 +139,7 @@ export class BackendCompilation extends IncCompiler.Base {
     const cwd = project.location;
     project.recreate.initAngularLibStructure(outFolder);
     const isIsomorphic = project.typeIs('isomorphic-lib');
-    const command = `npx ng build ${project.name} ${watch ? '--watch' : ''} `;
+    const command = `npm-run ng build ${project.name} ${watch ? '--watch' : ''} `;
     // + ` --output-path=./${outFolder}/browser`;
     if (isIsomorphic) {
       await Helpers.run(command, {

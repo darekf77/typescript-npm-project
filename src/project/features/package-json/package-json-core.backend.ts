@@ -349,13 +349,6 @@ export class PackageJsonCore {
     // await Helpers.pressKeyAndContinue()
   }
 
-  public writeToDiscSync(removeFromPj = false) {
-    // console.log(this.data)
-    this.splitAndWriteToDisc(removeFromPj);
-    // Helpers.log(`Press any key`)
-    // await Helpers.pressKeyAndContinue()
-  }
-
   private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
     const baselineInNodeModuels = path.join(this.cwd, config.folder.node_modules, path.basename(pathToBaseline))
     if (!fse.existsSync(baselineInNodeModuels)) {

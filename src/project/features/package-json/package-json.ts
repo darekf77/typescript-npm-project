@@ -23,7 +23,7 @@ const OVERRIDE_FROM_TNP = [ // TODO put in config ?
   'engines',
   'categories',
   'keywords',
-  'activationEvents'
+  'activationEvents',
 ];
 
 @Morphi.Entity<PackageJSON>({
@@ -100,6 +100,7 @@ export class PackageJSON
       return;
     }
     const existed = {};
+    const existedRecreateFromJSON5 = {};
     config.packageJsonSplit
       .filter(f => !f.endsWith('.json5'))
       .forEach(c => {
@@ -115,6 +116,7 @@ export class PackageJSON
             const json5AdditionaValue = json5VersionExists && Helpers.readJson(filePathSplitTnpJSON5, void 0, true);
 
             if (json5AdditionaValue && _.keys(json5AdditionaValue).length > 0) {
+              existedRecreateFromJSON5[c] = true;
               additionalSplitValue = json5AdditionaValue;
             } else {
               Helpers.removeFileIfExists(filePathSplitTnpJSON5);
@@ -124,6 +126,7 @@ export class PackageJSON
             if (_.isObject(additionalSplitValue) && Object.keys(additionalSplitValue).length > 0) {
               existed[c] = additionalSplitValue as any;
             } else {
+              delete existedRecreateFromJSON5[c]
               // Helpers.warn(`[package-json] wrong content of ${c} in ${filePathSplitTnp}`)
             }
           } catch (error) {
@@ -143,6 +146,11 @@ export class PackageJSON
         saveAtLoad = true;
       }
 
+      if (!json.recreatedFrom) {
+        json.recreatedFrom = {};
+        saveAtLoad = true;
+      }
+
       config.packageJsonSplit.forEach(c => {
 
         if (_.isObject(existed[c])) {
@@ -151,12 +159,20 @@ export class PackageJSON
             .replace(`${config.file.package_json}_`, '')
             .replace(`.json`, '');
           json[property] = existed[c] as any;
+          if (existedRecreateFromJSON5[c] && !json.recreatedFrom['tnp.json5']) {
+            saveAtLoad = true;
+            json.recreatedFrom['tnp.json5'] = true;
+          }
+          if (!json.recreatedFrom['tnp.json']) {
+            saveAtLoad = true;
+            json.recreatedFrom['tnp.json'] = true;
+          }
         }
       });
 
-
-
       if (json.tnp) {
+
+        //#region props consitency check
         if (!json.tnp.overrided) {
           json.tnp.overrided = {};
           saveAtLoad = true;
@@ -213,10 +229,12 @@ export class PackageJSON
           json.devDependencies = {};
           saveAtLoad = true;
         }
+
         if (!_.isArray(json.tnp.resources)) {
           json.tnp.resources = [];
           saveAtLoad = true;
         }
+        //#endregion
 
         if (!(['navi', 'scenario'] as ConfigModels.LibType[]).includes(json.tnp.type)) {
           (OVERRIDE_FROM_TNP as (any
@@ -230,7 +248,7 @@ export class PackageJSON
             } else if (!_.isNil(inPckageJson) && _.isNil(inTnp)) {
               json.tnp[key] = json[key];
             }
-            if (!_.isEqual(json[key], json.tnp[key])) {
+            if (!_.isEqual(json[key], json.tnp[key])) { // TODO skechy
               json[key] = json.tnp[key];
               saveAtLoad = true;
             }

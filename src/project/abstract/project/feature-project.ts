@@ -15,10 +15,9 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
+import { InsideStructures } from '../../features/inside-structures/inside-structures';
 //#endregion
 import { _ } from 'tnp-core';
-
-
 
 
 export abstract class FeatureProject {
@@ -112,7 +111,12 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  incrementalBuildProcess: IncrementalBuildProcessExtended;
+  public incrementalBuildProcess: IncrementalBuildProcessExtended;
   //#endregion
+
+  //#region @backend
+  public insideStructure: InsideStructures;
+  //#endregion
+
 
 }

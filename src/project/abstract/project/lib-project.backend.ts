@@ -246,7 +246,7 @@ export abstract class LibProject {
     const vsixPackageName = this.extensionVsixName;
     try {
       await Helpers.actionWrapper(() => {
-        this.run(`npx vsce package --yarn`).sync();
+        this.run(`npm-run vsce package --yarn`).sync();
       }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
       if (showInfo) {
         const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
@@ -540,7 +540,7 @@ export abstract class LibProject {
     return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
   }
 
-  get coreLibFiles() {
+  get angularCoreLibFiles() {
     const files = [
       'projects/my-lib/tsconfig.spec.json',
       'projects/my-lib/tsconfig.lib.prod.json',
@@ -549,6 +549,42 @@ export abstract class LibProject {
       'projects/my-lib/package.json',
       'projects/my-lib/ng-package.json',
       'projects/my-lib/karma.conf.js',
+    ];
+
+    return files;
+  }
+
+  get angularCoreAppFiles() {
+    const files = [
+      'app/src/app/app.component.html',
+      'app/src/app/app.component.scss',
+      'app/src/app/app.component.spec.ts',
+      'app/src/app/app.component.ts',
+      'app/src/app/app.module.ts',
+      'app/src/assets/.gitkeep',
+      'app/src/environments/environment.prod.ts',
+      'app/src/environments/environment.ts',
+      'app/src/app',
+      'app/src/assets',
+      'app/src/environments',
+      'app/src/favicon.ico',
+      'app/src/index.html',
+      'app/src/main.ts',
+      'app/src/polyfills.ts',
+      'app/src/styles.scss',
+      'app/src/test.ts',
+      'app/.browserslistrc',
+      'app/.editorconfig',
+      'app/.gitignore',
+      // 'app/README.md',
+      'app/angular.json',
+      'app/karma.conf.js',
+      'app/package-lock.json',
+      'app/package.json',
+      'app/src',
+      'app/tsconfig.app.json',
+      'app/tsconfig.json',
+      'app/tsconfig.spec.json'
     ];
 
     return files;

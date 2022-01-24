@@ -168,7 +168,7 @@
         "tnp-helpers": "0.0.73",
         "tnp-db": "0.0.44",
         "tnp-ui": "0.0.33",
-        "tnp-core": "1.0.34",
+        "tnp-core": "1.0.35",
         "tnp-cli": "2.0.20",
         "tnp-tools": "0.0.46",
         "@types/node": "10.12.30",
@@ -505,7 +505,7 @@
     "ugly": true
   },
   "scripts": {
-    "activate": "npm i --force && firedev dedupe && npx tsc && sudo firedev link && tnp link:core && tnp bd"
+    "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd"
   },
   "license": "MIT",
   "private": false,

@@ -213,7 +213,23 @@ async function $OUTPUT_TEST_ASCII() {
   process.exit(0)
 }
 
+export function $PRINT_RELATIVES(folder) {
+  const base = folder;
+  folder = path.join(process.cwd(), folder);
+  const files = Helpers
+    .getRecrusiveFilesFrom(folder)
+    .map(f => f.replace(folder, base));
+
+  console.log(`
+
+  ${files.map( f => `'${f}'` ).join(',\n')}
+
+  `);
+  process.exit(0)
+}
+
 export default {
+  $PRINT_RELATIVES: Helpers.CLIWRAP($PRINT_RELATIVES, '$PRINT_RELATIVES'),
   $OUTPUT_TEST_ASCII: Helpers.CLIWRAP($OUTPUT_TEST_ASCII, '$OUTPUT_TEST_ASCII'),
   $THROW_ERR: Helpers.CLIWRAP($THROW_ERR, '$THROW_ERR'),
   $SEND_EMAIL: Helpers.CLIWRAP($SEND_EMAIL, '$SEND_EMAIL'),

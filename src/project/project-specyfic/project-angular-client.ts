@@ -67,7 +67,7 @@ export class ProjectAngularClient
 
   preventWarningTypescirptMismatch() {
     //#region @backendFunc
-    this.run('npx ng set warnings.typescriptMismatch=false').sync()
+    this.run('npm-run ng set warnings.typescriptMismatch=false').sync()
     //#endregion
   }
 
@@ -92,9 +92,9 @@ export class ProjectAngularClient
       let command: string;
       if (this.isEjectedProject) {
         await Helpers.killProcessByPort(port)
-        command = `npx webpack-dev-server  --host 0.0.0.0 ${p} `;
+        command = `npm-run webpack-dev-server  --host 0.0.0.0 ${p} `;
       } else {
-        command = `npx ng serve ${p} --aot=false`;
+        command = `npm-run ng serve ${p} --aot=false`;
       }
       Helpers.info(`
 
@@ -127,7 +127,7 @@ export class ProjectAngularClient
         //   "--display none"
         // ]
         Helpers.tryRemoveDir(path.join(this.location, outDirApp));
-        this.run(`npx webpack --config=webpack.config.build.${aot}js ${baseHref}`,
+        this.run(`npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
           {
             output: (this.env.config.name === 'local'),
             silence: (this.env.config.name !== 'local'),
@@ -147,11 +147,11 @@ export class ProjectAngularClient
         const outPutPathCommand = `--output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`;
 
         if (this.frameworkVersionEquals('v1')) {
-          command = `npx ng build  ${statsCommand} `
+          command = `npm-run ng build  ${statsCommand} `
             + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
         } else {
           const aot = flags.includes('aot');
-          command = `npx ng build  ${statsCommand} --serviceWorker=true `
+          command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
             + ` --aot=${aot ? 'true' : 'false --build-optimizer=false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
         }
 

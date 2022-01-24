@@ -45,7 +45,7 @@ async function selectClientsMenu(buildOptions: BuildOptions, currentProject: Pro
   const menu = async () => {
 
     const choices = currentProject.parent.children
-      .filter(c => c.typeIs(...config.allowedTypes.app))
+      .filter(c => c.typeIs(...config.allowedTypes.app) && c.typeIsNot('docker'))
       .map(c => {
         const notIncludedInEnv = (!c || !c.env || !c.env.config) ? true :
           !_.isUndefined(c.env.config.workspace.projects.find(p => p.name === c.name));

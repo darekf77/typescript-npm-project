@@ -46,7 +46,7 @@ export class ProjectContainer
       }
     });
     if (chagned) {
-      this.packageJson.writeToDiscSync();
+      this.packageJson.writeToDisc();
     }
     //#endregion
   }

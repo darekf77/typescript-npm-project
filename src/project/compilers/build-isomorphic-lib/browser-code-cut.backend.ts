@@ -1,3 +1,4 @@
+//#region imports
 import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
@@ -12,16 +13,23 @@ import { Project } from '../../abstract';
 import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
 import { RegionRemover } from './region-remover.backend';
+//#endregion
 
+//#region consts
 const depbugFiles = [
   // 'decorators-endpoint-class.ts'
 ];
+//#endregion
 
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
+  //#region fields & getters
   get allowedToReplace() {
     return Models.other.CutableFileExtArr;
   }
+  //#endregion
+
+  //#region debug
   debug(fileName: string) {
     // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
     if (this.project) {
@@ -29,8 +37,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
 
   }
+  //#endregion
 
-
+  //#region handle tick in code
   handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
       Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`)
@@ -38,13 +47,15 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     return replacement;
   }
+  //#endregion
 
-
+  //#region handle output
   handleOutput(replacement: string, ext: Models.other.CutableFileExt): string {
     replacement = this.handleTickInCode(replacement);
 
     return replacement;
   }
+  //#endregion
 
   //#region constructor
   constructor(
@@ -452,6 +463,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
+  //#region save or delete
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
@@ -480,4 +492,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     // }
   }
+  //#endregion
+
 }

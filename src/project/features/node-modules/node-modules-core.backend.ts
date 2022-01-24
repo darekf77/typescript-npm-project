@@ -24,44 +24,44 @@ export class NodeModulesCore extends FeatureForProject {
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
 
-    if (this.project.frameworkVersionEquals('v3')) { // TODO QUICK_FIX
-      const onlyDedpupeForV3 = [
-        "@angular/animations",
-        "@angular/cdk",
-        "@angular/common",
-        "@angular/compiler",
-        "@angular/http",
-        "@angular/core",
-        "@angular/forms",
-        "@angular/material",
-        "@angular/platform-browser",
-        "@angular/platform-browser-dynamic",
-        "@angular/pwa",
-        "@angular/router",
-        "@angular/service-worker",
-        "zone.js",
-        "typescript",
-      ]
+    // if (this.project.frameworkVersionAtLeast('v3')) { // TODO QUICK_FIX
+    //   const onlyDedpupeForV3 = [
+    //     "@angular/animations",
+    //     "@angular/cdk",
+    //     "@angular/common",
+    //     "@angular/compiler",
+    //     "@angular/http",
+    //     "@angular/core",
+    //     "@angular/forms",
+    //     "@angular/material",
+    //     "@angular/platform-browser",
+    //     "@angular/platform-browser-dynamic",
+    //     "@angular/pwa",
+    //     "@angular/router",
+    //     "@angular/service-worker",
+    //     "zone.js",
+    //     "typescript",
+    //   ]
 
-      const isomorphicPkgs = [
-        ...this.project.isomorphicPackages,
-        ...onlyDedpupeForV3,
-      ];
-      // console.log(`isomorphicPkgs ${this.project.name} ${this.project.location} `, isomorphicPkgs)
-      dedupePackages(
-        this.project.location,
-        packagesNames.filter(f => isomorphicPkgs.includes(f)),
-        false,
-        !this.project.npmPackages.useSmartInstall
-      );
-    } else {
-      dedupePackages(
-        this.project.location,
-        packagesNames,
-        false,
-        !this.project.npmPackages.useSmartInstall
-      );
-    }
+    //   const isomorphicPkgs = [
+    //     ...this.project.isomorphicPackages,
+    //     ...onlyDedpupeForV3,
+    //   ];
+    //   // console.log(`isomorphicPkgs ${this.project.name} ${this.project.location} `, isomorphicPkgs)
+    //   dedupePackages(
+    //     this.project.location,
+    //     packagesNames.filter(f => isomorphicPkgs.includes(f)),
+    //     false,
+    //     !this.project.npmPackages.useSmartInstall
+    //   );
+    // } else {
+    dedupePackages(
+      this.project.location,
+      packagesNames,
+      false,
+      !this.project.npmPackages.useSmartInstall
+    );
+    // }
   };
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
   public dedupeCount = (packages?: string[]) => {
@@ -80,6 +80,13 @@ export class NodeModulesCore extends FeatureForProject {
       this.project.run(`${config.frameworkName} install`).sync();
     }
     Helpers.createSymLink(this.path, target.node_modules.path)
+  };
+
+  public linkTo = (target: string) => {
+    if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
+      this.project.run(`${config.frameworkName} install`).sync();
+    }
+    Helpers.createSymLink(this.path, target)
   };
 
   /**

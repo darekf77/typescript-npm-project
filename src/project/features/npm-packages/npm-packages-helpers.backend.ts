@@ -150,7 +150,7 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
   const noPackageLock = (project.isStandaloneProject) ? '--no-package-lock' : '';
 
   if (useYarn
-    // || project.frameworkVersionEquals('v3')
+    // || project.frameworkVersionAtLeast('v3') // yarn sucks
     ) {
     // --ignore-scripts
     // yarn install --prefer-offline

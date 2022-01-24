@@ -32,7 +32,7 @@ export class TestRunner
   async start(files?: string[], watchMode = false, debugMode = false) {
     let command: string;
     if (this.project.typeIs('isomorphic-lib')) {
-      command = `npx mocha ${debugMode ? '--inspect' : ''} -r ts-node/register ${this.fileCommand(files)}`
+      command = `npm-run mocha ${debugMode ? '--inspect' : ''} -r ts-node/register ${this.fileCommand(files)}`
         + ` --timeout ${config.CONST.UNIT_TEST_TIMEOUT}`
     }
     if (!command) {

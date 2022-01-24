@@ -44,8 +44,14 @@ export class FilesRecreator extends FeatureForProject {
       return;
     }
     const project = this.project as Project;
-    if (project.frameworkVersionAtLeast('v3') && project.typeIs('angular-lib', 'isomorphic-lib')) {
-      this.initAngularLibStructure();
+
+
+    if (project.frameworkVersionAtLeast('v3')) {
+      if (project.typeIs('angular-lib')) {
+        this.initAngularLibStructure();
+      } else if (project.typeIs('isomorphic-lib')) {
+        project.insideStructure.recrate();
+      }
     }
 
     this.initAssets();
@@ -59,7 +65,7 @@ export class FilesRecreator extends FeatureForProject {
 
   }
 
-  // tslint:disable-next-line: member-ordering
+
   public initAngularLibStructure(outFolder: ConfigModels.OutFolder = 'dist') {
     const project: Project = this.project;
     const tmpProjects = `tmp-projects-for-${outFolder}/${project.name}`;
@@ -68,7 +74,7 @@ export class FilesRecreator extends FeatureForProject {
     const angularLibCore = Project.by('angular-lib', project._frameworkVersion) as Project;
 
     [
-      ...angularLibCore.coreLibFiles,
+      ...angularLibCore.angularCoreLibFiles,
       ...(project.typeIs('isomorphic-lib') ? ['angular.json.filetemplate'] : [])
     ].forEach(f => {
       const orgPath = path.join(angularLibCore.location, f);

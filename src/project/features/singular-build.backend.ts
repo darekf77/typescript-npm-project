@@ -63,7 +63,7 @@ export class SingularBuild extends FeatureForProject {
     );
 
     this.singularWatchProj.packageJson.data.tnp.isGenerated = true;
-    await this.singularWatchProj.packageJson.writeToDisc();
+    this.singularWatchProj.packageJson.writeToDisc();
 
     children.forEach(c => {
       const source = (c.typeIs('angular-lib') ? config.folder.components : config.folder.src);

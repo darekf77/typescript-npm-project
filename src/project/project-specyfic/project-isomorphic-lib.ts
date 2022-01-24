@@ -112,14 +112,14 @@ export class ProjectIsomorphicLib
     }
     if (this.frameworkVersionAtLeast('v3')) {
 
-      this.coreLibFiles.forEach(relativePath => {
-        const sourceProject = Project.by<Project>('angular-lib', this._frameworkVersion);
-        // console.log(` path: ${path.join(sourceProject.location, relativePath)} `)
-        files.push({
-          sourceProject,
-          relativePath,
-        });
-      });
+      // this.coreLibFiles.forEach(relativePath => {
+      //   const sourceProject = Project.by<Project>('angular-lib', this._frameworkVersion);
+      //   // console.log(` path: ${path.join(sourceProject.location, relativePath)} `)
+      //   files.push({
+      //     sourceProject,
+      //     relativePath,
+      //   });
+      // });
 
       files.push({
         sourceProject: Project.by<Project>('angular-lib', this._frameworkVersion),
@@ -151,54 +151,64 @@ export class ProjectIsomorphicLib
     //#endregion
   ) {
     //#region @backend
-    let webpackEnvParams = `--env.outFolder=${outDir}`;
-    webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+    if (this.frameworkVersionAtLeast('v3')) {
+      console.log('ANGULAR BUILD')
+    } else {
 
-    let client = _.first(forClient as Project[]);
-
-    if (!global.tnpNonInteractive) {
-      if (!this.isStandaloneProject && forClient.length === 0) {
-        const answer: { project: string } = await inquirer
-          .prompt([
-            {
-              type: 'list',
-              name: 'project',
-              message: 'Which project do you wanna simulate ?',
-              choices: this.parent.children
-                .filter(c => c.typeIs(...config.allowedTypes.app))
-                .filter(c => c.name !== this.name)
-                .map(c => c.name),
-              filter: function (val) {
-                return val.toLowerCase();
-              }
-            }
-          ]) as any;
-        client = Project.From<Project>(path.join(this.location, '..', answer.project));
+      if (!watch) {
+        Helpers.warn(`App build not possible for isomorphic-lib in static build mode`)
+        return;
       }
+
+      let webpackEnvParams = `--env.outFolder=${outDir}`;
+      webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+
+      let client = _.first(forClient as Project[]);
+
+      if (!global.tnpNonInteractive) {
+        if (!this.isStandaloneProject && forClient.length === 0) {
+          const answer: { project: string } = await inquirer
+            .prompt([
+              {
+                type: 'list',
+                name: 'project',
+                message: 'Which project do you wanna simulate ?',
+                choices: this.parent.children
+                  .filter(c => c.typeIs(...config.allowedTypes.app))
+                  .filter(c => c.name !== this.name)
+                  .map(c => c.name),
+                filter: function (val) {
+                  return val.toLowerCase();
+                }
+              }
+            ]) as any;
+          client = Project.From<Project>(path.join(this.location, '..', answer.project));
+        }
+      }
+
+      let port: number;
+      if (client) {
+        port = client.getDefaultPort();
+        webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
+      }
+
+      const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
+      if (_.isNumber(argsAdditionalParams.port)) {
+        port = argsAdditionalParams.port;
+      }
+      if (_.isNumber(port)) {
+        await Helpers.killProcessByPort(port);
+        webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
+      }
+
+      const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+      Helpers.info(`
+
+      WEBPACK COMMAND: ${command}
+
+      `)
+      this.run(command).sync();
     }
-
-    let port: number;
-    if (client) {
-      port = client.getDefaultPort();
-      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
-    }
-
-    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
-    if (_.isNumber(argsAdditionalParams.port)) {
-      port = argsAdditionalParams.port;
-    }
-    if (_.isNumber(port)) {
-      await Helpers.killProcessByPort(port);
-      webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
-    }
-
-    const command = `npx webpack-dev-server ${webpackEnvParams}`;
-    Helpers.info(`
-
-    WEBPACK COMMAND: ${command}
-
-    `)
-    this.run(command).sync();
     //#endregion
   }
 
@@ -208,10 +218,6 @@ export class ProjectIsomorphicLib
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        if (!watch) {
-          Helpers.log(`App build not possible for isomorphic-lib in static build mode`)
-          return;
-        }
         await this.selectToSimulate(outDir, watch, forClient as any, buildOptions.args);
       } else {
         await this.buildLib();
@@ -270,7 +276,7 @@ export class ProjectIsomorphicLib
     } else {
 
       const webpackCommandFn = (watchCommand: boolean) =>
-        `npx webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
+        `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
       const webpackCommand = webpackCommandFn(this.buildOptions.watch);
       const { obscure, uglify, nodts } = this.buildOptions;
@@ -339,7 +345,7 @@ export class ProjectIsomorphicLib
           } catch (er) {
             Helpers.error(`BUNDLE production build failed`, false, true);
           }
-          await this.incrementalBuildProcess.start('isomorphic compilation (only client) ')
+          await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
         } else {
           await this.incrementalBuildProcess.start('isomorphic compilation');
           // if (outDir === 'bundle') {
@@ -352,7 +358,7 @@ export class ProjectIsomorphicLib
   }
   compilerDeclarationFiles() {
     //#region @backend
-    this.run(`npx tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
+    this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
     //#endregion
   }
 
@@ -364,7 +370,7 @@ export class ProjectIsomorphicLib
     }
     const indexEs5js = `index-es5.js`;
     Helpers.writeFile(path.join(this.location, config.folder.bundle, config.file._babelrc), '{ "presets": ["env"] }\n');
-    this.run(`npx babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
+    this.run(`npm-run babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
     Helpers.writeFile(
       path.join(this.location, config.folder.bundle, config.file.index_js),
       Helpers.readFile(path.join(this.location, config.folder.bundle, indexEs5js))
@@ -380,7 +386,7 @@ export class ProjectIsomorphicLib
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
       return
     }
-    const command = `npx uglifyjs bundle/index.js --output bundle/index.js`
+    const command = `npm-run uglifyjs bundle/index.js --output bundle/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
@@ -401,7 +407,7 @@ export class ProjectIsomorphicLib
       Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
       return
     }
-    const commnad = `npx javascript-obfuscator bundle/index.js `
+    const commnad = `npm-run javascript-obfuscator bundle/index.js `
       + ` --output bundle/index.js`
       + ` --target node`
       + ` --rotate-string-array true`

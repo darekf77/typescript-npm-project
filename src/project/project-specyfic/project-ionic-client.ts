@@ -35,9 +35,9 @@ export class ProjectIonicClient
     //#region @backend
     const { prod, watch, outDir } = buildOptions;
     if (watch) {
-      this.run(`npx ionic serve --no-open -p ${this.getDefaultPort()}`).async()
+      this.run(`npm-run ionic serve --no-open -p ${this.getDefaultPort()}`).async()
     } else {
-      this.run(`npx ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
+      this.run(`npm-run ionic-app-scripts build ${prod ? '--prod' : ''}`).sync();
     }
     //#endregion
   }

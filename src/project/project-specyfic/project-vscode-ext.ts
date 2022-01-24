@@ -56,11 +56,11 @@ export class ProjectVscodeExt
     //#region @backend
     try {
       if (buildOptions.watch) {
-        this.run(`npx tsc -p ./`).sync();
+        this.run(`npm-run tsc -p ./`).sync();
         this.run(`node update-proj.js --watch`).async();
-        this.run(`npx tsc -watch -p ./`).async();
+        this.run(`npm-run tsc -watch -p ./`).async();
       } else {
-        this.run(`npx tsc -p ./`).sync();
+        this.run(`npm-run tsc -p ./`).sync();
         this.run(`node update-proj.js`).sync();
       }
     } catch (error) {
