@@ -183,6 +183,7 @@ function $VSCODE_GLOBAL() {
     'tslint.autoFixOnSave': false, // TODO
     'tslint.enable': false, // TODO
     'tslint.alwaysShowRuleFailuresAsWarnings': true,
+    "workbench.editor.enablePreview": true,
   };
   const settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');

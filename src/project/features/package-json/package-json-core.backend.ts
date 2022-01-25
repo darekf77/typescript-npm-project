@@ -342,7 +342,7 @@ export class PackageJsonCore {
 
   }
 
-  public async writeToDisc(removeFromPj = false) {
+  public writeToDisc(removeFromPj = false) {
     // console.log(this.data)
     this.splitAndWriteToDisc(removeFromPj);
     // Helpers.log(`Press any key`)
