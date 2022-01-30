@@ -8,6 +8,20 @@ import { Models } from "tnp-models";
 import { Helpers } from 'tnp-helpers';
 //#endregion
 
+const OVERRIDE_FROM_TNP = [ // TODO put in config ?
+  'scripts',
+  'description',
+  'license',
+  'private',
+  'author',
+  'homepage',
+  'main',
+  'engines',
+  'categories',
+  'keywords',
+  'activationEvents',
+];
+
 export type SaveRequests = {
   additionalSaveRequired: boolean;
 };
@@ -33,9 +47,9 @@ export class PackageJsonFile {
     return !this.hasIncorrectContent;
   }
 
-  // get isTnpTypeProject() {
-  //   return !!this.content?.tnp?.type;
-  // }
+  get isTnpTypeProject() {
+    return !!this.content?.tnp?.type;
+  }
 
   get data() {
     return _.cloneDeep(this.content);
@@ -46,7 +60,7 @@ export class PackageJsonFile {
   }
 
   get saveAtLoad() {
-    return this.additionalSaveRequired;
+    return this.isTnpTypeProject && this.additionalSaveRequired && !Helpers.isLink(this.fullPath);
   }
 
   private notReadable: boolean = false;
@@ -108,14 +122,14 @@ export class PackageJsonFile {
 
     allKeys
       .filter(key =>
-        config.OVERRIDE_FROM_TNP.includes(key)
+        OVERRIDE_FROM_TNP.includes(key)
       )
       .forEach(key => {
         const contentValue = content[key];
         const overrideValue = override[key];
 
         if (!(_.isUndefined(contentValue) && _.isUndefined(overrideValue))) {
-          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !config.OVERRIDE_FROM_TNP.includes(key)) {
+          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !OVERRIDE_FROM_TNP.includes(key)) {
 
             if (_.isObject(contentValue[key])) {
               override[key] = _.cloneDeep(contentValue[key]);

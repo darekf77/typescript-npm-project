@@ -153,6 +153,7 @@ export class ProjectIsomorphicLib
     //#region @backend
     if (this.frameworkVersionAtLeast('v3')) {
       console.log('ANGULAR BUILD')
+      // @LAST
     } else {
 
       if (!watch) {

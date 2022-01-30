@@ -225,10 +225,22 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
 
   if (!Helpers.exists(containerCoreProject.smartNodeModules.path)) {
     Helpers.mkdirp(path.dirname(containerCoreProject.smartNodeModules.path));
-    Helpers.createSymLink(
-      containerCoreProject.packageJson.path,
-      path.join(path.dirname(containerCoreProject.smartNodeModules.path), config.file.package_json),
-    );
+    [
+      config.file.package_json,
+      config.file.package_json__tnp_json,
+      config.file.package_json__tnp_json5,
+    ].forEach(pkgFilename => {
+      const sourcePj = path.join(containerCoreProject.location, pkgFilename);
+      if (Helpers.exists(sourcePj)) {
+        const destPj = path.join(path.dirname(containerCoreProject.smartNodeModules.path), pkgFilename);
+        Helpers.removeFileIfExists(destPj);
+        Helpers.createSymLink(
+          sourcePj,
+          destPj,
+        );
+      }
+    })
+
   }
   const smartTempContainerCorePackagesProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
   const reinstallForceSmartNodeModules = (

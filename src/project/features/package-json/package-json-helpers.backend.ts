@@ -399,6 +399,9 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     _.keys(project.packageJson.data.dependencies)
       .forEach(depName => {
         const v = project.packageJson.data.dependencies[depName];
+        if (v === 'undefined') {
+          delete project.packageJson.data.dependencies[depName];
+        }
         if (v) {
           if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
             return depName.startsWith(s);
@@ -412,7 +415,11 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
     _.keys(project.packageJson.data.devDependencies)
       .forEach(depName => {
+
         const v = project.packageJson.data.devDependencies[depName];
+        if (v === 'undefined') {
+          delete project.packageJson.data.dependencies[depName];
+        }
         if (v) {
           if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
             return depName.startsWith(s);
@@ -425,6 +432,20 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
     //#endregion
   }
+  _.keys(project.packageJson.data.dependencies)
+    .forEach(depName => {
+      const v = project.packageJson.data.dependencies[depName];
+      if (v === 'undefined') {
+        delete project.packageJson.data.dependencies[depName];
+      }
+    });
+  _.keys(project.packageJson.data.devDependencies)
+    .forEach(depName => {
+      const v = project.packageJson.data.devDependencies[depName];
+      if (v === 'undefined') {
+        delete project.packageJson.data.devDependencies[depName];
+      }
+    });
 }
 //#endregion
 

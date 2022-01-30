@@ -313,21 +313,25 @@ export class PackageJsonCore {
       const obj = data[property];
       const splitPath = path.join(path.dirname(this.path), resultFileName);
       Helpers.log(`splitPath: ${splitPath}`, 2);
-      const dataToWrite = _.isObject(obj) ? obj : {};
+      const dataToWrite = (_.isObject(obj) ? obj : {}) as Models.npm.IPackageJSON;
       if (resultFileName.endsWith('.json5')) {
         const current = Helpers.exists(splitPath) && Helpers.readJson(splitPath, void 0, true);
         if (current && _.keys(current).length > 0) {
           const writer = json5Write.load(Helpers.readFile(splitPath));
           writer.write(dataToWrite);
-          Helpers.writeFile(splitPath, writer.toSource());
-          if (property === 'tnp') {
-            tnpSaved = true;
+          if (!Helpers.isLink(splitPath)) {
+            Helpers.writeFile(splitPath, writer.toSource());
+            if (property === 'tnp') {
+              tnpSaved = true;
+            }
           }
         }
       } else {
-        Helpers.writeJson(splitPath, dataToWrite);
-        if (property === 'tnp') {
-          tnpSaved = true;
+        if (!Helpers.isLink(splitPath) && !!(dataToWrite?.tnp?.type)) {
+          Helpers.writeJson(splitPath, dataToWrite);
+          if (property === 'tnp') {
+            tnpSaved = true;
+          }
         }
       }
     });
@@ -349,9 +353,13 @@ export class PackageJsonCore {
             .replace(`.json`, '');
           delete data[property];
         });
-      Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+      if (!Helpers.isLink(this.path)) {
+        Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+      }
     } else {
-      Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+      if (!Helpers.isLink(this.path)) {
+        Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+      }
     }
 
   }

@@ -73,7 +73,7 @@ export class NodeModulesBase extends NodeModulesCore {
         //     }));
 
         //     const dest = path.join(this.project.node_modules.path, path.basename(f));
-        //     if (needsCopy) {  //// TODO UNCOMMENT @LAST FIXING angular-lib v3 smart install
+        //     if (needsCopy) {  //// TODO UNCOMMENT angular-lib v3 smart install
         //       const realFileOrFolderPath = Helpers.isLink(f) ? fse.realpathSync(f) : f;
         //       if (Helpers.exists(realFileOrFolderPath)) {
         //         if (Helpers.isFile(realFileOrFolderPath)) {
