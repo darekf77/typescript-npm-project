@@ -1,7 +1,5 @@
 {
   "resources": [],
-  "type": "isomorphic-lib",
-  "version": "v2",
   "overrided": {
     "dependencies": {
       "@types/semver": "6.0.1",
@@ -42,6 +40,14 @@
     "includeOnly": [],
     "linkedFolders": []
   },
+  "linkedProjects": [],
+  "libReleaseOptions": {
+    "nodts": false,
+    "obscure": true,
+    "ugly": true
+  },
+  "type": "isomorphic-lib",
+  "version": "v2",
   "libs-with-issues": {
     "ts-sinon": "1.0.12",
     "@types/jasmine": "~2.8.0",
@@ -497,12 +503,6 @@
         }
       }
     }
-  },
-  "linkedProjects": [],
-  "libReleaseOptions": {
-    "nodts": false,
-    "obscure": true,
-    "ugly": true
   },
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd"

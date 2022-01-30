@@ -61,3 +61,8 @@ git remote set-url orgin <my-new-origin-name>
 ```
 du -sh ./node_modules/* | sort -nr | grep '\dM.*'
 ```
+
+
+# mp3 download
+youtube-dl -x --audio-format mp3 --prefer-ffmpeg youyublink
+

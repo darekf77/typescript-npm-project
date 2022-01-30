@@ -1,8 +1,5 @@
 {
   "resources": [],
-  "type": "isomorphic-lib",
-  "version": "v2",
-
   "overrided": {
     "dependencies": {
       "@types/semver": "6.0.1",
@@ -47,6 +44,17 @@
     "includeOnly": [],
     "linkedFolders": []
   },
+  "linkedProjects": [],
+
+  "libReleaseOptions": {
+    "nodts": false,
+    "obscure": true,
+    "ugly": true
+  },
+
+  "type": "isomorphic-lib",
+
+  "version": "v2",
 
   "libs-with-issues": {
     "ts-sinon": "1.0.12",
@@ -516,14 +524,6 @@
         }
       }
     }
-  },
-
-  "linkedProjects": [],
-
-  "libReleaseOptions": {
-    "nodts": false,
-    "obscure": true,
-    "ugly": true
   },
 
   "scripts": {

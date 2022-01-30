@@ -11,6 +11,7 @@ import { config, ConfigModels } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../packages-recognition-extended';
 //#endregion
 
+//#region clean ignored
 function clenIgnored(project: Project, deps: Object, overrided = {}) {
   if (_.isArray(project.packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
     const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
@@ -25,6 +26,7 @@ function clenIgnored(project: Project, deps: Object, overrided = {}) {
     });
   }
 }
+//#endregion
 
 //#region find npm version range
 export function findVersionRange(rootProject: Project, dependency: Project | string) {
@@ -46,6 +48,7 @@ export function findVersionRange(rootProject: Project, dependency: Project | str
 }
 //#endregion
 
+//#region resolve new deps and overrride for project
 function resovleNewDepsAndOverrideForProject(project: Project) {
   let toOverrideDependencies = (project.packageJson.data.tnp.overrided &&
     project.packageJson.data.tnp.overrided.dependencies) ?
@@ -89,7 +92,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
     parentOverride
   };
 }
-
+//#endregion
 
 //#region resolve and save deps for project
 export function reolveAndSaveDeps(project: Project, action: Models.npm.SaveAction,
@@ -183,6 +186,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 }
 //#endregion
 
+//#region remove deps by type
 function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
   const depsByType = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.onlyFor[libType];
   const names = depsByType ? Object.keys(depsByType) : [];
@@ -191,6 +195,7 @@ function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
   });
   return deps;
 }
+//#endregion
 
 //#region before save action
 function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
@@ -565,7 +570,7 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 //#endregion
 
 //#region set dependency and save
-export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project, ) {
+export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project,) {
   // console.log('set DEPS', p)
   // process.exit(0)
   if (!p || !p.name) {

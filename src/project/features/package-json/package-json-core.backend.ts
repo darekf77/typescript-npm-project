@@ -300,7 +300,9 @@ export class PackageJsonCore {
       Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
       return;
     }
+    const data = _.cloneDeep(this.data) as Models.npm.IPackageJSON;
 
+    let tnpSaved = false;
     config.packageJsonSplit.forEach(resultFileName => {
 
       const property = resultFileName
@@ -308,7 +310,7 @@ export class PackageJsonCore {
         .replace(`.json5`, '')
         .replace(`.json`, '');
 
-      const obj = this.data[property];
+      const obj = data[property];
       const splitPath = path.join(path.dirname(this.path), resultFileName);
       Helpers.log(`splitPath: ${splitPath}`, 2);
       const dataToWrite = _.isObject(obj) ? obj : {};
@@ -318,26 +320,38 @@ export class PackageJsonCore {
           const writer = json5Write.load(Helpers.readFile(splitPath));
           writer.write(dataToWrite);
           Helpers.writeFile(splitPath, writer.toSource());
+          if (property === 'tnp') {
+            tnpSaved = true;
+          }
         }
       } else {
         Helpers.writeJson(splitPath, dataToWrite);
+        if (property === 'tnp') {
+          tnpSaved = true;
+        }
       }
-
     });
+
+    if (tnpSaved) {
+      delete data.tnp; // TODO testing // COMMNENT
+      // delete data['overrided']; // TODO testing // COMMNENT
+    }
+
+
     Helpers.log(`Split done..`, 2);
     if (removeFromPj) {
-      const dataToWrite = _.cloneDeep(this.data);
+
       config.packageJsonSplit
         .filter(c => c.endsWith('.json5'))
         .forEach(c => {
           const property = c
             .replace(`${config.file.package_json}_`, '')
             .replace(`.json`, '');
-          delete dataToWrite[property];
+          delete data[property];
         });
-      Helpers.writeFile(this.path, _.isObject(dataToWrite) ? dataToWrite : {});
+      Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
     } else {
-      Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
+      Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
     }
 
   }

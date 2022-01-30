@@ -144,15 +144,13 @@ export class GitActions extends FeatureForProject {
             config.file.package_json,
             config.file.package_json__tnp_json,
           ].forEach(pj => {
-            const pathPjOrg = path.join(c.location, pj);
-            if (Helpers.exists(pathPjOrg)) {
-              const currentContent = Helpers.readJson(pathPjOrg);
+            // const pathPjOrg = path.join(c.location, pj);
+            const pproj = Project.From(c.location) as Project;
+            if (pproj) {
+              let currentContent = pproj.packageJson.data;
 
-              if (pj === config.file.package_json) {
-                (currentContent as Models.npm.IPackageJSON).tnp.overrided.linkedFolders = [];
-              }
               if (pj === config.file.package_json__tnp_json) {
-                currentContent.overrided.linkedFolders = [];
+                currentContent = pproj.packageJson.data.tnp as any;
               }
               const destPathPj = path.join(morphiEqivalentPath, pj);
               Helpers.writeJson(destPathPj, currentContent);
