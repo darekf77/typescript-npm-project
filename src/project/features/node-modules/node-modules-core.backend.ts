@@ -19,8 +19,12 @@ export class NodeModulesCore extends FeatureForProject {
   }
   public get exist() { return nodeModulesExists(this.project); }
   public get isLink() { return Helpers.isLink(this.path); }
-  public dedupe = (packages?: string[]) => {
+  public dedupe = (packagesOrOptions?: string[] | { packages?: string[]; reason: string }) => {
 
+    const packages = _.isArray(packagesOrOptions) ? packagesOrOptions : packagesOrOptions?.packages;
+    if (!_.isArray(packagesOrOptions) && packagesOrOptions?.reason) {
+      Helpers.info(`Reason to dedupe: ${packagesOrOptions?.reason}`)
+    }
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
 

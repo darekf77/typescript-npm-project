@@ -145,7 +145,7 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
-  private async selectToSimulate(
+  private async buildNgApp(
     //#region @backend
     outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[], args: string
     //#endregion
@@ -219,7 +219,7 @@ export class ProjectIsomorphicLib
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        await this.selectToSimulate(outDir, watch, forClient as any, buildOptions.args);
+        await this.buildNgApp(outDir, watch, forClient as any, buildOptions.args);
       } else {
         await this.buildLib();
       }

@@ -269,7 +269,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
 
   if (!smartTempContainerCorePackagesProj.node_modules.exist || reinstallForceSmartNodeModules) {
     smartTempContainerCorePackagesProj.npmPackages.installFromArgs('', false, true);
-    smartTempContainerCorePackagesProj.node_modules.dedupe(); // TODO QUICK FIX
+    smartTempContainerCorePackagesProj.node_modules.dedupe({ reason: 'smart temp container dedeupe' }); // TODO QUICK FIX
   }
 
   if (!reinstallForceSmartNodeModules && containerCoreProject.node_modules.exist) {

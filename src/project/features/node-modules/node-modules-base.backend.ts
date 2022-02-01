@@ -39,8 +39,10 @@ export class NodeModulesBase extends NodeModulesCore {
       const packagesToLinkOrCopy = [
         ...Helpers.foldersFrom(source.node_modules.path),
         ...Helpers.linksToFoldersFrom(source.node_modules.path,
+
           // this.project.frameworkVersionAtLeast('v3') // TODO not needed for now
-        )
+        ),
+        ...[path.join(source.node_modules.path, '.install-date')],
       ];
 
       Helpers.log(`
@@ -106,7 +108,7 @@ export class NodeModulesBase extends NodeModulesCore {
           .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
           .forEach(f => {
             const dest = path.join(this.project.node_modules.path, path.basename(f));
-            if (path.basename(f) === '.bin') {
+            if (['.bin', '.install-date'].includes(path.basename(f))) {
               const linkFromBin = fse.realpathSync(f);
               if (Helpers.exists(linkFromBin)) {
                 if (Helpers.isFile(linkFromBin)) {

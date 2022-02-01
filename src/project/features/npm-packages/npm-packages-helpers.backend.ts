@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import { path } from 'tnp-core';
 import { fse } from 'tnp-core';
-import { _ } from 'tnp-core';
+import { _, moment } from 'tnp-core';
 
 import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
@@ -51,6 +51,7 @@ export function executeCommand(command: string, project: Project) {
 
    `);
   project.run(command, { output: true, biggerBuffer: true }).sync();
+  Helpers.writeFile([project.node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
 
@@ -151,15 +152,19 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
 
   if (useYarn
     // || project.frameworkVersionAtLeast('v3') // yarn sucks
-    ) {
+  ) {
     // --ignore-scripts
     // yarn install --prefer-offline
     const argsForFasterInstall = `--prefer-offline --no-audit`;
-    command = `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''}  ${argsForFasterInstall}`
-      + `${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''}`;
+    command = `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''} `
+      + ` ${argsForFasterInstall} `
+      + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
   } else {
-    const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit ${noPackageLock}`;
-    command = `npm ${install} ${pkg ? pkg.name : ''} ${(pkg && pkg.installType) ? pkg.installType : ''} ${argsForFasterInstall} `;
+    const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit `
+      + ` ${noPackageLock} `;
+    command = `npm ${install} ${pkg ? pkg.name : ''} `
+      + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `
+      + ` ${argsForFasterInstall} `;
   }
   return command;
 }
