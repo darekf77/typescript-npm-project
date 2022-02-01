@@ -145,6 +145,8 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
+  priva
+
   private async buildNgApp(
     //#region @backend
     outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[], args: string

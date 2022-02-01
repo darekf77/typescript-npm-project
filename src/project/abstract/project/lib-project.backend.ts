@@ -1,5 +1,6 @@
+//#region imports
 //#region @backend
-import { BuildProcess } from '../../features';
+import { BuildOptions, BuildProcess } from '../../features';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
@@ -12,7 +13,7 @@ import { Models } from 'tnp-models';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { CLASS } from 'typescript-class-helpers';
-
+//#endregion
 
 /**
  * Project ready to be build/publish as npm package.
@@ -22,6 +23,7 @@ import { CLASS } from 'typescript-class-helpers';
  */
 export abstract class LibProject {
 
+  //#region fields & getters
   // @ts-ignore
   get isGlobalSystemTool(this: Project) {
     if (Helpers.isBrowser) {
@@ -49,50 +51,79 @@ export abstract class LibProject {
     //#endregion
   }
 
-
-  //#region @backend
-  projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
-    const files = [];
-    return files;
-  }
-
-  recreateIfNotExists() {
-    return [];
-  }
-
-  projectSpecyficFiles(this: Project) {
+  get angularCoreLibFiles() {
+    //#region @backendFunc
     const files = [
-      'index.js',
-      'index.d.ts',
-      'index.js.map',
+      'projects/my-lib/tsconfig.spec.json',
+      'projects/my-lib/tsconfig.lib.prod.json',
+      'projects/my-lib/tsconfig.lib.json',
+      'projects/my-lib/README.md',
+      'projects/my-lib/package.json',
+      'projects/my-lib/ng-package.json',
+      'projects/my-lib/karma.conf.js',
     ];
+
     return files;
+    //#endregion
   }
 
-  projectSpecyficFilesLinked(this: Project) {
+  get angularCoreAppFiles() {
+    //#region @backendFunc
     const files = [
+      'app/src/app/app.component.html',
+      'app/src/app/app.component.scss',
+      'app/src/app/app.component.spec.ts',
+      'app/src/app/app.component.ts',
+      'app/src/app/app.module.ts',
+      'app/src/assets/.gitkeep',
+      'app/src/environments/environment.prod.ts',
+      'app/src/environments/environment.ts',
+      'app/src/app',
+      'app/src/assets',
+      'app/src/environments',
+      'app/src/favicon.ico',
+      'app/src/index.html',
+      'app/src/main.ts',
+      'app/src/polyfills.ts',
+      'app/src/styles.scss',
+      'app/src/test.ts',
+      'app/.browserslistrc',
+      'app/.editorconfig',
+      'app/.gitignore',
+      // 'app/README.md',
+      'app/angular.json',
+      'app/karma.conf.js',
+      'app/package-lock.json',
+      'app/package.json',
+      'app/src',
+      'app/tsconfig.app.json',
+      'app/tsconfig.json',
+      'app/tsconfig.spec.json'
     ];
+
     return files;
+    //#endregion
   }
 
+  //#endregion
 
+  //#region api
+
+  //#region api / build (watch) angular 13+ app
+  async buildAppForAngular13Plus(buildOptions: BuildOptions) {
+
+  }
+  //#endregion
+
+  //#region api / build lib
   async buildLib() {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
+  //#endregion
 
-  checkIfLogginInToNpm(this: Project) {
-    // if (!this.canBePublishToNpmRegistry) {
-    //   return;
-    // }
-    try {
-      this.run('npm whoami').sync();
-    } catch (e) {
-      Helpers.error(`Please login in to npm.`, false, true)
-    }
-  }
-
+  //#region api / before lib build
   protected beforeLibBuild(this: Project, outDir: Models.dev.BuildDir) {
-
+    //#region @backend
     this.copyWhenExist('bin', outDir);
     this.linkWhenExist(config.file.package_json, outDir);
     config.packageJsonSplit.forEach(c => {
@@ -108,162 +139,13 @@ export abstract class LibProject {
       this.linkWhenExist(config.folder.node_modules, outDir);
       this.linkWhenExist('package.json', path.join(outDir, config.folder.client));
     }
-  }
-
-  protected copyWhenExist(this: Project, source: string, outDir: string) {
-    //#region @backend
-    const basename = source;
-    source = path.join(this.location, source);
-    const dest = path.join(this.location, outDir, basename);
-    if (Helpers.exists(source)) {
-      if (Helpers.isFolder(source)) {
-        Helpers.tryCopyFrom(source, dest);
-      } else {
-        Helpers.copyFile(source, dest);
-        if (path.basename(source) === config.file.tnpEnvironment_json) {
-          Helpers.setValueToJSON(dest, 'currentProjectLocation', void 0);
-        }
-      }
-    } else {
-      Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);
-    }
     //#endregion
   }
-  protected linkWhenExist(this: Project, source: string, outLInk: string) {
-    //#region @backend
-    const basename = source;
-    source = path.join(this.location, source);
-    outLInk = path.join(this.location, outLInk, basename);
+  //#endregion
 
-
-    if (Helpers.exists(source)) {
-      if (Helpers.isLink(source)) {
-        source = Helpers.pathFromLink(source);
-      }
-      if (Helpers.exists(source)) {
-        Helpers.createSymLink(source, outLInk)
-      }
-    }
-    //#endregion
-  }
-
-
-  /**
-   * Return how many projects has changed
-   * @param bumbVersionIn
-   * @param newVersion
-   * @param onlyInThisProjectSubprojects
-   */
-  async bumpVersionInOtherProjects(this: Project, newVersion, onlyInThisProjectSubprojects = false) {
-    if (onlyInThisProjectSubprojects) {
-      // console.log('UPDATE VERSION !!!!!!!!!!!!!')
-      updateChildrenVersion(this, newVersion, this.name);
-    } else {
-      if (this.TnpProject.name === this.name) {
-        Helpers.info(`Ommiting version bump ${this.name} - for tnp itself`)
-      } else if (this.packageJson.hasDependency(this.TnpProject.name)) {
-        Helpers.info(`Ommiting version bump ${this.name} - has tnp as dependency`)
-      } else {
-        this.TnpProject.packageJson.setDependencyAndSave({
-          name: this.name,
-          version: newVersion,
-        }, `Bump new version "${newVersion}" of ${this.name}`);
-        // try { /// TODO FIX THIS broken getDependents
-        //   await (new Promise((resolve, reject) => {
-        //     try {
-        //       getDependents(this.name, (err, packages: any[]) => {
-        //         if (err) {
-        //           reject(`[${config.frameworkName}] Can't get depended packages..`)
-        //         } else {
-        //           packages.forEach(pkg => {
-        //             Helpers.info(`Please update "${pkg}" depended on this package...`)
-        //           })
-        //           resolve()
-        //         }
-        //       });
-        //     } catch (error) {
-        //       reject(`[${config.frameworkName}] Error while getting depended packages.. `)
-        //     }
-        //   }));
-        // } catch (error) {
-        //   Helpers.warn(`[${config.frameworkName}] `
-        //     + `Not able to show dependent packages for ${chalk.bold(this.name)}`)
-        // }
-      }
-    }
-  }
-
-  private commit(this: Project, newVer: string, message = 'new version') {
-    this.git.commit(`${message} ${newVer}`);
-  }
-
-  public compileES5version(this: Project) {
-
-    // TODO fix this for angular-lib
-    if (this.frameworkVersionAtLeast('v3')) {
-      return;
-    }
-
-    if (this.frameworkVersionEquals('v1') || this.typeIsNot('isomorphic-lib')) {
-      return;
-    }
-
-    const pathBundle = path.join(this.location, config.folder.bundle);
-    const cwdBrowser = path.join(pathBundle, config.folder.browser);
-    const cwdClient = path.join(pathBundle, config.folder.client);
-    const pathBabelRc = path.join(cwdBrowser, config.file._babelrc);
-    const pathCompiled = path.join(cwdBrowser, 'es5');
-    const pathCompiledClient = path.join(cwdClient, 'es5');
-    Helpers.writeFile(pathBabelRc, '{ "presets": ["env"] }\n');
-    try {
-      Helpers.run(`babel . -d es5`, { cwd: cwdBrowser }).sync();
-      Helpers.copy(pathCompiled, pathCompiledClient);
-    } catch (err) {
-      Helpers.removeFileIfExists(pathBabelRc);
-      Helpers.error(err, true, true);
-      Helpers.error(`Not able to create es5 version of lib`, false, true);
-    }
-    Helpers.removeFileIfExists(pathBabelRc);
-
-  }
-
-  public async installLocaly(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
-    if (this.isVscodeExtension) {
-      const vsixPackageName = this.extensionVsixName;
-      if (!this.containsFile(config.folder.out)) {
-        Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
-      }
-      // if (!Helpers.exists(this.path(vsixPackageName).absolute.normal)) {
-      await this.createVscePackage(false);
-      // }
-      Helpers.info(`Installing extension: ${vsixPackageName} `
-        + `with creation date: ${fse.lstatSync(this.path(vsixPackageName).absolute.normal).birthtime}...`);
-      this.run(`code --install-extension ${vsixPackageName}`).sync();
-    }
-  }
-
-  private async createVscePackage(this: Project, showInfo = true) {
-    const vsixPackageName = this.extensionVsixName;
-    try {
-      await Helpers.actionWrapper(() => {
-        this.run(`npm-run vsce package --yarn`).sync();
-      }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
-      if (showInfo) {
-        const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
-        Helpers.info(`
-
-        Please use command: ${commandInstall} # or ${config.frameworkName} il
-        to install this package in local vscode instance.
-
-        `)
-      }
-    } catch (error) {
-      Helpers.error(error, true, true);
-      Helpers.error(`Not able to build ${vsixPackageName} package `);
-    }
-  }
-
+  //#region api / release
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
+    //#region @backend
     // @ts-ignore
     Helpers.log(`LIB: automaticRelease=${automaticRelease}`);
     Helpers.log(`LIB: global.tnpNonInteractive=${global.tnpNonInteractive}`);
@@ -533,77 +415,13 @@ export abstract class LibProject {
       .forEach(c => {
         c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
       });
+    //#endregion
   }
+  //#endregion
 
-
-  private async tagVersion(this: Project, newVersion: string) {
-    return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
-  }
-
-  get angularCoreLibFiles() {
-    const files = [
-      'projects/my-lib/tsconfig.spec.json',
-      'projects/my-lib/tsconfig.lib.prod.json',
-      'projects/my-lib/tsconfig.lib.json',
-      'projects/my-lib/README.md',
-      'projects/my-lib/package.json',
-      'projects/my-lib/ng-package.json',
-      'projects/my-lib/karma.conf.js',
-    ];
-
-    return files;
-  }
-
-  get angularCoreAppFiles() {
-    const files = [
-      'app/src/app/app.component.html',
-      'app/src/app/app.component.scss',
-      'app/src/app/app.component.spec.ts',
-      'app/src/app/app.component.ts',
-      'app/src/app/app.module.ts',
-      'app/src/assets/.gitkeep',
-      'app/src/environments/environment.prod.ts',
-      'app/src/environments/environment.ts',
-      'app/src/app',
-      'app/src/assets',
-      'app/src/environments',
-      'app/src/favicon.ico',
-      'app/src/index.html',
-      'app/src/main.ts',
-      'app/src/polyfills.ts',
-      'app/src/styles.scss',
-      'app/src/test.ts',
-      'app/.browserslistrc',
-      'app/.editorconfig',
-      'app/.gitignore',
-      // 'app/README.md',
-      'app/angular.json',
-      'app/karma.conf.js',
-      'app/package-lock.json',
-      'app/package.json',
-      'app/src',
-      'app/tsconfig.app.json',
-      'app/tsconfig.json',
-      'app/tsconfig.spec.json'
-    ];
-
-    return files;
-  }
-
-
-
-  async pushToGitRepo(this: Project, newVersion: string) {
-    newVersion = await this.tagVersion(newVersion);
-    this.packageJson.setBuildHash(this.git.lastCommitHash());
-    this.packageJson.save('updating hash');
-    this.commit(newVersion, `build hash update`);
-    Helpers.log('Pushing to git repository... ')
-    Helpers.log(`Git branch: ${this.git.currentBranchName}`);
-    this.git.pushCurrentBranch();
-    Helpers.info('Pushing to git repository done.');
-  }
-
+  //#region api / create client version as copy of browser
   private createClientVersionAsCopyOfBrowser(this: Project) {
+    //#region @backend
     const bundleFolder = path.join(this.location, config.folder.bundle);
     const browser = path.join(bundleFolder, config.folder.browser)
     const client = path.join(bundleFolder, config.folder.client)
@@ -616,11 +434,13 @@ export abstract class LibProject {
       Helpers.writeFile(`${browser}.js`, msg);
       Helpers.writeFile(`${client}.js`, msg);
     }
-
+    //#endregion
   }
+  //#endregion
 
+  //#region api / bundle resource
   public bundleResources(this: Project) {
-
+    //#region @backend
     this.checkIfReadyForNpm()
     const bundleFolder = path.join(this.location, config.folder.bundle);
     if (!fse.existsSync(bundleFolder)) {
@@ -646,13 +466,266 @@ export abstract class LibProject {
         fse.copyFileSync(file, dest);
       }
     })
-    Helpers.info(`Resources copied to release folder: ${config.folder.bundle}`)
+    Helpers.info(`Resources copied to release folder: ${config.folder.bundle}`);
+    //#endregion
   }
   //#endregion
 
-}
+  //#endregion
 
-// export interface LibProject extends Partial<Project> { }
+  //#region methods
+
+   private getProxyNgApp(buildOptions: BuildOptions) {
+    // @LAST
+   }
+
+
+  //#region methods / project linked files
+  projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
+    const files = [];
+    return files;
+  }
+  //#endregion
+
+  //#region methods / create if not exists
+  recreateIfNotExists() {
+    return [];
+  }
+  //#endregion
+
+  //#region methods / project specify files
+  projectSpecyficFiles(this: Project) {
+    const files = [
+      'index.js',
+      'index.d.ts',
+      'index.js.map',
+    ];
+    return files;
+  }
+  //#endregion
+
+  //#region methods / project specyfic files linked
+  projectSpecyficFilesLinked(this: Project) {
+    const files = [
+    ];
+    return files;
+  }
+  //#endregion
+
+  //#region methods / check if loggin in to npm
+  private checkIfLogginInToNpm(this: Project) {
+    //#region @backend
+    // if (!this.canBePublishToNpmRegistry) {
+    //   return;
+    // }
+    try {
+      this.run('npm whoami').sync();
+    } catch (e) {
+      Helpers.error(`Please login in to npm.`, false, true)
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / copy when exists
+  protected copyWhenExist(this: Project, source: string, outDir: string) {
+    //#region @backend
+    const basename = source;
+    source = path.join(this.location, source);
+    const dest = path.join(this.location, outDir, basename);
+    if (Helpers.exists(source)) {
+      if (Helpers.isFolder(source)) {
+        Helpers.tryCopyFrom(source, dest);
+      } else {
+        Helpers.copyFile(source, dest);
+        if (path.basename(source) === config.file.tnpEnvironment_json) {
+          Helpers.setValueToJSON(dest, 'currentProjectLocation', void 0);
+        }
+      }
+    } else {
+      Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / link when exists
+  protected linkWhenExist(this: Project, source: string, outLInk: string) {
+    //#region @backend
+    const basename = source;
+    source = path.join(this.location, source);
+    outLInk = path.join(this.location, outLInk, basename);
+
+
+    if (Helpers.exists(source)) {
+      if (Helpers.isLink(source)) {
+        source = Helpers.pathFromLink(source);
+      }
+      if (Helpers.exists(source)) {
+        Helpers.createSymLink(source, outLInk)
+      }
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / bump version in other projects
+  /**
+   * Return how many projects has changed
+   * @param bumbVersionIn
+   * @param newVersion
+   * @param onlyInThisProjectSubprojects
+   */
+  async bumpVersionInOtherProjects(this: Project, newVersion, onlyInThisProjectSubprojects = false) {
+    if (onlyInThisProjectSubprojects) {
+      // console.log('UPDATE VERSION !!!!!!!!!!!!!')
+      updateChildrenVersion(this, newVersion, this.name);
+    } else {
+      if (this.TnpProject.name === this.name) {
+        Helpers.info(`Ommiting version bump ${this.name} - for tnp itself`)
+      } else if (this.packageJson.hasDependency(this.TnpProject.name)) {
+        Helpers.info(`Ommiting version bump ${this.name} - has tnp as dependency`)
+      } else {
+        this.TnpProject.packageJson.setDependencyAndSave({
+          name: this.name,
+          version: newVersion,
+        }, `Bump new version "${newVersion}" of ${this.name}`);
+        // try { /// TODO FIX THIS broken getDependents
+        //   await (new Promise((resolve, reject) => {
+        //     try {
+        //       getDependents(this.name, (err, packages: any[]) => {
+        //         if (err) {
+        //           reject(`[${config.frameworkName}] Can't get depended packages..`)
+        //         } else {
+        //           packages.forEach(pkg => {
+        //             Helpers.info(`Please update "${pkg}" depended on this package...`)
+        //           })
+        //           resolve()
+        //         }
+        //       });
+        //     } catch (error) {
+        //       reject(`[${config.frameworkName}] Error while getting depended packages.. `)
+        //     }
+        //   }));
+        // } catch (error) {
+        //   Helpers.warn(`[${config.frameworkName}] `
+        //     + `Not able to show dependent packages for ${chalk.bold(this.name)}`)
+        // }
+      }
+    }
+  }
+  //#endregion
+
+  //#region methods / commit
+  private commit(this: Project, newVer: string, message = 'new version') {
+    //#region @backend
+    this.git.commit(`${message} ${newVer}`);
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / compile es5
+  private compileES5version(this: Project) {
+    //#region @backend
+    // TODO fix this for angular-lib
+    if (this.frameworkVersionAtLeast('v3')) {
+      return;
+    }
+
+    if (this.frameworkVersionEquals('v1') || this.typeIsNot('isomorphic-lib')) {
+      return;
+    }
+
+    const pathBundle = path.join(this.location, config.folder.bundle);
+    const cwdBrowser = path.join(pathBundle, config.folder.browser);
+    const cwdClient = path.join(pathBundle, config.folder.client);
+    const pathBabelRc = path.join(cwdBrowser, config.file._babelrc);
+    const pathCompiled = path.join(cwdBrowser, 'es5');
+    const pathCompiledClient = path.join(cwdClient, 'es5');
+    Helpers.writeFile(pathBabelRc, '{ "presets": ["env"] }\n');
+    try {
+      Helpers.run(`babel . -d es5`, { cwd: cwdBrowser }).sync();
+      Helpers.copy(pathCompiled, pathCompiledClient);
+    } catch (err) {
+      Helpers.removeFileIfExists(pathBabelRc);
+      Helpers.error(err, true, true);
+      Helpers.error(`Not able to create es5 version of lib`, false, true);
+    }
+    Helpers.removeFileIfExists(pathBabelRc);
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / install locally
+  public async installLocaly(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
+    //#region @backend
+    if (this.isVscodeExtension) {
+      const vsixPackageName = this.extensionVsixName;
+      if (!this.containsFile(config.folder.out)) {
+        Helpers.error(`Please build your project: ${config.frameworkName} build:dist`, false, true);
+      }
+      // if (!Helpers.exists(this.path(vsixPackageName).absolute.normal)) {
+      await this.createVscePackage(false);
+      // }
+      Helpers.info(`Installing extension: ${vsixPackageName} `
+        + `with creation date: ${fse.lstatSync(this.path(vsixPackageName).absolute.normal).birthtime}...`);
+      this.run(`code --install-extension ${vsixPackageName}`).sync();
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / create vscode package
+  private async createVscePackage(this: Project, showInfo = true) {
+    //#region @backend
+    const vsixPackageName = this.extensionVsixName;
+    try {
+      await Helpers.actionWrapper(() => {
+        this.run(`npm-run vsce package --yarn`).sync();
+      }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
+      if (showInfo) {
+        const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
+        Helpers.info(`
+
+        Please use command: ${commandInstall} # or ${config.frameworkName} il
+        to install this package in local vscode instance.
+
+        `)
+      }
+    } catch (error) {
+      Helpers.error(error, true, true);
+      Helpers.error(`Not able to build ${vsixPackageName} package `);
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / tag version
+  private async tagVersion(this: Project, newVersion: string) {
+    //#region @backend
+    return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / push to git repo
+  private async pushToGitRepo(this: Project, newVersion: string) {
+    //#region @backend
+    newVersion = await this.tagVersion(newVersion);
+    this.packageJson.setBuildHash(this.git.lastCommitHash());
+    this.packageJson.save('updating hash');
+    this.commit(newVersion, `build hash update`);
+    Helpers.log('Pushing to git repository... ')
+    Helpers.log(`Git branch: ${this.git.currentBranchName}`);
+    this.git.pushCurrentBranch();
+    Helpers.info('Pushing to git repository done.');
+    //#endregion
+  }
+  //#endregion
+
+  //#endregion
+
+}
 
 //#region @backend
 export function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
