@@ -195,7 +195,7 @@ export class ProjectAngularLib
     const { outDir, ngbuildonly, watch } = this.buildOptions;
     this.beforeLibBuild(outDir);
     if (ngbuildonly) {
-      // await this.buildAngularVer(watch);
+      // await this.buildAngulazrVer(watch);
     } else {
       this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 

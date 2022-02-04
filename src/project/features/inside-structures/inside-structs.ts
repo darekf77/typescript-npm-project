@@ -38,6 +38,7 @@ export function angularAppFromV3IsomorphicLib(project: Project) {
       'app/package-lock.json',
       'app/package.json',
       'app/src',
+      'app/.nvmrc',
       'app/tsconfig.app.json',
       'app/tsconfig.json',
       'app/tsconfig.spec.json'

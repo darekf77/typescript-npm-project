@@ -3,7 +3,7 @@ import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
 import { Project } from '../abstract/project/project';
 import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remover.backend';
@@ -145,7 +145,30 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
-  priva
+  //#region @backend
+  public static angularProjPath(project: Project, outFolder?: ConfigModels.OutFolder, client?: string) {
+    const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}/${project.name}`;
+    const tmpProjects = `tmp-apps-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
+    if (project.isStandaloneProject) {
+      if (outFolder) {
+        return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
+      }
+      return tmpProjectsStandalone;
+    }
+    if (outFolder && client) {
+      return tmpProjects.replace('{{{outFolder}}}', outFolder).replace('{{{client}}}', client);
+    }
+    return tmpProjects;
+  }
+  //#endregion
+
+  private proxyNgApp(project: Project, buildOptions: BuildOptions) {
+    //#region @backendFunc
+    const projepath = ProjectIsomorphicLib.angularProjPath(project, buildOptions.outDir as any);
+    const proj = Project.From(projepath);
+    return proj as Project;
+    //#endregion
+  }
 
   private async buildNgApp(
     //#region @backend
@@ -153,65 +176,84 @@ export class ProjectIsomorphicLib
     //#endregion
   ) {
     //#region @backend
-    if (this.frameworkVersionAtLeast('v3')) {
-      console.log('ANGULAR BUILD')
-      // @LAST
-    } else {
 
-      if (!watch) {
-        Helpers.warn(`App build not possible for isomorphic-lib in static build mode`)
-        return;
-      }
 
-      let webpackEnvParams = `--env.outFolder=${outDir}`;
-      webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+    if (!watch) {
+      Helpers.warn(`App build not possible for isomorphic-lib in static build mode`)
+      return;
+    }
 
-      let client = _.first(forClient as Project[]);
+    let webpackEnvParams = `--env.outFolder=${outDir}`;
+    webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
-      if (!global.tnpNonInteractive) {
-        if (!this.isStandaloneProject && forClient.length === 0) {
-          const answer: { project: string } = await inquirer
-            .prompt([
-              {
-                type: 'list',
-                name: 'project',
-                message: 'Which project do you wanna simulate ?',
-                choices: this.parent.children
-                  .filter(c => c.typeIs(...config.allowedTypes.app))
-                  .filter(c => c.name !== this.name)
-                  .map(c => c.name),
-                filter: function (val) {
-                  return val.toLowerCase();
-                }
+    let client = _.first(forClient as Project[]);
+
+    if (!global.tnpNonInteractive) {
+      if (!this.isStandaloneProject && forClient.length === 0) {
+        const answer: { project: string } = await inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'project',
+              message: 'Which project do you wanna simulate ?',
+              choices: this.parent.children
+                .filter(c => c.typeIs(...config.allowedTypes.app))
+                .filter(c => c.name !== this.name)
+                .map(c => c.name),
+              filter: function (val) {
+                return val.toLowerCase();
               }
-            ]) as any;
-          client = Project.From<Project>(path.join(this.location, '..', answer.project));
-        }
+            }
+          ]) as any;
+        client = Project.From<Project>(path.join(this.location, '..', answer.project));
       }
+    }
 
-      let port: number;
-      if (client) {
-        port = client.getDefaultPort();
-        webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
-      }
+    let port: number;
+    if (client) {
+      port = client.getDefaultPort();
+      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
+    }
 
-      const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
-      if (_.isNumber(argsAdditionalParams.port)) {
-        port = argsAdditionalParams.port;
-      }
+    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
+    if (_.isNumber(argsAdditionalParams.port)) {
+      port = argsAdditionalParams.port;
+    }
+    if (_.isNumber(port)) {
+      await Helpers.killProcessByPort(port);
+    }
+
+    let command: string;
+    if (this.frameworkVersionAtLeast('v3')) {
+      const p = _.isNumber(port) ? `--port=${port}` : '';
+
+      const loadNvm = `export NVM_DIR="$([ -z "\${XDG_CONFIG_HOME-}" ] && printf %s "\${HOME}/.nvm" || printf %s "\${XDG_CONFIG_HOME}/nvm")"`
+      +` && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`;
+
+      command = `${loadNvm} && nvm use < .nvmrc && npm-run ng serve ${p}`;
+    } else {
       if (_.isNumber(port)) {
-        await Helpers.killProcessByPort(port);
         webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
       }
+      command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+    }
 
-      const command = `npm-run webpack-dev-server ${webpackEnvParams}`;
-      Helpers.info(`
+    let proj: Project;
+    if (this.frameworkVersionAtLeast('v3')) {
+      proj = this.proxyNgApp(this, this.buildOptions);
+    } else {
+      proj = this;
+    }
 
-      WEBPACK COMMAND: ${command}
+    Helpers.info(`
+
+      ANGULAR SERVE COMMAND: ${command}
+
+      inside: ${proj.location}
 
       `)
-      this.run(command).sync();
-    }
+    proj.run(command).sync();
+
     //#endregion
   }
 
@@ -250,21 +292,6 @@ export class ProjectIsomorphicLib
       });
   }
 
-  private REGEX_REGION(word) {
-    return new RegExp("[\\t ]*\\/\\/\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\/\\/\\s*#?endregion ?[\\t ]*\\n?", "g")
-  }
-  private replaceRegionsWith(stringContent = '', words = []) {
-    if (words.length === 0) { return stringContent; }
-    let word = words.shift();
-    let replacement = ''
-    if (Array.isArray(word) && word.length === 2) {
-      replacement = word[1];
-      word = word[0]
-    }
-
-    stringContent = stringContent.replace(this.REGEX_REGION(word), replacement);
-    return this.replaceRegionsWith(stringContent, words);
-  }
   //#endregion
 
   async buildLib() {

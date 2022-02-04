@@ -475,11 +475,6 @@ export abstract class LibProject {
 
   //#region methods
 
-   private getProxyNgApp(buildOptions: BuildOptions) {
-    // @LAST
-   }
-
-
   //#region methods / project linked files
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
     const files = [];
