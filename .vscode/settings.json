@@ -1,6 +1,7 @@
 {
   "files.exclude": {
     "@ngx-formly": true,
+    "json5-writer": true,
     "lowdb": true,
     "misc-utils-of-mine-generic": true,
     "*.sh": true,

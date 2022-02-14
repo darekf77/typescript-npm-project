@@ -105,7 +105,7 @@ export class NodeModulesBase extends NodeModulesCore {
       } else {
 
         packagesToLinkOrCopy
-          .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
+          .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f)) // TODO check this fix for weird things with /browser
           .forEach(f => {
             const dest = path.join(this.project.node_modules.path, path.basename(f));
             if (['.bin', '.install-date'].includes(path.basename(f))) {

@@ -1,17 +1,25 @@
 //#region imports
-import { path, crossPlatformPath } from 'tnp-core'
+//#region @backend
+import { IncCompiler } from 'incremental-compiler';
+//#endregion
+import {
+  //#region @backend
+  path, crossPlatformPath
+  //#endregion
+} from 'tnp-core'
 import { _ } from 'tnp-core';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
-import { IncCompiler } from 'incremental-compiler';
 import { config } from 'tnp-config';
-import { CLASS } from 'typescript-class-helpers';
-import { FrameworkFilesGenerator } from '../compilers/index';
 //#endregion
 
 export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA = any>
-  extends IncCompiler.Base<RES_ASYNC, RES_SYNC, ADDITIONAL_DATA> {
+  //#region @backend
+  extends IncCompiler.Base<RES_ASYNC, RES_SYNC, ADDITIONAL_DATA>
+//#endregion
+{
 
+  //#region @backend
   constructor(public project: Project, options: IncCompiler.Models.BaseClientCompilerOptions,
     allowFolderOutSideProject = false) {
     super(checkFolderCompiler(project, options, allowFolderOutSideProject));
@@ -27,9 +35,12 @@ export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any,
 
     return notAllowedFiles;
   }
+  //#endregion
 
 }
 
+//#region helpers
+//#region @backend
 function checkFolderCompiler(project: Project, options: IncCompiler.Models.BaseClientCompilerOptions, dontCheck = false) {
   if (_.isUndefined(options.folderPath)) {
     options.folderPath = [];
@@ -49,3 +60,5 @@ function checkFolderCompiler(project: Project, options: IncCompiler.Models.BaseC
   });
   return options;
 }
+//#endregion
+//#endregion

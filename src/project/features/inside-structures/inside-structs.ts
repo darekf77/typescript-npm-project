@@ -1,7 +1,7 @@
 //#region @backend
-import { Helpers, path, _ } from "tnp-core";
-import { Project } from "../../abstract/project/project";
-import { InsideStruct } from "./inside-struct";
+import { Helpers, path, _ } from 'tnp-core';
+import { Project } from '../../abstract/project/project';
+import { InsideStruct } from './inside-struct';
 
 
 export function angularAppFromV3IsomorphicLib(project: Project) {

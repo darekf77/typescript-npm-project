@@ -5,9 +5,9 @@ import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import { config, ConfigModels } from 'tnp-config';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
-import { Project } from '../abstract/project/project';
 import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remover.backend';
 //#endregion
+import { Project } from '../abstract/project/project';
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -227,7 +227,7 @@ export class ProjectIsomorphicLib
     if (this.frameworkVersionAtLeast('v3')) {
       const p = _.isNumber(port) ? `--port=${port}` : '';
 
-      const loadNvm = `export NVM_DIR="$([ -z "\${XDG_CONFIG_HOME-}" ] && printf %s "\${HOME}/.nvm" || printf %s "\${XDG_CONFIG_HOME}/nvm")"`
+      const loadNvm = `export NVM_DIR='$([ -z '\${XDG_CONFIG_HOME-}' ] && printf %s '\${HOME}/.nvm' || printf %s '\${XDG_CONFIG_HOME}/nvm')'`
       +` && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`;
 
       command = `${loadNvm} && nvm use < .nvmrc && npm-run ng serve ${p}`;

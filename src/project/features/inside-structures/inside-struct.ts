@@ -1,5 +1,5 @@
-import { ConfigModels } from "tnp-config";
-import { Project } from "../../abstract/project/project";
+import { ConfigModels } from 'tnp-config';
+import { Project } from '../../abstract/project/project';
 
 export type Opt = {
   outFolder: ConfigModels.OutFolder;

@@ -244,7 +244,7 @@ export abstract class LibProject {
       }
       this.packageJson.data.version = newVersion;
       this.packageJson.save('show for release')
-      this.run(`tnp init`).sync();
+      this.run(`${config.frameworkName} init`).sync();
 
       Helpers.info(`BUILD OPTION (${this.name}):
       prod=${!!prod},

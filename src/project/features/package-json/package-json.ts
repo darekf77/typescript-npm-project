@@ -1,13 +1,18 @@
+//#region imports
 //#region @backend
 import { PackageJsonBase } from './package-json-base.backend';
 //#endregion
-
-import { crossPlatformPath, Helpers, path, _ } from 'tnp-core';
+import {
+  //#region @backend
+  crossPlatformPath, path,
+  //#endregion
+  _, Helpers
+} from 'tnp-core';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';
 import { PackageJsonFile } from './package-json-file';
 import { config } from 'tnp-config';
-
+//#endregion
 @Morphi.Entity<PackageJSON>({
   className: 'PackageJSON',
   //#region @backend

@@ -1,15 +1,14 @@
-
 //#region @backend
-import { config, ConfigModels } from "tnp-config";
+import { config, ConfigModels } from 'tnp-config';
 import {
   path, _
-} from "tnp-core";
+} from 'tnp-core';
 
-import { Helpers } from "tnp-helpers";
-import { FeatureForProject } from "../../abstract/feature-for-project";
-import { Project } from "../../abstract/project/project";
-import { InsideStruct, Opt } from "./inside-struct";
-import { angularAppFromV3IsomorphicLib } from "./inside-structs";
+import { Helpers } from 'tnp-helpers';
+import { FeatureForProject } from '../../abstract/feature-for-project';
+import { Project } from '../../abstract/project/project';
+import { InsideStruct, Opt } from './inside-struct';
+import { angularAppFromV3IsomorphicLib } from './inside-structs';
 
 
 export class InsideStructures extends FeatureForProject {

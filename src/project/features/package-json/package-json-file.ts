@@ -1,26 +1,13 @@
 //#region imports
-import { _ } from "tnp-core";
 //#region @backend
-import { path } from "tnp-core";
+import { path } from 'tnp-core';
 //#endregion
-import { config, ConfigModels } from "tnp-config";
-import { Models } from "tnp-models";
+import { config, ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
+import { _ } from 'tnp-core';
 //#endregion
 
-const OVERRIDE_FROM_TNP = [ // TODO put in config ?
-  'scripts',
-  'description',
-  'license',
-  'private',
-  'author',
-  'homepage',
-  'main',
-  'engines',
-  'categories',
-  'keywords',
-  'activationEvents',
-];
 
 export type SaveRequests = {
   additionalSaveRequired: boolean;
@@ -60,7 +47,9 @@ export class PackageJsonFile {
   }
 
   get saveAtLoad() {
+    //#region @backendFunc
     return this.isTnpTypeProject && this.additionalSaveRequired && !Helpers.isLink(this.fullPath);
+    //#endregion
   }
 
   private notReadable: boolean = false;
@@ -110,6 +99,7 @@ export class PackageJsonFile {
 
   //#region api / apply tnp to content
   private applyTnpToContent(): void {
+    //#region @backend
     let additionalSaveRequired = this.additionalSaveRequired;
     //#region merging
     const content = (this.content) as Models.npm.IPackageJSON;
@@ -122,14 +112,14 @@ export class PackageJsonFile {
 
     allKeys
       .filter(key =>
-        OVERRIDE_FROM_TNP.includes(key)
+        config.OVERRIDE_FROM_TNP.includes(key)
       )
       .forEach(key => {
         const contentValue = content[key];
         const overrideValue = override[key];
 
         if (!(_.isUndefined(contentValue) && _.isUndefined(overrideValue))) {
-          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !OVERRIDE_FROM_TNP.includes(key)) {
+          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !config.OVERRIDE_FROM_TNP.includes(key)) {
 
             if (_.isObject(contentValue[key])) {
               override[key] = _.cloneDeep(contentValue[key]);
@@ -155,11 +145,13 @@ export class PackageJsonFile {
       });
     //#endregion
     this.additionalSaveRequired = additionalSaveRequired;
+    //#endregion
   }
   //#endregion
 
   //#region api / merge with higer priority package.json
   mergeWith(higherPriorityPjWithOnlyTnpProps: PackageJsonFile) {
+    //#region @backend
     let additionalSaveRequired = this.additionalSaveRequired || this.notReadable;
     //#region merging
     if (!higherPriorityPjWithOnlyTnpProps.containsOnlyTnpMetadata) {
@@ -194,17 +186,20 @@ export class PackageJsonFile {
     //#endregion
     this.additionalSaveRequired = additionalSaveRequired;
     this.applyTnpToContent();
+    //#endregion
   }
   //#endregion
 
   //#region api / last checks
   lastChecks() {
+    //#region @backend
     this.additionalSaveRequired = lastFixes(
       this.content,
       this.fullPath,
       PackageJsonFile.FRAMEWORK_KEY_OLD,
       this.additionalSaveRequired
     ).additionalSaveRequired;
+    //#endregion
   }
   //#endregion
 
@@ -223,6 +218,7 @@ function lastFixes(
   tnpProperty: typeof PackageJsonFile.FRAMEWORK_KEY_OLD,
   additionalSaveRequired = false
 ): SaveRequests {
+  //#region @backendFunc
   if (content[tnpProperty]
     && !!content[tnpProperty].type
     && content[tnpProperty].type !== 'navi'
@@ -257,6 +253,7 @@ function lastFixes(
   delete content['recreatedFrom'];
 
   return { additionalSaveRequired };
+  //#endregion
 }
 //#endregion
 
@@ -267,7 +264,7 @@ function consistencyFixes(
   tnpProperty: typeof PackageJsonFile.FRAMEWORK_KEY_OLD,
   additionalSaveRequired = false
 ): SaveRequests {
-
+  //#region @backendFunc
   if (!content) {
     // additionalSaveRequired = true; // NOT NEEDED
     content = {} as any;
@@ -340,7 +337,7 @@ function consistencyFixes(
   }
 
   return { additionalSaveRequired }
-
+  //#endregion
 }
 //#endregion
 

@@ -2,11 +2,9 @@ import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../abstract';
 
-
 export class GlobalWorkerApps extends FeatureForProject {
-
-
   get detectGlobal() {
+    //#region @backendFunc
     const isWin = (process.platform === 'win32')
     try {
       const command = `ls -al "\`npm root -g\`"`;
@@ -31,6 +29,7 @@ export class GlobalWorkerApps extends FeatureForProject {
     } catch (error) {
       return [];
     }
+    //#endregion
   }
 
 }
