@@ -148,57 +148,57 @@ export class BackendCompilation extends IncCompiler.Base {
   }
 
   protected async buildAngularLibVer(project: Project, outFolder: ConfigModels.OutFolder = 'dist', watch: boolean) {
-    const cwd = project.location;
-    project.insideStructure.structures.InsideStructAngular13Lib.struct.recreate(outFolder);
-    const isIsomorphic = project.typeIs('isomorphic-lib');
-    const command = `npm-run ng build ${project.name} ${watch ? '--watch' : ''} `;
-    // + ` --output-path=./${outFolder}/browser`;
-    if (isIsomorphic) {
-      await Helpers.run(command, {
-        cwd,
-        outputLineReplace: (line => line.replace(
-          `tmp-projects-for-${outFolder}/${project.name}/src/`,
-          `src/`
-        ))
-      }).asyncAsPromise();
-    } else {
-      await Helpers.run(command, {
-        cwd,
-      }).asyncAsPromise();
-    }
-    if (!watch) {
-      const browserPkgJsons = [
-        path.join(project.location, outFolder, config.folder.browser, config.file.package_json),
-        path.join(project.location, outFolder, config.folder.client, config.file.package_json),
-      ];
-      browserPkgJsons.forEach(p => {
-        const j = Helpers.readJson(p) as Models.npm.IPackageJSON;
-        j.dependencies = {};
-        j.devDependencies = {};
-        j.peerDependencies = {};
-        [
-          // 'module',
-          // 'fesm5',
-          // 'fesm2015',
-          // 'es2015',
-          // 'bundles',
-          // 'main'
-        ].forEach(k => {
-          if (k === 'main') {
-            j[k] = `esm2015/${project.name}.js`;
-          } else {
-            j[k] = void 0;
-            Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.browser, k));
-            Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.client, k));
-          }
+    // const cwd = project.location;
+    // project.insideStructure.structures.InsideStructAngular13Lib.struct.recreate(outFolder);
+    // const isIsomorphic = project.typeIs('isomorphic-lib');
+    // const command = `npm-run ng build ${project.name} ${watch ? '--watch' : ''} `;
+    // // + ` --output-path=./${outFolder}/browser`;
+    // if (isIsomorphic) {
+    //   await Helpers.run(command, {
+    //     cwd,
+    //     outputLineReplace: (line => line.replace(
+    //       `tmp-projects-for-${outFolder}/${project.name}/src/`,
+    //       `src/`
+    //     ))
+    //   }).asyncAsPromise();
+    // } else {
+    //   await Helpers.run(command, {
+    //     cwd,
+    //   }).asyncAsPromise();
+    // }
+    // if (!watch) {
+    //   const browserPkgJsons = [
+    //     path.join(project.location, outFolder, config.folder.browser, config.file.package_json),
+    //     path.join(project.location, outFolder, config.folder.client, config.file.package_json),
+    //   ];
+    //   browserPkgJsons.forEach(p => {
+    //     const j = Helpers.readJson(p) as Models.npm.IPackageJSON;
+    //     j.dependencies = {};
+    //     j.devDependencies = {};
+    //     j.peerDependencies = {};
+    //     [
+    //       // 'module',
+    //       // 'fesm5',
+    //       // 'fesm2015',
+    //       // 'es2015',
+    //       // 'bundles',
+    //       // 'main'
+    //     ].forEach(k => {
+    //       if (k === 'main') {
+    //         j[k] = `esm2015/${project.name}.js`;
+    //       } else {
+    //         j[k] = void 0;
+    //         Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.browser, k));
+    //         Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.client, k));
+    //       }
 
-        });
+    //     });
 
-        // j.scripts = {};
-        Helpers.writeJson(p, j);
-      });
+    //     // j.scripts = {};
+    //     Helpers.writeJson(p, j);
+    //   });
 
-    }
+    // }
 
   }
 

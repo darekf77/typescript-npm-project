@@ -41,7 +41,7 @@ export class InsideStruct {
      * Replace pathes while copying relateivePathesFromContainer
      * to destination project
      */
-    public pathReplacements: [string, LinkTypePathRep][] = [],
+    public pathReplacements: [string | RegExp, LinkTypePathRep][] = [],
     public linkNodeModulesTo: string[] = [],
     public linksFuncs: [
       /**
