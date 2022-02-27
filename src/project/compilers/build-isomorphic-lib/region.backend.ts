@@ -115,6 +115,8 @@ export class Region {
                 regionTag.toLowerCase() === '@backend'.toLowerCase()
                 ||
                 regionTag.toLowerCase() === '@notForNpm'.toLowerCase()
+                ||
+                regionTag.toLowerCase() === '@browser'.toLowerCase()
               ) {
                 // nothing here
               }

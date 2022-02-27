@@ -10,7 +10,7 @@ import {
   SmartNodeModules, RecentFilesForContainer
 } from '../../features';
 
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, BrowserCodePreventer } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
@@ -88,6 +88,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public frameworkFileGenerator: FrameworkFilesGenerator;
+  //#endregion
+
+  //#region @backend
+  public browserCodePreventer: BrowserCodePreventer;
   //#endregion
 
   //#region @backend
