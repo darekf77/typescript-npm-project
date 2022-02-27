@@ -175,9 +175,9 @@ export abstract class FolderProject {
       return void 0;
     }
     const parent = $Project.From<Project>(path.join(this.location, '..'));
-    if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
-      return parent.parent;
-    }
+    // if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
+    //   return parent.parent;
+    // }
     return parent;
     //#endregion
   }

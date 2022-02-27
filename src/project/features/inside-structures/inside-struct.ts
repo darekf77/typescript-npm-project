@@ -2,15 +2,22 @@ import { ConfigModels } from 'tnp-config';
 import { Project } from '../../abstract/project/project';
 
 export type Opt = {
-  outFolder: ConfigModels.OutFolder;
-  projectName: string;
+  outFolder?: ConfigModels.OutFolder;
+  projectName?: string;
+  projectLocation?: string;
   client?: Project;
-  replacement: Function;
+  replacement?: Function;
 };
 
 export type LinkType = (options: Opt) => string;
+export type LinkTypePathRep = (options: Omit<Opt, 'replacement'>) => string;
 export type EndAction = (options: Opt) => void;
 
+/**
+ * This class will exectute algorithm
+ * 1. Copy replative pathes to proper destination files/folders
+ * 2. Link node_modules to desitnation projects
+ */
 export class InsideStruct {
 
   //#region @backend
@@ -30,7 +37,11 @@ export class InsideStruct {
     public relateivePathesFromContainer?: string[],
     public projtectType?: ConfigModels.NewFactoryType,
     public frameworkVersion?: ConfigModels.FrameworkVersion,
-    public pathReplacements: [string, LinkType][] = [],
+    /**
+     * Replace pathes while copying relateivePathesFromContainer
+     * to destination project
+     */
+    public pathReplacements: [string, LinkTypePathRep][] = [],
     public linkNodeModulesTo: string[] = [],
     public linksFuncs: [
       /**
@@ -49,6 +60,10 @@ export class InsideStruct {
 
   public get coreContainer() {
     return Project.by(this.projtectType, this.frameworkVersion) as Project;
+  }
+
+  recreate(outFolder: ConfigModels.OutFolder = 'dist') {
+
   }
 
 

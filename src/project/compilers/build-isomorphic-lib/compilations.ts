@@ -27,7 +27,7 @@ export class BackendCompilationExtended extends BackendCompilation {
     const hideErrorsForBackend = currentProject.typeIs('angular-lib')
       && this.compilationFolderPath.endsWith(config.folder.components);
 
-    await this.tscCompilation
+    await this.libCompilation
       ({
         cwd: this.compilationFolderPath,
         watch,

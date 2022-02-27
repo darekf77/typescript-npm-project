@@ -237,9 +237,9 @@ export abstract class BaseProject {
       return this.browser.isWorkspaceChildProject;
     }
     //#region @backend
-    if (!!this.parent && this.parent.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
-      return true;
-    }
+    // if (!!this.parent && this.parent.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
+    //   return true;
+    // }
     return !!this.parent && this.parent.typeIs('workspace');
     //#endregion
   }

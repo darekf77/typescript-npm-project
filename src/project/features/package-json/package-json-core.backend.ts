@@ -164,6 +164,10 @@ export class PackageJsonCore {
     return _.isArray(p) ? p : [];
   }
 
+  get trusted(): Models.npm.TrustedType {
+    return this.data.tnp?.core?.dependencies?.trusted || {} as any;
+  }
+
   get path() {
     return path.join(this.cwd, config.file.package_json);
   }

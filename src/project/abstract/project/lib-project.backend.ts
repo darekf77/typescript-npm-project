@@ -51,21 +51,6 @@ export abstract class LibProject {
     //#endregion
   }
 
-  get angularCoreLibFiles() {
-    //#region @backendFunc
-    const files = [
-      'projects/my-lib/tsconfig.spec.json',
-      'projects/my-lib/tsconfig.lib.prod.json',
-      'projects/my-lib/tsconfig.lib.json',
-      'projects/my-lib/README.md',
-      'projects/my-lib/package.json',
-      'projects/my-lib/ng-package.json',
-      'projects/my-lib/karma.conf.js',
-    ];
-
-    return files;
-    //#endregion
-  }
 
   get angularCoreAppFiles() {
     //#region @backendFunc

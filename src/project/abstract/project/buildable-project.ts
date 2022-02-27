@@ -8,7 +8,7 @@ import chalk from 'chalk';
 //#endregion
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
-import type { Project } from './project';
+import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 
 
@@ -27,6 +27,28 @@ export abstract class BuildableProject {
     } catch (error) {
       return [];
     }
+  }
+
+  get trustedAllPossible() {
+    const tnp = Project.Tnp as Project;
+    PackagesRecognitionExtended.From(tnp.location).start();
+    return tnp.availableIsomorphicPackagesInNodeModules;
+  }
+
+  // @ts-ignore
+  get trusted(this: Project) {
+    const tnp = Project.Tnp as Project;
+    PackagesRecognitionExtended.From(tnp.location).start();
+    tnp.availableIsomorphicPackagesInNodeModules;
+    const currentProjVersion = this._frameworkVersion;
+    const value = tnp.packageJson.trusted[currentProjVersion];
+    if (value === '*') {
+      return tnp.availableIsomorphicPackagesInNodeModules;
+    }
+    if (Array.isArray(value)) {
+      return value;
+    }
+    return [];
   }
 
   /**

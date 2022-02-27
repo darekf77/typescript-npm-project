@@ -36,7 +36,7 @@ export class BackendCompilation extends IncCompiler.Base {
   }
   public isEnableCompilation = true;
 
-  async tscCompilation({
+  async libCompilation({
     cwd,
     watch = false,
     outDir,
@@ -75,69 +75,81 @@ export class BackendCompilation extends IncCompiler.Base {
     ${commandJsAndMaps}
 
     # inside: ${cwd}`)
-    const project = Project.From(locationOfMainProject) as Project;
-    // console.log(`project from ${locationOfMainProject}`, project)
-    if (!!project
-      && !!isBrowserBuild
-      && buildType === 'bundle'
-      && project.frameworkVersionAtLeast('v3')
-      && project.typeIs(
-        'angular-lib',
-        // 'isomorphic-lib' TODO angular circural deps in new js sucks
-      )) {
-      await this.buildAngularVer(project, buildType, watch);
-    } else {
-      //#region normal js build
-      if (watch) {
-        await Helpers.logProc2(child_process.exec(commandJsAndMaps, { cwd }), ['Watching for file changes.']);
-        if (generateDeclarations) {
-          Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-          await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
-        }
-      } else {
-        try {
-          child_process.execSync(commandJsAndMaps, {
-            cwd,
-            stdio: [0, 1, 2]
-          });
-        } catch (e) {
-          Helpers.error(`[morphi] Compilation error (1): ${e}`, false, true);
-        }
+    // const project = Project.From(locationOfMainProject) as Project;
+    // // console.log(`project from ${locationOfMainProject}`, project)
+    // if (!!project
+    //   && !!isBrowserBuild
+    //   && project.frameworkVersionAtLeast('v3')
+    //   && project.typeIs(
+    //     'angular-lib',
+    //     // 'isomorphic-lib' TODO angular circural deps in new js sucks
+    //   )) {
+    //   await this.buildAngularLibVer(project, buildType, watch);
+    // } else {
+    await this.buildStandardLibVer({
+      watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+    })
+    // }
 
-
-        if (generateDeclarations) {
-          Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-          try {
-            child_process.execSync(commandDts, {
-              cwd,
-              stdio: [0, 1, 2]
-            })
-          } catch (e) {
-            Helpers.error(`[morphi] Compilation error (2): ${e}`, false, true);
-          }
-        }
-      }
-      //#endregion
-    }
-
-    if (!!project && !!isBrowserBuild) {
-      const bePjPath = path.join(project.location, buildType, config.file.package_json);
-      const bepj = Helpers.readJson(bePjPath) as Models.npm.IPackageJSON;
-      (project.packageJson.data.tnp.overrided.includeOnly || []).forEach(p => {
-        const verTnp = (Project.by('container', project._frameworkVersion) as Project)
-          .packageJson.data.dependencies[p];
-        if (!!verTnp) {
-          bepj.dependencies[p] = `~${verTnp}`;
-        }
-      });
-      Helpers.writeJson(bePjPath, bepj);
-    }
+    // if (!!project && !!isBrowserBuild) {
+    //   const bePjPath = path.join(project.location, buildType, config.file.package_json);
+    //   const bepj = Helpers.readJson(bePjPath) as Models.npm.IPackageJSON;
+    //   (project.packageJson.data.tnp.overrided.includeOnly || []).forEach(p => {
+    //     const verTnp = (Project.by('container', project._frameworkVersion) as Project)
+    //       .packageJson.data.dependencies[p];
+    //     if (!!verTnp) {
+    //       bepj.dependencies[p] = `~${verTnp}`;
+    //     }
+    //   });
+    //   Helpers.writeJson(bePjPath, bepj);
+    // }
 
   }
 
-  protected async buildAngularVer(project: Project, outFolder: ConfigModels.OutFolder = 'dist', watch: boolean) {
+  protected async buildStandardLibVer(options: {
+    watch: boolean;
+    commandJsAndMaps: string;
+    commandDts: string,
+    generateDeclarations: boolean,
+    cwd: string;
+  }) {
+    const { watch, generateDeclarations, commandDts, commandJsAndMaps, cwd } = options;
+    //#region normal js build
+    if (watch) {
+      await Helpers.logProc2(child_process.exec(commandJsAndMaps, { cwd }), ['Watching for file changes.']);
+      if (generateDeclarations) {
+        Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+        await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
+      }
+    } else {
+      try {
+        child_process.execSync(commandJsAndMaps, {
+          cwd,
+          stdio: [0, 1, 2]
+        });
+      } catch (e) {
+        Helpers.error(`[morphi] Compilation error (1): ${e}`, false, true);
+      }
+
+
+      if (generateDeclarations) {
+        Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+        try {
+          child_process.execSync(commandDts, {
+            cwd,
+            stdio: [0, 1, 2]
+          })
+        } catch (e) {
+          Helpers.error(`[morphi] Compilation error (2): ${e}`, false, true);
+        }
+      }
+    }
+    //#endregion
+  }
+
+  protected async buildAngularLibVer(project: Project, outFolder: ConfigModels.OutFolder = 'dist', watch: boolean) {
     const cwd = project.location;
-    project.recreate.initAngularLibStructure(outFolder);
+    project.insideStructure.structures.InsideStructAngular13Lib.struct.recreate(outFolder);
     const isIsomorphic = project.typeIs('isomorphic-lib');
     const command = `npm-run ng build ${project.name} ${watch ? '--watch' : ''} `;
     // + ` --output-path=./${outFolder}/browser`;
@@ -192,7 +204,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   protected compilerName = 'Backend Compiler';
   async compile(watch = false) {
-    await this.tscCompilation({
+    await this.libCompilation({
       cwd: this.compilationFolderPath,
       watch,
       outDir: (`../${this.outFolder}` as any),

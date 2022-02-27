@@ -210,38 +210,39 @@ export default _default;
   }
 
   public linkSourceOfItselfToNodeModules() {
-    if (!this.project.isStandaloneProject) {
-      return;
-    }
-    if (process.platform === 'win32') { // TODO QUICKFIX
-      Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
-      return;
-    }
-    const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
-    const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
-    Helpers.removeIfExists(pathToSelf);
-    glob.sync(`${pathToSrc}/**/*.*`)
-      .filter(f => !Helpers.isFolder(f))
-      .map(f => crossPlatformPath(f))
-      .forEach(f => {
-        const relative = f.replace(`${pathToSrc}/`, '');
-        const from = f;
-        const to1 = path.join(pathToSelf, relative);
-        const to2 = path.join(pathToSelf, config.folder.browser, relative)
-        try {
-          Helpers.createSymLink(f, to1, { continueWhenExistedFolderDoesntExists: true });
-          Helpers.createSymLink(f, to2, { continueWhenExistedFolderDoesntExists: true });
-        } catch (error) {
-          Helpers.warn(`[${config.frameworkName}][linkSourceOfItselfToNodeModules]
-          Not able to link "${from}"
-          to:
-          ${to1}
-          and
-          ${to2}
-          `)
-        }
+    return;
+    // if (!this.project.isStandaloneProject) {
+    //   return;
+    // }
+    // if (process.platform === 'win32') { // TODO QUICKFIX
+    //   Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
+    //   return;
+    // }
+    // const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
+    // const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
+    // Helpers.removeIfExists(pathToSelf);
+    // glob.sync(`${pathToSrc}/**/*.*`)
+    //   .filter(f => !Helpers.isFolder(f))
+    //   .map(f => crossPlatformPath(f))
+    //   .forEach(f => {
+    //     const relative = f.replace(`${pathToSrc}/`, '');
+    //     const from = f;
+    //     const to1 = path.join(pathToSelf, relative);
+    //     const to2 = path.join(pathToSelf, config.folder.browser, relative)
+    //     try {
+    //       Helpers.createSymLink(f, to1, { continueWhenExistedFolderDoesntExists: true });
+    //       Helpers.createSymLink(f, to2, { continueWhenExistedFolderDoesntExists: true });
+    //     } catch (error) {
+    //       Helpers.warn(`[${config.frameworkName}][linkSourceOfItselfToNodeModules]
+    //       Not able to link "${from}"
+    //       to:
+    //       ${to1}
+    //       and
+    //       ${to2}
+    //       `)
+    //     }
 
-      });
+    //   });
   }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic

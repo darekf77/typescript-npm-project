@@ -9,8 +9,6 @@ import { CLASS } from 'typescript-class-helpers';
 import { _ } from 'tnp-core';
 import { ProjectAngularClient } from './project-angular-client';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
-import { Models } from 'tnp-models';
 
 //#region @backend
 @CLASS.NAME('ProjectAngularLib')
@@ -181,8 +179,6 @@ export class ProjectAngularLib
     return config;
     //#endregion
   }
-
-
 
   sourceFilesToIgnore() {
     //#region @backendFunc

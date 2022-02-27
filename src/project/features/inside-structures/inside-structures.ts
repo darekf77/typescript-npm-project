@@ -1,41 +1,86 @@
 //#region @backend
-import { config, ConfigModels } from 'tnp-config';
 import {
   path, _
 } from 'tnp-core';
+//#endregion
+import { CLASS } from 'typescript-class-helpers';
+import { config, ConfigModels } from 'tnp-config';
 
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract/feature-for-project';
 import { Project } from '../../abstract/project/project';
 import { InsideStruct, Opt } from './inside-struct';
-import { angularAppFromV3IsomorphicLib } from './inside-structs';
+import { InsideStructAngular13App, InsideStructAngular13Lib } from './structs';
+import { BaseInsideStruct } from './structs/base-inside-struct';
 
+const structs = {
+  InsideStructAngular13App,
+  InsideStructAngular13Lib
+};
 
 export class InsideStructures extends FeatureForProject {
 
-  recrate(outFolder: ConfigModels.OutFolder = 'dist') {
+  //#region field & getters
+  readonly structures = {} as { [name in keyof typeof structs]: BaseInsideStruct; }
+  protected recreatedOnce = false;
+  private _gitIgnoreFiles = [];
+  private _npmIgnoreFiles = [];
+  private _fileTemplates = [];
+  get gitIgnore() {
+
+    this.preventBeforeInit();
+    return this._gitIgnoreFiles;
+  }
+
+  get npmIgnore() {
+    this.preventBeforeInit();
+    return this._npmIgnoreFiles;
+  }
+
+  get fileTemplates() {
+    this.preventBeforeInit();
+    return this._fileTemplates;
+  }
+  //#endregion
+
+  constructor(project: Project) {
+    super(project);
+    //#region @backend
+    Object.keys(structs).forEach(s => {
+      const structFn = structs[s] as typeof BaseInsideStruct;
+      this.structures[CLASS.getName(structFn)] = new structFn(project);
+    });
+    //#endregion
+  }
+
+
+  //#region api
+
+  //#region api / recreate
+  public async recrate(outFolder: ConfigModels.OutFolder = 'dist') {
 
     const clients: Project[] = this.project.isWorkspaceChildProject
       ? this.project.parent.childrenThatAreLibs : [];
 
-    const gitIgnoreFiles = [];
-
-    const action = (client: Project) => {
-      const structs = [
-        angularAppFromV3IsomorphicLib(this.project)
-      ];
+    const action = async (client: Project) => {
+      const structs = Object.values(this.structures);
 
       for (let index = 0; index < structs.length; index++) {
-        const struct = structs[index];
+        const insideStruct = structs[index];
 
-        if (!struct) {
+        if (!insideStruct) {
           continue;
         }
 
-        const opt: Opt = { outFolder, projectName: this.project.name, client } as any;
+        const opt: Opt = {
+          outFolder,
+          projectName: this.project.name,
+          projectLocation: path.join(this.project.location),
+          client
+        } as any;
 
         const replacement = (pathOrg) => {
-          const replacedPart = struct.pathReplacements.reduce((a, b) => {
+          const replacedPart = insideStruct.struct.pathReplacements.reduce((a, b) => {
             return pathOrg
               .replace(b[0], b[1](opt))
               .replace('{{{outFolder}}}', outFolder)
@@ -47,9 +92,9 @@ export class InsideStructures extends FeatureForProject {
 
         //#region copying files
         [
-          ...struct.relateivePathesFromContainer,
+          ...insideStruct.struct.relateivePathesFromContainer,
         ].forEach(f => {
-          const orgPath = path.join(struct.coreContainer.location, f);
+          const orgPath = path.join(insideStruct.struct.coreContainer.location, f);
           const destPath = path.join(
             this.project.location,
             replacement(f) || f,
@@ -70,16 +115,16 @@ export class InsideStructures extends FeatureForProject {
         //#endregion
 
         //#region linking node_modules
-        for (let index = 0; index < struct.linkNodeModulesTo.length; index++) {
-          const f = struct.linkNodeModulesTo[index]
+        for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
+          const f = insideStruct.struct.linkNodeModulesTo[index]
           const destPath = replacement(f);
           this.project.node_modules.linkTo(destPath);
         }
         //#endregion
 
         //#region linking files and folders
-        for (let index = 0; index < struct.linksFuncs.length; index++) {
-          const [fun1, fun2] = struct.linksFuncs[index]
+        for (let index = 0; index < insideStruct.struct.linksFuncs.length; index++) {
+          const [fun1, fun2] = insideStruct.struct.linksFuncs[index]
           let from = fun1(opt);
           from = replacement(from);
 
@@ -89,8 +134,8 @@ export class InsideStructures extends FeatureForProject {
         }
         //#endregion
 
-        if (_.isFunction(struct.endAction)) {
-          struct.endAction(opt);
+        if (_.isFunction(insideStruct.struct.endAction)) {
+          await Helpers.runSyncOrAsync(insideStruct.struct.endAction, opt);
         }
       }
     };
@@ -98,17 +143,24 @@ export class InsideStructures extends FeatureForProject {
     if (clients.length > 0) {
       for (let index = 0; index < clients.length; index++) {
         const client = clients[index];
-        action(client);
+        await action(client);
       }
     } else {
-      action(this.project);
+      await action(this.project);
     }
 
-    console.log(gitIgnoreFiles);
-
-    return { gitIgnoreFiles };
+    this.recreatedOnce = true;
   }
+  //#endregion
+
+  //#endregion
+
+  //#region methods
+  private preventBeforeInit() {
+    if (!this.recreatedOnce) {
+      Helpers.error(`[inside struct] Please recrete() project before accessing this`)
+    }
+  }
+  //#endregion
 
 }
-
-//#endregion

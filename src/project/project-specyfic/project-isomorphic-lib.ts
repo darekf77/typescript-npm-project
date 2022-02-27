@@ -89,10 +89,11 @@ export class ProjectIsomorphicLib
       ];
     }
 
-    if (this.frameworkVersionAtLeast('v3')) {
+    if (this.frameworkVersionAtLeast('v3')) { // TODO REMOVE_THIS
       files = [
         'angular.json.filetemplate',
         'tsconfig.ng.json.filetemplate',
+        ...files
       ];
     }
 
@@ -110,7 +111,7 @@ export class ProjectIsomorphicLib
         relativePath: 'webpack.backend-bundle-build.js'
       });
     }
-    if (this.frameworkVersionAtLeast('v3')) {
+    if (this.frameworkVersionAtLeast('v3')) { // TODO REMOVE_THIS
 
       // this.coreLibFiles.forEach(relativePath => {
       //   const sourceProject = Project.by<Project>('angular-lib', this._frameworkVersion);
@@ -226,11 +227,9 @@ export class ProjectIsomorphicLib
     let command: string;
     if (this.frameworkVersionAtLeast('v3')) {
       const p = _.isNumber(port) ? `--port=${port}` : '';
-
-      const loadNvm = `export NVM_DIR='$([ -z '\${XDG_CONFIG_HOME-}' ] && printf %s '\${HOME}/.nvm' || printf %s '\${XDG_CONFIG_HOME}/nvm')'`
-      +` && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`;
-
-      command = `${loadNvm} && nvm use < .nvmrc && npm-run ng serve ${p}`;
+      // const nvmCMDPath = path.join(__dirname, 'loadnvm.sh');
+      const loadNvm = 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"';
+      command = `${loadNvm} && nvm use v14 && npm-run ng serve ${p}`;
     } else {
       if (_.isNumber(port)) {
         webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
@@ -252,6 +251,7 @@ export class ProjectIsomorphicLib
       inside: ${proj.location}
 
       `)
+
     proj.run(command).sync();
 
     //#endregion

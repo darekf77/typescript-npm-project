@@ -425,7 +425,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
 
     }
-    this.rawContent = this.afterRegionsReplacement(this.rawContent);
+    if (this.project.frameworkVersionAtLeast('v3')) {
+      // no modification of any code straight ng is being use
+    } else {
+      this.rawContent = this.afterRegionsReplacement(this.rawContent);
+    }
     return this;
   }
   //#endregion
