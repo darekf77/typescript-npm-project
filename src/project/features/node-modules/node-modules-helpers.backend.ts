@@ -194,6 +194,12 @@ export function nodeModulesExists(project: Project) {
   const p = path.join(project.location, config.folder.node_modules);
   return fse.existsSync(p);
 }
+
+export function nodeModulesHasOnlyLinks(project: Project) {
+  const links = Helpers.linksFrom(project.node_modules.path);
+  return links.length > 500; // TODO QUICK_FIX
+}
+
 //#endregion
 
 //#region add dependencies

@@ -12,10 +12,10 @@ export class NpmPackages extends NpmPackagesBase {
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      await project.npmPackages.installProcess(`tnp install`, { smoothInstall, smartInstallPreparing });
+      await project.npmPackages.installProcess(`${config.frameworkName} install`, { smoothInstall, smartInstallPreparing });
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      await project.npmPackages.installProcess(`tnp install ${packages
+      await project.npmPackages.installProcess(`${config.frameworkName} install ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
         .join(', ')} `, { npmPackages: packages, smoothInstall, smartInstallPreparing });
     }

@@ -13,7 +13,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
-
+const loadNvm = 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 
 //#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')
@@ -147,9 +147,16 @@ export class ProjectIsomorphicLib
   }
 
   //#region @backend
-  public static angularProjPath(project: Project, outFolder?: ConfigModels.OutFolder, client?: string) {
-    const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}/${project.name}`;
-    const tmpProjects = `tmp-apps-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
+  public static angularProjProxyPath(
+    project: Project,
+    outFolder?: ConfigModels.OutFolder,
+    client?: string,
+    type: 'app' | 'lib' = 'app'
+  ) {
+    const pref = ((type === 'app') ? 'apps' : 'libs')
+
+    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}/${project.name}`;
+    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
     if (project.isStandaloneProject) {
       if (outFolder) {
         return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
@@ -163,13 +170,19 @@ export class ProjectIsomorphicLib
   }
   //#endregion
 
-  private proxyNgApp(project: Project, buildOptions: BuildOptions) {
+  private proxyNgProj(project: Project, buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
     //#region @backendFunc
-    const projepath = ProjectIsomorphicLib.angularProjPath(project, buildOptions.outDir as any);
+    const projepath = ProjectIsomorphicLib.angularProjProxyPath(
+      project,
+      buildOptions.outDir as any,
+      void 0, // TODO
+      type
+    );
     const proj = Project.From(projepath);
     return proj as Project;
     //#endregion
   }
+
 
   private async buildNgApp(
     //#region @backend
@@ -228,8 +241,8 @@ export class ProjectIsomorphicLib
     if (this.frameworkVersionAtLeast('v3')) {
       const p = _.isNumber(port) ? `--port=${port}` : '';
       // const nvmCMDPath = path.join(__dirname, 'loadnvm.sh');
-      const loadNvm = 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"';
-      command = `${loadNvm} && nvm use v14 && npm-run ng serve ${p}`;
+
+      command = `${loadNvm} && npm-run ng serve ${p}`;
     } else {
       if (_.isNumber(port)) {
         webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
@@ -239,7 +252,7 @@ export class ProjectIsomorphicLib
 
     let proj: Project;
     if (this.frameworkVersionAtLeast('v3')) {
-      proj = this.proxyNgApp(this, this.buildOptions);
+      proj = this.proxyNgProj(this, this.buildOptions);
     } else {
       proj = this;
     }
@@ -305,10 +318,6 @@ export class ProjectIsomorphicLib
       // await this.buildAngularVer(watch);
     } else {
 
-      const webpackCommandFn = (watchCommand: boolean) =>
-        `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
-
-      const webpackCommand = webpackCommandFn(this.buildOptions.watch);
       const { obscure, uglify, nodts } = this.buildOptions;
       if (outDir === 'bundle') {
         this.cutReleaseCode();
@@ -317,6 +326,24 @@ export class ProjectIsomorphicLib
       if (outDir === 'bundle' && (obscure || uglify)) {
 
         this.quickFixes.overritenBadNpmPackages();
+
+      }
+
+      if (this.frameworkVersionAtLeast('v3')) {
+        var angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
+        Helpers.info(`
+
+        ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
+
+        command: ${angularCommand}
+
+        `);
+      } else {
+        const webpackCommandFn = (watchCommand: boolean) =>
+          `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
+
+        var webpackCommand = webpackCommandFn(this.buildOptions.watch);
+
         Helpers.info(`
 
         WEBPACK ${this.buildOptions.watch ? 'WATCH (ONLY FOR CLI FUNCTIONS) ' : ''
@@ -326,7 +353,6 @@ export class ProjectIsomorphicLib
 
         `);
       }
-
 
 
       if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
@@ -345,13 +371,18 @@ export class ProjectIsomorphicLib
             Helpers.error(`WATCH BUNDLE build failed`, false, true);
           }
         } else {
-          await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
-            {
-              watchOnly: this.buildOptions.watchOnly,
-              afterInitCallBack: async () => {
-                await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-              }
-            });
+          if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
+            await this.proxyNgProj(this, this.buildOptions, 'lib').run(angularCommand).asyncAsPromise()
+          } else {
+            await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+              {
+                watchOnly: this.buildOptions.watchOnly,
+                afterInitCallBack: async () => {
+                  await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+                }
+              });
+          }
+
         }
       } else {
 
@@ -377,12 +408,15 @@ export class ProjectIsomorphicLib
           }
           await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
         } else {
+
           await this.incrementalBuildProcess.start('isomorphic compilation');
           // if (outDir === 'bundle') {
           //   this.buildAngularVer();
           // }
         }
       }
+
+
     }
     //#endregion
   }

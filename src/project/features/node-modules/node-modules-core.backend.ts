@@ -7,7 +7,7 @@ import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import {
-  dedupePackages, nodeModulesExists, addDependenceis, stuberizeFrontendPackages
+  dedupePackages, nodeModulesExists, addDependenceis, stuberizeFrontendPackages, nodeModulesHasOnlyLinks
 } from './node-modules-helpers.backend';
 //#endregion
 
@@ -18,8 +18,10 @@ export class NodeModulesCore extends FeatureForProject {
     return path.join(this.path, packageName);
   }
   public get exist() { return nodeModulesExists(this.project); }
+  public get itIsSmartInstalation() { return nodeModulesHasOnlyLinks(this.project); }
   public get isLink() { return Helpers.isLink(this.path); }
   public dedupe = (packagesOrOptions?: string[] | { packages?: string[]; reason: string }) => {
+
 
     const packages = _.isArray(packagesOrOptions) ? packagesOrOptions : packagesOrOptions?.packages;
     if (!_.isArray(packagesOrOptions) && packagesOrOptions?.reason) {
@@ -28,44 +30,45 @@ export class NodeModulesCore extends FeatureForProject {
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
 
-    // if (this.project.frameworkVersionAtLeast('v3')) { // TODO QUICK_FIX
-    //   const onlyDedpupeForV3 = [
-    //     "@angular/animations",
-    //     "@angular/cdk",
-    //     "@angular/common",
-    //     "@angular/compiler",
-    //     "@angular/http",
-    //     "@angular/core",
-    //     "@angular/forms",
-    //     "@angular/material",
-    //     "@angular/platform-browser",
-    //     "@angular/platform-browser-dynamic",
-    //     "@angular/pwa",
-    //     "@angular/router",
-    //     "@angular/service-worker",
-    //     "zone.js",
-    //     "typescript",
-    //   ]
+    if (this.project.frameworkVersionAtLeast('v3')) { // TODO QUICK_FIX REMOVE_THIS
+      const onlyDedpupeForV3 = [
+        "@angular/animations",
+        "@angular/cdk",
+        "@angular/common",
+        "@angular/compiler",
+        "@angular/http",
+        "@angular/core",
+        "@angular/forms",
+        "@angular/material",
+        "@angular/platform-browser",
+        "@angular/platform-browser-dynamic",
+        "@angular/pwa",
+        "@angular/router",
+        "@angular/service-worker",
+        "zone.js",
+        "typescript",
+      ]
 
-    //   const isomorphicPkgs = [
-    //     ...this.project.isomorphicPackages,
-    //     ...onlyDedpupeForV3,
-    //   ];
-    //   // console.log(`isomorphicPkgs ${this.project.name} ${this.project.location} `, isomorphicPkgs)
-    //   dedupePackages(
-    //     this.project.location,
-    //     packagesNames.filter(f => isomorphicPkgs.includes(f)),
-    //     false,
-    //     !this.project.npmPackages.useSmartInstall
-    //   );
-    // } else {
-    dedupePackages(
-      this.project.location,
-      packagesNames,
-      false,
-      !this.project.npmPackages.useSmartInstall
-    );
-    // }
+      const isomorphicPkgs = [
+        ...this.project.isomorphicPackages,
+        ...onlyDedpupeForV3,
+      ];
+      // console.log(`isomorphicPkgs ${this.project.name} ${this.project.location} `, isomorphicPkgs)
+      dedupePackages(
+        this.project.location,
+        packagesNames.filter(f => isomorphicPkgs.includes(f)),
+        false,
+        !this.project.npmPackages.useSmartInstall
+      );
+    } else {
+      // console.trace('AAAAAA')
+      dedupePackages(
+        this.project.location,
+        packagesNames,
+        false,
+        !this.project.npmPackages.useSmartInstall
+      );
+    }
   };
   // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
   public dedupeCount = (packages?: string[]) => {

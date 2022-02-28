@@ -57,7 +57,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/tsconfig.app.json',
         'lib/tsconfig.json',
         'lib/tsconfig.spec.json',
-
+        'lib/projects/my-lib/src',
         'lib/projects/my-lib/tsconfig.spec.json',
         'lib/projects/my-lib/tsconfig.lib.prod.json',
         'lib/projects/my-lib/tsconfig.lib.json',
@@ -70,7 +70,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
       projtectType: project._type,
       frameworkVersion: project._frameworkVersion,
       pathReplacements: [
-        [ new RegExp('^lib\\/'), ({ client }) => {
+        [new RegExp('^lib\\/'), ({ client }) => {
           if (project.isStandaloneProject) {
             return `${tmpProjectsStandalone}/`;
           }
@@ -78,7 +78,103 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         }],
       ],
       linkNodeModulesTo: ['lib/'],
-      endAction: (({ outFolder, projectName, client, replacement }) => {
+      endAction: (({ outFolder, projectName, client, replacement, projectLocation }) => {
+
+        (() => {
+          const jsonPath = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            config.file.package_json,
+          );
+
+          const container = Project.by('container', this.project._frameworkVersion) as Project;
+
+          const json = Helpers.readJson(jsonPath) as Models.npm.IPackageJSON;
+
+          json.devDependencies = {};
+
+          Object.keys(container.packageJson.data.dependencies).forEach(pkgName => {
+            json.dependencies[pkgName] = container.packageJson.data.dependencies[pkgName];
+          });
+
+          // Object.keys(json.devDependencies).forEach(pkgName => {
+          //   json.devDependencies[pkgName] = container.packageJson.data.dependencies[pkgName];
+          // });
+
+          Helpers.writeJson(jsonPath, json);
+
+        })();
+
+        (() => {
+          const source = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/my-lib`
+          );
+
+
+          const dest = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}`
+          );
+          Helpers.remove(dest);
+          Helpers.move(source, dest);
+        })();
+
+
+        (() => {
+          const source = path.join(
+            projectLocation,
+            config.folder.src,
+            'lib'
+          );
+
+          const dest = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}/src/lib`
+          );
+          Helpers.remove(dest);
+          Helpers.createSymLink(source, dest);
+        })();
+
+
+        [
+          path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}/package.json`
+          ),
+          path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}/ng-package.json`
+          ),
+          path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `angular.json`
+          ),
+          path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `tsconfig.json`
+          ),
+        ].forEach(f => {
+          let content = Helpers.readFile(f) || '';
+          content = content.replace(new RegExp('my\\-lib', 'g'), projectName)
+          Helpers.writeFile(f, content);
+        });
+
 
       })
     });

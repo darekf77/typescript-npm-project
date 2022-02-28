@@ -130,6 +130,7 @@ export class InsideStructures extends FeatureForProject {
 
           let to = fun2(opt);
           to = replacement(to);
+          Helpers.remove(to);
           Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
         }
         //#endregion
