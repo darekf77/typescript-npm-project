@@ -408,8 +408,8 @@ export class ProjectIsomorphicLib
           }
           await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
         } else {
-
           await this.incrementalBuildProcess.start('isomorphic compilation');
+          await this.proxyNgProj(this, this.buildOptions, 'lib').run(angularCommand).sync()
           // if (outDir === 'bundle') {
           //   this.buildAngularVer();
           // }
