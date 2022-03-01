@@ -155,12 +155,12 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
   ) {
     // --ignore-scripts
     // yarn install --prefer-offline
-    const argsForFasterInstall = `--prefer-offline --no-audit`;
+    const argsForFasterInstall = ` --no-audit`;
     command = `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''} `
       + ` ${argsForFasterInstall} `
       + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
   } else {
-    const argsForFasterInstall = `--force --ignore-engines --no-progress --prefer-offline --no-audit `
+    const argsForFasterInstall = `--force --ignore-engines --no-progress --no-audit `
       + ` ${noPackageLock} `;
     command = `npm ${install} ${pkg ? pkg.name : ''} `
       + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `
