@@ -99,20 +99,45 @@ export class GitActions extends FeatureForProject {
   //#endregion
 
   //#region repeat menu push,pull
-  private async repeatMenu(action: keyof GitActions, force = false) {
+  private async repeatMenu(action: keyof GitActions, force = false, origin = 'origin') {
     await Helpers.actionWrapper(async () => {
       if (action === 'pull') {
         await this.project.git.pullCurrentBranch(true);
       }
       if (action === 'push') {
-        await this.project.git.pushCurrentBranch(force);
+        await this.project.git.pushCurrentBranch(force, origin);
       }
     }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.name)}...`);
   }
   //#endregion
 
+  public async pushAll(commitMessage?: string, force = false) {
+    let remotes: { origin: string; url: string; }[] = [];
+    try {
+      remotes = (Helpers.run(`git remote -v`, { cwd: process.cwd(), output: false }).sync()?.toString() || '')
+        .trim()
+        .replace(new RegExp('\\(push\\)', 'g'), ' ')
+        .replace(new RegExp('\\t', 'g'), ' ')
+        .split('\n')
+        .filter(f => f.search('(fetch)') === -1)
+        .map(s => {
+          const [origin, url] = s.trim().split(' ');
+          return {
+            origin,
+            url
+          }
+        });
+    } catch (error) { }
+
+    for (let index = 0; index < remotes.length; index++) {
+      const { origin, url } = remotes[index];
+      await this.push(commitMessage, force, origin);
+    }
+    process.exit()
+  }
+
   //#region push
-  public async push(commitMessage?: string, force = false) {
+  public async push(commitMessage?: string, force = false, origin = 'origin') {
     if (!commitMessage) {
       commitMessage = 'update';
     }
@@ -166,7 +191,7 @@ export class GitActions extends FeatureForProject {
       } catch (error) { }
     }
 
-    await this.repeatMenu('push', force);
+    await this.repeatMenu('push', force, origin);
   }
   //#endregion
 

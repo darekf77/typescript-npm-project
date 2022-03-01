@@ -73,6 +73,12 @@ export async function $PUSH(comitMessage: string, exit = true, force = false) {
   process.exit(0);
 }
 
+export async function $PUSH_ALL(comitMessage: string, exit = true, force = false) {
+  await (Project.Current as Project).gitActions.pushAll(comitMessage, force);
+  process.exit(0);
+}
+
+
 export async function $FORCE_PUSH(comitMessage: string, exit = true, force = false) {
   await (Project.Current as Project).gitActions.push(comitMessage, true);
   process.exit(0);
@@ -215,6 +221,7 @@ export default {
   $RENAME_ORIGIN: Helpers.CLIWRAP($RENAME_ORIGIN, '$RENAME_ORIGIN'),
   $SET_ORIGIN: Helpers.CLIWRAP($SET_ORIGIN, '$SET_ORIGIN'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),
+  $PUSH_ALL: Helpers.CLIWRAP($PUSH_ALL, '$PUSH_ALL'),
   $FORCE_PUSH: Helpers.CLIWRAP($FORCE_PUSH, '$FORCE_PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
