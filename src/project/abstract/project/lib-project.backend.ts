@@ -263,7 +263,7 @@ export abstract class LibProject {
             Helpers.copyFile(f, newDest);
           });
       }
-      this.compileES5version();
+      this.compileBrowserES5version();
 
       this.bundleResources()
       this.commit(newVersion);
@@ -605,7 +605,7 @@ export abstract class LibProject {
   //#endregion
 
   //#region methods / compile es5
-  private compileES5version(this: Project) {
+  private compileBrowserES5version(this: Project) {
     //#region @backend
     // TODO fix this for angular-lib
     if (this.frameworkVersionAtLeast('v3')) {

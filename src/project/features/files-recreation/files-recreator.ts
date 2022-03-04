@@ -43,9 +43,9 @@ export class FilesRecreator extends FeatureForProject {
       return;
     }
 
-    if (this.project.frameworkVersionAtLeast('v3')
-      && this.project.typeIs('isomorphic-lib', 'angular-lib')) {
-      await this.project.insideStructure.recrate();
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+      await this.project.insideStructure.recrate('dist');
+      await this.project.insideStructure.recrate('bundle');
     }
 
     this.initAssets();

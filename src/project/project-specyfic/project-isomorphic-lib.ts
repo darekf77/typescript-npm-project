@@ -52,6 +52,18 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
+  get ignoreInV3() {
+    const files = [
+      'angular.json.filetemplate',
+      'ngsw-config.json.filetemplate',
+      'tsconfig.ng.json.filetemplate'
+    ];
+    return [
+      ...files,
+      ...files.map(f => f.replace('.filetemplate', '')),
+    ]
+  }
+
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
     let files = super.projectSpecyficFiles()
@@ -70,9 +82,15 @@ export class ProjectIsomorphicLib
       files = files.filter(f => f !== 'tsconfig.browser.json');
     }
 
+    if (this.frameworkVersionAtLeast('v3')) {
+      files = files.filter(f => !this.ignoreInV3.includes(f))
+    }
+
     return files;
     //#endregion
   }
+
+
 
   filesTemplates() {
     //#region @backendFunc
@@ -87,6 +105,10 @@ export class ProjectIsomorphicLib
         ...this.vscodeFileTemplates,
         ...files,
       ];
+    }
+
+    if (this.frameworkVersionAtLeast('v3')) {
+      files = files.filter(f => !this.ignoreInV3.includes(f))
     }
 
     return files;
@@ -155,21 +177,42 @@ export class ProjectIsomorphicLib
   }
 
 
-  private async buildNgApp(
+  private async buildApp(
     //#region @backend
-    outDir: Models.dev.BuildDir, watch: boolean, forClient: Project[] | string[], args: string
+    outDir: Models.dev.BuildDir,
+    watch: boolean,
+    forClient: Project[] | string[],
+    args: string,
+    baseHref: string,
+    prod: boolean,
     //#endregion
   ) {
     //#region @backend
 
-
-    if (!watch) {
-      Helpers.warn(`App build not possible for isomorphic-lib in static build mode`)
-      return;
+    //#region prepare baseHref
+    if (baseHref) {
+      baseHref = `${baseHref}/`;
+      baseHref = baseHref.replace(/\/\//g, '/')
     }
+    baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '');
+    baseHref = `--${baseHref}`;
+    //#endregion
 
     let webpackEnvParams = `--env.outFolder=${outDir}`;
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
+
+    const outPutPathCommand = `--output-path ../../${this.isStandaloneProject
+      ? config.folder.docs
+      : config.folder.previewDistApp} ${baseHref}`;
+
+    let { flags } = require('minimist')(args.split(' '));
+    flags = (_.isString(flags) ? [flags] : []);
+    flags = (!_.isArray(flags) ? [] : flags);
+
+    // TODO ?
+    // const statsCommand = (!this.isStandaloneProject ? (
+    //   this.env.config.name === 'static' ? '--stats-json' : ''
+    // ) : '');
 
     let client = _.first(forClient as Project[]);
 
@@ -209,11 +252,25 @@ export class ProjectIsomorphicLib
     }
 
     let command: string;
-    if (this.frameworkVersionAtLeast('v3')) {
-      const p = _.isNumber(port) ? `--port=${port}` : '';
-      // const nvmCMDPath = path.join(__dirname, 'loadnvm.sh');
 
-      command = `${loadNvm} && npm-run ng serve ${p}`;
+    if (this.frameworkVersionAtLeast('v3')) {
+      const portToServe = _.isNumber(port) ? `--port=${port}` : '';
+      const aot = flags.includes('aot');
+      const ngBuildCmd = `${loadNvm} && npm-run ng build `
+        + `${aot ? '--aot=true' : ''} `
+        + `${prod ? '--prod' : ''} `
+        + `${watch ? '--watch' : ''}`
+        + `${outPutPathCommand} `
+
+      if (watch) {
+        if (outDir === 'dist') {
+          command = `${loadNvm} && npm-run ng serve ${portToServe} ${prod ? '--prod' : ''}`;
+        } else {
+          command = ngBuildCmd;
+        }
+      } else {
+        command = ngBuildCmd;
+      }
     } else {
       if (_.isNumber(port)) {
         webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
@@ -230,7 +287,7 @@ export class ProjectIsomorphicLib
 
     Helpers.info(`
 
-      ANGULAR SERVE COMMAND: ${command}
+      ANGULAR COMMAND: ${command}
 
       inside: ${proj.location}
 
@@ -243,11 +300,11 @@ export class ProjectIsomorphicLib
 
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backendFunc
-    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [] } = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref } = buildOptions;
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        await this.buildNgApp(outDir, watch, forClient as any, buildOptions.args);
+        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod);
       } else {
         await this.buildLib();
       }
@@ -295,35 +352,33 @@ export class ProjectIsomorphicLib
       }
 
       if (outDir === 'bundle' && (obscure || uglify)) {
-
         this.quickFixes.overritenBadNpmPackages();
-
       }
 
-      if (this.frameworkVersionAtLeast('v3')) {
-        var angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
-        Helpers.info(`
+
+      const angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
+      Helpers.info(`
 
         ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
 
         command: ${angularCommand}
 
         `);
-      } else {
-        const webpackCommandFn = (watchCommand: boolean) =>
-          `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
-        var webpackCommand = webpackCommandFn(this.buildOptions.watch);
+      const webpackCommandFn = (watchCommand: boolean) =>
+        `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
-        Helpers.info(`
+      const webpackCommand = webpackCommandFn(this.buildOptions.watch);
+
+      Helpers.info(`
 
         WEBPACK ${this.buildOptions.watch ? 'WATCH (ONLY FOR CLI FUNCTIONS) ' : ''
-          } BACKEND BUILD started...
+        } BACKEND BUILD started...
 
         command: ${webpackCommand}
 
         `);
-      }
+
 
 
       if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
@@ -331,8 +386,10 @@ export class ProjectIsomorphicLib
       }
       this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
-      if (this.buildOptions.watch) {
+      const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
 
+      if (this.buildOptions.watch) {
+        //#region watch build
         if (outDir === 'bundle') {
           // Helpers.error(`Watch build not available for bundle build`, false, true);
           Helpers.info(`Starting watch bundle build for fast cli..`);
@@ -341,20 +398,19 @@ export class ProjectIsomorphicLib
           } catch (er) {
             Helpers.error(`WATCH BUNDLE build failed`, false, true);
           }
-        } else {
-          if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
-            await this.proxyNgProj(this, this.buildOptions, 'lib').run(angularCommand).asyncAsPromise()
-          } else {
-            await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
-              {
-                watchOnly: this.buildOptions.watchOnly,
-                afterInitCallBack: async () => {
-                  await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-                }
-              });
-          }
-
         }
+        await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+          {
+            watchOnly: this.buildOptions.watchOnly,
+            afterInitCallBack: async () => {
+              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+            }
+          });
+        if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
+          await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
+        }
+
+        //#endregion
       } else {
 
         if (outDir === 'bundle' && (obscure || uglify || nodts)) {
@@ -362,43 +418,46 @@ export class ProjectIsomorphicLib
             this.run(webpackCommand).sync();
 
             if (obscure || uglify) {
-              this.compileToEs5();
+              this.backendCompileToEs5();
             }
             if (uglify) {
-              this.uglifyCode(config.reservedArgumentsNamesUglify)
+              this.backendUglifyCode(config.reservedArgumentsNamesUglify)
             };
             if (obscure) {
-              this.obscureCode(config.reservedArgumentsNamesUglify);
+              this.backendObscureCode(config.reservedArgumentsNamesUglify);
             }
             if (!nodts) {
-              this.compilerDeclarationFiles()
+              this.backendCompilerDeclarationFiles()
             };
             // process.exit(0)
           } catch (er) {
             Helpers.error(`BUNDLE production build failed`, false, true);
           }
           await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
+          await proxyProject.run(angularCommand).sync()
         } else {
           await this.incrementalBuildProcess.start('isomorphic compilation');
-          await this.proxyNgProj(this, this.buildOptions, 'lib').run(angularCommand).sync()
+          await proxyProject.run(angularCommand).sync()
           // if (outDir === 'bundle') {
           //   this.buildAngularVer();
           // }
         }
+        await this.browserCodePreventer.start('browser code preventer');
       }
 
 
     }
     //#endregion
   }
-  compilerDeclarationFiles() {
+
+  backendCompilerDeclarationFiles() {
     //#region @backend
     this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
     //#endregion
   }
 
   //#region @backend
-  compileToEs5() {
+  backendCompileToEs5() {
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in bundle`)
       return;
@@ -415,7 +474,7 @@ export class ProjectIsomorphicLib
   }
   //#endregion
 
-  uglifyCode(reservedNames: string[]) {
+  backendUglifyCode(reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
@@ -436,7 +495,7 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
-  obscureCode(reservedNames: string[]) {
+  backendObscureCode(reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)

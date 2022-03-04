@@ -75,34 +75,16 @@ export class BackendCompilation extends IncCompiler.Base {
     ${commandJsAndMaps}
 
     # inside: ${cwd}`)
-    // const project = Project.From(locationOfMainProject) as Project;
-    // // console.log(`project from ${locationOfMainProject}`, project)
-    // if (!!project
-    //   && !!isBrowserBuild
-    //   && project.frameworkVersionAtLeast('v3')
-    //   && project.typeIs(
-    //     'angular-lib',
-    //     // 'isomorphic-lib' TODO angular circural deps in new js sucks
-    //   )) {
-    //   await this.buildAngularLibVer(project, buildType, watch);
-    // } else {
-    await this.buildStandardLibVer({
-      watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
-    })
-    // }
+    const project = Project.nearestTo(cwd) as Project;
+    Helpers.log(`Project form ${cwd}: ${project?.location}`)
 
-    // if (!!project && !!isBrowserBuild) {
-    //   const bePjPath = path.join(project.location, buildType, config.file.package_json);
-    //   const bepj = Helpers.readJson(bePjPath) as Models.npm.IPackageJSON;
-    //   (project.packageJson.data.tnp.overrided.includeOnly || []).forEach(p => {
-    //     const verTnp = (Project.by('container', project._frameworkVersion) as Project)
-    //       .packageJson.data.dependencies[p];
-    //     if (!!verTnp) {
-    //       bepj.dependencies[p] = `~${verTnp}`;
-    //     }
-    //   });
-    //   Helpers.writeJson(bePjPath, bepj);
-    // }
+    if (project.frameworkVersionAtLeast('v3') && isBrowserBuild) {
+      // nothing here for for now
+    } else {
+      await this.buildStandardLibVer({
+        watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+      })
+    }
 
   }
 
@@ -113,6 +95,7 @@ export class BackendCompilation extends IncCompiler.Base {
     generateDeclarations: boolean,
     cwd: string;
   }) {
+
     const { watch, generateDeclarations, commandDts, commandJsAndMaps, cwd } = options;
     //#region normal js build
     if (watch) {
@@ -145,61 +128,6 @@ export class BackendCompilation extends IncCompiler.Base {
       }
     }
     //#endregion
-  }
-
-  protected async buildAngularLibVer(project: Project, outFolder: ConfigModels.OutFolder = 'dist', watch: boolean) {
-    // const cwd = project.location;
-    // project.insideStructure.structures.InsideStructAngular13Lib.struct.recreate(outFolder);
-    // const isIsomorphic = project.typeIs('isomorphic-lib');
-    // const command = `npm-run ng build ${project.name} ${watch ? '--watch' : ''} `;
-    // // + ` --output-path=./${outFolder}/browser`;
-    // if (isIsomorphic) {
-    //   await Helpers.run(command, {
-    //     cwd,
-    //     outputLineReplace: (line => line.replace(
-    //       `tmp-projects-for-${outFolder}/${project.name}/src/`,
-    //       `src/`
-    //     ))
-    //   }).asyncAsPromise();
-    // } else {
-    //   await Helpers.run(command, {
-    //     cwd,
-    //   }).asyncAsPromise();
-    // }
-    // if (!watch) {
-    //   const browserPkgJsons = [
-    //     path.join(project.location, outFolder, config.folder.browser, config.file.package_json),
-    //     path.join(project.location, outFolder, config.folder.client, config.file.package_json),
-    //   ];
-    //   browserPkgJsons.forEach(p => {
-    //     const j = Helpers.readJson(p) as Models.npm.IPackageJSON;
-    //     j.dependencies = {};
-    //     j.devDependencies = {};
-    //     j.peerDependencies = {};
-    //     [
-    //       // 'module',
-    //       // 'fesm5',
-    //       // 'fesm2015',
-    //       // 'es2015',
-    //       // 'bundles',
-    //       // 'main'
-    //     ].forEach(k => {
-    //       if (k === 'main') {
-    //         j[k] = `esm2015/${project.name}.js`;
-    //       } else {
-    //         j[k] = void 0;
-    //         Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.browser, k));
-    //         Helpers.removeFolderIfExists(path.join(project.location, outFolder, config.folder.client, k));
-    //       }
-
-    //     });
-
-    //     // j.scripts = {};
-    //     Helpers.writeJson(p, j);
-    //   });
-
-    // }
-
   }
 
   protected compilerName = 'Backend Compiler';

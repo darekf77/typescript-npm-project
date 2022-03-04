@@ -62,9 +62,22 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
   ]
 
   fix(fileAbsolutePath: string) {
+    if (Helpers.isFolder(fileAbsolutePath)) {
+      return;
+    }
     if (path.extname(fileAbsolutePath) !== '.js') {
       return;
     }
+
+    for (let index = 0; index < this.bases.length; index++) {
+      const baseOutfolder = this.bases[index];
+      const base = path.join(baseOutfolder, config.folder.node_modules);
+      if (fileAbsolutePath.startsWith(base)) {
+        return;
+      }
+    }
+
+
     if (fileAbsolutePath.replace(path.join(this.project.location, config.folder.dist), '').startsWith(`/${config.folder.browser}/`)) {
       return;
     }
@@ -78,12 +91,19 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
       return;
     }
 
+    // const realPath = path.resolve(fileAbsolutePath);
+    // if (realPath !== fileAbsolutePath) {
+    //   return;
+    // } sd
+
     const content = Helpers.readFile(fileAbsolutePath);
     if (content && !content.trimRight().endsWith(FIXED)) {
       const raw = RegionRemover.from(fileAbsolutePath, content, ['@browser' as any], this.project as Project);
       Helpers.writeFile(fileAbsolutePath, raw.output + '\n' + FIXED)
     }
+
   }
+
 
   async syncAction(absoluteFilePathes: string[]) {
     absoluteFilePathes.forEach(f => {

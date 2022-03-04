@@ -1,5 +1,5 @@
 //#region @backend
-import { fse, crossPlatformPath } from 'tnp-core'
+import { fse, crossPlatformPath, glob } from 'tnp-core'
 import { path } from 'tnp-core'
 import { config as configMorphi } from 'morphi';
 //#endregion
@@ -334,6 +334,11 @@ export abstract class FolderProject {
   public async reset(this: Project, showMsg = true) {
     await this.compilerCache.unsetData()
     this.quickFixes.removeUncessesaryFiles();
+
+    glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
+      Helpers.remove(fileTemplate);
+      Helpers.remove(fileTemplate.replace('.filetemplate', ''));
+    });
 
     if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
       const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));

@@ -175,6 +175,17 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           Helpers.writeFile(f, content);
         });
 
+        (() => {
+          const ngPath = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}/ng-package.json`);
+          const json = Helpers.readJson(ngPath);
+          json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/browser`)
+          Helpers.writeJson(ngPath, json);
+        })();
+
 
       })
     });

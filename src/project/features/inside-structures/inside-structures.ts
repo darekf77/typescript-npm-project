@@ -57,7 +57,7 @@ export class InsideStructures extends FeatureForProject {
   //#region api
 
   //#region api / recreate
-  public async recrate(outFolder: ConfigModels.OutFolder = 'dist') {
+  public async recrate(outFolder: ConfigModels.OutFolder) {
 
     const clients: Project[] = this.project.isWorkspaceChildProject
       ? this.project.parent.childrenThatAreLibs : [];

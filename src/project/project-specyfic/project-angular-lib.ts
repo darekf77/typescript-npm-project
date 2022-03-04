@@ -111,13 +111,6 @@ export class ProjectAngularLib
         }));
     }
 
-    if (this.frameworkVersionAtLeast('v3')) {
-      config = [
-        'tsconfig.ng.json.filetemplate',
-        ...config,
-      ];
-    }
-
     return config;
     //#endregion
   }
