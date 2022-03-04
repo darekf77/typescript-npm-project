@@ -1,5 +1,5 @@
 import { Helpers } from 'tnp-helpers';
-import { path, _ } from 'tnp-core';
+import { path, _, crossPlatformPath, fse, os } from 'tnp-core';
 import { config } from 'tnp-config';
 import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
@@ -200,6 +200,8 @@ function $VSCODE_GLOBAL() {
     settingspath = settingspathLinux;
   }
 
+  const dest = crossPlatformPath(path.join(os.userInfo().homedir, settingspath).replace('~', ''));
+  Helpers.writeFile(dest, settings);
   Helpers.writeFile(settingspath, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
