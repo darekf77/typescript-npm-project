@@ -89,14 +89,6 @@ export class ProjectIsomorphicLib
       ];
     }
 
-    if (this.frameworkVersionAtLeast('v3')) { // TODO REMOVE_THIS
-      files = [
-        'angular.json.filetemplate',
-        'tsconfig.ng.json.filetemplate',
-        ...files
-      ];
-    }
-
     return files;
     //#endregion
   }
@@ -111,28 +103,7 @@ export class ProjectIsomorphicLib
         relativePath: 'webpack.backend-bundle-build.js'
       });
     }
-    if (this.frameworkVersionAtLeast('v3')) { // TODO REMOVE_THIS
 
-      // this.coreLibFiles.forEach(relativePath => {
-      //   const sourceProject = Project.by<Project>('angular-lib', this._frameworkVersion);
-      //   // console.log(` path: ${path.join(sourceProject.location, relativePath)} `)
-      //   files.push({
-      //     sourceProject,
-      //     relativePath,
-      //   });
-      // });
-
-      files.push({
-        sourceProject: Project.by<Project>('angular-lib', this._frameworkVersion),
-        relativePath: 'angular.json.filetemplate',
-      });
-
-      files.push({
-        sourceProject: Project.by<Project>('angular-lib', this._frameworkVersion),
-        relativePath: 'tsconfig.ng.json.filetemplate',
-      });
-
-    }
     return files;
     //#endregion
   }
