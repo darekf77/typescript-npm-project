@@ -202,7 +202,6 @@ function $VSCODE_GLOBAL() {
 
   const dest = crossPlatformPath(path.join(os.userInfo().homedir, settingspath).replace('~', ''));
   Helpers.writeFile(dest, settings);
-  Helpers.writeFile(settingspath, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
 }

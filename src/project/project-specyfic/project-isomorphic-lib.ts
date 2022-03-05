@@ -372,7 +372,7 @@ export class ProjectIsomorphicLib
 
       Helpers.info(`
 
-        WEBPACK ${this.buildOptions.watch ? 'WATCH (ONLY FOR CLI FUNCTIONS) ' : ''
+        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''
         } BACKEND BUILD started...
 
         command: ${webpackCommand}
