@@ -262,8 +262,26 @@ export function $EXT(args, exit) {
   return $VSCODE_EXT(args, exit);
 }
 
+export async function $PROJ_EXT(args, exit) {
+
+  const p = crossPlatformPath(path.join(process.cwd(), '.vscode/extensions.json'));
+  console.log(p)
+  const extensions: { recommendations: string[] } = Helpers.readJson(p, { recommendations: [] }, true);
+  for (let index = 0; index < extensions.recommendations.length; index++) {
+    const extname = extensions.recommendations[index];
+    try {
+      Helpers.run(`code --install-extension ${extname}`).sync();
+      Helpers.info(`Installed: ${extname}`)
+    } catch (error) {
+      Helpers.warn(`Not able to install ${extname}`);
+    }
+  }
+  process.exit(0)
+}
+
 export default {
   $EXT: Helpers.CLIWRAP($EXT, '$EXT'),
+  $PROJ_EXT: Helpers.CLIWRAP($PROJ_EXT, '$PROJ_EXT'),
   $VSCODE_EXT: Helpers.CLIWRAP($VSCODE_EXT, '$VSCODE_EXT'),
   $VSCODE_TEMP_SHOW: Helpers.CLIWRAP($VSCODE_TEMP_SHOW, '$VSCODE_TEMP_SHOW'),
   $FILES_SHOW: Helpers.CLIWRAP($FILES_SHOW, '$FILES_SHOW'),

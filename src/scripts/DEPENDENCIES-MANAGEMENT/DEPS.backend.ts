@@ -745,7 +745,17 @@ v2 Isomorphic-lib core:\t  ${ilv2.location}
 //#endregion
 
 
+async function $TREE(arg: string) {
+  const files = Helpers.getRecrusiveFilesFrom(crossPlatformPath(path.join(process.cwd(), arg)));
+  for (let index = 0; index < files.length; index++) {
+    const f = files[index];
+    console.log(`'${f.replace(process.cwd(), '')}',`)
+  }
+  process.exit(0)
+}
+
 export default {
+  $TREE: Helpers.CLIWRAP($TREE, '$TREE'),
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
   $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),
   $INSTALL_IN_TNP: Helpers.CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),

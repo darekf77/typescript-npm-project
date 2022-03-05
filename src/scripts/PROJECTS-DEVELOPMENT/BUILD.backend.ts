@@ -255,7 +255,7 @@ const $SERVE = async (args) => {
     if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
       Helpers.error(`Please build your project first`, false, true);
     }
-    if (proj.typeIs('angular-lib')) {
+    if (proj.typeIs('angular-lib') || (proj.typeIs('isomorphic-lib') && proj.frameworkVersionAtLeast('v3'))) {
       //#region serve angular lib
       const localUrl = `http://localhost:${8080}/${proj.name}/`;
       const app = express();

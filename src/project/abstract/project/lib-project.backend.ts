@@ -351,7 +351,12 @@ export abstract class LibProject {
 
         await this.bumpVersionInOtherProjects(newVersion);
 
-        if (this.typeIs('angular-lib') && !global.tnpNonInteractive) {
+        if (
+          (
+            this.typeIs('angular-lib')
+            || (this.typeIs('isomorphic-lib') && this.frameworkVersionAtLeast('v3'))
+          )
+          && !global.tnpNonInteractive) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
             let appBuildOptions = { docsAppInProdMode: prod };

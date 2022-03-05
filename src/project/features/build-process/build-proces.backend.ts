@@ -174,6 +174,10 @@ inside generated projects...
         await this.project.filesStructure.init(buildOptions.args);
       }
 
+      if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+        this.project.insideStructure.recrate(buildOptions.outDir as any);
+      }
+
       if (buildOptions.watch) {
         let config = void 0;
         while (true) {
