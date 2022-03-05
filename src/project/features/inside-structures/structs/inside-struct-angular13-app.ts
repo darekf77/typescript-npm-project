@@ -1,9 +1,12 @@
 //#region @backend
 import { CLASS } from 'typescript-class-helpers';
-import { Helpers, path, _ } from 'tnp-core';
+import { crossPlatformPath, glob, path, _ } from 'tnp-core';
+import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
+import { config } from 'morphi';
 
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
@@ -29,7 +32,6 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/src/environments/environment.prod.ts',
         'app/src/environments/environment.ts',
         'app/src/app',
-        'app/src/assets',
         'app/src/environments',
         'app/src/favicon.ico',
         'app/src/index.html',
@@ -39,14 +41,6 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/src/test.ts',
         'app/src/manifest.webmanifest',
         'app/ngsw-config.json',
-        '/app/src/assets/icons/icon-128x128.png',
-        '/app/src/assets/icons/icon-144x144.png',
-        '/app/src/assets/icons/icon-152x152.png',
-        '/app/src/assets/icons/icon-192x192.png',
-        '/app/src/assets/icons/icon-384x384.png',
-        '/app/src/assets/icons/icon-512x512.png',
-        '/app/src/assets/icons/icon-72x72.png',
-        '/app/src/assets/icons/icon-96x96.png',
         'app/.browserslistrc',
         'app/.editorconfig',
         'app/.gitignore',
@@ -91,10 +85,11 @@ export class InsideStructAngular13App extends BaseInsideStruct {
 
         //#region replace app.module.ts
         (() => {
-          const appModuleFilePath = project.location
-            + '/'
-            + replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-            + `/src/app/app.module.ts`;
+          const appModuleFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/app/app.module.ts`
+          );
 
           let appModuleFile = Helpers.readFile(appModuleFilePath);
 
@@ -113,10 +108,11 @@ ${appModuleFile}
 
         //#region replace app.component.html
         (() => {
-          const appModuleFilePath = project.location
-            + '/'
-            + replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-            + `/src/app/app.component.html`;
+          const appModuleFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/app/app.component.html`
+          );
 
           let appHtmlFile = Helpers.readFile(appModuleFilePath);
 
@@ -129,6 +125,99 @@ ${appModuleFile}
           Helpers.writeFile(appModuleFilePath, appHtmlFile);
         })();
         //#endregion
+
+        //#region link assets
+        (() => {
+
+          const assetsSource = crossPlatformPath(path.join(
+            project.location,
+            config.folder.src,
+            config.folder.assets,
+          ))
+          const assetsDest = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/src/assets`
+          ));
+
+          Helpers.remove(assetsDest);
+          Helpers.createSymLink(assetsSource, assetsDest)
+
+        })();
+        //#endregion
+
+        //#region rebuild manifest
+        (() => {
+
+          const manifestJsonPath = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/src/manifest.webmanifest`
+          ));
+
+          const manifestJson: {
+            "name": string;//  "app",
+            "short_name": string;//  "app",
+            "theme_color": string;// "#1976d2",
+            "background_color": string;//  "#fafafa",
+            "display": "standalone",
+            "scope": string;// "./",
+            "start_url": string;//  "start_url": "./", => "start_url" "https://darekf77.github.io/bs4-breakpoint/"
+            icons: {
+              "src": string; // "assets/icons/icon-96x96.png",
+              "sizes": string; // "96x96",
+              "type": string; // "image/png",
+              "purpose": string; // "maskable any"
+            }[];
+          } = Helpers.readJson(manifestJsonPath, {}, true);
+
+          const assetsPath = crossPlatformPath(path.join(
+            project.location,
+            config.folder.src,
+            config.folder.assets
+          ));
+
+          const iconsPath = crossPlatformPath(path.join(
+            assetsPath,
+            'icons'
+          ));
+
+
+          const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
+            // @ts-ignore
+            return Models.other.ImageFileExtensionArr.includes(path.extname(f as any).replace('.', ''));
+          }); // glob.sync(`${iconsPath}/**/*.(png|jpeg|svg)`);
+
+          manifestJson.icons = iconsFilesPathes.map(f => {
+            return {
+              src: f.replace(`${assetsPath}/`, ''),
+              sizes: _.last(path.basename(f).replace(path.extname(f), '').split('-')),
+              type: `image/${path.extname(f).replace('.', '')}`,
+              purpose: "maskable any"
+            }
+          });
+
+          const origin = project.git.originURL;
+          if (origin.search('github.com') !== -1) {
+            const remoteUsername = _.first(_.first(origin
+              .replace('https://', '')
+              .replace('http://', '')
+              .split('/')).split(':'))
+
+            manifestJson.start_url = `https://${remoteUsername}.github.io/${project.name}/`
+          }
+
+
+          Helpers.writeJson(manifestJsonPath, manifestJson);
+
+        })();
+        //#endregion
+
+
 
         //#endregion
       })
