@@ -28,7 +28,7 @@
       "ng2-preloader": '1.0.15',
       "rebird-https-letsencrypt": '0.0.11',
       "bs3-breakpoint": '0.0.10',
-      '@types/cheerio': '0.22.31',
+      '@types/cheerio': '0.22.31'
     },
     "ignoreDepsPattern": [
       "bs4-breakpoint",
@@ -151,7 +151,11 @@
           'tnp-config',
           'tnp-cli',
           'ng2-logger',
-          'bs4-breakpoint'
+          'bs4-breakpoint',
+          'typescript-class-helpers',
+          'lodash-walk-object',
+          'json10',
+          'ng2-rest',
         ]
       },
       "dedupe-for-testing": [
@@ -196,19 +200,19 @@
       ],
       "common": {
         // all isomorphic application config
-        "tnp-config": '1.0.24',
+        "tnp-config": '1.0.27',
         "tnp-models": '0.0.37',
         "tnp-helpers": '0.0.73',
         "tnp-db": '0.0.44',
         "tnp-ui": '0.0.33',
-        "tnp-core": '1.0.56',
-        "tnp-cli": '2.0.23',
+        "tnp-core": '1.0.57',
+        "tnp-cli": '2.0.25',
         "tnp-tools": '0.0.46',
         "@types/node": "10.12.30",
         "morphi": '4.0.54',
         "gulp": "^3.9.1",
-        "ng2-logger": '8.0.26',
-        "ng2-rest": '11.0.42',
+        "ng2-logger": '8.0.28',
+         "ng2-rest": '11.0.42',
         "record-replay-req-res-scenario": '0.0.26',
         "randomcolor": "^0.5.3",
         "uuid": "^8.3.2",
@@ -254,8 +258,8 @@
         },
         "json": {
           "underscore": "^1.9.1",
-          "json10": '1.0.36',
-          "lodash-walk-object": '1.0.37',
+          "json10": '1.0.38',
+          "lodash-walk-object": '1.0.39',
           "json-stringify-safe": "^5.0.1",
           "@types/json-stringify-safe": "^5.0.0",
           "circular-json": "^0.5.1",
@@ -301,7 +305,7 @@
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '1.0.45',
+          "typescript-class-helpers": '1.0.47',
           "tslib": "2.2.0",
           "ts-node": "^7.0.1",
           "typescript": "4.1.5",
@@ -376,7 +380,7 @@
           "essentials": {
             "element-resize-detector": "1.1.15",
             "static-columns": '2.0.17',
-            "bs4-breakpoint": '2.0.43',
+            "bs4-breakpoint": '2.0.42',
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
             "ngx-moment": "^3.0.1",

@@ -34,6 +34,7 @@
         "mikebovenlander.formate",
         "vespa-dev-works.jestrunit",
         "marinhobrandao.angular2tests",
-        "abumalick.vscode-nvm"
+        "abumalick.vscode-nvm",
+        "esbenp.prettier-vscode",
     ]
 }

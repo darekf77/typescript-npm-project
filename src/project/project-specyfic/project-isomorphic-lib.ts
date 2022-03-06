@@ -395,7 +395,7 @@ export class ProjectIsomorphicLib
 
     const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
 
-    Helpers.info(`
+    Helpers.log(`
 
     proxy Proj = ${proxyProject?.location}
 

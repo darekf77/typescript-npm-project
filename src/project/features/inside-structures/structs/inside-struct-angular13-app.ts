@@ -270,7 +270,7 @@ ${appModuleFile}
             'app'
           ));
 
-          if (!Helpers.exists(appFile) || !Helpers.exists(appFolder)) {
+          if (!Helpers.exists(appFile) && !Helpers.exists(appFolder)) {
             const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
             const moduleName = `${_.upperFirst(_.camelCase(project.name))}Module`;
 
