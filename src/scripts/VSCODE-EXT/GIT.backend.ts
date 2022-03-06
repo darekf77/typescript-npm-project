@@ -194,7 +194,6 @@ function $GIT_LAST_TAG_HASH() {
 }
 
 function $PUSH_TAG(args: string) {
-  debugger
   const proj = Project.Current as Project;
   proj.createNewVersionWithTagFor.pathRelease(args);
   proj.git.pushCurrentBranch();
@@ -209,10 +208,22 @@ function $GIT_CHECK_TAG_EXISTS(args) {
   process.exit(0)
 }
 
+function $LAST_TAG() {
+  const proj = Project.Current as Project;
+  Helpers.info(`
+
+  last tag: ${proj.git.lastTagVersionName}
+  last tag hash: ${proj.git.lastTagHash()}
+
+  `);
+  process.exit(0)
+}
+
 export default {
   $PUSH_TAG: Helpers.CLIWRAP($PUSH_TAG, '$PUSH_TAG'),
   $GIT_CHECK_TAG_EXISTS: Helpers.CLIWRAP($GIT_CHECK_TAG_EXISTS, '$GIT_CHECK_TAG_EXISTS'),
   $GIT_LAST_TAG_HASH: Helpers.CLIWRAP($GIT_LAST_TAG_HASH, '$GIT_LAST_TAG_HASH'),
+  $LAST_TAG: Helpers.CLIWRAP($LAST_TAG, '$LAST_TAG'),
   $GIT_INFO: Helpers.CLIWRAP($GIT_INFO, '$GIT_INFO'),
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),

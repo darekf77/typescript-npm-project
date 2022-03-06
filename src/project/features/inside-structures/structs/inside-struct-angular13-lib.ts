@@ -53,7 +53,6 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/karma.conf.js',
         'lib/package-lock.json',
         'lib/package.json',
-        'lib/.nvmrc',
         'lib/tsconfig.app.json',
         'lib/tsconfig.json',
         'lib/tsconfig.spec.json',

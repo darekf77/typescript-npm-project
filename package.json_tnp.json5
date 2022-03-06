@@ -31,6 +31,7 @@
       '@types/cheerio': '0.22.31',
     },
     "ignoreDepsPattern": [
+      "bs4-breakpoint",
       "base-model-wrap",
       "http-socket-proxy-router",
       "angular2-example-http-login",
@@ -145,7 +146,13 @@
       "trusted": {
         'v1': '*',
         'v2': '*',
-        'v3': []
+        'v3': [
+          'tnp-core',
+          'tnp-config',
+          'tnp-cli',
+          'ng2-logger',
+          'bs4-breakpoint'
+        ]
       },
       "dedupe-for-testing": [
         "@types/jasmine",
@@ -189,18 +196,18 @@
       ],
       "common": {
         // all isomorphic application config
-        "tnp-config": '1.0.23',
+        "tnp-config": '1.0.24',
         "tnp-models": '0.0.37',
         "tnp-helpers": '0.0.73',
         "tnp-db": '0.0.44',
         "tnp-ui": '0.0.33',
-        "tnp-core": '1.0.37',
-        "tnp-cli": '2.0.22',
+        "tnp-core": '1.0.56',
+        "tnp-cli": '2.0.23',
         "tnp-tools": '0.0.46',
         "@types/node": "10.12.30",
         "morphi": '4.0.54',
         "gulp": "^3.9.1",
-        "ng2-logger": '8.0.25',
+        "ng2-logger": '8.0.26',
         "ng2-rest": '11.0.42',
         "record-replay-req-res-scenario": '0.0.26',
         "randomcolor": "^0.5.3",
@@ -247,8 +254,8 @@
         },
         "json": {
           "underscore": "^1.9.1",
-          "json10": '1.0.34',
-          "lodash-walk-object": '1.0.35',
+          "json10": '1.0.36',
+          "lodash-walk-object": '1.0.37',
           "json-stringify-safe": "^5.0.1",
           "@types/json-stringify-safe": "^5.0.0",
           "circular-json": "^0.5.1",
@@ -294,7 +301,7 @@
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '1.0.42',
+          "typescript-class-helpers": '1.0.45',
           "tslib": "2.2.0",
           "ts-node": "^7.0.1",
           "typescript": "4.1.5",

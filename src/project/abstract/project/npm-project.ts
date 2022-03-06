@@ -167,10 +167,10 @@ export class NpmProject {
     return {
       pathRelease(commitMsg?: string) {
         const proj = that as Project;
-        let currentPathNum = proj.versionPathAsNumber + 1;
-        let commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.versionPatchedPlusOne);
+        let currentPathNum = proj.versionPathAsNumber; // + 1;
+        let commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.version);
         proj.git.commit(commitMessage);
-        let tagName = `v${proj.versionPatchedPlusOne}`;
+        let tagName = `v${proj.version}`;
 
         while (true) {
           if (proj.git.checkTagExists(tagName)) {

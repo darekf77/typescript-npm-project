@@ -6,6 +6,7 @@ import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
+import * as semver from 'semver';
 //#endregion
 import { Project } from './project';
 import { _ } from 'tnp-core';
@@ -129,11 +130,10 @@ export abstract class LibProject {
   //#endregion
 
   //#region api / release
+
+
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
     //#region @backend
-
-    this.packageJson.data.version = this.versionPatchedPlusOne;
-    this.packageJson.save('bump everytime when release')
 
     //#region handle realeas temp folder
     // @ts-ignore
@@ -200,22 +200,37 @@ export abstract class LibProject {
     }
     //#endregion
 
+    const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
+      path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
+    const PorjectClass = CLASS.getBy('Project') as typeof Project;
+    const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
+
+    let atLestVersion = realCurrentProj.git.lastTagVersionName.trim().replace('v', '');
+    if (semver.gt(realCurrentProj.version, atLestVersion)) {
+      atLestVersion = realCurrentProj.version;
+    }
+
+    realCurrentProj.packageJson.data.version = atLestVersion;
+    realCurrentProj.packageJson.data.version = realCurrentProj.versionPatchedPlusOne;
+    realCurrentProj.packageJson.save('bump everytime when release');
+
+
     this.checkIfLogginInToNpm();
 
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
     this.checkIfReadyForNpm();
-    const newVersion = this.version;
+    const newVersion = realCurrentProj.version;
 
-    function removeTagAndCommit(tagOnly = false) {
-      Helpers.error(`PLEASE RUN: `, true, true);
-      if (!tagOnly) {
-        Helpers.error(`git reset --hard HEAD~1`, true, true);
-      }
-      Helpers.error(`git tag --delete v${newVersion}`, automaticRelease, true);
-      if (automaticRelease) {
-        Helpers.error('release problem...', false, true);
-      }
+    function removeTagAndCommit() {
+      // Helpers.error(`PLEASE RUN: `, true, true);
+      // if (!tagOnly) {
+      //   Helpers.error(`git reset --hard HEAD~1`, true, true);
+      // }
+      Helpers.error(`'release problem... `, automaticRelease, true);
+      // if (automaticRelease) {
+      //   Helpers.error('release problem...', false, true);
+      // }
     }
 
     await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
@@ -412,20 +427,29 @@ export abstract class LibProject {
       removeTagAndCommit();
     });
 
-    const PorjectClass = CLASS.getBy('Project') as typeof Project;
 
-    const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
-      path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
-    const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
+
+
+    const tnpProj = PorjectClass.Tnp as Project;
 
     [
-      PorjectClass.Tnp as Project,
+      tnpProj,
       PorjectClass.From(PorjectClass.NaviCliLocation) as Project,
       PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
     ].filter(f => !!f)
       .forEach(c => {
         c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
       });
+
+    if (tnpProj) {
+      const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
+      if (_.isArray(arrTrusted) && !arrTrusted.includes(this.name)) {
+        arrTrusted.push(this.name);
+        tnpProj.packageJson.save('Saving trusted for framework version');
+      }
+    }
+
+
     //#endregion
   }
   //#endregion

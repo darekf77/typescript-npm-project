@@ -357,11 +357,15 @@ export class PackageJsonCore {
             .replace(`.json`, '');
           delete data[property];
         });
-      if (!Helpers.isLink(this.path)) {
+      if (Helpers.isLink(this.path)) {
+        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
+      } else {
         Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
       }
     } else {
-      if (!Helpers.isLink(this.path)) {
+      if (Helpers.isLink(this.path)) {
+        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
+      } else {
         Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
       }
     }
