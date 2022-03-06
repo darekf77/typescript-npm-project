@@ -290,6 +290,7 @@ export abstract class BuildableProject {
     }
 
     // TODO QUICK FIX
+    this.buildOptions.copyto = (this.buildOptions.copyto ? this.buildOptions.copyto : []);
 
     this.buildOptions.copyto = (this.buildOptions.copyto as Project[]).filter(f => f.typeIs('angular-lib', 'isomorphic-lib'));
 

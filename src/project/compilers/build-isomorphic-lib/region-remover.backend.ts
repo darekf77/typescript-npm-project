@@ -3,6 +3,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-core';
 import { Region } from './region.backend';
 import type { Project } from '../../abstract/project';
+import { ConfigModels } from 'tnp-config';
 
 
 const REGEX_REGION = {
@@ -60,21 +61,21 @@ export class RegionRemover {
 
   private constructor(
     public readonly fileAbsolutePath: string,
-    fileExtension: Models.other.CutableFileExt,
+    fileExtension: ConfigModels.CutableFileExt,
     private content: string,
     replacementss?: Models.dev.Replacement[],
     public readonly project?: Project
 
   ) {
-    if ((['js', 'ts', 'scss', 'sass'] as Models.other.CutableFileExt[]).includes(fileExtension)) {
+    if ((['js', 'ts', 'scss', 'sass'] as ConfigModels.CutableFileExt[]).includes(fileExtension)) {
       this.START_REGION.push(REGEX_REGION.TS_JS_SCSS_SASS.START);
       this.END_REGION.push(REGEX_REGION.TS_JS_SCSS_SASS.END);
     }
-    if ((['html'] as Models.other.CutableFileExt[]).includes(fileExtension)) {
+    if ((['html'] as ConfigModels.CutableFileExt[]).includes(fileExtension)) {
       this.START_REGION.push(REGEX_REGION.HTML.START);
       this.END_REGION.push(REGEX_REGION.HTML.END);
     }
-    if ((['scss', 'sass', 'css'] as Models.other.CutableFileExt[]).includes(fileExtension)) {
+    if ((['scss', 'sass', 'css'] as ConfigModels.CutableFileExt[]).includes(fileExtension)) {
       this.START_REGION.push(REGEX_REGION.CSS.START);
       this.END_REGION.push(REGEX_REGION.CSS.END);
     }

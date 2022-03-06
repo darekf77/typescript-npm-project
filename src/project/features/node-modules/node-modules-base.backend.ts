@@ -56,7 +56,6 @@ export class NodeModulesBase extends NodeModulesCore {
       ) {
         //#region copy / link process
         // const allowedAsFolder = [
-        //   ...config.packagesThat.needToBeCopiedInstedLink,
         //   ...source.isomorphicPackages,
         // ];
         // //#endregion

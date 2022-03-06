@@ -45,13 +45,16 @@ export class EnvironmentConfig
     return !fse.existsSync(f);
   }
 
-  public async updateData(config?: Models.env.EnvConfig) {
+  public async updateData(configEn?: Models.env.EnvConfig) {
     if (this.project.isStandaloneProject && this.project.isGenerated) {
       return;
     }
-    config = !!config ? config : this.project.env.config;
+    configEn = !!configEn ? configEn : this.project.env.config;
     if (this.project.git.isGitRepo) {
-      config.build = {
+      if (!configEn && this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+        Helpers.error(`Please build library first: ${config.frameworkName} build:dist`,)
+      }
+      configEn.build = {
         number: this.project.git.countComits(),
         date: this.project.git.lastCommitDate(),
         hash: this.project.git.lastCommitHash(),
@@ -61,7 +64,7 @@ export class EnvironmentConfig
         }
       }
     }
-    saveEnvironmentConfig(this.project, config);
+    saveEnvironmentConfig(this.project, configEn);
   }
 
 

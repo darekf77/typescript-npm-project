@@ -129,7 +129,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         (() => {
           const source = path.join(
             projectLocation,
-            config.folder.src,
+            `tmp-src-${outFolder}`,
             'lib'
           );
 
@@ -140,7 +140,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             `projects/${projectName}/src/lib`
           );
           Helpers.remove(dest);
-          Helpers.createSymLink(source, dest);
+          Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
         })();
 
 

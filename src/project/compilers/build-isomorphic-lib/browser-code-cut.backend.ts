@@ -13,6 +13,7 @@ import { Project } from '../../abstract';
 import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
 import { RegionRemover } from './region-remover.backend';
+import { ConfigModels } from 'tnp-config';
 //#endregion
 
 //#region consts
@@ -50,7 +51,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region handle output
-  handleOutput(replacement: string, ext: Models.other.CutableFileExt): string {
+  handleOutput(replacement: string, ext: ConfigModels.CutableFileExt): string {
     replacement = this.handleTickInCode(replacement);
 
     return replacement;
@@ -268,7 +269,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     codeCuttFn: (jsExpressionToEval: string,
       env: Models.env.EnvConfig,
       absoluteFilePath: string) => boolean,
-    ext: Models.other.CutableFileExt = 'ts'
+    ext: ConfigModels.CutableFileExt = 'ts'
   ) {
     // this.isDebuggingFile && console.log(`[findReplacements] START EXT: "${ext}"`)
     // const handleHtmlRegex = (ext === 'html' ? '\\s+\\-\\-\\>' : '');
@@ -394,7 +395,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     options = _.clone(options);
     this.options = options;
     // console.log('options.replacements', options.replacements)
-    const ext = path.extname(this.absoluteFilePath).replace('.', '') as Models.other.CutableFileExt;
+    const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
       //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
@@ -436,7 +437,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   //#region replace region width
   replaceRegionsWith(stringContent = '', replacementPatterns = [], replacement = '',
-    ext: Models.other.CutableFileExt = 'ts') {
+    ext: ConfigModels.CutableFileExt = 'ts') {
 
     if (replacementPatterns.length === 0) {
       return stringContent;

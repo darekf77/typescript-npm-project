@@ -6,7 +6,7 @@ import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import { os } from 'tnp-core';
 import { chokidar } from 'tnp-core';
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
@@ -88,7 +88,7 @@ export class CopyManager extends FeatureForProject {
     return [];
   }
   private async start(
-    event?: Models.other.FileEvent,
+    event?: ConfigModels.FileEvent,
     specyficFileRelativePath?: string,
     dontRemoveDestFolder = false
   ) {

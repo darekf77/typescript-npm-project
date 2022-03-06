@@ -5,7 +5,7 @@ import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
 
 export function $VSCODE_EXT(args: string, exit = true) {
-  Helpers.run(`npm install && npm-run tsc && npm run build:install`, {
+  Helpers.run(`tnp clear && tnp bd && tnp il`, {
     cwd: config.pathes.tnp_vscode_ext_location,
     output: true
   }).sync();

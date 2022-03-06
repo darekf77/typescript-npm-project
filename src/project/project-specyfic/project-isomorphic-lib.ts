@@ -165,12 +165,12 @@ export class ProjectIsomorphicLib
 
   private proxyNgProj(project: Project, buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
     //#region @backendFunc
-    const projepath = ProjectIsomorphicLib.angularProjProxyPath(
+    const projepath = path.join(this.location, ProjectIsomorphicLib.angularProjProxyPath(
       project,
       buildOptions.outDir as any,
       void 0, // TODO
       type
-    );
+    ));
     const proj = Project.From(projepath);
     return proj as Project;
     //#endregion
@@ -335,29 +335,36 @@ export class ProjectIsomorphicLib
 
   //#endregion
 
+  fixBuildDirs(outDir: Models.dev.BuildDir) {
+    const p = path.join(this.location, outDir);
+    if (!Helpers.isFolder(p)) {
+      Helpers.readFile(p);
+      Helpers.mkdirp(p);
+    }
+  }
+
   async buildLib() {
     //#region @backend
     const { outDir, ngbuildonly, watch } = this.buildOptions;
 
+    this.fixBuildDirs(outDir);
+
     Helpers.log(`[buildLib] start of building`);
     this.beforeLibBuild(outDir);
 
-    if (ngbuildonly) {
-      // await this.buildAngularVer(watch);
-    } else {
 
-      const { obscure, uglify, nodts } = this.buildOptions;
-      if (outDir === 'bundle') {
-        this.cutReleaseCode();
-      }
+    const { obscure, uglify, nodts } = this.buildOptions;
+    if (outDir === 'bundle') {
+      this.cutReleaseCode();
+    }
 
-      if (outDir === 'bundle' && (obscure || uglify)) {
-        this.quickFixes.overritenBadNpmPackages();
-      }
+    if (outDir === 'bundle' && (obscure || uglify)) {
+      this.quickFixes.overritenBadNpmPackages();
+    }
 
 
-      const angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
-      Helpers.info(`
+    const angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
+    Helpers.info(`
 
         ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
 
@@ -365,15 +372,15 @@ export class ProjectIsomorphicLib
 
         `);
 
-      const webpackCommandFn = (watchCommand: boolean) =>
-        `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
+    const webpackCommandFn = (watchCommand: boolean) =>
+      `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
-      const webpackCommand = webpackCommandFn(this.buildOptions.watch);
+    const webpackCommand = webpackCommandFn(this.buildOptions.watch);
 
-      Helpers.info(`
+    Helpers.info(`
 
-        WEBPACK ${this.buildOptions.watch ? 'WATCH' : ''
-        } BACKEND BUILD started...
+        WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''
+      } BACKEND BUILD started...
 
         command: ${webpackCommand}
 
@@ -381,72 +388,76 @@ export class ProjectIsomorphicLib
 
 
 
-      if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
-        this.buildOptions.genOnlyClientCode = true;
-      }
-      this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
-
-      const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
-
-      if (this.buildOptions.watch) {
-        //#region watch build
-        if (outDir === 'bundle') {
-          // Helpers.error(`Watch build not available for bundle build`, false, true);
-          Helpers.info(`Starting watch bundle build for fast cli..`);
-          try {
-            this.run(webpackCommand).async();
-          } catch (er) {
-            Helpers.error(`WATCH BUNDLE build failed`, false, true);
-          }
-        }
-        await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
-          {
-            watchOnly: this.buildOptions.watchOnly,
-            afterInitCallBack: async () => {
-              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-            }
-          });
-        if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
-          await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
-        }
-
-        //#endregion
-      } else {
-
-        if (outDir === 'bundle' && (obscure || uglify || nodts)) {
-          try {
-            this.run(webpackCommand).sync();
-
-            if (obscure || uglify) {
-              this.backendCompileToEs5();
-            }
-            if (uglify) {
-              this.backendUglifyCode(config.reservedArgumentsNamesUglify)
-            };
-            if (obscure) {
-              this.backendObscureCode(config.reservedArgumentsNamesUglify);
-            }
-            if (!nodts) {
-              this.backendCompilerDeclarationFiles()
-            };
-            // process.exit(0)
-          } catch (er) {
-            Helpers.error(`BUNDLE production build failed`, false, true);
-          }
-          await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
-          await proxyProject.run(angularCommand).sync()
-        } else {
-          await this.incrementalBuildProcess.start('isomorphic compilation');
-          await proxyProject.run(angularCommand).sync()
-          // if (outDir === 'bundle') {
-          //   this.buildAngularVer();
-          // }
-        }
-        await this.browserCodePreventer.start('browser code preventer');
-      }
-
-
+    if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
+      this.buildOptions.genOnlyClientCode = true;
     }
+    this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
+
+    const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
+
+    Helpers.info(`
+
+    proxy Proj = ${proxyProject?.location}
+
+    `)
+
+    if (this.buildOptions.watch) {
+      //#region watch build
+      if (outDir === 'bundle') {
+        // Helpers.error(`Watch build not available for bundle build`, false, true);
+        Helpers.info(`Starting watch bundle build for fast cli..`);
+        try {
+          this.run(webpackCommand).async();
+        } catch (er) {
+          Helpers.error(`WATCH BUNDLE build failed`, false, true);
+        }
+      }
+      await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+        {
+          watchOnly: this.buildOptions.watchOnly,
+          afterInitCallBack: async () => {
+            await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+          }
+        });
+      if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
+        await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
+      }
+
+      //#endregion
+    } else {
+
+      if (outDir === 'bundle' && (obscure || uglify || nodts)) {
+        try {
+          this.run(webpackCommand).sync();
+
+          if (obscure || uglify) {
+            this.backendCompileToEs5();
+          }
+          if (uglify) {
+            this.backendUglifyCode(config.reservedArgumentsNamesUglify)
+          };
+          if (obscure) {
+            this.backendObscureCode(config.reservedArgumentsNamesUglify);
+          }
+          if (!nodts) {
+            this.backendCompilerDeclarationFiles()
+          };
+          // process.exit(0)
+        } catch (er) {
+          Helpers.error(`BUNDLE production build failed`, false, true);
+        }
+        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
+        await proxyProject.run(angularCommand).sync()
+      } else {
+        await this.incrementalBuildProcess.start('isomorphic compilation');
+        await proxyProject.run(angularCommand).sync()
+        // if (outDir === 'bundle') {
+        //   this.buildAngularVer();
+        // }
+      }
+      await this.browserCodePreventer.start('browser code preventer');
+    }
+
     //#endregion
   }
 

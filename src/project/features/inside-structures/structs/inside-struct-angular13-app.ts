@@ -1,12 +1,13 @@
 //#region @backend
 import { CLASS } from 'typescript-class-helpers';
-import { crossPlatformPath, glob, path, _ } from 'tnp-core';
+import { crossPlatformPath, path, _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
 import { config } from 'morphi';
+import * as cheerio from 'cheerio';
 
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
@@ -49,7 +50,6 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/karma.conf.js',
         'app/package-lock.json',
         'app/package.json',
-        'app/src',
         'app/.nvmrc',
         'app/tsconfig.app.json',
         'app/tsconfig.json',
@@ -134,6 +134,11 @@ ${appModuleFile}
             config.folder.src,
             config.folder.assets,
           ))
+
+          if (!Helpers.exists(assetsSource)) {
+            Helpers.mkdirp(assetsSource);
+          }
+
           const assetsDest = crossPlatformPath(path.join(
             project.location
             ,
@@ -175,11 +180,16 @@ ${appModuleFile}
             }[];
           } = Helpers.readJson(manifestJsonPath, {}, true);
 
+          manifestJson.name = _.startCase(project.name);
+          manifestJson.short_name = project.name;
+
           const assetsPath = crossPlatformPath(path.join(
             project.location,
             config.folder.src,
             config.folder.assets
           ));
+
+
 
           const iconsPath = crossPlatformPath(path.join(
             assetsPath,
@@ -194,7 +204,7 @@ ${appModuleFile}
 
           manifestJson.icons = iconsFilesPathes.map(f => {
             return {
-              src: f.replace(`${assetsPath}/`, ''),
+              src: f.replace(`${path.dirname(assetsPath)}/`, ''),
               sizes: _.last(path.basename(f).replace(path.extname(f), '').split('-')),
               type: `image/${path.extname(f).replace('.', '')}`,
               purpose: "maskable any"
@@ -203,7 +213,7 @@ ${appModuleFile}
 
           const origin = project.git.originURL;
           if (origin.search('github.com') !== -1) {
-            const remoteUsername = _.first(_.first(origin
+            const remoteUsername = _.first(Helpers.arrays.second(origin
               .replace('https://', '')
               .replace('http://', '')
               .split('/')).split(':'))
@@ -217,6 +227,35 @@ ${appModuleFile}
         })();
         //#endregion
 
+
+        //#region inject environment => done throught reading json
+        (() => {
+
+          // const indexHtml = crossPlatformPath(path.join(
+          //   project.location
+          //   ,
+          //   replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+          //   ,
+          //   `/src/index.html`
+          // ));
+
+          // const $ = cheerio.load(Helpers.readFile(indexHtml));
+
+          // $('body').append(`
+          // <script>
+          // if (global === undefined) {
+          //   var global = window;
+          // }
+          // var ENV = ${JSON.stringify(project.env.config)};
+          // window.ENV = ENV;
+          // global.ENV = ENV;
+          // </script>
+
+          // `);
+          // Helpers.writeFile(indexHtml, $.html())
+
+        })();
+        //#endregion
 
 
         //#endregion

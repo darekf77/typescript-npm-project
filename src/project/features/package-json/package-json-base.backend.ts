@@ -85,11 +85,22 @@ export class PackageJsonBase extends PackageJsonCore {
     reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
   }
 
-  linkTo(destination: string) {
-    const source = path.join(this.project.location, config.file.package_json);
-    const dest = path.join(destination, config.file.package_json);
-    Helpers.removeFileIfExists(dest);
-    Helpers.createSymLink(source, dest);
+  linkTo(destination: string, linkAllTypes = false) {
+    (() => {
+      const source = path.join(this.project.location, config.file.package_json);
+      const dest = path.join(destination, config.file.package_json);
+      Helpers.removeFileIfExists(dest);
+      Helpers.createSymLink(source, dest);
+    })();
+
+    Helpers.filesFrom(this.project.location)
+      .filter(f => path.basename(f).startsWith(config.file.package_json))
+      .forEach(source => {
+        const dest = path.join(destination, path.basename(source));
+        Helpers.removeFileIfExists(dest);
+        Helpers.createSymLink(source, dest);
+      });
+
   }
 
   public removeDependencyAndSave = (p: Models.npm.Package, reason: string) => {

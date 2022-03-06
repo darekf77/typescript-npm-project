@@ -131,6 +131,11 @@ export abstract class LibProject {
   //#region api / release
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
     //#region @backend
+
+    this.packageJson.data.version = this.versionPatchedPlusOne;
+    this.packageJson.save('bump everytime when release')
+
+    //#region handle realeas temp folder
     // @ts-ignore
     Helpers.log(`LIB: automaticRelease=${automaticRelease}`);
     Helpers.log(`LIB: global.tnpNonInteractive=${global.tnpNonInteractive}`);
@@ -169,6 +174,7 @@ export abstract class LibProject {
           markAsGenerated: false, // TODO not needed
           forceCopyPackageJSON: true, // TODO not needed
         });
+        this.packageJson.linkTo(absolutePathReleaseProject, true);
 
         const generatedProject = $Project.From(absolutePathReleaseProject) as Project;
         this.allResources.forEach(relPathResource => {
@@ -182,22 +188,24 @@ export abstract class LibProject {
             }
           }
         })
-        this.packageJson.linkTo(absolutePathReleaseProject);
+
         this.node_modules.linkToProject(generatedProject as Project);
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
+        await generatedProject.insideStructure.recrate('bundle')
         await generatedProject.release(releaseOptions, automaticRelease);
         return;
       }
     }
+    //#endregion
 
     this.checkIfLogginInToNpm();
 
     const { prod = false, obscure, uglify, nodts } = releaseOptions;
 
     this.checkIfReadyForNpm();
-    const newVersion = this.versionPatchedPlusOne;
+    const newVersion = this.version;
 
     function removeTagAndCommit(tagOnly = false) {
       Helpers.error(`PLEASE RUN: `, true, true);
@@ -372,12 +380,25 @@ export abstract class LibProject {
           Building docs prevew - start
 
           `);
-            await this.run(`tnp build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
+            const init = this.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
+            await this.run(`${init}`
+              + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
+
+            if (this.frameworkVersionAtLeast('v3')) {
+              const currentDocs = path.join(this.location, config.folder.docs);
+              const currentDocsDest = path.join(this.location, '..', '..', '..', '..', config.folder.docs);
+              Helpers.removeFolderIfExists(currentDocsDest);
+              Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
+            }
+
             Helpers.log(`
 
           Building docs prevew - done
 
           `);
+
+
+
             this.pushToGitRepo(newVersion)
           }, () => {
             this.pushToGitRepo(newVersion)
