@@ -155,7 +155,6 @@
           'typescript-class-helpers',
           'lodash-walk-object',
           'json10',
-          'ng2-rest',
         ]
       },
       "dedupe-for-testing": [
