@@ -169,7 +169,9 @@
           'background-worker-process',
           'firedev-crud-deamon',
           'tnp-db',
-          // 'tnp-ui',
+          'ng4-icons',
+          'ng4-modal',
+          'tnp-ui',
           // 'tnp',
 
           // 'magic-renamer'
@@ -419,8 +421,8 @@
             "@swimlane/ngx-datatable": "^13.0.0",
             "angular-tree-component": "^7.0.0",
             "ng-modal-lib": "0.0.6",
-            "ng4-modal": '0.0.30',
-            "ng4-icons": '0.0.30'
+            "ng4-modal": '13.0.2',
+            "ng4-icons": '13.0.3'
           },
           "build-tools": {
             "concurrently": "^3.5.1",
