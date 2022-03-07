@@ -345,7 +345,6 @@ export class PackageJsonCore {
       // delete data['overrided']; // TODO testing // COMMNENT
     }
 
-
     Helpers.log(`Split done..`, 2);
     if (removeFromPj) {
 
@@ -360,13 +359,17 @@ export class PackageJsonCore {
       if (Helpers.isLink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+        const d = (_.isObject(data) ? data : {});
+        delete d['main']; // TODO QUICK_FIX delete main from package.json
+        Helpers.writeFile(this.path, d);
       }
     } else {
       if (Helpers.isLink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        Helpers.writeFile(this.path, (_.isObject(data) ? data : {}));
+        const d = (_.isObject(data) ? data : {});
+        delete d['main']; // TODO QUICK_FIX delete main from package.json
+        Helpers.writeFile(this.path, d);
       }
     }
 

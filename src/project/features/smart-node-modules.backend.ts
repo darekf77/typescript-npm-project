@@ -281,9 +281,14 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     return;
   }
   Helpers.actionWrapper(() => {
-    Helpers.foldersFrom(smartTempContainerCorePackagesProj.node_modules.path).forEach(from => {
+    const folders = Helpers.foldersFrom(smartTempContainerCorePackagesProj.node_modules.path);
+    folders.forEach(from => {
+      // Helpers.info(`linking from smart to node_modules: ${path.dirname(from).startsWith('@')
+      //   ? from.split('/').slice(-2).join('/')
+      //   : from.split('/').slice(-1).join('/')
+      //   }`)
       const dest = path.join(containerCoreProject.node_modules.path, path.basename(from));
-      Helpers.removeFileIfExists(dest);
+      Helpers.remove(dest, true);
       Helpers.createSymLink(from, dest);
     });
   }, `updating node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)} `);

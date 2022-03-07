@@ -338,7 +338,7 @@ export class ProjectIsomorphicLib
   fixBuildDirs(outDir: Models.dev.BuildDir) {
     const p = path.join(this.location, outDir);
     if (!Helpers.isFolder(p)) {
-      Helpers.readFile(p);
+      Helpers.remove(p);
       Helpers.mkdirp(p);
     }
   }

@@ -205,7 +205,7 @@ export abstract class LibProject {
     const PorjectClass = CLASS.getBy('Project') as typeof Project;
     const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
 
-    let atLestVersion = realCurrentProj.git.lastTagVersionName.trim().replace('v', '');
+    let atLestVersion = realCurrentProj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
     if (semver.gt(realCurrentProj.version, atLestVersion)) {
       atLestVersion = realCurrentProj.version;
     }
@@ -432,20 +432,20 @@ export abstract class LibProject {
 
     const tnpProj = PorjectClass.Tnp as Project;
 
-    [
-      tnpProj,
-      PorjectClass.From(PorjectClass.NaviCliLocation) as Project,
-      PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
-    ].filter(f => !!f)
-      .forEach(c => {
-        c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
-      });
-
     if (tnpProj) {
       const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
-      if (_.isArray(arrTrusted) && !arrTrusted.includes(this.name)) {
-        arrTrusted.push(this.name);
-        tnpProj.packageJson.save('Saving trusted for framework version');
+      if (
+        (_.isString(arrTrusted) && (arrTrusted === '*')) ||
+        (_.isArray(arrTrusted) && arrTrusted.includes(this.name))
+      ) {
+        [
+          // tnpProj,
+          // PorjectClass.From(PorjectClass.NaviCliLocation) as Project, // TODO
+          PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
+        ].filter(f => !!f)
+          .forEach(c => {
+            c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+          });
       }
     }
 

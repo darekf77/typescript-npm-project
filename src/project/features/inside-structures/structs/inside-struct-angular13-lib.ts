@@ -12,6 +12,7 @@ import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 import { BaseInsideStruct } from './base-inside-struct';
 import { InsideStruct } from '../inside-struct';
+import { recreateApp } from './inside-struct-helpers';
 
 @CLASS.NAME('InsideStructAngular13Lib')
 export class InsideStructAngular13Lib extends BaseInsideStruct {
@@ -184,6 +185,8 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/browser`)
           Helpers.writeJson(ngPath, json);
         })();
+
+        recreateApp(project);
 
 
       })

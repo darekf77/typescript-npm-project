@@ -28,7 +28,10 @@
       "ng2-preloader": '1.0.15',
       "rebird-https-letsencrypt": '0.0.11',
       "bs3-breakpoint": '0.0.10',
-      '@types/cheerio': '0.22.31'
+      '@types/cheerio': '0.22.31',
+      'firedev-crud': '13.0.3',
+      'firedev-ports': '13.0.1',
+      'firedev-crud-deamon': '13.0.1',
     },
     "ignoreDepsPattern": [
       "bs4-breakpoint",
@@ -146,7 +149,8 @@
       "trusted": {
         'v1': '*',
         'v2': '*',
-        'v3': [
+        'v3':
+         [
           'tnp-core',
           'tnp-config',
           'tnp-cli',
@@ -155,6 +159,23 @@
           'typescript-class-helpers',
           'lodash-walk-object',
           'json10',
+          'incremental-compiler',
+          'ng2-rest',
+          'morphi',
+          'tnp-models',
+          'tnp-helpers',
+          'firedev-crud',
+          'firedev-ports',
+          'background-worker-process',
+          'firedev-crud-deamon',
+          'tnp-db',
+          // 'tnp-ui',
+          // 'tnp',
+
+          // 'magic-renamer'
+          // 'record-replay-req-res-scenario'
+          // 'ng-talkback'
+          'typeorm'
         ]
       },
       "dedupe-for-testing": [
@@ -199,19 +220,19 @@
       ],
       "common": {
         // all isomorphic application config
-        "tnp-config": '1.0.27',
-        "tnp-models": '0.0.37',
-        "tnp-helpers": '0.0.73',
-        "tnp-db": '0.0.44',
+        "tnp-config": '1.0.30',
+        "tnp-models": '13.0.3',
+        "tnp-helpers": '13.0.5',
+        "tnp-db": '13.0.3',
         "tnp-ui": '0.0.33',
-        "tnp-core": '1.0.57',
-        "tnp-cli": '2.0.25',
+        "tnp-core": '1.0.60',
+        "tnp-cli": '2.0.27',
         "tnp-tools": '0.0.46',
         "@types/node": "10.12.30",
-        "morphi": '4.0.54',
+        "morphi": '13.0.3',
         "gulp": "^3.9.1",
-        "ng2-logger": '8.0.28',
-         "ng2-rest": '11.0.42',
+        "ng2-logger": '8.0.30',
+         "ng2-rest": '13.0.3',
         "record-replay-req-res-scenario": '0.0.26',
         "randomcolor": "^0.5.3",
         "uuid": "^8.3.2",
@@ -257,8 +278,8 @@
         },
         "json": {
           "underscore": "^1.9.1",
-          "json10": '1.0.38',
-          "lodash-walk-object": '1.0.39',
+          "json10": '1.0.39',
+          "lodash-walk-object": '1.0.41',
           "json-stringify-safe": "^5.0.1",
           "@types/json-stringify-safe": "^5.0.0",
           "circular-json": "^0.5.1",
@@ -304,7 +325,7 @@
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '1.0.47',
+          "typescript-class-helpers": '1.0.49',
           "tslib": "2.2.0",
           "ts-node": "^7.0.1",
           "typescript": "4.1.5",
@@ -445,7 +466,7 @@
           "typescript-formatter": "7.2.2",
           "callsite-record": "4.1.3",
           "@types/vinyl": "^2.0.2",
-          "background-worker-process": '0.0.35',
+          "background-worker-process": '13.0.1',
           "terminal-ui": {
             "progress": "^2.0.3",
             "@types/progress": "^2.0.3",
