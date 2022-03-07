@@ -31,7 +31,7 @@
       '@types/cheerio': '0.22.31',
       'firedev-crud': '13.0.3',
       'firedev-ports': '13.0.1',
-      'firedev-crud-deamon': '13.0.1',
+      'firedev-crud-deamon': '13.0.1'
     },
     "ignoreDepsPattern": [
       "bs4-breakpoint",
@@ -171,6 +171,7 @@
           'tnp-db',
           'ng4-icons',
           'ng4-modal',
+          'firedev-storage',
           'tnp-ui',
           // 'tnp',
 
@@ -226,7 +227,7 @@
         "tnp-models": '13.0.3',
         "tnp-helpers": '13.0.5',
         "tnp-db": '13.0.3',
-        "tnp-ui": '0.0.33',
+        "tnp-ui": '13.0.1',
         "tnp-core": '1.0.60',
         "tnp-cli": '2.0.27',
         "tnp-tools": '0.0.46',
@@ -409,6 +410,7 @@
             "ngx-pipes": "^2.1.7",
             "ngx-wig": "^1.2.7",
             "ngx-store": "2.1.0",
+            'firedev-storage': '3.1.3',
             "node-localstorage": "2.1.6",
             "ng2-file-upload": "^1.3.0",
             "ngx-toastr": "^8",
