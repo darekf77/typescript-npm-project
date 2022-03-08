@@ -47,3 +47,6 @@ chsh -s /bin/bash
 brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
 arch -x86_64 brew install pkg-config cairo pango libpng jpeg giflib librsvg libvips vips
 
+
+# time machine logs
+log show --predicate 'subsystem == "com.apple.TimeMachine"' --info | grep 'upd: (' | cut -c 1-19,140-999
