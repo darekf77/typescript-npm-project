@@ -53,10 +53,9 @@ Thumbs.db
 /.vscode/launch.json.filetemplate
 /.vscode/tasks.json.filetemplate
 /tsconfig.json.filetemplate
-/projects/tmp*
 
-!tsconfig*
-webpack.*
+
+
 
 # =====================
 *.filetemplate

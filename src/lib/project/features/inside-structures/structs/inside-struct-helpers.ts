@@ -1,14 +1,14 @@
-import { config } from "tnp-config";
+import { config } from 'tnp-config';
 
 import {
   _,
   //#region @backend
   crossPlatformPath, path
   //#endregion
-} from "tnp-core";
+} from 'tnp-core';
 
-import { Helpers } from "tnp-helpers";
-import type { Project } from "../../../abstract/project/project";
+import { Helpers } from 'tnp-helpers';
+import type { Project } from '../../../abstract/project/project';
 
 export function recreateApp(project: Project) {
   //#region @backend

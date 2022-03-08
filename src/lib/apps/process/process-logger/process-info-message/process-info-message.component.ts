@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { PROCESS } from '../../PROCESS';
 import 'rxjs/add/observable/fromEvent';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { ProcessLoggerBaseClass } from '../../process-logger-base.class';
 //#endregion
 

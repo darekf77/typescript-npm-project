@@ -1,10 +1,10 @@
-import { IncCompiler } from "incremental-compiler";
-import { config } from "tnp-config";
-import { Helpers, path } from "tnp-core";
-import { Models } from "tnp-models";
-import { FeatureCompilerForProject } from "../../abstract/feature-compiler-for-project.backend";
-import type { Project } from "../../abstract/project/project";
-import { RegionRemover } from "../build-isomorphic-lib/region-remover.backend";
+import { IncCompiler } from 'incremental-compiler';
+import { config } from 'tnp-config';
+import { Helpers, path } from 'tnp-core';
+import { Models } from 'tnp-models';
+import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
+import type { Project } from '../../abstract/project/project';
+import { RegionRemover } from '../build-isomorphic-lib/region-remover.backend';
 const FIXED = '// @fixed';
 
 

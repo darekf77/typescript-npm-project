@@ -58,7 +58,7 @@ if (Object.keys(global['ENV']).length === 0) {
 //#region imports
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
-import scriptsFnArr from './scripts/index';
+import scriptsFnArr from './lib/scripts/index';
 
 import axios from 'axios';
 /**
@@ -67,7 +67,7 @@ import axios from 'axios';
 axios.defaults.timeout = config.CONST.BACKEND_HTTP_REQUEST_TIMEOUT; // TODO QUICK_FIX
 
 import chalk from 'chalk';
-import { Project } from './project';
+import { Project } from './lib/project';
 // import { Ora } from 'ora';
 
 

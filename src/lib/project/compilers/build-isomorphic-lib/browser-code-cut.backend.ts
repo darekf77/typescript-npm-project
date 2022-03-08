@@ -228,6 +228,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
           const compiled = sass.renderSync({
             data: contentScss,
           })
+          // @ts-ignore
           replacement = compiled.css;
           replacement = _.isObject(replacement) ? replacement.toString() : replacement;
           // this.debugging && console.log('compiled', compiled)

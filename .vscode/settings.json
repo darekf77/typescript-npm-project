@@ -1,13 +1,5 @@
 {
   "files.exclude": {
-    "@ngx-formly": true,
-    "json5-writer": true,
-    "lowdb": true,
-    "misc-utils-of-mine-generic": true,
-    "*.sh": true,
-    "*.xlsx": true,
-    "scripts": true,
-    "bin": true,
     "webpack.backend-bundle-build.js": true,
     "node_modules": true,
     "tmp*": true,
@@ -43,7 +35,6 @@
     ".vscode/launch.json.filetemplate": true,
     ".vscode/tasks.json.filetemplate": true,
     "tsconfig.json.filetemplate": true,
-    "projects/tmp*": true,
     ".gitignore": true,
     ".npmignore": true,
     ".babelrc": true,
@@ -60,7 +51,7 @@
     "projects": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.background": "#5c3735",
+    "activityBar.background": "#c72820",
     "statusBar.background": "#5c3735",
     "statusBar.debuggingBackground": "#5c3735"
   },

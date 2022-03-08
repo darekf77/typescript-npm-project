@@ -18,7 +18,7 @@ import { path } from 'tnp-core'
 import { child_process } from 'tnp-core';
 import axios from 'axios';
 //#endregion
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 const log = Log.create('PROJECT');
 
 export interface IPROJECT extends Project {
