@@ -644,6 +644,31 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       }
     }
   }
+
+  if (project.frameworkVersionAtLeast('v3')) {
+    if (_.isArray(project.packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
+      const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
+      patterns.forEach(patternIgnore => {
+        Object.keys(project.packageJson.data.dependencies).forEach(depName => {
+          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`);
+          const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
+          if (patternRegex.test(depName)) {
+            delete project.packageJson.data.dependencies[depName];
+          }
+        });
+
+        Object.keys(project.packageJson.data.devDependencies).forEach(depName => {
+          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`);
+          const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
+          if (patternRegex.test(depName)) {
+            delete project.packageJson.data.devDependencies[depName];
+          }
+        });
+      });
+    }
+  }
+
+
   if (project.isContainerCoreProject) { // TODO TESTING
     //#region handle container core bulk deps instatlation for all other packages
     _.keys(project.packageJson.data.dependencies)
