@@ -526,6 +526,7 @@ ${coreFiles}
       files.forEach(file => {
         if (file.linked) {
           Helpers.info(`Linking: ${file.from}`)
+          Helpers.removeFileIfExists(file.where);
           Helpers.createSymLink(file.from, file.where);
         } else {
           Helpers.copyFile(file.from, file.where);
