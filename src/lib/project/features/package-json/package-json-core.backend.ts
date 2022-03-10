@@ -359,16 +359,20 @@ export class PackageJsonCore {
       if (Helpers.isLink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        const d = (_.isObject(data) ? data : {});
-        delete d['main']; // TODO QUICK_FIX delete main from package.json
+        const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
+        if (d.tnp?.type === 'isomorphic-lib') {
+          delete d['main']; // TODO QUICK_FIX delete main from package.json
+        }
         Helpers.writeFile(this.path, d);
       }
     } else {
       if (Helpers.isLink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        const d = (_.isObject(data) ? data : {});
-        delete d['main']; // TODO QUICK_FIX delete main from package.json
+        const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
+        if (d.tnp?.type === 'isomorphic-lib') {
+          delete d['main']; // TODO QUICK_FIX delete main from package.json
+        }
         Helpers.writeFile(this.path, d);
       }
     }
