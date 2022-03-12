@@ -32,8 +32,17 @@ export class PackageJSON
 
     //#region @backendFunc
     const pj = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json)));
-    const pj_tnp = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json)));
+    let pj_tnp = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json)));
     const pj_tnp5 = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json5)));
+
+    if (pj_tnp.exists && pj_tnp5.exists
+      && (
+        (pj_tnp.data.tnp.type !== pj_tnp5.data.tnp.type)
+        ||
+        (pj_tnp.data.tnp.version !== pj_tnp5.data.tnp.version)
+    )) {
+      pj_tnp.hasOldContent = true;
+    }
 
     if (!pj.exists && !pj_tnp.exists && !pj_tnp5.exists) {
       return;

@@ -31,7 +31,7 @@ export class PackageJsonFile {
   }
 
   public get isReadable() {
-    return !this.hasIncorrectContent;
+    return !this.hasIncorrectContent && !this.hasOldContent;
   }
 
   get isTnpTypeProject() {
@@ -53,6 +53,7 @@ export class PackageJsonFile {
   }
 
   private notReadable: boolean = false;
+  public hasOldContent: boolean = false;
   private additionalSaveRequired: boolean = false;
   private readonly content: Models.npm.IPackageJSON;
   private readonly __actuallProp: string;
