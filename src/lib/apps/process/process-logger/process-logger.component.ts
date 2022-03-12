@@ -25,7 +25,7 @@ const log = Log.create('process loger'
 export class DualComponentControllerExtended extends DualComponentController {
 
   get modelDataConfig(): MDC {
-    return this.getValTemplateOptions('modelDataConfig')
+    return  void 0; // this.getValTemplateOptions('modelDataConfig')
   }
 
 }
@@ -191,7 +191,7 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
   ngOnInit() {
     this.expandedById = this.expandedById ? this.expandedById : {} as any;
     this.openOnStartById = this.openOnStartById ? this.openOnStartById : {} as any;
-    super.ngOnInit();
+    // super.ngOnInit();
     if (_.isNil(this.expandedById[this.id])) {
       this.isExpanded = true;
     }
@@ -215,7 +215,7 @@ export class ProcessLoggerComponent extends BaseFormlyComponent implements OnIni
   }
 
   onChange(v) {
-    this.formControl.setValue(v);
+    // this.formControl.setValue(v);
     console.log(this.model);
   }
   //#endregion

@@ -576,6 +576,4 @@
 
   license: "MIT",
   private: false,
-  main: "index.js",
-  workerPlugins: {},
 }
