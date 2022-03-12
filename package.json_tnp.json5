@@ -1,39 +1,36 @@
 {
-  "resources": [],
-  "overrided": {
-    "dependencies": {
+  resources: [],
+  overrided: {
+    dependencies: {
       "@types/semver": "6.0.1",
 
       // compare npm packges versions
-      "semver": "6.3.0",
+      semver: "6.3.0",
 
       // git hooks
-      "husky": "^1.3.1",
+      // husky: "^1.3.1",
 
-      // swagger generator
-      "ng2-rest-swagger-generator": '6.0.23',
+      // // swagger generator
+      // "ng2-rest-swagger-generator": "6.0.23",
 
-      // nodejs require optimization
-      "cache-require-paths": "0.3.0",
+      // // nodejs require optimization
+      // "cache-require-paths": "0.3.0",
 
-      "base-model-wrap": "3.0.13",
-      "http-socket-proxy-router": '0.0.13',
-      "isomorphic-storage": "0.0.2",
-      "nodemailer": "6.6.1",
-      "angular2-example-http-login": '5.0.21',
-      "edit-table": '0.0.19',
-      "loading-info": '0.0.15',
-      "ng2-accordions": '1.0.21',
-      "ng2-button-loader": '0.0.17',
-      "ng2-preloader": '1.0.15',
-      "rebird-https-letsencrypt": '0.0.11',
-      "bs3-breakpoint": '0.0.10',
-      '@types/cheerio': '0.22.31',
-      'firedev-crud': '13.0.3',
-      'firedev-ports': '13.0.1',
-      'firedev-crud-deamon': '13.0.1'
+      // "base-model-wrap": "3.0.13",
+      // "http-socket-proxy-router": "0.0.13",
+      // "isomorphic-storage": "0.0.2",
+      // nodemailer: "6.6.1",
+      // "angular2-example-http-login": "5.0.21",
+      // "edit-table": "0.0.19",
+      // "loading-info": "0.0.15",
+      // "ng2-accordions": "1.0.21",
+      // "ng2-button-loader": "0.0.17",
+      // "ng2-preloader": "1.0.15",
+      // "rebird-https-letsencrypt": "0.0.11",
+      // "bs3-breakpoint": "0.0.10",
+      // "@types/cheerio": "0.22.31",
     },
-    "ignoreDepsPattern": [
+    ignoreDepsPattern: [
       "bs4-breakpoint",
       "base-model-wrap",
       "http-socket-proxy-router",
@@ -48,33 +45,33 @@
       "rebird-https-letsencrypt",
       "@iconify/icons-fa-solid",
       "@iconify/icons-mdi",
-      "@iconify/react"
+      "@iconify/react",
     ],
-    "includeAsDev": [],
-    "includeOnly": [],
-    "linkedFolders": []
+    includeAsDev: [],
+    includeOnly: [],
+    linkedFolders: [],
   },
-  "linkedProjects": [],
+  linkedProjects: [],
 
-  "libReleaseOptions": {
-    "nodts": false,
-    "obscure": true,
-    "ugly": true
+  libReleaseOptions: {
+    nodts: false,
+    obscure: true,
+    ugly: true,
   },
 
-  "type": "isomorphic-lib",
+  type: "isomorphic-lib",
 
-  "version": "v3",
+  version: "v3",
 
   "libs-with-issues": {
     "ts-sinon": "1.0.12",
     "@types/jasmine": "~2.8.0",
-    "@types/jasminewd2": "~2.0.2"
+    "@types/jasminewd2": "~2.0.2",
   },
 
-  "core": {
-    "dependencies": {
-      "dedupe": [
+  core: {
+    dependencies: {
+      dedupe: [
         "tnp-models",
         "tnp-helpers",
         "tnp-db",
@@ -131,55 +128,54 @@
           "!babel-register",
           "!babel-runtime",
           "!babel-polyfill",
-          "@jimp*"
+          "@jimp*",
         ],
         "core-js-compat",
         "@ngx-formly/bootstrap",
         "@ngx-formly/core",
         "@ngx-formly/ionic",
-        "@ngx-formly/material"
+        "@ngx-formly/material",
       ],
-      "neverAsLink": [],
-      "stubForBackend": [
+      neverAsLink: [],
+      stubForBackend: [
         "@ngx-formly/core",
         "@ngx-formly/bootstrap",
         "@ngx-formly/ionic",
-        "@ngx-formly/material"
+        "@ngx-formly/material",
       ],
-      "trusted": {
-        'v1': '*',
-        'v2': '*',
-        'v3':
-         [
-          'tnp-core',
-          'tnp-config',
-          'tnp-cli',
-          'ng2-logger',
-          'bs4-breakpoint',
-          'typescript-class-helpers',
-          'lodash-walk-object',
-          'json10',
-          'incremental-compiler',
-          'ng2-rest',
-          'morphi',
-          'tnp-models',
-          'tnp-helpers',
-          'firedev-crud',
-          'firedev-ports',
-          'background-worker-process',
-          'firedev-crud-deamon',
-          'tnp-db',
-          'ng4-icons',
-          'ng4-modal',
-          'firedev-storage',
-          'tnp-ui',
+      trusted: {
+        v1: "*",
+        v2: "*",
+        v3: [
+          "tnp-core",
+          "tnp-config",
+          "tnp-cli",
+          "ng2-logger",
+          "bs4-breakpoint",
+          "typescript-class-helpers",
+          "lodash-walk-object",
+          "json10",
+          "incremental-compiler",
+          "ng2-rest",
+          "morphi",
+          "tnp-models",
+          "tnp-helpers",
+          "firedev-crud",
+          "firedev-ports",
+          "background-worker-process",
+          "firedev-crud-deamon",
+          "tnp-db",
+          "ng4-icons",
+          "ng4-modal",
+          "firedev-storage",
+          "tnp-ui",
           // 'tnp',
 
           // 'magic-renamer'
           // 'record-replay-req-res-scenario'
           // 'ng-talkback'
-          'typeorm'
-        ]
+          "typeorm",
+        ],
       },
       "dedupe-for-testing": [
         "@types/jasmine",
@@ -191,9 +187,9 @@
         "karma-coverage-istanbul-reporter",
         "karma-jasmine",
         "karma-jasmine-html-reporter",
-        "protractor"
+        "protractor",
       ],
-      "always": [
+      always: [
         "@types/node",
         "tslib",
         "reflect-metadata",
@@ -207,9 +203,9 @@
         "babel-loader",
         "babel-plugin-syntax-dynamic-import",
         "babel-preset-env",
-        "babel-preset-es2015"
+        "babel-preset-es2015",
       ],
-      "asDevDependencies": [
+      asDevDependencies: [
         "@types/node",
         "tslib",
         "reflect-metadata",
@@ -219,129 +215,132 @@
         "gulp",
         "tslint",
         "prettier",
-        "vscode"
+        "vscode",
       ],
-      "common": {
+      common: {
         // all isomorphic application config
-        "tnp-config": '1.0.30',
-        "tnp-models": '13.0.3',
-        "tnp-helpers": '13.0.5',
-        "tnp-db": '13.0.3',
-        "tnp-ui": '13.0.1',
-        "tnp-core": '1.0.60',
-        "tnp-cli": '2.0.27',
-        "tnp-tools": '0.0.46',
+        "tnp-config": "1.0.30",
+        "tnp-models": "13.0.3",
+        "tnp-helpers": "13.0.5",
+        "tnp-db": "13.0.3",
+        'firedev-crud': '13.0.3',
+        'firedev-ports': '13.0.1',
+        'firedev-crud-deamon': '13.0.1'
+        "tnp-ui": "13.0.1",
+        "tnp-core": "1.0.60",
+        "tnp-cli": "2.0.27",
+        "tnp-tools": "0.0.46",
         "@types/node": "10.12.30",
-        "morphi": '13.0.3',
-        "gulp": "^3.9.1",
-        "ng2-logger": '8.0.30',
-         "ng2-rest": '13.0.3',
-        "record-replay-req-res-scenario": '0.0.26',
-        "randomcolor": "^0.5.3",
-        "uuid": "^8.3.2",
+        morphi: "13.0.3",
+        gulp: "^3.9.1",
+        "ng2-logger": "8.0.30",
+        "ng2-rest": "13.0.3",
+        "record-replay-req-res-scenario": "0.0.26",
+        randomcolor: "^0.5.3",
+        uuid: "^8.3.2",
         "buffer-shims": "^1.0.0",
         "content-type": "^1.0.4",
         // isomorphic http requests
-        "axios": "^0.17.1",
-        "ng-talkback": '2.4.25',
-        "magic-renamer": '0.0.20',
-        "vpn-split": '0.0.18',
-        "node-cli-tester": '0.0.22',
-        "strings": {
+        axios: "^0.17.1",
+        "ng-talkback": "2.4.25",
+        "magic-renamer": "0.0.20",
+        "vpn-split": "0.0.18",
+        "node-cli-tester": "0.0.22",
+        strings: {
           "@types/diff": "^3.2.2",
-          "diff": "^3.2.0",
-          "cheerio": "1.0.0-rc.3",
-          "string-similarity": "~4.0.2"
+          diff: "^3.2.0",
+          cheerio: "1.0.0-rc.3",
+          "string-similarity": "~4.0.2",
         },
-        "promises": {
+        promises: {
           "@types/q": "^1.0.3",
-          "q": "^1.5.1",
+          q: "^1.5.1",
           // "wait.for": "0.6.6"
         },
-        "multithread": {
-          "task.js": "^0.1.5"
+        multithread: {
+          "task.js": "^0.1.5",
         },
-        "date": {
-          "dateformat": "^3.0.3",
+        date: {
+          dateformat: "^3.0.3",
           "@types/dateformat": "^1.0.1",
-          "moment": "^2.22.2"
+          moment: "^2.22.2",
         },
-        "webpack": {
-          "webpack": "3.10.0",
+        webpack: {
+          webpack: "3.10.0",
           "webpack-cli": "3.3.12",
           "webpack-dev-server": "~2.9.3",
-          "html-webpack-plugin": "^2.29.0"
+          "html-webpack-plugin": "^2.29.0",
         },
-        "babel": {
+        babel: {
           "babel-core": "^6.25.0",
           "babel-loader": "^7.1.1",
           "babel-plugin-syntax-dynamic-import": "^6.18.0",
           "babel-preset-env": "^1.6.1",
-          "babel-preset-es2015": "^6.24.1"
+          "babel-preset-es2015": "^6.24.1",
         },
-        "json": {
-          "underscore": "^1.9.1",
-          "json10": '1.0.39',
-          "lodash-walk-object": '1.0.41',
+        json: {
+          underscore: "^1.9.1",
+          json10: "1.0.39",
+          "lodash-walk-object": "1.0.41",
           "json-stringify-safe": "^5.0.1",
           "@types/json-stringify-safe": "^5.0.0",
           "circular-json": "^0.5.1",
-          "json5": "~2.1.3",
+          json5: "~2.1.3",
           "json5-writer": "~0.2.0",
           "@types/json5": "0.0.29",
           "@types/lodash": "4.14.92",
-          "lodash": "^4.17.4"
+          lodash: "^4.17.4",
         },
         "isomophic-orm": {
-          "typeorm": "0.2.7"
+          typeorm: "0.2.7",
         },
         "files-operations": {
-          "lnk": "~1.0.1",
+          lnk: "~1.0.1",
           "cross-spawn": "~7.0.3",
           "copy-paste": "~1.3.0",
-          "chokidar": "3.5.1",
+          chokidar: "3.5.1",
           "@types/chokidar": "2.1.3",
-          "cpr": "^3.0.1",
-          "mkdirp": "^0.5.1",
-          "rimraf": "^2.6.2",
+          cpr: "^3.0.1",
+          mkdirp: "^0.5.1",
+          rimraf: "^2.6.2",
           "fs-extra": "8.1.0",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": '1.1.53',
-          "open": "7.2.1",
+          "incremental-compiler": "1.1.53",
+          open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
-          "@types/sharp": "0.23.1"
+          "@types/sharp": "0.23.1",
         },
-        "sockets": {
+        sockets: {
           "@types/socket.io-client": "^1.4.32",
           "socket.io": "2.4.1",
-          "@types/socket.io": "^1.4.31"
+          "@types/socket.io": "^1.4.31",
         },
-        "tests": {
+        tests: {
           "@types/chai": "^4.1.2",
-          "chai": "^4.2.0",
-          "mocha": "^5.2.0",
+          chai: "^4.2.0",
+          mocha: "^5.2.0",
           "@types/mocha": "^5.2.5",
-          "detect-mocha": "0.1.0"
+          "detect-mocha": "0.1.0",
         },
-        "typescript": {
+        typescript: {
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '1.0.49',
-          "tslib": "2.2.0",
+          "typescript-class-helpers": "1.0.49",
+          tslib: "2.2.0",
           "ts-node": "^7.0.1",
-          "typescript": "4.1.5",
-          "tslint": "^5.9.1",
-          "prettier": "~2.3.2",
-          "eslint": "7.13.0",
+          typescript: "4.1.5",
+          tslint: "^5.9.1",
+          prettier: "~2.3.2",
+          eslint: "7.13.0",
           "eslint-plugin-import": "2.22.1",
           "eslint-plugin-jsdoc": "30.7.8",
           "eslint-plugin-prefer-arrow": "1.2.2",
-          "nodemon": "^1.14.11",
-          "enum-values": "1.2.1"
+          nodemon: "^1.14.11",
+          "enum-values": "1.2.1",
         },
-        "angular": {
+        angular: {
           "@angular-devkit/build-optimizer": "^0.3.1",
           "@angular-devkit/schematics": "^0.0.42",
           "@angular/animations": "5.2.0",
@@ -360,14 +359,14 @@
           "@angular/router": "5.2.0",
           "core-js": "2.5.3",
           "zone.js": "0.8.20",
-          "rxjs": "5.5.6",
-          "tsickle": "^0.26.0",
-          "sw-toolbox": "^3.6.0"
-        }
+          rxjs: "5.5.6",
+          tsickle: "^0.26.0",
+          "sw-toolbox": "^3.6.0",
+        },
       },
-      "onlyFor": {
+      onlyFor: {
         "vscode-ext": {
-          "vscode": "^1.1.37"
+          vscode: "^1.1.37",
         },
         "electron-client": {
           "cross-env": "7.0.2",
@@ -380,41 +379,41 @@
           // "spectron": "13.0.0"
         },
         "angular-lib": {
-          "@1": "angular-client"
+          "@1": "angular-client",
         },
         "angular-client": {
           "ngx-formly": {
             "@ngx-formly/bootstrap": "^4.6.3",
             "@ngx-formly/core": "^3.1.0",
             "@ngx-formly/ionic": "^4.6.3",
-            "@ngx-formly/material": "^3.1.0"
+            "@ngx-formly/material": "^3.1.0",
           },
           "ui-libs": {
-            "bootstrap": "4.3.1",
-            "ngx-bootstrap": "^2.0.2"
+            bootstrap: "4.3.1",
+            "ngx-bootstrap": "^2.0.2",
           },
-          "icons": {
-            "button-dropdown": '1.0.45',
+          icons: {
+            "button-dropdown": "1.0.45",
             "@iconify/react": "1.1.3",
             "@mdi/js": "5.8.55",
             "font-awesome": "^4.7.0",
-            "material-design-icons": "3.0.1"
+            "material-design-icons": "3.0.1",
           },
-          "essentials": {
+          essentials: {
             "element-resize-detector": "1.1.15",
-            "static-columns": '2.0.17',
-            "bs4-breakpoint": '2.0.42',
+            "static-columns": "2.0.17",
+            "bs4-breakpoint": "2.0.42",
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
             "ngx-moment": "^3.0.1",
             "ngx-pipes": "^2.1.7",
             "ngx-wig": "^1.2.7",
             "ngx-store": "2.1.0",
-            'firedev-storage': '3.1.3',
+            "firedev-storage": "3.1.3",
             "node-localstorage": "2.1.6",
             "ng2-file-upload": "^1.3.0",
             "ngx-toastr": "^8",
-            "hammerjs": "^2.0.8",
+            hammerjs: "^2.0.8",
             "@ngx-loading-bar/core": "^2.2.0",
             "@ngx-loading-bar/http": "^2.2.0",
             "@ngx-loading-bar/router": "^2.2.0",
@@ -423,26 +422,26 @@
             "@swimlane/ngx-datatable": "^13.0.0",
             "angular-tree-component": "^7.0.0",
             "ng-modal-lib": "0.0.6",
-            "ng4-modal": '13.0.2',
-            "ng4-icons": '13.0.3'
+            "ng4-modal": "13.0.2",
+            "ng4-icons": "13.0.3",
           },
           "build-tools": {
-            "concurrently": "^3.5.1",
+            concurrently: "^3.5.1",
             "gulp-inline-ng2-template": "^4.1.0",
-            "autoprefixer": "^6.5.3",
+            autoprefixer: "^6.5.3",
             "babel-cli": "^6.26.0",
             "circular-dependency-plugin": "^4.2.1",
-            "codelyzer": "^4.0.2",
+            codelyzer: "^4.0.2",
             "copy-webpack-plugin": "^4.1.1",
             "css-loader": "^0.28.1",
-            "cssnano": "^3.10.0",
+            cssnano: "^3.10.0",
             "exports-loader": "^0.6.3",
             "file-loader": "^1.1.5",
             "friendly-errors-webpack-plugin": "^1.6.1",
             "istanbul-instrumenter-loader": "^2.0.0",
             "jasmine-core": "~2.8.0",
             "jasmine-spec-reporter": "~4.2.0",
-            "karma": "~2.0.0",
+            karma: "~2.0.0",
             "karma-chrome-launcher": "~2.2.0",
             "karma-cli": "~1.0.1",
             "karma-coverage-istanbul-reporter": "^1.3.0",
@@ -454,7 +453,7 @@
             "postcss-custom-properties": "^7.0.0",
             "postcss-loader": "^2.0.8",
             "postcss-url": "^7.1.2",
-            "protractor": "~5.2.0",
+            protractor: "~5.2.0",
             "raw-loader": "^0.5.1",
             "sass-loader": "^6.0.3",
             "source-map-loader": "^0.2.0",
@@ -463,41 +462,41 @@
             "uglifyjs-webpack-plugin": "~1.1.2",
             "url-loader": "^0.6.2",
             "@ngtools/webpack": "^1.9.3",
-            "sass-variable-loader": "^0.1.2"
-          }
+            "sass-variable-loader": "^0.1.2",
+          },
         },
         "isomorphic-lib": {
           "typescript-formatter": "7.2.2",
           "callsite-record": "4.1.3",
           "@types/vinyl": "^2.0.2",
-          "background-worker-process": '13.0.1',
+          "background-worker-process": "13.0.1",
           "terminal-ui": {
-            "progress": "^2.0.3",
+            progress: "^2.0.3",
             "@types/progress": "^2.0.3",
-            "ora": "3.4.0",
-            "enquirer": "^2.3.0",
-            "prompts": "^0.1.8",
-            "omelette": "^0.4.5",
+            ora: "3.4.0",
+            enquirer: "^2.3.0",
+            prompts: "^0.1.8",
+            omelette: "^0.4.5",
             "@types/inquirer": "~7.3.1",
-            "inquirer": "~7.3.3",
-            "minimist": "^1.2.0",
-            "chalk": "^2.3.2",
-            "fuzzy": "^0.1.3",
-            "inquirer-autocomplete-prompt": "~1.3.0"
+            inquirer: "~7.3.3",
+            minimist: "^1.2.0",
+            chalk: "^2.3.2",
+            fuzzy: "^0.1.3",
+            "inquirer-autocomplete-prompt": "~1.3.0",
           },
           "files-watching": {
             "@types/watch": "^1.0.0",
-            "watch": "~1.0.2"
+            watch: "~1.0.2",
           },
           "operating-system": {
-            "portfinder": "1.0.21",
+            portfinder: "1.0.21",
             "@types/node-notifier": "^5.4.0",
             "node-notifier": "^6.0.0",
             "@types/glob": "^5.0.35",
-            "glob": "^7.1.2",
-            "sloc": "^0.2.0",
+            glob: "^7.1.2",
+            sloc: "^0.2.0",
             "simple-git": "^1.96.0",
-            "fkill": "6.1.0"
+            fkill: "6.1.0",
           },
           "system-informations": {
             // "cpuid": "^0.1.3",
@@ -505,57 +504,57 @@
             "check-node-version": "^3.2.0",
             "command-exists": "^1.2.2",
             "@types/systeminformation": "^3.23.0",
-            "systeminformation": "^3.45.7",
+            systeminformation: "^3.45.7",
             "ps-node": "^0.1.6",
             "npm-get-dependents": "^1.0.1",
             "is-elevated": "~3.0.0",
-            "sudo-block": "~3.0.0"
+            "sudo-block": "~3.0.0",
           },
-          "npm": {
+          npm: {
             "sort-package-json": "^1.11.0",
-            "npm-run": "^4.1.2"
+            "npm-run": "^4.1.2",
           },
-          "database": {
+          database: {
             // "sqlite3": "4.0.9", dependencies suck
-            "lowdb": "^1.0.0",
+            lowdb: "^1.0.0",
             "@types/lowdb": "^1.0.6",
-            "lockfile": "^1.0.4",
-            "@types/lockfile": "^1.0.0"
+            lockfile: "^1.0.4",
+            "@types/lockfile": "^1.0.0",
           },
-          "proxy": {
+          proxy: {
             // "redbird": "^0.7.0",
             "@types/http-proxy": "^1.16.0",
-            "http-proxy": "^1.16.2"
+            "http-proxy": "^1.16.2",
           },
           "server-https": {
             "http-server": "0.11.1",
             "@types/express-fileupload": "^0.1.1",
             "@types/express": "^4.11.0",
-            "errorhandler": "^1.5.0",
+            errorhandler: "^1.5.0",
             "express-fileupload": "^0.4.0",
-            "express": "^4.16.3",
+            express: "^4.16.3",
             "method-override": "^2.3.10",
-            "accepts": "^1.3.4",
+            accepts: "^1.3.4",
             "body-parser": "^1.18.2",
             "cookie-parser": "^1.4.3",
-            "cors": "^2.8.4",
+            cors: "^2.8.4",
             "http-proxy-middleware": "0.19.1",
             "@types/http-proxy-middleware": "0.19.2",
-            "compression": "1.7.4",
-            "hostile": "~1.3.3"
+            compression: "1.7.4",
+            hostile: "~1.3.3",
           },
-          "validators": {
-            "validator": "^9.2.0"
+          validators: {
+            validator: "^9.2.0",
           },
-          "authentication": {
-            "fbgraph": "^1.4.1",
+          authentication: {
+            fbgraph: "^1.4.1",
             "@types/oauth2orize": "^1.8.0",
             "@types/password-hash": "^1.2.19",
-            "bcryptjs": "2.4.3",
-            "passport": "^0.3.2",
+            bcryptjs: "2.4.3",
+            passport: "^0.3.2",
             "passport-http-bearer": "^1.0.1",
-            "password-hash": "^1.2.2"
-          }
+            "password-hash": "^1.2.2",
+          },
         },
         "ionic-client": {
           "@ionic-native/core": "^4.4.0",
@@ -563,20 +562,20 @@
           "@ionic-native/status-bar": "^4.4.0",
           "@ionic/storage": "^2.1.3",
           "@ionic/app-scripts": "^3.1.8",
-          "ionic": "^3.19.1",
+          ionic: "^3.19.1",
           "ionic-angular": "^3.9.2",
-          "ionicons": "^3.0.0"
-        }
-      }
-    }
+          ionicons: "^3.0.0",
+        },
+      },
+    },
   },
 
-  "scripts": {
-    "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd"
+  scripts: {
+    activate: "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd",
   },
 
-  "license": "MIT",
-  "private": false,
-  "main": "index.js",
-  'workerPlugins': {},
+  license: "MIT",
+  private: false,
+  main: "index.js",
+  workerPlugins: {},
 }
