@@ -6,7 +6,7 @@ import {
   //#region @backend
   crossPlatformPath, path,
   //#endregion
-  _, Helpers
+  _, Helpers, fse
 } from 'tnp-core';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';
@@ -35,13 +35,8 @@ export class PackageJSON
     let pj_tnp = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json)));
     const pj_tnp5 = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json5)));
 
-    if (pj_tnp.exists && pj_tnp5.exists
-      && (
-        (pj_tnp.data.tnp.type !== pj_tnp5.data.tnp.type)
-        ||
-        (pj_tnp.data.tnp.version !== pj_tnp5.data.tnp.version)
-    )) {
-      pj_tnp.hasOldContent = true;
+    if (pj_tnp.exists && pj_tnp5.exists) {
+      fse.unlinkSync(pj_tnp.fullPath)
     }
 
     if (!pj.exists && !pj_tnp.exists && !pj_tnp5.exists) {

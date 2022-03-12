@@ -2,7 +2,7 @@
 import { fse, CoreConfig } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
-import * as json5Write from 'json5-writer';
+import * as json5Write from 'json10-writer';
 import { _ } from 'tnp-core';
 import * as semver from 'semver';
 import chalk from 'chalk';
@@ -309,13 +309,23 @@ export class PackageJsonCore {
     let tnpSaved = false;
     config.packageJsonSplit.forEach(resultFileName => {
 
+      const splitPath = path.join(path.dirname(this.path), resultFileName);
+      const recreateJson5 = (resultFileName === config.file.package_json__tnp_json5)
+        && !Helpers.exists(splitPath)
+        && data.tnp?.type === 'isomorphic-lib'
+        && Number(data.tnp?.version.replace('v', '')) > 3;
+
+      if (recreateJson5) {
+        Helpers.writeJson(splitPath, data.tnp);
+      }
+
       const property = resultFileName
         .replace(`${config.file.package_json}_`, '')
         .replace(`.json5`, '')
         .replace(`.json`, '');
 
       const obj = data[property];
-      const splitPath = path.join(path.dirname(this.path), resultFileName);
+
       Helpers.log(`splitPath: ${splitPath}`, 2);
       const dataToWrite = (_.isObject(obj) ? obj : {}) as Models.npm.IPackageJSON;
       if (resultFileName.endsWith('.json5')) {
@@ -339,6 +349,8 @@ export class PackageJsonCore {
         }
       }
     });
+
+
 
     if (tnpSaved) {
       delete data.tnp; // TODO testing // COMMNENT

@@ -32,7 +32,7 @@ const $CLEAN_BUILD = async (args) => {
   await BUILD_DIST(args);
 };
 
-const $BUILDWATCH = async (args) => {
+const $BUILD_WATCH = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
     // TODO skipCopyToSelection no loger ipmortant
@@ -407,7 +407,7 @@ export default {
   $BUILD_DOCS_PROD: Helpers.CLIWRAP($BUILD_DOCS_PROD, '$BUILD_DOCS_PROD'),
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $CLEAN_BUILD: Helpers.CLIWRAP($CLEAN_BUILD, '$CLEAN_BUILD'),
-  $BUILDWATCH: Helpers.CLIWRAP($BUILDWATCH, '$BUILDWATCH'),
+  $BUILD_WATCH: Helpers.CLIWRAP($BUILD_WATCH, '$BUILD_WATCH'),
   $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
   $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
