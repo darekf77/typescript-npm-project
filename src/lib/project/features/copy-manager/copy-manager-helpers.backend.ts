@@ -78,6 +78,8 @@ export namespace CopyMangerHelpers {
       config.folder.custom,
     ];
 
+    // const toOmmitV3 = ((project.frameworkVersionAtLeast('v3') && project.typeIs('isomorphic-lib')) ? ['app', 'lib'] : []);
+
     const foldersToSkip = [
       ...(filterForBundle ? [
         '.vscode',
@@ -85,7 +87,7 @@ export namespace CopyMangerHelpers {
       ] : []),
       ...(project.projectLinkedFiles().map(c => c.relativePath)),
       ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
-      ...(project.isWorkspace ? project.children.map(c => c.name) : [])
+      // ...toOmmitV3,
     ];
 
     // console.log(foldersToSkip)

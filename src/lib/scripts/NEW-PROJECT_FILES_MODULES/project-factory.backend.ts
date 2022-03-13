@@ -131,10 +131,10 @@ export class ProjectFactory {
     let baseline = basedOn ? basedOnProject : Project.by<Project>(type, version);
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
 
-    console.log({ type, name, cwd, basedOn, version, skipInit, siteProjectMode });
+    // console.log({ type, name, cwd, basedOn, version, skipInit, siteProjectMode });
 
 
-    await baseline.reset();
+    // await baseline.reset();
     Helpers.log('[create] Baseline reset done')
     await baseline.filesStructure.init(` --recrusive `);
     Helpers.log('[create] Baseline init done')
@@ -259,17 +259,20 @@ export class ProjectFactory {
           `['workbench.colorCustomizations']['statusBar.debuggingBackground']`, void 0);
         await newCreatedProject.filesStructure.init('');
       } else {
-        if (!skipInit) {
-          const skipNodeModules = true;
-          const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')}`;
-          await newCreatedProject.filesStructure.init(argsForInit);
-        }
+        // if (!skipInit) {
+        const skipNodeModules = !newCreatedProject.frameworkVersionAtLeast('v3');
+        const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')}`;
+        await newCreatedProject.filesStructure.init(argsForInit);
+        // }
       }
       if (
         (newCreatedProject.parent?.isContainer || newCreatedProject.parent?.isWorkspace)
-        && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')) {
+        && newCreatedProject.typeIs('angular-lib', 'isomorphic-lib', 'vscode-ext')
+      ) {
+
         newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
         newCreatedProject.parent.packageJson.save(`updating "${newCreatedProject.parent._type}" or work linked projects`);
+
         if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
           const parentOrigin = newCreatedProject.parent.git.originURL;
           const projOrigin = parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git');
@@ -317,7 +320,7 @@ export class ProjectFactory {
     const type = 'isomorphic-lib' as any;
     const name = argv[0];
 
-    await this.create({
+    const proj = await this.create({
       type,
       name,
       cwd,
@@ -325,6 +328,12 @@ export class ProjectFactory {
       version: config.defaultFrameworkVersion, // (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
       skipInit
     });
+
+    Helpers.writeFile([proj.location, 'README.md'], `
+  #  ${_.startCase(proj.name)}
+
+    `)
+
     if (exit) {
       process.exit(0)
     }

@@ -247,7 +247,7 @@ export class CopyManager extends FeatureForProject {
 
 
     if (options.regenerateProjectChilds && this.project.isContainerWorkspaceRelated) {
-      let childs = this.project.children;
+      let childs = this.project.children.filter(f => !['lib', 'app'].includes(path.basename(f.location)));
 
       if (options.regenerateOnlyCoreProjects) {
         if (this.project.isCoreProject) {
