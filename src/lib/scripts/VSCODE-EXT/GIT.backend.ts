@@ -195,6 +195,7 @@ function $GIT_LAST_TAG_HASH() {
 
 function $PUSH_TAG(args: string) {
   const proj = Project.Current as Project;
+  proj.bumpVersionForPath(proj);
   proj.createNewVersionWithTagFor.pathRelease(args);
   proj.git.pushCurrentBranch();
   process.exit(0);

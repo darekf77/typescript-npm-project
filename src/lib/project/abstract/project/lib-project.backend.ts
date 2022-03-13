@@ -209,16 +209,11 @@ export abstract class LibProject {
     const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
       path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
     const PorjectClass = CLASS.getBy('Project') as typeof Project;
+
     const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
 
-    let atLestVersion = realCurrentProj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
-    if (semver.gt(realCurrentProj.version, atLestVersion)) {
-      atLestVersion = realCurrentProj.version;
-    }
 
-    realCurrentProj.packageJson.data.version = atLestVersion;
-    realCurrentProj.packageJson.data.version = realCurrentProj.versionPatchedPlusOne;
-    realCurrentProj.packageJson.save('bump everytime when release');
+    this.bumpVersionForPath(realCurrentProj);
 
 
     this.checkIfLogginInToNpm();

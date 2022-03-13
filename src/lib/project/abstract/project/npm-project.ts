@@ -3,6 +3,7 @@ import { _, CoreConfig } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import chalk from 'chalk';
+import * as semver from 'semver';
 //#endregion
 
 import type { Project } from './project';
@@ -153,6 +154,17 @@ export class NpmProject {
     const versionToUpdate = ver.join('.');
     this.packageJson.data.version = versionToUpdate.toString();
     this.packageJson.save(`[npm-project] updating version path`);
+  }
+
+  bumpVersionForPath(proj: Project) {
+    let atLestVersion = proj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
+    if (semver.gt(proj.version, atLestVersion)) {
+      atLestVersion = proj.version;
+    }
+
+    proj.packageJson.data.version = atLestVersion;
+    proj.packageJson.data.version = proj.versionPatchedPlusOne;
+    proj.packageJson.save('bump everytime when release');
   }
 
   get versionPathAsNumber() {
