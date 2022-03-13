@@ -216,6 +216,7 @@ export class FilesStructure extends FeatureForProject {
     }
     //#endregion
 
+
     if (this.project.isWorkspaceChildProject) {
       const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);
       if (!fse.existsSync(isInNodeMOdules)) {

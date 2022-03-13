@@ -98,10 +98,14 @@ export class ProjectFactory {
     const cwdProj = Project.From<Project>(cwd);
     if (cwdProj && cwdProj.isWorkspace) {
       version = cwdProj._frameworkVersion;
+    } else {
+      version = config.defaultFrameworkVersion;
     }
-    if (cwdProj && cwdProj.isContainer) {
-      version = cwdProj._frameworkVersion;
-    }
+    // if (cwdProj && cwdProj.isContainer) {
+    //   version = cwdProj._frameworkVersion;
+    // }
+
+
 
     Helpers.log(`[create] version: ${version}`);
     Helpers.log(`[create] cwdProj: ${cwdProj && cwdProj.name}`);
@@ -126,6 +130,9 @@ export class ProjectFactory {
 
     let baseline = basedOn ? basedOnProject : Project.by<Project>(type, version);
     Helpers.log(`[create] PROJECT BASELINE ${baseline.name} in ${baseline.location}`);
+
+    console.log({ type, name, cwd, basedOn, version, skipInit, siteProjectMode });
+
 
     await baseline.reset();
     Helpers.log('[create] Baseline reset done')
@@ -291,7 +298,7 @@ export class ProjectFactory {
   public async workspaceFromArgs(args: string, exit = true, cwd: string) {
     const argv = args.split(' ');
 
-    if (!_.isArray(argv) || argv.length < 2) {
+    if (!_.isArray(argv) || argv.length < 1) {
       Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
       this.errorMsgCreateProject()
     }
@@ -307,15 +314,15 @@ export class ProjectFactory {
         + `${config.frameworkName} new: site name - of - workspace - site`
         + `--basedOn relativePathToBaselineWorkspace`, false, true);
     }
-    const type = argv[0] as any;
-    const name = argv[1];
+    const type = 'isomorphic-lib' as any;
+    const name = argv[0];
 
     await this.create({
       type,
       name,
       cwd,
       basedOn: void 0,
-      version: (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
+      version: config.defaultFrameworkVersion, // (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
       skipInit
     });
     if (exit) {

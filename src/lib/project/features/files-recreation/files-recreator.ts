@@ -482,11 +482,15 @@ ${coreFiles}
 
     if (crossPlatformPath(this.project.location) === crossPlatformPath(defaultProjectProptotype.location)) {
       Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project._type} ${this.project._frameworkVersion}`)
-      const toLink = defaultProjectProptotype.projectLinkedFiles()
-      toLink.forEach(c => {
-        Helpers.info(`[LINKING] ${c.relativePath} from ${c.sourceProject.location}  `);
-        Helpers.createSymLink(path.join(c.sourceProject.location, c.relativePath), path.join(this.project.location, c.relativePath));
-      });
+      if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
+        // nothing
+      } else {
+        const toLink = defaultProjectProptotype.projectLinkedFiles()
+        toLink.forEach(c => {
+          Helpers.info(`[LINKING] ${c.relativePath} from ${c.sourceProject.location}  `);
+          Helpers.createSymLink(path.join(c.sourceProject.location, c.relativePath), path.join(this.project.location, c.relativePath));
+        });
+      }
     } else {
       const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
       const projectSpecyficFiles = this.project.projectSpecyficFiles();

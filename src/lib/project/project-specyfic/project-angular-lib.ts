@@ -119,6 +119,10 @@ export class ProjectAngularLib
     //#region @backendFunc
     let files = super.projectLinkedFiles();
 
+    if (this.frameworkVersionAtLeast('v3')) {
+      return files;
+    }
+
     if (this.frameworkVersionAtLeast('v2')) {
       files = files.concat([
         {

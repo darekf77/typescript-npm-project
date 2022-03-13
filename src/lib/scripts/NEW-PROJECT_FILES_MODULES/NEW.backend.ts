@@ -9,12 +9,12 @@ import { ConfigModels } from 'tnp-config';
 export async function NEW(args: string, exit = true) {
   const cwd = crossPlatformPath(process.cwd());
   const argv = args.split(' ');
-  const type = argv[0] as ConfigModels.NewFactoryType;
-  if (type === 'model') {
-    await ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
-  } else {
-    await ProjectFactory.Instance.workspaceFromArgs(args, exit, cwd)
-  }
+  const type = 'isomorphic-lib';  // argv[0] as ConfigModels.NewFactoryType;
+  // if (type === 'model') {
+  //   await ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
+  // } else {
+  await ProjectFactory.Instance.workspaceFromArgs(args, exit, cwd)
+  // }
 }
 export function NEW_SITE(args: string, exit = true) {
   const cwd = crossPlatformPath(process.cwd());
