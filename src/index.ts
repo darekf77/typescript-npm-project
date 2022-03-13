@@ -6,7 +6,3 @@ export * from './global-typings';
 export * from './lib';
 export default start;
 //#endregion
-
-//#region @browser
-console.log('firedev in browser');
-//#endregion
