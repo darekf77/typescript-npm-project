@@ -88,7 +88,7 @@ export abstract class BuildableProject {
               {
                 type: 'checkbox',
                 name: 'projects',
-                message: 'Select projects where to copy bundle after finish: ',
+                message: `Select projects where to copy bundle after ${buildOptions?.watch ? 'each compilation finish' : 'finish'} :`,
                 choices: existedProjects
                   .map(c => {
                     return { value: c.location, name: `${chalk.bold(c.name)} (${c.genericName})` };
@@ -172,8 +172,15 @@ export abstract class BuildableProject {
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
     if (this.parent?.isContainer && this.parent.frameworkVersionAtLeast('v2')) {
+
+      const containerProj = Project.by('container', this._frameworkVersion) as Project;
+
       // const projsChain = this.parent.projectsInOrderForChainBuild([]);
       const projsChain = this.parent.children;
+
+      if (containerProj.packageJson.data.dependencies[this.name]) {
+        projsChain.push(containerProj);
+      }
 
       const projects = projsChain.filter(d => d.name !== this.parent.name
         && d.frameworkVersionAtLeast(this._frameworkVersion)

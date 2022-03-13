@@ -477,10 +477,17 @@ ${coreFiles}
 
     });
 
-    const defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
+    let defaultProjectProptotype: Project;
+
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
+      // nothing here
+    } else {
+      defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
+    }
+
     const files: Models.other.RecreateFile[] = [];
 
-    if (crossPlatformPath(this.project.location) === crossPlatformPath(defaultProjectProptotype.location)) {
+    if (crossPlatformPath(this.project.location) === crossPlatformPath(defaultProjectProptotype?.location)) {
       Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project._type} ${this.project._frameworkVersion}`)
       if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
         // nothing
@@ -491,7 +498,7 @@ ${coreFiles}
           Helpers.createSymLink(path.join(c.sourceProject.location, c.relativePath), path.join(this.project.location, c.relativePath));
         });
       }
-    } else {
+    } else if (defaultProjectProptotype) {
       const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
       projectSpecyficFiles.forEach(f => {
