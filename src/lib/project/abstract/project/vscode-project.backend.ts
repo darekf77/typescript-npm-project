@@ -223,7 +223,8 @@ export abstract class VscodeProject {
       'port': 9229,
       'skipFiles': [
         '<node_internals>/**'
-      ]
+      ],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     };
     //#endregion
 

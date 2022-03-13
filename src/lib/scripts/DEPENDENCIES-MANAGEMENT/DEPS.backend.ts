@@ -184,6 +184,7 @@ export async function $RESET_NPM_ALL(args: string, exit = true) {
   for (let index = 0; index < projects.length; index++) {
     const project = projects[index];
     // console.log(project.project.genericName)
+    // @ts-ignore
     (project.project as Project).packageJson.reset();
   }
   if (exit) {
@@ -546,8 +547,8 @@ EXIT /b
       const copyToChildrens = childrens.filter(ic => c.name !== ic.name);
       const copyToChildrensNames = copyToChildrens.map(ic => ic.name);
       Helpers.log(`Linking ${childGenericName} for every package in container... `);
-      const opt = await BuildOptions.from(`${config.frameworkName} bd`,
-        c, { copyto: copyToChildrens });
+      // @ts-ignore
+      const opt = await BuildOptions.from(`${config.frameworkName} bd`, c, { copyto: copyToChildrens });
       await c.copyManager.initCopyingOnBuildFinish(opt);
       Helpers.log(`Linking ${childGenericName} for every package in container... DONE`);
     }
@@ -620,19 +621,23 @@ async function ACTION_COPYTO(action: 'add' | 'remove', args) {
     const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
     if (cmd) {
       try {
+        // @ts-ignore
         var b = await BuildOptions.from(cmd.command, Project.Current);
       } catch (error) {
         console.log(error);
       }
       if (action === 'add') {
+        // @ts-ignore
         (b.copyto as Project[]).push(proj)
       }
       if (action === 'remove') {
+        // @ts-ignore
         (b.copyto as Project[]) = (b.copyto as Project[]).filter(p => p !== proj);
       }
       Helpers.info(`Updating command`);
       await db.updateCommandBuildOptions(Project.Current.location, b);
       Helpers.info(`Build option update done.. ${action}ed ${chalk.bold(proj.genericName)}`);
+      // @ts-ignore
       await db.triggerChangeForProject(Project.Current, `tnp-copyto-${action}` as any);
     } else {
       Helpers.warn(`No command to update`)

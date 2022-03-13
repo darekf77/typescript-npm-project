@@ -183,7 +183,7 @@ const $KILLALL = () => {
 }
 
 const $KILLALLNODE = () => {
-  if(process.platform === 'win32') {
+  if (process.platform === 'win32') {
     Helpers.run(`taskkill /f /im node.exe`).sync();
     return;
   }
@@ -203,8 +203,8 @@ export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
   const db = await TnpDB.Instance();
-  let projects = (await db.getProjects())
-    .map(p => p.project as Project)
+  // @ts-ignore
+  let projects = (await db.getProjects()).map(p => p.project as Project)
     .filter(p => !p.isGenerated && !p.isGeneratedForRelease);
 
   const igt = path.join((Project.Tnp as Project).location, '../..', 'igt');
@@ -414,10 +414,13 @@ async function $CHILDS_REQUIRED(args: string) {
 
 //#region all projects
 export async function $ALL_PROJECTS(args: string) {
+  //#region @backend
   const db = await TnpDB.Instance();
+  // @ts-ignore
   const projects = (await db.getProjects()).map(p => p.project as Project);
   console.log(projects.map(p => p.info).join('\n'));
   process.exit(0)
+  //#endregion
 }
 //#endregion
 

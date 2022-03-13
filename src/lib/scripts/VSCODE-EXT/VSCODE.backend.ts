@@ -52,7 +52,9 @@ export async function $VSCODE_INIT_ALL() {
   const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
+    // @ts-ignore
     (proj.project as Project).recreate.vscode.settings.excludedFiles();
+    // @ts-ignore
     (proj.project as Project).recreate.vscode.settings.colorsFromWorkspace();
   }
   process.exit(0);
@@ -211,16 +213,19 @@ const $VSCODE_FIX = async () => {
   const projects = await db.getProjects();
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
+    // @ts-ignore
     proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme(false);
   }
   await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
+    // @ts-ignore
     proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme();
   }
   await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
   for (let index = 0; index < projects.length; index++) {
     const proj = projects[index];
+    // @ts-ignore
     proj.project && (proj.project as Project).recreate.vscode.settings.gitReset();
   }
   process.exit(0);

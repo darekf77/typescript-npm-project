@@ -48,14 +48,21 @@ export class CopyManager extends FeatureForProject {
         const db = await TnpDB.Instance();
         const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
         if (cmd) {
+          // @ts-ignore
           const b = await BuildOptions.from(cmd.command, Project.Current);
           Helpers.info(`
 
           COPYTO UPDATED: "${channel}"
 
-          from: ${(this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')}
+          from: ${
+            // @ts-ignore
+            (this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')
+          }
 
-          to: ${(b.copyto as Project[]).map(c => c.name).join(', ')}
+          to: ${
+            // @ts-ignore
+            (b.copyto as Project[]).map(c => c.name).join(', ')
+          }
 
       `)
           this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
@@ -63,11 +70,13 @@ export class CopyManager extends FeatureForProject {
         }
       }
 
+      // @ts-ignore
       db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
         Helpers.log(`[copytomanager] realtime update add`);
         await updateFromDbLastCommand('tnp-copyto-add')();
       });
 
+      // @ts-ignore
       db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
         Helpers.log(`[copytomanager] realtime update remove`);
         await updateFromDbLastCommand('tnp-copyto-remove')();
@@ -83,6 +92,7 @@ export class CopyManager extends FeatureForProject {
   //#region start
   get projectToCopyTo() {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+      // @ts-ignore
       return this.buildOptions.copyto as Project[];
     }
     return [];

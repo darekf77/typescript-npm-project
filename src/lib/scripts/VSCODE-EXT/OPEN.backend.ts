@@ -98,6 +98,7 @@ async function $OPEN(args: string) {
     projects = (Project.Current.children as Project[]).filter(c => c.frameworkVersionAtLeast(name as any));
   } else {
     projects = (await db.getProjects()).filter(p => {
+      // @ts-ignore
       return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
     }).map(c => c.project);
   }

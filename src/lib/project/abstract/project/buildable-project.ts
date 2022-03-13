@@ -105,6 +105,7 @@ export abstract class BuildableProject {
     }
 
     if (buildOptions) {
+      // @ts-ignore
       buildOptions.copyto = result;
       await db.updateCommandBuildOptions(project.location, buildOptions);
       await db.updateBuildOptions(buildOptions, process.pid);
@@ -282,6 +283,7 @@ export abstract class BuildableProject {
         // (this.buildOptions.copyto as any[]).forEach((p: Project) => unique[p.location] = p);
         // this.buildOptions.copyto = Object.keys(unique).map(location => unique[location]);
         if (!(this.isStandaloneProject && this.node_modules.isLink)) {
+          // @ts-ignore
           if ((this.buildOptions.copyto as Project[]).includes(this)) {
             Helpers.log(`
 
@@ -292,6 +294,7 @@ export abstract class BuildableProject {
             - componetnts (for angular-lib)
 
             `);
+            // @ts-ignore
             (this.buildOptions.copyto as Project[]) = (this.buildOptions.copyto as Project[]).filter(p => p !== this);
           }
         }
@@ -313,12 +316,15 @@ export abstract class BuildableProject {
     }
 
     // TODO QUICK FIX
+    // @ts-ignore
     this.buildOptions.copyto = (this.buildOptions.copyto ? this.buildOptions.copyto : []);
 
+    // @ts-ignore
     this.buildOptions.copyto = (this.buildOptions.copyto as Project[]).filter(f => f.typeIs('angular-lib', 'isomorphic-lib'));
 
     let withoutNodeModules: Project[] = [];
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
+      // @ts-ignore
       (this.buildOptions.copyto as Project[]).forEach((c) => {
         Helpers.info(`Checking node_modules for ${c.genericName}`);
         if (!c.node_modules.exist) {

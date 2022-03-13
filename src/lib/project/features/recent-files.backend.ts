@@ -41,6 +41,7 @@ export class RecentFilesForContainer extends FeatureForProject {
       watch: true,
     });
     const container = this.project;
+    // @ts-ignore
     const onlyChildren = builds.map(c => c.project as Project).filter(p => p.location.startsWith(container.location));
     this.setFrom(onlyChildren.map(c => {
       return c.location.replace(`${container.location}/`, '');
