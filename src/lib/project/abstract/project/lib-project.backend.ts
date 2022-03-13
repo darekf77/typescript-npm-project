@@ -167,6 +167,12 @@ export abstract class LibProject {
 
         Helpers.removeFolderIfExists(baseFolder);
 
+        const browserFolder = path.join(this.location, config.folder.browser);
+
+        if (!Helpers.exists(browserFolder, false)) {
+          Helpers.remove(browserFolder);
+        }
+
         Helpers.removeFolderIfExists(absolutePathReleaseProject);
         Helpers.mkdirp(absolutePathReleaseProject);
         this.copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
