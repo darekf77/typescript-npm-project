@@ -373,7 +373,7 @@ export class ProjectIsomorphicLib
         `);
 
     const webpackCommandFn = (watchCommand: boolean) =>
-      `npm-run webpack --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
+      `npx webpack@3.10.0 --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
 
@@ -429,7 +429,12 @@ export class ProjectIsomorphicLib
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
         try {
           this.run(webpackCommand).sync();
+        } catch (er) {
+          Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
+        }
+        await this.browserCodePreventer.start('browser code preventer');
 
+        try {
           if (obscure || uglify) {
             this.backendCompileToEs5();
           }
@@ -444,18 +449,17 @@ export class ProjectIsomorphicLib
           };
           // process.exit(0)
         } catch (er) {
-          Helpers.error(`BUNDLE production build failed`, false, true);
+          Helpers.error(`BUNDLE (obscure || uglify || nodts) process failed`, false, true);
         }
         await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
         await proxyProject.run(angularCommand).sync()
+
       } else {
         await this.incrementalBuildProcess.start('isomorphic compilation');
         await proxyProject.run(angularCommand).sync()
-        // if (outDir === 'bundle') {
-        //   this.buildAngularVer();
-        // }
+        await this.browserCodePreventer.start('browser code preventer');
       }
-      await this.browserCodePreventer.start('browser code preventer');
+
     }
 
     //#endregion

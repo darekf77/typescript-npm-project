@@ -190,6 +190,7 @@ export class SourceModifier extends SourceModForSite {
   }
 
   process(input: string, relativePath: string) {
+
     const modType = this.getModType(this.project, relativePath);
     // Helpers.log(`[sourceModifier][process] modType: ${modType}, relative path: ${relativePath}`);
     // if (modType === 'tmp-src-for') {
@@ -197,7 +198,7 @@ export class SourceModifier extends SourceModForSite {
     //   // return input;
     // }
     // console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
-    input = Helpers.tsCodeModifier.fixApostrphes(input);
+    // input = Helpers.tsCodeModifier.fixApostrphes(input); TODO QUICK_FIX @LAST @UNCOMMENT
     // input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);
     if (this.project.isWorkspaceChildProject) {

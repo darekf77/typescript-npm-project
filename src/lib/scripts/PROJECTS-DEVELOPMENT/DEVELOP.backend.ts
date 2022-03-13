@@ -339,7 +339,7 @@ export async function $INFO(args: string) {
     `)
   } else {
     const proj = Project.Current as Project;
-    console.clear()
+    // console.clear()
     console.info(`
 
     name: ${proj.name}

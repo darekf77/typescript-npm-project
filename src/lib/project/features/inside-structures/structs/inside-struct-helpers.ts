@@ -30,10 +30,11 @@ export function recreateApp(project: Project) {
       const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
       const moduleName = `${_.upperFirst(_.camelCase(project.name))}Module`;
 
+      // TODO quick fix for @ browser remover
       Helpers.writeFile(appFile, `
 
-//#region @notForNpm
-//#region @browser
+${'//#region'} @notForNpm
+${'//#region'} @${'bro'+'wser'}
 import { NgModule } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 
@@ -63,9 +64,9 @@ async function start(port: number)  {
 
 export default start;
 
-//#endregion
+${'//#endregion'}
 
-//#endregion
+${'//#endregion'}
 
 
 

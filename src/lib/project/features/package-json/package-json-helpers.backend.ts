@@ -722,22 +722,22 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       }
     });
 
-  if (project.isContainerCoreProject) {
-    const all = project.trustedAllPossible;
-    const trusted = project.trusted;
 
-    all.forEach(trustedDep => {
+  const all = project.trustedAllPossible;
+  const trusted = project.trusted;
 
-      const dep = project.packageJson.data.dependencies[trustedDep];
-      const devDep = project.packageJson.data.devDependencies[trustedDep];
-      if (dep && !trusted.includes(trustedDep)) {
-        delete project.packageJson.data.dependencies[trustedDep];
-      }
-      if (devDep && !trusted.includes(trustedDep)) {
-        delete project.packageJson.data.devDependencies[trustedDep];
-      }
+  all.forEach(trustedDep => {
 
-    });
-  }
+    const dep = project.packageJson.data.dependencies[trustedDep];
+    const devDep = project.packageJson.data.devDependencies[trustedDep];
+    if (dep && !trusted.includes(trustedDep)) {
+      delete project.packageJson.data.dependencies[trustedDep];
+    }
+    if (devDep && !trusted.includes(trustedDep)) {
+      delete project.packageJson.data.devDependencies[trustedDep];
+    }
+
+  });
+
 }
 //#endregion

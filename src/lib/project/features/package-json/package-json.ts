@@ -4,9 +4,9 @@ import { PackageJsonBase } from './package-json-base.backend';
 //#endregion
 import {
   //#region @backend
-  crossPlatformPath, path,
+  crossPlatformPath, path, fse,
   //#endregion
-  _, Helpers, fse
+  _, Helpers
 } from 'tnp-core';
 import { Morphi } from 'morphi';
 import type { Project } from '../../abstract';

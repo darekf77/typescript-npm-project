@@ -207,6 +207,26 @@ export abstract class BuildableProject {
   //#region @backend
   async build(this: Project, buildOptions?: BuildOptions) {
     // Helpers.log(`BUILD OPTIONS: ${JSON10.stringify(buildOptions)}`)
+
+    //#region TODO refactor this part
+    const { obscure, uglify, nodts }: {
+      obscure: boolean,
+      nodts: boolean,
+      uglify: boolean
+    } = require('minimist')(buildOptions.args.split(' '));
+
+    if (_.isUndefined(buildOptions.obscure) && obscure) {
+      buildOptions.obscure = true;
+    }
+    if (_.isUndefined(buildOptions.nodts) && nodts) {
+      buildOptions.nodts = true;
+    }
+    if (_.isUndefined(buildOptions.uglify) && uglify) {
+      buildOptions.uglify = true;
+    }
+    //#endregion
+
+
     if (this.typeIs('unknow')) {
       return;
     }
