@@ -164,7 +164,7 @@ export class NpmProject {
 
     proj.packageJson.data.version = atLestVersion;
     proj.packageJson.data.version = proj.versionPatchedPlusOne;
-    proj.packageJson.save('bump everytime when release');
+    proj.packageJson.save('bump for patch release');
   }
 
   get versionPathAsNumber() {
