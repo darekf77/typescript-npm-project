@@ -397,7 +397,7 @@
           },
           essentials: {
             "element-resize-detector": "1.1.15",
-            "static-columns": "2.0.17",
+            "static-columns": '13.0.1',
             "bs4-breakpoint": "2.0.42",
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
@@ -567,7 +567,7 @@
   },
 
   scripts: {
-    activate: "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd",
+    activate: "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd && tnp env:install",
   },
 
   license: "MIT",

@@ -230,8 +230,9 @@
   },
   "lastBuildTagHash": "276554446fb0d5db1d989542c222309451e09090",
   "scripts": {
-    "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd"
+    "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd && tnp env:install"
   },
   "license": "MIT",
-  "private": false
+  "private": false,
+  "devDependencies": {}
 }

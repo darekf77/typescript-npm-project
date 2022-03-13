@@ -12,6 +12,7 @@ import { config } from 'tnp-config';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
 import { RegionRemover } from '../project/compilers/build-isomorphic-lib/region-remover.backend';
 import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/cutCodeFn.backend';
+import { CLI } from 'tnp-cli';
 declare const ENV: any;
 // console.log('hello')
 
@@ -23,6 +24,15 @@ function $CONFIGS() {
 function CHECK_ENV() {
   Helpers.checkEnvironment(config.required);
   process.exit(0)
+}
+
+function ENV_INSTALL() {
+  CLI.installEnvironment(config.required);
+  process.exit(0)
+}
+
+function INSTALL_ENV() {
+  ENV_INSTALL()
 }
 
 
@@ -222,7 +232,7 @@ export function $PRINT_RELATIVES(folder) {
 
   console.log(`
 
-  ${files.map( f => `'${f}'` ).join(',\n')}
+  ${files.map(f => `'${f}'`).join(',\n')}
 
   `);
   process.exit(0)
@@ -256,5 +266,6 @@ export default {
   $CONFIGS: Helpers.CLIWRAP($CONFIGS, '$CONFIGS'),
   CHECK_ENV: [Helpers.CLIWRAP(CHECK_ENV, 'CHECK_ENV'), `Sample docs`],
   ENV_CHECK: Helpers.CLIWRAP(ENV_CHECK, 'ENV_CHECK'),
-
+  ENV_INSTALL: Helpers.CLIWRAP(ENV_INSTALL, 'ENV_INSTALL'),
+  INSTALL_ENV: Helpers.CLIWRAP(INSTALL_ENV, 'INSTALL_ENV'),
 }
