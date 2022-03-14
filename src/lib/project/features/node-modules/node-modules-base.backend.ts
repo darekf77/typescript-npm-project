@@ -51,7 +51,6 @@ export class NodeModulesBase extends NodeModulesCore {
 
       `);
 
-      // @LAST TODO
 
       const filtered = packagesToLinkOrCopy
         .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f));

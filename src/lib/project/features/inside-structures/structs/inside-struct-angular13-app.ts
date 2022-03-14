@@ -103,7 +103,7 @@ ${appModuleFile}
             `${moduleName},`
           );
 
-          if (!watchBuild) { // TODO @LAST it will colide with ng serve ?
+          if (!watchBuild) { // TODO it will colide with ng serve ?
             appModuleFile = appModuleFile
               .replace(new RegExp(Helpers.escapeStringForRegEx('//bundleOnly'), 'g'), '');
           }
