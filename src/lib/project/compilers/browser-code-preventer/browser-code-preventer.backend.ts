@@ -5,10 +5,10 @@ import { Models } from 'tnp-models';
 import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import type { Project } from '../../abstract/project/project';
 import { RegionRemover } from '../build-isomorphic-lib/region-remover.backend';
-const FIXED = '// @fixed';
+const FIXED = '/* @fixed */ ';
 
 
-function pathes(project: Project) { // TODO @LAST OPTIMIZE THIS
+function pathes(project: Project) { // TODO  OPTIMIZE THIS
   const pattern = ''
   return [
     path.join(project.location, config.folder.dist) + pattern,
@@ -97,9 +97,25 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     // } sd
 
     const content = Helpers.readFile(fileAbsolutePath);
-    if (content && !content.trimRight().endsWith(FIXED)) {
-      const raw = RegionRemover.from(fileAbsolutePath, content, ['@browser' as any], this.project as Project);
-      Helpers.writeFile(fileAbsolutePath, raw.output + '\n' + FIXED)
+    if (content && !content.trimLeft().startsWith(FIXED)) {
+      let raw = content;
+
+      let removeNext = false;
+      raw = raw.split('\n').map((l, i) => {
+        if (removeNext) {
+          removeNext = false;
+          return '/* browser code */';
+        }
+        if (l.search('@browserLine') !== -1) {
+          removeNext = true;
+          return '/* browser code */';
+        }
+        return l;
+      }).join('\n')
+
+      // @ts-ignore
+      raw = RegionRemover.from(fileAbsolutePath, raw, ['@browser'], this.project as Project).output;
+      Helpers.writeFile(fileAbsolutePath, FIXED + raw)
     }
 
   }

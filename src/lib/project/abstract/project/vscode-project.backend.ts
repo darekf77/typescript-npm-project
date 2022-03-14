@@ -237,6 +237,7 @@ export abstract class VscodeProject {
         'program': '${workspaceFolder}/run.js',
         'cwd': void 0,
         'args': [],
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"],
         'runtimeArgs': [
           '--nolazy', '-r', 'ts-node/register',
           '--experimental-worker'

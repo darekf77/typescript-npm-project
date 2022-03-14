@@ -110,15 +110,19 @@ export class Region {
 
             let out = (isArr ? rep[1] : '') as string;
 
+            const verticalLength = regionOrString.toString().split('\n').length - 1;
+
             if (regionOrString.containsTitle(regionTag)) {
               if (
                 regionTag.toLowerCase() === '@backend'.toLowerCase()
                 ||
                 regionTag.toLowerCase() === '@notForNpm'.toLowerCase()
-                ||
-                regionTag.toLowerCase() === '@browser'.toLowerCase()
               ) {
                 // nothing here
+              }
+              if (regionTag.toLowerCase() === '@browser'.toLowerCase()) {
+
+                out = `${_.times(verticalLength).map(n => '/* browser code */\n').join('')}  ${out}`;
               }
               if (
                 regionTag.toLowerCase() === '@backendFunc'.toLowerCase()

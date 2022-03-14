@@ -40,7 +40,9 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
     }
   ],
   "compounds": [

@@ -13,7 +13,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
-const loadNvm =  'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
+const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 
 //#region @backend
 @CLASS.NAME('ProjectIsomorphicLib')
@@ -56,7 +56,6 @@ export class ProjectIsomorphicLib
     const files = [
       'angular.json.filetemplate',
       'ngsw-config.json.filetemplate',
-      'tsconfig.ng.json.filetemplate'
     ];
     return [
       ...files,
@@ -368,9 +367,9 @@ export class ProjectIsomorphicLib
 
         ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
 
-        command: ${angularCommand}
-
         `);
+
+    Helpers.log(` command: ${angularCommand}`);
 
     const webpackCommandFn = (watchCommand: boolean) =>
       `npx webpack@3.10.0 --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
@@ -382,9 +381,8 @@ export class ProjectIsomorphicLib
         WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''
       } BACKEND BUILD started...
 
-        command: ${webpackCommand}
-
         `);
+    Helpers.log(` command: ${webpackCommand}`);
 
 
 
@@ -419,7 +417,7 @@ export class ProjectIsomorphicLib
             await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
           }
         });
-      if (this.frameworkVersionAtLeast('v3')) { // TOOD @LAST
+      if (this.frameworkVersionAtLeast('v3')) { // TOOD
         await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
       }
 

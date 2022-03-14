@@ -198,7 +198,7 @@ export class SourceModifier extends SourceModForSite {
     //   // return input;
     // }
     // console.log(`modType: ${modType}, relatiePath: ${relativePath}`)
-    // input = Helpers.tsCodeModifier.fixApostrphes(input); TODO QUICK_FIX @LAST @UNCOMMENT
+    // input = Helpers.tsCodeModifier.fixApostrphes(input); TODO QUICK_FIX @UNCOMMENT
     // input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);
     if (this.project.isWorkspaceChildProject) {

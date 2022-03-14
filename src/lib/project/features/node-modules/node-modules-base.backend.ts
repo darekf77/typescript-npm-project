@@ -51,110 +51,52 @@ export class NodeModulesBase extends NodeModulesCore {
 
       `);
 
-      if (false
-        // this.project.frameworkVersionAtLeast('v3')
-      ) {
-        //#region copy / link process
-        // const allowedAsFolder = [
-        //   ...source.isomorphicPackages,
-        // ];
-        // //#endregion
+      // @LAST TODO
 
-        // packagesToLinkOrCopy
-        //   .filter(f => path.basename(f) !== this.project.name) // TODO check this fix for weird things with /browser
-        //   .forEach(f => {
-        //     const basename = path.basename(f);
+      const filtered = packagesToLinkOrCopy
+        .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f));
 
-        //     const needsCopy = !_.isUndefined(allowedAsFolder.find(p => {
-        //       if (p.endsWith('*')) {
-        //         return basename.startsWith(p.replace('*', ''));
-        //       } else {
-        //         return p === basename;
-        //       }
-        //     }));
-
-        //     const dest = path.join(this.project.node_modules.path, path.basename(f));
-        //     if (needsCopy) {  //// TODO UNCOMMENT angular-lib v3 smart install
-        //       const realFileOrFolderPath = Helpers.isLink(f) ? fse.realpathSync(f) : f;
-        //       if (Helpers.exists(realFileOrFolderPath)) {
-        //         if (Helpers.isFile(realFileOrFolderPath)) {
-        //           Helpers.copyFile(realFileOrFolderPath, dest);
-        //         }
-        //         if (Helpers.isFolder(realFileOrFolderPath)) {
-        //           Helpers.removeFolderIfExists(dest);
-        //           Helpers.copy(realFileOrFolderPath, dest, {
-        //             asSeparatedFiles: true,
-        //             asSeparatedFilesSymlinkAsFile: false,
-        //             // copySymlinksAsFiles: (basename !== '.bin'),
-        //           });
-        //         }
-        //       } else {
-        //         Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `
-        //           + `${path.basename(f)}`, false);
-        //       }
-        //     } else {
-        //       if (process.platform === 'win32') {
-        //         // TODO QUICK_FIX on windows you can't create link to link
-        //         Helpers.createSymLink(fse.realpathSync(f), dest, { speedUpProcess: true });
-        //       } else {
-        //         Helpers.createSymLink(f, dest, { speedUpProcess: true });
-        //       }
-        //     }
-        //   });
-      } else {
-
-        packagesToLinkOrCopy
-          .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f)) // TODO check this fix for weird things with /browser
-          .forEach(f => {
-            const dest = path.join(this.project.node_modules.path, path.basename(f));
-            if (['.bin', '.install-date'].includes(path.basename(f))) {
-              const linkFromBin = fse.realpathSync(f);
-              if (Helpers.exists(linkFromBin)) {
-                if (Helpers.isFile(linkFromBin)) {
-                  Helpers.copyFile(linkFromBin, dest);
-                }
-                if (Helpers.isFolder(linkFromBin)) {
-                  Helpers.removeFolderIfExists(dest);
-                  // Helpers.copy(linkFromBin, dest, {
-                  //   errorOnExist: false,
-                  //   filter: (f) => {
-                  //     return
-                  //   }
-                  // });
-                  // try {
-                  //   Helpers.copy(linkFromBin)
-                  // } catch (error) {
-
-                  // }
-                  const all = Helpers.filesFrom(linkFromBin);
-                  all.forEach(f => {
-                    Helpers.removeFileIfExists(path.join(dest, path.basename(f)));
-                    if (Helpers.exists(f, false)) {
-                      f = fse.realpathSync(f);
-                      // const file = Helpers.readFile(f);
-                      // file.replace( new RegExp(),`require('../${path.basename(f)}/lib` )
-                      // `require('../lib`
-                      Helpers.createSymLink(f, path.join(dest, path.basename(f)));
-                    } else {
-                      Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed file from bin `
-                        + `${path.basename(f)}`, false);
-                    }
-                  });
-                }
-              } else {
-                Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `
-                  + `${path.basename(f)}`, false);
-              }
-            } else {
-              if (process.platform === 'win32') {
-                // TODO QUICK_FIX on windows you can't create link to link
-                Helpers.createSymLink(fse.realpathSync(f), dest, { speedUpProcess: true });
-              } else {
-                Helpers.createSymLink(f, dest, { speedUpProcess: true });
-              }
+      filtered.forEach(f => {
+        const dest = path.join(this.project.node_modules.path, path.basename(f));
+        if (['.bin', '.install-date'].includes(path.basename(f))) {
+          //#region handle specyfick folders and files
+          const linkFromBin = fse.realpathSync(f);
+          if (Helpers.exists(linkFromBin)) {
+            if (Helpers.isFile(linkFromBin)) {
+              Helpers.copyFile(linkFromBin, dest);
             }
-          });
-      }
+            if (Helpers.isFolder(linkFromBin)) {
+              Helpers.removeFolderIfExists(dest);
+              const all = Helpers.filesFrom(linkFromBin);
+              all.forEach(f => {
+                Helpers.removeFileIfExists(path.join(dest, path.basename(f)));
+                if (Helpers.exists(f, false)) {
+                  f = fse.realpathSync(f);
+                  // const file = Helpers.readFile(f);
+                  // file.replace( new RegExp(),`require('../${path.basename(f)}/lib` )
+                  // `require('../lib`
+                  Helpers.createSymLink(f, path.join(dest, path.basename(f)));
+                } else {
+                  Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed file from bin `
+                    + `${path.basename(f)}`, false);
+                }
+              });
+            }
+          } else {
+            Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `
+              + `${path.basename(f)}`, false);
+          }
+          //#endregion
+        } else {
+          if (process.platform === 'win32') {
+            // TODO QUICK_FIX on windows you can't create link to link
+            Helpers.createSymLink(fse.realpathSync(f), dest, { speedUpProcess: true });
+          } else {
+            Helpers.createSymLink(f, dest, { speedUpProcess: true });
+          }
+        }
+      });
+
 
 
       return;

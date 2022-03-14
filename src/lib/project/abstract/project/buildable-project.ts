@@ -178,9 +178,6 @@ export abstract class BuildableProject {
       // const projsChain = this.parent.projectsInOrderForChainBuild([]);
       const projsChain = this.parent.children;
 
-      if (containerProj.packageJson.data.dependencies[this.name]) {
-        projsChain.push(containerProj);
-      }
 
       const projects = projsChain.filter(d => d.name !== this.parent.name
         && d.frameworkVersionAtLeast(this._frameworkVersion)
@@ -191,8 +188,17 @@ export abstract class BuildableProject {
           'workspace',
           'scenario',
           'electron-client',
-          'ionic-client'
+          'ionic-client',
+          'container'
         ));
+
+      if (containerProj.packageJson.data.dependencies[this.name]
+        || Object.keys(config.frameworkNames).includes(this.name) // TODO QUICK_FIX
+      ) {
+        Helpers.info(`UPDATING ALSO container core ${this._frameworkVersion}...`)
+        projects.push(containerProj);
+      }
+
       this.buildOptions.copyto = projects as any;
     } else {
       const db = await TnpDB.Instance();
@@ -313,7 +319,7 @@ export abstract class BuildableProject {
           const projectCurrent = this;
           const projectName = projectCurrent.name;
           const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`);
-          Helpers.info(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
+          Helpers.log(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
         });
       }
 
@@ -327,7 +333,15 @@ export abstract class BuildableProject {
     this.buildOptions.copyto = (this.buildOptions.copyto ? this.buildOptions.copyto : []);
 
     // @ts-ignore
-    this.buildOptions.copyto = (this.buildOptions.copyto as Project[]).filter(f => f.typeIs('angular-lib', 'isomorphic-lib'));
+    this.buildOptions.copyto = (this.buildOptions.copyto as Project[]).filter(f => {
+      if (f.typeIs('angular-lib', 'isomorphic-lib')) {
+        return true;
+      }
+      if (f.isContainerCoreProject) {
+        return true;
+      }
+      return false;
+    });
 
     let withoutNodeModules: Project[] = [];
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
