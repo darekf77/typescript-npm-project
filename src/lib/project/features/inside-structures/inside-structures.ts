@@ -57,7 +57,7 @@ export class InsideStructures extends FeatureForProject {
   //#region api
 
   //#region api / recreate
-  public async recrate(outFolder: ConfigModels.OutFolder) {
+  public async recrate(outFolder: ConfigModels.OutFolder, watchBuild = true) {
 
     const clients: Project[] = this.project.isWorkspaceChildProject
       ? this.project.parent.childrenThatAreLibs : [];
@@ -76,7 +76,8 @@ export class InsideStructures extends FeatureForProject {
           outFolder,
           projectName: this.project.name,
           projectLocation: path.join(this.project.location),
-          client
+          client,
+          watchBuild,
         } as any;
 
         const replacement = (pathOrg) => {

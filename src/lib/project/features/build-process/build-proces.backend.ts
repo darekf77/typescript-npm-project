@@ -175,7 +175,7 @@ inside generated projects...
       }
 
       if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
-        this.project.insideStructure.recrate(buildOptions.outDir as any);
+        this.project.insideStructure.recrate(buildOptions.outDir as any, buildOptions.watch);
       }
 
       if (buildOptions.watch) {

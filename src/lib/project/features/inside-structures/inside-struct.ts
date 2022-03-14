@@ -7,6 +7,7 @@ export type Opt = {
   projectLocation?: string;
   client?: Project;
   replacement?: Function;
+  watchBuild?: boolean;
 };
 
 export type LinkType = (options: Opt) => string;

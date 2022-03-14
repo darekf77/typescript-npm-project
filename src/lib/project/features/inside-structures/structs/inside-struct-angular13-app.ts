@@ -80,7 +80,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         ],
         //#endregion
       ],
-      endAction: (({ outFolder, projectName, client, replacement }) => {
+      endAction: (({ outFolder, projectName, client, watchBuild, replacement }) => {
         //#region action after recreating/updating inside strcut
 
         //#region replace app.module.ts
@@ -102,6 +102,12 @@ ${appModuleFile}
             '//<<<TO_REPLACE_MODULE>>>',
             `${moduleName},`
           );
+
+          if (!watchBuild) { // TODO @LAST it will colide with ng serve ?
+            appModuleFile = appModuleFile
+              .replace(new RegExp(Helpers.escapeStringForRegEx('//bundleOnly'), 'g'), '');
+          }
+
           Helpers.writeFile(appModuleFilePath, appModuleFile);
         })();
         //#endregion
@@ -125,6 +131,8 @@ ${appModuleFile}
           Helpers.writeFile(appModuleFilePath, appHtmlFile);
         })();
         //#endregion
+
+
 
         //#region link assets
         (() => {
