@@ -171,7 +171,13 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           ),
         ].forEach(f => {
           let content = Helpers.readFile(f) || '';
-          content = content.replace(new RegExp('my\\-lib', 'g'), projectName)
+          content = content.replace(new RegExp('my\\-lib', 'g'), projectName);
+          if (path.basename(f) === 'tsconfig.json') {
+            content = content.replace(
+              new RegExp(Helpers.escapeStringForRegEx(`"dist/${projectName}`), 'g'),
+               `"../../${outFolder}/browser/${projectName}`);
+          }
+
           Helpers.writeFile(f, content);
         });
 

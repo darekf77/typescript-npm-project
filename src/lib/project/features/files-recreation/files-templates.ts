@@ -67,49 +67,54 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       .split('\n')
       .filter(line => !line.trimLeft().startsWith('#'))
       .map(line => {
-        const matches = line.match(/\{\{\{.*\}\}\}/);
-        if (_.isArray(matches)) {
-          matches.forEach(pattern => {
-            const expression = pattern.replace(/(\{|\})/g, '');
-            // const reservedExpSec = ENV;
-            // const reservedExpOne = _;
-            // console.log('varssss: ', pattern)
-            const exp = `(function(ENV,_){
-              // console.log(typeof ENV)
-              return ${expression.trim()}
-            })(reservedExpSec,reservedExpOne)`;
-            // console.log(exp)
 
-            //     console.log(`Eval expre
+        const simpleLines = line.split('}}}').filter(f => !!f?.trim())
+        simpleLines.forEach(l => {
+          const matches = (l + '}}}').match(/\{\{\{.*\}\}\}/);
+          if (_.isArray(matches)) {
+            matches.forEach(pattern => {
+              const expression = pattern.replace(/(\{|\})/g, '');
+              // const reservedExpSec = ENV;
+              // const reservedExpOne = _;
+              // console.log('varssss: ', pattern)
+              const exp = `(function(ENV,_){
+                // console.log(typeof ENV)
+                return ${expression.trim()}
+              })(reservedExpSec,reservedExpOne)`;
+              // console.log(exp)
 
-            // ${exp}
+              //     console.log(`Eval expre
 
-            // `);
+              // ${exp}
 
-            try {
-              var toReplace = eval(exp);
-              line = line.replace(pattern, toReplace);
-            } catch (err) {
-              Helpers.info(`
+              // `);
 
-              exp: ${exp}
+              try {
+                var toReplace = eval(exp);
+                line = line.replace(new RegExp(Helpers.escapeStringForRegEx(pattern), 'g'), toReplace);
+              } catch (err) {
+                Helpers.info(`
 
-              pattern: ${pattern}
+                exp: ${exp}
 
-              toReplace: ${toReplace}
+                pattern: ${pattern}
 
-              line: ${line}
+                toReplace: ${toReplace}
 
-              err: ${err}
+                line: ${line}
+
+                err: ${err}
 
 
-              `);
-              Helpers.error(`Error during filtemplate parse: ${orgFilePath}`, true, true);
-              Helpers.error(err, soft, true);
-            }
-            // console.log('toReplace', toReplace)
-          });
-        }
+                `);
+                Helpers.error(`Error during filtemplate parse: ${orgFilePath}`, true, true);
+                Helpers.error(err, soft, true);
+              }
+              // console.log('toReplace', toReplace)
+            });
+          }
+        })
+
         return line;
       }).join('\n');
 

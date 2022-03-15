@@ -283,12 +283,12 @@ export abstract class BuildableProject {
         }
       }
 
-      if (this.node_modules.isLink && buildOptions.outDir === 'dist') {
-        if (!_.isArray(this.buildOptions.copyto)) {
-          this.buildOptions.copyto = [];
-        }
-        this.buildOptions.copyto.push(this as any);
-      }
+      // // TODO  -> FOR BUNDLE copyt node_modules not link
+      // if (!_.isArray(this.buildOptions.copyto)) {
+      //   this.buildOptions.copyto = [];
+      // }
+      // this.buildOptions.copyto.push(this as any);
+
 
       if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
 

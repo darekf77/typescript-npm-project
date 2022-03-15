@@ -122,9 +122,11 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
 
 
   async syncAction(absoluteFilePathes: string[]) {
+    Helpers.info('fixing @browser code started...')
     absoluteFilePathes.forEach(f => {
       this.fix(f);
     });
+    Helpers.info('fixing @browser code.. done')
   }
 
 }

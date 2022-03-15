@@ -210,6 +210,27 @@ export default _default;
   }
 
   public linkSourceOfItselfToNodeModules() {
+    // if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v3')) {
+    //   // (() => { // TODO this cannot be done with direct ts-compilation
+    //   //   const source = crossPlatformPath(path.join(this.project.location, config.folder.dist, config.folder.browser));
+    //   //   const dest = crossPlatformPath(path.join(this.project.location, config.folder.dist, 'lib', config.folder.browser));
+    //   //   Helpers.removeIfExists(dest);
+    //   //   if (!Helpers.exists(path.dirname(dest))) {
+    //   //     Helpers.mkdirp(dest);
+    //   //   }
+    //   //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+    //   // })();
+
+    //   (() => {
+    //     const source = crossPlatformPath(path.join(this.project.location, config.folder.dist));
+    //     const dest = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
+    //     Helpers.removeIfExists(dest);
+    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+    //   })();
+
+    //   return;
+    // }
+
     return;
     // if (!this.project.isStandaloneProject) {
     //   return;

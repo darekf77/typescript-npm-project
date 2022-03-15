@@ -315,6 +315,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
+  protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
+    return super.getInlinePackage(packageName, packagesNames.concat(this.project.name))
+  }
+
   //#region remove from line pkg
   replaceFromLine(pkgName: string, imp: string) {
     // console.log(`Check package: "${pkgName}"`)

@@ -46,16 +46,7 @@ export class CodeCut {
 
 export class BrowserCodeCut {
 
-  public static IsomorphicLibs = [
-    'ng2-rest',
-    'typeorm',
-    'ng2-logger',
-    'morphi',
-    'tnp-bundle',
-    'typescript-class-helpers',
-    'lodash-walk-object',
-    'json10',
-  ];
+  public static IsomorphicLibs = [];
   public static resolveAndAddIsomorphicLibs(libsNames: string[]) {
     this.IsomorphicLibs = this.IsomorphicLibs.concat(libsNames);
   }
@@ -154,13 +145,13 @@ export class BrowserCodeCut {
     * Check if package of isomorphic-lib type
     * @param packageName
     */
-  protected getInlinePackage(packageName: string): Models.InlinePkg {
+  protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
 
     // console.log('MORPHI this.isomorphicLibs', this.isomorphicLibs)
     let realName = packageName;
     let isIsomorphic = false;
     if (packageName !== void 0) {
-      isIsomorphic = !!BrowserCodeCut.IsomorphicLibs
+      isIsomorphic = !!packagesNames
         .find(p => {
           if (p === packageName) {
             return true;
@@ -250,7 +241,7 @@ export class BrowserCodeCut {
     return this;
   }
 
-  replaceRegionsForIsomorphicLib(options:  Models.dev.ReplaceOptionsExtended) {
+  replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
     // console.log('options.replacements', options.replacements)
     if (this.absoluteFilePath.endsWith('.ts')) {
