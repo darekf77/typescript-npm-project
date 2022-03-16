@@ -6,7 +6,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
-import { BrowserCodeCutExtended } from './browser-code-cut.backend';
+import { BrowserCodeCutExtended } from './browser-code-cut-extended.backend';
 import { BuildOptions } from 'tnp-db';
 import { CodeCut } from './browser-code-cut';
 
@@ -39,12 +39,13 @@ export class ExtendedCodeCut extends CodeCut {
       this.compilationProject,
       this.buildOptions,
       this.sourceOutBrowser
-    ).replaceRegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
-      .flatTypescriptImportExport('import')
-      .flatTypescriptImportExport('export')
-      .replaceRegionsFromTsImportExport('import')
-      .replaceRegionsFromTsImportExport('export')
-      .replaceRegionsFromJSrequire()
+    )
+      .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
+      .FLATTypescriptImportExport('export')
+      .FLATTypescriptImportExport('import')
+      .REPLACERegionsFromTsImportExport('export')
+      .REPLACERegionsFromTsImportExport('import')
+      .REPLACERegionsFromJSrequire()
       .saveOrDelete();
   }
 

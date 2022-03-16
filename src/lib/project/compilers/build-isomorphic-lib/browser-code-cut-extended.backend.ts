@@ -30,16 +30,6 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
-  //#region debug
-  debug(fileName: string) {
-    // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-    if (this.project) {
-      this.isDebuggingFile = true; // (path.basename(this.absoluteFilePath) === fileName);
-    }
-
-  }
-  //#endregion
-
   //#region handle tick in code
   handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
@@ -408,40 +398,16 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#region replace regions for isomorphic-lib/angular-lib
   private options: Models.dev.ReplaceOptionsExtended;
   // @ts-ignore
-  replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+  REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
     options = _.clone(options);
     this.options = options;
     // console.log('options.replacements', options.replacements)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-      //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
-      //       Helpers.log(`
-      //       INPUT ${path.basename(this.absoluteFilePath)}:
-      // ************************************************************
-      //       ${this.rawContent}
-      // ************************************************************
-      //       `);
-      //     }
-
-
 
       this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
-
-      // this.rawContent = this.replaceRegionsWith(rrr, options.replacements, '', ext);
-      // Helpers.info(`PROCESING WITH DEEP region`)
       this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements, this.project).output;
-
-      //     if ((!_.isUndefined(depbugFiles.find(f => this.absoluteFilePath.endsWith(f))))) {
-      //       Helpers.log(`
-      //       OUTPUT ${path.basename(this.absoluteFilePath)}:
-      // ************************************************************
-      //       ${this.rawContent}
-      // ************************************************************
-      //       `);
-      //     }
-
-
     }
     if (this.project.frameworkVersionAtLeast('v3')) {
       // no modification of any code straight ng is being use

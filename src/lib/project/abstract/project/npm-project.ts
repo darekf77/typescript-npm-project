@@ -42,7 +42,7 @@ export class NpmProject {
       return this.browser.isPrivate;
     }
     //#region @backend
-    return this.packageJson && this.packageJson.isPrivate;
+    return !!this.packageJson.isPrivate;
     //#endregion
   }
 

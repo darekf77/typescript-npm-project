@@ -20,7 +20,12 @@ const $RELEASE = async (args: string) => {
     argsObj.releaseType = 'patch';
   }
 
-  Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease}`)
+  const specifiedVersion = argsObj.args
+    .split(' ')
+    .find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
+
+  Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease} `
+    + `${specifiedVersion ? (' - only framework version = ' + specifiedVersion) : ''}`)
   const automaticRelease = !!argsObj.automaticRelease;
   if (automaticRelease) {
     global.tnpNonInteractive = true;
@@ -34,8 +39,11 @@ const $RELEASE = async (args: string) => {
   // const autoRelease = !!argsObj.auto;
 
   const proj = Project.Current as Project;
+  /**
+   * TODO this is not helpfull...
+   */
   const lastReleaseProjFilePath = path.join(proj.location, 'tmp-last-released-proj')
-  const lastReleaseProjContent = Helpers.readFile(lastReleaseProjFilePath);
+  const lastReleaseProjContent = void 0; //  Helpers.readFile(lastReleaseProjFilePath); TODO QUICK_FIX
   const lastRelased = !!lastReleaseProjContent && Project.From(path.join(proj.location, lastReleaseProjContent))
   //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   // Helpers.info(`
@@ -57,34 +65,77 @@ const $RELEASE = async (args: string) => {
 
   if (proj.isContainer) {
     //#region container release
-    const { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
+    let { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
       return Project.From(path.join(proj.location, a));
     });
     args = commandString;
 
+    resolved = resolved.filter(f => f.location !== proj.location);
+
     const forceReleaseAll = !!argsObj.all || (resolved.length > 0);
 
     const depsOfResolved = proj.projectsInOrderForChainBuild(resolved)
-      .filter(d => d.name !== proj.name && !d.isPrivate);
+      .filter(d => d.name !== proj.name);
 
     const otherDeps = proj.children.filter(c => {
       return !depsOfResolved.includes(c);
     });
 
-    const deps = [
+    let deps = [
       ...depsOfResolved,
       ...otherDeps,
     ];
 
-    const depsOnlyToPush = proj.children.filter(c => {
-      return !deps.includes(c);
-    });
+    const depsOnlyToPush = [];
+
+
+    //#region filter children
+    for (let index = 0; index < deps.length; index++) {
+      const child = deps[index];
+
+
+      const lastBuildHash = child.packageJson.getBuildHash();
+      const lastTagHash = child.git.lastTagHash();
+      const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
+      const versionIsOk = !!specifiedVersion ? child.frameworkVersionAtLeast(specifiedVersion as any) : true;
+
+      const shouldRelease = (
+        versionIsOk
+        && !child.isPrivate
+        && !child.targetProjects.exists
+        && (!sameHashes || forceReleaseAll)
+      );
+      Helpers.log(`ACTUALL RELEASE: ${shouldRelease}
+      isPrivate: ${child.isPrivate}
+      versionIsOk: ${versionIsOk}
+      releaseAll: ${forceReleaseAll}
+      sameHashes: ${sameHashes}
+      `)
+
+      if (!shouldRelease) {
+
+
+        // Helpers.pressKeyAndContinue();
+        // child.git.commit();
+        // await child.git.pushCurrentBranch();
+
+        depsOnlyToPush.push(child);
+        deps[index] = void 0;
+      }
+    }
+    deps = deps.filter(f => !!f);
+
+    //#endregion
+
+
+
+
 
     //#region projs tempalte
     const projsTemplate = (child?: Project) => {
       return `
 
-    PROJECTS FOR RELEASE CHAIN:
+    PROJECTS FOR RELEASE CHAIN: ${specifiedVersion ? ('(only framework version = ' + specifiedVersion + ' )') : ''}
 
 ${deps
           .filter(p => {
@@ -153,14 +204,13 @@ processing...
       Helpers.clearConsole();
       Helpers.info(projsTemplate(child));
 
-      const lastBuildHash = child.packageJson.getBuildHash();
-      const lastTagHash = child.git.lastTagHash();
-      const sameHashes = (lastBuildHash === lastTagHash); // TODO QUICK FIX
 
 
       const init = async () => {
         while (true) {
           try {
+            child.node_modules.remove();
+            child.smartNodeModules.install('install');
             child.run(`${config.frameworkName} init`
               + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
               { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).sync();
@@ -171,53 +221,26 @@ processing...
         }
       };
 
-      const shouldRelease = (
-        !child.isPrivate
-        && !child.targetProjects.exists
-        && (!sameHashes || forceReleaseAll)
-      );
-      Helpers.log(`ACTUALL RELEASE: ${shouldRelease}
 
-      releaseAll: ${forceReleaseAll}
-      sameHashes: ${sameHashes}
-      `)
       // Helpers.pressKeyAndContinue(`press any key`);
 
-      if (shouldRelease) {
-        while (true) {
-          await init();
-          try {
-            child.run(`${config.frameworkName} release `
-              + ` --automaticRelease=${resolved.length === 0}`
-              + ` --tnpNonInteractive=${resolved.length === 0}`
-              + ` ${global.hideLog ? '' : '-verbose'}`
-              , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).sync();
-            // await child.release(handleStandalone(child, {}), true);
-            // Helpers.pressKeyAndContinue(`Release done`);
-            break;
-          } catch (error) {
-            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
-          }
+
+      while (true) {
+        await init();
+        try {
+          child.run(`${config.frameworkName} release ${!!specifiedVersion ? specifiedVersion : ''}`
+            + ` --automaticRelease=${resolved.length === 0}`
+            + ` --tnpNonInteractive=${resolved.length === 0}`
+            + ` ${global.hideLog ? '' : '-verbose'}`
+            , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).sync();
+          // await child.release(handleStandalone(child, {}), true);
+          // Helpers.pressKeyAndContinue(`Release done`);
+          break;
+        } catch (error) {
+          Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
         }
-      } else {
-        Helpers.warn(`
-
-        No realase needed for ${chalk.bold(child.name)} ..just initing and pushing to git...
-
-        `); // hash in package.json to check
-
-        if (child.typeIs('angular-lib', 'isomorphic-lib')) {
-          try {
-            await child.filesStructure.init('')
-          } catch (error) {
-            Helpers.info(`Not able to init fully...`);
-          }
-        }
-
-        // Helpers.pressKeyAndContinue();
-        child.git.commit();
-        await child.git.pushCurrentBranch();
       }
+
       // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
@@ -228,7 +251,22 @@ processing...
 
     if (resolved.length === 0) {
       for (let index = 0; index < depsOnlyToPush.length; index++) {
-        const depForPush = depsOnlyToPush[index];
+        const depForPush = depsOnlyToPush[index] as Project;
+
+        Helpers.warn(`
+
+        No realase needed for ${chalk.bold(depForPush.name)} ..just initing and pushing to git...
+
+        `); // hash in package.json to check
+
+        if (depForPush.typeIs('angular-lib', 'isomorphic-lib') && depForPush.isSmartContainer) {
+          try {
+            await depForPush.filesStructure.init('')
+          } catch (error) {
+            Helpers.info(`Not able to init fully...`);
+          }
+        }
+
         depForPush.git.commit(`release push`);
         await depForPush.git.pullCurrentBranch()
       }

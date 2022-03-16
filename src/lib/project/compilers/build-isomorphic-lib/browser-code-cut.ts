@@ -8,7 +8,7 @@ import {
 
 import { ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
-
+import { Helpers } from 'tnp-helpers';
 
 export class CodeCut {
 
@@ -32,14 +32,14 @@ export class CodeCut {
 
   file(absolutePathToFile) {
     // console.log('options here ', options)
-    return new (this.browserCodeCut)(absolutePathToFile)
-      .flatTypescriptImportExport('import')
-      .flatTypescriptImportExport('export')
-      .replaceRegionsForIsomorphicLib(_.cloneDeep(this.options))
-      .replaceRegionsFromTsImportExport('import')
-      .replaceRegionsFromTsImportExport('export')
-      .replaceRegionsFromJSrequire()
-      .saveOrDelete()
+    // return new (this.browserCodeCut)(absolutePathToFile)
+    //   // .FLATTypescriptImportExport('import')
+    //   // .FLATTypescriptImportExport('export')
+    //   .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options))
+    //   .REPLACERegionsFromTsImportExport('import')
+    //   .REPLACERegionsFromTsImportExport('export')
+    //   .REPLACERegionsFromJSrequire()
+    //   .saveOrDelete()
   }
 }
 
@@ -74,35 +74,81 @@ export class BrowserCodeCut {
     this.isDebuggingFile = (path.basename(this.absoluteFilePath) === fileName);
   }
 
-  public flatTypescriptImportExport(usage: ConfigModels.TsUsage) {
+  public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
     if (!this.absoluteFilePath.endsWith('.ts')) {
       return this;
     }
+    const isExport = (usage === 'export');
     const fileContent: string = this.rawContent;
-    const regexParialUsage = new RegExp(`${usage}\\s+{`)
-    const regexFrom = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`)
+    const commentStart = new RegExp(`\\/\\*`);
+    const commentEnds = new RegExp(`\\*\\/`);
+    const commentEndExportOnly = new RegExp(`^(\\ )*\\}\\;?\\ *`);
+    const singleLineExport = new RegExp(`^\\ *export\\ +\\{.*\\}\\;?`)
+
+    const regextStart = new RegExp(`${usage}\\s+{`)
+    const regexEnd = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`)
+    let toAppendLines = 0;
+    let insideComment = false;
     if (_.isString(fileContent)) {
-      let joiningLine = false;
-      let output = '';
-      fileContent.split(/\r?\n/).forEach((line) => {
-        const importOrExportPart = regexParialUsage.test(line);
-        const fromLibPart = regexFrom.test(line)
+      let appendingToNewFlatOutput = false;
+      let newFlatOutput = '';
+      fileContent.split(/\r?\n/).forEach((line, index) => {
+
+        const matchSingleLineExport = isExport && singleLineExport.test(line);
+        const matchCommentStart = commentStart.test(line);
+        const matchCommentEnd = commentEnds.test(line);
+        const matchStart = regextStart.test(line);
+
+        const matchEndExportOnly = isExport && commentEndExportOnly.test(line) && (line.replace(commentEndExportOnly, '') === '');
+        const matchEnd = (matchEndExportOnly || regexEnd.test(line))
+
+
+        if (matchCommentStart) {
+          insideComment = true;
+        }
+        if (insideComment && matchCommentEnd) {
+          insideComment = false;
+        }
+        // (path.basename(this.absoluteFilePath) === 'core-imports.ts') && console.log(`${insideComment}: ${line}`)
+        // isExport && (path.basename(this.absoluteFilePath) === 'core-imports.ts') && console.log(`export end: ${matchEndExportOnly}: >>>${line}<<<`)
         // console.log(`I(${regexParialUsage.test(line)}) F(${regexFrom.test(line)})\t: ${line} `)
-        if (joiningLine) {
-          if (!importOrExportPart && !fromLibPart) {
-            output += ` ${line}`
-          } else if (fromLibPart) {
-            joiningLine = false;
-            output += ` ${line}\n`
+        // (path.basename(this.absoluteFilePath) === 'core-imports.ts') && console.log(`matchSingleLineExport: ${matchSingleLineExport}: >>>${line}<<<`)
+        // if (insideComment || matchSingleLineExport) {
+        //   newFlatOutput += (((index > 0) ? '\n' : '') + line);
+        //   toAppendLines++;
+        // }
+        if (appendingToNewFlatOutput) {
+          if (!matchStart && !matchEnd) {
+            newFlatOutput += ` ${line}`;
+            toAppendLines++;
+          } else if (insideComment) {
+            newFlatOutput += ` ${line}`;
+            toAppendLines++;
+          } else if (matchEnd) {
+            appendingToNewFlatOutput = false;
+            newFlatOutput += ` ${line}${_.times(toAppendLines,
+              () => `${Models.label.flatenImportExportRequred}\n`).join('')}`;
+            toAppendLines = 0;
           }
         } else {
-          joiningLine = (importOrExportPart && !fromLibPart);
-          // if (joiningLine) console.log('line', line)
-          output += `\n${line}`
+          if (insideComment) {
+            newFlatOutput += (((index > 0) ? '\n' : '') + line);
+          } else {
+            if (matchSingleLineExport) {
+              newFlatOutput += (((index > 0) ? '\n' : '') + line);
+            } else {
+              appendingToNewFlatOutput = (matchStart && !matchEnd);
+              // if (joiningLine) console.log('line', line)
+              newFlatOutput += (((index > 0) ? '\n' : '') + line);
+            }
+            toAppendLines = 1;
+          }
         }
+
       })
-      this.rawContent = output;
+      this.rawContent = newFlatOutput;
     }
+    // console.log('\n\n\n\n')
     return this;
   }
 
@@ -203,7 +249,7 @@ export class BrowserCodeCut {
     }
   }
 
-  replaceRegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
+  REPLACERegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
     if (!this.absoluteFilePath.endsWith('.ts')) {
       return this;
     }
@@ -221,7 +267,7 @@ export class BrowserCodeCut {
     return this;
   }
 
-  replaceRegionsFromJSrequire() {
+  REPLACERegionsFromJSrequire() {
     if (!this.absoluteFilePath.endsWith('.ts')) {
       return this;
     }
@@ -241,7 +287,7 @@ export class BrowserCodeCut {
     return this;
   }
 
-  replaceRegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+  REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
     // console.log('options.replacements', options.replacements)
     if (this.absoluteFilePath.endsWith('.ts')) {

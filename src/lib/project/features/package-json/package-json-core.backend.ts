@@ -78,7 +78,7 @@ export class PackageJsonCore {
     if (_.isString(res)) {
       return res;
     }
-    return config.defaultFrameworkVersion;
+    return '' as any;
   }
 
   get isSmart(): boolean {

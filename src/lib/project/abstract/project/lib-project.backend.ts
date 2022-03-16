@@ -444,14 +444,19 @@ export abstract class LibProject {
     const tnpProj = PorjectClass.Tnp as Project;
 
     if (tnpProj) {
+
+      let firedeProj: Project;
+      if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
+        firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
+      }
+
       const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
       if (
         (_.isString(arrTrusted) && (arrTrusted === '*')) ||
         (_.isArray(arrTrusted) && arrTrusted.includes(this.name))
       ) {
         [
-          // tnpProj,
-          // PorjectClass.From(PorjectClass.NaviCliLocation) as Project, // TODO
+          firedeProj,
           PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
         ].filter(f => !!f)
           .forEach(c => {

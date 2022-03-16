@@ -330,7 +330,8 @@ export abstract class BaseProject {
       if (!_.isUndefined(this.__cacheStandaloneDependencies)) {
         return this.__cacheStandaloneDependencies;
       }
-      const dependenciesNames = this.packageJson.dependencies();
+      // const dependenciesNames = this.packageJson.dependencies();
+      const dependenciesNames = this.packageJson.data?.tnp?.overrided?.includeOnly || []; // TODO NOT SURE
       const res = dependenciesNames.map(d => {
         const child = this.parent.children.find(f => f.name === d);
         return child;

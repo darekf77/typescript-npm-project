@@ -449,12 +449,25 @@ export class ProjectIsomorphicLib
         } catch (er) {
           Helpers.error(`BUNDLE (obscure || uglify || nodts) process failed`, false, true);
         }
-        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ')
-        await proxyProject.run(angularCommand).sync()
+        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
+        try {
+          await proxyProject.run(angularCommand).sync()
+        } catch (e) {
+          Helpers.error(`
+          Command failed: ${angularCommand}
 
+          Not able to build project: ${this.genericName}`, false, true)
+        }
       } else {
         await this.incrementalBuildProcess.start('isomorphic compilation');
-        await proxyProject.run(angularCommand).sync()
+        try {
+          await proxyProject.run(angularCommand).sync()
+        } catch (e) {
+          Helpers.error(`
+          Command failed: ${angularCommand}
+
+          Not able to build project: ${this.genericName}`, false, true)
+        }
         await this.browserCodePreventer.start('browser code preventer');
       }
 
