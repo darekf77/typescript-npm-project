@@ -517,7 +517,7 @@ export class ProjectIsomorphicLib
     const commnad = `npm-run javascript-obfuscator bundle/index.js `
       + ` --output bundle/index.js`
       + ` --target node`
-      + ` --rotate-array-string true`
+      + ` --string-array-rotate true`
       // + ` --stringArray true`
       + ` --string-array-encoding base64`
       + ` --reserved-names '${reservedNames.join(',')}'`
