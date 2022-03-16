@@ -231,16 +231,19 @@ function lastFixes(
 
     if (!content.version) {
       let lastVersionFromNpm: string;
-      try {
-        lastVersionFromNpm = Helpers.run(`npm show ${content.name} version`
-          , { output: false }).sync().toString().trim();
-        if (lastVersionFromNpm) {
-          additionalSaveRequired = true;
-          content.version = lastVersionFromNpm;
+
+      if (!content.private) {
+        try {
+          lastVersionFromNpm = Helpers.run(`npm show ${content.name} version`
+            , { output: false }).sync().toString().trim();
+          if (lastVersionFromNpm) {
+            additionalSaveRequired = true;
+            content.version = lastVersionFromNpm;
+          }
+        } catch (error) {
+          Helpers.warn(`Not able to get last version of project: ${content.name}`
+            + ` from npm registry...`);
         }
-      } catch (error) {
-        Helpers.warn(`Not able to get last version of project: ${content.name}`
-          + ` from npm registry...`);
       }
     }
     if (!content.version) {

@@ -69,7 +69,7 @@ export class NodeModulesBase extends NodeModulesCore {
               const all = Helpers.filesFrom(linkFromBin);
               all.forEach(f => {
                 Helpers.removeFileIfExists(path.join(dest, path.basename(f)));
-                if (Helpers.exists(f, false)) {
+                if (Helpers.exists(f)) {
                   f = fse.realpathSync(f);
                   // const file = Helpers.readFile(f);
                   // file.replace( new RegExp(),`require('../${path.basename(f)}/lib` )

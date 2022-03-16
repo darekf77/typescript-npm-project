@@ -31,7 +31,13 @@ export class PackageJSON
     : PackageJSON {
 
     //#region @backendFunc
-    const pj = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json)));
+
+    const packageJsonPath = crossPlatformPath(path.join(location, config.file.package_json));
+    if (!Helpers.exists(packageJsonPath)) {
+      return void 0;
+    }
+
+    const pj = PackageJsonFile.from(packageJsonPath);
     let pj_tnp = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json)));
     const pj_tnp5 = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json5)));
 
@@ -62,7 +68,12 @@ export class PackageJSON
     const pkgJson = new PackageJSON({ data: pj.data, location, project });
     if (pj.saveAtLoad || (!pj_tnp5.exists && pkgJson.data.tnp.version === 'v3')) {
       Helpers.log(`Saving fixed package.json structure in ${location}`);
-      pkgJson.writeToDisc();
+      try {
+        pkgJson.writeToDisc();
+      } catch (error) {
+        debugger
+      }
+
     }
 
     return pkgJson;

@@ -169,7 +169,7 @@ export abstract class LibProject {
 
         const browserFolder = path.join(this.location, config.folder.browser);
 
-        if (!Helpers.exists(browserFolder, false)) {
+        if (!Helpers.exists(browserFolder)) {
           Helpers.remove(browserFolder);
         }
 
