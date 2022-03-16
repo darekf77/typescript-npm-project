@@ -118,6 +118,7 @@ export abstract class BaseProject {
   // @ts-ignore
   get isSmartContainer(this: Project) {
     return this.frameworkVersionAtLeast('v3')
+      && this.packageJson.isSmart
       && this.isContainer
       && !this.isContainerCoreProject
       && !this.isContainerCoreProjectTempProj;

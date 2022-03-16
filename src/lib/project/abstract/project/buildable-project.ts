@@ -288,6 +288,16 @@ export abstract class BuildableProject {
         this.buildOptions.copyto = [];
       }
 
+      const additionalSmartContainerChildren = (this.buildOptions.copyto as Project[])
+        .filter(c => c.isSmartContainer)
+        .reduce((a, b) => {
+          return a.concat(b.children)
+        }, []);
+
+      this.buildOptions.copyto = [
+        ...additionalSmartContainerChildren,
+        ...this.buildOptions.copyto,
+      ];
 
 
       if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {

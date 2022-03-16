@@ -42,7 +42,10 @@
       "@iconify/react",
     ],
     includeAsDev: [],
-    includeOnly: [],
+    includeOnly: [
+      'tnp-db',
+      'tnp-iu'
+    ],
     linkedFolders: [],
   },
   linkedProjects: [],
@@ -165,6 +168,7 @@
           "firedev-storage",
           "tnp-ui",
           'tnp',
+          'firedev',
 
           "typeorm",
         ],

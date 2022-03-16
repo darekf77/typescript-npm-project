@@ -671,6 +671,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   if (project.isContainerCoreProject) { // TODO TESTING
     //#region handle container core bulk deps instatlation for all other packages
+
     _.keys(project.packageJson.data.dependencies)
       .forEach(depName => {
         const v = project.packageJson.data.dependencies[depName];
@@ -705,6 +706,13 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
           }
         }
       });
+
+    if (project.frameworkVersionAtLeast('v3')) {
+      const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
+      project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
+      project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+    }
+
     //#endregion
   }
   _.keys(project.packageJson.data.dependencies)

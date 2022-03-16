@@ -81,6 +81,10 @@ export class PackageJsonCore {
     return config.defaultFrameworkVersion;
   }
 
+  get isSmart(): boolean {
+    return !!this.data.tnp?.smart;
+  }
+
   get frameworks(): ConfigModels.UIFramework[] {
     const res = this.data.tnp &&
       _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
