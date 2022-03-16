@@ -44,7 +44,7 @@
     includeAsDev: [],
     includeOnly: [
       'tnp-db',
-      'tnp-iu'
+      'tnp-ui'
     ],
     linkedFolders: [],
   },
