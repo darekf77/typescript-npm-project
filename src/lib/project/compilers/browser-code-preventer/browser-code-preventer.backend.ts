@@ -106,7 +106,7 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
           removeNext = false;
           return Models.label.browserCode;
         }
-        if (l.search('@browserLine') !== -1) {
+        if (l.search('@browser' + 'Line') !== -1) { // TODO QUCK_FIX regex for comment
           removeNext = true;
           return Models.label.browserCode;
         }
