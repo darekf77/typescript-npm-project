@@ -316,7 +316,19 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
-    return super.getInlinePackage(packageName, packagesNames.concat(this.project.name))
+    const packages = packagesNames.concat([
+      this.project.name,
+      ...(this.project.isSmartContainerChild
+        ? this.project.parent.children.map(c => `@${this.project.parent.name}/${c.name}`)
+        : []
+      ),
+      ...(this.project.isSmartContainer
+        ? this.project.children.map(c => `@${this.project.name}/${c.name}`)
+        : []
+      )
+    ]);
+
+    return super.getInlinePackage(packageName, packages);
   }
 
   //#region remove from line pkg

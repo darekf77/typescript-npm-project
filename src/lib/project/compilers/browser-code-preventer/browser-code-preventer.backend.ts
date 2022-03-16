@@ -104,11 +104,11 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
       raw = raw.split('\n').map((l, i) => {
         if (removeNext) {
           removeNext = false;
-          return '/* browser code */';
+          return Models.label.browserCode;
         }
         if (l.search('@browserLine') !== -1) {
           removeNext = true;
-          return '/* browser code */';
+          return Models.label.browserCode;
         }
         return l;
       }).join('\n')

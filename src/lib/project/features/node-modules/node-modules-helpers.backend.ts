@@ -274,12 +274,7 @@ function fixPackageJson(pathToPacakgeJson: string, project: Project) {
   Helpers.writeFile(pathToPacakgeJson, newFile);
 }
 
-function generatedFileWrap(content: string) {
-  return `${content}
-// [${config.frameworkName}] GENERATED CONTENT FOR BACKEND VERSION
-// [${config.frameworkName}] GENERATED CONTENT FOR BACKEND VERSION
-        `.trim()
-}
+
 
 function createSubVersion(proj: Project, symlinkFolderFromSrcToRcreate: string[]) {
   const projLocation = (proj.location);
@@ -507,7 +502,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       newContent = newContent.replace(
         new RegExp(`\;\\n${Helpers.escapeStringForRegEx(specialFunctionEnd)}`, 'g'),
         ' { return void 0; }\n')
-      Helpers.writeFile(newFile, generatedFileWrap(newContent));
+      Helpers.writeFile(newFile, Helpers.generatedFileWrap(newContent));
       Helpers.removeFileIfExists(f);
     }
 
@@ -551,9 +546,9 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       });
 
     Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
-      generatedFileWrap(`export * from './dist';`));
+    Helpers.generatedFileWrap(`export * from './dist';`));
 
-    Helpers.writeFile(path.join(proj.location, config.file.index_js), generatedFileWrap(`
+    Helpers.writeFile(path.join(proj.location, config.file.index_js), Helpers.generatedFileWrap(`
     "use strict";
     Object.defineProperty(exports, '__esModule', { value: true });
     var tslib_1 = require('tslib');

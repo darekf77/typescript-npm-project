@@ -116,6 +116,19 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
+  get isSmartContainer(this: Project) {
+    return this.frameworkVersionAtLeast('v3')
+      && this.isContainer
+      && !this.isContainerCoreProject
+      && !this.isContainerCoreProjectTempProj;
+  }
+
+  // @ts-ignore
+  get isSmartContainerChild(this: Project) {
+    return this.parent?.isSmartContainer;
+  }
+
+  // @ts-ignore
   get isContainerOrWorkspaceWithLinkedProjects(this: Project) {
     // @ts-ignore
     return (this.isContainer || this.isWorkspace) && this.packageJson.linkedProjects.length > 0;

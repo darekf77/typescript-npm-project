@@ -118,7 +118,7 @@ export class BrowserCodeCut {
         rawImport = rawImport.trim()
         if (rawImport.startsWith(`./`)) return void 0;
         if (rawImport.startsWith(`../`)) return void 0;
-        const fisrtName = rawImport.match(new RegExp(`[a-zA-z]+\\/`))
+        const fisrtName = rawImport.match(new RegExp(`\@?([a-zA-z]|\-)+\\/`))
         let res: string = (_.isArray(fisrtName) && fisrtName.length > 0) ? fisrtName[0] : rawImport;
         if (res.endsWith('/') && res.length > 1) {
           res = res.substring(0, res.length - 1)
@@ -131,7 +131,7 @@ export class BrowserCodeCut {
         rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim()
         if (rawImport.startsWith(`./`)) return void 0;
         if (rawImport.startsWith(`../`)) return void 0;
-        const fisrtName = rawImport.match(new RegExp(`([a-zA-z]|\-)+\\/`))
+        const fisrtName = rawImport.match(new RegExp(`\@?([a-zA-z]|\-)+\\/`))
         let res: string = (_.isArray(fisrtName) && fisrtName.length > 0) ? fisrtName[0] : rawImport;
         if (res.endsWith('/') && res.length > 1) {
           res = res.substring(0, res.length - 1)

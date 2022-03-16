@@ -25,14 +25,20 @@ export class GitActions extends FeatureForProject {
       locaiton: ${this.project.location}`, false, true);
     }
     if (this.project.git.currentBranchName !== 'master') {
-      this.project.run(`code .`).async();
-      Helpers.warn(`
+      if (this.project.isContainer || this.project.isWorkspace) {
+        if (this.project.git.isGitRepo && this.project.git.isGitRoot) {
+          this.project.run(`git checkout -b master && git add --all . && git commit -m "first"`).async();
+        }
+      } else {
+        this.project.run(`code .`).async();
+        Helpers.warn(`
 
-      Project: ${this.project.genericName}
-      WARNGING default branch is not master...
+        Project: ${this.project.genericName}
+        WARNGING default branch is not master...
 
-      `);
-      Helpers.pressKeyAndContinue(`press any key to continue or stop the process..`);
+        `);
+        Helpers.pressKeyAndContinue(`press any key to continue or stop the process..`);
+      }
     }
     fixRemote(this.project);
     this.project.removeFolderByRelativePath('node_modules/husky');
@@ -49,7 +55,9 @@ export class GitActions extends FeatureForProject {
   //#region get unexisted projects
   private async cloneUnexistedProjects() {
     const shouldBeProjectArr = this.project.packageJson.linkedProjects.map(relativePath => {
-      if (!Project.From(path.join(this.project.location, relativePath))) {
+      const possibleProj = Project.From(path.join(this.project.location, relativePath));
+      // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
+      if (!possibleProj) {
         return relativePath;
       }
     }).filter(f => !!f);

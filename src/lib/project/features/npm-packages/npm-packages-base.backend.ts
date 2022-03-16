@@ -1,6 +1,6 @@
 //#region imports
 import chalk from 'chalk';
-import { _ } from 'tnp-core';
+import { path, _ } from 'tnp-core';
 
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -12,6 +12,10 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
+    if (this.project.isSmartContainer) {
+      return true;
+    }
+
     if (this.project.isTnp || this.project.isNaviCli) {
       return false;
     }
@@ -84,6 +88,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
       const installAllowed = (
         !this.project.isContainer
+        || this.project.isSmartContainer
         || this.project.isContainerOrWorkspaceWithLinkedProjects
         || this.project.isContainerCoreProject
       );
@@ -123,6 +128,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
         }
         // this.project.node_modules.stuberizeFrontendPackages();
       }
+
       this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);
     }
 
@@ -130,4 +136,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       PROGRESS_DATA.log({ msg: `npm instalation finish ok` });
     }
   }
+
+
+
 }

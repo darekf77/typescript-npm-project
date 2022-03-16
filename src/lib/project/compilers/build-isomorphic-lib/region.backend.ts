@@ -113,23 +113,22 @@ export class Region {
             const verticalLength = regionOrString.toString().split('\n').length - 1;
 
             if (regionOrString.containsTitle(regionTag)) {
-              if (
-                regionTag.toLowerCase() === '@backend'.toLowerCase()
-                ||
-                regionTag.toLowerCase() === '@notForNpm'.toLowerCase()
-              ) {
-                // nothing here
+              if (regionTag.toLowerCase() === '@backend'.toLowerCase()) {
+                out = `${_.times(verticalLength).map(() => Models.label.backendCode + '\n').join('')}  ${out}`;
+              }
+              if (regionTag.toLowerCase() === '@notForNpm'.toLowerCase()) {
+                out = `${_.times(verticalLength).map(() => Models.label.notForNpmCode + '\n').join('')}  ${out}`;
               }
               if (regionTag.toLowerCase() === '@browser'.toLowerCase()) {
-
-                out = `${_.times(verticalLength).map(n => '/* browser code */\n').join('')}  ${out}`;
+                out = `${_.times(verticalLength).map(() => Models.label.browserCode + '\n').join('')}  ${out}`;
               }
               if (
                 regionTag.toLowerCase() === '@backendFunc'.toLowerCase()
               ) {
                 let spacesPrevious = previous.search(/\S/);
                 spacesPrevious = (spacesPrevious < 0 ? 0 : spacesPrevious);
-                out = `${_.times(spacesPrevious).map(n => ' ').join('')}  ${out}`;
+                out = `${_.times(verticalLength).map(() => Models.label.backendCode + '\n').join('')}`
+                  + `${_.times(spacesPrevious).map(n => ' ').join('')}  ${out}`;
               }
               if (
                 regionTag.toLowerCase() === '@cutCodeIfTrue'.toLowerCase()

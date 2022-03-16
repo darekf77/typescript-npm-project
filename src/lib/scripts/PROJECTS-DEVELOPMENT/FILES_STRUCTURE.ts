@@ -128,7 +128,9 @@ export async function STATIC_INIT_ALL(args: string, exit = true) {
 }
 
 export async function CLEAN(args: string, exit = true) {
-  await (Project.Current as Project).filesStructure.clearFromArgs(args)
+  const proj = (Project.Current as Project);
+  await proj.filesStructure.clearFromArgs(args);
+
   if (exit) {
     process.exit(0);
   }
@@ -146,10 +148,11 @@ export async function STATIC_CLEAN(args: string, exit = true) {
 export const STATIC_CLEAR = STATIC_CLEAN;
 
 export async function CLEAN_ALL(args: string, exit = true) {
-  if ((Project.Current as Project).isWorkspaceChildProject) {
-    await (Project.Current as Project).parent.filesStructure.clear({ recrusive: true })
+  const proj = (Project.Current as Project);
+  if (proj.isWorkspaceChildProject && proj.isSmartContainerChild) {
+    await proj.parent.filesStructure.clear({ recrusive: true })
   } else {
-    await (Project.Current as Project).filesStructure.clear({ recrusive: true })
+    await proj.filesStructure.clear({ recrusive: true })
   }
   if (exit) {
     process.exit(0);

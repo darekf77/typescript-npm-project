@@ -9,6 +9,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 
+//#region site option
 export type NewSiteOptions = {
   type?: ConfigModels.NewFactoryType,
   name?: string,
@@ -19,9 +20,10 @@ export type NewSiteOptions = {
   alsoBasedOn?: string[];
   siteProjectMode?: 'strict' | 'dependency';
 };
+//#endregion
 
 export class ProjectFactory {
-
+  //#region singleton
   private static _instance: ProjectFactory;
   public static get Instance() {
     if (!this._instance) {
@@ -29,15 +31,18 @@ export class ProjectFactory {
     }
     return this._instance;
   }
+  //#endregion
 
-
+  //#region destination path
   private getDestinationPath(projectName: string, cwd: string) {
     if (path.isAbsolute(projectName)) {
       return projectName;
     }
     return path.join(cwd, projectName);
   }
+  //#endregion
 
+  //#region error messages
   private errorMsgCreateProject() {
     Helpers.log(chalk.green(`Good examples:`));
     config.projectTypes.forNpmLibs.forEach(t => {
@@ -53,12 +58,21 @@ export class ProjectFactory {
     ));
     Helpers.error(`Please use example above.`, false, true);
   }
+  //#endregion
 
+  //#region fix after crateion
   private pacakgeJsonFixAfterCreation(locationDest, basedOn?: string, name?: string, isDependencySite = false) {
     const pkgJSONpath = path.join(locationDest, config.file.package_json);
     const json: Models.npm.IPackageJSON = fse.readJSONSync(pkgJSONpath)
     json.name = ((name === path.basename(locationDest)) ? name : _.kebabCase(path.basename(locationDest)));
-
+    if (!json.tnp) {
+      // @ts-ignore
+      json.tnp = {};
+    }
+    json.version = '0.0.0';
+    json.private = true;
+    json.tnp.type = 'isomorphic-lib';
+    json.tnp.version = config.defaultFrameworkVersion;
     json.tnp.isCoreProject = false;
     json.tnp.isGenerated = false;
     json.tnp.useFramework = false;
@@ -70,8 +84,9 @@ export class ProjectFactory {
 
     Helpers.writeFile(pkgJSONpath, json);
   }
+  //#endregion
 
-
+  //#region fix options
   private fixOptions_create(options: NewSiteOptions) {
     if (_.isNil(options)) {
       options = {} as any;
@@ -91,24 +106,147 @@ export class ProjectFactory {
 
     return options;
   }
+  //#endregion
+
+  //#region create models
+  public createModelFromArgs(args: string, exit = true, cwd: string) {
+    const argv = args.split(' ');
+    const name = argv[1]
+    const relativePath = argv[2]
+    Project.From<Project>(cwd).filesFactory.createModel(relativePath, name);
+    if (exit) {
+      process.exit(0)
+    }
+  }
+  //#endregion
+
+  //#region workspace
+  public async workspaceFromArgs(args: string, exit = true, cwd: string) {
+    const argv = args.split(' ');
+
+    if (!_.isArray(argv) || argv.length < 1) {
+      Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
+      this.errorMsgCreateProject()
+    }
+    const { basedOn, version, skipInit }: {
+      basedOn: string;
+      version: ConfigModels.FrameworkVersion;
+      skipInit?: boolean
+    } = require('minimist')(args.split(' '));
+
+
+    if (basedOn) {
+      Helpers.error(`To create workspace site use command: `
+        + `${config.frameworkName} new: site name - of - workspace - site`
+        + `--basedOn relativePathToBaselineWorkspace`, false, true);
+    }
+    const type = 'isomorphic-lib' as any;
+    const name = argv[0];
+
+    const proj = await this.create({
+      type,
+      name,
+      cwd,
+      basedOn: void 0,
+      version: config.defaultFrameworkVersion, // (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
+      skipInit
+    });
+
+    Helpers.writeFile([proj.location, 'README.md'], `
+  #  ${_.startCase(proj.name)}
+
+    `)
+
+    if (exit) {
+      process.exit(0)
+    }
+
+  }
+  //#endregion
+
+  //#region create workspace site
+  public async workspaceSiteFromArgs(args: string, exit = true, cwd: string, strictSiteMode = true) {
+    const argv = args.split(' ');
+
+    if (args.length < 2) {
+      this.errorMsgCreateSite()
+    }
+    const alsoBasedOn = ((argv.length > 2 && !strictSiteMode) ? (argv.slice(2)) : []);
+
+    await this.create({
+      type: 'workspace',
+      name: argv[0] as any,
+      cwd,
+      basedOn: argv[1] as any,
+      siteProjectMode: strictSiteMode ? 'strict' : 'dependency',
+      alsoBasedOn
+    });
+    if (exit) {
+      process.exit(0)
+    }
+  }
+  //#endregion
+
+
   public async create(options: NewSiteOptions): Promise<Project> {
 
     let { type, name, cwd, basedOn, version, skipInit, siteProjectMode, alsoBasedOn } = this.fixOptions_create(options);
-
-    const cwdProj = Project.From<Project>(cwd);
-    if (cwdProj && cwdProj.isWorkspace) {
-      version = cwdProj._frameworkVersion;
-    } else {
-      version = config.defaultFrameworkVersion;
-    }
+    version = config.defaultFrameworkVersion;
+    // let cwdProj = Project.From<Project>(cwd);
+    // if (cwdProj && cwdProj.isWorkspace) {
+    //   version = cwdProj._frameworkVersion;
+    // } else {
+    //   version = config.defaultFrameworkVersion;
+    // }
     // if (cwdProj && cwdProj.isContainer) {
     //   version = cwdProj._frameworkVersion;
     // }
 
+    const containers = name.replace('\\', '/').split('/');
+
+    if (containers.length > 1) {
+      var firstContainer: Project;
+
+      name = _.last(containers);
+      const foldersToRecreate = _.cloneDeep(containers).slice(0, containers.length - 1);
+      let tmpCwd = cwd;
+      do {
+        const folder = foldersToRecreate.shift();
+        const containerPath = path.join(tmpCwd, folder);
+        if (!Helpers.exists(containerPath)) {
+          Helpers.mkdirp(containerPath);
+        }
+        const packageJsonPath = path.join(containerPath, config.file.package_json);
+        if (!Helpers.exists(packageJsonPath)) {
+          Helpers.writeJson(packageJsonPath, {
+            name: path.basename(containerPath),
+            version: '0.0.0',
+            private: true,
+            tnp: {
+              version: config.defaultFrameworkVersion,
+              type: 'container',
+            }
+          } as Models.npm.IPackageJSON);
+        }
+        tmpCwd = containerPath;
+        cwd = containerPath;
+        const containerProj = (Project.From(containerPath) as Project);
+        if (containerProj) {
+          await containerProj.filesStructure.init('')
+          containerProj.run('git init').sync();
+          if (!firstContainer) {
+            firstContainer = containerProj;
+          }
+        }
+      } while (foldersToRecreate.length > 0);
+    }
+
+    if (firstContainer && firstContainer.parent?.isContainer) {
+      await firstContainer.parent.filesStructure.init('')
+    }
 
 
     Helpers.log(`[create] version: ${version}`);
-    Helpers.log(`[create] cwdProj: ${cwdProj && cwdProj.name}`);
     Helpers.log(`[create] skip init ${skipInit}`);
 
 
@@ -285,81 +423,11 @@ export class ProjectFactory {
         await newCreatedProject.parent.filesStructure.struct('');
       }
     }
+    if (firstContainer) {
+      await firstContainer.filesStructure.init('');
+    }
+
     return newCreatedProject;
   }
-
-  public createModelFromArgs(args: string, exit = true, cwd: string) {
-    const argv = args.split(' ');
-    const name = argv[1]
-    const relativePath = argv[2]
-    Project.From<Project>(cwd).filesFactory.createModel(relativePath, name);
-    if (exit) {
-      process.exit(0)
-    }
-  }
-
-  public async workspaceFromArgs(args: string, exit = true, cwd: string) {
-    const argv = args.split(' ');
-
-    if (!_.isArray(argv) || argv.length < 1) {
-      Helpers.error(`Top few argument for ${chalk.black('init')} parameter.`, true);
-      this.errorMsgCreateProject()
-    }
-    const { basedOn, version, skipInit }: {
-      basedOn: string;
-      version: ConfigModels.FrameworkVersion;
-      skipInit?: boolean
-    } = require('minimist')(args.split(' '));
-
-
-    if (basedOn) {
-      Helpers.error(`To create workspace site use command: `
-        + `${config.frameworkName} new: site name - of - workspace - site`
-        + `--basedOn relativePathToBaselineWorkspace`, false, true);
-    }
-    const type = 'isomorphic-lib' as any;
-    const name = argv[0];
-
-    const proj = await this.create({
-      type,
-      name,
-      cwd,
-      basedOn: void 0,
-      version: config.defaultFrameworkVersion, // (_.isString(version) && version.length <= 3 && version.startsWith('v')) ? version : void 0,
-      skipInit
-    });
-
-    Helpers.writeFile([proj.location, 'README.md'], `
-  #  ${_.startCase(proj.name)}
-
-    `)
-
-    if (exit) {
-      process.exit(0)
-    }
-
-  }
-
-  public async workspaceSiteFromArgs(args: string, exit = true, cwd: string, strictSiteMode = true) {
-    const argv = args.split(' ');
-
-    if (args.length < 2) {
-      this.errorMsgCreateSite()
-    }
-    const alsoBasedOn = ((argv.length > 2 && !strictSiteMode) ? (argv.slice(2)) : []);
-
-    await this.create({
-      type: 'workspace',
-      name: argv[0] as any,
-      cwd,
-      basedOn: argv[1] as any,
-      siteProjectMode: strictSiteMode ? 'strict' : 'dependency',
-      alsoBasedOn
-    });
-    if (exit) {
-      process.exit(0)
-    }
-  }
-
 
 }

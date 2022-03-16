@@ -75,12 +75,12 @@ export class NodeModulesCore extends FeatureForProject {
     dedupePackages(this.project.location, packages, true, !this.project.npmPackages.useSmartInstall)
   };
   public remove = (packageInside?: string) => {
-    Helpers.info(`Removing node_modules from ${this.project?.name}`)
+    Helpers.info(`Removing node_modules from ${this.project?.name}`);
     if (packageInside) {
       Helpers.removeIfExists(path.join(this.path, packageInside))
       return;
     }
-    Helpers.tryRemoveDir(this.path)
+    Helpers.remove(this.path)
   };
   public linkToProject = (target: Project) => {
     if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
@@ -93,6 +93,7 @@ export class NodeModulesCore extends FeatureForProject {
     if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
       this.project.run(`${config.frameworkName} install`).sync();
     }
+    Helpers.remove(path.join(target, config.folder.node_modules));
     Helpers.createSymLink(this.path, target)
   };
 

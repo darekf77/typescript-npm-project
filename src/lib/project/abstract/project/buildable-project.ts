@@ -284,10 +284,10 @@ export abstract class BuildableProject {
       }
 
       // // TODO  -> FOR BUNDLE copyt node_modules not link
-      // if (!_.isArray(this.buildOptions.copyto)) {
-      //   this.buildOptions.copyto = [];
-      // }
-      // this.buildOptions.copyto.push(this as any);
+      if (!_.isArray(this.buildOptions.copyto)) {
+        this.buildOptions.copyto = [];
+      }
+
 
 
       if (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
@@ -379,6 +379,10 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
     if (!this.isVscodeExtension) {
       PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[buildable-project]');
+    }
+
+    if (this.isSmartContainerChild) {
+      this.buildOptions.copyto = []
     }
 
 
