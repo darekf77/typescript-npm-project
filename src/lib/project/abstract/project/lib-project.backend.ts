@@ -319,6 +319,16 @@ export abstract class LibProject {
     });
     this.packageJson.showDeps(`after release show when ok`);
 
+    if (this.packageJson.name === 'tnp') {  // TODO QUICK_FIX
+      Helpers.setValueToJSON(path.join(this.location, config.folder.bundle, config.file.package_json), 'dependencies',
+        this.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+          return _.merge(a, {
+            [b]: this.TnpProject.packageJson.data.dependencies[b]
+          })
+        }, {})
+      );
+    }
+
     if (!global.tnpNonInteractive) {
       this.run(`code .`).sync();
       Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
