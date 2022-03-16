@@ -715,6 +715,16 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
     //#endregion
   }
+
+  if (project.name === 'tnp') {
+    delete project.packageJson.data.dependencies['tnp'];
+    delete project.packageJson.data.dependencies['firedev'];
+  }
+
+  if (project.name === 'firedev') {
+    delete project.packageJson.data.dependencies['tnp'];
+  }
+
   _.keys(project.packageJson.data.dependencies)
     .forEach(depName => {
       const v = project.packageJson.data.dependencies[depName];
