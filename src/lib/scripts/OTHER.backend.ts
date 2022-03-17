@@ -192,7 +192,7 @@ async function $SEND_EMAIL(args: string) {
   // // send mail with defined transport object
   // let info = await transporter.sendMail({
   //   from: '"Fred Foo 👻" <foo@example.com>', // sender address
-  //   to: "darekf77@gmai.com, dariusz.filipiak@igt.com", // list of receivers
+  //   to: "darekf77@icloud.com", // list of receivers
   //   subject: "Hello ✔", // Subject line
   //   text: "Hello world?", // plain text body
   //   html: "<b>Hello world?</b>", // html body

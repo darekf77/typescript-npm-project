@@ -202,25 +202,33 @@ const $KILLWORKER = async () => {
 export async function $DEVELOP(args: string, exit = true) {
   // console.log('adasdas')
   const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
+  const projectsToOpen = args.trim().split(' ');
+  const projectForAction: Project[] = [];
+
   const db = await TnpDB.Instance();
   // @ts-ignore
   let projects = (await db.getProjects()).map(p => p.project as Project)
     .filter(p => !p.isGenerated && !p.isGeneratedForRelease);
 
-  const igt = path.join((Project.Tnp as Project).location, '../..', 'igt');
-  // console.log('igt', igt)
+  const projs = path.join((Project.Tnp as Project).location, '../..');
+
   const unknowNPm: Project[] = [];
-  if (fse.existsSync(igt)) {
-    projects = projects.concat(fse.readdirSync(igt)
-      .map(f => {
-        f = path.join(igt, f);
-        const proj = Project.From<Project>(f)
-        // console.log(`${f} proj name: ${proj && proj.name}`);
-        if (proj) {
-          unknowNPm.push(proj)
-        }
-        return proj;
-      }));
+  if (fse.existsSync(projs)) {
+
+    Helpers.foldersFrom(projs).forEach(folderWithProjects => {
+      projects = projects.concat(fse.readdirSync(folderWithProjects)
+        .map(f => {
+          f = path.join(projs, f);
+          const proj = Project.From<Project>(f)
+          // console.log(`${f} proj name: ${proj && proj.name}`);
+          if (proj) {
+            unknowNPm.push(proj)
+          }
+          return proj;
+        }));
+    })
+
+
   }
 
   unknowNPm.forEach(p => {
@@ -239,8 +247,7 @@ export async function $DEVELOP(args: string, exit = true) {
     }
   });
 
-  const projectsToOpen = args.trim().split(' ');
-  const projectForAction: Project[] = [];
+
 
   projectsToOpen.forEach(projectName => {
     try {
