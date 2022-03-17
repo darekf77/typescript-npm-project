@@ -371,8 +371,10 @@ export class ProjectIsomorphicLib
 
     Helpers.log(` command: ${angularCommand}`);
 
+    const webpackGlob = this.npmPackages.global('webpack');
+
     const webpackCommandFn = (watchCommand: boolean) =>
-      `npx webpack@3.10.0 --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
+      `node ${webpackGlob} --version && node ${webpackGlob} --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
 
@@ -397,13 +399,20 @@ export class ProjectIsomorphicLib
 
     proxy Proj = ${proxyProject?.location}
 
-    `)
+    `);
+
+    // const webPack1 = `require('webpack')`;
+    // const webPack2 = `require('${this.npmPackages.global('webpack', true)}')`;
+    // const fileWEbpack = path.join(this.location, 'webpack.backend-bundle-build.js')
+    // const fileContent = Helpers.readFile(fileWEbpack).replace(webPack1, webPack2);
+    // Helpers.writeFile(fileWEbpack, fileContent);
 
     if (this.buildOptions.watch) {
       //#region watch build
       if (outDir === 'bundle') {
         // Helpers.error(`Watch build not available for bundle build`, false, true);
         Helpers.info(`Starting watch bundle build for fast cli..`);
+
         try {
           this.run(webpackCommand).async();
         } catch (er) {

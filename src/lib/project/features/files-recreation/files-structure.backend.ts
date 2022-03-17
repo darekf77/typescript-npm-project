@@ -257,6 +257,10 @@ export class FilesStructure extends FeatureForProject {
         }
       }
 
+      if (this.project.isContainerCoreProject && this.project.frameworkVersionEquals('v1')) {
+        this.project.quickFixes.overritenBadNpmPackages();
+      }
+
       if (this.project.isSmartContainerChild) {
         const parentPackageSource = path.join(this.project.parent.node_modules.pathFor(`@${this.project.parent.name}`));
         const parentPackageDest = path.join(this.project.node_modules.pathFor(`@${this.project.parent.name}`));

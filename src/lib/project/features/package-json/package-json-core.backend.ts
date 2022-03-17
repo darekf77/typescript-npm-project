@@ -78,7 +78,7 @@ export class PackageJsonCore {
     if (_.isString(res)) {
       return res;
     }
-    return '' as any;
+    return 'v1' as any;
   }
 
   get isSmart(): boolean {

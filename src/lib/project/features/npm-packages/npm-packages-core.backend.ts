@@ -1,6 +1,6 @@
 //#region imports
 import chalk from 'chalk';
-import { moment, path } from 'tnp-core'
+import { crossPlatformPath, moment, path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
@@ -19,6 +19,15 @@ import {
 //#endregion
 
 export class NpmPackagesCore extends FeatureForProject {
+
+
+  global(globalPackageName: string, packageOnly = false) {
+    const oldContainer = Project.by('container', 'v1') as Project;
+    if (packageOnly) {
+      return crossPlatformPath(path.join(oldContainer.node_modules.path, globalPackageName));
+    }
+    return crossPlatformPath(path.join(oldContainer.node_modules.path, globalPackageName, `bin/${globalPackageName}`));
+  }
 
   protected get emptyNodeModuls() {
     return !this.project.node_modules.exist;
@@ -105,7 +114,7 @@ export class NpmPackagesCore extends FeatureForProject {
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognitionExtended.fromProject(this.project).start(true,'[actualNpmProcess] after npm i');
+    PackagesRecognitionExtended.fromProject(this.project).start(true, '[actualNpmProcess] after npm i');
 
     if (!generatLockFiles) {
       if (useYarn) {

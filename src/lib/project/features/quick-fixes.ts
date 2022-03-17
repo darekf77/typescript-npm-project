@@ -140,7 +140,7 @@ export class QuickFixes extends FeatureForProject {
 
   public overritenBadNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
-    if (this.project.isTnp) { // TODO for all packages ???
+    if (this.project.isTnp || this.project.isContainerCoreProject) { // TODO for all packages ???
       this.project.node_modules.fixesForNodeModulesPackages
         .forEach(f => {
           const source = path.join(this.project.location, f);
@@ -267,6 +267,9 @@ export default _default;
   }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
+    if (this.project.frameworkVersionEquals('v1')) {
+      return;
+    }
     Helpers.log(`[quick fixes] missing source folder start`)
     if (!fse.existsSync(this.project.location)) {
       return;
