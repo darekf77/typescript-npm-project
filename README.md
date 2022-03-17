@@ -1,6 +1,6 @@
 # tnp 
 
-project is a core part of  https://github.com/darekf77/firedev
+this project is a core part of  https://github.com/darekf77/firedev
 (tnp means "typescript-npm-project" -> first mame of firedev )
 
 
