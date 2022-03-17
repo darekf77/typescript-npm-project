@@ -64,7 +64,7 @@ export class GitActions extends FeatureForProject {
     if (shouldBeProjectArr.length > 0) {
       Helpers.pressKeyAndContinue(`
 
-    ${shouldBeProjectArr.map(p => `-${p}`).join('\n')}
+${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
 
       press any key to clone each above project..`);
       for (let index = 0; index < shouldBeProjectArr.length; index++) {
@@ -79,7 +79,9 @@ export class GitActions extends FeatureForProject {
           }
         } else {
           const ADDRESS_GITHUB_SSH = this.project.git.originURL;
-          const githubGitUrl = ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
+          const githubGitUrl = this.project.isSmartContainer
+            ? ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${this.project.name}--${projectNameFromPackageJson}.git`)
+            : ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
           await Helpers.actionWrapper(() => {
             this.project.git.clone(githubGitUrl);
           }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
