@@ -11,7 +11,7 @@ import * as semver from 'semver';
 import { Project } from './project';
 import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
-import { Helpers, Project as $Project } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
@@ -182,7 +182,7 @@ export abstract class LibProject {
         });
         this.packageJson.linkTo(absolutePathReleaseProject, true);
 
-        const generatedProject = $Project.From(absolutePathReleaseProject) as Project;
+        const generatedProject = Project.From(absolutePathReleaseProject) as Project;
         this.allResources.forEach(relPathResource => {
           const source = path.join(this.location, relPathResource);
           const dest = path.join(absolutePathReleaseProject, relPathResource);
@@ -208,9 +208,9 @@ export abstract class LibProject {
 
     const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
       path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
-    const PorjectClass = CLASS.getBy('Project') as typeof Project;
+    // const PorjectClass = CLASS.getBy('Project') as typeof Project;
 
-    const realCurrentProj = PorjectClass.From(realCurrentProjLocation) as Project;
+    const realCurrentProj = Project.From(realCurrentProjLocation) as Project;
 
 
     this.bumpVersionForPath(realCurrentProj);
@@ -441,7 +441,7 @@ export abstract class LibProject {
 
 
 
-    const tnpProj = PorjectClass.Tnp as Project;
+    const tnpProj = Project.Tnp as Project;
 
     if (tnpProj) {
 
@@ -449,6 +449,7 @@ export abstract class LibProject {
       if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
         firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
       }
+      const coreCont =  Project.by('container', realCurrentProj._frameworkVersion) as Project;
 
       const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
       if (
@@ -457,7 +458,7 @@ export abstract class LibProject {
       ) {
         [
           firedeProj,
-          PorjectClass.by('container', realCurrentProj._frameworkVersion) as Project
+          coreCont,
         ].filter(f => !!f)
           .forEach(c => {
             c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
