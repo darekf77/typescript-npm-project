@@ -127,7 +127,7 @@ export class ProjectAngularClient
         //   "--display none"
         // ]
         Helpers.tryRemoveDir(path.join(this.location, outDirApp));
-        this.run(`npm-run webpack --config=webpack.config.build.${aot}js ${baseHref}`,
+        this.run(`npx webpack@3 --config=webpack.config.build.${aot}js ${baseHref}`,
           {
             output: (this.env.config.name === 'local'),
             silence: (this.env.config.name !== 'local'),

@@ -382,7 +382,7 @@ export class ProjectIsomorphicLib
       } BACKEND BUILD started...
 
         `);
-    Helpers.log(` command: ${webpackCommand}`);
+    Helpers.info(` command: ${webpackCommand}`);
 
 
 
