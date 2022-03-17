@@ -209,8 +209,10 @@ processing...
       const init = async () => {
         while (true) {
           try {
-            child.node_modules.remove();
-            child.smartNodeModules.install('install');
+            if (child.npmPackages.useSmartInstall) {
+              child.node_modules.remove();
+              child.smartNodeModules.install('install');
+            }
             child.run(`${config.frameworkName} init`
               + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
               { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).sync();
