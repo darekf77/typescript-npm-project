@@ -709,7 +709,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
     if (project.frameworkVersionAtLeast('v3')) {
       const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
-      project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
+      // project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
       project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
     }
 
@@ -719,10 +719,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   if (project.name === 'tnp') {
     delete project.packageJson.data.dependencies['tnp'];
     delete project.packageJson.data.dependencies['firedev'];
-  }
 
-  if (project.name === 'firedev') {
-    delete project.packageJson.data.dependencies['tnp'];
+
   }
 
   _.keys(project.packageJson.data.dependencies)
