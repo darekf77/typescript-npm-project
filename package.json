@@ -1,6 +1,6 @@
 {
   "name": "tnp",
-  "version": "13.0.27",
+  "version": "13.0.28",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
@@ -234,5 +234,6 @@
     "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd && tnp env:install"
   },
   "license": "MIT",
-  "private": false
+  "private": false,
+  "devDependencies": {}
 }
