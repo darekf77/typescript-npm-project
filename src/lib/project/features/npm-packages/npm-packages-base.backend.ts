@@ -16,7 +16,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return true;
     }
 
-    if (this.project.isTnp || this.project.isNaviCli) {
+    if (this.project.isTnp) {
       return false;
     }
 
