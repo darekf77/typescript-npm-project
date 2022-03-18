@@ -199,12 +199,15 @@ export abstract class BuildableProject {
         projects.push(containerProj);
       }
 
+      // @ts-ignore
       this.buildOptions.copyto = projects as any;
     } else {
       const db = await TnpDB.Instance();
       const projects = (await db.getProjects())
         .map(p => p.project)
         .filter(p => p.location !== this.location);
+
+        // @ts-ignore
       this.buildOptions.copyto = projects as any;
     }
   }
