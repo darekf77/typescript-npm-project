@@ -12,7 +12,7 @@ import { Models } from 'tnp-models';
 import { CLASS } from 'typescript-class-helpers';
 import { BaseInsideStruct } from './base-inside-struct';
 import { InsideStruct } from '../inside-struct';
-import { recreateApp } from './inside-struct-helpers';
+import { recreateApp, recreateIndex } from './inside-struct-helpers';
 
 @CLASS.NAME('InsideStructAngular13Lib')
 export class InsideStructAngular13Lib extends BaseInsideStruct {
@@ -193,6 +193,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         })();
 
         recreateApp(project);
+        recreateIndex(project);
 
 
       })

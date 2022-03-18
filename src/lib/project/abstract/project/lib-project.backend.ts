@@ -444,6 +444,7 @@ export abstract class LibProject {
     const tnpProj = Project.Tnp as Project;
 
     if (tnpProj) {
+      tnpProj.packageJson.save('showing for trusted')
 
       let firedeProj: Project;
       if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX

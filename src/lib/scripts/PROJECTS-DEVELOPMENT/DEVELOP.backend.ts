@@ -351,6 +351,7 @@ export async function $INFO(args: string) {
 
     name: ${proj.name}
     version: ${proj.version}
+    private: ${proj.isPrivate}
     last npm version: ${proj.lastNpmVersion}
     frameworkVersion: ${proj._frameworkVersion}
     genericName: ${proj.genericName}

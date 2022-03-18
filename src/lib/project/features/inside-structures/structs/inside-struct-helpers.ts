@@ -10,6 +10,22 @@ import {
 import { Helpers } from 'tnp-helpers';
 import type { Project } from '../../../abstract/project/project';
 
+export function recreateIndex(project: Project) {
+  (() => {
+    const indexInSrcFile = crossPlatformPath(path.join(
+      project.location,
+      config.folder.src,
+      'index.ts'
+    ));
+
+    if (!Helpers.exists(indexInSrcFile)) {
+      Helpers.writeFile(indexInSrcFile, `export * from './lib';
+      `);
+    }
+
+  })();
+}
+
 export function recreateApp(project: Project) {
   //#region @backend
   //#region when app.ts or app is not available is not
@@ -34,43 +50,43 @@ export function recreateApp(project: Project) {
       Helpers.writeFile(appFile, `
 
 ${'//#region'} @notForNpm
-${'//#region'} @${'bro'+'wser'}
-import { NgModule } from '@angular/core';
-import { Component, OnInit } from '@angular/core';
+${'//#region'} @${'bro' + 'wser'}
+    import { NgModule } from '@angular/core';
+    import { Component, OnInit } from '@angular/core';
 
-@Component({
-selector: 'app-${project.name}',
-template: 'hello from ${project.name}'
-})
-export class ${componentName} implements OnInit {
-constructor() { }
+    @Component({
+      selector: 'app-${project.name}',
+      template: 'hello from ${project.name}'
+    })
+    export class $ { componentName } implements OnInit {
+      constructor() { }
 
-ngOnInit() { }
-}
+      ngOnInit() { }
+    }
 
-@NgModule({
-imports: [],
-exports: [${componentName}],
-declarations: [${componentName}],
-providers: [],
-})
-export class ${moduleName} { }
-//#endregion
+    @NgModule({
+      imports: [],
+      exports: [${componentName}],
+      declarations: [${componentName}],
+      providers: [],
+    })
+    export class $ { moduleName } { }
+    //#endregion
 
-//#region @backend
-async function start(port: number)  {
+    //#region @backend
+    async function start(port: number) {
 
-}
+    }
 
-export default start;
-
-${'//#endregion'}
+    export default start;
 
 ${'//#endregion'}
 
+${'//#endregion'}
 
 
-      `.trim());
+
+    `.trim());
     }
 
 
