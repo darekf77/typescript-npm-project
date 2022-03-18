@@ -291,14 +291,17 @@ export abstract class BuildableProject {
         this.buildOptions.copyto = [];
       }
 
+      // @ts-ignore
       const additionalSmartContainerChildren = (this.buildOptions.copyto as Project[])
         .filter(c => c.isSmartContainer)
         .reduce((a, b) => {
           return a.concat(b.children)
         }, []);
 
+      // @ts-ignore
       this.buildOptions.copyto = [
         ...additionalSmartContainerChildren,
+        // @ts-ignore
         ...this.buildOptions.copyto,
       ];
 
@@ -325,8 +328,10 @@ export abstract class BuildableProject {
           }
         }
 
+        // @ts-ignore
         this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(this.buildOptions.copyto, 'location');
 
+        // @ts-ignore
         (this.buildOptions.copyto as any[]).forEach((proj: Project) => {
           const project = proj;
           const projectCurrent = this;
@@ -336,6 +341,7 @@ export abstract class BuildableProject {
         });
       }
 
+      // @ts-ignore
       if (this.buildOptions.copytoAll || (_.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0)) {
         this.packageJson.save('show before build');
       }
