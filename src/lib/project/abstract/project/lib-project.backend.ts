@@ -298,14 +298,14 @@ export abstract class LibProject {
     // this.packageJson.data.version = newVersion;
     // this.packageJson.save(`[release tnp]`);
 
-    config.packageJsonSplit.forEach(c => {
-      const property = c
-        .replace(`${config.file.package_json}_`, '')
-        .replace(`.json`, '');
-      Helpers.setValueToJSON(
-        path.join(this.location, config.folder.bundle, config.file.package_json),
-        property, void 0);
-    });
+    // config.packageJsonSplit.forEach(c => {
+    //   const property = c
+    //     .replace(`${config.file.package_json}_`, '')
+    //     .replace(`.json`, '');
+    //   Helpers.setValueToJSON(
+    //     path.join(this.location, config.folder.bundle, config.file.package_json),
+    //     property, void 0);
+    // });
 
     [
       // config.folder.browser, /// TODO FIX for typescript
