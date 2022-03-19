@@ -572,7 +572,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
       clenIgnored(project, project.packageJson.data.dependencies, {});
     } else {
-      project.packageJson.data.devDependencies = devDependencies;
+      project.packageJson.data.devDependencies = devDependencies || {};
       project.packageJson.data.dependencies = dependencies;
     }
     //#region  install latest version of package
