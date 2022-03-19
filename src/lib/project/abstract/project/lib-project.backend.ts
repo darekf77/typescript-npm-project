@@ -298,7 +298,7 @@ export abstract class LibProject {
     // this.packageJson.data.version = newVersion;
     // this.packageJson.save(`[release tnp]`);
 
-    // config.packageJsonSplit.forEach(c => {
+    // config.packageJsonSplit.forEach(c => { // TODO QUCK fix -> it was cousing git conflicts in package.json
     //   const property = c
     //     .replace(`${config.file.package_json}_`, '')
     //     .replace(`.json`, '');
