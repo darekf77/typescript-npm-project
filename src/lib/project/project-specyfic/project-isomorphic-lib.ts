@@ -363,13 +363,16 @@ export class ProjectIsomorphicLib
 
 
     const angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
-    Helpers.info(`
 
-        ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
+    const showInfoAngular = () => {
+      Helpers.info(`
 
-        `);
+      ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
 
-    Helpers.log(` command: ${angularCommand}`);
+      `);
+
+      Helpers.log(` command: ${angularCommand}`);
+    };
 
     const webpackGlob = this.npmPackages.global('webpack');
 
@@ -378,14 +381,15 @@ export class ProjectIsomorphicLib
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
 
-    Helpers.info(`
+    const showInfoWebpack = () => {
+      Helpers.info(`
 
-        WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''
-      } BACKEND BUILD started...
+      WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''
+        } BACKEND BUILD started...
 
-        `);
-    Helpers.info(` command: ${webpackCommand}`);
-
+      `);
+      Helpers.info(` command: ${webpackCommand}`);
+    };
 
 
     if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
@@ -414,6 +418,7 @@ export class ProjectIsomorphicLib
         Helpers.info(`Starting watch bundle build for fast cli..`);
 
         try {
+          showInfoWebpack()
           this.run(webpackCommand).async();
         } catch (er) {
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
@@ -427,6 +432,7 @@ export class ProjectIsomorphicLib
           }
         });
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
+        showInfoAngular()
         await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
       }
 
@@ -435,6 +441,7 @@ export class ProjectIsomorphicLib
 
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
         try {
+          showInfoWebpack()
           this.run(webpackCommand).sync();
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
@@ -460,6 +467,7 @@ export class ProjectIsomorphicLib
         }
         await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
         try {
+          showInfoAngular()
           await proxyProject.run(angularCommand).sync()
         } catch (e) {
           Helpers.error(`
@@ -470,6 +478,7 @@ export class ProjectIsomorphicLib
       } else {
         await this.incrementalBuildProcess.start('isomorphic compilation');
         try {
+          showInfoAngular()
           await proxyProject.run(angularCommand).sync()
         } catch (e) {
           Helpers.error(`
