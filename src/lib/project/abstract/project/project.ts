@@ -109,14 +109,17 @@ export class Project extends $Project<Project>
 
   //#region @backend
   public static linkCoreFolders() {
-    const essentialToLink = [
+    let essentialToLink = [
       'container',
       'angular-lib',
       'isomorphic-lib',
       // TODO add this automaticly in futere
     ] as ConfigModels.LibType[];
     config.coreProjectVersions.forEach(v => {
-      essentialToLink.forEach(t => {
+      const toLink = Number(v.replace('v', '')) < 3
+        ? essentialToLink
+        : essentialToLink.filter(f => f !== 'angular-lib');
+        toLink.forEach(t => {
         const continer = Project.by(t, v as any) as Project;
         continer.recreate.handleProjectSpecyficFiles();
       });

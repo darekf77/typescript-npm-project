@@ -1,6 +1,6 @@
 //#region @backend
-import { Ora } from 'ora';
-
+// import { Ora } from 'ora';
+export {};
 
 declare global {
   namespace NodeJS {
@@ -44,7 +44,7 @@ declare global {
       restartWorker?: boolean;
       reinitDb?: boolean;
       dbAlreadyRecreated?: boolean;
-      spinner: Ora;
+      spinner: any; // Ora;
 
     }
   }
