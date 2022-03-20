@@ -1,6 +1,6 @@
 {
   "name": "tnp",
-  "version": "13.0.43",
+  "version": "13.0.44",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
