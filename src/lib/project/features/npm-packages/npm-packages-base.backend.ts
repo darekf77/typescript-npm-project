@@ -118,14 +118,14 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
       if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
         if (!this.project.node_modules.isLink) {
-
           if (!this.project.node_modules.itIsSmartInstalation) {
             this.project.node_modules.dedupe();
           }
-
-          // TODO this does not apply for smartInstalation..
-          // but how to check if smart installation is smart not normal ?
         }
+
+        // TODO this does not apply for smartInstalation..
+        // but how to check if smart installation is smart not normal ?
+
         // this.project.node_modules.stuberizeFrontendPackages();
       }
 

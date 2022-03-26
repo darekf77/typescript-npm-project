@@ -331,8 +331,9 @@ export async function $INFO(args: string) {
     }
     const exists = Helpers.exists(args);
     const isFolder = Helpers.isFolder(args);
-    const isFile = Helpers.isFile(args);
-    const isLink = Helpers.isLink(args);
+    const isFile = !isFolder;
+    const isExistedSymlink = Helpers.isExistedSymlink(args);
+    const isUnexistedLink = Helpers.isUnexistedLink(args);
     const size = Helpers.size(args);
     Helpers.info(`
     path: ${args}
@@ -340,7 +341,8 @@ export async function $INFO(args: string) {
     exists: ${exists}
     isFolder: ${isFolder}
     isFile: ${isFile}
-    isLink: ${isLink}
+    isExistedSymlink: ${isExistedSymlink}
+    isUnexistedLink: ${isUnexistedLink}
     size: ${size} bytes
 
     `)

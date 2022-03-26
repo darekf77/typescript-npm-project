@@ -47,7 +47,7 @@ export class PackagesRecognition {
     }
     const node_modules = crossPlatformPath(path.join(this.cwd, config.folder.node_modules));
 
-    const linksToFolders = Helpers.linksFrom(node_modules, { linksOnlyTo: 'folders' });
+    const linksToFolders = Helpers.linksToFolderFrom(node_modules);
 
     let folders = [
       ...Helpers.foldersFrom(node_modules),

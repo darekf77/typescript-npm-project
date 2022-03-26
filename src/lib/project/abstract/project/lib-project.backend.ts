@@ -606,7 +606,7 @@ export abstract class LibProject {
 
 
     if (Helpers.exists(source)) {
-      if (Helpers.isLink(source)) {
+      if (Helpers.isExistedSymlink(source)) {
         source = Helpers.pathFromLink(source);
       }
       if (Helpers.exists(source)) {

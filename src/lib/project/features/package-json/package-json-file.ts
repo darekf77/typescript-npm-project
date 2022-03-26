@@ -48,7 +48,9 @@ export class PackageJsonFile {
 
   get saveAtLoad() {
     //#region @backendFunc
-    return this.isTnpTypeProject && this.additionalSaveRequired && !Helpers.isLink(this.fullPath);
+    return this.isTnpTypeProject
+      && this.additionalSaveRequired
+      && !Helpers.isSymlinkFileExitedOrUnexisted(this.fullPath);
     //#endregion
   }
 

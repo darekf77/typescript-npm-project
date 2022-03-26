@@ -337,7 +337,7 @@ export class FilesStructure extends FeatureForProject {
 
   handleSmartContainer() {
     const nodeModulesContainer = path.join(this.project.location, config.folder.node_modules, `@${this.project.name}`);
-    if (Helpers.isLink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
+    if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
       Helpers.remove(nodeModulesContainer);
     }
     if (!Helpers.exists(nodeModulesContainer)) {

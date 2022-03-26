@@ -141,14 +141,14 @@ function nodeMOdulesOK(pathToFolder: string | string[], moreThan = 1) {
   Helpers.log(`[node-modules] checking if exists in: ${pathToFolder}`)
   if (Helpers.exists(pathToFolder)) {
     const count = {
-      files: 0,
+      unknowFilesOrUnexitedLInks: 0,
       folders: 0,
       links: 0
     };
     res = !_.isUndefined(fse.readdirSync(pathToFolder)
       .map(f => path.join(pathToFolder as string, f))
       .find(f => {
-        if (count.files > moreThan) {
+        if (count.unknowFilesOrUnexitedLInks > moreThan) {
           return true;
         }
         if (count.folders > moreThan) {
@@ -157,12 +157,12 @@ function nodeMOdulesOK(pathToFolder: string | string[], moreThan = 1) {
         if (count.links > moreThan) {
           return true;
         }
-        if (Helpers.isLink(f)) {
+        if (Helpers.isExistedSymlink(f)) {
           count.links++;
         } else if (Helpers.isFolder(f)) {
           count.folders++;
-        } else if (Helpers.isFile(f)) {
-          count.files++;
+        } else {
+          count.unknowFilesOrUnexitedLInks++;
         }
         return false;
       })
@@ -196,7 +196,7 @@ export function nodeModulesExists(project: Project) {
 }
 
 export function nodeModulesHasOnlyLinks(project: Project) {
-  const links = Helpers.linksFrom(project.node_modules.path);
+  const links = Helpers.linksToFolderFrom(project.node_modules.path);
   return links.length > 500; // TODO QUICK_FIX
 }
 
@@ -546,7 +546,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       });
 
     Helpers.writeFile(path.join(proj.location, config.file.index_d_ts),
-    Helpers.generatedFileWrap(`export * from './dist';`));
+      Helpers.generatedFileWrap(`export * from './dist';`));
 
     Helpers.writeFile(path.join(proj.location, config.file.index_js), Helpers.generatedFileWrap(`
     "use strict";

@@ -61,9 +61,6 @@ export class NodeModulesBase extends NodeModulesCore {
           //#region handle specyfick folders and files
           const linkFromBin = fse.realpathSync(f);
           if (Helpers.exists(linkFromBin)) {
-            if (Helpers.isFile(linkFromBin)) {
-              Helpers.copyFile(linkFromBin, dest);
-            }
             if (Helpers.isFolder(linkFromBin)) {
               Helpers.removeFolderIfExists(dest);
               const all = Helpers.filesFrom(linkFromBin);
@@ -80,6 +77,8 @@ export class NodeModulesBase extends NodeModulesCore {
                     + `${path.basename(f)}`, false);
                 }
               });
+            } else {
+              Helpers.copyFile(linkFromBin, dest);
             }
           } else {
             Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `

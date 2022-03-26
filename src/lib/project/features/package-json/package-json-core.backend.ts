@@ -337,7 +337,7 @@ export class PackageJsonCore {
         if (current && _.keys(current).length > 0) {
           const writer = json5Write.load(Helpers.readFile(splitPath));
           writer.write(dataToWrite);
-          if (!Helpers.isLink(splitPath)) {
+          if (!Helpers.isSymlinkFileExitedOrUnexisted(splitPath)) {
             Helpers.writeFile(splitPath, writer.toSource());
             if (property === 'tnp') {
               tnpSaved = true;
@@ -345,7 +345,7 @@ export class PackageJsonCore {
           }
         }
       } else {
-        if (!Helpers.isLink(splitPath) && !!(dataToWrite?.tnp?.type)) {
+        if (!Helpers.isSymlinkFileExitedOrUnexisted(splitPath) && !!(dataToWrite?.tnp?.type)) {
           Helpers.writeJson(splitPath, dataToWrite);
           if (property === 'tnp') {
             tnpSaved = true;
@@ -372,7 +372,7 @@ export class PackageJsonCore {
             .replace(`.json`, '');
           delete data[property];
         });
-      if (Helpers.isLink(this.path)) {
+      if (Helpers.isExistedSymlink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
@@ -382,7 +382,7 @@ export class PackageJsonCore {
         Helpers.writeFile(this.path, d);
       }
     } else {
-      if (Helpers.isLink(this.path)) {
+      if (Helpers.isExistedSymlink(this.path)) {
         Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;

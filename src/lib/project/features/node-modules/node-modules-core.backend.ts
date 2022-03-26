@@ -19,7 +19,7 @@ export class NodeModulesCore extends FeatureForProject {
   }
   public get exist() { return nodeModulesExists(this.project); }
   public get itIsSmartInstalation() { return nodeModulesHasOnlyLinks(this.project); }
-  public get isLink() { return Helpers.isLink(this.path); }
+  public get isLink() { return Helpers.isSymlinkFileExitedOrUnexisted(this.path); }
   public dedupe = (packagesOrOptions?: string[] | { packages?: string[]; reason: string }) => {
 
 
