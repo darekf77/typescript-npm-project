@@ -10,7 +10,7 @@ import chalk from 'chalk';
  * THIS FUNCTION CAN'T BE RECURIVE
  * event in worksapce childs...
  */
-export async function chainBuild(args: string) {
+export async function chainBuild(args: string, watch = false, outFolder: Models.dev.BuildDir = 'dist') {
   const allowedLibs = [
     'angular-lib',
     'isomorphic-lib',
@@ -19,10 +19,12 @@ export async function chainBuild(args: string) {
 
   let project = (Project.Current as Project);
 
-  if (project.isContainer) {
+  if (project.isSmartContainer) {
+    await project.buildProcess.startForLibFromArgs(false, watch, outFolder, args);
 
   } else {
-    //#region chain build for workspace
+    //#region not smat container
+    let orgArgs = args;
     const firstArg = _.first(args.split(' '));
     if (project.isWorkspace || project.isContainer) {
       let selectedChild = project.children.find(c => c.name === firstArg);
@@ -39,152 +41,161 @@ export async function chainBuild(args: string) {
         project = selectedChild;
       }
     }
-    await Helpers.compilationWrapper(async () => {
-      project.removeFileByRelativePath(config.file.tnpEnvironment_json);
-      await (project.env as any as EnvironmentConfig).init(args);
-    }, `Reiniting environment for chaing build...`);
 
 
-    if (project.typeIsNot(...allowedLibs)) {
-      Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
-    }
-    //#endregion
-  }
+    if (project.isContainer) {
+      // nothing here
+    } else {
+      //#region chain build for workspace
+      await Helpers.compilationWrapper(async () => {
+        project.removeFileByRelativePath(config.file.tnpEnvironment_json);
+        await (project.env as any as EnvironmentConfig).init(args);
+      }, `Reiniting environment for chaing build...`);
 
-  var orgArgs = args;
-  if (project.isWorkspaceChildProject) {
-    args += ` --forClient=${project.name}`;
-  }
 
-  let deps: Project[] = [];
-  const copyto: { [projectLocation: string]: Project[]; } = {};
-
-  if (project.isStandaloneProject) {
-    deps = [project];
-  } else if (project.isContainer) {
-    const standaloneProjects = project.projectsFromArgs(args, (newArgs) => {
-      args = newArgs;
-    });
-    deps = standaloneProjects.map(p => {
-      copyto[p.project.location] = p.copyto;
-      return p.project;
-    });
-  } else {
-    deps = project.projectsInOrderForChainBuild();
-  }
-
-  const baselineProjects = [];
-
-  if (project.isSite) {
-    //#region handle site
-    const depsWithBaseline = [];
-    deps.forEach(d => {
-      if (!!d.baseline) {
-        depsWithBaseline.push(d.baseline);
-        baselineProjects.push(d.baseline)
+      if (project.typeIsNot(...allowedLibs)) {
+        Helpers.error(`Command only for project types: ${allowedLibs.join(',')}`, false, true);
       }
-      depsWithBaseline.push(d);
-    });
-    deps = depsWithBaseline;
-    //#endregion
-  }
+      //#endregion
+    }
 
-  Helpers.info(`
 
-  CHAIN BUILD PLAN:
-${deps.map((d, i) => {
-    const s = _.isArray(copyto[d.location]) ? ` copy to: ${
-      (copyto[d.location].length === 0) ? '-' : copyto[d.location]
+    if (project.isWorkspaceChildProject) {
+      args += ` --forClient=${project.name}`;
+    }
+
+    let deps: Project[] = [];
+    const copyto: { [projectLocation: string]: Project[]; } = {};
+
+    if (project.isStandaloneProject) {
+      deps = [project];
+    } else if (project.isContainer) {
+      const standaloneProjects = project.projectsFromArgs(args, (newArgs) => {
+        args = newArgs;
+      });
+      deps = standaloneProjects.map(p => {
+        copyto[p.project.location] = p.copyto;
+        return p.project;
+      });
+    } else {
+      deps = project.projectsInOrderForChainBuild();
+    }
+
+    const baselineProjects = [];
+
+    if (project.isSite) {
+      //#region handle site
+      const depsWithBaseline = [];
+      deps.forEach(d => {
+        if (!!d.baseline) {
+          depsWithBaseline.push(d.baseline);
+          baselineProjects.push(d.baseline)
+        }
+        depsWithBaseline.push(d);
+      });
+      deps = depsWithBaseline;
+      //#endregion
+    }
+
+    Helpers.info(`
+
+    CHAIN BUILD PLAN:
+  ${deps.map((d, i) => {
+      const s = _.isArray(copyto[d.location]) ? ` copy to: ${(copyto[d.location].length === 0) ? '-' : copyto[d.location]
         .map(p => chalk.italic(p.name)
           // + '(' + p.location + ')'
         ).join(', ')
-      }` : '';
-    return (i + 1) + '. ' + chalk.bold(d.genericName) + s;
-  }).join('\n')}
+        }` : '';
+      return (i + 1) + '. ' + chalk.bold(d.genericName) + s;
+    }).join('\n')}
 
-  `)
+    `)
 
-  let index = 0;
-  const buildedOK = [];
+    let index = 0;
+    const buildedOK = [];
 
-  if (project.isStandaloneProject && !project.isDocker) {
-    args += ` --skipCopyToSelection true`;
-    const copytoPathes = await project.selectProjectToCopyTO();
-    if (copytoPathes.length > 0) {
-      copytoPathes.forEach(pathToPorjectToCopy => {
-        args += ` --copyto=${pathToPorjectToCopy}`;
-      });
-    }
-  }
-
-  while (index < deps.length) {
-    // for (let index = 0; index < deps.length; index++) {
-    const projDep = deps[index];
-
-    const action = async (proj: Project) => {
-      const isBaselineForThisBuild = baselineProjects.includes(proj);
-      let argsForProjct = args;
-      const watchModeAvailable = await proj.compilerCache.isWatchModeAllowed;
-      if (watchModeAvailable) {
-        Helpers.info(`[chainbuild] watch mode added for ${proj.name}`);
-        argsForProjct += ` --watchOnly`;
-      } else {
-        Helpers.info(`[chainbuild] full compilation needed for ${proj.name}`);
-      }
-
-      const command = `${config.frameworkName} bdw ${argsForProjct} `
-        + ` ${!project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
-        + ` ${!global.hideLog ? '-verbose' : ''}`
-        + ` ${isBaselineForThisBuild ? '--skipBuild=true' : ''}`
-        + (_.isArray(copyto[proj.location]) ?
-          copyto[proj.location].map(p => ` --copyto=${p.location} `).join(' ')
-          : '')
-        ;
-      Helpers.info(`
-
-      Running command in ${isBaselineForThisBuild ? 'baseline' : ''} dependency "${chalk.bold(proj.genericName)}" : ${command}
-
-      `);
-      if (proj.isWorkspaceChildProject || proj.isStandaloneProject) {
-
-        await proj.run(command, {
-          output: true,
-          prefix: chalk.bold(`${isBaselineForThisBuild ? '[baseline]' : ''}[${proj.name}]`)
-        }).unitlOutputContains(isBaselineForThisBuild ?
-          'Skip build for ' :
-          [
-            'Waching files.. started.. please wait',
-            'No need to copying on build finsh', // angular lib,
-            'Build steps ended...',
-          ]
-          ,
-          [
-            'Error: Command failed',
-            ': error ',
-            'Command failed:',
-            'Compilation error',
-            'Error: Please compile your'
-          ]);
-
-      }
-      // if (proj.isStandaloneProject) {
-      //   proj.run(`${config.frameworkName} bd ${args}`).sync();
-      // }
-    };
-
-    if (!buildedOK.includes(projDep)) {
-      try {
-        await action(projDep);
-        buildedOK.push(projDep);
-      } catch (error) {
-        Helpers.pressKeyAndContinue(`Fix errors for project ${projDep.genericName} and press ENTER to build again.. and wait 10s`);
-        continue;
+    if (project.isStandaloneProject && !project.isDocker) {
+      args += ` --skipCopyToSelection true`;
+      const copytoPathes = await project.selectProjectToCopyTO();
+      if (copytoPathes.length > 0) {
+        copytoPathes.forEach(pathToPorjectToCopy => {
+          args += ` --copyto=${pathToPorjectToCopy}`;
+        });
       }
     }
-    index++;
+
+    while (index < deps.length) {
+      // for (let index = 0; index < deps.length; index++) {
+      const projDep = deps[index];
+
+      const action = async (proj: Project) => {
+        const isBaselineForThisBuild = baselineProjects.includes(proj);
+        let argsForProjct = args;
+        const watchModeAvailable = await proj.compilerCache.isWatchModeAllowed;
+        if (watchModeAvailable) {
+          Helpers.info(`[chainbuild] watch mode added for ${proj.name}`);
+          argsForProjct += ` --watchOnly`;
+        } else {
+          Helpers.info(`[chainbuild] full compilation needed for ${proj.name}`);
+        }
+
+        const command = `${config.frameworkName} bdw ${argsForProjct} `
+          + ` ${!project.isStandaloneProject ? '--tnpNonInteractive' : ''}`
+          + ` ${!global.hideLog ? '-verbose' : ''}`
+          + ` ${isBaselineForThisBuild ? '--skipBuild=true' : ''}`
+          + (_.isArray(copyto[proj.location]) ?
+            copyto[proj.location].map(p => ` --copyto=${p.location} `).join(' ')
+            : '')
+          ;
+        Helpers.info(`
+
+        Running command in ${isBaselineForThisBuild ? 'baseline' : ''} dependency "${chalk.bold(proj.genericName)}" : ${command}
+
+        `);
+        if (proj.isWorkspaceChildProject || proj.isStandaloneProject) {
+
+          await proj.run(command, {
+            output: true,
+            prefix: chalk.bold(`${isBaselineForThisBuild ? '[baseline]' : ''}[${proj.name}]`)
+          }).unitlOutputContains(isBaselineForThisBuild ?
+            'Skip build for ' :
+            [
+              'Waching files.. started.. please wait',
+              'No need to copying on build finsh', // angular lib,
+              'Build steps ended...',
+            ]
+            ,
+            [
+              'Error: Command failed',
+              ': error ',
+              'Command failed:',
+              'Compilation error',
+              'Error: Please compile your'
+            ]);
+
+        }
+        // if (proj.isStandaloneProject) {
+        //   proj.run(`${config.frameworkName} bd ${args}`).sync();
+        // }
+      };
+
+      if (!buildedOK.includes(projDep)) {
+        try {
+          await action(projDep);
+          buildedOK.push(projDep);
+        } catch (error) {
+          Helpers.pressKeyAndContinue(`Fix errors for project ${projDep.genericName} and press ENTER to build again.. and wait 10s`);
+          continue;
+        }
+      }
+      index++;
+    }
+
+    if (!project.isContainer) {
+      await project.buildProcess.startForAppFromArgs(false, true, 'dist', orgArgs);
+    }
+    //#endregion
   }
 
-  if (!project.isContainer) {
-    await project.buildProcess.startForAppFromArgs(false, true, 'dist', orgArgs);
-  }
+
 }

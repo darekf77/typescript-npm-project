@@ -8,6 +8,8 @@ import { Project } from '../abstract';
 import { BuildOptions } from 'tnp-db';
 import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
+import type { ProjectIsomorphicLib } from './project-isomorphic-lib';
+import { Models } from 'tnp-models';
 
 //#region @backend
 @CLASS.NAME('ProjectContainer')
@@ -61,10 +63,19 @@ export class ProjectContainer
 
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
+    if (this.isSmartContainer) {
+      return [
+        'tsconfig.json',
+      ]
+    }
     return [
 
     ];
     //#endregion
+  }
+
+  proxyProjFor(client: string, outFolder: Models.dev.BuildDir): ProjectIsomorphicLib {
+    return Project.From(SingularBuild.getProxyProj(this, client, outFolder)) as any
   }
 
   async buildSteps(buildOptions?: BuildOptions) {
@@ -72,8 +83,10 @@ export class ProjectContainer
     if (!fse.existsSync(this.location)) {
       return;
     }
-    const { prod, watch, outDir, args, appBuild } = buildOptions;
+    const { outDir, args } = buildOptions;
 
+    const proxy = this.proxyProjFor(_.first(args.split(' ')).trim(), outDir);
+    await proxy.buildSteps(buildOptions);
 
     //#endregion
   }

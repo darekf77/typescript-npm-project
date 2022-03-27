@@ -3,7 +3,6 @@ import { _ } from 'tnp-core';
 import { glob } from 'tnp-core';
 import { fse } from 'tnp-core'
 import chalk from 'chalk';
-import { SingularBuild } from '../features/singular-build.backend';
 import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
@@ -123,7 +122,7 @@ export class ProjectWorkspace
     })}`);
 
     if (watch) {
-      await (new SingularBuild(this)).init(watch, prod);
+      await this.singluarBuild.init(watch, prod, buildOptions.outDir);
     } else {
       PROGRESS_DATA.log({ value: 0, msg: `Process started` });
       for (let index = 0; index < projects.length; index++) {

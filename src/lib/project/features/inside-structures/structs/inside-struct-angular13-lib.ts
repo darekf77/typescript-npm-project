@@ -20,7 +20,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
   private constructor(project: Project) {
     super(project);
     //#region @backend
-    if (!project.frameworkVersionAtLeast('v3')) {
+    if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
     const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}/${project.name}`;
@@ -175,7 +175,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           if (path.basename(f) === 'tsconfig.json') {
             content = content.replace(
               new RegExp(Helpers.escapeStringForRegEx(`"dist/${projectName}`), 'g'),
-               `"../../${outFolder}/browser/${projectName}`);
+              `"../../${outFolder}/browser/${projectName}`);
           }
 
           Helpers.writeFile(f, content);

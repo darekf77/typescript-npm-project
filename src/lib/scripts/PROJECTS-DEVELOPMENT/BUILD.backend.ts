@@ -33,12 +33,16 @@ const $CLEAN_BUILD = async (args) => {
 };
 
 const $BUILD_WATCH = async (args) => {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
-    // TODO skipCopyToSelection no loger ipmortant
-    args = `${args} --skipCopyToSelection --copytoAll`;
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isSmartContainer) {
+    await chainBuild(args, true);
+  } else {
+    if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
+      // TODO skipCopyToSelection no loger ipmortant
+      args = `${args} --skipCopyToSelection --copytoAll`;
+    }
+    await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
   }
-  await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
 };
 
 //#region BUILD / DEFAULT

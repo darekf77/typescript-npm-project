@@ -22,7 +22,7 @@ export type InitOptions = {
 }
 
 export class FilesStructure extends FeatureForProject {
-  handledSmartContainer = {};
+  // handledSmartContainer = {};
   findBaselines(proj: Project, baselines: Project[] = []): Project[] {
     if (!!proj.baseline) {
       baselines.unshift(proj.baseline)
@@ -180,11 +180,6 @@ export class FilesStructure extends FeatureForProject {
     }
     //#endregion
 
-    if (this.project.isSmartContainer) {
-      //#region handle smart container
-      this.handleSmartContainer();
-      //#endregion
-    }
 
     //#region recretate forsite
 
@@ -261,22 +256,30 @@ export class FilesStructure extends FeatureForProject {
         this.project.quickFixes.overritenBadNpmPackages();
       }
 
-      if (this.project.isSmartContainerChild) {
-        const parentPackageSource = path.join(this.project.parent.node_modules.pathFor(`@${this.project.parent.name}`));
-        const parentPackageDest = path.join(this.project.node_modules.pathFor(`@${this.project.parent.name}`));
-        if (!this.handledSmartContainer[this.project.parent.location]) {
-          this.handledSmartContainer[this.project.parent.location] = true;
-          if (!this.project.parent.node_modules.exist) {
-            await this.project.parent.npmPackages.installProcess('handle missing smart container node_modules')
-          }
-          this.project.parent.filesStructure.handleSmartContainer();
-        }
-        Helpers.remove(parentPackageDest);
-        Helpers.createSymLink(parentPackageSource, parentPackageDest)
-      }
+      // if (this.project.isSmartContainerChild) {
+      //   const parentPackageSource = path.join(this.project.parent.node_modules.pathFor(`@${this.project.parent.name}`));
+      //   const parentPackageDest = path.join(this.project.node_modules.pathFor(`@${this.project.parent.name}`));
+      //   if (!this.handledSmartContainer[this.project.parent.location]) {
+      //     this.handledSmartContainer[this.project.parent.location] = true;
+      //     if (!this.project.parent.node_modules.exist) {
+      //       await this.project.parent.npmPackages.installProcess('handle missing smart container node_modules')
+      //     }
+      //     this.project.parent.filesStructure.handleSmartContainer();
+      //   }
+      //   Helpers.remove(parentPackageDest);
+      //   Helpers.createSymLink(parentPackageSource, parentPackageDest)
+      // }
     }
 
     //#endregion
+
+    if (this.project.isSmartContainer) {
+      //#region handle smart container
+      // this.handleSmartContainer();
+      await this.project.singluarBuild.init(watch, false, 'dist', args as any);
+      //#endregion
+    }
+
 
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
 
@@ -335,50 +338,50 @@ export class FilesStructure extends FeatureForProject {
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
-  handleSmartContainer() {
-    const nodeModulesContainer = path.join(this.project.location, config.folder.node_modules, `@${this.project.name}`);
-    if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
-      Helpers.remove(nodeModulesContainer);
-    }
-    if (!Helpers.exists(nodeModulesContainer)) {
-      Helpers.mkdirp(nodeModulesContainer);
-    }
-    const childrens = this.project.children.filter(f => f.typeIs('isomorphic-lib'));
-    for (let index = 0; index < childrens.length; index++) {
-      const child = childrens[index];
-      (() => {
-        const source = path.join(child.location, config.folder.dist, 'lib');
-        const dest = path.join(nodeModulesContainer, child.name, 'lib');
-        if (!Helpers.exists(path.dirname(dest))) {
-          Helpers.mkdirp(path.dirname(dest));
-        }
-        Helpers.remove(dest);
-        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-      })();
+  handleSmartContainer() { // TODO everything will be in src
+    // const nodeModulesContainer = path.join(this.project.location, config.folder.node_modules, `@${this.project.name}`);
+    // if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
+    //   Helpers.remove(nodeModulesContainer);
+    // }
+    // if (!Helpers.exists(nodeModulesContainer)) {
+    //   Helpers.mkdirp(nodeModulesContainer);
+    // }
+    // const childrens = this.project.children.filter(f => f.typeIs('isomorphic-lib'));
+    // for (let index = 0; index < childrens.length; index++) {
+    //   const child = childrens[index];
+    //   (() => {
+    //     const source = path.join(child.location, config.folder.dist, 'lib');
+    //     const dest = path.join(nodeModulesContainer, child.name, 'lib');
+    //     if (!Helpers.exists(path.dirname(dest))) {
+    //       Helpers.mkdirp(path.dirname(dest));
+    //     }
+    //     Helpers.remove(dest);
+    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+    //   })();
 
-      (() => {
-        const source = path.join(child.location, config.folder.dist, config.folder.browser);
-        const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
-        Helpers.remove(dest);
-        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-      })();
+    //   (() => {
+    //     const source = path.join(child.location, config.folder.dist, config.folder.browser);
+    //     const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
+    //     Helpers.remove(dest);
+    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+    //   })();
 
-      (() => {
-        const dest = path.join(nodeModulesContainer, child.name, config.file.index_js);
-        Helpers.writeFile(dest, Helpers.generatedFileWrap(`
-          "use strict";
-          Object.defineProperty(exports, '__esModule', { value: true });
-          var tslib_1 = require('tslib');
-          tslib_1.__exportStar(require('./lib'), exports);
-                  `.trim()))
-      })();
+    //   (() => {
+    //     const dest = path.join(nodeModulesContainer, child.name, config.file.index_js);
+    //     Helpers.writeFile(dest, Helpers.generatedFileWrap(`
+    //       "use strict";
+    //       Object.defineProperty(exports, '__esModule', { value: true });
+    //       var tslib_1 = require('tslib');
+    //       tslib_1.__exportStar(require('./lib'), exports);
+    //               `.trim()))
+    //   })();
 
-      (() => {
-        const dest = path.join(nodeModulesContainer, child.name, config.file.index_d_ts);
-        Helpers.writeFile(dest, Helpers.generatedFileWrap(`export * from './lib';`))
-      })();
+    //   (() => {
+    //     const dest = path.join(nodeModulesContainer, child.name, config.file.index_d_ts);
+    //     Helpers.writeFile(dest, Helpers.generatedFileWrap(`export * from './lib';`))
+    //   })();
 
-    }
+    // }
   }
 
   recreateSiteChildren() {

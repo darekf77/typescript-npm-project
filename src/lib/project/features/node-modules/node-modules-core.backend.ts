@@ -90,6 +90,9 @@ export class NodeModulesCore extends FeatureForProject {
   };
 
   public linkTo = (target: string) => {
+    if(!path.isAbsolute(target)) {
+      Helpers.error(`[linkTo] taget path is not absolute "${target}"`)
+    }
     if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
       this.project.run(`${config.frameworkName} install`).sync();
     }

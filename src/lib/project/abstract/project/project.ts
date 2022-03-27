@@ -44,6 +44,7 @@ import { RecentFilesForContainer } from '../../features/recent-files.backend';
 import { CloudProject } from './cloud-project';
 import { GlobalWorkerApps } from '../../features/global-worker-apps';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
+import { SingularBuild } from '../../features/singular-build.backend';
 //#endregion
 
 @Morphi.Entity<Project>({
@@ -119,7 +120,7 @@ export class Project extends $Project<Project>
       const toLink = Number(v.replace('v', '')) < 3
         ? essentialToLink
         : essentialToLink.filter(f => f !== 'angular-lib');
-        toLink.forEach(t => {
+      toLink.forEach(t => {
         const continer = Project.by(t, v as any) as Project;
         continer.recreate.handleProjectSpecyficFiles();
       });
@@ -193,6 +194,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('recent', RecentFilesForContainer);
       this.defineProperty<Project>('workerApps', GlobalWorkerApps);
       this.defineProperty<Project>('insideStructure', InsideStructures);
+      this.defineProperty<Project>('singluarBuild', SingularBuild);
 
     }
 

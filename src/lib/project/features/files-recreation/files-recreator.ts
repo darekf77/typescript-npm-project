@@ -348,7 +348,7 @@ export class FilesRecreator extends FeatureForProject {
 
               if (hide) {
                 settings = getSettingsFor(self.project, settings) as any;
-                if (self.project.isWorkspace) {
+                if (self.project.isWorkspace || self.project.isSmartContainer) {
                   self.project.children.forEach(c => {
                     const childernSettings = getSettingsFor(c);
                     Object.keys(childernSettings['files.exclude']).forEach(k => {

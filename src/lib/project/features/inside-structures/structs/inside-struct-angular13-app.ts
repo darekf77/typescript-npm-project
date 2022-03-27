@@ -16,7 +16,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
   private constructor(project: Project) {
     super(project);
     //#region @backend
-    if (!project.frameworkVersionAtLeast('v3')) {
+    if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
     const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}/${project.name}`;

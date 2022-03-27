@@ -43,7 +43,8 @@ async function askForWhenEmpty(): Promise<Project> {
 
 export async function $STRUCT(args: string, exit = true) {
   await askForWhenEmpty();
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = (Project.Current as Project);
+  proj = proj?.isSmartContainer ? proj : Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   if (proj) {
     await proj.filesStructure.struct(args);
@@ -60,7 +61,9 @@ export async function STRUCTURE(args: string, exit = true) {
 
 export async function $INIT(args: string, exit = true) {
   await askForWhenEmpty();
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = (Project.Current as Project);
+
+  proj = proj?.isSmartContainer ? proj : Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj) {
     await proj.filesStructure.init(args);
   }

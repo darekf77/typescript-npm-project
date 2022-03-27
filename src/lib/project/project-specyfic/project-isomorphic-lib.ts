@@ -297,8 +297,10 @@ export class ProjectIsomorphicLib
     //#endregion
   }
 
+
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backendFunc
+    this.buildOptions = buildOptions;
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref } = buildOptions;
 
     if (!onlyWatchNoBuild) {
@@ -308,7 +310,7 @@ export class ProjectIsomorphicLib
         await this.buildLib();
       }
     }
-    return;
+
     //#endregion
   }
 
@@ -435,10 +437,10 @@ export class ProjectIsomorphicLib
         showInfoAngular()
         await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
       }
-
+      // console.log('HEHEHHE')
       //#endregion
     } else {
-
+      //#region non watch build
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
         try {
           showInfoWebpack()
@@ -488,9 +490,9 @@ export class ProjectIsomorphicLib
         }
         await this.browserCodePreventer.start('browser code preventer');
       }
-
+      //#endregion
     }
-
+    // console.log('EEEEE')
     //#endregion
   }
 

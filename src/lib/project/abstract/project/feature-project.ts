@@ -16,6 +16,7 @@ import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcessExtended } from '../../compilers';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
+import { SingularBuild } from '../../features/singular-build.backend';
 //#endregion
 import { _ } from 'tnp-core';
 
@@ -120,6 +121,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public insideStructure: InsideStructures;
+  //#endregion
+
+  //#region @backend
+  public singluarBuild: SingularBuild;
   //#endregion
 
 

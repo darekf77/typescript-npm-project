@@ -46,10 +46,12 @@ export class InsideStructures extends FeatureForProject {
   constructor(project: Project) {
     super(project);
     //#region @backend
+
     Object.keys(structs).forEach(s => {
       const structFn = structs[s] as typeof BaseInsideStruct;
       this.structures[CLASS.getName(structFn)] = new structFn(project);
     });
+
     //#endregion
   }
 
@@ -118,7 +120,7 @@ export class InsideStructures extends FeatureForProject {
         //#region linking node_modules
         for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
           const f = insideStruct.struct.linkNodeModulesTo[index]
-          const destPath = replacement(f);
+          const destPath = path.join(client.location, replacement(f));
           this.project.node_modules.linkTo(destPath);
         }
         //#endregion
@@ -127,10 +129,10 @@ export class InsideStructures extends FeatureForProject {
         for (let index = 0; index < insideStruct.struct.linksFuncs.length; index++) {
           const [fun1, fun2] = insideStruct.struct.linksFuncs[index]
           let from = fun1(opt);
-          from = replacement(from);
+          from = path.join(client.location, replacement(from));
 
           let to = fun2(opt);
-          to = replacement(to);
+          to = path.join(client.location, replacement(to));
           Helpers.remove(to);
           Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
         }
