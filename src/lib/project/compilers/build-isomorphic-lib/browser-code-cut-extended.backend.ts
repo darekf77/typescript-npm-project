@@ -306,17 +306,37 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
+
+    let parent: Project;
+    if (this.project.isSmartContainer) {
+      parent = this.project;
+    }
+    if (this.project.isSmartContainerChild) {
+      parent = this.project.parent;
+    }
+    const folderBefore = path.basename(path.dirname(path.dirname(this.project.location)));
+    if ([config.folder.dist, config.folder.bundle].includes(folderBefore)) {
+      const probablyParentPath = path.join(this.project.location, '../../..');
+      const probablyParent = Helpers.isFolder(probablyParentPath) && Project.From(probablyParentPath) as Project;
+      if (probablyParent?.isSmartContainer) {
+        parent = probablyParent;
+      }
+    }
+
+
     const packages = packagesNames.concat([
       this.project.name,
-      ...(this.project.isSmartContainerChild
-        ? this.project.parent.children.map(c => `@${this.project.parent.name}/${c.name}`)
-        : []
-      ),
-      ...(this.project.isSmartContainer
-        ? this.project.children.map(c => `@${this.project.name}/${c.name}`)
-        : []
-      )
+      ...(!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`)),
+      // ...(this.project.isSmartContainerChild
+      //   ? this.project.parent.children.map(c => `@${this.project.parent.name}/${c.name}`)
+      //   : []
+      // ),
+      // ...(this.project.isSmartContainer
+      //   ? `)
+      //   : []
+      // )
     ]);
+
 
     return super.getInlinePackage(packageName, packages);
   }

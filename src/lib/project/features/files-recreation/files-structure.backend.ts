@@ -273,10 +273,12 @@ export class FilesStructure extends FeatureForProject {
 
     //#endregion
 
+    this.handleSmartContainer(this.project);
+
     if (this.project.isSmartContainer) {
       //#region handle smart container
       // this.handleSmartContainer();
-      await this.project.singluarBuild.init(watch, false, 'dist', args as any);
+      await this.project.singluarBuild.init(watch, false, 'dist', Helpers.removeSlashAtEnd(args) as any);
       //#endregion
     }
 
@@ -338,51 +340,7 @@ export class FilesStructure extends FeatureForProject {
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
   }
 
-  handleSmartContainer() { // TODO everything will be in src
-    // const nodeModulesContainer = path.join(this.project.location, config.folder.node_modules, `@${this.project.name}`);
-    // if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
-    //   Helpers.remove(nodeModulesContainer);
-    // }
-    // if (!Helpers.exists(nodeModulesContainer)) {
-    //   Helpers.mkdirp(nodeModulesContainer);
-    // }
-    // const childrens = this.project.children.filter(f => f.typeIs('isomorphic-lib'));
-    // for (let index = 0; index < childrens.length; index++) {
-    //   const child = childrens[index];
-    //   (() => {
-    //     const source = path.join(child.location, config.folder.dist, 'lib');
-    //     const dest = path.join(nodeModulesContainer, child.name, 'lib');
-    //     if (!Helpers.exists(path.dirname(dest))) {
-    //       Helpers.mkdirp(path.dirname(dest));
-    //     }
-    //     Helpers.remove(dest);
-    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    //   })();
 
-    //   (() => {
-    //     const source = path.join(child.location, config.folder.dist, config.folder.browser);
-    //     const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
-    //     Helpers.remove(dest);
-    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    //   })();
-
-    //   (() => {
-    //     const dest = path.join(nodeModulesContainer, child.name, config.file.index_js);
-    //     Helpers.writeFile(dest, Helpers.generatedFileWrap(`
-    //       "use strict";
-    //       Object.defineProperty(exports, '__esModule', { value: true });
-    //       var tslib_1 = require('tslib');
-    //       tslib_1.__exportStar(require('./lib'), exports);
-    //               `.trim()))
-    //   })();
-
-    //   (() => {
-    //     const dest = path.join(nodeModulesContainer, child.name, config.file.index_d_ts);
-    //     Helpers.writeFile(dest, Helpers.generatedFileWrap(`export * from './lib';`))
-    //   })();
-
-    // }
-  }
 
   recreateSiteChildren() {
     const newChilds: Project[] = []
@@ -456,6 +414,87 @@ export class FilesStructure extends FeatureForProject {
       });
     }
 
+  }
+
+  handleSmartContainer(project: Project) { // TODO everything will be in src
+    if (!project.isSmartContainer && !project.isSmartContainerChild) {
+      return;
+    }
+    const parent = project.isSmartContainerChild ? project.parent : project;
+
+    const nodeModulesContainer = path.join(parent.location, config.folder.node_modules, `@${parent.name}`);
+    if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
+      Helpers.remove(nodeModulesContainer);
+    }
+    if (!Helpers.exists(nodeModulesContainer)) {
+      Helpers.mkdirp(nodeModulesContainer);
+    }
+    const childrens = parent.children.filter(f => f.typeIs('isomorphic-lib') && f.frameworkVersionAtLeast('v3'));
+    for (let index = 0; index < childrens.length; index++) {
+      const child = childrens[index];
+
+      (() => {
+        const source = path.join(child.location, config.folder.src, 'lib');
+        const dest = path.join(nodeModulesContainer, child.name, 'lib');
+        if (!Helpers.exists(path.dirname(dest))) {
+          Helpers.mkdirp(path.dirname(dest));
+        }
+        Helpers.remove(dest);
+        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+      })();
+
+      //#region  for browser code tsconfig links can be usefull
+      // (() => {
+
+      //   // FOR CONTAINER AND CHILD DIFFEREN LOCATION OF DIST
+      //   if (project.isSmartContainer) {
+      //     // dist/codete-blog-ngrx/ngrx-process/tmp-src-dist/libs // TODO QUICK_FIX
+      //     // const source = path.join(project.location, config.folder.dist, project.name, child.name, `tmp-src-dist`, 'libs', child.name);
+      //     // const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
+      //     // Helpers.remove(dest);
+      //     // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+      //   } else if (project.isSmartContainerChild) {
+      //     // const source = path.join(child.location, config.folder.dist, config.folder.browser);
+      //     // const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
+      //     // Helpers.remove(dest);
+      //     // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+      //   }
+      // })();
+
+      // (() => {
+      //   const source = path.join(child.location, config.folder.dist, 'lib');
+      //   const dest = path.join(nodeModulesContainer, child.name, 'lib');
+      //   if (!Helpers.exists(path.dirname(dest))) {
+      //     Helpers.mkdirp(path.dirname(dest));
+      //   }
+      //   Helpers.remove(dest);
+      //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+      // })();
+
+      // (() => {
+      //   const source = path.join(child.location, config.folder.dist, config.folder.browser);
+      //   const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
+      //   Helpers.remove(dest);
+      //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
+      // })();
+      //#endregion
+
+      (() => {
+        const dest = path.join(nodeModulesContainer, child.name, config.file.index_js);
+        Helpers.writeFile(dest, Helpers.generatedFileWrap(`
+          "use strict";
+          Object.defineProperty(exports, '__esModule', { value: true });
+          var tslib_1 = require('tslib');
+          tslib_1.__exportStar(require('./lib'), exports);
+                  `.trim()))
+      })();
+
+      (() => {
+        const dest = path.join(nodeModulesContainer, child.name, config.file.index_d_ts);
+        Helpers.writeFile(dest, Helpers.generatedFileWrap(`export * from './lib';`))
+      })();
+
+    }
   }
 
 }

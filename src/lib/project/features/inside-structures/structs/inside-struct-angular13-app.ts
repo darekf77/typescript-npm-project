@@ -267,6 +267,54 @@ ${appModuleFile}
 
         recreateApp(project);
 
+        //#region add proper pathes to tsconfig
+        (() => {
+          const tsconfigJSONpath = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/tsconfig.json`
+          ));
+
+          const libsPathes = crossPlatformPath(path.join(
+            project.location, `src/libs`
+          ));
+
+          const content = Helpers.readJson(tsconfigJSONpath, void 0, true);
+
+
+          let libs = Helpers.linksToFoldersFrom(libsPathes);
+          const parentPath = path.resolve(path.join(project.location, '../../..'));
+
+          const parent = Project.From(parentPath) as Project;
+          if (parent && parent.isSmartContainer && libs.length > 0 && content.compilerOptions) {
+
+            // console.log('tsconfigJSON', tsconfigJSONpath, content)
+            // console.log('libsPathes', libsPathes)
+            // console.log(`libs`, libs)
+            // console.log(`PARENT PATH: ${parentPath}  `)
+
+            content.compilerOptions.paths = ((libs).reduce((a, b) => {
+              const pathRelative = b
+                .replace(parent.location, '')
+                .split('/')
+                .slice(4)
+                .join('/')
+                .replace('src/', `src/app/${project.name}/`)
+                ;
+              return _.merge(a, {
+                [`@${parent.name}/${path.basename(b)}/${config.folder.browser}`]: [`./${pathRelative}`],
+                [`@${parent.name}/${path.basename(b)}/${config.folder.browser}/*`]: [`./${pathRelative}/*`],
+              })
+            }, {}));
+            Helpers.writeJson(tsconfigJSONpath, content);
+          }
+
+          // console.info(JSON.stringify(content.compilerOptions, null, 4))
+
+        })();
+        //#endregion
 
         //#endregion
       })

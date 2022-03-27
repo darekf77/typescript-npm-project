@@ -210,6 +210,46 @@ export abstract class VscodeProject {
   }
   //#endregion
 
+  public static launchFroSmartContaienr(container: Project) {
+    if (!container.isSmartContainer) {
+      return;
+    }
+
+    const configurations = container.children.filter(f => {
+      return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
+    }).map(c => {
+      return {
+        "type": "node",
+        "request": "launch",
+        "name": `Launch Server @${container.name}/${c.name}`,
+        "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
+        "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run.js`,
+        "args": [
+        ],
+        "outFiles": [
+          "${workspaceFolder}" + `/dist/${container.name}/${c.name}/dist/**/*.js`
+        ],
+        "runtimeArgs": [
+          "--nolazy",
+          "-r",
+          "ts-node/register",
+          "--experimental-worker"
+        ],
+        "presentation": {
+          "group": "workspaceServers"
+        }
+      }
+    })
+
+    const temlateSmartContine = {
+      "version": "0.2.0",
+      configurations,
+      // "compounds": []
+    };
+    const launchJSOnFilePath = path.join(container.location, '.vscode/launch.json')
+    Helpers.writeFile(launchJSOnFilePath, temlateSmartContine);
+  }
+
   //#region public api / get template of launch.json
   getTemlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
     let configurations = [];

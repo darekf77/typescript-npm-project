@@ -65,7 +65,9 @@ export class ProjectContainer
     //#region @backendFunc
     if (this.isSmartContainer) {
       return [
-        'tsconfig.json',
+        // 'tsconfig.json',
+        // ...this.vscodeFileTemplates,
+        // '.vscode/launch.json'
       ]
     }
     return [

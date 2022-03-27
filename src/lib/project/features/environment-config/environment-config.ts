@@ -5,7 +5,7 @@ import { _ } from 'tnp-core';
 import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import {
-  err, overrideDefaultPortsAndWorkspaceConfig,
+  handleError, overrideDefaultPortsAndWorkspaceConfig,
   saveConfigWorkspca as saveEnvironmentConfig, tmpEnvironmentFileName, workspaceConfigBy,
   overrideWorksapceRouterPort,
   standaloneConfigBy
@@ -149,7 +149,7 @@ export class EnvironmentConfig
       }
       if (!Helpers.isValidIp(configResult.ip)) {
         Helpers.error(`Bad ip address in your environment .json config`, true)
-        err(configResult, void 0, this.project.location);
+        handleError(configResult, void 0, this.project.location);
       }
     }
 
@@ -170,7 +170,7 @@ export class EnvironmentConfig
 
       if (!configResult.workspace || !configResult.workspace.workspace) {
         Helpers.error(`You shoud define 'workspace' object inside config.workspace object`, true)
-        err(configResult, void 0, this.project.location)
+        handleError(configResult, void 0, this.project.location)
       }
 
       if (configResult.name === 'local' || !configResult.domain) {

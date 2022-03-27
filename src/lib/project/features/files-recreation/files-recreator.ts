@@ -349,6 +349,12 @@ export class FilesRecreator extends FeatureForProject {
               if (hide) {
                 settings = getSettingsFor(self.project, settings) as any;
                 if (self.project.isWorkspace || self.project.isSmartContainer) {
+
+                  if(self.project.isSmartContainer) {
+                    settings['files.exclude'][`recent.json`] = true;
+                    // settings['files.exclude'][`src/lib`] = true;
+                  }
+
                   self.project.children.forEach(c => {
                     const childernSettings = getSettingsFor(c);
                     Object.keys(childernSettings['files.exclude']).forEach(k => {
@@ -358,7 +364,10 @@ export class FilesRecreator extends FeatureForProject {
                     settings['files.exclude'][`${c.name}/webpack*`] = true;
                     settings['files.exclude'][`${c.name}/index*`] = true;
                     settings['files.exclude'][`${c.name}/run.js`] = true;
-                    settings['files.exclude'][`${c.name}/.vscode`] = true;
+
+                    settings['files.exclude'][`${c.name}/src/index.ts`] = true;
+                    // settings['files.exclude'][`${c.name}/src/lib`] = true;
+                    // settings['files.exclude'][`${c.name}/src/lib`] = true;
                     settings['files.exclude'][`${c.name}/README.md`] = true;
                     settings['files.exclude'][`${c.name}/karma.conf.js*`] = true;
                     settings['files.exclude'][`${c.name}/protractor.conf.js*`] = true;

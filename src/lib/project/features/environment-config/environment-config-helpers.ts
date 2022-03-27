@@ -11,12 +11,13 @@ import { ProxyRouter } from '../proxy-router';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
 
+export const existedConfigs = {} as { [workspacePath in string]: Models.env.EnvConfig; }
 
 export const tmpEnvironmentFileName = config.file.tnpEnvironment_json;
 
 
-
-export function err(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
+//#region handle error
+export function handleError(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
 
   let configString = fileContent ? fileContent : `
   ...
@@ -39,21 +40,23 @@ ${configString}
 ${Helpers.terminalLine()}
 `, false, true)
 }
+//#endregion
 
+//#region validate config
 export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePath: string, isStandalone = false) {
   if (!_.isObject(workspaceConfig)) {
-    err(undefined, Helpers.readFile(filePath), filePath);
+    handleError(undefined, Helpers.readFile(filePath), filePath);
   }
 
   if (isStandalone) {
 
   } else {
-    if (!_.isObject(_.get(workspaceConfig, 'workspace'))) err(workspaceConfig, void 0, filePath);
-    if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) err(workspaceConfig, void 0, filePath)
+    if (!_.isObject(_.get(workspaceConfig, 'workspace'))) handleError(workspaceConfig, void 0, filePath);
+    if (!_.isArray(_.get(workspaceConfig, 'workspace.projects'))) handleError(workspaceConfig, void 0, filePath)
     workspaceConfig.workspace.projects.forEach(p => {
-      if (_.isUndefined(p.name)) err(workspaceConfig, void 0, filePath)
-      if (_.isUndefined(p.port)) err(workspaceConfig, void 0, filePath)
-      if (_.isUndefined(p.baseUrl)) err(workspaceConfig, void 0, filePath)
+      if (_.isUndefined(p.name)) handleError(workspaceConfig, void 0, filePath)
+      if (_.isUndefined(p.port)) handleError(workspaceConfig, void 0, filePath)
+      if (_.isUndefined(p.baseUrl)) handleError(workspaceConfig, void 0, filePath)
     });
 
     if (_.isUndefined(_.get(workspaceConfig, 'workspace.build'))) {
@@ -70,18 +73,22 @@ export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePat
       }
     }
     if (!_.isObject(_.get(workspaceConfig, 'workspace.build'))) {
-      err(workspaceConfig, void 0, filePath)
+      handleError(workspaceConfig, void 0, filePath)
     }
   }
 
 
 }
+//#endregion
 
+//#region override port type
 export interface OverridePortType {
   workspaceProjectLocation: string;
   workspaceConfig: Models.env.EnvConfig;
 }
+//#endregion
 
+//#region handle projects ports
 export async function handleProjectsPorts(project: Project, configProject: Models.env.EnvConfigProject, generatePorts) {
   if (generatePorts) {
     // Helpers.log(`[handleProject] generatedPort`)
@@ -106,12 +113,14 @@ export async function handleProjectsPorts(project: Project, configProject: Model
     }
   }
 }
+//#endregion
 
+//#region override worksapce router port
 export async function overrideWorksapceRouterPort(options: OverridePortType, generatePorts = true) {
   const { workspaceProjectLocation, workspaceConfig } = options;
 
   if (!workspaceConfig || !workspaceConfig.workspace || !workspaceConfig.workspace.workspace) {
-    err(workspaceConfig, void 0, `overrideWorksapceRouterPort - ${options.workspaceProjectLocation}`);
+    handleError(workspaceConfig, void 0, `overrideWorksapceRouterPort - ${options.workspaceProjectLocation}`);
   }
 
   const project = Project.From<Project>(workspaceProjectLocation)
@@ -122,11 +131,10 @@ export async function overrideWorksapceRouterPort(options: OverridePortType, gen
   const configProject = workspaceConfig.workspace.workspace;
 
   await handleProjectsPorts(project, configProject, generatePorts && workspaceConfig.dynamicGenIps);
-
 }
+//#endregion
 
-
-
+//#region override default ports and workspace config
 export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePortType, generatePorts = true) {
 
   const { workspaceProjectLocation, workspaceConfig } = options;
@@ -146,7 +154,9 @@ export async function overrideDefaultPortsAndWorkspaceConfig(options: OverridePo
     await handleProjectsPorts(project, configProject, generatePorts && workspaceConfig.dynamicGenIps)
   }
 }
+//#endregion
 
+//#region frontend cut version
 
 function frontendCuttedVersion(workspaceConfig: Models.env.EnvConfig) {
   const c = _.cloneDeep(workspaceConfig);
@@ -157,7 +167,9 @@ function frontendCuttedVersion(workspaceConfig: Models.env.EnvConfig) {
   // })
   return c;
 }
+//#endregion
 
+//#region get port
 function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
   let env: Models.env.EnvConfigProject;
   if (project.isWorkspace) {
@@ -168,85 +180,9 @@ function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
   const envPort = env?.port;
   return _.isNumber(envPort) ? envPort : project.getDefaultPort();
 }
+//#endregion
 
-export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
-  workspaceConfig.currentProjectName = project.name;
-  workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
-  workspaceConfig.currentProjectLaunchConfiguration = project.getTemlateOfLaunchJSON(workspaceConfig);
-  workspaceConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(workspaceConfig);
-  workspaceConfig.currentProjectType = project._type;
-  workspaceConfig.currentFrameworkVersion = Project.Tnp.version;
-  workspaceConfig.currentProjectLocation = project.location;
-  workspaceConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
-  workspaceConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
-  workspaceConfig.currentProjectIsStatic = project.isGenerated;
-  workspaceConfig.isStandaloneProject = project.isStandaloneProject;
-  workspaceConfig.frameworks = project.frameworks;
-
-  if (project.typeIs('angular-lib')) {
-    const componentsFolder = `browser${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
-    workspaceConfig.currentProjectComponentsFolder = componentsFolder;
-  }
-
-  let currentLibProjectSourceFolder: 'src' | 'components';
-  if (project.typeIs('angular-lib')) {
-    currentLibProjectSourceFolder = 'components';
-  }
-  if (project.typeIs('isomorphic-lib')) {
-    currentLibProjectSourceFolder = 'src';
-  }
-  workspaceConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
-
-  const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
-
-  if (project.isStandaloneProject) {
-
-    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
-      encoding: 'utf8',
-      spaces: 2
-    })
-    Helpers.log(`config saved in standalone project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
-
-  } else if (project.isWorkspace) {
-
-    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
-      encoding: 'utf8',
-      spaces: 2
-    })
-    Helpers.log(`config saved in worksapce ${tmpEnvironmentPath}`);
-
-    project.children.forEach(p => {
-      saveConfigWorkspca(p, workspaceConfig);
-    })
-
-  } else if (project.isWorkspaceChildProject) {
-
-    if (project.typeIs('angular-client', 'angular-lib', 'ionic-client', 'docker')) {
-      fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
-        encoding: 'utf8',
-        spaces: 2
-      })
-      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
-    } else if (project.typeIs('isomorphic-lib')) {
-      fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
-        encoding: 'utf8',
-        spaces: 2
-      })
-      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
-    } else {
-      Helpers.log(`config not needed for child ${tmpEnvironmentPath}`)
-    }
-
-  }
-}
-
-
-
-
-
-export const existedConfigs = {} as { [workspacePath in string]: Models.env.EnvConfig; }
-
-
+//#region standalone config by
 export async function standaloneConfigBy(standaloneProject: Project,
   environment: ConfigModels.EnvironmentName): Promise<Models.env.EnvConfig> {
   let configStandaloneEnv: Models.env.EnvConfig;
@@ -263,7 +199,9 @@ export async function standaloneConfigBy(standaloneProject: Project,
   existedConfigs[standaloneProject.location] = configStandaloneEnv;
   return configStandaloneEnv;
 }
+//#endregion
 
+//#region workspace config by
 export async function workspaceConfigBy(workspace: Project,
   environment: ConfigModels.EnvironmentName): Promise<Models.env.EnvConfig> {
   let configWorkspaceEnv: Models.env.EnvConfig;
@@ -329,7 +267,9 @@ export async function workspaceConfigBy(workspace: Project,
 
   return configWorkspaceEnv;
 }
+//#endregion
 
+//#region create example config for
 function createExampleConfigFor(proj: Project) {
 
   function templetForInfo(project: Project, counter = 0) {
@@ -392,6 +332,119 @@ config = {
 module.exports = exports = { config };
   `;
 }
+//#endregion
+
+
+export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env.EnvConfig) {
+  workspaceConfig.currentProjectName = project.name;
+  workspaceConfig.currentProjectPort = getPort(project, workspaceConfig);
+  workspaceConfig.currentProjectLaunchConfiguration = project.getTemlateOfLaunchJSON(workspaceConfig);
+  workspaceConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(workspaceConfig);
+  workspaceConfig.currentProjectType = project._type;
+  workspaceConfig.currentFrameworkVersion = Project.Tnp.version;
+  workspaceConfig.currentProjectLocation = project.location;
+  workspaceConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
+  workspaceConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
+  workspaceConfig.currentProjectIsStatic = project.isGenerated;
+  workspaceConfig.isStandaloneProject = project.isStandaloneProject;
+  workspaceConfig.frameworks = project.frameworks;
+
+  //#region TODO UNCOMMENT when building container from children level
+  // let libs = Helpers.linksToFoldersFrom(path.join(project.location, config.folder.src, 'libs'));
+  // const isSmartWorkspaceChild = project.isSmartContainerChild;
+  // if (isSmartWorkspaceChild) {
+  //   libs = project.parent.children.filter(f => {
+  //     return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
+  //   }).map(f => {
+  //     return path.join(f.location);
+  //   })
+  // }
+  // if (libs.length > 0) {
+  //   const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
+  //   const parent = Project.From(parentPath);
+  //   if (parent) {
+  //     workspaceConfig['pathesTsconfig'] = JSON.stringify((libs).reduce((a, b) => {
+  //       if (isSmartWorkspaceChild) {
+  //         const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
+  //         return _.merge(a, {
+  //           [`@${parent.name}/${path.basename(b)}`]: [`../${pathRelative}`],
+  //           [`@${parent.name}/${path.basename(b)}/*`]: [`../${pathRelative}/*`],
+  //         })
+  //       } else {
+  //         const pathRelative = b.replace(parent.location, '').split('/').slice(4).join('/');
+  //         return _.merge(a, {
+  //           [`@${parent.name}/${path.basename(b)}`]: [`./${pathRelative}`],
+  //           [`@${parent.name}/${path.basename(b)}/*`]: [`./${pathRelative}/*`],
+  //         })
+  //       }
+  //     }, {}));
+  //   } else {
+  //     Helpers.warn(`[env config] parent not found by path ${parentPath}`);
+  //   }
+
+  // } else {
+  //   workspaceConfig['pathesTsconfig'] = JSON.stringify({});
+  // }
+  //#endregion
+
+
+  if (project.typeIs('angular-lib')) {
+    const componentsFolder = `browser${project.isStandaloneProject ? '' : `-for-${project.name}`}`;
+    workspaceConfig.currentProjectComponentsFolder = componentsFolder;
+  }
+
+  let currentLibProjectSourceFolder: 'src' | 'components';
+  if (project.typeIs('angular-lib')) {
+    currentLibProjectSourceFolder = 'components';
+  }
+  if (project.typeIs('isomorphic-lib')) {
+    currentLibProjectSourceFolder = 'src';
+  }
+  workspaceConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
+
+  const tmpEnvironmentPath = path.join(project.location, tmpEnvironmentFileName)
+
+  if (project.isStandaloneProject) {
+
+    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+      encoding: 'utf8',
+      spaces: 2
+    })
+    Helpers.log(`config saved in standalone project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
+
+  } else if (project.isWorkspace) {
+
+    fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+      encoding: 'utf8',
+      spaces: 2
+    })
+    Helpers.log(`config saved in worksapce ${tmpEnvironmentPath}`);
+
+    project.children.forEach(p => {
+      saveConfigWorkspca(p, workspaceConfig);
+    })
+
+  } else if (project.isWorkspaceChildProject) {
+
+    if (project.typeIs('angular-client', 'angular-lib', 'ionic-client', 'docker')) {
+      fse.writeJSONSync(tmpEnvironmentPath, frontendCuttedVersion(workspaceConfig), {
+        encoding: 'utf8',
+        spaces: 2
+      })
+      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
+    } else if (project.typeIs('isomorphic-lib')) {
+      fse.writeJSONSync(tmpEnvironmentPath, workspaceConfig, {
+        encoding: 'utf8',
+        spaces: 2
+      })
+      Helpers.log(`config saved for child ${tmpEnvironmentPath}`)
+    } else {
+      Helpers.log(`config not needed for child ${tmpEnvironmentPath}`)
+    }
+
+  }
+}
+
 
 
 //#endregion

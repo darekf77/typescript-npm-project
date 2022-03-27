@@ -316,7 +316,7 @@ export class PackageJsonCore {
       const splitPath = path.join(path.dirname(this.path), resultFileName);
       const recreateJson5 = (resultFileName === config.file.package_json__tnp_json5)
         && !Helpers.exists(splitPath)
-        && data.tnp?.type === 'isomorphic-lib'
+        && (data.tnp?.type === 'isomorphic-lib' || ((data.tnp?.type === 'container') && (data.tnp?.smart)))
         && Number(data.tnp?.version.replace('v', '')) >= 3;
 
       if (recreateJson5) {

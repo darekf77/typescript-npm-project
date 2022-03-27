@@ -47,8 +47,11 @@ export function options(project: Project): IncCompiler.Models.BaseClientCompiler
 @IncCompiler.Class({ className: 'BrowserCodePreventer' })
 export class BrowserCodePreventer extends FeatureCompilerForProject {
 
+  readonly isSmartContainerTarget: boolean = false;
   constructor(public project: Project) {
     super(project, options(project));
+    const folderBefore = path.basename(path.dirname(path.dirname(project.location)));
+    this.isSmartContainerTarget = [config.folder.dist, config.folder.bundle].includes(folderBefore);
   }
 
   @IncCompiler.methods.AsyncAction()
@@ -65,6 +68,12 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     if (Helpers.isFolder(fileAbsolutePath)) {
       return;
     }
+
+    if(this.isSmartContainerTarget && path.extname(fileAbsolutePath) !== '.js.map') {
+      // TODO LAST difrent changes to source map to allow backend
+      return;
+    }
+
     if (path.extname(fileAbsolutePath) !== '.js') {
       return;
     }

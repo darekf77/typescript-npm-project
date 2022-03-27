@@ -8,6 +8,7 @@ import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
+import { VscodeProject } from '../abstract/project/vscode-project.backend';
 
 /**
  * DEPRAECATED
@@ -63,42 +64,54 @@ export class SingularBuild extends FeatureForProject {
     parent.node_modules.linkToProject(singularWatchProj);
     await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
 
-    (() => {
-      const tsconfigPath = path.join(parent.location, config.file.tsconfig_json);
-      const paths = children.reduce((a, c) => {
-        return _.merge(a, {
-          [`@${parent.name}/${c.name}`]: [`./${c.name}/${config.folder.src}/lib`],
-          [`@${parent.name}/${c.name}/*`]: [`./${c.name}/${config.folder.src}/lib/*`],
-        });
-      }, {})
 
-      const content = {
-        "compilerOptions": {
-          "baseUrl": ".",
-          paths
-        }
-      };
-      Helpers.writeJson(tsconfigPath, content);
-    })();
+    VscodeProject.launchFroSmartContaienr(parent);
+
+
+    // (() => {
+    //   const targetSrc = path.join(destProjPath, config.folder.src);
+    //   const srcContainerSmart = path.join(parent.location, config.folder.src);
+    //   Helpers.createSymLink(targetSrc, srcContainerSmart);
+    // })();
+
+    //#region tsconfig pathes are only good for FE (THIS CODE DOESN'T MAKE SENSE)
+    // (() => {
+    //   const tsconfigPath = path.join(parent.location, config.file.tsconfig_json);
+    //   const paths = children.reduce((a, c) => {
+    //     return _.merge(a, {
+    //       [`@${parent.name}/${c.name}`]: [`./${c.name}/${config.folder.src}/lib`],
+    //       [`@${parent.name}/${c.name}/*`]: [`./${c.name}/${config.folder.src}/lib/*`],
+    //     });
+    //   }, {})
+
+    //   const content = {
+    //     "compilerOptions": {
+    //       "rootDir": "./",
+    //       paths
+    //     }
+    //   };
+    //   Helpers.writeJson(tsconfigPath, content);
+    // })();
 
     // const tsconfigParentBase = path.join(parent.location, 'tsconfig.base.json');
 
-    (() => {
-      const tsconfigPath = path.join(singularWatchProj.location, config.file.tsconfig_json);
-      const content = Helpers.readJson(tsconfigPath);
-      const paths = children.reduce((a, c) => {
-        return _.merge(a, {
-          [`@${parent.name}/${c.name}`]: [`./${config.folder.src}/libs/${c.name}`],
-          [`@${parent.name}/${c.name}/*`]: [`./${config.folder.src}/libs/${c.name}/*`],
-        });
-      }, {})
+    // (() => {
+    //   const tsconfigPath = path.join(singularWatchProj.location, config.file.tsconfig_json);
+    //   const content = Helpers.readJson(tsconfigPath);
+    //   const paths = children.reduce((a, c) => {
+    //     return _.merge(a, {
+    //       [`@${parent.name}/${c.name}`]: [`./${config.folder.src}/libs/${c.name}`],
+    //       [`@${parent.name}/${c.name}/*`]: [`./${config.folder.src}/libs/${c.name}/*`],
+    //     });
+    //   }, {})
 
-      content.compilerOptions.paths = paths;
-      Helpers.writeJson(tsconfigPath, content);
-    })();
+    //   content.compilerOptions.paths = paths;
+    //   Helpers.writeJson(tsconfigPath, content);
+    // })();
 
 
     // Helpers.writeJson(tsconfigParentBase, contenttsconfig);
+    //#endregion
 
     return singularWatchProj;
   }
