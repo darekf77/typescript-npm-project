@@ -359,6 +359,8 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
       return path.join(f.location);
     })
   }
+  const customRootDir = 'customRootDir';
+
   if (libs.length > 0) {
     const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
     const parent = Project.From(parentPath);
@@ -378,7 +380,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
           })
         }
       }, {}));
-      workspaceConfig['exclusion'] = `exclude:[]`;
+      // workspaceConfig['exclusion'] = `exclude:[]`;
     } else {
       Helpers.warn(`[env config] parent not found by path ${parentPath}`);
     }
@@ -387,13 +389,15 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     workspaceConfig['pathesTsconfig'] = JSON.stringify({});
   }
 
-  // if (project.isSmartContainerTarget) {
-  //   workspaceConfig['exclusion'] = `exclude:[]`;
-  // } else if (project.isSmartContainerChild) {
-  //   workspaceConfig['exclusion'] = `exclude:[".."]`;
-  // } else {
-  workspaceConfig['exclusion'] = '';
-  // }
+  if (project.isSmartContainerTarget) {
+    workspaceConfig[customRootDir] = `"rootDir": "./src"`;
+  } else if (project.isSmartContainerChild) {
+    workspaceConfig[customRootDir] = `"rootDir": "../"`;
+  } else if (project.isSite) {
+    workspaceConfig[customRootDir] = `"rootDir": "./tmp-src"`
+  } else {
+    workspaceConfig[customRootDir] = `"rootDir": "./src"`
+  }
 
   //#endregion
 
