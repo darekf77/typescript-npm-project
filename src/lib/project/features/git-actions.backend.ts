@@ -83,7 +83,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
             ? ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${this.project.name}--${projectNameFromPackageJson}.git`)
             : ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
           await Helpers.actionWrapper(() => {
-            this.project.git.clone(githubGitUrl);
+            this.project.git.clone(githubGitUrl + ` ${projectNameFromPackageJson}`);
           }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
         }
 
