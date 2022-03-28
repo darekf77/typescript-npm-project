@@ -1,11 +1,13 @@
 import { IncCompiler } from 'incremental-compiler';
 import { config } from 'tnp-config';
-import { Helpers, path } from 'tnp-core';
+import { glob, Helpers, path, _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import type { Project } from '../../abstract/project/project';
 import { RegionRemover } from '../build-isomorphic-lib/region-remover.backend';
 const FIXED = '/* @fixed */ ';
+const MAP_VERSION = '{"version"';
+const MAP_FIXED = `{"fixed":true,"version"`;
 
 
 function pathes(project: Project) { // TODO  OPTIMIZE THIS
@@ -50,8 +52,7 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
   readonly isSmartContainerTarget: boolean = false;
   constructor(public project: Project) {
     super(project, options(project));
-    const folderBefore = path.basename(path.dirname(path.dirname(project.location)));
-    this.isSmartContainerTarget = [config.folder.dist, config.folder.bundle].includes(folderBefore);
+    this.isSmartContainerTarget = project.isSmartContainerTarget;
   }
 
   @IncCompiler.methods.AsyncAction()
@@ -64,19 +65,28 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     path.join(this.project.location, config.folder.bundle),
   ]
 
+  runForFolder(folderPath: Models.dev.BuildDir) {
+    const folder = `${path.join(this.project.location, folderPath)}/**/*.*`;
+    const files = glob.sync(folder);
+    // console.log('folder', files)
+    // console.log('KURWA', files)
+    files.forEach(f => {
+      this.fix(f);
+    })
+  }
+
   fix(fileAbsolutePath: string) {
     if (Helpers.isFolder(fileAbsolutePath)) {
       return;
     }
 
-    if(this.isSmartContainerTarget && path.extname(fileAbsolutePath) !== '.js.map') {
-      // TODO LAST difrent changes to source map to allow backend
+    const isMapFile = (this.isSmartContainerTarget && fileAbsolutePath.endsWith('.js.map'));
+
+    if (path.extname(fileAbsolutePath) !== '.js' && !isMapFile) {
       return;
     }
 
-    if (path.extname(fileAbsolutePath) !== '.js') {
-      return;
-    }
+    // console.log('checking', fileAbsolutePath)
 
     for (let index = 0; index < this.bases.length; index++) {
       const baseOutfolder = this.bases[index];
@@ -106,26 +116,53 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     // } sd
 
     const content = Helpers.readFile(fileAbsolutePath);
-    if (content && !content.trimLeft().startsWith(FIXED)) {
-      let raw = content;
 
-      let removeNext = false;
-      raw = raw.split('\n').map((l, i) => {
-        if (removeNext) {
-          removeNext = false;
-          return Models.label.browserCode;
+    if (isMapFile) {
+      if (content && !content.trimLeft().startsWith(MAP_FIXED)) {
+        let jsonMap: { sources: string[] } = JSON.parse(content);
+        const source = _.first(jsonMap.sources);
+        const [backPath, libPath] = source.split('/src/');
+        const splitedLibPath = libPath.split('/');
+        const folderOrFIle = _.first(splitedLibPath);
+        const newBackPath = path.join(backPath, '../../..');
+        let target = this.project.name;
+        let back: string = _.first(jsonMap.sources);
+        if (['lib', 'app', 'app.ts'].includes(folderOrFIle)) {
+          back = path.join(newBackPath, target, config.folder.src, libPath);
         }
-        if (l.search('@browser' + 'Line') !== -1) { // TODO QUCK_FIX regex for comment
-          removeNext = true;
-          return Models.label.browserCode;
+        if (folderOrFIle === 'libs') {
+          target = splitedLibPath[1];
+          back = path.join(newBackPath, target, config.folder.src, splitedLibPath.slice(1).join('/'));
         }
-        return l;
-      }).join('\n')
+        jsonMap.sources = [back];
+        Helpers.writeFile(fileAbsolutePath, JSON.stringify(jsonMap).replace(MAP_VERSION, MAP_FIXED));
+        // console.log(`FIXED MAP: ${fileAbsolutePath}`)
+      }
+    } else {
+      if (content && !content.trimLeft().startsWith(FIXED)) {
+        let raw = content;
 
-      // @ts-ignore
-      raw = RegionRemover.from(fileAbsolutePath, raw, ['@browser'], this.project as Project).output;
-      Helpers.writeFile(fileAbsolutePath, FIXED + raw)
+        let removeNext = false;
+        raw = raw.split('\n').map((l, i) => {
+          if (removeNext) {
+            removeNext = false;
+            return Models.label.browserCode;
+          }
+          if (l.search('@browser' + 'Line') !== -1) { // TODO QUCK_FIX regex for comment
+            removeNext = true;
+            return Models.label.browserCode;
+          }
+          return l;
+        }).join('\n')
+
+        // @ts-ignore
+        raw = RegionRemover.from(fileAbsolutePath, raw, ['@browser'], this.project as Project).output;
+        Helpers.writeFile(fileAbsolutePath, FIXED + raw)
+      }
     }
+
+
+
 
   }
 

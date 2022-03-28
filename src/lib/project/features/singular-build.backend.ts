@@ -67,6 +67,23 @@ export class SingularBuild extends FeatureForProject {
 
     VscodeProject.launchFroSmartContaienr(parent);
 
+    // (() => {
+    //   const tsconfigPath = path.join(parent.location, config.file.tsconfig_json);
+    //   const paths = children.reduce((a, c) => {
+    //     return _.merge(a, {
+    //       [`@${parent.name}/${c.name}`]: [`./${c.name}/${config.folder.src}/lib`],
+    //       [`@${parent.name}/${c.name}/*`]: [`./${c.name}/${config.folder.src}/lib/*`],
+    //     });
+    //   }, {})
+
+    //   const content = {
+    //     "compilerOptions": {
+    //       "rootDir": "./",
+    //       paths
+    //     }
+    //   };
+    //   Helpers.writeJson(tsconfigPath, content);
+    // })();
 
     // (() => {
     //   const targetSrc = path.join(destProjPath, config.folder.src);

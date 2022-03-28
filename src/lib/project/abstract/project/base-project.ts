@@ -116,6 +116,17 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
+  get isSmartContainerTarget(this: Project) {
+    const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
+    return [config.folder.dist, config.folder.bundle].includes(folderBefore);
+  }
+
+  // @ts-ignore
+  get smartContainerTargetParentContainerPath(this: Project) {
+    return path.dirname(path.dirname(path.dirname(this.location)));
+  }
+
+  // @ts-ignore
   get isSmartContainer(this: Project) {
     return this.frameworkVersionAtLeast('v3')
       && this.packageJson.isSmart

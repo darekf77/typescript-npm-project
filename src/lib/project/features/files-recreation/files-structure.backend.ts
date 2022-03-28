@@ -256,28 +256,16 @@ export class FilesStructure extends FeatureForProject {
         this.project.quickFixes.overritenBadNpmPackages();
       }
 
-      // if (this.project.isSmartContainerChild) {
-      //   const parentPackageSource = path.join(this.project.parent.node_modules.pathFor(`@${this.project.parent.name}`));
-      //   const parentPackageDest = path.join(this.project.node_modules.pathFor(`@${this.project.parent.name}`));
-      //   if (!this.handledSmartContainer[this.project.parent.location]) {
-      //     this.handledSmartContainer[this.project.parent.location] = true;
-      //     if (!this.project.parent.node_modules.exist) {
-      //       await this.project.parent.npmPackages.installProcess('handle missing smart container node_modules')
-      //     }
-      //     this.project.parent.filesStructure.handleSmartContainer();
-      //   }
-      //   Helpers.remove(parentPackageDest);
-      //   Helpers.createSymLink(parentPackageSource, parentPackageDest)
-      // }
     }
 
     //#endregion
 
+
     this.handleSmartContainer(this.project);
+
 
     if (this.project.isSmartContainer) {
       //#region handle smart container
-      // this.handleSmartContainer();
       await this.project.singluarBuild.init(watch, false, 'dist', Helpers.removeSlashAtEnd(args) as any);
       //#endregion
     }

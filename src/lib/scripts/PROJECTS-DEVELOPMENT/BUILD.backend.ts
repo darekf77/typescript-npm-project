@@ -19,7 +19,10 @@ const $BUILD = async (args) => {
 };
 
 const BUILD_DIST = async (args) => {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isSmartContainerChild) {
+    proj = proj.parent;
+  }
   await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 

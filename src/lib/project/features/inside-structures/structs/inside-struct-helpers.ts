@@ -8,7 +8,7 @@ import {
 } from 'tnp-core';
 
 import { Helpers } from 'tnp-helpers';
-import type { Project } from '../../../abstract/project/project';
+import { Project } from '../../../abstract/project/project';
 
 export function recreateIndex(project: Project) {
   (() => {
@@ -18,9 +18,22 @@ export function recreateIndex(project: Project) {
       'index.ts'
     ));
 
-    if (!Helpers.exists(indexInSrcFile)) {
-      Helpers.writeFile(indexInSrcFile, `export * from './lib';
-      `);
+    if (project.isSmartContainerTarget) {
+      const container = Project.From(project.smartContainerTargetParentContainerPath) as Project;
+      if (!Helpers.exists(indexInSrcFile)) {
+        const exportsContainer = container.children.map(c => {
+          return `export * from './libs/${c.name}';`
+        }).join('\n');
+        Helpers.writeFile(indexInSrcFile, `
+${exportsContainer}
+        `);
+      }
+
+    } else {
+      if (!Helpers.exists(indexInSrcFile)) {
+        Helpers.writeFile(indexInSrcFile, `export * from './lib';
+        `);
+      }
     }
 
   })();

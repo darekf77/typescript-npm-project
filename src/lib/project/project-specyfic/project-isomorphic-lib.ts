@@ -435,7 +435,12 @@ export class ProjectIsomorphicLib
         });
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
-        await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
+        if (this.isSmartContainerTarget) {
+          const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+          parent.run(`${config.frameworkName} baw ${this.name}`).async();
+        } else {
+          await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
+        }
       }
       // console.log('HEHEHHE')
       //#endregion
@@ -481,7 +486,12 @@ export class ProjectIsomorphicLib
         await this.incrementalBuildProcess.start('isomorphic compilation');
         try {
           showInfoAngular()
-          await proxyProject.run(angularCommand).sync()
+          if (this.isSmartContainerTarget) {
+            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+            parent.run(`${config.frameworkName} ba ${this.name}`).async();
+          } else {
+            await proxyProject.run(angularCommand).sync()
+          }
         } catch (e) {
           Helpers.error(`
           Command failed: ${angularCommand}
@@ -491,6 +501,9 @@ export class ProjectIsomorphicLib
         await this.browserCodePreventer.start('browser code preventer');
       }
       //#endregion
+    }
+    if (this.frameworkVersionAtLeast('v3') && this.isSmartContainerTarget) {
+      this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
     }
     // console.log('EEEEE')
     //#endregion

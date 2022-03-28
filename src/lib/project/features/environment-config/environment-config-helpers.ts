@@ -350,41 +350,51 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
   workspaceConfig.frameworks = project.frameworks;
 
   //#region TODO UNCOMMENT when building container from children level
-  // let libs = Helpers.linksToFoldersFrom(path.join(project.location, config.folder.src, 'libs'));
-  // const isSmartWorkspaceChild = project.isSmartContainerChild;
-  // if (isSmartWorkspaceChild) {
-  //   libs = project.parent.children.filter(f => {
-  //     return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
-  //   }).map(f => {
-  //     return path.join(f.location);
-  //   })
-  // }
-  // if (libs.length > 0) {
-  //   const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
-  //   const parent = Project.From(parentPath);
-  //   if (parent) {
-  //     workspaceConfig['pathesTsconfig'] = JSON.stringify((libs).reduce((a, b) => {
-  //       if (isSmartWorkspaceChild) {
-  //         const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
-  //         return _.merge(a, {
-  //           [`@${parent.name}/${path.basename(b)}`]: [`../${pathRelative}`],
-  //           [`@${parent.name}/${path.basename(b)}/*`]: [`../${pathRelative}/*`],
-  //         })
-  //       } else {
-  //         const pathRelative = b.replace(parent.location, '').split('/').slice(4).join('/');
-  //         return _.merge(a, {
-  //           [`@${parent.name}/${path.basename(b)}`]: [`./${pathRelative}`],
-  //           [`@${parent.name}/${path.basename(b)}/*`]: [`./${pathRelative}/*`],
-  //         })
-  //       }
-  //     }, {}));
-  //   } else {
-  //     Helpers.warn(`[env config] parent not found by path ${parentPath}`);
-  //   }
+  let libs = Helpers.linksToFoldersFrom(path.join(project.location, config.folder.src, 'libs'));
+  const isSmartWorkspaceChild = project.isSmartContainerChild;
+  if (isSmartWorkspaceChild) {
+    libs = project.parent.children.filter(f => {
+      return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
+    }).map(f => {
+      return path.join(f.location);
+    })
+  }
+  if (libs.length > 0) {
+    const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
+    const parent = Project.From(parentPath);
+    if (parent) {
+      workspaceConfig['pathesTsconfig'] = JSON.stringify((libs).reduce((a, b) => {
+        if (isSmartWorkspaceChild) {
+          const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
+          return _.merge(a, {
+            [`@${parent.name}/${path.basename(b)}`]: [`../${pathRelative}`],
+            [`@${parent.name}/${path.basename(b)}/*`]: [`../${pathRelative}/*`],
+          })
+        } else {
+          const pathRelative = b.replace(parent.location, '').split('/').slice(4).join('/');
+          return _.merge(a, {
+            [`@${parent.name}/${path.basename(b)}`]: [`./${pathRelative}`],
+            [`@${parent.name}/${path.basename(b)}/*`]: [`./${pathRelative}/*`],
+          })
+        }
+      }, {}));
+      workspaceConfig['exclusion'] = `exclude:[]`;
+    } else {
+      Helpers.warn(`[env config] parent not found by path ${parentPath}`);
+    }
 
+  } else {
+    workspaceConfig['pathesTsconfig'] = JSON.stringify({});
+  }
+
+  // if (project.isSmartContainerTarget) {
+  //   workspaceConfig['exclusion'] = `exclude:[]`;
+  // } else if (project.isSmartContainerChild) {
+  //   workspaceConfig['exclusion'] = `exclude:[".."]`;
   // } else {
-  //   workspaceConfig['pathesTsconfig'] = JSON.stringify({});
+  workspaceConfig['exclusion'] = '';
   // }
+
   //#endregion
 
 
