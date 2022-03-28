@@ -5,7 +5,7 @@ import { path } from 'tnp-core';
 //#endregion
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
-import type { Project } from './project';
+import { Project } from './project';
 import { config } from 'tnp-config';
 
 export abstract class BaseProject {
@@ -118,7 +118,8 @@ export abstract class BaseProject {
   // @ts-ignore
   get isSmartContainerTarget(this: Project) {
     const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
-    return [config.folder.dist, config.folder.bundle].includes(folderBefore);
+    return [config.folder.dist, config.folder.bundle].includes(folderBefore)
+      && Project.From(this.smartContainerTargetParentContainerPath)?.isSmartContainer;
   }
 
   // @ts-ignore

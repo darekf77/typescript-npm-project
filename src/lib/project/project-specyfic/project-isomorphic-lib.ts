@@ -477,6 +477,7 @@ export class ProjectIsomorphicLib
           showInfoAngular()
           await proxyProject.run(angularCommand).sync()
         } catch (e) {
+          Helpers.log(e)
           Helpers.error(`
           Command failed: ${angularCommand}
 
@@ -493,6 +494,7 @@ export class ProjectIsomorphicLib
             await proxyProject.run(angularCommand).sync()
           }
         } catch (e) {
+          Helpers.log(e)
           Helpers.error(`
           Command failed: ${angularCommand}
 
