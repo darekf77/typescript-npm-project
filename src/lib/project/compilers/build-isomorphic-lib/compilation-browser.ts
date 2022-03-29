@@ -101,14 +101,14 @@ export class BroswerCompilation extends BackendCompilation {
         if (fse.existsSync(destinationFilePath)) {
           fse.unlinkSync(destinationFilePath)
         }
-        if (['module', 'component']
-          .map(c => `.${c}.ts`)
-          .filter(c => destinationFilePath.endsWith(c)).length > 0) {
-          const orgFil = `${destinationFilePath}.orginal`;
-          if (fse.existsSync(orgFil)) {
-            fse.unlinkSync(orgFil)
-          }
-        }
+        // if (['module', 'component']
+        //   .map(c => `.${c}.ts`)
+        //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {
+        //   const orgFil = `${destinationFilePath}.orginal`;
+        //   if (fse.existsSync(orgFil)) {
+        //     fse.unlinkSync(orgFil)
+        //   }
+        // }
       } else {
         if (fse.existsSync(absoluteFilePath)) {
           if (!fse.existsSync(path.dirname(destinationFilePath))) {
