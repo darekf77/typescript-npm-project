@@ -17,7 +17,7 @@ function clenIgnored(project: Project, deps: Object, overrided = {}) {
     const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
     patterns.forEach(p => {
       Object.keys(deps).forEach(depName => {
-        Helpers.log(`check patter: ${p} agains ${depName}`);
+        Helpers.log(`check patter: ${p} agains ${depName}`, 2);
         const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(p)));
         if (patternRegex.test(depName) && !overrided[depName]) {
           delete deps[depName];
@@ -650,7 +650,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
       patterns.forEach(patternIgnore => {
         Object.keys(project.packageJson.data.dependencies).forEach(depName => {
-          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`);
+          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`, 2);
           const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
           if (patternRegex.test(depName)) {
             delete project.packageJson.data.dependencies[depName];
@@ -658,7 +658,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         });
 
         Object.keys(project.packageJson.data.devDependencies).forEach(depName => {
-          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`);
+          Helpers.log(`check patter: ${patternIgnore} agains ${depName}`, 2);
           const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
           if (patternRegex.test(depName)) {
             delete project.packageJson.data.devDependencies[depName];

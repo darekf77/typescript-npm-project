@@ -105,7 +105,9 @@ const $RELEASE = async (args: string) => {
         && !child.targetProjects.exists
         && (!sameHashes || forceReleaseAll)
       );
-      Helpers.log(`ACTUALL RELEASE: ${shouldRelease}
+      Helpers.log(`ACTUALL RELEASE ${child.name}: ${shouldRelease}
+      lastBuildHash: ${lastBuildHash}
+      lastTagHash: ${lastTagHash}
       isPrivate: ${child.isPrivate}
       versionIsOk: ${versionIsOk}
       releaseAll: ${forceReleaseAll}

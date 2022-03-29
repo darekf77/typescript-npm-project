@@ -57,7 +57,7 @@ export class PackagesRecognition {
     folders = folders
       .map(f => path.basename(f))
       .filter(packageName => {
-        Helpers.log(`Checking package node_modules/${packageName}`)
+        Helpers.log(`Checking package node_modules/${packageName}`, 2)
         try {
           return this.checkIsomorphic(node_modules, packageName);
         } catch (error) {

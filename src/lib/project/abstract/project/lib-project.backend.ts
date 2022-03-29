@@ -385,11 +385,7 @@ export abstract class LibProject {
 
         await this.bumpVersionInOtherProjects(newVersion);
 
-        if (
-          (
-            this.typeIs('angular-lib')
-            || (this.typeIs('isomorphic-lib') && this.frameworkVersionAtLeast('v3'))
-          )
+        if ((this.typeIs('angular-lib') || (this.typeIs('isomorphic-lib') && this.frameworkVersionAtLeast('v3')))
           && !global.tnpNonInteractive) {
           await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
@@ -422,15 +418,12 @@ export abstract class LibProject {
           Building docs prevew - done
 
           `);
-
-
-
-            this.pushToGitRepo(newVersion)
-          }, () => {
-            this.pushToGitRepo(newVersion)
+            await this.pushToGitRepo(newVersion, realCurrentProj)
+          }, async () => {
+            await this.pushToGitRepo(newVersion, realCurrentProj)
           });
         } else {
-          this.pushToGitRepo(newVersion)
+          await this.pushToGitRepo(newVersion, realCurrentProj)
         }
 
       }
@@ -450,7 +443,7 @@ export abstract class LibProject {
       if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
         firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
       }
-      const coreCont =  Project.by('container', realCurrentProj._frameworkVersion) as Project;
+      const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
 
       const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
       if (
@@ -736,11 +729,11 @@ export abstract class LibProject {
   //#endregion
 
   //#region methods / push to git repo
-  private async pushToGitRepo(this: Project, newVersion: string) {
+  private async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project) {
     //#region @backend
     newVersion = await this.tagVersion(newVersion);
-    this.packageJson.setBuildHash(this.git.lastCommitHash());
-    this.packageJson.save('updating hash');
+    realCurrentProj.packageJson.setBuildHash(this.git.lastCommitHash());
+    realCurrentProj.packageJson.save('updating hash');
     this.commit(newVersion, `build hash update`);
     Helpers.log('Pushing to git repository... ')
     Helpers.log(`Git branch: ${this.git.currentBranchName}`);
