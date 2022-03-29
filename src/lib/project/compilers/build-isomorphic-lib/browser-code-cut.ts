@@ -11,7 +11,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 
 const filesToDebug = [
-  'app.ts'
+  // 'app.ts'
 ]
 
 export class CodeCut {

@@ -328,6 +328,18 @@ function consistencyFixes(
     content[tnpProperty].overrided.includeAsDev = [];
     additionalSaveRequired = true;
   }
+
+  if (_.isString(content[tnpProperty].overrided.includeAsDev)) { // TODO QUICK_FIX
+    content[tnpProperty].overrided.includeAsDev = [];
+    additionalSaveRequired = true;
+  }
+
+  if (_.isArray(content[tnpProperty].overrided.includeAsDev)
+    && (content[tnpProperty].overrided.includeAsDev.length > 0)) { // TODO QUICK_FIX
+    content[tnpProperty].overrided.includeAsDev = [];
+    additionalSaveRequired = true;
+  }
+
   if (!_.isArray(content[tnpProperty].overrided.includeOnly)) {
     content[tnpProperty].overrided.includeOnly = [];
     additionalSaveRequired = true;

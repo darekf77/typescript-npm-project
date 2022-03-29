@@ -418,6 +418,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     if (this.project.frameworkVersionAtLeast('v3')) {
       // no modification of any code straight ng is being use
+      this.rawContent = this.rawContent.replace(
+        new RegExp(Helpers.escapeStringForRegEx(`/${this.project.name}/src/assets/`), 'g'),
+        `assets/assets-for/${this.project.name}/`
+      ).replace(
+        new RegExp(Helpers.escapeStringForRegEx(`${this.project.name}/src/assets/`), 'g'),
+        `assets/assets-for/${this.project.name}/`
+      );
+
     } else {
       this.rawContent = this.afterRegionsReplacement(this.rawContent);
     }

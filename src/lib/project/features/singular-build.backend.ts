@@ -38,20 +38,43 @@ export class SingularBuild extends FeatureForProject {
       Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
     });
 
-    const libPath = path.join(destProjPath, config.folder.src, 'lib');
-    const appPath = path.join(destProjPath, config.folder.src, 'app');
-    const appTsPath = path.join(destProjPath, config.folder.src, 'app.ts');
+    [
+      'lib',
+      'app',
+      'app.ts',
+      'app.html',
+      'app.css',
+      'app.scss',
+    ].forEach(f => {
+      const source = path.join(client.location, config.folder.src, f);
+      const dest = path.join(destProjPath, config.folder.src, f);
+      if (['app', 'lib'].includes(f)) {
+        if (!Helpers.exists(source)) {
+          Helpers.mkdirp(source);
+        }
+      }
+      if (Helpers.exists(source)) {
+        Helpers.createSymLink(source, dest);
+      }
+    });
 
-    const clientLibPath = path.join(client.location, config.folder.src, 'lib');
-    const clientAppPath = path.join(client.location, config.folder.src, 'app');
-    const clientAppTsPath = path.join(client.location, config.folder.src, 'app.ts');
+    // const libPath = path.join(destProjPath, config.folder.src, 'lib');
+    // const appPath = path.join(destProjPath, config.folder.src, 'app');
+    // const appTsPath = path.join(destProjPath, config.folder.src, 'app.ts');
+    // const appHtmlPath = path.join(destProjPath, config.folder.src, 'app.html');
 
-    Helpers.createSymLink(clientLibPath, libPath);
-    if (!Helpers.exists(clientAppPath)) {
-      Helpers.mkdirp(clientAppPath);
-    }
-    Helpers.createSymLink(clientAppPath, appPath);
-    Helpers.createSymLink(clientAppTsPath, appTsPath);
+    // const clientLibPath = path.join(client.location, config.folder.src, 'lib');
+    // const clientAppPath = path.join(client.location, config.folder.src, 'app');
+    // const clientAppTsPath = path.join(client.location, config.folder.src, 'app.ts');
+    // const clientAppHtmlPath = path.join(client.location, config.folder.src, 'app.html');
+
+    // Helpers.createSymLink(clientLibPath, libPath);
+    // if (!Helpers.exists(clientAppPath)) {
+    //   Helpers.mkdirp(clientAppPath);
+    // }
+    // Helpers.createSymLink(clientAppPath, appPath);
+    // Helpers.createSymLink(clientAppTsPath, appTsPath);
+    // Helpers.createSymLink(clientAppHtmlPath, appHtmlPath);
 
     children.forEach(c => {
       const source = path.join(c.location, config.folder.src, 'lib');
@@ -59,7 +82,7 @@ export class SingularBuild extends FeatureForProject {
       const dest = path.join(destProjPath, config.folder.src, 'libs', c.name);
       const destAssets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
       Helpers.createSymLink(source, dest);
-      Helpers.createSymLink(sourceAssets, destAssets);
+      Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
     });
 
 
