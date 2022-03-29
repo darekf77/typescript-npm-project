@@ -55,8 +55,11 @@ export class SingularBuild extends FeatureForProject {
 
     children.forEach(c => {
       const source = path.join(c.location, config.folder.src, 'lib');
+      const sourceAssets = path.join(c.location, config.folder.src, 'assets');
       const dest = path.join(destProjPath, config.folder.src, 'libs', c.name);
+      const destAssets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
       Helpers.createSymLink(source, dest);
+      Helpers.createSymLink(sourceAssets, destAssets);
     });
 
 

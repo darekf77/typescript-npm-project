@@ -65,6 +65,14 @@ export class PackageJsonFile {
     //#region @backend
     this.fullPath = fullPath;
     let content = Helpers.readJson(fullPath, void 0) as Models.npm.IPackageJSON;
+
+    // if (fullPath.endsWith('.json5') && ) {
+    //   Helpers.warn(`
+    //   (probably validation issue)
+    //   something may be wrong with you file: ${fullPath}
+    //   `)
+    // }
+
     if (content && !content.name) { // WHY => tnp prop doesn't have name property
       const actuallProp = path.basename(fullPath)
         .replace(config.file.package_json, '')

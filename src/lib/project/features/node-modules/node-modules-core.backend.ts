@@ -80,7 +80,7 @@ export class NodeModulesCore extends FeatureForProject {
       Helpers.removeIfExists(path.join(this.path, packageInside))
       return;
     }
-    Helpers.remove(this.path)
+    Helpers.remove(this.path, true)
   };
   public linkToProject = (target: Project) => {
     if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
@@ -90,7 +90,7 @@ export class NodeModulesCore extends FeatureForProject {
   };
 
   public linkTo = (target: string) => {
-    if(!path.isAbsolute(target)) {
+    if (!path.isAbsolute(target)) {
       Helpers.error(`[linkTo] taget path is not absolute "${target}"`)
     }
     if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install

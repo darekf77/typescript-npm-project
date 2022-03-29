@@ -235,6 +235,51 @@ ${appModuleFile}
         })();
         //#endregion
 
+          //#region inject environment => done throught reading json
+        (() => {
+
+          const anuglarJsonPath = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/angular.json`
+          ));
+
+          const json = Helpers.readJson(anuglarJsonPath, void 0, true);
+          // console.log(anuglarJsonPath)
+          // console.log(json)
+          const assets = json.projects.app.architect.build.options.assets;
+          if (this.project.isSmartContainerTarget) {
+            const parent = Project.From(project.smartContainerTargetParentContainerPath);
+            parent.children.map(c => {
+              assets.push(`src/app/${project.name}/assets/${c.name}/assets`);
+            });
+            json.projects.app.architect.build.options.assets = Helpers.arrays.uniqArray(assets);
+          } else {
+
+          }
+
+          Helpers.writeFile(anuglarJsonPath, json)
+
+          // const $ = cheerio.load(Helpers.readFile(indexHtml));
+
+          // $('body').append(`
+          // <script>
+          // if (global === undefined) {
+          //   var global = window;
+          // }
+          // var ENV = ${JSON.stringify(project.env.config)};
+          // window.ENV = ENV;
+          // global.ENV = ENV;
+          // </script>
+
+          // `);
+          // Helpers.writeFile(indexHtml, $.html())
+
+        })();
+        //#endregion
+
 
         //#region inject environment => done throught reading json
         (() => {

@@ -1,5 +1,5 @@
 //#region @backend
-import { path } from 'tnp-core'
+import { path, _ } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { glob, crossPlatformPath } from 'tnp-core';
 import chalk from 'chalk';
@@ -105,7 +105,7 @@ export class QuickFixes extends FeatureForProject {
       const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
       if (!fse.existsSync(pubilcApiLoc)) {
         Helpers.writeFile(pubilcApiLoc, `
-        export function helloWorld() { }
+        export function helloWorldFrom${_.startCase(this.project.name)}() { }
         `.trimLeft())
       }
     }
