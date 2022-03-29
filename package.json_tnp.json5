@@ -45,6 +45,7 @@
     includeOnly: [
       'tnp-ui',
       'ora',
+      'progress',
     ],
     linkedFolders: [],
   },
@@ -230,7 +231,7 @@
         'firedev-ports': '13.0.11',
         'firedev-crud-deamon': '13.0.8',
         "tnp-ui": '13.0.10',
-        "tnp-core": '13.0.27',
+        "tnp-core": '13.0.28',
         "tnp-cli": '13.0.8',
         "tnp-tools": "0.0.46",
         "@types/node": "10.12.30",
