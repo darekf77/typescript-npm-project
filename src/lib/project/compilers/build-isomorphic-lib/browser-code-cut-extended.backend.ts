@@ -421,7 +421,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       this.rawContent = this.rawContent.replace(
         new RegExp(Helpers.escapeStringForRegEx(`/${this.project.name}/src/assets/`), 'g'),
         `assets/assets-for/${this.project.name}/`
-      ).replace(
+      );
+
+      this.rawContent = this.rawContent.replace(
         new RegExp(Helpers.escapeStringForRegEx(`${this.project.name}/src/assets/`), 'g'),
         `assets/assets-for/${this.project.name}/`
       );
