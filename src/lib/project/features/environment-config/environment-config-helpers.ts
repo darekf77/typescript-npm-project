@@ -389,7 +389,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     workspaceConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({});
   }
 
-  if (!(workspaceConfig['pathesTsconfig'] as string)?.endsWith(',')) {
+  if (workspaceConfig['pathesTsconfig'] && !(workspaceConfig['pathesTsconfig'] as string)?.endsWith(',')) {
     workspaceConfig['pathesTsconfig'] = `${workspaceConfig['pathesTsconfig']},`;
   }
 

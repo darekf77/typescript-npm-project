@@ -62,7 +62,7 @@ export function recreateApp(project: Project) {
       // TODO quick fix for @ browser remover
       Helpers.writeFile(appFile, `
 
-${'//#region'} @notForNpm
+${'//#region'} ${'@notForNpm'}
 
 // ${'@browser'}Line
     import { NgModule } from '@angular/core';
@@ -89,16 +89,16 @@ ${'//#region'} @${'bro' + 'wser'}
     export class ${moduleName} { }
     //#endregion
 
-    //#region @backend
+    //#region ${'@backend'}
     async function start(port: number) {
       console.log('hello world from backend');
     }
 
     export default start;
 
-${'//#endregion'}
+${'//#end' + 'region'}
 
-${'//#endregion'}
+${'//#end' + 'region'}
 
 
 
