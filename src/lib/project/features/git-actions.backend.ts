@@ -94,13 +94,16 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
 
   //#region  get linked projects and childrens
   private async getLinkedPorjectsAndChildrens(action: keyof GitActions, commitMessage?: string): Promise<Project[]> {
-    await this.cloneUnexistedProjects();
+    if (this.project.isMonorepo) {
+      return [];
+    }
 
+    await this.cloneUnexistedProjects();
     let childrenToPush = [
       ...this.project.children.filter(c => {
         return this.project.packageJson.linkedProjects.includes(c.name);
       }),
-      ...this.project.linkedProjectsExisted,
+      ... this.project.linkedProjectsExisted,
     ];
 
     childrenToPush = childrenToPush.filter(f => !!f);

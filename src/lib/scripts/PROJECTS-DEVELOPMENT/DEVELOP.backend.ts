@@ -354,6 +354,8 @@ export async function $INFO(args: string) {
     name: ${proj.name}
     version: ${proj.version}
     private: ${proj.isPrivate}
+    monorepo: ${proj.isMonorepo}
+    isSmartContainer: ${proj.isSmartContainer}
     last npm version: ${proj.lastNpmVersion}
     frameworkVersion: ${proj._frameworkVersion}
     genericName: ${proj.genericName}

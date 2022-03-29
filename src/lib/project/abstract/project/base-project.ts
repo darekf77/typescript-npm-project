@@ -295,6 +295,13 @@ export abstract class BaseProject {
     //#endregion
   }
 
+  // @ts-ignore
+  get isMonorepo(this: Project) {
+    //#region @backendFunc
+    return this.packageJson.isMonorepo;
+    //#endregion
+  }
+
   //#region @backend
   // @ts-ignore
   get linkedFolders(this: Project) {

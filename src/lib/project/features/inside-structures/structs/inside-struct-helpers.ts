@@ -63,10 +63,13 @@ export function recreateApp(project: Project) {
       Helpers.writeFile(appFile, `
 
 ${'//#region'} @notForNpm
-${'//#region'} @${'bro' + 'wser'}
+
+// ${'@browser'}Line
     import { NgModule } from '@angular/core';
+// ${'@browser'}Line
     import { Component, OnInit } from '@angular/core';
 
+${'//#region'} @${'bro' + 'wser'}
     @Component({
       selector: 'app-${project.name}',
       template: 'hello from ${project.name}'
@@ -88,7 +91,7 @@ ${'//#region'} @${'bro' + 'wser'}
 
     //#region @backend
     async function start(port: number) {
-
+      console.log('hello world from backend');
     }
 
     export default start;

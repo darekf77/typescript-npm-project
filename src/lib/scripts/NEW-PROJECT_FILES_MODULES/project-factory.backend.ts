@@ -373,10 +373,12 @@ export class ProjectFactory {
         }
       })
     }
-    if (!newCreatedProject.git.isGitRepo) {
-      Helpers.info(`[create] Git repository inited`);
-      newCreatedProject.run(`git init`).sync();
-    }
+    // const igGitRepo = newCreatedProject.git.isGitRepo;
+    // Helpers.info(`newCreatedProject IS GIT REPO: ${igGitRepo}`)
+    // if (!igGitRepo && !newCreatedProject.parent?.isMonorepo) {
+    //   Helpers.info(`[create] Git repository inited`);
+    //   newCreatedProject.run(`git init`).sync();
+    // }
     Helpers.log(`[create] Project from create method: ${newCreatedProject && newCreatedProject.genericName} `)
     if (newCreatedProject) {
       newCreatedProject.recreate.vscode.settings.excludedFiles();
@@ -409,19 +411,32 @@ export class ProjectFactory {
       ) {
 
         newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
+        newCreatedProject.parent.packageJson.data.tnp.linkedProjects = Helpers
+          .arrays
+          .uniqArray(newCreatedProject.parent.packageJson.linkedProjects);
+
         newCreatedProject.parent.packageJson.save(`updating "${newCreatedProject.parent._type}" or work linked projects`);
 
         if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
-          const parentOrigin = newCreatedProject.parent.git.originURL;
-          const projOrigin = parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git');
-          Helpers.info(`Adding git origin: ${projOrigin}
-          to project ${newCreatedProject.name} ...`);
-          newCreatedProject.run(`git init `
-            + `&& git remote add origin ${projOrigin} ` +
-            `&& git branch -M master `).sync();
+          if (!newCreatedProject.parent.isMonorepo) {
+            const parentOrigin = newCreatedProject.parent.git.originURL;
+            const projOrigin = newCreatedProject.isWorkspace ?
+              parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git')
+              : parentOrigin.replace(path.basename(parentOrigin), (newCreatedProject.parent.name + '--' + newCreatedProject.name + '.git'));
+            Helpers.info(`Adding git origin: ${projOrigin}
+            to project ${newCreatedProject.name} ...`);
+            newCreatedProject.run(`git init `
+              + `&& git remote add origin ${projOrigin} ` +
+              `&& git branch -M master `).sync();
+          }
         }
         if (!newCreatedProject?.isSmartContainerChild) {
           await newCreatedProject.parent.filesStructure.struct('');
+        }
+        if (newCreatedProject.parent.isSmartContainer) {
+          await newCreatedProject.parent.filesStructure.init(newCreatedProject.name)
+        } else {
+          await newCreatedProject.parent.filesStructure.struct('')
         }
 
       }

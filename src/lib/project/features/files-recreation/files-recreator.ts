@@ -350,7 +350,7 @@ export class FilesRecreator extends FeatureForProject {
                 settings = getSettingsFor(self.project, settings) as any;
                 if (self.project.isWorkspace || self.project.isSmartContainer) {
 
-                  if(self.project.isSmartContainer) {
+                  if (self.project.isSmartContainer) {
                     settings['files.exclude'][`recent.json`] = true;
                     // settings['files.exclude'][`src/lib`] = true;
                   }
@@ -453,7 +453,7 @@ ${this.project.isTnp ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isContainerOrWorkspaceWithLinkedProjects ? `
 # container/workspace git projects
-${this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
+${this.project.isMonorepo ? [] : this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}

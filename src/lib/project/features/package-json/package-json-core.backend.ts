@@ -85,6 +85,10 @@ export class PackageJsonCore {
     return !!this.data.tnp?.smart;
   }
 
+  get isMonorepo(): boolean {
+    return !!this.data.tnp?.monorepo;
+  }
+
   get frameworks(): ConfigModels.UIFramework[] {
     const res = this.data.tnp &&
       _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;

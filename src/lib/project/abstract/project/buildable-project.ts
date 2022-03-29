@@ -190,7 +190,7 @@ export abstract class BuildableProject {
           'electron-client',
           'ionic-client',
           'container'
-        ));
+        ) || d.isSmartContainer);
 
       if (containerProj.packageJson.data.dependencies[this.name]
         || Object.keys(config.frameworkNames).includes(this.name) // TODO QUICK_FIX
@@ -207,7 +207,7 @@ export abstract class BuildableProject {
         .map(p => p.project)
         .filter(p => p.location !== this.location);
 
-        // @ts-ignore
+      // @ts-ignore
       this.buildOptions.copyto = projects as any;
     }
   }
@@ -336,7 +336,7 @@ export abstract class BuildableProject {
       if (f.typeIs('angular-lib', 'isomorphic-lib')) {
         return true;
       }
-      if (f.isContainerCoreProject) {
+      if (f.isContainerCoreProject || f.isSmartContainer) {
         return true;
       }
       return false;
